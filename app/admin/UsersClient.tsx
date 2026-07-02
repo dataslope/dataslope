@@ -22,7 +22,7 @@
  * row (and the email) occupied. "Impersonate" becomes that user in this
  * browser (refused for admins server-side); return to /admin to stop.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft,
   Ban,
@@ -82,13 +82,21 @@ interface AdminUser {
   createdAt: string | Date;
 }
 
-/** How many users to pull in one page (the dashboard filters client-side). */
+/** Page size for the browse list; each search request also caps at this. */
 const LIST_LIMIT = 200;
+
+/** How long to sit on keystrokes before firing the server-side search. */
+const SEARCH_DEBOUNCE_MS = 300;
 
 export function UsersClient() {
   const { data: session, isPending: sessionPending } = useSession();
   const [users, setUsers] = useState<AdminUser[]>([]);
+  // Total matching accounts as reported by the server — the table may hold
+  // more rows than one page, so `users.length` alone under-reports.
+  const [total, setTotal] = useState(0);
+  const [searchTruncated, setSearchTruncated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
   const [query, setQuery] = useState("");
@@ -98,54 +106,151 @@ export function UsersClient() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
-  const loadUsers = useCallback(async () => {
+  // Monotonic sequence for loads: rapid typing fires overlapping requests,
+  // and a slow stale response must not overwrite a newer result.
+  const loadSeq = useRef(0);
+
+  /**
+   * Load the first page (no search) or the search results. Search runs
+   * SERVER-side: filtering the loaded page client-side would silently hide
+   * every account older than the newest LIST_LIMIT — with enough sign-ups an
+   * admin couldn't find (or ban) an old account at all. The endpoint searches
+   * one field per request, so a query fans out to email + name and merges.
+   */
+  const loadUsers = useCallback(async (search: string) => {
+    const seq = ++loadSeq.current;
     setLoading(true);
     setError(null);
     setDenied(false);
-    const { data, error: listError } = await authClient.admin.listUsers({
-      query: { limit: LIST_LIMIT, sortBy: "createdAt", sortDirection: "desc" },
-    });
-    if (listError) {
-      // 401/403 means "signed in but not an admin" — show a distinct notice.
-      if (listError.status === 401 || listError.status === 403) {
-        setDenied(true);
+    try {
+      const q = search.trim();
+      const baseQuery = {
+        limit: LIST_LIMIT,
+        sortBy: "createdAt",
+        sortDirection: "desc" as const,
+      };
+      const responses = q
+        ? await Promise.all(
+            (["email", "name"] as const).map((searchField) =>
+              authClient.admin.listUsers({
+                query: {
+                  ...baseQuery,
+                  searchValue: q,
+                  searchField,
+                  searchOperator: "contains" as const,
+                },
+              }),
+            ),
+          )
+        : [await authClient.admin.listUsers({ query: baseQuery })];
+      if (seq !== loadSeq.current) return; // superseded by a newer load
+
+      const failed = responses.find((r) => r.error)?.error;
+      if (failed) {
+        // 401/403 means "signed in but not an admin" — show a distinct notice.
+        if (failed.status === 401 || failed.status === 403) {
+          setDenied(true);
+        } else {
+          setError(failed.message ?? "Couldn't load users. Please try again.");
+        }
+        setUsers([]);
+        setTotal(0);
+        setSearchTruncated(false);
+      } else if (q) {
+        const seen = new Set<string>();
+        const merged: AdminUser[] = [];
+        for (const r of responses) {
+          for (const u of (r.data?.users ?? []) as AdminUser[]) {
+            if (!seen.has(u.id)) {
+              seen.add(u.id);
+              merged.push(u);
+            }
+          }
+        }
+        merged.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        setUsers(merged);
+        setTotal(merged.length);
+        // Either field maxing out its page means matches were left behind.
+        setSearchTruncated(
+          responses.some((r) => (r.data?.users?.length ?? 0) >= LIST_LIMIT),
+        );
       } else {
-        setError(listError.message ?? "Couldn't load users. Please try again.");
+        const { data } = responses[0];
+        setUsers((data?.users ?? []) as AdminUser[]);
+        setTotal(data?.total ?? 0);
+        setSearchTruncated(false);
       }
+    } catch {
+      if (seq !== loadSeq.current) return;
+      setError("Couldn't reach the server. Please try again.");
       setUsers([]);
-    } else {
-      setUsers((data?.users ?? []) as AdminUser[]);
+      setTotal(0);
     }
-    setLoading(false);
+    if (seq === loadSeq.current) setLoading(false);
   }, []);
 
   useEffect(() => {
     // Fetch once a session is confirmed (the admin-gated request is rejected
     // server-side for non-admins). No session → we fall through to the sign-in
-    // prompt below, which doesn't read `loading`.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void loadUsers();
-  }, [sessionPending, session, loadUsers]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+    // prompt below, which doesn't read `loading`. Search input re-runs this,
+    // debounced; the empty query (initial load, cleared box) fires at once.
+    if (sessionPending || !session) return;
+    const timer = setTimeout(
+      () => void loadUsers(query),
+      query.trim() ? SEARCH_DEBOUNCE_MS : 0,
     );
-  }, [users, query]);
+    return () => clearTimeout(timer);
+  }, [sessionPending, session, loadUsers, query]);
+
+  /** Append the next browse page (search results are single-shot). */
+  async function handleLoadMore() {
+    setLoadingMore(true);
+    setError(null);
+    try {
+      const { data, error: listError } = await authClient.admin.listUsers({
+        query: {
+          limit: LIST_LIMIT,
+          offset: users.length,
+          sortBy: "createdAt",
+          sortDirection: "desc",
+        },
+      });
+      if (listError) {
+        setError(listError.message ?? "Couldn't load more users.");
+      } else {
+        setUsers((prev) => {
+          const seen = new Set(prev.map((u) => u.id));
+          const fresh = ((data?.users ?? []) as AdminUser[]).filter(
+            (u) => !seen.has(u.id),
+          );
+          return [...prev, ...fresh];
+        });
+        setTotal(data?.total ?? 0);
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
+    }
+    setLoadingMore(false);
+  }
 
   async function handleRemove(userId: string) {
     setBusyId(userId);
     setError(null);
-    const { error: removeError } = await authClient.admin.removeUser({
-      userId,
-    });
-    if (removeError) {
-      setError(removeError.message ?? "Couldn't remove that user.");
-    } else {
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+    try {
+      const { error: removeError } = await authClient.admin.removeUser({
+        userId,
+      });
+      if (removeError) {
+        setError(removeError.message ?? "Couldn't remove that user.");
+      } else {
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+        setTotal((t) => Math.max(0, t - 1));
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
     }
     setBusyId(null);
     setConfirmId(null);
@@ -154,17 +259,21 @@ export function UsersClient() {
   async function handleToggleBan(user: AdminUser) {
     setBusyId(user.id);
     setError(null);
-    const { error: banError } = user.banned
-      ? await authClient.admin.unbanUser({ userId: user.id })
-      : await authClient.admin.banUser({ userId: user.id });
-    if (banError) {
-      setError(banError.message ?? "Couldn't update that user.");
-    } else {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, banned: !user.banned } : u,
-        ),
-      );
+    try {
+      const { error: banError } = user.banned
+        ? await authClient.admin.unbanUser({ userId: user.id })
+        : await authClient.admin.banUser({ userId: user.id });
+      if (banError) {
+        setError(banError.message ?? "Couldn't update that user.");
+      } else {
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === user.id ? { ...u, banned: !user.banned } : u,
+          ),
+        );
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
     }
     setBusyId(null);
   }
@@ -180,6 +289,28 @@ export function UsersClient() {
       setUsers((prev) =>
         prev.map((u) => (u.id === user.id ? { ...u, plan: next } : u)),
       );
+    }
+    setBusyId(null);
+  }
+
+  async function handleToggleRole(user: AdminUser) {
+    const next = user.role === "admin" ? "user" : "admin";
+    setBusyId(user.id);
+    setError(null);
+    try {
+      const { error: roleError } = await authClient.admin.setRole({
+        userId: user.id,
+        role: next,
+      });
+      if (roleError) {
+        setError(roleError.message ?? "Couldn't change that user's role.");
+      } else {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, role: next } : u)),
+        );
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
     }
     setBusyId(null);
   }
@@ -255,6 +386,41 @@ export function UsersClient() {
         <ArrowRightLeft className="size-3.5" />
         <span className="sr-only">Switch plan</span>
       </Button>
+    </div>
+  );
+
+  // Role display + toggle. Demoting is the explicit revocation path — the
+  // ADMIN_EMAILS/ADMIN_USER_IDS allowlists only ever *grant* (a listed user
+  // is re-promoted at their next sign-in), so removal from the env list must
+  // be paired with a demotion here. Self is excluded: locking yourself out
+  // of the dashboard you're standing in is never what you meant.
+  const renderRole = (user: AdminUser, isSelf: boolean, isBusy: boolean) => (
+    <div className="flex items-center gap-1">
+      {user.role === "admin" ? (
+        <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
+          <ShieldCheck />
+          Admin
+        </Badge>
+      ) : (
+        <span className="text-sm text-muted-foreground">User</span>
+      )}
+      {!isSelf && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`size-7 ${quietActionClass}`}
+          onClick={() => void handleToggleRole(user)}
+          disabled={isBusy}
+          title={
+            user.role === "admin"
+              ? "Demote to regular user"
+              : "Grant admin access"
+          }
+        >
+          <ArrowRightLeft className="size-3.5" />
+          <span className="sr-only">Toggle role</span>
+        </Button>
+      )}
     </div>
   );
 
@@ -368,14 +534,22 @@ export function UsersClient() {
           description={
             loading
               ? "Loading users…"
-              : `${users.length} ${users.length === 1 ? "account" : "accounts"}`
+              : query.trim()
+                ? `${users.length} ${users.length === 1 ? "match" : "matches"}${
+                    searchTruncated
+                      ? " (more exist — narrow the search)"
+                      : ""
+                  }`
+                : users.length < total
+                  ? `Showing ${users.length} of ${total} accounts`
+                  : `${total} ${total === 1 ? "account" : "accounts"}`
           }
           action={
             <Button
               variant="ghost"
               size="sm"
               className={quietActionClass}
-              onClick={() => void loadUsers()}
+              onClick={() => void loadUsers(query)}
               disabled={loading}
             >
               <RefreshCw className={loading ? "animate-spin" : undefined} />
@@ -404,11 +578,11 @@ export function UsersClient() {
               <Loader2 className="mr-2 inline size-4 animate-spin" />
               Loading…
             </p>
-          ) : filtered.length === 0 ? (
+          ) : users.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">
-              {users.length === 0
-                ? "No users yet."
-                : "No users match your search."}
+              {query.trim()
+                ? "No users match your search."
+                : "No users yet."}
             </p>
           ) : (
             <>
@@ -428,7 +602,7 @@ export function UsersClient() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.map((user) => {
+                    {users.map((user) => {
                       const isSelf = user.id === session.user.id;
                       const isAdminRow = user.role === "admin";
                       const isBusy = busyId === user.id;
@@ -443,16 +617,7 @@ export function UsersClient() {
                             {renderPlan(user, isBusy)}
                           </TableCell>
                           <TableCell className={cellClass}>
-                            {isAdminRow ? (
-                              <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
-                                <ShieldCheck />
-                                Admin
-                              </Badge>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">
-                                User
-                              </span>
-                            )}
+                            {renderRole(user, isSelf, isBusy)}
                           </TableCell>
                           <TableCell className={cellClass}>
                             <StatusBadge banned={user.banned} />
@@ -476,7 +641,7 @@ export function UsersClient() {
 
               {/* Mobile: stacked cards */}
               <ul className="md:hidden">
-                {filtered.map((user) => {
+                {users.map((user) => {
                   const isSelf = user.id === session.user.id;
                   const isAdminRow = user.role === "admin";
                   const isBusy = busyId === user.id;
@@ -490,12 +655,7 @@ export function UsersClient() {
                         {renderPlan(user, isBusy)}
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                        {isAdminRow && (
-                          <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
-                            <ShieldCheck />
-                            Admin
-                          </Badge>
-                        )}
+                        {renderRole(user, isSelf, isBusy)}
                         <StatusBadge banned={user.banned} />
                         <span>Joined {formatJoined(user.createdAt)}</span>
                       </div>
@@ -506,6 +666,24 @@ export function UsersClient() {
                   );
                 })}
               </ul>
+
+              {/* Browse mode pages through the full table; search is
+                  single-shot (the server already scoped it). */}
+              {!query.trim() && users.length < total && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`${quietActionClass} self-center`}
+                  onClick={() => void handleLoadMore()}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    `Load ${Math.min(LIST_LIMIT, total - users.length)} more`
+                  )}
+                </Button>
+              )}
             </>
           )}
 
@@ -515,10 +693,14 @@ export function UsersClient() {
             email so the person can sign up again.{" "}
             <strong className="font-medium text-foreground">Ban</strong> blocks
             sign-in but keeps the account.{" "}
-            <strong className="font-medium text-foreground">Plan</strong>{" "}
-            changes can take up to five minutes to reach an already-signed-in
-            session (the session cookie cache); impersonation and fresh
-            sign-ins see the new plan immediately.
+            <strong className="font-medium text-foreground">Plan</strong> and{" "}
+            <strong className="font-medium text-foreground">Role</strong>{" "}
+            changes (and bans) reach the AI and admin endpoints immediately —
+            they read the session fresh — but the person&apos;s
+            header/account display can lag up to five minutes (the session
+            cookie cache). Demoting an admin who is still listed in
+            ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in
+            — remove them from the config too.
           </p>
         </PanelBody>
       </Panel>

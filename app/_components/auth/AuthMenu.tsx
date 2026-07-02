@@ -64,16 +64,21 @@ export function AuthMenu() {
   }
 
   const { user } = session;
-  // Role-based admins see a shortcut to /admin. `adminUserIds` admins (pinned
-  // by config, role still "user") won't see the link but can navigate directly;
-  // either way the dashboard's actions are server-enforced.
+  // Admins see a shortcut to /admin. Config-listed admins (ADMIN_EMAILS /
+  // ADMIN_USER_IDS) have their `role` column promoted to "admin" at sign-in
+  // (sign-in hooks in lib/auth/server.ts), so this role check covers them
+  // too; either way the dashboard's actions are server-enforced.
   const isAdmin = user.role === "admin";
 
   async function handleSignOut() {
     setSigningOut(true);
-    await signOut();
-    // Re-render anything reading the session; the menu collapses to "Sign in".
-    router.refresh();
+    try {
+      await signOut();
+      // Re-render anything reading the session; the menu collapses to "Sign in".
+      router.refresh();
+    } catch {
+      // Network failure — leave the session as-is; the item re-enables.
+    }
     setSigningOut(false);
   }
 

@@ -14,7 +14,7 @@
  * tabular layout on mobile and scroll horizontally (the ui Table wrapper is
  * already overflow-x-auto).
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
 import { Badge } from "@/components/ui/badge";
@@ -115,13 +115,20 @@ export function AiUsageClient() {
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
 
+  // Monotonic sequence: flipping the day picker quickly fires overlapping
+  // fetches, and a slow stale response must not overwrite the newer report
+  // (or snap the picker back to the stale day).
+  const loadSeq = useRef(0);
+
   const load = useCallback(async (requestedDay?: string) => {
+    const seq = ++loadSeq.current;
     setLoading(true);
     setError(null);
     setDenied(false);
     try {
       const qs = requestedDay ? `?day=${requestedDay}` : "";
       const res = await fetch(`/api/admin/ai-usage${qs}`);
+      if (seq !== loadSeq.current) return; // superseded by a newer load
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
           setDenied(true);
@@ -131,14 +138,16 @@ export function AiUsageClient() {
         setReport(null);
       } else {
         const data = (await res.json()) as AiUsageReport;
+        if (seq !== loadSeq.current) return;
         setReport(data);
         setDay(data.day);
       }
     } catch {
+      if (seq !== loadSeq.current) return;
       setError("Couldn't load AI usage. Please try again.");
       setReport(null);
     }
-    setLoading(false);
+    if (seq === loadSeq.current) setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -157,9 +166,12 @@ export function AiUsageClient() {
     );
   }
 
-  const dayTotal = report
-    ? (report.global.find((g) => g.day === report.day)?.totalTok ?? 0)
-    : 0;
+  // The `global` totals only cover the server's recent-days window — a day
+  // older than that has no entry, which must read as "no data", not "0
+  // tokens" (the per-user table below may show real usage for it).
+  const dayEntry = report?.global.find((g) => g.day === report.day);
+  const dayTotal = dayEntry?.totalTok ?? 0;
+  const dayInWindow = dayEntry !== undefined;
   const chatRequests =
     report?.users.reduce((sum, u) => sum + u.requests, 0) ?? 0;
   const completions =
@@ -203,14 +215,18 @@ export function AiUsageClient() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatTile
             label="Tokens used"
-            value={loading ? "…" : compact.format(dayTotal)}
+            value={loading ? "…" : dayInWindow ? compact.format(dayTotal) : "—"}
             detail={
               report
-                ? `${Math.round((dayTotal / report.globalCap) * 100)}% of the ${compact.format(report.globalCap)} daily cap`
+                ? dayInWindow
+                  ? `${Math.round((dayTotal / report.globalCap) * 100)}% of the ${compact.format(report.globalCap)} daily cap`
+                  : "Totals are only kept for recent days"
                 : undefined
             }
           >
-            {report && <CapMeter fraction={dayTotal / report.globalCap} />}
+            {report && dayInWindow && (
+              <CapMeter fraction={dayTotal / report.globalCap} />
+            )}
           </StatTile>
           <StatTile
             label="Chat requests"

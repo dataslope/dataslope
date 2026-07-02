@@ -36,13 +36,20 @@ export type AdminGate =
   | { ok: false; status: 401 | 403; message: string };
 
 /** Resolve the request's session and require an admin. 401 = no session,
- *  403 = signed in but not an admin. */
+ *  403 = signed in but not an admin. The cookie cache is bypassed so a
+ *  demotion or ban takes effect immediately instead of after the cache's
+ *  five-minute maxAge — matching Better Auth's own admin endpoints, which
+ *  force an authoritative session read. Admin routes are rare, so the extra
+ *  D1 read costs nothing that matters. */
 export async function requireAdmin(
   env: CloudflareEnv,
   request: Request,
 ): Promise<AdminGate> {
   const auth = await createAuth(env, request);
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = await auth.api.getSession({
+    headers: request.headers,
+    query: { disableCookieCache: true },
+  });
   if (!session) {
     return { ok: false, status: 401, message: "Sign in required." };
   }

@@ -84,11 +84,17 @@ interface CreatedAccount {
 
 const LIST_LIMIT = 200;
 const MAX_BATCH = 10;
+/** Backstop on the pagination loop — 50 pages of 200 is far beyond any
+ *  plausible test-account count and keeps a server bug from looping forever. */
+const MAX_LIST_PAGES = 50;
 
+/** Random base-36 slug from the Web Crypto CSPRNG. These slugs become live
+ *  credentials — default passwords and sign-in-able email prefixes on
+ *  pre-verified (often Pro) accounts — so Math.random()'s guessable output
+ *  isn't good enough. */
 function randomSlug(length = 5): string {
-  return Math.random()
-    .toString(36)
-    .slice(2, 2 + length);
+  const bytes = crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes, (b) => (b % 36).toString(36)).join("");
 }
 
 export function TestUsersClient() {
@@ -126,19 +132,46 @@ export function TestUsersClient() {
     setLoading(true);
     setError(null);
     setDenied(false);
-    const { data, error: listError } = await authClient.admin.listUsers({
-      query: { limit: LIST_LIMIT, sortBy: "createdAt", sortDirection: "desc" },
-    });
-    if (listError) {
-      if (listError.status === 401 || listError.status === 403) {
-        setDenied(true);
-      } else {
-        setError(listError.message ?? "Couldn't load users. Please try again.");
+    // Filter server-side (email ends with the reserved domain) and page
+    // through EVERY match. Filtering one newest-first page client-side would
+    // hide any test account older than the newest LIST_LIMIT sign-ups — and
+    // "Remove all" would silently skip it while claiming the cleanup is done.
+    try {
+      const collected: TestUser[] = [];
+      for (let page = 0; page < MAX_LIST_PAGES; page++) {
+        const { data, error: listError } = await authClient.admin.listUsers({
+          query: {
+            limit: LIST_LIMIT,
+            offset: collected.length,
+            sortBy: "createdAt",
+            sortDirection: "desc",
+            searchValue: `@${TEST_EMAIL_DOMAIN}`,
+            searchField: "email",
+            searchOperator: "ends_with",
+          },
+        });
+        if (listError) {
+          if (listError.status === 401 || listError.status === 403) {
+            setDenied(true);
+          } else {
+            setError(
+              listError.message ?? "Couldn't load users. Please try again.",
+            );
+          }
+          setUsers([]);
+          setLoading(false);
+          return;
+        }
+        const batch = (data?.users ?? []) as TestUser[];
+        collected.push(...batch);
+        const totalMatches = data?.total ?? collected.length;
+        if (batch.length === 0 || collected.length >= totalMatches) break;
       }
+      // isTestEmail is the same domain rule — a belt-and-braces re-check.
+      setUsers(collected.filter((u) => isTestEmail(u.email)));
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
       setUsers([]);
-    } else {
-      const all = (data?.users ?? []) as TestUser[];
-      setUsers(all.filter((u) => isTestEmail(u.email)));
     }
     setLoading(false);
   }, []);
@@ -174,20 +207,27 @@ export function TestUsersClient() {
           ? emailPrefix.trim().toLowerCase()
           : `test-${plan}-${slug}`;
       const email = `${prefix}@${TEST_EMAIL_DOMAIN}`;
-      const { error: createErr } = await authClient.admin.createUser({
-        email,
-        password: pw,
-        name: `Test ${label} ${slug}`,
-        role: "user",
-        // `emailVerified: true` skips verification (a @dataslope.test address
-        // can't receive mail); `plan` sets the membership tier directly —
-        // exactly what a billing webhook would do.
-        data: { plan, emailVerified: true },
-      });
-      if (createErr) {
+      try {
+        const { error: createErr } = await authClient.admin.createUser({
+          email,
+          password: pw,
+          name: `Test ${label} ${slug}`,
+          role: "user",
+          // `emailVerified: true` skips verification (a @dataslope.test address
+          // can't receive mail); `plan` sets the membership tier directly —
+          // exactly what a billing webhook would do.
+          data: { plan, emailVerified: true },
+        });
+        if (createErr) {
+          setCreateError(
+            createErr.message ??
+              "Couldn't create a test user. Check the email prefix isn't taken.",
+          );
+          break;
+        }
+      } catch {
         setCreateError(
-          createErr.message ??
-            "Couldn't create a test user. Check the email prefix isn't taken.",
+          "Couldn't reach the server. Please check your connection and try again.",
         );
         break;
       }
@@ -238,14 +278,18 @@ export function TestUsersClient() {
   async function handleRemove(user: TestUser) {
     setBusyId(user.id);
     setError(null);
-    const { error: removeError } = await authClient.admin.removeUser({
-      userId: user.id,
-    });
-    if (removeError) {
-      setError(removeError.message ?? "Couldn't remove that user.");
-    } else {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      setCreated((prev) => prev.filter((c) => c.email !== user.email));
+    try {
+      const { error: removeError } = await authClient.admin.removeUser({
+        userId: user.id,
+      });
+      if (removeError) {
+        setError(removeError.message ?? "Couldn't remove that user.");
+      } else {
+        setUsers((prev) => prev.filter((u) => u.id !== user.id));
+        setCreated((prev) => prev.filter((c) => c.email !== user.email));
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
     }
     setBusyId(null);
   }
@@ -253,14 +297,18 @@ export function TestUsersClient() {
   async function handleRemoveAll() {
     setRemoveAll("busy");
     setError(null);
-    for (const user of users) {
-      const { error: removeError } = await authClient.admin.removeUser({
-        userId: user.id,
-      });
-      if (removeError) {
-        setError(removeError.message ?? "Couldn't remove every test user.");
-        break;
+    try {
+      for (const user of users) {
+        const { error: removeError } = await authClient.admin.removeUser({
+          userId: user.id,
+        });
+        if (removeError) {
+          setError(removeError.message ?? "Couldn't remove every test user.");
+          break;
+        }
       }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
     }
     setCreated([]);
     await loadTestUsers();
@@ -643,9 +691,9 @@ export function TestUsersClient() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Test users are ordinary accounts identified by the reserved
               @{TEST_EMAIL_DOMAIN} domain — safe to remove at any time. Plan
-              changes can take up to five minutes to reach an already-signed-in
-              session (the session cookie cache); impersonation and fresh
-              sign-ins see the new plan immediately.
+              changes reach the AI endpoints immediately — they read the
+              session fresh — but the account&apos;s header/plan display can
+              lag up to five minutes (the session cookie cache).
             </p>
           </PanelBody>
         </Panel>

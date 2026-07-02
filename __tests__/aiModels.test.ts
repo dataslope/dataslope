@@ -94,26 +94,16 @@ describe("resolveModel", () => {
     );
   });
 
-  it("degrades free to the pro provider when only pro is fully configured, keeping free budgets", () => {
+  it("never upgrades free to the pro provider (cost fail-closed)", () => {
+    // Only the expensive pro provider is configured: free-tier requests must
+    // get "not configured" (503 at the route), not the pricey model.
     const e = env({
       AI_PRO_API_KEY: "oai-key",
       AI_PRO_BASE_URL: "https://api.openai.com/v1",
       AI_PRO_MODEL: "gpt-4o",
     });
-    const free = resolveModel("free", e)!;
-    expect(free.apiKey).toBe("oai-key");
-    expect(free.baseUrl).toBe("https://api.openai.com/v1");
-    expect(free.tier).toBe("free");
-    expect(free.dailyRequestBudget).toBe(
-      resolveModel(
-        "free",
-        env({
-          AI_FREE_API_KEY: "x",
-          AI_FREE_BASE_URL: "https://openrouter.ai/api/v1",
-          AI_FREE_MODEL: "some/model",
-        }),
-      )!.dailyRequestBudget,
-    );
+    expect(resolveModel("free", e)).toBeNull();
+    expect(resolveModel("pro", e)).not.toBeNull();
   });
 
   it("treats a tier as unconfigured if base URL or model is missing, even with a key set", () => {

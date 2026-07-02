@@ -40,8 +40,9 @@ declare global {
     // tier needs its base URL, model id, AND API key (below) all set to be
     // usable. Both providers must speak the OpenAI /chat/completions
     // streaming API. Currently both tiers point at OpenRouter's DeepSeek V4
-    // Flash model (see wrangler.jsonc). Leave a tier's base URL/model/key
-    // unset to have it degrade to the other tier's provider (resolveModel).
+    // Flash model (see wrangler.jsonc). Fallback is asymmetric, by cost
+    // (resolveModel): pro degrades to the free provider when unconfigured,
+    // but free never silently upgrades to the pro provider.
     AI_FREE_BASE_URL?: string;
     AI_FREE_MODEL?: string;
     AI_PRO_BASE_URL?: string;
@@ -89,7 +90,11 @@ declare global {
     // Admins for /admin, regardless of their `role` column (bootstraps the
     // first admin). Both are comma-separated and merge; specify whichever is
     // handier. ADMIN_EMAILS is resolved to user IDs against D1 (see
-    // resolveAdminUserIds in lib/auth/server.ts).
+    // resolveAdminUserIds in lib/auth/server.ts). Signing in while listed
+    // promotes the user's `role` column to 'admin' (sign-in hooks in
+    // lib/auth/server.ts + lib/auth/adminBootstrap.ts), which surfaces the
+    // /admin shortcut in the avatar menu and the Pro tier (lib/ai/tier.ts)
+    // on their session.
     ADMIN_EMAILS?: string;
     ADMIN_USER_IDS?: string;
   }

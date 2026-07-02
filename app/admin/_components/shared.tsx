@@ -275,11 +275,18 @@ export async function setUserPlan(
   userId: string,
   plan: "free" | "pro",
 ): Promise<string | null> {
-  const { error } = await authClient.admin.updateUser({
-    userId,
-    data: { plan },
-  });
-  return error ? (error.message ?? "Couldn't update that user's plan.") : null;
+  // Server-side failures resolve with {error}; a network failure rejects.
+  try {
+    const { error } = await authClient.admin.updateUser({
+      userId,
+      data: { plan },
+    });
+    return error
+      ? (error.message ?? "Couldn't update that user's plan.")
+      : null;
+  } catch {
+    return "Couldn't reach the server. Please try again.";
+  }
 }
 
 /**
@@ -290,8 +297,12 @@ export async function setUserPlan(
  * Returns an error message, or navigates away on success.
  */
 export async function impersonateUser(userId: string): Promise<string | null> {
-  const { error } = await authClient.admin.impersonateUser({ userId });
-  if (error) return error.message ?? "Couldn't impersonate that user.";
+  try {
+    const { error } = await authClient.admin.impersonateUser({ userId });
+    if (error) return error.message ?? "Couldn't impersonate that user.";
+  } catch {
+    return "Couldn't reach the server. Please try again.";
+  }
   window.location.assign("/");
   return null;
 }

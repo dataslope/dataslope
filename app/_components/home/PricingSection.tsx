@@ -20,7 +20,10 @@ import {
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
-import { startProCheckout } from "../billing/proCheckout";
+import {
+  stashCheckoutPeriod,
+  startProCheckout,
+} from "../billing/proCheckout";
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
@@ -209,17 +212,31 @@ function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
  * (or the annual product isn't), the button says so instead of dead-ending.
  */
 function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const sessionUser = session?.user as
+    | { plan?: string; role?: string }
+    | undefined;
+  // Admins are treated as Pro everywhere (lib/ai/tier.ts) — route them to
+  // their account page rather than into a checkout for a plan they already
+  // effectively have, mirroring app/account/AccountClient.tsx.
   const isPro =
-    ((session?.user as { plan?: string } | undefined)?.plan ?? "")
-      .toLowerCase() === "pro";
+    (sessionUser?.plan ?? "").toLowerCase() === "pro" ||
+    sessionUser?.role === "admin";
 
   async function handleClick() {
     setError(null);
+    // While the first session fetch is in flight a signed-in user would be
+    // misrouted to /sign-in (which bounces to /account, never checkout) —
+    // ignore clicks until the session state is known.
+    if (isPending) return;
     if (!session) {
+      // Remember the chosen billing period across the sign-in detour — the
+      // buyer lands on /account afterwards, whose Upgrade button honors it
+      // (otherwise an annual purchase silently becomes monthly).
+      stashCheckoutPeriod(annual ? "annual" : "monthly");
       router.push("/sign-in");
       return;
     }
