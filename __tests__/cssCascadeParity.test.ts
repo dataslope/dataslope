@@ -8,7 +8,7 @@ import tailwindPostcss from "@tailwindcss/postcss";
  * Cross-stylesheet cascade-parity regression test.
  *
  * The app has two Tailwind roots — app/tailwind.css (home, /pricing,
- * /account, /admin, legal) and app/learn/learn.css (/learn, /interview).
+ * /account, /admin, legal) and app/docs.css (/courses lessons, /fumadocs-dev, /interview-prep).
  * After a client-side navigation BOTH stylesheets can be applied to the
  * document at once, and the App Router does not guarantee which <link> ends
  * up later in <head>: the order follows the user's navigation history.
@@ -71,7 +71,7 @@ function utilityRules(css: string): Array<[string, string]> {
 /** Learn-only utilities must be Fumadocs-theme/plugin-dependent. */
 const FUMADOCS_ONLY = /fd-|^prose(-|$)|^not-prose$/;
 
-describe("Tailwind root cascade parity (app/tailwind.css vs app/learn/learn.css)", () => {
+describe("Tailwind root cascade parity (app/tailwind.css vs app/docs.css)", () => {
   let tw: Array<[string, string]>;
   let learn: Array<[string, string]>;
   let twMap: Map<string, string>;
@@ -80,7 +80,7 @@ describe("Tailwind root cascade parity (app/tailwind.css vs app/learn/learn.css)
   beforeAll(async () => {
     const [twCss, learnCss] = await Promise.all([
       compile(path.join(ROOT, "app/tailwind.css")),
-      compile(path.join(ROOT, "app/learn/learn.css")),
+      compile(path.join(ROOT, "app/docs.css")),
     ]);
     tw = utilityRules(twCss);
     learn = utilityRules(learnCss);

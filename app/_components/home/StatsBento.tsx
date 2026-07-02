@@ -37,7 +37,7 @@ export function StatsBento({
       name: `${stats.courses} free courses`,
       description:
         "Hands-on, browser-based courses with interactive code blocks — all free, no sign-up, no paywall.",
-      href: "/learn",
+      href: "/courses",
       cta: "Browse courses",
       className: "col-span-3 lg:col-span-2",
       background: <CoursesListBackground titles={courseTitles} />,
@@ -47,7 +47,7 @@ export function StatsBento({
       name: "Free interview prep",
       description:
         "Role-based preparation — data analyst, data scientist, data & analytics engineer, ML, and backend.",
-      href: "/interview",
+      href: "/interview-prep",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
       background: <TypingBackground />,

@@ -1,0 +1,71 @@
+// Opt the courses catalog into the same Tailwind + Magic UI bundle the home
+// page uses, and pull in the home-route hardening so the reused HomeNav /
+// HomeFooter (which rely on `.ds-home`-scoped rules in home.css) lay out
+// correctly. Same setup as /pricing.
+import "@/app/tailwind.css";
+import "@/app/home.css";
+import type { Metadata } from "next";
+import { HomeNav } from "../_components/home/HomeNav";
+import { HomeFooter } from "../_components/home/HomeFooter";
+import { getCourseCatalog } from "@/lib/courseCatalog";
+import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { CoursesCatalog } from "./_components/CoursesCatalog";
+
+const PAGE_TITLE = "Courses — Dataslope";
+const PAGE_DESCRIPTION =
+  "Hands-on, browser-based tracks across data and engineering. Every lesson runs live — no setup, no sign-up.";
+
+export const metadata: Metadata = {
+  // A bare string here lets the root layout's "%s · DataSlope" template render
+  // the tab title as "Courses · DataSlope".
+  title: "Courses",
+  description: PAGE_DESCRIPTION,
+  alternates: { canonical: "/courses" },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/courses`,
+    siteName: "DataSlope",
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+};
+
+// Applies the persisted light/dark choice before first paint (same contract as
+// the home page) so a returning dark-mode visitor never sees a light flash.
+const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
+
+export default async function CoursesPage() {
+  const courses = await getCourseCatalog();
+  return (
+    <>
+      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      <div
+        style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
+        className="ds-home min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"
+      >
+        <HomeNav />
+
+        <main className="mx-auto w-full max-w-[1120px] px-4 pt-12 sm:px-6">
+          <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
+            Courses
+          </h1>
+          <p className="mt-2.5 text-[15.5px] text-[var(--ds-gray-600)] [text-wrap:pretty] dark:text-[var(--ds-gray-400)]">
+            Hands-on, browser-based tracks across data and engineering. Every
+            lesson runs live — no setup, no sign-up.
+          </p>
+
+          <CoursesCatalog courses={courses} />
+        </main>
+
+        <HomeFooter />
+      </div>
+    </>
+  );
+}

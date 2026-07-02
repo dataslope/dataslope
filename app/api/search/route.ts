@@ -1,7 +1,7 @@
 /**
  * Fumadocs search API route (Orama), served server-side from the Worker.
  *
- * The `/learn` source runs in Fumadocs `dynamic` mode, so the stock
+ * The docs sources run in Fumadocs `dynamic` mode, so the stock
  * `createFromSource(source)` would read each lesson's MDX from disk at request
  * time to build its index — which throws on Cloudflare Workers (no filesystem)
  * and 500s. Its "advanced" index is also ~54 MB, too big for a Worker.

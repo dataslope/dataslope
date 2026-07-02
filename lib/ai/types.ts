@@ -23,9 +23,11 @@ export interface AskAiFile {
 export interface AskAiClientContext {
   surface: AskAiSurface;
   /**
-   * Learn only: lesson slug segments, e.g. ["python-basics", "loops"]. The
-   * server resolves the lesson markdown itself from this (fetching the
-   * prerendered `.md` asset) and never trusts client-supplied page text.
+   * Learn surface only: full lesson path segments including the section base,
+   * e.g. ["courses", "python-basics", "loops"] or
+   * ["fumadocs-dev", "code-blocks-python"]. The server allowlists the base,
+   * resolves the lesson markdown itself (fetching the prerendered `.md`
+   * asset), and never trusts client-supplied page text.
    */
   slug?: string[];
   /** Language / SQL-dialect id, e.g. "python", "duckdb". */

@@ -1,4 +1,4 @@
-// Lints <MultipleChoice> blocks in content/learn for the rules that keep
+// Lints <MultipleChoice> blocks in content/courses + content/fumadocs-dev for the rules that keep
 // every question answerable, non-contradictory, and neutrally worded:
 //
 //   1. no-correct          — every question must mark exactly one `- [o]`
@@ -18,7 +18,7 @@
 //                            statement's truth value.
 //
 // Used both as a CLI (`node scripts/check-mcq.mjs [files...]`, defaults to
-// all of content/learn) and as a library by __tests__/mcqContent.test.ts.
+// all course + fumadocs-dev content) and as a library by __tests__/mcqContent.test.ts.
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -167,8 +167,11 @@ export function lintFiles(files) {
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
   const args = process.argv.slice(2);
-  const root = path.join(process.cwd(), "content", "learn");
-  const files = args.length ? args : findMcqFiles(root);
+  const roots = [
+    path.join(process.cwd(), "content", "courses"),
+    path.join(process.cwd(), "content", "fumadocs-dev"),
+  ];
+  const files = args.length ? args : roots.flatMap((root) => findMcqFiles(root));
   const violations = lintFiles(files);
   if (violations.length) {
     const byRule = {};

@@ -1,7 +1,8 @@
 /**
  * Build-time collector for the custom SVG graphics gallery (`/svg-gallery`).
  *
- * Walks every lesson under `content/learn/`, extracts each hand-authored inline
+ * Walks every lesson under `content/courses/` and `content/fumadocs-dev/`,
+ * extracts each hand-authored inline
  * `<svg>` graphic (via `extractSvgGraphics`), and groups them by course, tagging
  * each with the same globally-unique ID that `remarkSvgLabels` stamps onto the
  * rendered page (e.g. `svg-intro-sql-postgres-filtering-rows-f4f4db`) plus a
@@ -11,8 +12,8 @@
  * `<svg>` elements, so the `<svg>`-only collection skips them by construction.
  *
  * Deliberately free of any Fumadocs `source` dependency: lesson URLs are
- * derived from file paths (the same `/learn/<path-without-extension>` mapping
- * the loader uses, with `index` collapsing to the folder) and course titles
+ * derived from file paths (the same `<base>/<path-without-extension>` mapping
+ * the loaders use, with `index` collapsing to the folder) and course titles
  * come from each course's `meta.json` (same as the homepage course list),
  * falling back to the index page's frontmatter title, then the slug. That
  * keeps the module importable from `scripts/build-svg-gallery-data.mjs`,
@@ -24,21 +25,28 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { extractSvgGraphics } from "./extractSvgGraphics";
 
-const CONTENT_DIR = path.join(process.cwd(), "content", "learn");
+// Sections to walk: content directory → URL base (mirrors lib/source.ts).
+const SECTIONS = [
+  { dir: path.join(process.cwd(), "content", "courses"), base: "/courses" },
+  {
+    dir: path.join(process.cwd(), "content", "fumadocs-dev"),
+    base: "/fumadocs-dev",
+  },
+];
 
 export interface GalleryGraphic {
   /** Globally-unique, content-hashed ID — identical to the on-page label. */
   id: string;
   /** Render-ready SVG markup (JSX-isms rewritten to valid HTML). */
   html: string;
-  /** URL of the lesson that contains this graphic (e.g. /learn/foo/bar). */
+  /** URL of the lesson that contains this graphic (e.g. /courses/foo/bar). */
   route: string;
   /** Same lesson URL, anchored to this graphic's label. */
   href: string;
 }
 
 export interface GalleryCourse {
-  /** Course folder slug (first path segment under content/learn/). */
+  /** Course folder slug (first path segment under the section dir). */
   slug: string;
   /** Human-readable course title (from the course's meta.json, if any). */
   title: string;
@@ -65,10 +73,10 @@ function walkLessonFiles(dir: string, prefix = ""): string[] {
   return out.sort();
 }
 
-/** `course/lesson.mdx` → `/learn/course/lesson`; `index` collapses away. */
-function lessonUrl(rel: string): string {
+/** `course/lesson.mdx` → `<base>/course/lesson`; `index` collapses away. */
+function lessonUrl(base: string, rel: string): string {
   const stem = rel.replace(/\.mdx?$/i, "").replace(/(^|\/)index$/i, "");
-  return stem ? `/learn/${stem}` : "/learn";
+  return stem ? `${base}/${stem}` : base;
 }
 
 /** Pull `title:` out of a leading YAML frontmatter block, if present. */
@@ -81,10 +89,10 @@ function frontmatterTitle(raw: string): string | undefined {
   return title || undefined;
 }
 
-/** Course title from `content/learn/<slug>/meta.json`, if present. */
-function metaTitle(slug: string): string | undefined {
+/** Course title from `<sectionDir>/<slug>/meta.json`, if present. */
+function metaTitle(sectionDir: string, slug: string): string | undefined {
   try {
-    const raw = readFileSync(path.join(CONTENT_DIR, slug, "meta.json"), "utf8");
+    const raw = readFileSync(path.join(sectionDir, slug, "meta.json"), "utf8");
     const meta = JSON.parse(raw) as { title?: unknown };
     return typeof meta.title === "string" && meta.title ? meta.title : undefined;
   } catch {
@@ -95,7 +103,8 @@ function metaTitle(slug: string): string | undefined {
 let cache: GalleryCourse[] | null = null;
 
 /**
- * Collect every custom inline `<svg>` graphic across all `/learn` lessons,
+ * Collect every custom inline `<svg>` graphic across all course lessons and
+ * fumadocs-dev demo pages,
  * grouped by course and tagged with its on-page ID and a link to its lesson.
  * Memoised so the work runs once per build.
  */
@@ -105,40 +114,42 @@ export function getSvgGallery(): GalleryCourse[] {
   const courses = new Map<string, GalleryCourse>();
   const titles = new Map<string, string>();
 
-  for (const rel of walkLessonFiles(CONTENT_DIR)) {
-    const abs = path.join(CONTENT_DIR, rel);
-    let raw: string;
-    try {
-      raw = readFileSync(abs, "utf8");
-    } catch {
-      continue;
-    }
+  for (const { dir, base } of SECTIONS) {
+    for (const rel of walkLessonFiles(dir)) {
+      const abs = path.join(dir, rel);
+      let raw: string;
+      try {
+        raw = readFileSync(abs, "utf8");
+      } catch {
+        continue;
+      }
 
-    // Nested lessons group under their course folder; loose demo pages
-    // directly under content/learn/ group under their own file stem.
-    const nested = rel.includes("/");
-    const slug = nested ? rel.split("/")[0] : rel.replace(/\.mdx?$/i, "");
+      // Nested lessons group under their course folder; loose demo pages
+      // directly under the section dir group under their own file stem.
+      const nested = rel.includes("/");
+      const slug = nested ? rel.split("/")[0] : rel.replace(/\.mdx?$/i, "");
 
-    if (!titles.has(slug)) {
-      const title = nested
-        ? (metaTitle(slug) ??
-          frontmatterTitle(readCourseIndex(slug) ?? "") ??
-          slug)
-        : (frontmatterTitle(raw) ?? slug);
-      titles.set(slug, title);
-    }
+      if (!titles.has(slug)) {
+        const title = nested
+          ? (metaTitle(dir, slug) ??
+            frontmatterTitle(readCourseIndex(dir, slug) ?? "") ??
+            slug)
+          : (frontmatterTitle(raw) ?? slug);
+        titles.set(slug, title);
+      }
 
-    const graphics = extractSvgGraphics(raw, abs);
-    if (graphics.length === 0) continue;
+      const graphics = extractSvgGraphics(raw, abs);
+      if (graphics.length === 0) continue;
 
-    let bucket = courses.get(slug);
-    if (!bucket) {
-      bucket = { slug, title: slug, graphics: [] };
-      courses.set(slug, bucket);
-    }
-    const url = lessonUrl(rel);
-    for (const g of graphics) {
-      bucket.graphics.push({ ...g, route: url, href: `${url}#${g.id}` });
+      let bucket = courses.get(slug);
+      if (!bucket) {
+        bucket = { slug, title: slug, graphics: [] };
+        courses.set(slug, bucket);
+      }
+      const url = lessonUrl(base, rel);
+      for (const g of graphics) {
+        bucket.graphics.push({ ...g, route: url, href: `${url}#${g.id}` });
+      }
     }
   }
 
@@ -148,10 +159,10 @@ export function getSvgGallery(): GalleryCourse[] {
   return cache;
 }
 
-function readCourseIndex(slug: string): string | undefined {
+function readCourseIndex(sectionDir: string, slug: string): string | undefined {
   for (const name of ["index.mdx", "index.md"]) {
     try {
-      return readFileSync(path.join(CONTENT_DIR, slug, name), "utf8");
+      return readFileSync(path.join(sectionDir, slug, name), "utf8");
     } catch {
       // try the next candidate
     }

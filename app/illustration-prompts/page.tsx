@@ -1,7 +1,7 @@
 /**
  * `/illustration-prompts` — a build-time review page for the custom line-art
  * illustration placeholders (`<IllustrationPrompt>`) authored across the
- * `/learn` and `/interview` pages.
+ * `/courses`, `/fumadocs-dev`, and `/interview-prep` pages.
  *
  * Each distinct illustration gets one card with its semantic target file name
  * (e.g. `leland-wilkinson-portrait.svg`), the exact generation prompt and a

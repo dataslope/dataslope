@@ -5,8 +5,8 @@
  * Why this exists:
  *
  * Fumadocs's default `createFromSource(source)` builds an Orama "advanced"
- * index at request time by reading each lesson's MDX from disk (the `/learn`
- * collection runs in `dynamic` mode — see `source.config.ts`). On Cloudflare
+ * index at request time by reading each lesson's MDX from disk (the docs
+ * collections run in `dynamic` mode — see `source.config.ts`). On Cloudflare
  * Workers there is no filesystem at request time, so that route 500s. Even
  * setting that aside, the advanced index is ~54 MB (≈35k heading/section
  * documents) — far past the 25 MB Workers-asset limit and too large to hold
@@ -44,7 +44,13 @@ import { structure } from "fumadocs-core/mdx-plugins";
 import remarkMdx from "remark-mdx";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const CONTENT_DIR = join(ROOT, "content", "learn");
+// Indexed sections: content directory → URL base. Courses and the dev-only
+// component gallery both render the Fumadocs search dialog, so both are
+// indexed (the dev pages were part of the old content/learn tree too).
+const SECTIONS = [
+  { dir: join(ROOT, "content", "courses"), base: "/courses" },
+  { dir: join(ROOT, "content", "fumadocs-dev"), base: "/fumadocs-dev" },
+];
 const OUT_FILE = join(ROOT, "lib", "generated", "search-index.js");
 
 // Index prose nodes only; omit `mdxJsxFlowElement` (the self-closing
@@ -81,24 +87,25 @@ function frontmatterField(fm, name) {
   return m[1].replace(/^(["'])(.*)\1$/, "$2").trim() || undefined;
 }
 
-/** `course/lesson.mdx` → `/learn/course/lesson`; `index` collapses away. */
-function lessonUrl(rel) {
+/** `course/lesson.mdx` → `<base>/course/lesson`; `index` collapses away. */
+function lessonUrl(base, rel) {
   const stem = rel.replace(/\.mdx?$/i, "").replace(/(^|\/)index$/i, "");
-  return stem ? `/learn/${stem}` : "/learn";
+  return stem ? `${base}/${stem}` : base;
 }
 
-/** Course title from `content/learn/<slug>/meta.json`, if present. */
+/** Course title from `<sectionDir>/<slug>/meta.json`, if present. */
 const metaTitleCache = new Map();
-function courseTitle(slug) {
-  if (metaTitleCache.has(slug)) return metaTitleCache.get(slug);
+function courseTitle(sectionDir, slug) {
+  const key = join(sectionDir, slug);
+  if (metaTitleCache.has(key)) return metaTitleCache.get(key);
   let title;
   try {
-    const meta = JSON.parse(readFileSync(join(CONTENT_DIR, slug, "meta.json"), "utf8"));
+    const meta = JSON.parse(readFileSync(join(sectionDir, slug, "meta.json"), "utf8"));
     if (typeof meta.title === "string" && meta.title) title = meta.title;
   } catch {
     // No meta.json — leave breadcrumbs empty.
   }
-  metaTitleCache.set(slug, title);
+  metaTitleCache.set(key, title);
   return title;
 }
 
@@ -119,40 +126,41 @@ function plainTextFallback(body) {
     .trim();
 }
 
-const files = walk(CONTENT_DIR);
 const docs = [];
 let fellBack = 0;
 
-for (const rel of files) {
-  const raw = readFileSync(join(CONTENT_DIR, rel), "utf8");
-  const { body, fm } = splitFrontmatter(raw);
+for (const { dir, base } of SECTIONS) {
+  for (const rel of walk(dir)) {
+    const raw = readFileSync(join(dir, rel), "utf8");
+    const { body, fm } = splitFrontmatter(raw);
 
-  let content;
-  try {
-    const sd = structure(body, [remarkMdx], STRUCTURE_OPTIONS);
-    content = [
-      ...sd.headings.map((h) => h.content),
-      ...sd.contents.map((c) => c.content),
-    ].join("\n");
-  } catch {
-    content = plainTextFallback(body);
-    fellBack++;
+    let content;
+    try {
+      const sd = structure(body, [remarkMdx], STRUCTURE_OPTIONS);
+      content = [
+        ...sd.headings.map((h) => h.content),
+        ...sd.contents.map((c) => c.content),
+      ].join("\n");
+    } catch {
+      content = plainTextFallback(body);
+      fellBack++;
+    }
+
+    const url = lessonUrl(base, rel);
+    const nested = rel.includes("/");
+    const slug = nested ? rel.split("/")[0] : rel.replace(/\.mdx?$/i, "");
+    const title = frontmatterField(fm, "title") ?? slug;
+    const crumb = nested ? courseTitle(dir, slug) : undefined;
+
+    docs.push({
+      url,
+      title,
+      description: frontmatterField(fm, "description") ?? "",
+      breadcrumbs: crumb ? [crumb] : [],
+      content,
+      keywords: "",
+    });
   }
-
-  const url = lessonUrl(rel);
-  const nested = rel.includes("/");
-  const slug = nested ? rel.split("/")[0] : rel.replace(/\.mdx?$/i, "");
-  const title = frontmatterField(fm, "title") ?? slug;
-  const crumb = nested ? courseTitle(slug) : undefined;
-
-  docs.push({
-    url,
-    title,
-    description: frontmatterField(fm, "description") ?? "",
-    breadcrumbs: crumb ? [crumb] : [],
-    content,
-    keywords: "",
-  });
 }
 
 mkdirSync(dirname(OUT_FILE), { recursive: true });

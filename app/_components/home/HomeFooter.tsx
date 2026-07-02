@@ -9,6 +9,7 @@ const DEV_LINKS = [
   { href: "/svg-gallery", label: "SVG Gallery", external: false },
   { href: "/illustration-prompts", label: "Illustration Prompts", external: false },
   { href: "/magicui-demo", label: "Magic UI Demo", external: false },
+  { href: "/fumadocs-dev", label: "Fumadocs Dev", external: false },
 ];
 
 const RESOURCE_LINKS = [

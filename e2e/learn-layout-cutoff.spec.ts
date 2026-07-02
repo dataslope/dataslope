@@ -15,7 +15,7 @@ import { test, expect } from "@playwright/test";
  * `flex`, so the navbar is hidden on desktop.
  *
  * The /learn route loads its Tailwind + Fumadocs CSS as a separate segment
- * chunk (`app/learn/learn.css`, imported from the layout). The Next.js App
+ * chunk (`app/docs.css`, imported from the layout). The Next.js App
  * Router does not order segment CSS deterministically on a client-side
  * navigation into /learn; when the chunk lands such that base `flex` ends up
  * after `md:hidden`, `flex` wins and the mobile navbar paints on desktop. Its
@@ -24,7 +24,7 @@ import { test, expect } from "@playwright/test";
  * sliced off — the "negative top margin" symptom — until a hard refresh restores
  * the server cascade.
  *
- * The fix (`app/learn/learn.css`) re-asserts the desktop-hidden invariant in an
+ * The fix (`app/docs.css`) re-asserts the desktop-hidden invariant in an
  * *unlayered* rule (`@media (min-width: 48rem) { #nd-subnav { display: none } }`).
  * Unlayered styles outrank every `@layer`, so this beats the base-`flex` utility
  * regardless of how the App Router orders the chunks — while leaving the navbar
@@ -47,7 +47,7 @@ const UTILITIES_FLEX_REORDER =
 test("learn route: the mobile navbar is hidden on desktop on a normal load", async ({
   page,
 }) => {
-  await page.goto("/learn");
+  await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
   // Desktop Chrome viewport (≥48rem): the mobile navbar must not be rendered.
@@ -57,7 +57,7 @@ test("learn route: the mobile navbar is hidden on desktop on a normal load", asy
 test("learn route: the mobile navbar stays hidden on desktop when the utilities layer is reordered (App Router soft-nav race)", async ({
   page,
 }) => {
-  await page.goto("/learn");
+  await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
   // Reproduce the soft-navigation cascade: re-apply the base `flex` utility into
@@ -84,7 +84,7 @@ test("learn route: the mobile navbar is still shown below 48rem (fix does not ov
   page,
 }) => {
   await page.setViewportSize({ width: 420, height: 860 });
-  await page.goto("/learn");
+  await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
   // On mobile the navbar is the only navigation — the desktop-hide rule is
