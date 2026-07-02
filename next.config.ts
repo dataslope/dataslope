@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 
 // Give `next dev` access to the Cloudflare bindings/env declared in
 // wrangler.jsonc when developing against the OpenNext adapter. It's a no-op
@@ -10,19 +9,13 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 initOpenNextCloudflareForDev();
 
 // The C# .NET runtime bundle (cdn-assets/_dotnet/) is served from
-// jsDelivr CDN (see app/_components/runtime/cdn.ts) so Vercel never
+// jsDelivr CDN (see app/_components/runtime/cdn.ts) so the app origin never
 // handles those large files. PGlite (@electric-sql/pglite) is also
 // served from jsDelivr CDN via dynamic imports (see postgres.ts and
 // postgres-worker.ts). Java's tools.jar is published as the
 // `dataslope-tools-jar` npm package and fetched from unpkg (see
 // TOOLS_JAR_CDN in app/_components/runtime/cdn.ts), since jsDelivr does
 // not serve .jar files.
-//
-// The /_dotnet/ redirect below is no longer required for the C#
-// metadata reference flow — Runner.cs now fetches DLLs directly from
-// the jsDelivr CDN base URL. It is kept here only as a safety net for
-// any stale cached requests or third-party links pointing at the old
-// app-origin /_dotnet/ path.
 const nextConfig: NextConfig = {
   // Treat MDX files under content/ as page sources via fumadocs-mdx.
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
@@ -55,13 +48,6 @@ const nextConfig: NextConfig = {
       static: 1800,
     },
   },
-  redirects: async () => [
-    {
-      source: "/_dotnet/:path*",
-      destination: `${CDN_BASE_URL}/_dotnet/:path*`,
-      permanent: false,
-    },
-  ],
   // Expose every `/courses` lesson (and `/fumadocs-dev` demo page) as raw
   // Markdown at `${page.url}.md`, served by the route handlers under
   // `app/llms/`. The page-action buttons (Copy Markdown / View as Markdown)
