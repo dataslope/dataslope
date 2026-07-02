@@ -1,5 +1,3 @@
-import { readdirSync } from "node:fs";
-import path from "node:path";
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
@@ -63,28 +61,6 @@ const nextConfig: NextConfig = {
       destination: `${CDN_BASE_URL}/_dotnet/:path*`,
       permanent: false,
     },
-    // ── Route restructuring (courses-page redesign) ──────────────────────
-    // The old public URLs moved:
-    //   /learn/<course>/…  →  /courses/<course>/…   (all courses)
-    //   /learn/<dev page>  →  /fumadocs-dev/<dev page>  (loose demo pages)
-    //   /learn             →  /courses              (the index)
-    //   /interview/…       →  /interview-prep/…
-    // The dev-page entries are generated from the files actually present in
-    // content/fumadocs-dev/ and MUST precede the /learn/:path* catch-all —
-    // Next.js applies redirects in order, first match wins.
-    ...fumadocsDevSlugs().map((slug) => ({
-      source: `/learn/${slug}`,
-      destination: `/fumadocs-dev/${slug}`,
-      permanent: true,
-    })),
-    { source: "/learn", destination: "/courses", permanent: true },
-    { source: "/learn/:path*", destination: "/courses/:path*", permanent: true },
-    { source: "/interview", destination: "/interview-prep", permanent: true },
-    {
-      source: "/interview/:path*",
-      destination: "/interview-prep/:path*",
-      permanent: true,
-    },
   ],
   // Expose every `/courses` lesson (and `/fumadocs-dev` demo page) as raw
   // Markdown at `${page.url}.md`, served by the route handlers under
@@ -105,17 +81,6 @@ const nextConfig: NextConfig = {
     ],
   }),
 };
-
-/** Top-level demo-page slugs under content/fumadocs-dev/ (the pages that used
- *  to live loose under /learn), for the one-time redirect table above. Read at
- *  config-load time — Node's fs is available here, and the list only changes
- *  when a dev page is added or removed. */
-function fumadocsDevSlugs(): string[] {
-  return readdirSync(path.join(process.cwd(), "content", "fumadocs-dev"))
-    .filter((name) => name.endsWith(".mdx") && name !== "index.mdx")
-    .map((name) => name.replace(/\.mdx$/, ""))
-    .sort();
-}
 
 const withMDX = createMDX();
 
