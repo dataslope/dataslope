@@ -70,6 +70,9 @@ import {
   persistKey,
   savePersistedCode,
 } from "./codePersistence";
+// Global keyframes for the run overlay (shared with ChallengeCard and the
+// playgrounds) — the module CSS references them by their global names.
+import "./runOverlayAnimations.css";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 

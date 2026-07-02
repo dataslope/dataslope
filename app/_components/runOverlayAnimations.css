@@ -1,0 +1,56 @@
+/* ─── Run-overlay keyframes, shared project-wide ──────────────────────────
+ * One source for the "code is running" overlay animation (two drifting
+ * sine-wave layers + glow pulse + streaming light bar). Previously each
+ * consumer carried a byte-identical private copy (`cb-*` in
+ * CodeBlock.module.css, `cc-*` in ChallengeCard.module.css, `dataslope*` in
+ * playground.css).
+ *
+ * The keyframe names are global. CSS modules only rename @keyframes defined
+ * inside the module itself, so the module stylesheets can reference these
+ * names directly — each consuming component just has to import this file:
+ *
+ *   import "@/app/_components/runOverlayAnimations.css";
+ *
+ * The overlay *rule* sets (sizes, masks, gradients) stay with each consumer —
+ * they differ by design tokens — only the motion is shared. */
+
+@keyframes ds-run-wave-back {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-240px);
+  }
+}
+@keyframes ds-run-wave-front {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-240px);
+  }
+}
+@keyframes ds-run-glow-pulse {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+@keyframes ds-run-stream {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

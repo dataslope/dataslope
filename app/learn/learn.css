@@ -2,36 +2,46 @@
  *
  * Why a separate stylesheet?
  *
- * The rest of this app uses CSS modules + plain CSS — no Tailwind. By
- * importing Tailwind's preflight (`@import 'tailwindcss'`) and the
- * Fumadocs UI presets only from `app/learn/layout.tsx`, Next.js scopes
- * this stylesheet to the /learn chunk and keeps it out of the
- * /playground bundle. The narrow `@source` glob limits utility-class
- * generation to Fumadocs's own JS files, so we don't accidentally pay
- * for utilities we never use.
+ * Outside of the Tailwind-opt-in routes (home, /pricing, /account,
+ * /admin, legal — see app/tailwind.css) this app uses CSS modules +
+ * plain CSS. By importing Tailwind's preflight (`@import 'tailwindcss'`)
+ * and the Fumadocs UI presets only from `app/learn/layout.tsx`, Next.js
+ * scopes this stylesheet to the /learn chunk and keeps it out of the
+ * /playground bundle. Utility-class generation is driven by the @source
+ * list in app/tailwind.shared.css, shared with the app/tailwind.css root
+ * so both roots emit identical utility layers (see that file's header).
  */
-/* Pull in the same Inter weights the playground bundles, so the docs
-   typography matches the playground chrome and doesn't wait on the
-   system fallback while Fumadocs's default font loads. The `@import`
-   must precede the tailwind/fumadocs imports below — `@import` rules
-   are required to come before any non-`@import`/`@layer`/`@charset`
-   at-rule, including the inlined CSS pulled in by tailwindcss. */
+/* Pull in the same Inter/JetBrains Mono faces the playground bundles, so
+   the docs typography matches the playground chrome and doesn't wait on the
+   system fallback while Fumadocs's default font loads. Kept byte-identical
+   to the @import in app/_components/playground.css so the browser fetches
+   it once when both stylesheets are loaded. The `@import` must precede the
+   tailwind/fumadocs imports below — `@import` rules are required to come
+   before any non-`@import`/`@layer`/`@charset` at-rule, including the
+   inlined CSS pulled in by tailwindcss. */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
 
 /* `source(none)` disables Tailwind v4's automatic content detection,
    which otherwise crawls the entire project on every CSS compile. In this
    repo that sweep walks large non-source trees (public/, cdn-assets/,
    agent-outputs/, the 800-file content/ tree) and added ~2 minutes to the
-   /learn dev compile on a cold cache. The app authors no Tailwind utility
-   classes of its own — only Fumadocs UI uses them — so the single explicit
-   `@source` below (Fumadocs's prebuilt JS) is the complete set of class
-   names Tailwind needs to scan. If app code ever starts using Tailwind
-   utilities directly, add an `@source` for those files here. */
+   /learn dev compile on a cold cache. The explicit `@source` list this root
+   compiles from lives in app/tailwind.shared.css (imported below), SHARED
+   with the app/tailwind.css root. That sharing is load-bearing: both roots
+   must generate the SAME utility layer so the App Router's unpredictable
+   stylesheet ordering across client-side navigations can never flip a
+   base/variant pair (`hidden md:block`, `flex md:hidden`, …) — see the
+   header comment in tailwind.shared.css. Add new @source globs THERE,
+   never here. */
 @import "tailwindcss" source(none);
-@source "../../node_modules/fumadocs-ui/dist/**/*.js";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 @import "katex/dist/katex.min.css";
+/* Shared @source list, dark variant, shadcn/Magic UI tokens and keyframes.
+   Imported after the Fumadocs preset so this file's `@custom-variant dark`
+   definition (byte-identical to the one Fumadocs registers) is the one in
+   effect, keeping `dark:*` utilities identical across both Tailwind roots. */
+@import "../tailwind.shared.css";
 
 /* ── Tailwind v4 border-color default hardening (intermittent black borders) ──
    Tailwind v4's preflight resets every element to `border: 0 solid`, which
@@ -90,10 +100,14 @@
    mobile where it's the only nav. `#id` specificity is incidental — being
    unlayered is what makes this win the cascade no matter how the chunks land.
 
-   The companion, root-cause mitigation is `experimental.cssChunking: 'strict'`
-   in next.config.ts, which makes the segment-CSS order deterministic in the
-   first place; this rule is the belt-and-suspenders that holds even if a chunk
-   ever slips through in the wrong order. */
+   The companion, root-cause mitigation is the shared @source list in
+   app/tailwind.shared.css: both Tailwind roots generate identical utility
+   layers, so a foreign sheet ordered after this one carries the same
+   correctly-ordered `flex`/`md:hidden` pair and can't flip the navbar.
+   (`experimental.cssChunking: 'strict'` in next.config.ts was originally
+   meant to be that mitigation, but it is webpack-only and this project
+   builds with Turbopack — see the note in next.config.ts.) This rule is the
+   belt-and-suspenders that holds even if the two sheets ever diverge. */
 @media (min-width: 48rem) {
   #nd-subnav {
     display: none;

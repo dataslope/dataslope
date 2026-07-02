@@ -15,7 +15,7 @@
    tokens under the `--cb-*` names these rules consume, so the output
    area always tracks the surrounding card's light/dark theme. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
 
 .outputScope {
   --cb-black: var(--ds-black);
@@ -134,11 +134,11 @@
 }
 .runWaveBack {
   fill: color-mix(in oklab, var(--cb-accent) 22%, transparent);
-  animation: cb-waveBack 2.4s linear infinite;
+  animation: ds-run-wave-back 2.4s linear infinite;
 }
 .runWaveFront {
   fill: color-mix(in oklab, var(--cb-accent) 45%, transparent);
-  animation: cb-waveFront 1.4s linear infinite;
+  animation: ds-run-wave-front 1.4s linear infinite;
 }
 .runGlow {
   position: absolute;
@@ -148,7 +148,7 @@
     color-mix(in oklab, var(--cb-accent) 40%, transparent) 0%,
     transparent 70%
   );
-  animation: cb-glowPulse 0.9s ease-in-out infinite alternate;
+  animation: ds-run-glow-pulse 0.9s ease-in-out infinite alternate;
 }
 .runStream {
   position: absolute;
@@ -164,48 +164,7 @@
   );
   filter: blur(0.5px);
   transform: translateX(-100%);
-  animation: cb-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-}
-
-@keyframes cb-waveBack {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-240px);
-  }
-}
-@keyframes cb-waveFront {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-240px);
-  }
-}
-@keyframes cb-glowPulse {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0.85;
-  }
-}
-@keyframes cb-stream {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+  animation: ds-run-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 /* ─── Toast (Base UI) ────────────────────────────────────────────────

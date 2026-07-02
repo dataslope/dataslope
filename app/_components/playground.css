@@ -1,7 +1,15 @@
 /* ─── Playground (Python / R) shared styles ─────────────────────────────── */
 /* Extracted from public/python.html so the React component can reuse them. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400..700&display=swap");
+/* Kept byte-identical to the @import in app/learn/learn.css so the browser
+   treats them as one resource and fetches it once when both stylesheets are
+   loaded (they routinely coexist: lessons embed playgrounds, and client-side
+   navigation keeps prior routes' CSS applied). */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
+
+/* Shared run-overlay keyframes (ds-run-*), also used by CodeBlock and
+   ChallengeCard. */
+@import "./runOverlayAnimations.css";
 
 :root {
   --bg: #0f1117;
@@ -67,11 +75,9 @@ html[data-playground-theme="light"] .pyodide-loading {
   background: var(--bg);
 }
 
-.playground-root *,
-.playground-root *::before,
-.playground-root *::after {
-  box-sizing: border-box;
-}
+/* (box-sizing: border-box is set globally on every element by
+   app/globals.css, which the root layout imports on every route — no
+   playground-scoped re-declaration is needed.) */
 
 /* ─── Consistent scrollbar styling ───────────────────────────────────────
    Apply across every playground (Python, R, SQL, Java, C#, …) so any
@@ -127,9 +133,6 @@ body.playground-active {
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 14px;
-}
-
-body.playground-active {
   overflow: hidden;
 }
 
@@ -393,15 +396,9 @@ body.playground-active {
 .header-btn.icon-only {
   padding: 4px 10px;
 }
-/* The settings-cog SVG draws via stroke and explicitly sets fill="none",
-   so we don't need a global rule that forces fill:none on every icon-only
-   SVG — doing so blanks out filled glyphs (e.g. react-icons' FaInfo).
-   The cog's own inline attributes still take precedence. */
-.header-btn.icon-only svg.stroke-icon {
-  fill: none;
-  stroke: currentColor;
-  flex-shrink: 0;
-}
+/* (No global fill/stroke rule for icon-only SVGs: the settings-cog draws
+   via stroke and sets fill="none" inline, and forcing fill:none here would
+   blank out filled glyphs like react-icons' FaInfo.) */
 
 /* No outer border on the action group, so first/last buttons don't
    need rounded corners — they remain flush with the header. */
@@ -1465,8 +1462,8 @@ body.playground-active {
   height: 380px;
 }
 
-/* DataFrame tables — kept in lockstep with `.dataframeWrap` in
-   CodeBlock.module.css and `.outCellHtml` in ChallengeCard.module.css:
+/* DataFrame tables — kept in lockstep with `.outCellHtml table` in
+   ChallengeCard.module.css (same declarations, --ch-* tokens instead):
    the Jupyter-notebook default look (600-weight header row and index
    column, very subtle row striping, right-aligned cells, no cell
    borders) in slightly tightened Inter (--font-sans) at a compact size.
@@ -1813,10 +1810,6 @@ body.playground-active {
   flex-direction: column;
   gap: 20px;
 }
-.settings-body-themes {
-  padding: 14px 16px;
-}
-
 /* Restore-defaults / clear-localStorage actions. Sit at the bottom of
    the General tab, separated from the rest by a divider so they don't
    read as just-another-toggle. The buttons are grouped into rounded
@@ -1904,79 +1897,6 @@ body.playground-active {
 .settings-action-danger:hover {
   background: color-mix(in srgb, var(--red) 9%, transparent);
   color: var(--red);
-}
-
-/* Editor-themes tab — grid of preview cards. */
-.theme-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-}
-.theme-card {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  background: var(--bg3);
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: left;
-  overflow: hidden;
-  font-family: inherit;
-  transition:
-    border-color 0.15s,
-    transform 0.15s;
-}
-.theme-card:hover {
-  border-color: var(--text-muted);
-}
-.theme-card:focus-visible {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-glow);
-}
-.theme-card.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary);
-}
-.theme-card-preview {
-  border-bottom: 1px solid;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  line-height: 1.5;
-  padding: 10px 12px;
-  white-space: pre;
-  overflow: hidden;
-  min-height: 70px;
-}
-.theme-card-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--text);
-  font-weight: 500;
-}
-.theme-card-name {
-  letter-spacing: -0.01em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.theme-card-default-badge {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--text-dim);
-  opacity: 0.7;
-  background: var(--bg2);
-  border-radius: 4px;
-  padding: 1px 5px;
-}
-.theme-card-check {
-  color: var(--primary);
-  font-weight: 700;
 }
 
 /* On narrow viewports the settings panel takes (almost) the full screen
@@ -2693,137 +2613,6 @@ input[type="range"].fs-slider:disabled {
   color: var(--red, #e57373);
 }
 
-/* Big horizontally-moving title text. The track holds 4 copies of the
-   title so something is always on-screen as it translates. The mask on
-   the parent fades the text out toward the left/right edges so it
-   doesn't visually slam into the viewport boundaries. */
-.loading-hero {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 18%,
-    #000 82%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 18%,
-    #000 82%,
-    transparent 100%
-  );
-}
-.loading-hero-track {
-  display: flex;
-  flex-shrink: 0;
-  gap: 1.5em;
-  white-space: nowrap;
-  animation: playground-loadHero 18s linear infinite;
-  will-change: transform;
-}
-.loading-hero-text {
-  font-family: var(--font-ui);
-  font-weight: 900;
-  font-size: clamp(56px, 14vw, 180px);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--text);
-}
-@keyframes playground-loadHero {
-  from {
-    transform: translateX(0);
-  }
-  /* Each copy of the text is one quarter of the total track width plus
-     the inter-copy gap; translating by -25% slides exactly one copy
-     out the left, leaving the loop seamless. */
-  to {
-    transform: translateX(-25%);
-  }
-}
-
-/* Bottom strip: small witty message + full-width indeterminate progress
-   bar. Sits flush against the bottom of the viewport. */
-.loading-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 24px 16px;
-  width: 100%;
-}
-.loading-quip {
-  font-size: 13px;
-  color: var(--text);
-  font-family: var(--font-ui);
-  text-align: center;
-  min-height: 1.4em;
-  line-height: 1.4;
-  /* Soft cross-fade so consecutive quips don't snap. */
-  animation: playground-quipFade 0.5s ease;
-}
-@keyframes playground-quipFade {
-  from {
-    opacity: 0;
-    transform: translateY(2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.loading-bar-wrap {
-  width: 100%;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.loading-bar {
-  height: 100%;
-  background: var(--text);
-  border-radius: 2px;
-  animation: playground-loadBar 2.5s ease-in-out infinite;
-}
-/* Determinate variant — used once the adapter reports boot fractions;
-   width is driven inline by the smoothed fraction. */
-.loading-bar.determinate {
-  animation: none;
-  margin-left: 0;
-  transition: width 360ms ease;
-}
-@keyframes playground-loadBar {
-  0% {
-    width: 5%;
-    margin-left: 0;
-  }
-  50% {
-    width: 60%;
-    margin-left: 20%;
-  }
-  100% {
-    width: 5%;
-    margin-left: 95%;
-  }
-}
-
-/* Error state — pause the moving text and surface the failure message
-   in red via the bottom strip. */
-.pyodide-loading.has-error .loading-hero-track {
-  animation-play-state: paused;
-}
-.pyodide-loading.has-error .loading-bar {
-  animation-play-state: paused;
-  background: var(--red);
-}
-.pyodide-loading.has-error .loading-quip {
-  color: var(--red);
-  font-weight: 500;
-}
-
 /* Resizer — draggable divider between editor and output panes. A persistent
    grip indicator makes it discoverable without requiring the user to hover to
    find the hit area. */
@@ -3425,11 +3214,11 @@ input[type="range"].fs-slider:disabled {
 }
 .dataslope-wave--back {
   fill: color-mix(in oklab, var(--primary) 22%, transparent);
-  animation: dataslopeWaveBack 2.4s linear infinite;
+  animation: ds-run-wave-back 2.4s linear infinite;
 }
 .dataslope-wave--front {
   fill: color-mix(in oklab, var(--primary) 45%, transparent);
-  animation: dataslopeWaveFront 1.4s linear infinite;
+  animation: ds-run-wave-front 1.4s linear infinite;
 }
 
 /* Soft accent glow that tints the bottom edge of the band so the
@@ -3442,7 +3231,7 @@ input[type="range"].fs-slider:disabled {
     color-mix(in oklab, var(--primary) 40%, transparent) 0%,
     transparent 70%
   );
-  animation: dataslopePulse 0.9s ease-in-out infinite alternate;
+  animation: ds-run-glow-pulse 0.9s ease-in-out infinite alternate;
 }
 
 /* A bright, narrow data-flow line that streaks across the band.
@@ -3461,48 +3250,7 @@ input[type="range"].fs-slider:disabled {
   );
   filter: blur(0.5px);
   transform: translateX(-100%);
-  animation: dataslopeStream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-}
-
-@keyframes dataslopeWaveBack {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-240px);
-  }
-}
-@keyframes dataslopeWaveFront {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-240px);
-  }
-}
-@keyframes dataslopePulse {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0.85;
-  }
-}
-@keyframes dataslopeStream {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+  animation: ds-run-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 /* Default: the dedicated mobile-variant overlay is hidden. The media
@@ -4633,7 +4381,6 @@ html[data-playground-theme="dark"] .welcome h3 {
    far apart on wide screens. Left-aligned (no auto-centering) so the
    content sits flush to the left with its own built-in padding. */
 .playground-settings-tab-pane .settings-body,
-.playground-settings-tab-pane .settings-body-themes,
 .playground-settings-tab-pane .settings-actions {
   max-width: 720px;
 }
