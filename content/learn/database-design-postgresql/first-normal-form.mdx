@@ -13,7 +13,7 @@ one value, and the table has no repeating groups.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three values squeezed into a single crowded cell separate along a dotted arrow into three cells holding one value each — first normal form making cells atomic"
+  aria-label="Three values squeezed into a single crowded cell separate along a thin arrow into three cells holding one value each — first normal form making cells atomic"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -29,13 +29,15 @@ one value, and the table has no repeating groups.
     <circle cx="188" cy="99" r="12" />
     <circle cx="430" cy="142" r="10" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="272" cy="95" r="3.5" />
-    <circle cx="298" cy="95" r="3.5" />
-    <circle cx="324" cy="95" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="344,86 362,95 344,104" fillOpacity="0.6" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M264 95 H 336"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <polygon points="336,87 336,103 350,95" fill="currentColor" />
   </g>
   <g fill="currentColor" opacity="0.1">
     <rect x="398" y="28" width="150" height="40" rx="10" />

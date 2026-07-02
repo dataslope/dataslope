@@ -13,7 +13,7 @@ key, the whole key, and nothing but the key.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Inside one table three columns form a chain: short dotted hops run key to fact to fact, while the long red arc shows the fact reaching the key only secondhand — a transitive dependency"
+  aria-label="Inside one table three columns form a chain: short thin hops run key to fact to fact, while a long crossed-out red arc shows the fact reaching the key only secondhand — a transitive dependency"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -28,21 +28,25 @@ key, the whole key, and nothing but the key.
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="470" cy="126" r="11" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="220" cy="110" r="3" />
-    <circle cx="245" cy="104" r="3" />
-    <circle cx="270" cy="110" r="3" />
-    <circle cx="370" cy="110" r="3" />
-    <circle cx="395" cy="104" r="3" />
-    <circle cx="420" cy="110" r="3" />
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    opacity="0.35"
+  >
+    <path d="M188 118 C 220 98, 270 98, 302 118" />
+    <path d="M338 118 C 370 98, 420 98, 452 118" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="206" cy="86" r="3.5" fillOpacity="0.6" />
-    <circle cx="248" cy="62" r="3.5" fillOpacity="0.6" />
-    <circle cx="296" cy="48" r="3.5" fillOpacity="0.6" />
-    <circle cx="344" cy="48" r="3.5" fillOpacity="0.6" />
-    <circle cx="392" cy="62" r="3.5" fillOpacity="0.6" />
-    <circle cx="434" cy="86" r="3.5" fillOpacity="0.6" />
+    <path
+      d="M200 100 C 240 44, 400 44, 440 100"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeOpacity="0.6"
+    />
     <rect x="306" y="44" width="28" height="6" rx="3" transform="rotate(-45 320 47)" />
   </g>
 </svg>

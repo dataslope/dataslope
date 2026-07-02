@@ -13,7 +13,7 @@ stored directly with one foreign key.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Every dot in the left column is dotted-linked to every dot in the right column, weaving a tangle that a single foreign key cannot hold"
+  aria-label="Every dot in the left column is linked by a thin line to every dot in the right column, weaving a tangle that a single foreign key cannot hold"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -29,29 +29,22 @@ stored directly with one foreign key.
     <circle cx="490" cy="105" r="12" />
     <circle cx="490" cy="155" r="12" />
   </g>
-  <g fill="currentColor" opacity="0.22">
-    <circle cx="249" cy="55" r="3" />
-    <circle cx="320" cy="55" r="3" />
-    <circle cx="391" cy="55" r="3" />
-    <circle cx="249" cy="69" r="3" />
-    <circle cx="320" cy="80" r="3" />
-    <circle cx="391" cy="92" r="3" />
-    <circle cx="249" cy="82" r="3" />
-    <circle cx="391" cy="128" r="3" />
-    <circle cx="249" cy="92" r="3" />
-    <circle cx="391" cy="69" r="3" />
-    <circle cx="249" cy="105" r="3" />
-    <circle cx="320" cy="105" r="3" />
-    <circle cx="391" cy="105" r="3" />
-    <circle cx="249" cy="119" r="3" />
-    <circle cx="320" cy="130" r="3" />
-    <circle cx="391" cy="142" r="3" />
-    <circle cx="249" cy="128" r="3" />
-    <circle cx="249" cy="142" r="3" />
-    <circle cx="391" cy="119" r="3" />
-    <circle cx="249" cy="155" r="3" />
-    <circle cx="320" cy="155" r="3" />
-    <circle cx="391" cy="155" r="3" />
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    opacity="0.22"
+  >
+    <path d="M164 55 L 476 55" />
+    <path d="M164 55 L 476 105" />
+    <path d="M164 55 L 476 155" />
+    <path d="M164 105 L 476 55" />
+    <path d="M164 105 L 476 105" />
+    <path d="M164 105 L 476 155" />
+    <path d="M164 155 L 476 55" />
+    <path d="M164 155 L 476 105" />
+    <path d="M164 155 L 476 155" />
   </g>
 </svg>
 

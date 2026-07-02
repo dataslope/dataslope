@@ -13,7 +13,7 @@ to insert.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A traveler dot follows a dotted path along the horizon toward a rising yellow sun — the course ends where the next stretch of practice begins"
+  aria-label="A traveler dot follows a thin path along the horizon toward a rising yellow sun with thin rays — the course ends where the next stretch of practice begins"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -21,17 +21,28 @@ to insert.
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <path d="M250 150 A70 70 0 0 1 390 150 Z" fillOpacity="0.85" />
-    <circle cx="216" cy="106" r="4" fillOpacity="0.5" />
-    <circle cx="252" cy="64" r="4" fillOpacity="0.5" />
-    <circle cx="320" cy="44" r="4" fillOpacity="0.5" />
-    <circle cx="388" cy="64" r="4" fillOpacity="0.5" />
-    <circle cx="424" cy="106" r="4" fillOpacity="0.5" />
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeOpacity="0.5"
+    >
+      <path d="M246 119 L 224 109" />
+      <path d="M270 88 L 256 69" />
+      <path d="M320 70 L 320 46" />
+      <path d="M370 88 L 384 69" />
+      <path d="M394 119 L 416 109" />
+    </g>
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="92" cy="196" r="3" />
-    <circle cx="140" cy="188" r="3" />
-    <circle cx="188" cy="178" r="3" />
-    <circle cx="234" cy="168" r="3" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M84 198 C 140 190, 210 178, 260 166"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="276" cy="160" r="8" />

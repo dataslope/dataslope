@@ -14,23 +14,24 @@ links.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three child squares point up at their parents, but one pointer ends at a ghost outline crossed in red — an orphan reference to a parent that does not exist"
+  aria-label="Three child squares point up at their parents along thin lines, but one line ends at a dashed ghost outline crossed in red — an orphan reference to a parent that does not exist"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="170" cy="58" r="13" />
     <circle cx="320" cy="58" r="13" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="483" cy="58" r="2.5" />
-    <circle cx="479" cy="48" r="2.5" />
-    <circle cx="470" cy="45" r="2.5" />
-    <circle cx="461" cy="48" r="2.5" />
-    <circle cx="457" cy="58" r="2.5" />
-    <circle cx="461" cy="68" r="2.5" />
-    <circle cx="470" cy="71" r="2.5" />
-    <circle cx="479" cy="68" r="2.5" />
-  </g>
+  <circle
+    cx="470"
+    cy="58"
+    r="13"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeDasharray="3 6"
+    strokeLinecap="round"
+    opacity="0.3"
+  />
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <rect x="460" y="55" width="20" height="5" rx="2.5" transform="rotate(45 470 58)" />
     <rect x="460" y="55" width="20" height="5" rx="2.5" transform="rotate(-45 470 58)" />
@@ -40,18 +41,25 @@ links.
     <rect x="308" y="138" width="24" height="24" rx="7" />
     <rect x="458" y="138" width="24" height="24" rx="7" />
   </g>
-  <g fill="currentColor" opacity="0.32">
-    <circle cx="170" cy="122" r="3" />
-    <circle cx="170" cy="104" r="3" />
-    <circle cx="170" cy="86" r="3" />
-    <circle cx="320" cy="122" r="3" />
-    <circle cx="320" cy="104" r="3" />
-    <circle cx="320" cy="86" r="3" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M170 132 V 78" />
+    <path d="M320 132 V 78" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="470" cy="122" r="3" fillOpacity="0.5" />
-    <circle cx="470" cy="104" r="3" fillOpacity="0.6" />
-    <circle cx="470" cy="86" r="3" fillOpacity="0.7" />
+  <g style={{ color: "var(--ds-red-500)" }}>
+    <path
+      d="M470 132 V 78"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeOpacity="0.6"
+    />
   </g>
 </svg>
 

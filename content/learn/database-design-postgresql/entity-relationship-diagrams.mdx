@@ -22,7 +22,7 @@ hardens your choices into a database.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="On a faint whiteboard, two entity boxes are already linked while a third is still being sketched as a dotted outline with a pen nib — drawing the schema before building it"
+  aria-label="On a faint whiteboard, two entity boxes are already linked by a thin line while a third is still being sketched as a dashed outline with a pen nib — drawing the schema before building it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -38,20 +38,24 @@ hardens your choices into a database.
     <circle cx="330" cy="144" r="7" />
     <rect x="346" y="158" width="58" height="9" rx="4.5" fillOpacity="0.5" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="244" cy="100" r="3" />
-    <circle cx="266" cy="112" r="3" />
-    <circle cx="288" cy="124" r="3" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M232 98 C 256 108, 274 116, 296 126"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="452" cy="48" r="3.5" />
-    <circle cx="480" cy="48" r="3.5" />
-    <circle cx="508" cy="48" r="3.5" />
-    <circle cx="536" cy="48" r="3.5" />
-    <circle cx="452" cy="70" r="3.5" />
-    <circle cx="452" cy="92" r="3.5" />
-    <circle cx="452" cy="114" r="3.5" />
-    <circle cx="478" cy="114" r="3.5" />
+    <path
+      d="M536 48 H 452 V 114 H 486"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeDasharray="5 9"
+    />
     <polygon points="548,40 562,48 548,56 552,48" />
   </g>
 </svg>
