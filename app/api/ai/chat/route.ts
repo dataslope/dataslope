@@ -1,10 +1,10 @@
 /**
  * "Ask AI" streaming chat endpoint.
  *
- * Signed-in only. Selects the model by membership tier (free → a cheaper
- * OpenRouter model; pro → an OpenAI model — see lib/ai/models.ts), assembles
- * page/playground context, enforces per-user + global budgets, then streams the
- * provider's answer straight through as Server-Sent Events.
+ * Signed-in only. Selects the model by membership tier (see lib/ai/models.ts
+ * for the per-tier provider/model config), assembles page/playground context,
+ * enforces per-user + global budgets, then streams the provider's answer
+ * straight through as Server-Sent Events.
  *
  * `force-dynamic` keeps it off the incremental cache — it reads the session,
  * calls an external API, and streams, so it must run per request (same posture

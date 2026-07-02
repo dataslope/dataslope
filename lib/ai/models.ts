@@ -1,13 +1,13 @@
 // Per-tier model + provider resolution for "Ask AI".
 //
-// The product decision: FREE members use a cheaper model from an
-// OpenAI-compatible aggregator (OpenRouter by default), and PAID (pro) members
-// use an OpenAI model. Each tier has its own base URL, API key, and model id,
-// plus its own output cap and daily budgets. Everything is overridable by env
-// so the actual provider/model is a config change, never a code change.
+// Base URL, model id, and API key are all required per tier — there are no
+// hardcoded fallbacks, so the actual provider/model lives entirely in env
+// (wrangler.jsonc `vars` for the base URL + model id, `wrangler secret put`
+// for the API key) and can change without touching this file. A tier missing
+// any of the three is treated as unconfigured (see resolveModel below).
 //
-// Both providers speak the OpenAI `/chat/completions` streaming API, so the
-// same adapter (lib/ai/provider.ts) drives either one.
+// Both providers must speak the OpenAI `/chat/completions` streaming API, so
+// the same adapter (lib/ai/provider.ts) drives whichever ones are configured.
 import type { MemberTier } from "./types";
 
 export interface ResolvedModel {
@@ -17,7 +17,7 @@ export interface ResolvedModel {
   baseUrl: string;
   /** Provider API key (a secret). */
   apiKey: string;
-  /** Model id, e.g. "openai/gpt-4o-mini" (OpenRouter) or "gpt-4o" (OpenAI). */
+  /** Model id, e.g. "deepseek/deepseek-v4-flash" (OpenRouter). */
   model: string;
   /** Max output tokens — the single biggest per-request cost lever. */
   maxTokens: number;
@@ -29,22 +29,20 @@ export interface ResolvedModel {
   contextBudget: number;
 }
 
-/** Non-secret defaults per tier. Only the API keys have no default. */
-const DEFAULTS: Record<
-  MemberTier,
-  Omit<ResolvedModel, "tier" | "apiKey">
-> = {
+type TierLimits = Pick<
+  ResolvedModel,
+  "maxTokens" | "dailyTokenBudget" | "dailyRequestBudget" | "contextBudget"
+>;
+
+/** Non-secret per-tier limits. Provider/model have no defaults — see wrangler.jsonc. */
+const LIMITS: Record<MemberTier, TierLimits> = {
   free: {
-    baseUrl: "https://openrouter.ai/api/v1",
-    model: "openai/gpt-4o-mini",
     maxTokens: 800,
     dailyTokenBudget: 60_000,
     dailyRequestBudget: 40,
     contextBudget: 8_000,
   },
   pro: {
-    baseUrl: "https://api.openai.com/v1",
-    model: "gpt-4o",
     maxTokens: 1_200,
     dailyTokenBudget: 400_000,
     dailyRequestBudget: 400,
@@ -52,35 +50,39 @@ const DEFAULTS: Record<
   },
 };
 
-/** Build a tier's provider config from env, or null if its key is unset. */
+/** Build a tier's provider config from env, or null if key/base URL/model isn't all set. */
 function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null {
-  const d = DEFAULTS[tier];
   if (tier === "pro") {
-    if (!env.AI_PRO_API_KEY) return null;
+    if (!env.AI_PRO_API_KEY || !env.AI_PRO_BASE_URL || !env.AI_PRO_MODEL) {
+      return null;
+    }
     return {
-      ...d,
+      ...LIMITS.pro,
       tier,
       apiKey: env.AI_PRO_API_KEY,
-      baseUrl: env.AI_PRO_BASE_URL || d.baseUrl,
-      model: env.AI_PRO_MODEL || d.model,
+      baseUrl: env.AI_PRO_BASE_URL,
+      model: env.AI_PRO_MODEL,
     };
   }
-  if (!env.AI_FREE_API_KEY) return null;
+  if (!env.AI_FREE_API_KEY || !env.AI_FREE_BASE_URL || !env.AI_FREE_MODEL) {
+    return null;
+  }
   return {
-    ...d,
+    ...LIMITS.free,
     tier,
     apiKey: env.AI_FREE_API_KEY,
-    baseUrl: env.AI_FREE_BASE_URL || d.baseUrl,
-    model: env.AI_FREE_MODEL || d.model,
+    baseUrl: env.AI_FREE_BASE_URL,
+    model: env.AI_FREE_MODEL,
   };
 }
 
 /**
- * Resolve the model to use for `tier`. If that tier's provider key isn't
- * configured, degrade to whichever provider *is* configured (so a half-wired
- * environment still answers) while keeping the requesting tier's budgets and
- * output caps. Returns null only when NO provider key is set at all → the
- * caller should 503 ("assistant isn't configured yet").
+ * Resolve the model to use for `tier`. If that tier's provider isn't fully
+ * configured (key, base URL, and model all set), degrade to whichever tier
+ * *is* configured (so a half-wired environment still answers) while keeping
+ * the requesting tier's budgets and output cap. Returns null only when
+ * NEITHER tier is configured → the caller should 503 ("assistant isn't
+ * configured yet").
  */
 export function resolveModel(
   tier: MemberTier,
@@ -93,13 +95,9 @@ export function resolveModel(
   if (!fallback) return null;
 
   // Use the available provider, but keep the requesting tier's limits.
-  const d = DEFAULTS[tier];
   return {
     ...fallback,
     tier,
-    maxTokens: d.maxTokens,
-    dailyTokenBudget: d.dailyTokenBudget,
-    dailyRequestBudget: d.dailyRequestBudget,
-    contextBudget: d.contextBudget,
+    ...LIMITS[tier],
   };
 }
