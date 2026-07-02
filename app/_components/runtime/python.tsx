@@ -705,6 +705,28 @@ class PyodideWorkerRuntime implements LanguageRuntime {
     this.worker.terminate();
   }
 
+  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages): asks
+   *  the worker to pre-install the heavy package set — and any micropip
+   *  drawer packages the sources import — when the authored code (or an
+   *  explicit `packages` list) actually needs it. Explicit module names
+   *  are turned into synthetic `import x` lines so the worker's gate and
+   *  micropip mapping treat them exactly like authored imports. */
+  warmPackages(
+    sources: string[],
+    options?: { packages?: string[]; force?: boolean },
+  ): void {
+    const hints = [
+      ...sources,
+      ...(options?.packages ?? []).map((mod) => `import ${mod}`),
+    ].filter((s) => s.trim().length > 0);
+    if (hints.length === 0 && !options?.force) return;
+    this.worker.postMessage({
+      kind: "warm-packages",
+      sources: hints,
+      force: options?.force ?? false,
+    });
+  }
+
   async run(
     code: string,
     emit: EmitOutput,

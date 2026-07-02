@@ -226,6 +226,13 @@ export interface ChallengeCardProps {
    *  should `assert`/`throw`/`stop()` on failure and be silent on
    *  success — the language-specific harness wraps the rest. */
   tests: ChallengeTest[];
+  /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
+   *  pre-install when the card's runtime warms, merged with the modules
+   *  found by scanning the card's own code (init/starter/solution/tests).
+   *  Escape hatch for imports the scan can't see — instructions that ask
+   *  the learner to write the import themselves, or dynamic imports.
+   *  Only meaningful for runtimes with optional package sets (Python). */
+  packages?: string[];
 }
 
 function detectIsMac(): boolean {
@@ -345,6 +352,7 @@ export default function ChallengeCard({
   datasets,
   showFileTabBar = false,
   tests,
+  packages,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
@@ -376,6 +384,29 @@ export default function ChallengeCard({
   useEffect(() => {
     datasetsRef.current = cardDatasets;
   }, [cardDatasets]);
+
+  // Everything this card could ask the runtime to execute — per-file
+  // init/starter/solution plus injected test snippets. Passed to
+  // `runtime.warmPackages` as the needs-analysis input so heavy optional
+  // packages (Python's data stack) only download for cards whose code
+  // actually imports them. Kept in a ref (like `datasetsRef` above) so
+  // the warm-up observer doesn't re-register when MDX re-creates the
+  // prop arrays.
+  const warmHintRef = useRef<{ sources: string[]; packages?: string[] }>({
+    sources: [],
+  });
+  useEffect(() => {
+    const sources: string[] = [];
+    for (const file of files ?? []) {
+      if (file.initCode) sources.push(file.initCode);
+      sources.push(file.starterCode);
+      if (file.solutionCode) sources.push(file.solutionCode);
+    }
+    for (const test of tests) {
+      if (isNativeTest(test)) sources.push(test.code);
+    }
+    warmHintRef.current = { sources, packages };
+  }, [files, tests, packages]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -1307,6 +1338,12 @@ export default function ChallengeCard({
         void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
           .then((rt) => {
             if (!runtimeRef.current) runtimeRef.current = rt;
+            // Pre-install heavy optional packages only if this card's
+            // authored code (or its explicit `packages` prop) needs
+            // them — see LanguageRuntime.warmPackages. Fire-and-forget:
+            // a Run installs on demand regardless.
+            const hint = warmHintRef.current;
+            rt.warmPackages?.(hint.sources, { packages: hint.packages });
           })
           .catch(() => {
             warmedRef.current = false;

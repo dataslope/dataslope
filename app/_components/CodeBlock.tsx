@@ -133,6 +133,12 @@ interface CodeBlockProps {
   /** Force the file tab bar to render even for a single-file workspace.
    *  Multi-file workspaces always show it; this opts a one-file block in. */
   showFileTabBar?: boolean;
+  /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
+   *  pre-install when the block's runtime warms, merged with the modules
+   *  found by scanning the block's own code (init + starter). Escape
+   *  hatch for imports the scan can't see — e.g. dynamic imports. Only
+   *  meaningful for runtimes with optional package sets (Python). */
+  packages?: string[];
 }
 
 // Match the convention of the existing playground for shortcut hints.
@@ -365,6 +371,7 @@ function CodeBlockInner({
   entryFilename,
   datasets,
   showFileTabBar = false,
+  packages,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -444,6 +451,24 @@ function CodeBlockInner({
   useEffect(() => {
     datasetsRef.current = blockDatasets;
   }, [blockDatasets]);
+
+  // Everything this block could ask the runtime to execute — per-file
+  // init + starter code. Passed to `runtime.warmPackages` as the
+  // needs-analysis input so heavy optional packages (Python's data
+  // stack) only download for blocks whose code actually imports them.
+  // Kept in a ref (like `datasetsRef` above) so the warm-up observer
+  // doesn't re-register when MDX re-creates the prop arrays.
+  const warmHintRef = useRef<{ sources: string[]; packages?: string[] }>({
+    sources: [],
+  });
+  useEffect(() => {
+    const sources: string[] = [];
+    for (const file of files ?? []) {
+      if (file.initCode) sources.push(file.initCode);
+      sources.push(file.starterCode);
+    }
+    warmHintRef.current = { sources, packages };
+  }, [files, packages]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -1011,6 +1036,12 @@ function CodeBlockInner({
         void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
           .then((rt) => {
             if (!runtimeRef.current) runtimeRef.current = rt;
+            // Pre-install heavy optional packages only if this block's
+            // authored code (or its explicit `packages` prop) needs
+            // them — see LanguageRuntime.warmPackages. Fire-and-forget:
+            // a Run installs on demand regardless.
+            const hint = warmHintRef.current;
+            rt.warmPackages?.(hint.sources, { packages: hint.packages });
           })
           .catch(() => {
             // Warm-up is best-effort; let a later Run retry and surface errors.

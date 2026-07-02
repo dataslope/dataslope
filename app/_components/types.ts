@@ -156,6 +156,24 @@ export interface LanguageRuntime {
    *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
    *  this hook, which also exempts them from eviction. */
   dispose?(): void | Promise<void>;
+  /** Optional: hint that the given authored source snippets may run
+   *  soon, so the runtime can pre-install heavy optional packages while
+   *  the user is still reading (Python's numpy/pandas/scipy/matplotlib/
+   *  plotly set). Fire-and-forget and best-effort: runtimes install
+   *  missing packages on demand at run time regardless, so a missed or
+   *  wrong hint only changes *when* the download happens, never whether
+   *  a run succeeds.
+   *
+   *  `options.packages` adds importable module names (e.g. `"pandas"`,
+   *  `"sklearn"`) to warm even though no source imports them — the
+   *  escape hatch for content whose instructions ask the learner to
+   *  write the import themselves, or for dynamic imports the scan can't
+   *  see. `options.force` skips the needs-analysis and warms the full
+   *  set (used by the playground, whose future code is unknown). */
+  warmPackages?(
+    sources: string[],
+    options?: { packages?: string[]; force?: boolean },
+  ): void;
 }
 
 export interface LanguageAdapter {

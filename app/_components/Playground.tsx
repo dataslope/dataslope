@@ -1503,6 +1503,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         );
         if (cancelled) return;
         runtimeRef.current = rt;
+        // The playground can't predict what the user will type, and its
+        // audience skews toward the data stack — pre-warm the full
+        // optional package set unconditionally (the pre-#549 behaviour,
+        // now opt-in per surface via warmPackages). Fire-and-forget: a
+        // run that needs packages installs them on demand regardless.
+        rt.warmPackages?.([], { force: true });
         setLoaded(true);
         setStatusState("ready");
       } catch (err) {
