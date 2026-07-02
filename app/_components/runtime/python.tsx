@@ -699,6 +699,12 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   constructor(private worker: Worker) {}
 
+  /** Free the Pyodide heap by terminating the worker. Registry-eviction
+   *  hook — the instance must not be used after this. */
+  dispose(): void {
+    this.worker.terminate();
+  }
+
   async run(
     code: string,
     emit: EmitOutput,

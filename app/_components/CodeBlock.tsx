@@ -48,7 +48,12 @@ import type {
   OutputCell,
   PlotlyFigure,
 } from "./types";
-import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import {
+  getSharedRuntime,
+  isRuntimeReady,
+  retainRuntime,
+  RuntimeScope,
+} from "./runtimeRegistry";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
 import {
   datasetStageFilename,
@@ -969,6 +974,15 @@ function CodeBlockInner({
   useEffect(() => {
     runRef.current = run;
   }, [run]);
+
+  // Pin this block's runtime in the registry while the block is mounted,
+  // so eviction (the per-scope LRU cap) never tears a runtime down under
+  // a block that could still Run against it — including the `runtimeRef`
+  // cached above.
+  useEffect(
+    () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
+    [adapter.id],
+  );
 
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
   // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so

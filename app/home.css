@@ -77,6 +77,16 @@ html.dark .ds-home {
   }
 }
 
+/* Decorative CSS animations pause while their section is offscreen — see
+ * AnimationPauseGate.tsx, which toggles the data attribute from an
+ * IntersectionObserver. Scoped under .ds-home so the rule can't leak into
+ * other routes; `!important` outranks the animation shorthand set by the
+ * animate-* utilities. */
+.ds-home [data-anims="paused"],
+.ds-home [data-anims="paused"] * {
+  animation-play-state: paused !important;
+}
+
 /* Footer: one column on mobile, three from sm up. Driven by a scoped rule
  * (rather than Tailwind grid utilities) so a leaked `.grid`/`grid-cols-*`
  * from /learn can't collapse it back to the wrong column count. */

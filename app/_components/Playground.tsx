@@ -150,7 +150,11 @@ import {
   upsertDataFolder,
   writeDataFile,
 } from "./files/opfsDataStorage";
-import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
+import {
+  getSharedRuntime,
+  retainRuntime,
+  RuntimeScope,
+} from "./runtimeRegistry";
 import { PLOTLY_CDN } from "./runtime/cdn";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
@@ -1519,6 +1523,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // subsequent changes are pushed via Compartment reconfigure below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter]);
+
+  // Pin this playground's runtime in the registry while mounted, so the
+  // per-scope LRU eviction never terminates the engine under a live
+  // playground (including the `runtimeRef` cached above).
+  useEffect(
+    () => retainRuntime(RuntimeScope.Playground, adapter.id),
+    [adapter.id],
+  );
 
   // Push editor-theme changes into CodeMirror after init.
   useEffect(() => {

@@ -185,3 +185,17 @@
     opacity: 0;
   }
 }
+
+/* The Magic UI animations above are all infinite and purely decorative —
+ * disable them outright for users who prefer reduced motion. (The JS-driven
+ * counterparts check useReducedMotion / matchMedia themselves.) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical,
+  .animate-shimmer-slide,
+  .animate-spin-around,
+  .animate-ripple,
+  .animate-blink-cursor {
+    animation: none !important;
+  }
+}

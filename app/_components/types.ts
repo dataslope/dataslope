@@ -148,6 +148,14 @@ export interface LanguageRuntime {
    *  implementations must clear their internal tracking after returning
    *  to avoid reporting the same file twice. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
+  /** Optional: tear the runtime down and free its resources (terminate
+   *  the backing Web Worker, close the WASM instance). Called by the
+   *  runtime registry when this runtime is evicted to bound how many
+   *  language VMs stay resident at once — after it runs, the instance
+   *  must not be used again. Runtimes that cannot release their
+   *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
+   *  this hook, which also exempts them from eviction. */
+  dispose?(): void | Promise<void>;
 }
 
 export interface LanguageAdapter {

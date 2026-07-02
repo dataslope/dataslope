@@ -74,7 +74,12 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
-import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import {
+  getSharedRuntime,
+  isRuntimeReady,
+  retainRuntime,
+  RuntimeScope,
+} from "./runtimeRegistry";
 import {
   datasetStageFilename,
   fetchDatasetBytes,
@@ -1265,6 +1270,15 @@ export default function ChallengeCard({
   useEffect(() => {
     runRef.current = run;
   }, [run]);
+
+  // Pin this card's runtime in the registry while the card is mounted, so
+  // eviction (the per-scope LRU cap) never tears a runtime down under a
+  // card that could still Run against it — including the `runtimeRef`
+  // cached above.
+  useEffect(
+    () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
+    [adapter.id],
+  );
 
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
   // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so

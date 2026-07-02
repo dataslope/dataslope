@@ -1,7 +1,18 @@
 "use client";
 
-import { forwardRef, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+} from "motion/react";
 import type { IconType } from "react-icons";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
@@ -37,13 +48,20 @@ function MonoIcon({ id, size = 22 }: { id: string; size?: number }) {
 }
 
 /** Steps through `count` on an interval, after an initial `delay`. A count of
- *  1 stays put (no animation). Shared by the rotating icon and its label so
- *  they always show the same language. */
-function useRotatingIndex(count: number, delay = 0, interval = 2800): number {
+ *  1 stays put (no animation), and rotation only runs while `active` (i.e.
+ *  the section is on screen and the user hasn't asked for reduced motion).
+ *  Shared by the rotating icon and its label so they always show the same
+ *  language. */
+function useRotatingIndex(
+  count: number,
+  delay = 0,
+  interval = 2800,
+  active = true,
+): number {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (count < 2) return;
+    if (count < 2 || !active) return;
     let timer: number | undefined;
     const start = window.setTimeout(() => {
       timer = window.setInterval(
@@ -55,7 +73,7 @@ function useRotatingIndex(count: number, delay = 0, interval = 2800): number {
       window.clearTimeout(start);
       if (timer) window.clearInterval(timer);
     };
-  }, [count, delay, interval]);
+  }, [count, delay, interval, active]);
 
   return index % count;
 }
@@ -114,12 +132,19 @@ interface NodeItem {
 
 /** A language node: its circle plus a rotating label. `side` decides which
  *  edge of the diagram it lives on — left-column labels sit to the left of the
- *  circle (right-aligned), right-column labels to the right (left-aligned). */
+ *  circle (right-aligned), right-column labels to the right (left-aligned).
+ *  `active` gates the rotation (false while the section is offscreen). */
 const BeamNode = forwardRef<
   HTMLDivElement,
-  { items: NodeItem[]; side: "left" | "right"; delay?: number; label: string }
->(({ items, side, delay = 0, label }, ref) => {
-  const index = useRotatingIndex(items.length, delay);
+  {
+    items: NodeItem[];
+    side: "left" | "right";
+    delay?: number;
+    label: string;
+    active: boolean;
+  }
+>(({ items, side, delay = 0, label, active }, ref) => {
+  const index = useRotatingIndex(items.length, delay, 2800, active);
   const current = items[index];
 
   const circle = (
@@ -151,6 +176,13 @@ BeamNode.displayName = "BeamNode";
 
 export function BeamSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Icon/label rotation drives AnimatePresence cross-fades on eight nodes
+  // every 2.8s forever — pause it while the diagram is offscreen, and skip
+  // it under prefers-reduced-motion. (The beams themselves pause in
+  // AnimatedBeam, and the FlickeringGrid backdrop already self-gates.)
+  const sectionInView = useInView(containerRef as RefObject<Element>);
+  const reducedMotion = useReducedMotion();
+  const rotationActive = sectionInView && !reducedMotion;
   const centerRef = useRef<HTMLDivElement>(null);
   // Left column (top → bottom): Python/R, JS/TS, PHP, C/C++.
   const left1 = useRef<HTMLDivElement>(null);
@@ -170,10 +202,10 @@ export function BeamSection() {
     >
       {/* Left column — labels hug the right edge so they sit beside the circle. */}
       <div className="flex flex-col items-end justify-center gap-6">
-        <BeamNode ref={left1} side="left" label="Python and R" delay={0} items={[{ id: "python", name: "Python" }, { id: "r", name: "R" }]} />
-        <BeamNode ref={left2} side="left" label="JavaScript and TypeScript" delay={700} items={[{ id: "javascript", name: "JavaScript" }, { id: "typescript", name: "TypeScript" }]} />
-        <BeamNode ref={left3} side="left" label="PHP" items={[{ id: "php", name: "PHP" }]} />
-        <BeamNode ref={left4} side="left" label="C and C++" delay={1400} items={[{ id: "c", name: "C" }, { id: "cpp", name: "C++" }]} />
+        <BeamNode ref={left1} active={rotationActive} side="left" label="Python and R" delay={0} items={[{ id: "python", name: "Python" }, { id: "r", name: "R" }]} />
+        <BeamNode ref={left2} active={rotationActive} side="left" label="JavaScript and TypeScript" delay={700} items={[{ id: "javascript", name: "JavaScript" }, { id: "typescript", name: "TypeScript" }]} />
+        <BeamNode ref={left3} active={rotationActive} side="left" label="PHP" items={[{ id: "php", name: "PHP" }]} />
+        <BeamNode ref={left4} active={rotationActive} side="left" label="C and C++" delay={1400} items={[{ id: "c", name: "C" }, { id: "cpp", name: "C++" }]} />
       </div>
 
       {/* Center logo */}
@@ -199,10 +231,10 @@ export function BeamSection() {
 
       {/* Right column — labels hug the left edge, beside the circle. */}
       <div className="flex flex-col items-start justify-center gap-6">
-        <BeamNode ref={right1} side="right" label="Java and C#" delay={350} items={[{ id: "java", name: "Java" }, { id: "csharp", name: "C#" }]} />
-        <BeamNode ref={right2} side="right" label="SQLite" items={[{ id: "sqlite", name: "SQLite" }]} />
-        <BeamNode ref={right3} side="right" label="PostgreSQL" items={[{ id: "postgres", name: "PostgreSQL" }]} />
-        <BeamNode ref={right4} side="right" label="DuckDB" items={[{ id: "duckdb", name: "DuckDB" }]} />
+        <BeamNode ref={right1} active={rotationActive} side="right" label="Java and C#" delay={350} items={[{ id: "java", name: "Java" }, { id: "csharp", name: "C#" }]} />
+        <BeamNode ref={right2} active={rotationActive} side="right" label="SQLite" items={[{ id: "sqlite", name: "SQLite" }]} />
+        <BeamNode ref={right3} active={rotationActive} side="right" label="PostgreSQL" items={[{ id: "postgres", name: "PostgreSQL" }]} />
+        <BeamNode ref={right4} active={rotationActive} side="right" label="DuckDB" items={[{ id: "duckdb", name: "DuckDB" }]} />
       </div>
 
       {/* Every beam flows from a language node INTO the center. Right-side
