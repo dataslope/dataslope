@@ -1,5 +1,8 @@
 import Link from "../Link";
 import { ArrowRight } from "lucide-react";
+// Display labels for tag slugs live in lib/tagLabels.ts (shared with the
+// /courses catalog page).
+import { formatTagLabel } from "@/lib/tagLabels";
 
 export interface CourseTags {
   language?: string[];
@@ -39,53 +42,6 @@ const CHIP_CLASSES: Record<string, string> = {
     "border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] text-[var(--ds-gray-600)] dark:border-white/10 dark:bg-white/5 dark:text-[var(--ds-gray-300)]",
 };
 
-// Proper display labels for tag slugs whose casing isn't just "capitalize each
-// word" — languages, tools, and libraries with established names. Anything not
-// listed falls back to title-casing the hyphenated slug (e.g.
-// "exploratory-data-analysis" → "Exploratory Data Analysis").
-const TAG_LABELS: Record<string, string> = {
-  // Languages
-  c: "C",
-  cpp: "C++",
-  csharp: "C#",
-  java: "Java",
-  javascript: "JavaScript",
-  python: "Python",
-  r: "R",
-  sql: "SQL",
-  typescript: "TypeScript",
-  // Tools / databases
-  dotnet: ".NET",
-  duckdb: "DuckDB",
-  postgresql: "PostgreSQL",
-  sqlite: "SQLite",
-  // Libraries (kept at their canonical casing)
-  dplyr: "dplyr",
-  ggplot2: "ggplot2",
-  linq: "LINQ",
-  matplotlib: "Matplotlib",
-  nltk: "NLTK",
-  numpy: "NumPy",
-  pandas: "pandas",
-  plotly: "Plotly",
-  "scikit-learn": "scikit-learn",
-  scipy: "SciPy",
-  seaborn: "seaborn",
-  statsmodels: "statsmodels",
-};
-
-/** Turn a tag slug into a badge label: a known proper name, or the slug
- *  title-cased with hyphens replaced by spaces. */
-function formatTagLabel(value: string): string {
-  return (
-    TAG_LABELS[value] ??
-    value
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
-  );
-}
-
 function flattenTags(tags: CourseTags): { category: string; value: string }[] {
   const chips: { category: string; value: string }[] = [];
   for (const category of TAG_CATEGORY_ORDER) {
@@ -115,7 +71,7 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
           return (
             <Link
               key={slug}
-              href={`/learn/${slug}`}
+              href={`/courses/${slug}`}
               // Dense index grid — don't viewport-prefetch every course card
               // (see the opt-out note in app/_components/Link.tsx).
               prefetch={false}

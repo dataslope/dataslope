@@ -1,0 +1,423 @@
+---
+title: What Is a Database?
+description: A plain-language answer — what a database really is, the five problems it was invented to solve, how it stores data, and where it hides inside every app you use.
+---
+
+You used a database before breakfast today. Probably a dozen. The
+alarm app that remembered your wake-up time, the bank app that knew
+your balance, the message thread that still had last night's
+conversation, the coffee shop register that rang up your order —
+every one of them leaned on a database. They are the most invisible
+successful technology in the world, and this page makes them
+visible.
+
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A tidy bookshelf of colored data books with one book gliding along a dotted arc to a waiting reader — an organized collection that can be searched and served"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="120" y="28" width="260" height="170" rx="14" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="132" y="88" width="236" height="5" rx="2.5" />
+    <rect x="132" y="148" width="236" height="5" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="140" y="56" width="11" height="32" rx="4" />
+    <rect x="172" y="56" width="11" height="32" rx="4" fillOpacity="0.5" />
+    <rect x="204" y="56" width="11" height="32" rx="4" />
+    <rect x="268" y="56" width="11" height="32" rx="4" fillOpacity="0.6" />
+    <rect x="156" y="116" width="11" height="32" rx="4" />
+    <rect x="220" y="116" width="11" height="32" rx="4" fillOpacity="0.5" />
+    <rect x="284" y="116" width="11" height="32" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="156" y="56" width="11" height="32" rx="4" fillOpacity="0.8" />
+    <rect x="252" y="56" width="11" height="32" rx="4" />
+    <rect x="188" y="116" width="11" height="32" rx="4" fillOpacity="0.7" />
+    <rect x="252" y="116" width="11" height="32" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="188" y="56" width="11" height="32" rx="4" />
+    <rect x="140" y="116" width="11" height="32" rx="4" fillOpacity="0.7" />
+    <rect x="268" y="116" width="11" height="32" rx="4" />
+    <rect x="316" y="116" width="11" height="32" rx="4" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="260" cy="40" r="3.5" />
+    <circle cx="310" cy="34" r="3.5" />
+    <circle cx="360" cy="40" r="3.5" />
+    <circle cx="408" cy="56" r="3.5" />
+    <circle cx="448" cy="78" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="478" y="94" width="12" height="34" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="530" cy="134" r="11" />
+    <rect x="512" y="150" width="36" height="30" rx="12" fillOpacity="0.35" />
+  </g>
+</svg>
+
+## A first, honest definition
+
+A **database** is an organized collection of information, together
+with software that lets you **store**, **find**, **change**, and
+**protect** that information reliably — even when many people and
+programs use it at the same time.
+
+Read that again slowly. There are four verbs hiding in it, and they
+are the whole reason databases exist:
+
+```mermaid
+flowchart TD
+    S["Store<br/>(keep data safely)"] --> F["Find<br/>(answer questions)"]
+    F --> C["Change<br/>(add, edit, delete)"]
+    C --> P["Protect<br/>(stay correct and safe)"]
+```
+
+A pile of files can *store* data. A database is what you get when
+storing is the easy part, and **finding, changing, and protecting**
+the data — quickly, correctly, and at scale — become the hard part.
+
+<Callout type="info" title="Database vs. database system">
+Strictly speaking, the organized data is the *database*, and the
+software that manages it is the *database management system*, or
+**DBMS**. PostgreSQL is a DBMS. In everyday speech people say
+"database" for both, and so will we — but it is useful to know that
+the data and the software managing it are two different things.
+</Callout>
+
+## The five nightmares
+
+Databases were not invented because someone thought they were
+elegant. They were invented because, without them, working with
+data at any real scale becomes a nightmare — five distinct
+nightmares, in fact. Every feature you will learn in this course
+exists to prevent one of them.
+
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Loose pages tumble away in the wind on the left while the same data sits as tidy dots inside a sturdy vault on the right"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="70" y="46" width="56" height="72" rx="6" opacity="0.2" transform="rotate(-14 98 82)" />
+    <rect x="140" y="70" width="56" height="72" rx="6" opacity="0.14" transform="rotate(10 168 106)" />
+    <rect x="95" y="120" width="56" height="72" rx="6" opacity="0.1" transform="rotate(22 123 156)" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="82" y="60" width="32" height="6" rx="3" transform="rotate(-14 98 82)" />
+    <rect x="82" y="74" width="24" height="6" rx="3" transform="rotate(-14 98 82)" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="215" y="30" width="50" height="64" rx="6" fillOpacity="0.35" transform="rotate(28 240 62)" />
+    <circle cx="290" cy="44" r="3.5" fillOpacity="0.3" />
+    <circle cx="305" cy="58" r="3.5" fillOpacity="0.25" />
+    <circle cx="316" cy="74" r="3.5" fillOpacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="400" y="50" width="180" height="130" rx="16" fillOpacity="0.12" />
+    <circle cx="442" cy="86" r="7" />
+    <circle cx="490" cy="86" r="7" fillOpacity="0.6" />
+    <circle cx="442" cy="146" r="7" fillOpacity="0.6" />
+    <circle cx="490" cy="116" r="7" />
+    <circle cx="538" cy="146" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="538" cy="86" r="7" />
+    <circle cx="442" cy="116" r="7" fillOpacity="0.7" />
+    <circle cx="538" cy="116" r="7" fillOpacity="0.7" />
+    <circle cx="490" cy="146" r="7" />
+    <rect x="560" y="95" width="10" height="40" rx="5" />
+  </g>
+</svg>
+
+**Nightmare 1: losing the data.** Imagine a shop that records every
+sale in a notebook. The notebook can be lost, burned, soaked, or
+simply run out of pages. If two clerks each keep their own
+notebook, the records are split across two places that may
+disagree. A database provides **durable, central storage**: one
+trusted place where data lives, survives crashes, and can be backed
+up.
+
+**Nightmare 2: many people at once.** Now imagine ten clerks all
+updating the same inventory at the same moment. Two of them sell
+the last umbrella within the same second — who actually got it?
+Without coordination, the shop just sold one umbrella twice.
+Databases solve this with **concurrency control**: many users can
+read and write at the same time, and the data stays consistent.
+The last umbrella is sold exactly once.
+
+**Nightmare 3: slow searches.** A notebook with 100 sales is easy
+to scan. A notebook with 10 million is not — answering *"how much
+did we sell in March to customers in Ohio?"* by reading every line
+would take days. Databases are built to **answer questions fast**,
+even over huge amounts of data, using clever internal structures so
+that finding the right rows does not require reading every row.
+
+**Nightmare 4: copies that disagree.** Suppose a customer's address
+is written in five different places, and the customer moves. You
+must remember to update all five — miss one, and your data quietly
+contradicts itself. Which address is correct? Nobody knows.
+Databases let you store each fact **once** and refer to it from
+everywhere else. This idea — *don't repeat the same fact* — is the
+beating heart of relational databases, and we will return to it
+again and again.
+
+**Nightmare 5: nonsense and half-finished work.** Data needs
+protecting from accidents (a program crashes halfway through
+recording a sale) and from bad values (a price of `"banana"`, an
+age of `-7`). Databases guarantee that a change either fully
+happens or does not happen at all, and they **enforce rules** about
+what counts as valid data, refusing values that break them.
+
+```mermaid
+flowchart TB
+    N["Naive storage<br/>(files, notebooks, scattered sheets)"]
+    N --> P1["Data gets lost"]
+    N --> P2["Conflicting edits"]
+    N --> P3["Slow searches"]
+    N --> P4["Inconsistent copies"]
+    N --> P5["Invalid or half-written data"]
+    P1 --> DB["A database<br/>solves all five"]
+    P2 --> DB
+    P3 --> DB
+    P4 --> DB
+    P5 --> DB
+```
+
+When a concept later in the course feels abstract, ask yourself:
+*which of these five nightmares is this protecting me from?* The
+answer is almost always illuminating.
+
+## What the stored data looks like
+
+So a database keeps data safe, consistent, and findable. But what
+does the data actually *look like* inside? The relational answer is
+disarmingly simple: **rectangles.**
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A jumble of colored facts on the left is lined up into a neat grid of rows and columns on the right"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="105" cy="60" r="9" />
+    <rect x="126" y="114" width="20" height="13" rx="4" transform="rotate(-15 136 120)" fillOpacity="0.7" />
+    <circle cx="160" cy="160" r="6" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="142" y="44" width="17" height="17" rx="5" transform="rotate(20 150 52)" />
+    <circle cx="178" cy="95" r="10" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="90" cy="112" r="7" />
+    <polygon points="100,164 118,164 109,148" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor">
+    <rect x="232" y="100" width="46" height="8" rx="4" opacity="0.25" />
+    <polygon points="278,88 278,120 308,104" opacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="350" y="58" width="56" height="28" rx="6" />
+    <rect x="412" y="58" width="56" height="28" rx="6" />
+    <rect x="474" y="58" width="56" height="28" rx="6" />
+    <rect x="350" y="92" width="56" height="28" rx="6" />
+    <rect x="412" y="92" width="56" height="28" rx="6" />
+    <rect x="474" y="92" width="56" height="28" rx="6" />
+    <rect x="350" y="126" width="56" height="28" rx="6" />
+    <rect x="412" y="126" width="56" height="28" rx="6" />
+    <rect x="474" y="126" width="56" height="28" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="378" cy="72" r="6" />
+    <circle cx="440" cy="106" r="6" />
+    <circle cx="502" cy="106" r="6" fillOpacity="0.6" />
+    <circle cx="440" cy="140" r="6" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="440" cy="72" r="6" />
+    <circle cx="378" cy="106" r="6" />
+    <circle cx="502" cy="140" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="502" cy="72" r="6" />
+    <circle cx="378" cy="140" r="6" />
+  </g>
+</svg>
+
+Almost all useful data is a collection of **facts about things**.
+"This customer is named Ada and lives in Toronto." "This order was
+placed on March 3rd for \$42." A relational database groups those
+facts into **tables**: each **row** is one thing (one customer, one
+order), each **column** is one attribute (a name, a city, a price),
+and each **cell** holds a single value.
+
+| id | name | city |
+| --- | --- | --- |
+| 1 | Ada | Toronto |
+| 2 | Linus | Helsinki |
+| 3 | Grace | New York |
+
+Why a grid, rather than paragraphs of text? Because a grid makes
+questions answerable *mechanically*. "Which rows have
+`city = 'Toronto'`?" — check one column. "How many customers?" —
+count the rows. Every value has a known place and a known kind,
+and that regularity is what lets a computer answer questions about
+millions of facts in milliseconds. Here is that exact table, alive.
+Run the query and what comes back is the stored grid itself:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A stored table is just a grid of rows and columns"
+  initSql={`CREATE TABLE customers (
+  id   INTEGER,
+  name TEXT,
+  city TEXT
+);
+INSERT INTO customers (id, name, city) VALUES
+  (1, 'Ada',   'Toronto'),
+  (2, 'Linus', 'Helsinki'),
+  (3, 'Grace', 'New York');`}
+  starterCode={`SELECT
+  *
+FROM
+  customers;`}
+/>
+
+The `*` means "every column." That labeled grid is the single most
+important image in this course — almost everything we do from here
+is *reading* such a grid, *changing* it, or *combining* two of
+them. The next section makes each part of it precise.
+
+## Where the database hides in an app
+
+One last piece of the picture. When you use an app — a store, a
+chat, a banking site — there are really **two separate things**
+working together: the **application** (the screens and buttons you
+touch) and the **database** (the quiet, screen-less system that
+remembers everything). The application never stores the real data
+itself. Every time it needs to remember or retrieve something, it
+sends the database a request written in SQL. That request is called
+a **query**.
+
+```mermaid
+flowchart TD
+    User["You<br/>(tap, type, click)"] --> App["Application<br/>(screens & logic)"]
+    App -->|"a query: please give me X"| DB[("Database")]
+    DB -->|"the rows that match"| App
+    App -->|"a nice screen"| User
+```
+
+Open a food-delivery app and tap a restaurant: that is a query
+("give me the menu for restaurant 57"). Place an order: another
+query ("insert this order"). The app is, to a surprising degree, a
+friendly face on top of a stream of SQL — and the language of that
+stream is what you are here to learn. (For a fuller tour of this
+picture, see [How Applications Use
+Databases](/courses/intro-sql-postgres/how-applications-use-databases)
+in the *Interesting discussions* section near the end of the
+course.)
+
+## A tiny mental model to carry with you
+
+For the rest of this course, hold this picture in your head: a
+database is a **trustworthy librarian** for your data.
+
+```mermaid
+flowchart TD
+    U["You / an app"] -->|"a request"| L["Database<br/>(the librarian)"]
+    L -->|"exactly the right data"| U
+    L --- D[("Stored data")]
+```
+
+You do not walk into the stacks and rummage around yourself. You
+hand the librarian a precise request — *"every customer in Ohio who
+ordered last month"* — and the librarian fetches exactly that,
+quickly, without losing or damaging anything, even while answering
+hundreds of other requests at the same time.
+
+Two clarifications before we move on, because they trip people up.
+A database is **not** a website or an app — apps *use* databases,
+but the database itself has no buttons or screens. And a database
+is **not** necessarily huge: it can hold ten rows or ten billion.
+What makes it a database is *how* the data is managed, not how much
+there is. (If you are wondering how all this compares to the
+spreadsheets you already know — a genuinely interesting question —
+that comparison gets its own page:
+[Spreadsheets vs. Databases](/courses/intro-sql-postgres/spreadsheets-vs-databases),
+also in *Interesting discussions*.)
+
+So: organized data, a librarian guarding it, requests written in a
+language called SQL. The obvious next questions are *why that
+particular language* and *why PostgreSQL* — and the answers involve
+a 1970 research paper, a trademark dispute, and a race IBM lost to
+a startup. That story is next.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which of the following best describes what a database is?
+
+- A single spreadsheet file stored on your desktop.
+  > A spreadsheet can hold data, but a database is defined by the software that lets many users reliably store, find, change, and protect data — often far beyond what a spreadsheet can do.
+- A website that displays information to users.
+  > A website may *use* a database, but the database itself has no user interface. They are separate things.
+- [o] An organized collection of data plus software that lets you reliably store, find, change, and protect it.
+  > This captures the four jobs — store, find, change, protect — that make something a database rather than just a pile of files.
+- A programming language for building apps.
+  > A programming language is a tool for writing software; a database is the system that manages data. SQL is a language *for talking to* databases, which is different again.
+
+A database is the combination of organized data and the management
+system that keeps it reliable, searchable, and safe.`}
+/>
+
+<MultipleChoice
+  markdown={`Two clerks try to sell the last item in stock at the same instant. Which database capability prevents the item from being sold twice?
+
+- Fast searching over large tables.
+  > Speed helps answer questions quickly but does not, by itself, coordinate simultaneous changes to the same data.
+- Backing up data to survive crashes.
+  > Backups protect against data loss, but they do not arbitrate between two simultaneous edits.
+- [o] Concurrency control — coordinating simultaneous reads and writes so the data stays consistent.
+  > Concurrency control is precisely what lets many users act at once while ensuring the last item is sold exactly once.
+- Enforcing that prices are numbers, not text.
+  > Validating data types keeps individual values sensible, but it does not resolve a race between two simultaneous sales.
+
+Coordinating simultaneous access so the data stays correct is the job of concurrency control.`}
+/>
+
+<MultipleChoice
+  markdown={`Storing a customer's address in five different places creates which classic problem that databases are designed to prevent?
+
+- The data takes up too much disk space to store.
+  > Storage space is rarely the real issue; copying a short address five times costs almost nothing. The deeper danger is the data disagreeing with itself.
+- [o] Inconsistency — if the address changes, some copies may be updated and others missed, so the data contradicts itself.
+  > Storing a fact once and referring to it everywhere is exactly how relational databases avoid this, and it is a theme we return to throughout the course.
+- The address becomes impossible to search.
+  > Having multiple copies does not prevent searching; the real risk is that the copies disagree after an update.
+- The database runs out of memory.
+  > Memory exhaustion is unrelated to having a few duplicate addresses; the genuine problem is conflicting copies.
+
+Storing the same fact in many places risks those copies drifting out of sync — the consistency problem.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a SQL **query**, in plain terms?
+
+- A type of button inside an application.
+  > Buttons are part of the application's interface; a query is the request the app sends to the database when a button is used.
+- A backup copy of the database.
+  > A backup is a safety copy of data; a query is an instruction or question sent to the database.
+- [o] A precise request — a question or an instruction — sent to the database, written in SQL.
+  > Whether it reads data or changes it, a query is the message that tells the database exactly what to do.
+- The physical disk where data is stored.
+  > Storage hardware holds the data; a query is the request that asks the database to read or change that data.
+
+A query is how you ask a database a question or tell it to make a change.`}
+/>

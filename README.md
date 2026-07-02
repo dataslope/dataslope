@@ -43,7 +43,7 @@ npm run cf:deploy    # build + deploy to Cloudflare
 
 ### One-time setup: incremental cache bucket
 
-OpenNext serves the prerendered home page and `/learn/*` lessons from an R2-backed incremental cache (see `open-next.config.ts`). Without it the Worker re-renders those pages on demand and hits `node:fs`, which doesn't exist in the Workers runtime — returning a 500 (this is what caused `*.workers.dev` preview URLs to fail). Create the bucket once before the first deploy:
+OpenNext serves the prerendered home page and `/courses/*` lessons from an R2-backed incremental cache (see `open-next.config.ts`). Without it the Worker re-renders those pages on demand and hits `node:fs`, which doesn't exist in the Workers runtime — returning a 500 (this is what caused `*.workers.dev` preview URLs to fail). Create the bucket once before the first deploy:
 
 ```bash
 npx wrangler r2 bucket create dataslope-inc-cache
@@ -53,7 +53,7 @@ The bucket is bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.jsonc`. It is **p
 
 ### Cloudflare Workers Builds configuration
 
-Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/learn/*`.
+Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.
 
 | Field | Value |
 | --- | --- |
@@ -68,7 +68,7 @@ Both `deploy` (production) and `upload` (preview versions) populate the R2 cache
 
 OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy — production and each preview — writes a fresh copy (~0.6 GB) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows ~0.6 GB per deploy.
 
-A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it daily: it deletes every build folder that is **both** not the live production build **and** older than 3 days. The live production build is preserved regardless of age — important because a stable site can go weeks without a deploy, and deleting its cache would 500 the home page and `/learn/*` lessons. Superseded production builds and merged-PR previews age out 3 days after their last deploy.
+A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it daily: it deletes every build folder that is **both** not the live production build **and** older than 3 days. The live production build is preserved regardless of age — important because a stable site can go weeks without a deploy, and deleting its cache would 500 the home page and `/courses/*` lessons. Superseded production builds and merged-PR previews age out 3 days after their last deploy.
 
 The job identifies the live build by fetching [`/api/cache-build-id`](app/api/cache-build-id/route.ts) (the running Worker reports the exact `OPEN_NEXT_BUILD_ID` it serves from) and **aborts without deleting anything** if it can't positively identify that folder, so a transient error can never wipe the bucket. Trigger it manually with `dry_run` to preview deletions.
 
@@ -103,7 +103,7 @@ To enable verification + reset:
 
    For local dev, add `RESEND_API_KEY` (and optionally `EMAIL_FROM`) to `.dev.vars`. Before a domain is verified, Resend only delivers to your own account address via the `onboarding@resend.dev` sandbox From.
 
-Auth gates **actions, never content**: every `/learn` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
+Auth gates **actions, never content**: every `/courses` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
 
 Key files:
 
@@ -171,7 +171,7 @@ The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContex
 
 ### Ask AI
 
-A signed-in, streaming "Ask AI" chat pane on the `/learn` lessons and `/playground/*` pages (`app/api/ai/chat/route.ts` + `app/_components/ai/`). It runs on the Workers runtime and pipes an OpenAI-compatible provider's Server-Sent-Event stream straight through — no Node APIs, no filesystem (lesson context is fetched from the prerendered `${slug}.md` asset, not read from disk).
+A signed-in, streaming "Ask AI" chat pane on the `/courses` lessons and `/playground/*` pages (`app/api/ai/chat/route.ts` + `app/_components/ai/`). It runs on the Workers runtime and pipes an OpenAI-compatible provider's Server-Sent-Event stream straight through — no Node APIs, no filesystem (lesson context is fetched from the prerendered `${slug}.md` asset, not read from disk).
 
 **Model per membership tier.** Base URL + model id are non-secret `vars` in `wrangler.jsonc` (`AI_FREE_BASE_URL` / `AI_FREE_MODEL` / `AI_PRO_BASE_URL` / `AI_PRO_MODEL`) — there's no hardcoded fallback (`lib/ai/models.ts`), so a tier needs its base URL, model id, and API key all set to be usable. Both tiers currently point at **OpenRouter**'s **DeepSeek V4 Flash** model. The API key is a secret:
 
@@ -217,6 +217,25 @@ Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record** 
 4. Local dev: same four values in `.dev.vars`.
 
 Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/account`, the Pro CTA on `/pricing` — which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
+
+### Cloud saves & playground sharing
+
+Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share" — works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or — for the SQL playgrounds — a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
+
+- **Endpoints:** `GET/PUT/DELETE /api/workspaces[/:id[/bundle]]` (owner-only) and `POST/GET/DELETE /api/shares[/:id[/bundle]]` (share reads are public — the slug is the capability). Share links land on `/s/<id>` (noindex, disallowed in robots).
+- **Retention (read-time, no cron):** guest share links carry a fixed ~30-day expiry; free members' saves + links expire after ~30 days of inactivity (opening / viewing resets the clock); Pro storage doesn't expire. Expired rows are never served and are purged lazily by whichever route encounters them. Policy numbers live in `lib/workspaces/policy.ts` and are what `/pricing` documents.
+- **Quotas:** free 100 MB / Pro 10 GB, account-wide across saves + shares; per-bundle caps (guest 10 MB, free 25 MB, pro 100 MB compressed); guest share creation is metered per salted-IP hash + a global daily backstop (`share_usage_daily`, no raw IPs stored).
+- **Management:** `/account` gains a "Cloud storage" card listing every save + share link (open / delete / copy / revoke).
+
+**One-time setup** — create the bucket and apply the migration; the feature answers 503 until both exist:
+
+```bash
+npx wrangler r2 bucket create dataslope-workspaces
+npx wrangler d1 migrations apply dataslope-auth            # local
+npx wrangler d1 migrations apply dataslope-auth --remote   # Cloudflare
+```
+
+Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete after ~45 days) backstops byte reclamation for guest snapshots whose lazy sweep hasn't run; the D1 rows self-heal.
 
 ### Admin dashboard
 

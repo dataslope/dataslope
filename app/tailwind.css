@@ -6,7 +6,7 @@
  * for the Tailwind utility classes — the header nav, for one, is pure Tailwind
  * with no Magic UI component at all.)
  *
- * Why this file exists (and how it relates to app/learn/learn.css):
+ * Why this file exists (and how it relates to app/docs.css):
  *
  *   The /learn route loads Tailwind because Fumadocs UI depends on it. The
  *   rest of the app is authored with CSS modules + plain CSS and doesn't use
@@ -26,7 +26,7 @@
  *
  * Everything this root compiles from — the @source list, the dark variant,
  * the design tokens, and the Magic UI keyframes — lives in
- * app/tailwind.shared.css, which app/learn/learn.css imports too. That is
+ * app/tailwind.shared.css, which app/docs.css imports too. That is
  * deliberate and load-bearing: both Tailwind roots must generate the SAME
  * utility layer so that the App Router's unpredictable stylesheet ordering
  * across client-side navigations can never flip a base/variant pair (see the

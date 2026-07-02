@@ -78,7 +78,11 @@ const PLANS: Plan[] = [
         note: "Browser only — no cloud persistence",
       },
       { text: "No cloud storage", included: false },
-      { text: "No playground sharing", included: false },
+      {
+        icon: Share2,
+        text: "Share playgrounds",
+        note: "Share links expire 30 days after creation",
+      },
       {
         icon: Sparkles,
         text: "3 “Ask AI” messages every 24 hours",
@@ -87,7 +91,7 @@ const PLANS: Plan[] = [
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
-    href: "/learn",
+    href: "/courses",
   },
   {
     name: "Free Member",
@@ -124,7 +128,7 @@ const PLANS: Plan[] = [
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Sign up for free",
-    href: "/learn",
+    href: "/courses",
   },
   {
     name: "Pro",
@@ -165,7 +169,7 @@ const PLANS: Plan[] = [
       },
     ],
     cta: "Go Pro",
-    href: "/learn",
+    href: "/courses",
     highlighted: true,
     badge: "Unlimited AI Chat",
     checkout: true,
@@ -361,9 +365,9 @@ export function PricingSection({
             Pricing
           </h2>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
-            Every course, interview track, and playground is free to use. Create
-            a free account for cloud saves and sharing, or go Pro for storage
-            that never expires.
+            Every course, interview track, and playground is free to use — and
+            anyone can share a playground with a link. Create a free account
+            for cloud saves, or go Pro for storage that never expires.
           </p>
         </div>
       )}

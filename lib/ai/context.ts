@@ -12,6 +12,11 @@ import { systemPrompt } from "./prompt";
 // injection from a tampered client (e.g. "..", "%2e", absolute URLs).
 const SLUG_SEGMENT = /^[a-z0-9][a-z0-9-]*$/;
 
+// The client sends the full path segments (base included); only the docs
+// sections with a raw-Markdown mirror may be fetched (see next.config.ts
+// rewrites) — anything else from a tampered client is rejected.
+const LESSON_BASES = new Set(["courses", "fumadocs-dev"]);
+
 /**
  * Fetch a lesson's raw markdown from our own prerendered `${slug}.md` asset.
  *
@@ -26,9 +31,10 @@ export async function fetchLessonMarkdown(
   requestUrl: string,
 ): Promise<string | null> {
   if (!slug || slug.length === 0) return null;
+  if (!LESSON_BASES.has(slug[0])) return null;
   if (!slug.every((s) => SLUG_SEGMENT.test(s))) return null;
   try {
-    const url = new URL(`/learn/${slug.join("/")}.md`, requestUrl);
+    const url = new URL(`/${slug.join("/")}.md`, requestUrl);
     const res = await fetch(url.toString(), {
       headers: { Accept: "text/markdown" },
     });

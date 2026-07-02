@@ -1,0 +1,183 @@
+---
+title: Where to Go Next
+description: Review the database design journey and choose practical next steps for practicing PostgreSQL modeling.
+---
+
+You have reached the end of the design course. The big idea is simple,
+but powerful: a database schema is a model of the world your software
+cares about.
+
+A good model makes true things easy to store and impossible things hard
+to insert.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A traveler dot follows a thin path along the horizon toward a rising yellow sun with thin rays — the course ends where the next stretch of practice begins"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="60" y="150" width="520" height="5" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M250 150 A70 70 0 0 1 390 150 Z" fillOpacity="0.85" />
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeOpacity="0.5"
+    >
+      <path d="M246 119 L 224 109" />
+      <path d="M270 88 L 256 69" />
+      <path d="M320 70 L 320 46" />
+      <path d="M370 88 L 384 69" />
+      <path d="M394 119 L 416 109" />
+    </g>
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M84 198 C 140 190, 210 178, 260 166"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="276" cy="160" r="8" />
+  </g>
+</svg>
+
+## The journey you took
+
+You started with the reason design matters, then built up the tools for
+making design decisions deliberately.
+
+Each topic answers a different question:
+
+- What things do we track?
+- What facts describe those things?
+- How do those things relate?
+- What must be unique, required, or valid?
+- Where should each fact live?
+- How can the design change safely?
+
+And if you skipped the [Interesting
+Discussions](/courses/database-design-postgresql/the-relational-revolution)
+section, go back for the stories: how a 1970 paper by an IBM
+mathematician invented everything in this course, and how a Berkeley
+research project became the PostgreSQL engine that ran your queries
+here.
+
+## Practice by modeling something familiar
+
+The best next step is to design a small schema for a system you already
+understand.
+
+Try one of these:
+
+- a recipe collection
+- a workout tracker
+- a school course catalog
+- a volunteer scheduling system
+- a personal library
+- a simple invoicing app
+
+Start with sentences. Circle the nouns and verbs. Draw an ER diagram.
+Then write the tables.
+
+```mermaid
+flowchart TD
+    Familiar["System you know"] --> Sentences["Requirement sentences"]
+    Sentences --> Diagram["ER diagram"]
+    Diagram --> Tables["PostgreSQL tables"]
+    Tables --> Examples["Sample rows and queries"]
+```
+
+## Use the PostgreSQL Playground
+
+You can practice table design in the PostgreSQL Playground:
+
+[/playground/postgres](/playground/postgres)
+
+Try creating a schema, inserting a few rows, and then testing the rules
+that should reject bad data.
+
+```mermaid
+flowchart TD
+    Create["Create tables"] --> Insert["Insert valid rows"]
+    Insert --> Test["Try invalid rows"]
+    Test --> Improve["Improve constraints"]
+    Improve --> Create
+```
+
+That loop is how design skill grows.
+
+## Practice querying too
+
+Design and querying support each other. When you understand joins, you
+can test whether your relationships feel natural. When you understand
+relationships, joins make more sense.
+
+For query practice, visit the sibling course:
+
+[/courses/intro-sql-postgres](/courses/intro-sql-postgres)
+
+It covers the SQL skills you will use to explore the schemas you
+design.
+
+```mermaid
+flowchart TD
+    Design["Design tables"] --> Query["Query relationships"]
+    Query --> Notice["Notice design issues"]
+    Notice --> Improve["Improve the schema"]
+```
+
+## What comes after design
+
+After you are comfortable modeling data, other database topics become
+more useful:
+
+- indexing
+- query performance
+- migrations in production systems
+- backups and administration
+- security and permissions
+- larger operational architectures
+
+Those topics are beyond this course. They matter, but they work best
+when the underlying schema already has clear entities, relationships,
+keys, and constraints.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the best way to keep practicing database design?
+
+- Memorize table names from someone else's schema only.
+  > Reading examples helps, but design skill grows by modeling real requirements.
+- [o] Pick a familiar system, write requirements, draw relationships, and create tables.
+  > Practicing the full loop builds judgment about entities, keys, and constraints.
+- Start with sharding and replication.
+  > Those topics come after a clear schema model.
+- Avoid inserting sample rows.
+  > Sample rows help test whether the design represents real examples.
+
+Practice the design loop on small systems you understand.`}
+/>
+
+<MultipleChoice
+  markdown={`Why keep practicing SQL queries after a design course?
+
+- Queries and design are completely unrelated.
+  > Querying relationships helps reveal whether the design is easy to use.
+- [o] Queries help you test and understand the relationships you modeled.
+  > Joins and filters show whether the schema supports real questions.
+- Query practice removes the need for constraints.
+  > Constraints still protect data quality.
+- SQL only works on single-table schemas.
+  > SQL is especially useful for relational schemas with multiple tables.
+
+Design and querying reinforce each other.`}
+/>

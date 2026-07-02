@@ -52,8 +52,8 @@ const read = (rel: string) => readFileSync(abs(rel), "utf8");
 // Lessons that mix <svg> graphics with Mermaid diagrams, with clean frontmatter
 // so the labeller can parse them for a direct on-page-vs-gallery comparison.
 const samples = [
-  "content/learn/intro-sql-postgres/filtering-rows.mdx",
-  "content/learn/intro-sql-postgres/what-is-a-database.mdx",
+  "content/courses/intro-sql-postgres/filtering-rows.mdx",
+  "content/courses/intro-sql-postgres/what-is-a-database.mdx",
 ];
 
 describe("extractSvgGraphics", () => {
@@ -74,7 +74,7 @@ describe("extractSvgGraphics", () => {
   });
 
   it("matches the example ID format from the task", () => {
-    const rel = "content/learn/intro-sql-postgres/filtering-rows.mdx";
+    const rel = "content/courses/intro-sql-postgres/filtering-rows.mdx";
     const ids = extractSvgGraphics(read(rel), abs(rel)).map((g) => g.id);
     expect(ids.length).toBeGreaterThan(0);
     for (const id of ids) {
@@ -86,7 +86,7 @@ describe("extractSvgGraphics", () => {
     // error-handling-with-types.mdx carries TSX generics (`<T,>`) in its
     // frontmatter — a frontmatter-unaware MDX parse would throw. Blanking the
     // frontmatter lets it through and still yields its two graphics.
-    const rel = "content/learn/typescript-from-scratch/error-handling-with-types.mdx";
+    const rel = "content/courses/typescript-from-scratch/error-handling-with-types.mdx";
     const graphics = extractSvgGraphics(read(rel), abs(rel));
     expect(graphics.length).toBe(2);
     for (const g of graphics) {
@@ -117,7 +117,7 @@ describe("jsxSvgToHtml", () => {
   });
 
   it("preserves real authored graphics structurally", () => {
-    const rel = "content/learn/intro-sql-postgres/filtering-rows.mdx";
+    const rel = "content/courses/intro-sql-postgres/filtering-rows.mdx";
     const html = extractSvgGraphics(read(rel), abs(rel))[0].html;
     expect(html.startsWith("<svg")).toBe(true);
     expect(html.trimEnd().endsWith("</svg>")).toBe(true);

@@ -137,6 +137,8 @@ import {
 } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
+import { CloudShareControls } from "./cloud/CloudShareControls";
+import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import { FileCode2, Settings } from "lucide-react";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
 import {
@@ -832,6 +834,36 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [adapter.id, setWorkspace],
   );
+
+  // ─── Cloud saves + sharing ──────────────────────────────────────────────
+  // Serializes the live workspace (tab manifest + editor buffers, falling
+  // back to OPFS for files not open this session) into the portable bundle
+  // that /api/workspaces and /api/shares store. Dialog state lives here so
+  // the mobile menu can open the dialogs the header buttons own on desktop.
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
+  const buildCloudBundle =
+    useCallback(async (): Promise<WorkspaceBundle | null> => {
+      const wsId = workspaceIdRef.current;
+      const fileList = filesRef.current;
+      if (!wsId || fileList.length === 0) return null;
+      const bundleFiles: BundleCodeFile[] = [];
+      for (const f of fileList) {
+        const dirty = dirtyBuffersRef.current.get(f.id);
+        const content = dirty ?? (await opfsReadFile(wsId, f.id)) ?? "";
+        bundleFiles.push({ filename: f.filename, content });
+      }
+      const active = fileList.find((f) => f.id === activeFileIdRef.current);
+      return {
+        version: 1,
+        kind: "code",
+        playground: adapter.id,
+        name: workspaceName || "Workspace",
+        exportedAt: Date.now(),
+        files: bundleFiles,
+        activeFilename: active?.filename,
+      };
+    }, [adapter.id, workspaceName]);
 
   useEffect(() => {
     settingsOpenRef.current = settingsOpen;
@@ -3130,6 +3162,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Menu.Portal>
             </Menu.Root>
 
+            <CloudShareControls
+              playgroundId={adapter.id}
+              workspaceId={workspaceId}
+              workspaceName={workspaceName}
+              buildBundle={buildCloudBundle}
+              shareOpen={shareDialogOpen}
+              onShareOpenChange={setShareDialogOpen}
+              cloudOpen={cloudDialogOpen}
+              onCloudOpenChange={setCloudDialogOpen}
+            />
+
             {adapter.packages.length > 0 && (
               <button
                 type="button"
@@ -3231,6 +3274,35 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </span>
                         </button>
                       )}
+                      {/* Share + cloud saves — the header buttons that own
+                          these dialogs are desktop-only, so mirror them
+                          here (the dialogs portal above the drawer). */}
+                      <button
+                        type="button"
+                        className="mobile-menu-action"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setShareDialogOpen(true);
+                        }}
+                      >
+                        <span>Share</span>
+                        <span className="mobile-menu-chev" aria-hidden="true">
+                          ›
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        className="mobile-menu-action"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setCloudDialogOpen(true);
+                        }}
+                      >
+                        <span>Cloud saves</span>
+                        <span className="mobile-menu-chev" aria-hidden="true">
+                          ›
+                        </span>
+                      </button>
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
                           management here as a bottom-sheet instead. */}

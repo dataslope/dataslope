@@ -1,0 +1,247 @@
+---
+title: Why DuckDB?
+description: How a research lab in Amsterdam built a fast, zero-setup analytical engine named after a duck. What makes DuckDB different from traditional databases, and why it fits modern analysis workflows so well.
+---
+
+The last page explained *why* analytical SQL rewards a column-oriented,
+vectorized engine. **DuckDB** is exactly that engine — purpose-built for
+analysis, and the one this whole course runs on. This page is the short
+version of *where it came from* and *why it became so popular*, so the
+tool you are about to use stops feeling like a black box.
+
+<IllustrationPrompt subject="a duck (the DuckDB mascot) perched on a stack of database disks" />
+
+<Callout type="info" title="A database named after a duck">
+DuckDB was created by **Mark Raasveldt** and **Hannes Mühleisen** at the
+**CWI** research institute in Amsterdam — the same lab that produced the
+column-store database **MonetDB**, and where Guido van Rossum created
+Python. First released around **2019**, it is named after Hannes's pet
+duck, **Wilbur**: ducks are hardy and live everywhere, which is exactly
+what the authors wanted in a database.
+</Callout>
+
+<svg
+  viewBox="0 0 640 225"
+  role="img"
+  aria-label="A faraway server tower can only be reached along a long dotted arc interrupted by a red toll, while inside the laptop on the right a green engine glows in concentric rings next to the little files it queries in place — DuckDB runs where you already are"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="60" y="42" width="64" height="138" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="72" y="58" width="40" height="8" rx="4" />
+    <rect x="72" y="76" width="40" height="8" rx="4" />
+    <rect x="72" y="94" width="40" height="8" rx="4" />
+    <circle cx="78" cy="156" r="3.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="148" cy="84" r="3" />
+    <circle cx="174" cy="68" r="3" />
+    <circle cx="202" cy="56" r="3" />
+    <circle cx="232" cy="48" r="3" />
+    <circle cx="296" cy="46" r="3" />
+    <circle cx="326" cy="52" r="3" />
+    <circle cx="354" cy="62" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="264" cy="44" r="7" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="392" y="48" width="206" height="124" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="372" y="178" width="246" height="14" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="462" cy="110" r="34" fillOpacity="0.14" />
+    <circle cx="462" cy="110" r="22" fillOpacity="0.35" />
+    <circle cx="462" cy="110" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="524" y="76" width="32" height="40" rx="5" fillOpacity="0.4" />
+    <path d="M 548 76 L 556 84 L 548 84 Z" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="536" y="124" width="32" height="36" rx="5" fillOpacity="0.45" />
+    <path d="M 560 124 L 568 132 L 560 132 Z" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="500" cy="98" r="2.5" />
+    <circle cx="512" cy="106" r="2.5" />
+    <circle cx="506" cy="128" r="2.5" />
+    <circle cx="518" cy="136" r="2.5" />
+  </g>
+</svg>
+
+## The problem DuckDB solves
+
+Organizations now generate **enormous** amounts of data almost by
+accident — every click, order, sensor reading, and log line is recorded.
+Analysts want to explore that data, but their two traditional options
+each hurt:
+
+- A **transactional database** (like a typical app's PostgreSQL or MySQL)
+  is row-oriented and tuned for many small writes. Big analytical scans
+  are possible but not its strength, and you must run a server.
+- A **data warehouse** (a big cloud analytics system) is powerful but
+  heavy: accounts, clusters, credentials, cost, and network latency just
+  to answer "what was last month's revenue?"
+
+For a single analyst poking at a few gigabytes on a laptop, both are
+overkill. DuckDB fills exactly that gap.
+
+```mermaid
+flowchart TD
+    A["Transactional DB<br/>(row store, needs a server)"] -- "too slow for<br/>big scans" --> Gap["The analyst's gap"]
+    B["Cloud warehouse<br/>(heavy, needs setup and cost)"] -- "too much overhead<br/>for quick analysis" --> Gap
+    Gap --> D["DuckDB<br/>(fast, in-process,<br/>zero setup)"]
+```
+
+## What makes DuckDB different
+
+A few design choices, taken together, make DuckDB feel made for the
+exploratory loop you learned about.
+
+- **Column-oriented and vectorized.** It inherits the column-store,
+  batch-processing design from the last page, so summary queries over many
+  rows fly.
+- **In-process, no server.** DuckDB runs *inside* your program (or, here,
+  inside your browser tab). There is no server to start, no port, no
+  login. You open it and query.
+- **Single-file or in-memory.** A whole database can be one file you copy
+  around like a spreadsheet — or live entirely in memory for a quick
+  analysis.
+- **Reads files directly.** DuckDB can query CSV and Parquet files *in
+  place* — even straight from a URL — without a separate "load" step,
+  which suits ad-hoc analysis.
+- **Analyst-friendly SQL.** Conveniences like `GROUP BY ALL`,
+  `SELECT * EXCLUDE (...)`, `SUMMARIZE`, and friendly list/struct types
+  cut the ceremony out of common analytical queries.
+
+```mermaid
+flowchart TB
+    subgraph Why["Why analysts reach for DuckDB"]
+        W1["Column store +<br/>vectorized engine"]
+        W2["Runs in-process,<br/>zero setup"]
+        W3["Queries CSV / Parquet<br/>directly"]
+        W4["Ergonomic analytical<br/>SQL extensions"]
+    end
+    W1 --> R["Fast, frictionless<br/>exploration"]
+    W2 --> R
+    W3 --> R
+    W4 --> R
+```
+
+People sometimes call DuckDB *"SQLite for analytics."* SQLite gave
+everyone a tiny, embedded **transactional** database with no server;
+DuckDB does the same for **analytical** work. It is the OLAP counterpart
+to SQLite's OLTP niche — same spirit, opposite workload.
+
+## Where it fits in a modern workflow
+
+DuckDB rarely replaces the cloud warehouse or the app's database. It sits
+*beside* them as the analyst's fast scratchpad:
+
+- Pull a sample or an export (a CSV or Parquet file) and explore it
+  locally at full speed.
+- Prototype an analytical query on your laptop before running it on the
+  big warehouse.
+- Use it as the engine inside notebooks and data pipelines for
+  transformation steps.
+
+```mermaid
+flowchart TD
+    W[("Warehouse /<br/>app database")] -- "export sample" --> F["CSV / Parquet<br/>file"]
+    F --> Duck["DuckDB<br/>(local exploration)"]
+    Duck --> Insight["Charts, reports,<br/>decisions"]
+```
+
+The important point for this course: DuckDB lets you practice *real
+analytical SQL* with **zero friction**. The same engine runs right here
+in your browser, so every example is live — and to prove the "reads files
+directly" point, this one queries a **CSV on the web** with `read_csv_auto`
+and never downloads it as a step you can see.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="A taste of analyst-friendly DuckDB SQL — over a remote CSV"
+  starterCode={`-- read_csv_auto opens the file and infers its columns.
+-- GROUP BY ALL groups by every non-aggregated column automatically.
+SELECT
+  species,
+  island,
+  COUNT(*) AS n,
+  ROUND(AVG(body_mass_g), 0) AS avg_mass
+FROM
+  read_csv_auto(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/palmer-penguins.csv'
+  )
+GROUP BY ALL
+ORDER BY
+  n DESC;`}
+/>
+
+Two conveniences in four lines: DuckDB opened a remote CSV and inferred
+its columns with no schema declaration, and `GROUP BY ALL` let you skip
+restating `species, island` (a traditional database makes you list every
+grouping column twice). Small frictions like these are exactly what make
+DuckDB pleasant for the rapid question-query-look loop.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`DuckDB is often described as **"SQLite for analytics."** What does that capture?
+
+- DuckDB is a fork of SQLite that adds a web server.
+  > DuckDB is not a SQLite fork, and it adds no server; the analogy is about *style*, not lineage.
+- [o] Like SQLite, it is a tiny, embedded, zero-setup database — but tuned for analytical (OLAP) work instead of transactions.
+  > Both run in-process with no server; SQLite targets transactional use, DuckDB targets analytical scans.
+- It can only store the same amount of data as SQLite.
+  > The analogy is about embedding and ease of use, not a storage-size limit.
+- It requires the same cloud account as a data warehouse.
+  > DuckDB needs no account or cloud setup at all; that is part of its appeal.
+
+The analogy means "embedded and frictionless like SQLite, but built for
+analytics rather than transactions."`}
+/>
+
+<MultipleChoice
+  markdown={`Which property makes DuckDB well-suited to **fast analytical queries**?
+
+- It stores data row-by-row to speed up single-row lookups.
+  > Row storage favors transactional point lookups; DuckDB is column-oriented, which favors analytical scans.
+- [o] It is column-oriented and vectorized, so summary queries over many rows read only the needed columns, in batches.
+  > Column storage plus batch processing is precisely what accelerates "scan many rows, summarize a few columns" workloads.
+- It refuses to run aggregate queries.
+  > Aggregates are central to what DuckDB does well, not something it refuses.
+- It requires a dedicated server cluster.
+  > DuckDB runs in-process with no server; needing a cluster would be the opposite of its design.
+
+Column-oriented, vectorized execution is the engine behind DuckDB's
+analytical speed.`}
+/>
+
+<MultipleChoice
+  markdown={`In a modern data workflow, DuckDB most often serves as...
+
+- A replacement for every cloud data warehouse in production.
+  > DuckDB usually complements warehouses rather than replacing large-scale production systems.
+- [o] A fast, local scratchpad for exploring samples and prototyping analytical queries with zero setup.
+  > Its in-process, file-reading design makes it ideal for quick local exploration alongside heavier systems.
+- The transactional database behind a high-traffic web application.
+  > High-concurrency transactional serving is an OLTP job; DuckDB targets analytical workloads.
+- A tool exclusively for database administration tasks like replication.
+  > Administration and replication are outside DuckDB's analytical focus.
+
+DuckDB shines as the analyst's frictionless local engine for exploration
+and prototyping.`}
+/>
+
+You now understand *why* analytical SQL, *why* the OLAP workload, and
+*why* DuckDB. Time to stop talking about analysis and start doing it — let
+us write your first analytical query. (If you want the analyst's
+*exploratory mindset* spelled out first, the
+[Thinking in Datasets](/courses/sql-analytics-duckdb/thinking-in-datasets)
+deep dive in the *Interesting discussions* section near the end covers it
+— but you can pick it up as you go.)

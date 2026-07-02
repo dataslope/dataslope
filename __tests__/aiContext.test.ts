@@ -91,6 +91,13 @@ describe("fetchLessonMarkdown", () => {
     expect(await fetchLessonMarkdown([], "https://x.com")).toBeNull();
     expect(await fetchLessonMarkdown(["..", "etc"], "https://x.com")).toBeNull();
     expect(await fetchLessonMarkdown(["a b"], "https://x.com")).toBeNull();
+    // First segment must be an allowlisted docs base (courses/fumadocs-dev).
+    expect(
+      await fetchLessonMarkdown(["python-basics", "loops"], "https://x.com"),
+    ).toBeNull();
+    expect(
+      await fetchLessonMarkdown(["courses", "a b"], "https://x.com"),
+    ).toBeNull();
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -101,19 +108,21 @@ describe("fetchLessonMarkdown", () => {
         new Response("# lesson", { status: 200 }) as unknown as Response,
       );
     const md = await fetchLessonMarkdown(
-      ["python-basics", "loops"],
+      ["courses", "python-basics", "loops"],
       "https://dataslope.com/api/ai/chat",
     );
     expect(md).toBe("# lesson");
     expect(spy).toHaveBeenCalledOnce();
     const url = String(spy.mock.calls[0][0]);
-    expect(url).toBe("https://dataslope.com/learn/python-basics/loops.md");
+    expect(url).toBe("https://dataslope.com/courses/python-basics/loops.md");
   });
 
   it("returns null on a non-OK response", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response("nope", { status: 404 }) as unknown as Response,
     );
-    expect(await fetchLessonMarkdown(["missing"], "https://x.com")).toBeNull();
+    expect(
+      await fetchLessonMarkdown(["courses", "missing"], "https://x.com"),
+    ).toBeNull();
   });
 });
