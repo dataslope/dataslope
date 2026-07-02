@@ -25,8 +25,9 @@ import { admin } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
 
-/** Split a comma-separated secret into a trimmed, non-empty list. */
-function parseList(raw: string | undefined): string[] {
+/** Split a comma-separated secret into a trimmed, non-empty list. Exported
+ *  for the custom admin API routes' authorization check (lib/auth/admin.ts). */
+export function parseList(raw: string | undefined): string[] {
   if (!raw) return [];
   return raw
     .split(",")

@@ -201,12 +201,17 @@ Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors
 
 ### Admin dashboard
 
-`/admin` is a gated dashboard for managing user accounts, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). It lists every user and offers two actions per account:
+`/admin` is a gated dashboard with a sidebar, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). The shell lives in `app/admin/layout.tsx`; adding a section is one route folder plus one entry in `app/admin/_components/AdminSidebar.tsx`. Current sections:
 
-- **Remove** — a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case — e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
-- **Ban** — the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
+- **Users** (`/admin`) — lists every account with per-row actions:
+  - **Plan switch** — flips `free` ↔ `pro` via `admin.updateUser` (an already-signed-in session can lag up to five minutes behind, from the session cookie cache; impersonation and fresh sign-ins see the new plan immediately).
+  - **Impersonate** — become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
+  - **Remove** — a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case — e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
+  - **Ban** — the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
+- **Test users** (`/admin/test-users`) — creates disposable accounts for testing member-gated features (AI autocomplete, Ask AI tiers). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan — no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
+- **AI usage** (`/admin/ai-usage`) — per-user and site-wide Ask AI + completion counters for a chosen UTC day, against the global cap. Backed by `GET /api/admin/ai-usage`, a custom route gated by `requireAdmin` (`lib/auth/admin.ts`) since it isn't a Better Auth endpoint.
 
-Authorization is enforced **server-side** on every `admin.*` endpoint, so the page itself can stay a statically-prerendered, client-read screen like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
+Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 
 The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
 
