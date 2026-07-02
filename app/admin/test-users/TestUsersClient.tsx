@@ -17,12 +17,14 @@
  * Users table badges as "Test". Passwords are only shown at creation time —
  * to get into an existing test account, impersonate it (or remove and
  * recreate it).
+ *
+ * Presentation follows the soft design kit in `_components/shared.tsx`; the
+ * account list renders as a table on desktop and stacked cards on mobile.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowRightLeft,
   Check,
-  CircleAlert,
   Copy,
   Loader2,
   Plus,
@@ -32,13 +34,6 @@ import {
 } from "lucide-react";
 import { authClient, useSession } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -52,14 +47,25 @@ import {
   AccessDeniedCard,
   AdminPageHeader,
   CenteredNote,
+  ErrorNote,
+  Panel,
+  PanelBody,
+  PanelHeader,
   PlanBadge,
   SignInPrompt,
   TEST_EMAIL_DOMAIN,
+  cellClass,
+  dangerActionClass,
   formatJoined,
+  headRowClass,
   impersonateUser,
   isImpersonatedSession,
   isTestEmail,
+  quietActionClass,
+  rowClass,
   setUserPlan,
+  softInputClass,
+  theadClass,
 } from "../_components/shared";
 
 interface TestUser {
@@ -261,6 +267,56 @@ export function TestUsersClient() {
     setRemoveAll("idle");
   }
 
+  // --- Row pieces shared by the desktop table and the mobile card list ----
+
+  const renderPlan = (user: TestUser, isBusy: boolean) => (
+    <div className="flex items-center gap-1">
+      <PlanBadge plan={user.plan} />
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`size-7 ${quietActionClass}`}
+        onClick={() => void handleTogglePlan(user)}
+        disabled={isBusy}
+        title={
+          (user.plan ?? "").toLowerCase() === "pro"
+            ? "Switch to free"
+            : "Switch to pro"
+        }
+      >
+        <ArrowRightLeft className="size-3.5" />
+        <span className="sr-only">Switch plan</span>
+      </Button>
+    </div>
+  );
+
+  const renderActions = (user: TestUser, isBusy: boolean) => (
+    <div className="flex flex-wrap items-center gap-1 md:flex-nowrap">
+      <Button
+        variant="ghost"
+        size="sm"
+        className={quietActionClass}
+        onClick={() => void handleImpersonate(user)}
+        disabled={isBusy}
+        title="Browse the site as this user (come back to /admin to stop)"
+      >
+        <VenetianMask />
+        Impersonate
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={dangerActionClass}
+        onClick={() => void handleRemove(user)}
+        disabled={isBusy}
+        title="Delete this test account"
+      >
+        {isBusy ? <Loader2 className="animate-spin" /> : <Trash2 />}
+        Remove
+      </Button>
+    </div>
+  );
+
   // --- Gating states -------------------------------------------------------
 
   if (sessionPending) return <CenteredNote>Loading…</CenteredNote>;
@@ -280,9 +336,9 @@ export function TestUsersClient() {
       onClick={() => setPlan(value)}
       aria-pressed={plan === value}
       className={
-        "rounded-md px-3 py-1.5 text-sm font-medium transition-colors " +
+        "flex-1 rounded-md px-4 py-1.5 text-sm font-medium transition-colors sm:flex-none " +
         (plan === value
-          ? "bg-background text-foreground shadow-sm"
+          ? "bg-white text-foreground shadow-sm dark:bg-white/15 dark:text-white"
           : "text-muted-foreground hover:text-foreground")
       }
     >
@@ -298,24 +354,21 @@ export function TestUsersClient() {
         title="Test users"
         description="Disposable, pre-verified accounts for testing member-gated features like AI autocomplete."
       />
-      <div className="flex flex-col gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Create test users</CardTitle>
-            <CardDescription>
-              Accounts are created verified on a reserved @{TEST_EMAIL_DOMAIN}{" "}
-              address — no verification email, no billing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <div className="flex flex-col gap-5 sm:gap-6">
+        <Panel>
+          <PanelHeader
+            title="Create test users"
+            description={`Accounts are created verified on a reserved @${TEST_EMAIL_DOMAIN} address — no verification email, no billing.`}
+          />
+          <PanelBody>
             <form
               onSubmit={(e) => void handleCreate(e)}
               className="flex flex-col gap-4"
             >
-              <div className="flex flex-wrap items-end gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:flex sm:flex-wrap sm:items-end">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium">Plan</span>
-                  <div className="flex w-fit items-center gap-1 rounded-lg bg-muted p-1">
+                  <div className="flex items-center gap-1 rounded-lg bg-zinc-500/[0.07] p-1 sm:w-fit dark:bg-white/[0.07]">
                     {planButton("free", "Free")}
                     {planButton("pro", "Pro")}
                   </div>
@@ -338,7 +391,7 @@ export function TestUsersClient() {
                         ),
                       )
                     }
-                    className="w-24"
+                    className={`${softInputClass} w-full sm:w-24`}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -350,7 +403,7 @@ export function TestUsersClient() {
                     type="text"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-48 font-mono"
+                    className={`${softInputClass} w-full font-mono sm:w-48`}
                     autoComplete="off"
                     spellCheck={false}
                   />
@@ -358,51 +411,55 @@ export function TestUsersClient() {
                 {count === 1 && (
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="test-user-email" className="text-sm font-medium">
-                      Email <span className="font-normal text-muted-foreground">(optional)</span>
+                      Email{" "}
+                      <span className="font-normal text-muted-foreground">
+                        (optional)
+                      </span>
                     </label>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <Input
                         id="test-user-email"
                         type="text"
                         placeholder={`test-${plan}-abc12`}
                         value={emailPrefix}
                         onChange={(e) => setEmailPrefix(e.target.value)}
-                        className="w-44 font-mono"
+                        className={`${softInputClass} w-full font-mono sm:w-44`}
                         autoComplete="off"
                         spellCheck={false}
                       />
-                      <span className="text-sm text-muted-foreground">
+                      <span className="shrink-0 text-sm text-muted-foreground">
                         @{TEST_EMAIL_DOMAIN}
                       </span>
                     </div>
                   </div>
                 )}
-                <Button type="submit" disabled={creating || password.length === 0}>
+                <Button
+                  type="submit"
+                  disabled={creating || password.length === 0}
+                  className="w-full sm:w-auto"
+                >
                   {creating ? <Loader2 className="animate-spin" /> : <Plus />}
                   Create {count > 1 ? `${count} test users` : "test user"}
                 </Button>
               </div>
 
-              {createError && (
-                <p
-                  role="alert"
-                  className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                >
-                  <CircleAlert className="size-4 shrink-0" />
-                  {createError}
-                </p>
-              )}
+              {createError && <ErrorNote>{createError}</ErrorNote>}
             </form>
 
             {created.length > 0 && (
-              <div className="mt-5 rounded-lg border bg-muted/40 p-4">
-                <div className="flex items-center justify-between gap-2">
+              <div className="mt-5 rounded-xl bg-zinc-500/[0.06] p-4 dark:bg-white/[0.05]">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">
                     Created {created.length}{" "}
                     {created.length === 1 ? "account" : "accounts"}. Save these
                     credentials — passwords aren&apos;t shown again.
                   </p>
-                  <Button variant="outline" size="sm" onClick={() => void handleCopy()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={quietActionClass}
+                    onClick={() => void handleCopy()}
+                  >
                     {copied ? <Check /> : <Copy />}
                     {copied ? "Copied" : "Copy"}
                   </Button>
@@ -419,19 +476,19 @@ export function TestUsersClient() {
                 </p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </PanelBody>
+        </Panel>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Existing test users</CardTitle>
-            <CardDescription>
-              {loading
+        <Panel>
+          <PanelHeader
+            title="Existing test users"
+            description={
+              loading
                 ? "Loading…"
-                : `${users.length} ${users.length === 1 ? "account" : "accounts"} on @${TEST_EMAIL_DOMAIN}`}
-            </CardDescription>
-            <div className="col-start-2 row-span-2 row-start-1 flex items-center gap-2 self-start justify-self-end">
-              {removeAll === "confirm" ? (
+                : `${users.length} ${users.length === 1 ? "account" : "accounts"} on @${TEST_EMAIL_DOMAIN}`
+            }
+            action={
+              removeAll === "confirm" ? (
                 <>
                   <span className="text-xs text-muted-foreground">
                     Remove all {users.length}?
@@ -455,8 +512,9 @@ export function TestUsersClient() {
                 <>
                   {users.length > 0 && (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
+                      className={dangerActionClass}
                       onClick={() => setRemoveAll("confirm")}
                       disabled={removeAll === "busy" || loading}
                     >
@@ -469,8 +527,9 @@ export function TestUsersClient() {
                     </Button>
                   )}
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
+                    className={quietActionClass}
                     onClick={() => void loadTestUsers()}
                     disabled={loading}
                   >
@@ -478,135 +537,118 @@ export function TestUsersClient() {
                     Refresh
                   </Button>
                 </>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {error && (
-              <p
-                role="alert"
-                className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-              >
-                <CircleAlert className="size-4 shrink-0" />
-                {error}
+              )
+            }
+          />
+          <PanelBody className="flex flex-col gap-4">
+            {error && <ErrorNote>{error}</ErrorNote>}
+
+            {loading ? (
+              <p className="py-12 text-center text-sm text-muted-foreground">
+                <Loader2 className="mr-2 inline size-4 animate-spin" />
+                Loading…
               </p>
+            ) : users.length === 0 ? (
+              <p className="py-12 text-center text-sm text-muted-foreground">
+                No test users yet — create some above.
+              </p>
+            ) : (
+              <>
+                {/* Desktop: table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className={headRowClass}>
+                        <TableHead className={theadClass}>User</TableHead>
+                        <TableHead className={theadClass}>Plan</TableHead>
+                        <TableHead className={theadClass}>Created</TableHead>
+                        <TableHead className={`${theadClass} text-right`}>
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => {
+                        const isBusy = busyId === user.id;
+                        return (
+                          <TableRow key={user.id} className={rowClass}>
+                            {/* w-full + max-w-0: take the leftover table
+                                width, but still truncate instead of
+                                stretching it. */}
+                            <TableCell className={`${cellClass} w-full max-w-0`}>
+                              <div className="min-w-0">
+                                <div className="truncate font-medium">
+                                  {user.name || "—"}
+                                </div>
+                                <div className="truncate font-mono text-xs text-muted-foreground">
+                                  {user.email}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className={cellClass}>
+                              {renderPlan(user, isBusy)}
+                            </TableCell>
+                            <TableCell
+                              className={`${cellClass} text-muted-foreground`}
+                            >
+                              {formatJoined(user.createdAt)}
+                            </TableCell>
+                            <TableCell className={`${cellClass} text-right`}>
+                              <div className="flex justify-end">
+                                {renderActions(user, isBusy)}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile: stacked cards */}
+                <ul className="md:hidden">
+                  {users.map((user) => {
+                    const isBusy = busyId === user.id;
+                    return (
+                      <li
+                        key={user.id}
+                        className="flex flex-col gap-2.5 border-b border-zinc-500/[0.07] py-4 first:pt-1 last:border-b-0 last:pb-1 dark:border-white/[0.05]"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="truncate font-medium">
+                              {user.name || "—"}
+                            </div>
+                            <div className="truncate font-mono text-xs text-muted-foreground">
+                              {user.email}
+                            </div>
+                          </div>
+                          {renderPlan(user, isBusy)}
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-1.5">
+                          <span className="text-xs text-muted-foreground">
+                            Created {formatJoined(user.createdAt)}
+                          </span>
+                          <div className="-mr-2">
+                            {renderActions(user, isBusy)}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
             )}
 
-            <div className="rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Plan</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        <Loader2 className="mr-2 inline size-4 animate-spin" />
-                        Loading…
-                      </TableCell>
-                    </TableRow>
-                  ) : users.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        No test users yet — create some above.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    users.map((user) => {
-                      const isBusy = busyId === user.id;
-                      return (
-                        <TableRow key={user.id}>
-                          {/* w-full + max-w-0: take the leftover table width,
-                              but still truncate instead of stretching it. */}
-                          <TableCell className="w-full max-w-0">
-                            <div className="min-w-0">
-                              <div className="truncate font-medium">
-                                {user.name || "—"}
-                              </div>
-                              <div className="truncate font-mono text-xs text-muted-foreground">
-                                {user.email}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1.5">
-                              <PlanBadge plan={user.plan} />
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-7"
-                                onClick={() => void handleTogglePlan(user)}
-                                disabled={isBusy}
-                                title={
-                                  (user.plan ?? "").toLowerCase() === "pro"
-                                    ? "Switch to free"
-                                    : "Switch to pro"
-                                }
-                              >
-                                <ArrowRightLeft className="size-3.5" />
-                                <span className="sr-only">Switch plan</span>
-                              </Button>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {formatJoined(user.createdAt)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => void handleImpersonate(user)}
-                                disabled={isBusy}
-                                title="Browse the site as this user (come back to /admin to stop)"
-                              >
-                                <VenetianMask />
-                                Impersonate
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => void handleRemove(user)}
-                                disabled={isBusy}
-                                title="Delete this test account"
-                              >
-                                {isBusy ? (
-                                  <Loader2 className="animate-spin" />
-                                ) : (
-                                  <Trash2 />
-                                )}
-                                Remove
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Test users are ordinary accounts identified by the reserved
               @{TEST_EMAIL_DOMAIN} domain — safe to remove at any time. Plan
               changes can take up to five minutes to reach an already-signed-in
               session (the session cookie cache); impersonation and fresh
               sign-ins see the new plan immediately.
             </p>
-          </CardContent>
-        </Card>
+          </PanelBody>
+        </Panel>
       </div>
     </>
   );

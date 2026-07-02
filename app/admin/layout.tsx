@@ -37,9 +37,9 @@ export default function AdminLayout({
       >
         <HomeNav />
 
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 md:flex-row">
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-4 py-6 sm:px-6 sm:py-8 md:flex-row md:gap-10 md:py-10">
           <AdminSidebar />
-          <main className="min-w-0 flex-1">{children}</main>
+          <main className="min-w-0 flex-1 pb-10">{children}</main>
         </div>
       </div>
     </>

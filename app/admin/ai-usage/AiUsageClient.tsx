@@ -9,19 +9,16 @@
  *
  * Data comes from `GET /api/admin/ai-usage` (admin-enforced server-side).
  * The day picker refetches; global history shows the recent daily totals
- * against the configured site-wide cap.
+ * against the configured site-wide cap. Presentation follows the soft
+ * design kit in `_components/shared.tsx`; the numeric tables keep their
+ * tabular layout on mobile and scroll horizontally (the ui Table wrapper is
+ * already overflow-x-auto).
  */
 import { useCallback, useEffect, useState } from "react";
-import { CircleAlert, Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -36,12 +33,21 @@ import {
   AccessDeniedCard,
   AdminPageHeader,
   CenteredNote,
+  ErrorNote,
+  Panel,
+  PanelBody,
+  PanelHeader,
   PlanBadge,
   SignInPrompt,
+  cellClass,
+  headRowClass,
   isImpersonatedSession,
   isTestEmail,
+  quietActionClass,
+  rowClass,
+  softInputClass,
+  theadClass,
 } from "../_components/shared";
-import { Badge } from "@/components/ui/badge";
 
 /** Compact figure for stat tiles: 1,284 → "1.3K", 4200000 → "4.2M". */
 const compact = new Intl.NumberFormat("en", {
@@ -63,16 +69,12 @@ function StatTile({
   children?: React.ReactNode;
 }) {
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-1 py-4">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="text-2xl font-semibold">{value}</span>
-        {detail && (
-          <span className="text-xs text-muted-foreground">{detail}</span>
-        )}
-        {children}
-      </CardContent>
-    </Card>
+    <Panel className="flex flex-col gap-1 p-4 sm:p-5">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-2xl font-semibold">{value}</span>
+      {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
+      {children}
+    </Panel>
   );
 }
 
@@ -84,10 +86,10 @@ function CapMeter({ fraction }: { fraction: number }) {
   const pct = Math.min(100, Math.round(fraction * 100));
   const tone =
     fraction >= 0.85
-      ? { fill: "bg-red-600", track: "bg-red-100 dark:bg-red-950" }
+      ? { fill: "bg-red-600", track: "bg-red-500/15 dark:bg-red-500/20" }
       : fraction >= 0.6
-        ? { fill: "bg-amber-500", track: "bg-amber-100 dark:bg-amber-950" }
-        : { fill: "bg-blue-600", track: "bg-blue-100 dark:bg-blue-950" };
+        ? { fill: "bg-amber-500", track: "bg-amber-500/15 dark:bg-amber-500/20" }
+        : { fill: "bg-blue-600", track: "bg-blue-500/15 dark:bg-blue-500/20" };
   return (
     <div
       role="meter"
@@ -169,8 +171,8 @@ export function AiUsageClient() {
         title="AI usage"
         description="Ask AI chat and inline-completion spend, per user and site-wide."
       />
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-5 sm:gap-6">
+        <div className="flex flex-wrap items-center gap-2">
           <label htmlFor="ai-usage-day" className="text-sm font-medium">
             Day (UTC)
           </label>
@@ -182,11 +184,12 @@ export function AiUsageClient() {
               setDay(e.target.value);
               if (e.target.value) void load(e.target.value);
             }}
-            className="w-40"
+            className={`${softInputClass} w-40`}
           />
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
+            className={quietActionClass}
             onClick={() => void load(day || undefined)}
             disabled={loading}
           >
@@ -195,17 +198,9 @@ export function AiUsageClient() {
           </Button>
         </div>
 
-        {error && (
-          <p
-            role="alert"
-            className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
-            <CircleAlert className="size-4 shrink-0" />
-            {error}
-          </p>
-        )}
+        {error && <ErrorNote>{error}</ErrorNote>}
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatTile
             label="Tokens used"
             value={loading ? "…" : compact.format(dayTotal)}
@@ -231,160 +226,146 @@ export function AiUsageClient() {
           />
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Per-user usage</CardTitle>
-            <CardDescription>
-              {loading
+        <Panel>
+          <PanelHeader
+            title="Per-user usage"
+            description={
+              loading
                 ? "Loading…"
                 : `${report?.users.length ?? 0} ${
                     (report?.users.length ?? 0) === 1 ? "user" : "users"
-                  } with AI activity on ${report?.day ?? "—"}`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border">
+                  } with AI activity on ${report?.day ?? "—"}`
+            }
+          />
+          <PanelBody>
+            {loading ? (
+              <p className="py-12 text-center text-sm text-muted-foreground">
+                <Loader2 className="mr-2 inline size-4 animate-spin" />
+                Loading…
+              </p>
+            ) : !report || report.users.length === 0 ? (
+              <p className="py-12 text-center text-sm text-muted-foreground">
+                No AI activity on this day.
+              </p>
+            ) : (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Plan</TableHead>
-                    <TableHead className="text-right">Chat requests</TableHead>
-                    <TableHead className="text-right">Chat tokens</TableHead>
-                    <TableHead className="text-right">Completions</TableHead>
-                    <TableHead className="text-right">
+                  <TableRow className={headRowClass}>
+                    <TableHead className={theadClass}>User</TableHead>
+                    <TableHead className={theadClass}>Plan</TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Chat requests
+                    </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Chat tokens
+                    </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Completions
+                    </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
                       Completion tokens
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        <Loader2 className="mr-2 inline size-4 animate-spin" />
-                        Loading…
-                      </TableCell>
-                    </TableRow>
-                  ) : !report || report.users.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        No AI activity on this day.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    report.users.map((u) => (
-                      <TableRow key={u.userId}>
-                        {/* w-full + max-w-0: take the leftover table width,
-                            but still truncate instead of stretching it. */}
-                        <TableCell className="w-full max-w-0">
-                          <div className="min-w-0">
-                            <div className="truncate font-medium">
-                              {u.name || "—"}
-                              {isTestEmail(u.email) && (
-                                <Badge
-                                  variant="secondary"
-                                  className="ml-2 align-middle"
-                                >
-                                  Test
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="truncate text-xs text-muted-foreground">
-                              {u.email}
-                            </div>
+                  {report.users.map((u) => (
+                    <TableRow key={u.userId} className={rowClass}>
+                      {/* min/max widths keep the identity column readable
+                          while the wrapper scrolls horizontally on mobile. */}
+                      <TableCell className={`${cellClass} min-w-44 max-w-56`}>
+                        <div className="min-w-0">
+                          <div className="truncate font-medium">
+                            {u.name || "—"}
+                            {isTestEmail(u.email) && (
+                              <Badge
+                                variant="secondary"
+                                className="ml-2 align-middle"
+                              >
+                                Test
+                              </Badge>
+                            )}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <PlanBadge plan={u.plan} />
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {full.format(u.requests)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {full.format(u.inputTok + u.outputTok)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {full.format(u.completions)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {full.format(u.completionInTok + u.completionOutTok)}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                          <div className="truncate text-xs text-muted-foreground">
+                            {u.email}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className={cellClass}>
+                        <PlanBadge plan={u.plan} />
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.requests)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.inputTok + u.outputTok)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.completions)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.completionInTok + u.completionOutTok)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground">
+            )}
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
               Tokens are input + output as reported by the provider (or a
               char/4 estimate when it doesn&apos;t report usage). Usage is
               recorded just after each response finishes, so very recent
               activity can take a moment to appear.
             </p>
-          </CardContent>
-        </Card>
+          </PanelBody>
+        </Panel>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent days</CardTitle>
-            <CardDescription>
-              Site-wide daily token totals against the global cap.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border">
+        <Panel>
+          <PanelHeader
+            title="Recent days"
+            description="Site-wide daily token totals against the global cap."
+          />
+          <PanelBody>
+            {loading ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                <Loader2 className="mr-2 inline size-4 animate-spin" />
+                Loading…
+              </p>
+            ) : !report || report.global.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No usage recorded yet.
+              </p>
+            ) : (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Day</TableHead>
-                    <TableHead className="text-right">Tokens</TableHead>
-                    <TableHead className="text-right">% of cap</TableHead>
+                  <TableRow className={headRowClass}>
+                    <TableHead className={theadClass}>Day</TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Tokens
+                    </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      % of cap
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="h-16 text-center text-muted-foreground"
-                      >
-                        <Loader2 className="mr-2 inline size-4 animate-spin" />
-                        Loading…
+                  {report.global.map((g) => (
+                    <TableRow key={g.day} className={rowClass}>
+                      <TableCell className={`${cellClass} font-medium`}>
+                        {g.day}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(g.totalTok)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {Math.round((g.totalTok / report.globalCap) * 100)}%
                       </TableCell>
                     </TableRow>
-                  ) : !report || report.global.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="h-16 text-center text-muted-foreground"
-                      >
-                        No usage recorded yet.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    report.global.map((g) => (
-                      <TableRow key={g.day}>
-                        <TableCell className="font-medium">{g.day}</TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {full.format(g.totalTok)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {Math.round((g.totalTok / report.globalCap) * 100)}%
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                  ))}
                 </TableBody>
               </Table>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </PanelBody>
+        </Panel>
       </div>
     </>
   );
