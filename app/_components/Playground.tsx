@@ -137,7 +137,7 @@ import {
 } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
-import { CloudShareControls } from "./cloud/CloudShareControls";
+import { ShareControls } from "./cloud/ShareControls";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import { FileCode2, Settings } from "lucide-react";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
@@ -841,7 +841,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // that /api/workspaces and /api/shares store. Dialog state lives here so
   // the mobile menu can open the dialogs the header buttons own on desktop.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const wsId = workspaceIdRef.current;
@@ -3092,6 +3091,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               onManagerOpenChange={setWorkspaceManagerOpen}
               unsaved={!workspaceSaved && workspaceDirty}
               onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
             />
           )}
 
@@ -3159,15 +3159,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Menu.Portal>
             </Menu.Root>
 
-            <CloudShareControls
-              playgroundId={adapter.id}
-              workspaceId={workspaceId}
+            <ShareControls
               workspaceName={workspaceName}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
-              cloudOpen={cloudDialogOpen}
-              onCloudOpenChange={setCloudDialogOpen}
             />
 
             {adapter.packages.length > 0 && (
@@ -3271,9 +3267,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </span>
                         </button>
                       )}
-                      {/* Share + cloud saves — the header buttons that own
-                          these dialogs are desktop-only, so mirror them
-                          here (the dialogs portal above the drawer). */}
+                      {/* Share — the header button that owns this dialog is
+                          desktop-only, so mirror it here (the dialog portals
+                          above the drawer). Cloud backups live inside the
+                          workspace manager, reached via "Workspace" above. */}
                       <button
                         type="button"
                         className="mobile-menu-action"
@@ -3283,19 +3280,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         }}
                       >
                         <span>Share</span>
-                        <span className="mobile-menu-chev" aria-hidden="true">
-                          ›
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        className="mobile-menu-action"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setCloudDialogOpen(true);
-                        }}
-                      >
-                        <span>Cloud saves</span>
                         <span className="mobile-menu-chev" aria-hidden="true">
                           ›
                         </span>

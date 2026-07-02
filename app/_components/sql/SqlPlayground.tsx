@@ -101,7 +101,7 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
-import { CloudShareControls } from "../cloud/CloudShareControls";
+import { ShareControls } from "../cloud/ShareControls";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -1004,7 +1004,6 @@ function SqlPlaygroundInner() {
   // A SQL bundle carries the active database as a replayable SQL dump plus
   // the query tabs — the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const dump = await buildSqlDumpText();
@@ -2006,18 +2005,15 @@ function SqlPlaygroundInner() {
                 tabs.some((t) => !t.kind && t.code !== t.pristineCode)
               }
               onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
             />
           )}
           <div className="header-actions desktop-only">
-            <CloudShareControls
-              playgroundId={PLAYGROUND_ID}
-              workspaceId={activeWorkspace?.id ?? null}
+            <ShareControls
               workspaceName={activeWorkspace?.name ?? ""}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
-              cloudOpen={cloudDialogOpen}
-              onCloudOpenChange={setCloudDialogOpen}
             />
             <Menu.Root>
               <Menu.Trigger
@@ -2307,11 +2303,6 @@ function SqlPlaygroundInner() {
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
-          />
-          <MobileMenuAction
-            label="Cloud saves"
-            chevron
-            onClick={() => setCloudDialogOpen(true)}
           />
           <MobileMenuSubSheet label="Import">
             <MobileMenuAction

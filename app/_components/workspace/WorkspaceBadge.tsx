@@ -8,6 +8,14 @@
  * into a Drawer-backed full manager (rename / delete / duplicate +
  * per-workspace size estimate).
  *
+ * This menu is also the single home for cloud backups (workspaceCloud.tsx):
+ * cloud saves share their id with the local workspace, so instead of a
+ * separate "Cloud" dialog with a second list, each local row carries its
+ * backup status, backups that exist only on the account are listed as
+ * "on your account" rows, and the active workspace gets one "Back up"
+ * action. Sharing stays separate (ShareControls) — publishing an immutable
+ * link is a different intent than saving.
+ *
  * Workspace switching is implemented as `setActiveWorkspaceId` followed
  * by `window.location.reload()` — engines and editor state rebuild from
  * scratch as a side effect of the reload, which is both simpler and
@@ -28,10 +36,16 @@ import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Drawer } from "@base-ui/react/drawer";
 import {
   Check,
+  Cloud,
+  CloudDownload,
+  CloudUpload,
   Copy as CopyIcon,
   Download,
   Folder,
+  FolderDown,
   HardDrive,
+  Loader2,
+  LogIn,
   Pencil,
   Plus,
   Save,
@@ -53,6 +67,19 @@ import {
   downloadWorkspaceZip,
   importWorkspaceFromZip,
 } from "../opfs/workspaceArchive";
+import type {
+  CloudWorkspaceMeta,
+  WorkspaceBundle,
+} from "@/lib/workspaces/types";
+import { INACTIVITY_EXPIRY_DAYS } from "@/lib/workspaces/policy";
+import { deleteCloudWorkspace } from "../cloud/cloudApi";
+import {
+  backUpWorkspace,
+  isBackupStale,
+  openCloudSave,
+  useCloudBackups,
+  type CloudBackups,
+} from "./workspaceCloud";
 
 const RECENT_LIMIT = 6;
 
@@ -77,6 +104,11 @@ export interface WorkspaceBadgeProps {
    *  The host promotes the draft to a saved workspace (see
    *  `saveDraftWorkspace`). */
   onSave?: (name: string) => void | Promise<void>;
+  /** Serializes the CURRENT playground state into a bundle — the same
+   *  builder the Share dialog uses. Powers "Back up" for the active
+   *  workspace; when omitted, the backup action is hidden (cloud rows and
+   *  statuses still render). */
+  buildBundle?: () => Promise<WorkspaceBundle | null>;
 }
 
 function formatBytes(bytes: number): string {
@@ -127,6 +159,43 @@ function formatRelative(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString();
 }
 
+/** One-line backup status for a workspace, e.g. "Backed up 5m ago". "Opened
+ *  since" flags that the backup predates the last open — the registry tracks
+ *  opens, not edits, so it's a prompt to back up again, not a diff. */
+function backupStatusText(
+  meta: CloudWorkspaceMeta | undefined,
+  stale: boolean,
+): string {
+  if (!meta) return "Not backed up";
+  const rel = formatRelative(Date.parse(meta.updatedAt));
+  return stale ? `Backed up ${rel} · opened since` : `Backed up ${rel}`;
+}
+
+/** Inline "backed up Xm ago" marker appended to a local row's meta line. */
+function CloudStatusInline({
+  entry,
+  meta,
+}: {
+  entry: WorkspaceEntry;
+  meta: CloudWorkspaceMeta;
+}) {
+  const stale = isBackupStale(entry, meta);
+  return (
+    <span
+      className={`workspace-cloud-status${stale ? " stale" : ""}`}
+      title={
+        stale
+          ? "Opened since its last backup — back up again to capture recent changes."
+          : "Backed up to your account."
+      }
+    >
+      {" · "}
+      <Cloud size={10} aria-hidden="true" />{" "}
+      {formatRelative(Date.parse(meta.updatedAt))}
+    </span>
+  );
+}
+
 export function WorkspaceBadge({
   playgroundId,
   activeWorkspaceId,
@@ -135,6 +204,7 @@ export function WorkspaceBadge({
   onManagerOpenChange,
   unsaved = false,
   onSave,
+  buildBundle,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -180,6 +250,82 @@ export function WorkspaceBadge({
         .slice(0, RECENT_LIMIT),
     [registry, playgroundId],
   );
+
+  // Cloud backups for this playground. Cloud saves share ids with local
+  // workspaces, so `cloudById` decorates local rows with their backup and
+  // `cloudOnly` is the remainder — backups with no copy on this device.
+  const cloud = useCloudBackups(playgroundId, popoverOpen || managerOpen);
+  const { refresh: refreshCloud } = cloud;
+  const cloudById = useMemo(() => {
+    const map = new Map<string, CloudWorkspaceMeta>();
+    for (const meta of cloud.metas) map.set(meta.id, meta);
+    return map;
+  }, [cloud.metas]);
+  const cloudOnly = useMemo(
+    () =>
+      cloud.metas.filter(
+        (m) =>
+          m.id !== activeWorkspaceId && // an unsaved draft's backup isn't "elsewhere"
+          !registry.some((e) => e.id === m.id),
+      ),
+    [cloud.metas, registry, activeWorkspaceId],
+  );
+  const showCloud = cloud.available && !cloud.signedOut;
+
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [cloudBusyId, setCloudBusyId] = useState<string | null>(null);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+
+  const handleBackUp = useCallback(async () => {
+    if (!activeWorkspaceId || !buildBundle) return;
+    setBackupBusy(true);
+    setCloudError(null);
+    try {
+      await backUpWorkspace(activeWorkspaceId, buildBundle);
+      await refreshCloud();
+    } catch (err) {
+      setCloudError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBackupBusy(false);
+    }
+  }, [activeWorkspaceId, buildBundle, refreshCloud]);
+
+  const handleOpenCloudOnly = useCallback(
+    async (meta: CloudWorkspaceMeta) => {
+      setCloudBusyId(meta.id);
+      setCloudError(null);
+      try {
+        await openCloudSave(playgroundId, meta, activeWorkspaceId);
+        // success ends in a navigation — no state to restore
+      } catch (err) {
+        setCloudError(err instanceof Error ? err.message : String(err));
+        setCloudBusyId(null);
+      }
+    },
+    [playgroundId, activeWorkspaceId],
+  );
+
+  // Backup state of the ACTIVE workspace, surfaced as a dot on the pill:
+  // gray = in this browser only, green = backed up, amber = opened since
+  // its last backup. No dot for guests (nothing to report).
+  const activeEntry = useMemo(
+    () => registry.find((e) => e.id === activeWorkspaceId),
+    [registry, activeWorkspaceId],
+  );
+  const activeMeta = activeWorkspaceId
+    ? cloudById.get(activeWorkspaceId)
+    : undefined;
+  const activeStale =
+    !!activeMeta && isBackupStale(activeEntry, activeMeta);
+  let backupDot: "local" | "fresh" | "stale" | null = null;
+  if (showCloud && cloud.loaded && activeWorkspaceId) {
+    backupDot = !activeMeta ? "local" : activeStale ? "stale" : "fresh";
+  }
+  const badgeTitle = `Active workspace: ${activeWorkspaceName || "(unnamed)"}${
+    backupDot
+      ? ` — ${backupStatusText(activeMeta, activeStale).toLowerCase()}`
+      : ""
+  }`;
 
   // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`
   // call is independent so we fire them in parallel and stream results
@@ -236,13 +382,19 @@ export function WorkspaceBadge({
       <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
         <Popover.Trigger
           className="workspace-badge"
-          title={`Active workspace: ${activeWorkspaceName || "(unnamed)"}`}
+          title={badgeTitle}
           aria-label="Active workspace"
         >
           <Folder size={12} aria-hidden="true" />
           <span className="workspace-badge-name">
             {activeWorkspaceName || "Workspace"}
           </span>
+          {backupDot && (
+            <span
+              className={`workspace-badge-dot ${backupDot}`}
+              aria-hidden="true"
+            />
+          )}
           <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
             <polyline
               points="2,4 6,8 10,4"
@@ -288,12 +440,107 @@ export function WorkspaceBadge({
                               {formatBytes(popoverSizes.get(ws.id) ?? 0)}
                             </>
                           )}
+                          {showCloud && cloudById.has(ws.id) && (
+                            <CloudStatusInline
+                              entry={ws}
+                              meta={cloudById.get(ws.id)!}
+                            />
+                          )}
                         </span>
                       </span>
                     </button>
                   );
                 })}
+                {showCloud && cloudOnly.length > 0 && (
+                  <>
+                    <div className="workspace-popover-subheader">
+                      On your account — not on this device
+                    </div>
+                    {cloudOnly.map((meta) => (
+                      <button
+                        type="button"
+                        key={meta.id}
+                        className="workspace-popover-item"
+                        onClick={() => void handleOpenCloudOnly(meta)}
+                        disabled={cloudBusyId !== null}
+                        title="Open this backup on this device"
+                      >
+                        <span className="workspace-popover-item-check">
+                          {cloudBusyId === meta.id ? (
+                            <Loader2
+                              size={12}
+                              aria-hidden="true"
+                              className="cloud-spin"
+                            />
+                          ) : (
+                            <CloudDownload size={12} aria-hidden="true" />
+                          )}
+                        </span>
+                        <span className="workspace-popover-item-text">
+                          <span className="workspace-popover-item-name">
+                            {meta.name}
+                          </span>
+                          <span className="workspace-popover-item-meta">
+                            Saved {formatRelative(Date.parse(meta.updatedAt))}
+                            {" · "}
+                            {formatBytes(meta.sizeBytes)}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
+              {cloud.available &&
+                (cloud.signedOut ? (
+                  <a href="/sign-in" className="workspace-popover-signin">
+                    <LogIn size={12} aria-hidden="true" />
+                    <span>Sign in to back up workspaces</span>
+                  </a>
+                ) : (
+                  <div className="workspace-popover-cloud">
+                    <div className="workspace-popover-cloud-row">
+                      {buildBundle && (
+                        <button
+                          type="button"
+                          className="workspace-popover-backup-btn"
+                          onClick={() => void handleBackUp()}
+                          disabled={backupBusy || !activeWorkspaceId}
+                          title={`Back up “${activeWorkspaceName || "this workspace"}” to your account`}
+                        >
+                          {backupBusy ? (
+                            <Loader2
+                              size={12}
+                              aria-hidden="true"
+                              className="cloud-spin"
+                            />
+                          ) : (
+                            <CloudUpload size={12} aria-hidden="true" />
+                          )}
+                          <span>{backupBusy ? "Backing up…" : "Back up"}</span>
+                        </button>
+                      )}
+                      <span
+                        className={`workspace-popover-backup-status${activeStale ? " stale" : ""}`}
+                      >
+                        {cloud.loaded
+                          ? backupStatusText(activeMeta, activeStale)
+                          : "Checking backups…"}
+                      </span>
+                    </div>
+                    {(cloudError ?? cloud.error) && (
+                      <p role="alert" className="workspace-popover-cloud-error">
+                        {cloudError ?? cloud.error}
+                      </p>
+                    )}
+                    {cloud.usage && (
+                      <div className="workspace-popover-usage">
+                        {formatBytes(cloud.usage.bytesUsed)} of{" "}
+                        {formatBytes(cloud.usage.bytesLimit)} cloud storage used
+                      </div>
+                    )}
+                  </div>
+                ))}
               <div className="workspace-popover-footer">
                 <button
                   type="button"
@@ -349,6 +596,8 @@ export function WorkspaceBadge({
         activeWorkspaceId={activeWorkspaceId}
         registry={registry}
         onRegistryChange={refreshRegistry}
+        cloud={cloud}
+        buildBundle={buildBundle}
       />
     </>
   );
@@ -377,8 +626,9 @@ function SaveWorkspaceDialog({
         <Dialog.Popup className="confirm-popup sql-rename-popup">
           <Dialog.Title className="confirm-title">Save workspace</Dialog.Title>
           <Dialog.Description className="confirm-desc">
-            Give this workspace a name to add it to your saved list. Your work
-            stays in this browser.
+            Give this workspace a name to add it to your saved list. Saved
+            workspaces live in this browser — use “Back up” in the workspace
+            menu to keep a copy on your account.
           </Dialog.Description>
           <form
             className="sql-rename-form"
@@ -424,6 +674,8 @@ interface WorkspaceManagerDrawerProps {
   activeWorkspaceId: string | null;
   registry: WorkspaceEntry[];
   onRegistryChange: () => void;
+  cloud: CloudBackups;
+  buildBundle?: () => Promise<WorkspaceBundle | null>;
 }
 
 function WorkspaceManagerDrawer({
@@ -433,6 +685,8 @@ function WorkspaceManagerDrawer({
   activeWorkspaceId,
   registry,
   onRegistryChange,
+  cloud,
+  buildBundle,
 }: WorkspaceManagerDrawerProps) {
   const list = useMemo(
     () =>
@@ -453,6 +707,76 @@ function WorkspaceManagerDrawer({
   >(null);
   const [operationError, setOperationError] = useState<string | null>(null);
   const importInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Cloud state mirrors the popover: same id-keyed model, richer actions.
+  const { refresh: refreshCloud } = cloud;
+  const cloudById = useMemo(() => {
+    const map = new Map<string, CloudWorkspaceMeta>();
+    for (const meta of cloud.metas) map.set(meta.id, meta);
+    return map;
+  }, [cloud.metas]);
+  const cloudOnly = useMemo(
+    () =>
+      cloud.metas.filter(
+        (m) =>
+          m.id !== activeWorkspaceId &&
+          !registry.some((e) => e.id === m.id),
+      ),
+    [cloud.metas, registry, activeWorkspaceId],
+  );
+  const showCloud = cloud.available && !cloud.signedOut;
+  const [cloudBusyId, setCloudBusyId] = useState<string | null>(null);
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [restoreTarget, setRestoreTarget] = useState<CloudWorkspaceMeta | null>(
+    null,
+  );
+  const [cloudDeleteTarget, setCloudDeleteTarget] =
+    useState<CloudWorkspaceMeta | null>(null);
+
+  const handleBackUp = useCallback(async () => {
+    if (!activeWorkspaceId || !buildBundle) return;
+    setBackupBusy(true);
+    setOperationError(null);
+    try {
+      await backUpWorkspace(activeWorkspaceId, buildBundle);
+      await refreshCloud();
+    } catch (err) {
+      setOperationError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBackupBusy(false);
+    }
+  }, [activeWorkspaceId, buildBundle, refreshCloud]);
+
+  const handleOpenCloud = useCallback(
+    async (meta: CloudWorkspaceMeta) => {
+      setCloudBusyId(meta.id);
+      setOperationError(null);
+      try {
+        await openCloudSave(playgroundId, meta, activeWorkspaceId);
+        // success ends in a navigation — no state to restore
+      } catch (err) {
+        setOperationError(err instanceof Error ? err.message : String(err));
+        setCloudBusyId(null);
+      }
+    },
+    [playgroundId, activeWorkspaceId],
+  );
+
+  const handleDeleteCloud = useCallback(
+    async (meta: CloudWorkspaceMeta) => {
+      setCloudBusyId(meta.id);
+      setOperationError(null);
+      try {
+        await deleteCloudWorkspace(meta.id);
+        await refreshCloud();
+      } catch (err) {
+        setOperationError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setCloudBusyId(null);
+      }
+    },
+    [refreshCloud],
+  );
 
   // Recompute byte sizes whenever the drawer opens or the workspace list
   // changes. We rebuild the full map rather than diffing because the
@@ -546,6 +870,8 @@ function WorkspaceManagerDrawer({
                       {isSqlPlayground(playgroundId)
                         ? "Each workspace is a separate, saved copy of this playground’s files and database — switch between them to keep projects apart. Everything stays in your browser."
                         : "Each workspace is a separate, saved copy of this playground’s files — switch between them to keep projects apart. Everything stays in your browser."}
+                      {showCloud &&
+                        " Rows with a cloud mark are also backed up to your account."}
                     </Drawer.Description>
                   </div>
                   <Drawer.Close
@@ -680,9 +1006,63 @@ function WorkspaceManagerDrawer({
                             </span>
                             <span>·</span>
                             <span>Last opened {formatRelative(ws.lastUsedAt)}</span>
+                            {showCloud && cloudById.has(ws.id) && (
+                              <span>
+                                <CloudStatusInline
+                                  entry={ws}
+                                  meta={cloudById.get(ws.id)!}
+                                />
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="workspace-manager-item-actions">
+                          {showCloud && buildBundle && active && (
+                            <ActionButton
+                              label={backupBusy ? "Backing up…" : "Back up"}
+                              onClick={() => void handleBackUp()}
+                              icon={
+                                backupBusy ? (
+                                  <Loader2
+                                    size={12}
+                                    aria-hidden="true"
+                                    className="cloud-spin"
+                                  />
+                                ) : (
+                                  <CloudUpload size={12} aria-hidden="true" />
+                                )
+                              }
+                              disabled={backupBusy}
+                            />
+                          )}
+                          {showCloud &&
+                            cloudById.has(ws.id) &&
+                            (isSqlPlayground(playgroundId) ? (
+                              // SQL backups replay into the current session
+                              // database — the workspace itself isn't touched,
+                              // so no confirmation is needed.
+                              <ActionButton
+                                label="Open backup"
+                                onClick={() =>
+                                  void handleOpenCloud(cloudById.get(ws.id)!)
+                                }
+                                icon={
+                                  <FolderDown size={12} aria-hidden="true" />
+                                }
+                                disabled={cloudBusyId !== null}
+                              />
+                            ) : (
+                              <ActionButton
+                                label="Restore"
+                                onClick={() =>
+                                  setRestoreTarget(cloudById.get(ws.id)!)
+                                }
+                                icon={
+                                  <CloudDownload size={12} aria-hidden="true" />
+                                }
+                                disabled={cloudBusyId !== null}
+                              />
+                            ))}
                           <ActionButton
                             label="Export"
                             onClick={() => void handleExport(ws)}
@@ -722,6 +1102,76 @@ function WorkspaceManagerDrawer({
                       </div>
                     );
                   })}
+
+                  {showCloud && cloudOnly.length > 0 && (
+                    <>
+                      <div className="workspace-manager-cloud-header">
+                        On your account — not on this device
+                      </div>
+                      {cloudOnly.map((meta) => (
+                        <div key={meta.id} className="workspace-manager-item">
+                          <div className="workspace-manager-item-main">
+                            <span className="workspace-manager-item-name workspace-manager-cloud-name">
+                              <Cloud size={12} aria-hidden="true" /> {meta.name}
+                            </span>
+                            <div className="workspace-manager-item-meta">
+                              <span>{formatBytes(meta.sizeBytes)}</span>
+                              <span>·</span>
+                              <span>
+                                Saved{" "}
+                                {formatRelative(Date.parse(meta.updatedAt))}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="workspace-manager-item-actions">
+                            <ActionButton
+                              label={
+                                cloudBusyId === meta.id ? "Opening…" : "Open"
+                              }
+                              onClick={() => void handleOpenCloud(meta)}
+                              icon={<FolderDown size={12} aria-hidden="true" />}
+                              disabled={cloudBusyId !== null}
+                            />
+                            <ActionButton
+                              label="Delete backup"
+                              onClick={() => setCloudDeleteTarget(meta)}
+                              icon={<Trash2 size={12} aria-hidden="true" />}
+                              danger
+                              disabled={cloudBusyId !== null}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  {showCloud && (
+                    <p className="workspace-manager-cloud-note">
+                      {cloud.usage && (
+                        <>
+                          {formatBytes(cloud.usage.bytesUsed)} of{" "}
+                          {formatBytes(cloud.usage.bytesLimit)} cloud storage
+                          used ·{" "}
+                        </>
+                      )}
+                      Manage backups and share links on your{" "}
+                      <a href="/account">account page</a>.
+                      {cloud.usage?.plan === "free" && (
+                        <>
+                          {" "}
+                          Free backups expire after {INACTIVITY_EXPIRY_DAYS}
+                          {" "}days of inactivity — opening one resets its
+                          clock.
+                        </>
+                      )}
+                    </p>
+                  )}
+                  {cloud.available && cloud.signedOut && (
+                    <p className="workspace-manager-cloud-note">
+                      <a href="/sign-in">Sign in</a> to back up workspaces to
+                      your account and open them on any device.
+                    </p>
+                  )}
                 </div>
               </Drawer.Content>
             </Drawer.Popup>
@@ -776,7 +1226,114 @@ function WorkspaceManagerDrawer({
           }
         }}
       />
+
+      <RestoreBackupDialog
+        target={restoreTarget}
+        onClose={() => setRestoreTarget(null)}
+        onConfirm={(meta) => {
+          setRestoreTarget(null);
+          void handleOpenCloud(meta);
+        }}
+      />
+
+      <DeleteBackupDialog
+        target={cloudDeleteTarget}
+        onClose={() => setCloudDeleteTarget(null)}
+        onConfirm={(meta) => {
+          setCloudDeleteTarget(null);
+          void handleDeleteCloud(meta);
+        }}
+      />
     </>
+  );
+}
+
+/** Confirmation before a code-playground restore: pulling the backup
+ *  replaces the workspace's files on this device (the same clobber the old
+ *  Cloud dialog guarded with "Replace local copy?", now framed from the
+ *  workspace's point of view). */
+function RestoreBackupDialog({
+  target,
+  onClose,
+  onConfirm,
+}: {
+  target: CloudWorkspaceMeta | null;
+  onClose: () => void;
+  onConfirm: (meta: CloudWorkspaceMeta) => void;
+}) {
+  return (
+    <AlertDialog.Root
+      open={target !== null}
+      onOpenChange={(o) => !o && onClose()}
+    >
+      <AlertDialog.Portal>
+        <AlertDialog.Backdrop className="confirm-backdrop" />
+        <AlertDialog.Popup className="confirm-popup">
+          <AlertDialog.Title className="confirm-title">
+            Restore backup?
+          </AlertDialog.Title>
+          <AlertDialog.Description className="confirm-desc">
+            The backup of <strong>“{target?.name}”</strong> from{" "}
+            {target ? formatRelative(Date.parse(target.updatedAt)) : ""} will
+            replace this workspace&rsquo;s current files on this device.
+          </AlertDialog.Description>
+          <div className="confirm-actions">
+            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              Cancel
+            </AlertDialog.Close>
+            <button
+              type="button"
+              className="confirm-btn confirm-btn-danger"
+              onClick={() => target && onConfirm(target)}
+            >
+              Restore backup
+            </button>
+          </div>
+        </AlertDialog.Popup>
+      </AlertDialog.Portal>
+    </AlertDialog.Root>
+  );
+}
+
+function DeleteBackupDialog({
+  target,
+  onClose,
+  onConfirm,
+}: {
+  target: CloudWorkspaceMeta | null;
+  onClose: () => void;
+  onConfirm: (meta: CloudWorkspaceMeta) => void;
+}) {
+  return (
+    <AlertDialog.Root
+      open={target !== null}
+      onOpenChange={(o) => !o && onClose()}
+    >
+      <AlertDialog.Portal>
+        <AlertDialog.Backdrop className="confirm-backdrop" />
+        <AlertDialog.Popup className="confirm-popup">
+          <AlertDialog.Title className="confirm-title">
+            Delete backup?
+          </AlertDialog.Title>
+          <AlertDialog.Description className="confirm-desc">
+            The backup of <strong>“{target?.name}”</strong> will be removed
+            from your account. Copies on your devices are untouched.
+          </AlertDialog.Description>
+          <div className="confirm-actions">
+            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              Cancel
+            </AlertDialog.Close>
+            <button
+              type="button"
+              className="confirm-btn confirm-btn-danger"
+              onClick={() => target && onConfirm(target)}
+            >
+              Delete backup
+            </button>
+          </div>
+        </AlertDialog.Popup>
+      </AlertDialog.Portal>
+    </AlertDialog.Root>
   );
 }
 

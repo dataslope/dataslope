@@ -118,7 +118,7 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
-import { CloudShareControls } from "../cloud/CloudShareControls";
+import { ShareControls } from "../cloud/ShareControls";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -3177,7 +3177,7 @@ function PostgresPlaygroundInner() {
 
   /** Serializes the active database to a replayable SQL dump. Shared by the
    *  "SQL dump (.sql)" export download and the cloud/share bundle builder
-   *  (CloudShareControls). Returns null while the engine is booting. */
+   *  (ShareControls / workspaceCloud). Returns null while the engine is booting. */
   const buildPostgresDumpSql = useCallback(async (): Promise<string | null> => {
     const engine = engineRef.current;
     if (!engine) return null;
@@ -3267,7 +3267,6 @@ function PostgresPlaygroundInner() {
   // A SQL bundle carries the active database as a replayable SQL dump plus
   // the query tabs — the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const dump = await buildPostgresDumpSql();
@@ -3653,18 +3652,15 @@ function PostgresPlaygroundInner() {
                 tabs.some((t) => !t.kind && t.code !== t.pristineCode)
               }
               onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
             />
           )}
           <div className="header-actions desktop-only">
-            <CloudShareControls
-              playgroundId={PLAYGROUND_ID}
-              workspaceId={activeWorkspace?.id ?? null}
+            <ShareControls
               workspaceName={activeWorkspace?.name ?? ""}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
-              cloudOpen={cloudDialogOpen}
-              onCloudOpenChange={setCloudDialogOpen}
             />
             <Menu.Root>
               <Menu.Trigger
@@ -3923,11 +3919,6 @@ function PostgresPlaygroundInner() {
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
-          />
-          <MobileMenuAction
-            label="Cloud saves"
-            chevron
-            onClick={() => setCloudDialogOpen(true)}
           />
           <MobileMenuSubSheet label="Import">
             <MobileMenuAction

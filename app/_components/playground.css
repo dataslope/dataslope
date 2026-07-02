@@ -4027,6 +4027,26 @@ html[data-playground-theme="dark"] .welcome h3 {
   white-space: nowrap;
 }
 
+/* Backup state of the active workspace, shown as a dot on the pill for
+   signed-in users: gray = in this browser only, green = backed up, amber =
+   opened since its last backup. Guests get no dot (nothing to report). */
+.workspace-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+.workspace-badge-dot.local {
+  background: var(--text-dim);
+  opacity: 0.55;
+}
+.workspace-badge-dot.fresh {
+  background: var(--green);
+}
+.workspace-badge-dot.stale {
+  background: var(--yellow);
+}
+
 /* Save button — shown next to the badge only when the active workspace is an
    unsaved draft the user has changed. Accent-filled so it reads as the call to
    action (the draft isn't in the saved list until it's clicked). */
@@ -4131,6 +4151,111 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-popover-item-meta {
   font-size: 11px;
   color: var(--text-dim);
+}
+
+/* Section label separating cloud-only rows ("on your account, not on this
+   device") from the local recents above them. */
+.workspace-popover-subheader {
+  padding: 8px 12px 4px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+
+/* Inline "backed up Xm ago" marker on a workspace row's meta line. */
+.workspace-cloud-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-dim);
+}
+.workspace-cloud-status.stale {
+  color: var(--yellow);
+}
+
+/* Backup strip between the workspace list and the New/Manage footer:
+   one "Back up" action for the active workspace plus its status, the
+   usage line, and inline errors. */
+.workspace-popover-cloud {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.workspace-popover-cloud-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.workspace-popover-backup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: none;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+.workspace-popover-backup-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+.workspace-popover-backup-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.workspace-popover-backup-status {
+  font-size: 11px;
+  color: var(--text-dim);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace-popover-backup-status.stale {
+  color: var(--yellow);
+}
+.workspace-popover-usage {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.workspace-popover-cloud-error {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--err-accent);
+}
+
+/* Guest variant of the backup strip: a single sign-in row. */
+.workspace-popover-signin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.workspace-popover-signin:hover {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .workspace-popover-footer {
@@ -4312,6 +4437,36 @@ html[data-playground-theme="dark"] .welcome h3 {
   cursor: not-allowed;
 }
 
+/* Cloud rows in the manager: a labelled section for backups that exist only
+   on the account, plus the footer note linking to full management. */
+.workspace-manager-cloud-header {
+  margin-top: 18px;
+  padding-bottom: 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace-manager-cloud-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.workspace-manager-cloud-note {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.workspace-manager-cloud-note a {
+  color: var(--text-muted);
+}
+
 /* ───────────────────────────────────────────────────────────────────────
    Settings rendered inline inside a tab pane (instead of the legacy
    dialog). Reuses the `.settings-tabs` / `.settings-body` styling but
@@ -4363,9 +4518,10 @@ html[data-playground-theme="dark"] .welcome h3 {
   max-width: 720px;
 }
 
-/* ── Cloud saves & share dialogs (app/_components/cloud/) ─────────────────
+/* ── Share dialog (app/_components/cloud/ShareControls.tsx) ───────────────
    Composed from the confirm-* dialog primitives above; these classes only
-   add the list / status layout the cloud dialogs need. */
+   add the link/status layout the share dialog needs. (`.cloud-spin` is also
+   reused by the workspace menu's backup spinners.) */
 .cloud-dialog {
   width: min(440px, calc(100vw - 32px));
 }
@@ -4379,56 +4535,6 @@ html[data-playground-theme="dark"] .welcome h3 {
   flex: 1 1 auto;
   min-width: 0;
 }
-.cloud-save-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-  flex-wrap: wrap;
-}
-.cloud-usage {
-  font-size: 12px;
-  color: var(--text-dim);
-}
-.cloud-list {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-.cloud-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
-  border-radius: 8px;
-}
-.cloud-item-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.cloud-item-name {
-  font-size: 13px;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.cloud-item-meta {
-  font-size: 11.5px;
-  color: var(--text-dim);
-}
-.cloud-item-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
 .cloud-note {
   margin-top: 12px;
   font-size: 12px;
@@ -4438,11 +4544,6 @@ html[data-playground-theme="dark"] .welcome h3 {
 .cloud-note a {
   color: inherit;
   text-decoration: underline;
-}
-.cloud-notice {
-  margin-top: 10px;
-  font-size: 12.5px;
-  color: var(--accent, #16a34a);
 }
 .cloud-error {
   margin-top: 10px;

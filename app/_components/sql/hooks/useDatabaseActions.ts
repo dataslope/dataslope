@@ -254,7 +254,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
 
   /** Serializes the active database to a replayable SQL dump (DDL + data).
    *  Shared by the "SQL dump (.sql)" export download and the cloud/share
-   *  bundle builder (see CloudShareControls). Returns null while the engine
+   *  bundle builder (see ShareControls). Returns null while the engine
    *  is still booting. */
   const buildSqlDumpText = useCallback(async (): Promise<string | null> => {
     const engine = engineRef.current;
