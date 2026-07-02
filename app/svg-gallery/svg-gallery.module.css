@@ -78,7 +78,13 @@
   color: var(--fg);
 }
 
+/* Fixed to the viewport so the light/dark switch stays reachable at any
+   scroll position. Still a descendant of .page, so the theme tokens apply. */
 .themeToggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -91,6 +97,7 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 .themeToggle:hover {
