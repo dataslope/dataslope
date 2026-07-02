@@ -16,7 +16,7 @@ pointer to the next node.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three nodes, each a blue data box with a green pointer tab, chained by thin curved arrows, the last tab holding a red square for null — a linked list"
+  aria-label="Three nodes, each a blue data box with a green pointer tab, chained by thin curved arrows, the last tab holding a gray square for null — a linked list"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -32,21 +32,22 @@ pointer to the next node.
     <rect x="326" y="104" width="28" height="28" rx="6" />
     <rect x="506" y="104" width="28" height="28" rx="6" />
   </g>
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    opacity="0.35"
-  >
-    <path d="M182 108 C 206 92, 232 92, 254 106" />
-    <path d="M362 108 C 386 92, 412 92, 434 106" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    >
+      <path d="M182 108 C 206 92, 232 92, 254 106" />
+      <path d="M362 108 C 386 92, 412 92, 434 106" />
+    </g>
+    <g fill="currentColor">
+      <polygon points="248,96 260,110 244,112" />
+      <polygon points="428,96 440,110 424,112" />
+    </g>
   </g>
-  <g fill="currentColor" opacity="0.4">
-    <polygon points="248,96 260,110 244,112" />
-    <polygon points="428,96 440,110 424,112" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
     <rect x="512" y="110" width="16" height="16" rx="4" />
   </g>
 </svg>
