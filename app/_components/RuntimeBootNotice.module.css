@@ -204,7 +204,7 @@
   background: var(--color-fd-muted, #f4f4f5);
   border: 1px solid var(--color-fd-border, #e3e6ea);
   overflow-x: auto;
-  font-family: var(--ds-font-mono, "JetBrains Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-fd-foreground, #18181b);
@@ -225,7 +225,7 @@
 
 .previewEditor {
   padding: 12px 4px;
-  font-family: var(--ch-font-mono, "JetBrains Mono", ui-monospace, monospace);
+  font-family: var(--ch-font-mono, var(--font-mono, ui-monospace, monospace));
   font-size: 13px;
   line-height: 1.65;
   overflow-x: auto;

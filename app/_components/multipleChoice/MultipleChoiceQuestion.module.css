@@ -9,8 +9,6 @@
    `--color-…` vars); brand colors come from the global `--ds-*` ramp
    (app/brand.css). */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
-
 .card {
   /* Local neutral palette (Tailwind) — kept in sync with ChallengeCard;
      brand accent colors are referenced from --ds-* below. */
@@ -26,9 +24,10 @@
   --mc-text-muted: var(--ds-gray-400);
   --mc-accent: var(--ds-blue-600);
 
-  --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
-  --mc-font-mono:
-    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  /* Inter / JetBrains Mono via the next/font variables published on <html>
+     (app/layout.tsx) — the faces themselves are loaded there once. */
+  --mc-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
+  --mc-font-mono: var(--font-mono, ui-monospace, monospace);
   --mc-radius: 8px;
 
   background: var(--mc-bg);

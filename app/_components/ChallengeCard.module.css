@@ -8,8 +8,6 @@
    is language-agnostic — the same component is meant to host R and
    TypeScript challenges later. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
-
 .card {
   /* Light, paper-style chrome distinct from the dark-by-default
      CodeBlock — challenges are meant to feel like a worksheet, not a
@@ -58,9 +56,10 @@
   /* Modal backdrop: slate-900 at 55% opacity. */
   --ch-overlay: color-mix(in srgb, var(--ch-slate-900) 55%, transparent);
 
-  --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
-  --ch-font-mono:
-    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  /* Inter / JetBrains Mono via the next/font variables published on <html>
+     (app/layout.tsx) — the faces themselves are loaded there once. */
+  --ch-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
+  --ch-font-mono: var(--font-mono, ui-monospace, monospace);
   --ch-radius: 8px;
 
   background: var(--ch-bg);
@@ -1090,7 +1089,9 @@
     0 1px 2px color-mix(in srgb, var(--ds-black) 12%, transparent),
     0 8px 24px color-mix(in srgb, var(--ds-black) 22%, transparent);
   min-width: 240px;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  /* --font-sans lives on <html>, so unlike the .card-scoped tokens it does
+     reach this portal. */
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
   outline: none;
 }
 
@@ -1140,7 +1141,7 @@
   border: 1px solid color-mix(in srgb, var(--ds-white) 28%, transparent);
   color: color-mix(in srgb, var(--ds-white) 88%, transparent);
   box-shadow: none;
-  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 11.5px;
   padding: 2px 5px;
   border-radius: 4px;
@@ -1547,7 +1548,7 @@
 /* Footer row stating the full row/column count of a truncated frame. */
 .outCellHtml :global(td.dataframe-rows-footer) {
   padding: 4px 10px;
-  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
   font-size: 14px;
   color: var(--ch-text-muted);
   font-style: normal;
@@ -1558,7 +1559,7 @@
 /* Dimensions line pandas appends below a truncated frame. */
 .outCellHtml :global(p) {
   margin: 6px 0 0;
-  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
   font-size: 14px;
   color: var(--ch-text-muted);
 }
@@ -1885,8 +1886,8 @@
   --ch-text-muted: var(--ds-gray-400);
   --ch-red: var(--ds-red-600);
   --ch-green: var(--ds-green-600);
-  --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
-  --ch-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --ch-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
+  --ch-font-mono: var(--font-mono, ui-monospace, monospace);
 
   width: min(460px, 92vw);
   background: var(--ch-bg);

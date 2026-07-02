@@ -1,12 +1,6 @@
 /* ─── Playground (Python / R) shared styles ─────────────────────────────── */
 /* Extracted from public/python.html so the React component can reuse them. */
 
-/* Kept byte-identical to the @import in app/learn/learn.css so the browser
-   treats them as one resource and fetches it once when both stylesheets are
-   loaded (they routinely coexist: lessons embed playgrounds, and client-side
-   navigation keeps prior routes' CSS applied). */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
-
 /* Shared run-overlay keyframes (ds-run-*), also used by CodeBlock and
    ChallengeCard. */
 @import "./runOverlayAnimations.css";
@@ -56,9 +50,10 @@
      across the playgrounds — a faint lift that reads consistently on any
      surface (--bg, --bg2, popups) rather than the heavier --bg3 step. */
   --menu-item-hover: color-mix(in srgb, var(--text) 6%, transparent);
-  --font-mono:
-    "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
-  --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  /* --font-mono (JetBrains Mono) is published on <html> by next/font in
+     app/layout.tsx; redeclaring it here would race that rule on specificity.
+     --font-ui is the playground-local alias every rule below consumes. */
+  --font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
   --radius: 8px;
   /* Editor font size — overridable inline by the font-size slider.
      Defining it as a variable lets the slider take effect even though
@@ -1533,7 +1528,7 @@ body.playground-active {
 /* Footer row that states the full row/column count for truncated frames. */
 .dataframe-wrap .dataframe-rows-footer {
   padding: 4px 10px;
-  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
   font-size: 14px;
   color: var(--text-dim);
   text-align: right;
@@ -1542,7 +1537,7 @@ body.playground-active {
 /* Dimensions line pandas appends below a truncated frame. */
 .dataframe-wrap p {
   margin: 6px 0 0;
-  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
   font-size: 14px;
   color: var(--text-dim);
 }
