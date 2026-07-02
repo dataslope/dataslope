@@ -550,9 +550,10 @@ function MermaidContent({ chart }: { chart: string }) {
       // fonts.ready` is insufficient because font-display:swap fonts may not be
       // in the "ready" set until explicitly triggered. `fonts.load()` guarantees
       // the face is available (or settles with a no-op if it can't load) first.
-      // next/font registers the faces under hashed family names, so resolve the
-      // real names from the variables it publishes on <html> rather than
-      // hardcoding "Inter"/"JetBrains Mono" (which would silently no-op).
+      // next/font registers the faces under names of its choosing (hashed or
+      // suffixed with a generated fallback, depending on the bundler), so
+      // resolve the actual family lists from the variables it publishes on
+      // <html> rather than hardcoding "Inter"/"JetBrains Mono".
       const rootStyle = getComputedStyle(document.documentElement);
       await Promise.allSettled(
         ["--font-sans", "--font-mono"].flatMap((variable) => {
