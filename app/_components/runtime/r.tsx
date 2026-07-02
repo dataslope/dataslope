@@ -571,6 +571,8 @@ interface WebRInstance {
   evalRVoid(code: string): Promise<void>;
   evalRString(code: string): Promise<string>;
   installPackages(pkgs: string[]): Promise<void>;
+  /** Shuts down the webR session and terminates its worker. */
+  close(): Promise<void>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -859,6 +861,15 @@ class WebRRuntime implements LanguageRuntime {
   private completionSetup: Promise<boolean> | null = null;
 
   constructor(private webR: WebRInstance) {}
+
+  /** Free the R heap by shutting the webR session down. Registry-eviction
+   *  hook — the instance must not be used after this. Also un-registers
+   *  this session from the styler formatter so a later Format click
+   *  starts a fresh session instead of talking to a dead one. */
+  dispose(): void {
+    releaseFormatterSession(this.webR);
+    void this.webR.close().catch(() => {});
+  }
 
   // ─── Autocomplete via R's own completion engine ───────────────────────
   //
@@ -1206,6 +1217,14 @@ unlink("${CREATED_FILES_PATH}")`,
 
 let activeWebR: WebRInstance | null = null;
 let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;
+
+/** Forget `webR` if the formatter is set to reuse it — called when the
+ *  runtime that owns the session is disposed (registry eviction), so a
+ *  later Format click lazily starts a fresh session instead of hitting a
+ *  terminated worker. */
+function releaseFormatterSession(webR: WebRInstance): void {
+  if (activeWebR === webR) activeWebR = null;
+}
 
 // Sessions that already have {styler} installed and configured, so we install
 // it at most once each. Keyed weakly so sessions can still be garbage-collected.

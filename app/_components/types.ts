@@ -194,6 +194,32 @@ export interface LanguageRuntime {
    *  implementations must clear their internal tracking after returning
    *  to avoid reporting the same file twice. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
+  /** Optional: tear the runtime down and free its resources (terminate
+   *  the backing Web Worker, close the WASM instance). Called by the
+   *  runtime registry when this runtime is evicted to bound how many
+   *  language VMs stay resident at once — after it runs, the instance
+   *  must not be used again. Runtimes that cannot release their
+   *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
+   *  this hook, which also exempts them from eviction. */
+  dispose?(): void | Promise<void>;
+  /** Optional: hint that the given authored source snippets may run
+   *  soon, so the runtime can pre-install heavy optional packages while
+   *  the user is still reading (Python's numpy/pandas/scipy/matplotlib/
+   *  plotly set). Fire-and-forget and best-effort: runtimes install
+   *  missing packages on demand at run time regardless, so a missed or
+   *  wrong hint only changes *when* the download happens, never whether
+   *  a run succeeds.
+   *
+   *  `options.packages` adds importable module names (e.g. `"pandas"`,
+   *  `"sklearn"`) to warm even though no source imports them — the
+   *  escape hatch for content whose instructions ask the learner to
+   *  write the import themselves, or for dynamic imports the scan can't
+   *  see. `options.force` skips the needs-analysis and warms the full
+   *  set (used by the playground, whose future code is unknown). */
+  warmPackages?(
+    sources: string[],
+    options?: { packages?: string[]; force?: boolean },
+  ): void;
 }
 
 export interface LanguageAdapter {

@@ -122,7 +122,7 @@ export function PlaygroundShowcase() {
       </div>
 
       <div className="mx-auto max-w-7xl">
-        <EmbeddedPlayground playgroundId={playgroundId} />
+        <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
       <div className="mt-6 text-center">

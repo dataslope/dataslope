@@ -507,7 +507,13 @@ class CppWorkerRuntime implements LanguageRuntime {
    *  files in the workspace are available to the compiler. */
   private stagedFiles: Map<string, string> = new Map();
 
-  constructor(private worker: Worker) {}
+    constructor(private worker: Worker) {}
+
+  /** Free the runtime by terminating its worker. Registry-eviction hook —
+   *  the instance must not be used after this. */
+  dispose(): void {
+    this.worker.terminate();
+  }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const decoder = new TextDecoder();

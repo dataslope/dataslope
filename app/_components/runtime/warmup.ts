@@ -25,11 +25,21 @@
 // are no-ops.
 
 import type { LanguageAdapter } from "../types";
-import { getSharedRuntime, type RuntimeScope } from "../runtimeRegistry";
+import {
+  getSharedRuntime,
+  onRuntimeEvicted,
+  type RuntimeScope,
+} from "../runtimeRegistry";
 
 const requested = new Set<string>();
 // Sequential boot chain — see "one heavy boot at a time" above.
 let bootChain: Promise<void> = Promise.resolve();
+
+// When the registry evicts a runtime, forget that we warmed it so a later
+// route-land on the same language can warm it again.
+onRuntimeEvicted((scope, adapterId) => {
+  requested.delete(`${scope}:${adapterId}`);
+});
 
 interface NetworkInformationLike {
   saveData?: boolean;

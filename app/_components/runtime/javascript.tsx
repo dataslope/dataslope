@@ -265,6 +265,12 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
 
   constructor(private worker: Worker) {}
 
+  /** Free the runtime by terminating its worker. Registry-eviction hook —
+   *  the instance must not be used after this. */
+  dispose(): void {
+    this.worker.terminate();
+  }
+
   /** Intellisense via the shared TS language service worker (allowJs
    *  inference) — separate from the execution worker so analysis never
    *  queues behind a long-running user program. */
