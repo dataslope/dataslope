@@ -36,11 +36,12 @@ declare global {
     TRUSTED_ORIGINS?: string;
 
     // --- "Ask AI" model config (vars; see lib/ai/models.ts) ---
-    // Base URL + model id per membership tier. Both providers must speak the
-    // OpenAI /chat/completions streaming API. Defaults: free → OpenRouter
-    // (openai/gpt-4o-mini), pro → OpenAI (gpt-4o). The API keys are secrets
-    // (below). Leave a tier's key unset to have it degrade to the other tier's
-    // provider.
+    // Base URL + model id per membership tier — no hardcoded fallback, so a
+    // tier needs its base URL, model id, AND API key (below) all set to be
+    // usable. Both providers must speak the OpenAI /chat/completions
+    // streaming API. Currently both tiers point at OpenRouter's DeepSeek V4
+    // Flash model (see wrangler.jsonc). Leave a tier's base URL/model/key
+    // unset to have it degrade to the other tier's provider (resolveModel).
     AI_FREE_BASE_URL?: string;
     AI_FREE_MODEL?: string;
     AI_PRO_BASE_URL?: string;

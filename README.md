@@ -173,22 +173,21 @@ The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContex
 
 A signed-in, streaming "Ask AI" chat pane on the `/learn` lessons and `/playground/*` pages (`app/api/ai/chat/route.ts` + `app/_components/ai/`). It runs on the Workers runtime and pipes an OpenAI-compatible provider's Server-Sent-Event stream straight through — no Node APIs, no filesystem (lesson context is fetched from the prerendered `${slug}.md` asset, not read from disk).
 
-**Model per membership tier.** Free members use a cheaper model via **OpenRouter**; **Pro** members use an **OpenAI** model (`lib/ai/models.ts`). The base URLs and model ids are non-secret `vars` in `wrangler.jsonc` (`AI_FREE_BASE_URL` / `AI_FREE_MODEL` / `AI_PRO_BASE_URL` / `AI_PRO_MODEL`); the API keys are secrets:
+**Model per membership tier.** Base URL + model id are non-secret `vars` in `wrangler.jsonc` (`AI_FREE_BASE_URL` / `AI_FREE_MODEL` / `AI_PRO_BASE_URL` / `AI_PRO_MODEL`) — there's no hardcoded fallback (`lib/ai/models.ts`), so a tier needs its base URL, model id, and API key all set to be usable. Both tiers currently point at **OpenRouter**'s **DeepSeek V4 Flash** model. The API key is a secret:
 
 ```bash
-npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key (free tier)
-npx wrangler secret put AI_PRO_API_KEY    # OpenAI key (pro tier)
+npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key — covers both tiers today
+npx wrangler secret put AI_PRO_API_KEY    # optional: only needed if pro should use a separate key
 ```
 
-If only one key is set, both tiers use that provider (a half-wired env still answers). With neither set, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
+If a tier is missing its key, base URL, or model, it degrades to whichever tier *is* fully configured (a half-wired env still answers), keeping its own budgets. With neither tier fully configured, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
 
 **Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
 
 For local dev, add the keys to `.dev.vars`:
 
 ```
-AI_FREE_API_KEY="sk-or-…"   # OpenRouter
-AI_PRO_API_KEY="sk-…"       # OpenAI
+AI_FREE_API_KEY="sk-or-…"   # OpenRouter — covers both tiers today
 PRO_USER_EMAILS="you@example.com"   # optional; grants the pro model without billing
 ```
 

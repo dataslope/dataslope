@@ -46,19 +46,25 @@ describe("resolveTier", () => {
 });
 
 describe("resolveModel", () => {
-  const bothKeys = env({
+  const bothTiers = env({
     AI_FREE_API_KEY: "or-key",
+    AI_FREE_BASE_URL: "https://openrouter.ai/api/v1",
+    AI_FREE_MODEL: "deepseek/deepseek-v4-flash",
     AI_PRO_API_KEY: "oai-key",
+    AI_PRO_BASE_URL: "https://api.openai.com/v1",
+    AI_PRO_MODEL: "gpt-4o",
   });
 
-  it("uses OpenRouter for free and OpenAI for pro by default", () => {
-    const free = resolveModel("free", bothKeys)!;
-    expect(free.baseUrl).toContain("openrouter");
+  it("uses each tier's own base URL/model/key when fully configured", () => {
+    const free = resolveModel("free", bothTiers)!;
+    expect(free.baseUrl).toBe("https://openrouter.ai/api/v1");
+    expect(free.model).toBe("deepseek/deepseek-v4-flash");
     expect(free.apiKey).toBe("or-key");
     expect(free.tier).toBe("free");
 
-    const pro = resolveModel("pro", bothKeys)!;
-    expect(pro.baseUrl).toContain("openai");
+    const pro = resolveModel("pro", bothTiers)!;
+    expect(pro.baseUrl).toBe("https://api.openai.com/v1");
+    expect(pro.model).toBe("gpt-4o");
     expect(pro.apiKey).toBe("oai-key");
     expect(pro.tier).toBe("pro");
     // Pro gets a larger output cap + budget than free.
@@ -66,38 +72,57 @@ describe("resolveModel", () => {
     expect(pro.dailyTokenBudget).toBeGreaterThan(free.dailyTokenBudget);
   });
 
-  it("honours base URL + model overrides", () => {
+  it("degrades pro to the free provider when only free is fully configured, keeping pro budgets", () => {
     const e = env({
-      AI_FREE_API_KEY: "k",
-      AI_FREE_BASE_URL: "https://example.com/v1",
-      AI_FREE_MODEL: "some/model",
+      AI_FREE_API_KEY: "or-key",
+      AI_FREE_BASE_URL: "https://openrouter.ai/api/v1",
+      AI_FREE_MODEL: "deepseek/deepseek-v4-flash",
     });
-    const m = resolveModel("free", e)!;
-    expect(m.baseUrl).toBe("https://example.com/v1");
-    expect(m.model).toBe("some/model");
-  });
-
-  it("degrades pro to the free provider when only the free key is set, keeping pro budgets", () => {
-    const e = env({ AI_FREE_API_KEY: "or-key" });
     const pro = resolveModel("pro", e)!;
     expect(pro.apiKey).toBe("or-key");
-    expect(pro.baseUrl).toContain("openrouter");
+    expect(pro.baseUrl).toBe("https://openrouter.ai/api/v1");
     expect(pro.tier).toBe("pro"); // still reported as pro
-    expect(pro.maxTokens).toBe(resolveModel("pro", env({ AI_PRO_API_KEY: "x" }))!.maxTokens);
-  });
-
-  it("degrades free to the pro provider when only the pro key is set, keeping free budgets", () => {
-    const e = env({ AI_PRO_API_KEY: "oai-key" });
-    const free = resolveModel("free", e)!;
-    expect(free.apiKey).toBe("oai-key");
-    expect(free.baseUrl).toContain("openai");
-    expect(free.tier).toBe("free");
-    expect(free.dailyRequestBudget).toBe(
-      resolveModel("free", env({ AI_FREE_API_KEY: "x" }))!.dailyRequestBudget,
+    expect(pro.maxTokens).toBe(
+      resolveModel(
+        "pro",
+        env({
+          AI_PRO_API_KEY: "x",
+          AI_PRO_BASE_URL: "https://api.openai.com/v1",
+          AI_PRO_MODEL: "gpt-4o",
+        }),
+      )!.maxTokens,
     );
   });
 
-  it("returns null when no provider key is configured", () => {
+  it("degrades free to the pro provider when only pro is fully configured, keeping free budgets", () => {
+    const e = env({
+      AI_PRO_API_KEY: "oai-key",
+      AI_PRO_BASE_URL: "https://api.openai.com/v1",
+      AI_PRO_MODEL: "gpt-4o",
+    });
+    const free = resolveModel("free", e)!;
+    expect(free.apiKey).toBe("oai-key");
+    expect(free.baseUrl).toBe("https://api.openai.com/v1");
+    expect(free.tier).toBe("free");
+    expect(free.dailyRequestBudget).toBe(
+      resolveModel(
+        "free",
+        env({
+          AI_FREE_API_KEY: "x",
+          AI_FREE_BASE_URL: "https://openrouter.ai/api/v1",
+          AI_FREE_MODEL: "some/model",
+        }),
+      )!.dailyRequestBudget,
+    );
+  });
+
+  it("treats a tier as unconfigured if base URL or model is missing, even with a key set", () => {
+    const e = env({ AI_FREE_API_KEY: "or-key" }); // no base URL/model
+    expect(resolveModel("free", e)).toBeNull();
+    expect(resolveModel("pro", e)).toBeNull();
+  });
+
+  it("returns null when no provider is configured at all", () => {
     expect(resolveModel("free", env({}))).toBeNull();
     expect(resolveModel("pro", env({}))).toBeNull();
   });
