@@ -252,82 +252,150 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [performImportSqlite, performImportSqlDump],
   );
 
+  /** Serializes the active database to a replayable SQL dump (DDL + data).
+   *  Shared by the "SQL dump (.sql)" export download and the cloud/share
+   *  bundle builder (see CloudShareControls). Returns null while the engine
+   *  is still booting. */
+  const buildSqlDumpText = useCallback(async (): Promise<string | null> => {
+    const engine = engineRef.current;
+    if (!engine) return null;
+    const [tableList, viewList, triggerList] = await Promise.all([
+      engine.listTables(),
+      engine.listViews(),
+      engine.listTriggers(),
+    ]);
+
+    const lines: string[] = [
+      // foreign_keys OFF lets tables import regardless of FK ordering.
+      // No explicit BEGIN/COMMIT: the OPFS-backed worker manages its own
+      // transaction, and wrapping the dump in one makes the import fail
+      // ("no such table") as the engine's commit resets the open
+      // user transaction mid-script.
+      "PRAGMA foreign_keys = OFF;",
+      "",
+    ];
+
+    // DDL + INSERT statements for each table
+    for (const name of tableList) {
+      const ddl = await engine.getDDL(name);
+      lines.push(`${ddl};`, "");
+
+      // Generated columns are computed by the engine and can't be inserted
+      // into, so omit them from the INSERT column list / values (otherwise
+      // the re-import fails with "cannot INSERT into generated column").
+      const colInfo = await engine.listColumns(name);
+      const generatedCols = new Set(
+        colInfo.filter((c) => c.generated).map((c) => c.name),
+      );
+      const results = await engine.exec(
+        `SELECT * FROM "${name.replace(/"/g, '""')}"`,
+      );
+      if (results && results.length > 0) {
+        const { columns, values } = results[0];
+        const keepIdx = columns
+          .map((c, i) => (generatedCols.has(c) ? -1 : i))
+          .filter((i) => i >= 0);
+        const colList = keepIdx
+          .map((i) => `"${columns[i].replace(/"/g, '""')}"`)
+          .join(", ");
+        for (const row of values) {
+          const valList = keepIdx
+            .map((i) => {
+              const v = row[i];
+              if (v === null) return "NULL";
+              if (typeof v === "number" || typeof v === "bigint")
+                return String(v);
+              if (v instanceof Uint8Array)
+                return `X'${Array.from(v)
+                  .map((b) => b.toString(16).padStart(2, "0"))
+                  .join("")}'`;
+              return `'${String(v).replace(/'/g, "''")}'`;
+            })
+            .join(", ");
+          lines.push(
+            `INSERT INTO "${name.replace(/"/g, '""')}" (${colList}) VALUES (${valList});`,
+          );
+        }
+        lines.push("");
+      }
+    }
+
+    // DDL for views and triggers. Indexes are intentionally NOT re-emitted
+    // here: getDDL(table) already includes each table's CREATE INDEX
+    // statements, so listing them again would fail the re-import with
+    // "index … already exists".
+    for (const name of [...viewList, ...triggerList]) {
+      const ddl = await engine.getDDL(name);
+      lines.push(`${ddl};`, "");
+    }
+
+    return lines.join("\n");
+  }, [engineRef]);
+
+  /** Display label for the active database, e.g. "chinook.sqlite" — the
+   *  rename-aware filename shown in the DB selector. */
+  const activeDatabaseLabel = useCallback(async (): Promise<string> => {
+    const engine = engineRef.current;
+    if (!engine) return "database";
+    const sample = await engine.activeSample();
+    const overriddenFilename = customFilenames[activeDbId];
+    return overriddenFilename ?? sample.filename ?? sample.id ?? "database";
+  }, [activeDbId, customFilenames, engineRef]);
+
+  /**
+   * Replays a cloud/share bundle into a fresh session database: blank DB →
+   * execute the dump → swap it in → replace the tabs with the bundle's
+   * queries. The same shape as performImportSqlDump, except the tabs come
+   * from the bundle instead of the blank database's stored/default tabs.
+   */
+  const applySqlBundle = useCallback(
+    async (dump: string, tabSeeds: { title: string; code: string }[]) => {
+      const engine = engineRef.current;
+      if (!engine) throw new Error("The SQL engine isn't ready yet.");
+      const sample = await engine.loadBlankDatabase();
+      setCustomFilenames((prev) => {
+        if (!(sample.id in prev)) return prev;
+        const next = { ...prev };
+        delete next[sample.id];
+        return next;
+      });
+      if (dump.trim()) await engine.execAll(dump);
+      await applyDbLoad(sample);
+      const newTabs = tabSeeds.map((seed) => ({
+        title: seed.title,
+        code: seed.code,
+        id: newTabId(),
+        pristineCode: seed.code,
+      }));
+      tabsRef.current = newTabs;
+      activeTabIdRef.current = newTabs[0].id;
+      setTabs(newTabs);
+      saveTabs(sample.id, newTabs);
+      setActiveTabId(newTabs[0].id);
+      const view = editorRef.current;
+      if (view) replaceDoc(view, newTabs[0].code);
+      setResultsByTab({});
+    },
+    [
+      applyDbLoad,
+      engineRef,
+      editorRef,
+      tabsRef,
+      activeTabIdRef,
+      setCustomFilenames,
+      setTabs,
+      setActiveTabId,
+      setResultsByTab,
+    ],
+  );
+
   const exportDatabaseAsSqlDump = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
     void (async () => {
       try {
-        const [tableList, viewList, triggerList] = await Promise.all([
-          engine.listTables(),
-          engine.listViews(),
-          engine.listTriggers(),
-        ]);
-
-        const lines: string[] = [
-          // foreign_keys OFF lets tables import regardless of FK ordering.
-          // No explicit BEGIN/COMMIT: the OPFS-backed worker manages its own
-          // transaction, and wrapping the dump in one makes the import fail
-          // ("no such table") as the engine's commit resets the open
-          // user transaction mid-script.
-          "PRAGMA foreign_keys = OFF;",
-          "",
-        ];
-
-        // DDL + INSERT statements for each table
-        for (const name of tableList) {
-          const ddl = await engine.getDDL(name);
-          lines.push(`${ddl};`, "");
-
-          // Generated columns are computed by the engine and can't be inserted
-          // into, so omit them from the INSERT column list / values (otherwise
-          // the re-import fails with "cannot INSERT into generated column").
-          const colInfo = await engine.listColumns(name);
-          const generatedCols = new Set(
-            colInfo.filter((c) => c.generated).map((c) => c.name),
-          );
-          const results = await engine.exec(
-            `SELECT * FROM "${name.replace(/"/g, '""')}"`,
-          );
-          if (results && results.length > 0) {
-            const { columns, values } = results[0];
-            const keepIdx = columns
-              .map((c, i) => (generatedCols.has(c) ? -1 : i))
-              .filter((i) => i >= 0);
-            const colList = keepIdx
-              .map((i) => `"${columns[i].replace(/"/g, '""')}"`)
-              .join(", ");
-            for (const row of values) {
-              const valList = keepIdx
-                .map((i) => {
-                  const v = row[i];
-                  if (v === null) return "NULL";
-                  if (typeof v === "number" || typeof v === "bigint")
-                    return String(v);
-                  if (v instanceof Uint8Array)
-                    return `X'${Array.from(v)
-                      .map((b) => b.toString(16).padStart(2, "0"))
-                      .join("")}'`;
-                  return `'${String(v).replace(/'/g, "''")}'`;
-                })
-                .join(", ");
-              lines.push(
-                `INSERT INTO "${name.replace(/"/g, '""')}" (${colList}) VALUES (${valList});`,
-              );
-            }
-            lines.push("");
-          }
-        }
-
-        // DDL for views and triggers. Indexes are intentionally NOT re-emitted
-        // here: getDDL(table) already includes each table's CREATE INDEX
-        // statements, so listing them again would fail the re-import with
-        // "index … already exists".
-        for (const name of [...viewList, ...triggerList]) {
-          const ddl = await engine.getDDL(name);
-          lines.push(`${ddl};`, "");
-        }
-
-        const sqlText = lines.join("\n");
+        const sqlText = await buildSqlDumpText();
+        if (sqlText === null) return;
         const sample = await engine.activeSample();
         const overriddenFilename = customFilenames[activeDbId];
         const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
@@ -351,7 +419,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         showToast(`Export failed: ${msg}`, "warn");
       }
     })();
-  }, [activeDbId, customFilenames, showToast, engineRef]);
+  }, [activeDbId, buildSqlDumpText, customFilenames, showToast, engineRef]);
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
@@ -735,6 +803,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
 
   return {
     applyDbLoad,
+    applySqlBundle,
+    activeDatabaseLabel,
+    buildSqlDumpText,
     performDbSwitch,
     performImportDatabaseFile,
     requestDbSwitch,

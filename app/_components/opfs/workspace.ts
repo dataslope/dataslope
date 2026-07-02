@@ -156,14 +156,18 @@ async function getWorkspaceDir(
  *
  * If OPFS is unavailable the workspace entry is still returned (with no OPFS
  * backing) so callers can fall back to localStorage-only mode.
+ *
+ * Pass `{ id }` to create the workspace under a fixed identifier — used when
+ * materializing a cloud copy so the local workspace keeps the cloud id and
+ * the two stay paired across devices (see app/_components/cloud/).
  */
 export async function createWorkspace(
   name: string,
   playground: string,
-  opts: { register?: boolean } = {},
+  opts: { register?: boolean; id?: string } = {},
 ): Promise<WorkspaceEntry> {
   const { register = true } = opts;
-  const id = newWorkspaceId();
+  const id = opts.id ?? newWorkspaceId();
   const now = Date.now();
   const entry: WorkspaceEntry = {
     id,

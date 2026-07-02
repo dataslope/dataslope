@@ -11,6 +11,7 @@ import {
   takeCheckoutPeriod,
   waitForProActivation,
 } from "../_components/billing/proCheckout";
+import { CloudStorageSection } from "./CloudStorageSection";
 
 /**
  * The account area is the canonical example of the report's rule: auth gates
@@ -130,6 +131,7 @@ export function AccountClient() {
   }
 
   return (
+    <>
     <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white p-6 dark:border-white/10 dark:bg-white/5">
       <div className="flex items-center gap-4">
         {user.image ? (
@@ -229,5 +231,10 @@ export function AccountClient() {
         {signingOut ? "Signing out…" : "Sign out"}
       </button>
     </div>
+
+    {/* Cloud saves + share links (all playgrounds) — the quota is
+        account-wide, so this is where users see and free up everything. */}
+    <CloudStorageSection />
+    </>
   );
 }

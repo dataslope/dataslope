@@ -218,6 +218,25 @@ Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record** 
 
 Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/account`, the Pro CTA on `/pricing` — which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
 
+### Cloud saves & playground sharing
+
+Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share" — works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or — for the SQL playgrounds — a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
+
+- **Endpoints:** `GET/PUT/DELETE /api/workspaces[/:id[/bundle]]` (owner-only) and `POST/GET/DELETE /api/shares[/:id[/bundle]]` (share reads are public — the slug is the capability). Share links land on `/s/<id>` (noindex, disallowed in robots).
+- **Retention (read-time, no cron):** guest share links carry a fixed ~30-day expiry; free members' saves + links expire after ~30 days of inactivity (opening / viewing resets the clock); Pro storage doesn't expire. Expired rows are never served and are purged lazily by whichever route encounters them. Policy numbers live in `lib/workspaces/policy.ts` and are what `/pricing` documents.
+- **Quotas:** free 100 MB / Pro 10 GB, account-wide across saves + shares; per-bundle caps (guest 10 MB, free 25 MB, pro 100 MB compressed); guest share creation is metered per salted-IP hash + a global daily backstop (`share_usage_daily`, no raw IPs stored).
+- **Management:** `/account` gains a "Cloud storage" card listing every save + share link (open / delete / copy / revoke).
+
+**One-time setup** — create the bucket and apply the migration; the feature answers 503 until both exist:
+
+```bash
+npx wrangler r2 bucket create dataslope-workspaces
+npx wrangler d1 migrations apply dataslope-auth            # local
+npx wrangler d1 migrations apply dataslope-auth --remote   # Cloudflare
+```
+
+Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete after ~45 days) backstops byte reclamation for guest snapshots whose lazy sweep hasn't run; the D1 rows self-heal.
+
 ### Admin dashboard
 
 `/admin` is a gated dashboard with a sidebar, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). The shell lives in `app/admin/layout.tsx`; adding a section is one route folder plus one entry in `app/admin/_components/AdminSidebar.tsx`. Current sections:

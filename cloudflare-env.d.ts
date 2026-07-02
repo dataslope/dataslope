@@ -19,6 +19,11 @@ declare global {
   interface CloudflareEnv {
     // R2 bucket backing OpenNext's incremental cache.
     NEXT_INC_CACHE_R2_BUCKET: R2Bucket;
+    // R2 bucket holding cloud-saved workspace bundles + shared playground
+    // snapshots (metadata lives in D1 — migrations/0005). Optional so the
+    // /api/workspaces + /api/shares routes can degrade to 503 "not
+    // configured" on deployments that haven't created the bucket yet.
+    WORKSPACES_BUCKET?: R2Bucket;
     // D1 database for Better Auth (users + sessions). See migrations/.
     DB: D1Database;
     // Static-assets binding (prerendered pages + /_next/static).

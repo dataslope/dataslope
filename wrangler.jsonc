@@ -31,7 +31,14 @@
   // Binding name is fixed by OpenNext: `NEXT_INC_CACHE_R2_BUCKET`. Create the
   // bucket once with: `npx wrangler r2 bucket create dataslope-inc-cache`.
   "r2_buckets": [
-    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" }
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" },
+    // Cloud-saved playground workspaces + shared playground snapshots (the
+    // gzipped JSON bundles; see lib/workspaces/bundle.ts). D1 holds only the
+    // metadata rows (migrations/0005) — the payload bytes live here because
+    // SQL dumps and file sets routinely exceed D1's 2 MB row cap, and R2
+    // reads are egress-free. Create the bucket once with:
+    // `npx wrangler r2 bucket create dataslope-workspaces`.
+    { "binding": "WORKSPACES_BUCKET", "bucket_name": "dataslope-workspaces" }
   ],
   // D1 (edge SQLite) backing user accounts and sessions for Better Auth — the
   // accounts layer from agent-outputs/20260621-1733-…-auth-membership-….md (Q1).

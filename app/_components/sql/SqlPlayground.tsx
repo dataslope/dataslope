@@ -101,6 +101,13 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { CloudShareControls } from "../cloud/CloudShareControls";
+import {
+  bundleTabSeeds,
+  fetchBundleByRef,
+  takePendingBundleRef,
+} from "../cloud/materialize";
+import type { WorkspaceBundle } from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
@@ -982,6 +989,9 @@ function SqlPlaygroundInner() {
     exportDatabase,
     exportDatabaseToXlsx,
     exportDatabaseAsSqlDump,
+    applySqlBundle,
+    activeDatabaseLabel,
+    buildSqlDumpText,
     handleCsvFile,
     submitCsvImport,
     handleJsonFile,
@@ -989,6 +999,71 @@ function SqlPlaygroundInner() {
     handleParquetFile,
     submitParquetImport,
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
+
+  // ─── Cloud saves + sharing ────────────────────────────────────────────
+  // A SQL bundle carries the active database as a replayable SQL dump plus
+  // the query tabs — the database binary itself never leaves the browser.
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
+  const buildCloudBundle =
+    useCallback(async (): Promise<WorkspaceBundle | null> => {
+      const dump = await buildSqlDumpText();
+      if (dump === null) return null;
+      const label = await activeDatabaseLabel();
+      const queryTabs = tabsRef.current.filter((t) => !t.kind);
+      const activeIdx = queryTabs.findIndex(
+        (t) => t.id === activeTabIdRef.current,
+      );
+      return {
+        version: 1,
+        kind: "sql",
+        playground: PLAYGROUND_ID,
+        name: activeWorkspace?.name ?? "SQLite Workspace",
+        exportedAt: Date.now(),
+        sql: {
+          dialect: "sqlite",
+          dump,
+          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
+          activeTabIndex: Math.max(0, activeIdx),
+          databaseLabel: label,
+        },
+      };
+    }, [activeDatabaseLabel, buildSqlDumpText, activeWorkspace?.name]);
+
+  // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
+  // page and the Cloud dialog leave a ref in sessionStorage and navigate
+  // here; the marker is consumed on the first attempt so a failure can't
+  // loop across reloads).
+  const pendingBundleTriedRef = useRef(false);
+  useEffect(() => {
+    if (!loaded || pendingBundleTriedRef.current) return;
+    pendingBundleTriedRef.current = true;
+    const pendingRef = takePendingBundleRef(PLAYGROUND_ID);
+    if (!pendingRef) return;
+    void (async () => {
+      try {
+        const bundle = await fetchBundleByRef(pendingRef);
+        if (
+          bundle.kind !== "sql" ||
+          bundle.playground !== PLAYGROUND_ID ||
+          !bundle.sql
+        ) {
+          throw new Error("This link isn't a SQLite playground.");
+        }
+        await applySqlBundle(bundle.sql.dump, bundleTabSeeds(bundle));
+        showToast(
+          pendingRef.source === "share"
+            ? `Opened a copy of “${bundle.name}”.`
+            : `Opened cloud save “${bundle.name}”.`,
+        );
+      } catch (err) {
+        showToast(
+          `Couldn't open the playground: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+      }
+    })();
+  }, [loaded, applySqlBundle, showToast]);
 
   // ─── Settings setters (persist to localStorage) ──────────────────────
   const setFontSize = useCallback(
@@ -1934,6 +2009,16 @@ function SqlPlaygroundInner() {
             />
           )}
           <div className="header-actions desktop-only">
+            <CloudShareControls
+              playgroundId={PLAYGROUND_ID}
+              workspaceId={activeWorkspace?.id ?? null}
+              workspaceName={activeWorkspace?.name ?? ""}
+              buildBundle={buildCloudBundle}
+              shareOpen={shareDialogOpen}
+              onShareOpenChange={setShareDialogOpen}
+              cloudOpen={cloudDialogOpen}
+              onCloudOpenChange={setCloudDialogOpen}
+            />
             <Menu.Root>
               <Menu.Trigger
                 className="header-btn"
@@ -2217,6 +2302,16 @@ function SqlPlaygroundInner() {
             label="Workspace"
             chevron
             onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuAction
+            label="Share"
+            chevron
+            onClick={() => setShareDialogOpen(true)}
+          />
+          <MobileMenuAction
+            label="Cloud saves"
+            chevron
+            onClick={() => setCloudDialogOpen(true)}
           />
           <MobileMenuSubSheet label="Import">
             <MobileMenuAction
