@@ -52,6 +52,16 @@ declare global {
     // (bootstrap; mirrors ADMIN_EMAILS). See lib/ai/tier.ts.
     PRO_USER_EMAILS?: string;
 
+    // --- Polar billing (Pro subscriptions; see lib/billing/polar.ts) ---
+    // Billing is inert until POLAR_ACCESS_TOKEN + POLAR_PRO_PRODUCT_ID are
+    // set (webhook endpoint additionally needs POLAR_WEBHOOK_SECRET).
+    // The Polar product whose active subscription grants the 'pro' plan.
+    POLAR_PRO_PRODUCT_ID?: string;
+    // Optional second product for annual billing (slug "pro-annual").
+    POLAR_PRO_ANNUAL_PRODUCT_ID?: string;
+    // "sandbox" while testing against sandbox.polar.sh; unset = production.
+    POLAR_SERVER?: string;
+
     // --- secrets (set via `wrangler secret put`, absent from wrangler.jsonc) ---
     // Required (not optional): signs the OAuth `state` + session cookies, so it
     // must be a single stable value present on every isolate/deployment. If it
@@ -71,6 +81,11 @@ declare global {
     // AI_PRO_BASE_URL. If only one is set, both tiers use it (see resolveModel).
     AI_FREE_API_KEY?: string;
     AI_PRO_API_KEY?: string;
+    // Polar billing secrets (see lib/billing/polar.ts): the organization
+    // access token, and the per-endpoint webhook secret Polar shows when you
+    // point a webhook at /api/auth/polar/webhooks.
+    POLAR_ACCESS_TOKEN?: string;
+    POLAR_WEBHOOK_SECRET?: string;
     // Admins for /admin, regardless of their `role` column (bootstraps the
     // first admin). Both are comma-separated and merge; specify whichever is
     // handier. ADMIN_EMAILS is resolved to user IDs against D1 (see

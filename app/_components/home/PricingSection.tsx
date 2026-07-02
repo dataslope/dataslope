@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 
 import Link from "../Link";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth/client";
+import { startProCheckout } from "../billing/proCheckout";
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
@@ -47,6 +50,8 @@ interface Plan {
   /** The promoted tier — green CTA + inline badge (no border/shadow). */
   highlighted?: boolean;
   badge?: string;
+  /** CTA starts a Polar checkout (signed-in users) instead of navigating. */
+  checkout?: boolean;
 }
 
 const FEATURE_COUNT = 9;
@@ -160,6 +165,7 @@ const PLANS: Plan[] = [
     href: "/learn",
     highlighted: true,
     badge: "Unlimited AI Chat",
+    checkout: true,
   },
 ];
 
@@ -190,6 +196,59 @@ function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
           </span>
         )}
       </span>
+    </div>
+  );
+}
+
+/**
+ * CTA for the Pro column. Where it sends the visitor depends on who they are:
+ * signed out → /sign-in (an account is required — the Polar customer is
+ * keyed to the user id); already Pro → /account (manage the subscription);
+ * signed-in free member → straight into Polar's hosted checkout for the
+ * period selected by the monthly/annual toggle. If billing isn't configured
+ * (or the annual product isn't), the button says so instead of dead-ending.
+ */
+function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isPro =
+    ((session?.user as { plan?: string } | undefined)?.plan ?? "")
+      .toLowerCase() === "pro";
+
+  async function handleClick() {
+    setError(null);
+    if (!session) {
+      router.push("/sign-in");
+      return;
+    }
+    if (isPro) {
+      router.push("/account");
+      return;
+    }
+    setBusy(true);
+    const checkoutError = await startProCheckout(annual ? "annual" : "monthly");
+    // On success the browser navigates to Polar; we only get here on failure.
+    if (checkoutError) setError(checkoutError);
+    setBusy(false);
+  }
+
+  return (
+    <div className="my-3">
+      <button
+        type="button"
+        onClick={() => void handleClick()}
+        disabled={busy}
+        className="inline-flex w-full items-center justify-center rounded-lg bg-[var(--ds-green-600)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)] disabled:opacity-60"
+      >
+        {busy ? "Opening checkout…" : isPro ? "Manage your plan" : plan.cta}
+      </button>
+      {error && (
+        <p role="alert" className="mt-2 text-center text-xs text-red-500">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -240,16 +299,20 @@ function PlanColumn({
       </div>
 
       {/* Extra breathing room above and below the button. */}
-      <Link
-        href={plan.href}
-        className={`my-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
-          plan.highlighted
-            ? "bg-[var(--ds-green-600)] text-white hover:bg-[var(--ds-green-700)]"
-            : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] hover:bg-[var(--ds-green-100)] dark:bg-[var(--ds-green-500)]/10 dark:text-[var(--ds-green-300)] dark:hover:bg-[var(--ds-green-500)]/15"
-        }`}
-      >
-        {plan.cta}
-      </Link>
+      {plan.checkout ? (
+        <ProCheckoutCta plan={plan} annual={annual} />
+      ) : (
+        <Link
+          href={plan.href}
+          className={`my-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+            plan.highlighted
+              ? "bg-[var(--ds-green-600)] text-white hover:bg-[var(--ds-green-700)]"
+              : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] hover:bg-[var(--ds-green-100)] dark:bg-[var(--ds-green-500)]/10 dark:text-[var(--ds-green-300)] dark:hover:bg-[var(--ds-green-500)]/15"
+          }`}
+        >
+          {plan.cta}
+        </Link>
+      )}
 
       {plan.features.map((feature, i) => (
         <FeatureRow

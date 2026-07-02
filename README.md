@@ -191,14 +191,46 @@ AI_FREE_API_KEY="sk-or-…"   # OpenRouter — covers both tiers today
 PRO_USER_EMAILS="you@example.com"   # optional; grants the pro model without billing
 ```
 
+### AI inline completion (pro)
+
+Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors — code blocks, challenge cards, and the `/playground/*` editors (`app/_components/ai/inlineCompletion.ts` + `app/api/ai/complete/route.ts`). After a short typing pause the editor requests a fill-in-the-middle suggestion; **Tab** accepts, **Escape** dismisses, and typing "through" the suggestion consumes it. Challenge/code-block editors send the active file's read-only init code as extra prompt context.
+
+**Pro members only, enforced server-side.** The endpoint returns 401 for guests and 403 for signed-in free members — the client gate (a `GET /api/ai/complete` capability probe the extension fires once per page) is only there to avoid doomed requests. Completions reuse the **pro-tier** provider config above (OpenRouter → DeepSeek V4 Flash today) via the same OpenAI-compatible `/chat/completions` adapter (`lib/ai/provider.ts`), non-streaming with a small output cap (`lib/ai/completion.ts`).
+
+**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/0004`) so a busy editor session can't eat a member's chat budget — but they share the global daily token ceiling, which stays the single backstop on total provider spend.
+
+### Pro subscriptions (Polar)
+
+Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record** — Polar is the legal seller, handles global VAT/sales tax, invoices, and chargebacks, and pays out; we never touch card data. Individuals/sole proprietors can onboard without a company. The integration is the official Better Auth plugin (`@polar-sh/better-auth`), configured in `lib/billing/polar.ts` and mounted under the existing `/api/auth/*` catch-all:
+
+- `POST /api/auth/checkout` — hosted-checkout session for the signed-in user (slugs `pro` / `pro-annual`); the client redirects to Polar. Anonymous checkout is off (the customer must be keyed to a user id).
+- `GET|POST /api/auth/customer/portal` — Polar's customer portal (invoices, payment method, cancel/renew) for the signed-in user.
+- `POST /api/auth/polar/webhooks` — Polar → us, signature-verified (standardwebhooks HMAC; pure-JS crypto, Workers-safe). **This is the only billing writer of `user.plan`.**
+
+**How plan sync works.** Checkout is created with `externalCustomerId = user.id`, so every webhook's customer carries our user id. We key everything off the `customer.state_changed` event — it fires on every subscription transition and carries the full current state, so the plan is a pure function of the latest event (`derivePlanFromCustomerState`): Pro while any active subscription matches a configured Pro product, free otherwise. One indexed D1 `UPDATE user SET plan` per event; no extra tables. An admin's manual plan switch for a *paying* customer is overwritten by the next state event (billing owns paid status); comped users (`PRO_USER_EMAILS`, admins, admin-set plan on non-customers) are untouched. After checkout the buyer lands on `/account?checkout=success`, which polls the session with the cookie cache bypassed until the webhook's flip is visible.
+
+**Setup.** Billing is inert until configured (like social login / email / AI):
+
+1. Create a Polar organization (start on `sandbox.polar.sh`), a Pro product (e.g. $4.99/mo), and optionally an annual product.
+2. `wrangler.jsonc` vars: `POLAR_PRO_PRODUCT_ID` (+ `POLAR_PRO_ANNUAL_PRODUCT_ID` for the yearly slug), `POLAR_SERVER` (`"sandbox"` while testing; empty = production).
+3. Secrets: `npx wrangler secret put POLAR_ACCESS_TOKEN` (org access token) and, after creating a webhook endpoint in Polar pointing at `https://dataslope.com/api/auth/polar/webhooks` (subscribe it to at least `customer.state_changed`), `npx wrangler secret put POLAR_WEBHOOK_SECRET`.
+4. Local dev: same four values in `.dev.vars`.
+
+Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/account`, the Pro CTA on `/pricing` — which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
+
 ### Admin dashboard
 
-`/admin` is a gated dashboard for managing user accounts, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). It lists every user and offers two actions per account:
+`/admin` is a gated dashboard with a sidebar, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). The shell lives in `app/admin/layout.tsx`; adding a section is one route folder plus one entry in `app/admin/_components/AdminSidebar.tsx`. Current sections:
 
-- **Remove** — a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case — e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
-- **Ban** — the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
+- **Users** (`/admin`) — lists every account with per-row actions:
+  - **Plan switch** — flips `free` ↔ `pro` via `admin.updateUser` (an already-signed-in session can lag up to five minutes behind, from the session cookie cache; impersonation and fresh sign-ins see the new plan immediately).
+  - **Impersonate** — become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
+  - **Remove** — a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case — e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
+  - **Ban** — the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
+- **Test users** (`/admin/test-users`) — creates disposable accounts for testing member-gated features (AI autocomplete, Ask AI tiers). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan — no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
+- **AI usage** (`/admin/ai-usage`) — per-user and site-wide Ask AI + completion counters for a chosen UTC day, against the global cap. Backed by `GET /api/admin/ai-usage`, a custom route gated by `requireAdmin` (`lib/auth/admin.ts`) since it isn't a Better Auth endpoint.
 
-Authorization is enforced **server-side** on every `admin.*` endpoint, so the page itself can stay a statically-prerendered, client-read screen like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
+Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 
 The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
 
