@@ -45,6 +45,7 @@ import {
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
+import { aiInlineCompletion } from "./ai/inlineCompletion";
 
 import type {
   ExampleSnippet,
@@ -1464,6 +1465,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           languageComp.of([]),
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
+          // AI ghost-text completion (pro members only — the extension gates
+          // itself and stays inert for guests/free members). Filename is read
+          // through refs so tab switches don't rebuild the editor extensions,
+          // matching how the persist listener works.
+          aiInlineCompletion({
+            language: adapter.id,
+            filename: () =>
+              filesRef.current.find((f) => f.id === activeFileIdRef.current)
+                ?.filename,
+          }),
           persistListener,
         ],
       });

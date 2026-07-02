@@ -191,6 +191,14 @@ AI_FREE_API_KEY="sk-or-…"   # OpenRouter — covers both tiers today
 PRO_USER_EMAILS="you@example.com"   # optional; grants the pro model without billing
 ```
 
+### AI inline completion (pro)
+
+Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors — code blocks, challenge cards, and the `/playground/*` editors (`app/_components/ai/inlineCompletion.ts` + `app/api/ai/complete/route.ts`). After a short typing pause the editor requests a fill-in-the-middle suggestion; **Tab** accepts, **Escape** dismisses, and typing "through" the suggestion consumes it. Challenge/code-block editors send the active file's read-only init code as extra prompt context.
+
+**Pro members only, enforced server-side.** The endpoint returns 401 for guests and 403 for signed-in free members — the client gate (a `GET /api/ai/complete` capability probe the extension fires once per page) is only there to avoid doomed requests. Completions reuse the **pro-tier** provider config above (OpenRouter → DeepSeek V4 Flash today) via the same OpenAI-compatible `/chat/completions` adapter (`lib/ai/provider.ts`), non-streaming with a small output cap (`lib/ai/completion.ts`).
+
+**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/0004`) so a busy editor session can't eat a member's chat budget — but they share the global daily token ceiling, which stays the single backstop on total provider spend.
+
 ### Admin dashboard
 
 `/admin` is a gated dashboard for managing user accounts, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). It lists every user and offers two actions per account:

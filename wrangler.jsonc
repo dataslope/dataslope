@@ -60,14 +60,15 @@
     // `npx wrangler secret put RESEND_API_KEY` (see README). Email verification
     // and password reset stay off until that key is set.
     "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
-    // "Ask AI" model selection (non-secret). Both tiers currently point at
-    // OpenRouter's DeepSeek V4 Flash model. There's no hardcoded fallback
-    // (see lib/ai/models.ts) — change the model ids here without a code
-    // change. The API key is a secret: set it with
+    // "Ask AI" + AI inline completion model selection (non-secret). Both
+    // tiers currently point at OpenRouter's DeepSeek V4 Flash model. There's
+    // no hardcoded fallback (see lib/ai/models.ts) — change the model ids
+    // here without a code change. The API key is a secret: set it with
     // `npx wrangler secret put AI_FREE_API_KEY` (one OpenRouter key covers
     // both tiers via resolveModel's fallback; add AI_PRO_API_KEY too if pro
     // should use a separate key later). Ask AI stays inert (503) until a
-    // tier has its key + base URL + model all set.
+    // tier has its key + base URL + model all set. AI inline completion
+    // (app/api/ai/complete — pro members only) uses the pro-tier config.
     "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
     "AI_FREE_MODEL": "deepseek/deepseek-v4-flash",
     "AI_PRO_BASE_URL": "https://openrouter.ai/api/v1",

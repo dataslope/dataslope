@@ -65,6 +65,7 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
+import { aiInlineCompletion } from "./ai/inlineCompletion";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -628,6 +629,15 @@ export default function ChallengeCard({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
         noActiveLine,
+        // AI ghost-text completion (pro members only — the extension gates
+        // itself and stays inert for guests/free members). The active file's
+        // read-only init code travels as extra prompt prefix so suggestions
+        // can use the names it defines.
+        aiInlineCompletion({
+          language: adapter.id,
+          filename: () => activeFilenameRef.current,
+          contextPrefix: () => initForFile(activeFilenameRef.current),
+        }),
         // Debounced persist of the user's buffer so reloads /
         // navigation away and back restore their in-progress attempt.
         EditorView.updateListener.of((update) => {
