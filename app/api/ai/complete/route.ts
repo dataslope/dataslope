@@ -153,8 +153,11 @@ export async function POST(request: Request): Promise<Response> {
   );
   const inTok = result.inputTokens || approxInput;
   const outTok = result.outputTokens || estimateTokens(result.text);
+  // A failed write undercounts usage against the daily budgets — it must not
+  // fail the response, but log it so undercounting is visible in the Worker
+  // logs rather than silent.
   const write = recordCompletionUsage(env, user.id, day, inTok, outTok).catch(
-    () => {},
+    (err) => console.error("ai/complete: usage write failed", err),
   );
   if (ctx?.waitUntil) ctx.waitUntil(write);
 

@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "../_components/Link";
 import { signOut, useSession } from "@/lib/auth/client";
 import {
+  type CheckoutPeriod,
   openBillingPortal,
   startProCheckout,
+  takeCheckoutPeriod,
   waitForProActivation,
 } from "../_components/billing/proCheckout";
 
@@ -32,6 +34,16 @@ export function AccountClient() {
   const [activation, setActivation] = useState<"idle" | "waiting" | "slow">(
     "idle",
   );
+  // Billing period picked on the pricing page while signed out — the sign-in
+  // detour lands here, and the Upgrade button must honor the original choice
+  // (an annual pick must not silently become a monthly checkout).
+  const [period, setPeriod] = useState<CheckoutPeriod>("monthly");
+
+  useEffect(() => {
+    const stashed = takeCheckoutPeriod();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage only exists client-side
+    if (stashed) setPeriod(stashed);
+  }, []);
 
   // Detect the checkout return via window.location (not useSearchParams, so
   // the page keeps prerendering statically without a Suspense boundary).
@@ -103,7 +115,7 @@ export function AccountClient() {
   async function handleUpgrade() {
     setBillingBusy(true);
     setBillingError(null);
-    const error = await startProCheckout();
+    const error = await startProCheckout(period);
     // On success the browser navigates to Polar; we only get here on failure.
     if (error) setBillingError(error);
     setBillingBusy(false);
@@ -189,7 +201,11 @@ export function AccountClient() {
           disabled={billingBusy}
           className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)] disabled:opacity-60"
         >
-          {billingBusy ? "Opening checkout…" : "Upgrade to Pro — $4.99/month"}
+          {billingBusy
+            ? "Opening checkout…"
+            : period === "annual"
+              ? "Upgrade to Pro — $40/year"
+              : "Upgrade to Pro — $4.99/month"}
         </button>
       )}
 

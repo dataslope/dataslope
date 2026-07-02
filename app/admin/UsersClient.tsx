@@ -293,6 +293,28 @@ export function UsersClient() {
     setBusyId(null);
   }
 
+  async function handleToggleRole(user: AdminUser) {
+    const next = user.role === "admin" ? "user" : "admin";
+    setBusyId(user.id);
+    setError(null);
+    try {
+      const { error: roleError } = await authClient.admin.setRole({
+        userId: user.id,
+        role: next,
+      });
+      if (roleError) {
+        setError(roleError.message ?? "Couldn't change that user's role.");
+      } else {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, role: next } : u)),
+        );
+      }
+    } catch {
+      setError("Couldn't reach the server. Please try again.");
+    }
+    setBusyId(null);
+  }
+
   async function handleImpersonate(user: AdminUser) {
     setBusyId(user.id);
     setError(null);
@@ -364,6 +386,41 @@ export function UsersClient() {
         <ArrowRightLeft className="size-3.5" />
         <span className="sr-only">Switch plan</span>
       </Button>
+    </div>
+  );
+
+  // Role display + toggle. Demoting is the explicit revocation path — the
+  // ADMIN_EMAILS/ADMIN_USER_IDS allowlists only ever *grant* (a listed user
+  // is re-promoted at their next sign-in), so removal from the env list must
+  // be paired with a demotion here. Self is excluded: locking yourself out
+  // of the dashboard you're standing in is never what you meant.
+  const renderRole = (user: AdminUser, isSelf: boolean, isBusy: boolean) => (
+    <div className="flex items-center gap-1">
+      {user.role === "admin" ? (
+        <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
+          <ShieldCheck />
+          Admin
+        </Badge>
+      ) : (
+        <span className="text-sm text-muted-foreground">User</span>
+      )}
+      {!isSelf && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`size-7 ${quietActionClass}`}
+          onClick={() => void handleToggleRole(user)}
+          disabled={isBusy}
+          title={
+            user.role === "admin"
+              ? "Demote to regular user"
+              : "Grant admin access"
+          }
+        >
+          <ArrowRightLeft className="size-3.5" />
+          <span className="sr-only">Toggle role</span>
+        </Button>
+      )}
     </div>
   );
 
@@ -560,16 +617,7 @@ export function UsersClient() {
                             {renderPlan(user, isBusy)}
                           </TableCell>
                           <TableCell className={cellClass}>
-                            {isAdminRow ? (
-                              <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
-                                <ShieldCheck />
-                                Admin
-                              </Badge>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">
-                                User
-                              </span>
-                            )}
+                            {renderRole(user, isSelf, isBusy)}
                           </TableCell>
                           <TableCell className={cellClass}>
                             <StatusBadge banned={user.banned} />
@@ -607,12 +655,7 @@ export function UsersClient() {
                         {renderPlan(user, isBusy)}
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                        {isAdminRow && (
-                          <Badge className="border-transparent bg-[var(--ds-blue-600)]/10 text-[var(--ds-blue-600)] dark:bg-white/10 dark:text-white">
-                            <ShieldCheck />
-                            Admin
-                          </Badge>
-                        )}
+                        {renderRole(user, isSelf, isBusy)}
                         <StatusBadge banned={user.banned} />
                         <span>Joined {formatJoined(user.createdAt)}</span>
                       </div>
@@ -650,10 +693,14 @@ export function UsersClient() {
             email so the person can sign up again.{" "}
             <strong className="font-medium text-foreground">Ban</strong> blocks
             sign-in but keeps the account.{" "}
-            <strong className="font-medium text-foreground">Plan</strong>{" "}
-            changes (and bans) reach the AI endpoints immediately — they read
-            the session fresh — but the person&apos;s header/account display
-            can lag up to five minutes (the session cookie cache).
+            <strong className="font-medium text-foreground">Plan</strong> and{" "}
+            <strong className="font-medium text-foreground">Role</strong>{" "}
+            changes (and bans) reach the AI and admin endpoints immediately —
+            they read the session fresh — but the person&apos;s
+            header/account display can lag up to five minutes (the session
+            cookie cache). Demoting an admin who is still listed in
+            ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in
+            — remove them from the config too.
           </p>
         </PanelBody>
       </Panel>

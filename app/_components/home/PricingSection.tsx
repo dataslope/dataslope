@@ -20,7 +20,10 @@ import {
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
-import { startProCheckout } from "../billing/proCheckout";
+import {
+  stashCheckoutPeriod,
+  startProCheckout,
+} from "../billing/proCheckout";
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
@@ -230,6 +233,10 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
     // ignore clicks until the session state is known.
     if (isPending) return;
     if (!session) {
+      // Remember the chosen billing period across the sign-in detour — the
+      // buyer lands on /account afterwards, whose Upgrade button honors it
+      // (otherwise an annual purchase silently becomes monthly).
+      stashCheckoutPeriod(annual ? "annual" : "monthly");
       router.push("/sign-in");
       return;
     }

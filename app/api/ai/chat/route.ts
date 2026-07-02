@@ -170,8 +170,11 @@ export async function POST(request: Request): Promise<Response> {
         // it, else a char/4 estimate of what streamed before any interruption).
         const inTok = usageIn || approxInputTokens;
         const outTok = usageOut || estimateTokens(answer);
+        // A failed write undercounts usage against the daily budgets — it
+        // must not fail the (already-streamed) response, but log it so
+        // undercounting is visible in the Worker logs rather than silent.
         const write = recordUsage(env, user.id, day, inTok, outTok).catch(
-          () => {},
+          (err) => console.error("ai/chat: usage write failed", err),
         );
         if (ctx?.waitUntil) ctx.waitUntil(write);
       }

@@ -99,6 +99,35 @@ export async function openBillingPortal(): Promise<string | null> {
   }
 }
 
+/** sessionStorage key remembering the billing period a signed-out visitor
+ *  picked on the pricing page before being detoured through /sign-in. */
+const PENDING_PERIOD_KEY = "pending-checkout-period";
+
+export type CheckoutPeriod = "monthly" | "annual";
+
+/** Remember the chosen billing period across the sign-in detour. Same-tab
+ *  only (sessionStorage), so a stashed choice can't leak into another
+ *  visitor's session on a shared machine. */
+export function stashCheckoutPeriod(period: CheckoutPeriod): void {
+  try {
+    sessionStorage.setItem(PENDING_PERIOD_KEY, period);
+  } catch {
+    // Storage unavailable — the buyer just defaults to monthly on /account.
+  }
+}
+
+/** Read-and-clear the stashed billing period (single-use by design: it
+ *  should only influence the immediately-following upgrade offer). */
+export function takeCheckoutPeriod(): CheckoutPeriod | null {
+  try {
+    const value = sessionStorage.getItem(PENDING_PERIOD_KEY);
+    sessionStorage.removeItem(PENDING_PERIOD_KEY);
+    return value === "annual" || value === "monthly" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * After returning from checkout, the webhook that flips `plan` to 'pro' can
  * land a moment after the redirect — and the session cookie cache can lag up
