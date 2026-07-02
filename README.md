@@ -199,6 +199,25 @@ Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors
 
 **Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/0004`) so a busy editor session can't eat a member's chat budget — but they share the global daily token ceiling, which stays the single backstop on total provider spend.
 
+### Pro subscriptions (Polar)
+
+Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record** — Polar is the legal seller, handles global VAT/sales tax, invoices, and chargebacks, and pays out; we never touch card data. Individuals/sole proprietors can onboard without a company. The integration is the official Better Auth plugin (`@polar-sh/better-auth`), configured in `lib/billing/polar.ts` and mounted under the existing `/api/auth/*` catch-all:
+
+- `POST /api/auth/checkout` — hosted-checkout session for the signed-in user (slugs `pro` / `pro-annual`); the client redirects to Polar. Anonymous checkout is off (the customer must be keyed to a user id).
+- `GET|POST /api/auth/customer/portal` — Polar's customer portal (invoices, payment method, cancel/renew) for the signed-in user.
+- `POST /api/auth/polar/webhooks` — Polar → us, signature-verified (standardwebhooks HMAC; pure-JS crypto, Workers-safe). **This is the only billing writer of `user.plan`.**
+
+**How plan sync works.** Checkout is created with `externalCustomerId = user.id`, so every webhook's customer carries our user id. We key everything off the `customer.state_changed` event — it fires on every subscription transition and carries the full current state, so the plan is a pure function of the latest event (`derivePlanFromCustomerState`): Pro while any active subscription matches a configured Pro product, free otherwise. One indexed D1 `UPDATE user SET plan` per event; no extra tables. An admin's manual plan switch for a *paying* customer is overwritten by the next state event (billing owns paid status); comped users (`PRO_USER_EMAILS`, admins, admin-set plan on non-customers) are untouched. After checkout the buyer lands on `/account?checkout=success`, which polls the session with the cookie cache bypassed until the webhook's flip is visible.
+
+**Setup.** Billing is inert until configured (like social login / email / AI):
+
+1. Create a Polar organization (start on `sandbox.polar.sh`), a Pro product (e.g. $4.99/mo), and optionally an annual product.
+2. `wrangler.jsonc` vars: `POLAR_PRO_PRODUCT_ID` (+ `POLAR_PRO_ANNUAL_PRODUCT_ID` for the yearly slug), `POLAR_SERVER` (`"sandbox"` while testing; empty = production).
+3. Secrets: `npx wrangler secret put POLAR_ACCESS_TOKEN` (org access token) and, after creating a webhook endpoint in Polar pointing at `https://dataslope.com/api/auth/polar/webhooks` (subscribe it to at least `customer.state_changed`), `npx wrangler secret put POLAR_WEBHOOK_SECRET`.
+4. Local dev: same four values in `.dev.vars`.
+
+Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/account`, the Pro CTA on `/pricing` — which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
+
 ### Admin dashboard
 
 `/admin` is a gated dashboard with a sidebar, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). The shell lives in `app/admin/layout.tsx`; adding a section is one route folder plus one entry in `app/admin/_components/AdminSidebar.tsx`. Current sections:

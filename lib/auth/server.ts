@@ -24,6 +24,7 @@ import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
+import { polarPlugin } from "@/lib/billing/polar";
 
 /** Split a comma-separated secret into a trimmed, non-empty list. Exported
  *  for the custom admin API routes' authorization check (lib/auth/admin.ts). */
@@ -126,6 +127,8 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
   // Email verification + password reset only turn on once a sender is wired up.
   const emailConfigured = Boolean(env.RESEND_API_KEY);
 
+  const adminUserIdsResolved = await resolveAdminUserIds(env, request);
+
   return betterAuth({
     // D1 via the Kysely SQLite dialect — the most Cloudflare-native path, with
     // full ownership of the tables (schema in /migrations). One dialect per
@@ -219,7 +222,18 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // the dashboard staying a statically-prerendered, client-read page (the
     // codebase's "auth gates actions, not content" rule) is still safe: a
     // non-admin who loads /admin simply gets 403s and an empty screen.
-    plugins: [admin({ adminUserIds: await resolveAdminUserIds(env, request) })],
+    //
+    // Polar billing (Pro subscriptions) mounts checkout/portal/webhook
+    // endpoints when configured — see lib/billing/polar.ts. Like every other
+    // integration here it's fail-safe: with no POLAR_* config the plugin
+    // simply isn't registered and auth runs exactly as before.
+    plugins: (() => {
+      const adminPlugin = admin({
+        adminUserIds: adminUserIdsResolved,
+      });
+      const billing = polarPlugin(env);
+      return billing ? [adminPlugin, billing] : [adminPlugin];
+    })(),
     session: {
       // Cache the session in a short-lived signed cookie so the common
       // "who am I" check is served from the cookie instead of a D1 read on
