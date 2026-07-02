@@ -3,10 +3,11 @@
 /**
  * Mount point for the "Ask AI" widget, rendered once from the root layout.
  *
- * It renders NOTHING except on `/learn/*` and `/playground/*`, and the actual
- * widget (which pulls in react-markdown) is dynamically imported so those bytes
- * never load on the home page, pricing, etc. Off-surface this is a bare
- * `usePathname()` check — no session fetch, no widget code.
+ * It renders NOTHING except on the lesson routes (`/courses/*`,
+ * `/fumadocs-dev/*`) and `/playground/*`, and the actual widget (which pulls
+ * in react-markdown) is dynamically imported so those bytes never load on
+ * the home page, pricing, etc. Off-surface this is a bare `usePathname()`
+ * check — no session fetch, no widget code.
  *
  * `collectContext` is called at send time (not render), so it reads the live
  * playground store / current slug each time the user asks.
@@ -50,22 +51,32 @@ function collectPlayground(segment: string): AskAiClientContext {
 
 export default function AskAi() {
   const pathname = usePathname() ?? "";
-  const onLearn = pathname === "/learn" || pathname.startsWith("/learn/");
+  // Lesson surfaces: course lessons and the dev component gallery. The bare
+  // `/courses` URL is the catalog page — no lesson to ask about there.
+  const onLesson =
+    pathname.startsWith("/courses/") ||
+    pathname === "/fumadocs-dev" ||
+    pathname.startsWith("/fumadocs-dev/");
   const onPlayground = pathname.startsWith("/playground");
 
   const collectContext = useCallback((): AskAiClientContext => {
-    const segments = pathname.split("/").filter(Boolean); // e.g. ["learn","a","b"]
-    if (pathname.startsWith("/learn")) {
-      return { surface: "learn", slug: segments.slice(1) };
+    const segments = pathname.split("/").filter(Boolean); // e.g. ["courses","a","b"]
+    if (
+      pathname.startsWith("/courses") ||
+      pathname.startsWith("/fumadocs-dev")
+    ) {
+      // Send the FULL path segments (base included) — the server allowlists
+      // the base segment and fetches `/<segments>.md` (see lib/ai/context.ts).
+      return { surface: "learn", slug: segments };
     }
     return collectPlayground(segments[1] ?? "");
   }, [pathname]);
 
-  if (!onLearn && !onPlayground) return null;
+  if (!onLesson && !onPlayground) return null;
 
   return (
     <AskAiWidget
-      surface={onLearn ? "learn" : "playground"}
+      surface={onLesson ? "learn" : "playground"}
       collectContext={collectContext}
     />
   );

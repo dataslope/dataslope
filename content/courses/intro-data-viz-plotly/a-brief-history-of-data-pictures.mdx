@@ -1,0 +1,344 @@
+---
+title: A Brief History of Data Pictures
+description: From a star map carved in a mammoth tusk to a Crimean battlefield to your browser — how humans learned to think with pictures
+---
+
+Before there were "data visualizations," there were **pictures that
+carried information**. The story of this course is, in the end, the
+story of one of humanity's oldest habits: turning abstract things
+into shapes the eye can read.
+
+This page is a single, deliberate sweep through that history — from
+the first chart ever drawn to the moment, a few seconds from now,
+when *you* will make one in your browser. We keep it short on
+purpose: the goal is to make a chart within a page or two, not to
+write a textbook of dates. (If the longer story tempts you, there
+is an [Interesting discussions](/courses/intro-data-viz-plotly/interesting-discussions)
+appendix near the end.)
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three eras side by side: an ochre cave-painting cluster of dots, then tally marks, then a small coordinate chart — pictures slowly becoming data"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="95" cy="95" r="7" fillOpacity="0.4" />
+    <circle cx="115" cy="80" r="5" fillOpacity="0.5" />
+    <circle cx="138" cy="72" r="6" fillOpacity="0.45" />
+    <circle cx="160" cy="82" r="5" fillOpacity="0.5" />
+    <circle cx="175" cy="100" r="7" fillOpacity="0.4" />
+    <circle cx="158" cy="118" r="5" fillOpacity="0.5" />
+    <circle cx="132" cy="124" r="8" fillOpacity="0.45" />
+    <circle cx="108" cy="116" r="4" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="232" cy="60" r="3" />
+    <circle cx="232" cy="100" r="3" />
+    <circle cx="232" cy="140" r="3" />
+    <circle cx="424" cy="60" r="3" />
+    <circle cx="424" cy="100" r="3" />
+    <circle cx="424" cy="140" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="270" y="70" width="8" height="60" rx="4" />
+    <rect x="284" y="70" width="8" height="60" rx="4" />
+    <rect x="298" y="70" width="8" height="60" rx="4" />
+    <rect x="312" y="70" width="8" height="60" rx="4" />
+    <rect x="259" y="96" width="72" height="8" rx="4" transform="rotate(-30 295 100)" />
+    <rect x="350" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
+    <rect x="364" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
+    <rect x="378" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="460" y="60" width="4" height="100" rx="2" />
+    <rect x="460" y="156" width="120" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="490" cy="135" r="6" />
+    <circle cx="515" cy="118" r="6" />
+    <circle cx="540" cy="98" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="565" cy="78" r="7" />
+  </g>
+</svg>
+
+## The first picture of disagreement
+
+A map is the oldest visual abstraction. A line on a map is not a
+river — it is a *symbol* for a river. That gap, between *the thing*
+and *the picture of the thing*, is the whole foundation of data
+visualization, and humans have been exploiting it for a very long
+time. The oldest known *star* map is carved into a mammoth tusk
+roughly 32,000 years old.
+
+But the first true *statistical* chart came much later. In **1644**,
+the Flemish astronomer **Michael van Langren** was wrestling with a
+fierce open problem: the longitude difference between Toledo and
+Rome. Twelve astronomers had published estimates ranging from 17° to
+30°. Instead of averaging them into one false-confident number, van
+Langren drew each estimate as a dot on a single horizontal line:
+
+```
+Toledo                                          Rome
+  |                                              |
+  | x   x x  x  x x   x x x      x  x       x
+  17°  18°  19°  20°  21°  22°  23°  24°  ...  30°
+```
+
+Just by *seeing* the dots cluster, you feel the uncertainty in your
+gut. Van Langren had discovered something profound: **a picture of
+disagreement is often more honest than a single number.**
+
+## Playfair invents the charts you already know
+
+<IllustrationPrompt subject="William Playfair" photo />
+
+If van Langren is the great-grandfather of statistical graphics, the
+*father* is **William Playfair** — a Scottish engineer and political
+economist. In a single 1786 book, the *Commercial and Political
+Atlas*, Playfair invented or popularized the **line chart** (for
+change over time) and the **bar chart** (for comparing categories).
+A few years later, in 1801, he added the **pie chart**.
+
+Playfair's leap was philosophical. To a generation raised on tables
+of numbers, the claim that *economic data could be seen, not just
+read* was strange and a little suspicious. A bar chart was a
+*picture* of trade — was that serious? Today the answer is obvious;
+in 1786 it was not. Every chart you make in this course descends
+from his argument that pictures of data are a legitimate way to know
+things.
+
+## Florence Nightingale: a chart that changed a war
+
+<IllustrationPrompt subject="Florence Nightingale" photo />
+
+The most consequential early chart was not made by a mathematician.
+In 1854, an English nurse named **Florence Nightingale** arrived at
+a British military hospital in Scutari during the Crimean War. What
+she found was horror — wounded soldiers were dying in vast numbers,
+but not, as the public believed, of their wounds. They were dying of
+**typhus, cholera, and dysentery contracted inside the hospital
+itself.**
+
+Nightingale knew the numbers better than anyone in London. She also
+knew that *numbers in a report do not change policy*. So she did
+something almost unprecedented for a woman — or for anyone — in the
+mid-19th century: **she drew a chart.**
+
+<svg
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A rose diagram of wedges fanning out from a center, large blue wedges of preventable disease dwarfing the small red wedges of battle wounds"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <circle cx="320" cy="135" r="112" fill="currentColor" opacity="0.05" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M320 135 L320 40 A95 95 0 0 1 387.2 67.8 Z" fillOpacity="0.4" />
+    <path d="M320 135 L394.2 60.8 A105 105 0 0 1 425 135 Z" fillOpacity="0.5" />
+    <path d="M320 135 L408 135 A88 88 0 0 1 382.2 197.2 Z" fillOpacity="0.42" />
+    <path d="M320 135 L369.5 184.5 A70 70 0 0 1 320 205 Z" fillOpacity="0.34" />
+    <path d="M320 135 L320 193 A58 58 0 0 1 279 176 Z" fillOpacity="0.3" />
+    <path d="M320 135 L286.1 168.9 A48 48 0 0 1 272 135 Z" fillOpacity="0.26" />
+    <path d="M320 135 L265 135 A55 55 0 0 1 281.1 96.1 Z" fillOpacity="0.3" />
+    <path d="M320 135 L267 82 A75 75 0 0 1 320 60 Z" fillOpacity="0.36" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M320 135 L320 105 A30 30 0 0 1 341.2 113.8 Z" fillOpacity="0.6" />
+    <path d="M320 135 L344 111 A34 34 0 0 1 354 135 Z" fillOpacity="0.65" />
+    <path d="M320 135 L348 135 A28 28 0 0 1 339.8 154.8 Z" fillOpacity="0.6" />
+    <path d="M320 135 L337 152 A24 24 0 0 1 320 159 Z" fillOpacity="0.55" />
+    <path d="M320 135 L320 155 A20 20 0 0 1 305.9 149.1 Z" fillOpacity="0.5" />
+    <path d="M320 135 L308 147 A17 17 0 0 1 303 135 Z" fillOpacity="0.5" />
+    <path d="M320 135 L301 135 A19 19 0 0 1 306.6 121.6 Z" fillOpacity="0.55" />
+    <path d="M320 135 L302.3 117.3 A25 25 0 0 1 320 110 Z" fillOpacity="0.6" />
+  </g>
+  <circle cx="320" cy="135" r="4" fill="currentColor" opacity="0.5" />
+</svg>
+
+The chart she published in 1858 is now famous as the **Coxcomb** or
+**rose diagram**. Each month of the war is a wedge fanning out from a
+center; the *area* of each wedge encodes the number of deaths, and
+the *color* encodes the cause — blue for preventable disease, red
+for wounds. The blue wedges were *enormous*. The red wedges were
+tiny. Anyone who looked — a politician, a queen, a newspaper editor —
+could see in a single glance that **soldiers were not dying of war;
+they were dying of dirt.**
+
+The chart did its job. The British government created a Sanitary
+Commission, the hospitals were cleaned, and mortality plummeted. In
+1859, Nightingale became the **first woman elected a Fellow of the
+Royal Statistical Society.** Her diagram is the first widely-cited
+example of data visualization as an instrument of political change —
+and every public-health chart since traces a line back to it.
+
+<Callout type="info" title="The honesty-vs-impact tension, in one chart">
+Modern specialists point out that a plain **bar chart** would have
+been *more accurate* than the rose diagram, because the eye judges
+length better than area. They are right. But Nightingale's chart was
+also **persuasive design** — the dramatic rose shape was memorable,
+and it *traveled*. Sometimes the best chart for *exploration* is not
+the best chart for *advocacy*. We return to this tension throughout
+the course.
+</Callout>
+
+<IllustrationPrompt subject="Napoleon's 1812 march flow-map" />
+
+Two contemporaries deserve a sentence each, because they round out
+the founding generation. In **1854**, physician **John Snow** mapped
+cholera deaths around the Broad Street pump in London — a founding
+act of data-driven, spatial epidemiology. And in **1869**, the
+engineer **Charles Minard** drew a flow map of Napoleon's
+catastrophic 1812 Russian campaign that Edward Tufte would later
+call "probably the best statistical graphic ever drawn."
+
+## From parliamentary foldouts to your browser
+
+For most of this history, charts were **static**. Playfair's lines
+were ink on paper; Nightingale's rose was a foldout in a
+parliamentary report; Excel charts, even in the 1990s, were small
+frozen pictures. A static chart says one thing: *"Here is what I, the
+author, decided was important."* You could look at it — you could not
+*ask it anything*.
+
+That changed when the chart moved onto the **web**. Two browser
+technologies — **SVG** (shapes that respond to mouse and touch) and
+**JavaScript** (a language that reacts to input in real time) — made
+every chart on every page *interactive-capable*. In 2011, **Mike
+Bostock** released **D3.js**, the JavaScript library that powered a
+decade of New York Times graphics. D3 was extraordinarily powerful
+and extraordinarily *hard* — a single chart could take hundreds of
+lines.
+
+So the next decade was spent building friendlier wrappers around
+that engine. The one this course uses — **Plotly Express**, which we
+meet properly on the next page — turns an interactive web chart into
+a single line of Python.
+
+```mermaid
+flowchart LR
+    VL["van Langren<br/>1644"] --> PF["Playfair<br/>1786"]
+    PF --> FN["Nightingale<br/>1858"]
+    FN --> EX["Excel charts<br/>1990s"]
+    EX --> D3["D3.js<br/>2011"]
+    D3 --> PX["Plotly Express<br/>2019"]
+```
+
+## Interactivity is not a gimmick
+
+It is tempting to think of interactivity as a *nice extra*. It is
+not. A truly interactive chart changes the **cognitive workload** of
+analysis. Ben Shneiderman captured the idea in a famous 1996 mantra:
+
+> **Overview first, zoom and filter, then details on demand.**
+
+You see the *whole shape* of the data, then drill into the part that
+interests you, then read exact values — and each step is a tiny
+question you ask *without writing code*. That loop, done in seconds,
+is the rhythm of modern data analysis. This entire course runs in
+your browser precisely so you can *live inside that loop* on every
+page.
+
+Here is a first taste. This is the kind of analysis Nightingale was
+doing — comparing causes over time — rendered with the tool you are
+about to learn. Don't worry about the syntax yet; just **hover** over
+the bars and **click a legend entry** to hide a series.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+
+# A small table inspired by Nightingale's: monthly deaths by cause.
+df = pd.DataFrame({
+    "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] * 2,
+    "cause": ["Disease"] * 6 + ["Wounds"] * 6,
+    "deaths": [320, 410, 540, 480, 350, 290, 40, 55, 60, 65, 50, 45],
+})`,
+      starterCode: `fig = px.bar(
+    df,
+    x="month",
+    y="deaths",
+    color="cause",
+    barmode="group",
+    template="simple_white",
+    title="Monthly deaths by cause — a modern Nightingale chart",
+    labels={"deaths": "Deaths", "month": "Month", "cause": "Cause"},
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+You did not need to know any Python to *read* that chart — the blue
+"Disease" bars dwarf the red "Wounds" bars, exactly Nightingale's
+point. **A well-made chart explains itself.** That is the standard
+we are aiming for, and the next page introduces the tool that gets
+us there in one line.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is Michael van Langren's 1644 longitude chart historically important?
+
+- It was the first map of the world.
+  > The earliest geographic maps predate van Langren by thousands of years — Babylonian clay tablets and Ptolemy's *Geographia* are among many examples. His 1644 chart was not a map of the world.
+- [o] It was an early statistical graphic that revealed disagreement among measurements by plotting them visually.
+  > By plotting each astronomer's estimate as a dot on a line, van Langren let the *eye* notice that the values clustered far from the conventional answer. A picture of disagreement turned out to be more honest than any single number.
+- It proved that Toledo and Rome were 17° apart.
+  > The actual longitude difference is approximately 14.5°. More importantly, van Langren's chart showed the *range of uncertainty* across twelve estimates — it did not prove any single value.
+- It was the first chart drawn with a computer.
+  > Computers did not exist in 1644 — van Langren drew his chart by hand. Electronic computers emerged in the mid-20th century, more than 300 years later.
+
+Van Langren's insight — that a picture of data can reveal a story numbers alone can't — is the seed of every chart in this course.`}
+/>
+
+<MultipleChoice
+  markdown={`Which chart types is **William Playfair** credited with inventing or popularizing?
+
+- [o] Line chart, bar chart, and pie chart.
+  > Playfair introduced the line and bar charts in his 1786 *Commercial and Political Atlas* and the pie chart around 1801. All three are still among the most-used chart types on Earth.
+- Scatter plot and heatmap.
+  > Scatter plots are credited to later contributors (Francis Galton used them in the 1880s), and heatmaps became common in 20th-century scientific visualization. Neither is associated with Playfair.
+- 3-D surface plot and treemap.
+  > 3-D surface plots emerged with computational graphics, and treemaps were invented by Ben Shneiderman in 1991. Neither connects to Playfair in the 18th century.
+- Histogram and box plot.
+  > Histograms are attributed to Karl Pearson in the 1890s, and box plots to John Tukey in the 1970s. Both post-date Playfair by at least a century.
+
+These chart types feel "natural" today only because Playfair won the argument. In 1786 they were strange new objects.`}
+/>
+
+<MultipleChoice
+  markdown={`What was the *primary point* of Nightingale's rose diagram?
+
+- That war is dangerous.
+  > The Crimean War was obviously dangerous, but Nightingale's specific argument was about *preventable* mortality inside the hospitals — a distinct and actionable claim.
+- [o] That far more soldiers were dying of preventable infections than of battlefield wounds.
+  > The blue wedges (disease) dwarfed the red wedges (wounds), making it instantly visible that *sanitation*, not enemy fire, was the deadlier threat — and turning a statistical argument into something a non-statistician could see at a glance.
+- That Crimea was colder in winter than in summer.
+  > Temperature appears nowhere in the rose diagram; the wedge areas encode deaths by cause, not weather.
+- That nurses were better than doctors.
+  > The diagram does not compare professional roles; its argument is about preventable disease versus wounds, pointing to sanitation failures.
+
+The chart's purpose was to provoke a specific *action*: clean up the hospitals. It did.`}
+/>
+
+<MultipleChoice
+  markdown={`What does Ben Shneiderman's mantra "overview first, zoom and filter, then details on demand" describe?
+
+- A SQL query optimization strategy.
+  > That phrase describes a human-facing workflow for exploring data through an interactive interface, not a database performance technique.
+- [o] A foundational rhythm for interactive data exploration — first see the whole, then narrow down, then inspect specifics.
+  > This 1996 phrase captures how an analyst uses an interactive chart: get the gestalt, drill into the interesting subset, then read exact values. Plotly Express supports every step of this loop out of the box.
+- A type of Plotly chart.
+  > It is a design philosophy about how users interact with *any* chart, not a specific chart type.
+- A type of database index.
+  > Database indexes speed up retrieval inside a database engine; the mantra is a user-interface and visualization principle, unrelated to database internals.
+
+If you remember one rule about interactive design, make it this one.`}
+/>

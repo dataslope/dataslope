@@ -6,8 +6,8 @@ import { test, expect } from "@playwright/test";
  *
  * Background
  * ----------
- * The /learn route loads Tailwind v4 via `app/learn/learn.css`, imported from
- * `app/learn/layout.tsx` and therefore scoped to the /learn segment's CSS
+ * The /learn route loads Tailwind v4 via `app/docs.css`, imported from
+ * `app/fumadocs-dev/layout.tsx` and therefore scoped to the /learn segment's CSS
  * chunk. Tailwind v4 dropped v3's gray border default: its preflight emits
  * `*, ::before, ::after { border: 0 solid }`, leaving the default border *color*
  * at `currentColor` (the near-black text color). Fumadocs restores a gray
@@ -23,7 +23,7 @@ import { test, expect } from "@playwright/test";
  * late `@layer base { * { border: 0 solid } }` to a loaded /learn page flips the
  * universal border default from gray to the black text color.)
  *
- * The fix (`app/learn/learn.css`) pins the gray default one layer up, in
+ * The fix (`app/docs.css`) pins the gray default one layer up, in
  * `@layer components`. Layer precedence (components > base) is independent of
  * stylesheet/chunk order, so it always beats the base-layer preflight regardless
  * of how the App Router orders the chunks, while still losing to border-color
@@ -80,7 +80,7 @@ async function readBorderColors(evaluate: <T>(fn: () => T) => Promise<T>) {
 test("learn route: default border color is the Fumadocs gray token on a normal load", async ({
   page,
 }) => {
-  await page.goto("/learn");
+  await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
   const c = await readBorderColors((fn) => page.evaluate(fn));
@@ -101,7 +101,7 @@ test("learn route: default border color is the Fumadocs gray token on a normal l
 test("learn route: default border stays gray when the base-layer preflight is reordered last (App Router soft-nav race)", async ({
   page,
 }) => {
-  await page.goto("/learn");
+  await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
   // Reproduce the soft-navigation cascade: re-apply the preflight's universal

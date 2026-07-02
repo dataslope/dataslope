@@ -11,7 +11,7 @@ name: R2 incremental-cache cleanup
 # What it does: deletes every build folder that is BOTH (a) not the live
 # production build and (b) older than THRESHOLD_DAYS. The live production build
 # is preserved regardless of age, so a site that sits unchanged for months never
-# loses its cache (which would 500 the home page and /learn/* — see
+# loses its cache (which would 500 the home page and /courses/* — see
 # open-next.config.ts). Superseded production builds and merged-PR previews age
 # out THRESHOLD_DAYS after their last deploy.
 #

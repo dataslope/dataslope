@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { discoverPages } from "./_discoverPages";
 
-// Drives every <ChallengeCard> on every /learn/challenge-cards/<lang>
+// Drives every <ChallengeCard> on every /fumadocs-dev/challenge-cards-<lang>
 // page, loads its reference solution into the editor buffers, clicks
 // Submit, and asserts that all of the card's declared tests pass.
 //
@@ -49,29 +49,29 @@ declare global {
 }
 
 // Default: the per-language/dialect demo pages. Set COURSEWARE=1 to sweep
-// every /learn page that embeds a <ChallengeCard> or <SqlChallengeCard>
-// across all courses — a long, opt-in CI run.
+// every docs page that embeds a <ChallengeCard> or <SqlChallengeCard>
+// across all courses — a long, opt-in CI run. `path` is the full route.
 const DEMO_PAGES: { path: string; label: string }[] = [
-  { path: "challenge-cards-javascript", label: "JavaScript" },
-  { path: "challenge-cards-typescript", label: "TypeScript" },
-  { path: "challenge-cards-python", label: "Python" },
-  { path: "challenge-cards-r", label: "R" },
-  { path: "challenge-cards-java", label: "Java" },
-  { path: "challenge-cards-c", label: "C" },
-  { path: "challenge-cards-cpp", label: "C++" },
-  { path: "challenge-cards-csharp", label: "C#" },
-  { path: "challenge-cards-php", label: "PHP" },
+  { path: "/fumadocs-dev/challenge-cards-javascript", label: "JavaScript" },
+  { path: "/fumadocs-dev/challenge-cards-typescript", label: "TypeScript" },
+  { path: "/fumadocs-dev/challenge-cards-python", label: "Python" },
+  { path: "/fumadocs-dev/challenge-cards-r", label: "R" },
+  { path: "/fumadocs-dev/challenge-cards-java", label: "Java" },
+  { path: "/fumadocs-dev/challenge-cards-c", label: "C" },
+  { path: "/fumadocs-dev/challenge-cards-cpp", label: "C++" },
+  { path: "/fumadocs-dev/challenge-cards-csharp", label: "C#" },
+  { path: "/fumadocs-dev/challenge-cards-php", label: "PHP" },
   // SQL challenge cards register on the same window.__dsChallenges registry
   // and expose the same data-* attributes (see SqlChallengeCard).
-  { path: "sql-challenge-cards-sqlite", label: "SQLite" },
-  { path: "sql-challenge-cards-duckdb", label: "DuckDB" },
-  { path: "sql-challenge-cards-postgres", label: "PostgreSQL" },
+  { path: "/fumadocs-dev/sql-challenge-cards-sqlite", label: "SQLite" },
+  { path: "/fumadocs-dev/sql-challenge-cards-duckdb", label: "DuckDB" },
+  { path: "/fumadocs-dev/sql-challenge-cards-postgres", label: "PostgreSQL" },
 ];
 
 const CHALLENGE_PAGES: { path: string; label: string }[] = process.env
   .COURSEWARE
   ? discoverPages(["<ChallengeCard", "<SqlChallengeCard"]).map((p) => ({
-      path: p.route.replace(/^\/learn\//, ""),
+      path: p.route,
       label: p.route,
     }))
   : DEMO_PAGES;
@@ -204,7 +204,7 @@ test.describe("Challenge solutions", () => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
-      await page.goto(`/learn/${pagePath}`);
+      await page.goto(pagePath);
       // Cards register on `window.__dsChallenges` from a `useEffect`
       // that fires once the React tree commits — wait until at least
       // one card has registered before reading the manifest, so we

@@ -1,0 +1,204 @@
+---
+title: Welcome
+description: An analytical-SQL course for people who already know basic SQL but want to learn how analysts actually use it — to explore, summarize, and reason about large datasets with DuckDB.
+---
+
+Welcome to **SQL for Data Analysis with DuckDB**. You already know the
+basics — `SELECT`, `WHERE`, `JOIN`, maybe `GROUP BY` — and you can read a
+simple query without flinching. This course is about the *next* leap:
+using SQL not to power an application, but to **think with data**.
+
+Here is what that looks like. The query below reaches across the internet
+to a 53,940-row Parquet file of diamond sales, summarizes it by cut, and
+hands you back five lines — **without downloading the file first.** Click
+*Run*, wait a second for the engine to wake up, and read the result. Then
+change one thing — swap `cut` for `color` in both the `SELECT` and the
+`GROUP BY` — and run it again.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Query a file on the web, straight from your browser"
+  starterCode={`SELECT
+  cut,
+  COUNT(*) AS n,
+  ROUND(AVG(price), 0) AS avg_price
+FROM
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
+GROUP BY
+  cut
+ORDER BY
+  avg_price DESC;`}
+/>
+
+Read what just happened. There was no upload, no import, no `CREATE
+TABLE` — DuckDB opened a remote file and scanned it in place, and the
+whole thing ran on a real database engine **inside this browser tab**.
+That is the shape of analytical SQL, and the shape of this entire course:
+the same `SELECT` keyword that fetches one user's profile in an app can,
+with a different mindset, condense tens of thousands of sales into a
+single ranked summary.
+
+<Callout type="info" title="This whole course runs in your browser">
+Every SQL example on every page runs on a real DuckDB engine — the actual
+database compiled to WebAssembly and loaded on demand. There is no server,
+no signup, and nothing to install. Edit the query, click *Run*, and the
+result appears right below the editor.
+</Callout>
+
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="An abstract duck built from filled circles glides along a waterline under a yellow sun, and its reflection below the surface is a bar chart of columnar stripes — data turning into insight wherever DuckDB swims"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="86" cy="62" r="3" />
+    <circle cx="128" cy="34" r="2.5" />
+    <circle cx="178" cy="78" r="2" />
+    <circle cx="466" cy="96" r="2.5" />
+    <circle cx="598" cy="112" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="540" cy="48" r="26" fillOpacity="0.18" />
+    <circle cx="540" cy="48" r="16" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <rect x="36" y="146" width="568" height="4" rx="2" />
+    <rect x="64" y="160" width="92" height="3" rx="1.5" />
+    <rect x="470" y="160" width="110" height="3" rx="1.5" />
+    <rect x="104" y="172" width="58" height="3" rx="1.5" />
+    <rect x="506" y="174" width="64" height="3" rx="1.5" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="236" cy="140" r="3" />
+    <circle cx="210" cy="134" r="2.5" />
+    <circle cx="186" cy="140" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 276 104 L 242 82 L 260 116 Z" />
+    <circle cx="302" cy="116" r="34" />
+    <rect x="332" y="76" width="16" height="38" rx="8" />
+    <circle cx="344" cy="76" r="17" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <circle cx="296" cy="118" r="14" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 359 68 L 384 76 L 359 86 Z" />
+  </g>
+  <circle cx="349" cy="71" r="2.6" fill="var(--ds-white)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="254" y="154" width="17" height="50" rx="5" fillOpacity="0.4" />
+    <rect x="277" y="154" width="17" height="30" rx="5" fillOpacity="0.28" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="300" y="154" width="17" height="68" rx="5" fillOpacity="0.5" />
+    <rect x="323" y="154" width="17" height="42" rx="5" fillOpacity="0.32" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="346" y="154" width="17" height="56" rx="5" fillOpacity="0.42" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="369" y="154" width="17" height="24" rx="5" fillOpacity="0.4" />
+  </g>
+</svg>
+
+## Who this course is for
+
+You will feel at home here if any of these describe you:
+
+- You can write basic `SELECT` queries and understand tables, rows, and
+  joins — but you have never used SQL to *analyze* anything.
+- You have heard terms like *OLAP*, *window function*, *aggregation*, or
+  *exploratory data analysis* and want to know what they really mean.
+- You use spreadsheets or a BI tool for analysis and suspect SQL would
+  let you go faster and further.
+- You keep hearing about **DuckDB** and want to understand why analysts
+  are so excited about it.
+
+You do **not** need:
+
+- Any experience with data analysis, statistics, or BI tools.
+- Any experience with DuckDB specifically.
+- Anything installed on your computer.
+
+What you **do** need is comfort with basic SQL: `SELECT`, `FROM`,
+`WHERE`, `ORDER BY`, and a rough idea of what a `JOIN` does. If those
+feel shaky, our
+[Introduction to SQL and Relational Databases](/courses/intro-sql-postgres)
+course builds them from scratch.
+
+## What you will be able to do
+
+By the end of the course you will be able to:
+
+- Explain how **analytical** (OLAP) work differs from **transactional**
+  (OLTP) application work — and why that difference shapes every query.
+- **Explore an unfamiliar dataset** quickly: profile it, slice it, and
+  find what is interesting.
+- **Aggregate and summarize** millions of rows into the handful of
+  numbers a decision actually needs.
+- Use **window functions** to rank, compute running totals, and compare
+  each row to its neighbors.
+- **Transform and reshape** data — conditional logic, dates, and pivots.
+- **Compose** large analytical queries from small, readable building
+  blocks with CTEs and subqueries.
+- Turn raw rows into **business metrics** and build **reproducible**
+  analytical workflows.
+
+## What this course is *not*
+
+This is an **analytics** course. It deliberately spends **little or no
+time** on database administration topics — production deployment, high
+availability, replication, security hardening, transactions, multi-user
+concurrency, ORMs, query-planner internals, or cloud infrastructure.
+Those matter for *running* a database in production, but they are not
+what an analyst reaches for when asking questions of data.
+
+| This course focuses on | This course skips |
+| --- | --- |
+| Analytical SQL | Administration |
+| Exploratory analysis | Transactions |
+| Aggregation | Replication, HA |
+| Window functions | Deployment |
+| Data to insight | ORMs, backends |
+
+## How the course is organized
+
+Two short opening pages set the frame: how analytical (**OLAP**) work
+differs from the transactional (**OLTP**) SQL behind a typical app, and
+*why DuckDB* exists. After that you are querying real data on every page,
+and each new technique answers an analytical question you already care
+about. Near the end, an **Interesting discussions** section collects a
+couple of optional deep dives — the analyst's exploratory mindset, and the
+reproducibility habits that make analysis trustworthy — kept out of the
+main path so it never delays the hands-on work.
+
+## The three kinds of interactive widgets
+
+You will meet three kinds of interactive elements:
+
+1. **Runnable SQL blocks.** A live DuckDB editor. Some blocks pre-load
+   sample data for you; edit the query, click *Run*, and inspect the
+   result table.
+2. **Challenge cards.** Small problems with tests — write a query,
+   run the tests, and see which ones pass.
+3. **Multiple-choice questions.** Quick conceptual checks, with an
+   explanation for every choice, so you can confirm an idea has landed
+   before moving on.
+
+<Callout type="info" title="Each SQL block is independent">
+Tables you create in one runnable block are **not** visible to the next
+block, even on the same page — every block that needs data sets it up
+itself. If you want a single long-lived workspace to experiment in, open
+the [DuckDB Playground](/playground/duckdb) in a new tab.
+</Callout>
+
+The diamonds query at the top of this page was your first taste:
+*"for each cut, how many diamonds and what is the average price — biggest
+first."* You could not answer that by reading the raw rows. The query does
+it instantly, and would do it just as instantly over ten million. With the
+mindset set, let us make the difference between this kind of work and
+ordinary application SQL precise.

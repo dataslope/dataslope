@@ -12,7 +12,7 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 // workerd, whose Node compatibility layer (unenv) has no filesystem — so any
 // page that touches `node:fs` at request time throws `fs.readdir/readFile is
 // not implemented` and returns a 500. That hits the home page (course listing
-// via `readdir`) and all `/learn/*` lessons (Fumadocs `dynamic` mode reads
+// via `readdir`) and all `/courses/*` lessons (Fumadocs `dynamic` mode reads
 // each MDX body from disk via `page.data.load()`).
 //
 // We use the R2-backed incremental cache rather than the read-only

@@ -21,7 +21,7 @@
  *
  * Note: Fumadocs sidebar/TOC links don't go through this wrapper — their
  * prefetching is tamed separately via `sidebar={{ prefetch: false }}` on
- * `DocsLayout` in `app/learn/layout.tsx` and `app/interview/layout.tsx`.
+ * `DocsLayout` in the docs-route layouts (courses/fumadocs-dev/interview-prep).
  */
 import NextLink from "next/link";
 import type { ComponentProps } from "react";

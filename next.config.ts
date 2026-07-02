@@ -1,3 +1,5 @@
+import { readdirSync } from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
@@ -40,7 +42,7 @@ const nextConfig: NextConfig = {
     // mitigations are CSS-level: the shared @source list in
     // app/tailwind.shared.css (both Tailwind roots emit identical utility
     // layers, so stylesheet order can't flip base/variant winners) and the
-    // layer/unlayered re-assertions in app/learn/learn.css + app/home.css.
+    // layer/unlayered re-assertions in app/docs.css + app/home.css.
     cssChunking: "strict",
     // Keep prefetched/visited route payloads reusable in the client router
     // cache so re-hovers and back/forward navigations don't re-fetch the same
@@ -61,20 +63,59 @@ const nextConfig: NextConfig = {
       destination: `${CDN_BASE_URL}/_dotnet/:path*`,
       permanent: false,
     },
+    // ── Route restructuring (courses-page redesign) ──────────────────────
+    // The old public URLs moved:
+    //   /learn/<course>/…  →  /courses/<course>/…   (all courses)
+    //   /learn/<dev page>  →  /fumadocs-dev/<dev page>  (loose demo pages)
+    //   /learn             →  /courses              (the index)
+    //   /interview/…       →  /interview-prep/…
+    // The dev-page entries are generated from the files actually present in
+    // content/fumadocs-dev/ and MUST precede the /learn/:path* catch-all —
+    // Next.js applies redirects in order, first match wins.
+    ...fumadocsDevSlugs().map((slug) => ({
+      source: `/learn/${slug}`,
+      destination: `/fumadocs-dev/${slug}`,
+      permanent: true,
+    })),
+    { source: "/learn", destination: "/courses", permanent: true },
+    { source: "/learn/:path*", destination: "/courses/:path*", permanent: true },
+    { source: "/interview", destination: "/interview-prep", permanent: true },
+    {
+      source: "/interview/:path*",
+      destination: "/interview-prep/:path*",
+      permanent: true,
+    },
   ],
-  // Expose every `/learn` lesson as raw Markdown at `${page.url}.md`, served
-  // by the route handler in `app/llms/learn/[[...slug]]/`. The page-action
-  // buttons (Copy Markdown / View as Markdown) point at these URLs. Using
-  // `beforeFiles` guarantees the `.md` suffix is intercepted before the
-  // `/learn/[[...slug]]` page route gets a chance to match it. The bare
-  // `/learn.md` entry covers the course index (content/learn/index.mdx).
+  // Expose every `/courses` lesson (and `/fumadocs-dev` demo page) as raw
+  // Markdown at `${page.url}.md`, served by the route handlers under
+  // `app/llms/`. The page-action buttons (Copy Markdown / View as Markdown)
+  // point at these URLs. Using `beforeFiles` guarantees the `.md` suffix is
+  // intercepted before the catch-all page routes get a chance to match it.
+  // The bare `/fumadocs-dev.md` entry covers that section's index page
+  // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page — its
+  // index is the course-catalog page — so there is no bare `/courses.md`.
   rewrites: async () => ({
     beforeFiles: [
-      { source: "/learn.md", destination: "/llms/learn" },
-      { source: "/learn/:path*.md", destination: "/llms/learn/:path*" },
+      { source: "/courses/:path*.md", destination: "/llms/courses/:path*" },
+      { source: "/fumadocs-dev.md", destination: "/llms/fumadocs-dev" },
+      {
+        source: "/fumadocs-dev/:path*.md",
+        destination: "/llms/fumadocs-dev/:path*",
+      },
     ],
   }),
 };
+
+/** Top-level demo-page slugs under content/fumadocs-dev/ (the pages that used
+ *  to live loose under /learn), for the one-time redirect table above. Read at
+ *  config-load time — Node's fs is available here, and the list only changes
+ *  when a dev page is added or removed. */
+function fumadocsDevSlugs(): string[] {
+  return readdirSync(path.join(process.cwd(), "content", "fumadocs-dev"))
+    .filter((name) => name.endsWith(".mdx") && name !== "index.mdx")
+    .map((name) => name.replace(/\.mdx$/, ""))
+    .sort();
+}
 
 const withMDX = createMDX();
 

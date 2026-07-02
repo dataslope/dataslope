@@ -1,7 +1,7 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { discoverPages } from "./_discoverPages";
 
-// Runs every <SqlCodeBlock> on each /learn/sql-code-blocks-<dialect> demo
+// Runs every <SqlCodeBlock> on each /fumadocs-dev/sql-code-blocks-<dialect> demo
 // page and asserts the query executes without the block entering its
 // "error" status. SQL blocks render via @sqlite.org/sqlite-wasm (in
 // process), DuckDB-WASM and PGlite — all client-side.
@@ -11,17 +11,17 @@ import { discoverPages } from "./_discoverPages";
 //             ("idle"|"loading"|"running"|"ready"|"error")
 //   - run:    [data-testid="sql-codeblock-run"] (disabled while busy)
 
-// Default: the per-dialect demo pages. COURSEWARE=1 sweeps every /learn page
+// Default: the per-dialect demo pages. COURSEWARE=1 sweeps every docs page
 // that embeds a <SqlCodeBlock> across all courses (long, opt-in CI run).
 const DEMO_PAGES: { path: string; label: string }[] = [
-  { path: "sql-code-blocks-sqlite", label: "SQLite" },
-  { path: "sql-code-blocks-duckdb", label: "DuckDB" },
-  { path: "sql-code-blocks-postgres", label: "PostgreSQL" },
+  { path: "/fumadocs-dev/sql-code-blocks-sqlite", label: "SQLite" },
+  { path: "/fumadocs-dev/sql-code-blocks-duckdb", label: "DuckDB" },
+  { path: "/fumadocs-dev/sql-code-blocks-postgres", label: "PostgreSQL" },
 ];
 
 const SQL_PAGES: { path: string; label: string }[] = process.env.COURSEWARE
   ? discoverPages(["<SqlCodeBlock"]).map((p) => ({
-      path: p.route.replace(/^\/learn\//, ""),
+      path: p.route,
       label: p.route,
     }))
   : DEMO_PAGES;
@@ -55,7 +55,7 @@ test.describe("SQL code blocks run cleanly", () => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
-      await page.goto(`/learn/${pagePath}`);
+      await page.goto(pagePath);
       const blocks = page.getByTestId("sql-code-block");
       await expect(blocks.first()).toBeVisible({ timeout: 60_000 });
       const count = await blocks.count();
