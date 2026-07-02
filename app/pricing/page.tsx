@@ -88,9 +88,10 @@ export default function PricingPage() {
               </h1>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
                 Every course, interview track, and playground is free to use —
-                no account required. Create a free account for cloud saves and
-                sharing, or go Pro for storage that never expires. The detailed
-                notes below the table explain exactly what each row means.
+                no account required, and anyone can share a playground with a
+                link. Create a free account for cloud saves, or go Pro for
+                storage that never expires. The detailed notes below the table
+                explain exactly what each row means.
               </p>
             </div>
           </section>
@@ -158,12 +159,20 @@ export default function PricingPage() {
                 </Footnote>
 
                 <Footnote n={6} lead="“Share playgrounds.”">
-                  Sharing creates a link others can open to view and run a copy
-                  of your playground. On the Free Member plan, shared playgrounds
-                  follow the same one-month inactivity cleanup as your other
-                  cloud saves (see note 4); on Pro, shared links stay live for as
-                  long as you&apos;re subscribed. Guests can&apos;t create share
-                  links — that needs a free account.
+                  Sharing creates a link to a snapshot of your playground —
+                  the files, and for SQL playgrounds the database and queries
+                  — taken at the moment you share. Anyone who opens the link
+                  gets their own private copy to run and edit; nobody can
+                  change your original through a link, and later edits
+                  aren&apos;t shared until you create a new link.{" "}
+                  <strong>Everyone can share, including guests</strong> with no
+                  account: guest links simply expire 30 days after they&apos;re
+                  created and can&apos;t be managed afterwards. Links created
+                  while signed in can be copied or revoked anytime from your
+                  account page; on the Free Member plan they follow the same
+                  one-month inactivity cleanup as your other cloud saves (see
+                  note 4) and count toward your storage quota (note 5), while
+                  on Pro they stay live for as long as you&apos;re subscribed.
                 </Footnote>
 
                 <Footnote n={7} lead="“Ask AI” messages.">
