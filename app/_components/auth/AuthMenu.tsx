@@ -72,9 +72,13 @@ export function AuthMenu() {
 
   async function handleSignOut() {
     setSigningOut(true);
-    await signOut();
-    // Re-render anything reading the session; the menu collapses to "Sign in".
-    router.refresh();
+    try {
+      await signOut();
+      // Re-render anything reading the session; the menu collapses to "Sign in".
+      router.refresh();
+    } catch {
+      // Network failure — leave the session as-is; the item re-enables.
+    }
     setSigningOut(false);
   }
 

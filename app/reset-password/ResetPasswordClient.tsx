@@ -61,10 +61,20 @@ export function ResetPasswordClient() {
     }
     if (!token) return;
     setSubmitting(true);
-    const { error } = await resetPassword({ newPassword: password, token });
-    if (error) {
+    // Server-side failures resolve with {error}; a network failure rejects —
+    // catch it so the form doesn't stay disabled at "Updating…".
+    try {
+      const { error } = await resetPassword({ newPassword: password, token });
+      if (error) {
+        setError(
+          error.message ?? "Couldn't reset your password. Request a new link.",
+        );
+        setSubmitting(false);
+        return;
+      }
+    } catch {
       setError(
-        error.message ?? "Couldn't reset your password. Request a new link.",
+        "Couldn't reach the server. Please check your connection and try again.",
       );
       setSubmitting(false);
       return;

@@ -37,10 +37,18 @@ export async function POST(request: Request): Promise<Response> {
   const { env, ctx } = getCloudflareContext();
 
   // --- Auth gate: Ask AI is an action, so it requires a session. ---
+  // The cookie cache is bypassed here: this route spends provider tokens per
+  // request, and the cached session outlives bans/plan changes by up to five
+  // minutes (banUser revokes DB sessions, but the signed cookie stays valid
+  // until its maxAge). One extra D1 read is noise next to the model call.
   const auth = await createAuth(env, request);
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = await auth.api.getSession({
+    headers: request.headers,
+    query: { disableCookieCache: true },
+  });
   if (!session) return json({ error: "Sign in to use Ask AI." }, 401);
   const user = session.user;
+  if (user.banned) return json({ error: "This account is suspended." }, 403);
 
   // --- Parse + validate the request body. ---
   let body: AskAiRequest;

@@ -35,8 +35,11 @@ export function AccountClient() {
 
   // Detect the checkout return via window.location (not useSearchParams, so
   // the page keeps prerendering statically without a Suspense boundary).
+  // Require the exact value Polar sends (lib/billing/polar.ts) — a stale or
+  // hand-typed `?checkout=` must not flash a "payment received" notice.
   useEffect(() => {
-    if (!new URLSearchParams(window.location.search).has("checkout")) return;
+    const value = new URLSearchParams(window.location.search).get("checkout");
+    if (value !== "success") return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
     setActivation("waiting");
     let cancelled = false;
@@ -88,8 +91,12 @@ export function AccountClient() {
 
   async function handleSignOut() {
     setSigningOut(true);
-    await signOut();
-    router.refresh();
+    try {
+      await signOut();
+      router.refresh();
+    } catch {
+      // Network failure — leave the session as-is; the button re-enables.
+    }
     setSigningOut(false);
   }
 

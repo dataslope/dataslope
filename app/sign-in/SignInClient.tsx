@@ -146,6 +146,20 @@ export function SignInClient() {
     setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
   }, []);
 
+  // A browser Back from the OAuth provider can restore this page from the
+  // bfcache with `socialPending`/`submitting` still set from before the
+  // navigation — which would leave every control disabled with no request in
+  // flight. `pageshow` with `persisted` fires exactly on that restore.
+  useEffect(() => {
+    function onPageShow(e: PageTransitionEvent) {
+      if (!e.persisted) return;
+      setSocialPending(null);
+      setSubmitting(false);
+    }
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
   if (!isPending && session) {
     return <p className={styles.redirecting}>Redirecting to your account…</p>;
   }
@@ -165,12 +179,32 @@ export function SignInClient() {
     setNotice(null);
   }
 
-  function startSocial(provider: string) {
+  async function startSocial(provider: string) {
     setSocialPending(provider);
-    // Full-page redirect to the provider, returning to CALLBACK_URL.
-    void signIn
-      .social({ provider, callbackURL: CALLBACK_URL })
-      .catch(() => setSocialPending(null));
+    setError(null);
+    // Full-page redirect to the provider, returning to CALLBACK_URL. On
+    // success the client's redirect plugin navigates away, so the button
+    // staying "pending" is right. Server-side failures resolve with {error}
+    // (they do NOT reject) — e.g. the provider isn't configured in this
+    // environment — and must re-enable the card; a rejection is a network
+    // failure and must too.
+    try {
+      const { error } = await signIn.social({
+        provider,
+        callbackURL: CALLBACK_URL,
+      });
+      if (error) {
+        setError(
+          error.message ?? "Couldn't start sign-in with that provider.",
+        );
+        setSocialPending(null);
+      }
+    } catch {
+      setError(
+        "Couldn't reach the server. Please check your connection and try again.",
+      );
+      setSocialPending(null);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -179,13 +213,31 @@ export function SignInClient() {
     setNotice(null);
 
     if (isForgot) {
-      // Fire-and-forget: show the same neutral message whether or not the email
-      // exists, so the form can't be used to probe which addresses are registered.
       setSubmitting(true);
-      await requestPasswordReset({ email, redirectTo: "/reset-password" });
-      setNotice(
-        "If an account exists for that email, a reset link is on its way.",
-      );
+      try {
+        // The server already answers 200 with a neutral body for unknown
+        // emails, so the form can't probe which addresses are registered.
+        // A returned error is therefore always a genuine failure (sender not
+        // configured, Resend outage) — surfacing it leaks nothing, and
+        // pretending the link was sent would leave the user waiting forever.
+        const { error } = await requestPasswordReset({
+          email,
+          redirectTo: "/reset-password",
+        });
+        if (error) {
+          setError(
+            error.message ?? "Couldn't send the reset link. Please try again.",
+          );
+        } else {
+          setNotice(
+            "If an account exists for that email, a reset link is on its way.",
+          );
+        }
+      } catch {
+        setError(
+          "Couldn't reach the server. Please check your connection and try again.",
+        );
+      }
       setSubmitting(false);
       return;
     }
@@ -196,37 +248,47 @@ export function SignInClient() {
     // derive it from the email rather than prompting for it.
     const derivedName = email.split("@")[0]?.trim() || email;
 
-    const { data, error } = isSignup
-      ? await signUp.email({
-          name: derivedName,
-          email,
-          password,
-          callbackURL: CALLBACK_URL,
-        })
-      : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
+    // Server-side failures resolve with {error}; only a network-level failure
+    // rejects — catch it so the form doesn't stay disabled at "Signing in…".
+    try {
+      const { data, error } = isSignup
+        ? await signUp.email({
+            name: derivedName,
+            email,
+            password,
+            callbackURL: CALLBACK_URL,
+          })
+        : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
 
-    if (error) {
-      // When verification is required, an unverified sign-in is rejected and a
-      // fresh verification email is sent — tell the user to check their inbox.
-      if (error.code === "EMAIL_NOT_VERIFIED") {
-        setNotice(
-          "Please verify your email first. We've sent you a new verification link.",
-        );
-      } else {
-        setError(error.message ?? "Something went wrong. Please try again.");
+      if (error) {
+        // When verification is required, an unverified sign-in is rejected and a
+        // fresh verification email is sent — tell the user to check their inbox.
+        if (error.code === "EMAIL_NOT_VERIFIED") {
+          setNotice(
+            "Please verify your email first. We've sent you a new verification link.",
+          );
+        } else {
+          setError(error.message ?? "Something went wrong. Please try again.");
+        }
+        setSubmitting(false);
+        return;
       }
-      setSubmitting(false);
-      return;
-    }
 
-    // Sign-up with verification required returns no active session — prompt to
-    // verify rather than redirecting into a gated page.
-    if (isSignup && data && !("token" in data && data.token)) {
-      setPassword("");
-      go("signin"); // clears notice…
-      setNotice(
-        "Account created. Check your email for a verification link, then sign in.",
-      ); // …so set it after the switch
+      // Sign-up with verification required returns no active session — prompt to
+      // verify rather than redirecting into a gated page.
+      if (isSignup && data && !("token" in data && data.token)) {
+        setPassword("");
+        go("signin"); // clears notice…
+        setNotice(
+          "Account created. Check your email for a verification link, then sign in.",
+        ); // …so set it after the switch
+        setSubmitting(false);
+        return;
+      }
+    } catch {
+      setError(
+        "Couldn't reach the server. Please check your connection and try again.",
+      );
       setSubmitting(false);
       return;
     }
@@ -347,7 +409,7 @@ export function SignInClient() {
           <div className={styles.socialGrid}>
             <button
               type="button"
-              onClick={() => startSocial("google")}
+              onClick={() => void startSocial("google")}
               disabled={busy}
               className={styles.socialBtn}
             >
@@ -356,7 +418,7 @@ export function SignInClient() {
             </button>
             <button
               type="button"
-              onClick={() => startSocial("github")}
+              onClick={() => void startSocial("github")}
               disabled={busy}
               className={styles.socialBtn}
             >

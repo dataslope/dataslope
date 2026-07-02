@@ -57,12 +57,22 @@ export async function POST(request: Request): Promise<Response> {
   const { env, ctx } = getCloudflareContext();
 
   // --- Auth gate: guests are blocked outright. ---
+  // Cookie cache bypassed: this endpoint spends provider tokens per request,
+  // and the cached session outlives bans/plan changes by up to five minutes.
+  // (The advisory GET probe above stays on the cheap cached path — the POST
+  // re-checks everything anyway.)
   const auth = await createAuth(env, request);
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = await auth.api.getSession({
+    headers: request.headers,
+    query: { disableCookieCache: true },
+  });
   if (!session) {
     return json({ error: "Sign in to use AI autocomplete." }, 401);
   }
   const user = session.user;
+  if (user.banned) {
+    return json({ error: "This account is suspended." }, 403);
+  }
 
   // --- Tier gate: completions are a pro feature, enforced server-side. ---
   const tier = resolveTier(user, env);

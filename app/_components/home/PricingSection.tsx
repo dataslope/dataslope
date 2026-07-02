@@ -209,7 +209,7 @@ function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
  * (or the annual product isn't), the button says so instead of dead-ending.
  */
 function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -225,6 +225,10 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
 
   async function handleClick() {
     setError(null);
+    // While the first session fetch is in flight a signed-in user would be
+    // misrouted to /sign-in (which bounces to /account, never checkout) —
+    // ignore clicks until the session state is known.
+    if (isPending) return;
     if (!session) {
       router.push("/sign-in");
       return;
