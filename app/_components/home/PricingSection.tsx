@@ -213,9 +213,15 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const sessionUser = session?.user as
+    | { plan?: string; role?: string }
+    | undefined;
+  // Admins are treated as Pro everywhere (lib/ai/tier.ts) — route them to
+  // their account page rather than into a checkout for a plan they already
+  // effectively have, mirroring app/account/AccountClient.tsx.
   const isPro =
-    ((session?.user as { plan?: string } | undefined)?.plan ?? "")
-      .toLowerCase() === "pro";
+    (sessionUser?.plan ?? "").toLowerCase() === "pro" ||
+    sessionUser?.role === "admin";
 
   async function handleClick() {
     setError(null);

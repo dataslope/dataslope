@@ -21,8 +21,10 @@
  * route handlers / server components instead.
  */
 import { betterAuth } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
 import { admin } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
+import { promoteConfiguredAdmins } from "@/lib/auth/adminBootstrap";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
 import { polarPlugin } from "@/lib/billing/polar";
 
@@ -46,6 +48,12 @@ export function parseList(raw: string | undefined): string[] {
  *     admin plugin only understands user *ids*, so we resolve emails → ids
  *     against D1 here.
  *   - `ADMIN_USER_IDS` — literal Better Auth user ids (no DB lookup needed).
+ *
+ * Signing in additionally *promotes* a config-listed user's `role` column to
+ * 'admin' (see the sign-in hooks in createAuth), so the session the client
+ * reads — the avatar menu's /admin shortcut, the account page's Pro display,
+ * the Pro tier in lib/ai/tier.ts — reflects admin status without hand-editing
+ * D1. These allowlists then act as the safety net for endpoints in between.
  *
  * The email→id lookup is one indexed D1 read, and `adminUserIds` is only ever
  * consulted inside the admin plugin's own endpoints (`/api/auth/admin/*`). So
@@ -86,7 +94,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
   // requests can land on different Worker isolates or straddle a new deployment.
   // If the secret differs across the round-trip, the signature no longer
   // verifies, Better Auth treats the state cookie as missing, and the sign-in
-  // aborts to `/?error=state_mismatch` (the user silently ends up signed out).
+  // aborts with `error=state_mismatch` (the user silently ends up signed out).
   //
   // Passing `undefined` here does NOT fail — Better Auth falls back to a
   // built-in key whose selection depends on `process.env.NODE_ENV`, which is not
@@ -167,6 +175,18 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
       }
       return origins;
     },
+    // Where failed OAuth callbacks land. Without this, Better Auth bounces
+    // them through its built-in /api/auth/error page, which in production
+    // redirects to `/?error=<code>` — stranding codes like `state_mismatch`
+    // in the home page URL with no UI that reads them. The most common
+    // occurrence isn't even a real failure: a *duplicate* callback request
+    // (back button, browser re-fetch) whose one-time state was already
+    // consumed by the request that signed the user in, so they're signed in
+    // yet parked on `/?error=state_mismatch`. Land on /sign-in instead:
+    // SignInClient strips the code from the URL and shows friendly copy for
+    // genuine failures, while an already-signed-in visitor (the duplicate-
+    // callback case) is immediately redirected on to /account.
+    onAPIError: { errorURL: "/sign-in" },
     // Email + password sign-in. Passwords are hashed by Better Auth and stored
     // in the `account` table (providerId "credential") — the existing schema
     // already has the `password` column, so no migration change is needed.
@@ -210,6 +230,54 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
           required: false,
           defaultValue: "free",
           input: false,
+        },
+      },
+    },
+    // Complete the ADMIN_EMAILS / ADMIN_USER_IDS bootstrap: config-listed
+    // admins get their `role` column promoted to 'admin' when they sign in,
+    // so the session the client reads carries admin status — which surfaces
+    // the /admin shortcut in the avatar menu and, since admins are treated
+    // as Pro (lib/ai/tier.ts), the full Pro feature set. See
+    // lib/auth/adminBootstrap.ts for the promotion semantics (one-way,
+    // no-op for everyone not config-listed).
+    //
+    // The promotion runs as a request-level *before* hook on the sign-in and
+    // OAuth-callback endpoints — not a session.create database hook — so the
+    // role is already 'admin' when the handler reads the user row. That
+    // matters because the handler seeds the 5-minute session cookie cache
+    // from that read: a database hook fires after the read, which would leave
+    // a freshly signed-in admin looking like a plain user until the cache
+    // expired. Sign-in requests are rare, so this stays off the hot
+    // get-session path.
+    hooks: {
+      before: createAuthMiddleware(async (ctx) => {
+        if (!ctx.path.startsWith("/sign-in") && !ctx.path.startsWith("/callback")) {
+          return;
+        }
+        try {
+          await promoteConfiguredAdmins(env.DB, {
+            adminUserIds: parseList(env.ADMIN_USER_IDS),
+            adminEmails: parseList(env.ADMIN_EMAILS),
+          });
+        } catch {
+          // Best-effort: a failed promotion must never abort a sign-in.
+        }
+      }),
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          // New sign-ups don't have a row for the hook above to promote —
+          // write role 'admin' into the INSERT itself, so even the first
+          // session's cookie cache carries the admin role.
+          before: async (user) => {
+            const email = (user.email ?? "").toLowerCase();
+            const isConfigAdmin = parseList(env.ADMIN_EMAILS)
+              .map((e) => e.toLowerCase())
+              .includes(email);
+            if (!isConfigAdmin) return;
+            return { data: { ...user, role: "admin" } };
+          },
         },
       },
     },

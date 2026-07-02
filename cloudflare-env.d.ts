@@ -89,7 +89,11 @@ declare global {
     // Admins for /admin, regardless of their `role` column (bootstraps the
     // first admin). Both are comma-separated and merge; specify whichever is
     // handier. ADMIN_EMAILS is resolved to user IDs against D1 (see
-    // resolveAdminUserIds in lib/auth/server.ts).
+    // resolveAdminUserIds in lib/auth/server.ts). Signing in while listed
+    // promotes the user's `role` column to 'admin' (sign-in hooks in
+    // lib/auth/server.ts + lib/auth/adminBootstrap.ts), which surfaces the
+    // /admin shortcut in the avatar menu and the Pro tier (lib/ai/tier.ts)
+    // on their session.
     ADMIN_EMAILS?: string;
     ADMIN_USER_IDS?: string;
   }

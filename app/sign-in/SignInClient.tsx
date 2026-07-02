@@ -15,6 +15,26 @@ import styles from "../_components/auth/authCard.module.css";
 /** Where to land after a successful sign-in. */
 const CALLBACK_URL = "/account";
 
+/**
+ * Friendly copy for the `?error=<code>` a failed OAuth callback forwards here
+ * (see `onAPIError` in lib/auth/server.ts). The dominant code,
+ * `state_mismatch`, is usually a *duplicate* callback request whose one-time
+ * state was already consumed by the request that signed the user in — in that
+ * case a session exists and the signed-in redirect below whisks the visitor to
+ * /account before any copy renders. When one of these does render, the sign-in
+ * genuinely failed and retrying is the fix.
+ */
+const STALE_ATTEMPT_COPY =
+  "That sign-in attempt expired or was already used. Please try again.";
+const AUTH_ERROR_COPY: Record<string, string> = {
+  state_mismatch: STALE_ATTEMPT_COPY,
+  state_not_found: STALE_ATTEMPT_COPY,
+  state_invalid: STALE_ATTEMPT_COPY,
+  access_denied: "Sign-in was cancelled before it completed. Please try again.",
+};
+const AUTH_ERROR_FALLBACK =
+  "Something went wrong during sign-in. Please try again.";
+
 /** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
 const MIN_PASSWORD = 8;
 
@@ -104,6 +124,27 @@ export function SignInClient() {
   useEffect(() => {
     if (!isPending && session) router.replace(CALLBACK_URL);
   }, [isPending, session, router]);
+
+  // Surface a forwarded OAuth-callback failure (`/sign-in?error=<code>`) and
+  // scrub the code from the address bar so it doesn't linger through reloads,
+  // bookmarks, or copied links. Read via window.location (not useSearchParams)
+  // so the page keeps prerendering statically without a Suspense boundary —
+  // same pattern as the checkout return in app/account/AccountClient.tsx.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
+    if (!code) return;
+    params.delete("error");
+    params.delete("error_description");
+    const rest = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${rest ? `?${rest}` : ""}${window.location.hash}`,
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
+    setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
+  }, []);
 
   if (!isPending && session) {
     return <p className={styles.redirecting}>Redirecting to your account…</p>;
