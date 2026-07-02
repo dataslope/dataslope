@@ -33,6 +33,7 @@ import {
 import { Popover } from "@base-ui-components/react/popover";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Menu } from "@base-ui-components/react/menu";
 import { Drawer } from "@base-ui/react/drawer";
 import {
   Check,
@@ -44,6 +45,7 @@ import {
   Folder,
   FolderDown,
   HardDrive,
+  Info,
   Loader2,
   LogIn,
   Pencil,
@@ -207,7 +209,12 @@ export function WorkspaceBadge({
   buildBundle,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  // The Save menu's dialog: "local" names the draft; "both" also backs the
+  // freshly-saved workspace up to the account afterwards.
+  const [saveDialogMode, setSaveDialogMode] = useState<
+    "local" | "both" | null
+  >(null);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [internalManagerOpen, setInternalManagerOpen] = useState(false);
   // Controlled when the host passes `managerOpen`/`onManagerOpenChange`
   // (the mobile hamburger does), otherwise self-managed.
@@ -312,6 +319,10 @@ export function WorkspaceBadge({
     () => registry.find((e) => e.id === activeWorkspaceId),
     [registry, activeWorkspaceId],
   );
+  // Not in the registry → an unsaved draft. "Save locally" names it; once
+  // registered, local persistence is automatic (OPFS), so the Save menu's
+  // local option flips to a passive "saved" state.
+  const isDraft = !activeEntry;
   const activeMeta = activeWorkspaceId
     ? cloudById.get(activeWorkspaceId)
     : undefined;
@@ -408,8 +419,27 @@ export function WorkspaceBadge({
           <Popover.Positioner sideOffset={6} align="start" className="playground-header-positioner">
             <Popover.Popup className="bui-popup workspace-popover">
               <div className="workspace-popover-header">
-                Workspaces for {playgroundLabel(playgroundId)}
+                <span>Workspaces for {playgroundLabel(playgroundId)}</span>
+                <button
+                  type="button"
+                  className="workspace-popover-info-btn"
+                  aria-label="How workspaces and backups work"
+                  aria-expanded={infoOpen}
+                  title="How workspaces and backups work"
+                  onClick={() => setInfoOpen((v) => !v)}
+                >
+                  <Info size={13} aria-hidden="true" />
+                </button>
               </div>
+              {infoOpen && (
+                <div className="workspace-popover-info">
+                  Workspaces are separate copies of this playground&rsquo;s
+                  files{isSqlPlayground(playgroundId) ? " and database" : ""},
+                  auto-saved in this browser as you work. Backing up puts a
+                  snapshot on your account so you can open it on any device —
+                  it only changes when you back up again.
+                </div>
+              )}
               <div className="workspace-popover-body">
                 {recent.length === 0 && (
                   <div className="workspace-popover-empty">
@@ -454,7 +484,7 @@ export function WorkspaceBadge({
                 {showCloud && cloudOnly.length > 0 && (
                   <>
                     <div className="workspace-popover-subheader">
-                      On your account — not on this device
+                      Cloud — not on this device
                     </div>
                     {cloudOnly.map((meta) => (
                       <button
@@ -550,7 +580,7 @@ export function WorkspaceBadge({
                   }}
                 >
                   <Plus size={12} aria-hidden="true" />
-                  <span>New workspace</span>
+                  <span>New</span>
                 </button>
                 <button
                   type="button"
@@ -566,26 +596,112 @@ export function WorkspaceBadge({
         </Popover.Portal>
       </Popover.Root>
 
-      {unsaved && onSave && (
-        <button
-          type="button"
-          className="workspace-save-btn"
-          onClick={() => setSaveDialogOpen(true)}
-          title="Save this workspace so it appears in your list"
-        >
-          <Save size={12} aria-hidden="true" />
-          <span>Save</span>
-        </button>
+      {onSave && (
+        <Menu.Root>
+          <Menu.Trigger
+            className={`workspace-save-btn${unsaved ? "" : " quiet"}`}
+            title="Save this workspace — locally, to your account, or both"
+          >
+            <Save size={12} aria-hidden="true" />
+            <span>Save</span>
+            <svg viewBox="0 0 12 12" width={9} height={9} aria-hidden="true">
+              <polyline
+                points="2,4 6,8 10,4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner
+              sideOffset={6}
+              align="start"
+              className="playground-header-positioner"
+            >
+              <Menu.Popup className="bui-popup workspace-save-menu">
+                <Menu.Item
+                  className="example-item"
+                  disabled={!isDraft}
+                  onClick={() => {
+                    if (isDraft) setSaveDialogMode("local");
+                  }}
+                >
+                  <div className="ex-title">
+                    {isDraft ? "Save locally…" : "Saved locally"}
+                  </div>
+                  <div className="ex-desc">
+                    {isDraft
+                      ? "Name this workspace and keep it in this browser"
+                      : "Auto-saves in this browser as you work"}
+                  </div>
+                </Menu.Item>
+                {cloud.available &&
+                  (cloud.signedOut ? (
+                    <Menu.Item
+                      className="example-item"
+                      render={<a href="/sign-in" />}
+                    >
+                      <div className="ex-title">Back up to cloud</div>
+                      <div className="ex-desc">
+                        Sign in to keep a copy on your account
+                      </div>
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item
+                      className="example-item"
+                      disabled={backupBusy || !activeWorkspaceId || !buildBundle}
+                      onClick={() => void handleBackUp()}
+                    >
+                      <div className="ex-title">Back up to cloud</div>
+                      <div className="ex-desc">
+                        {backupBusy
+                          ? "Backing up…"
+                          : "Keep a snapshot on your account"}
+                      </div>
+                    </Menu.Item>
+                  ))}
+                {cloud.available && (
+                  <Menu.Item
+                    className="example-item"
+                    disabled={
+                      !isDraft || cloud.signedOut || backupBusy || !buildBundle
+                    }
+                    onClick={() => {
+                      if (isDraft && !cloud.signedOut) {
+                        setSaveDialogMode("both");
+                      }
+                    }}
+                  >
+                    <div className="ex-title">Save locally + back up</div>
+                    <div className="ex-desc">
+                      {!isDraft
+                        ? "Already saved locally — use “Back up to cloud”"
+                        : cloud.signedOut
+                          ? "Sign in to enable cloud backups"
+                          : "Name it here and keep a copy on your account"}
+                    </div>
+                  </Menu.Item>
+                )}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
       )}
 
       <SaveWorkspaceDialog
-        open={saveDialogOpen}
+        open={saveDialogMode !== null}
+        alsoBackUp={saveDialogMode === "both"}
         defaultName={defaultWorkspaceName(registry, playgroundId)}
-        onClose={() => setSaveDialogOpen(false)}
+        onClose={() => setSaveDialogMode(null)}
         onConfirm={async (name) => {
-          setSaveDialogOpen(false);
+          const mode = saveDialogMode;
+          setSaveDialogMode(null);
           await onSave?.(name);
           refreshRegistry();
+          // The draft keeps its id when promoted, so the backup lands on
+          // the same workspace the badge is showing.
+          if (mode === "both") await handleBackUp();
         }}
       />
 
@@ -605,11 +721,15 @@ export function WorkspaceBadge({
 
 function SaveWorkspaceDialog({
   open,
+  alsoBackUp,
   defaultName,
   onClose,
   onConfirm,
 }: {
   open: boolean;
+  /** True for the Save menu's "Save locally + back up" path — the copy and
+   *  the primary button reflect that a cloud backup follows the save. */
+  alsoBackUp: boolean;
   defaultName: string;
   onClose: () => void;
   onConfirm: (name: string) => void | Promise<void>;
@@ -626,9 +746,9 @@ function SaveWorkspaceDialog({
         <Dialog.Popup className="confirm-popup sql-rename-popup">
           <Dialog.Title className="confirm-title">Save workspace</Dialog.Title>
           <Dialog.Description className="confirm-desc">
-            Give this workspace a name to add it to your saved list. Saved
-            workspaces live in this browser — use “Back up” in the workspace
-            menu to keep a copy on your account.
+            {alsoBackUp
+              ? "Give this workspace a name to add it to your saved list. It stays in this browser, and a snapshot is backed up to your account."
+              : "Give this workspace a name to add it to your saved list. Saved workspaces live in this browser — use “Back up to cloud” in the Save menu to keep a copy on your account."}
           </Dialog.Description>
           <form
             className="sql-rename-form"
@@ -649,7 +769,7 @@ function SaveWorkspaceDialog({
                 Cancel
               </Dialog.Close>
               <button type="submit" className="confirm-btn confirm-btn-primary">
-                Save
+                {alsoBackUp ? "Save & back up" : "Save"}
               </button>
             </div>
           </form>
@@ -1106,7 +1226,7 @@ function WorkspaceManagerDrawer({
                   {showCloud && cloudOnly.length > 0 && (
                     <>
                       <div className="workspace-manager-cloud-header">
-                        On your account — not on this device
+                        Cloud — not on this device
                       </div>
                       {cloudOnly.map((meta) => (
                         <div key={meta.id} className="workspace-manager-item">

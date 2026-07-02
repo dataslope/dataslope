@@ -2766,9 +2766,10 @@ input[type="range"].fs-slider:disabled {
     display: none;
   }
 
-  /* The workspace badge moves into the hamburger menu on mobile so the
-     header keeps just the logo, language switcher, and menu button. */
-  .workspace-badge {
+  /* The workspace badge + save menu move into the hamburger menu on mobile
+     so the header keeps just the logo, language switcher, and menu button. */
+  .workspace-badge,
+  .workspace-save-btn {
     display: none;
   }
 
@@ -4047,14 +4048,15 @@ html[data-playground-theme="dark"] .welcome h3 {
   background: var(--yellow);
 }
 
-/* Save button — shown next to the badge only when the active workspace is an
-   unsaved draft the user has changed. Accent-filled so it reads as the call to
-   action (the draft isn't in the saved list until it's clicked). */
+/* Save menu trigger — sits next to the badge on every playground. Accent-
+   filled while the active workspace is an unsaved draft with changes (the
+   call to action: it isn't in the saved list yet); otherwise the `quiet`
+   variant matches the badge pill. */
 .workspace-save-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-left: 6px;
+  margin-left: 8px;
   padding: 4px 10px;
   background: var(--primary);
   border: 1px solid var(--primary);
@@ -4073,6 +4075,36 @@ html[data-playground-theme="dark"] .welcome h3 {
   background: color-mix(in srgb, var(--primary) 88%, #000);
 }
 
+.workspace-save-btn.quiet {
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  border-color: var(--border);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.workspace-save-btn.quiet:hover {
+  background: var(--bg);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+/* Save destination menu (local / cloud / both). Items reuse the shared
+   .example-item title + description treatment. */
+.workspace-save-menu {
+  min-width: 260px;
+}
+.workspace-save-menu .example-item[data-disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.workspace-save-menu .example-item[data-disabled]:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+.workspace-save-menu .example-item {
+  display: block;
+  text-decoration: none;
+}
+
 .workspace-popover {
   min-width: 260px;
   max-width: 320px;
@@ -4081,13 +4113,48 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .workspace-popover-header {
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 8px 9px 12px;
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Toggles the inline explainer below the header. */
+.workspace-popover-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.workspace-popover-info-btn:hover,
+.workspace-popover-info-btn[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+/* Inline explainer: how local workspaces and cloud backups relate. */
+.workspace-popover-info {
+  padding: 10px 12px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   border-bottom: 1px solid var(--border);
 }
 
@@ -4153,10 +4220,11 @@ html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text-dim);
 }
 
-/* Section label separating cloud-only rows ("on your account, not on this
-   device") from the local recents above them. */
+/* Section label separating cloud-only rows ("Cloud — not on this device")
+   from the local recents above them. */
 .workspace-popover-subheader {
-  padding: 8px 12px 4px;
+  margin-top: 4px;
+  padding: 10px 12px 6px;
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 600;
@@ -4181,11 +4249,11 @@ html[data-playground-theme="dark"] .welcome h3 {
    one "Back up" action for the active workspace plus its status, the
    usage line, and inline errors. */
 .workspace-popover-cloud {
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 .workspace-popover-cloud-row {
   display: flex;
@@ -4381,7 +4449,8 @@ html[data-playground-theme="dark"] .welcome h3 {
 
 .workspace-manager-item-meta {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 2px 6px;
   font-size: 11px;
   color: var(--text-dim);
   font-family: var(--font-ui);
@@ -4390,46 +4459,45 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-item-actions {
   display: flex;
   flex-wrap: wrap;
-  /* No gap — consecutive actions are separated by a subtle divider
-     (border-left below) instead of pills with their own borders. */
-  gap: 0;
+  /* Chip buttons carry their own borders, so wrapping onto a second line
+     reads as an intentional grid (the old borderless buttons with
+     border-left dividers looked broken when they wrapped). */
+  gap: 6px;
   /* Spacing above the row of actions. */
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .workspace-manager-action {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   padding: 4px 10px;
-  background: transparent;
-  border: none;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 999px;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
-}
-
-/* The first action aligns flush with the content above it. */
-.workspace-manager-action:first-child {
-  padding-left: 0;
-}
-
-/* Subtle divider between consecutive actions (Export · Rename · …). */
-.workspace-manager-action + .workspace-manager-action {
-  border-left: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
 }
 
 .workspace-manager-action:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+  border-color: var(--border);
 }
 
 .workspace-manager-action.danger {
   color: var(--danger, #e57373);
+  border-color: color-mix(in srgb, var(--danger, #e57373) 30%, transparent);
 }
 
 .workspace-manager-action.danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--danger, #e57373) 14%, transparent);
+  background: color-mix(in srgb, var(--danger, #e57373) 12%, transparent);
+  border-color: color-mix(in srgb, var(--danger, #e57373) 50%, transparent);
 }
 
 .workspace-manager-action:disabled {
