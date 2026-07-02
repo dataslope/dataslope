@@ -57,3 +57,13 @@ export const PLOTLY_CDN = `https://cdn.jsdelivr.net/npm/plotly.js-dist-min@${PLO
 // CDN base at runtime. Keep MERMAID_VERSION in sync with package.json.
 export const MERMAID_VERSION = "11.15.0";
 export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/+esm`;
+
+// The TypeScript compiler (~2 MB gz) powers JS/TS intellisense inside a
+// dedicated worker (see ts-language-worker.ts). Loaded from jsDelivr via
+// importScripts — same rationale as Pyodide: it stays out of the client
+// chunks and only downloads when a JS/TS editor first requests a
+// completion. The lib.*.d.ts standard-library declarations come from the
+// same pinned package. Keep TYPESCRIPT_VERSION in sync with the
+// `typescript` version pinned in package.json.
+export const TYPESCRIPT_VERSION = "5.7.3";
+export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;

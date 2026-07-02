@@ -76,8 +76,19 @@ import {
   indentOnInput,
   indentUnit,
 } from "@codemirror/language";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import {
+  acceptCompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+} from "@codemirror/autocomplete";
 import { themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
+import {
+  makeSqlAutocompletionExtension,
+  makeSqlLangExtension,
+} from "./sql/shared/editorSetup";
+import { introspectSqlSchemas } from "./sql/shared/schemaIntrospect";
 import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
@@ -1076,6 +1087,10 @@ export default function SqlChallengeCard({
   // reconfigure the CM theme without remounting the editor.
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
+  // Lang/completion compartments — stored so the completion-schema
+  // refresh can reconfigure without remounting the editor.
+  const langCompRef = useRef<Compartment | null>(null);
+  const completionCompRef = useRef<Compartment | null>(null);
   // Debounce handle for localStorage persistence (see editor mount).
   const persistSaveTimerRef = useRef<number | null>(null);
 
@@ -1143,6 +1158,7 @@ export default function SqlChallengeCard({
     if (!editorHostRef.current || editorRef.current) return;
     const themeComp = new Compartment();
     const languageComp = new Compartment();
+    const completionComp = new Compartment();
 
     // Restore any previously-saved SQL buffer; fall back to the MDX
     // starter when nothing is stored.
@@ -1166,6 +1182,11 @@ export default function SqlChallengeCard({
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,
+        // Schema-aware completion (same engine as the SQL playgrounds).
+        // Seeded with an empty schema so keyword completion works right
+        // away; reconfigured with live tables/columns once the card's
+        // engine boots — see `refreshCompletionSchema` below.
+        completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
             // Default keyboard action mirrors the split button:
@@ -1188,7 +1209,19 @@ export default function SqlChallengeCard({
               return true;
             },
           },
+          {
+            key: "Ctrl-Space",
+            run: (v) => {
+              startCompletion(v);
+              return true;
+            },
+          },
           ...closeBracketsKeymap,
+          // Completion keys before `defaultKeymap` so arrows move the
+          // popup selection. Enter is removed so it always inserts a
+          // newline; Tab accepts instead — matching the SQL playgrounds.
+          ...completionKeymap.filter((b) => b.key !== "Enter"),
+          { key: "Tab", run: acceptCompletion },
           ...defaultKeymap,
           ...historyKeymap,
           ...redoKeymap,
@@ -1212,12 +1245,14 @@ export default function SqlChallengeCard({
     });
     editorRef.current = view;
     mainThemeCompRef.current = themeComp;
+    langCompRef.current = languageComp;
+    completionCompRef.current = completionComp;
 
     void (async () => {
       try {
-        const { sql } = await import("@codemirror/lang-sql");
+        const langExt = await makeSqlLangExtension(dialect);
         if (editorRef.current === view) {
-          view.dispatch({ effects: languageComp.reconfigure(sql()) });
+          view.dispatch({ effects: languageComp.reconfigure(langExt) });
         }
       } catch {
         // SQL language extension is optional — editor still works
@@ -1235,9 +1270,39 @@ export default function SqlChallengeCard({
       view.destroy();
       editorRef.current = null;
       mainThemeCompRef.current = null;
+      langCompRef.current = null;
+      completionCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Rebuild the completion schema (and lang-sql's copy) from the live
+  // database. Called after engine boot and after every run/submit, so
+  // tables the challenge SQL creates complete immediately. Best-effort:
+  // failures leave the previous schema in place.
+  const refreshCompletionSchema = useCallback(
+    async (engine: SqlEngineLike) => {
+      try {
+        const schemas = await introspectSqlSchemas(engine.exec, dialect);
+        const view = editorRef.current;
+        const completionComp = completionCompRef.current;
+        const langComp = langCompRef.current;
+        if (!view || !completionComp || !langComp) return;
+        const langExt = await makeSqlLangExtension(dialect, schemas.langSchema);
+        view.dispatch({
+          effects: [
+            completionComp.reconfigure(
+              makeSqlAutocompletionExtension(schemas.completion, dialect),
+            ),
+            langComp.reconfigure(langExt),
+          ],
+        });
+      } catch {
+        // Completion schema is a nicety — never surface as an error.
+      }
+    },
+    [dialect],
+  );
 
   // Sync the CodeMirror theme whenever the docs colour scheme toggles
   // (Fumadocs dark/light toggle or OS preference change).
@@ -1330,17 +1395,21 @@ export default function SqlChallengeCard({
 
   // Eagerly boot the engine on mount so the table viewer can populate
   // before the learner clicks Run. The engine is per-card and isolated,
-  // so doing this once per mount is safe.
+  // so doing this once per mount is safe. The completion schema
+  // piggybacks on the same boot.
   useEffect(() => {
     if (!tableViewerEnabled) return;
     void ensureEngine()
-      .then((engine) => refreshTableViewer(engine))
+      .then((engine) => {
+        void refreshCompletionSchema(engine);
+        return refreshTableViewer(engine);
+      })
       .catch(() => {
         // Lower the skeleton so it doesn't spin forever; per-table
         // errors surface in their own column once a run succeeds.
         markTablesInitDone();
       });
-  }, [ensureEngine, refreshTableViewer, tableViewerEnabled, markTablesInitDone]);
+  }, [ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled, markTablesInitDone]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   /**
@@ -1430,13 +1499,14 @@ export default function SqlChallengeCard({
       }
       setStatus("ready");
       setStatusMessage("Done");
-      if (tableViewerEnabled) {
-        try {
-          const engine = await ensureEngine();
-          await refreshTableViewer(engine);
-        } catch {
-          /* viewer refresh failure shouldn't mask the run's success */
-        }
+      // The run may have created/dropped tables — refresh the
+      // completion schema (and the viewer when enabled).
+      try {
+        const engine = await ensureEngine();
+        void refreshCompletionSchema(engine);
+        if (tableViewerEnabled) await refreshTableViewer(engine);
+      } catch {
+        /* viewer refresh failure shouldn't mask the run's success */
       }
     } catch (err) {
       if (runSeqRef.current !== mySeq) return;
@@ -1450,7 +1520,7 @@ export default function SqlChallengeCard({
       // clearing it would re-enable Submit mid-flight for its successor.
       if (runSeqRef.current === mySeq) setActiveAction(null);
     }
-  }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
+  }, [executeSql, ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
@@ -1618,6 +1688,7 @@ export default function SqlChallengeCard({
     setStatusMessage(
       allPass ? "All tests passed" : `${passed}/${displayed.length} passed`,
     );
+    void refreshCompletionSchema(engine);
     if (tableViewerEnabled) {
       try {
         await refreshTableViewer(engine);
@@ -1629,7 +1700,7 @@ export default function SqlChallengeCard({
       // Only the latest submission owns the busy spinner (see `run`).
       if (runSeqRef.current === mySeq) setActiveAction(null);
     }
-  }, [canCheck, ensureEngine, executeSql, refreshTableViewer, solutionSql, tableViewerEnabled, tests]);
+  }, [canCheck, ensureEngine, executeSql, refreshTableViewer, refreshCompletionSchema, solutionSql, tableViewerEnabled, tests]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
   useEffect(() => {
@@ -1745,13 +1816,16 @@ export default function SqlChallengeCard({
     clearTableViewer();
     if (tableViewerEnabled) {
       void ensureEngine()
-        .then((engine) => refreshTableViewer(engine))
+        .then((engine) => {
+          void refreshCompletionSchema(engine);
+          return refreshTableViewer(engine);
+        })
         .catch(() => {
           /* see mount-time bootstrap */
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, refreshCompletionSchema, clearTableViewer, tableViewerEnabled, toasts]);
 
   // ─── Apply solution ─────────────────────────────────────────────────
   // Load the reference SQL into the learner's editor (the "Load Solution

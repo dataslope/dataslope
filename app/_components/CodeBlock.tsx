@@ -41,6 +41,7 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
+import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
   LanguageAdapter,
@@ -590,6 +591,17 @@ function CodeBlockInner({
         EditorState.tabSize.of(adapter.indentWidth),
         indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
+        // Intellisense: runtime-backed + static completion sources,
+        // trigger characters, and the completion keymap. The runtime
+        // attaches lazily (warm-up or first Run); until then the static
+        // sources answer. The active file's read-only init code is
+        // prepended so whole-file analyzers see the names it defines.
+        languageCompletion({
+          adapterId: adapter.id,
+          getRuntime: () => runtimeRef.current,
+          getContextPrefix: () => initForFile(activeFilenameRef.current),
+          getFilename: () => activeFilenameRef.current,
+        }),
         keymap.of([
           {
             key: "Mod-Enter",

@@ -1,4 +1,6 @@
 import type {
+  CompletionListItem,
+  CompletionRequest,
   CompletionResult,
   EmitOutput,
   ExampleSnippet,
@@ -677,7 +679,7 @@ type WorkerOutMessage =
   | {
       kind: "complete-result";
       id: number;
-      completions: string[];
+      completions: CompletionListItem[];
       replaceLength: number;
     };
 
@@ -767,7 +769,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
     });
   }
 
-  async complete(line: string, column: number): Promise<CompletionResult> {
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
     const id = ++this.nextId;
     return new Promise<CompletionResult>((resolve) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -778,7 +780,14 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         resolve({ list: msg.completions, replaceLength: msg.replaceLength });
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "complete", id, line, column });
+      this.worker.postMessage({
+        kind: "complete",
+        id,
+        doc: request.doc,
+        lineNumber: request.lineNumber,
+        line: request.line,
+        column: request.column,
+      });
     });
   }
 
