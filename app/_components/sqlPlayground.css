@@ -4566,9 +4566,6 @@
     padding: 0 10px;
     overflow: hidden;
   }
-  .playground-header .brand-name {
-    display: none;
-  }
   .playground-header .workspace-badge {
     /* Hidden on mobile — the workspace lives in the hamburger drawer.
        Higher specificity than playground.css's `.workspace-badge` hide,

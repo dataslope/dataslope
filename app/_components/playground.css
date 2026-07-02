@@ -177,19 +177,6 @@ body.playground-active {
   display: block;
 }
 
-/* Placeholder text for the DataSlope brand mark. Sits in the slot
-   where the per-language logo tile used to live; will be swapped for
-   an actual logo image once available. Rendered as an anchor linking
-   to the home page. */
-.brand-name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--text);
-  letter-spacing: -0.01em;
-  text-decoration: none;
-}
-
 .header-sep {
   flex: 1;
 }
@@ -2826,17 +2813,13 @@ input[type="range"].fs-slider:disabled {
     display: none;
   }
 
-  /* Let the header fit a phone: drop the "Dataslope" wordmark (the logo
-     icon stays) and let the logo group + workspace badge shrink/truncate
-     so the language switcher, badge, and menu button all stay on one row
-     without forcing the layout wider than the viewport. */
+  /* Let the header fit a phone: let the logo group + workspace badge
+     shrink/truncate so the language switcher, badge, and menu button all
+     stay on one row without forcing the layout wider than the viewport. */
   .playground-header,
   .logo,
   .workspace-badge {
     min-width: 0;
-  }
-  .brand-name {
-    display: none;
   }
 
   /* Hide the CodeMirror line-number gutter on mobile so the code takes
