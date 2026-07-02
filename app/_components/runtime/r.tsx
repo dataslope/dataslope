@@ -1,4 +1,7 @@
 import type {
+  CompletionListItem,
+  CompletionRequest,
+  CompletionResult,
   EmitOutput,
   ExampleSnippet,
   LanguageAdapter,
@@ -566,7 +569,10 @@ interface WebRInstance {
   FS: WebRFS;
   init(): Promise<void>;
   evalRVoid(code: string): Promise<void>;
+  evalRString(code: string): Promise<string>;
   installPackages(pkgs: string[]): Promise<void>;
+  /** Shuts down the webR session and terminates its worker. */
+  close(): Promise<void>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -850,8 +856,101 @@ class WebRRuntime implements LanguageRuntime {
   // Absolute FS paths written during the previous prepareFileSystem call.
   // Used to remove stale files when tabs are renamed or deleted.
   private stagedPaths = new Set<string>();
+  // One-time `rc.settings` setup for the completion engine; false when
+  // it failed (completions then stay empty for the session).
+  private completionSetup: Promise<boolean> | null = null;
 
   constructor(private webR: WebRInstance) {}
+
+  /** Free the R heap by shutting the webR session down. Registry-eviction
+   *  hook — the instance must not be used after this. Also un-registers
+   *  this session from the styler formatter so a later Format click
+   *  starts a fresh session instead of talking to a dead one. */
+  dispose(): void {
+    releaseFormatterSession(this.webR);
+    void this.webR.close().catch(() => {});
+  }
+
+  // ─── Autocomplete via R's own completion engine ───────────────────────
+  //
+  // R ships a readline-oriented completion engine in `utils` (the same
+  // one Rgui/ESS use). WebR exposes it like any other R code, so
+  // completions cover keywords, base functions, user globals from the
+  // previous run, package exports (`::`), list/data.frame components
+  // (`$`), and function arguments (`name=`) — with zero extra download.
+  // This mirrors the official webR REPL's CodeMirror wiring.
+
+  private ensureCompletionSetup(): Promise<boolean> {
+    if (!this.completionSetup) {
+      this.completionSetup = this.webR
+        .evalRVoid(
+          // func = TRUE appends "(" to function completions (stripped
+          // below, but it's what tells us the completion IS a function);
+          // fuzzy stays off — CodeMirror does its own fuzzy filtering.
+          "utils::rc.settings(ops = TRUE, ns = TRUE, args = TRUE, func = TRUE, fuzzy = FALSE)",
+        )
+        .then(
+          () => true,
+          () => false,
+        );
+    }
+    return this.completionSetup;
+  }
+
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
+    const empty: CompletionResult = { list: [], replaceLength: 0 };
+    if (!(await this.ensureCompletionSetup())) return empty;
+
+    const lineToCursor = request.line.slice(0, request.column);
+    if (!lineToCursor.trim() && !request.explicit) return empty;
+
+    // Drive the engine exactly like R's own console: assign the line
+    // buffer + cursor, let R guess the token, complete it, and read the
+    // results back joined on a separator no completion can contain.
+    // `JSON.stringify` produces escaping that is also valid in an R
+    // string literal, so the user's line never breaks the R code.
+    const rCode = `local({
+  lb <- ${JSON.stringify(lineToCursor)}
+  utils:::.assignLinebuffer(lb)
+  utils:::.assignEnd(nchar(lb))
+  token <- utils:::.guessTokenFromLine()
+  utils:::.completeToken()
+  comps <- utils:::.retrieveCompletions()
+  paste(c(token, comps), collapse = "\\x1f")
+})`;
+
+    let raw: string;
+    try {
+      raw = await this.webR.evalRString(rCode);
+    } catch {
+      return empty;
+    }
+
+    const parts = raw.split("\x1f");
+    const token = parts[0] ?? "";
+    if (!token && !request.explicit) return empty;
+
+    // R annotates completions by suffix: `name=` is a function
+    // argument, `name(` a function, `pkg::` a namespace.
+    const byLabel = new Map<string, CompletionListItem>();
+    for (const comp of parts.slice(1)) {
+      if (!comp) continue;
+      let item: CompletionListItem;
+      if (comp.endsWith("=")) {
+        item = { label: comp, type: "variable", detail: "argument", boost: 5 };
+      } else if (comp.endsWith("(")) {
+        item = { label: comp.slice(0, -1), type: "function" };
+      } else if (comp.endsWith("::")) {
+        item = { label: comp, type: "namespace" };
+      } else {
+        item = { label: comp, type: "variable" };
+      }
+      const label = typeof item === "string" ? item : item.label;
+      if (!byLabel.has(label)) byLabel.set(label, item);
+    }
+
+    return { list: [...byLabel.values()], replaceLength: token.length };
+  }
 
   private joinStagedPath(relPath: string): string {
     const trimmed = relPath.replace(/^\/+/, "");
@@ -1118,6 +1217,14 @@ unlink("${CREATED_FILES_PATH}")`,
 
 let activeWebR: WebRInstance | null = null;
 let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;
+
+/** Forget `webR` if the formatter is set to reuse it — called when the
+ *  runtime that owns the session is disposed (registry eviction), so a
+ *  later Format click lazily starts a fresh session instead of hitting a
+ *  terminated worker. */
+function releaseFormatterSession(webR: WebRInstance): void {
+  if (activeWebR === webR) activeWebR = null;
+}
 
 // Sessions that already have {styler} installed and configured, so we install
 // it at most once each. Keyed weakly so sessions can still be garbage-collected.

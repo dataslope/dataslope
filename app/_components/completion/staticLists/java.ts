@@ -1,0 +1,165 @@
+import { snippetCompletion, type Completion } from "@codemirror/autocomplete";
+
+// Static completion tier for the Java playground surfaces. No client-side
+// Java language server exists (Eclipse JDT-LS has no browser port — see
+// the feasibility report in agent-outputs/), so this is keywords, the
+// common JDK vocabulary, and a few high-value snippets; document-word
+// completion (wired in `languageCompletion.ts`) covers the rest.
+
+const kw = (label: string): Completion => ({ label, type: "keyword" });
+const ty = (label: string, detail?: string): Completion => ({
+  label,
+  type: "class",
+  detail,
+});
+const fn = (label: string, detail: string): Completion => ({
+  label,
+  type: "function",
+  detail,
+});
+
+const JAVA_KEYWORDS: readonly Completion[] = [
+  "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
+  "class", "const", "continue", "default", "do", "double", "else", "enum",
+  "extends", "final", "finally", "float", "for", "if", "implements",
+  "import", "instanceof", "int", "interface", "long", "native", "new",
+  "package", "private", "protected", "public", "record", "return", "sealed",
+  "short", "static", "strictfp", "super", "switch", "synchronized", "this",
+  "throw", "throws", "transient", "try", "var", "void", "volatile", "while",
+  "yield", "true", "false", "null",
+].map(kw);
+
+const JAVA_TYPES: readonly Completion[] = [
+  ty("String", "java.lang"),
+  ty("Object", "java.lang"),
+  ty("Integer", "java.lang"),
+  ty("Long", "java.lang"),
+  ty("Double", "java.lang"),
+  ty("Float", "java.lang"),
+  ty("Boolean", "java.lang"),
+  ty("Character", "java.lang"),
+  ty("Byte", "java.lang"),
+  ty("Short", "java.lang"),
+  ty("Math", "java.lang"),
+  ty("System", "java.lang"),
+  ty("Thread", "java.lang"),
+  ty("Runnable", "java.lang"),
+  ty("Exception", "java.lang"),
+  ty("RuntimeException", "java.lang"),
+  ty("IllegalArgumentException", "java.lang"),
+  ty("IllegalStateException", "java.lang"),
+  ty("NullPointerException", "java.lang"),
+  ty("StringBuilder", "java.lang"),
+  ty("Comparable", "java.lang"),
+  ty("Iterable", "java.lang"),
+  ty("List", "java.util"),
+  ty("ArrayList", "java.util"),
+  ty("LinkedList", "java.util"),
+  ty("Map", "java.util"),
+  ty("HashMap", "java.util"),
+  ty("TreeMap", "java.util"),
+  ty("LinkedHashMap", "java.util"),
+  ty("Set", "java.util"),
+  ty("HashSet", "java.util"),
+  ty("TreeSet", "java.util"),
+  ty("Queue", "java.util"),
+  ty("Deque", "java.util"),
+  ty("ArrayDeque", "java.util"),
+  ty("PriorityQueue", "java.util"),
+  ty("Optional", "java.util"),
+  ty("Arrays", "java.util"),
+  ty("Collections", "java.util"),
+  ty("Objects", "java.util"),
+  ty("Scanner", "java.util"),
+  ty("Random", "java.util"),
+  ty("Iterator", "java.util"),
+  ty("Comparator", "java.util"),
+  ty("Stream", "java.util.stream"),
+  ty("Collectors", "java.util.stream"),
+  ty("IntStream", "java.util.stream"),
+  ty("Function", "java.util.function"),
+  ty("Predicate", "java.util.function"),
+  ty("Supplier", "java.util.function"),
+  ty("Consumer", "java.util.function"),
+  ty("LocalDate", "java.time"),
+  ty("LocalDateTime", "java.time"),
+  ty("Duration", "java.time"),
+  ty("BigDecimal", "java.math"),
+  ty("BigInteger", "java.math"),
+];
+
+const JAVA_STATICS: readonly Completion[] = [
+  fn("System.out.println", "(x)"),
+  fn("System.out.print", "(x)"),
+  fn("System.out.printf", "(format, args...)"),
+  fn("System.err.println", "(x)"),
+  fn("System.currentTimeMillis", "()"),
+  fn("System.nanoTime", "()"),
+  fn("Math.abs", "(x)"),
+  fn("Math.max", "(a, b)"),
+  fn("Math.min", "(a, b)"),
+  fn("Math.pow", "(base, exp)"),
+  fn("Math.sqrt", "(x)"),
+  fn("Math.floor", "(x)"),
+  fn("Math.ceil", "(x)"),
+  fn("Math.round", "(x)"),
+  fn("Math.random", "()"),
+  fn("Integer.parseInt", "(String s)"),
+  fn("Integer.valueOf", "(String s)"),
+  fn("Double.parseDouble", "(String s)"),
+  fn("Long.parseLong", "(String s)"),
+  fn("Boolean.parseBoolean", "(String s)"),
+  fn("String.valueOf", "(x)"),
+  fn("String.format", "(format, args...)"),
+  fn("String.join", "(delimiter, elements...)"),
+  fn("Arrays.asList", "(elements...)"),
+  fn("Arrays.toString", "(array)"),
+  fn("Arrays.sort", "(array)"),
+  fn("Arrays.fill", "(array, value)"),
+  fn("Arrays.stream", "(array)"),
+  fn("Collections.sort", "(list)"),
+  fn("Collections.reverse", "(list)"),
+  fn("Collections.max", "(collection)"),
+  fn("Collections.min", "(collection)"),
+  fn("Collections.emptyList", "()"),
+  fn("List.of", "(elements...)"),
+  fn("Map.of", "(k1, v1, ...)"),
+  fn("Set.of", "(elements...)"),
+  fn("Objects.equals", "(a, b)"),
+  fn("Objects.requireNonNull", "(obj)"),
+  fn("Optional.of", "(value)"),
+  fn("Optional.empty", "()"),
+  fn("Stream.of", "(elements...)"),
+  fn("IntStream.range", "(start, end)"),
+  fn("Collectors.toList", "()"),
+  fn("Collectors.joining", "(delimiter)"),
+  fn("Collectors.groupingBy", "(classifier)"),
+];
+
+const JAVA_SNIPPETS: readonly Completion[] = [
+  snippetCompletion("System.out.println(${})", {
+    label: "sout",
+    detail: "System.out.println(…)",
+    type: "keyword",
+  }),
+  snippetCompletion(
+    "public static void main(String[] args) {\n\t${}\n}",
+    { label: "main", detail: "main method", type: "keyword" },
+  ),
+  snippetCompletion(
+    "for (int ${i} = 0; ${i} < ${n}; ${i}++) {\n\t${}\n}",
+    { label: "fori", detail: "indexed for loop", type: "keyword" },
+  ),
+  snippetCompletion("for (${var} : ${iterable}) {\n\t${}\n}", {
+    label: "foreach",
+    detail: "enhanced for loop",
+    type: "keyword",
+  }),
+];
+
+export const JAVA_COMPLETIONS: readonly Completion[] = [
+  ...JAVA_KEYWORDS,
+  ...JAVA_TYPES,
+  ...JAVA_STATICS,
+  ...JAVA_SNIPPETS,
+];

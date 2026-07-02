@@ -46,8 +46,19 @@ import {
 } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import {
+  acceptCompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+} from "@codemirror/autocomplete";
 import { themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
+import {
+  makeSqlAutocompletionExtension,
+  makeSqlLangExtension,
+} from "./sql/shared/editorSetup";
+import { introspectSqlSchemas } from "./sql/shared/schemaIntrospect";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -123,6 +134,8 @@ export default function SqlCodeBlock({
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const mainThemeCompRef = useRef<Compartment | null>(null);
+  const langCompRef = useRef<Compartment | null>(null);
+  const completionCompRef = useRef<Compartment | null>(null);
   const persistSaveTimerRef = useRef<number | null>(null);
 
   // Stable localStorage key for the user's SQL buffer. `dialect` is in
@@ -173,6 +186,7 @@ export default function SqlCodeBlock({
     if (!editorHostRef.current || editorRef.current) return;
     const themeComp = new Compartment();
     const languageComp = new Compartment();
+    const completionComp = new Compartment();
 
     const persisted = loadPersistedCode(persistedKey);
     const initialDoc = persisted ?? starterCode;
@@ -194,6 +208,11 @@ export default function SqlCodeBlock({
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,
+        // Schema-aware completion (same engine as the SQL playgrounds).
+        // Seeded with an empty schema so keyword completion works right
+        // away; reconfigured with live tables/columns once the block's
+        // engine boots — see `refreshCompletionSchema` below.
+        completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
             key: "Mod-Enter",
@@ -202,7 +221,19 @@ export default function SqlCodeBlock({
               return true;
             },
           },
+          {
+            key: "Ctrl-Space",
+            run: (v) => {
+              startCompletion(v);
+              return true;
+            },
+          },
           ...closeBracketsKeymap,
+          // Completion keys before `defaultKeymap` so arrows move the
+          // popup selection. Enter is removed so it always inserts a
+          // newline; Tab accepts instead — matching the SQL playgrounds.
+          ...completionKeymap.filter((b) => b.key !== "Enter"),
+          { key: "Tab", run: acceptCompletion },
           ...defaultKeymap,
           ...historyKeymap,
           ...redoKeymap,
@@ -224,12 +255,14 @@ export default function SqlCodeBlock({
     });
     editorRef.current = view;
     mainThemeCompRef.current = themeComp;
+    langCompRef.current = languageComp;
+    completionCompRef.current = completionComp;
 
     void (async () => {
       try {
-        const { sql } = await import("@codemirror/lang-sql");
+        const langExt = await makeSqlLangExtension(dialect);
         if (editorRef.current === view) {
-          view.dispatch({ effects: languageComp.reconfigure(sql()) });
+          view.dispatch({ effects: languageComp.reconfigure(langExt) });
         }
       } catch {
         // SQL language extension is optional — editor still works
@@ -246,9 +279,39 @@ export default function SqlCodeBlock({
       view.destroy();
       editorRef.current = null;
       mainThemeCompRef.current = null;
+      langCompRef.current = null;
+      completionCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Rebuild the completion schema (and lang-sql's copy) from the live
+  // database. Called after engine boot and after every run, so tables
+  // created by the block's own SQL complete immediately. Best-effort:
+  // failures leave the previous schema in place.
+  const refreshCompletionSchema = useCallback(
+    async (engine: { exec: (sql: string) => Promise<SqlResult[]> }) => {
+      try {
+        const schemas = await introspectSqlSchemas(engine.exec, dialect);
+        const view = editorRef.current;
+        const completionComp = completionCompRef.current;
+        const langComp = langCompRef.current;
+        if (!view || !completionComp || !langComp) return;
+        const langExt = await makeSqlLangExtension(dialect, schemas.langSchema);
+        view.dispatch({
+          effects: [
+            completionComp.reconfigure(
+              makeSqlAutocompletionExtension(schemas.completion, dialect),
+            ),
+            langComp.reconfigure(langExt),
+          ],
+        });
+      } catch {
+        // Completion schema is a nicety — never surface as an error.
+      }
+    },
+    [dialect],
+  );
 
   // Sync the CodeMirror theme whenever the docs colour scheme toggles.
   useEffect(() => {
@@ -289,16 +352,20 @@ export default function SqlCodeBlock({
   );
 
   // Eagerly boot the engine on mount so the table viewer can populate
-  // before the learner clicks Run.
+  // before the learner clicks Run. The completion schema piggybacks on
+  // the same boot.
   useEffect(() => {
     if (!tableViewerEnabled) return;
     void ensureEngine()
-      .then((engine) => refreshTableViewer(engine))
+      .then((engine) => {
+        void refreshCompletionSchema(engine);
+        return refreshTableViewer(engine);
+      })
       .catch(() => {
         // Lower the skeleton so it doesn't spin forever.
         markTablesInitDone();
       });
-  }, [ensureEngine, refreshTableViewer, tableViewerEnabled, markTablesInitDone]);
+  }, [ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled, markTablesInitDone]);
 
   // ─── Execution ──────────────────────────────────────────────────────
   const executeSql = useCallback(
@@ -373,13 +440,14 @@ export default function SqlCodeBlock({
       }
       setStatus("ready");
       setStatusMessage("Done");
-      if (tableViewerEnabled) {
-        try {
-          const engine = await ensureEngine();
-          await refreshTableViewer(engine);
-        } catch {
-          /* viewer refresh failure shouldn't mask the run's success */
-        }
+      // The run may have created/dropped tables — refresh the
+      // completion schema (and the viewer when enabled).
+      try {
+        const engine = await ensureEngine();
+        void refreshCompletionSchema(engine);
+        if (tableViewerEnabled) await refreshTableViewer(engine);
+      } catch {
+        /* viewer refresh failure shouldn't mask the run's success */
       }
     } catch (err) {
       if (runSeqRef.current !== mySeq) return;
@@ -389,7 +457,7 @@ export default function SqlCodeBlock({
       setStatus("error");
       setStatusMessage(message);
     }
-  }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
+  }, [executeSql, ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
   useEffect(() => {
@@ -424,13 +492,16 @@ export default function SqlCodeBlock({
     clearTableViewer();
     if (tableViewerEnabled) {
       void ensureEngine()
-        .then((engine) => refreshTableViewer(engine))
+        .then((engine) => {
+          void refreshCompletionSchema(engine);
+          return refreshTableViewer(engine);
+        })
         .catch(() => {
           markTablesInitDone();
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, refreshCompletionSchema, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";

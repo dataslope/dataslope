@@ -1,4 +1,6 @@
 import type {
+  CompletionListItem,
+  CompletionRequest,
   CompletionResult,
   EmitOutput,
   ExampleSnippet,
@@ -677,7 +679,7 @@ type WorkerOutMessage =
   | {
       kind: "complete-result";
       id: number;
-      completions: string[];
+      completions: CompletionListItem[];
       replaceLength: number;
     };
 
@@ -698,6 +700,34 @@ class PyodideWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
 
   constructor(private worker: Worker) {}
+
+  /** Free the Pyodide heap by terminating the worker. Registry-eviction
+   *  hook — the instance must not be used after this. */
+  dispose(): void {
+    this.worker.terminate();
+  }
+
+  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages): asks
+   *  the worker to pre-install the heavy package set — and any micropip
+   *  drawer packages the sources import — when the authored code (or an
+   *  explicit `packages` list) actually needs it. Explicit module names
+   *  are turned into synthetic `import x` lines so the worker's gate and
+   *  micropip mapping treat them exactly like authored imports. */
+  warmPackages(
+    sources: string[],
+    options?: { packages?: string[]; force?: boolean },
+  ): void {
+    const hints = [
+      ...sources,
+      ...(options?.packages ?? []).map((mod) => `import ${mod}`),
+    ].filter((s) => s.trim().length > 0);
+    if (hints.length === 0 && !options?.force) return;
+    this.worker.postMessage({
+      kind: "warm-packages",
+      sources: hints,
+      force: options?.force ?? false,
+    });
+  }
 
   async run(
     code: string,
@@ -739,7 +769,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
     });
   }
 
-  async complete(line: string, column: number): Promise<CompletionResult> {
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
     const id = ++this.nextId;
     return new Promise<CompletionResult>((resolve) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
@@ -750,7 +780,14 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         resolve({ list: msg.completions, replaceLength: msg.replaceLength });
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "complete", id, line, column });
+      this.worker.postMessage({
+        kind: "complete",
+        id,
+        doc: request.doc,
+        lineNumber: request.lineNumber,
+        line: request.line,
+        column: request.column,
+      });
     });
   }
 

@@ -66,6 +66,7 @@ import {
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
+import { languageCompletion } from "./completion/languageCompletion";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -75,7 +76,12 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
-import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import {
+  getSharedRuntime,
+  isRuntimeReady,
+  retainRuntime,
+  RuntimeScope,
+} from "./runtimeRegistry";
 import {
   datasetStageFilename,
   fetchDatasetBytes,
@@ -222,6 +228,13 @@ export interface ChallengeCardProps {
    *  should `assert`/`throw`/`stop()` on failure and be silent on
    *  success — the language-specific harness wraps the rest. */
   tests: ChallengeTest[];
+  /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
+   *  pre-install when the card's runtime warms, merged with the modules
+   *  found by scanning the card's own code (init/starter/solution/tests).
+   *  Escape hatch for imports the scan can't see — instructions that ask
+   *  the learner to write the import themselves, or dynamic imports.
+   *  Only meaningful for runtimes with optional package sets (Python). */
+  packages?: string[];
 }
 
 function detectIsMac(): boolean {
@@ -341,6 +354,7 @@ export default function ChallengeCard({
   datasets,
   showFileTabBar = false,
   tests,
+  packages,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
@@ -372,6 +386,29 @@ export default function ChallengeCard({
   useEffect(() => {
     datasetsRef.current = cardDatasets;
   }, [cardDatasets]);
+
+  // Everything this card could ask the runtime to execute — per-file
+  // init/starter/solution plus injected test snippets. Passed to
+  // `runtime.warmPackages` as the needs-analysis input so heavy optional
+  // packages (Python's data stack) only download for cards whose code
+  // actually imports them. Kept in a ref (like `datasetsRef` above) so
+  // the warm-up observer doesn't re-register when MDX re-creates the
+  // prop arrays.
+  const warmHintRef = useRef<{ sources: string[]; packages?: string[] }>({
+    sources: [],
+  });
+  useEffect(() => {
+    const sources: string[] = [];
+    for (const file of files ?? []) {
+      if (file.initCode) sources.push(file.initCode);
+      sources.push(file.starterCode);
+      if (file.solutionCode) sources.push(file.solutionCode);
+    }
+    for (const test of tests) {
+      if (isNativeTest(test)) sources.push(test.code);
+    }
+    warmHintRef.current = { sources, packages };
+  }, [files, tests, packages]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -597,6 +634,17 @@ export default function ChallengeCard({
         EditorState.tabSize.of(adapter.indentWidth),
         indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
+        // Intellisense: runtime-backed + static completion sources,
+        // trigger characters, and the completion keymap. The runtime
+        // attaches lazily (warm-up or first Run); until then the static
+        // sources answer. The active file's read-only init code is
+        // prepended so whole-file analyzers see the names it defines.
+        languageCompletion({
+          adapterId: adapter.id,
+          getRuntime: () => runtimeRef.current,
+          getContextPrefix: () => initForFile(activeFilenameRef.current),
+          getFilename: () => activeFilenameRef.current,
+        }),
         keymap.of([
           {
             // Default keyboard action mirrors the split button's
@@ -1276,6 +1324,15 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // Pin this card's runtime in the registry while the card is mounted, so
+  // eviction (the per-scope LRU cap) never tears a runtime down under a
+  // card that could still Run against it — including the `runtimeRef`
+  // cached above.
+  useEffect(
+    () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
+    [adapter.id],
+  );
+
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
   // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
   // the time a reader spends on the page's prose pays for the runtime
@@ -1303,6 +1360,12 @@ export default function ChallengeCard({
         void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
           .then((rt) => {
             if (!runtimeRef.current) runtimeRef.current = rt;
+            // Pre-install heavy optional packages only if this card's
+            // authored code (or its explicit `packages` prop) needs
+            // them — see LanguageRuntime.warmPackages. Fire-and-forget:
+            // a Run installs on demand regardless.
+            const hint = warmHintRef.current;
+            rt.warmPackages?.(hint.sources, { packages: hint.packages });
           })
           .catch(() => {
             warmedRef.current = false;

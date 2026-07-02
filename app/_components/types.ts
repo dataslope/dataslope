@@ -108,9 +108,53 @@ export interface RunOptions {
   onStatus?: (message: string, preparing?: boolean) => void;
 }
 
+/** A single completion suggestion with optional editor metadata. Plain
+ *  strings are accepted everywhere an item is expected so lightweight
+ *  providers can return bare identifiers. */
+export interface CompletionItemDetail {
+  label: string;
+  /** CodeMirror completion kind ("function", "variable", "class",
+   *  "keyword", "property", "namespace", …) — drives the popup icon. */
+  type?: string;
+  /** Short annotation rendered after the label (e.g. a type or
+   *  signature), the way desktop IDEs annotate suggestions. */
+  detail?: string;
+  /** Longer documentation shown in the completion info panel. */
+  info?: string;
+  /** Text inserted on accept when it differs from `label`. */
+  apply?: string;
+  /** Ranking nudge (-99..99); higher sorts above equal matches. */
+  boost?: number;
+}
+
+export type CompletionListItem = string | CompletionItemDetail;
+
+/** Cursor snapshot handed to `LanguageRuntime.complete`. Carries both
+ *  the full document (for whole-file analyzers like jedi or the
+ *  TypeScript language service) and the line/column pair (for
+ *  line-based engines like R's `utils` completion). */
+export interface CompletionRequest {
+  /** Full text of the editor document. */
+  doc: string;
+  /** 0-based cursor offset within `doc`. */
+  offset: number;
+  /** Text of the line containing the cursor. */
+  line: string;
+  /** 0-based cursor column within `line`. */
+  column: number;
+  /** 1-based line number of the cursor within `doc`. */
+  lineNumber: number;
+  /** True when the user explicitly requested completion (Ctrl-Space)
+   *  rather than a trigger character opening it. */
+  explicit: boolean;
+  /** Workspace-relative path of the file being edited, when the
+   *  surface knows it (multi-file playgrounds). */
+  filename?: string;
+}
+
 export interface CompletionResult {
   /** Suggested completions for the current cursor prefix. */
-  list: string[];
+  list: CompletionListItem[];
   /** Number of characters before the cursor that should be replaced when
    *  inserting a completion (i.e. the length of the matched prefix). */
   replaceLength: number;
@@ -118,9 +162,11 @@ export interface CompletionResult {
 
 export interface LanguageRuntime {
   run(code: string, emit: EmitOutput, options?: RunOptions): Promise<void>;
-  /** Optional: compute completions for the given line up to ``column``.
-   *  Adapters that don't implement autocomplete simply omit this. */
-  complete?(line: string, column: number): Promise<CompletionResult>;
+  /** Optional: compute completions for the cursor described by
+   *  `request`. Adapters that don't implement autocomplete simply omit
+   *  this. Implementations should be best-effort: resolve with an empty
+   *  list rather than rejecting on analyzer errors. */
+  complete?(request: CompletionRequest): Promise<CompletionResult>;
   /** Optional: stage workspace files into the runtime's virtual file
    *  system before `run()` is invoked. Called by the playground with the
    *  full set of currently-open files (code tabs and uploaded data
@@ -148,6 +194,32 @@ export interface LanguageRuntime {
    *  implementations must clear their internal tracking after returning
    *  to avoid reporting the same file twice. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
+  /** Optional: tear the runtime down and free its resources (terminate
+   *  the backing Web Worker, close the WASM instance). Called by the
+   *  runtime registry when this runtime is evicted to bound how many
+   *  language VMs stay resident at once — after it runs, the instance
+   *  must not be used again. Runtimes that cannot release their
+   *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
+   *  this hook, which also exempts them from eviction. */
+  dispose?(): void | Promise<void>;
+  /** Optional: hint that the given authored source snippets may run
+   *  soon, so the runtime can pre-install heavy optional packages while
+   *  the user is still reading (Python's numpy/pandas/scipy/matplotlib/
+   *  plotly set). Fire-and-forget and best-effort: runtimes install
+   *  missing packages on demand at run time regardless, so a missed or
+   *  wrong hint only changes *when* the download happens, never whether
+   *  a run succeeds.
+   *
+   *  `options.packages` adds importable module names (e.g. `"pandas"`,
+   *  `"sklearn"`) to warm even though no source imports them — the
+   *  escape hatch for content whose instructions ask the learner to
+   *  write the import themselves, or for dynamic imports the scan can't
+   *  see. `options.force` skips the needs-analysis and warms the full
+   *  set (used by the playground, whose future code is unknown). */
+  warmPackages?(
+    sources: string[],
+    options?: { packages?: string[]; force?: boolean },
+  ): void;
 }
 
 export interface LanguageAdapter {
