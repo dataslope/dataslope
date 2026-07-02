@@ -138,6 +138,7 @@ import {
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
+import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import { FileCode2, Settings } from "lucide-react";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
@@ -909,6 +910,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── CodeMirror ─────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latches after the first post-mount focus so the entry policy (cursor at
+  // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
+  const entryFocusDoneRef = useRef(false);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
   const outputBodyRef = useRef<HTMLDivElement | null>(null);
@@ -1577,13 +1581,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // tab is handled above (early return), so we never steal focus
     // from the settings form here.
     //
-    // Hold off while the boot overlay still covers the screen: on mobile,
-    // focusing CodeMirror pops the on-screen keyboard, which would slide up
-    // over the loading screen for no use. `showLoadingOverlay` is in the
-    // deps so that once the overlay unmounts this effect re-runs and the
-    // editor takes focus — the keyboard appears only after the loading
-    // screen is gone.
+    // Hold off while the boot overlay still covers the screen, and route
+    // the FIRST focus after mount through the shared entry policy: desktop
+    // lands the cursor at the end of the code; mobile skips it entirely so
+    // the on-screen keyboard doesn't pop before the user asks to type.
+    // `showLoadingOverlay` is in the deps so the entry focus fires once the
+    // overlay unmounts. Later runs (user-initiated tab ops) focus as before.
     if (showLoadingOverlay) return;
+    if (!entryFocusDoneRef.current) {
+      entryFocusDoneRef.current = true;
+      applyEntryFocus(view);
+      return;
+    }
     view.focus();
   }, [activeFileId, activeTabId, workspaceReady, showLoadingOverlay]);
 

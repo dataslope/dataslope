@@ -102,6 +102,7 @@ import {
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
+import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -774,6 +775,9 @@ function SqlPlaygroundInner() {
   const engineRef = useRef<SqliteEngine | null>(null);
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latches after the first post-mount focus so the entry policy (cursor at
+  // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
+  const entryFocusDoneRef = useRef(false);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
@@ -1597,14 +1601,22 @@ function SqlPlaygroundInner() {
       }
     }
     // Focus the editor so the user can type immediately after any tab
-    // operation. Skip tabs whose editor pane is hidden.
+    // operation. Skip tabs whose editor pane is hidden. The FIRST focus
+    // after mount goes through the shared entry policy instead: desktop
+    // lands the cursor at the end of the query, mobile skips the focus so
+    // the on-screen keyboard doesn't pop before the user asks to type.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
       tab?.kind !== "view-data" &&
       tab?.kind !== "query-history"
     ) {
-      view?.focus();
+      if (!entryFocusDoneRef.current) {
+        entryFocusDoneRef.current = true;
+        applyEntryFocus(view);
+      } else {
+        view.focus();
+      }
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps

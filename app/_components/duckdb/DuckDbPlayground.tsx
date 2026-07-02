@@ -125,6 +125,7 @@ import {
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
+import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -1253,6 +1254,9 @@ function DuckDbPlaygroundInner() {
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latches after the first post-mount focus so the entry policy (cursor at
+  // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
+  const entryFocusDoneRef = useRef(false);
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
@@ -2053,6 +2057,15 @@ function DuckDbPlaygroundInner() {
       view.dispatch({
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
+    }
+    // The FIRST focus after mount goes through the shared entry policy:
+    // desktop lands the cursor at the end of the query, mobile skips the
+    // focus so the on-screen keyboard doesn't pop before the user asks to
+    // type. Later runs (user-initiated tab ops) focus as before.
+    if (!entryFocusDoneRef.current) {
+      entryFocusDoneRef.current = true;
+      applyEntryFocus(view);
+      return;
     }
     view.focus();
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
