@@ -50,6 +50,15 @@ type InMessage =
       id: number;
       /** Workspace-relative paths → file bytes. */
       files: Array<[string, Uint8Array]>;
+    }
+  | {
+      kind: "warm-packages";
+      /** Authored code that may run soon (starter/init/solution/test
+       *  snippets). Phase B is kicked only when one of these actually
+       *  needs it; see `warmHintNeedsHeavyPackages`. */
+      sources: string[];
+      /** Skip the needs-analysis and warm the full set (playground). */
+      force?: boolean;
     };
 
 type OutMessage =
@@ -392,12 +401,13 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
 
   post({ kind: "ready" });
 
-  // Phase B starts immediately in the background so the package set is
-  // usually in place before the first pandas-importing run. Failures
-  // are deliberately swallowed here: ensurePackages() clears itself on
-  // error, and the next run that needs packages retries (and surfaces
-  // the real error through the run's error path).
-  void ensurePackages().catch(() => {});
+  // Phase B is NOT kicked here. It starts when a `warm-packages` hint
+  // says the surface's authored code needs the data stack (or `force`s
+  // it, as the playground does), or lazily when a package-needing run
+  // awaits ensurePackages(). Booting it unconditionally made every
+  // Python surface — including stdlib-only ones like the home page's
+  // hero challenge — pay hundreds of MB for numpy/pandas/scipy/
+  // matplotlib/plotly it never used.
 }
 
 // ─── Boot phase B: the heavy package set ───────────────────────────────
@@ -490,14 +500,14 @@ function ensurePackages(): Promise<void> {
 // named http) merely wait for the full boot, i.e. today's behaviour.
 const PHASE_B_AMBIENT_RE = /\b(?:plt|matplotlib|urllib|requests|http)\b/;
 
-/** True when `code` can't run correctly on the bare (phase A)
- *  interpreter. Conservative: any uncertainty (unparseable code,
- *  unknown imports) waits for the full boot — the failure mode is
- *  "behaves like before the two-phase split", never a broken run. */
-function runNeedsHeavyPackages(code: string): boolean {
+/** Whether `code` imports anything beyond the stdlib, or `null` when
+ *  that's unknowable (unparseable code, gate machinery unavailable).
+ *  Callers pick the failure direction: the run gate treats `null` as
+ *  "needs packages" (never break a run), the warm-hint gate treats it
+ *  as "no evidence" (never download speculatively on a guess). */
+function importsBeyondStdlib(code: string): boolean | null {
   const stdlib = stdlibModuleNames;
-  if (!pyodide || !stdlib) return true;
-  if (PHASE_B_AMBIENT_RE.test(code)) return true;
+  if (!pyodide || !stdlib) return null;
   try {
     pyodide.globals.set("_pg_gate_code", code);
     const proxy = pyodide.runPython("_pg_find_imports(_pg_gate_code)") as {
@@ -508,8 +518,30 @@ function runNeedsHeavyPackages(code: string): boolean {
     proxy.destroy?.();
     return imports.some((mod) => !stdlib.has(mod));
   } catch {
-    return true;
+    return null;
   }
+}
+
+/** True when `code` can't run correctly on the bare (phase A)
+ *  interpreter. Conservative: any uncertainty (unparseable code,
+ *  unknown imports) waits for the full boot — the failure mode is
+ *  "behaves like before the two-phase split", never a broken run. */
+function runNeedsHeavyPackages(code: string): boolean {
+  if (PHASE_B_AMBIENT_RE.test(code)) return true;
+  return importsBeyondStdlib(code) ?? true;
+}
+
+/** Warm-hint variant of the gate, applied per source so one snippet
+ *  with an intentionally incomplete starter (unparseable) can't poison
+ *  the answer for the rest. Optimistic on uncertainty: a source that
+ *  doesn't parse is skipped rather than assumed heavy — the worst case
+ *  is the first Run paying the install behind the standard "first run
+ *  only" notice, whereas pessimism would re-create the very
+ *  download-for-everyone this hint mechanism exists to avoid. */
+function warmHintNeedsHeavyPackages(sources: string[]): boolean {
+  return sources.some(
+    (src) => PHASE_B_AMBIENT_RE.test(src) || importsBeyondStdlib(src) === true,
+  );
 }
 
 async function runCode(
@@ -893,6 +925,29 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
           id,
           message: err instanceof Error ? err.message : String(err),
         });
+      }
+    });
+    return;
+  }
+
+  if (msg.kind === "warm-packages") {
+    const { sources, force } = msg;
+    // The gate itself is queued (it runs Python via find_imports), but
+    // the install is fired in the background so it never holds the run
+    // queue: a run that needs the packages awaits ensurePackages()
+    // itself, and everything else shouldn't wait behind the download.
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        if (!pyodide) return;
+        if (force || warmHintNeedsHeavyPackages(sources)) {
+          void ensurePackages()
+            .then(() => ensureMicropipPackages(sources.join("\n")))
+            .catch(() => {});
+        }
+      } catch {
+        // Warm-up is best-effort — a package-needing run retries and
+        // surfaces the real error through its own path.
       }
     });
     return;

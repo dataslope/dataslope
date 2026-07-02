@@ -39,6 +39,9 @@ interface MdxCodeBlockProps {
   datasets?: DatasetStageSpec[];
   label?: string;
   showFileTabBar?: boolean;
+  /** Importable module names to pre-install alongside the runtime —
+   *  see `CodeBlockProps.packages`. */
+  packages?: string[];
 }
 
 export default function MdxCodeBlock({
@@ -48,6 +51,7 @@ export default function MdxCodeBlock({
   datasets,
   label,
   showFileTabBar,
+  packages,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -65,6 +69,7 @@ export default function MdxCodeBlock({
       datasets={datasets}
       label={label}
       showFileTabBar={showFileTabBar}
+      packages={packages}
     />
   );
 }

@@ -16,8 +16,14 @@
  *     each with a topic-appropriate icon.
  */
 
-import { useEffect, useRef, useState, type ElementType } from "react";
-import { AnimatePresence } from "motion/react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ElementType,
+  type RefObject,
+} from "react";
+import { AnimatePresence, useInView } from "motion/react";
 import {
   BarChart3,
   Binary,
@@ -106,15 +112,18 @@ const STATE_COLOR: Record<TestState, string> = {
 export function TestRailBackground() {
   const reduced = usePrefersReducedMotion();
   const [step, setStep] = useState(0);
+  // Endless loop — only tick while the card is actually on screen.
+  const railRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(railRef as RefObject<Element>);
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !inView) return;
     const t = setTimeout(
       () => setStep((s) => (s + 1) % RAIL_STAGES.length),
       RAIL_STAGES[step].hold,
     );
     return () => clearTimeout(t);
-  }, [step, reduced]);
+  }, [step, reduced, inView]);
 
   const states = reduced ? ALL_PASS : RAIL_STAGES[step].states;
   const passed = states.filter((s) => s === "pass").length;
@@ -122,7 +131,10 @@ export function TestRailBackground() {
   const allPass = passed === total;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
+    <div
+      ref={railRef}
+      className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]"
+    >
       {/* Rail pinned to the right so it doesn't sit over the trophy icon; the
           pass-count badge is a header row above the rail so the two never
           overlap. */}
@@ -358,9 +370,13 @@ function InfiniteCourseList({ courses }: { courses: CourseItem[] }) {
     courses.length ? [{ ...courses[0], key: 0 }] : [],
   );
   const nextIndex = useRef(1);
+  // Endless feed: each tick runs spring/layout animations across every
+  // visible pill, so only tick while the card is actually on screen.
+  const listRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(listRef as RefObject<Element>);
 
   useEffect(() => {
-    if (reduced || courses.length === 0) return;
+    if (reduced || !inView || courses.length === 0) return;
     const id = setInterval(() => {
       setQueue((prev) => {
         const course = courses[nextIndex.current % courses.length];
@@ -370,7 +386,7 @@ function InfiniteCourseList({ courses }: { courses: CourseItem[] }) {
       });
     }, DELAY);
     return () => clearInterval(id);
-  }, [courses, reduced]);
+  }, [courses, reduced, inView]);
 
   // Reduced motion: render a static stack instead of the animated feed.
   const items = reduced
@@ -378,7 +394,7 @@ function InfiniteCourseList({ courses }: { courses: CourseItem[] }) {
     : queue;
 
   return (
-    <div className="flex w-full flex-col items-center gap-2.5">
+    <div ref={listRef} className="flex w-full flex-col items-center gap-2.5">
       <AnimatePresence>
         {items.map((item) => (
           <AnimatedListItem key={item.key}>

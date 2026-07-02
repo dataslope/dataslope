@@ -251,7 +251,13 @@ type WorkerOutMessage =
 
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
-  constructor(private worker: Worker) {}
+    constructor(private worker: Worker) {}
+
+  /** Free the runtime by terminating its worker. Registry-eviction hook —
+   *  the instance must not be used after this. */
+  dispose(): void {
+    this.worker.terminate();
+  }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const id = ++this.nextId;

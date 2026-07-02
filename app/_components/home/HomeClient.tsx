@@ -3,6 +3,7 @@
 import { BlurFade } from "@/components/ui/blur-fade";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { Highlighter } from "@/components/ui/highlighter";
+import { AnimationPauseGate } from "./AnimationPauseGate";
 import { HomeNav } from "./HomeNav";
 import { HeroMarquee } from "./HeroMarquee";
 import { HeroInteractive } from "./HeroInteractive";
@@ -56,16 +57,20 @@ export function HomeClient({
         {/* overflow-x-clip catches any horizontal overflow (e.g. decorative
             backgrounds) without breaking the sticky nav, which is a sibling. */}
         <main className="overflow-x-clip">
-          {/* ── Hero: marquee + interactive "try it" panel ── */}
+          {/* ── Hero: marquee + interactive "try it" panel. The pause gate
+              stops the marquee / ripple / shimmer CSS loops once the hero is
+              scrolled out of view. ── */}
           <section className="px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
-            <BlurFade delay={0.05}>
-              <HeroMarquee />
-            </BlurFade>
-            <BlurFade delay={0.18}>
-              <div className="mt-12">
-                <HeroInteractive />
-              </div>
-            </BlurFade>
+            <AnimationPauseGate>
+              <BlurFade delay={0.05}>
+                <HeroMarquee />
+              </BlurFade>
+              <BlurFade delay={0.18}>
+                <div className="mt-12">
+                  <HeroInteractive />
+                </div>
+              </BlurFade>
+            </AnimationPauseGate>
           </section>
 
           {/* ── Animated beam ── */}
@@ -116,14 +121,18 @@ export function HomeClient({
             <CoursesSection courses={courses} />
           </section>
 
-          {/* ── At-a-glance stats (Magic UI bento grid) ── */}
+          {/* ── At-a-glance stats (Magic UI bento grid). The pause gate stops
+              the diamond-loader / cursor CSS loops once the grid is scrolled
+              out of view (the JS-driven backgrounds gate themselves). ── */}
           <section className="py-12">
-            <BlurFade inView>
-              <StatsBento
-                stats={stats}
-                courseTitles={courses.map((c) => c.title)}
-              />
-            </BlurFade>
+            <AnimationPauseGate>
+              <BlurFade inView>
+                <StatsBento
+                  stats={stats}
+                  courseTitles={courses.map((c) => c.title)}
+                />
+              </BlurFade>
+            </AnimationPauseGate>
           </section>
 
           {/* ── Embedded playground showcase (heading/link follow the
