@@ -14,6 +14,14 @@
  * learn.css's element/single-class selectors, so they win regardless of which
  * stylesheet the browser ordered last. They only match on the home route, so
  * they never affect /learn itself.
+ *
+ * NOTE: the utility-vs-utility half of this bug class (`.hidden` vs
+ * `md:flex`, …) is now fixed at the root by the shared @source list in
+ * app/tailwind.shared.css — both Tailwind roots emit identical utility
+ * layers, so stylesheet order can't flip those pairs anymore (enforced by
+ * __tests__/cssCascadeParity.test.ts). The rules below remain as
+ * belt-and-suspenders, and the element-selector half (learn.css's global
+ * `body`/`h1..h6` typography) still relies on them.
  * ========================================================================== */
 
 /* Keep the whole page — and every heading in it — on the home page's own

@@ -4191,10 +4191,6 @@
 
 /* Read-only history editors: suppress the active-line highlight that
    appears when a line is clicked. */
-.sql-history-entry-editor .cm-activeLineMarker {
-  background-color: transparent !important;
-}
-
 .sql-history-entry-editor .cm-activeLineGutter {
   background-color: transparent !important;
 }
@@ -4527,7 +4523,6 @@
 /* Limit the inner content width so labels and switches don't spread too
    far apart on wide screens. Left-aligned with its own built-in padding. */
 .sql-settings-tab-pane .settings-body,
-.sql-settings-tab-pane .settings-body-themes,
 .sql-settings-tab-pane .settings-actions {
   max-width: 720px;
 }
@@ -4556,21 +4551,6 @@
    so it wins inside the media query too. */
 .playground-root[data-settings-active] .sql-mobile-tabs {
   display: none;
-}
-
-/* UX-18: the loading hero stamps the title at up to 180px (`playground.css`),
-   which towers over the status caption + progress bar on a desktop monitor.
-   Right-size it on desktop so the rolling title stays bold but no longer
-   swamps the viewport, and give the caption a touch more prominence. Scoped
-   to the SQL playgrounds (this stylesheet only loads on their routes), like
-   the mobile hero override below. */
-@media (min-width: 769px) {
-  .pyodide-loading .loading-hero-text {
-    font-size: clamp(48px, 8vw, 104px);
-  }
-  .pyodide-loading .loading-quip {
-    font-size: 14px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -4709,12 +4689,6 @@
   }
   .sql-mobile-tab span {
     line-height: 1;
-  }
-
-  /* The loading hero stamps the title 3–4× at desktop size; shrink it so it
-     doesn't tower over a phone screen (UX-18). */
-  .pyodide-loading .loading-hero-text {
-    font-size: clamp(32px, 12vw, 64px);
   }
 }
 

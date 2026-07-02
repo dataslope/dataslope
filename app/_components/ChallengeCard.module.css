@@ -8,7 +8,7 @@
    is language-agnostic — the same component is meant to host R and
    TypeScript challenges later. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
 
 .card {
   /* Light, paper-style chrome distinct from the dark-by-default
@@ -668,7 +668,8 @@
   font-feature-settings: "calt" 0, "liga" 0, "dlig" 0, "clig" 0;
 }
 
-.editor :global(.cm-editor .cm-scroller) {
+.editor :global(.cm-editor .cm-scroller),
+.initEditor :global(.cm-editor .cm-scroller) {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
@@ -677,21 +678,25 @@
   scrollbar-color: var(--ch-scrollbar-thumb) transparent;
 }
 
-.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar,
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track,
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb,
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
   background: var(--ch-scrollbar-thumb);
   border-radius: 3px;
 }
 
-.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+.editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover,
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
   background: var(--ch-scrollbar-thumb-hover);
 }
 
@@ -834,32 +839,8 @@
   cursor: default;
 }
 
-.initEditor :global(.cm-editor .cm-scroller) {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ch-scrollbar-thumb) transparent;
-}
-
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
-  background: var(--ch-scrollbar-thumb);
-  border-radius: 3px;
-}
-
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
-  background: var(--ch-scrollbar-thumb-hover);
-}
+/* (CM scroller layout + thin scrollbar are shared with `.editor` — see the
+   grouped rules above.) */
 
 .initEditor :global(.cm-editor .cm-cursor) {
   display: none !important;
@@ -1496,8 +1477,9 @@
   max-width: 100%;
 }
 
-/* DataFrame tables — kept in lockstep with `.dataframeWrap` in
-   CodeBlock.module.css: the Jupyter-notebook default look (600-weight
+/* DataFrame tables — kept in lockstep with `.dataframe-wrap` in
+   playground.css (same declarations, generic tokens instead):
+   the Jupyter-notebook default look (600-weight
    header row and index column, very subtle row striping, right-aligned
    cells, no cell borders) in slightly tightened Inter (--font-sans) at
    a compact size. Semantic --ch-* tokens rebind in dark mode, so no
@@ -1628,12 +1610,12 @@
 
 .runWaveBack {
   fill: color-mix(in oklab, var(--ch-accent) 22%, transparent);
-  animation: cc-waveBack 2.4s linear infinite;
+  animation: ds-run-wave-back 2.4s linear infinite;
 }
 
 .runWaveFront {
   fill: color-mix(in oklab, var(--ch-accent) 45%, transparent);
-  animation: cc-waveFront 1.4s linear infinite;
+  animation: ds-run-wave-front 1.4s linear infinite;
 }
 
 .runGlow {
@@ -1642,7 +1624,7 @@
   background: radial-gradient(120% 80% at 50% 110%,
       color-mix(in oklab, var(--ch-accent) 40%, transparent) 0%,
       transparent 70%);
-  animation: cc-glowPulse 0.9s ease-in-out infinite alternate;
+  animation: ds-run-glow-pulse 0.9s ease-in-out infinite alternate;
 }
 
 .runStream {
@@ -1657,57 +1639,7 @@
       transparent 100%);
   filter: blur(0.5px);
   transform: translateX(-100%);
-  animation: cc-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-}
-
-@keyframes cc-waveBack {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-240px);
-  }
-}
-
-@keyframes cc-waveFront {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-240px);
-  }
-}
-
-@keyframes cc-glowPulse {
-  from {
-    opacity: 0.45;
-  }
-
-  to {
-    opacity: 0.85;
-  }
-}
-
-@keyframes cc-stream {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-
-  15% {
-    opacity: 1;
-  }
-
-  85% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+  animation: ds-run-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 /* ─── Test panel ──────────────────────────────────────────────────── */

@@ -106,6 +106,9 @@ import {
   type ParsedTestResult,
 } from "./challengeHarness";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
+// Global keyframes for the run overlay (shared with CodeBlock and the
+// playgrounds) — the module CSS references them by their global names.
+import "./runOverlayAnimations.css";
 import styles from "./ChallengeCard.module.css";
 // Boot-notice styles are shared with `<CodeBlock>` (which already
 // shares this card's styles for its chrome — the reuse runs both ways).

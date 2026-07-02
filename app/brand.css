@@ -8,13 +8,11 @@
  *      and illustrations that need more than four distinct, non-semantic colors.
  *   2. Raw hue aliases (--ds-blue → --ds-blue-500, etc.).
  *   3. Mode-agnostic "ink" anchors that clear WCAG AA body text on white.
- *   4. Semantic role tokens, with light-mode defaults and dark-mode overrides.
+ *   4. The --ds-focus role token (the one semantic role with a consumer).
  *
- * Theme mechanisms differ per route — the dark overrides below target BOTH:
- *   - `.dark`              → /learn (next-themes / Fumadocs)
- *   - `[data-theme=dark]`  → /playground (editor-theme driven)
- * The home route (/) is currently dark-only and consumes the raw hue ramps
- * directly (its accents are decorative, which read fine on dark).
+ * Consumers handle dark mode themselves: /learn maps the hues onto Fumadocs
+ * tokens per theme in learn.css, and the playgrounds derive their own roles
+ * from the raw hues in playground.css.
  *
  * Ramps were generated in OKLCH (constant hue, lightness/chroma interpolated
  * toward white/near-black, gamut-mapped). Re-verify any value used for text in
@@ -163,25 +161,13 @@
   --ds-gray-800: #1f2937;
   --ds-gray-900: #111827;
 
-  /* ── Semantic roles — LIGHT MODE defaults ─────────────────────────── */
-  --ds-primary:      var(--ds-blue);      /* fills, primary buttons, active   */
-  --ds-link:         var(--ds-blue-ink);  /* text/links on a light surface    */
-  --ds-focus:        var(--ds-blue);      /* focus ring (UI, 3:1 is enough)   */
-  --ds-success:      var(--ds-green-ink);
-  --ds-success-fill: var(--ds-green);
-  --ds-danger:       var(--ds-red-ink);
-  --ds-danger-fill:  var(--ds-red);
-  --ds-warning:      var(--ds-amber-ink);
-  --ds-warning-fill: var(--ds-yellow);
-}
-
-/* ── Semantic roles — DARK MODE ───────────────────────────────────────
- * On dark surfaces the bright 500s already clear AA body text, so text
- * roles point straight at them (no ink needed). Targets both dark hooks. */
-.dark,
-[data-theme="dark"] {
-  --ds-link:    var(--ds-blue-400);
-  --ds-success: var(--ds-green-400);
-  --ds-danger:  var(--ds-red-400);
-  --ds-warning: var(--ds-yellow-400);
+  /* ── Semantic roles ───────────────────────────────────────────────────
+   * Only the focus ring survives as a semantic token; the rest of the old
+   * role layer (--ds-primary/--ds-link/--ds-success/--ds-danger/--ds-warning
+   * and their -fill/dark variants) was never consumed anywhere — the
+   * playgrounds define their own roles from the raw hues (playground.css)
+   * and /learn maps hues onto Fumadocs tokens (learn.css) — so it was
+   * removed. Reintroduce a role token here only together with its first
+   * consumer. */
+  --ds-focus: var(--ds-blue); /* focus ring (UI, 3:1 is enough) */
 }

@@ -1,0 +1,244 @@
+/* ============================================================================
+ * tailwind.shared.css — the single @source list, dark variant, design tokens,
+ * and keyframes shared by EVERY Tailwind root in the app.
+ * ----------------------------------------------------------------------------
+ * This app has two Tailwind roots (files that `@import "tailwindcss"`):
+ *
+ *   - app/tailwind.css      → home, /pricing, /account, /admin, legal pages
+ *   - app/learn/learn.css   → /learn and /interview (adds Fumadocs UI)
+ *
+ * Next.js scopes each stylesheet to the routes that import it, but after a
+ * client-side navigation BOTH can be applied to the document at once, and the
+ * App Router does not guarantee which <link> ends up later in <head> — the
+ * order follows the user's navigation history (see #528/#541; with Turbopack,
+ * Next 16's default bundler, there is no cssChunking option to pin it). Both
+ * roots emit into the same cascade layers (`base`, `components`, `utilities`),
+ * and for two same-layer, same-specificity rules the LAST one in document
+ * order wins.
+ *
+ * The invariant that makes stylesheet order irrelevant: BOTH ROOTS MUST
+ * GENERATE THE SAME UTILITY CSS. Tailwind orders utilities deterministically
+ * within a root, so when the roots compile from one shared @source list, the
+ * two sheets' utility layers are interchangeable — whichever the router puts
+ * last, every base/variant pair (`hidden md:block`, `flex lg:grid`,
+ * `block dark:hidden`, …) still resolves the same way.
+ *
+ * If the lists drift apart, a class generated in only one sheet overrides its
+ * responsive/dark counterpart from the other sheet depending on navigation
+ * order. Real examples from before this file existed: /admin → /learn → back
+ * left the admin tables invisible (the learn sheet's later `hidden` copy beat
+ * the admin sheet's `md:block`); /learn → home → back to /learn re-showed the
+ * mobile navbar on desktop (the home sheet's later `flex` beat `md:hidden`).
+ *
+ * So: NEVER add an @source to one root only — add it HERE.
+ * __tests__/cssCascadeParity.test.ts compiles both roots and fails if their
+ * utility layers diverge.
+ *
+ * Known, accepted divergence: utilities that only compile in the learn root
+ * because they depend on Fumadocs's theme/plugins (`bg-fd-*`, `prose`,
+ * `fd-steps`, …). Those never share a CSS property with a generic utility on
+ * the same element, so they can't lose a cross-sheet ordering race the way
+ * display/spacing pairs can. The parity test allowlists exactly that set.
+ * ==========================================================================*/
+
+/* ── Sources — the union scanned by BOTH roots ────────────────────────────
+ * `source(none)` in each root disables Tailwind's automatic content crawl
+ * (which would walk content/, public/, cdn-assets/, agent-outputs/ and add
+ * minutes to a cold compile), so utility classes are generated ONLY for the
+ * files matched here. ADD A GLOB HERE when a new directory starts using
+ * Tailwind classes — never in just one of the two roots. */
+@source "../components/**/*.{ts,tsx}";
+@source "./_components/home/**/*.{ts,tsx}";
+/* The header's account control lives here; without this glob its Tailwind
+   classes (e.g. the avatar's `size-*`) are never generated, so the avatar
+   image falls back to its intrinsic ~96px size. */
+@source "./_components/auth/**/*.{ts,tsx}";
+@source "./_components/legal/**/*.{ts,tsx}";
+@source "./admin/**/*.{ts,tsx}";
+@source "./magicui-demo/**/*.{ts,tsx}";
+/* Thin route pages that author Tailwind classes directly. These were missing
+   from the old per-root lists, so classes used only there (e.g. /pricing's
+   `scroll-mt-20`, `sm:pt-16`; /account's `max-w-md`) silently never
+   generated. */
+@source "./pricing/**/*.{ts,tsx}";
+@source "./account/**/*.{ts,tsx}";
+@source "./privacy/**/*.{ts,tsx}";
+@source "./terms/**/*.{ts,tsx}";
+/* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
+   non-learn root needs these too — that is the point of the union: the home/
+   admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so
+   that when it is ordered after the learn sheet, its later `flex`/`grid`
+   copies can't flip the docs chrome (mobile navbar, TOC, search dialog)
+   visible on desktop. */
+@source "../node_modules/fumadocs-ui/dist/**/*.js";
+
+/* ── Dark variant ─────────────────────────────────────────────────────────
+ * Class-based dark mode (a `.dark` ancestor — set by next-themes on /learn
+ * and by the app's own toggle elsewhere). The selector shape matches the one
+ * Fumadocs UI registers (`fumadocs-ui/css/lib/base.css`) so `dark:*`
+ * utilities compile to byte-identical rules in both roots. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── shadcn / Magic UI design tokens (neutral base) ───────────────────────
+ * Magic UI components reference these through utilities like bg-background,
+ * text-foreground, border-border, bg-card, text-muted-foreground, etc.
+ *
+ * The custom properties are namespaced `--ui-*` instead of shadcn's stock
+ * `--background`/`--border`/… names. The stock names collide with the
+ * playground palette (app/_components/playground.css defines `--border`,
+ * `--primary`, `--accent`, `--radius` at :root, and playgroundTheme.ts writes
+ * `--border` & friends as inline styles on <html> while any playground is
+ * mounted — including the home page's embedded showcase). With the stock
+ * names, `border-border` etc. resolved to the playground's dark-slate palette
+ * whenever a playground sheet loaded after this one. The `--ui-` namespace
+ * makes the two token systems disjoint. If you install a new shadcn/Magic UI
+ * component that ships raw `var(--foreground)`-style references, rename them
+ * to `var(--ui-foreground)` (see components/ui/ripple.tsx). */
+:root {
+  --ui-radius: 0.625rem;
+  --ui-background: oklch(1 0 0);
+  --ui-foreground: oklch(0.145 0 0);
+  --ui-card: oklch(1 0 0);
+  --ui-card-foreground: oklch(0.145 0 0);
+  --ui-popover: oklch(1 0 0);
+  --ui-popover-foreground: oklch(0.145 0 0);
+  --ui-primary: oklch(0.205 0 0);
+  --ui-primary-foreground: oklch(0.985 0 0);
+  --ui-secondary: oklch(0.97 0 0);
+  --ui-secondary-foreground: oklch(0.205 0 0);
+  --ui-muted: oklch(0.97 0 0);
+  --ui-muted-foreground: oklch(0.556 0 0);
+  --ui-accent: oklch(0.97 0 0);
+  --ui-accent-foreground: oklch(0.205 0 0);
+  --ui-destructive: oklch(0.577 0.245 27.325);
+  --ui-border: oklch(0.922 0 0);
+  --ui-input: oklch(0.922 0 0);
+  --ui-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --ui-background: oklch(0.145 0 0);
+  --ui-foreground: oklch(0.985 0 0);
+  --ui-card: oklch(0.205 0 0);
+  --ui-card-foreground: oklch(0.985 0 0);
+  --ui-popover: oklch(0.205 0 0);
+  --ui-popover-foreground: oklch(0.985 0 0);
+  --ui-primary: oklch(0.922 0 0);
+  --ui-primary-foreground: oklch(0.205 0 0);
+  --ui-secondary: oklch(0.269 0 0);
+  --ui-secondary-foreground: oklch(0.985 0 0);
+  --ui-muted: oklch(0.269 0 0);
+  --ui-muted-foreground: oklch(0.708 0 0);
+  --ui-accent: oklch(0.269 0 0);
+  --ui-accent-foreground: oklch(0.985 0 0);
+  --ui-destructive: oklch(0.704 0.191 22.216);
+  --ui-border: oklch(1 0 0 / 10%);
+  --ui-input: oklch(1 0 0 / 15%);
+  --ui-ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  --color-background: var(--ui-background);
+  --color-foreground: var(--ui-foreground);
+  --color-card: var(--ui-card);
+  --color-card-foreground: var(--ui-card-foreground);
+  --color-popover: var(--ui-popover);
+  --color-popover-foreground: var(--ui-popover-foreground);
+  --color-primary: var(--ui-primary);
+  --color-primary-foreground: var(--ui-primary-foreground);
+  --color-secondary: var(--ui-secondary);
+  --color-secondary-foreground: var(--ui-secondary-foreground);
+  --color-muted: var(--ui-muted);
+  --color-muted-foreground: var(--ui-muted-foreground);
+  --color-accent: var(--ui-accent);
+  --color-accent-foreground: var(--ui-accent-foreground);
+  --color-destructive: var(--ui-destructive);
+  --color-border: var(--ui-border);
+  --color-input: var(--ui-input);
+  --color-ring: var(--ui-ring);
+
+  --radius-sm: calc(var(--ui-radius) - 4px);
+  --radius-md: calc(var(--ui-radius) - 2px);
+  --radius-lg: var(--ui-radius);
+  --radius-xl: calc(var(--ui-radius) + 4px);
+
+  /* Magic UI component animations (referenced by animate-* utilities). */
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-ripple: ripple var(--duration, 2s) ease infinite;
+  --animate-blink-cursor: blink-cursor 1s step-end infinite;
+}
+
+/* Keyframes for the Magic UI animations declared above. Each Magic UI
+ * component installed via the shadcn registry may add its own keyframes here —
+ * keep this list in sync with the components under components/ui. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+@keyframes ripple {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+@keyframes blink-cursor {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The Magic UI animations above are all infinite and purely decorative —
+ * disable them outright for users who prefer reduced motion. (The JS-driven
+ * counterparts check useReducedMotion / matchMedia themselves.) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical,
+  .animate-shimmer-slide,
+  .animate-spin-around,
+  .animate-ripple,
+  .animate-blink-cursor {
+    animation: none !important;
+  }
+}
