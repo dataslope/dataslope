@@ -17,16 +17,24 @@ lambda and know what it's doing.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three tiny mappings, each an input dot, a fat arrow, and an output — change of shape, change of size, one into two — with a captured red dot tethered to the last row"
+  aria-label="Three tiny mappings, each an input dot, a thin arrow, and an output — change of shape, change of size, one into two — with a captured red dot tethered to the last row by a thin line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    opacity="0.3"
+  >
+    <path d="M232 60 H 282" />
+    <path d="M232 110 H 282" />
+    <path d="M232 160 H 282" />
+  </g>
   <g fill="currentColor" opacity="0.35">
-    <rect x="240" y="54" width="30" height="12" rx="6" />
-    <polygon points="274,46 274,74 298,60" />
-    <rect x="240" y="104" width="30" height="12" rx="6" />
-    <polygon points="274,96 274,124 298,110" />
-    <rect x="240" y="154" width="30" height="12" rx="6" />
-    <polygon points="274,146 274,174 298,160" />
+    <polygon points="282,53 282,67 296,60" />
+    <polygon points="282,103 282,117 296,110" />
+    <polygon points="282,153 282,167 296,160" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="200" cy="60" r="11" />
@@ -43,8 +51,14 @@ lambda and know what it's doing.
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <circle cx="120" cy="204" r="8" />
-    <circle cx="146" cy="192" r="3" fillOpacity="0.5" />
-    <circle cx="170" cy="178" r="3" fillOpacity="0.5" />
+    <path
+      d="M131 198 C 152 188, 170 178, 186 168"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeOpacity="0.45"
+    />
   </g>
 </svg>
 
