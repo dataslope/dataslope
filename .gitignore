@@ -68,6 +68,11 @@ script-runner-src/__pycache__/
 # committed `.d.ts` sibling is kept so typecheck/lint pass before it exists.
 /lib/generated/search-index.js
 
+# Mermaid's brand-token fallback map, parsed from app/brand.css (rebuilt by
+# `scripts/build-brand-fallbacks.mjs` on postinstall + build + dev). The
+# committed `.d.ts` sibling is kept so typecheck/lint pass before it exists.
+/lib/generated/brand-fallbacks.js
+
 # Output of scripts/check-mermaid-errors.mjs (regenerated on demand).
 /mermaid-check-results.json
 

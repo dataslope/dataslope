@@ -15,8 +15,6 @@
    tokens under the `--cb-*` names these rules consume, so the output
    area always tracks the surrounding card's light/dark theme. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
-
 .outputScope {
   --cb-black: var(--ds-black);
   --cb-slate-200: var(--ch-slate-200);
@@ -232,11 +230,7 @@
     0 4px 16px color-mix(in srgb, var(--cb-black) 18%, transparent),
     0 1px 4px color-mix(in srgb, var(--cb-black) 8%, transparent);
   background-clip: padding-box;
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
   font-size: 12.5px;
   line-height: 1.4;
   letter-spacing: -0.01em;
@@ -340,11 +334,7 @@
      heading tracking to this <h2> and wins over the value set on
      `.toastRoot` (a directly-matched element rule beats an inherited value).
      Pin Inter on the title itself so the toast text stays in the UI font. */
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
   font-weight: 500;
   font-size: 12.5px;
   line-height: 1.35;

@@ -18,6 +18,10 @@ const eslintConfig = [
       // emitted by scripts/build-search-index.mjs; gitignored). The committed
       // .d.ts sibling is linted normally.
       "lib/generated/search-index.js",
+      // Generated brand-token fallback map (emitted from app/brand.css by
+      // scripts/build-brand-fallbacks.mjs; gitignored). The committed .d.ts
+      // sibling is linted normally.
+      "lib/generated/brand-fallbacks.js",
     ],
   },
   {

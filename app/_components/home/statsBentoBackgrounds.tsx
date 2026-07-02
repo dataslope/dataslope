@@ -44,8 +44,6 @@ import {
 import { DiamondAssembleTurnLoader } from "@/app/_components/mdx/loadingAnimations";
 import { TypingAnimation } from "@/components/ui/typing-animation";
 import { AnimatedListItem } from "@/components/ui/animated-list";
-// Loads JetBrains Mono for the typing card (see TypingBackground).
-import "./typingFont.css";
 
 /** Respect the user's reduced-motion preference for the JS-driven animations. */
 function usePrefersReducedMotion(): boolean {
@@ -223,7 +221,7 @@ export function TypingBackground() {
       <div
         className="absolute left-6 right-4 top-7 text-right text-2xl font-normal"
         style={{
-          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          fontFamily: "var(--font-mono, ui-monospace, monospace)",
           color: "var(--ds-green)",
         }}
       >

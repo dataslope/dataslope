@@ -14,6 +14,7 @@ import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
 import styles from "./mermaid.module.css";
 import { Timeline } from "./timeline";
 import { MERMAID_CDN } from "../runtime/cdn";
+import BRAND_FALLBACKS from "@/lib/generated/brand-fallbacks.js";
 
 export function Mermaid({ chart }: { chart: string }) {
   // Mermaid lays `timeline` diagrams out horizontally, so a chart with many
@@ -74,14 +75,15 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 //
 // Mermaid runs color math (khroma) over theme values and needs concrete colors,
 // so we resolve the brand tokens to hex at render time (brand.css stays the
-// source of truth) with literal fallbacks.
+// source of truth) with literal fallbacks — BRAND_FALLBACKS, generated from
+// brand.css at build time by scripts/build-brand-fallbacks.mjs.
 
 // Inter for regular text; JetBrains Mono for diagrams that are entirely code.
 // Inline <code> spans in flowchart labels are styled via mermaid.module.css; whole
 // class/ER diagrams (see isCodeDiagram) render in mono so Mermaid measures — and
 // therefore sizes the boxes — in the mono face. The CSS vars resolve in the DOM
-// (defined on :root and on <html> via next/font); the literal fallbacks keep text
-// measurement correct if a var is ever missing.
+// (published on <html> by next/font in app/layout.tsx); the literal fallbacks
+// keep text measurement correct if a var is ever missing.
 const SANS =
   'var(--font-sans), Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const MONO =
@@ -107,44 +109,6 @@ const MONO_DIRECTIVE = `%%{init: ${JSON.stringify({
   fontFamily: MONO,
   themeVariables: { fontFamily: MONO },
 })}}%%\n`;
-
-const BRAND_FALLBACKS: Record<string, string> = {
-  "--ds-blue-300": "#8ABFFF",
-  "--ds-blue-400": "#5BA7FF",
-  "--ds-blue-500": "#148CFF",
-  "--ds-blue-550": "#0E82EE",
-  "--ds-blue-600": "#0878DD",
-  "--ds-blue-650": "#046ECD",
-  "--ds-blue-700": "#0064BD",
-  "--ds-blue-750": "#005AAC",
-  "--ds-blue-800": "#00519C",
-  "--ds-blue-850": "#00488D",
-  "--ds-blue-900": "#00407F",
-  "--ds-blue-950": "#003871",
-  "--ds-teal-500": "#00AEAA",
-  "--ds-teal-600": "#009491",
-  "--ds-green-500": "#20C621",
-  "--ds-green-600": "#0AA80F",
-  "--ds-yellow-500": "#FFDD6C",
-  "--ds-yellow-600": "#D4B651",
-  "--ds-orange-500": "#E47600",
-  "--ds-orange-600": "#C36400",
-  "--ds-red-500": "#FF4F59",
-  "--ds-red-600": "#DC3F49",
-  "--ds-purple-500": "#AB77FA",
-  "--ds-purple-600": "#9263D7",
-  "--ds-gray-50": "#F9FAFB",
-  "--ds-gray-100": "#F3F4F6",
-  "--ds-gray-200": "#E5E7EB",
-  "--ds-gray-300": "#D1D5DB",
-  "--ds-gray-400": "#9CA3AF",
-  "--ds-gray-500": "#6B7280",
-  "--ds-gray-600": "#4B5563",
-  "--ds-gray-700": "#374151",
-  "--ds-gray-800": "#1F2937",
-  "--ds-gray-900": "#111827",
-  "--ds-white": "#FFFFFF",
-};
 
 // The seven-hue brand wheel (app/brand.css §1.1) used for categorical diagrams
 // (pie) and for snapping author fills back onto the palette. `dark` marks hues
@@ -175,7 +139,7 @@ const MINDMAP_BRANCHES = [
   "--ds-blue-750",
 ];
 
-function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
+function readBrand(): (token: string) => string {
   let resolved: Record<string, string> = BRAND_FALLBACKS;
   if (typeof window !== "undefined") {
     const root = getComputedStyle(document.documentElement);
@@ -219,7 +183,7 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
   const cScale: Record<string, string> = {};
   for (let i = 0; i < 12; i++) {
     const hue = WHEEL[i % WHEEL.length];
-    cScale[`cScale${i}`] = c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS);
+    cScale[`cScale${i}`] = c(`--ds-${hue.name}-500`);
     cScale[`cScaleLabel${i}`] = hue.dark ? dark : light;
   }
 
@@ -362,7 +326,7 @@ function hueToWheel(h: number): (typeof WHEEL)[number] {
 // or near-white/black fills return null (left as-is, e.g. cluster surfaces).
 function snapToBrand(
   fill: string,
-  c: (token: keyof typeof BRAND_FALLBACKS) => string,
+  c: (token: string) => string,
 ): { fill: string; name: string; dark: boolean } | null {
   const rgb = parseRgb(fill);
   if (!rgb) return null;
@@ -370,7 +334,7 @@ function snapToBrand(
   if (s < 0.12 || l > 0.97 || l < 0.03) return null;
   const hue = hueToWheel(h);
   return {
-    fill: c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS),
+    fill: c(`--ds-${hue.name}-500`),
     name: hue.name,
     dark: hue.dark,
   };
@@ -433,7 +397,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
       const token = m
         ? MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length]
         : MINDMAP_ROOT;
-      fillHex = c(token as keyof typeof BRAND_FALLBACKS);
+      fillHex = c(token);
       // Every mindmap shade (root 500 + dark branches) carries white text.
       darkText = false;
     } else {
@@ -444,7 +408,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
         darkText = snapped.dark;
       }
     }
-    const stroke600 = c(`--ds-${hueName}-600` as keyof typeof BRAND_FALLBACKS);
+    const stroke600 = c(`--ds-${hueName}-600`);
 
     shapes.forEach((shape) => {
       if (fillHex) shape.style.setProperty("fill", fillHex, "important");
@@ -533,7 +497,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     const host = d.closest(".node");
     const shape = host?.querySelector("rect, polygon, circle, ellipse, path");
     const snapped = shape && snapToBrand(getComputedStyle(shape).fill, c);
-    const col = c(`--ds-${snapped?.name ?? "blue"}-600` as keyof typeof BRAND_FALLBACKS);
+    const col = c(`--ds-${snapped?.name ?? "blue"}-600`);
     d.style.setProperty("stroke", col, "important");
     d.querySelectorAll<SVGElement>("line, path, rect").forEach((e) => {
       e.style.setProperty("stroke", col, "important");
@@ -547,7 +511,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     const m = (e.getAttribute("class") ?? "").match(/section-edge-(\d+)/);
     if (!m) return;
     const token = MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length];
-    e.style.setProperty("stroke", c(token as keyof typeof BRAND_FALLBACKS), "important");
+    e.style.setProperty("stroke", c(token), "important");
   });
 }
 
@@ -581,18 +545,24 @@ function MermaidContent({ chart }: { chart: string }) {
 
   const { svg, bindFunctions } = use(
     cachePromise(`${chart}-${resolvedTheme}`, async () => {
-      // Explicitly request Inter (regular text) and JetBrains Mono (code) at the
-      // weights/size Mermaid measures with, before rendering. `document.fonts.
-      // ready` is insufficient because font-display:swap fonts may not be in the
-      // "ready" set until explicitly triggered. `fonts.load()` guarantees the
-      // face is available (or settles with a no-op if it can't load) first.
-      await Promise.allSettled([
-        document.fonts.load("400 15px Inter"),
-        document.fonts.load("700 15px Inter"),
-        document.fonts.load('400 15px "JetBrains Mono"'),
-        document.fonts.load('500 15px "JetBrains Mono"'),
-        document.fonts.load('700 15px "JetBrains Mono"'),
-      ]);
+      // Explicitly request the sans (Inter) and mono (JetBrains Mono) faces at
+      // the weights/size Mermaid measures with, before rendering. `document.
+      // fonts.ready` is insufficient because font-display:swap fonts may not be
+      // in the "ready" set until explicitly triggered. `fonts.load()` guarantees
+      // the face is available (or settles with a no-op if it can't load) first.
+      // next/font registers the faces under hashed family names, so resolve the
+      // real names from the variables it publishes on <html> rather than
+      // hardcoding "Inter"/"JetBrains Mono" (which would silently no-op).
+      const rootStyle = getComputedStyle(document.documentElement);
+      await Promise.allSettled(
+        ["--font-sans", "--font-mono"].flatMap((variable) => {
+          const family = rootStyle.getPropertyValue(variable).trim();
+          if (!family) return [];
+          return [400, 500, 700].map((weight) =>
+            document.fonts.load(`${weight} 15px ${family}`),
+          );
+        }),
+      );
       const prefix = isCodeDiagram(chart) ? MONO_DIRECTIVE : "";
       return mermaid.render(id, prefix + chart.replaceAll("\\n", "\n"));
     }),

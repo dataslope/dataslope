@@ -11,16 +11,6 @@
  * list in app/tailwind.shared.css, shared with the app/tailwind.css root
  * so both roots emit identical utility layers (see that file's header).
  */
-/* Pull in the same Inter/JetBrains Mono faces the playground bundles, so
-   the docs typography matches the playground chrome and doesn't wait on the
-   system fallback while Fumadocs's default font loads. Kept byte-identical
-   to the @import in app/_components/playground.css so the browser fetches
-   it once when both stylesheets are loaded. The `@import` must precede the
-   tailwind/fumadocs imports below — `@import` rules are required to come
-   before any non-`@import`/`@layer`/`@charset` at-rule, including the
-   inlined CSS pulled in by tailwindcss. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
-
 /* `source(none)` disables Tailwind v4's automatic content detection,
    which otherwise crawls the entire project on every CSS compile. In this
    repo that sweep walks large non-source trees (public/, cdn-assets/,
@@ -114,17 +104,12 @@
   }
 }
 
-/* Override Fumadocs's default sans stack inside the /learn route with
-   Inter and apply slightly tight letter-spacing for a more polished
-   editorial feel. We scope to `body` (which is shared, but layout-CSS
-   imports here are scoped to the /learn bundle by Next.js so they
-   don't leak into other routes). */
-:root {
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
-    monospace;
-}
+/* The --font-sans (Inter) and --font-mono (JetBrains Mono) variables are
+   published on <html> by next/font in app/layout.tsx — the single place the
+   webfonts load. Don't redeclare them here: an unlayered :root re-definition
+   would tie next/font's html-class rule on specificity and leave the winner
+   to stylesheet order, which the App Router doesn't guarantee across
+   client-side navigations (the same race class as the blocks above). */
 
 /* Ensure inline and block <code> elements pick up the JetBrains Mono
    stack regardless of whether they're inside a .prose block or not. */
@@ -132,8 +117,7 @@ code,
 pre,
 kbd,
 samp {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
-    monospace;
+  font-family: var(--font-mono, ui-monospace, monospace);
 }
 
 /* Use pure white for the body and sidebar backgrounds in light mode only.
@@ -279,16 +263,18 @@ samp {
   --tw-prose-body: var(--color-fd-foreground);
 }
 
+/* Inter (via next/font's --font-sans) with slightly tight letter-spacing for
+   a more polished editorial feel, overriding Fumadocs's default sans stack.
+   Scoped to `body` (which is shared, but layout-CSS imports here are scoped
+   to the /learn bundle by Next.js so they don't leak into other routes). */
 body {
-  font-family:
-    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  font-family: var(--font-sans, system-ui, sans-serif);
   letter-spacing: -0.011em;
 }
 
 /* Inter for headings, with tightened tracking for a polished display
-   feel. The bundled Inter is a static (non-variable) webfont, so
-   font-variation-settings is cleared rather than driving an opsz axis. */
+   feel. font-variation-settings is cleared rather than driving an opsz
+   axis so headings render the same faces as body text. */
 h1,
 h2,
 h3,
@@ -504,8 +490,8 @@ code.hljs {
                                       overrides Mermaid's own font-size and the
                                       text overflows its measured node boxes
    - h1–h6                            headings (handled separately)
-   The bundled Inter is a static webfont, so font-variation-settings is
-   cleared. Letter-spacing is pulled in to −0.011em, matching the tight
+   font-variation-settings is cleared so no variation axis lingers.
+   Letter-spacing is pulled in to −0.011em, matching the tight
    Inter tracking set on `body`, for a polished editorial colour.
    ─────────────────────────────────────────────────────────────────────── */
 .prose :where(p, li, td, th):not(
