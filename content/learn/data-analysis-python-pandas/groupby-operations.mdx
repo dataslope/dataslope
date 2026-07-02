@@ -10,7 +10,7 @@ category" question in data analysis ends up here.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Mixed colored dots in one box split into three single-color boxes, and each box collapses into one summary row of its color — groupby's split, apply, combine"
+  aria-label="Mixed colored dots in one box split along thin lines into three single-color boxes, and each box collapses into one summary row of its color — groupby's split, apply, combine"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="55" width="130" height="120" rx="16" fill="currentColor" opacity="0.08" />
@@ -29,10 +29,14 @@ category" question in data analysis ends up here.
     <circle cx="95" cy="120" r="7" />
     <circle cx="135" cy="150" r="7" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="205" cy="115" r="3" />
-    <circle cx="220" cy="115" r="3" />
-    <polygon points="232,107 248,115 232,123" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M200 115 H 254"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="270" y="35" width="110" height="46" rx="12" fillOpacity="0.12" />
@@ -52,13 +56,16 @@ category" question in data analysis ends up here.
     <circle cx="320" cy="172" r="6" />
     <circle cx="348" cy="172" r="6" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="405" cy="70" r="3" />
-    <circle cx="422" cy="82" r="3" />
-    <circle cx="405" cy="115" r="3" />
-    <circle cx="422" cy="115" r="3" />
-    <circle cx="405" cy="160" r="3" />
-    <circle cx="422" cy="148" r="3" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M390 58 L 434 92" />
+    <path d="M390 115 H 434" />
+    <path d="M390 172 L 434 138" />
   </g>
   <rect x="440" y="75" width="140" height="80" rx="14" fill="currentColor" opacity="0.08" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
