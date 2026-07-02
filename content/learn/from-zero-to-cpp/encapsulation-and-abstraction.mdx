@@ -40,10 +40,18 @@ language gives you tools to apply.
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="320" cy="115" r="78" fillOpacity="0.1" />
     <path fillRule="evenodd" d="M242 115 a78 78 0 1 0 156 0 a78 78 0 1 0 -156 0 M250 115 a70 70 0 1 0 140 0 a70 70 0 1 0 -140 0" fillOpacity="0.8" />
-    <circle cx="320" cy="51" r="3.5" fillOpacity="0.5" />
-    <circle cx="384" cy="115" r="3.5" fillOpacity="0.5" />
-    <circle cx="320" cy="179" r="3.5" fillOpacity="0.5" />
-    <circle cx="256" cy="115" r="3.5" fillOpacity="0.5" />
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeOpacity="0.5"
+    >
+      <path d="M320 49 V 61" />
+      <path d="M386 115 H 374" />
+      <path d="M320 181 V 169" />
+      <path d="M254 115 H 266" />
+    </g>
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="316" y="61" width="8" height="58" rx="4" />
