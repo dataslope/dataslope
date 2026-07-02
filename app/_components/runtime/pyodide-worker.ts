@@ -41,10 +41,32 @@ interface OutputCellMessage {
 }
 
 // ─── Protocol ──────────────────────────────────────────────────────────
+
+/** Rich completion item — mirrors `CompletionItemDetail` in ../types. */
+interface CompletionItemMessage {
+  label: string;
+  type?: string;
+  detail?: string;
+  info?: string;
+  apply?: string;
+  boost?: number;
+}
+
 type InMessage =
   | { kind: "init" }
   | { kind: "run"; id: number; code: string; theme?: "light" | "dark" }
-  | { kind: "complete"; id: number; line: string; column: number }
+  | {
+      kind: "complete";
+      id: number;
+      /** Full document text (jedi analyses the whole buffer). */
+      doc: string;
+      /** 1-based line of the cursor within `doc`. */
+      lineNumber: number;
+      /** Text of the cursor's line (rlcompleter fallback path). */
+      line: string;
+      /** 0-based column of the cursor within `line`. */
+      column: number;
+    }
   | {
       kind: "prepare-fs";
       id: number;
@@ -65,7 +87,7 @@ type OutMessage =
   | {
       kind: "complete-result";
       id: number;
-      completions: string[];
+      completions: Array<string | CompletionItemMessage>;
       replaceLength: number;
     };
 
@@ -371,6 +393,7 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
     "__name__", "__doc__", "__package__", "__loader__", "__spec__",
     "__builtins__", "__file__", "__cached__",
     "_user_code_str", "_complete_line", "_complete_column",
+    "_complete_doc", "_complete_line_no",
     # Explicitly guard the set and the helpers themselves —
     # set(globals().keys()) above already captures them, but listing them
     # here makes the intent obvious and guards against future reordering.
@@ -481,6 +504,102 @@ function ensurePackages(): Promise<void> {
     );
   }
   return packagesPromise;
+}
+
+// ─── jedi-based autocomplete ───────────────────────────────────────────
+// jedi ships as a Pyodide package (~1.7 MB of wheels) and is loaded
+// lazily on the first completion request. `jedi.Interpreter` analyses
+// the full editor buffer *and* the live worker globals, so completions
+// cover static code (imports, defs above the cursor) and the real
+// objects of the previous run (actual DataFrame columns) — the same
+// approach JupyterLite's Pyodide kernel uses. On load failure (e.g. a
+// blocked CDN) completion falls back to the rlcompleter path above for
+// the rest of the session.
+
+const JEDI_SETUP = `
+import json as _json
+import jedi as _jedi
+
+# jedi -> CodeMirror completion kinds (drives the popup icons).
+_JEDI_TYPE_MAP = {
+    "module": "namespace",
+    "class": "class",
+    "instance": "variable",
+    "function": "function",
+    "param": "variable",
+    "path": "text",
+    "keyword": "keyword",
+    "property": "property",
+    "statement": "variable",
+    "namespace": "namespace",
+}
+
+def _python_completions_jedi(doc, line_no, column, line):
+    """Complete \`doc\` at 1-based \`line_no\` / 0-based \`column\`.
+
+    Returns a JSON string {"items": [...], "replaceLength": n} or null
+    when jedi itself failed (the caller then falls back to rlcompleter).
+    """
+    try:
+        interp = _jedi.Interpreter(doc, [globals()])
+        comps = interp.complete(line=int(line_no), column=int(column))
+    except Exception:
+        return _json.dumps(None)
+    if not comps:
+        return _json.dumps({"items": [], "replaceLength": 0})
+    prefix_len = comps[0].get_completion_prefix_length()
+    typed = line[max(0, int(column) - prefix_len):int(column)]
+    # Hide private/dunder names unless the user is typing an underscore.
+    hide_private = not typed.startswith("_")
+    items = []
+    for c in comps:
+        name = c.name
+        if hide_private and name.startswith("_"):
+            continue
+        items.append({
+            "label": name,
+            "type": _JEDI_TYPE_MAP.get(c.type, "variable"),
+        })
+        # Cap the payload — the popup shows a handful; CodeMirror
+        # re-filters as the user types and re-queries past validFor.
+        if len(items) >= 200:
+            break
+    return _json.dumps({"items": items, "replaceLength": prefix_len})
+
+# These globals postdate setup A's protected-names snapshot — protect
+# them or the per-run global reset would delete them.
+_PG_PROTECTED_NAMES |= {
+    "_json", "_jedi", "_JEDI_TYPE_MAP", "_python_completions_jedi",
+}
+`;
+
+let jediPromise: Promise<boolean> | null = null;
+
+/** Load + set up jedi once; resolves false (and stops retrying) if the
+ *  package can't be fetched so completions degrade to rlcompleter
+ *  instead of re-downloading on every keystroke. */
+function ensureJedi(): Promise<boolean> {
+  if (!jediPromise) {
+    jediPromise = (async () => {
+      if (!pyodide) return false;
+      try {
+        await pyodide.loadPackage("jedi", {
+          messageCallback: (m: string) => {
+            console.log("[pyodide:loadPackage]", m);
+          },
+          errorCallback: (m: string) => {
+            console.error("[pyodide:loadPackage]", m);
+          },
+        });
+        await pyodide.runPythonAsync(JEDI_SETUP);
+        return true;
+      } catch (err) {
+        console.error("[pyodide] jedi unavailable, using rlcompleter", err);
+        return false;
+      }
+    })();
+  }
+  return jediPromise;
 }
 
 // Phase-B-provided ambient names: the setup scripts define a global
@@ -697,7 +816,8 @@ if _plt is not None:
   }
 }
 
-async function completeCode(
+/** rlcompleter fallback — used when the jedi wheel can't be loaded. */
+async function completeWithRlcompleter(
   id: number,
   line: string,
   column: number,
@@ -728,6 +848,62 @@ async function completeCode(
       replaceLength = len;
     }
   }
+
+  post({ kind: "complete-result", id, completions, replaceLength });
+}
+
+async function completeCode(
+  id: number,
+  doc: string,
+  lineNumber: number,
+  line: string,
+  column: number,
+): Promise<void> {
+  if (!pyodide) throw new Error("Pyodide is not initialised");
+
+  if (!(await ensureJedi())) {
+    await completeWithRlcompleter(id, line, column);
+    return;
+  }
+
+  // Globals (not string interpolation) carry the request so the user's
+  // text never needs escaping into Python source.
+  pyodide.globals.set("_complete_doc", doc);
+  pyodide.globals.set("_complete_line_no", lineNumber);
+  pyodide.globals.set("_complete_line", line);
+  pyodide.globals.set("_complete_column", column);
+
+  const json = (await pyodide.runPythonAsync(
+    "_python_completions_jedi(_complete_doc, _complete_line_no, _complete_column, _complete_line)",
+  )) as string;
+
+  let parsed: {
+    items?: Array<{ label?: unknown; type?: unknown }>;
+    replaceLength?: unknown;
+  } | null = null;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    parsed = null;
+  }
+
+  // `null` signals a jedi-level failure on this request (e.g. a parse
+  // edge case) — fall back rather than answering with nothing.
+  if (!parsed) {
+    await completeWithRlcompleter(id, line, column);
+    return;
+  }
+
+  const completions: CompletionItemMessage[] = [];
+  for (const item of parsed.items ?? []) {
+    if (typeof item?.label !== "string") continue;
+    completions.push({
+      label: item.label,
+      type: typeof item.type === "string" ? item.type : undefined,
+    });
+  }
+  const replaceLength =
+    typeof parsed.replaceLength === "number" ? parsed.replaceLength : 0;
 
   post({ kind: "complete-result", id, completions, replaceLength });
 }
@@ -866,11 +1042,11 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   }
 
   if (msg.kind === "complete") {
-    const { id, line, column } = msg;
+    const { id, doc, lineNumber, line, column } = msg;
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await completeCode(id, line, column);
+        await completeCode(id, doc, lineNumber, line, column);
       } catch {
         // Completions are best-effort — return an empty list rather than
         // surfacing the error to the user.

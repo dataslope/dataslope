@@ -35,16 +35,12 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import {
-  autocompletion,
   closeBrackets,
   closeBracketsKeymap,
-  completionKeymap,
-  startCompletion,
-  type CompletionContext,
-  type CompletionResult,
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
+import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
   ExampleSnippet,
@@ -1342,37 +1338,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const wrapComp = new Compartment();
       const languageComp = new Compartment();
 
-      // Bridge the runtime adapter's `complete()` into v6 autocompletion.
-      // The runtime returns `{ list, replaceLength }` describing the prefix
-      // under the cursor; we translate that into a v6 `CompletionResult`.
-      const completionSource = async (
-        ctx: CompletionContext,
-      ): Promise<CompletionResult | null> => {
-        const rt = runtimeRef.current;
-        if (!rt || typeof rt.complete !== "function") return null;
-        const line = ctx.state.doc.lineAt(ctx.pos);
-        const col = ctx.pos - line.from;
-        try {
-          const res = await rt.complete(line.text, col);
-          if (!res || res.list.length === 0) return null;
-          return {
-            from: ctx.pos - res.replaceLength,
-            to: ctx.pos,
-            options: res.list.map((label) => ({ label, type: "variable" })),
-            validFor: /^[\w$]*$/,
-          };
-        } catch {
-          return null;
-        }
-      };
-
-      // Listen for doc changes to persist + auto-trigger completion on `.`,
-      // matching the v5 inputRead "type a dot" UX.
-      // The persist target is the *currently active file*: contents
-      // land in the file's in-memory dirty buffer (synchronous) and in
-      // OPFS via an async queue. We deliberately read the active file
-      // and workspace ids from refs so tab switches don't require
-      // rebuilding the editor extensions.
+      // Listen for doc changes to persist the *currently active file*:
+      // contents land in the file's in-memory dirty buffer (synchronous)
+      // and in OPFS via an async queue. We deliberately read the active
+      // file and workspace ids from refs so tab switches don't require
+      // rebuilding the editor extensions. (Completion triggers — `.`,
+      // Ctrl-Space, etc. — live inside `languageCompletion` below.)
       const persistListener = EditorView.updateListener.of((update) => {
         if (!update.docChanged) return;
         if (!suppressPersistRef.current) {
@@ -1385,16 +1356,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           }
           // A genuine user edit makes the workspace eligible to be saved.
           markDirty();
-        }
-        for (const tr of update.transactions) {
-          if (!tr.isUserEvent("input.type")) continue;
-          let inserted = "";
-          tr.changes.iterChanges((_fA, _tA, _fB, _tB, ins) => {
-            inserted += ins.toString();
-          });
-          if (inserted === ".") {
-            startCompletion(update.view);
-          }
         }
       });
 
@@ -1426,10 +1387,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           // LanguageAdapter.indentWidth) so Tab matches the Format button.
           EditorState.tabSize.of(adapter.indentWidth),
           indentUnit.of(" ".repeat(adapter.indentWidth)),
-          autocompletion({
-            override: [completionSource],
-            activateOnTyping: false,
-            closeOnBlur: true,
+          // Intellisense: runtime-backed + static completion sources,
+          // trigger characters, and the completion keymap (Tab accepts,
+          // Enter always inserts a newline).
+          languageCompletion({
+            adapterId: adapter.id,
+            getRuntime: () => runtimeRef.current,
+            getFilename: () =>
+              filesRef.current.find((f) => f.id === activeFileIdRef.current)
+                ?.filename,
           }),
           keymap.of([
             {
@@ -1446,19 +1412,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 return true;
               },
             },
-            {
-              key: "Ctrl-Space",
-              run: (v) => {
-                startCompletion(v);
-                return true;
-              },
-            },
             ...closeBracketsKeymap,
             ...defaultKeymap,
             ...searchKeymap,
             ...historyKeymap,
             ...redoKeymap,
-            ...completionKeymap,
             indentWithTab,
           ]),
           languageComp.of([]),

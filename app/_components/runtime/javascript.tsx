@@ -1,4 +1,6 @@
 import type {
+  CompletionRequest,
+  CompletionResult,
   EmitOutput,
   ExampleSnippet,
   LanguageAdapter,
@@ -7,6 +9,11 @@ import type {
   RunOptions,
 } from "../types";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
+import {
+  buildTsCompletionRequest,
+  completeWithTsService,
+  decodeWorkspaceTextFiles,
+} from "./tsLanguageService";
 
 // JavaScript runs in a dedicated Web Worker backed by almostnode — a
 // browser-native Node.js runtime. The worker stages every open file
@@ -251,9 +258,30 @@ type WorkerOutMessage =
 
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
+  // Text files from the last `prepareFileSystem` snapshot — cross-file
+  // context for the language-service completions (imports of sibling
+  // workspace files resolve against these).
+  private stagedText = new Map<string, string>();
+
   constructor(private worker: Worker) {}
 
+  /** Intellisense via the shared TS language service worker (allowJs
+   *  inference) — separate from the execution worker so analysis never
+   *  queues behind a long-running user program. */
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
+    return completeWithTsService(
+      buildTsCompletionRequest(
+        this.stagedText,
+        request.doc,
+        request.filename,
+        "index.js",
+        request.offset,
+      ),
+    );
+  }
+
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    this.stagedText = decodeWorkspaceTextFiles(files);
     const id = ++this.nextId;
     const payload: Array<[string, Uint8Array]> = [];
     for (const [path, bytes] of files) payload.push([path, bytes]);

@@ -1,0 +1,218 @@
+import type { Completion } from "@codemirror/autocomplete";
+
+// Static completion tier for the PHP playground surfaces. Intelephense is
+// closed-source with no browser build and phpactor has no wasm port (see
+// the feasibility report in agent-outputs/), so the practical ceiling is
+// keywords + the common builtin-function surface with signatures.
+// `$variable` completion comes from the document scanner in
+// `languageCompletion.ts`.
+
+const kw = (label: string): Completion => ({ label, type: "keyword" });
+const cn = (label: string): Completion => ({ label, type: "constant" });
+const fn = (label: string, detail: string): Completion => ({
+  label,
+  type: "function",
+  detail,
+});
+
+const PHP_KEYWORDS: readonly Completion[] = [
+  "abstract", "and", "array", "as", "break", "callable", "case", "catch",
+  "class", "clone", "const", "continue", "declare", "default", "do", "echo",
+  "else", "elseif", "empty", "enum", "extends", "final", "finally", "fn",
+  "for", "foreach", "function", "global", "if", "implements", "include",
+  "include_once", "instanceof", "insteadof", "interface", "isset", "list",
+  "match", "namespace", "new", "or", "print", "private", "protected",
+  "public", "readonly", "require", "require_once", "return", "static",
+  "switch", "throw", "trait", "try", "unset", "use", "var", "while", "xor",
+  "yield", "true", "false", "null",
+  "int", "float", "string", "bool", "void", "mixed", "iterable", "object",
+  "never", "self", "parent",
+].map(kw);
+
+const PHP_CONSTANTS: readonly Completion[] = [
+  "PHP_EOL", "PHP_INT_MAX", "PHP_INT_MIN", "PHP_FLOAT_EPSILON", "PHP_VERSION",
+  "M_PI", "E_ALL", "E_ERROR", "E_WARNING", "E_NOTICE", "SORT_REGULAR",
+  "SORT_NUMERIC", "SORT_STRING", "COUNT_RECURSIVE", "JSON_PRETTY_PRINT",
+  "JSON_UNESCAPED_SLASHES", "JSON_UNESCAPED_UNICODE", "JSON_THROW_ON_ERROR",
+  "ARRAY_FILTER_USE_KEY", "ARRAY_FILTER_USE_BOTH", "STR_PAD_LEFT",
+  "STR_PAD_RIGHT", "PREG_SPLIT_NO_EMPTY",
+].map(cn);
+
+const PHP_FUNCTIONS: readonly Completion[] = [
+  // Output & debugging
+  fn("var_dump", "(mixed ...$values): void"),
+  fn("print_r", "(mixed $value, bool $return = false)"),
+  fn("printf", "(string $format, mixed ...$values): int"),
+  fn("sprintf", "(string $format, mixed ...$values): string"),
+  fn("var_export", "(mixed $value, bool $return = false)"),
+  fn("error_log", "(string $message): bool"),
+  fn("die", "(string $status = ?)"),
+
+  // Strings
+  fn("strlen", "(string $string): int"),
+  fn("str_replace", "(array|string $search, array|string $replace, string|array $subject)"),
+  fn("str_contains", "(string $haystack, string $needle): bool"),
+  fn("str_starts_with", "(string $haystack, string $needle): bool"),
+  fn("str_ends_with", "(string $haystack, string $needle): bool"),
+  fn("str_repeat", "(string $string, int $times): string"),
+  fn("str_pad", "(string $string, int $length, string $pad = \" \"): string"),
+  fn("str_split", "(string $string, int $length = 1): array"),
+  fn("substr", "(string $string, int $offset, ?int $length = null): string"),
+  fn("strpos", "(string $haystack, string $needle, int $offset = 0): int|false"),
+  fn("strrpos", "(string $haystack, string $needle): int|false"),
+  fn("strtolower", "(string $string): string"),
+  fn("strtoupper", "(string $string): string"),
+  fn("ucfirst", "(string $string): string"),
+  fn("ucwords", "(string $string): string"),
+  fn("lcfirst", "(string $string): string"),
+  fn("trim", "(string $string, string $characters = ...): string"),
+  fn("ltrim", "(string $string): string"),
+  fn("rtrim", "(string $string): string"),
+  fn("explode", "(string $separator, string $string, int $limit = PHP_INT_MAX): array"),
+  fn("implode", "(string $separator, array $array): string"),
+  fn("join", "(string $separator, array $array): string"),
+  fn("nl2br", "(string $string): string"),
+  fn("htmlspecialchars", "(string $string): string"),
+  fn("strip_tags", "(string $string): string"),
+  fn("strrev", "(string $string): string"),
+  fn("strcmp", "(string $a, string $b): int"),
+  fn("strcasecmp", "(string $a, string $b): int"),
+  fn("similar_text", "(string $a, string $b): int"),
+  fn("wordwrap", "(string $string, int $width = 75): string"),
+  fn("number_format", "(float $num, int $decimals = 0): string"),
+
+  // Arrays
+  fn("count", "(Countable|array $value): int"),
+  fn("array_push", "(array &$array, mixed ...$values): int"),
+  fn("array_pop", "(array &$array): mixed"),
+  fn("array_shift", "(array &$array): mixed"),
+  fn("array_unshift", "(array &$array, mixed ...$values): int"),
+  fn("array_merge", "(array ...$arrays): array"),
+  fn("array_combine", "(array $keys, array $values): array"),
+  fn("array_keys", "(array $array): array"),
+  fn("array_values", "(array $array): array"),
+  fn("array_map", "(?callable $callback, array $array, array ...$arrays): array"),
+  fn("array_filter", "(array $array, ?callable $callback = null): array"),
+  fn("array_reduce", "(array $array, callable $callback, mixed $initial = null): mixed"),
+  fn("array_slice", "(array $array, int $offset, ?int $length = null): array"),
+  fn("array_splice", "(array &$array, int $offset, ?int $length = null): array"),
+  fn("array_search", "(mixed $needle, array $haystack): int|string|false"),
+  fn("array_key_exists", "(string|int $key, array $array): bool"),
+  fn("array_flip", "(array $array): array"),
+  fn("array_reverse", "(array $array): array"),
+  fn("array_unique", "(array $array): array"),
+  fn("array_sum", "(array $array): int|float"),
+  fn("array_product", "(array $array): int|float"),
+  fn("array_fill", "(int $start, int $count, mixed $value): array"),
+  fn("array_column", "(array $array, string|int|null $column_key): array"),
+  fn("array_diff", "(array $array, array ...$arrays): array"),
+  fn("array_intersect", "(array $array, array ...$arrays): array"),
+  fn("array_rand", "(array $array, int $num = 1)"),
+  fn("in_array", "(mixed $needle, array $haystack, bool $strict = false): bool"),
+  fn("sort", "(array &$array): bool"),
+  fn("rsort", "(array &$array): bool"),
+  fn("asort", "(array &$array): bool"),
+  fn("ksort", "(array &$array): bool"),
+  fn("usort", "(array &$array, callable $callback): bool"),
+  fn("shuffle", "(array &$array): bool"),
+  fn("range", "(mixed $start, mixed $end, int|float $step = 1): array"),
+  fn("compact", "(array|string $var_name, ...): array"),
+  fn("extract", "(array &$array): int"),
+
+  // Math
+  fn("abs", "(int|float $num): int|float"),
+  fn("max", "(mixed ...$values): mixed"),
+  fn("min", "(mixed ...$values): mixed"),
+  fn("round", "(int|float $num, int $precision = 0): float"),
+  fn("floor", "(int|float $num): float"),
+  fn("ceil", "(int|float $num): float"),
+  fn("pow", "(mixed $base, mixed $exp): int|float"),
+  fn("sqrt", "(float $num): float"),
+  fn("intdiv", "(int $num1, int $num2): int"),
+  fn("fmod", "(float $num1, float $num2): float"),
+  fn("rand", "(int $min = ?, int $max = ?): int"),
+  fn("mt_rand", "(int $min = ?, int $max = ?): int"),
+  fn("random_int", "(int $min, int $max): int"),
+  fn("pi", "(): float"),
+
+  // Types & conversion
+  fn("is_array", "(mixed $value): bool"),
+  fn("is_string", "(mixed $value): bool"),
+  fn("is_int", "(mixed $value): bool"),
+  fn("is_float", "(mixed $value): bool"),
+  fn("is_bool", "(mixed $value): bool"),
+  fn("is_null", "(mixed $value): bool"),
+  fn("is_numeric", "(mixed $value): bool"),
+  fn("is_callable", "(mixed $value): bool"),
+  fn("intval", "(mixed $value, int $base = 10): int"),
+  fn("floatval", "(mixed $value): float"),
+  fn("strval", "(mixed $value): string"),
+  fn("boolval", "(mixed $value): bool"),
+  fn("settype", "(mixed &$var, string $type): bool"),
+  fn("gettype", "(mixed $value): string"),
+  fn("get_class", "(object $object): string"),
+  fn("method_exists", "(object|string $object_or_class, string $method): bool"),
+  fn("property_exists", "(object|string $object_or_class, string $property): bool"),
+  fn("function_exists", "(string $function): bool"),
+
+  // JSON / serialisation
+  fn("json_encode", "(mixed $value, int $flags = 0): string|false"),
+  fn("json_decode", "(string $json, ?bool $associative = null): mixed"),
+  fn("serialize", "(mixed $value): string"),
+  fn("unserialize", "(string $data): mixed"),
+
+  // Regular expressions
+  fn("preg_match", "(string $pattern, string $subject, array &$matches = null): int|false"),
+  fn("preg_match_all", "(string $pattern, string $subject, array &$matches = null): int|false"),
+  fn("preg_replace", "(string|array $pattern, string|array $replacement, string|array $subject)"),
+  fn("preg_split", "(string $pattern, string $subject): array|false"),
+  fn("preg_quote", "(string $str, ?string $delimiter = null): string"),
+
+  // Date & time
+  fn("date", "(string $format, ?int $timestamp = null): string"),
+  fn("time", "(): int"),
+  fn("mktime", "(int $hour, int $minute = ?, int $second = ?): int|false"),
+  fn("strtotime", "(string $datetime, ?int $baseTimestamp = null): int|false"),
+  fn("date_create", "(string $datetime = \"now\"): DateTime|false"),
+  fn("microtime", "(bool $as_float = false): string|float"),
+  fn("sleep", "(int $seconds): int"),
+  fn("usleep", "(int $microseconds): void"),
+
+  // Files & misc
+  fn("file_get_contents", "(string $filename): string|false"),
+  fn("file_put_contents", "(string $filename, mixed $data): int|false"),
+  fn("file_exists", "(string $filename): bool"),
+  fn("fopen", "(string $filename, string $mode)"),
+  fn("fclose", "($stream): bool"),
+  fn("fgets", "($stream): string|false"),
+  fn("fwrite", "($stream, string $data): int|false"),
+  fn("readline", "(?string $prompt = null): string|false"),
+  fn("unlink", "(string $filename): bool"),
+  fn("scandir", "(string $directory): array|false"),
+  fn("array_walk", "(array|object &$array, callable $callback): bool"),
+  fn("call_user_func", "(callable $callback, mixed ...$args): mixed"),
+  fn("func_get_args", "(): array"),
+  fn("define", "(string $constant_name, mixed $value): bool"),
+  fn("defined", "(string $constant_name): bool"),
+  fn("constant", "(string $name): mixed"),
+  fn("uniqid", "(string $prefix = \"\"): string"),
+  fn("md5", "(string $string): string"),
+  fn("sha1", "(string $string): string"),
+  fn("hash", "(string $algo, string $data): string"),
+  fn("base64_encode", "(string $string): string"),
+  fn("base64_decode", "(string $string): string|false"),
+  fn("urlencode", "(string $string): string"),
+  fn("urldecode", "(string $string): string"),
+  fn("http_build_query", "(array|object $data): string"),
+  fn("parse_url", "(string $url): array|string|int|null|false"),
+  fn("filter_var", "(mixed $value, int $filter = FILTER_DEFAULT): mixed"),
+  fn("array_is_list", "(array $array): bool"),
+  fn("str_word_count", "(string $string): array|int"),
+  fn("checkdate", "(int $month, int $day, int $year): bool"),
+];
+
+export const PHP_COMPLETIONS: readonly Completion[] = [
+  ...PHP_KEYWORDS,
+  ...PHP_CONSTANTS,
+  ...PHP_FUNCTIONS,
+];
