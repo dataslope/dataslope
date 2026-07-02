@@ -10,7 +10,7 @@
  * search inserts (see `createSearchAPI("simple", …)` in `app/api/search`).
  */
 declare const searchIndex: {
-  /** Lesson URL, e.g. `/learn/intro-sql-postgres/filtering-rows`. */
+  /** Lesson URL, e.g. `/courses/intro-sql-postgres/filtering-rows`. */
   url: string;
   /** Page title (frontmatter `title`, falling back to the slug). */
   title: string;

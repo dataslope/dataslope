@@ -37,7 +37,7 @@ function labelIds(tree: { children: Array<Record<string, unknown>> }): string[] 
   return ids;
 }
 
-const LEARN = "/repo/content/learn";
+const LEARN = "/repo/content/courses";
 const SVG_A = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>';
 const SVG_B = '<svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" /></svg>';
 const HASH = /^[0-9a-f]{6}$/;

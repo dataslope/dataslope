@@ -1,7 +1,8 @@
 /**
  * Build-time collector for the `/illustration-prompts` gallery.
  *
- * Walks every lesson under `content/learn/` and `content/interview/`, finds
+ * Walks every lesson under `content/courses/`, `content/fumadocs-dev/`, and
+ * `content/interview/`, finds
  * each `<IllustrationPrompt …>` placeholder, and groups the placements by their
  * semantic file slug (see `lib/illustrationPrompt.ts`) so the gallery shows one
  * card per distinct illustration to be drawn — with its target file name, the
@@ -27,8 +28,17 @@ import {
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
+/** Content collections: directory name under content/ → public URL base
+ *  (mirrors the loader baseUrls in lib/source.ts). */
+type Collection = "courses" | "fumadocs-dev" | "interview";
+const URL_BASE: Record<Collection, string> = {
+  courses: "/courses",
+  "fumadocs-dev": "/fumadocs-dev",
+  interview: "/interview-prep",
+};
+
 export interface PromptUsage {
-  /** Lesson URL (e.g. /learn/mastering-ggplot2/interesting-discussions). */
+  /** Lesson URL (e.g. /courses/mastering-ggplot2/interesting-discussions). */
   route: string;
   /** Same URL anchored to this illustration's slug. */
   href: string;
@@ -37,7 +47,7 @@ export interface PromptUsage {
   /** Human-readable course/role title. */
   courseTitle: string;
   /** Which collection the lesson lives in. */
-  collection: "learn" | "interview";
+  collection: Collection;
 }
 
 export interface IllustrationPromptEntry {
@@ -91,10 +101,11 @@ function walkLessonFiles(dir: string, prefix = ""): string[] {
   return out.sort();
 }
 
-/** `course/lesson.mdx` → `/<base>/course/lesson`; `index` collapses away. */
-function lessonUrl(base: "learn" | "interview", rel: string): string {
+/** `course/lesson.mdx` → `<urlBase>/course/lesson`; `index` collapses away. */
+function lessonUrl(collection: Collection, rel: string): string {
+  const base = URL_BASE[collection];
   const stem = rel.replace(/\.mdx?$/i, "").replace(/(^|\/)index$/i, "");
-  return stem ? `/${base}/${stem}` : `/${base}`;
+  return stem ? `${base}/${stem}` : base;
 }
 
 /** Pull `title:` out of a leading YAML frontmatter block, if present. */
@@ -139,10 +150,10 @@ interface RawPlacement {
   route: string;
   courseSlug: string;
   courseTitle: string;
-  collection: "learn" | "interview";
+  collection: Collection;
 }
 
-function collectPlacements(base: "learn" | "interview"): RawPlacement[] {
+function collectPlacements(base: Collection): RawPlacement[] {
   const dir = path.join(CONTENT_ROOT, base);
   const titles = new Map<string, string>();
   const out: RawPlacement[] = [];
@@ -193,7 +204,8 @@ function collectPlacements(base: "learn" | "interview"): RawPlacement[] {
 let cache: IllustrationPromptsData | null = null;
 
 /**
- * Collect every `<IllustrationPrompt>` placement across the learn and interview
+ * Collect every `<IllustrationPrompt>` placement across the courses,
+ * fumadocs-dev, and interview
  * collections, deduplicated into one entry per distinct illustration (semantic
  * file slug). Memoised so the scan runs once per build.
  */
@@ -201,7 +213,8 @@ export function getIllustrationPrompts(): IllustrationPromptsData {
   if (cache) return cache;
 
   const placements = [
-    ...collectPlacements("learn"),
+    ...collectPlacements("courses"),
+    ...collectPlacements("fumadocs-dev"),
     ...collectPlacements("interview"),
   ];
 

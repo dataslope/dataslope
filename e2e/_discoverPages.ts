@@ -1,17 +1,24 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-// Discovers the /learn routes whose MDX source contains a given component,
-// by walking content/learn and mapping file paths to fumadocs routes:
+// Discovers the docs routes whose MDX source contains a given component,
+// by walking content/courses + content/fumadocs-dev and mapping file paths
+// to fumadocs routes:
 //
-//   content/learn/index.mdx                  -> /learn
-//   content/learn/code-blocks-python.mdx     -> /learn/code-blocks-python
-//   content/learn/python-basics/strings.mdx  -> /learn/python-basics/strings
-//   content/learn/<course>/index.mdx         -> /learn/<course>
+//   content/fumadocs-dev/index.mdx                 -> /fumadocs-dev
+//   content/fumadocs-dev/code-blocks-python.mdx    -> /fumadocs-dev/code-blocks-python
+//   content/courses/python-basics/strings.mdx      -> /courses/python-basics/strings
+//   content/courses/<course>/index.mdx             -> /courses/<course>
 //
 // Used by the courseware-wide e2e sweeps so they don't hardcode a page list.
 
-const CONTENT = path.join(process.cwd(), "content", "learn");
+const SECTIONS = [
+  { dir: path.join(process.cwd(), "content", "courses"), base: "/courses" },
+  {
+    dir: path.join(process.cwd(), "content", "fumadocs-dev"),
+    base: "/fumadocs-dev",
+  },
+];
 
 function walk(dir: string): string[] {
   const out: string[] = [];
@@ -23,12 +30,12 @@ function walk(dir: string): string[] {
   return out;
 }
 
-function fileToRoute(file: string): string {
-  const rel = path.relative(CONTENT, file).replace(/\\/g, "/");
+function fileToRoute(dir: string, base: string, file: string): string {
+  const rel = path.relative(dir, file).replace(/\\/g, "/");
   let slug = rel.replace(/\.mdx$/, "");
   slug = slug.replace(/(^|\/)index$/, "");
   slug = slug.replace(/\/$/, "");
-  return slug ? `/learn/${slug}` : "/learn";
+  return slug ? `${base}/${slug}` : base;
 }
 
 export interface DiscoveredPage {
@@ -40,10 +47,12 @@ export interface DiscoveredPage {
  *  (e.g. ["<CodeBlock", "<SqlCodeBlock"]). Sorted for stable ordering. */
 export function discoverPages(openerTags: string[]): DiscoveredPage[] {
   const pages: DiscoveredPage[] = [];
-  for (const file of walk(CONTENT)) {
-    const src = fs.readFileSync(file, "utf8");
-    if (openerTags.some((t) => src.includes(t))) {
-      pages.push({ route: fileToRoute(file), file });
+  for (const { dir, base } of SECTIONS) {
+    for (const file of walk(dir)) {
+      const src = fs.readFileSync(file, "utf8");
+      if (openerTags.some((t) => src.includes(t))) {
+        pages.push({ route: fileToRoute(dir, base, file), file });
+      }
     }
   }
   pages.sort((a, b) => a.route.localeCompare(b.route));

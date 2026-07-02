@@ -23,7 +23,7 @@
     "binding": "ASSETS"
   },
   // Backing store for OpenNext's incremental cache (see open-next.config.ts).
-  // The prerendered home page and ~800 `/learn/*` lessons are written here at
+  // The prerendered home page and ~800 `/courses/*` lessons are written here at
   // deploy time (the `opennextjs-cloudflare deploy`/`preview` populate step)
   // and served from here at request time, so the Worker never re-renders them
   // and never touches `node:fs`. Unlike the static-assets cache this resolves

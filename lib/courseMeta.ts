@@ -5,7 +5,7 @@
  * that live in `meta.json`, not in the page's own MDX frontmatter (the index
  * page's frontmatter title is typically "Welcome"/"Overview", not the name).
  *
- * `section` defaults to `"learn"` (the courses); pass `"interview"` for the
+ * `section` defaults to `"courses"`; pass `"interview"` for the
  * interview-prep roles. Returns `null` for slugs that aren't section roots
  * (e.g. loose demo pages directly under the section have no `meta.json`).
  */
@@ -20,7 +20,7 @@ export interface CourseMeta {
 
 export async function getCourseMeta(
   courseSlug: string,
-  section = "learn",
+  section = "courses",
 ): Promise<CourseMeta | null> {
   try {
     const raw = await readFile(

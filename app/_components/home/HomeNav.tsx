@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "@base-ui-components/react/menu";
 import { Dialog } from "@base-ui-components/react/dialog";
 import {
@@ -47,6 +47,36 @@ function LangIcon({
     >
       <Icon size={Math.round(size * factor)} />
     </span>
+  );
+}
+
+/** Desktop primary-menu link. The item for the section being viewed renders
+ *  in the brand accent (matching the courses-page mockup) — derived from the
+ *  current pathname, so `/courses/python-basics` still lights up "Courses". */
+function NavLink({
+  href,
+  prefetch,
+  children,
+}: {
+  href: string;
+  prefetch?: boolean;
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname() ?? "";
+  const active = pathname === href || pathname.startsWith(`${href}/`);
+  return (
+    <Link
+      href={href}
+      prefetch={prefetch}
+      aria-current={active ? "page" : undefined}
+      className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+        active
+          ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
+          : "text-[#121212] hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -222,14 +252,14 @@ function MobileDrawer() {
               footer below stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
             <Dialog.Close
-              render={<Link href="/learn" prefetch={false} />}
+              render={<Link href="/courses" prefetch={false} />}
               className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
             >
               Courses
             </Dialog.Close>
 
             <Dialog.Close
-              render={<Link href="/interview" prefetch={false} />}
+              render={<Link href="/interview-prep" prefetch={false} />}
               className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
             >
               Interview Prep
@@ -320,28 +350,14 @@ export function HomeNav() {
 
         {/* Center: primary menu (desktop only — visibility handled by the
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
-            from /learn can't keep it collapsed after a back-navigation). */}
+            from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-1">
-          <Link
-            href="/learn"
-            prefetch
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
-          >
+          <NavLink href="/courses" prefetch>
             Courses
-          </Link>
-          <Link
-            href="/interview"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
-          >
-            Interview Prep
-          </Link>
+          </NavLink>
+          <NavLink href="/interview-prep">Interview Prep</NavLink>
           <PlaygroundMenu />
-          <Link
-            href="/pricing"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
-          >
-            Pricing
-          </Link>
+          <NavLink href="/pricing">Pricing</NavLink>
         </div>
 
         {/* Right: theme + GitHub + (mobile) hamburger */}

@@ -91,7 +91,7 @@ const PLANS: Plan[] = [
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
-    href: "/learn",
+    href: "/courses",
   },
   {
     name: "Free Member",
@@ -128,7 +128,7 @@ const PLANS: Plan[] = [
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Sign up for free",
-    href: "/learn",
+    href: "/courses",
   },
   {
     name: "Pro",
@@ -169,7 +169,7 @@ const PLANS: Plan[] = [
       },
     ],
     cta: "Go Pro",
-    href: "/learn",
+    href: "/courses",
     highlighted: true,
     badge: "Unlimited AI Chat",
     checkout: true,

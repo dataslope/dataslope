@@ -1,9 +1,10 @@
 /**
  * Fumadocs source configuration.
  *
- * Defines the MDX content collection that powers the `/learn` route.
- * The collection lives under `content/learn/` at the repo root and is
- * surfaced via `lib/source.ts` using Fumadocs's `loader()`.
+ * Defines the MDX content collections that power the `/courses`,
+ * `/fumadocs-dev`, and `/interview-prep` routes. The collections live under
+ * `content/` at the repo root and are surfaced via `lib/source.ts` using
+ * Fumadocs's `loader()`.
  *
  * Plays the same role here as `source.config.ts` does in the official
  * Fumadocs starter — keeps schema definitions and any future remark/rehype
@@ -12,7 +13,7 @@
  *
  * Math support: `remarkMath` parses `$...$` (inline) and `$$...$$` (block)
  * LaTeX in MDX bodies, and `rehypeKatex` renders it to HTML/CSS via KaTeX
- * (whose stylesheet is already imported in `app/learn/learn.css`). We pass
+ * (whose stylesheet is already imported in `app/docs.css`). We pass
  * `throwOnError: false` so a stray dollar sign that is not valid LaTeX
  * degrades to a visible inline error instead of failing the whole build.
  *
@@ -33,13 +34,13 @@ import rehypeKatex from "rehype-katex";
 import { remarkPreserveCodeIndent } from "./lib/remarkPreserveCodeIndent";
 import { remarkSvgLabels } from "./lib/remarkSvgLabels";
 
-export const docs = defineDocs({
-  dir: "content/learn",
+export const courses = defineDocs({
+  dir: "content/courses",
   docs: {
     // Compile each lesson's MDX body on demand at request time instead of
     // bundling all ~800 files into the route graph. By default the generated
     // `.source/server.ts` statically imports every lesson, so the first
-    // request to any `/learn` page makes Turbopack compile all ~800 bodies
+    // request to any `/courses` page makes Turbopack compile all ~800 bodies
     // (each through the remark/rehype/Shiki pipeline) before the page can
     // render. `dynamic` keeps the bodies out of the bundler entirely:
     // Fumadocs reads + compiles the requested file with its own MDX compiler
@@ -50,11 +51,22 @@ export const docs = defineDocs({
   },
 });
 
-// Interview Prep — a second docs collection under `content/interview/`,
-// surfaced at `/interview` (see `lib/source.ts`). Same `dynamic` rationale as
-// the learn collection above. fumadocs-mdx names the collection after this
+// Fumadocs Dev — the development-only component-gallery pages (code blocks,
+// challenge cards, loading states, …) that used to live loose under the old
+// `/learn` route, now under `content/fumadocs-dev/` and surfaced at
+// `/fumadocs-dev` (see `lib/source.ts`). Same `dynamic` rationale as above.
+export const fumadocsDev = defineDocs({
+  dir: "content/fumadocs-dev",
+  docs: {
+    dynamic: true,
+  },
+});
+
+// Interview Prep — a docs collection under `content/interview/`, surfaced at
+// `/interview-prep` (see `lib/source.ts`). Same `dynamic` rationale as the
+// courses collection above. fumadocs-mdx names each collection after its
 // export (`interview`), so it gets its own `?collection=interview` entries in
-// the generated `.source` and never collides with `docs`.
+// the generated `.source` and never collides with the other collections.
 export const interview = defineDocs({
   dir: "content/interview",
   docs: {

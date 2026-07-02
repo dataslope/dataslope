@@ -60,14 +60,14 @@ export function hash6(input: string): string {
 }
 
 // Derive a page slug from a lesson's absolute .mdx path: drop everything up
-// to and including `content/learn/`, strip the extension and a trailing
+// to and including the content section dir (`content/courses/`,
+// `content/fumadocs-dev/`, …), strip the extension and a trailing
 // `/index`, then flatten to a dash-delimited lowercase slug. Exported so the
 // build-time SVG gallery (lib/svgGallery.ts) can reproduce the exact same IDs
 // this plugin stamps onto the rendered pages.
 export function pageSlugFromPath(raw: string): string {
-  const marker = "content/learn/";
-  const at = raw.indexOf(marker);
-  const rel = at >= 0 ? raw.slice(at + marker.length) : raw;
+  const marker = /content\/[^/]+\//.exec(raw);
+  const rel = marker ? raw.slice(marker.index + marker[0].length) : raw;
   const slug = rel
     .replace(/\.mdx?$/i, "")
     .replace(/\/index$/i, "")

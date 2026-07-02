@@ -5,7 +5,7 @@
  * This app has two Tailwind roots (files that `@import "tailwindcss"`):
  *
  *   - app/tailwind.css      → home, /pricing, /account, /admin, legal pages
- *   - app/learn/learn.css   → /learn and /interview (adds Fumadocs UI)
+ *   - app/docs.css   → /learn and /interview (adds Fumadocs UI)
  *
  * Next.js scopes each stylesheet to the routes that import it, but after a
  * client-side navigation BOTH can be applied to the document at once, and the
@@ -64,6 +64,10 @@
 @source "./account/**/*.{ts,tsx}";
 @source "./privacy/**/*.{ts,tsx}";
 @source "./terms/**/*.{ts,tsx}";
+/* The /courses catalog index page + its client components (the course
+   lessons under courses/[...slug] render Fumadocs chrome with inline
+   styles, so scanning them too is harmless). */
+@source "./courses/**/*.{ts,tsx}";
 /* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
    non-learn root needs these too — that is the point of the union: the home/
    admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so

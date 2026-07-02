@@ -41,8 +41,8 @@ export const metadata: Metadata = {
 };
 
 // Applies the persisted theme (the `theme` localStorage key + an explicit
-// `dark`/`light` class on <html>, shared with the Fumadocs-powered /learn
-// route) before first paint, so a returning dark-mode visitor never sees a
+// `dark`/`light` class on <html>, shared with the Fumadocs-powered docs
+// routes) before first paint, so a returning dark-mode visitor never sees a
 // light flash. The explicit `light` class also stops scheme-detecting
 // components (e.g. the challenge-card editor) from falling back to the OS
 // preference. A missing/"light" value leaves the page in its light default.
@@ -55,15 +55,15 @@ interface CourseMeta {
 }
 
 async function getCourses(): Promise<Course[]> {
-  const learnDir = path.join(process.cwd(), "content", "learn");
-  const entries = await readdir(learnDir, { withFileTypes: true });
+  const coursesDir = path.join(process.cwd(), "content", "courses");
+  const entries = await readdir(coursesDir, { withFileTypes: true });
 
   const courses: Course[] = [];
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     try {
       const raw = await readFile(
-        path.join(learnDir, entry.name, "meta.json"),
+        path.join(coursesDir, entry.name, "meta.json"),
         "utf-8",
       );
       const meta = JSON.parse(raw) as CourseMeta;
@@ -110,11 +110,15 @@ function countMatches(haystacks: string[], pattern: RegExp): number {
 // round number for display (the grid renders them with a trailing "+").
 async function getHomeStats(courses: Course[]): Promise<HomeStats> {
   const contentDir = path.join(process.cwd(), "content");
-  const [learnMdx, interviewMdx] = await Promise.all([
-    readMdxFiles(path.join(contentDir, "learn")),
+  // Courses + the fumadocs-dev demo pages + interview prep — the same corpus
+  // that lived under content/learn + content/interview before the split, so
+  // the figures stay comparable across the route restructuring.
+  const [courseMdx, devMdx, interviewMdx] = await Promise.all([
+    readMdxFiles(path.join(contentDir, "courses")),
+    readMdxFiles(path.join(contentDir, "fumadocs-dev")),
     readMdxFiles(path.join(contentDir, "interview")),
   ]);
-  const allMdx = [...learnMdx, ...interviewMdx];
+  const allMdx = [...courseMdx, ...devMdx, ...interviewMdx];
 
   // Runnable blocks: executable `<CodeBlock>` (non-SQL) + `<SqlCodeBlock>`.
   const runnableCodeBlocks =

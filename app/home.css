@@ -1,7 +1,7 @@
 /* ============================================================================
  * home.css — hardening for the home route ("/").
  * ----------------------------------------------------------------------------
- * The /learn route's stylesheet (app/learn/learn.css) defines GLOBAL element
+ * The /learn route's stylesheet (app/docs.css) defines GLOBAL element
  * typography — `body { font-family: Inter }` and `h1..h6 { font-family: Inter }`
  * with tightened display tracking — and imports Tailwind's preflight, whose
  * `.hidden` utility competes with our responsive `md:*` display utilities.

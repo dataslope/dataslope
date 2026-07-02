@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-// House style for /learn page titles: use an em-dash ("Code Blocks — C"),
+// House style for course/dev page titles: use an em-dash ("Code Blocks — C"),
 // not a spaced hyphen ("Code Blocks - C"), as the separator. Guards the
 // fix to code-blocks-c.mdx against regression and keeps the demo-page
 // title family consistent. Runs under `npm test`.
@@ -23,8 +23,11 @@ function frontmatterTitle(src: string): string | null {
   return title ? title[1].trim() : null;
 }
 
-describe("content/learn page titles", () => {
-  const files = mdxFiles(path.join(process.cwd(), "content", "learn"));
+describe("content/courses + content/fumadocs-dev page titles", () => {
+  const files = [
+    ...mdxFiles(path.join(process.cwd(), "content", "courses")),
+    ...mdxFiles(path.join(process.cwd(), "content", "fumadocs-dev")),
+  ];
 
   it("locates the content corpus", () => {
     expect(files.length).toBeGreaterThan(100);

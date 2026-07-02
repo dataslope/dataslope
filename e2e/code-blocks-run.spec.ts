@@ -1,7 +1,7 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { discoverPages } from "./_discoverPages";
 
-// Runs every <CodeBlock> on each /learn/code-blocks-<lang> demo page and
+// Runs every <CodeBlock> on each /fumadocs-dev/code-blocks-<lang> demo page and
 // asserts the snippet executes without producing an ERROR (stderr) output
 // cell. This is the "do all code blocks run?" check.
 //
@@ -16,24 +16,25 @@ import { discoverPages } from "./_discoverPages";
 // runtimeRegistry.ts), so the heavy WASM init happens once per page.
 
 // Default: the per-language demo pages (fast, representative). Set
-// COURSEWARE=1 to instead sweep every /learn page that embeds a <CodeBlock>
-// across all courses — a long run intended for an opt-in CI job.
+// COURSEWARE=1 to instead sweep every docs page that embeds a <CodeBlock>
+// across all courses — a long run intended for an opt-in CI job. `path` is
+// the full route.
 const DEMO_PAGES: { path: string; label: string }[] = [
-  { path: "code-blocks-javascript", label: "JavaScript" },
-  { path: "code-blocks-typescript", label: "TypeScript" },
-  { path: "code-blocks-python", label: "Python" },
-  { path: "code-blocks-r", label: "R" },
-  { path: "code-blocks-php", label: "PHP" },
-  { path: "code-blocks-c", label: "C" },
-  { path: "code-blocks-cpp", label: "C++" },
-  { path: "code-blocks-java", label: "Java" },
-  { path: "code-blocks-csharp", label: "C#" },
+  { path: "/fumadocs-dev/code-blocks-javascript", label: "JavaScript" },
+  { path: "/fumadocs-dev/code-blocks-typescript", label: "TypeScript" },
+  { path: "/fumadocs-dev/code-blocks-python", label: "Python" },
+  { path: "/fumadocs-dev/code-blocks-r", label: "R" },
+  { path: "/fumadocs-dev/code-blocks-php", label: "PHP" },
+  { path: "/fumadocs-dev/code-blocks-c", label: "C" },
+  { path: "/fumadocs-dev/code-blocks-cpp", label: "C++" },
+  { path: "/fumadocs-dev/code-blocks-java", label: "Java" },
+  { path: "/fumadocs-dev/code-blocks-csharp", label: "C#" },
 ];
 
 const CODE_BLOCK_PAGES: { path: string; label: string }[] = process.env
   .COURSEWARE
   ? discoverPages(["<CodeBlock"]).map((p) => ({
-      path: p.route.replace(/^\/learn\//, ""),
+      path: p.route,
       label: p.route,
     }))
   : DEMO_PAGES;
@@ -74,7 +75,7 @@ test.describe("Code blocks run cleanly", () => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
-      await page.goto(`/learn/${pagePath}`);
+      await page.goto(pagePath);
       const blocks = page.getByTestId("code-block");
       await expect(blocks.first()).toBeVisible({ timeout: 60_000 });
       const count = await blocks.count();

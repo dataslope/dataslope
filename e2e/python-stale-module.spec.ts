@@ -10,7 +10,7 @@ import { test, expect, type Page } from "@playwright/test";
 // the STALE module — and a correct solution still fails its tests.
 //
 // Reproduced against the live "Implement greet() in utils.py" card on
-// /learn/challenge-cards-python:
+// /fumadocs-dev/challenge-cards-python:
 //   1. Submit with the broken starter (greet returns "") → tests fail,
 //      `utils` is now cached in sys.modules.
 //   2. Replace utils.py with the reference solution and submit again.
@@ -66,7 +66,7 @@ async function clickSubmitAndAwaitBanner(
 test("multi-file Python picks up an edited helper module on re-run", async ({
   page,
 }) => {
-  await page.goto("/learn/challenge-cards-python");
+  await page.goto("/fumadocs-dev/challenge-cards-python");
   await page.waitForFunction(
     (k) => !!(window as unknown as WinDS).__dsChallenges?.[k],
     KEY,
