@@ -221,6 +221,80 @@
 :global(html.dark) .footer {
   border-top-color: #2c2c2c;
 }
+/* Context chips: the highlighted-text chip plus one chip per on-screen /
+   pinned widget, rendered above the input. Scrolls horizontally when a page
+   has many widgets in view rather than growing the footer. */
+.contextRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  max-width: 220px;
+  padding: 3px 8px;
+  border: 1px solid #d7dbe0;
+  border-radius: 9999px;
+  background: #f7f8fa;
+  color: #4b5563;
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+:global(html.dark) .chip {
+  border-color: #333;
+  background: #202225;
+  color: #b6bcc4;
+}
+.chipLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chipButton {
+  cursor: pointer;
+}
+.chipButton:hover {
+  border-color: var(--ds-blue-500, #3b82f6);
+  color: inherit;
+}
+.chipPinned {
+  border-color: var(--ds-blue-600, #1f6feb);
+  background: #eaf1fd;
+  color: #1d4ed8;
+}
+:global(html.dark) .chipPinned {
+  border-color: var(--ds-blue-500, #3b82f6);
+  background: #172742;
+  color: #93b4f5;
+}
+.chipSelection {
+  border-style: dashed;
+}
+.chipDismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: -2px -4px -2px 0;
+  padding: 2px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.chipDismiss:hover {
+  opacity: 1;
+  background: rgba(127, 127, 127, 0.18);
+}
+
 .inputRow {
   display: flex;
   align-items: flex-end;

@@ -70,6 +70,79 @@ describe("buildMessages", () => {
     expect(blob).toContain("KeyboardInterrupt");
   });
 
+  it("includes widgets, selection, and schema when provided", () => {
+    const { messages } = buildMessages({
+      surface: "learn",
+      question: "why is this wrong?",
+      lessonMarkdown: null,
+      context: {
+        surface: "learn",
+        schema: "Table users (id INTEGER, name TEXT)",
+        selection: "for i in range(10)",
+        selectionLabel: "Challenge: Loop practice",
+        widgets: [
+          {
+            kind: "challenge",
+            label: "Challenge: Loop practice",
+            content: "Instructions: print numbers\nUser's code: while True: pass",
+            referenced: true,
+          },
+          {
+            kind: "mcq",
+            label: "Question: What does range(3) return?",
+            content: "Choices:\n1. [0, 1, 2] [correct answer]",
+          },
+        ],
+      },
+      history: [],
+      contextBudget: 8000,
+    });
+    const blob = messages.map((m) => m.content).join("\n");
+    expect(blob).toContain("Table users");
+    expect(blob).toContain("for i in range(10)");
+    expect(blob).toContain("inside Challenge: Loop practice");
+    expect(blob).toContain("[challenge] Challenge: Loop practice (referenced by the user)");
+    expect(blob).toContain("[mcq] Question: What does range(3) return? (visible on the user's screen)");
+    expect(blob).toContain("while True: pass");
+  });
+
+  it("drops empty widgets and caps the widget count", () => {
+    const widgets = Array.from({ length: 12 }, (_, i) => ({
+      kind: "code-block",
+      label: `Block ${i}`,
+      content: i === 0 ? "   " : `code ${i}`,
+    }));
+    const { messages } = buildMessages({
+      surface: "learn",
+      question: "q",
+      lessonMarkdown: null,
+      context: { surface: "learn", widgets },
+      history: [],
+      contextBudget: 50000,
+    });
+    const blob = messages.map((m) => m.content).join("\n");
+    expect(blob).not.toContain("Block 0"); // blank content filtered
+    expect(blob).toContain("Block 1");
+    expect(blob).toContain("Block 8"); // 8 widgets kept (1..8)
+    expect(blob).not.toContain("Block 9"); // 9th non-empty widget dropped
+  });
+
+  it("omits widget/selection/schema blocks when absent", () => {
+    const { messages } = buildMessages({
+      surface: "learn",
+      question: "q",
+      lessonMarkdown: null,
+      context: base,
+      history: [],
+      contextBudget: 8000,
+    });
+    // Skip the system prompt — it legitimately describes these context kinds.
+    const blob = messages.slice(1).map((m) => m.content).join("\n");
+    expect(blob).not.toContain("Interactive widgets");
+    expect(blob).not.toContain("highlighted");
+    expect(blob).not.toContain("Database schema");
+  });
+
   it("keeps the last question even when the budget is tiny", () => {
     const { messages } = buildMessages({
       surface: "learn",

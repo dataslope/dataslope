@@ -15,6 +15,25 @@ export interface AskAiFile {
 }
 
 /**
+ * One on-page widget (challenge card, code block, multiple-choice question,
+ * SQL playground shell) captured at send time. `content` is a packed
+ * plain-text description of the widget's live state — instructions, the
+ * user's current code, output, test results, selected answers. The server
+ * treats every field as untrusted DATA and re-clips against the token budget.
+ */
+export interface AskAiWidgetContext {
+  /** Widget kind, e.g. "challenge", "code-block", "mcq", "sql-playground". */
+  kind: string;
+  /** Short human label, e.g. `Challenge: Reverse a list`. */
+  label: string;
+  /** Packed plain-text state of the widget. */
+  content: string;
+  /** True when the user explicitly attached this widget to the question
+   *  (vs. it merely being visible on screen). */
+  referenced?: boolean;
+}
+
+/**
  * Client-collected context that travels with a question. Every string here is
  * treated by the server as untrusted DATA (never instructions) — the system
  * prompt says so explicitly. All fields are optional and bounded; the server
@@ -38,6 +57,18 @@ export interface AskAiClientContext {
   outputs?: string[];
   /** Freeform label of the focused widget, e.g. "Challenge: reverse a list". */
   focus?: string;
+  /** Text the user highlighted on the page when asking. */
+  selection?: string;
+  /** Label of the widget the selection came from, when it fell inside one. */
+  selectionLabel?: string;
+  /**
+   * On-page widgets captured at send time: ones the user explicitly pinned
+   * in the panel (`referenced: true`) first, then whatever is currently
+   * visible in the viewport, most-visible first.
+   */
+  widgets?: AskAiWidgetContext[];
+  /** SQL surfaces only: compact database-schema summary (tables/columns/FKs). */
+  schema?: string;
 }
 
 /** One prior conversation turn (capped client-side before sending). */

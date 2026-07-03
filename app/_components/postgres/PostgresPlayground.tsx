@@ -202,6 +202,9 @@ import type {
 } from "../sql/types";
 import type { RuntimeInfo } from "../types";
 import type { SqlCompletionSchema } from "../sql/sqlCompletion";
+import { useAskAiSource } from "../ai/contextRegistry";
+import { describeSqlSurface } from "../ai/widgetSnapshots";
+import { formatSqlSchemaText } from "../ai/sqlSchemaText";
 import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
 import {
   importRowsIntoPostgres,
@@ -1194,6 +1197,8 @@ function PostgresPlaygroundInner() {
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latest autocomplete schema, reused as the Ask AI schema snapshot.
+  const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
@@ -2031,6 +2036,7 @@ function PostgresPlaygroundInner() {
         kind: "view",
       });
     }
+    askAiSchemaRef.current = completionSchema;
     const key = JSON.stringify(completionSchema);
     if (key === lastReconfigureKeyRef.current) return;
     view.dispatch({
@@ -2060,6 +2066,22 @@ function PostgresPlaygroundInner() {
       cancelled = true;
     };
   }, [tables, views, columnsByEntity, foreignKeysByEntity, schemas]);
+
+  // Ask AI context: the playground registers itself so the assistant can see
+  // the SQL in the active tab, the last error, and the database schema.
+  useAskAiSource({
+    kind: "sql-playground",
+    label: "Postgres playground",
+    getSnapshot: () => ({
+      content: describeSqlSurface({
+        dialect: "postgres",
+        sqlLabel: activeTab ? `tab "${activeTab.title}"` : undefined,
+        sql: editorRef.current?.state.doc.toString() ?? activeTab?.code ?? "",
+        error: result?.error,
+      }),
+      schema: formatSqlSchemaText(askAiSchemaRef.current),
+    }),
+  });
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {
