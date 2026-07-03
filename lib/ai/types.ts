@@ -84,6 +84,23 @@ export interface AskAiRequest {
   history?: AskAiTurn[];
 }
 
+/**
+ * POST body for `/api/ai/suggest` — three suggested questions for the panel's
+ * empty state and after each answer. Same context shape as chat; no question.
+ * Tracked on suggestion-specific counters, so it never consumes the member's
+ * Ask AI chat budget.
+ */
+export interface AskAiSuggestRequest {
+  context: AskAiClientContext;
+  /** Recent conversation turns, so post-answer suggestions are follow-ups. */
+  history?: AskAiTurn[];
+}
+
+/** Response body for `POST /api/ai/suggest`. Empty array = nothing to show. */
+export interface AskAiSuggestResponse {
+  questions: string[];
+}
+
 /** OpenAI-style chat message (server-internal, but shaped here for reuse). */
 export interface ChatMessage {
   role: "system" | "user" | "assistant";

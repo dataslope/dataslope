@@ -75,6 +75,10 @@ interface BuildArgs {
   history: AskAiTurn[];
   /** Approx input-token budget for everything except the system prompt. */
   contextBudget: number;
+  /** Override for the system prompt. Defaults to the Ask AI chat prompt;
+   *  the suggested-questions endpoint passes its own (lib/ai/suggest.ts)
+   *  while reusing this packing pipeline unchanged. */
+  system?: string;
 }
 
 /**
@@ -90,7 +94,7 @@ export function buildMessages(args: BuildArgs): {
     args;
 
   const messages: ChatMessage[] = [
-    { role: "system", content: systemPrompt(surface) },
+    { role: "system", content: args.system ?? systemPrompt(surface) },
   ];
 
   let budget = contextBudget;

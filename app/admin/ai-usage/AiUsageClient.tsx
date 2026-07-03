@@ -181,7 +181,7 @@ export function AiUsageClient() {
     <>
       <AdminPageHeader
         title="AI usage"
-        description="Ask AI chat and inline-completion spend, per user and site-wide."
+        description="Ask AI chat, inline-completion, and suggested-question spend, per user and site-wide."
       />
       <div className="flex flex-col gap-5 sm:gap-6">
         <div className="flex flex-wrap items-center gap-2">
@@ -281,6 +281,12 @@ export function AiUsageClient() {
                     <TableHead className={`${theadClass} text-right`}>
                       Completion tokens
                     </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Suggestions
+                    </TableHead>
+                    <TableHead className={`${theadClass} text-right`}>
+                      Suggestion tokens
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -320,6 +326,12 @@ export function AiUsageClient() {
                       </TableCell>
                       <TableCell className={`${cellClass} text-right tabular-nums`}>
                         {full.format(u.completionInTok + u.completionOutTok)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.suggests)}
+                      </TableCell>
+                      <TableCell className={`${cellClass} text-right tabular-nums`}>
+                        {full.format(u.suggestInTok + u.suggestOutTok)}
                       </TableCell>
                     </TableRow>
                   ))}
