@@ -4,7 +4,8 @@
  * Mount point for the "Ask AI" widget, rendered once from the root layout.
  *
  * It renders NOTHING except on the lesson routes (`/courses/*`,
- * `/fumadocs-dev/*`) and `/playground/*`, and the actual widget (which pulls
+ * `/interview-prep/*`, `/fumadocs-dev/*`) and `/playground/*`, and the
+ * actual widget (which pulls
  * in react-markdown) is dynamically imported so those bytes never load on
  * the home page, pricing, etc. Off-surface this is a bare `usePathname()`
  * check — no session fetch, no widget code.
@@ -51,10 +52,14 @@ function collectPlayground(segment: string): AskAiClientContext {
 
 export default function AskAi() {
   const pathname = usePathname() ?? "";
-  // Lesson surfaces: course lessons and the dev component gallery. The bare
-  // `/courses` URL is the catalog page — no lesson to ask about there.
+  // Lesson surfaces: course lessons, interview-prep pages, and the dev
+  // component gallery. The bare `/courses` URL is the catalog page — no
+  // lesson to ask about there. Interview-prep has no raw-Markdown mirror,
+  // so its context comes entirely from the widget registry (the questions
+  // on screen), which is what matters there anyway.
   const onLesson =
     pathname.startsWith("/courses/") ||
+    pathname.startsWith("/interview-prep/") ||
     pathname === "/fumadocs-dev" ||
     pathname.startsWith("/fumadocs-dev/");
   const onPlayground = pathname.startsWith("/playground");
@@ -63,10 +68,12 @@ export default function AskAi() {
     const segments = pathname.split("/").filter(Boolean); // e.g. ["courses","a","b"]
     if (
       pathname.startsWith("/courses") ||
+      pathname.startsWith("/interview-prep") ||
       pathname.startsWith("/fumadocs-dev")
     ) {
       // Send the FULL path segments (base included) — the server allowlists
       // the base segment and fetches `/<segments>.md` (see lib/ai/context.ts).
+      // Bases without a `.md` mirror (interview-prep) resolve to null there.
       return { surface: "learn", slug: segments };
     }
     return collectPlayground(segments[1] ?? "");

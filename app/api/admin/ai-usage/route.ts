@@ -32,6 +32,9 @@ export interface AiUsageUserRow {
   completions: number;
   completionInTok: number;
   completionOutTok: number;
+  suggests: number;
+  suggestInTok: number;
+  suggestOutTok: number;
 }
 
 export interface AiUsageReport {
@@ -62,11 +65,12 @@ export async function GET(request: Request): Promise<Response> {
   const users = await env.DB.prepare(
     `SELECT a.user_id, u.email, u.name, u.plan,
             a.requests, a.input_tok, a.output_tok,
-            a.completions, a.completion_in_tok, a.completion_out_tok
+            a.completions, a.completion_in_tok, a.completion_out_tok,
+            a.suggests, a.suggest_in_tok, a.suggest_out_tok
      FROM ai_usage_daily a
      JOIN user u ON u.id = a.user_id
      WHERE a.day = ?
-     ORDER BY (a.input_tok + a.output_tok + a.completion_in_tok + a.completion_out_tok) DESC
+     ORDER BY (a.input_tok + a.output_tok + a.completion_in_tok + a.completion_out_tok + a.suggest_in_tok + a.suggest_out_tok) DESC
      LIMIT 200`,
   )
     .bind(day)
@@ -81,6 +85,9 @@ export async function GET(request: Request): Promise<Response> {
       completions: number;
       completion_in_tok: number;
       completion_out_tok: number;
+      suggests: number;
+      suggest_in_tok: number;
+      suggest_out_tok: number;
     }>();
 
   const global = await env.DB.prepare(
@@ -105,6 +112,9 @@ export async function GET(request: Request): Promise<Response> {
       completions: r.completions,
       completionInTok: r.completion_in_tok,
       completionOutTok: r.completion_out_tok,
+      suggests: r.suggests,
+      suggestInTok: r.suggest_in_tok,
+      suggestOutTok: r.suggest_out_tok,
     })),
     global: (global.results ?? []).map((r) => ({
       day: r.day,

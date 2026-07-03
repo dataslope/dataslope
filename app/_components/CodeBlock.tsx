@@ -41,6 +41,8 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
+import { useAskAiSource } from "./ai/contextRegistry";
+import { describeCodeBlock } from "./ai/widgetSnapshots";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
@@ -806,6 +808,31 @@ function CodeBlockInner({
     }
     return out;
   }, [workspaceFiles]);
+
+  // Ask AI context: the block registers itself so the assistant can see the
+  // code (with the user's live edits) and output of blocks on screen.
+  useAskAiSource({
+    kind: "code-block",
+    label: `${adapter.runtimeInfo.language} code block: ${workspaceFiles
+      .map((f) => f.filename)
+      .join(", ")}`,
+    elementRef: cardRef,
+    getSnapshot: () => {
+      const buffers = snapshotAllFiles();
+      return {
+        content: describeCodeBlock({
+          files: workspaceFiles.map((f) => ({
+            filename: f.filename,
+            code: buffers.get(f.filename) ?? "",
+            initCode: f.initCode,
+          })),
+          outputs: outputs
+            .filter((c) => c.type === "stdout" || c.type === "stderr")
+            .map((c) => c.content),
+        }),
+      };
+    },
+  });
 
   // Build a file's effective source for a run: its read-only init code
   // (if any) prepended to the editable buffer, via the adapter-aware

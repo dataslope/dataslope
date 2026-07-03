@@ -129,6 +129,84 @@ export async function checkCompletionBudget(
   return { ok: true };
 }
 
+/**
+ * Pre-flight check for one suggested-questions request. Suggestions have
+ * their own per-user daily counters (migration 0006) so the panel fetching
+ * three questions on open / after each answer never consumes the member's
+ * Ask AI chat budget, but they share the global daily token ceiling — that
+ * stays the single backstop on total spend.
+ */
+export async function checkSuggestBudget(
+  env: CloudflareEnv,
+  userId: string,
+  limits: { dailyRequestBudget: number; dailyTokenBudget: number },
+  day: string,
+): Promise<BudgetDecision> {
+  const globalCap =
+    Number(env.AI_DAILY_GLOBAL_TOKEN_CAP) > 0
+      ? Number(env.AI_DAILY_GLOBAL_TOKEN_CAP)
+      : DEFAULT_GLOBAL_CAP;
+
+  const global = await env.DB.prepare(
+    "SELECT total_tok FROM ai_usage_global WHERE day = ?",
+  )
+    .bind(day)
+    .first<{ total_tok: number }>();
+  if (global && global.total_tok >= globalCap) {
+    return { ok: false, status: 503, message: "AI is very busy right now." };
+  }
+
+  const usage = await env.DB.prepare(
+    "SELECT suggests, suggest_in_tok, suggest_out_tok FROM ai_usage_daily WHERE user_id = ? AND day = ?",
+  )
+    .bind(userId, day)
+    .first<{
+      suggests: number;
+      suggest_in_tok: number;
+      suggest_out_tok: number;
+    }>();
+  if (usage) {
+    if (
+      usage.suggests >= limits.dailyRequestBudget ||
+      usage.suggest_in_tok + usage.suggest_out_tok >= limits.dailyTokenBudget
+    ) {
+      // Suggestions are a nicety — the client hides them on any error.
+      return { ok: false, status: 429, message: "Suggestions are paused for today." };
+    }
+  }
+
+  return { ok: true };
+}
+
+/** Record one suggestion request's usage (per-user suggest counters + the
+ *  shared global token total). Best-effort: run via ctx.waitUntil. */
+export async function recordSuggestUsage(
+  env: CloudflareEnv,
+  userId: string,
+  day: string,
+  inputTok: number,
+  outputTok: number,
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO ai_usage_daily (user_id, day, suggests, suggest_in_tok, suggest_out_tok)
+     VALUES (?, ?, 1, ?, ?)
+     ON CONFLICT(user_id, day) DO UPDATE SET
+       suggests        = suggests + 1,
+       suggest_in_tok  = suggest_in_tok + excluded.suggest_in_tok,
+       suggest_out_tok = suggest_out_tok + excluded.suggest_out_tok`,
+  )
+    .bind(userId, day, inputTok, outputTok)
+    .run();
+
+  await env.DB.prepare(
+    `INSERT INTO ai_usage_global (day, total_tok)
+     VALUES (?, ?)
+     ON CONFLICT(day) DO UPDATE SET total_tok = total_tok + excluded.total_tok`,
+  )
+    .bind(day, inputTok + outputTok)
+    .run();
+}
+
 /** Record one completion's usage (per-user completion counters + the shared
  *  global token total). Best-effort: run via ctx.waitUntil, like recordUsage. */
 export async function recordCompletionUsage(
