@@ -20,36 +20,43 @@ The discipline of knowing which is which is most of what "good
 error handling" means.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 200"
   role="img"
-  aria-label="A red dot tumbles off the end of a blue execution ledge and lands in a translucent green net strung low across the frame — an exception thrown, then caught"
+  aria-label="A blue line of execution snaps at a red cross, drops into a green catching curve, and climbs back up to continue to a safe green end — an exception thrown, caught, and handled"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="50" width="170" height="8" rx="4" fillOpacity="0.35" />
-    <circle cx="110" cy="38" r="7" fillOpacity="0.5" />
-    <circle cx="162" cy="38" r="7" />
+  <g style={{ color: "var(--ds-blue-500)" }}>
+    <circle cx="72" cy="80" r="9" fill="currentColor" />
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      strokeOpacity="0.6"
+    >
+      <path d="M86 80 H 282" />
+      <path d="M462 92 H 544" />
+    </g>
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="262" cy="74" r="9" fillOpacity="0.55" />
-    <circle cx="288" cy="106" r="3.5" fillOpacity="0.5" />
-    <circle cx="304" cy="136" r="3.5" fillOpacity="0.45" />
-    <circle cx="314" cy="160" r="3.5" fillOpacity="0.4" />
+  <g style={{ color: "var(--ds-red-500)" }}>
+    <path
+      d="M294 68 L 318 92 M318 68 L 294 92"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+    />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <rect x="246" y="140" width="6" height="50" rx="3" />
-    <rect x="536" y="134" width="6" height="50" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M250 172 Q395 216 540 164 L540 178 Q395 230 250 186 Z" fillOpacity="0.3" />
-    <circle cx="300" cy="184" r="2.5" fillOpacity="0.6" />
-    <circle cx="350" cy="192" r="2.5" fillOpacity="0.6" />
-    <circle cx="400" cy="195" r="2.5" fillOpacity="0.6" />
-    <circle cx="450" cy="191" r="2.5" fillOpacity="0.6" />
-    <circle cx="500" cy="182" r="2.5" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="366" cy="180" r="9" />
+  <g style={{ color: "var(--ds-green-500)" }}>
+    <path
+      d="M306 100 C 330 158, 430 158, 456 100"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      strokeOpacity="0.7"
+    />
+    <circle cx="560" cy="88" r="11" fill="currentColor" />
   </g>
 </svg>
 

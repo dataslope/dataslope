@@ -22,41 +22,49 @@ That single move, taken seriously, changes almost everything about
 how software is structured.
 
 <svg
-  viewBox="0 0 640 200"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="Loose data dots and behavior bars drifting apart on the left become three sealed capsules on the right, each bundling one dot with its bar — data and functions becoming objects"
+  aria-label="Loose data dots and behavior bars are drawn along thin lines into a sealed green capsule that bundles one dot with its bar, a second capsule already formed below — data and functions becoming objects"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M162 146 C 220 138, 264 128, 316 118" />
+    <path d="M204 60 C 252 70, 292 84, 324 96" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="95" cy="62" r="8" fillOpacity="0.55" />
-    <circle cx="160" cy="118" r="8" fillOpacity="0.55" />
-    <circle cx="105" cy="162" r="8" fillOpacity="0.55" />
+    <circle cx="150" cy="150" r="8" fillOpacity="0.55" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="170" y="52" width="28" height="9" rx="4.5" fillOpacity="0.6" />
     <rect x="78" y="106" width="28" height="9" rx="4.5" fillOpacity="0.6" />
-    <rect x="196" y="156" width="28" height="9" rx="4.5" fillOpacity="0.6" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="268" cy="100" r="3" />
-    <circle cx="288" cy="100" r="3" />
-    <circle cx="308" cy="100" r="3" />
-  </g>
-  <polygon points="322,91 322,109 340,100" fill="currentColor" opacity="0.35" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="380" y="22" width="160" height="44" rx="22" fillOpacity="0.15" />
-    <rect x="380" y="78" width="160" height="44" rx="22" fillOpacity="0.15" />
-    <rect x="380" y="134" width="160" height="44" rx="22" fillOpacity="0.15" />
+  <g style={{ color: "var(--ds-green-500)" }}>
+    <rect
+      x="330"
+      y="80"
+      width="180"
+      height="60"
+      rx="30"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+    />
+    <rect x="368" y="158" width="150" height="44" rx="22" fill="currentColor" fillOpacity="0.12" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="412" cy="44" r="8" />
-    <circle cx="412" cy="100" r="8" />
-    <circle cx="412" cy="156" r="8" />
+    <circle cx="380" cy="110" r="10" />
+    <circle cx="402" cy="180" r="7" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="444" y="39.5" width="64" height="9" rx="4.5" />
-    <rect x="444" y="95.5" width="64" height="9" rx="4.5" />
-    <rect x="444" y="151.5" width="64" height="9" rx="4.5" />
+    <rect x="404" y="105" width="64" height="10" rx="5" />
+    <rect x="420" y="175.5" width="48" height="9" rx="4.5" />
   </g>
 </svg>
 
