@@ -4566,10 +4566,8 @@
     padding: 0 10px;
     overflow: hidden;
   }
-  .playground-header .brand-name {
-    display: none;
-  }
-  .playground-header .workspace-badge {
+  .playground-header .workspace-badge,
+  .playground-header .workspace-save-btn {
     /* Hidden on mobile — the workspace lives in the hamburger drawer.
        Higher specificity than playground.css's `.workspace-badge` hide,
        so this is what actually drops it on the SQL playgrounds. */

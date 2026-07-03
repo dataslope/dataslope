@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -26,8 +27,9 @@ import {
  * The playground boots a full WASM engine (PGlite, Pyodide, …) the moment its
  * route mounts, which costs hundreds of MB of memory — far too much to spend
  * on every visitor who merely scrolls past. So the iframe is a *click-to-
- * activate facade*: a static mock of the playground window with a Launch
- * button, and the real route only loads after an explicit click. Once
+ * activate facade*: a mock of the playground window with a Launch button
+ * (animated with CSS only, so it still costs ~nothing to keep on screen),
+ * and the real route only loads after an explicit click. Once
  * launched, a playground that has been far offscreen for a while is unloaded
  * again to reclaim its memory (its tabs/workspace persist in localStorage and
  * OPFS, so relaunching restores where the visitor left off).
@@ -51,8 +53,13 @@ function FacadeGlyph({ id }: { id: string }) {
   );
 }
 
-/** Static, animation-free mock of the playground window shown before launch:
- *  window chrome, a fake gutter/code skeleton, and the centered Launch CTA. */
+/** Mock of the playground window shown before launch: window chrome, a fake
+ *  gutter/code skeleton (CSS-animated so the window reads as live, not a dead
+ *  image), and the centered Launch CTA. The whole region launches on click —
+ *  the outer div carries the click handler and a subtle full-surface hover
+ *  tint, while the ShimmerButton inside is the real, keyboard-focusable
+ *  <button> (its activation click bubbles up; nesting it inside a <button>
+ *  root would be invalid HTML). */
 function PlaygroundFacade({
   playgroundId,
   label,
@@ -64,15 +71,12 @@ function PlaygroundFacade({
   suspended: boolean;
   onLaunch: () => void;
 }) {
-  // Deterministic skeleton "code line" widths (percent) — static divs, so the
-  // facade costs nothing to keep on screen.
+  // Deterministic skeleton "code line" widths (percent).
   const lineWidths = [42, 68, 55, 30, 74, 48, 22, 61];
   return (
-    <button
-      type="button"
+    <div
       onClick={onLaunch}
-      aria-label={`Launch the ${label} playground`}
-      className="group flex size-full cursor-pointer flex-col text-left"
+      className="group flex size-full cursor-pointer flex-col text-left transition-colors duration-200 hover:bg-[var(--ds-green-50)]/40 dark:hover:bg-[var(--ds-green-500)]/[0.04]"
     >
       {/* Window chrome */}
       <div className="flex items-center gap-2 border-b border-[var(--ds-gray-200)] bg-white px-4 py-3 dark:border-white/10 dark:bg-white/5">
@@ -87,10 +91,12 @@ function PlaygroundFacade({
         </span>
       </div>
 
-      {/* Body: code-line skeleton behind a centered launch CTA */}
+      {/* Body: code-line skeleton behind a centered launch CTA. The bars
+          breathe on a staggered pulse and the last line carries a blinking
+          caret, so the mock reads as a live editor mid-thought. */}
       <div className="relative flex-1">
         <div
-          className="absolute inset-0 flex flex-col gap-3 overflow-hidden p-6 opacity-70 [mask-image:linear-gradient(to_bottom,#000,transparent_85%)]"
+          className="absolute inset-0 flex flex-col gap-3 overflow-hidden p-6 opacity-70 transition-opacity duration-200 group-hover:opacity-100 [mask-image:linear-gradient(to_bottom,#000,transparent_85%)]"
           aria-hidden="true"
         >
           {lineWidths.map((w, i) => (
@@ -99,18 +105,30 @@ function PlaygroundFacade({
                 {i + 1}
               </span>
               <span
-                className="h-3 rounded bg-[var(--ds-gray-200)] dark:bg-white/10"
-                style={{ width: `${w}%` }}
+                className="h-3 animate-pulse rounded bg-[var(--ds-gray-200)] motion-reduce:animate-none dark:bg-white/10"
+                style={{ width: `${w}%`, animationDelay: `${i * 180}ms` }}
               />
+              {i === lineWidths.length - 1 && (
+                <span className="animate-blink-cursor -ml-2.5 h-3 w-1.5 rounded-sm bg-[var(--ds-gray-400)] dark:bg-white/40" />
+              )}
             </div>
           ))}
         </div>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-[var(--ds-gray-300)] bg-white px-6 py-3 text-sm font-semibold text-[var(--ds-gray-900)] shadow-sm transition-colors group-hover:border-[var(--ds-blue-500)] group-hover:text-[var(--ds-blue-700)] dark:border-white/15 dark:bg-[#1a1a1a] dark:text-white dark:group-hover:border-[var(--ds-blue-400)] dark:group-hover:text-[var(--ds-blue-400)]">
+          {/* Magic UI ShimmerButton with the brand-green shimmer as the accent
+              edge; like the hero's PickerSelect trigger, the fill tracks the
+              page surface (--color-fd-background) so it reads as part of the
+              page in both themes. */}
+          <ShimmerButton
+            background="var(--color-fd-background)"
+            shimmerColor="var(--ds-green-500)"
+            shimmerSize="0.15em"
+            className="gap-2.5 border-[color:var(--ds-gray-300)] px-6 py-3 text-sm font-semibold text-[var(--ds-gray-900)] shadow-sm transition-colors group-hover:border-[var(--ds-green-600)] group-hover:text-[var(--ds-green-700)] dark:border-white/15 dark:text-white dark:group-hover:border-[var(--ds-green-400)] dark:group-hover:text-[var(--ds-green-400)]"
+          >
             <Play size={16} aria-hidden="true" />
             Launch the {label} playground
-          </span>
+          </ShimmerButton>
           <span className="text-center text-xs text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
             {suspended
               ? "Paused to free memory — relaunch to pick up where you left off."
@@ -118,7 +136,7 @@ function PlaygroundFacade({
           </span>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 

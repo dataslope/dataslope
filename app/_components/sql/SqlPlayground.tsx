@@ -101,7 +101,8 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
-import { CloudShareControls } from "../cloud/CloudShareControls";
+import { ShareControls } from "../cloud/ShareControls";
+import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -777,6 +778,9 @@ function SqlPlaygroundInner() {
   const engineRef = useRef<SqliteEngine | null>(null);
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latches after the first post-mount focus so the entry policy (cursor at
+  // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
+  const entryFocusDoneRef = useRef(false);
   // Latest autocomplete schema, reused as the Ask AI schema snapshot.
   const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
@@ -1009,7 +1013,6 @@ function SqlPlaygroundInner() {
   // A SQL bundle carries the active database as a replayable SQL dump plus
   // the query tabs — the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const dump = await buildSqlDumpText();
@@ -1620,14 +1623,22 @@ function SqlPlaygroundInner() {
       }
     }
     // Focus the editor so the user can type immediately after any tab
-    // operation. Skip tabs whose editor pane is hidden.
+    // operation. Skip tabs whose editor pane is hidden. The FIRST focus
+    // after mount goes through the shared entry policy instead: desktop
+    // lands the cursor at the end of the query, mobile skips the focus so
+    // the on-screen keyboard doesn't pop before the user asks to type.
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
       tab?.kind !== "view-data" &&
       tab?.kind !== "query-history"
     ) {
-      view?.focus();
+      if (!entryFocusDoneRef.current) {
+        entryFocusDoneRef.current = true;
+        applyEntryFocus(view);
+      } else {
+        view.focus();
+      }
     }
     // Only rerun when the active tab id changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2028,18 +2039,15 @@ function SqlPlaygroundInner() {
                 tabs.some((t) => !t.kind && t.code !== t.pristineCode)
               }
               onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
             />
           )}
           <div className="header-actions desktop-only">
-            <CloudShareControls
-              playgroundId={PLAYGROUND_ID}
-              workspaceId={activeWorkspace?.id ?? null}
+            <ShareControls
               workspaceName={activeWorkspace?.name ?? ""}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
-              cloudOpen={cloudDialogOpen}
-              onCloudOpenChange={setCloudDialogOpen}
             />
             <Menu.Root>
               <Menu.Trigger
@@ -2329,11 +2337,6 @@ function SqlPlaygroundInner() {
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
-          />
-          <MobileMenuAction
-            label="Cloud saves"
-            chevron
-            onClick={() => setCloudDialogOpen(true)}
           />
           <MobileMenuSubSheet label="Import">
             <MobileMenuAction

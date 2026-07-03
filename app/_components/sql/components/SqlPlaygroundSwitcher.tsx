@@ -12,8 +12,9 @@ import { PLAYGROUNDS } from "../../playgrounds";
 import { useIsFramed } from "../../useIsFramed";
 
 /**
- * Shared "Dataslope" brand logo + brand name + playground switcher
- * rendered in the top-left of every playground's header.
+ * Shared "Dataslope" brand logo + playground switcher rendered in the
+ * top-left of every playground's header. The logo is icon-only — the
+ * "Dataslope" wordmark is deliberately omitted to keep the header compact.
  *
  * Extracted so that all three SQL playgrounds (and ideally other
  * playgrounds in the future) share a single source of truth for the
@@ -29,25 +30,20 @@ export function SqlPlaygroundSwitcher({
   playgroundId,
 }: SqlPlaygroundSwitcherProps) {
   const router = useRouter();
-  // Hide the brand logo + wordmark when embedded (the home page's iframe);
-  // keep them on the standalone playground pages.
+  // Hide the brand logo when embedded (the home page's iframe);
+  // keep it on the standalone playground pages.
   const embedded = useIsFramed();
   return (
     <div className="logo">
       {!embedded && (
-        <>
-          <Link href="/" aria-label="Dataslope home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/dataslope-logo-blue.svg"
-              alt="Dataslope logo"
-              className="brand-logo"
-            />
-          </Link>
-          <Link href="/" className="brand-name">
-            Dataslope
-          </Link>
-        </>
+        <Link href="/" aria-label="Dataslope home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/dataslope-logo-blue.svg"
+            alt="Dataslope logo"
+            className="brand-logo"
+          />
+        </Link>
       )}
       {/* Hidden when embedded (home page iframe): switching is done by the
           page's own switcher. */}

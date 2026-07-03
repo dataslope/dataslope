@@ -9,8 +9,20 @@ html, body {
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
 }
 
+/* Pre-paint document background, keyed off the explicit `.dark` class that
+   every route applies to <html> before first paint (the per-route
+   THEME_BOOTSTRAP scripts, the /playground bootstrap in app/layout.tsx, and
+   next-themes on the Fumadocs routes — /courses, /interview-prep,
+   /fumadocs-dev). A fixed dark value here painted a dark first frame
+   for light-mode users — most visibly as a dark blink when the home page's
+   embedded playground iframe loaded. The values mirror the canonical page
+   surfaces (#ffffff light / #121212 dark — see app/home.css and
+   THEME_PALETTES in playgroundTheme.ts). */
 html {
-  background: #0f1117;
+  background: #ffffff;
+}
+html.dark {
+  background: #121212;
 }
 
 *, *::before, *::after {

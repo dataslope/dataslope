@@ -8,7 +8,8 @@ import { HomeNav } from "./HomeNav";
 import { HeroMarquee } from "./HeroMarquee";
 import { HeroInteractive } from "./HeroInteractive";
 import { BeamSection } from "./BeamSection";
-import { CoursesSection, type Course } from "./CoursesSection";
+import { CoursesSection } from "./CoursesSection";
+import type { CatalogCourse } from "@/lib/courseCatalog";
 import { StatsBento, type HomeStats } from "./StatsBento";
 import { PlaygroundShowcase } from "./PlaygroundShowcase";
 import { PricingSection } from "./PricingSection";
@@ -39,7 +40,7 @@ export function HomeClient({
   courses,
   stats,
 }: {
-  courses: Course[];
+  courses: CatalogCourse[];
   stats: HomeStats;
 }) {
   // Brand blue (--ds-blue-500) underline under the gray subtitle text, in both

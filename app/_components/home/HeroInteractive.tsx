@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import type { IconType } from "react-icons";
@@ -21,8 +21,15 @@ import {
 
 // The editor/runtime-backed cards are heavy (CodeMirror + a WASM runtime), so
 // they're code-split and rendered client-only — only the active tab mounts.
+// The fallback renders inside the RippleFrame, on top of the ripple halo, so
+// its fill must be fully opaque (the page-surface token, not a translucent
+// tint) — otherwise the rings show through while a tab's card loads.
 const CardLoading = () => (
-  <div className="flex min-h-[26rem] items-center justify-center rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] text-sm text-[var(--ds-gray-500)] dark:border-white/10 dark:bg-white/5">
+  <div className="flex min-h-[26rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm text-[var(--ds-gray-500)] dark:border-white/10">
+    <Loader2
+      className="size-6 animate-spin text-[var(--ds-blue-500)]"
+      aria-hidden="true"
+    />
     Loading…
   </div>
 );

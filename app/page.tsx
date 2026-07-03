@@ -8,7 +8,7 @@ import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeClient } from "./_components/home/HomeClient";
-import type { Course, CourseTags } from "./_components/home/CoursesSection";
+import { getCourseCatalog, type CatalogCourse } from "@/lib/courseCatalog";
 import type { HomeStats } from "./_components/home/StatsBento";
 import { JsonLd } from "./_components/JsonLd";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
@@ -48,40 +48,6 @@ export const metadata: Metadata = {
 // preference. A missing/"light" value leaves the page in its light default.
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
-interface CourseMeta {
-  title: string;
-  root?: boolean;
-  tags?: CourseTags;
-}
-
-async function getCourses(): Promise<Course[]> {
-  const coursesDir = path.join(process.cwd(), "content", "courses");
-  const entries = await readdir(coursesDir, { withFileTypes: true });
-
-  const courses: Course[] = [];
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    try {
-      const raw = await readFile(
-        path.join(coursesDir, entry.name, "meta.json"),
-        "utf-8",
-      );
-      const meta = JSON.parse(raw) as CourseMeta;
-      if (meta.root && meta.title) {
-        courses.push({
-          slug: entry.name,
-          title: meta.title,
-          tags: meta.tags ?? {},
-        });
-      }
-    } catch {
-      // No meta.json or unreadable — skip
-    }
-  }
-
-  return courses.sort((a, b) => a.title.localeCompare(b.title));
-}
-
 // Recursively read every MDX lesson under a content directory so the home
 // page's stats reflect the live corpus instead of a hand-maintained number.
 async function readMdxFiles(dir: string): Promise<string[]> {
@@ -108,7 +74,7 @@ function countMatches(haystacks: string[], pattern: RegExp): number {
 // Build-time figures shown in the home page's Magic UI bento grid. Computed by
 // scanning the MDX corpus so they never drift from reality, then floored to a
 // round number for display (the grid renders them with a trailing "+").
-async function getHomeStats(courses: Course[]): Promise<HomeStats> {
+async function getHomeStats(courses: CatalogCourse[]): Promise<HomeStats> {
   const contentDir = path.join(process.cwd(), "content");
   // Courses + the fumadocs-dev demo pages + interview prep — the same corpus
   // that lived under content/learn + content/interview before the split, so
@@ -150,7 +116,9 @@ async function getHomeStats(courses: Course[]): Promise<HomeStats> {
 }
 
 export default async function Home() {
-  const courses = await getCourses();
+  // Popularity-sorted catalog (shared with /courses) — the Courses section
+  // shows the top four and filters by topic client-side.
+  const courses = await getCourseCatalog();
   const stats = await getHomeStats(courses);
   return (
     <>

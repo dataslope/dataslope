@@ -11,16 +11,10 @@
  * catalog (not the filtered list), matching the mockup.
  */
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
-import type { IconType } from "react-icons";
-import Link from "@/app/_components/Link";
-import {
-  LANGUAGE_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR,
-} from "@/app/_components/languageIcons";
+import { ChevronDown, Search } from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
-import { CourseGlyph } from "./courseArt";
+import { CourseCard, LangIcon, LevelBars } from "./CourseCard";
 
 // Sidebar language order, from the mockup. Languages found in the catalog but
 // missing here (future additions) are appended alphabetically.
@@ -53,68 +47,6 @@ const FAINT = "text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]";
 const MUTED = "text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]";
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 const ACCENT = "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]";
-const HOVER_BG = "hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.08]";
-
-/** Neutral database glyph for "sql" — the shared language-icon registry only
- *  has per-engine marks (SQLite/PostgreSQL/DuckDB); path from the mockup. */
-function SqlIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
-      <path d="M12 2C7.58 2 4 3.79 4 6s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4zM4 8.5V12c0 2.21 3.58 4 8 4s8-1.79 8-4V8.5c-1.72 1.5-4.7 2.5-8 2.5s-6.28-1-8-2.5zM4 14.5V18c0 2.21 3.58 4 8 4s8-1.79 8-4v-3.5c-1.72 1.5-4.7 2.5-8 2.5s-6.28-1-8-2.5z" />
-    </svg>
-  );
-}
-
-/** Mono (currentColor) language icon at the mockup's optical sizes. */
-function LangIcon({ id, size = 16 }: { id: string; size?: number }) {
-  if (id === "sql") {
-    return (
-      <span
-        className="inline-flex shrink-0 items-center justify-center"
-        style={{ width: size, height: size }}
-        aria-hidden="true"
-      >
-        <SqlIcon size={size} />
-      </span>
-    );
-  }
-  const Icon: IconType | undefined = LANGUAGE_ICONS[id];
-  if (!Icon) return null;
-  const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
-  return (
-    <span
-      className="inline-flex shrink-0 items-center justify-center"
-      style={{ width: size, height: size }}
-      aria-hidden="true"
-    >
-      <Icon size={Math.round(size * factor)} />
-    </span>
-  );
-}
-
-/** The mockup's bar-style level meter: three 11×4 bars, 1 green / 2 blue /
- *  3 red filled left-to-right, the rest on the neutral track. */
-function LevelBars({ level }: { level: string }) {
-  const n = level === "beginner" ? 1 : level === "advanced" ? 3 : 2;
-  const fill =
-    level === "beginner"
-      ? "bg-[var(--ds-green-500)]"
-      : level === "advanced"
-        ? "bg-[var(--ds-red-500)]"
-        : "bg-[var(--ds-blue-500)]";
-  return (
-    <span className="inline-flex gap-0.5" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className={`h-1 w-[11px] rounded-[1px] ${
-            i < n ? fill : "bg-[#e2e5ea] dark:bg-white/[0.14]"
-          }`}
-        />
-      ))}
-    </span>
-  );
-}
 
 /** One sidebar filter row: leading glyph, label, trailing count. */
 function SideRow({
@@ -137,7 +69,7 @@ function SideRow({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[13.5px] transition-colors ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-colors ${
         active
           ? `font-semibold ${ACCENT}`
           : "text-[#121212] dark:text-white"
@@ -151,6 +83,42 @@ function SideRow({
         {count}
       </span>
     </button>
+  );
+}
+
+/** A native `<select>` styled as a filter dropdown for the mobile filter bar
+ *  (single-select: the sidebar's multi-select rows are desktop-only). */
+function MobileFilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={label}
+        className={`w-full cursor-pointer appearance-none rounded-lg border bg-transparent py-2 pl-3 pr-8 text-[13px] font-medium text-[#121212] outline-none [color-scheme:light] dark:text-white dark:[color-scheme:dark] ${HAIRLINE}`}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        size={14}
+        aria-hidden="true"
+        className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 ${FAINT}`}
+      />
+    </div>
   );
 }
 
@@ -226,9 +194,63 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const countText = list.length === 1 ? "1 course" : `${list.length} courses`;
 
   return (
-    <div className="mt-10 grid grid-cols-1 items-start gap-10 md:grid-cols-[224px_1fr] md:gap-14">
-      {/* ── Filter sidebar ── */}
-      <aside className="flex flex-col gap-7 pt-0.5">
+    <>
+      {/* ── Mobile filter bar ── the sidebar is desktop-only; on mobile the
+          language + difficulty filters collapse to dropdowns that stick to
+          the top (just under the nav) once the page scrolls. Full-bleed
+          background so scrolled rows never show through. */}
+      <div className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]">
+        <label
+          className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 ${HAIRLINE}`}
+        >
+          <Search size={15} className={FAINT} aria-hidden="true" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search courses…"
+            className="min-w-0 flex-1 border-none bg-transparent text-[13.5px] text-[#121212] outline-none placeholder:text-[var(--ds-gray-400)] dark:text-white dark:placeholder:text-[var(--ds-gray-500)]"
+          />
+        </label>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <MobileFilterSelect
+            label="Filter by language"
+            value={langs[0] ?? ""}
+            onChange={(v) => setLangs(v ? [v] : [])}
+            options={[
+              { value: "", label: "All languages" },
+              ...languages.map((l) => ({
+                value: l,
+                label: `${formatTagLabel(l)} (${langCount(l)})`,
+              })),
+            ]}
+          />
+          <MobileFilterSelect
+            label="Filter by difficulty"
+            value={levels[0] ?? ""}
+            onChange={(v) => setLevels(v ? [v] : [])}
+            options={[
+              { value: "", label: "All difficulties" },
+              ...LEVELS.map((l) => ({
+                value: l,
+                label: `${formatTagLabel(l)} (${levelCount(l)})`,
+              })),
+            ]}
+          />
+        </div>
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={reset}
+            className={`mt-2.5 cursor-pointer text-[13px] font-medium ${ACCENT}`}
+          >
+            Reset filters
+          </button>
+        )}
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 items-start gap-10 md:mt-10 md:grid-cols-[224px_1fr] md:gap-14">
+        {/* ── Filter sidebar (desktop only) ── */}
+        <aside className="hidden flex-col gap-7 pt-0.5 md:flex">
         <label
           className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 ${HAIRLINE}`}
         >
@@ -308,50 +330,9 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
           </select>
         </div>
 
-        {list.map((course) => {
-          const lang = course.tags.language?.[0] ?? "python";
-          const level = course.tags.level?.[0] ?? "intermediate";
-          return (
-            <Link
-              key={course.slug}
-              href={`/courses/${course.slug}`}
-              // Dense index list — don't viewport-prefetch every course row
-              // (see the opt-out note in app/_components/Link.tsx).
-              prefetch={false}
-              className={`-mx-3 grid grid-cols-[44px_1fr] items-center gap-5 rounded-[10px] border-b px-3 py-5 sm:grid-cols-[44px_1fr_auto] ${HAIRLINE} ${HOVER_BG}`}
-            >
-              <CourseGlyph tags={course.tags} size={36} />
-              <span className="flex min-w-0 flex-col gap-[5px]">
-                <span
-                  className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING}`}
-                >
-                  {course.title}
-                </span>
-                <span
-                  className={`line-clamp-2 text-sm leading-normal ${MUTED}`}
-                >
-                  {course.description}
-                </span>
-              </span>
-              <span className="hidden w-32 flex-col items-end gap-2 sm:flex">
-                <span className="inline-flex items-center gap-[7px]">
-                  <LevelBars level={level} />
-                  <span
-                    className={`text-[12.5px] font-medium capitalize ${SOFT}`}
-                  >
-                    {level}
-                  </span>
-                </span>
-                <span
-                  className={`inline-flex items-center gap-1.5 text-[12.5px] ${SOFT}`}
-                >
-                  <LangIcon id={lang} size={14} />
-                  {formatTagLabel(lang)}
-                </span>
-              </span>
-            </Link>
-          );
-        })}
+        {list.map((course) => (
+          <CourseCard key={course.slug} course={course} />
+        ))}
 
         {courses.length > 0 && list.length === 0 && (
           <div className="px-6 py-14 text-center">
@@ -371,7 +352,8 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
             </p>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

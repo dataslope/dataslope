@@ -65,7 +65,7 @@ function FooterLink({
 
 export function HomeFooter() {
   return (
-    <footer className="mt-24 border-t border-[var(--ds-gray-200)] dark:border-white/10">
+    <footer className="mt-24">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="ds-footer-grid">
           {/* Column 1 — logo (no wordmark) + GitHub at the bottom. */}

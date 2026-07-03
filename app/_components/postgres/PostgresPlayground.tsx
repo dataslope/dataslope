@@ -118,7 +118,8 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
-import { CloudShareControls } from "../cloud/CloudShareControls";
+import { ShareControls } from "../cloud/ShareControls";
+import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
   bundleTabSeeds,
   fetchBundleByRef,
@@ -1197,6 +1198,9 @@ function PostgresPlaygroundInner() {
   // ─── Refs ─────────────────────────────────────────────────────────────
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  // Latches after the first post-mount focus so the entry policy (cursor at
+  // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
+  const entryFocusDoneRef = useRef(false);
   // Latest autocomplete schema, reused as the Ask AI schema snapshot.
   const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
   const langCompRef = useRef<Compartment | null>(null);
@@ -1941,6 +1945,15 @@ function PostgresPlaygroundInner() {
       view.dispatch({
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
+    }
+    // The FIRST focus after mount goes through the shared entry policy:
+    // desktop lands the cursor at the end of the query, mobile skips the
+    // focus so the on-screen keyboard doesn't pop before the user asks to
+    // type. Later runs (user-initiated tab ops) focus as before.
+    if (!entryFocusDoneRef.current) {
+      entryFocusDoneRef.current = true;
+      applyEntryFocus(view);
+      return;
     }
     view.focus();
   }, [activeTabId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -3199,7 +3212,7 @@ function PostgresPlaygroundInner() {
 
   /** Serializes the active database to a replayable SQL dump. Shared by the
    *  "SQL dump (.sql)" export download and the cloud/share bundle builder
-   *  (CloudShareControls). Returns null while the engine is booting. */
+   *  (ShareControls / workspaceCloud). Returns null while the engine is booting. */
   const buildPostgresDumpSql = useCallback(async (): Promise<string | null> => {
     const engine = engineRef.current;
     if (!engine) return null;
@@ -3289,7 +3302,6 @@ function PostgresPlaygroundInner() {
   // A SQL bundle carries the active database as a replayable SQL dump plus
   // the query tabs — the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const dump = await buildPostgresDumpSql();
@@ -3675,18 +3687,15 @@ function PostgresPlaygroundInner() {
                 tabs.some((t) => !t.kind && t.code !== t.pristineCode)
               }
               onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
             />
           )}
           <div className="header-actions desktop-only">
-            <CloudShareControls
-              playgroundId={PLAYGROUND_ID}
-              workspaceId={activeWorkspace?.id ?? null}
+            <ShareControls
               workspaceName={activeWorkspace?.name ?? ""}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
-              cloudOpen={cloudDialogOpen}
-              onCloudOpenChange={setCloudDialogOpen}
             />
             <Menu.Root>
               <Menu.Trigger
@@ -3945,11 +3954,6 @@ function PostgresPlaygroundInner() {
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
-          />
-          <MobileMenuAction
-            label="Cloud saves"
-            chevron
-            onClick={() => setCloudDialogOpen(true)}
           />
           <MobileMenuSubSheet label="Import">
             <MobileMenuAction
