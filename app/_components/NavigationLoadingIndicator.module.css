@@ -1,0 +1,53 @@
+/* Global navigation loading badge — a small fixed card in the BOTTOM-LEFT
+   corner (bottom-right belongs to the AskAi launcher, z-index 60) that hosts
+   the brand "diamond assemble + quarter-turn" loader while an App Router
+   navigation is in flight. Explicit light/dark values (following the site's
+   html.dark class) rather than surface tokens, so it renders identically on
+   the Tailwind-based /courses pages and the plain-CSS /playground pages. The
+   opaque card + border + drop shadow keep the loader legible over any page
+   content scrolling beneath it. */
+
+@keyframes badgeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.badge {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e5e9;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.16),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  animation: badgeIn 0.18s ease-out;
+}
+
+:global(html.dark) .badge {
+  background: #1a1a1a;
+  border-color: #2c2c2c;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge {
+    animation: none;
+  }
+}
