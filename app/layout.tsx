@@ -4,6 +4,7 @@ import "./brand.css";
 import "./globals.css";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import AskAi from "@/app/_components/ai/AskAi";
+import NavigationLoadingIndicator from "@/app/_components/NavigationLoadingIndicator";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
 // variables on <html> so every route (and every portal — portals stay inside
@@ -127,6 +128,9 @@ export default function RootLayout({
             /playground (pathname-gated inside), and its heavy deps are
             dynamically imported so other pages don't pay for them. */}
         <AskAi />
+        {/* Corner badge with the brand diamond loader, shown while a slow
+            client-side navigation (playgrounds, course pages) is pending. */}
+        <NavigationLoadingIndicator />
       </body>
     </html>
   );
