@@ -13,7 +13,7 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into hollow rings — an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
+  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into small solid gray dots — an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -35,14 +35,14 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
     <circle cx="80" cy="160" r="11" />
     <circle cx="140" cy="160" r="8.5" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <path d="M 191 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 193.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 247 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 249.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 303 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 305.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 359 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 361.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 415 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 417.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 471 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 473.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
-    <path d="M 527 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 529.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <circle cx="196" cy="160" r="5" />
+    <circle cx="252" cy="160" r="5" />
+    <circle cx="308" cy="160" r="5" />
+    <circle cx="364" cy="160" r="5" />
+    <circle cx="420" cy="160" r="5" />
+    <circle cx="476" cy="160" r="5" />
+    <circle cx="532" cy="160" r="5" />
   </g>
 </svg>
 
@@ -272,29 +272,64 @@ inside the band.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Thin bars rise and dip around a shaded zero band: the first two clear it convincingly in blue, most hide inside it, and one lone red bar pokes out far down the row — spikes inside the band are noise, and an isolated far-out spike deserves suspicion"
+  aria-label="Lollipop spikes around a shaded zero band: the first two rise clear of it in blue, the rest hide inside as small gray stems, and one lone red spike pokes far out down the row — only the overall pattern, not a single stray spike, names a model"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="50" y="96" width="540" height="48" rx="10" fill="currentColor" opacity="0.08" />
-  <rect x="50" y="118" width="540" height="4" rx="2" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="78" y="50" width="9" height="68" rx="4.5" />
-    <rect x="116" y="66" width="9" height="52" rx="4.5" />
+  <rect x="60" y="94" width="520" height="52" rx="10" fill="currentColor" opacity="0.08" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="60" y="118" width="520" height="4" rx="2" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <rect x="154" y="122" width="9" height="16" rx="4.5" />
-    <rect x="192" y="102" width="9" height="16" rx="4.5" />
-    <rect x="230" y="122" width="9" height="12" rx="4.5" />
-    <rect x="268" y="106" width="9" height="12" rx="4.5" />
-    <rect x="306" y="122" width="9" height="17" rx="4.5" />
-    <rect x="344" y="104" width="9" height="14" rx="4.5" />
-    <rect x="382" y="122" width="9" height="13" rx="4.5" />
-    <rect x="420" y="103" width="9" height="15" rx="4.5" />
-    <rect x="458" y="122" width="9" height="15" rx="4.5" />
-    <rect x="534" y="108" width="9" height="10" rx="4.5" />
+  <g
+    style={{ color: "var(--ds-blue-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M100 118 V 56" />
+    <path d="M140 118 V 72" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="100" cy="50" r="5.5" />
+    <circle cx="140" cy="66" r="5.5" />
+  </g>
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M180 118 V 106" />
+    <path d="M220 122 V 134" />
+    <path d="M260 118 V 110" />
+    <path d="M300 122 V 130" />
+    <path d="M340 118 V 104" />
+    <path d="M380 122 V 136" />
+    <path d="M420 118 V 108" />
+    <path d="M460 122 V 132" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <circle cx="180" cy="102" r="4" />
+    <circle cx="220" cy="138" r="4" />
+    <circle cx="260" cy="106" r="4" />
+    <circle cx="300" cy="134" r="4" />
+    <circle cx="340" cy="100" r="4" />
+    <circle cx="380" cy="140" r="4" />
+    <circle cx="420" cy="104" r="4" />
+    <circle cx="460" cy="136" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }}>
+    <path
+      d="M520 118 V 52"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="496" y="46" width="9" height="72" rx="4.5" fillOpacity="0.9" />
+    <circle cx="520" cy="46" r="5.5" />
   </g>
 </svg>
 
