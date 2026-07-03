@@ -20,7 +20,7 @@
  *     math equations.
  */
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -28,7 +28,21 @@ import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import { Check, X, RotateCcw, MousePointerClick, ScrollText } from "lucide-react";
 import { parseQuestion, type ParsedChoice } from "./parseQuestion";
+import { useAskAiSource } from "../ai/contextRegistry";
+import { describeMcq } from "../ai/widgetSnapshots";
 import styles from "./MultipleChoiceQuestion.module.css";
+
+/** First line of the question body, de-markdowned just enough to read as a
+ *  chip label in the Ask AI panel. */
+function questionChipLabel(body: string, badge: string): string {
+  const firstLine =
+    body
+      .split("\n")
+      .map((l) => l.trim())
+      .find((l) => l && !l.startsWith("```")) ?? "";
+  const plain = firstLine.replace(/[`*_#>]/g, "").trim();
+  return `${badge}: ${plain.slice(0, 80) || "multiple choice"}`;
+}
 
 /** Choice verdict assigned after the learner picks an answer. Drives the
  *  per-choice colour ring + glyph and is read off `data-verdict` in the
@@ -113,9 +127,34 @@ export default function MultipleChoiceQuestion({
     : null;
   const groupName = useId();
 
+  // Ask AI context: the question registers itself so the assistant can see
+  // the question, its choices, and what the learner picked.
+  const cardRef = useRef<HTMLElement | null>(null);
+  useAskAiSource({
+    kind: "mcq",
+    label: questionChipLabel(parsed.body, badge),
+    elementRef: cardRef,
+    getSnapshot: () => ({
+      content: describeMcq({
+        body: parsed.body,
+        choices: parsed.choices.map((c) => ({
+          text: c.text,
+          correct: c.correct,
+          selected: selectedId === c.id,
+        })),
+        submitted,
+        explanation: parsed.explanation,
+      }),
+    }),
+  });
+
   return (
     <div className={styles.cardShell}>
-    <section className={styles.card} aria-label="Multiple choice question">
+    <section
+      ref={cardRef}
+      className={styles.card}
+      aria-label="Multiple choice question"
+    >
       <header className={styles.header}>
         <span className={styles.badge}>
           <ScrollText size={10} aria-hidden />

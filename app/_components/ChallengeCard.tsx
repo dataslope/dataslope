@@ -66,6 +66,8 @@ import {
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
+import { useAskAiSource } from "./ai/contextRegistry";
+import { describeChallenge } from "./ai/widgetSnapshots";
 import { languageCompletion } from "./completion/languageCompletion";
 import {
   LANGUAGE_ICONS,
@@ -934,6 +936,39 @@ export default function ChallengeCard({
     return out;
   }, [workspaceFiles]);
 
+  // Ask AI context: the card registers itself so the assistant can see the
+  // challenge the user is looking at — instructions, their current code,
+  // output, and test results. Snapshots are pulled only at send time.
+  useAskAiSource({
+    kind: "challenge",
+    label: `${badge}: ${title}`,
+    elementRef: cardRef,
+    getSnapshot: () => {
+      const instructionsText =
+        typeof instructions === "string"
+          ? instructions
+          : (cardRef.current
+              ?.querySelector("[data-askai-instructions]")
+              ?.textContent ?? "");
+      const buffers = snapshotAllFiles();
+      return {
+        content: describeChallenge({
+          instructions: instructionsText,
+          files: workspaceFiles.map((f) => ({
+            filename: f.filename,
+            code: buffers.get(f.filename) ?? "",
+            initCode: f.initCode,
+          })),
+          outputs: outputs
+            .filter((c) => c.type === "stdout" || c.type === "stderr")
+            .map((c) => c.content),
+          tests: testResults,
+          banner: bannerState,
+        }),
+      };
+    },
+  });
+
   // Build a file's effective source for a run: its read-only init code
   // (if any) prepended to the editable buffer, via the adapter-aware
   // merge so e.g. PHP's leading `<?php` isn't duplicated.
@@ -1724,7 +1759,9 @@ export default function ChallengeCard({
 
       {/* ── Instructions ── */}
       <div className={styles.instructions}>
-        <div className={styles.instructionsBody}>
+        {/* data-askai-instructions lets the Ask AI snapshot read the rendered
+            instructions text when `instructions` is JSX rather than a string. */}
+        <div className={styles.instructionsBody} data-askai-instructions>
           {renderInstructions(instructions)}
         </div>
       </div>

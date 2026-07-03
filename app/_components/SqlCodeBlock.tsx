@@ -59,6 +59,10 @@ import {
   makeSqlLangExtension,
 } from "./sql/shared/editorSetup";
 import { introspectSqlSchemas } from "./sql/shared/schemaIntrospect";
+import { useAskAiSource } from "./ai/contextRegistry";
+import { describeSqlSurface } from "./ai/widgetSnapshots";
+import { formatSqlSchemaText } from "./ai/sqlSchemaText";
+import type { SqlCompletionSchema } from "./sql/sqlCompletion";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -137,6 +141,10 @@ export default function SqlCodeBlock({
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
   const persistSaveTimerRef = useRef<number | null>(null);
+  // Root card element (Ask AI visibility tracking) and the latest
+  // introspected completion schema (reused as the Ask AI schema snapshot).
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
 
   // Stable localStorage key for the user's SQL buffer. `dialect` is in
   // the fingerprint because identical starter SQL can mean different
@@ -293,6 +301,7 @@ export default function SqlCodeBlock({
     async (engine: { exec: (sql: string) => Promise<SqlResult[]> }) => {
       try {
         const schemas = await introspectSqlSchemas(engine.exec, dialect);
+        askAiSchemaRef.current = schemas.completion;
         const view = editorRef.current;
         const completionComp = completionCompRef.current;
         const langComp = langCompRef.current;
@@ -312,6 +321,25 @@ export default function SqlCodeBlock({
     },
     [dialect],
   );
+
+  // Ask AI context: the block registers itself so the assistant can see the
+  // SQL the user is editing, the last error/result, and the live schema.
+  useAskAiSource({
+    kind: "code-block",
+    label: title ? `SQL code block: ${title}` : `SQL code block (${dialect})`,
+    elementRef: cardRef,
+    getSnapshot: () => ({
+      content: describeSqlSurface({
+        dialect,
+        sql: editorRef.current?.state.doc.toString() ?? "",
+        error: resultError,
+        resultSummary: resultSet
+          ? `${resultSet.values.length} row(s): ${resultSet.columns.join(", ")}`
+          : resultMessage,
+      }),
+      schema: formatSqlSchemaText(askAiSchemaRef.current),
+    }),
+  });
 
   // Sync the CodeMirror theme whenever the docs colour scheme toggles.
   useEffect(() => {
@@ -564,6 +592,7 @@ export default function SqlCodeBlock({
   return (
     <div className={styles.cardShell}>
     <div
+      ref={cardRef}
       className={styles.card}
       data-flavor="sql"
       data-testid="sql-code-block"

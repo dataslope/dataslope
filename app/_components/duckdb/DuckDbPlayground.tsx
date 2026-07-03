@@ -211,6 +211,9 @@ import type {
 } from "../sql/types";
 import type { RuntimeInfo } from "../types";
 import type { SqlCompletionSchema } from "../sql/sqlCompletion";
+import { useAskAiSource } from "../ai/contextRegistry";
+import { describeSqlSurface } from "../ai/widgetSnapshots";
+import { formatSqlSchemaText } from "../ai/sqlSchemaText";
 import { useDuckDbSettingsStore } from "./stores/useDuckDbSettingsStore";
 import {
   importRowsIntoDuckDb,
@@ -1257,6 +1260,8 @@ function DuckDbPlaygroundInner() {
   // Latches after the first post-mount focus so the entry policy (cursor at
   // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
   const entryFocusDoneRef = useRef(false);
+  // Latest autocomplete schema, reused as the Ask AI schema snapshot.
+  const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
@@ -2163,6 +2168,7 @@ function DuckDbPlaygroundInner() {
         kind: "view",
       });
     }
+    askAiSchemaRef.current = completionSchema;
     const key = JSON.stringify(completionSchema);
     if (key === lastReconfigureKeyRef.current) return;
     // Dispatch the completion reconfigure immediately so user-defined
@@ -2196,6 +2202,22 @@ function DuckDbPlaygroundInner() {
       cancelled = true;
     };
   }, [tables, views, columnsByEntity, foreignKeysByEntity, schemas]);
+
+  // Ask AI context: the playground registers itself so the assistant can see
+  // the SQL in the active tab, the last error, and the database schema.
+  useAskAiSource({
+    kind: "sql-playground",
+    label: "DuckDB playground",
+    getSnapshot: () => ({
+      content: describeSqlSurface({
+        dialect: "duckdb",
+        sqlLabel: activeTab ? `tab "${activeTab.title}"` : undefined,
+        sql: editorRef.current?.state.doc.toString() ?? activeTab?.code ?? "",
+        error: result?.error,
+      }),
+      schema: formatSqlSchemaText(askAiSchemaRef.current),
+    }),
+  });
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {

@@ -134,6 +134,9 @@ import { SqlPlaygroundShell } from "./components/SqlPlaygroundShell";
 import { ToastList } from "./components/ToastList";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import type { SqlCompletionSchema } from "./sqlCompletion";
+import { useAskAiSource } from "../ai/contextRegistry";
+import { describeSqlSurface } from "../ai/widgetSnapshots";
+import { formatSqlSchemaText } from "../ai/sqlSchemaText";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { usePragmaStore } from "./stores/usePragmaStore";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
@@ -778,6 +781,8 @@ function SqlPlaygroundInner() {
   // Latches after the first post-mount focus so the entry policy (cursor at
   // end on desktop, no keyboard-popping focus on mobile) applies exactly once.
   const entryFocusDoneRef = useRef(false);
+  // Latest autocomplete schema, reused as the Ask AI schema snapshot.
+  const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
@@ -1545,6 +1550,7 @@ function SqlPlaygroundInner() {
         });
       }
       if (cancelled) return;
+      askAiSchemaRef.current = completionSchema;
       const langExt = await makeSqlLangExtension("sqlite", schema);
       if (cancelled) return;
       view.dispatch({
@@ -1560,6 +1566,22 @@ function SqlPlaygroundInner() {
       cancelled = true;
     };
   }, [tables, views]);
+
+  // Ask AI context: the playground registers itself so the assistant can see
+  // the SQL in the active tab, the last error, and the database schema.
+  useAskAiSource({
+    kind: "sql-playground",
+    label: "SQLite playground",
+    getSnapshot: () => ({
+      content: describeSqlSurface({
+        dialect: "sqlite",
+        sqlLabel: activeTab ? `tab "${activeTab.title}"` : undefined,
+        sql: editorRef.current?.state.doc.toString() ?? activeTab?.code ?? "",
+        error: result?.error,
+      }),
+      schema: formatSqlSchemaText(askAiSchemaRef.current),
+    }),
+  });
 
   useEffect(() => {
     document.documentElement.style.setProperty(
