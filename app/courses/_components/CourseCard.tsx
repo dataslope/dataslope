@@ -92,7 +92,7 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
       prefetch={false}
       className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}
     >
-      <CourseGlyph tags={course.tags} size={32} />
+      <CourseGlyph slug={course.slug} tags={course.tags} size={32} />
       <span className="flex min-w-0 flex-col gap-[5px]">
         <span
           className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING}`}
