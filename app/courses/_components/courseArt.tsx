@@ -1,12 +1,11 @@
 /**
  * Course-row artwork for the `/courses` catalog — the "mono" glyph variant
  * from the courses-page mockup (option 2a — Refined sidebar): a single-shade
- * line motif chosen by the course's domain tag, tinted by its language.
+ * line motif chosen by the course's domain tag.
  *
- * Everything draws in `currentColor`; `LANG_INK_CLASS` supplies the per-
- * language ink (an AA-on-white brand step in light mode, the matching light
- * ramp step in dark mode — the exact pairs from the mockup's LANG_ART table,
- * mapped onto the brand.css ramps).
+ * Everything draws in `currentColor`; the glyph inherits the row's text colour
+ * (heading tone by default) so the icon reads as part of the title rather than
+ * a separate per-language accent.
  */
 import type { CourseTags } from "@/app/_components/home/CoursesSection";
 
@@ -36,19 +35,6 @@ const MOTIFS: Record<string, string> = {
   "data-visualization": "scatter",
   "scientific-computing": "sinegrid",
   "numerical-methods": "sinegrid",
-};
-
-/** Per-language ink (light / dark), from the mockup's LANG_ART palette. */
-export const LANG_INK_CLASS: Record<string, string> = {
-  python: "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-300)]",
-  typescript: "text-[var(--ds-blue-800)] dark:text-[var(--ds-blue-200)]",
-  javascript: "text-[var(--ds-yellow-700)] dark:text-[var(--ds-yellow-400)]",
-  sql: "text-[var(--ds-green-700)] dark:text-[var(--ds-green-300)]",
-  java: "text-[var(--ds-red-700)] dark:text-[var(--ds-red-300)]",
-  cpp: "text-[var(--ds-red-800)] dark:text-[var(--ds-red-200)]",
-  c: "text-[var(--ds-teal-700)] dark:text-[var(--ds-teal-300)]",
-  csharp: "text-[var(--ds-purple-700)] dark:text-[var(--ds-purple-300)]",
-  r: "text-[var(--ds-orange-700)] dark:text-[var(--ds-orange-300)]",
 };
 
 // Stroke props shared by the outline shapes (the mockup's `S` constant).
@@ -196,22 +182,22 @@ function motifShapes(kind: string): React.ReactNode {
   }
 }
 
-/** The mockup's mono glyph: single-shade motif, no background tile. */
+/** The mockup's mono glyph: single-shade motif, no background tile. Inherits
+ *  the row's text colour via `className` (defaults to the heading tone) so the
+ *  icon matches the surrounding text. */
 export function CourseGlyph({
   tags,
   size = 36,
+  className = "text-[var(--ds-gray-900)] dark:text-white",
 }: {
   tags: CourseTags;
   size?: number;
+  className?: string;
 }) {
-  const lang = tags.language?.[0] ?? "python";
   const kind =
     (tags.domain ?? []).map((d) => MOTIFS[d]).find(Boolean) ?? "stairs";
   return (
-    <span
-      className={`inline-flex shrink-0 ${LANG_INK_CLASS[lang] ?? LANG_INK_CLASS.python}`}
-      aria-hidden="true"
-    >
+    <span className={`inline-flex shrink-0 ${className}`} aria-hidden="true">
       <svg viewBox="8 8 40 40" width={size} height={size} className="block">
         {motifShapes(kind)}
       </svg>

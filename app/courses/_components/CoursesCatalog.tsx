@@ -11,7 +11,7 @@
  * catalog (not the filtered list), matching the mockup.
  */
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import type { IconType } from "react-icons";
 import Link from "@/app/_components/Link";
 import {
@@ -154,6 +154,42 @@ function SideRow({
   );
 }
 
+/** A native `<select>` styled as a filter dropdown for the mobile filter bar
+ *  (single-select: the sidebar's multi-select rows are desktop-only). */
+function MobileFilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={label}
+        className={`w-full cursor-pointer appearance-none rounded-lg border bg-transparent py-2 pl-3 pr-8 text-[13px] font-medium text-[#121212] outline-none [color-scheme:light] dark:text-white dark:[color-scheme:dark] ${HAIRLINE}`}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        size={14}
+        aria-hidden="true"
+        className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 ${FAINT}`}
+      />
+    </div>
+  );
+}
+
 function courseSearchText(c: CatalogCourse): string {
   const tags = Object.values(c.tags).flat().map(formatTagLabel);
   return `${c.title} ${c.description} ${tags.join(" ")}`.toLowerCase();
@@ -226,9 +262,63 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const countText = list.length === 1 ? "1 course" : `${list.length} courses`;
 
   return (
-    <div className="mt-10 grid grid-cols-1 items-start gap-10 md:grid-cols-[224px_1fr] md:gap-14">
-      {/* ── Filter sidebar ── */}
-      <aside className="flex flex-col gap-7 pt-0.5">
+    <>
+      {/* ── Mobile filter bar ── the sidebar is desktop-only; on mobile the
+          language + difficulty filters collapse to dropdowns that stick to
+          the top (just under the nav) once the page scrolls. Full-bleed
+          background so scrolled rows never show through. */}
+      <div className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]">
+        <label
+          className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 ${HAIRLINE}`}
+        >
+          <Search size={15} className={FAINT} aria-hidden="true" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search courses…"
+            className="min-w-0 flex-1 border-none bg-transparent text-[13.5px] text-[#121212] outline-none placeholder:text-[var(--ds-gray-400)] dark:text-white dark:placeholder:text-[var(--ds-gray-500)]"
+          />
+        </label>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <MobileFilterSelect
+            label="Filter by language"
+            value={langs[0] ?? ""}
+            onChange={(v) => setLangs(v ? [v] : [])}
+            options={[
+              { value: "", label: "All languages" },
+              ...languages.map((l) => ({
+                value: l,
+                label: `${formatTagLabel(l)} (${langCount(l)})`,
+              })),
+            ]}
+          />
+          <MobileFilterSelect
+            label="Filter by difficulty"
+            value={levels[0] ?? ""}
+            onChange={(v) => setLevels(v ? [v] : [])}
+            options={[
+              { value: "", label: "All difficulties" },
+              ...LEVELS.map((l) => ({
+                value: l,
+                label: `${formatTagLabel(l)} (${levelCount(l)})`,
+              })),
+            ]}
+          />
+        </div>
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={reset}
+            className={`mt-2.5 cursor-pointer text-[13px] font-medium ${ACCENT}`}
+          >
+            Reset filters
+          </button>
+        )}
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 items-start gap-10 md:mt-10 md:grid-cols-[224px_1fr] md:gap-14">
+        {/* ── Filter sidebar (desktop only) ── */}
+        <aside className="hidden flex-col gap-7 pt-0.5 md:flex">
         <label
           className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 ${HAIRLINE}`}
         >
@@ -318,7 +408,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
               // Dense index list — don't viewport-prefetch every course row
               // (see the opt-out note in app/_components/Link.tsx).
               prefetch={false}
-              className={`-mx-3 grid grid-cols-[44px_1fr] items-center gap-5 rounded-[10px] border-b px-3 py-5 sm:grid-cols-[44px_1fr_auto] ${HAIRLINE} ${HOVER_BG}`}
+              className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}
             >
               <CourseGlyph tags={course.tags} size={36} />
               <span className="flex min-w-0 flex-col gap-[5px]">
@@ -332,21 +422,21 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
                 >
                   {course.description}
                 </span>
-              </span>
-              <span className="hidden w-32 flex-col items-end gap-2 sm:flex">
-                <span className="inline-flex items-center gap-[7px]">
-                  <LevelBars level={level} />
-                  <span
-                    className={`text-[12.5px] font-medium capitalize ${SOFT}`}
-                  >
-                    {level}
+                {/* Difficulty + language, below the description and aligned
+                    with it. The fixed-width difficulty column lines every
+                    language icon up at the same x across all rows. Shown on
+                    every breakpoint. */}
+                <span className="mt-2 grid grid-cols-[8.5rem_auto] items-center text-[12.5px]">
+                  <span className="inline-flex items-center gap-[7px]">
+                    <LevelBars level={level} />
+                    <span className={`font-medium capitalize ${SOFT}`}>
+                      {level}
+                    </span>
                   </span>
-                </span>
-                <span
-                  className={`inline-flex items-center gap-1.5 text-[12.5px] ${SOFT}`}
-                >
-                  <LangIcon id={lang} size={14} />
-                  {formatTagLabel(lang)}
+                  <span className={`inline-flex items-center gap-1.5 ${SOFT}`}>
+                    <LangIcon id={lang} size={14} />
+                    {formatTagLabel(lang)}
+                  </span>
                 </span>
               </span>
             </Link>
@@ -371,7 +461,8 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
             </p>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
