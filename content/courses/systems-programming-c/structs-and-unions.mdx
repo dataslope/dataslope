@@ -14,43 +14,37 @@ reality.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two courses of the same bricks: declared char-int-char the top wall needs six ghost padding bricks and runs twelve bytes long; reordered largest-first below, it packs into eight, with the four saved bytes highlighted in yellow"
+  aria-label="Two rows of byte boxes for the same struct: declared char-int-char, the top row needs six gray padding boxes and runs twelve bytes long, while the reordered row below packs into eight — a yellow bracket marks the four bytes saved"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.6">
-    <rect x="176" y="56" width="22" height="34" rx="4" />
-    <rect x="368" y="56" width="22" height="34" rx="4" />
-    <rect x="272" y="130" width="22" height="34" rx="4" />
-    <rect x="296" y="130" width="22" height="34" rx="4" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="48" width="24" height="36" rx="5" />
+    <rect x="344" y="48" width="24" height="36" rx="5" />
+    <rect x="232" y="130" width="24" height="36" rx="5" />
+    <rect x="260" y="130" width="24" height="36" rx="5" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.65">
-    <rect x="272" y="56" width="94" height="34" rx="4" />
-    <rect x="176" y="130" width="94" height="34" rx="4" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="148" y="48" width="24" height="36" rx="5" />
+    <rect x="176" y="48" width="24" height="36" rx="5" />
+    <rect x="204" y="48" width="24" height="36" rx="5" />
+    <rect x="372" y="48" width="24" height="36" rx="5" />
+    <rect x="400" y="48" width="24" height="36" rx="5" />
+    <rect x="428" y="48" width="24" height="36" rx="5" />
+    <rect x="288" y="130" width="24" height="36" rx="5" />
+    <rect x="316" y="130" width="24" height="36" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.15">
-    <path d="M200 56 h22 v34 h-22 Z M204 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M224 56 h22 v34 h-22 Z M228 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M248 56 h22 v34 h-22 Z M252 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M392 56 h22 v34 h-22 Z M396 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M416 56 h22 v34 h-22 Z M420 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M440 56 h22 v34 h-22 Z M444 60 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M320 130 h22 v34 h-22 Z M324 134 h14 v26 h-14 Z" fillRule="evenodd" />
-    <path d="M344 130 h22 v34 h-22 Z M348 134 h14 v26 h-14 Z" fillRule="evenodd" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="232" y="48" width="108" height="36" rx="5" />
+    <rect x="120" y="130" width="108" height="36" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="176" y="96" width="288" height="3" rx="1.5" />
-    <rect x="176" y="91" width="2" height="8" />
-    <rect x="272" y="91" width="2" height="8" />
-    <rect x="368" y="91" width="2" height="8" />
-    <rect x="462" y="91" width="2" height="8" />
-    <rect x="176" y="170" width="192" height="3" rx="1.5" />
-    <rect x="176" y="165" width="2" height="8" />
-    <rect x="272" y="165" width="2" height="8" />
-    <rect x="366" y="165" width="2" height="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="372" y="130" width="92" height="34" rx="6" fillOpacity="0.15" />
-    <rect x="372" y="170" width="92" height="3" rx="1.5" fillOpacity="0.8" />
+  <g style={{ color: "var(--ds-yellow-500)" }}>
+    <path
+      d="M372 158 H 452 M372 158 V 138 M452 158 V 138"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </g>
 </svg>
 
@@ -358,38 +352,32 @@ union's size is the size of its largest member.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three translucent rooms of different sizes share one corner and the same floor space, a single occupant dot inside and only one roof tab active — a union stores any one member at a time in storage sized for the largest"
-  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Three members of different widths — a wide blue, a medium green, and a small yellow — funnel along thin lines into one storage box sized for the largest, and only the green one currently sits inside — a union holds any one member at a time"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="180" y="48" width="230" height="100" rx="10" fillOpacity="0.15" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M218 66 L 300 104" />
+    <path d="M349 66 L 324 104" />
+    <path d="M436 66 L 346 104" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="180" y="74" width="150" height="74" rx="10" fillOpacity="0.18" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="28" width="136" height="32" rx="6" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="180" y="98" width="90" height="50" rx="10" fillOpacity="0.2" />
+    <rect x="412" y="28" width="48" height="32" rx="6" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="196" y="36" width="36" height="12" rx="5" fillOpacity="0.2" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="240" y="36" width="36" height="12" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="284" y="36" width="36" height="12" rx="5" fillOpacity="0.2" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="240" y="110" width="160" height="60" rx="10" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="224" cy="122" r="9" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <rect x="180" y="158" width="230" height="3" rx="1.5" />
-    <rect x="180" y="153" width="2" height="8" />
-    <rect x="408" y="153" width="2" height="8" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="455" cy="70" r="3" />
-    <circle cx="120" cy="130" r="3" />
+    <rect x="306" y="28" width="86" height="32" rx="6" fillOpacity="0.4" />
+    <rect x="252" y="122" width="86" height="36" rx="6" />
   </g>
 </svg>
 
@@ -497,40 +485,34 @@ byte.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A single byte bar split into eight thin slots: three carry tiny flags — read raised, write lowered, execute raised — and the rest sit unused, the way bitfields pack booleans into one integer"
+  aria-label="A row of eight tiny toggle switches: the blue, green, and yellow ones are flipped up while the unused gray ones rest down — bitfields packing single-bit flags into one integer"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="140" y="88" width="360" height="34" rx="9" fill="currentColor" opacity="0.1" />
-  <g fill="currentColor" opacity="0.18">
-    <rect x="184" y="92" width="2" height="26" />
-    <rect x="229" y="92" width="2" height="26" />
-    <rect x="274" y="92" width="2" height="26" />
-    <rect x="319" y="92" width="2" height="26" />
-    <rect x="364" y="92" width="2" height="26" />
-    <rect x="409" y="92" width="2" height="26" />
-    <rect x="454" y="92" width="2" height="26" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="160" y="45" width="10" height="60" rx="5" />
+    <rect x="200" y="45" width="10" height="60" rx="5" />
+    <rect x="240" y="45" width="10" height="60" rx="5" />
+    <rect x="280" y="45" width="10" height="60" rx="5" />
+    <rect x="320" y="45" width="10" height="60" rx="5" />
+    <rect x="360" y="45" width="10" height="60" rx="5" />
+    <rect x="400" y="45" width="10" height="60" rx="5" />
+    <rect x="440" y="45" width="10" height="60" rx="5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="88" width="44" height="34" rx="9" fillOpacity="0.35" />
-    <rect x="160" y="34" width="3" height="54" fillOpacity="0.7" />
-    <path d="M163 34 L189 42 L163 50 Z" />
+    <circle cx="165" cy="52" r="8" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="186" y="88" width="43" height="34" rx="0" fillOpacity="0.18" />
-    <rect x="205" y="64" width="3" height="24" fillOpacity="0.5" />
-    <path d="M208 64 L230 71 L208 78 Z" fillOpacity="0.45" />
+    <circle cx="285" cy="52" r="8" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="231" y="88" width="43" height="34" fillOpacity="0.35" />
-    <rect x="250" y="34" width="3" height="54" fillOpacity="0.7" />
-    <path d="M253 34 L279 42 L253 50 Z" />
+    <circle cx="365" cy="52" r="8" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="297" cy="105" r="2.5" />
-    <circle cx="342" cy="105" r="2.5" />
-    <circle cx="387" cy="105" r="2.5" />
-    <circle cx="432" cy="105" r="2.5" />
-    <circle cx="477" cy="105" r="2.5" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <circle cx="205" cy="98" r="8" />
+    <circle cx="245" cy="98" r="8" />
+    <circle cx="325" cy="98" r="8" />
+    <circle cx="405" cy="98" r="8" />
+    <circle cx="445" cy="98" r="8" />
   </g>
 </svg>
 
