@@ -20,45 +20,49 @@ This chapter answers: **How do you type arrays?** **What's the difference
 between arrays and tuples?** **What bugs does this prevent?**
 
 <svg
-  viewBox="0 0 640 250"
+  viewBox="0 0 640 240"
   role="img"
-  aria-label="An open rail threads identical blue beads that fade off toward more of the same, while an egg-carton tray below holds exactly three cups — square, circle, and triangle each in its own slot — and a red extra shape waits with no cup to fit — arrays are any length of one type, tuples are fixed positions with a type each"
+  aria-label="A rail of identical blue squares runs on past a dashed continuation — an array holds any number of one type — while below, a tray with exactly three slots holds a green square, a blue circle, and a yellow triangle in fixed positions — a tuple gives each slot its own type"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.18">
-    <rect x="60" y="60" width="470" height="6" rx="3" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="60" y="72" width="470" height="8" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M544 76 H 596"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeDasharray="6 8"
+    />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="63" r="11" />
-    <circle cx="140" cy="63" r="11" />
-    <circle cx="190" cy="63" r="11" />
-    <circle cx="240" cy="63" r="11" />
-    <circle cx="290" cy="63" r="11" />
-    <circle cx="340" cy="63" r="11" />
-    <circle cx="390" cy="63" r="11" />
-    <circle cx="435" cy="63" r="11" fillOpacity="0.55" />
-    <circle cx="472" cy="63" r="11" fillOpacity="0.3" />
-    <circle cx="507" cy="63" r="11" fillOpacity="0.15" />
+    <rect x="80" y="44" width="26" height="26" rx="6" />
+    <rect x="130" y="44" width="26" height="26" rx="6" />
+    <rect x="180" y="44" width="26" height="26" rx="6" />
+    <rect x="230" y="44" width="26" height="26" rx="6" />
+    <rect x="280" y="44" width="26" height="26" rx="6" />
+    <rect x="330" y="44" width="26" height="26" rx="6" />
+    <rect x="380" y="44" width="26" height="26" rx="6" />
+    <rect x="430" y="44" width="26" height="26" rx="6" />
   </g>
-  <g fill="currentColor">
-    <rect x="170" y="150" width="300" height="70" rx="16" opacity="0.1" />
-    <circle cx="220" cy="185" r="26" opacity="0.16" />
-    <circle cx="320" cy="185" r="26" opacity="0.16" />
-    <circle cx="420" cy="185" r="26" opacity="0.16" />
-    <circle cx="505" cy="188" r="2.5" opacity="0.25" />
-    <circle cx="488" cy="187" r="2.5" opacity="0.25" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="170" y="140" width="300" height="64" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
+    <rect x="268" y="148" width="6" height="48" rx="3" />
+    <rect x="368" y="148" width="6" height="48" rx="3" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="202" y="167" width="36" height="36" rx="8" />
+    <rect x="199" y="152" width="40" height="40" rx="8" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="185" r="18" />
+    <circle cx="320" cy="172" r="20" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M420 165 L442 203 L398 203 Z" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="535" cy="190" r="12" />
+    <polygon points="421,150 443,192 399,192" />
   </g>
 </svg>
 
@@ -184,33 +188,41 @@ in large codebases where function signatures act as machine-checked
 documentation.
 
 <svg
-  viewBox="0 0 640 170"
+  viewBox="0 0 640 190"
   role="img"
-  aria-label="A row of beads rests under a translucent green display dome while a red ball arriving from outside stops at the glass — a readonly array can be viewed and iterated but never mutated"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Four blue squares sit safely inside a green outlined display case while a red square outside is stopped at the wall with a red cross — a readonly array can be viewed and iterated but never mutated"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.18">
-    <rect x="140" y="128" width="360" height="6" rx="3" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="100" y="138" width="440" height="5" rx="2.5" />
+  <g style={{ color: "var(--ds-green-500)" }}>
+    <rect
+      x="140"
+      y="50"
+      width="280"
+      height="90"
+      rx="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+    />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="120" r="10" />
-    <circle cx="230" cy="120" r="10" />
-    <circle cx="280" cy="120" r="10" />
-    <circle cx="330" cy="120" r="10" />
-    <circle cx="380" cy="120" r="10" />
-    <circle cx="430" cy="120" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M120 132 A200 90 0 0 1 520 132 L504 132 A184 76 0 0 0 136 132 Z" fillOpacity="0.7" />
-    <path d="M136 132 A184 76 0 0 1 504 132 Z" fillOpacity="0.08" />
+    <rect x="168" y="81" width="28" height="28" rx="6" />
+    <rect x="228" y="81" width="28" height="28" rx="6" />
+    <rect x="288" y="81" width="28" height="28" rx="6" />
+    <rect x="348" y="81" width="28" height="28" rx="6" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="468" cy="66" r="8" />
-    <circle cx="494" cy="52" r="3.5" fillOpacity="0.45" />
-    <circle cx="516" cy="42" r="3" fillOpacity="0.25" />
+    <rect x="478" y="82" width="26" height="26" rx="6" transform="rotate(12 491 95)" />
+  </g>
+  <g
+    style={{ color: "var(--ds-red-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+  >
+    <path d="M432 87 L 448 103" />
+    <path d="M448 87 L 432 103" />
   </g>
 </svg>
 
@@ -383,28 +395,32 @@ iterate over it, `push` to it (if the tuple is mutable), etc.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A single egg-carton slot holds one fixed green square, then a coupling joins an open rail of blue beads stretching away and fading out — a tuple's required head followed by a rest element of any length"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="A single tray slot holds one fixed green square, then a rail of identical blue squares stretches away past a dashed continuation — a tuple's required head followed by a rest element of any length"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="50" y="62" width="140" height="76" rx="14" opacity="0.1" />
-    <circle cx="120" cy="100" r="28" opacity="0.16" />
-    <circle cx="196" cy="100" r="4" opacity="0.3" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="56" y="66" width="110" height="68" rx="12" />
+    <rect x="190" y="96" width="330" height="8" rx="4" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="101" y="81" width="38" height="38" rx="8" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <rect x="204" y="97" width="356" height="6" rx="3" />
+    <rect x="91" y="80" width="40" height="40" rx="8" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="240" cy="100" r="11" />
-    <circle cx="290" cy="100" r="11" />
-    <circle cx="340" cy="100" r="11" />
-    <circle cx="390" cy="100" r="11" />
-    <circle cx="438" cy="100" r="11" fillOpacity="0.55" />
-    <circle cx="482" cy="100" r="11" fillOpacity="0.3" />
-    <circle cx="522" cy="100" r="11" fillOpacity="0.15" />
+    <rect x="210" y="68" width="26" height="26" rx="6" />
+    <rect x="260" y="68" width="26" height="26" rx="6" />
+    <rect x="310" y="68" width="26" height="26" rx="6" />
+    <rect x="360" y="68" width="26" height="26" rx="6" />
+    <rect x="410" y="68" width="26" height="26" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M534 100 H 586"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeDasharray="6 8"
+    />
   </g>
 </svg>
 

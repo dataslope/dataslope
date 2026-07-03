@@ -8,43 +8,40 @@ In [Generics Basics](./generics-basics), we saw how unconstrained type parameter
 This is where **generic constraints** come in. You can restrict a type parameter to types that satisfy certain conditions using the `extends` keyword. This unlocks richer operations: accessing properties, calling methods, indexing into objects, and more — all while keeping the code generic and type-safe.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="Wildly different shapes all hang from one rail by the same small ring, while a shape born without a ring lies fallen on the floor below — a constraint lets any type in, as long as it brings the required part"
+  aria-label="Three very different shapes all connect to the same rail through an identical small plug, while a red shape with no plug sits apart beneath a red cross — a constraint admits any type as long as it brings the required part"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.3">
-    <rect x="60" y="40" width="520" height="8" rx="4" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="80" y="60" width="380" height="16" rx="8" />
   </g>
-  <g fill="currentColor" opacity="0.5">
-    <path d="M123 58 A7 7 0 1 1 137 58 A7 7 0 1 1 123 58 Z M126 58 A4 4 0 1 0 134 58 A4 4 0 1 0 126 58 Z" fillRule="evenodd" />
-    <path d="M233 58 A7 7 0 1 1 247 58 A7 7 0 1 1 233 58 Z M236 58 A4 4 0 1 0 244 58 A4 4 0 1 0 236 58 Z" fillRule="evenodd" />
-    <path d="M353 58 A7 7 0 1 1 367 58 A7 7 0 1 1 353 58 Z M356 58 A4 4 0 1 0 364 58 A4 4 0 1 0 356 58 Z" fillRule="evenodd" />
-    <path d="M463 58 A7 7 0 1 1 477 58 A7 7 0 1 1 463 58 Z M466 58 A4 4 0 1 0 474 58 A4 4 0 1 0 466 58 Z" fillRule="evenodd" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <rect x="128" y="64" width="4" height="12" rx="2" />
-    <rect x="238" y="64" width="4" height="12" rx="2" />
-    <rect x="358" y="64" width="4" height="12" rx="2" />
-    <rect x="468" y="64" width="4" height="12" rx="2" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <rect x="136" y="76" width="8" height="26" rx="3" />
+    <rect x="246" y="76" width="8" height="26" rx="3" />
+    <rect x="344" y="76" width="8" height="26" rx="3" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="130" cy="98" r="22" />
-    <path d="M470 76 L496 124 L444 124 Z" />
+    <circle cx="140" cy="122" r="20" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="218" y="76" width="44" height="44" rx="8" />
+    <rect x="230" y="102" width="40" height="40" rx="8" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="342" y="76" width="36" height="70" rx="10" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="60" y="214" width="520" height="4" rx="2" />
+    <rect x="330" y="102" width="36" height="62" rx="10" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="560" cy="196" r="18" />
-    <circle cx="540" cy="162" r="2.5" fillOpacity="0.4" />
-    <circle cx="549" cy="176" r="2.5" fillOpacity="0.3" />
+    <circle cx="540" cy="150" r="18" />
+  </g>
+  <g
+    style={{ color: "var(--ds-red-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3.5"
+    strokeLinecap="round"
+  >
+    <path d="M528 96 L 552 120" />
+    <path d="M552 96 L 528 120" />
   </g>
 </svg>
 
