@@ -137,7 +137,7 @@ function SideRow({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[13.5px] transition-colors ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-colors ${
         active
           ? `font-semibold ${ACCENT}`
           : "text-[#121212] dark:text-white"
@@ -410,30 +410,26 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
               prefetch={false}
               className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}
             >
-              <CourseGlyph tags={course.tags} size={36} />
+              <CourseGlyph tags={course.tags} size={32} />
               <span className="flex min-w-0 flex-col gap-[5px]">
                 <span
                   className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING}`}
                 >
                   {course.title}
                 </span>
-                <span
-                  className={`line-clamp-2 text-sm leading-normal ${MUTED}`}
-                >
+                <span className="line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)]">
                   {course.description}
                 </span>
                 {/* Difficulty + language, below the description and aligned
                     with it. The fixed-width difficulty column lines every
                     language icon up at the same x across all rows. Shown on
                     every breakpoint. */}
-                <span className="mt-2 grid grid-cols-[8.5rem_auto] items-center text-[12.5px]">
-                  <span className="inline-flex items-center gap-[7px]">
+                <span className="mt-2.5 grid grid-cols-[9.5rem_auto] items-center text-[13.5px] text-[#121212] dark:text-white">
+                  <span className="inline-flex items-center gap-3">
                     <LevelBars level={level} />
-                    <span className={`font-medium capitalize ${SOFT}`}>
-                      {level}
-                    </span>
+                    <span className="font-medium capitalize">{level}</span>
                   </span>
-                  <span className={`inline-flex items-center gap-1.5 ${SOFT}`}>
+                  <span className="inline-flex items-center gap-1.5">
                     <LangIcon id={lang} size={14} />
                     {formatTagLabel(lang)}
                   </span>
