@@ -1,0 +1,116 @@
+name: Cloudflare build PR comments
+
+# Posts a NEW pull-request comment on every Cloudflare Workers Builds event:
+#   • build started
+#   • build succeeded  (includes the commit's preview URL)
+#   • build failed / cancelled / timed out
+#   • build skipped
+#
+# Every comment links to the Cloudflare build page for that exact commit.
+# All data comes from the check_run event payload that Cloudflare emits — no
+# Cloudflare API token or secret is required (GITHUB_TOKEN is enough).
+#
+# NOTE: check_run-triggered workflows always run from the DEFAULT branch's copy
+# of this file, so this only takes effect once it is merged to `main`. It cannot
+# post comments for the very PR that introduces it.
+
+on:
+  check_run:
+    types: [created, completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    # Only react to the Cloudflare Workers Builds check (named "Workers Builds: <script>").
+    if: startsWith(github.event.check_run.name, 'Workers Builds')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post build-status comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const cr = context.payload.check_run;
+            const action = context.payload.action; // 'created' | 'completed'
+            const sha = cr.head_sha;
+            const shortSha = sha.slice(0, 7);
+            const { owner, repo } = context.repo;
+            const buildUrl = cr.details_url || cr.html_url;
+            const commitUrl = `https://github.com/${owner}/${repo}/commit/${sha}`;
+            const commitLink = `[\`${shortSha}\`](${commitUrl})`;
+
+            // A build that is created already-completed (e.g. an instantly skipped
+            // build) also fires a 'completed' event — let that one handle it so we
+            // never emit a phantom "started" comment.
+            if (action === 'created' && cr.status === 'completed') {
+              core.info('Check run created already-completed; deferring to the completed event.');
+              return;
+            }
+
+            // Resolve the open PR(s) for this commit. The payload usually carries
+            // them; fall back to the REST lookup for safety.
+            let prNumbers = (cr.pull_requests || []).map((p) => p.number);
+            if (prNumbers.length === 0) {
+              const { data } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha: sha,
+              });
+              prNumbers = data.filter((p) => p.state === 'open').map((p) => p.number);
+            }
+            if (prNumbers.length === 0) {
+              core.info('No open PR associated with this commit; nothing to comment.');
+              return;
+            }
+
+            // Pull the preview URLs out of the check-run summary. On success these
+            // should already be present in the event payload; re-fetch as a fallback.
+            const parse = (text) => {
+              const grab = (label) => {
+                const m = (text || '').match(new RegExp(`${label}:\\s*(https?://\\S+)`));
+                return m ? m[1] : null;
+              };
+              return { alias: grab('Preview Alias URL'), preview: grab('Preview URL') };
+            };
+            let urls = parse(cr.output && cr.output.summary);
+            if (action === 'completed' && cr.conclusion === 'success' && !urls.alias && !urls.preview) {
+              try {
+                const { data } = await github.rest.checks.get({ owner, repo, check_run_id: cr.id });
+                urls = parse(data.output && data.output.summary);
+              } catch (e) {
+                core.warning(`Could not re-fetch check run output: ${e.message}`);
+              }
+            }
+
+            // Compose the comment body for this event.
+            let body;
+            if (action === 'created') {
+              body =
+                `🏗️ **Cloudflare build started** for ${commitLink}\n\n` +
+                `[View build on Cloudflare ↗](${buildUrl})`;
+            } else {
+              const conclusion = cr.conclusion;
+              if (conclusion === 'success') {
+                const lines = [`✅ **Cloudflare build succeeded** for ${commitLink}`, ''];
+                if (urls.alias) lines.push(`**Preview:** ${urls.alias}`);
+                if (urls.preview) lines.push(`Version preview: ${urls.preview}`);
+                lines.push('', `[Build details ↗](${buildUrl})`);
+                body = lines.join('\n');
+              } else if (conclusion === 'skipped' || conclusion === 'neutral') {
+                body =
+                  `⏭️ **Cloudflare build skipped** for ${commitLink}\n\n` +
+                  `[View build ↗](${buildUrl})`;
+              } else {
+                // failure, timed_out, cancelled, action_required, stale
+                body =
+                  `❌ **Cloudflare build ${conclusion}** for ${commitLink}\n\n` +
+                  `[View build logs ↗](${buildUrl})`;
+              }
+            }
+
+            for (const issue_number of prNumbers) {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.info(`Commented on PR #${issue_number} (${action}/${cr.conclusion || cr.status}).`);
+            }
