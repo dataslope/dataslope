@@ -101,15 +101,15 @@ function PlaygroundFacade({
         >
           {lineWidths.map((w, i) => (
             <div key={i} className="flex items-center gap-4">
-              <span className="w-5 text-right text-xs tabular-nums text-[var(--ds-gray-300)] dark:text-white/20">
+              <span className="w-5 text-right text-xs tabular-nums text-[var(--ds-gray-300)] transition-colors group-hover:text-[var(--ds-green-600)] dark:text-white/20 dark:group-hover:text-[var(--ds-green-500)]">
                 {i + 1}
               </span>
               <span
-                className="h-3 animate-pulse rounded bg-[var(--ds-gray-200)] motion-reduce:animate-none dark:bg-white/10"
+                className="h-3 animate-pulse rounded bg-[var(--ds-gray-200)] transition-colors group-hover:bg-[var(--ds-green-200)] motion-reduce:animate-none dark:bg-white/10 dark:group-hover:bg-[var(--ds-green-500)]/25"
                 style={{ width: `${w}%`, animationDelay: `${i * 180}ms` }}
               />
               {i === lineWidths.length - 1 && (
-                <span className="animate-blink-cursor -ml-2.5 h-3 w-1.5 rounded-sm bg-[var(--ds-gray-400)] dark:bg-white/40" />
+                <span className="animate-blink-cursor -ml-2.5 h-3 w-1.5 rounded-sm bg-[var(--ds-gray-400)] transition-colors group-hover:bg-[var(--ds-green-500)] dark:bg-white/40 dark:group-hover:bg-[var(--ds-green-400)]" />
               )}
             </div>
           ))}
@@ -129,7 +129,7 @@ function PlaygroundFacade({
             <Play size={16} aria-hidden="true" />
             Launch the {label} playground
           </ShimmerButton>
-          <span className="text-center text-xs text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-green-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-green-400)]">
             {suspended
               ? "Paused to free memory — relaunch to pick up where you left off."
               : "Runs entirely in your browser — nothing downloads until you launch it."}

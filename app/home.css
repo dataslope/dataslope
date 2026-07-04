@@ -85,6 +85,18 @@ html.dark .ds-home {
   }
 }
 
+/* Header theme + GitHub icon buttons: desktop-only, mirroring the nav menu.
+ * On mobile the drawer exposes a theme switch and a GitHub link instead, so
+ * these hide to keep the compact header to brand + hamburger. */
+.ds-home .ds-nav-icons {
+  display: none;
+}
+@media (min-width: 768px) {
+  .ds-home .ds-nav-icons {
+    display: inline-flex;
+  }
+}
+
 /* Decorative CSS animations pause while their section is offscreen — see
  * AnimationPauseGate.tsx, which toggles the data attribute from an
  * IntersectionObserver. Scoped under .ds-home so the rule can't leak into

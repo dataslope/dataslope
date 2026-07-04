@@ -399,7 +399,14 @@ export function SignInClient() {
         )}
 
         <button type="submit" disabled={busy} className={styles.primary}>
-          {submitting ? cta[1] : cta[0]}
+          {submitting ? (
+            <span className={styles.btnBusy}>
+              <span className={styles.spinner} aria-hidden="true" />
+              {cta[1]}
+            </span>
+          ) : (
+            cta[0]
+          )}
         </button>
       </form>
 
@@ -413,8 +420,17 @@ export function SignInClient() {
               disabled={busy}
               className={styles.socialBtn}
             >
-              <GoogleGlyph />
-              {socialPending === "google" ? "Redirecting…" : "Google"}
+              {socialPending === "google" ? (
+                <>
+                  <span className={styles.spinner} aria-hidden="true" />
+                  Redirecting…
+                </>
+              ) : (
+                <>
+                  <GoogleGlyph />
+                  Google
+                </>
+              )}
             </button>
             <button
               type="button"
@@ -422,8 +438,17 @@ export function SignInClient() {
               disabled={busy}
               className={styles.socialBtn}
             >
-              <GitHubIcon size={16} />
-              {socialPending === "github" ? "Redirecting…" : "GitHub"}
+              {socialPending === "github" ? (
+                <>
+                  <span className={styles.spinner} aria-hidden="true" />
+                  Redirecting…
+                </>
+              ) : (
+                <>
+                  <GitHubIcon size={16} />
+                  GitHub
+                </>
+              )}
             </button>
           </div>
         </div>

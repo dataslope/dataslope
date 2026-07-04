@@ -16,7 +16,7 @@ import {
 import { signOut, useSession } from "@/lib/auth/client";
 import type { IconType } from "react-icons";
 import Link from "../Link";
-import { AuthMenu } from "../auth/AuthMenu";
+import { AuthMenu, SIGN_IN_BUTTON_CLASS } from "../auth/AuthMenu";
 import { GitHubIcon } from "./icons";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -169,22 +169,32 @@ function BrandLogo() {
   );
 }
 
-/** Auth block for the mobile drawer: a "Sign in" link when signed out, or the
- *  account name + Account/Sign-out actions when signed in. Full-width rows
- *  rather than the desktop avatar dropdown, to match the drawer's nav items. */
+/** Auth block for the top of the mobile drawer: a solid "Sign in" button (styled
+ *  like the desktop control) when signed out, or the account name +
+ *  Account/Sign-out actions when signed in. While the first session read is in
+ *  flight a size-matched skeleton renders instead of "Sign in", so a signed-in
+ *  visitor doing a full-page load doesn't see it flash before the account rows. */
 function MobileAuthSection() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const rowClass =
     "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10";
 
-  if (isPending || !session) {
+  if (isPending) {
+    return (
+      <span
+        aria-hidden="true"
+        className="block h-9 w-full animate-pulse rounded-lg bg-[var(--ds-gray-100)] dark:bg-white/10"
+      />
+    );
+  }
+
+  if (!session) {
     return (
       <Dialog.Close
         render={<Link href="/sign-in" prefetch={false} />}
-        className={rowClass}
+        className={`${SIGN_IN_BUTTON_CLASS} w-full justify-center`}
       >
-        <UserIcon size={16} />
         Sign in
       </Dialog.Close>
     );
@@ -219,10 +229,44 @@ function MobileAuthSection() {
   );
 }
 
+/** Pill toggle switch (sun ↔ moon) for the drawer footer. The knob position and
+ *  glyph are driven purely by the `.dark` class on <html> (set pre-hydration),
+ *  so they never mismatch on hydration. */
+function ThemeSwitch() {
+  const { theme, toggle } = useTheme();
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      role="switch"
+      aria-checked={theme === "dark"}
+      aria-label="Toggle color theme"
+      title="Toggle color theme"
+      className="relative inline-flex h-7 w-[3.25rem] shrink-0 items-center rounded-full bg-[var(--ds-gray-100)] px-1 transition-colors dark:bg-white/10"
+    >
+      {/* Faint end markers so the control reads as sun ↔ moon. */}
+      <Sun
+        size={13}
+        className="pointer-events-none absolute left-1.5 text-[var(--ds-gray-400)]"
+        aria-hidden="true"
+      />
+      <Moon
+        size={13}
+        className="pointer-events-none absolute right-1.5 text-[var(--ds-gray-400)]"
+        aria-hidden="true"
+      />
+      {/* Knob: sits left in light mode, slides right in dark mode. */}
+      <span className="z-10 inline-flex size-5 items-center justify-center rounded-full bg-white text-[var(--ds-gray-700)] shadow-sm transition-transform duration-200 dark:translate-x-[1.5rem] dark:bg-[#2a2a2a] dark:text-white">
+        <Sun size={12} className="block dark:hidden" aria-hidden="true" />
+        <Moon size={12} className="hidden dark:block" aria-hidden="true" />
+      </span>
+    </button>
+  );
+}
+
 /** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
  *  drawer) holding the same navigation the desktop bar exposes inline. */
 function MobileDrawer() {
-  const { toggle } = useTheme();
   return (
     <Dialog.Root>
       <Dialog.Trigger
@@ -235,16 +279,17 @@ function MobileDrawer() {
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
         <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#1a1a1a]">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)]">
-              Menu
-            </span>
+          {/* Top: close button, then the auth control (Sign in / account). */}
+          <div className="mb-2 flex items-center justify-end">
             <Dialog.Close
               aria-label="Close menu"
               className="inline-flex size-8 items-center justify-center rounded-lg text-[var(--ds-gray-500)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:hover:bg-white/10 dark:hover:text-white"
             >
               <X size={18} />
             </Dialog.Close>
+          </div>
+          <div className="mb-2 flex flex-col gap-1 border-b border-[var(--ds-gray-200)] pb-3 dark:border-white/10">
+            <MobileAuthSection />
           </div>
 
           {/* One unified scroll for all nav items (rather than a nested
@@ -288,22 +333,10 @@ function MobileDrawer() {
                 {p.label}
               </Dialog.Close>
             ))}
-
-            <div className="mt-2 border-t border-[var(--ds-gray-200)] pt-2 dark:border-white/10">
-              <MobileAuthSection />
-            </div>
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
-            <button
-              type="button"
-              onClick={toggle}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
-            >
-              <Sun size={16} className="hidden dark:block" />
-              <Moon size={16} className="block dark:hidden" />
-              Theme
-            </button>
+            <ThemeSwitch />
             <a
               href={GITHUB_URL}
               target="_blank"
@@ -324,9 +357,22 @@ export function HomeNav() {
   // Shrink-on-scroll: the header is taller at the top of the page and
   // compacts to its sticky height once scrolled. The background stays a
   // solid white/#121212 (no backdrop blur, shadow, or opacity).
+  //
+  // Two thresholds (hysteresis) with a gap wider than the header's shrink
+  // delta (≤16px). A single threshold caused an infinite bounce near the top:
+  // toggling the header height changes the in-flow document height, and the
+  // browser's scroll-anchoring nudges scrollY to compensate — which flips the
+  // threshold back, resizing the header again, ad infinitum. The gap keeps that
+  // compensation from ever crossing the opposite threshold.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () =>
+      setScrolled((prev) => {
+        const y = window.scrollY;
+        if (!prev && y > 48) return true;
+        if (prev && y < 12) return false;
+        return prev;
+      });
     window.addEventListener("scroll", onScroll, { passive: true });
     // Defer the initial read out of the effect body (handles back-nav into a
     // scrolled position without a synchronous setState).
@@ -362,8 +408,12 @@ export function HomeNav() {
 
         {/* Right: theme + GitHub + (mobile) hamburger */}
         <div className="flex items-center justify-end gap-1">
-          <ThemeToggle />
-          <GitHubLink />
+          {/* Theme + GitHub are desktop-only; on mobile the drawer carries a
+              theme switch and a GitHub link instead. */}
+          <span className="ds-nav-icons items-center gap-1">
+            <ThemeToggle />
+            <GitHubLink />
+          </span>
           {/* Desktop-only: the mobile drawer carries its own auth control so
               this one isn't crammed next to the hamburger on small screens. */}
           <span className="ds-nav-auth">

@@ -66,6 +66,20 @@ export function HomeClient({
               <BlurFade delay={0.05}>
                 <HeroMarquee />
               </BlurFade>
+              {/* One-line "what is this" statement so a first-time visitor
+                  immediately understands the product before the interactive
+                  demo below. */}
+              <BlurFade delay={0.12}>
+                <p className="mx-auto mt-8 max-w-2xl text-center text-lg text-[var(--ds-gray-600)] [text-wrap:pretty] sm:text-xl dark:text-[var(--ds-gray-300)]">
+                  Dataslope is a{" "}
+                  <span className="font-semibold text-[var(--ds-gray-900)] dark:text-white">
+                    100% free
+                  </span>{" "}
+                  platform to learn programming and prep for coding interviews —
+                  interactive courses and language playgrounds that run entirely
+                  in your browser, no sign-up required.
+                </p>
+              </BlurFade>
               <BlurFade delay={0.18}>
                 <div className="mt-12">
                   <HeroInteractive />
