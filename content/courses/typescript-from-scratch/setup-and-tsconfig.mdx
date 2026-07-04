@@ -8,44 +8,42 @@ Now that you understand *why* TypeScript exists and *how* it works, let's get pr
 We'll keep it minimal. You don't need a complex build pipeline, a framework, or a bundler to learn TypeScript. The in-browser playground on this site is enough for most lessons. But if you want to experiment locally, this page shows you how.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="A mixer console of five faders and two dials: the large master fader is pushed all the way up and glows green while one neglected fader sits low above a red light — tsconfig as a panel of strictness controls"
+  aria-label="A panel of six strictness switches: five are flipped up — the large green master among them — while one neglected switch still hangs down in red — tsconfig as a bank of compiler checks you switch on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="70" y="28" width="500" height="174" rx="18" opacity="0.06" />
-    <rect x="120" y="50" width="8" height="120" rx="4" opacity="0.18" />
-    <rect x="180" y="50" width="8" height="120" rx="4" opacity="0.18" />
-    <rect x="240" y="50" width="8" height="120" rx="4" opacity="0.18" />
-    <rect x="300" y="50" width="8" height="120" rx="4" opacity="0.18" />
-    <rect x="360" y="50" width="8" height="120" rx="4" opacity="0.18" />
-    <rect x="438" y="42" width="10" height="132" rx="5" opacity="0.22" />
-    <path d="M504 70 A16 16 0 1 1 536 70 A16 16 0 1 1 504 70 Z M510 70 A10 10 0 1 0 530 70 A10 10 0 1 0 510 70 Z" fillRule="evenodd" opacity="0.25" />
-    <path d="M504 130 A16 16 0 1 1 536 130 A16 16 0 1 1 504 130 Z M510 130 A10 10 0 1 0 530 130 A10 10 0 1 0 510 130 Z" fillRule="evenodd" opacity="0.25" />
+  <g style={{ color: "var(--ds-gray-300)" }}>
+    <rect
+      x="110"
+      y="40"
+      width="420"
+      height="140"
+      rx="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+    />
+  </g>
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="150" y="70" width="10" height="80" rx="5" />
+    <rect x="214" y="70" width="10" height="80" rx="5" />
+    <rect x="278" y="70" width="10" height="80" rx="5" />
+    <rect x="342" y="70" width="10" height="80" rx="5" />
+    <rect x="406" y="70" width="10" height="80" rx="5" />
+    <rect x="470" y="70" width="10" height="80" rx="5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="110" y="80" width="28" height="14" rx="7" />
-    <rect x="170" y="114" width="28" height="14" rx="7" />
-    <rect x="230" y="60" width="28" height="14" rx="7" />
-    <rect x="290" y="98" width="28" height="14" rx="7" />
-    <rect x="350" y="148" width="28" height="14" rx="7" />
-    <circle cx="531" cy="59" r="4" />
-    <circle cx="509" cy="141" r="4" />
+    <circle cx="155" cy="78" r="9" />
+    <circle cx="219" cy="78" r="9" />
+    <circle cx="347" cy="78" r="9" />
+    <circle cx="411" cy="78" r="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="425" y="46" width="36" height="16" rx="8" />
-    <circle cx="443" cy="32" r="4" fillOpacity="0.6" />
-    <circle cx="124" cy="186" r="5" />
-    <circle cx="184" cy="186" r="5" />
-    <circle cx="304" cy="186" r="5" />
-    <circle cx="443" cy="186" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="244" cy="186" r="5" />
+    <circle cx="283" cy="78" r="11" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="364" cy="186" r="5" />
+    <circle cx="475" cy="142" r="9" />
   </g>
 </svg>
 
@@ -303,45 +301,31 @@ This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two plank walkways with the same missing plank: on the upper one a walking dot is a single step from the unmarked hole, on the lower one a green ramp arcs over the gap and the dot is already safely across — strictNullChecks makes the null hole visible and handled"
+  aria-label="Two copies of the same road with a missing stretch: on top the blue traveler is a step away from the unmarked hole crossed out in red, while below a solid green plate covers the gap and the traveler is already safely across — strictNullChecks makes the null hole visible and handled"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.25">
-    <rect x="70" y="58" width="46" height="12" rx="6" />
-    <rect x="124" y="58" width="46" height="12" rx="6" />
-    <rect x="178" y="58" width="46" height="12" rx="6" />
-    <rect x="232" y="58" width="46" height="12" rx="6" />
-    <rect x="286" y="58" width="46" height="12" rx="6" />
-    <rect x="394" y="58" width="46" height="12" rx="6" />
-    <rect x="448" y="58" width="46" height="12" rx="6" />
-    <rect x="502" y="58" width="46" height="12" rx="6" />
-    <rect x="70" y="150" width="46" height="12" rx="6" />
-    <rect x="124" y="150" width="46" height="12" rx="6" />
-    <rect x="178" y="150" width="46" height="12" rx="6" />
-    <rect x="232" y="150" width="46" height="12" rx="6" />
-    <rect x="286" y="150" width="46" height="12" rx="6" />
-    <rect x="394" y="150" width="46" height="12" rx="6" />
-    <rect x="448" y="150" width="46" height="12" rx="6" />
-    <rect x="502" y="150" width="46" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="340" y="58" width="46" height="12" rx="6" fillOpacity="0.22" />
-    <circle cx="363" cy="86" r="4" fillOpacity="0.6" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="70" y="64" width="270" height="10" rx="5" />
+    <rect x="390" y="64" width="160" height="10" rx="5" />
+    <rect x="70" y="156" width="270" height="10" rx="5" />
+    <rect x="390" y="156" width="160" height="10" rx="5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="314" cy="46" r="9" />
-    <circle cx="524" cy="138" r="9" />
+    <circle cx="300" cy="52" r="9" />
+    <circle cx="470" cy="144" r="9" />
+  </g>
+  <g
+    style={{ color: "var(--ds-red-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+  >
+    <path d="M355 82 L 375 102" />
+    <path d="M375 82 L 355 102" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M330 150 C348 116 378 116 396 150 L382 150 C370 128 356 128 344 150 Z" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="120" cy="40" r="2.5" />
-    <circle cx="172" cy="40" r="2.5" />
-    <circle cx="224" cy="40" r="2.5" />
-    <circle cx="276" cy="40" r="2.5" />
-    <circle cx="430" cy="132" r="2.5" />
-    <circle cx="468" cy="132" r="2.5" />
+    <rect x="336" y="152" width="58" height="18" rx="6" />
   </g>
 </svg>
 

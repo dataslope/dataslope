@@ -12,7 +12,7 @@ the stack) will be.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue CPU disc exchanges dotted read and write arrows with a column of memory pills while clock ticks pulse beneath it — processor, memory, and the beat that drives them"
+  aria-label="A blue CPU disc exchanges thin read and write arrows with a column of memory pills while clock ticks pulse beneath it — processor, memory, and the beat that drives them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -34,19 +34,25 @@ the stack) will be.
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="420" y="96" width="130" height="24" rx="12" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="272" cy="78" r="3.5" />
-    <circle cx="296" cy="78" r="3.5" />
-    <circle cx="320" cy="78" r="3.5" />
-    <circle cx="344" cy="78" r="3.5" />
-    <circle cx="296" cy="132" r="3.5" />
-    <circle cx="320" cy="132" r="3.5" />
-    <circle cx="344" cy="132" r="3.5" />
-    <circle cx="368" cy="132" r="3.5" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M262 78 H 362"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <polygon points="362,70 362,86 378,78" fill="currentColor" />
+    <path
+      d="M378 132 H 294"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <polygon points="294,124 294,140 278,132" fill="currentColor" />
   </g>
   <g fill="currentColor" opacity="0.4">
-    <polygon points="366,70 366,86 382,78" />
-    <polygon points="274,132 290,124 290,140" />
     <rect x="150" y="186" width="6" height="14" rx="3" fillOpacity="0.5" />
     <rect x="172" y="186" width="6" height="14" rx="3" fillOpacity="0.5" />
     <rect x="216" y="186" width="6" height="14" rx="3" fillOpacity="0.5" />

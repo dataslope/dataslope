@@ -14,7 +14,7 @@ shortcut around design; it is a trade-off you make with your eyes open.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A green fact from one table is copied into another, but the copy wears a yellow badge ring and a sync trail back to its source — duplication done deliberately, with eyes open"
+  aria-label="A green fact from one table is copied into another, but the copy wears a yellow badge ring and a thin sync line back to its source — duplication done deliberately, with eyes open"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -35,12 +35,15 @@ shortcut around design; it is a trade-off you make with your eyes open.
     <path fillRule="evenodd" d="M477 112 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0 M481 112 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0" fillOpacity="0.8" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="172" cy="170" r="3.5" fillOpacity="0.5" />
-    <circle cx="240" cy="182" r="3.5" fillOpacity="0.5" />
-    <circle cx="320" cy="186" r="3.5" fillOpacity="0.5" />
-    <circle cx="400" cy="182" r="3.5" fillOpacity="0.5" />
-    <circle cx="462" cy="166" r="3.5" fillOpacity="0.5" />
-    <polygon points="487,140 478,158 496,156" fillOpacity="0.7" />
+    <path
+      d="M482 132 C 400 186, 230 186, 150 100"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeOpacity="0.5"
+    />
+    <polygon points="142,90 147,104 158,95" fillOpacity="0.5" />
   </g>
 </svg>
 

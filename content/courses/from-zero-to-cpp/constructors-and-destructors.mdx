@@ -12,7 +12,7 @@ management in C++.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A green disc emerges from a yellow mold, travels along a dotted line, then gently dissolves into smaller and fainter dots — a constructor builds the object and a destructor unmakes it at the end"
+  aria-label="A green disc emerges from a yellow mold, travels along a thin line, then gently dissolves into smaller and fainter dots — a constructor builds the object and a destructor unmakes it at the end"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -29,12 +29,15 @@ management in C++.
     <circle cx="506" cy="95" r="3" fillOpacity="0.2" />
     <circle cx="522" cy="108" r="2.5" fillOpacity="0.15" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="200" cy="105" r="3" />
-    <circle cx="228" cy="105" r="3" />
-    <circle cx="256" cy="105" r="3" />
-    <circle cx="344" cy="105" r="3" />
-    <circle cx="368" cy="105" r="3" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M180 105 H 270" />
+    <path d="M330 105 H 400" />
   </g>
 </svg>
 

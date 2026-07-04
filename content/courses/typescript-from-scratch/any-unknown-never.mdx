@@ -15,74 +15,52 @@ This chapter answers: **What is `any` and when should you (not) use it?**
 these types relate to each other?**
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="Three stalls side by side: a wild storm of dots that leaks across its own boundary, a locked blue crate with a keyhole while a visitor hovers above, and a spot where only a dotted outline with a faint afterglow remains — any ignores the rules, unknown demands a check first, never holds nothing at all"
+  aria-label="Three boxes: the first has no lid and its contents tumble out anywhere, the second is shut tight with a small yellow padlock that demands a check before use, and the third is only a dashed empty outline — any ignores the rules, unknown locks them, never holds nothing at all"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="235" cy="36" r="2" />
-    <circle cx="235" cy="62" r="2" />
-    <circle cx="235" cy="88" r="2" />
-    <circle cx="235" cy="114" r="2" />
-    <circle cx="235" cy="140" r="2" />
-    <circle cx="235" cy="166" r="2" />
-    <circle cx="235" cy="192" r="2" />
-    <circle cx="425" cy="36" r="2" />
-    <circle cx="425" cy="62" r="2" />
-    <circle cx="425" cy="88" r="2" />
-    <circle cx="425" cy="114" r="2" />
-    <circle cx="425" cy="140" r="2" />
-    <circle cx="425" cy="166" r="2" />
-    <circle cx="425" cy="192" r="2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="100" y="110" width="100" height="70" rx="10" fillOpacity="0.55" />
+    <rect x="270" y="100" width="100" height="80" rx="10" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M70 130 C80 86 140 70 170 96 C196 118 180 160 140 162 C112 164 96 146 104 126" fillOpacity="0.14" />
-    <circle cx="100" cy="80" r="5" />
-    <circle cx="156" cy="64" r="4" fillOpacity="0.8" />
-    <circle cx="186" cy="110" r="6" fillOpacity="0.9" />
-    <circle cx="80" cy="140" r="4" fillOpacity="0.7" />
-    <circle cx="140" cy="172" r="5" fillOpacity="0.8" />
-    <circle cx="196" cy="160" r="3.5" fillOpacity="0.6" />
-    <circle cx="60" cy="100" r="3" fillOpacity="0.5" />
-    <circle cx="252" cy="74" r="4" fillOpacity="0.7" />
-    <circle cx="266" cy="180" r="3" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="124" cy="108" r="6" fillOpacity="0.85" />
-    <circle cx="170" cy="140" r="3.5" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="92" cy="174" r="4" fillOpacity="0.7" />
-    <circle cx="206" cy="76" r="4" fillOpacity="0.6" />
-    <rect x="276" y="90" width="110" height="78" rx="10" />
-    <rect x="276" y="78" width="110" height="20" rx="9" fillOpacity="0.75" />
-  </g>
-  <g fill="var(--ds-white)">
-    <circle cx="331" cy="122" r="6" />
-    <path d="M331 126 L337 144 L325 144 Z" />
+    <circle cx="128" cy="88" r="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="331" cy="40" r="9" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="331" cy="58" r="2.5" />
-    <circle cx="331" cy="68" r="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="538" cy="115" r="2.5" />
-    <circle cx="533.4" cy="127.7" r="2.5" />
-    <circle cx="520" cy="133" r="2.5" />
-    <circle cx="506.6" cy="127.7" r="2.5" />
-    <circle cx="502" cy="115" r="2.5" />
-    <circle cx="506.6" cy="102.3" r="2.5" />
-    <circle cx="520" cy="97" r="2.5" />
-    <circle cx="533.4" cy="102.3" r="2.5" />
+    <rect x="162" y="72" width="18" height="18" rx="4" transform="rotate(14 171 81)" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="520" cy="115" r="3.5" fillOpacity="0.25" />
-    <circle cx="547" cy="86" r="2" fillOpacity="0.3" />
-    <circle cx="556" cy="76" r="1.8" fillOpacity="0.2" />
+    <polygon points="200,96 214,70 228,96" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }}>
+    <path
+      d="M312 122 V 112 A 8 8 0 0 1 328 112 V 122"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="4"
+      strokeLinecap="round"
+    />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="304" y="122" width="32" height="24" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="320" cy="133" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <rect
+      x="440"
+      y="100"
+      width="100"
+      height="80"
+      rx="10"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeDasharray="6 8"
+      strokeLinecap="round"
+    />
   </g>
 </svg>
 
@@ -476,45 +454,52 @@ console.log("Type relationships demonstrated");
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A fountain of basins: values rain from the wide top pool into the middle pools, the tiny basin at the bottom receives nothing, yet faint streams rise from it back to every pool above — anything fits in unknown, nothing fits in never, and never fits anywhere"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Colored value dots rest on the wide top shelf where anything fits, thin arrows fall to the middle type shelves, and the tiny dashed shelf at the bottom holds nothing yet sends arrows up to the shelves above — anything fits in unknown, nothing fits in never, and never fits anywhere"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.1">
-    <path d="M120 40 L520 40 L504 78 L136 78 Z" />
-    <path d="M150 120 L300 120 L288 152 L162 152 Z" />
-    <path d="M340 120 L490 120 L478 152 L352 152 Z" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M240 64 V 92" />
+    <path d="M410 64 V 92" />
+    <path d="M302 176 L 250 140" />
+    <path d="M338 176 L 390 140" />
   </g>
-  <g fill="currentColor" opacity="0.14">
-    <path d="M290 196 L350 196 L344 218 L296 218 Z" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="240,104 233,92 247,92" />
+    <polygon points="410,104 403,92 417,92" />
+    <polygon points="240,133 252,132 246,145" />
+    <polygon points="400,133 388,132 394,145" />
+  </g>
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="140" y="42" width="360" height="14" rx="7" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="60" r="7" />
-    <circle cx="380" cy="58" r="7" />
-    <circle cx="400" cy="136" r="7" />
-    <circle cx="430" cy="136" r="7" />
+    <circle cx="200" cy="32" r="7" />
+    <circle cx="380" cy="30" r="7" />
+    <rect x="170" y="110" width="120" height="14" rx="7" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="260" cy="58" r="7" />
-    <circle cx="440" cy="60" r="7" />
-    <circle cx="200" cy="136" r="7" />
-    <circle cx="240" cy="136" r="7" />
+    <circle cx="260" cy="30" r="7" />
+    <circle cx="440" cy="32" r="7" />
+    <rect x="350" y="110" width="120" height="14" rx="7" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="62" r="7" />
+    <circle cx="320" cy="32" r="7" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="225" cy="92" r="2.5" />
-    <circle cx="225" cy="106" r="2.5" />
-    <circle cx="415" cy="92" r="2.5" />
-    <circle cx="415" cy="106" r="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="284" cy="186" r="2" />
-    <circle cx="272" cy="170" r="2" />
-    <circle cx="260" cy="154" r="2" />
-    <circle cx="356" cy="186" r="2" />
-    <circle cx="368" cy="170" r="2" />
-    <circle cx="380" cy="154" r="2" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeDasharray="5 6"
+    strokeLinecap="round"
+  >
+    <rect x="290" y="180" width="60" height="14" rx="7" />
   </g>
 </svg>
 

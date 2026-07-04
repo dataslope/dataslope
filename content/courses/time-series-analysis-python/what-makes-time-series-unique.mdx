@@ -417,7 +417,7 @@ evaluation that pretended the future was available.
   aria-label="A gentle weekly traffic wave ripples beneath a green band of forecast comfort until one red spike erupts straight through it with alarm ticks flying — a model validated with a leaky split looks calm right up until the real future arrives unannounced"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="40" y="170" width="560" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <rect x="40" y="171" width="560" height="3" rx="1.5" fill="currentColor" opacity="0.25" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="50" y="118" width="540" height="20" rx="10" fillOpacity="0.16" />
   </g>
@@ -429,10 +429,6 @@ evaluation that pretended the future was available.
     <rect x="470" y="40" width="4" height="13" rx="2" transform="rotate(-28 472 46)" />
     <rect x="490" y="32" width="4" height="13" rx="2" />
     <rect x="510" y="40" width="4" height="13" rx="2" transform="rotate(28 512 46)" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="556" cy="152" r="4" />
-    <circle cx="578" cy="158" r="4" />
   </g>
 </svg>
 
@@ -458,11 +454,35 @@ baseline.** Two are classic:
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two echo trails converge on tomorrow's yellow dot along a timeline: a short blue hop from yesterday and a long green arc from the same month one year back — the naive and seasonal-naive baselines that every real model must beat"
+  aria-label="Two thin arrows converge on tomorrow's yellow dot along a timeline of blue readings: a short blue hop from yesterday's value and a long green arc from the same month one year back — the naive and seasonal-naive baselines every real model must beat"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="44" y="162" width="556" height="4" rx="2" fill="currentColor" opacity="0.2" />
-  <g fill="currentColor" opacity="0.3">
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="44" y="162" width="556" height="3" rx="1.5" />
+  </g>
+  <g
+    style={{ color: "var(--ds-green-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M100 140 C 220 30, 460 30, 578 136" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="582,146 570,132 584,128" />
+  </g>
+  <g
+    style={{ color: "var(--ds-blue-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M542 140 C 550 118, 566 116, 576 132" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="580,142 568,132 582,126" />
     <circle cx="60" cy="150" r="4" />
     <circle cx="140" cy="150" r="4" />
     <circle cx="180" cy="150" r="4" />
@@ -474,27 +494,13 @@ baseline.** Two are classic:
     <circle cx="420" cy="150" r="4" />
     <circle cx="460" cy="150" r="4" />
     <circle cx="500" cy="150" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="540" cy="150" r="6" />
-    <circle cx="552" cy="135" r="3" fillOpacity="0.85" />
-    <circle cx="564" cy="130" r="3" fillOpacity="0.7" />
-    <circle cx="574" cy="138" r="3" fillOpacity="0.55" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="100" cy="150" r="6" />
-    <circle cx="148" cy="117" r="3.5" fillOpacity="0.9" />
-    <circle cx="196" cy="91" r="3.5" fillOpacity="0.85" />
-    <circle cx="244" cy="73" r="3.5" fillOpacity="0.8" />
-    <circle cx="292" cy="62" r="3.5" fillOpacity="0.75" />
-    <circle cx="340" cy="58" r="3.5" fillOpacity="0.7" />
-    <circle cx="388" cy="62" r="3.5" fillOpacity="0.65" />
-    <circle cx="436" cy="73" r="3.5" fillOpacity="0.6" />
-    <circle cx="484" cy="91" r="3.5" fillOpacity="0.55" />
-    <circle cx="532" cy="117" r="3.5" fillOpacity="0.5" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="580" cy="150" r="7.5" />
+    <circle cx="584" cy="150" r="7.5" />
   </g>
 </svg>
 

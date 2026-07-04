@@ -20,44 +20,56 @@ C# splits resources into two camps:
 Understanding this split is the foundation of clean, leak-free C#.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="Green tokens leave a depot, travel a dotted loop through a yellow work zone, and come back to be reused — but one red token has fallen off the loop and never returned"
+  aria-label="Green tokens leave a depot and ride a thin loop through a yellow work zone back home, while one red token slips off the bottom of the loop and never returns"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <ellipse
+      cx="350"
+      cy="110"
+      rx="140"
+      ry="62"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+    <path
+      d="M178 110 H 206"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <polygon points="374,42 374,56 388,49" fill="currentColor" fillOpacity="0.6" />
+    <polygon points="326,164 326,178 312,171" fill="currentColor" fillOpacity="0.6" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="70" width="120" height="80" rx="14" fillOpacity="0.12" />
+    <rect x="60" y="70" width="116" height="80" rx="14" fillOpacity="0.12" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="98" y="84" width="22" height="22" rx="5" fillOpacity="0.85" />
-    <rect x="132" y="84" width="22" height="22" rx="5" fillOpacity="0.6" />
-    <rect x="98" y="116" width="22" height="22" rx="5" fillOpacity="0.4" />
+    <rect x="78" y="84" width="22" height="22" rx="5" fillOpacity="0.85" />
+    <rect x="112" y="84" width="22" height="22" rx="5" fillOpacity="0.6" />
+    <rect x="78" y="116" width="22" height="22" rx="5" fillOpacity="0.4" />
+    <rect x="330" y="38" width="20" height="20" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="230" cy="88" r="3" />
-    <circle cx="270" cy="70" r="3" />
-    <circle cx="320" cy="58" r="3" />
-    <circle cx="375" cy="56" r="3" />
-    <circle cx="430" cy="66" r="3" />
-    <circle cx="466" cy="80" r="3" />
-    <circle cx="452" cy="130" r="3" />
-    <circle cx="400" cy="146" r="3" />
-    <circle cx="340" cy="152" r="3" />
-    <circle cx="280" cy="146" r="3" />
-    <circle cx="236" cy="130" r="3" />
-  </g>
-  <polygon points="398,48 398,64 414,56" fill="currentColor" opacity="0.35" />
-  <polygon points="312,144 312,160 296,152" fill="currentColor" opacity="0.35" />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="505" cy="102" r="26" fillOpacity="0.22" />
+    <circle cx="490" cy="110" r="27" fillOpacity="0.22" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="494" y="91" width="22" height="22" rx="5" />
+    <rect x="479" y="99" width="22" height="22" rx="5" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="368" cy="162" r="2.5" fillOpacity="0.5" />
-    <circle cx="363" cy="171" r="2.5" fillOpacity="0.4" />
-    <rect x="350" y="178" width="20" height="20" rx="5" fillOpacity="0.75" transform="rotate(12 360 188)" />
+    <path
+      d="M350 172 C 354 186, 360 196, 368 204"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeOpacity="0.5"
+    />
+    <rect x="368" y="200" width="20" height="20" rx="5" fillOpacity="0.75" transform="rotate(12 378 210)" />
   </g>
 </svg>
 

@@ -10,11 +10,23 @@ This page takes you inside TypeScript's architecture — from the relationship b
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Twin block towers: the left one is wrapped in green scaffolding with a red bug pinned on a beam, the right one stands identical but bare while the scaffold dissolves into drifting dots beside a play button — types support the build, then erase before the code runs"
+  aria-label="Twin block towers: the left one is wrapped in green scaffolding, the right one stands identical but bare beside a yellow play button, joined by a thin arrow — types support the build, then erase completely before the code runs"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.2">
-    <rect x="90" y="190" width="470" height="4" rx="2" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="90" y="190" width="470" height="5" rx="2.5" />
+  </g>
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M262 128 H 340" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="354,128 340,121 340,135" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="130" y="152" width="64" height="36" rx="6" />
@@ -30,27 +42,9 @@ This page takes you inside TypeScript's architecture — from the relationship b
     <rect x="106" y="60" width="112" height="5" rx="2.5" />
     <rect x="106" y="100" width="112" height="5" rx="2.5" />
     <rect x="106" y="140" width="112" height="5" rx="2.5" />
-    <circle cx="412" cy="160" r="3" fillOpacity="0.25" />
-    <circle cx="416" cy="120" r="3" fillOpacity="0.18" />
-    <circle cx="414" cy="84" r="2.5" fillOpacity="0.12" />
-    <circle cx="508" cy="150" r="3" fillOpacity="0.22" />
-    <circle cx="512" cy="108" r="3" fillOpacity="0.15" />
-    <circle cx="510" cy="76" r="2.5" fillOpacity="0.1" />
-    <circle cx="446" cy="58" r="2.5" fillOpacity="0.14" />
-    <circle cx="478" cy="50" r="2.5" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="200" cy="96" r="5.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="270" cy="128" r="3" />
-    <circle cx="292" cy="128" r="3" />
-    <circle cx="314" cy="128" r="3" />
-    <circle cx="336" cy="128" r="3" />
-    <path d="M348 120 L364 128 L348 136 Z" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M540 158 L558 169 L540 180 Z" />
+    <polygon points="540,155 562,168 540,181" />
   </g>
 </svg>
 
@@ -205,38 +199,41 @@ The scanner doesn't understand *meaning* yet. It just recognizes keywords (`let`
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A continuous flowing ribbon of source text falls apart into a neat row of small colored chips and beads — the scanner chopping raw characters into discrete tokens"
+  aria-label="One continuous gray strip of source text is marked with white cut lines, and below it the same strip has been chopped into separate colored token chips — the scanner turning raw characters into discrete tokens"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.18">
-    <path d="M60 50 C140 34 220 62 300 48 C380 36 460 60 580 44 L580 58 C460 74 380 50 300 62 C220 76 140 48 60 64 Z" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="100" y="40" width="440" height="22" rx="11" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="110" cy="84" r="2.5" />
-    <circle cx="190" cy="88" r="2.5" />
-    <circle cx="270" cy="84" r="2.5" />
-    <circle cx="350" cy="88" r="2.5" />
-    <circle cx="430" cy="84" r="2.5" />
-    <circle cx="510" cy="88" r="2.5" />
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <rect x="180" y="38" width="4" height="26" rx="2" />
+    <rect x="260" y="38" width="4" height="26" rx="2" />
+    <rect x="340" y="38" width="4" height="26" rx="2" />
+    <rect x="420" y="38" width="4" height="26" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M320 74 V 94"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="320,106 313,94 327,94" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="106" width="46" height="20" rx="10" />
-    <rect x="240" y="106" width="38" height="20" rx="10" />
-    <circle cx="398" cy="116" r="9" />
-    <rect x="480" y="106" width="46" height="20" rx="10" />
+    <rect x="100" y="120" width="70" height="22" rx="11" />
+    <rect x="342" y="120" width="50" height="22" rx="11" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="130" cy="116" r="9" />
-    <circle cx="212" cy="116" r="9" />
-    <rect x="328" y="106" width="46" height="20" rx="10" />
+    <rect x="186" y="120" width="58" height="22" rx="11" />
+    <rect x="408" y="120" width="62" height="22" rx="11" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="158" y="106" width="30" height="20" rx="10" />
-    <circle cx="300" cy="116" r="9" />
-    <rect x="426" y="106" width="30" height="20" rx="10" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="550" cy="116" r="4" />
+    <rect x="260" y="120" width="66" height="22" rx="11" />
+    <rect x="486" y="120" width="54" height="22" rx="11" />
   </g>
 </svg>
 
@@ -409,14 +406,6 @@ These optimizations are why TypeScript scales to massive codebases (Microsoft's 
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="384" y="24" width="80" height="44" rx="9" fillOpacity="0.78" />
     <rect x="384" y="160" width="80" height="44" rx="9" fillOpacity="0.78" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="366" cy="100" r="2.5" />
-    <circle cx="376" cy="84" r="2.5" />
-    <circle cx="384" cy="66" r="2.5" />
-    <circle cx="366" cy="128" r="2.5" />
-    <circle cx="375" cy="144" r="2.5" />
-    <circle cx="382" cy="158" r="2.5" />
   </g>
 </svg>
 

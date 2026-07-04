@@ -10,7 +10,7 @@ analyst needs.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A scatter of many dots passes between two converging funnel walls and emerges as one large green circle trailed by small satellite values — a whole distribution compressed into a few summary numbers"
+  aria-label="A scatter of many dots passes between two converging funnel walls and emerges as one large green circle linked by thin lines to small satellite values — a whole distribution compressed into a few summary numbers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -34,13 +34,16 @@ analyst needs.
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="440" cy="110" r="28" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="472" cy="88" r="2.5" />
-    <circle cx="484" cy="79" r="2.5" />
-    <circle cx="476" cy="122" r="2.5" />
-    <circle cx="492" cy="126" r="2.5" />
-    <circle cx="463" cy="142" r="2.5" />
-    <circle cx="470" cy="156" r="2.5" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M464 90 L 500 74" />
+    <path d="M466 116 L 506 126" />
+    <path d="M460 134 L 476 162" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="510" cy="68" r="9" />

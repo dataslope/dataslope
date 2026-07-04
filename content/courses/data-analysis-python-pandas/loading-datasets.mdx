@@ -11,7 +11,7 @@ unhappy paths.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A flat text file of value bars separated by comma dots flows through an arrow into a tidy grid with a blue header row and colored values — read_csv turning text into a DataFrame"
+  aria-label="A flat text file of value bars separated by comma dots flows along an arrow into a tidy grid with a blue header row and colored values — read_csv turning text into a DataFrame"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="40" width="170" height="150" rx="10" fill="currentColor" opacity="0.08" />
@@ -38,12 +38,17 @@ unhappy paths.
     <circle cx="132" cy="148" r="2.5" />
     <circle cx="180" cy="148" r="2.5" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="280" cy="115" r="3" />
-    <circle cx="300" cy="115" r="3" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M272 115 H 316"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <polygon points="316,107 316,123 330,115" fill="currentColor" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="318,105 336,115 318,125" />
     <rect x="370" y="56" width="54" height="26" rx="5" fillOpacity="0.5" />
     <rect x="432" y="56" width="54" height="26" rx="5" fillOpacity="0.5" />
     <rect x="494" y="56" width="54" height="26" rx="5" fillOpacity="0.5" />

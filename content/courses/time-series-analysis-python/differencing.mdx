@@ -13,33 +13,42 @@ too far.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue staircase climbs steadily on the left while on the right its risers have been laid out as five identical green tiles on level ground beneath a small delta sign — differencing turns a rising level into a constant step, and the trend vanishes"
+  aria-label="A blue line climbs in steps on the left; past a small arrow, the green differenced line runs perfectly flat above its baseline — differencing turns a rising level into a constant step, and the trend vanishes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="48" y="184" width="556" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="162" width="52" height="22" rx="4" fillOpacity="0.75" />
-    <rect x="112" y="140" width="52" height="44" rx="4" fillOpacity="0.75" />
-    <rect x="164" y="118" width="52" height="66" rx="4" fillOpacity="0.75" />
-    <rect x="216" y="96" width="52" height="88" rx="4" fillOpacity="0.75" />
-    <rect x="268" y="74" width="52" height="110" rx="4" fillOpacity="0.75" />
+  <g
+    style={{ color: "var(--ds-blue-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M60 164 H 110 V 140 H 160 V 116 H 210 V 92 H 260" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="344" cy="128" r="3.5" />
-    <circle cx="360" cy="128" r="3.5" />
-    <circle cx="376" cy="128" r="3.5" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M292 128 H 330"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </g>
-  <text x="497" y="140" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="20" fill="currentColor" opacity="0.45" textAnchor="middle">Δ</text>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="396" y="164" width="34" height="20" rx="5" fillOpacity="0.85" />
-    <rect x="438" y="164" width="34" height="20" rx="5" fillOpacity="0.85" />
-    <rect x="480" y="164" width="34" height="20" rx="5" fillOpacity="0.85" />
-    <rect x="522" y="164" width="34" height="20" rx="5" fillOpacity="0.85" />
-    <rect x="564" y="164" width="34" height="20" rx="5" fillOpacity="0.85" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="344,128 330,121 330,135" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="80" cy="50" r="4" />
-    <circle cx="580" cy="56" r="3" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="370" y="164" width="210" height="4" rx="2" />
+  </g>
+  <g
+    style={{ color: "var(--ds-green-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+  >
+    <path d="M370 124 H 580" />
   </g>
 </svg>
 
@@ -286,37 +295,40 @@ that went *up* instead of down.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A calm, already-stationary band of blue dots passes through one needless extra difference and emerges as a violent red sawtooth swinging alternately high and low with twice the spread — over-differencing manufactures negative correlation instead of removing anything"
+  aria-label="A calm blue line with gentle jitter passes one needless extra difference and becomes a violent red sawtooth with twice the spread — over-differencing manufactures negative correlation instead of removing anything"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="50" y="86" width="222" height="28" rx="14" fillOpacity="0.12" />
-    <circle cx="62" cy="96" r="4" />
-    <circle cx="80" cy="106" r="4" />
-    <circle cx="98" cy="98" r="4" />
-    <circle cx="116" cy="104" r="4" />
-    <circle cx="134" cy="94" r="4" />
-    <circle cx="152" cy="106" r="4" />
-    <circle cx="170" cy="100" r="4" />
-    <circle cx="188" cy="96" r="4" />
-    <circle cx="206" cy="104" r="4" />
-    <circle cx="224" cy="98" r="4" />
-    <circle cx="242" cy="103" r="4" />
-    <circle cx="260" cy="97" r="4" />
+  <g
+    style={{ color: "var(--ds-blue-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M50 98 L 90 106 L 130 94 L 170 104 L 210 96 L 250 102" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="296" cy="100" r="3.5" />
-    <circle cx="314" cy="100" r="3.5" />
-    <circle cx="332" cy="100" r="3.5" />
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M280 100 H 318"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 364 95 L 388 53 L 424 137 L 460 53 L 496 137 L 532 53 L 568 137 L 588 95 L 588 105 L 568 147 L 532 63 L 496 147 L 460 63 L 424 147 L 388 63 L 364 105 Z" fillOpacity="0.5" />
-    <circle cx="388" cy="58" r="4.5" />
-    <circle cx="424" cy="142" r="4.5" />
-    <circle cx="460" cy="58" r="4.5" />
-    <circle cx="496" cy="142" r="4.5" />
-    <circle cx="532" cy="58" r="4.5" />
-    <circle cx="568" cy="142" r="4.5" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="332,100 318,93 318,107" />
+  </g>
+  <g
+    style={{ color: "var(--ds-red-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M360 100 L 396 54 L 432 146 L 468 54 L 504 146 L 540 54 L 576 100" />
   </g>
 </svg>
 
@@ -383,10 +395,9 @@ integrates its forecasts back up.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="From a yellow starting dot, flat green change-tiles are stacked one atop another, column by column, until the blue staircase silhouette reappears on the right — integration, the cumulative sum plus the starting value, undoes differencing and is the I in ARIMA"
+  aria-label="From a yellow starting dot, flat green change-tiles are stacked one atop another, column by column, rebuilding the staircase on the right — integration, the cumulative sum plus the starting value, undoes differencing and is the I in ARIMA"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="48" y="182" width="556" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="70" cy="169" r="8" />
   </g>
@@ -394,14 +405,6 @@ integrates its forecasts back up.
     <rect x="94" y="160" width="34" height="18" rx="5" fillOpacity="0.85" />
     <rect x="136" y="160" width="34" height="18" rx="5" fillOpacity="0.85" />
     <rect x="178" y="160" width="34" height="18" rx="5" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="238" cy="130" r="3.5" />
-    <circle cx="254" cy="130" r="3.5" />
-    <circle cx="270" cy="130" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 296 178 L 296 158 L 340 158 L 340 138 L 384 138 L 384 118 L 428 118 L 428 98 L 472 98 L 472 78 L 516 78 L 516 178 Z" fillOpacity="0.15" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="300" y="160" width="34" height="18" rx="5" fillOpacity="0.85" />
@@ -419,10 +422,6 @@ integrates its forecasts back up.
     <rect x="476" y="120" width="34" height="18" rx="5" fillOpacity="0.85" />
     <rect x="476" y="100" width="34" height="18" rx="5" fillOpacity="0.85" />
     <rect x="476" y="80" width="34" height="18" rx="5" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="560" cy="60" r="4" />
-    <circle cx="588" cy="120" r="3" />
   </g>
 </svg>
 

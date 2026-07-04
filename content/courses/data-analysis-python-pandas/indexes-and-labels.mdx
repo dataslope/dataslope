@@ -10,7 +10,7 @@ until you realize they are doing real work behind the scenes.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two rows of cells reach toward each other with little label tags between them; matching tags connect straight down except one crossed pair — pandas lines values up by label, not by position"
+  aria-label="Two rows of cells with little label tags between them; matching tags connect by straight vertical lines except one crossed pair — pandas lines values up by label, not by position"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -29,16 +29,17 @@ until you realize they are doing real work behind the scenes.
     <rect x="370" y="114" width="32" height="10" rx="5" />
     <rect x="300" y="114" width="40" height="10" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="180" cy="101" r="2.5" />
-    <circle cx="180" cy="109" r="2.5" />
-    <circle cx="250" cy="101" r="2.5" />
-    <circle cx="250" cy="109" r="2.5" />
-    <circle cx="338" cy="100" r="2.5" />
-    <circle cx="355" cy="105" r="2.5" />
-    <circle cx="372" cy="110" r="2.5" />
-    <circle cx="372" cy="100" r="2.5" />
-    <circle cx="338" cy="110" r="2.5" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <path d="M180 99 V 111" />
+    <path d="M250 99 V 111" />
+    <path d="M320 99 L 386 111" />
+    <path d="M390 99 L 324 111" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="150" y="132" width="60" height="28" rx="6" fillOpacity="0.6" />

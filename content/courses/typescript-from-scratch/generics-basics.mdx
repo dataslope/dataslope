@@ -24,45 +24,48 @@ function identity<T>(x: T): T {
 Now `identity(42)` returns `number`, `identity("hello")` returns `string`, and the compiler tracks the exact type through the function. This is the power of generics: **abstraction without information loss**.
 
 <svg
-  viewBox="0 0 640 240"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="A pantograph linkage rests its tracer on a blue triangle while its pen reproduces the very same triangle across the desk, and a circle and a square wait in line to be traced next — one generic mechanism that works for any shape without forgetting which it was given"
+  aria-label="A queue of shapes waits at a gray machine marked with angle brackets: the blue triangle that goes in comes out the other side exactly the same shape — one generic mechanism works for any type without forgetting which one it was given"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.2">
-    <rect x="60" y="232" width="520" height="4" rx="2" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M238 114 H 258" />
+    <path d="M378 114 H 398" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="306" y="26" width="28" height="12" rx="6" />
-    <rect x="317" y="36" width="6" height="58" rx="3" />
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="270,114 258,108 258,120" />
+    <polygon points="410,114 398,108 398,120" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <path d="M177 183 L317 93 L325 103 L185 194 Z" />
-    <path d="M323 93 L463 183 L455 194 L315 103 Z" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="276" y="70" width="88" height="88" rx="14" />
   </g>
-  <g fill="currentColor" opacity="0.5">
-    <circle cx="320" cy="99" r="7" />
-    <path d="M170 187 A11 11 0 1 1 192 187 A11 11 0 1 1 170 187 Z M175 187 A6 6 0 1 0 187 187 A6 6 0 1 0 175 187 Z" fillRule="evenodd" />
-    <circle cx="459" cy="188" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M181 198 L203 232 L159 232 Z" />
-    <path d="M459 198 L481 232 L437 232 Z" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="466" cy="196" r="2.5" fillOpacity="0.8" />
-    <circle cx="474" cy="190" r="2" fillOpacity="0.6" />
+  <g
+    style={{ color: "var(--ds-white)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M306 96 L 294 114 L 306 132" />
+    <path d="M334 96 L 346 114 L 334 132" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="80" cy="220" r="11" />
+    <circle cx="90" cy="114" r="12" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="106" y="210" width="22" height="22" rx="4" />
+    <rect x="134" y="102" width="24" height="24" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.15">
-    <circle cx="560" cy="60" r="3" />
-    <circle cx="600" cy="140" r="3" />
-    <circle cx="60" cy="110" r="3" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="196,127 210,101 224,127" />
+    <polygon points="426,127 440,101 454,127" />
   </g>
 </svg>
 
@@ -411,40 +414,38 @@ The type parameter `T` is inferred from the input array. If you pass `number[]`,
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two runs of the same capsule: whatever color enters, a thread of that color runs through the inside and the very same color exits — the type parameter is a thread tying the output type to the input type"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Two runs of the same gray capsule: a blue circle enters and a blue thread runs through to a blue circle on the far side, while a yellow square enters below and a yellow thread ties it to a yellow square — the type parameter threads the output type to the input type"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.1">
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
     <rect x="260" y="38" width="160" height="44" rx="22" />
     <rect x="260" y="110" width="160" height="44" rx="22" />
   </g>
+  <g
+    style={{ color: "var(--ds-blue-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+  >
+    <path d="M156 60 H 484" />
+  </g>
+  <g
+    style={{ color: "var(--ds-yellow-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+  >
+    <path d="M156 132 H 484" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="140" cy="60" r="13" />
-    <circle cx="278" cy="60" r="2.5" fillOpacity="0.5" />
-    <circle cx="304" cy="60" r="2.5" fillOpacity="0.5" />
-    <circle cx="330" cy="60" r="2.5" fillOpacity="0.5" />
-    <circle cx="356" cy="60" r="2.5" fillOpacity="0.5" />
-    <circle cx="382" cy="60" r="2.5" fillOpacity="0.5" />
-    <circle cx="404" cy="60" r="2.5" fillOpacity="0.5" />
     <circle cx="500" cy="60" r="13" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="128" y="120" width="24" height="24" rx="5" />
-    <circle cx="278" cy="132" r="2.5" fillOpacity="0.5" />
-    <circle cx="304" cy="132" r="2.5" fillOpacity="0.5" />
-    <circle cx="330" cy="132" r="2.5" fillOpacity="0.5" />
-    <circle cx="356" cy="132" r="2.5" fillOpacity="0.5" />
-    <circle cx="382" cy="132" r="2.5" fillOpacity="0.5" />
-    <circle cx="404" cy="132" r="2.5" fillOpacity="0.5" />
     <rect x="488" y="120" width="24" height="24" rx="5" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="190" cy="60" r="2.5" />
-    <circle cx="220" cy="60" r="2.5" />
-    <circle cx="448" cy="60" r="2.5" />
-    <circle cx="190" cy="132" r="2.5" />
-    <circle cx="220" cy="132" r="2.5" />
-    <circle cx="448" cy="132" r="2.5" />
   </g>
 </svg>
 

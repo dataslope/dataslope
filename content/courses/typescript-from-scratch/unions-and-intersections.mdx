@@ -18,7 +18,7 @@ This chapter covers: **union types**, **intersection types**,
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Two streams, one blue and one yellow, fork together into a single broad channel that carries beads of both colors downstream while a red bead hovers outside the banks — a union accepts values from either branch and nothing else"
+  aria-label="Two streams, one blue and one yellow, fork together into a single broad green channel that carries beads of both colors downstream — a union accepts values from either branch"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -27,8 +27,11 @@ This chapter covers: **union types**, **intersection types**,
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <path d="M40 210 C150 206 220 154 320 144 L320 108 C220 118 150 180 40 184 Z" fillOpacity="0.3" />
   </g>
-  <g fill="currentColor" opacity="0.12">
-    <path d="M320 96 L600 96 L600 144 L320 144 Z" />
+  <g fill="var(--ds-white)">
+    <path d="M320 96 L600 96 L600 144 L320 144 C 296 138 276 128 264 120 C 276 112 296 102 320 96 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M320 96 L600 96 L600 144 L320 144 C 296 138 276 128 264 120 C 276 112 296 102 320 96 Z" fillOpacity="0.3" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="350" cy="112" r="7" />
@@ -40,18 +43,6 @@ This chapter covers: **union types**, **intersection types**,
     <circle cx="385" cy="128" r="7" />
     <circle cx="455" cy="124" r="7" />
     <circle cx="525" cy="126" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="330" cy="52" r="8" />
-    <circle cx="312" cy="40" r="3" fillOpacity="0.35" />
-    <circle cx="298" cy="32" r="2.5" fillOpacity="0.2" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="80" cy="120" r="3" />
-    <circle cx="130" cy="116" r="3" />
-    <circle cx="180" cy="120" r="3" />
-    <circle cx="590" cy="60" r="3" />
-    <circle cx="560" cy="190" r="3" />
   </g>
 </svg>
 
@@ -187,36 +178,32 @@ The type `Person` has *both* the `name` property from `Named` *and* the
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Shapes ride two rails toward two punched plates: the green circle fits the cutouts in both plates and sails through, while the red square passes the first plate only to be stopped flat by the second — an intersection admits only what satisfies every constraint"
+  aria-label="A Venn diagram of a blue set and a yellow set whose overlapping lens is highlighted green: blue shapes sit in the blue-only region, yellow shapes in the yellow-only region, a green bead rests inside the shared lens, and a red square sits outside both circles — an intersection admits only values that satisfy every constraint"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.12">
-    <rect x="80" y="94" width="500" height="4" rx="2" />
-    <rect x="80" y="152" width="500" height="4" rx="2" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="210" y="36" width="46" height="140" rx="10" />
+    <circle cx="270" cy="100" r="78" fillOpacity="0.3" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="380" y="36" width="46" height="140" rx="10" />
+    <circle cx="370" cy="100" r="78" fillOpacity="0.3" />
   </g>
   <g fill="var(--ds-white)">
-    <circle cx="233" cy="80" r="16" />
-    <rect x="219" y="124" width="28" height="28" rx="4" />
-    <circle cx="403" cy="80" r="16" />
-    <path d="M403 116 L419 146 L387 146 Z" />
+    <path d="M320 40.1 A 78 78 0 0 1 320 159.9 A 78 78 0 0 1 320 40.1 Z" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="120" cy="80" r="13" />
-    <circle cx="318" cy="80" r="13" fillOpacity="0.75" />
-    <circle cx="540" cy="80" r="13" />
-    <circle cx="505" cy="80" r="3" fillOpacity="0.4" />
-    <circle cx="480" cy="80" r="2.5" fillOpacity="0.25" />
+    <path d="M320 40.1 A 78 78 0 0 1 320 159.9 A 78 78 0 0 1 320 40.1 Z" fillOpacity="0.35" />
+    <circle cx="320" cy="100" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="232" cy="82" r="8" />
+    <rect x="222" y="112" width="17" height="17" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="408" cy="82" r="8" />
+    <path d="M408 111 L418 129 L398 129 Z" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="350" y="124" width="28" height="28" rx="4" />
-    <circle cx="322" cy="138" r="2.5" fillOpacity="0.35" />
-    <circle cx="296" cy="138" r="2.5" fillOpacity="0.2" />
+    <rect x="524" y="48" width="18" height="18" rx="4" transform="rotate(12 533 57)" />
   </g>
 </svg>
 
@@ -536,28 +523,18 @@ this at declaration time in most cases.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="A blue disc and a yellow disc strain toward each other, but where their overlap should be there is only a dotted empty ring — conflicting constraints intersect to never, the type with no values"
+  aria-label="Two puzzle pieces, one blue and one yellow, each with a protruding tab facing the other so they can never interlock, and a small red cross marks the gap between them — conflicting constraints intersect to never, the type with no values"
   style={{ display: "block", width: "100%", maxWidth: "420px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="80" r="48" fillOpacity="0.3" />
+    <path d="M150 32 H285 V64 A16 16 0 0 1 285 96 V128 H150 Z" fillOpacity="0.3" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="440" cy="80" r="48" fillOpacity="0.3" />
+    <path d="M490 32 H355 V64 A16 16 0 0 0 355 96 V128 H490 Z" fillOpacity="0.3" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <path d="M268 72 L282 80 L268 88 Z" />
-    <path d="M372 72 L358 80 L372 88 Z" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="336" cy="80" r="2.5" />
-    <circle cx="331.3" cy="91.3" r="2.5" />
-    <circle cx="320" cy="96" r="2.5" />
-    <circle cx="308.7" cy="91.3" r="2.5" />
-    <circle cx="304" cy="80" r="2.5" />
-    <circle cx="308.7" cy="68.7" r="2.5" />
-    <circle cx="320" cy="64" r="2.5" />
-    <circle cx="331.3" cy="68.7" r="2.5" />
+  <g style={{ color: "var(--ds-red-500)" }} stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none">
+    <path d="M312 72 L328 88" />
+    <path d="M328 72 L312 88" />
   </g>
 </svg>
 

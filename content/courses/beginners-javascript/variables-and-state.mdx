@@ -10,7 +10,7 @@ remembers a value and gives it a name.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Three labelled boxes holding colored balls; in the last box a faded ball is being replaced by a new one arriving from outside"
+  aria-label="Three labelled boxes holding colored balls; in the last box a faded ball gives way to a new one arriving along a curved path — reassigning a variable"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -32,9 +32,15 @@ remembers a value and gives it a name.
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <circle cx="516" cy="105" r="20" />
-    <circle cx="560" cy="28" r="4" fillOpacity="0.5" />
-    <circle cx="548" cy="42" r="5" fillOpacity="0.65" />
-    <circle cx="536" cy="56" r="6" fillOpacity="0.8" />
+    <path
+      d="M584 24 C 568 46, 552 62, 538 76"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeOpacity="0.45"
+    />
+    <polygon points="532,86 545,82 537,70" fillOpacity="0.45" />
   </g>
 </svg>
 

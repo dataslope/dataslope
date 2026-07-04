@@ -11,52 +11,47 @@ future it has never seen. Get this wrong and every accuracy number you report
 is a comfortable fiction.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 200"
   role="img"
-  aria-label="A yellow fence divides the timeline into blue past dots for training and green future dots for testing, while below a small interleaved blue-and-green row is struck through in red — the chronological split is the law, and the shuffled split is the forbidden alternative"
+  aria-label="Two timelines: on top, a solid blue training stretch is separated from the green test stretch by one yellow divider and earns a green check; below, blue and green pieces interleave at random and earn a red cross — validation must split time in order, never shuffled"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="44" y="148" width="552" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="64" cy="128" r="5" />
-    <circle cx="96" cy="136" r="5" />
-    <circle cx="128" cy="122" r="5" />
-    <circle cx="160" cy="130" r="5" />
-    <circle cx="192" cy="114" r="5" />
-    <circle cx="224" cy="124" r="5" />
-    <circle cx="256" cy="108" r="5" />
-    <circle cx="288" cy="118" r="5" />
-    <circle cx="320" cy="104" r="5" />
-    <circle cx="348" cy="110" r="5" />
+    <rect x="80" y="50" width="240" height="26" rx="8" />
+    <rect x="80" y="120" width="40" height="26" rx="8" />
+    <rect x="168" y="120" width="40" height="26" rx="8" />
+    <rect x="256" y="120" width="40" height="26" rx="8" />
+    <rect x="344" y="120" width="40" height="26" rx="8" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="374" y="82" width="9" height="70" rx="4" />
-    <rect x="398" y="82" width="9" height="70" rx="4" />
-    <rect x="366" y="94" width="50" height="7" rx="3.5" fillOpacity="0.8" />
-    <rect x="366" y="122" width="50" height="7" rx="3.5" fillOpacity="0.8" />
+    <rect x="330" y="42" width="6" height="42" rx="3" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="440" cy="100" r="5" />
-    <circle cx="472" cy="108" r="5" />
-    <circle cx="504" cy="94" r="5" />
-    <circle cx="536" cy="102" r="5" />
-    <circle cx="568" cy="88" r="5" />
-    <circle cx="592" cy="96" r="5" />
+    <rect x="346" y="50" width="180" height="26" rx="8" />
+    <rect x="124" y="120" width="40" height="26" rx="8" />
+    <rect x="212" y="120" width="40" height="26" rx="8" />
+    <rect x="300" y="120" width="40" height="26" rx="8" />
+    <rect x="388" y="120" width="40" height="26" rx="8" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="220" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="260" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="300" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="340" cy="198" r="4" fillOpacity="0.6" />
+  <g
+    style={{ color: "var(--ds-green-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M556 64 L 566 74 L 584 48" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="240" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="280" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="320" cy="198" r="4" fillOpacity="0.6" />
-    <circle cx="360" cy="198" r="4" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="286" y="170" width="8" height="58" rx="4" transform="rotate(52 290 199)" fillOpacity="0.85" />
+  <g
+    style={{ color: "var(--ds-red-500)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="round"
+  >
+    <path d="M556 120 L 582 146" />
+    <path d="M582 120 L 556 146" />
   </g>
 </svg>
 
@@ -231,33 +226,31 @@ percentage genuinely makes sense.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two forecast records around the same truth line: on the left, green dots miss by small even amounts; on the right, blue dots sit perfectly except for one towering red blunder under a yellow magnifier — squared-error metrics like RMSE make that single blunder dominate the score"
+  aria-label="Two error buckets: the left holds a handful of small, even green squares, while the right is dominated by one huge red square beside two tiny blue ones — squaring errors makes a single blunder dominate the RMSE score"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="50" y="108" width="230" height="4" rx="2" fill="currentColor" opacity="0.25" />
-  <rect x="360" y="108" width="230" height="4" rx="2" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="66" cy="100" r="4.5" />
-    <circle cx="102" cy="120" r="4.5" />
-    <circle cx="138" cy="102" r="4.5" />
-    <circle cx="174" cy="118" r="4.5" />
-    <circle cx="210" cy="101" r="4.5" />
-    <circle cx="246" cy="119" r="4.5" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="140" y="60" width="6" height="100" rx="3" />
+    <rect x="300" y="60" width="6" height="100" rx="3" />
+    <rect x="140" y="154" width="166" height="6" rx="3" />
+    <rect x="380" y="60" width="6" height="100" rx="3" />
+    <rect x="540" y="60" width="6" height="100" rx="3" />
+    <rect x="380" y="154" width="166" height="6" rx="3" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="376" cy="110" r="4.5" />
-    <circle cx="412" cy="110" r="4.5" />
-    <circle cx="448" cy="110" r="4.5" />
-    <circle cx="484" cy="110" r="4.5" />
-    <circle cx="556" cy="110" r="4.5" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="160" y="134" width="16" height="16" rx="4" />
+    <rect x="182" y="134" width="16" height="16" rx="4" />
+    <rect x="204" y="134" width="16" height="16" rx="4" />
+    <rect x="226" y="134" width="16" height="16" rx="4" />
+    <rect x="170" y="114" width="16" height="16" rx="4" />
+    <rect x="196" y="114" width="16" height="16" rx="4" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="517" y="48" width="6" height="60" rx="3" fillOpacity="0.3" />
-    <circle cx="520" cy="42" r="6" />
+    <rect x="400" y="96" width="54" height="54" rx="8" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 504 42 a 16 16 0 1 0 32 0 a 16 16 0 1 0 -32 0 Z M 508 42 a 12 12 0 1 0 24 0 a 12 12 0 1 0 -24 0 Z" fillRule="evenodd" />
-    <rect x="529" y="51" width="7" height="20" rx="3.5" transform="rotate(-45 532.5 61)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="464" y="138" width="12" height="12" rx="3" />
+    <rect x="482" y="138" width="12" height="12" rx="3" />
   </g>
 </svg>
 
@@ -411,39 +404,32 @@ it won't have at prediction time:
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="The yellow fence guards the split above the ground, but a red trail of dots tunnels beneath it from the future side back into training, surfacing among the blue past dots — preprocessing computed on the whole series leaks the future even when the split itself looks correct"
+  aria-label="The yellow divider guards the split above the ground, but a red pipe siphons from the green future side, dips beneath the timeline, and surfaces with an arrow inside the blue training side — preprocessing computed on the whole series leaks the future even when the split looks correct"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="44" y="130" width="552" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="44" y="130" width="552" height="5" rx="2.5" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="80" cy="112" r="5" />
-    <circle cx="130" cy="104" r="5" />
-    <circle cx="180" cy="112" r="5" />
-    <circle cx="230" cy="102" r="5" />
-    <circle cx="280" cy="110" r="5" />
+    <rect x="80" y="100" width="220" height="26" rx="8" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="310" y="68" width="9" height="62" rx="4" />
-    <rect x="334" y="68" width="9" height="62" rx="4" />
-    <rect x="302" y="80" width="50" height="6" rx="3" fillOpacity="0.8" />
-    <rect x="302" y="104" width="50" height="6" rx="3" fillOpacity="0.8" />
+    <rect x="324" y="66" width="8" height="64" rx="4" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="372" cy="104" r="5" />
-    <circle cx="422" cy="112" r="5" />
-    <circle cx="472" cy="100" r="5" />
-    <circle cx="522" cy="110" r="5" />
-    <circle cx="572" cy="102" r="5" />
+    <rect x="356" y="100" width="220" height="26" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }}>
+    <path
+      d="M470 134 C 470 182, 180 192, 180 142"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="462" cy="142" r="3.5" fillOpacity="0.7" />
-    <circle cx="420" cy="164" r="3.5" fillOpacity="0.7" />
-    <circle cx="378" cy="178" r="3.5" fillOpacity="0.7" />
-    <circle cx="330" cy="182" r="3.5" fillOpacity="0.7" />
-    <circle cx="282" cy="178" r="3.5" fillOpacity="0.7" />
-    <circle cx="240" cy="164" r="3.5" fillOpacity="0.7" />
-    <circle cx="198" cy="142" r="3.5" fillOpacity="0.7" />
-    <circle cx="190" cy="120" r="5.5" />
+    <polygon points="180,128 173,142 187,142" />
   </g>
 </svg>
 

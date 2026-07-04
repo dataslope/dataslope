@@ -12,16 +12,24 @@ to one specific stage.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="An assembly line: a source document, a toothed gear, a chip, and finally a runnable pill with a play triangle, joined by dotted conveyor segments"
+  aria-label="An assembly line: a source document, a toothed gear, a chip, and finally a runnable pill with a play triangle, joined by thin arrows"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    opacity="0.3"
+  >
+    <path d="M150 105 H 188" />
+    <path d="M284 105 H 322" />
+    <path d="M427 105 H 448" />
+  </g>
   <g fill="currentColor" opacity="0.3">
-    <circle cx="155" cy="105" r="3" />
-    <circle cx="175" cy="105" r="3" />
-    <circle cx="290" cy="105" r="3" />
-    <circle cx="310" cy="105" r="3" />
-    <circle cx="437" cy="105" r="3" />
-    <circle cx="455" cy="105" r="3" />
+    <polygon points="188,98 188,112 200,105" />
+    <polygon points="322,98 322,112 334,105" />
+    <polygon points="448,98 448,112 460,105" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="70" y="60" width="70" height="90" rx="10" />

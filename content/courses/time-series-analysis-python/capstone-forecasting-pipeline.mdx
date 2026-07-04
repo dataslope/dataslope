@@ -103,49 +103,44 @@ Every forecast starts with eyes on the data. We name what we see *before*
 touching a model.
 
 <svg
-  viewBox="0 0 640 260"
+  viewBox="0 0 640 240"
   role="img"
-  aria-label="A dotted trail climbs from a blue seasonal wave in the foothills, passes a red pitfall and a yellow gate partway up, and reaches a green summit flag where a beam of light fans into the sky — the whole forecasting pipeline as one journey from raw data to a validated forecast"
+  aria-label="A thin path climbs in three straight legs from a blue starting dot through blue and yellow stations to a green flag planted at the summit, while a red pitfall dot sits just off the trail — the forecasting pipeline as one journey from raw data to a validated forecast"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="90" cy="52" r="14" fillOpacity="0.9" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <path d="M 40 210 C 120 170 200 190 280 170 C 360 150 440 170 520 140 C 560 126 580 130 600 122 L 600 230 L 40 230 Z" />
-  </g>
-  <g fill="currentColor" opacity="0.13">
-    <path d="M 40 224 C 140 200 220 210 320 188 C 420 166 500 174 600 146 L 600 236 L 40 236 Z" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M70 200 L 240 160 L 410 110 L 540 64" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 40 232 C 60 232 70 206 90 206 C 110 206 118 224 138 224 C 158 224 166 196 186 196 C 206 196 214 218 234 218 C 254 218 262 188 282 188 L 282 232 Z" fillOpacity="0.3" />
-  </g>
-  <g fill="currentColor" opacity="0.4">
-    <circle cx="120" cy="216" r="3.5" />
-    <circle cx="160" cy="208" r="3.5" />
-    <circle cx="200" cy="200" r="3.5" />
-    <circle cx="240" cy="192" r="3.5" />
-    <circle cx="280" cy="184" r="3.5" />
-    <circle cx="316" cy="172" r="3.5" />
-    <circle cx="352" cy="160" r="3.5" />
-    <circle cx="388" cy="148" r="3.5" />
-    <circle cx="424" cy="136" r="3.5" />
-    <circle cx="460" cy="124" r="3.5" />
-    <circle cx="496" cy="112" r="3.5" />
-    <circle cx="524" cy="100" r="3.5" />
+    <circle cx="70" cy="200" r="9" />
+    <circle cx="155" cy="180" r="7" />
+    <circle cx="240" cy="160" r="7" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="362" y="128" width="7" height="44" rx="3" />
-    <rect x="386" y="120" width="7" height="44" rx="3" />
-    <rect x="356" y="114" width="44" height="7" rx="3.5" />
+    <circle cx="325" cy="135" r="7" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="302" cy="200" r="4.5" />
+    <circle cx="330" cy="185" r="6" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 550 62 L 604 12 L 632 48 Z" fillOpacity="0.12" />
-    <rect x="544" y="64" width="5" height="56" rx="2.5" />
-    <path d="M 549 64 L 583 76 L 549 88 Z" />
+    <circle cx="475" cy="87" r="7" />
+    <polygon points="540,20 574,28 540,36" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }}>
+    <path
+      d="M540 64 V 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
   </g>
 </svg>
 
@@ -459,22 +454,23 @@ page — the residual diagnostic, paid off in hard numbers.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three error columns stand against a yellow line set by the baseline: the neutral baseline column reaches it exactly, the blue model only just dips beneath it, and the green seasonal model sits far lower with a small medal dot above — an error score only means something when it beats the baseline on the same honest test"
+  aria-label="Three horizontal error bars grow from the same wall toward a yellow baseline mark: the gray baseline bar reaches it exactly, the blue model stops just short of it, and the green seasonal model is much shorter — an error score only means something when it beats the baseline on the same honest test"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="50" y="170" width="540" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="60" y="78" width="500" height="6" rx="3" fillOpacity="0.55" />
+  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
+    <rect x="100" y="40" width="6" height="140" rx="3" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <rect x="100" y="84" width="64" height="86" rx="7" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="380" y="36" width="4" height="148" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <rect x="106" y="52" width="274" height="28" rx="9" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="268" y="96" width="64" height="74" rx="7" fillOpacity="0.75" />
+    <rect x="106" y="96" width="250" height="28" rx="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="436" y="130" width="64" height="40" rx="7" />
-    <circle cx="468" cy="112" r="5.5" />
+    <rect x="106" y="140" width="150" height="28" rx="9" />
   </g>
 </svg>
 
@@ -573,37 +569,39 @@ In production, a forecast is a living thing:
   uncertainty doesn't support.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="Around a continuous loop, a blue gear-like model node hands off to green monitoring pulse dots and yellow retraining arrows, while one red dot drifts away from the orbit trailing a fading tail — in production a forecast lives in a cycle of monitoring, drift detection, and refitting"
+  aria-label="Three production stages — a blue model box, a green monitoring dot, and a yellow retraining tile — joined in a loop by thin curved arrows, while a red drift dot escapes the cycle along a thin line — a deployed forecast lives in a monitor, detect, and refit cycle"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <path d="M 248 105 a 72 72 0 1 0 144 0 a 72 72 0 1 0 -144 0 Z M 254 105 a 66 66 0 1 0 132 0 a 66 66 0 1 0 -132 0 Z" fillRule="evenodd" fill="currentColor" opacity="0.15" />
+  <g
+    style={{ color: "var(--ds-gray-400)" }}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <path d="M348 48 A 76 76 0 0 1 390 130" />
+    <path d="M364 160 A 76 76 0 0 1 276 160" />
+    <path d="M250 130 A 76 76 0 0 1 292 48" />
+    <path d="M402 168 L 448 196" />
+  </g>
+  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
+    <polygon points="392,144 380,128 398,126" />
+    <polygon points="264,156 282,152 276,168" />
+    <polygon points="298,42 292,60 282,46" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="315" y="14" width="10" height="10" rx="2" />
-    <rect x="315" y="42" width="10" height="10" rx="2" />
-    <rect x="301" y="28" width="10" height="10" rx="2" />
-    <rect x="329" y="28" width="10" height="10" rx="2" />
-    <circle cx="320" cy="33" r="12" />
+    <rect x="302" y="20" width="36" height="36" rx="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="382" cy="142" r="6.5" />
-    <circle cx="392" cy="118" r="5" fillOpacity="0.7" />
-    <circle cx="390" cy="92" r="4" fillOpacity="0.45" />
+    <circle cx="386" cy="148" r="13" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="244" y="152" width="20" height="8" rx="4" transform="rotate(32 254 156)" />
-    <rect x="222" y="132" width="20" height="8" rx="4" transform="rotate(52 232 136)" />
+    <rect x="232" y="134" width="42" height="26" rx="8" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="394" cy="64" r="3" fillOpacity="0.35" />
-    <circle cx="406" cy="54" r="3.5" fillOpacity="0.55" />
-    <circle cx="420" cy="44" r="5.5" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="120" cy="60" r="4" />
-    <circle cx="520" cy="160" r="4" />
-    <circle cx="150" cy="170" r="3" />
+    <circle cx="458" cy="202" r="6" />
   </g>
 </svg>
 

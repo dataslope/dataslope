@@ -8,6 +8,12 @@
  * tiny shell with zero ISR-store involvement. Everything here — the light/dark
  * theme toggle, course pagination, and per-graphic copy buttons — is
  * client-side.
+ *
+ * The current page is mirrored into the URL as `?page=N` (1-based; page 1
+ * keeps the URL clean) via the History API rather than the Next router, so
+ * specific pages can be link-shared and back/forward navigate between pages
+ * without ever re-rendering the static shell. The gallery only renders on the
+ * client (after the data fetch), so reading `window.location` here is safe.
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { Check, Copy, Moon, Sun } from "lucide-react";
@@ -91,16 +97,35 @@ export function SvgGalleryFromStaticData() {
   );
 }
 
+/** Zero-based page index from the URL's 1-based `?page=N`, clamped to range. */
+function pageFromLocation(pageCount: number): number {
+  const raw = new URLSearchParams(window.location.search).get("page");
+  const n = raw ? Number.parseInt(raw, 10) : 1;
+  if (!Number.isFinite(n)) return 0;
+  return Math.min(Math.max(n, 1), pageCount) - 1;
+}
+
 export function SvgGalleryClient({ courses }: { courses: GalleryCourse[] }) {
   const total = courses.reduce((n, c) => n + c.graphics.length, 0);
   const pageCount = Math.max(1, Math.ceil(courses.length / COURSES_PER_PAGE));
 
   const [theme, toggleTheme] = useTheme();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(() => pageFromLocation(pageCount));
   const [copied, setCopied] = useState<string | null>(null);
+
+  // Back/forward should walk through previously visited pages.
+  useEffect(() => {
+    const onPop = () => setPage(pageFromLocation(pageCount));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [pageCount]);
 
   const goTo = useCallback((p: number) => {
     setPage(p);
+    const url = new URL(window.location.href);
+    if (p === 0) url.searchParams.delete("page");
+    else url.searchParams.set("page", String(p + 1));
+    window.history.pushState(null, "", url);
     window.scrollTo({ top: 0 });
   }, []);
 
