@@ -14,39 +14,25 @@ the end.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two green dots share the top step of a podium while the second step holds only a ghost ring and a blue dot stands on third — when rows tie, RANK hands out two golds and no silver"
+  aria-label="A podium where two green dots share the tallest step marked with one pip, the second step holds only a dashed empty ring, and a blue dot stands on the third step marked with three pips — when rows tie, RANK hands out two golds and no silver"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="148" y="128" width="116" height="76" rx="8" opacity="0.12" />
-    <rect x="264" y="92" width="116" height="112" rx="8" opacity="0.18" />
-    <rect x="380" y="152" width="116" height="52" rx="8" opacity="0.09" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="264" y="92" width="116" height="112" rx="8" fillOpacity="0.2" />
     <circle cx="298" cy="72" r="11" />
     <circle cx="344" cy="72" r="11" />
+    <circle cx="322" cy="148" r="6" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="298" cy="50" r="3" fillOpacity="0.8" />
-    <circle cx="321" cy="44" r="3.5" fillOpacity="0.9" />
-    <circle cx="344" cy="50" r="3" fillOpacity="0.8" />
-  </g>
-  <g fill="currentColor" opacity="0.22">
-    <path d="M 206 108 m -10 0 a 10 10 0 1 0 20 0 a 10 10 0 1 0 -20 0 M 206 108 m -6 0 a 6 6 0 1 1 12 0 a 6 6 0 1 1 -12 0" fillRule="evenodd" />
-  </g>
+  <rect x="148" y="128" width="116" height="76" rx="8" fill="currentColor" opacity="0.08" />
+  <circle cx="206" cy="108" r="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="380" y="152" width="116" height="52" rx="8" fillOpacity="0.12" />
     <circle cx="438" cy="132" r="10" />
+    <circle cx="420" cy="178" r="5" />
+    <circle cx="438" cy="178" r="5" />
+    <circle cx="456" cy="178" r="5" />
   </g>
-  <g fill="currentColor" opacity="0.45">
-    <text x="322" y="156" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" textAnchor="middle">1</text>
-    <text x="438" y="186" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="18" textAnchor="middle">3</text>
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <text x="206" y="172" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="20" textAnchor="middle">2</text>
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <rect x="120" y="210" width="400" height="5" rx="2.5" />
-  </g>
+  <rect x="120" y="208" width="400" height="3" rx="1.5" fill="var(--ds-gray-400)" />
 </svg>
 
 ## Numbering rows with `ROW_NUMBER`
