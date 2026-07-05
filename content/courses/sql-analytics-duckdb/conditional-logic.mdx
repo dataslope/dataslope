@@ -14,45 +14,37 @@ analytical SQL.
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Plain dots ride a single track into a yellow switch diamond that routes each one onto the first branch whose test it passes, coloring it on the way out — CASE turning raw values into clean categories"
+  aria-label="Gray values ride one line into a yellow CASE diamond that routes each along a solid branch line into a blue, green, or red bucket — the first test a value passes decides its category"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.08">
-    <rect x="36" y="96" width="200" height="24" rx="12" />
+  <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="40" y1="108" x2="240" y2="108" />
+    <line x1="300" y1="108" x2="420" y2="48" />
+    <line x1="300" y1="108" x2="420" y2="108" />
+    <line x1="300" y1="108" x2="420" y2="168" />
   </g>
-  <g fill="currentColor" opacity="0.4">
-    <circle cx="70" cy="108" r="7" />
-    <circle cx="116" cy="108" r="7" />
-    <circle cx="162" cy="108" r="7" />
+  <g fill="var(--ds-gray-500)">
+    <circle cx="80" cy="108" r="6" />
+    <circle cx="130" cy="108" r="6" />
+    <circle cx="180" cy="108" r="6" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 270 80 L 298 108 L 270 136 L 242 108 Z" fillOpacity="0.9" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <circle cx="322" cy="88" r="2.5" />
-    <circle cx="354" cy="72" r="2.5" />
-    <circle cx="386" cy="58" r="2.5" />
-    <circle cx="322" cy="108" r="2.5" />
-    <circle cx="354" cy="108" r="2.5" />
-    <circle cx="386" cy="108" r="2.5" />
-    <circle cx="322" cy="128" r="2.5" />
-    <circle cx="354" cy="144" r="2.5" />
-    <circle cx="386" cy="158" r="2.5" />
+    <path d="M 270 78 L 300 108 L 270 138 L 240 108 Z" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="424" cy="46" r="7" />
-    <circle cx="468" cy="40" r="7" />
-    <rect x="506" y="30" width="34" height="18" rx="9" fillOpacity="0.45" />
+    <rect x="420" y="28" width="150" height="40" rx="20" fillOpacity="0.15" />
+    <circle cx="450" cy="48" r="6" />
+    <circle cx="482" cy="48" r="6" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="424" cy="108" r="7" />
-    <circle cx="468" cy="108" r="7" />
-    <circle cx="512" cy="108" r="7" />
-    <rect x="544" y="99" width="52" height="18" rx="9" fillOpacity="0.45" />
+    <rect x="420" y="88" width="150" height="40" rx="20" fillOpacity="0.15" />
+    <circle cx="450" cy="108" r="6" />
+    <circle cx="482" cy="108" r="6" />
+    <circle cx="514" cy="108" r="6" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="424" cy="170" r="7" />
-    <rect x="460" y="161" width="70" height="18" rx="9" fillOpacity="0.45" />
+    <rect x="420" y="148" width="150" height="40" rx="20" fillOpacity="0.15" />
+    <circle cx="450" cy="168" r="6" />
   </g>
 </svg>
 
@@ -265,35 +257,33 @@ Two small but constant companions of conditional logic:
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Two divisions side by side: dividing by a raw red zero ends in a jagged burst, while NULLIF first softens the zero into a hollow ring so the same division lands as a calm, harmless NULL"
-  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Two divisions on stacked cards: dividing a blue value by a raw red zero ends in a jagged red burst, while NULLIF turns the zero into a hollow ring first so the same division lands as a calm green NULL"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="40" width="68" height="16" rx="8" fillOpacity="0.8" />
-    <rect x="70" y="104" width="68" height="16" rx="8" fillOpacity="0.8" />
-  </g>
-  <g fill="currentColor" opacity="0.5">
-    <text x="178" y="56" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" textAnchor="middle">÷</text>
-    <text x="178" y="120" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" textAnchor="middle">÷</text>
-  </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <text x="232" y="57" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" textAnchor="middle" fontWeight="700">0</text>
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <path d="M 232 104 m -9 0 a 9 9 0 1 0 18 0 a 9 9 0 1 0 -18 0 M 232 104 m -5 0 a 5 5 0 1 1 10 0 a 5 5 0 1 1 -10 0" fillRule="evenodd" />
-  </g>
-  <g fill="currentColor" opacity="0.22">
-    <circle cx="290" cy="48" r="2.5" />
-    <circle cx="316" cy="48" r="2.5" />
-    <circle cx="290" cy="112" r="2.5" />
-    <circle cx="316" cy="112" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 392 48 L 401 32 L 406 46 L 422 38 L 416 52 L 432 56 L 416 62 L 424 76 L 408 68 L 402 82 L 396 66 L 380 72 L 388 58 L 372 52 L 388 50 Z" fillOpacity="0.85" />
+    <rect x="48" y="24" width="544" height="52" rx="12" fillOpacity="0.1" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 402 112 m -13 0 a 13 13 0 1 0 26 0 a 13 13 0 1 0 -26 0 M 402 112 m -7 0 a 7 7 0 1 1 14 0 a 7 7 0 1 1 -14 0" fillRule="evenodd" />
+    <rect x="48" y="92" width="544" height="52" rx="12" fillOpacity="0.12" />
   </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="76" y="42" width="64" height="16" rx="8" />
+    <rect x="76" y="110" width="64" height="16" rx="8" />
+  </g>
+  <g fill="var(--ds-gray-500)">
+    <rect x="166" y="36" width="4" height="28" rx="2" transform="rotate(20 168 50)" />
+    <rect x="166" y="104" width="4" height="28" rx="2" transform="rotate(20 168 118)" />
+    <rect x="248" y="44" width="24" height="4" rx="2" />
+    <rect x="248" y="54" width="24" height="4" rx="2" />
+    <rect x="248" y="112" width="24" height="4" rx="2" />
+    <rect x="248" y="122" width="24" height="4" rx="2" />
+  </g>
+  <circle cx="210" cy="50" r="10" fill="none" stroke="var(--ds-red-500)" strokeWidth="4" />
+  <circle cx="210" cy="118" r="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="3.5" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 310 41 L 319 25 L 324 39 L 340 31 L 334 45 L 350 49 L 334 55 L 342 69 L 326 61 L 320 75 L 314 59 L 298 65 L 306 51 L 290 45 L 306 43 Z" />
+  </g>
+  <circle cx="320" cy="118" r="13" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" />
 </svg>
 
 <SqlCodeBlock
