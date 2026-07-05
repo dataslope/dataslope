@@ -8,47 +8,29 @@ Welcome to your first hands-on SQLite page. You do not need to install anything 
 One important habit: each block is **independent**. If one block creates a table, the next block does not remember it. When a block needs a table that is already prepared for you, the hidden setup lives in `initSql`; the query you see is the part you practice.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 160"
   role="img"
-  aria-label="A tin-can telephone: a tiny sum is spoken into the left can, the string sags across the page, and the right can answers with a one-cell result holding the number four — your first query is a small friendly conversation with SQLite"
+  aria-label="A yellow query capsule flows along a solid arrow into a round blue SQLite engine and out the other side as a small green one-cell result card — your first query is a short conversation with the database"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="66" y="96" width="78" height="48" rx="10" transform="rotate(8 105 120)" fillOpacity="0.8" />
-    <ellipse cx="140" cy="125" rx="9" ry="23" transform="rotate(8 140 125)" fillOpacity="0.45" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="56" y="64" width="130" height="34" rx="17" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="166" cy="136" r="2.5" />
-    <circle cx="196" cy="146" r="2.5" />
-    <circle cx="228" cy="153" r="2.5" />
-    <circle cx="262" cy="158" r="2.5" />
-    <circle cx="296" cy="161" r="2.5" />
-    <circle cx="330" cy="162" r="2.5" />
-    <circle cx="364" cy="161" r="2.5" />
-    <circle cx="398" cy="158" r="2.5" />
-    <circle cx="430" cy="153" r="2.5" />
-    <circle cx="460" cy="146" r="2.5" />
-    <circle cx="488" cy="138" r="2.5" />
+  <g fill="var(--ds-gray-500)">
+    <rect x="200" y="79" width="34" height="4" rx="2" />
+    <polygon points="232,72 232,90 250,81" />
+    <rect x="352" y="79" width="34" height="4" rx="2" />
+    <polygon points="384,72 384,90 402,81" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="300" cy="81" r="36" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="300" cy="81" r="7" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="500" y="98" width="78" height="48" rx="10" transform="rotate(-8 539 122)" fillOpacity="0.8" />
-    <ellipse cx="504" cy="127" rx="9" ry="23" transform="rotate(-8 504 127)" fillOpacity="0.45" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <path d="M 60 22 Q 60 12 70 12 L 196 12 Q 206 12 206 22 L 206 56 Q 206 66 196 66 L 120 66 L 100 84 L 106 66 L 70 66 Q 60 66 60 56 Z" />
-  </g>
-  <g fill="currentColor" opacity="0.55">
-    <text x="133" y="48" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="24" fontWeight="600">2+2</text>
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="452" y="14" width="64" height="58" rx="9" fillOpacity="0.3" />
-    <rect x="452" y="14" width="64" height="18" rx="9" fillOpacity="0.8" />
-  </g>
-  <g fill="currentColor" opacity="0.6">
-    <text x="484" y="60" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="24" fontWeight="700">4</text>
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <path d="M 500 80 L 516 72 L 510 88 Z" />
+    <rect x="416" y="52" width="170" height="58" rx="12" fillOpacity="0.15" />
+    <rect x="438" y="72" width="60" height="18" rx="6" />
   </g>
 </svg>
 
