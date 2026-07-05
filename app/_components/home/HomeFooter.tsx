@@ -4,8 +4,6 @@ import { GitHubIcon } from "./icons";
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
 // Development-only navigation surfaced in the footer during the redesign.
-// Internal tooling, not user pages — shown only outside production builds.
-const SHOW_DEV_LINKS = process.env.NODE_ENV !== "production";
 const DEV_LINKS = [
   { href: "/color-test", label: "Color Theme Test", external: false },
   { href: "/svg-gallery", label: "SVG Gallery", external: false },
@@ -98,17 +96,15 @@ export function HomeFooter() {
             </a>
           </div>
 
-          {/* Column 2 — development pages (dev builds only). */}
-          {SHOW_DEV_LINKS && (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
-                Development
-              </h3>
-              {DEV_LINKS.map((link) => (
-                <FooterLink key={link.href} {...link} />
-              ))}
-            </div>
-          )}
+          {/* Column 2 — development pages. */}
+          <div className="flex flex-col gap-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
+              Development
+            </h3>
+            {DEV_LINKS.map((link) => (
+              <FooterLink key={link.href} {...link} />
+            ))}
+          </div>
 
           {/* Column 3 — resources. */}
           <div className="flex flex-col gap-3">
