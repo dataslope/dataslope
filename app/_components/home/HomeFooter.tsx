@@ -33,7 +33,7 @@ const RESOURCE_LINKS = [
 ];
 
 const linkClass =
-  "text-sm text-[var(--ds-gray-600)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-blue-400)]";
+  "text-sm text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
 function FooterLink({
   href,
@@ -66,7 +66,7 @@ function FooterLink({
 export function HomeFooter() {
   return (
     <footer className="mt-24">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pb-28">
         <div className="ds-footer-grid">
           {/* Column 1 — logo (no wordmark) + GitHub at the bottom. */}
           <div className="flex flex-col justify-between gap-8">
@@ -90,7 +90,7 @@ export function HomeFooter() {
               rel="noopener noreferrer"
               aria-label="View source on GitHub"
               title="GitHub"
-              className="inline-flex size-10 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="inline-flex size-10 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
             >
               <GitHubIcon size={26} />
             </a>

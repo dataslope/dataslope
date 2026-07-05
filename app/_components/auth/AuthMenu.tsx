@@ -7,9 +7,10 @@
  * The session is read client-side via `useSession()` so the header can sit on
  * statically prerendered pages without making them dynamic — the server ships
  * the same anonymous HTML to everyone and this swaps in after hydration. While
- * the first session fetch is in flight we render the signed-out control, so the
- * markup is stable on first paint (no hydration mismatch) and only upgrades to
- * the avatar once a session is confirmed.
+ * the first session fetch is in flight we render a neutral skeleton (not the
+ * "Sign in" button), so the markup is stable on first paint (no hydration
+ * mismatch) and a signed-in visitor doing a full-page load never sees "Sign in"
+ * flash before the avatar resolves.
  */
 import { useState } from "react";
 import { Menu } from "@base-ui-components/react/menu";
@@ -20,6 +21,11 @@ import { signOut, useSession } from "@/lib/auth/client";
 
 const TRIGGER_CLASS =
   "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
+
+/** Solid, subtly filled "Sign in" button (light: --ds-gray-100 / #F3F4F6).
+ *  Shared with the mobile drawer's sign-in row so the two match. */
+export const SIGN_IN_BUTTON_CLASS =
+  "inline-flex items-center rounded-lg bg-[var(--ds-gray-100)] px-3 py-1.5 text-sm font-medium text-[#121212] transition-colors hover:bg-[var(--ds-gray-200)] dark:bg-white/10 dark:text-white dark:hover:bg-white/15";
 
 /** Circular avatar: the provider image when present, otherwise an initial. */
 function Avatar({ image, name }: { image?: string | null; name?: string | null }) {
@@ -51,12 +57,25 @@ export function AuthMenu() {
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
-  // Signed out (or still loading the first session): a plain link to /sign-in.
-  if (isPending || !session) {
+  // Still loading the first session: render a size-matched skeleton rather than
+  // the "Sign in" button, so a signed-in visitor doing a full-page load doesn't
+  // see "Sign in" flash before the avatar swaps in. The server always prerenders
+  // this (isPending) state, so the placeholder is hydration-stable.
+  if (isPending) {
+    return (
+      <span
+        aria-hidden="true"
+        className="inline-block h-8 w-[4.5rem] animate-pulse rounded-lg bg-[var(--ds-gray-100)] dark:bg-white/10"
+      />
+    );
+  }
+
+  // Signed out: a solid, subtly filled button linking to /sign-in.
+  if (!session) {
     return (
       <Link
         href="/sign-in"
-        className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-3 py-1.5 text-sm font-medium text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:border-white/15 dark:text-white dark:hover:bg-white/10"
+        className={SIGN_IN_BUTTON_CLASS}
       >
         Sign in
       </Link>

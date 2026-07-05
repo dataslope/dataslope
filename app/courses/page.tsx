@@ -56,7 +56,7 @@ export default async function CoursesPage() {
           {/* Centered heading, matching the /pricing page's title block. */}
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
-              Courses
+              Free Courses
             </h1>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Hands-on, browser-based tracks across data and engineering. Every
