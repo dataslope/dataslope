@@ -111,17 +111,6 @@ export function illustrationFileName(subject: string, photo: boolean): string {
   return `${illustrationFileSlug(subject, photo)}.svg`;
 }
 
-/**
- * Wikipedia article link for a person subject — used as the "reference
- * photo" link on the `/illustration-prompts` gallery. Deterministic (no
- * network call, no hand-picked image URL to get wrong): almost every named
- * person here has a bio page with a lead photo in the infobox.
- */
-export function personWikipediaUrl(subject: string): string {
-  const title = personDisplayName(subject).replace(/ /g, "_");
-  return `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-}
-
 /** Google Images search link for a person subject. */
 export function personImageSearchUrl(subject: string): string {
   const query = encodeURIComponent(personDisplayName(subject));

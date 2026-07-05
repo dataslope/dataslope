@@ -4,7 +4,6 @@ import {
   illustrationFileName,
   illustrationFileSlug,
   personImageSearchUrl,
-  personWikipediaUrl,
 } from "../lib/illustrationPrompt";
 
 // The `/illustration-prompts` gallery, the on-page placeholder anchor, and the
@@ -80,25 +79,6 @@ describe("illustrationFileSlug", () => {
     expect(illustrationFileName("Florence Nightingale", true)).toBe(
       "florence-nightingale-portrait.svg",
     );
-  });
-});
-
-describe("personWikipediaUrl", () => {
-  it("builds a Wikipedia article URL from the display name", () => {
-    expect(personWikipediaUrl("Alan Kay")).toBe(
-      "https://en.wikipedia.org/wiki/Alan_Kay",
-    );
-  });
-
-  it("drops a trailing descriptor and a leading 'the ' like the file slug does", () => {
-    expect(
-      personWikipediaUrl("Fred Brooks, author of The Mythical Man-Month"),
-    ).toBe("https://en.wikipedia.org/wiki/Fred_Brooks");
-    expect(
-      personWikipediaUrl(
-        "the Gang of Four: Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides",
-      ),
-    ).toBe("https://en.wikipedia.org/wiki/Gang_of_Four");
   });
 });
 

@@ -25,7 +25,6 @@ import {
   buildIllustrationPrompt,
   illustrationFileSlug,
   personImageSearchUrl,
-  personWikipediaUrl,
 } from "./illustrationPrompt";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
@@ -63,8 +62,6 @@ export interface IllustrationPromptEntry {
   photo: boolean;
   /** The exact image-generation prompt. */
   prompt: string;
-  /** Wikipedia article link, for a reference photo (people only). */
-  photoUrl?: string;
   /** Google Images search link (people only). */
   imageSearchUrl?: string;
   /** Every lesson that embeds this illustration. */
@@ -237,7 +234,6 @@ export function getIllustrationPrompts(): IllustrationPromptsData {
         subject: p.subject,
         photo: p.photo,
         prompt: buildIllustrationPrompt(p.subject, p.photo),
-        photoUrl: p.photo ? personWikipediaUrl(p.subject) : undefined,
         imageSearchUrl: p.photo ? personImageSearchUrl(p.subject) : undefined,
         usages: [],
       };
@@ -248,7 +244,6 @@ export function getIllustrationPrompts(): IllustrationPromptsData {
       entry.subject = p.subject;
       entry.prompt = buildIllustrationPrompt(p.subject, entry.photo);
       if (entry.photo) {
-        entry.photoUrl = personWikipediaUrl(p.subject);
         entry.imageSearchUrl = personImageSearchUrl(p.subject);
       }
     }
