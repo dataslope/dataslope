@@ -9,54 +9,46 @@ analyst's eyes. The same `SELECT` that fetches a record in an app becomes,
 with a shift in intent, the first move of an exploration.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue wedge sliced out of a data disc streams its green rows along dotted arcs into a column sorted by size, where an open yellow ring picks out only the top of the stack — WHERE slices, ORDER BY sorts, LIMIT peeks"
+  aria-label="Three cards in a pipeline joined by solid arrows: a grid where only some blue cells stay solid, a set of green bars sorted tallest to shortest, and a final card keeping just the top two bars with dashed outlines where the rest were dropped — WHERE slices, ORDER BY sorts, LIMIT peeks"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.1">
-    <circle cx="130" cy="112" r="64" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="104" cy="86" r="3.5" />
-    <circle cx="132" cy="64" r="3.5" />
-    <circle cx="88" cy="124" r="3.5" />
-    <circle cx="118" cy="150" r="3.5" />
-    <circle cx="148" cy="132" r="3.5" />
-    <circle cx="100" cy="156" r="3.5" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 162 112 L 217 80 A 64 64 0 0 1 217 144 Z" fillOpacity="0.3" />
+    <rect x="50" y="36" width="150" height="140" rx="12" fillOpacity="0.12" />
+    <rect x="74" y="64" width="26" height="26" rx="5" />
+    <rect x="110" y="64" width="26" height="26" rx="5" fillOpacity="0.15" />
+    <rect x="146" y="64" width="26" height="26" rx="5" />
+    <rect x="74" y="100" width="26" height="26" rx="5" fillOpacity="0.15" />
+    <rect x="110" y="100" width="26" height="26" rx="5" />
+    <rect x="146" y="100" width="26" height="26" rx="5" fillOpacity="0.15" />
+    <rect x="74" y="136" width="26" height="26" rx="5" />
+    <rect x="110" y="136" width="26" height="26" rx="5" fillOpacity="0.15" />
+    <rect x="146" y="136" width="26" height="26" rx="5" />
+  </g>
+  <g fill="var(--ds-gray-500)">
+    <rect x="205" y="104" width="22" height="4" rx="2" />
+    <polygon points="225,97 225,115 241,106" />
+    <rect x="400" y="104" width="22" height="4" rx="2" />
+    <polygon points="420,97 420,115 436,106" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="186" cy="112" r="4.5" />
-    <circle cx="204" cy="100" r="4.5" />
-    <circle cx="204" cy="124" r="4.5" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="258" cy="96" r="3" />
-    <circle cx="296" cy="82" r="3" />
-    <circle cx="336" cy="72" r="3" />
-    <circle cx="378" cy="66" r="3" />
-    <circle cx="262" cy="130" r="3" />
-    <circle cx="302" cy="136" r="3" />
-    <circle cx="344" cy="146" r="3" />
-    <circle cx="384" cy="152" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="478" cy="56" r="12" />
-    <circle cx="478" cy="92" r="9.5" />
-    <circle cx="478" cy="124" r="7.5" />
-    <circle cx="478" cy="152" r="5.5" fillOpacity="0.55" />
-    <circle cx="478" cy="176" r="4" fillOpacity="0.35" />
+    <rect x="245" y="36" width="150" height="140" rx="12" fillOpacity="0.12" />
+    <rect x="268" y="76" width="24" height="84" rx="4" />
+    <rect x="300" y="98" width="24" height="62" rx="4" />
+    <rect x="332" y="118" width="24" height="42" rx="4" />
+    <rect x="364" y="134" width="24" height="26" rx="4" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 440 74 a 38 38 0 1 0 76 0 a 38 38 0 1 0 -76 0 M 447 74 a 31 31 0 1 1 62 0 a 31 31 0 1 1 -62 0" fillRule="evenodd" fillOpacity="0.85" />
+    <rect x="440" y="36" width="150" height="140" rx="12" fillOpacity="0.18" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="568" cy="48" r="3" />
-    <circle cx="586" cy="110" r="3" />
-    <circle cx="560" cy="170" r="3" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="462" y="76" width="24" height="84" rx="4" />
+    <rect x="494" y="98" width="24" height="62" rx="4" />
+  </g>
+  <g fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="5 5">
+    <rect x="526" y="118" width="24" height="42" rx="4" />
+    <rect x="558" y="134" width="24" height="26" rx="4" />
   </g>
 </svg>
 
@@ -242,37 +234,24 @@ analytical `SELECT` lists are for.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Two stored value bars meet at a division glyph and produce a glowing yellow chip that floats above a dotted shelf — a derived measure that exists only inside the query, never in the table"
+  aria-label="A blue stored bar over a green stored bar joined by a fraction line, then a geometric equals sign, produce one solid yellow chip resting above a dashed shelf — a derived measure that exists only inside the query, never in the table"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="46" width="120" height="20" rx="10" fillOpacity="0.85" />
+    <rect x="70" y="44" width="120" height="20" rx="10" />
   </g>
+  <rect x="66" y="78" width="130" height="4" rx="2" fill="var(--ds-gray-500)" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="70" y="92" width="84" height="20" rx="10" fillOpacity="0.85" />
+    <rect x="88" y="96" width="84" height="20" rx="10" />
   </g>
-  <g fill="currentColor" opacity="0.5">
-    <text x="248" y="89" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="30" textAnchor="middle">÷</text>
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="296" cy="79" r="3" />
-    <circle cx="316" cy="79" r="3" />
-    <circle cx="336" cy="79" r="3" />
+  <g fill="var(--ds-gray-500)">
+    <rect x="240" y="70" width="26" height="5" rx="2.5" />
+    <rect x="240" y="82" width="26" height="5" rx="2.5" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="364" y="64" width="104" height="28" rx="14" fillOpacity="0.55" />
-    <circle cx="486" cy="58" r="3.5" fillOpacity="0.8" />
-    <circle cx="498" cy="74" r="2.5" fillOpacity="0.6" />
-    <circle cx="480" cy="100" r="2.5" fillOpacity="0.6" />
+    <rect x="304" y="62" width="110" height="28" rx="14" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <rect x="364" y="118" width="10" height="4" rx="2" />
-    <rect x="382" y="118" width="10" height="4" rx="2" />
-    <rect x="400" y="118" width="10" height="4" rx="2" />
-    <rect x="418" y="118" width="10" height="4" rx="2" />
-    <rect x="436" y="118" width="10" height="4" rx="2" />
-    <rect x="454" y="118" width="10" height="4" rx="2" />
-  </g>
+  <line x1="300" y1="110" x2="418" y2="110" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="6 6" strokeLinecap="round" />
 </svg>
 
 ## The same keywords, a new purpose
