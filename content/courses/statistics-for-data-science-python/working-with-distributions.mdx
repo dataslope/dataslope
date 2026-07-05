@@ -21,7 +21,7 @@ authoritative, *wrong* answers.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A frozen distribution sits inside a translucent ice cube at the center while four small tool tiles orbit it on dotted spokes — a density hump, a rising accumulation ribbon, a yellow quantile cut post, and a spray of random draws — every scipy distribution answers the same four questions"
+  aria-label="A frozen distribution sits inside a translucent ice cube at the center while four small tool tiles hang off it on thin solid spokes — a density hump, a rising accumulation ribbon, a yellow quantile cut post, and a spray of random draws — every scipy distribution answers the same four questions"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -29,21 +29,17 @@ authoritative, *wrong* answers.
     <circle cx="282" cy="96" r="3" fillOpacity="0.5" />
     <path d="M 280 152 C 300 152 302 104 320 104 C 338 104 340 152 360 152 Z" fillOpacity="0.55" />
   </g>
-  <g fill="currentColor" opacity="0.07">
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.08">
     <rect x="80" y="28" width="96" height="64" rx="12" />
     <rect x="464" y="28" width="96" height="64" rx="12" />
     <rect x="80" y="148" width="96" height="64" rx="12" />
     <rect x="464" y="148" width="96" height="64" rx="12" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="222" cy="98" r="2.5" />
-    <circle cx="200" cy="84" r="2.5" />
-    <circle cx="418" cy="98" r="2.5" />
-    <circle cx="440" cy="84" r="2.5" />
-    <circle cx="222" cy="150" r="2.5" />
-    <circle cx="200" cy="164" r="2.5" />
-    <circle cx="418" cy="150" r="2.5" />
-    <circle cx="440" cy="164" r="2.5" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="184" y1="78" x2="262" y2="104" />
+    <line x1="456" y1="78" x2="378" y2="104" />
+    <line x1="184" y1="170" x2="262" y2="144" />
+    <line x1="456" y1="170" x2="378" y2="144" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <path d="M 96 80 C 110 80 112 44 128 44 C 144 44 146 80 160 80 Z" fillOpacity="0.6" />
@@ -500,8 +496,8 @@ answering a question the data never spoke to.
   aria-label="A green fitted band runs solidly through the region where data dots actually live, then dissolves into fading ghost dots beyond the last observation, where a red diamond waits — past the data's edge a model is pure assumption, not evidence"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="140" width="520" height="4" rx="2" fill="currentColor" opacity="0.15" />
-  <g fill="currentColor" opacity="0.4">
+  <rect x="60" y="141" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.7">
     <circle cx="100" cy="112" r="4" />
     <circle cx="130" cy="96" r="4" />
     <circle cx="160" cy="104" r="4" />
@@ -523,9 +519,7 @@ answering a question the data never spoke to.
     <circle cx="482" cy="44" r="3.5" fillOpacity="0.12" />
     <circle cx="508" cy="40" r="3.5" fillOpacity="0.07" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <rect x="354" y="100" width="4" height="52" rx="2" />
-  </g>
+  <rect x="354" y="100" width="4" height="52" rx="2" fill="var(--ds-gray-500)" />
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <path d="M 552 36 L 564 48 L 552 60 L 540 48 Z" fillOpacity="0.85" />
   </g>
