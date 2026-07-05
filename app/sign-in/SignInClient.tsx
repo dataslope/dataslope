@@ -18,11 +18,18 @@ const CALLBACK_URL = "/account";
 /**
  * Friendly copy for the `?error=<code>` a failed OAuth callback forwards here
  * (see `onAPIError` in lib/auth/server.ts). The dominant code,
- * `state_mismatch`, is usually a *duplicate* callback request whose one-time
- * state was already consumed by the request that signed the user in — in that
- * case a session exists and the signed-in redirect below whisks the visitor to
- * /account before any copy renders. When one of these does render, the sign-in
- * genuinely failed and retrying is the fix.
+ * `state_mismatch`, has two known shapes:
+ *
+ *   - The one-time `state` cookie didn't make it back to the callback host.
+ *     This used to fail *every* sign-in started on www.dataslope.com (the
+ *     host-only cookie stayed on www while Google returned to the apex);
+ *     fixed by domain-scoping the cookie — see `oauthStateCookieDomain` in
+ *     lib/auth/server.ts. It still happens on hosts no cookie can bridge,
+ *     e.g. a workers.dev preview, where retrying (now from the apex this
+ *     error page landed on) is genuinely the fix.
+ *   - A *duplicate* callback request whose state was already consumed by the
+ *     request that signed the user in — a session exists, and the signed-in
+ *     redirect below whisks the visitor to /account before any copy renders.
  */
 const STALE_ATTEMPT_COPY =
   "That sign-in attempt expired or was already used. Please try again.";

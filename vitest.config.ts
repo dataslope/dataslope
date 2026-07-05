@@ -1,6 +1,12 @@
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    // Mirror tsconfig's `@/*` → repo root, so tests can import modules that
+    // themselves use the alias (e.g. lib/auth/server.ts).
+    alias: { "@": path.resolve(import.meta.dirname) },
+  },
   test: {
     // Tests that use browser APIs (WebAssembly, WebWorker, SharedArrayBuffer)
     // are tagged as "browser" and skipped in the Node environment.
