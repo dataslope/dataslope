@@ -3,6 +3,8 @@ import {
   buildIllustrationPrompt,
   illustrationFileName,
   illustrationFileSlug,
+  personImageSearchUrl,
+  personWikipediaUrl,
 } from "../lib/illustrationPrompt";
 
 // The `/illustration-prompts` gallery, the on-page placeholder anchor, and the
@@ -77,6 +79,33 @@ describe("illustrationFileSlug", () => {
   it("exposes the full file name with extension", () => {
     expect(illustrationFileName("Florence Nightingale", true)).toBe(
       "florence-nightingale-portrait.svg",
+    );
+  });
+});
+
+describe("personWikipediaUrl", () => {
+  it("builds a Wikipedia article URL from the display name", () => {
+    expect(personWikipediaUrl("Alan Kay")).toBe(
+      "https://en.wikipedia.org/wiki/Alan_Kay",
+    );
+  });
+
+  it("drops a trailing descriptor and a leading 'the ' like the file slug does", () => {
+    expect(
+      personWikipediaUrl("Fred Brooks, author of The Mythical Man-Month"),
+    ).toBe("https://en.wikipedia.org/wiki/Fred_Brooks");
+    expect(
+      personWikipediaUrl(
+        "the Gang of Four: Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides",
+      ),
+    ).toBe("https://en.wikipedia.org/wiki/Gang_of_Four");
+  });
+});
+
+describe("personImageSearchUrl", () => {
+  it("builds a Google Images search URL for the display name", () => {
+    expect(personImageSearchUrl("Alan Kay")).toBe(
+      "https://www.google.com/search?q=Alan%20Kay&tbm=isch",
     );
   });
 });

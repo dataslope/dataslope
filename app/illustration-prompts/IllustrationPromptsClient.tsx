@@ -9,7 +9,7 @@
  * per-card copy buttons — is client-side.
  */
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { Check, Copy, Moon, Sun } from "lucide-react";
+import { Check, Copy, Image as ImageIcon, Moon, Search, Sun } from "lucide-react";
 import type {
   IllustrationPromptEntry,
   IllustrationPromptsData,
@@ -82,6 +82,29 @@ function PromptCard({
       </div>
 
       <p className={styles.prompt}>{entry.prompt}</p>
+
+      {entry.photo && entry.photoUrl && entry.imageSearchUrl ? (
+        <div className={styles.refLinks}>
+          <a
+            className={styles.refLink}
+            href={entry.photoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ImageIcon size={13} aria-hidden="true" />
+            Reference photo
+          </a>
+          <a
+            className={styles.refLink}
+            href={entry.imageSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Search size={13} aria-hidden="true" />
+            Google Images
+          </a>
+        </div>
+      ) : null}
 
       <div className={styles.cardBottom}>
         <div className={styles.usages}>
