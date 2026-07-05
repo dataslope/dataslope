@@ -19,12 +19,12 @@ center you're actually asking for, and when each one quietly lies.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Seven dots rest on a plank with the green median dot among them while one heavy yellow value sits far down the beam, dragging the balance-point fulcrum into empty space where no data lives — the mean is a balance point, and outliers drag it"
+  aria-label="Seven dots rest on a plank with the green median among them while one heavy yellow value sits far down the beam, dragging the balance-point fulcrum into empty space where no data lives — the mean is a balance point, and outliers drag it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="70" y="166" width="500" height="4" rx="2" fill="currentColor" opacity="0.15" />
-  <rect x="80" y="120" width="480" height="8" rx="4" fill="currentColor" opacity="0.3" />
-  <path d="M 350 130 L 372 166 L 328 166 Z" fill="currentColor" opacity="0.45" />
+  <rect x="70" y="168" width="500" height="3" rx="1.5" fill="var(--ds-gray-300)" />
+  <rect x="80" y="120" width="480" height="8" rx="4" fill="var(--ds-gray-400)" />
+  <polygon points="350,130 372,168 328,168" fill="var(--ds-gray-500)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="120" cy="109" r="7" />
     <circle cx="146" cy="109" r="7" />
@@ -35,9 +35,8 @@ center you're actually asking for, and when each one quietly lies.
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="198" cy="109" r="7" />
-    <rect x="195.5" y="74" width="5" height="24" rx="2.5" fillOpacity="0.7" />
-    <circle cx="198" cy="68" r="6" fillOpacity="0.9" />
   </g>
+  <line x1="198" y1="96" x2="198" y2="66" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="520" cy="104" r="13" />
   </g>
@@ -240,15 +239,13 @@ compound.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A sorted row of dots with its two extreme ends caught inside translucent red trim zones, and a green marker resting below the center of the surviving dots — the trimmed mean averages only what is left after the extremes are chopped"
+  aria-label="A sorted row of dots with its two extreme ends caught inside translucent red trim zones, and a green marker resting below the center of the surviving blue dots — the trimmed mean averages only what is left after the extremes are chopped"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="66" width="520" height="4" rx="2" fill="currentColor" opacity="0.15" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.18">
-    <rect x="66" y="38" width="92" height="60" rx="12" />
-    <rect x="482" y="38" width="92" height="60" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.6">
+  <rect x="60" y="66" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="66" y="38" width="92" height="60" rx="12" fillOpacity="0.15" />
+    <rect x="482" y="38" width="92" height="60" rx="12" fillOpacity="0.15" />
     <circle cx="92" cy="68" r="7" />
     <circle cx="128" cy="68" r="7" />
     <circle cx="512" cy="68" r="7" />
