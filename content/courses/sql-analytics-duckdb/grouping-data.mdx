@@ -154,36 +154,34 @@ matrix of the business. Adding a grouping column is exactly the
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Six pill tiles arranged as a small quilt, each holding one of three region colors paired with either a solid or a hollow product mark — grouping by two columns yields one summary row per combination that appears"
+  aria-label="Six tinted pill tiles form a small grid: three region colors run down the rows, and a gray square or triangle product mark alternates across the columns — grouping by two columns yields one summary row per combination that appears"
   style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.07">
-    <rect x="116" y="28" width="190" height="36" rx="18" />
-    <rect x="334" y="28" width="190" height="36" rx="18" />
-    <rect x="116" y="78" width="190" height="36" rx="18" />
-    <rect x="334" y="78" width="190" height="36" rx="18" />
-    <rect x="116" y="128" width="190" height="36" rx="18" />
-    <rect x="334" y="128" width="190" height="36" rx="18" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="116" y="28" width="190" height="36" rx="18" fillOpacity="0.12" />
+    <rect x="334" y="28" width="190" height="36" rx="18" fillOpacity="0.12" />
     <circle cx="148" cy="46" r="9" />
     <circle cx="366" cy="46" r="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="116" y="78" width="190" height="36" rx="18" fillOpacity="0.12" />
+    <rect x="334" y="78" width="190" height="36" rx="18" fillOpacity="0.12" />
     <circle cx="148" cy="96" r="9" />
     <circle cx="366" cy="96" r="9" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="116" y="128" width="190" height="36" rx="18" fillOpacity="0.15" />
+    <rect x="334" y="128" width="190" height="36" rx="18" fillOpacity="0.15" />
     <circle cx="148" cy="146" r="9" />
     <circle cx="366" cy="146" r="9" />
   </g>
-  <g fill="currentColor" opacity="0.55">
-    <circle cx="272" cy="46" r="7" />
-    <circle cx="272" cy="96" r="7" />
-    <circle cx="272" cy="146" r="7" />
-    <path d="M 490 46 m -7 0 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 M 490 46 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0" fillRule="evenodd" />
-    <path d="M 490 96 m -7 0 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 M 490 96 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0" fillRule="evenodd" />
-    <path d="M 490 146 m -7 0 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 M 490 146 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0" fillRule="evenodd" />
+  <g fill="var(--ds-gray-500)">
+    <rect x="258" y="39" width="14" height="14" rx="3" />
+    <rect x="258" y="89" width="14" height="14" rx="3" />
+    <rect x="258" y="139" width="14" height="14" rx="3" />
+    <polygon points="483,38 492,54 474,54" />
+    <polygon points="483,88 492,104 474,104" />
+    <polygon points="483,138 492,154 474,154" />
   </g>
 </svg>
 
