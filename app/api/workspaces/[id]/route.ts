@@ -119,7 +119,9 @@ export async function PUT(
   const { upload } = parsed;
 
   // Quota check against the *live* footprint (expired rows purge here too, so
-  // freeing space is as simple as letting old drafts age out).
+  // freeing space is as simple as letting old drafts age out). The workspace
+  // being written is excluded from the purge — its background delete targets
+  // the same R2 key this PUT is about to write.
   const nowMs = Date.now();
   const state = await loadLiveUserState(
     env,
@@ -128,6 +130,7 @@ export async function PUT(
     tier,
     nowMs,
     ctx?.waitUntil ? (p) => ctx.waitUntil(p) : undefined,
+    { skipPurgeOfWorkspaceId: id },
   );
   const existing = state.workspaces.find((w) => w.id === id);
   if (!existing && state.usage.workspaceCount >= limits.maxWorkspaces) {

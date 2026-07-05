@@ -68,6 +68,11 @@ export async function GET(
       "Content-Type": BUNDLE_CONTENT_TYPE,
       "Content-Length": String(object.size),
       "Cache-Control": "private, no-store",
+      // The payload is user-uploaded bytes served from our origin: force
+      // download semantics and forbid sniffing so a hostile "bundle" can't
+      // be repurposed as hosted content.
+      "Content-Disposition": 'attachment; filename="workspace.bundle.gz"',
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

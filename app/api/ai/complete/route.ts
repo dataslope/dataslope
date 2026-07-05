@@ -29,6 +29,7 @@ import {
 import { estimateTokens } from "@/lib/ai/context";
 import { checkCompletionBudget, recordCompletionUsage, utcDay } from "@/lib/ai/limits";
 import { completeChat } from "@/lib/ai/provider";
+import { isSameOrigin } from "@/lib/workspaces/server";
 import type { AiCompleteAccess, AiCompleteRequest, AiCompleteResponse } from "@/lib/ai/types";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +55,9 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // Cookie-authenticated mutation that spends provider tokens — same
+  // cross-site posture as the shares/workspaces routes.
+  if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
   // --- Auth gate: guests are blocked outright. ---
@@ -138,7 +142,8 @@ export async function POST(request: Request): Promise<Response> {
       },
       { baseUrl: model.baseUrl, apiKey: model.apiKey },
     );
-  } catch {
+  } catch (err) {
+    console.error("ai/complete: provider request failed", err);
     return json({ error: "AI autocomplete is unavailable right now." }, 502);
   } finally {
     clearTimeout(timeout);

@@ -101,6 +101,12 @@ export interface WorkspaceBundle {
   sql?: BundleSqlState;
 }
 
+/** Caps on a bundle's file/tab list. Legit workspaces are far below both;
+ *  a hostile share could otherwise declare unbounded entries and wedge the
+ *  recipient's browser storage when the copy is materialized. */
+export const BUNDLE_MAX_FILES = 200;
+export const BUNDLE_FILENAME_MAX = 512;
+
 /** Structural validation of a decompressed bundle document. Returns `null`
  *  rather than throwing so callers can surface one friendly message. */
 export function validateBundle(value: unknown): WorkspaceBundle | null {
@@ -117,12 +123,14 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
 
   if (kind === "code") {
     if (!Array.isArray(b.files) || b.files.length === 0) return null;
+    if (b.files.length > BUNDLE_MAX_FILES) return null;
     for (const f of b.files as unknown[]) {
       const file = f as Record<string, unknown>;
       if (
         !file ||
         typeof file.filename !== "string" ||
         !file.filename.trim() ||
+        file.filename.length > BUNDLE_FILENAME_MAX ||
         typeof file.content !== "string"
       ) {
         return null;
@@ -135,7 +143,9 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
   if (!sql || typeof sql !== "object") return null;
   if (sql.dialect !== b.playground) return null;
   if (typeof sql.dump !== "string") return null;
-  if (!Array.isArray(sql.tabs)) return null;
+  if (!Array.isArray(sql.tabs) || sql.tabs.length > BUNDLE_MAX_FILES) {
+    return null;
+  }
   for (const t of sql.tabs as unknown[]) {
     const tab = t as Record<string, unknown>;
     if (!tab || typeof tab.title !== "string" || typeof tab.code !== "string") {

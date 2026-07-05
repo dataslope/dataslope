@@ -32,10 +32,9 @@ import {
   shareObjectKey,
 } from "@/lib/workspaces/policy";
 import {
-  checkGuestShareBudget,
   hashIp,
   insertShareRow,
-  recordGuestShare,
+  reserveGuestShare,
   sweepExpiredGuestShares,
   type ShareRow,
 } from "@/lib/workspaces/store";
@@ -98,18 +97,20 @@ export async function POST(request: Request): Promise<Response> {
     : GUEST_SHARE_MAX_BYTES;
 
   // Guest budget gate BEFORE buffering the upload — a rate-limited guest
-  // shouldn't cost a multi-MB body read.
-  let guestMeter: { ipHash: string; day: string } | null = null;
+  // shouldn't cost a multi-MB body read. The reservation is an atomic
+  // check-and-increment, so concurrent requests can't slip past the caps;
+  // a slot is consumed even if the upload later fails (fail-closed).
+  let isGuest = false;
   if (!user) {
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
     const ipHash = await hashIp(ip, env.BETTER_AUTH_SECRET ?? "dataslope");
     const day = utcDay(nowMs);
-    const decision = await checkGuestShareBudget(env, ipHash, day, {
+    const decision = await reserveGuestShare(env, ipHash, day, {
       perIp: GUEST_SHARES_PER_IP_PER_DAY,
       global: GUEST_SHARES_GLOBAL_PER_DAY,
     });
     if (!decision.ok) return json({ error: decision.message }, 429);
-    guestMeter = { ipHash, day };
+    isGuest = true;
   }
 
   const parsed = await readBundleUpload(request, maxItemBytes);
@@ -148,13 +149,10 @@ export async function POST(request: Request): Promise<Response> {
         403,
       );
     }
-  } else if (guestMeter) {
-    // Guest path: fixed link TTL + the daily counters checked above.
+  } else if (isGuest) {
+    // Guest path: fixed link TTL (the daily counters were reserved above).
     expiresAt = guestShareExpiryIso(nowMs);
 
-    const record = recordGuestShare(env, guestMeter.ipHash, guestMeter.day).catch(
-      (err) => console.error("shares: guest counter write failed", err),
-    );
     // Guest shares are the only rows nobody ever lists, so their expired
     // remains are swept here, amortized over new share creations.
     const sweep = sweepExpiredGuestShares(
@@ -162,12 +160,7 @@ export async function POST(request: Request): Promise<Response> {
       bucket,
       new Date(nowMs).toISOString(),
     ).catch((err) => console.error("shares: guest sweep failed", err));
-    if (ctx?.waitUntil) {
-      ctx.waitUntil(record);
-      ctx.waitUntil(sweep);
-    } else {
-      await record;
-    }
+    if (ctx?.waitUntil) ctx.waitUntil(sweep);
   }
 
   const shareId = newShareId();

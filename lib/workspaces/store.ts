@@ -259,37 +259,6 @@ export async function sweepExpiredGuestShares(
 // Usage + expiry partitioning
 // ---------------------------------------------------------------------------
 
-export interface StoredUsage {
-  workspaceCount: number;
-  shareCount: number;
-  bytesUsed: number;
-}
-
-/** Combined footprint of a member's cloud saves + share snapshots (both count
- *  against the plan quota, as documented on the pricing page). */
-export async function usageForUser(
-  env: CloudflareEnv,
-  userId: string,
-): Promise<StoredUsage> {
-  const [ws, sh] = await env.DB.batch<{ c: number; s: number }>([
-    env.DB.prepare(
-      `SELECT COUNT(*) AS c, COALESCE(SUM(size_bytes), 0) AS s
-         FROM cloud_workspaces WHERE user_id = ?`,
-    ).bind(userId),
-    env.DB.prepare(
-      `SELECT COUNT(*) AS c, COALESCE(SUM(size_bytes), 0) AS s
-         FROM playground_shares WHERE user_id = ?`,
-    ).bind(userId),
-  ]);
-  const w = ws.results[0] ?? { c: 0, s: 0 };
-  const s = sh.results[0] ?? { c: 0, s: 0 };
-  return {
-    workspaceCount: w.c,
-    shareCount: s.c,
-    bytesUsed: w.s + s.s,
-  };
-}
-
 /** Splits rows into live vs expired under the read-time retention rule.
  *  Accessors keep this generic over both row shapes (cloud saves have no
  *  fixed expiry column; shares do). */
@@ -337,56 +306,54 @@ export interface GuestBudgetDecision {
   message?: string;
 }
 
-export async function checkGuestShareBudget(
+/** Conditional check-and-increment in one statement: bumps the counter only
+ *  while it is under `limit`, so concurrent requests can't all observe the
+ *  same pre-increment value (the old read-check-then-write pattern let a
+ *  burst blow straight through the cap). A capped request updates nothing
+ *  (RETURNING yields no row), so rejected traffic can't inflate the counter. */
+function reserveCounterStmt(env: CloudflareEnv) {
+  return env.DB.prepare(
+    `INSERT INTO share_usage_daily (scope, day, count) VALUES (?, ?, 1)
+     ON CONFLICT(scope, day) DO UPDATE SET count = count + 1
+       WHERE count < ?
+     RETURNING count`,
+  );
+}
+
+/** Atomically reserves one guest share against the per-IP and global daily
+ *  budgets. The per-IP counter goes first so spam from an already-capped IP
+ *  never touches (and can never exhaust) the shared global counter. */
+export async function reserveGuestShare(
   env: CloudflareEnv,
   ipHash: string,
   day: string,
   limits: { perIp: number; global: number },
 ): Promise<GuestBudgetDecision> {
-  const [ipRes, globalRes] = await env.DB.batch<{ count: number }>([
-    env.DB.prepare(
-      `SELECT count FROM share_usage_daily WHERE scope = ? AND day = ?`,
-    ).bind(`ip:${ipHash}`, day),
-    env.DB.prepare(
-      `SELECT count FROM share_usage_daily WHERE scope = 'global' AND day = ?`,
-    ).bind(day),
-  ]);
-  const ipCount = ipRes.results[0]?.count ?? 0;
-  const globalCount = globalRes.results[0]?.count ?? 0;
-  if (globalCount >= limits.global) {
-    return {
-      ok: false,
-      message:
-        "Sharing is busy right now — please try again tomorrow, or sign in to share without the guest limit.",
-    };
-  }
-  if (ipCount >= limits.perIp) {
+  const ipRes = await reserveCounterStmt(env)
+    .bind(`ip:${ipHash}`, day, limits.perIp)
+    .all<{ count: number }>();
+  if (ipRes.results.length === 0) {
     return {
       ok: false,
       message:
         "You've reached today's guest share limit. Sign in (it's free) to keep sharing.",
     };
   }
-  return { ok: true };
-}
-
-export async function recordGuestShare(
-  env: CloudflareEnv,
-  ipHash: string,
-  day: string,
-): Promise<void> {
-  const upsert = env.DB.prepare(
-    `INSERT INTO share_usage_daily (scope, day, count) VALUES (?, ?, 1)
-     ON CONFLICT(scope, day) DO UPDATE SET count = count + 1`,
-  );
   // Prune counters older than a week in the same round trip — the table
   // stays a few hundred rows without any scheduled job.
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
-  await env.DB.batch([
-    upsert.bind(`ip:${ipHash}`, day),
-    upsert.bind("global", day),
+  const [globalRes] = await env.DB.batch<{ count: number }>([
+    reserveCounterStmt(env).bind("global", day, limits.global),
     env.DB.prepare(`DELETE FROM share_usage_daily WHERE day < ?`).bind(weekAgo),
   ]);
+  if (globalRes.results.length === 0) {
+    return {
+      ok: false,
+      message:
+        "Sharing is busy right now — please try again tomorrow, or sign in to share without the guest limit.",
+    };
+  }
+  return { ok: true };
 }

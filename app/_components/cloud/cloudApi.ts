@@ -48,17 +48,69 @@ export async function gzipBundle(bundle: WorkspaceBundle): Promise<Blob> {
   return new Response(stream).blob();
 }
 
-export async function gunzipBundle(data: Blob): Promise<WorkspaceBundle> {
-  const stream = data.stream().pipeThrough(new DecompressionStream("gzip"));
+/** Upper bound on a bundle's decompressed size. Real bundles are JSON that
+ *  compresses a few-to-20×, so this is far above anything legitimate; the
+ *  server only validates the *compressed* size, and a hostile share could
+ *  otherwise expand a few MB of gzip into multiple GB in the recipient's tab. */
+const MAX_DECOMPRESSED_BYTES = 200 * 1024 * 1024;
+
+export async function gunzipBundle(
+  data: Blob,
+  maxBytes: number = MAX_DECOMPRESSED_BYTES,
+): Promise<WorkspaceBundle> {
+  const reader = data
+    .stream()
+    .pipeThrough(new DecompressionStream("gzip"))
+    .getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        void reader.cancel().catch(() => {});
+        throw new CloudApiError("This bundle is too large to open.", 0);
+      }
+      chunks.push(value);
+    }
+  } catch (err) {
+    if (err instanceof CloudApiError) throw err;
+    throw new CloudApiError("This bundle is corrupted.", 0);
+  }
   let doc: unknown;
   try {
-    doc = JSON.parse(await new Response(stream).text());
+    const bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    doc = JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     throw new CloudApiError("This bundle is corrupted.", 0);
   }
   const bundle = validateBundle(doc);
   if (!bundle) throw new CloudApiError("This bundle is not supported.", 0);
   return bundle;
+}
+
+/** fetch() that rewrites network-level failures (the browser's raw
+ *  "Failed to fetch" / "Load failed") into friendly CloudApiError copy.
+ *  HTTP-level errors are still handled per call site via throwResponseError. */
+async function apiFetch(
+  input: string,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(input, init);
+  } catch {
+    throw new CloudApiError(
+      "Couldn't reach the cloud. Check your connection and try again.",
+      0,
+    );
+  }
 }
 
 async function throwResponseError(res: Response): Promise<never> {
@@ -91,7 +143,7 @@ function bundleForm(bundleBlob: Blob, bundle: WorkspaceBundle): FormData {
 // ---------------------------------------------------------------------------
 
 export async function listCloudWorkspaces(): Promise<CloudWorkspaceList> {
-  const res = await fetch("/api/workspaces");
+  const res = await apiFetch("/api/workspaces");
   if (!res.ok) return throwResponseError(res);
   return (await res.json()) as CloudWorkspaceList;
 }
@@ -101,7 +153,7 @@ export async function saveCloudWorkspace(
   bundle: WorkspaceBundle,
 ): Promise<CloudWorkspaceMeta> {
   const blob = await gzipBundle(bundle);
-  const res = await fetch(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
+  const res = await apiFetch(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
     method: "PUT",
     body: bundleForm(blob, bundle),
   });
@@ -113,7 +165,7 @@ export async function saveCloudWorkspace(
 export async function fetchCloudWorkspaceBundle(
   workspaceId: string,
 ): Promise<WorkspaceBundle> {
-  const res = await fetch(
+  const res = await apiFetch(
     `/api/workspaces/${encodeURIComponent(workspaceId)}/bundle`,
   );
   if (!res.ok) return throwResponseError(res);
@@ -121,7 +173,7 @@ export async function fetchCloudWorkspaceBundle(
 }
 
 export async function deleteCloudWorkspace(workspaceId: string): Promise<void> {
-  const res = await fetch(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
+  const res = await apiFetch(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
     method: "DELETE",
   });
   if (!res.ok) return throwResponseError(res);
@@ -135,7 +187,7 @@ export async function createShare(
   bundle: WorkspaceBundle,
 ): Promise<CreateShareResponse> {
   const blob = await gzipBundle(bundle);
-  const res = await fetch("/api/shares", {
+  const res = await apiFetch("/api/shares", {
     method: "POST",
     body: bundleForm(blob, bundle),
   });
@@ -147,7 +199,7 @@ export async function listShares(): Promise<{
   shares: ShareMeta[];
   usage: CloudUsage;
 }> {
-  const res = await fetch("/api/shares");
+  const res = await apiFetch("/api/shares");
   if (!res.ok) return throwResponseError(res);
   return (await res.json()) as { shares: ShareMeta[]; usage: CloudUsage };
 }
@@ -155,7 +207,7 @@ export async function listShares(): Promise<{
 export async function fetchShareBundle(
   shareId: string,
 ): Promise<WorkspaceBundle> {
-  const res = await fetch(
+  const res = await apiFetch(
     `/api/shares/${encodeURIComponent(shareId)}/bundle`,
   );
   if (!res.ok) return throwResponseError(res);
@@ -163,7 +215,7 @@ export async function fetchShareBundle(
 }
 
 export async function revokeShare(shareId: string): Promise<void> {
-  const res = await fetch(`/api/shares/${encodeURIComponent(shareId)}`, {
+  const res = await apiFetch(`/api/shares/${encodeURIComponent(shareId)}`, {
     method: "DELETE",
   });
   if (!res.ok) return throwResponseError(res);
