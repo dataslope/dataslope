@@ -66,20 +66,6 @@ const nextConfig: NextConfig = {
       },
     ],
   }),
-  // The routes moved in #558 (/learn → /courses, /interview → /interview-prep)
-  // right after ~800 of the old URLs were deliberately indexed; SERP clicks
-  // and bookmarks were hard-404ing. Slugs moved 1:1, so cheap temporary
-  // redirects (307) carry traffic through the indexing-decay window.
-  redirects: async () => [
-    { source: "/learn", destination: "/courses", permanent: false },
-    { source: "/learn/:path*", destination: "/courses/:path*", permanent: false },
-    { source: "/interview", destination: "/interview-prep", permanent: false },
-    {
-      source: "/interview/:path*",
-      destination: "/interview-prep/:path*",
-      permanent: false,
-    },
-  ],
 };
 
 const withMDX = createMDX();
