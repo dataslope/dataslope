@@ -23,7 +23,7 @@ skills in applied statistics.
   aria-label="A well-mixed field of blue and green dots is sampled by a yellow scoop that covers only one green-heavy corner, filling the tray with an unbalanced handful whose red estimate lands away from the yellow truth mark — a biased scoop stays wrong no matter how much it scoops"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="40" y="24" width="400" height="176" rx="16" fill="currentColor" opacity="0.05" />
+  <rect x="40" y="24" width="400" height="176" rx="16" fill="var(--ds-blue-500)" fillOpacity="0.06" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.75">
     <circle cx="70" cy="50" r="4" />
     <circle cx="130" cy="40" r="4" />
@@ -63,14 +63,13 @@ skills in applied statistics.
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="128" cy="158" r="52" fillOpacity="0.14" />
-    <path d="M76 158 a52 52 0 1 0 104 0 a52 52 0 1 0 -104 0 M82 158 a46 46 0 1 0 92 0 a46 46 0 1 0 -92 0" fillRule="evenodd" fillOpacity="0.7" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="450" cy="112" r="2.5" />
-    <circle cx="464" cy="112" r="2.5" />
-    <circle cx="478" cy="112" r="2.5" />
+  <circle cx="128" cy="158" r="49" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="6" />
+  <g fill="var(--ds-gray-500)">
+    <rect x="448" y="110" width="26" height="4" rx="2" />
+    <polygon points="472,103 472,121 488,112" />
   </g>
-  <rect x="490" y="70" width="110" height="86" rx="14" fill="currentColor" opacity="0.06" />
+  <rect x="490" y="70" width="110" height="86" rx="14" fill="var(--ds-blue-500)" fillOpacity="0.08" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="515" cy="96" r="5" />
     <circle cx="545" cy="96" r="5" />
@@ -81,7 +80,7 @@ skills in applied statistics.
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="515" cy="126" r="5" />
   </g>
-  <rect x="490" y="176" width="110" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <rect x="490" y="176" width="110" height="3" rx="1.5" fill="var(--ds-gray-400)" />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="543" y="168" width="4" height="20" rx="2" />
   </g>
@@ -331,11 +330,11 @@ instinct for bias.
   aria-label="Two dartboards: on the left a loose blue cluster centered on the yellow bullseye, on the right a tight red cluster parked stubbornly away from it — noisy but honest beats consistent but wrong, because more darts tighten a cluster yet never move its center"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <circle cx="180" cy="115" r="62" opacity="0.07" />
-    <circle cx="180" cy="115" r="40" opacity="0.1" />
-    <circle cx="460" cy="115" r="62" opacity="0.07" />
-    <circle cx="460" cy="115" r="40" opacity="0.1" />
+  <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5">
+    <circle cx="180" cy="115" r="62" />
+    <circle cx="180" cy="115" r="40" />
+    <circle cx="460" cy="115" r="62" />
+    <circle cx="460" cy="115" r="40" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="180" cy="115" r="9" />
@@ -357,11 +356,6 @@ instinct for bias.
     <circle cx="506" cy="72" r="5" />
     <circle cx="500" cy="80" r="5" />
     <circle cx="488" cy="84" r="5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="470" cy="105" r="2" />
-    <circle cx="479" cy="97" r="2" />
-    <circle cx="488" cy="90" r="2" />
   </g>
 </svg>
 
@@ -524,9 +518,7 @@ interviewed. Any time your dataset is "the ones still here," ask what the
     <circle cx="296" cy="190" r="4" />
     <circle cx="346" cy="190" r="4" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M292 58 a28 28 0 1 0 56 0 a28 28 0 1 0 -56 0 M299 58 a21 21 0 1 0 42 0 a21 21 0 1 0 -42 0" fillRule="evenodd" fillOpacity="0.75" />
-  </g>
+  <circle cx="320" cy="58" r="25" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="6" />
 </svg>
 
 <CodeBlock
