@@ -196,34 +196,29 @@ classic, silent analytical bug.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Dots flow along a lane toward a yellow filter gate, but a dotted bypass arc carries red dots up and over the gate back into the output — an ungrouped OR quietly lets rows skip the filter"
+  aria-label="Gray rows flow along a lane toward a yellow filter gate and come out green, but a solid red bypass arc jumps one row up and over the gate straight into the output — an ungrouped OR quietly lets rows skip the filter"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.08">
-    <rect x="40" y="98" width="560" height="30" rx="15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="40" y="98" width="560" height="30" rx="15" fillOpacity="0.08" />
   </g>
-  <g fill="currentColor" opacity="0.35">
+  <g fill="var(--ds-gray-500)">
     <circle cx="80" cy="113" r="6" />
     <circle cx="124" cy="113" r="6" />
     <circle cx="168" cy="113" r="6" />
     <circle cx="212" cy="113" r="6" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="296" y="78" width="14" height="30" rx="5" />
-    <rect x="296" y="118" width="14" height="30" rx="5" />
+    <rect x="296" y="74" width="12" height="32" rx="5" />
+    <rect x="296" y="120" width="12" height="32" rx="5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="372" cy="113" r="6" />
     <circle cx="420" cy="113" r="6" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="248" cy="92" r="4" fillOpacity="0.5" />
-    <circle cx="268" cy="64" r="4" fillOpacity="0.65" />
-    <circle cx="298" cy="44" r="4" fillOpacity="0.8" />
-    <circle cx="334" cy="50" r="4" fillOpacity="0.9" />
-    <circle cx="362" cy="72" r="4" />
-    <circle cx="382" cy="96" r="4" />
-    <circle cx="468" cy="113" r="6" />
+    <path d="M 240 100 C 280 30 430 30 470 90" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    <polygon points="462,88 478,84 472,104" />
     <circle cx="516" cy="113" r="6" />
   </g>
 </svg>
