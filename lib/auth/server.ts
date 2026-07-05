@@ -39,6 +39,44 @@ export function parseList(raw: string | undefined): string[] {
 }
 
 /**
+ * Domain attribute for the OAuth `state` cookie, derived from BETTER_AUTH_URL.
+ *
+ * Why it exists: a social sign-in spans two requests — the sign-in POST sets a
+ * signed one-time `state` cookie, then the provider redirects back to the
+ * callback, which requires that cookie (Better Auth's login-CSRF check). By
+ * default the cookie is host-only, while the callback always lands on the
+ * BETTER_AUTH_URL host because the OAuth redirect_uri is pinned to it. Both
+ * dataslope.com and www.dataslope.com serve this app with no canonical
+ * redirect, so a sign-in started on www set its cookie on www, Google returned
+ * to the apex where the cookie doesn't exist, and the callback failed with
+ * `?error=state_mismatch` — reproducibly, on every first attempt from www. The
+ * failure redirect lands on the apex /sign-in, which is why *retrying* always
+ * worked. Scoping the state cookie to the registrable domain (`Domain=
+ * dataslope.com` covers the apex and every subdomain) lets a flow started on
+ * any *.dataslope.com host complete on the apex callback. Session cookies are
+ * deliberately left host-only — this widens only the short-lived random nonce.
+ *
+ * Returns undefined (host-only cookie, today's behavior) when BETTER_AUTH_URL
+ * is unset or its host is not a dotted DNS name: browsers reject a Domain
+ * attribute they can't tail-match against the request host (localhost, IP
+ * literals), which would drop the cookie entirely and break sign-in outright.
+ */
+export function oauthStateCookieDomain(
+  baseURL: string | undefined,
+): string | undefined {
+  if (!baseURL) return undefined;
+  let hostname: string;
+  try {
+    hostname = new URL(baseURL).hostname;
+  } catch {
+    return undefined;
+  }
+  if (!hostname.includes(".") || hostname.startsWith("[")) return undefined;
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return undefined;
+  return hostname;
+}
+
+/**
  * Resolve who is an admin for this request. Two config sources, which merge —
  * both grant admin regardless of the `role` column, which solves the bootstrap
  * problem (there's no admin to promote the first one yet):
@@ -137,6 +175,8 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
 
   const adminUserIdsResolved = await resolveAdminUserIds(env, request);
 
+  const stateCookieDomain = oauthStateCookieDomain(env.BETTER_AUTH_URL);
+
   return betterAuth({
     // D1 via the Kysely SQLite dialect — the most Cloudflare-native path, with
     // full ownership of the tables (schema in /migrations). One dialect per
@@ -216,6 +256,31 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
         }
       : undefined,
     socialProviders,
+    // Fix for the "first Google sign-in fails with ?error=state_mismatch,
+    // clicking again works" loop. Two hardenings of the one-time OAuth `state`
+    // cookie, which the callback demands back (see oauthStateCookieDomain):
+    //
+    //   - `domain`: scope it to the registrable domain instead of host-only,
+    //     so a flow started on www.dataslope.com survives Google returning to
+    //     the pinned apex callback. (workers.dev previews still can't complete
+    //     social login — Google only redirects to the registered production
+    //     URI, and no cookie scope spans workers.dev → dataslope.com.)
+    //   - `maxAge`: Better Auth sets the cookie to 5 minutes but honours the
+    //     server-side state for 10 — someone who sits on Google's account
+    //     chooser for 6 minutes would fail the cookie check with the same
+    //     stale-attempt error. Align the cookie with the 10-minute window.
+    //
+    // Only the `state` cookie is touched; session cookies keep their defaults.
+    advanced: {
+      cookies: {
+        state: {
+          attributes: {
+            ...(stateCookieDomain ? { domain: stateCookieDomain } : {}),
+            maxAge: 600,
+          },
+        },
+      },
+    },
     // Membership tier, surfaced on the session so the "Ask AI" endpoint can
     // pick the model by plan (free → cheaper OpenRouter model; pro → OpenAI).
     // Backed by the `plan` column added in migrations/0003. `input: false` means
