@@ -20,11 +20,11 @@ wobbles every time you collect new data. Let's pin them down.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A vast faint dot field hides a yellow ring at its heart while nine scattered dots glow blue; the same nine reappear gathered in a small tray whose green summary dot is the only number you can actually compute — a sample statistic estimating a population parameter you never see"
+  aria-label="A vast field of gray dots hides a yellow ring at its heart while nine scattered dots glow blue; past a solid arrow the same nine reappear in a small tray whose green summary dot is the only number you can actually compute — a sample statistic estimating a population parameter you never see"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="36" y="22" width="380" height="186" rx="18" fill="currentColor" opacity="0.05" />
-  <g fill="currentColor" opacity="0.3">
+  <rect x="36" y="22" width="380" height="186" rx="18" fill="var(--ds-blue-500)" fillOpacity="0.06" />
+  <g fill="var(--ds-gray-400)">
     <circle cx="60" cy="50" r="3.5" />
     <circle cx="92" cy="38" r="3.5" />
     <circle cx="124" cy="56" r="3.5" />
@@ -89,10 +89,9 @@ wobbles every time you collect new data. Let's pin them down.
     <circle cx="330" cy="168" r="4.5" />
     <circle cx="212" cy="170" r="4.5" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="430" cy="100" r="2.5" />
-    <circle cx="447" cy="106" r="2.5" />
-    <circle cx="463" cy="112" r="2.5" />
+  <g fill="var(--ds-gray-500)">
+    <rect x="424" y="102" width="28" height="4" rx="2" />
+    <polygon points="450,95 450,113 468,104" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="478" y="66" width="124" height="98" rx="14" fillOpacity="0.1" />
@@ -171,8 +170,8 @@ pointless:
   aria-label="A shelf of identical batteries, two of them snapped in half by lifetime testing with a small yellow data spark above each — when measurement destroys the unit, you can only ever test a sample, never the whole shipment"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="132" width="500" height="5" rx="2.5" fill="currentColor" opacity="0.18" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.55">
+  <rect x="60" y="132" width="500" height="3" rx="1.5" fill="var(--ds-gray-400)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.6">
     <rect x="90" y="56" width="14" height="6" rx="2" />
     <rect x="80" y="62" width="34" height="64" rx="6" />
     <rect x="150" y="56" width="14" height="6" rx="2" />
@@ -186,7 +185,7 @@ pointless:
     <rect x="510" y="56" width="14" height="6" rx="2" />
     <rect x="500" y="62" width="34" height="64" rx="6" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.8">
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <rect x="210" y="56" width="14" height="6" rx="2" />
     <rect x="200" y="62" width="34" height="26" rx="6" />
     <rect x="208" y="98" width="34" height="28" rx="6" />
