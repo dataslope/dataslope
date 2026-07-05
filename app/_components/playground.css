@@ -4044,9 +4044,6 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-badge-dot.fresh {
   background: var(--green);
 }
-.workspace-badge-dot.stale {
-  background: var(--yellow);
-}
 
 /* Save menu trigger — sits next to the badge on every playground. Accent-
    filled while the active workspace is an unsaved draft with changes (the
@@ -4241,9 +4238,9 @@ html[data-playground-theme="dark"] .welcome h3 {
   gap: 3px;
   color: var(--text-dim);
 }
-.workspace-cloud-status.stale {
-  color: var(--yellow);
-}
+/* "Opened since" is informational, not a warning: the registry tracks opens,
+   not edits, so coloring it amber false-alarmed on every reopen. The .stale
+   class stays on the markup as a semantic hook. */
 
 /* Backup strip between the workspace list and the New/Manage footer:
    one "Back up" action for the active workspace plus its status, the
@@ -4294,9 +4291,6 @@ html[data-playground-theme="dark"] .welcome h3 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.workspace-popover-backup-status.stale {
-  color: var(--yellow);
 }
 .workspace-popover-usage {
   font-size: 11px;

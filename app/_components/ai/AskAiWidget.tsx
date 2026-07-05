@@ -40,6 +40,7 @@ import { useSession } from "@/lib/auth/client";
 import type { AskAiClientContext, AskAiSurface } from "@/lib/ai/types";
 import { useAskAi } from "./useAskAi";
 import { useSuggestedQuestions } from "./useSuggestedQuestions";
+import { countSchemaEntities } from "./sqlSchemaText";
 import {
   collectAskAiWidgets,
   findAskAiSourceLabelFor,
@@ -52,6 +53,10 @@ import styles from "./AskAiPanel.module.css";
 
 interface Props {
   surface: AskAiSurface;
+  /** What the user is looking at, for display copy only — "lesson" on course
+   *  pages, "question set" on interview-prep (which mounts as surface
+   *  "learn" but isn't a lesson), "playground" elsewhere. */
+  subjectNoun?: string;
   collectContext: () => AskAiClientContext;
 }
 
@@ -133,7 +138,13 @@ function ContextItem({
   );
 }
 
-export default function AskAiWidget({ surface, collectContext }: Props) {
+export default function AskAiWidget({
+  surface,
+  subjectNoun,
+  collectContext,
+}: Props) {
+  const subject =
+    subjectNoun ?? (surface === "learn" ? "lesson" : "playground");
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const { data: session, isPending } = useSession();
@@ -328,7 +339,7 @@ export default function AskAiWidget({ surface, collectContext }: Props) {
         {!signedIn ? (
           <div className={styles.signedOut}>
             <Sparkles size={22} />
-            <p>Sign in to ask AI about this {surface === "learn" ? "lesson" : "playground"}.</p>
+            <p>Sign in to ask AI about this {subject}.</p>
             <a className={styles.signInLink} href="/sign-in">
               <LogIn size={15} />
               Sign in
@@ -337,7 +348,15 @@ export default function AskAiWidget({ surface, collectContext }: Props) {
         ) : messages.length === 0 ? (
           <div className={styles.emptyWrap}>
             <div className={styles.empty}>
-              Ask about the {surface === "learn" ? "lesson, a code block, or a question" : "code, an error, or the language"} — I can see what&apos;s on your screen. Highlight text on the page to ask about it, or pin a card below to reference it directly.
+              Ask about the{" "}
+              {subject === "question set"
+                ? "questions on screen, your answer, or the underlying concept"
+                : surface === "learn"
+                  ? "lesson, a code block, or a question"
+                  : "code, an error, or the language"}{" "}
+              — I can see what&apos;s on your screen. Highlight text on the
+              page to ask about it, or pin a card below to reference it
+              directly.
             </div>
             <SuggestionList
               suggestions={suggestions}
@@ -410,7 +429,7 @@ export default function AskAiWidget({ surface, collectContext }: Props) {
                 {contextPreview.schema && (
                   <ContextItem icon={Database}>
                     Database schema (
-                    {contextPreview.schema.trim().split("\n").length} tables/views)
+                    {countSchemaEntities(contextPreview.schema)} tables/views)
                   </ContextItem>
                 )}
                 {(contextPreview.widgets ?? []).map((w, i) => {

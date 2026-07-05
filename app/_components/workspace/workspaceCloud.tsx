@@ -70,6 +70,11 @@ export function useCloudBackups(
   // Cloud storage not configured on the server (503) — treat exactly like an
   // unsupported browser and render no cloud UI at all.
   const [unavailable, setUnavailable] = useState(false);
+  // Server said 401 while the *client* session cookie still looks valid
+  // (expired/revoked server-side). The client session alone would keep
+  // `signedOut` false, leaving the menu on "Checking backups…" forever —
+  // this flag forces the sign-in row instead.
+  const [authLost, setAuthLost] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -77,9 +82,11 @@ export function useCloudBackups(
       setItems(res.workspaces);
       setUsage(res.usage);
       setError(null);
+      setAuthLost(false);
     } catch (err) {
       if (err instanceof CloudApiError && err.status === 401) {
         setItems(null); // session expired mid-flight — fall back to signed-out
+        setAuthLost(true);
       } else if (err instanceof CloudApiError && err.status === 503) {
         setUnavailable(true);
       } else {
@@ -112,7 +119,7 @@ export function useCloudBackups(
 
   return {
     available: !unavailable && isCloudSupported(),
-    signedOut: !isPending && !session,
+    signedOut: (!isPending && !session) || authLost,
     metas,
     loaded: items !== null,
     usage,
