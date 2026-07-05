@@ -44,12 +44,13 @@ import { structure } from "fumadocs-core/mdx-plugins";
 import remarkMdx from "remark-mdx";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-// Indexed sections: content directory → URL base. Courses and the dev-only
-// component gallery both render the Fumadocs search dialog, so both are
-// indexed (the dev pages were part of the old content/learn tree too).
+// Indexed sections: content directory → URL base. Courses only: the
+// dev-only /fumadocs-dev gallery is noindex + robots-disallowed, and
+// indexing it here leaked internal component-demo pages into the
+// learner-facing course search dialog. Its own search finding nothing is
+// an acceptable trade for a dev page.
 const SECTIONS = [
   { dir: join(ROOT, "content", "courses"), base: "/courses" },
-  { dir: join(ROOT, "content", "fumadocs-dev"), base: "/fumadocs-dev" },
 ];
 const OUT_FILE = join(ROOT, "lib", "generated", "search-index.js");
 

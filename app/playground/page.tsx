@@ -106,7 +106,7 @@ const CARDS: CardEntry[] = [
     id: "postgres",
     href: "/playground/postgres",
     title: "PostgreSQL",
-    desc: "Preview the mocked Postgres playground shell.",
+    desc: "Run PostgreSQL queries in the browser via PGlite.",
   },
   {
     id: "duckdb",
@@ -160,6 +160,11 @@ export default function Home() {
             </li>
           ))}
         </ul>
+        <nav aria-label="Site" className={styles.siteLinks}>
+          <Link href="/">Dataslope home</Link>
+          <Link href="/courses">Free courses</Link>
+          <Link href="/pricing">Pricing</Link>
+        </nav>
       </div>
     </main>
   );

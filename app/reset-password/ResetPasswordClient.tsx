@@ -98,7 +98,10 @@ export function ResetPasswordClient() {
         <button
           type="button"
           onClick={() => {
-            router.push("/sign-in");
+            // Deep-link straight into the "Reset your password" form —
+            // landing on the sign-in tab would make the user rediscover
+            // "Forgot password?" themselves.
+            router.push("/sign-in?mode=forgot");
             router.refresh();
           }}
           className={styles.primary}
@@ -143,6 +146,7 @@ export function ResetPasswordClient() {
         <div>
           <div className={styles.field}>
             <input
+              id="reset-password"
               type={showPw ? "text" : "password"}
               required
               minLength={MIN_PASSWORD}
@@ -151,9 +155,12 @@ export function ResetPasswordClient() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={submitting}
+              aria-describedby="reset-password-hint"
               className={`${styles.input} ${styles.inputPw}`}
             />
-            <label className={styles.label}>New password</label>
+            <label htmlFor="reset-password" className={styles.label}>
+              New password
+            </label>
             <button
               type="button"
               onClick={() => setShowPw((s) => !s)}
@@ -164,7 +171,10 @@ export function ResetPasswordClient() {
             </button>
           </div>
           <div className={styles.pwRow}>
-            <span className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}>
+            <span
+              id="reset-password-hint"
+              className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
+            >
               {pwOk ? "Strong enough — looks good." : "At least 8 characters."}
             </span>
           </div>
@@ -172,6 +182,7 @@ export function ResetPasswordClient() {
 
         <div className={`${styles.field} ${mismatch ? styles.fieldError : ""}`}>
           <input
+            id="reset-confirm"
             type={showPw ? "text" : "password"}
             required
             minLength={MIN_PASSWORD}
@@ -181,11 +192,17 @@ export function ResetPasswordClient() {
             onChange={(e) => setConfirm(e.target.value)}
             onBlur={() => setConfirmTouched(true)}
             disabled={submitting}
+            aria-invalid={mismatch || undefined}
+            aria-describedby={mismatch ? "reset-confirm-error" : undefined}
             className={styles.input}
           />
-          <label className={styles.label}>Confirm new password</label>
+          <label htmlFor="reset-confirm" className={styles.label}>
+            Confirm new password
+          </label>
           {mismatch && (
-            <p className={styles.errorText}>Passwords don&apos;t match</p>
+            <p id="reset-confirm-error" className={styles.errorText}>
+              Passwords don&apos;t match
+            </p>
           )}
         </div>
 

@@ -62,6 +62,12 @@ export function HomeClient({
               stops the marquee / ripple / shimmer CSS loops once the hero is
               scrolled out of view. ── */}
           <section className="px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
+            {/* The visible "heading" is the animated marquee; give screen
+                readers and the document outline a real h1 instead. */}
+            <h1 className="sr-only">
+              Dataslope — learn Python, SQL, R, JavaScript and more in your
+              browser
+            </h1>
             <AnimationPauseGate>
               <BlurFade delay={0.05}>
                 <HeroMarquee />
@@ -71,13 +77,13 @@ export function HomeClient({
                   demo below. */}
               <BlurFade delay={0.12}>
                 <p className="mx-auto mt-8 max-w-2xl text-center text-lg text-[var(--ds-gray-600)] [text-wrap:pretty] sm:text-xl dark:text-[var(--ds-gray-300)]">
-                  Dataslope is a{" "}
+                  Dataslope is a platform to learn programming and prep for
+                  coding interviews — every course and playground is{" "}
                   <span className="font-semibold text-[var(--ds-gray-900)] dark:text-white">
                     100% free
-                  </span>{" "}
-                  platform to learn programming and prep for coding interviews —
-                  interactive courses and language playgrounds that run entirely
-                  in your browser, no sign-up required.
+                  </span>
+                  , interactive, and runs entirely in your browser, no sign-up
+                  required.
                 </p>
               </BlurFade>
               <BlurFade delay={0.18}>
@@ -91,10 +97,10 @@ export function HomeClient({
           {/* ── Animated beam ── */}
           <section className="px-4 py-16 sm:px-6">
             <SectionHeading
-              title="11 languages, one browser tab"
+              title="12 playgrounds, one browser tab"
               subtitle={
                 <>
-                  Python, R, Javascript, Typescript, PHP, C, C++, Java, C#,
+                  Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,
                   SQLite, Postgres, and DuckDB —{" "}
                   <Highlighter action="underline" color={underlineColor} isView>
                     free

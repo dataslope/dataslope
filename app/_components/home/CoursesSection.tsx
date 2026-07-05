@@ -32,7 +32,7 @@ const MIN_TOPIC_COURSES = 3;
 const MAX_TOPICS = 6;
 
 export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
-  // null = the default "Most popular" view.
+  // null = the default "Recommended" view.
   const [topic, setTopic] = useState<string | null>(null);
 
   // Topic buttons: domains with enough courses to be worth a filter, most
@@ -82,7 +82,9 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
         </p>
       </div>
 
-      {/* Topic buttons: "Most popular" (default) + the biggest domains. */}
+      {/* Topic buttons: "Recommended" (default) + the biggest domains. The
+          default is a hand-curated ranking (lib/courseCatalog.ts), so it is
+          not labelled "Most popular" — there are no usage analytics yet. */}
       <div className="mb-4 flex flex-wrap justify-center gap-2">
         <button
           type="button"
@@ -90,7 +92,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
           aria-pressed={topic === null}
           className={`${pillBase} ${topic === null ? pillActive : pillIdle}`}
         >
-          Most popular
+          Recommended
         </button>
         {topics.map((d) => (
           <button
