@@ -19,49 +19,28 @@ depends on it, so read it whenever the topic matters to you.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three colored stations sit on a dotted loop that can be run lap after lap, and every lap drops one more identical green chip onto the stack at the right — a reproducible workflow returns the same answer every time it runs"
+  aria-label="Three colored station dots ride a thin loop whose gray arrowhead marks the direction of travel, and a geometric equals sign points to a stack of three identical green result chips — a reproducible workflow returns the same answer every lap"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="240" cy="38" r="3" />
-    <circle cx="277" cy="48" r="3" />
-    <circle cx="303" cy="74" r="3" />
-    <circle cx="312" cy="110" r="3" />
-    <circle cx="303" cy="146" r="3" />
-    <circle cx="277" cy="172" r="3" />
-    <circle cx="240" cy="182" r="3" />
-    <circle cx="203" cy="172" r="3" />
-    <circle cx="177" cy="146" r="3" />
-    <circle cx="168" cy="110" r="3" />
-    <circle cx="177" cy="74" r="3" />
-    <circle cx="203" cy="48" r="3" />
-  </g>
+  <circle cx="240" cy="110" r="72" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
+  <polygon points="304,102 320,102 312,122" fill="var(--ds-gray-500)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="240" cy="38" r="12" />
   </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="182" cy="156" r="12" />
+  </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="303" cy="146" r="12" />
+    <circle cx="298" cy="156" r="12" />
+  </g>
+  <g fill="var(--ds-gray-500)">
+    <rect x="372" y="100" width="28" height="5" rx="2.5" />
+    <rect x="372" y="112" width="28" height="5" rx="2.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="177" cy="146" r="12" />
-  </g>
-  <g fill="currentColor" opacity="0.22">
-    <circle cx="352" cy="110" r="2.5" />
-    <circle cx="374" cy="110" r="2.5" />
-    <circle cx="396" cy="110" r="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.4">
-    <text x="424" y="118" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" textAnchor="middle">=</text>
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="452" y="62" width="116" height="20" rx="10" fillOpacity="0.85" />
-    <rect x="452" y="100" width="116" height="20" rx="10" fillOpacity="0.85" />
-    <rect x="452" y="138" width="116" height="20" rx="10" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <circle cx="84" cy="60" r="3" />
-    <circle cx="64" cy="160" r="3" />
-    <circle cx="600" cy="190" r="3" />
+    <rect x="436" y="62" width="132" height="20" rx="10" />
+    <rect x="436" y="100" width="132" height="20" rx="10" />
+    <rect x="436" y="138" width="132" height="20" rx="10" />
   </g>
 </svg>
 
@@ -215,34 +194,28 @@ query follows.
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Three readers draw from one yellow named definition along dotted rays, while below two faded copy-pasted chips have already drifted out of line — a view keeps everyone computing the same metric"
+  aria-label="Three blue readers draw from one yellow named definition along thin solid lines, while below two gray copy-pasted chips have drifted out of line under a red slash — a view keeps everyone computing the same metric"
   style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="214" y1="66" x2="360" y2="28" />
+    <line x1="214" y1="66" x2="368" y2="66" />
+    <line x1="214" y1="66" x2="360" y2="104" />
+  </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="86" y="48" width="128" height="36" rx="18" />
-  </g>
-  <g fill="currentColor" opacity="0.22">
-    <circle cx="248" cy="46" r="2.5" />
-    <circle cx="286" cy="36" r="2.5" />
-    <circle cx="324" cy="30" r="2.5" />
-    <circle cx="248" cy="66" r="2.5" />
-    <circle cx="290" cy="66" r="2.5" />
-    <circle cx="332" cy="66" r="2.5" />
-    <circle cx="248" cy="86" r="2.5" />
-    <circle cx="286" cy="96" r="2.5" />
-    <circle cx="324" cy="102" r="2.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="372" cy="28" r="11" />
     <circle cx="380" cy="66" r="11" />
     <circle cx="372" cy="104" r="11" />
   </g>
-  <g fill="currentColor" opacity="0.14">
+  <g fill="var(--ds-gray-300)">
     <rect x="118" y="128" width="84" height="16" rx="8" />
-    <rect x="232" y="138" width="84" height="16" rx="8" />
+    <rect x="232" y="140" width="84" height="16" rx="8" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="206" y="124" width="34" height="6" rx="3" fillOpacity="0.6" />
+    <rect x="206" y="130" width="34" height="6" rx="3" transform="rotate(14 223 133)" />
   </g>
 </svg>
 
