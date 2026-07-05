@@ -17,36 +17,27 @@ increases?" is the question.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Ordered observations joined into one continuous ribbon, with one segment highlighted and a yellow interpolated point dropping a dotted line to the axis — the connection promises the space between points is meaningful"
+  aria-label="An ordered series joined into one continuous blue line inside a translucent confidence band, drawn over thin gray axes — the connection promises the space between points is meaningful"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="80" y="172" width="480" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
-  <g fill="currentColor" opacity="0.3">
-    <rect x="108" y="181" width="3" height="8" rx="1.5" />
-    <rect x="188" y="181" width="3" height="8" rx="1.5" />
-    <rect x="268" y="181" width="3" height="8" rx="1.5" />
-    <rect x="348" y="181" width="3" height="8" rx="1.5" />
-    <rect x="428" y="181" width="3" height="8" rx="1.5" />
-    <rect x="518" y="181" width="3" height="8" rx="1.5" />
+  <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
+    <line x1="84" y1="40" x2="84" y2="176" />
+    <line x1="84" y1="176" x2="556" y2="176" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="110,150 190,95 270,125 350,70 430,95 520,45 520,51 430,101 350,76 270,131 190,101 110,156" fillOpacity="0.55" />
-    <circle cx="110" cy="153" r="5.5" />
-    <circle cx="190" cy="98" r="5.5" />
-    <circle cx="270" cy="128" r="5.5" />
-    <circle cx="350" cy="73" r="5.5" />
-    <circle cx="430" cy="98" r="5.5" />
-    <circle cx="520" cy="48" r="5.5" />
+    <polygon
+      points="100,134 180,94 260,110 340,68 420,80 520,40 520,72 420,112 340,100 260,142 180,126 100,166"
+      fillOpacity="0.15"
+    />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="350,70 430,95 430,101 350,76" />
-    <circle cx="390" cy="86" r="5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="390" cy="112" r="3" />
-    <circle cx="390" cy="134" r="3" />
-    <circle cx="390" cy="156" r="3" />
-  </g>
+  <polyline
+    points="100,150 180,110 260,126 340,84 420,96 520,56"
+    fill="none"
+    stroke="var(--ds-blue-500)"
+    strokeWidth="3.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
 </svg>
 
 ## What a line plot needs and shows
