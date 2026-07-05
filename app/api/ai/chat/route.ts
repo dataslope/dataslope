@@ -22,6 +22,7 @@ import {
 } from "@/lib/ai/context";
 import { checkBudget, recordUsage, utcDay } from "@/lib/ai/limits";
 import { streamChat } from "@/lib/ai/provider";
+import { isSameOrigin } from "@/lib/workspaces/server";
 import type { AskAiRequest, AskAiStreamEvent } from "@/lib/ai/types";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,9 @@ function json(data: unknown, status = 200): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // Cookie-authenticated mutation that spends provider tokens — same
+  // cross-site posture as the shares/workspaces routes.
+  if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
   // --- Auth gate: Ask AI is an action, so it requires a session. ---
@@ -106,7 +110,8 @@ export async function POST(request: Request): Promise<Response> {
       },
       { baseUrl: model.baseUrl, apiKey: model.apiKey },
     );
-  } catch {
+  } catch (err) {
+    console.error("ai/chat: provider request failed", err);
     return json({ error: "The assistant is unavailable right now." }, 502);
   }
 
@@ -122,6 +127,25 @@ export async function POST(request: Request): Promise<Response> {
     async start(controller) {
       const emit = (event: AskAiStreamEvent) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+      const handleLine = (line: string) => {
+        if (!line.startsWith("data:")) return;
+        const data = line.slice(5).trim();
+        if (!data || data === "[DONE]") return;
+        try {
+          const parsed = JSON.parse(data);
+          const delta: unknown = parsed?.choices?.[0]?.delta?.content;
+          if (typeof delta === "string" && delta.length) {
+            answer += delta;
+            emit({ type: "delta", text: delta });
+          }
+          if (parsed?.usage) {
+            usageIn = parsed.usage.prompt_tokens ?? usageIn;
+            usageOut = parsed.usage.completion_tokens ?? usageOut;
+          }
+        } catch {
+          // keepalive / partial JSON line — ignore.
+        }
+      };
       const reader = upstream.getReader();
       try {
         for (;;) {
@@ -133,25 +157,14 @@ export async function POST(request: Request): Promise<Response> {
           while ((nl = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, nl).trim();
             buffer = buffer.slice(nl + 1);
-            if (!line.startsWith("data:")) continue;
-            const data = line.slice(5).trim();
-            if (!data || data === "[DONE]") continue;
-            try {
-              const parsed = JSON.parse(data);
-              const delta: unknown = parsed?.choices?.[0]?.delta?.content;
-              if (typeof delta === "string" && delta.length) {
-                answer += delta;
-                emit({ type: "delta", text: delta });
-              }
-              if (parsed?.usage) {
-                usageIn = parsed.usage.prompt_tokens ?? usageIn;
-                usageOut = parsed.usage.completion_tokens ?? usageOut;
-              }
-            } catch {
-              // keepalive / partial JSON line — ignore.
-            }
+            handleLine(line);
           }
         }
+        // Flush the decoder and process any unterminated final line — the
+        // provider's usage chunk may arrive without a trailing newline, and
+        // dropping it would silently fall back to estimated billing.
+        buffer += decoder.decode();
+        handleLine(buffer.trim());
         emit({ type: "done", tier: model.tier, model: model.model });
       } catch {
         try {

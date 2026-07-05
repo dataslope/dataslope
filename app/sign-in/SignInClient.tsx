@@ -153,6 +153,19 @@ export function SignInClient() {
     setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
   }, []);
 
+  // Deep-link support: /sign-in?mode=forgot (or signup) opens that form
+  // directly — the expired-reset-link page points here so users don't have
+  // to land on the sign-in tab and rediscover "Forgot password?". Same
+  // window.location pattern as the error effect above, for the same
+  // static-prerender reason.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("mode");
+    if (requested === "forgot" || requested === "signup") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
+      setMode(requested);
+    }
+  }, []);
+
   // A browser Back from the OAuth provider can restore this page from the
   // bfcache with `socialPending`/`submitting` still set from before the
   // navigation — which would leave every control disabled with no request in
@@ -317,6 +330,7 @@ export function SignInClient() {
           <button
             type="button"
             onClick={() => go("signin")}
+            aria-pressed={isSignin}
             className={`${styles.tab} ${isSignin ? styles.tabActive : ""}`}
           >
             Sign in
@@ -324,6 +338,7 @@ export function SignInClient() {
           <button
             type="button"
             onClick={() => go("signup")}
+            aria-pressed={isSignup}
             className={`${styles.tab} ${isSignup ? styles.tabActive : ""}`}
           >
             Create account
@@ -334,6 +349,7 @@ export function SignInClient() {
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={`${styles.field} ${emailError ? styles.fieldError : ""}`}>
           <input
+            id="auth-email"
             type="email"
             required
             autoComplete="email"
@@ -342,11 +358,17 @@ export function SignInClient() {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setEmailTouched(true)}
             disabled={busy}
+            aria-invalid={emailError || undefined}
+            aria-describedby={emailError ? "auth-email-error" : undefined}
             className={styles.input}
           />
-          <label className={styles.label}>Email address</label>
+          <label htmlFor="auth-email" className={styles.label}>
+            Email address
+          </label>
           {emailError && (
-            <p className={styles.errorText}>Enter a valid email address</p>
+            <p id="auth-email-error" className={styles.errorText}>
+              Enter a valid email address
+            </p>
           )}
         </div>
 
@@ -354,6 +376,7 @@ export function SignInClient() {
           <div>
             <div className={styles.field}>
               <input
+                id="auth-password"
                 type={showPw ? "text" : "password"}
                 required
                 minLength={MIN_PASSWORD}
@@ -362,9 +385,12 @@ export function SignInClient() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={busy}
+                aria-describedby={isSignup ? "auth-password-hint" : undefined}
                 className={`${styles.input} ${styles.inputPw}`}
               />
-              <label className={styles.label}>Password</label>
+              <label htmlFor="auth-password" className={styles.label}>
+                Password
+              </label>
               <button
                 type="button"
                 onClick={() => setShowPw((s) => !s)}
@@ -377,6 +403,7 @@ export function SignInClient() {
             <div className={styles.pwRow}>
               {isSignup ? (
                 <span
+                  id="auth-password-hint"
                   className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
                 >
                   {pwOk ? "Strong enough — looks good." : "At least 8 characters."}

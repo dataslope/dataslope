@@ -5,6 +5,7 @@ import "./globals.css";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import AskAi from "@/app/_components/ai/AskAi";
 import NavigationLoadingIndicator from "@/app/_components/NavigationLoadingIndicator";
+import SkipToContent from "@/app/_components/SkipToContent";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
 // variables on <html> so every route (and every portal — portals stay inside
@@ -123,6 +124,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>
+        {/* First tab stop on every page — playground headers alone have ~10
+            stops before the editor. Visually hidden until focused. */}
+        <SkipToContent />
         {children}
         {/* Signed-in "Ask AI" chat pane. Renders only on /learn and
             /playground (pathname-gated inside), and its heavy deps are

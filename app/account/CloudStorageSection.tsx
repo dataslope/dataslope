@@ -138,6 +138,15 @@ export function CloudStorageSection() {
 
   const handleDeleteWorkspace = useCallback(
     async (meta: CloudWorkspaceMeta) => {
+      // Same confirm idiom as handleOpen's local-overwrite guard: deletion is
+      // irreversible and one mis-tap away from the harmless "Open" button.
+      if (
+        !window.confirm(
+          `Delete the cloud backup of "${meta.name}"? This can't be undone. The copy in this browser (if any) is not affected.`,
+        )
+      ) {
+        return;
+      }
       setBusy(meta.id);
       setError(null);
       try {
@@ -166,6 +175,13 @@ export function CloudStorageSection() {
 
   const handleRevokeShare = useCallback(
     async (share: ShareMeta) => {
+      if (
+        !window.confirm(
+          `Revoke the share link for "${share.name}"? Anyone who has the link will lose access immediately, and it can't be re-enabled.`,
+        )
+      ) {
+        return;
+      }
       setBusy(share.id);
       setError(null);
       try {
@@ -212,7 +228,8 @@ export function CloudStorageSection() {
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">Loading…</p>
       ) : workspaces.length === 0 ? (
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">
-          No cloud saves yet — use the Cloud button in any playground.
+          No cloud saves yet — use Back up in a playground&rsquo;s workspace
+          menu.
         </p>
       ) : (
         <ul className="mt-1 divide-y divide-[var(--ds-gray-100)] dark:divide-white/5">
@@ -235,7 +252,7 @@ export function CloudStorageSection() {
                   disabled={busy !== null}
                   onClick={() => void handleOpen(meta)}
                 >
-                  Open
+                  {busy === meta.id ? "Opening…" : "Open"}
                 </button>
                 <button
                   type="button"

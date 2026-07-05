@@ -69,9 +69,10 @@ import {
   downloadWorkspaceZip,
   importWorkspaceFromZip,
 } from "../opfs/workspaceArchive";
-import type {
-  CloudWorkspaceMeta,
-  WorkspaceBundle,
+import {
+  isSqlPlayground,
+  type CloudWorkspaceMeta,
+  type WorkspaceBundle,
 } from "@/lib/workspaces/types";
 import { INACTIVITY_EXPIRY_DAYS } from "@/lib/workspaces/policy";
 import { deleteCloudWorkspace } from "../cloud/cloudApi";
@@ -123,16 +124,6 @@ function formatBytes(bytes: number): string {
     i += 1;
   }
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
-}
-
-const SQL_PLAYGROUNDS = new Set(["sqlite", "postgres", "duckdb"]);
-
-/** SQL playgrounds persist a database alongside their files; the language
- *  playgrounds (Python, JS, …) only have files. Used to keep the
- *  workspace copy that mentions "database" out of the non-SQL playgrounds,
- *  where it's both wrong and confusing. */
-function isSqlPlayground(id: string): boolean {
-  return SQL_PLAYGROUNDS.has(id);
 }
 
 /** A friendly default name for a newly-created workspace — e.g.
@@ -187,7 +178,7 @@ function CloudStatusInline({
       className={`workspace-cloud-status${stale ? " stale" : ""}`}
       title={
         stale
-          ? "Opened since its last backup — back up again to capture recent changes."
+          ? "Opened since its last backup. If you've changed anything since, back up again to capture it."
           : "Backed up to your account."
       }
     >
@@ -328,9 +319,12 @@ export function WorkspaceBadge({
     : undefined;
   const activeStale =
     !!activeMeta && isBackupStale(activeEntry, activeMeta);
-  let backupDot: "local" | "fresh" | "stale" | null = null;
+  // The dot only distinguishes "backed up" from "not backed up". "Opened
+  // since" stays a textual note: the registry tracks opens, not edits, so an
+  // amber dot here fired on every reopen and taught users to ignore it.
+  let backupDot: "local" | "fresh" | null = null;
   if (showCloud && cloud.loaded && activeWorkspaceId) {
-    backupDot = !activeMeta ? "local" : activeStale ? "stale" : "fresh";
+    backupDot = !activeMeta ? "local" : "fresh";
   }
   const badgeTitle = `Active workspace: ${activeWorkspaceName || "(unnamed)"}${
     backupDot

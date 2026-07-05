@@ -31,6 +31,7 @@ export default function robots(): MetadataRoute.Robots {
           "/llms/",
           "/color-test",
           "/svg-gallery",
+          "/illustration-prompts",
           "/magicui-demo",
           // Auth surfaces: personalized or credential flows, no SEO value
           // (also marked `robots: { index: false }` in their metadata).

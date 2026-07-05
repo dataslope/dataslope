@@ -56,7 +56,13 @@ export function workspacesBucket(env: CloudflareEnv): R2Bucket | null {
  */
 export function isSameOrigin(request: Request): boolean {
   const origin = request.headers.get("Origin");
-  if (!origin) return true;
+  if (!origin) {
+    // No Origin (curl, server-to-server): consult Sec-Fetch-Site when the
+    // client sent one, so a browser request whose Origin was stripped by a
+    // proxy still can't ride the user's cookies cross-site.
+    const fetchSite = request.headers.get("Sec-Fetch-Site");
+    return !fetchSite || fetchSite === "same-origin" || fetchSite === "none";
+  }
   try {
     return new URL(origin).host === new URL(request.url).host;
   } catch {
@@ -95,8 +101,14 @@ export async function readBundleUpload(
   maxBytes: number,
 ): Promise<UploadResult> {
   // Cheap pre-check before buffering anything. The multipart framing adds a
-  // little overhead on top of the payload, hence the slack.
+  // little overhead on top of the payload, hence the slack. A missing or
+  // non-positive Content-Length is rejected outright — browsers always send
+  // one for FormData bodies, and chunked uploads would otherwise buffer
+  // unbounded bytes into memory before the size check below.
   const contentLength = Number(request.headers.get("Content-Length") ?? "0");
+  if (!Number.isFinite(contentLength) || contentLength <= 0) {
+    return { ok: false, status: 411, message: "Malformed upload." };
+  }
   if (contentLength > maxBytes + META_MAX_BYTES + 64 * 1024) {
     return tooLarge(maxBytes);
   }
@@ -189,6 +201,12 @@ export async function loadLiveUserState(
   tier: MemberTier,
   nowMs: number,
   waitUntil?: (p: Promise<unknown>) => void,
+  opts?: {
+    /** Workspace id the caller is about to overwrite. Excluded from the lazy
+     *  purge: the background delete races the caller's R2 put on the SAME
+     *  key, so purging it could silently destroy the fresh save. */
+    skipPurgeOfWorkspaceId?: string;
+  },
 ): Promise<LiveUserState> {
   const [workspaceRows, shareRows] = await Promise.all([
     listWorkspaceRows(env, userId),
@@ -210,9 +228,12 @@ export async function loadLiveUserState(
     nowMs,
   );
 
-  if (ws.expired.length > 0 || sh.expired.length > 0) {
+  const purgeable = opts?.skipPurgeOfWorkspaceId
+    ? ws.expired.filter((r) => r.id !== opts.skipPurgeOfWorkspaceId)
+    : ws.expired;
+  if (purgeable.length > 0 || sh.expired.length > 0) {
     const purge = Promise.all([
-      deleteWorkspaces(env, bucket, userId, ws.expired),
+      deleteWorkspaces(env, bucket, userId, purgeable),
       deleteShares(env, bucket, sh.expired),
     ]).catch((err) => console.error("workspaces: lazy purge failed", err));
     if (waitUntil) waitUntil(purge);

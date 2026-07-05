@@ -133,12 +133,20 @@ function IndicatorImpl() {
     };
   }, [start, stop]);
 
-  if (!visible) return null;
-
   return (
-    <div className={styles.badge}>
-      <DiamondAssembleTurnLoader size={36} label="Loading page…" />
-    </div>
+    <>
+      {/* Always mounted so the live region exists before its text changes —
+          screen readers only announce content that appears in an existing
+          aria-live container. */}
+      <span role="status" aria-live="polite" className={styles.srStatus}>
+        {visible ? "Loading page…" : ""}
+      </span>
+      {visible && (
+        <div className={styles.badge} aria-hidden="true">
+          <DiamondAssembleTurnLoader size={36} label="Loading page…" />
+        </div>
+      )}
+    </>
   );
 }
 

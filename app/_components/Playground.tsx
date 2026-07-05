@@ -3138,7 +3138,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               <Menu.Trigger
                 className="header-btn"
                 title="Export code"
-                aria-label="Export"
+                aria-label="Export code"
               >
                 <ArrowDownToLine size={14} aria-hidden="true" />
                 <span className="btn-label">Export</span>
@@ -3180,8 +3180,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 type="button"
                 className="header-btn"
                 onClick={() => setPackagesOpen(true)}
-                title="Available Packages"
-                aria-label="Packages"
+                title="Available packages"
+                aria-label="Available packages"
               >
                 <Package size={14} aria-hidden="true" />
                 <span className="btn-label">Packages</span>
@@ -4047,7 +4047,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <span>Clear</span>
               </button>
             </div>
-            <div className="output-body" ref={outputBodyRef}>
+            {/* role="log": run results land here with no other cue a
+                screen-reader user could notice — polite live announcements
+                mirror what sighted users see appear in the pane. */}
+            <div
+              className="output-body"
+              ref={outputBodyRef}
+              role="log"
+              aria-live="polite"
+              aria-label="Program output"
+            >
               {outputs.length === 0 && statusState !== "running" ? (
                 <div className="welcome">
                   <div className="welcome-icon">

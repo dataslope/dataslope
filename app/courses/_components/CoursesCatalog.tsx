@@ -324,7 +324,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
             aria-label="Sort courses"
             className={`cursor-pointer border-none bg-transparent px-0.5 py-1 text-[13px] font-medium ${SOFT}`}
           >
-            <option value="popular">Most popular</option>
+            <option value="popular">Recommended</option>
             <option value="az">A to Z</option>
             <option value="level">By level</option>
           </select>

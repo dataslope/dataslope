@@ -5,6 +5,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  BUNDLE_FILENAME_MAX,
+  BUNDLE_MAX_FILES,
   manifestForBundle,
   parseManifest,
   validateBundle,
@@ -89,6 +91,29 @@ describe("validateBundle", () => {
     const b = sqlBundle();
     b.sql = { ...b.sql!, dialect: "duckdb" };
     expect(validateBundle(b)).toBeNull();
+  });
+
+  it("rejects bundles with excessive file counts or filename lengths", () => {
+    const manyFiles = Array.from({ length: BUNDLE_MAX_FILES + 1 }, (_, i) => ({
+      filename: `f${i}.py`,
+      content: "x",
+    }));
+    expect(validateBundle(codeBundle({ files: manyFiles }))).toBeNull();
+    expect(
+      validateBundle(
+        codeBundle({
+          files: [{ filename: "a".repeat(BUNDLE_FILENAME_MAX + 1), content: "x" }],
+        }),
+      ),
+    ).toBeNull();
+    // At the cap is still fine.
+    expect(
+      validateBundle(
+        codeBundle({
+          files: [{ filename: "a".repeat(BUNDLE_FILENAME_MAX), content: "x" }],
+        }),
+      ),
+    ).not.toBeNull();
   });
 });
 

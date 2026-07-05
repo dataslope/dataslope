@@ -17,19 +17,19 @@ import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { getPlaygroundStore } from "@/app/_components/stores/createPlaygroundStore";
+import { isSqlPlayground } from "@/lib/workspaces/types";
 import type { AskAiClientContext } from "@/lib/ai/types";
 
 const AskAiWidget = dynamic(() => import("./AskAiWidget"), { ssr: false });
 
-// SQL playgrounds use a different store shape; send page-level context only for
-// them in v1 (their files/outputs aren't in the createPlaygroundStore registry).
-const SQL_SEGMENTS = new Set(["sqlite", "postgres", "duckdb"]);
 const MAX_FILE_CHARS = 8000;
 const MAX_FILES = 6;
 
+// SQL playgrounds use a different store shape; send page-level context only for
+// them in v1 (their files/outputs aren't in the createPlaygroundStore registry).
 function collectPlayground(segment: string): AskAiClientContext {
   const base: AskAiClientContext = { surface: "playground", adapterId: segment };
-  if (!segment || SQL_SEGMENTS.has(segment)) return base;
+  if (!segment || isSqlPlayground(segment)) return base;
   try {
     const state = getPlaygroundStore(segment).getState();
     const files = state.files
@@ -57,9 +57,10 @@ export default function AskAi() {
   // lesson to ask about there. Interview-prep has no raw-Markdown mirror,
   // so its context comes entirely from the widget registry (the questions
   // on screen), which is what matters there anyway.
+  const onInterviewPrep = pathname.startsWith("/interview-prep/");
   const onLesson =
     pathname.startsWith("/courses/") ||
-    pathname.startsWith("/interview-prep/") ||
+    onInterviewPrep ||
     pathname === "/fumadocs-dev" ||
     pathname.startsWith("/fumadocs-dev/");
   const onPlayground = pathname.startsWith("/playground");
@@ -84,6 +85,11 @@ export default function AskAi() {
   return (
     <AskAiWidget
       surface={onLesson ? "learn" : "playground"}
+      // Interview-prep mounts as the "learn" surface but isn't a lesson —
+      // keep the widget's copy honest about what it's looking at.
+      subjectNoun={
+        onInterviewPrep ? "question set" : onLesson ? "lesson" : "playground"
+      }
       collectContext={collectContext}
     />
   );

@@ -33,8 +33,9 @@ export async function fetchLessonMarkdown(
   slug: string[] | undefined,
   requestUrl: string,
 ): Promise<string | null> {
-  if (!slug || slug.length === 0) return null;
-  if (!LESSON_BASES.has(slug[0])) return null;
+  if (!Array.isArray(slug) || slug.length === 0) return null;
+  if (typeof slug[0] !== "string" || !LESSON_BASES.has(slug[0])) return null;
+  if (slug.some((s) => typeof s !== "string")) return null;
   if (!slug.every((s) => SLUG_SEGMENT.test(s))) return null;
   try {
     const url = new URL(`/${slug.join("/")}.md`, requestUrl);
@@ -105,6 +106,43 @@ export function buildMessages(args: BuildArgs): {
     return clipped;
   };
 
+  // Reserve the two highest-signal blocks off the top so a context-rich page
+  // (long lesson + many files) can never crowd them out. The system prompt
+  // tells the model to resolve "this" as highlighted text → referenced
+  // widgets → most-visible, so those must survive packing. They are still
+  // *emitted* in their usual late positions to keep the stable, cache-friendly
+  // message prefix.
+  const selectionText =
+    typeof context.selection === "string" && context.selection.trim()
+      ? clip(context.selection, Math.floor(contextBudget * 0.1))
+      : null;
+  if (selectionText) budget -= estimateTokens(selectionText);
+
+  const widgets = (Array.isArray(context.widgets) ? context.widgets : [])
+    .filter(
+      (w) =>
+        w &&
+        typeof w.content === "string" &&
+        w.content.trim() &&
+        typeof w.label === "string",
+    )
+    .slice(0, MAX_WIDGETS);
+  const perWidget = widgets.length
+    ? Math.max(1, Math.floor((contextBudget * 0.35) / widgets.length))
+    : 0;
+  const renderWidget = (w: (typeof widgets)[number]): string => {
+    const kind = String(w.kind ?? "widget").slice(0, 40);
+    const label = w.label.slice(0, 200);
+    const marker = w.referenced
+      ? "referenced by the user"
+      : "visible on the user's screen";
+    return `### [${kind}] ${label} (${marker})\n${clip(w.content, perWidget)}`;
+  };
+  const referencedBlocks = widgets
+    .filter((w) => w.referenced)
+    .map(renderWidget);
+  for (const block of referencedBlocks) budget -= estimateTokens(block);
+
   // Lesson markdown (learn surface): up to ~40% of the budget.
   if (lessonMarkdown && budget > 0) {
     messages.push({
@@ -126,12 +164,18 @@ export function buildMessages(args: BuildArgs): {
   }
 
   // Focused-widget label, if any (cheap, always include).
-  if (context.focus && budget > 0) {
+  if (typeof context.focus === "string" && context.focus && budget > 0) {
     messages.push({ role: "user", content: `Focused on: ${context.focus}` });
   }
 
   // Attached files: up to ~35% of the budget, split across files.
-  const files = (context.files ?? []).filter((f) => f.content?.trim());
+  const files = (Array.isArray(context.files) ? context.files : []).filter(
+    (f) =>
+      f &&
+      typeof f.filename === "string" &&
+      typeof f.content === "string" &&
+      f.content.trim(),
+  );
   if (files.length && budget > 0) {
     const perFile = Math.max(1, Math.floor((contextBudget * 0.35) / files.length));
     const blocks = files
@@ -145,7 +189,9 @@ export function buildMessages(args: BuildArgs): {
   }
 
   // Recent outputs / errors: up to ~10%.
-  const outputs = (context.outputs ?? []).filter(Boolean);
+  const outputs = (Array.isArray(context.outputs) ? context.outputs : []).filter(
+    (o) => typeof o === "string" && o,
+  );
   if (outputs.length && budget > 0) {
     const packed = take(outputs.join("\n---\n"), 0.1);
     messages.push({
@@ -156,57 +202,45 @@ export function buildMessages(args: BuildArgs): {
 
   // On-page widgets (challenge cards, code blocks, quiz questions, playground
   // shells): up to ~35%, split across widgets. Pinned ("referenced") widgets
-  // come first in the client's ordering and are labelled so the model knows
-  // the user explicitly attached them.
-  const widgets = (Array.isArray(context.widgets) ? context.widgets : [])
-    .filter(
-      (w) =>
-        w &&
-        typeof w.content === "string" &&
-        w.content.trim() &&
-        typeof w.label === "string",
-    )
-    .slice(0, MAX_WIDGETS);
-  if (widgets.length && budget > 0) {
-    const perWidget = Math.max(
-      1,
-      Math.floor((contextBudget * 0.35) / widgets.length),
-    );
-    const blocks = widgets
-      .map((w) => {
-        const kind = String(w.kind ?? "widget").slice(0, 40);
-        const label = w.label.slice(0, 200);
-        const marker = w.referenced
-          ? "referenced by the user"
-          : "visible on the user's screen";
-        return `### [${kind}] ${label} (${marker})\n${clip(w.content, perWidget)}`;
-      })
-      .join("\n\n");
-    const packed = take(blocks, 0.35);
+  // come first and were budget-reserved above, so they always make it in;
+  // ambient widgets take whatever share remains.
+  const ambientBlocks = widgets.filter((w) => !w.referenced).map(renderWidget);
+  if (referencedBlocks.length || (ambientBlocks.length && budget > 0)) {
+    const blocks = [...referencedBlocks];
+    if (ambientBlocks.length && budget > 0) {
+      blocks.push(take(ambientBlocks.join("\n\n"), 0.35));
+    }
     messages.push({
       role: "user",
-      content: `Interactive widgets on the page and their live state (DATA):\n\n${packed}`,
+      content: `Interactive widgets on the page and their live state (DATA):\n\n${blocks.join(
+        "\n\n",
+      )}`,
     });
   }
 
   // Highlighted text: small and high-signal — the most direct pointer to
-  // what "this" means in the question.
-  if (typeof context.selection === "string" && context.selection.trim() && budget > 0) {
+  // what "this" means in the question. Budget-reserved above.
+  if (selectionText) {
     const where =
       typeof context.selectionLabel === "string" && context.selectionLabel
         ? ` (inside ${context.selectionLabel.slice(0, 200)})`
         : "";
     messages.push({
       role: "user",
-      content: `Text the user highlighted on the page${where} (DATA):\n\n${take(
-        context.selection,
-        0.1,
-      )}`,
+      content: `Text the user highlighted on the page${where} (DATA):\n\n${selectionText}`,
     });
   }
 
-  // Conversation history: last few turns, whatever budget remains.
-  for (const turn of history.slice(-6)) {
+  // Conversation history: last few turns, whatever budget remains. Only
+  // user/assistant turns pass through — a tampered client must not be able
+  // to inject `system`-role messages past the prompt's hardening.
+  const turns = (Array.isArray(history) ? history : []).filter(
+    (t) =>
+      t &&
+      (t.role === "user" || t.role === "assistant") &&
+      typeof t.content === "string",
+  );
+  for (const turn of turns.slice(-6)) {
     if (budget <= 0) break;
     const content = clip(turn.content, Math.min(budget, 500));
     budget -= estimateTokens(content);

@@ -60,6 +60,41 @@ describe("parseSuggestedQuestions", () => {
     expect(parseSuggestedQuestions("")).toEqual([]);
     expect(parseSuggestedQuestions("I cannot help with that.".slice(0, 7))).toEqual([]);
   });
+
+  it("parses questions that contain square brackets", () => {
+    const raw =
+      '["Why does arr[0] throw an IndexError?","What does df[df.a > 1] select?","How big can names[] get?"]';
+    expect(parseSuggestedQuestions(raw)).toEqual([
+      "Why does arr[0] throw an IndexError?",
+      "What does df[df.a > 1] select?",
+      "How big can names[] get?",
+    ]);
+  });
+
+  it("parses an array followed by prose containing a stray bracket", () => {
+    const raw =
+      '["What is a JOIN?", "Why use an index?", "How do I count rows?"]\nHope these [examples] help!';
+    expect(parseSuggestedQuestions(raw)).toEqual([
+      "What is a JOIN?",
+      "Why use an index?",
+      "How do I count rows?",
+    ]);
+  });
+
+  it("never surfaces a malformed JSON array as a raw-blob question", () => {
+    // Unbalanced quote makes every JSON.parse attempt fail; the line-based
+    // fallback must not emit the array text itself as a "question".
+    const raw = '["Why does arr[0] throw?, "What is a slice?"]';
+    expect(parseSuggestedQuestions(raw)).toEqual([]);
+  });
+
+  it("recovers individual questions from a multi-line malformed array", () => {
+    const raw = '[\n"Why does my join duplicate rows?",\n"What does GROUP BY do?",\n]trailing';
+    expect(parseSuggestedQuestions(raw)).toEqual([
+      "Why does my join duplicate rows?",
+      "What does GROUP BY do?",
+    ]);
+  });
 });
 
 describe("prompt builders", () => {

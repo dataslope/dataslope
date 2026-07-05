@@ -17,6 +17,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
+import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 import { PLAYGROUNDS } from "@/app/_components/playgrounds";
 import { isValidShareId } from "@/lib/workspaces/policy";
 import {
@@ -27,8 +28,6 @@ import { parseManifest, type BundleManifest } from "@/lib/workspaces/types";
 import { OpenShareCopy } from "./OpenShareCopy";
 
 export const dynamic = "force-dynamic";
-
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
 interface ShareView {
   id: string;

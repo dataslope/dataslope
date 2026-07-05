@@ -88,8 +88,11 @@ export function parseSuggestedQuestions(raw: string): string[] {
   };
 
   // Preferred path: a JSON array somewhere in the reply (possibly fenced).
-  const arrayMatch = raw.match(/\[[\s\S]*?\]/);
-  if (arrayMatch) {
+  // Greedy first — questions may themselves contain "]" (e.g. `arr[0]`) —
+  // then non-greedy, in case prose after the array contains a stray "]".
+  for (const pattern of [/\[[\s\S]*\]/, /\[[\s\S]*?\]/]) {
+    const arrayMatch = raw.match(pattern);
+    if (!arrayMatch) break;
     try {
       const parsed: unknown = JSON.parse(arrayMatch[0]);
       if (Array.isArray(parsed)) {
@@ -97,11 +100,24 @@ export function parseSuggestedQuestions(raw: string): string[] {
         if (out.length) return out;
       }
     } catch {
-      // fall through to the line-based parse
+      // try the next pattern, then the line-based parse
     }
   }
 
-  // Fallback: treat each non-empty line as a candidate question.
-  for (const line of raw.split("\n")) push(line);
+  // Fallback: treat each non-empty line as a candidate question. Skip
+  // JSON-structural lines so a malformed array surfaces as nothing (the
+  // client hides the section) instead of as a raw JSON blob "question".
+  for (const line of raw.split("\n")) {
+    const text = line.trim();
+    if (
+      text.startsWith("[") ||
+      text.startsWith("]") ||
+      text.endsWith("]") ||
+      text.startsWith("```")
+    ) {
+      continue;
+    }
+    push(text.replace(/,\s*$/, ""));
+  }
   return out;
 }

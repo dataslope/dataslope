@@ -34,9 +34,29 @@ export function formatSqlSchemaText(
     const kind = entity.kind === "view" ? "View" : "Table";
     lines.push(`${kind} ${entity.name} (${cols.join(", ")})`);
     if (lines.join("\n").length > MAX_SCHEMA_CHARS) {
-      lines.push(`… and ${schema.entities.length - lines.length + 1} more entities`);
+      // `lines` holds the entities already rendered (including this one), so
+      // the unrendered remainder is the difference — no +1.
+      const remaining = schema.entities.length - lines.length;
+      if (remaining > 0) lines.push(`… and ${remaining} more entities`);
       break;
     }
   }
   return lines.join("\n");
+}
+
+/**
+ * Number of entities a formatSqlSchemaText() summary describes, counting the
+ * truncated remainder from the trailer line rather than the trailer itself.
+ */
+export function countSchemaEntities(text: string): number {
+  let count = 0;
+  for (const line of text.split("\n")) {
+    if (line.startsWith("Table ") || line.startsWith("View ")) {
+      count += 1;
+    } else {
+      const more = line.match(/^… and (\d+) more entities$/);
+      if (more) count += Number(more[1]);
+    }
+  }
+  return count;
 }

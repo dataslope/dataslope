@@ -25,6 +25,25 @@
   margin: 0 0 2rem;
 }
 
+/* Escape hatches back to the rest of the site — this index is a sitemapped
+   search-landing page and previously had no navigation at all. */
+.siteLinks {
+  display: flex;
+  gap: 16px;
+  margin: 2.5rem 0 0;
+  font-size: 13px;
+}
+
+.siteLinks a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.siteLinks a:hover {
+  color: var(--ds-blue-400);
+}
+
 .list {
   list-style: none;
   padding: 0;

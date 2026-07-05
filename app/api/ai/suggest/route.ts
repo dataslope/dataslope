@@ -28,8 +28,13 @@ import {
   suggestInstruction,
   suggestSystemPrompt,
 } from "@/lib/ai/suggest";
-import { checkSuggestBudget, recordSuggestUsage, utcDay } from "@/lib/ai/limits";
+import {
+  recordSuggestUsage,
+  reserveSuggestRequest,
+  utcDay,
+} from "@/lib/ai/limits";
 import { completeChat } from "@/lib/ai/provider";
+import { isSameOrigin } from "@/lib/workspaces/server";
 import type { AskAiSuggestRequest, AskAiSuggestResponse } from "@/lib/ai/types";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +51,9 @@ function json(data: unknown, status = 200): Response {
 const PROVIDER_TIMEOUT_MS = 10_000;
 
 export async function POST(request: Request): Promise<Response> {
+  // Cookie-authenticated mutation that spends provider tokens — same
+  // cross-site posture as the shares/workspaces routes.
+  if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
   // --- Auth gate. Cookie cache bypassed: this endpoint spends provider
@@ -73,9 +81,12 @@ export async function POST(request: Request): Promise<Response> {
   const model = resolveModel("free", env) ?? resolveModel("pro", env);
   if (!model) return json({ error: "Not configured." }, 503);
 
-  // --- Budgets (suggestion-specific per-user counters + global ceiling). ---
+  // --- Budgets (suggestion-specific per-user counters + global ceiling).
+  // The request slot is reserved atomically up front — this endpoint is
+  // auto-fired by the client, so a deferred count would let concurrent
+  // bursts through the daily cap. ---
   const day = utcDay(Date.now());
-  const decision = await checkSuggestBudget(env, user.id, SUGGEST_LIMITS, day);
+  const decision = await reserveSuggestRequest(env, user.id, SUGGEST_LIMITS, day);
   if (!decision.ok) {
     return json({ error: decision.message }, decision.status ?? 429);
   }
@@ -111,7 +122,8 @@ export async function POST(request: Request): Promise<Response> {
       },
       { baseUrl: model.baseUrl, apiKey: model.apiKey },
     );
-  } catch {
+  } catch (err) {
+    console.error("ai/suggest: provider request failed", err);
     return json({ error: "Unavailable." }, 502);
   } finally {
     clearTimeout(timeout);
