@@ -10,48 +10,17 @@ This page gives you the vocabulary for talking about those shapes. The notation 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three dotted curves race across one chart as input grows — a green one stays flat, a blue one rises gently, and a red one explodes upward off the top"
+  aria-label="Three smooth curves race across one chart as input grows — a green one stays flat, a blue one rises steadily, and a red one explodes upward off the top"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
-    <rect x="80" y="28" width="4" height="160" rx="2" />
-    <rect x="80" y="186" width="480" height="4" rx="2" />
+    <rect x="80" y="28" width="3" height="160" rx="1.5" />
+    <rect x="80" y="187" width="480" height="3" rx="1.5" />
   </g>
   <text x="572" y="208" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fill="currentColor" opacity="0.45">n</text>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="110" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="145" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="180" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="215" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="250" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="285" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="320" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="355" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="390" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="425" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="460" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="495" cy="170" r="3.5" fillOpacity="0.55" />
-    <circle cx="534" cy="170" r="5.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="110" cy="176" r="3.5" fillOpacity="0.55" />
-    <circle cx="170" cy="166" r="3.5" fillOpacity="0.55" />
-    <circle cx="230" cy="154" r="3.5" fillOpacity="0.55" />
-    <circle cx="290" cy="140" r="3.5" fillOpacity="0.55" />
-    <circle cx="350" cy="124" r="3.5" fillOpacity="0.55" />
-    <circle cx="410" cy="106" r="3.5" fillOpacity="0.55" />
-    <circle cx="470" cy="86" r="3.5" fillOpacity="0.55" />
-    <circle cx="534" cy="64" r="5.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="110" cy="174" r="3" fillOpacity="0.55" />
-    <circle cx="146" cy="160" r="3.5" fillOpacity="0.6" />
-    <circle cx="178" cy="138" r="4" fillOpacity="0.65" />
-    <circle cx="206" cy="108" r="4.5" fillOpacity="0.7" />
-    <circle cx="228" cy="74" r="5" fillOpacity="0.8" />
-    <circle cx="246" cy="38" r="6" />
-    <polygon points="252,26 258,12 263,24 274,18 266,32 258,30" fillOpacity="0.7" />
-  </g>
+  <path d="M105 170 L540 167" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
+  <path d="M105 176 C 250 150, 400 110, 540 62" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinecap="round" />
+  <path d="M105 178 C 185 172, 222 130, 246 62 C 254 39, 259 24, 262 12" fill="none" stroke="var(--ds-red-500)" strokeWidth="4" strokeLinecap="round" />
 </svg>
 
 ## Why we care
