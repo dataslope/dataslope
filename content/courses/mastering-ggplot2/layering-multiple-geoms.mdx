@@ -9,49 +9,42 @@ figure, and controlling exactly which data and mappings each layer
 uses.
 
 <svg
-  viewBox="0 0 640 190"
+  viewBox="0 0 640 240"
   role="img"
-  aria-label="A tile of scatter points plus a tile with a trend line equals one combined, richer tile — geom layers adding into a single figure"
+  aria-label="Three small layer cards — blue points, a green line, a yellow band — feed along thin gray lines into one chart panel where all three geoms sit stacked together as a single figure"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="55" y="45" width="130" height="100" rx="10" opacity="0.07" />
-    <rect x="245" y="45" width="130" height="100" rx="10" opacity="0.07" />
-    <rect x="430" y="30" width="170" height="130" rx="10" opacity="0.07" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="176" y1="52" x2="250" y2="96" />
+    <line x1="176" y1="120" x2="250" y2="120" />
+    <line x1="176" y1="188" x2="250" y2="144" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="85" cy="120" r="5.5" />
-    <circle cx="110" cy="95" r="5.5" />
-    <circle cx="135" cy="110" r="5.5" />
-    <circle cx="160" cy="75" r="5.5" />
-  </g>
-  <g fill="currentColor" opacity="0.55">
-    <text x="215" y="103" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="26" fontWeight="bold">{"+"}</text>
-    <text x="403" y="103" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="26" fontWeight="bold">{"="}</text>
+    <rect x="56" y="24" width="120" height="56" rx="10" fillOpacity="0.08" />
+    <circle cx="90" cy="58" r="4.5" />
+    <circle cx="114" cy="44" r="4.5" />
+    <circle cx="138" cy="54" r="4.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="265" cy="130" r="3.5" />
-    <circle cx="280" cy="119" r="3.5" />
-    <circle cx="295" cy="108" r="3.5" />
-    <circle cx="310" cy="98" r="3.5" />
-    <circle cx="325" cy="87" r="3.5" />
-    <circle cx="340" cy="76" r="3.5" />
-    <circle cx="355" cy="65" r="3.5" />
+    <rect x="56" y="92" width="120" height="56" rx="10" fillOpacity="0.08" />
+    <path d="M 80 134 C 104 126 128 116 152 106" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
   </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="56" y="160" width="120" height="56" rx="10" fillOpacity="0.12" />
+    <rect x="78" y="179" width="76" height="18" rx="6" fillOpacity="0.5" />
+  </g>
+  <rect x="250" y="24" width="340" height="192" rx="12" fill="currentColor" opacity="0.06" />
+  <path d="M 272 174 C 350 158 430 114 556 82 L 556 110 C 430 142 350 186 272 202 Z" fill="var(--ds-yellow-500)" fillOpacity="0.3" />
+  <path d="M 272 188 C 350 172 430 128 556 96" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="470" cy="130" r="5.5" />
-    <circle cx="505" cy="100" r="5.5" />
-    <circle cx="540" cy="118" r="5.5" />
-    <circle cx="575" cy="80" r="5.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="455" cy="135" r="3.5" />
-    <circle cx="477" cy="124" r="3.5" />
-    <circle cx="499" cy="114" r="3.5" />
-    <circle cx="521" cy="103" r="3.5" />
-    <circle cx="543" cy="93" r="3.5" />
-    <circle cx="565" cy="82" r="3.5" />
-    <circle cx="585" cy="72" r="3.5" />
+    <circle cx="296" cy="178" r="5.5" />
+    <circle cx="330" cy="182" r="5.5" />
+    <circle cx="362" cy="158" r="5.5" />
+    <circle cx="398" cy="146" r="5.5" />
+    <circle cx="432" cy="128" r="5.5" />
+    <circle cx="468" cy="134" r="5.5" />
+    <circle cx="502" cy="112" r="5.5" />
+    <circle cx="536" cy="104" r="5.5" />
   </g>
 </svg>
 
