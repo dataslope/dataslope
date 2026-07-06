@@ -18,7 +18,7 @@ rule that separates an honest pipeline from a leaky one.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A huge blue circle, a tiny green square, and a small yellow dot pass through a narrow gate and come out the same size on the other side — scaling puts wildly different feature ranges on one common footing"
+  aria-label="A huge blue circle, a tiny green square, and a small yellow dot cross a thin gray arrow and come out the same size on the other side — scaling puts wildly different feature ranges on one common footing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -30,15 +30,9 @@ rule that separates an honest pipeline from a leaky one.
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="212" cy="52" r="10" fillOpacity="0.8" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="312" y="28" width="12" height="66" rx="6" />
-    <rect x="312" y="126" width="12" height="66" rx="6" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="280" cy="110" r="3" />
-    <circle cx="304" cy="110" r="3" />
-    <circle cx="332" cy="110" r="3" />
-    <circle cx="356" cy="110" r="3" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="280" y="108.5" width="90" height="3" rx="1.5" />
+    <polygon points="368,104.5 379,110 368,115.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="425" cy="110" r="20" />
