@@ -42,6 +42,9 @@ interface MdxCodeBlockProps {
   /** Importable module names to pre-install alongside the runtime —
    *  see `CodeBlockProps.packages`. */
   packages?: string[];
+  /** Inject the pinned Tailwind in-browser compiler into the preview —
+   *  see `CodeBlockProps.tailwind`. Preview adapters (web/react) only. */
+  tailwind?: boolean;
 }
 
 export default function MdxCodeBlock({
@@ -52,6 +55,7 @@ export default function MdxCodeBlock({
   label,
   showFileTabBar,
   packages,
+  tailwind,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -70,6 +74,7 @@ export default function MdxCodeBlock({
       label={label}
       showFileTabBar={showFileTabBar}
       packages={packages}
+      tailwind={tailwind}
     />
   );
 }

@@ -32,6 +32,8 @@ import { cAdapter } from "../app/_components/runtime/c";
 import { cppAdapter } from "../app/_components/runtime/cpp";
 import { javaAdapter } from "../app/_components/runtime/java";
 import { csharpAdapter } from "../app/_components/runtime/csharp";
+import { webAdapter } from "../app/_components/runtime/web";
+import { reactAdapter } from "../app/_components/runtime/react";
 
 // Python and R adapters import from "webr" / reference workers; we test
 // their exports separately once we have a proper mocking story.
@@ -44,6 +46,8 @@ const ADAPTERS = [
   { name: "C++", adapter: cppAdapter },
   { name: "Java", adapter: javaAdapter },
   { name: "C#", adapter: csharpAdapter },
+  { name: "Web (HTML/CSS/JS)", adapter: webAdapter },
+  { name: "React", adapter: reactAdapter },
 ];
 
 describe("LanguageAdapter shape", () => {
@@ -301,5 +305,109 @@ describe("C# adapter specifics", () => {
     const exts = csharpAdapter.exportFormats.map((f) => f.extension);
     expect(exts).toContain("csx");
     expect(exts).toContain("cs");
+  });
+});
+
+describe("Web adapter specifics", () => {
+  it("id is 'web'", () => expect(webAdapter.id).toBe("web"));
+
+  it("advertises the live-preview output capability", () => {
+    expect(webAdapter.outputCapabilities?.preview).toBe(true);
+  });
+
+  it("classifies every .html file as an entry point", () => {
+    const entries = webAdapter.findEntryFiles!([
+      { filename: "index.html", content: "<h1>a</h1>" },
+      { filename: "about.html", content: "<h1>b</h1>" },
+      { filename: "styles.css", content: "body {}" },
+      { filename: "script.js", content: "console.log(1)" },
+    ]);
+    expect(entries.map((e) => e.filename).sort()).toEqual([
+      "about.html",
+      "index.html",
+    ]);
+    expect(entries.every((e) => e.kind === "main")).toBe(true);
+  });
+
+  it("picks the CodeMirror mode from the file extension", () => {
+    expect(webAdapter.codeMirrorModeForFile!("styles.css")).toBe("css");
+    expect(webAdapter.codeMirrorModeForFile!("script.js")).toBe("javascript");
+    expect(webAdapter.codeMirrorModeForFile!("index.html")).toBe("htmlmixed");
+  });
+
+  it("hello example is a complete HTML document", () => {
+    const hello = webAdapter.examples.find((e) => e.key === "hello");
+    expect(hello).toBeTruthy();
+    expect(hello!.code.toLowerCase()).toContain("<!doctype html>");
+  });
+
+  it("ships a Tailwind example wired to the pinned CDN build", () => {
+    const tw = webAdapter.examples.find((e) => e.key === "tailwind");
+    expect(tw).toBeTruthy();
+    expect(tw!.code).toContain("@tailwindcss/browser");
+  });
+});
+
+describe("React adapter specifics", () => {
+  it("id is 'react'", () => expect(reactAdapter.id).toBe("react"));
+
+  it("advertises the live-preview output capability", () => {
+    expect(reactAdapter.outputCapabilities?.preview).toBe(true);
+  });
+
+  it("defaults to .tsx files with the tsx editor mode", () => {
+    expect(reactAdapter.defaultFileExtension).toBe("tsx");
+    expect(reactAdapter.codeMirrorMode).toBe("tsx");
+    expect(reactAdapter.codeMirrorModeForFile!("styles.css")).toBe("css");
+    expect(reactAdapter.codeMirrorModeForFile!("App.tsx")).toBeUndefined();
+  });
+
+  it("hello example mounts through react-dom/client", () => {
+    const hello = reactAdapter.examples.find((e) => e.key === "hello");
+    expect(hello).toBeTruthy();
+    expect(hello!.code).toContain('from "react-dom/client"');
+    expect(hello!.code).toContain("createRoot");
+  });
+
+  it("hasImport detects both default and side-effect imports", () => {
+    expect(
+      reactAdapter.hasImport(`import { useState } from "react";`, "react"),
+    ).toBe(true);
+    expect(reactAdapter.hasImport(`import "./styles.css";`, "react")).toBe(
+      false,
+    );
+  });
+});
+
+describe("web/react challenge harnesses", () => {
+  it("wraps the web harness in a <script> element with the sentinel protocol", async () => {
+    const { buildHarness, HARNESS_BEGIN } = await import(
+      "../app/_components/challengeHarness"
+    );
+    const harness = buildHarness("web", [
+      { id: "t1", name: "t", code: "if (1 !== 1) throw new Error('no');" },
+    ]);
+    expect(harness.trimStart().startsWith("<script>")).toBe(true);
+    expect(harness.trimEnd().endsWith("</script>")).toBe(true);
+    expect(harness).toContain(HARNESS_BEGIN);
+    expect(harness).toContain("__DSTEST__");
+    expect(harness).toContain("__dsPreviewHarnessDone");
+  });
+
+  it("emits the react harness as plain module-appendable JS", async () => {
+    const { buildHarness, HARNESS_BEGIN } = await import(
+      "../app/_components/challengeHarness"
+    );
+    const harness = buildHarness("react", [
+      { id: "t1", name: "t", code: "void 0;" },
+    ]);
+    expect(harness).not.toContain("<script>");
+    expect(harness).toContain(HARNESS_BEGIN);
+    expect(harness).toContain("__dsPreviewHarnessDone");
+    // Everything must live inside the IIFE — top-level await would
+    // delay module evaluation and therefore the load event the harness
+    // itself waits for (a deadlock).
+    expect(harness.trim().startsWith(";(function () {")).toBe(true);
+    expect(harness.trim().endsWith("})();")).toBe(true);
   });
 });

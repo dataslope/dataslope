@@ -95,6 +95,21 @@ export interface RunOptions {
    *  this to pick the right translation unit / class to compile and
    *  to exclude that file from the "extra sources" list. */
   entryFilename?: string;
+  /** Host element for live page previews (web / react adapters). The
+   *  surface owns this element (an always-mounted slot in its output
+   *  area); the runtime replaces its children with a sandboxed iframe
+   *  on every run, which doubles as the teardown story — swapping the
+   *  document kills the previous run's scripts. Adapters without a
+   *  preview channel ignore it; preview adapters fall back to a hidden
+   *  off-DOM host when the surface doesn't supply one (code still
+   *  runs and console output is still captured, just invisibly). */
+  previewHost?: HTMLElement | null;
+  /** Inject the pinned Tailwind CSS browser compiler
+   *  (`@tailwindcss/browser`) into the preview document before user
+   *  code, so utility classes in the learner's markup compile
+   *  client-side. Only meaningful for preview adapters; see
+   *  `TAILWIND_BROWSER_CDN` in `runtime/cdn.ts` for the pin. */
+  previewTailwind?: boolean;
   /** Optional transient status line for waits that happen *inside* a
    *  run — e.g. Python's deferred package set still installing on the
    *  first run after the two-phase boot, or R installing a `library()`
@@ -238,6 +253,12 @@ export interface LanguageAdapter {
   runtimeInfo: RuntimeInfo;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
+  /** Optional: per-file CodeMirror mode override for adapters whose
+   *  workspaces mix languages (the web adapter edits `.html`, `.css`,
+   *  and `.js` files side by side). Return `undefined` to fall back to
+   *  `codeMirrorMode`. Surfaces re-evaluate this whenever the active
+   *  tab changes and reconfigure the editor's language compartment. */
+  codeMirrorModeForFile?(filename: string): string | undefined;
   /** Number of spaces used for one indentation level. This MUST match
    *  the indent width produced by the adapter's `formatCode` formatter
    *  so the editor's Tab key inserts exactly what the formatter emits
@@ -255,6 +276,11 @@ export interface LanguageAdapter {
     dataframes?: boolean;
     charts?: boolean;
     figures?: boolean;
+    /** The runtime renders a live page preview (sandboxed iframe) in
+     *  addition to console text — the web / react adapters. Surfaces
+     *  use this to mount their preview slot and mention the preview
+     *  in the empty-state blurb. */
+    preview?: boolean;
   };
   /** Formats offered by the "Export" dropdown. The editor's current contents
    *  are written to a client-side download with the chosen extension. */
@@ -310,6 +336,9 @@ export interface LanguageAdapter {
   /** Optional: auto-format the given source code and return the formatted
    *  string. Implemented by adapters that ship a browser-side formatter
    *  (e.g. the C adapter uses clang-format via WASM). The playground UI
-   *  surfaces a "Format code" icon button when this method is present. */
-  formatCode?: (code: string) => Promise<string>;
+   *  surfaces a "Format code" icon button when this method is present.
+   *  `filename` is the active workspace file, so adapters whose
+   *  workspaces mix languages (web: .html/.css/.js) can pick the right
+   *  formatter dialect; single-language adapters may ignore it. */
+  formatCode?: (code: string, filename?: string) => Promise<string>;
 }

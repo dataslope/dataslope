@@ -1,0 +1,193 @@
+---
+title: Code Blocks — Web (HTML/CSS/JS)
+description: HTML/CSS/JS blocks render a live sandboxed page preview; console output streams into the output panel.
+---
+
+The `web` adapter runs pages on native browser primitives — no runtime
+download at all. Each Run composes the block's files into a single
+document and swaps it into a sandboxed `<iframe>` (unique opaque
+origin, `allow-scripts` without `allow-same-origin`). `console.*`
+output and uncaught errors stream back into the output panel through a
+`postMessage` bridge.
+
+## A complete page in one file
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      h1 { color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, web block!</h1>
+    <p>Edit the markup and press Run to re-render the preview.</p>
+    <script>
+      console.log("Scripts run too:", 6 * 7);
+    </script>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      h1 { color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, web block!</h1>
+    <p>Edit the markup and press Run to re-render the preview.</p>
+    <script>
+      console.log("Scripts run too:", 6 * 7);
+    </script>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+```
+
+## Multi-file: HTML + CSS + JS tabs
+
+`<link rel="stylesheet" href="styles.css">` and
+`<script src="script.js">` resolve to the sibling tabs — the adapter
+inlines them into the preview document so the sandbox stays
+self-contained.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Three tabs, one page</h1>
+    <button id="paint">Paint the heading</button>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.painted {
+  color: #16a34a;
+}
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const button = document.querySelector("#paint");
+const heading = document.querySelector("h1");
+
+button.addEventListener("click", () => {
+  heading.classList.toggle("painted");
+  console.log("painted?", heading.classList.contains("painted"));
+});
+
+console.log("Page wired up — click the button in the preview.");
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    { filename: "index.html", starterCode: `…` },
+    { filename: "styles.css", starterCode: `…` },
+    { filename: "script.js", starterCode: `…` },
+  ]}
+/>
+```
+
+## Tailwind variant
+
+Passing `tailwind` injects the pinned `@tailwindcss/browser` compiler
+(a development-time tool — real projects compile Tailwind at build
+time) into the preview document, so utility classes work with zero
+setup.
+
+<CodeBlock
+  adapter="web"
+  tailwind
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<main class="mx-auto mt-10 max-w-sm rounded-xl bg-white p-6 shadow-lg">
+  <h1 class="text-xl font-bold text-slate-900">Tailwind utilities</h1>
+  <p class="mt-2 text-slate-600">
+    Compiled on the fly, right in the sandboxed preview.
+  </p>
+  <button
+    class="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white"
+    onclick="console.log('clicked')"
+  >
+    A styled button
+  </button>
+</main>
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="web"
+  tailwind
+  files={[{ filename: "index.html", starterCode: `…utility classes…` }]}
+/>
+```
+
+## Console output streams into the panel
+
+`console.log` values are serialized inside the page (objects, arrays,
+DOM nodes included) and rendered as ordinary output cells. Uncaught
+exceptions and `console.error` arrive as error cells the same way.
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<h1>Console demo</h1>
+<script>
+  console.log("plain string");
+  console.log("objects too:", { language: "HTML", year: 1993 });
+  console.log("arrays:", [1, 2, 3]);
+</script>
+`,
+    },
+  ]}
+/>

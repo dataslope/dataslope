@@ -1,0 +1,157 @@
+---
+title: CSS — The Box Model
+description: Content, padding, border, and margin — the four layers of every element on every page.
+---
+
+Every element the browser renders is a rectangle, and every rectangle
+has the same four layers, from the inside out:
+
+1. **Content** — the text or image itself; sized by `width`/`height`.
+2. **Padding** — space between the content and the border. Shares the
+   element's background.
+3. **Border** — the (optionally visible) edge of the box.
+4. **Margin** — space *outside* the border, pushing neighbours away.
+   Always transparent.
+
+If CSS ever feels mysterious — "why is there a gap here?", "why is
+this box wider than I said?" — the answer is almost always the box
+model.
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+      .box {
+        width: 260px;
+        padding: 16px;          /* inside the border  */
+        border: 4px solid #2563eb;
+        margin: 24px;           /* outside the border */
+        background: #dbeafe;    /* fills content + padding */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">Box one</div>
+    <div class="box">Box two — notice the margins between us</div>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Try setting `padding: 0`, then `margin: 0`, and watch which gap
+disappears. That's the fastest way to internalize the difference.
+
+## `box-sizing` — one rule to keep
+
+By default, `width` sets only the *content* width, so padding and
+border make the box bigger than the number you wrote. Nearly every
+real stylesheet opts out of that surprise:
+
+```css
+* { box-sizing: border-box; }   /* width now includes padding + border */
+```
+
+## Shorthands
+
+`padding: 16px` sets all four sides. Two values (`padding: 8px 16px`)
+set vertical then horizontal; four values go clockwise from the top.
+`margin` works the same way. `border: 4px solid #2563eb` combines
+width, style, and color.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Frame the photo caption"
+  entryFilename="index.html"
+  instructions={`Style the \`.frame\` box in \`styles.css\` so that it has:
+
+1. \`16px\` of padding on all sides.
+2. A solid border that is \`3px\` wide, colored \`rgb(37, 99, 235)\`.
+3. A background of \`rgb(219, 234, 254)\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="frame">
+      A lighthouse at dusk — the sky did all the work.
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.frame {
+  /* your box-model styles here */
+}
+`,
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.frame {
+  padding: 16px;
+  border: 3px solid rgb(37, 99, 235);
+  background: rgb(219, 234, 254);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "padding",
+      name: "16px padding on every side",
+      code: `const s = getComputedStyle(document.querySelector(".frame"));
+for (const side of ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"]) {
+  if (s[side] !== "16px") {
+    throw new Error("Expected 16px " + side + ", got " + s[side] + ".");
+  }
+}`,
+    },
+    {
+      id: "border",
+      name: "A 3px solid blue border",
+      code: `const s = getComputedStyle(document.querySelector(".frame"));
+if (s.borderTopWidth !== "3px") {
+  throw new Error("Expected a 3px border, got " + s.borderTopWidth + ".");
+}
+if (s.borderTopStyle !== "solid") {
+  throw new Error("Expected a solid border, got " + s.borderTopStyle + ".");
+}
+if (s.borderTopColor !== "rgb(37, 99, 235)") {
+  throw new Error("Expected border color rgb(37, 99, 235), got " + s.borderTopColor + ".");
+}`,
+    },
+    {
+      id: "background",
+      name: "The light-blue background fills the box",
+      code: `const s = getComputedStyle(document.querySelector(".frame"));
+if (s.backgroundColor !== "rgb(219, 234, 254)") {
+  throw new Error("Expected background rgb(219, 234, 254), got " + s.backgroundColor + ".");
+}`,
+    },
+  ]}
+/>
+
+Boxes sorted — now let's arrange them: [flexbox layout](/courses/intro-web-development/css-flexbox-layout).

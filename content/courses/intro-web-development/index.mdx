@@ -1,0 +1,95 @@
+---
+title: Welcome
+description: A from-zero web development course — build real pages with HTML, CSS, and JavaScript, entirely in your browser.
+---
+
+Welcome to **Intro to Web Development** — a course where every lesson
+ends with a real, rendered web page.
+
+Web development has a superpower that most programming doesn't: you
+can *see* your program. Write a line of HTML and a heading appears.
+Change one CSS value and the whole layout shifts. Wire up one event
+listener and the page starts responding to you. This course leans into
+that feedback loop as hard as possible.
+
+<Callout type="info" title="Who this course is for">
+You should be comfortable using a browser and a keyboard. That's it.
+No prior HTML, CSS, or programming experience is assumed. If you've
+done our [Beginner's Guide to JavaScript](/courses/beginners-javascript),
+the JavaScript lessons here will feel familiar — but they stand on
+their own.
+</Callout>
+
+## How this course works
+
+Every code block below is **live**. The editor holds real HTML, and
+pressing **Run** renders it in a sandboxed page preview right under
+the code — the same way a browser renders any page on the internet.
+Nothing is sent to a server; the preview *is* your browser.
+
+Try it now. Change the name, press **Run** (or Ctrl/Cmd + Enter), and
+watch the page update:
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 80vh;
+      }
+      h1 { color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, I'm Ada!</h1>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+That's the whole workflow of this course: read a little, edit a page,
+run it, see what happens. Lessons also include **challenges** — small
+exercises checked automatically against the page you build. The checks
+look at the *actual rendered page*: its elements, its styles, and how
+it responds when buttons are clicked.
+
+## What you'll build and learn
+
+1. **How the web works** — what actually happens when you visit a page.
+2. **HTML** — the structure and meaning of a page: headings, text,
+   links, lists, images, and forms.
+3. **CSS** — how pages get their look: selectors, the box model, and
+   modern layout with flexbox.
+4. **JavaScript in the browser** — selecting elements, reacting to
+   clicks and input, and changing the page while it's running.
+5. **A capstone project** — an interactive scoreboard built from
+   three files, like a real mini-project.
+6. **Two industry tools** — a first look at **Tailwind CSS**
+   (utility-first styling) and **React** (component-based UIs), both
+   running fully in your browser.
+
+## A note on the three languages
+
+A web page is three languages doing three jobs:
+
+- **HTML** says *what things are* — "this is a heading", "this is a
+  list of ingredients", "this is a button".
+- **CSS** says *what things look like* — colors, spacing, size,
+  position.
+- **JavaScript** says *what things do* — what happens on a click, a
+  keypress, a timer.
+
+Keeping those jobs separate is the oldest and most useful habit in web
+development. The course is organized around it.
+
+Ready? Start with [How the Web Works](/courses/intro-web-development/how-the-web-works).

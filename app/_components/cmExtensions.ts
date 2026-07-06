@@ -73,6 +73,10 @@ async function loadLanguageModule(mode: string): Promise<Extension | null> {
       const { javascript } = await import("@codemirror/lang-javascript");
       return javascript({ typescript: true });
     }
+    case "tsx": {
+      const { javascript } = await import("@codemirror/lang-javascript");
+      return javascript({ typescript: true, jsx: true });
+    }
     case "php": {
       const { php } = await import("@codemirror/lang-php");
       return php();

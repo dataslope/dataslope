@@ -1,0 +1,175 @@
+---
+title: Challenge Cards — Web (HTML/CSS/JS)
+description: Web challenges assert on the real DOM of the sandboxed preview — structure, styles, and behaviour.
+---
+
+Web challenge tests are JavaScript snippets that run **inside the
+preview document** after it loads, so they can assert on the real DOM:
+`document.querySelector(...)`, `getComputedStyle(...)`, dispatched
+clicks. Results travel through the same sentinel protocol as every
+other language's harness.
+
+## HTML structure
+
+<ChallengeCard
+  adapter="web"
+  title="Build a profile card"
+  instructions={`Create a page containing:
+
+- an \`<h1>\` element with the text **Ada Lovelace**
+- a paragraph (\`<p>\`) that mentions the word **mathematician**
+- an unordered list (\`<ul>\`) with **at least two** \`<li>\` items`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <!-- Build the profile card here -->
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <body>
+    <h1>Ada Lovelace</h1>
+    <p>The first computer programmer — a mathematician and writer.</p>
+    <ul>
+      <li>Wrote the first published algorithm</li>
+      <li>Collaborated with Charles Babbage</li>
+    </ul>
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "heading",
+      name: "Page has an <h1> that says Ada Lovelace",
+      code: `const h1 = document.querySelector("h1");
+if (!h1) throw new Error("Add an <h1> element to the page.");
+if (!/ada lovelace/i.test(h1.textContent || "")) {
+  throw new Error("The <h1> should contain the text 'Ada Lovelace'.");
+}`,
+    },
+    {
+      id: "paragraph",
+      name: "A paragraph mentions 'mathematician'",
+      code: `const paragraphs = Array.from(document.querySelectorAll("p"));
+if (paragraphs.length === 0) throw new Error("Add a <p> element.");
+if (!paragraphs.some((p) => /mathematician/i.test(p.textContent || ""))) {
+  throw new Error("One paragraph should mention the word 'mathematician'.");
+}`,
+    },
+    {
+      id: "list",
+      name: "An unordered list has at least two items",
+      code: `const items = document.querySelectorAll("ul li");
+if (items.length < 2) {
+  throw new Error("Add a <ul> with at least two <li> items — found " + items.length + ".");
+}`,
+    },
+  ]}
+/>
+
+## CSS + behaviour (multi-file)
+
+<ChallengeCard
+  adapter="web"
+  title="Wire up the highlight button"
+  entryFilename="index.html"
+  instructions={`The page has a button and a paragraph. Finish the two TODOs:
+
+1. In \`styles.css\`, give the \`.highlight\` class a yellow background: \`rgb(254, 240, 138)\`.
+2. In \`script.js\`, add a click listener to the button that toggles the \`highlight\` class on the paragraph.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <p id="note">Select me with the button below.</p>
+    <button id="toggle">Toggle highlight</button>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+/* TODO 1: style the .highlight class */
+`,
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.highlight {
+  background: rgb(254, 240, 138);
+}
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const button = document.querySelector("#toggle");
+const note = document.querySelector("#note");
+
+// TODO 2: toggle the "highlight" class on #note when the button is clicked
+`,
+      solutionCode: `const button = document.querySelector("#toggle");
+const note = document.querySelector("#note");
+
+button.addEventListener("click", () => {
+  note.classList.toggle("highlight");
+});
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "click_adds_class",
+      name: "Clicking the button highlights the paragraph",
+      code: `const button = document.querySelector("#toggle");
+const note = document.querySelector("#note");
+if (!button || !note) throw new Error("Keep the #toggle button and #note paragraph.");
+button.click();
+await new Promise((r) => setTimeout(r, 30));
+if (!note.classList.contains("highlight")) {
+  throw new Error("After one click, #note should have the 'highlight' class.");
+}`,
+    },
+    {
+      id: "highlight_style",
+      name: "The .highlight class paints a yellow background",
+      code: `const note = document.querySelector("#note");
+note.classList.add("highlight");
+const bg = getComputedStyle(note).backgroundColor;
+if (bg !== "rgb(254, 240, 138)") {
+  throw new Error("Expected background rgb(254, 240, 138), got " + bg + ".");
+}`,
+    },
+    {
+      id: "click_toggles_back",
+      name: "A second click removes the highlight",
+      code: `const button = document.querySelector("#toggle");
+const note = document.querySelector("#note");
+note.classList.remove("highlight");
+button.click();
+await new Promise((r) => setTimeout(r, 30));
+button.click();
+await new Promise((r) => setTimeout(r, 30));
+if (note.classList.contains("highlight")) {
+  throw new Error("Clicking twice should end with the highlight removed (toggle, not add).");
+}`,
+    },
+  ]}
+/>

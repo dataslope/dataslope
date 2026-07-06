@@ -119,6 +119,11 @@ const COMPILER_OPTIONS: tsModule.CompilerOptions = {
   allowJs: true,
   esModuleInterop: true,
   allowSyntheticDefaultImports: true,
+  // The React playground shares this worker for .tsx/.jsx entries; the
+  // option only changes how those extensions parse, so the JS/TS
+  // adapters are unaffected. (React's own typings aren't fetched — DOM
+  // and local-workspace completions still work inside components.)
+  jsx: ts.JsxEmit.ReactJSX,
   noEmit: true,
 };
 

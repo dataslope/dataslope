@@ -67,3 +67,29 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 // `typescript` version pinned in package.json.
 export const TYPESCRIPT_VERSION = "5.7.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
+
+// esbuild-wasm powers the React/TSX playground's transform + bundle step
+// inside a dedicated worker (see esbuild-worker.ts). The browser build is
+// pulled with importScripts and the WASM binary streamed from the same
+// pinned package — nothing lands in the client chunks; the download only
+// happens when a React block/playground first boots. esbuild-wasm is NOT
+// in package.json (the worker declares the small API surface it uses),
+// so this pin is the single source of truth for the version.
+export const ESBUILD_WASM_VERSION = "0.28.1";
+export const ESBUILD_WASM_CDN_BASE = `https://cdn.jsdelivr.net/npm/esbuild-wasm@${ESBUILD_WASM_VERSION}`;
+
+// Tailwind's official in-browser compiler (@tailwindcss/browser v4) —
+// injected into web-preview documents when a block/example opts in via
+// `previewTailwind`. Tailwind Labs designates it a development-time
+// compiler (it compiles utility classes on the fly with a
+// MutationObserver), which is exactly the learning-playground use case;
+// don't reuse this pin for anything that ships production pages.
+export const TAILWIND_BROWSER_VERSION = "4.3.2";
+export const TAILWIND_BROWSER_CDN = `https://cdn.jsdelivr.net/npm/@tailwindcss/browser@${TAILWIND_BROWSER_VERSION}`;
+
+// esm.sh serves npm packages as native ES modules — the React preview's
+// bundler rewrites bare imports (`react`, `react-dom/client`, any npm
+// package) to pinned esm.sh URLs and marks them external, so the browser
+// fetches them directly inside the sandboxed preview iframe. See
+// esmResolve.ts for the specifier → URL mapping and the react pin.
+export const ESM_SH_ORIGIN = "https://esm.sh";

@@ -51,6 +51,7 @@ import type {
   OutputCell,
   PackageInfo,
   PlotlyFigure,
+  RunOptions,
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useCreepingBootFraction } from "./challengeShared";
@@ -187,6 +188,7 @@ function buildCapabilitiesBlurb(
   if (caps?.dataframes) items.push("data frames");
   if (caps?.charts) items.push("charts");
   if (caps?.figures) items.push("figures");
+  if (caps?.preview) items.push("a live page preview");
   if (items.length === 0) return "";
   if (items.length === 1) return `Supports text and ${items[0]}.`;
   if (items.length === 2)
@@ -915,7 +917,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const entryFocusDoneRef = useRef(false);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
+  const languageCompRef = useRef<Compartment | null>(null);
   const outputBodyRef = useRef<HTMLDivElement | null>(null);
+  // Slot the preview adapters (web / react) mount their sandboxed
+  // iframe into. Always in the DOM for preview-capable adapters so the
+  // element exists by the time `runtime.run` needs it.
+  const previewHostRef = useRef<HTMLDivElement | null>(null);
+  const hasPreview = Boolean(adapter.outputCapabilities?.preview);
 
   // Latest run handler in a ref so the editor's keymap can call into it
   // without being re-bound on every render.
@@ -1479,6 +1487,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       editorRef.current = view;
       themeCompRef.current = themeComp;
       wrapCompRef.current = wrapComp;
+      languageCompRef.current = languageComp;
 
       void loadLanguage(adapter.codeMirrorMode).then((ext) => {
         if (ext && editorRef.current === view) {
@@ -1528,6 +1537,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       editorRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      languageCompRef.current = null;
     };
     // editorTheme is intentionally only consumed for the *initial* CM theme;
     // subsequent changes are pushed via Compartment reconfigure below.
@@ -1595,6 +1605,31 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
     view.focus();
   }, [activeFileId, activeTabId, workspaceReady, showLoadingOverlay]);
+
+  // Per-file syntax highlighting for adapters whose workspaces mix
+  // languages (web: .html/.css/.js side by side). Reconfigures the
+  // language compartment whenever the active tab changes; adapters
+  // without `codeMirrorModeForFile` keep the mode loaded at mount.
+  useEffect(() => {
+    if (!adapter.codeMirrorModeForFile) return;
+    if (!workspaceReady) return;
+    const filename = files.find((f) => f.id === activeFileId)?.filename;
+    if (!filename) return;
+    const mode =
+      adapter.codeMirrorModeForFile(filename) ?? adapter.codeMirrorMode;
+    const view = editorRef.current;
+    const comp = languageCompRef.current;
+    if (!view || !comp) return;
+    let cancelled = false;
+    void loadLanguage(mode).then((ext) => {
+      if (cancelled || !ext) return;
+      if (editorRef.current !== view) return;
+      view.dispatch({ effects: comp.reconfigure(ext) });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [adapter, activeFileId, files, workspaceReady]);
 
   // Push word-wrap changes into CodeMirror after init.
   useEffect(() => {
@@ -1934,11 +1969,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           });
         }
       }
-      await rt.run(
-        code,
-        (cell) => collected.push(cell),
-        entryFilename ? { entryFilename } : undefined,
-      );
+      const runOptions: RunOptions = {};
+      if (entryFilename) runOptions.entryFilename = entryFilename;
+      // Preview adapters render into the surface-owned slot; each run
+      // replaces the previous iframe (which is also the teardown story).
+      if (hasPreview) runOptions.previewHost = previewHostRef.current;
+      await rt.run(code, (cell) => collected.push(cell), runOptions);
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const merged = mergeConsecutiveStdout(collected);
@@ -1951,7 +1987,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           runId,
         })),
       ]);
-      if (collected.length === 0) {
+      if (collected.length === 0 && !hasPreview) {
+        // Preview adapters "output" the page itself — a run with no
+        // console output is the normal case, not worth a toast.
         showToast("Code ran successfully — no output.");
       }
       // Keep the running overlay visible long enough for the 180ms CSS
@@ -1994,7 +2032,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setMobileTab("output");
     }
   },
-  [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
+  [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
 
   // Keep a fresh closure available for the CodeMirror keymap.
   useEffect(() => {
@@ -2006,10 +2044,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const clearOutput = useCallback(() => {
     const fileId = activeFileIdRef.current;
     if (fileId) clearOutputsForFile(fileId);
+    // Clearing also tears down the live preview — removing the iframe
+    // kills its document (scripts, timers, listeners) immediately.
+    if (hasPreview) previewHostRef.current?.replaceChildren();
     if (loaded) {
       setStatusState("ready");
     }
-  }, [clearOutputsForFile, loaded]);
+  }, [clearOutputsForFile, hasPreview, loaded]);
 
   // Build a filename → content map covering every code tab so the Run
   // button can detect entry-point declarations (`main`, `Main`,
@@ -2755,7 +2796,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const code = editorRef.current?.state.doc.toString() ?? "";
     setIsFormatting(true);
     try {
-      const formatted = await adapter.formatCode(code);
+      // Pass the active filename so mixed-language workspaces (web:
+      // .html/.css/.js) format with the right dialect.
+      const activeFilename = filesRef.current.find(
+        (f) => f.id === activeFileIdRef.current,
+      )?.filename;
+      const formatted = await adapter.formatCode(code, activeFilename);
       if (formatted === code) {
         showToast("Already formatted — nothing to change.");
         return;
@@ -4057,7 +4103,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               aria-live="polite"
               aria-label="Program output"
             >
-              {outputs.length === 0 && statusState !== "running" ? (
+              {hasPreview && (
+                // Live page preview for the web/react adapters. Always
+                // mounted so the slot element exists before the first
+                // run; the runtime swaps a sandboxed iframe into the
+                // slot on every run, and CSS renders a placeholder
+                // while the slot is still empty.
+                <div className="web-preview-panel" data-testid="web-preview">
+                  <div className="web-preview-header">
+                    <span className="web-preview-label">Preview</span>
+                  </div>
+                  <div className="web-preview-slot" ref={previewHostRef} />
+                </div>
+              )}
+              {outputs.length === 0 && statusState !== "running" && !hasPreview ? (
                 <div className="welcome">
                   <div className="welcome-icon">
                     <DiamondMark size={40} />

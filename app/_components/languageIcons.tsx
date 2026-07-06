@@ -21,6 +21,8 @@ import {
   SiSqlite,
   SiPostgresql,
   SiDuckdb,
+  SiHtml5,
+  SiReact,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
@@ -66,6 +68,8 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   sqlite: SiSqlite,
   postgres: SiPostgresql,
   duckdb: SiDuckdb,
+  web: SiHtml5,
+  react: SiReact,
 };
 
 /** Per-language relative size multiplier. Some glyphs read "heavier"
@@ -93,4 +97,6 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   sqlite: "#003b57",
   postgres: "#4169E1",
   duckdb: "#FFBE11",
+  web: "#e34f26",
+  react: "#61dafb",
 };

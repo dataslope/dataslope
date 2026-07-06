@@ -2690,3 +2690,62 @@
   scrollbar-color: var(--ch-scrollbar-thumb) transparent;
 }
 
+
+/* ─── Live page preview (web / react adapters) ────────────────────────────
+   Shared by <ChallengeCard> and <CodeBlock> (which imports this module for
+   its chrome). The panel is always mounted for preview-capable adapters so
+   the slot element exists before the first run; the runtime swaps a
+   sandboxed iframe into `.previewSlot` on every run. While the slot is
+   still empty, a placeholder message renders in its stead. */
+.previewPanel {
+  border-top: 1px solid var(--ch-border-light);
+  background: var(--ch-bg);
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px 8px 14px;
+}
+
+.previewLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-gray-500, #6b7280);
+}
+
+.previewSlot {
+  /* User-resizable height; pages get a white canvas like a real tab. */
+  resize: vertical;
+  overflow: auto;
+  height: 300px;
+  min-height: 100px;
+  margin: 0 14px 14px 14px;
+  border: 1px solid var(--ch-border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.previewSlot:empty {
+  display: grid;
+  place-items: center;
+  height: 120px;
+  resize: none;
+  background: transparent;
+}
+
+.previewSlot:empty::after {
+  content: "Run the code to render the page preview.";
+  font-size: 12.5px;
+  color: var(--ds-gray-500, #6b7280);
+}
+
+.previewSlot > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+}

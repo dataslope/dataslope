@@ -240,6 +240,11 @@ export interface ChallengeCardProps {
    *  the learner to write the import themselves, or dynamic imports.
    *  Only meaningful for runtimes with optional package sets (Python). */
   packages?: string[];
+  /** Inject the pinned Tailwind in-browser compiler into the preview
+   *  document on every Run / Check Answer. Only meaningful for preview
+   *  adapters (web / react); see `TAILWIND_BROWSER_CDN` in
+   *  runtime/cdn.ts for the pin. */
+  tailwind?: boolean;
 }
 
 function detectIsMac(): boolean {
@@ -360,6 +365,7 @@ export default function ChallengeCard({
   showFileTabBar = false,
   tests,
   packages,
+  tailwind = false,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
@@ -460,6 +466,13 @@ export default function ChallengeCard({
   // active file changes so the gutter offset tracks that file's init
   // line count (the editable region continues numbering after the init).
   const mainLineNumberCompRef = useRef<Compartment | null>(null);
+  // Language compartment — reconfigured per active file for adapters
+  // whose workspaces mix languages (web: .html/.css/.js).
+  const mainLanguageCompRef = useRef<Compartment | null>(null);
+  // Slot the preview adapters (web / react) mount their sandboxed
+  // iframe into; always in the DOM for preview-capable adapters so the
+  // element exists by the time `runtime.run` needs it.
+  const previewHostRef = useRef<HTMLDivElement | null>(null);
   // Debounce handle for the localStorage write that mirrors the editor
   // buffer. See `persistedKeyForFile` below.
   const persistSaveTimerRef = useRef<number | null>(null);
@@ -710,8 +723,14 @@ export default function ChallengeCard({
     editorRef.current = view;
     mainThemeCompRef.current = themeComp;
     mainLineNumberCompRef.current = lineNumberComp;
+    mainLanguageCompRef.current = languageComp;
 
-    void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+    // Mixed-language adapters (web) pick the mode from the active
+    // file's extension; the per-file effect below keeps it in sync.
+    const initialMode =
+      adapter.codeMirrorModeForFile?.(activeFilenameRef.current) ??
+      adapter.codeMirrorMode;
+    void loadLanguage(initialMode).then((ext) => {
       if (ext && editorRef.current === view) {
         view.dispatch({ effects: languageComp.reconfigure(ext) });
       }
@@ -729,6 +748,7 @@ export default function ChallengeCard({
       editorRef.current = null;
       mainThemeCompRef.current = null;
       mainLineNumberCompRef.current = null;
+      mainLanguageCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -775,6 +795,26 @@ export default function ChallengeCard({
       effects: comp.reconfigure(lineNumbersWithOffset(activeInitLineCount)),
     });
   }, [activeInitLineCount]);
+
+  // Per-file syntax highlighting for adapters whose workspaces mix
+  // languages (web: .html/.css/.js). No-op for single-language adapters.
+  useEffect(() => {
+    if (!adapter.codeMirrorModeForFile) return;
+    const view = editorRef.current;
+    const comp = mainLanguageCompRef.current;
+    if (!view || !comp) return;
+    const mode =
+      adapter.codeMirrorModeForFile(activeFilename) ?? adapter.codeMirrorMode;
+    let cancelled = false;
+    void loadLanguage(mode).then((ext) => {
+      if (cancelled || !ext) return;
+      if (editorRef.current !== view) return;
+      view.dispatch({ effects: comp.reconfigure(ext) });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [adapter, activeFilename]);
 
   // Sync the CodeMirror theme across all active editors when the docs
   // colour scheme toggles (Fumadocs dark/light toggle or OS preference).
@@ -1153,6 +1193,16 @@ export default function ChallengeCard({
           },
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
+            // Preview adapters render into the card-owned slot; each
+            // run replaces the previous iframe (which is also the
+            // teardown story for runaway scripts).
+            previewHost: adapter.outputCapabilities?.preview
+              ? previewHostRef.current
+              : undefined,
+            previewTailwind:
+              adapter.outputCapabilities?.preview && tailwind
+                ? true
+                : undefined,
             // Mid-run waits (e.g. Python's deferred package set on the
             // first run, or an on-demand `import`) show the boot notice
             // for the duration instead of a bare "Running…" while
@@ -1187,6 +1237,7 @@ export default function ChallengeCard({
       effectiveSourceFor,
       reportPrepare,
       resetPrepare,
+      tailwind,
     ],
   );
 
@@ -1457,6 +1508,9 @@ export default function ChallengeCard({
       persistSaveTimerRef.current = null;
     }
     setOutputs([]);
+    // Reset also tears down the live preview — removing the iframe
+    // kills its document (scripts, timers, listeners) immediately.
+    previewHostRef.current?.replaceChildren();
     setElapsed("");
     setStatus("idle");
     setStatusMessage("");
@@ -1634,7 +1688,12 @@ export default function ChallengeCard({
     setIsFormatting(true);
     const startedAt = performance.now();
     try {
-      const formatted = await adapter.formatCode(code);
+      // Pass the active filename so mixed-language workspaces (web:
+      // .html/.css/.js) format with the right dialect.
+      const formatted = await adapter.formatCode(
+        code,
+        activeFilenameRef.current,
+      );
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
@@ -2135,6 +2194,16 @@ export default function ChallengeCard({
           itemClassName={styles.toast}
         />
       </div>
+
+      {/* ── Live page preview (web / react adapters) ── */}
+      {adapter.outputCapabilities?.preview && (
+        <div className={styles.previewPanel} data-testid="web-preview">
+          <div className={styles.previewHeader}>
+            <span className={styles.previewLabel}>Preview</span>
+          </div>
+          <div className={styles.previewSlot} ref={previewHostRef} />
+        </div>
+      )}
 
       {/* ── Output panel ── */}
       {(outputs.length > 0 || isBusy) && (

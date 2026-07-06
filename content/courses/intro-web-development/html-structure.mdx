@@ -1,0 +1,157 @@
+---
+title: HTML — Structure of a Page
+description: Elements, tags, nesting, and the skeleton every page shares — doctype, head, and body.
+---
+
+HTML (*HyperText Markup Language*) describes what the parts of a page
+**are**. It does that with **elements**.
+
+## Elements and tags
+
+An element is usually a pair of tags wrapped around some content:
+
+```html
+<h1>Coffee Brewing Guide</h1>
+<p>Everything I know about making a good cup.</p>
+```
+
+- `<h1>` is an **opening tag**, `</h1>` is the **closing tag** (note
+  the slash), and everything between them is the element's content.
+- Tag names carry *meaning*, not appearance: `<h1>` is "the top-level
+  heading of this page", `<p>` is "a paragraph". The browser gives
+  them default looks (big bold text, spaced blocks), but their real
+  job is describing structure.
+
+Elements **nest**: a list contains list items, a paragraph can contain
+emphasized text. Nesting must be properly contained — close inner
+elements before outer ones.
+
+A few elements have no content and no closing tag, like `<img>` (an
+image) and `<br>` (a line break). They're called **void elements**.
+
+## The skeleton every page shares
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <title>Coffee Brewing Guide</title>
+  </head>
+  <body>
+    <h1>Coffee Brewing Guide</h1>
+    <h2>Why bother?</h2>
+    <p>Good coffee is <strong>90% technique</strong> and 10% beans.</p>
+    <h2>What you need</h2>
+    <p>A kettle, a scale, and six minutes of patience.</p>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Reading top to bottom:
+
+- `<!doctype html>` tells the browser "this is modern HTML". Every
+  page starts with it.
+- `<html>` wraps the entire document.
+- `<head>` holds information *about* the page — its `<title>` (shown
+  in the browser tab), stylesheets, and metadata. Nothing in the head
+  is rendered on the page itself.
+- `<body>` holds everything you actually see.
+
+Notice the heading levels: one `<h1>` for the page's main title, then
+`<h2>` for its sections (there are also `<h3>`–`<h6>` for deeper
+levels). Heading structure is how screen readers and search engines
+understand your page's outline — use levels for *hierarchy*, never
+for font size.
+
+## Whitespace mostly doesn't matter
+
+The browser collapses runs of spaces and newlines into a single
+space. Indentation exists for *you*, the reader of the source. Use it
+to mirror nesting, like the examples do.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Structure a recipe page"
+  instructions={`Build the skeleton of a recipe page in \`index.html\`:
+
+1. An \`<h1>\` containing the recipe name **Pancakes**.
+2. Two \`<h2>\` section headings: one containing the word **Ingredients**, one containing the word **Steps**.
+3. At least one \`<p>\` paragraph somewhere on the page.
+
+Keep the \`<!doctype html>\`, \`<head>\`, and \`<body>\` skeleton that's already there.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <title>Pancakes</title>
+  </head>
+  <body>
+    <!-- Build the page here -->
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <head>
+    <title>Pancakes</title>
+  </head>
+  <body>
+    <h1>Pancakes</h1>
+
+    <h2>Ingredients</h2>
+    <p>Flour, milk, eggs, a pinch of salt, and a hot pan.</p>
+
+    <h2>Steps</h2>
+    <p>Whisk everything together, then fry ladlefuls until golden.</p>
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "h1",
+      name: "There is exactly one <h1>, titled Pancakes",
+      code: `const h1s = document.querySelectorAll("h1");
+if (h1s.length !== 1) {
+  throw new Error("Use exactly one <h1> on the page — found " + h1s.length + ".");
+}
+if (!/pancakes/i.test(h1s[0].textContent || "")) {
+  throw new Error("The <h1> should contain the word 'Pancakes'.");
+}`,
+    },
+    {
+      id: "sections",
+      name: "Two <h2> sections: Ingredients and Steps",
+      code: `const texts = Array.from(document.querySelectorAll("h2")).map(
+  (h) => (h.textContent || "").toLowerCase(),
+);
+if (!texts.some((t) => t.includes("ingredients"))) {
+  throw new Error("Add an <h2> that says 'Ingredients'.");
+}
+if (!texts.some((t) => t.includes("steps"))) {
+  throw new Error("Add an <h2> that says 'Steps'.");
+}`,
+    },
+    {
+      id: "paragraph",
+      name: "The page has at least one paragraph",
+      code: `if (document.querySelectorAll("p").length < 1) {
+  throw new Error("Add at least one <p> element.");
+}`,
+    },
+  ]}
+/>
+
+Next: filling that structure with [text, links, and lists](/courses/intro-web-development/html-text-links-lists).

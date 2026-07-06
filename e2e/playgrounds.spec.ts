@@ -109,6 +109,46 @@ test.describe("Playgrounds (fast)", () => {
     expect(cells.find((c) => c.type === "stderr")).toBeUndefined();
   });
 
+  test("Web (HTML/CSS/JS) renders the live page preview", async ({ page }) => {
+    await page.goto("/playground/web");
+    await waitForRuntimeReady(page);
+    await page.locator(".run-btn").first().click();
+
+    // The default Hello example renders inside the sandboxed preview
+    // iframe mounted in the output pane's preview slot.
+    const preview = page.frameLocator(".web-preview-slot iframe");
+    await expect(preview.locator("h1")).toContainText(
+      "Hello, Web Playground!",
+      { timeout: 60_000 },
+    );
+
+    // Its console.log crosses the postMessage bridge into a stdout cell.
+    await page.waitForFunction(
+      () => document.querySelectorAll(".out-cell.stdout").length > 0,
+      null,
+      { timeout: 30_000 },
+    );
+  });
+
+  test("React compiles TSX in-browser and renders an interactive preview", async ({
+    page,
+  }) => {
+    await page.goto("/playground/react");
+    // First readiness wait covers the esbuild-wasm toolchain download.
+    await waitForRuntimeReady(page);
+    await page.locator(".run-btn").first().click();
+
+    const preview = page.frameLocator(".web-preview-slot iframe");
+    await expect(preview.locator("h1")).toContainText("You clicked 0 times", {
+      timeout: 120_000,
+    });
+
+    // The preview stays live after the run — clicking drives real
+    // React state updates inside the sandboxed document.
+    await preview.locator("button").click();
+    await expect(preview.locator("h1")).toContainText("You clicked 1 times");
+  });
+
   test("PHP runs the default example", async ({ page }) => {
     await page.goto("/playground/php");
     await waitForRuntimeReady(page);

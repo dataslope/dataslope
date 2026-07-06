@@ -18,6 +18,8 @@ import { cAdapter } from "./c";
 import { cppAdapter } from "./cpp";
 import { javaAdapter } from "./java";
 import { csharpAdapter } from "./csharp";
+import { webAdapter } from "./web";
+import { reactAdapter } from "./react";
 
 export const ADAPTERS: Record<string, LanguageAdapter> = {
   python: pythonAdapter,
@@ -29,6 +31,8 @@ export const ADAPTERS: Record<string, LanguageAdapter> = {
   cpp: cppAdapter,
   java: javaAdapter,
   csharp: csharpAdapter,
+  web: webAdapter,
+  react: reactAdapter,
 };
 
 export type AdapterId = keyof typeof ADAPTERS;

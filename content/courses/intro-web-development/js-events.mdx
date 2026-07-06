@@ -1,0 +1,177 @@
+---
+title: JavaScript — Events
+description: addEventListener, the event object, reading inputs, and intercepting form submits.
+---
+
+DOM manipulation gets interesting when it happens *in response to the
+user*. That's **events**: clicks, keypresses, typing, submitting,
+scrolling — the browser fires a named event for each, and your code
+can listen.
+
+## addEventListener
+
+```js
+button.addEventListener("click", function () {
+  console.log("clicked!");
+});
+```
+
+Read it as: *on this element, when a `"click"` happens, run this
+function.* The function is called an **event handler**, and it runs
+every time the event fires — once per click, forever.
+
+Handlers receive an **event object** with details: which key was
+pressed, where the pointer was, and — critically for forms —
+`event.preventDefault()`, which cancels the browser's default
+reaction (like reloading the page on submit).
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      input, button { font-size: 1rem; padding: 0.35rem 0.6rem; }
+      #shout { margin-top: 1rem; font-size: 1.4rem; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <h1>Echo chamber</h1>
+    <form id="echo-form">
+      <input id="phrase" placeholder="Type something…" />
+      <button type="submit">Shout it</button>
+    </form>
+    <p id="shout"></p>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `var form = document.querySelector("#echo-form");
+var phrase = document.querySelector("#phrase");
+var shout = document.querySelector("#shout");
+
+form.addEventListener("submit", function (event) {
+  // A form's default submit reloads the page — cancel that and
+  // handle the input ourselves instead.
+  event.preventDefault();
+
+  var text = phrase.value;
+  shout.textContent = text.toUpperCase() + "!";
+  console.log("shouted:", text);
+});
+
+// Live feedback while typing — the "input" event fires per keystroke.
+phrase.addEventListener("input", function () {
+  console.log("typing:", phrase.value);
+});
+`,
+    },
+  ]}
+/>
+
+Type in the preview and submit — then check the console output. Two
+takeaways:
+
+- **`input.value`** reads what's currently typed into a field.
+- **`event.preventDefault()`** inside a `submit` handler is how every
+  modern page handles forms with JavaScript instead of a page reload.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Night mode switch"
+  entryFilename="index.html"
+  instructions={`Make the button toggle night mode. In \`script.js\`:
+
+1. Select the button with the id \`mode\` and add a \`"click"\` event listener to it.
+2. In the handler, toggle the class \`night\` on \`document.body\` (use \`classList.toggle\`).
+3. Also update the button's own text: it should read \`Lights on\` while night mode is active, and \`Lights off\` otherwise.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+        transition: background 0.3s, color 0.3s;
+      }
+      body.night {
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      button { font-size: 1rem; padding: 0.4rem 1rem; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>Reading nook</h1>
+    <p>Some pages are easier on the eyes after dark.</p>
+    <button id="mode">Lights off</button>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `var button = document.querySelector("#mode");
+
+// 1. listen for clicks on the button
+// 2. toggle the "night" class on document.body
+// 3. set button.textContent to "Lights on" in night mode,
+//    "Lights off" otherwise
+`,
+      solutionCode: `var button = document.querySelector("#mode");
+
+button.addEventListener("click", function () {
+  var night = document.body.classList.toggle("night");
+  button.textContent = night ? "Lights on" : "Lights off";
+});
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "first_click",
+      name: "One click switches night mode on",
+      code: `const button = document.querySelector("#mode");
+button.click();
+await new Promise((r) => setTimeout(r, 30));
+if (!document.body.classList.contains("night")) {
+  throw new Error("After one click, <body> should have the 'night' class.");
+}
+if (!/lights on/i.test(button.textContent || "")) {
+  throw new Error("While night mode is active the button should read 'Lights on'.");
+}`,
+    },
+    {
+      id: "second_click",
+      name: "A second click switches it back off",
+      code: `const button = document.querySelector("#mode");
+button.click();
+await new Promise((r) => setTimeout(r, 30));
+if (document.body.classList.contains("night")) {
+  throw new Error("A second click should REMOVE the 'night' class (toggle, not add).");
+}
+if (!/lights off/i.test(button.textContent || "")) {
+  throw new Error("With night mode off the button should read 'Lights off'.");
+}`,
+    },
+  ]}
+/>
+
+You now have all three languages. Put them together in the
+[capstone project](/courses/intro-web-development/project-interactive-scoreboard).

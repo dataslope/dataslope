@@ -4624,3 +4624,59 @@ html[data-playground-theme="dark"] .welcome h3 {
     transform: rotate(360deg);
   }
 }
+
+/* ─── Live page preview (web / react adapters) ───────────────────────────
+   The panel is always mounted for preview-capable adapters so the slot
+   element exists before the first run; the runtime swaps a sandboxed
+   iframe into `.web-preview-slot` on every run. While the slot is still
+   empty, a placeholder message renders in its stead. */
+.web-preview-panel {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg2);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.web-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.web-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.web-preview-slot {
+  /* User-resizable height; pages get a white canvas like a real tab. */
+  resize: vertical;
+  overflow: auto;
+  height: 320px;
+  min-height: 120px;
+  background: #ffffff;
+}
+.web-preview-slot:empty {
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  resize: none;
+  height: 160px;
+}
+.web-preview-slot:empty::after {
+  content: "Run your code to render the page preview.";
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.web-preview-slot > iframe.ds-web-preview-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+}
