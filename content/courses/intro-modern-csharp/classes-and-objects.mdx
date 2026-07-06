@@ -17,48 +17,30 @@ The answer is the **class** — a way to bundle data and the
 behavior that owns it into a single unit.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 240"
   role="img"
-  aria-label="A blue cutter outline with a handle stamps out three solid squares below, each holding its white dot in a different spot — one class, many objects each with its own state"
+  aria-label="A dashed blue blueprint card with construction marks links by thin gray lines to three solid squares — blue, green, yellow — each stamped from the same plan but holding its white state dot in a different spot"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="230" y1="90" x2="374" y2="58" />
+    <line x1="230" y1="115" x2="374" y2="128" />
+    <line x1="230" y1="140" x2="374" y2="198" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }}>
-    <rect x="305" y="18" width="30" height="10" rx="5" fill="currentColor" />
-    <rect
-      x="280"
-      y="34"
-      width="80"
-      height="80"
-      rx="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-    />
+    <rect x="80" y="48" width="150" height="134" rx="14" fill="currentColor" fillOpacity="0.07" />
+    <rect x="80" y="48" width="150" height="134" rx="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="7 5" />
+    <circle cx="155" cy="98" r="24" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5 4" />
+    <rect x="104" y="140" width="100" height="4" rx="2" fill="currentColor" fillOpacity="0.35" />
+    <rect x="104" y="152" width="70" height="4" rx="2" fill="currentColor" fillOpacity="0.25" />
   </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M296 120 L 190 138" />
-    <path d="M320 120 V 138" />
-    <path d="M344 120 L 450 138" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="144" width="64" height="64" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="288" y="144" width="64" height="64" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="436" y="144" width="64" height="64" rx="14" />
-  </g>
+  <rect x="380" y="28" width="60" height="60" rx="14" fill="var(--ds-blue-500)" />
+  <rect x="380" y="98" width="60" height="60" rx="14" fill="var(--ds-green-500)" />
+  <rect x="380" y="168" width="60" height="60" rx="14" fill="var(--ds-yellow-500)" />
   <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.92">
-    <circle cx="160" cy="164" r="7" />
-    <circle cx="332" cy="188" r="7" />
-    <circle cx="480" cy="170" r="7" />
+    <circle cx="398" cy="46" r="7" />
+    <circle cx="410" cy="128" r="7" />
+    <circle cx="422" cy="210" r="7" />
   </g>
 </svg>
 
