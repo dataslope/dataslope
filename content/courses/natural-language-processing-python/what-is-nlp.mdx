@@ -16,37 +16,31 @@ which marks matter, or what any of it *means*. Natural Language Processing
 (NLP) is the field that closes that gap.
 
 <svg
-  viewBox="0 0 640 190"
+  viewBox="0 0 640 200"
   role="img"
-  aria-label="A long flat string bar with confident green cut marks where words clearly end, and two teal question-mark badges hovering where the right cut is ambiguous"
+  aria-label="Flowing wavy blue lines of human language pass through a thin gray arrow and become a tidy grid of green value cells with one bright yellow cell — free-form text turned into structure a machine can use"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.14">
-    <rect x="70" y="112" width="500" height="34" rx="17" />
+  <g fill="none" stroke="var(--ds-blue-500)" strokeWidth="4.5" strokeLinecap="round">
+    <path d="M 70 60 C 100 45 130 75 160 60 C 185 48 215 70 240 58" strokeOpacity="0.9" />
+    <path d="M 70 100 C 105 85 140 115 175 100 C 200 90 220 108 236 100" strokeOpacity="0.55" />
+    <path d="M 70 140 C 100 128 128 152 158 140 C 186 130 210 148 252 136" strokeOpacity="0.75" />
+  </g>
+  <g fill="var(--ds-gray-400)">
+    <rect x="286" y="98.5" width="44" height="3" rx="1.5" />
+    <polygon points="328,94.5 339,100 328,105.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="148" y="104" width="5" height="50" rx="2.5" fillOpacity="0.9" />
-    <rect x="318" y="104" width="5" height="50" rx="2.5" fillOpacity="0.9" />
-    <rect x="488" y="104" width="5" height="50" rx="2.5" fillOpacity="0.9" />
+    <rect x="380" y="52" width="26" height="26" rx="6" fillOpacity="0.9" />
+    <rect x="416" y="52" width="26" height="26" rx="6" fillOpacity="0.35" />
+    <rect x="452" y="52" width="26" height="26" rx="6" fillOpacity="0.6" />
+    <rect x="380" y="88" width="26" height="26" rx="6" fillOpacity="0.3" />
+    <rect x="416" y="88" width="26" height="26" rx="6" fillOpacity="0.8" />
+    <rect x="452" y="88" width="26" height="26" rx="6" fillOpacity="0.5" />
+    <rect x="380" y="124" width="26" height="26" rx="6" fillOpacity="0.65" />
+    <rect x="416" y="124" width="26" height="26" rx="6" fillOpacity="0.4" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="228" y="104" width="5" height="50" rx="2.5" fillOpacity="0.55" />
-    <rect x="408" y="104" width="5" height="50" rx="2.5" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
-    <circle cx="230.5" cy="62" r="14" />
-    <circle cx="410.5" cy="62" r="14" />
-  </g>
-  <g fill="currentColor" fontFamily="var(--font-sans), Georgia, serif" fontSize="17" fontWeight="700" textAnchor="middle">
-    <text x="230.5" y="68" style={{ fill: "var(--ds-white)" }}>?</text>
-    <text x="410.5" y="68" style={{ fill: "var(--ds-white)" }}>?</text>
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="230.5" cy="88" r="3" />
-    <circle cx="230.5" cy="98" r="2.5" />
-    <circle cx="410.5" cy="88" r="3" />
-    <circle cx="410.5" cy="98" r="2.5" />
-  </g>
+  <rect x="452" y="124" width="26" height="26" rx="6" fill="var(--ds-yellow-500)" />
 </svg>
 
 ## The core problem: text is unstructured
