@@ -65,6 +65,17 @@ const OBJECT_SLUGS: Record<string, string> = {
     "monty-hall-doors",
 };
 
+/** Display name for a person subject: drops a trailing descriptor after a
+ *  comma/colon (so "Fred Brooks, author of …" → "Fred Brooks") and a leading
+ *  "the " (so "the Gang of Four: …" → "Gang of Four"). Shared by the file-slug
+ *  logic and the gallery's reference-photo links. */
+function personDisplayName(subject: string): string {
+  return subject
+    .split(/[,:(]/)[0]
+    .trim()
+    .replace(/^the\s+/i, "");
+}
+
 /** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug. */
 function slugify(value: string): string {
   return value
@@ -92,14 +103,16 @@ export function illustrationFileSlug(subject: string, photo: boolean): string {
     if (mapped) return mapped;
     return slugify(subject).split("-").slice(0, 5).join("-");
   }
-  const base = subject
-    .split(/[,:(]/)[0]
-    .trim()
-    .replace(/^the\s+/i, "");
-  return `${slugify(base)}-portrait`;
+  return `${slugify(personDisplayName(subject))}-portrait`;
 }
 
 /** Full file name (with `.svg`) for a subject. */
 export function illustrationFileName(subject: string, photo: boolean): string {
   return `${illustrationFileSlug(subject, photo)}.svg`;
+}
+
+/** Google Images search link for a person subject. */
+export function personImageSearchUrl(subject: string): string {
+  const query = encodeURIComponent(personDisplayName(subject));
+  return `https://www.google.com/search?q=${query}&tbm=isch`;
 }

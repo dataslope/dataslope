@@ -24,6 +24,7 @@ import path from "node:path";
 import {
   buildIllustrationPrompt,
   illustrationFileSlug,
+  personImageSearchUrl,
 } from "./illustrationPrompt";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
@@ -61,6 +62,8 @@ export interface IllustrationPromptEntry {
   photo: boolean;
   /** The exact image-generation prompt. */
   prompt: string;
+  /** Google Images search link (people only). */
+  imageSearchUrl?: string;
   /** Every lesson that embeds this illustration. */
   usages: PromptUsage[];
 }
@@ -231,6 +234,7 @@ export function getIllustrationPrompts(): IllustrationPromptsData {
         subject: p.subject,
         photo: p.photo,
         prompt: buildIllustrationPrompt(p.subject, p.photo),
+        imageSearchUrl: p.photo ? personImageSearchUrl(p.subject) : undefined,
         usages: [],
       };
       bySlug.set(p.slug, entry);
@@ -239,6 +243,9 @@ export function getIllustrationPrompts(): IllustrationPromptsData {
       // slug is shared (e.g. two Datasaurus wordings → one drawing).
       entry.subject = p.subject;
       entry.prompt = buildIllustrationPrompt(p.subject, entry.photo);
+      if (entry.photo) {
+        entry.imageSearchUrl = personImageSearchUrl(p.subject);
+      }
     }
     // Record the usage, deduping repeated placements on the same route.
     if (!entry.usages.some((u) => u.route === p.route)) {

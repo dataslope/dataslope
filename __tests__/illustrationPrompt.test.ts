@@ -3,6 +3,7 @@ import {
   buildIllustrationPrompt,
   illustrationFileName,
   illustrationFileSlug,
+  personImageSearchUrl,
 } from "../lib/illustrationPrompt";
 
 // The `/illustration-prompts` gallery, the on-page placeholder anchor, and the
@@ -77,6 +78,14 @@ describe("illustrationFileSlug", () => {
   it("exposes the full file name with extension", () => {
     expect(illustrationFileName("Florence Nightingale", true)).toBe(
       "florence-nightingale-portrait.svg",
+    );
+  });
+});
+
+describe("personImageSearchUrl", () => {
+  it("builds a Google Images search URL for the display name", () => {
+    expect(personImageSearchUrl("Alan Kay")).toBe(
+      "https://www.google.com/search?q=Alan%20Kay&tbm=isch",
     );
   });
 });
