@@ -12,59 +12,36 @@ Backtracking is the disciplined answer. Build a candidate solution one choice at
 Make a choice, recurse into the world where that choice stands, then take the choice back so the loop can try the next one. The un-choose step is what separates backtracking from plain recursion — and forgetting it is the bug you will write most often on this page.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A dotted route explores a small maze, hits a red dead end, retreats as faint ghost dots, and threads the other corridor to the green exit — choose, explore, un-choose"
+  aria-label="A small decision tree: the gray left branch ends at a red dead end and is abandoned, dashed circles wait unexplored, and the bold green branch threads down to a solid green goal — choose, explore, un-choose"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.2">
-    <rect x="170" y="30" width="300" height="6" rx="3" />
-    <rect x="170" y="184" width="300" height="6" rx="3" />
-    <rect x="170" y="30" width="6" height="36" rx="3" />
-    <rect x="170" y="94" width="6" height="96" rx="3" />
-    <rect x="464" y="30" width="6" height="96" rx="3" />
-    <rect x="464" y="154" width="6" height="36" rx="3" />
-    <rect x="270" y="30" width="6" height="90" rx="3" />
-    <rect x="370" y="100" width="6" height="84" rx="3" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="312" y1="48" x2="226" y2="93" />
+    <line x1="215" y1="108" x2="164" y2="150" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="136" cy="80" r="6" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5">
+    <line x1="226" y1="107" x2="276" y2="152" />
+    <line x1="414" y1="107" x2="366" y2="152" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.65">
-    <circle cx="158" cy="80" r="3" />
-    <circle cx="186" cy="80" r="3" />
-    <circle cx="214" cy="80" r="3" />
-    <circle cx="240" cy="80" r="3" />
-    <circle cx="240" cy="104" r="3" />
-    <circle cx="240" cy="128" r="3" />
-    <circle cx="240" cy="150" r="3" />
-    <circle cx="268" cy="150" r="3" />
-    <circle cx="296" cy="150" r="3" />
-    <circle cx="324" cy="150" r="3" />
-    <circle cx="324" cy="126" r="3" />
-    <circle cx="324" cy="100" r="3" />
-    <circle cx="324" cy="74" r="3" />
-    <circle cx="352" cy="72" r="3" />
-    <circle cx="380" cy="70" r="3" />
-    <circle cx="408" cy="70" r="3" />
-    <circle cx="424" cy="94" r="3" />
-    <circle cx="424" cy="118" r="3" />
-    <circle cx="424" cy="140" r="3" />
-    <circle cx="450" cy="140" r="3" />
-    <circle cx="474" cy="140" r="3" />
+  <g stroke="var(--ds-green-500)" strokeWidth="3.5" strokeLinecap="round">
+    <line x1="328" y1="48" x2="414" y2="93" />
+    <line x1="426" y1="107" x2="475" y2="151" />
   </g>
-  <g fill="currentColor" opacity="0.18">
-    <circle cx="344" cy="150" r="2.5" />
-    <circle cx="350" cy="158" r="2" />
-    <circle cx="336" cy="158" r="2" />
-    <circle cx="322" cy="158" r="2" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="354" y="144" width="12" height="12" rx="3" fillOpacity="0.8" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="320" cy="40" r="10" />
+    <circle cx="220" cy="100" r="8" fillOpacity="0.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="496" cy="140" r="7" />
+    <circle cx="420" cy="100" r="8" />
+    <circle cx="480" cy="160" r="10" />
   </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="150" y="150" width="20" height="20" rx="5" />
+  </g>
+  <circle cx="280" cy="160" r="8" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="4 4" />
+  <circle cx="360" cy="160" r="8" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="4 4" />
 </svg>
 
 ```mermaid
