@@ -10,36 +10,32 @@ reader to what matters. These are small additions with an outsized
 effect.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 240"
   role="img"
-  aria-label="A chart with a title bar, a subtitle, and a yellow annotation tag whose dotted leader points at the highlighted peak — labels steering the reader's eye"
+  aria-label="A solid green title bar and lighter subtitle sit above a blue line chart; a yellow ring highlights one point on the curve, tied by a thin gray leader line to a yellow annotation card on the right, with small gray axis-label chips beside and below the panel"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="80" y="26" width="250" height="13" rx="6.5" opacity="0.4" />
-    <rect x="80" y="47" width="170" height="8" rx="4" opacity="0.18" />
-    <rect x="80" y="70" width="480" height="112" rx="10" opacity="0.06" />
-    <rect x="96" y="166" width="448" height="3" rx="1.5" opacity="0.15" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="88" y="22" width="190" height="13" rx="6.5" />
   </g>
+  <rect x="88" y="43" width="126" height="8" rx="4" fill="var(--ds-green-300)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="125" cy="158" r="5" fillOpacity="0.55" />
-    <circle cx="175" cy="146" r="5" fillOpacity="0.55" />
-    <circle cx="225" cy="150" r="5" fillOpacity="0.55" />
-    <circle cx="275" cy="128" r="5" fillOpacity="0.55" />
-    <circle cx="325" cy="134" r="5" fillOpacity="0.55" />
-    <circle cx="375" cy="112" r="5" fillOpacity="0.55" />
-    <circle cx="425" cy="118" r="5" fillOpacity="0.55" />
-    <circle cx="472" cy="96" r="7" />
+    <rect x="88" y="68" width="344" height="140" rx="10" fillOpacity="0.07" />
+    <path d="M 108 184 C 160 176 200 150 244 142 C 288 134 316 122 352 108 C 376 99 396 95 416 92" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    <circle cx="352" cy="108" r="5.5" />
   </g>
+  <circle cx="352" cy="108" r="13" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="3" />
+  <line x1="365" y1="106" x2="470" y2="100" stroke="var(--ds-gray-300)" strokeWidth="2" />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="472" cy="96" r="15" fillOpacity="0.18" />
-    <rect x="470" y="30" width="100" height="22" rx="8" fillOpacity="0.9" />
-    <circle cx="512" cy="60" r="2.5" fillOpacity="0.6" />
-    <circle cx="498" cy="70" r="2.5" fillOpacity="0.6" />
-    <circle cx="486" cy="80" r="2.5" fillOpacity="0.6" />
+    <rect x="470" y="72" width="122" height="56" rx="10" fillOpacity="0.16" />
   </g>
-  <g style={{ color: "var(--ds-gray-900)" }} fill="currentColor">
-    <rect x="482" y="38" width="68" height="5" rx="2.5" fillOpacity="0.55" />
+  <g fill="var(--ds-yellow-700)">
+    <rect x="490" y="90" width="76" height="6" rx="3" />
+    <rect x="490" y="104" width="54" height="6" rx="3" fillOpacity="0.5" />
+  </g>
+  <g fill="var(--ds-gray-300)">
+    <rect x="58" y="114" width="8" height="48" rx="4" />
+    <rect x="236" y="220" width="48" height="8" rx="4" />
   </g>
 </svg>
 
