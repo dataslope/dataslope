@@ -12,33 +12,24 @@ answer to *every* category of failure. In Java, that answer is
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A red ball thrown at the bottom of a stack of platforms bounces upward past frame after frame until a green mitt on one of them catches it — exceptions travel up the call stack to the nearest handler"
+  aria-label="A red exception diamond climbs a thin red line from the deepest frame of a blue call stack, slips past two dashed empty sockets, and is finally held by a solid green ring on the frame that handles it, marked with a green check"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="200" y="196" width="240" height="22" rx="10" fillOpacity="0.15" />
-    <rect x="220" y="156" width="200" height="22" rx="10" fillOpacity="0.22" />
-    <rect x="240" y="116" width="160" height="22" rx="10" fillOpacity="0.3" />
-    <rect x="260" y="76" width="120" height="22" rx="10" fillOpacity="0.38" />
+    <rect x="180" y="190" width="280" height="26" rx="10" fillOpacity="0.15" />
+    <rect x="200" y="150" width="240" height="26" rx="10" fillOpacity="0.22" />
+    <rect x="220" y="110" width="200" height="26" rx="10" fillOpacity="0.28" />
+    <rect x="240" y="70" width="160" height="26" rx="10" fillOpacity="0.35" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="350" cy="190" r="4" fillOpacity="0.4" />
-    <circle cx="382" cy="180" r="3.5" fillOpacity="0.4" />
-    <circle cx="408" cy="162" r="3.5" fillOpacity="0.4" />
-    <circle cx="424" cy="138" r="3.5" fillOpacity="0.4" />
-    <circle cx="436" cy="112" r="3.5" fillOpacity="0.4" />
-    <circle cx="444" cy="92" r="3.5" fillOpacity="0.4" />
-    <circle cx="446" cy="78" r="9" fillOpacity="0.9" />
+  <path d="M 300 200 C 380 195 424 160 420 83" fill="none" stroke="var(--ds-red-500)" strokeWidth="2.5" strokeLinecap="round" />
+  <circle cx="300" cy="200" r="5" fill="var(--ds-red-500)" />
+  <g fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 3">
+    <circle cx="398" cy="163" r="8" />
+    <circle cx="412" cy="123" r="8" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M420 96A26 26 0 0 0 472 96L462 96A16 16 0 0 1 430 96Z" fillOpacity="0.9" />
-    <rect x="396" y="106" width="30" height="6" rx="3" fillOpacity="0.5" />
-    <circle cx="486" cy="66" r="3" fillOpacity="0.6" />
-    <circle cx="496" cy="80" r="2.5" fillOpacity="0.6" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="160" y="224" width="320" height="4" rx="2" />
-  </g>
+  <rect x="412" y="75" width="16" height="16" rx="4" fill="var(--ds-red-500)" transform="rotate(45 420 83)" />
+  <circle cx="420" cy="83" r="15" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" />
+  <polyline points="446,80 451,85 460,72" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 </svg>
 
 ## What is an exception?
