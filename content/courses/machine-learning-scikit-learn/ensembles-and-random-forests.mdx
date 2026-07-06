@@ -21,33 +21,18 @@ of the most valuable intuitions in classical machine learning.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Five small trees — four green and one blue dissenter — send thin lines down to a single large green dot — a random forest averages many noisy trees into one stable answer"
+  aria-label="Three wobbly light green lines each guess the trend differently inside one card, and their bold green average cuts smoothly through the middle — an ensemble averages many noisy models into one steady prediction"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="90" y1="108" x2="303" y2="164" />
-    <line x1="190" y1="108" x2="310" y2="156" />
-    <line x1="290" y1="108" x2="317" y2="150" />
-    <line x1="390" y1="108" x2="330" y2="156" />
-    <line x1="490" y1="108" x2="337" y2="164" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.85">
-    <polygon points="90,40 66,84 114,84" />
-    <rect x="85" y="84" width="10" height="22" rx="3" />
-    <polygon points="190,40 166,84 214,84" />
-    <rect x="185" y="84" width="10" height="22" rx="3" />
-    <polygon points="390,40 366,84 414,84" />
-    <rect x="385" y="84" width="10" height="22" rx="3" />
-    <polygon points="490,40 466,84 514,84" />
-    <rect x="485" y="84" width="10" height="22" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.85">
-    <polygon points="290,40 266,84 314,84" />
-    <rect x="285" y="84" width="10" height="22" rx="3" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="320" cy="172" r="22" />
+    <rect x="90" y="30" width="460" height="150" rx="16" fillOpacity="0.08" />
   </g>
+  <g stroke="var(--ds-green-300)" strokeWidth="2.5" strokeLinecap="round" fill="none">
+    <path d="M120 150 C 200 100, 260 160, 330 100 C 390 55, 450 110, 520 60" />
+    <path d="M120 140 C 190 130, 270 80, 340 120 C 410 150, 460 70, 520 70" />
+    <path d="M120 160 C 210 140, 250 90, 320 130 C 400 170, 440 60, 520 50" />
+  </g>
+  <path d="M120 150 C 250 120, 390 85, 520 62" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" />
 </svg>
 
 ## The intuition: the wisdom of crowds
