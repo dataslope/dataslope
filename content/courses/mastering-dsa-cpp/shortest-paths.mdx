@@ -12,31 +12,14 @@ The algorithm at the heart of it has the best origin story in computer science. 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two routes between the same vertices — a tempting direct edge whose single weight is huge, and a longer green three-hop path whose small weights add up to less — why shortest paths weigh edges"
+  aria-label="Two routes between the same endpoints — a thin direct edge crowned by one huge red weight, and a bold green three-hop path whose small weights add up to less — why shortest paths weigh edges instead of counting them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="163" cy="87" r="4.5" />
-    <circle cx="215" cy="78" r="4.5" />
-    <circle cx="268" cy="72" r="4.5" />
-    <circle cx="320" cy="70" r="4.5" />
-    <circle cx="373" cy="72" r="4.5" />
-    <circle cx="425" cy="78" r="4.5" />
-    <circle cx="478" cy="87" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="320" cy="44" r="9" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.6">
-    <circle cx="145" cy="113" r="3" />
-    <circle cx="180" cy="125" r="3" />
-    <circle cx="215" cy="138" r="3" />
-    <circle cx="285" cy="150" r="3" />
-    <circle cx="320" cy="150" r="3" />
-    <circle cx="355" cy="150" r="3" />
-    <circle cx="425" cy="138" r="3" />
-    <circle cx="460" cy="125" r="3" />
-    <circle cx="495" cy="113" r="3" />
+  <path d="M120 92 C 200 50, 440 50, 520 92" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
+  <g stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round">
+    <line x1="118" y1="108" x2="243" y2="148" />
+    <line x1="257" y1="150" x2="383" y2="150" />
+    <line x1="397" y1="148" x2="522" y2="108" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="250" cy="150" r="7" />
@@ -45,17 +28,20 @@ The algorithm at the heart of it has the best origin story in computer science. 
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="110" cy="100" r="10" />
   </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="320" cy="58" r="10" />
+  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="530" cy="100" r="10" />
-    <circle cx="178" cy="140" r="8" fillOpacity="0.9" />
-    <circle cx="320" cy="170" r="8" fillOpacity="0.9" />
-    <circle cx="462" cy="140" r="8" fillOpacity="0.9" />
+    <circle cx="180" cy="124" r="8" />
+    <circle cx="320" cy="166" r="8" />
+    <circle cx="460" cy="124" r="8" />
   </g>
   <g style={{ fill: "var(--ds-white)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="11" fontWeight="700" textAnchor="middle">
-    <text x="320" y="48">9</text>
-    <text x="178" y="144">2</text>
-    <text x="320" y="174">1</text>
-    <text x="462" y="144">2</text>
+    <text x="320" y="62">9</text>
+    <text x="180" y="128">2</text>
+    <text x="320" y="170">1</text>
+    <text x="460" y="128">2</text>
   </g>
 </svg>
 
