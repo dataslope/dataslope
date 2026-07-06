@@ -12,54 +12,39 @@ This chapter is a short, practical guide to designing module
 boundaries with collections.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue collection in one module crosses a dotted boundary and arrives in the next module as a green copy wearing a shield, while a red arrow trying to flow back is barred"
+  aria-label="An architecture tree: a blue outlined interface card at the top branches over thin gray lines into three solid cards — blue, green, yellow — each backed by two lighter implementation chips below"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.06">
-    <rect x="40" y="36" width="250" height="148" rx="16" />
-    <rect x="350" y="36" width="250" height="148" rx="16" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="320" y1="56" x2="160" y2="96" />
+    <line x1="320" y1="56" x2="320" y2="96" />
+    <line x1="320" y1="56" x2="480" y2="96" />
+    <line x1="160" y1="132" x2="124" y2="170" />
+    <line x1="160" y1="132" x2="196" y2="170" />
+    <line x1="320" y1="132" x2="284" y2="170" />
+    <line x1="320" y1="132" x2="356" y2="170" />
+    <line x1="480" y1="132" x2="444" y2="170" />
+    <line x1="480" y1="132" x2="516" y2="170" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="320" cy="48" r="3" />
-    <circle cx="320" cy="76" r="3" />
-    <circle cx="320" cy="104" r="3" />
-    <circle cx="320" cy="132" r="3" />
-    <circle cx="320" cy="160" r="3" />
+  <g style={{ color: "var(--ds-blue-500)" }}>
+    <rect x="272" y="20" width="96" height="36" rx="12" fill="currentColor" fillOpacity="0.06" stroke="currentColor" strokeWidth="2.5" />
   </g>
+  <rect x="112" y="96" width="96" height="36" rx="12" fill="var(--ds-blue-500)" />
+  <rect x="272" y="96" width="96" height="36" rx="12" fill="var(--ds-green-500)" />
+  <rect x="432" y="96" width="96" height="36" rx="12" fill="var(--ds-yellow-500)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="95" y="86" width="110" height="56" rx="12" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="125" cy="114" r="6" fillOpacity="0.9" />
-    <circle cx="150" cy="114" r="6" fillOpacity="0.9" />
-    <circle cx="175" cy="114" r="6" fillOpacity="0.9" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="225" cy="98" r="3" />
-    <circle cx="258" cy="94" r="3" />
-    <circle cx="290" cy="92" r="3" />
-    <circle cx="352" cy="92" r="3" />
-    <circle cx="384" cy="94" r="3" />
+    <rect x="92" y="170" width="64" height="28" rx="9" fillOpacity="0.3" />
+    <rect x="164" y="170" width="64" height="28" rx="9" fillOpacity="0.3" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="415" y="86" width="110" height="56" rx="12" fillOpacity="0.6" />
+    <rect x="252" y="170" width="64" height="28" rx="9" fillOpacity="0.3" />
+    <rect x="324" y="170" width="64" height="28" rx="9" fillOpacity="0.3" />
   </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="445" cy="114" r="6" fillOpacity="0.9" />
-    <circle cx="470" cy="114" r="6" fillOpacity="0.9" />
-    <circle cx="495" cy="114" r="6" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="525,62 543,69 543,84 525,98 507,84 507,69" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="525" cy="78" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="352,158 352,174 336,166" fillOpacity="0.8" />
-    <rect x="326" y="156" width="5" height="20" rx="2.5" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="412" y="170" width="64" height="28" rx="9" fillOpacity="0.35" />
+    <rect x="484" y="170" width="64" height="28" rx="9" fillOpacity="0.35" />
   </g>
 </svg>
 
