@@ -9,44 +9,36 @@ most importantly — *transformations* like the log scale, plus a subtle
 trap about how scales filter data.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 224"
   role="img"
-  aria-label="The same six value ticks on two rulers — crowded to the left on a linear axis, spread evenly on a log axis — with dotted leaders showing how the transformation re-spaces them"
+  aria-label="The same six data points drawn in two panels: on a linear position scale they hug the bottom axis then shoot upward, while after a log transform — shown by a thin gray arrow — they fall on an evenly spaced straight line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.12">
-    <rect x="80" y="44" width="480" height="10" rx="5" />
-    <rect x="80" y="152" width="480" height="10" rx="5" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="88" y="38" width="4" height="22" rx="2" />
-    <rect x="99" y="38" width="4" height="22" rx="2" />
-    <rect x="126" y="38" width="4" height="22" rx="2" />
-    <rect x="172" y="38" width="4" height="22" rx="2" />
-    <rect x="264" y="38" width="4" height="22" rx="2" />
-    <rect x="538" y="38" width="4" height="22" rx="2" />
+    <rect x="60" y="32" width="220" height="160" rx="10" fillOpacity="0.06" />
+    <rect x="82" y="52" width="2.5" height="118" rx="1.25" fillOpacity="0.18" />
+    <rect x="82" y="167.5" width="176" height="2.5" rx="1.25" fillOpacity="0.18" />
+    <circle cx="98" cy="160" r="5.5" />
+    <circle cx="124" cy="155" r="5.5" />
+    <circle cx="150" cy="147" r="5.5" />
+    <circle cx="176" cy="133" r="5.5" />
+    <circle cx="202" cy="106" r="5.5" />
+    <circle cx="228" cy="60" r="5.5" />
+  </g>
+  <g fill="var(--ds-gray-400)">
+    <rect x="296" y="110.5" width="36" height="3" rx="1.5" />
+    <polygon points="330,106.5 341,112 330,117.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="88" y="146" width="4" height="22" rx="2" />
-    <rect x="159" y="146" width="4" height="22" rx="2" />
-    <rect x="267" y="146" width="4" height="22" rx="2" />
-    <rect x="349" y="146" width="4" height="22" rx="2" />
-    <rect x="430" y="146" width="4" height="22" rx="2" />
-    <rect x="538" y="146" width="4" height="22" rx="2" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="90" cy="88" r="2.5" />
-    <circle cx="90" cy="118" r="2.5" />
-    <circle cx="106" cy="88" r="2.5" />
-    <circle cx="126" cy="118" r="2.5" />
-    <circle cx="148" cy="88" r="2.5" />
-    <circle cx="216" cy="118" r="2.5" />
-    <circle cx="200" cy="88" r="2.5" />
-    <circle cx="296" cy="118" r="2.5" />
-    <circle cx="302" cy="88" r="2.5" />
-    <circle cx="384" cy="118" r="2.5" />
-    <circle cx="540" cy="88" r="2.5" />
-    <circle cx="540" cy="118" r="2.5" />
+    <rect x="356" y="32" width="220" height="160" rx="10" fillOpacity="0.06" />
+    <rect x="378" y="52" width="2.5" height="118" rx="1.25" fillOpacity="0.18" />
+    <rect x="378" y="167.5" width="176" height="2.5" rx="1.25" fillOpacity="0.18" />
+    <circle cx="394" cy="162" r="5.5" />
+    <circle cx="420" cy="141" r="5.5" />
+    <circle cx="446" cy="120" r="5.5" />
+    <circle cx="472" cy="99" r="5.5" />
+    <circle cx="498" cy="78" r="5.5" />
+    <circle cx="524" cy="57" r="5.5" />
   </g>
 </svg>
 
