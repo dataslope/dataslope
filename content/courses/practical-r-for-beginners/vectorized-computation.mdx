@@ -25,10 +25,10 @@ often *much* faster.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Above, a yellow dot hops cell to cell transforming one value at a time; below, one wide plus-one bar presses down on every cell of the row at once — vectorized computation replaces the loop"
+  aria-label="A row of cells holding light blue dots passes under one wide plus-one bar that presses on every cell at once, leaving a row of darker blue dots below — vectorized computation transforms the whole vector in a single step"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.08">
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.1">
     <rect x="150" y="40" width="36" height="36" rx="8" />
     <rect x="198" y="40" width="36" height="36" rx="8" />
     <rect x="246" y="40" width="36" height="36" rx="8" />
@@ -36,23 +36,13 @@ often *much* faster.
     <rect x="342" y="40" width="36" height="36" rx="8" />
     <rect x="390" y="40" width="36" height="36" rx="8" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="168" cy="58" r="6" fillOpacity="0.9" />
-    <circle cx="216" cy="58" r="6" fillOpacity="0.9" />
-    <circle cx="264" cy="58" r="6" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="312" cy="58" r="6" fillOpacity="0.3" />
-    <circle cx="360" cy="58" r="6" fillOpacity="0.3" />
-    <circle cx="408" cy="58" r="6" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="312" cy="24" r="6.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="268" cy="32" r="2.5" />
-    <circle cx="282" cy="20" r="2.5" />
-    <circle cx="298" cy="17" r="2.5" />
+  <g style={{ color: "var(--ds-blue-300)" }} fill="currentColor">
+    <circle cx="168" cy="58" r="6" />
+    <circle cx="216" cy="58" r="6" />
+    <circle cx="264" cy="58" r="6" />
+    <circle cx="312" cy="58" r="6" />
+    <circle cx="360" cy="58" r="6" />
+    <circle cx="408" cy="58" r="6" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="150" y="128" width="276" height="18" rx="9" />
@@ -72,7 +62,7 @@ often *much* faster.
   <g style={{ color: "var(--ds-white)" }} fill="currentColor">
     <text x="276" y="142" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13" fontWeight="700">+1</text>
   </g>
-  <g fill="currentColor" opacity="0.08">
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.1">
     <rect x="150" y="182" width="36" height="36" rx="8" />
     <rect x="198" y="182" width="36" height="36" rx="8" />
     <rect x="246" y="182" width="36" height="36" rx="8" />
@@ -80,7 +70,7 @@ often *much* faster.
     <rect x="342" y="182" width="36" height="36" rx="8" />
     <rect x="390" y="182" width="36" height="36" rx="8" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+  <g style={{ color: "var(--ds-blue-700)" }} fill="currentColor">
     <circle cx="168" cy="200" r="6" />
     <circle cx="216" cy="200" r="6" />
     <circle cx="264" cy="200" r="6" />
