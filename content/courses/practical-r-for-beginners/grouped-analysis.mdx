@@ -34,45 +34,52 @@ In dplyr, you do it in two lines: `group_by()` + `summarise()`.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A mixed row of blue, green, and yellow dots streams down into three single-color circles sized and numbered by their counts — each group collapsing to one summary row"
+  aria-label="A strip of mixed blue, green, and yellow squares fans down three solid gray arrows into color-pure group cards, each collapsing its rows into one summary bar sized to the group — group_by splits, summarize reduces"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <rect x="130" y="20" width="380" height="44" rx="10" fill="currentColor" opacity="0.06" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="140" cy="44" r="6" />
-    <circle cx="268" cy="44" r="6" />
-    <circle cx="332" cy="44" r="6" />
-    <circle cx="364" cy="44" r="6" />
-    <circle cx="492" cy="44" r="6" />
-    <circle cx="210" cy="90" r="3" fillOpacity="0.35" />
-    <circle cx="216" cy="118" r="3" fillOpacity="0.35" />
-    <circle cx="220" cy="144" r="3" fillOpacity="0.35" />
-    <circle cx="222" cy="172" r="28" />
+    <rect x="150" y="35" width="14" height="14" rx="4" />
+    <rect x="288" y="35" width="14" height="14" rx="4" />
+    <rect x="334" y="35" width="14" height="14" rx="4" />
+    <rect x="472" y="35" width="14" height="14" rx="4" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="172" cy="44" r="6" />
-    <circle cx="236" cy="44" r="6" />
-    <circle cx="396" cy="44" r="6" />
-    <circle cx="460" cy="44" r="6" />
-    <circle cx="322" cy="92" r="3" fillOpacity="0.35" />
-    <circle cx="321" cy="120" r="3" fillOpacity="0.35" />
-    <circle cx="320" cy="148" r="3" fillOpacity="0.35" />
-    <circle cx="322" cy="175" r="25" />
+    <rect x="196" y="35" width="14" height="14" rx="4" />
+    <rect x="380" y="35" width="14" height="14" rx="4" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="204" cy="44" r="6" />
-    <circle cx="300" cy="44" r="6" />
-    <circle cx="428" cy="44" r="6" />
-    <circle cx="424" cy="92" r="3" fillOpacity="0.35" />
-    <circle cx="421" cy="120" r="3" fillOpacity="0.35" />
-    <circle cx="419" cy="150" r="3" fillOpacity="0.35" />
-    <circle cx="420" cy="178" r="22" />
+    <rect x="242" y="35" width="14" height="14" rx="4" />
+    <rect x="426" y="35" width="14" height="14" rx="4" />
   </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <text x="222" y="179" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="17" fontWeight="700">5</text>
-    <text x="322" y="182" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="700">4</text>
-    <text x="420" y="184" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" fontWeight="700">3</text>
+  <g fill="var(--ds-gray-500)">
+    <rect x="153" y="72" width="4" height="22" rx="2" />
+    <polygon points="147,94 163,94 155,106" />
+    <rect x="318" y="72" width="4" height="22" rx="2" />
+    <polygon points="312,94 328,94 320,106" />
+    <rect x="483" y="72" width="4" height="22" rx="2" />
+    <polygon points="477,94 493,94 485,106" />
   </g>
-  <rect x="160" y="206" width="320" height="5" rx="2.5" fill="currentColor" opacity="0.12" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="85" y="112" width="140" height="96" rx="12" fillOpacity="0.1" />
+    <rect x="115" y="128" width="14" height="14" rx="4" />
+    <rect x="137" y="128" width="14" height="14" rx="4" />
+    <rect x="159" y="128" width="14" height="14" rx="4" />
+    <rect x="181" y="128" width="14" height="14" rx="4" />
+    <rect x="111" y="168" width="88" height="12" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="250" y="112" width="140" height="96" rx="12" fillOpacity="0.1" />
+    <rect x="302" y="128" width="14" height="14" rx="4" />
+    <rect x="324" y="128" width="14" height="14" rx="4" />
+    <rect x="294" y="168" width="52" height="12" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="415" y="112" width="140" height="96" rx="12" fillOpacity="0.14" />
+    <rect x="467" y="128" width="14" height="14" rx="4" />
+    <rect x="489" y="128" width="14" height="14" rx="4" />
+    <rect x="459" y="168" width="52" height="12" rx="6" />
+  </g>
 </svg>
 
 ## The basic pattern
