@@ -37,36 +37,29 @@ mysterious.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Inside a console window, a typed line after the prompt travels a dotted route through three small processing stations and comes back as a green line of output — what one click of Run really does"
+  aria-label="A console window with a green prompt chevron and a blue typed line, and a thin gray arrow dropping to the green line printed below — type a line, run it, see the result"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="120" y="28" width="400" height="170" rx="14" fill="currentColor" opacity="0.07" />
+  <rect x="120" y="30" width="400" height="160" rx="14" fill="currentColor" opacity="0.07" />
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="146" cy="52" r="5" fillOpacity="0.8" />
+    <circle cx="146" cy="54" r="5" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="166" cy="52" r="5" fillOpacity="0.8" />
-    <circle cx="424" cy="112" r="8" />
+    <circle cx="166" cy="54" r="5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="186" cy="52" r="5" fillOpacity="0.8" />
-    <circle cx="424" cy="168" r="8" />
-    <rect x="172" y="170" width="150" height="12" rx="6" fillOpacity="0.85" />
+    <circle cx="186" cy="54" r="5" />
   </g>
+  <polyline points="146,86 158,96 146,106" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <text x="146" y="97" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="18" fontWeight="700">{">"}</text>
-    <rect x="172" y="85" width="148" height="12" rx="6" fillOpacity="0.55" />
-    <circle cx="456" cy="140" r="8" />
+    <rect x="172" y="91" width="150" height="10" rx="5" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="344" cy="93" r="3" />
-    <circle cx="368" cy="97" r="3" />
-    <circle cx="394" cy="103" r="3" />
-    <circle cx="444" cy="122" r="3" />
-    <circle cx="446" cy="158" r="3" />
-    <circle cx="398" cy="174" r="3" />
-    <circle cx="372" cy="176" r="3" />
-    <circle cx="346" cy="176" r="3" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="198.5" y="112" width="3" height="22" rx="1.5" />
+    <polygon points="194.5,132 205.5,132 200,143" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="172" y="152" width="110" height="10" rx="5" />
   </g>
 </svg>
 
