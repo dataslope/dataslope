@@ -22,42 +22,23 @@ each idea precise; here we just want to internalize the shape of the
 problem.
 
 <svg
-  viewBox="0 0 640 170"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="Above each ruler tick a faint exact dot is paired with a blue computed dot sitting slightly off it — every number on a computer is slightly wrong"
+  aria-label="A perfect green circle in one card faces its computed twin in the next — the same shape rebuilt from straight blue segments — mathematics is exact, computation approximates"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="70" y="106" width="500" height="5" rx="2.5" opacity="0.2" />
-    <rect x="108" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="168" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="228" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="288" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="348" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="408" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="468" y="90" width="3" height="16" opacity="0.3" />
-    <rect x="528" y="90" width="3" height="16" opacity="0.3" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="70" y="30" width="210" height="150" rx="14" fillOpacity="0.1" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" opacity="0.3">
-    <circle cx="110" cy="68" r="7" />
-    <circle cx="170" cy="68" r="7" />
-    <circle cx="230" cy="68" r="7" />
-    <circle cx="290" cy="68" r="7" />
-    <circle cx="350" cy="68" r="7" />
-    <circle cx="410" cy="68" r="7" />
-    <circle cx="470" cy="68" r="7" />
-    <circle cx="530" cy="68" r="7" />
+  <circle cx="175" cy="105" r="52" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="300" y="103.5" width="40" height="3" rx="1.5" />
+    <polygon points="338,99.5 349,105 338,110.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="116" cy="64" r="6" />
-    <circle cx="165" cy="63" r="6" />
-    <circle cx="238" cy="65" r="6" />
-    <circle cx="285" cy="62" r="6" />
-    <circle cx="358" cy="64" r="6" />
-    <circle cx="404" cy="62" r="6" />
-    <circle cx="476" cy="65" r="6" />
-    <circle cx="526" cy="62" r="6" />
+    <rect x="370" y="30" width="210" height="150" rx="14" fillOpacity="0.08" />
   </g>
+  <polygon points="527,105 511.8,141.8 475,157 438.2,141.8 423,105 438.2,68.2 475,53 511.8,68.2" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinejoin="round" />
 </svg>
 
 ## Continuous mathematics, discrete machines
