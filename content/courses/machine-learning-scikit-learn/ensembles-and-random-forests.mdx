@@ -19,39 +19,34 @@ reach for first on tabular data. Understanding *why* averaging works is one
 of the most valuable intuitions in classical machine learning.
 
 <svg
-  viewBox="0 0 640 170"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A row of faint blue trees each casts a small vote dot — four green, one blue dissenter — and the votes stream into one large green consensus dot — a forest averages many unstable trees into a stable answer"
+  aria-label="Five small trees — four green and one blue dissenter — send thin lines down to a single large green dot — a random forest averages many noisy trees into one stable answer"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="70,30 44,78 96,78" fillOpacity="0.2" />
-    <rect x="65" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
-    <polygon points="150,30 124,78 176,78" fillOpacity="0.28" />
-    <rect x="145" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
-    <polygon points="230,30 204,78 256,78" fillOpacity="0.2" />
-    <rect x="225" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
-    <polygon points="310,30 284,78 336,78" fillOpacity="0.28" />
-    <rect x="305" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
-    <polygon points="390,30 364,78 416,78" fillOpacity="0.2" />
-    <rect x="385" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
+    <line x1="90" y1="108" x2="303" y2="164" />
+    <line x1="190" y1="108" x2="310" y2="156" />
+    <line x1="290" y1="108" x2="317" y2="150" />
+    <line x1="390" y1="108" x2="330" y2="156" />
+    <line x1="490" y1="108" x2="337" y2="164" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.85">
+    <polygon points="90,40 66,84 114,84" />
+    <rect x="85" y="84" width="10" height="22" rx="3" />
+    <polygon points="190,40 166,84 214,84" />
+    <rect x="185" y="84" width="10" height="22" rx="3" />
+    <polygon points="390,40 366,84 414,84" />
+    <rect x="385" y="84" width="10" height="22" rx="3" />
+    <polygon points="490,40 466,84 514,84" />
+    <rect x="485" y="84" width="10" height="22" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.85">
+    <polygon points="290,40 266,84 314,84" />
+    <rect x="285" y="84" width="10" height="22" rx="3" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="70" cy="124" r="7" />
-    <circle cx="150" cy="124" r="7" />
-    <circle cx="310" cy="124" r="7" />
-    <circle cx="390" cy="124" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="230" cy="124" r="7" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="445" cy="124" r="3" />
-    <circle cx="470" cy="124" r="3" />
-    <circle cx="495" cy="124" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="545" cy="124" r="20" />
+    <circle cx="320" cy="172" r="22" />
   </g>
 </svg>
 
