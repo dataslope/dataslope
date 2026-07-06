@@ -94,8 +94,8 @@ jobs:
               const conclusion = cr.conclusion;
               if (conclusion === 'success') {
                 const lines = [`✅ **Cloudflare build succeeded** for ${commitLink}`, ''];
-                if (urls.alias) lines.push(`**Preview:** ${urls.alias}`);
-                if (urls.preview) lines.push(`Version preview: ${urls.preview}`);
+                if (urls.alias) lines.push(`**Pull Request/Branch Preview URL:** ${urls.alias}`);
+                if (urls.preview) lines.push(`Commit Preview URL: ${urls.preview}`);
                 lines.push('', `[Build details ↗](${buildUrl})`);
                 body = lines.join('\n');
               } else if (conclusion === 'skipped' || conclusion === 'neutral') {
