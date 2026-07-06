@@ -15,38 +15,25 @@ and is easy to audit). Second, building it forces every earlier lesson to pay
 off at once — especially the warning about negation and stopwords.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="A balance scale tips toward a pan stacked with green positive word chips while lighter red negative chips ride high on the other side — the tilt of the beam is the sentence's sentiment"
+  aria-label="A sentence of word chips — two green positives, one red negative, grays neutral — drops signed bars above and below a thin zero line, and past a divider the bars sum to one net green sentiment score"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <polygon points="320,150 298,200 342,200" opacity="0.3" />
-    <rect x="262" y="200" width="116" height="8" rx="4" opacity="0.15" />
-    <polygon points="180,166 460,118 460,128 180,176" opacity="0.45" />
-    <circle cx="320" cy="147" r="6" opacity="0.5" />
-    <rect x="124" y="200" width="112" height="11" rx="5.5" opacity="0.3" />
-    <rect x="404" y="150" width="112" height="11" rx="5.5" opacity="0.3" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="180" cy="184" r="2.5" />
-    <circle cx="180" cy="193" r="2.5" />
-    <circle cx="460" cy="134" r="2.5" />
-    <circle cx="460" cy="143" r="2.5" />
-  </g>
+  <rect x="86" y="36" width="54" height="24" rx="10" fill="currentColor" opacity="0.18" />
+  <rect x="154" y="36" width="70" height="24" rx="10" fill="var(--ds-green-500)" />
+  <rect x="238" y="36" width="44" height="24" rx="10" fill="currentColor" opacity="0.18" />
+  <rect x="296" y="36" width="78" height="24" rx="10" fill="var(--ds-red-500)" />
+  <rect x="388" y="36" width="64" height="24" rx="10" fill="var(--ds-green-500)" />
+  <rect x="76" y="140" width="390" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="130" y="178" width="46" height="20" rx="10" fillOpacity="0.9" />
-    <rect x="182" y="178" width="50" height="20" rx="10" fillOpacity="0.75" />
-    <rect x="152" y="156" width="48" height="20" rx="10" fillOpacity="0.9" />
-    <circle cx="560" cy="58" r="16" fillOpacity="0.15" />
+    <rect x="178" y="104" width="22" height="36" rx="4" />
+    <rect x="409" y="112" width="22" height="28" rx="4" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="420" y="128" width="46" height="20" rx="10" fillOpacity="0.9" />
-    <rect x="472" y="128" width="36" height="20" rx="10" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="20" fontWeight="700" textAnchor="middle">
-    <text x="560" y="65">+</text>
-  </g>
+  <rect x="324" y="142.5" width="22" height="30" rx="4" fill="var(--ds-red-500)" />
+  <line x1="480" y1="96" x2="480" y2="186" stroke="var(--ds-gray-300)" strokeWidth="2" />
+  <rect x="494" y="140" width="70" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
+  <rect x="516" y="106" width="26" height="34" rx="4" fill="var(--ds-green-500)" />
 </svg>
 
 ## The idea: score words against a lexicon
