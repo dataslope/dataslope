@@ -7,6 +7,11 @@ Flip the stack's rule and you get its mirror twin. A queue is **first in, first 
 
 Queues were studied mathematically before computers existed to hold them: in 1909 the Danish engineer A. K. Erlang, working for the Copenhagen Telephone Company, founded queueing theory to answer how many circuits a telephone exchange needs before callers start hearing busy signals. The unit of telecom traffic load is still called the *erlang*. Software queues inherit the same questions — how fast must the consumer drain the line to keep the producer from backing up? — which is why the producer-consumer pattern below appears in every messaging system ever built.
 
+<Figure
+  slug="a-risograph-of-a-queue-data-structure"
+  alt="A risograph of a queue, items lined up and served first-in, first-out"
+/>
+
 <svg
   viewBox="0 0 640 190"
   role="img"
@@ -207,11 +212,6 @@ int main() {
 `,
     },
   ]}
-/>
-
-<Figure
-  slug="a-risograph-of-a-queue-data-structure"
-  alt="A risograph of a queue, items lined up and served first-in, first-out"
 />
 
 ## Breadth-first flavor

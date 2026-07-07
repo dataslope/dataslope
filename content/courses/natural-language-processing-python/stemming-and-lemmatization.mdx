@@ -14,6 +14,11 @@ There are two classic techniques for that collapse, and the difference
 between them — in mechanism, in output, and in when to use them — is one of
 the most clarifying things you can learn in NLP.
 
+<Figure
+  slug="a-risograph-of-a-gardener-stemming"
+  alt="A risograph of a gardener pruning stems, echoing how stemming trims words down to their root"
+/>
+
 <svg
   viewBox="0 0 640 210"
   role="img"
@@ -291,11 +296,6 @@ unchanged, while \`lemmatize("running", pos="v")\` returns "run"?
   > "Running" and "run" are different grammatical forms of the same verb; the lemmatizer correctly links them once told the word is a verb by passing \`pos="v"\`.
 
 The default-noun behavior trips up nearly everyone the first time; the fix is to pass the correct POS.`}
-/>
-
-<Figure
-  slug="a-risograph-of-a-gardener-stemming"
-  alt="A risograph of a gardener pruning stems, echoing how stemming trims words down to their root"
 />
 
 ## When to use which
