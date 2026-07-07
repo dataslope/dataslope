@@ -72,8 +72,8 @@ export function Figure({
       >
         <ImageIcon className={styles.pendingIcon} aria-hidden="true" />
         <span>
-          Image <code>{slug}</code> pending — add{" "}
-          <code>assets/images/{slug}.png</code> and run{" "}
+          Image <code>{slug}</code> pending — add a raster source named{" "}
+          <code>{slug}</code> under <code>assets/images/</code> and run{" "}
           <code>npm run build:images</code>.
         </span>
       </span>

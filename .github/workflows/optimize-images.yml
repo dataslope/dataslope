@@ -21,11 +21,18 @@ name: Optimize images
 # commit-back, set that generated path as a non-triggering "Build watch path"
 # in the Cloudflare Workers Builds settings, or rely on it honoring `[skip ci]`.
 
+# Runs on every branch, including main: PR-branch runs keep outputs in sync
+# before merge (so a merge commit is a no-op here), and a direct push of an
+# image to main still gets its outputs committed. Caveat: if main is ever
+# protected against direct pushes, a stale-outputs push to main will fail this
+# job's push step — regenerate locally (or via workflow_dispatch on the source
+# branch) in that case.
 on:
   push:
     paths:
       - "assets/images/**"
       - "scripts/build-images.mjs"
+  workflow_dispatch:
 
 permissions:
   contents: write

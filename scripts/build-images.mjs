@@ -44,7 +44,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, extname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const SRC_DIR = join(ROOT, "assets", "images");
@@ -52,17 +52,22 @@ const OUT_DIR = join(ROOT, "public", "images");
 const MANIFEST_FILE = join(ROOT, "lib", "generated", "images.js");
 
 // Raster source formats sharp can decode. SVG is vector and handled inline in
-// the MDX, so it is intentionally excluded.
+// the MDX, so it is intentionally excluded. GIF is also excluded: sharp reads
+// only the first frame by default, so an animated GIF would be silently
+// flattened — convert to PNG/WebP first.
 const SOURCE_EXTS = new Set([
   ".png",
   ".jpg",
   ".jpeg",
   ".webp",
-  ".gif",
   ".avif",
   ".tif",
   ".tiff",
 ]);
+
+// Every format the encoder can emit (WebP + the two possible fallbacks).
+// The prune step only touches files with these extensions.
+const OUTPUT_EXTS = new Set([".webp", ".png", ".jpg"]);
 
 // Cap the longest edge so an image displayed at ~640px still looks crisp on 2x
 // displays without shipping a 2048px original. `withoutEnlargement` keeps
@@ -73,11 +78,14 @@ const MAX_EDGE = 1600;
 // below (resize cap, webp/png/jpeg options). Forces a one-time full re-encode.
 const ENCODER_VERSION = "1";
 
-/** Lowercase, hyphenate to a URL/file-safe slug. */
-function slugify(value) {
+/** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug.
+ *  Exported for the vitest suite (__tests__/figureSlugs.test.ts). */
+export function slugify(value) {
   return value
     .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
+    // Strip the combining-diacritics block (escapes, not literal combining
+    // chars, so an editor/formatter can't silently mangle the range).
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
@@ -193,7 +201,8 @@ async function main() {
     const s = await ensureSharp();
     const meta = await s(input).metadata();
     // `rotate()` honors any EXIF orientation before we read dimensions.
-    const base = s(input, { limitInputPixels: 268402689 }).rotate().resize({
+    // (sharp's default limitInputPixels already guards decompression bombs.)
+    const base = s(input).rotate().resize({
       width: MAX_EDGE,
       height: MAX_EDGE,
       fit: "inside",
@@ -254,7 +263,7 @@ async function main() {
   }
   let pruned = 0;
   for (const file of readdirSync(OUT_DIR)) {
-    if (!SOURCE_EXTS.has(extname(file).toLowerCase())) continue;
+    if (!OUTPUT_EXTS.has(extname(file).toLowerCase())) continue;
     if (!expected.has(file)) {
       rmSync(join(OUT_DIR, file));
       pruned += 1;
@@ -275,7 +284,14 @@ async function main() {
   );
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Run only when executed directly (`node scripts/build-images.mjs`), so the
+// vitest suite can import the exported helpers without triggering a build.
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

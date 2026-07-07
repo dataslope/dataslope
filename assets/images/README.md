@@ -1,10 +1,11 @@
 # Content images (optimized raster art)
 
 Drop raster source images here, one per image, named `<slug>.<ext>`. Supported
-sources: `.png`, `.jpg`/`.jpeg`, `.webp`, `.gif`, `.avif`, `.tif`/`.tiff` (SVG
-is vector — author it inline in the MDX instead). The build step optimizes each
-one and the `<Figure>` component wires it into the pages that reference its
-`slug`.
+sources: `.png`, `.jpg`/`.jpeg`, `.webp`, `.avif`, `.tif`/`.tiff`. Not
+supported: SVG (vector — author it inline in the MDX instead) and GIF (the
+encoder reads only the first frame, so animation would be silently dropped —
+convert to PNG/WebP first). The build step optimizes each source and the
+`<Figure>` component wires it into the pages that reference its `slug`.
 
 The Recraft topic art is transparent PNG, but this folder takes any raster:
 photos, diagrams, screenshots, etc.
