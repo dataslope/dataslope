@@ -3,22 +3,38 @@ name: R2 incremental-cache cleanup
 # Prunes stale OpenNext incremental-cache build folders from the R2 bucket.
 #
 # Why this exists: the R2 cache keys every object as
-# `incremental-cache/<buildId>/<hash>.cache`. Each deploy — production AND every
-# Cloudflare preview — writes a fresh ~1–1.4 GB folder under a new build ID
-# (one HTML+RSC `.cache` object per prerendered page, ~1,600 of them), and
-# OpenNext never deletes old ones. Left alone, the bucket grows by that much
-# per deploy forever; at active-development velocity that reached ~34 GB in a
-# matter of days.
+# `incremental-cache/<buildId>/<hash>.cache` (see open-next.config.ts). Each
+# deploy — production AND every Cloudflare preview — writes a fresh ~1–1.4 GB
+# folder under a new build ID (one HTML+RSC `.cache` object per prerendered
+# page, ~1,600 of them), and OpenNext never deletes old ones. Left alone, the
+# bucket grows by that much per deploy forever; at active-development velocity
+# that reached ~34 GB in a matter of days.
+#
+# The build ID IS the deployed commit SHA: next.config.ts sets `generateBuildId`
+# to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
+# the commit it was built from. That's what lets this job map each folder to the
+# open pull request (branch) it belongs to and keep only the latest commit per
+# branch — impossible with Next's default random build IDs.
 #
 # What it does: always keeps the live production build — a site that sits
-# unchanged for months must never lose its cache, which would 500 the home
-# page and /courses/* (see open-next.config.ts). Every OTHER build folder is
-# deleted once it is either older than THRESHOLD_HOURS or outside the
-# MAX_RECENT newest: the age limit retires merged/abandoned previews quickly,
-# and the cap bounds the bucket on heavy deploy days.
+# unchanged for months must never lose its cache, which would 500 the home page
+# and /courses/* (see open-next.config.ts). Every OTHER folder is kept only
+# while ALL of these hold:
+#   • younger than THRESHOLD_HOURS, AND
+#   • its commit is the current head of an OPEN pull request — i.e. the most
+#     recent commit on an active branch. Superseded commits (an older head of a
+#     still-open PR) and merged/closed PR previews no longer match, so they are
+#     pruned, AND
+#   • its branch is among the MAX_BRANCHES most-recently-deployed such branches.
 #
-# Safety: the job aborts WITHOUT deleting anything if it cannot positively
-# identify the live production build folder, so a transient error can never
+# Net effect: the live production build, plus at most one preview per active
+# branch, capped at MAX_BRANCHES. Merging a PR (or pushing a newer commit to it)
+# drops the stale preview folder on the next run. Worst case is
+# (MAX_BRANCHES + 1) build folders.
+#
+# Safety: the job aborts WITHOUT deleting anything if it cannot (a) positively
+# identify the live production build folder, or (b) list the repo's open pull
+# requests — so a transient error can never leave every preview "unmatched" and
 # wipe the bucket. Run manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
@@ -43,6 +59,11 @@ concurrency:
   group: r2-cache-cleanup
   cancel-in-progress: false
 
+# Least privilege: read-only, and only what `gh pr list` needs.
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -50,15 +71,19 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      # A non-production build survives only while BOTH hold: younger than
-      # THRESHOLD_HOURS and among the MAX_RECENT newest. 24 h keeps a PR's
-      # preview URL alive through next-morning review; the cap keeps burst
-      # days (10+ deploys) bounded at (MAX_RECENT + 1) build folders total.
+      # A non-production build survives only while ALL hold: younger than
+      # THRESHOLD_HOURS, the current head commit of an open PR (the latest
+      # commit on an active branch), and among the MAX_BRANCHES most-recently-
+      # deployed such branches. 24 h keeps a PR's preview URL alive through
+      # next-morning review; MAX_BRANCHES bounds the bucket at
+      # (MAX_BRANCHES + 1) build folders total on busy days.
       THRESHOLD_HOURS: "24"
-      MAX_RECENT: "10"
+      MAX_BRANCHES: "10"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      # For `gh pr list` (see step 2). GITHUB_TOKEN with pull-requests: read.
+      GH_TOKEN: ${{ github.token }}
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: auto
@@ -81,7 +106,25 @@ jobs:
           prod_folder="${PREFIX}${prod_id}/"
           echo "Live production build: $prod_id"
 
-          # 2) Enumerate the build folders in the bucket.
+          # 2) Map active branches to their latest commit. Each OPEN PR's head
+          #    SHA is the most recent commit on that branch; a folder built from
+          #    that SHA (build IDs are commit SHAs — see next.config.ts) is the
+          #    branch's live preview. Merged/closed PRs drop out of this list, so
+          #    their previews are pruned. Abort on API failure — otherwise a
+          #    transient error would leave every folder unmatched and delete it.
+          if ! pr_json="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open \
+                --json number,headRefName,headRefOid --limit 300)"; then
+            echo "::error::Could not list open pull requests from GitHub. Aborting without deleting."
+            exit 1
+          fi
+          declare -A pr_branch   # commit SHA -> "branch (PR #n)", for keep decisions + logging
+          while IFS=$'\t' read -r sha branch num; do
+            [[ -z "$sha" ]] && continue
+            pr_branch["$sha"]="$branch (PR #$num)"
+          done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
+          echo "Open PRs (active branches): ${#pr_branch[@]}"
+
+          # 3) Enumerate the build folders in the bucket.
           mapfile -t folders < <(
             aws s3api list-objects-v2 \
               --bucket "$BUCKET" --prefix "$PREFIX" --delimiter "/" \
@@ -93,7 +136,7 @@ jobs:
             exit 0
           fi
 
-          # 3) Safety: refuse to proceed unless the production folder is present.
+          # 4) Safety: refuse to proceed unless the production folder is present.
           #    (Guards against a prefix/bucket mismatch deleting everything.)
           if ! printf '%s\n' "${folders[@]}" | grep -qxF "$prod_folder"; then
             echo "::error::Production folder '$prod_folder' not found in bucket. Aborting without deleting."
@@ -101,12 +144,12 @@ jobs:
           fi
 
           cutoff=$(( $(date -u +%s) - THRESHOLD_HOURS * 3600 ))
-          echo "Policy: keep live production + up to $MAX_RECENT builds younger than ${THRESHOLD_HOURS}h (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Policy: keep live production + the latest commit of up to $MAX_BRANCHES open-PR branches, each younger than ${THRESHOLD_HOURS}h (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
           echo "Dry run: $DRY_RUN"
 
-          # 4) Timestamp every non-production folder so they can be ranked
-          #    newest-first — the MAX_RECENT cap needs a global order, not a
-          #    per-folder decision.
+          # 5) Timestamp every non-production folder so active-branch previews
+          #    can be ranked newest-first — the MAX_BRANCHES cap needs a global
+          #    order, not a per-folder decision.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
@@ -128,19 +171,27 @@ jobs:
           done
 
           echo "KEEP  $prod_folder (live production)"
-          kept=1; deleted=0; rank=0
+          kept=1; deleted=0; branches=0
           while IFS=$'\t' read -r ts newest folder; do
             [[ -z "$folder" ]] && continue
-            rank=$((rank+1))
-            if (( ts >= cutoff && rank <= MAX_RECENT )); then
-              echo "KEEP  $folder (last written $newest, ${rank}/${MAX_RECENT} newest)"
-              kept=$((kept+1)); continue
-            fi
+            # Folder name is the commit SHA: strip the prefix and trailing slash.
+            sha="${folder#"$PREFIX"}"; sha="${sha%/}"
+
+            # Order matters: age retires everything first (the 24h floor applies
+            # even to an open PR's head), then per-branch keep, then the cap.
             if (( ts < cutoff )); then
               echo "DELETE $folder (last written $newest, older than ${THRESHOLD_HOURS}h)"
+            elif [[ -n "${pr_branch[$sha]+set}" ]]; then
+              branches=$((branches+1))
+              if (( branches <= MAX_BRANCHES )); then
+                echo "KEEP  $folder (${pr_branch[$sha]}, latest commit, branch ${branches}/${MAX_BRANCHES})"
+                kept=$((kept+1)); continue
+              fi
+              echo "DELETE $folder (${pr_branch[$sha]}, beyond the $MAX_BRANCHES most recent branches)"
             else
-              echo "DELETE $folder (last written $newest, beyond the $MAX_RECENT newest)"
+              echo "DELETE $folder (last written $newest, not the head of any open PR — merged, closed, or superseded)"
             fi
+
             if [[ "$DRY_RUN" != "true" ]]; then
               aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors
             fi
