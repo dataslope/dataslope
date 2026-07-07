@@ -291,6 +291,16 @@ export interface LanguageAdapter {
    *  e.g. "py", "js", "cpp". Used to seed the initial workspace file
    *  and to suggest names for "+" new tabs. */
   defaultFileExtension: string;
+  /** Optional: seed fresh playground workspaces with this multi-file
+   *  set instead of a single `<exportBaseFilename>.<ext>` file — the
+   *  web adapter uses it for its CodePen-style HTML/CSS/JS trio. The
+   *  first entry is the initial active file. */
+  defaultWorkspace?: ExampleFile[];
+  /** Optional: the playground offers a CodePen-style split view for
+   *  this adapter — every workspace file gets its own always-visible
+   *  editor (stacked in the editor pane) instead of tabs. The user can
+   *  flip between split and tabs; the preference persists per adapter. */
+  splitEditors?: boolean;
   /** Optional: classify which workspace files contain entry points
    *  (i.e. `main()` / `Main()` / top-level statements). Used by the
    *  Run button to populate a split-button dropdown when multiple

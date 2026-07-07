@@ -335,10 +335,28 @@ describe("Web adapter specifics", () => {
     expect(webAdapter.codeMirrorModeForFile!("index.html")).toBe("htmlmixed");
   });
 
-  it("hello example is a complete HTML document", () => {
+  it("hello example is the CodePen-style HTML/CSS/JS trio", () => {
     const hello = webAdapter.examples.find((e) => e.key === "hello");
     expect(hello).toBeTruthy();
-    expect(hello!.code.toLowerCase()).toContain("<!doctype html>");
+    // The HTML pane is a body fragment (implicit composition supplies
+    // the CSS/JS panes), matching the default workspace.
+    expect(hello!.entryFilename).toBe("index.html");
+    const extras = (hello!.files ?? []).map((f) => f.filename).sort();
+    expect(extras).toEqual(["script.js", "styles.css"]);
+  });
+
+  it("seeds fresh workspaces with the CodePen trio and offers split editors", () => {
+    expect(webAdapter.splitEditors).toBe(true);
+    const names = (webAdapter.defaultWorkspace ?? []).map((f) => f.filename);
+    expect(names).toEqual(["index.html", "styles.css", "script.js"]);
+    for (const f of webAdapter.defaultWorkspace ?? []) {
+      expect(f.content.trim().length).toBeGreaterThan(0);
+    }
+    // The HTML pane must not reference the siblings explicitly — the
+    // whole point is the implicit CodePen-style composition.
+    const html = webAdapter.defaultWorkspace![0].content;
+    expect(html).not.toContain("styles.css");
+    expect(html).not.toContain("script.js");
   });
 
   it("ships a Tailwind example wired to the pinned CDN build", () => {

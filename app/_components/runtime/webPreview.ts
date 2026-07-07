@@ -289,11 +289,24 @@ export interface WebComposeInput {
  * Service-Worker virtual server is the "real URLs" upgrade path), and
  * the console bridge (+ optional Tailwind compiler) is injected at the
  * top of the document.
+ *
+ * CodePen-style implicit composition: root-level `.css` / `.js`
+ * workspace files that the entry document does NOT reference get
+ * appended automatically — styles as `<style>`, scripts as `<script>`
+ * after the user's markup (so scripts see the parsed DOM, exactly like
+ * CodePen's JS pane). Explicitly referenced files inline at their tag
+ * as before, so documents that link their assets keep full control of
+ * position and never double-apply. Files inside folders stay opt-in
+ * (reference them explicitly) so nested/uploaded assets don't execute
+ * by surprise.
  */
 export function composeWebDocument(input: WebComposeInput): string {
   const textFiles = input.textFiles ?? new Map<string, string>();
   const binaryFiles = input.binaryFiles ?? new Map<string, Uint8Array>();
   let html = input.entryHtml;
+  // Workspace files the entry references explicitly — excluded from the
+  // implicit CodePen-style injection below.
+  const referenced = new Set<string>();
 
   // <link rel="stylesheet" href="styles.css"> → <style>…</style>
   html = html.replace(/<link\b[^>]*>/gi, (tag) => {
@@ -301,9 +314,11 @@ export function composeWebDocument(input: WebComposeInput): string {
     if (!rel || rel.toLowerCase() !== "stylesheet") return tag;
     const href = getAttr(tag, "href");
     if (!href) return tag;
-    const css = textFiles.get(normalizeAssetPath(href));
+    const path = normalizeAssetPath(href);
+    const css = textFiles.get(path);
     if (css === undefined) return tag; // external URL — leave it alone
-    return `<style data-inlined-from="${normalizeAssetPath(href)}">\n${escapeInlineStyleContent(css)}\n</style>`;
+    referenced.add(path);
+    return `<style data-inlined-from="${path}">\n${escapeInlineStyleContent(css)}\n</style>`;
   });
 
   // <script src="app.js"></script> → <script>…</script>
@@ -315,6 +330,7 @@ export function composeWebDocument(input: WebComposeInput): string {
       const path = normalizeAssetPath(src);
       const js = textFiles.get(path);
       if (js === undefined) return tag; // external URL — leave it alone
+      referenced.add(path);
       const type = getAttr(tag, "type");
       const isModule = type?.toLowerCase() === "module";
       const escaped = escapeInlineScriptContent(js);
@@ -356,6 +372,29 @@ export function composeWebDocument(input: WebComposeInput): string {
       `$1$2data:${mime};base64,${b64}$2`,
     );
   });
+
+  // Implicit CodePen-style composition of unreferenced root-level
+  // files. Styles append after the markup (they still apply page-wide,
+  // and appending keeps them the "last word" in the cascade — the
+  // pane-CSS mental model); scripts append last so they run against
+  // the fully parsed DOM, like CodePen's JS pane. Sorted for
+  // deterministic ordering across runs.
+  const injectable = [...textFiles.keys()]
+    .filter((path) => !path.includes("/") && !referenced.has(path))
+    .sort();
+  for (const path of injectable) {
+    if (/\.css$/i.test(path)) {
+      const css = textFiles.get(path)!;
+      html += `\n<style data-injected-from="${path}">\n${escapeInlineStyleContent(css)}\n</style>`;
+    }
+  }
+  for (const path of injectable) {
+    if (/\.(js|mjs)$/i.test(path)) {
+      const js = textFiles.get(path)!;
+      const type = /\.mjs$/i.test(path) ? ' type="module"' : "";
+      html += `\n<script${type} data-injected-from="${path}">\n${escapeInlineScriptContent(js)}\n</script>`;
+    }
+  }
 
   let prelude = buildPreviewBridge(input.token);
   if (input.tailwind) prelude += tailwindScriptTag();

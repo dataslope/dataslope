@@ -31,44 +31,83 @@ import { TAILWIND_BROWSER_CDN } from "./cdn";
 // ordinary stdout/stderr cells. See runtime/webPreview.ts for the
 // architecture and the sandboxing rules.
 
+// The CodePen-style default workspace: three panes, three languages,
+// implicit composition. The HTML pane is a body fragment — the CSS and
+// JS tabs apply automatically (see composeWebDocument), no <link> or
+// <script src> boilerplate required.
+const DEFAULT_HTML = `<div class="card">
+  <h1>Hello, Web Playground!</h1>
+  <p>
+    Edit any pane and press Run — the HTML, CSS, and JS tabs compose
+    into one live page, CodePen-style.
+  </p>
+  <button id="greet">Click me</button>
+</div>
+`;
+
+const DEFAULT_CSS = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  background: #f8fafc;
+}
+
+.card {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+p {
+  color: #475569;
+  max-width: 26rem;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+`;
+
+const DEFAULT_JS = `const button = document.querySelector("#greet");
+let clicks = 0;
+
+button.addEventListener("click", () => {
+  clicks += 1;
+  button.textContent = "Clicked " + clicks + (clicks === 1 ? " time" : " times");
+});
+
+console.log("Scripts run too — check the console output below.");
+`;
+
 const EXAMPLES: ExampleSnippet[] = [
   {
     key: "hello",
     title: "Hello, Web Page",
-    desc: "A complete page: HTML, CSS & JS in one file",
-    code: `<!doctype html>
-<html>
-  <head>
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        display: grid;
-        place-items: center;
-        min-height: 90vh;
-        background: #f8fafc;
-      }
-      .card {
-        background: white;
-        padding: 2rem 3rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        text-align: center;
-      }
-      h1 { color: #0f172a; margin: 0 0 0.5rem; }
-      p { color: #475569; margin: 0; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Hello, Web Playground!</h1>
-      <p>This page renders live in a sandboxed preview.</p>
-    </div>
-    <script>
-      console.log("Scripts run too — check the console output below.");
-    </script>
-  </body>
-</html>
-`,
+    desc: "The HTML/CSS/JS starter trio (CodePen-style)",
+    code: DEFAULT_HTML,
+    files: [
+      { filename: "styles.css", content: DEFAULT_CSS },
+      { filename: "script.js", content: DEFAULT_JS },
+    ],
+    entryFilename: "index.html",
   },
   {
     key: "multi_file",
@@ -422,8 +461,9 @@ export const webAdapter: LanguageAdapter = {
     engine: "Sandboxed iframe preview (native browser)",
     notes:
       "Pages render in a sandboxed iframe with a unique opaque origin — no runtime download at all. " +
-      "Multi-file workspaces inline <link> and <script src> references to sibling tabs; " +
-      "console output and errors stream into the output panel.",
+      "Root-level .css/.js tabs apply automatically, CodePen-style (reference a file explicitly with " +
+      "<link>/<script src> to control its position instead); console output and errors stream into " +
+      "the output panel.",
   },
   codeMirrorMode: "htmlmixed",
   codeMirrorModeForFile(filename) {
@@ -444,6 +484,14 @@ export const webAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "index",
   defaultFileExtension: "html",
+  // Fresh workspaces open as the CodePen trio with one always-visible
+  // editor per pane (the playground's split view).
+  defaultWorkspace: [
+    { filename: "index.html", content: DEFAULT_HTML },
+    { filename: "styles.css", content: DEFAULT_CSS },
+    { filename: "script.js", content: DEFAULT_JS },
+  ],
+  splitEditors: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (
     <>

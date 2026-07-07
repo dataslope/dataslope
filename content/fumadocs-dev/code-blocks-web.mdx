@@ -66,12 +66,66 @@ output and uncaught errors stream back into the output panel through a
 />
 ```
 
-## Multi-file: HTML + CSS + JS tabs
+## CodePen-style implicit composition
+
+Root-level `.css` and `.js` tabs apply automatically — the HTML tab
+can be a plain body fragment with no `<link>` or `<script src>`
+boilerplate, exactly like CodePen's three panes.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<h1>Three panes, zero boilerplate</h1>
+<p>No link or script tags here — the other tabs apply implicitly.</p>
+<button id="poke">Poke</button>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+h1 {
+  color: #7c3aed;
+}
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `document.querySelector("#poke").addEventListener("click", () => {
+  console.log("poked!");
+});
+
+console.log("composed implicitly — no script tag needed");
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    { filename: "index.html", starterCode: `<h1>…fragment, no tags…</h1>` },
+    { filename: "styles.css", starterCode: `…applies automatically…` },
+    { filename: "script.js", starterCode: `…runs after the markup…` },
+  ]}
+/>
+```
+
+## Multi-file: explicit HTML + CSS + JS references
 
 `<link rel="stylesheet" href="styles.css">` and
 `<script src="script.js">` resolve to the sibling tabs — the adapter
 inlines them into the preview document so the sandbox stays
-self-contained.
+self-contained, and explicitly referenced files are never injected a
+second time.
 
 <CodeBlock
   adapter="web"

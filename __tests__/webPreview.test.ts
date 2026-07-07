@@ -142,6 +142,57 @@ describe("composeWebDocument", () => {
     expect(doc).not.toContain(`src="dot.png"`);
   });
 
+  it("auto-injects unreferenced root-level css/js, CodePen-style", () => {
+    const doc = composeWebDocument({
+      entryHtml: `<h1>fragment</h1>`,
+      token,
+      textFiles: new Map([
+        ["styles.css", "h1 { color: teal; }"],
+        ["script.js", `console.log("implicit")`],
+      ]),
+    });
+    expect(doc).toContain(`data-injected-from="styles.css"`);
+    expect(doc).toContain("h1 { color: teal; }");
+    expect(doc).toContain(`data-injected-from="script.js"`);
+    expect(doc).toContain(`console.log("implicit")`);
+    // Styles inject before scripts; scripts run after the user markup.
+    expect(doc.indexOf("<h1>fragment</h1>")).toBeLessThan(
+      doc.indexOf(`data-injected-from="styles.css"`),
+    );
+    expect(doc.indexOf(`data-injected-from="styles.css"`)).toBeLessThan(
+      doc.indexOf(`data-injected-from="script.js"`),
+    );
+  });
+
+  it("does not double-apply files the entry references explicitly", () => {
+    const doc = composeWebDocument({
+      entryHtml: `<link rel="stylesheet" href="styles.css"><script src="script.js"></script>`,
+      token,
+      textFiles: new Map([
+        ["styles.css", "h1 { color: teal; }"],
+        ["script.js", `console.log("explicit")`],
+      ]),
+    });
+    expect(doc).toContain(`data-inlined-from="styles.css"`);
+    expect(doc).not.toContain(`data-injected-from="styles.css"`);
+    expect(doc).not.toContain(`data-injected-from="script.js"`);
+    expect(doc.match(/console\.log\("explicit"\)/g)).toHaveLength(1);
+  });
+
+  it("never auto-injects nested files or other html pages", () => {
+    const doc = composeWebDocument({
+      entryHtml: `<h1>page</h1>`,
+      token,
+      textFiles: new Map([
+        ["vendor/lib.js", `console.log("nested")`],
+        ["about.html", "<h1>about</h1>"],
+      ]),
+    });
+    expect(doc).not.toContain("data-injected-from");
+    expect(doc).not.toContain(`console.log("nested")`);
+    expect(doc).not.toContain("<h1>about</h1>");
+  });
+
   it("injects the pinned Tailwind compiler when asked", () => {
     const doc = composeWebDocument({
       entryHtml: "<h1>x</h1>",

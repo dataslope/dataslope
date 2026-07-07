@@ -112,15 +112,26 @@ test.describe("Playgrounds (fast)", () => {
   test("Web (HTML/CSS/JS) renders the live page preview", async ({ page }) => {
     await page.goto("/playground/web");
     await waitForRuntimeReady(page);
+
+    // The web playground opens CodePen-style: one always-visible pane
+    // per file of the default HTML/CSS/JS trio.
+    await expect(page.locator(".split-editor-section")).toHaveCount(3, {
+      timeout: 30_000,
+    });
+
     await page.locator(".run-btn").first().click();
 
-    // The default Hello example renders inside the sandboxed preview
-    // iframe mounted in the output pane's preview slot.
+    // The default trio renders inside the sandboxed preview iframe —
+    // the CSS and JS panes apply implicitly (no <link>/<script src>).
     const preview = page.frameLocator(".web-preview-slot iframe");
     await expect(preview.locator("h1")).toContainText(
       "Hello, Web Playground!",
       { timeout: 60_000 },
     );
+
+    // script.js wired a click handler — the preview stays interactive.
+    await preview.locator("#greet").click();
+    await expect(preview.locator("#greet")).toContainText("Clicked 1 time");
 
     // Its console.log crosses the postMessage bridge into a stdout cell.
     await page.waitForFunction(
