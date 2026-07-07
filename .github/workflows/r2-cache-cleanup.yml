@@ -4,20 +4,22 @@ name: R2 incremental-cache cleanup
 #
 # Why this exists: the R2 cache keys every object as
 # `incremental-cache/<buildId>/<hash>.cache`. Each deploy — production AND every
-# Cloudflare preview — writes a fresh ~0.6 GB folder under a new build ID, and
-# OpenNext never deletes old ones. Left alone, the bucket grows ~0.6 GB per
-# deploy forever.
+# Cloudflare preview — writes a fresh ~1–1.4 GB folder under a new build ID
+# (one HTML+RSC `.cache` object per prerendered page, ~1,600 of them), and
+# OpenNext never deletes old ones. Left alone, the bucket grows by that much
+# per deploy forever; at active-development velocity that reached ~34 GB in a
+# matter of days.
 #
-# What it does: deletes every build folder that is BOTH (a) not the live
-# production build and (b) older than THRESHOLD_DAYS. The live production build
-# is preserved regardless of age, so a site that sits unchanged for months never
-# loses its cache (which would 500 the home page and /courses/* — see
-# open-next.config.ts). Superseded production builds and merged-PR previews age
-# out THRESHOLD_DAYS after their last deploy.
+# What it does: always keeps the live production build — a site that sits
+# unchanged for months must never lose its cache, which would 500 the home
+# page and /courses/* (see open-next.config.ts). Every OTHER build folder is
+# deleted once it is either older than THRESHOLD_HOURS or outside the
+# MAX_RECENT newest: the age limit retires merged/abandoned previews quickly,
+# and the cap bounds the bucket on heavy deploy days.
 #
 # Safety: the job aborts WITHOUT deleting anything if it cannot positively
-# identify the live production build folder, so a transient error can never wipe
-# the bucket. Run manually with dry_run=true to preview deletions.
+# identify the live production build folder, so a transient error can never
+# wipe the bucket. Run manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
 #   CF_ACCOUNT_ID         Cloudflare account ID (the R2 S3 endpoint host)
@@ -26,8 +28,10 @@ name: R2 incremental-cache cleanup
 
 on:
   schedule:
-    # Daily at 04:17 UTC (off the top of the hour to avoid scheduler congestion).
-    - cron: "17 4 * * *"
+    # Every 6 hours, off the top of the hour to avoid scheduler congestion.
+    # (GitHub delays scheduled runs by up to a few hours under load; the
+    # THRESHOLD_HOURS retention absorbs that jitter.)
+    - cron: "17 */6 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -46,7 +50,12 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      THRESHOLD_DAYS: "3"
+      # A non-production build survives only while BOTH hold: younger than
+      # THRESHOLD_HOURS and among the MAX_RECENT newest. 24 h keeps a PR's
+      # preview URL alive through next-morning review; the cap keeps burst
+      # days (10+ deploys) bounded at (MAX_RECENT + 1) build folders total.
+      THRESHOLD_HOURS: "24"
+      MAX_RECENT: "10"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
@@ -91,16 +100,16 @@ jobs:
             exit 1
           fi
 
-          cutoff=$(( $(date -u +%s) - THRESHOLD_DAYS * 86400 ))
-          echo "Threshold: ${THRESHOLD_DAYS}d (delete folders last written before $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          cutoff=$(( $(date -u +%s) - THRESHOLD_HOURS * 3600 ))
+          echo "Policy: keep live production + up to $MAX_RECENT builds younger than ${THRESHOLD_HOURS}h (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
           echo "Dry run: $DRY_RUN"
 
-          deleted=0; kept=0
+          # 4) Timestamp every non-production folder so they can be ranked
+          #    newest-first — the MAX_RECENT cap needs a global order, not a
+          #    per-folder decision.
+          entries=()
           for folder in "${folders[@]}"; do
-            if [[ "$folder" == "$prod_folder" ]]; then
-              echo "KEEP  $folder (live production)"
-              kept=$((kept+1)); continue
-            fi
+            [[ "$folder" == "$prod_folder" ]] && continue
 
             # Newest object in the folder (all written together at deploy time).
             # The CLI auto-paginates above 1000 objects and applies --query to
@@ -115,19 +124,28 @@ jobs:
             if [[ -z "$newest" ]]; then
               echo "skip  $folder (empty)"; continue
             fi
-            ts=$(date -u -d "$newest" +%s)
-
-            if (( ts < cutoff )); then
-              echo "DELETE $folder (last written $newest)"
-              if [[ "$DRY_RUN" != "true" ]]; then
-                aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors
-              fi
-              deleted=$((deleted+1))
-            else
-              echo "KEEP  $folder (last written $newest, within threshold)"
-              kept=$((kept+1))
-            fi
+            entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$newest" +%s)" "$newest" "$folder")")
           done
+
+          echo "KEEP  $prod_folder (live production)"
+          kept=1; deleted=0; rank=0
+          while IFS=$'\t' read -r ts newest folder; do
+            [[ -z "$folder" ]] && continue
+            rank=$((rank+1))
+            if (( ts >= cutoff && rank <= MAX_RECENT )); then
+              echo "KEEP  $folder (last written $newest, ${rank}/${MAX_RECENT} newest)"
+              kept=$((kept+1)); continue
+            fi
+            if (( ts < cutoff )); then
+              echo "DELETE $folder (last written $newest, older than ${THRESHOLD_HOURS}h)"
+            else
+              echo "DELETE $folder (last written $newest, beyond the $MAX_RECENT newest)"
+            fi
+            if [[ "$DRY_RUN" != "true" ]]; then
+              aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors
+            fi
+            deleted=$((deleted+1))
+          done < <(printf '%s\n' ${entries[@]+"${entries[@]}"} | sort -rn)
 
           echo "---"
           # DRY_RUN is always exactly "true" or "false"; choose the verb to match.
