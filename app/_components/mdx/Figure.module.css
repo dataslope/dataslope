@@ -1,6 +1,7 @@
-/* Raster illustration embedded in a lesson / landing page. The source PNGs are
-   transparent and drawn to read on both the light (#ffffff) and dark (#121212)
-   backgrounds, so the figure itself carries no background. */
+/* Optimized raster image embedded in a lesson / landing page. Transparent
+   sources (the Recraft topic art) are drawn to read on both the light
+   (#ffffff) and dark (#121212) backgrounds, so the figure carries no
+   background of its own. */
 
 .figure {
   margin: 2.5rem auto;
