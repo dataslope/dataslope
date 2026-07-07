@@ -88,6 +88,13 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
+      # R2 intermittently returns a transient 500 InternalError on DeleteObject.
+      # The CLI's default (legacy) retry gives up after ~2 tries; switch to the
+      # standard retry mode and raise the attempt count so a burst of transient
+      # errors is absorbed inside a single `aws s3 rm` before the per-folder
+      # retry loop (see delete_folder) even has to intervene.
+      AWS_RETRY_MODE: standard
+      AWS_MAX_ATTEMPTS: "10"
       ENDPOINT: https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com
     steps:
       - name: Prune stale build folders
@@ -95,6 +102,24 @@ jobs:
         run: |
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
+
+          # Delete a folder, tolerating R2's intermittent 500 InternalError on
+          # DeleteObject. `aws s3 rm --recursive` re-lists the folder on every
+          # invocation and only deletes what is still present, so repeated
+          # attempts converge on an empty folder. Returns non-zero only if the
+          # folder still has objects after every attempt (a persistent, not
+          # transient, failure) — so one flaky delete no longer aborts the run.
+          delete_folder() {
+            local folder="$1" attempt
+            for attempt in 1 2 3 4 5; do
+              if aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors; then
+                return 0
+              fi
+              echo "  delete attempt ${attempt}/5 for $folder hit transient R2 errors; retrying in $((attempt * 5))s"
+              sleep $((attempt * 5))
+            done
+            return 1
+          }
 
           # 1) Ask the live production Worker which build it is serving from.
           prod_id="$(curl -fsS --max-time 30 "$BUILD_ID_URL" || true)"
@@ -171,7 +196,7 @@ jobs:
           done
 
           echo "KEEP  $prod_folder (live production)"
-          kept=1; deleted=0; branches=0
+          kept=1; deleted=0; failed=0; branches=0
           while IFS=$'\t' read -r ts newest folder; do
             [[ -z "$folder" ]] && continue
             # Folder name is the commit SHA: strip the prefix and trailing slash.
@@ -192,10 +217,17 @@ jobs:
               echo "DELETE $folder (last written $newest, not the head of any open PR — merged, closed, or superseded)"
             fi
 
-            if [[ "$DRY_RUN" != "true" ]]; then
-              aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors
+            if [[ "$DRY_RUN" == "true" ]]; then
+              deleted=$((deleted+1))
+            elif delete_folder "$folder"; then
+              deleted=$((deleted+1))
+            else
+              # Persistent (non-transient) failure: log it, keep sweeping the
+              # rest, and fail the job at the end so it's surfaced. The next
+              # scheduled run retries this folder from scratch.
+              echo "::error::Could not fully delete $folder after 5 attempts (persistent R2 errors)."
+              failed=$((failed+1))
             fi
-            deleted=$((deleted+1))
           done < <(printf '%s\n' ${entries[@]+"${entries[@]}"} | sort -rn)
 
           echo "---"
@@ -205,5 +237,12 @@ jobs:
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "Folders kept: $kept | folders would be deleted: $deleted"
           else
-            echo "Folders kept: $kept | folders deleted: $deleted"
+            echo "Folders kept: $kept | folders deleted: $deleted | folders failed: $failed"
+          fi
+
+          # Surface persistent delete failures loudly, but only after every
+          # folder has been attempted — a later run will retry the stragglers.
+          if (( failed > 0 )); then
+            echo "::error::${failed} folder(s) could not be fully deleted after retries; the next scheduled run will retry them."
+            exit 1
           fi
