@@ -13,6 +13,13 @@
   width: 100%;
   height: auto;
   max-width: 100%;
+  /* Fill the full content width (the figure carries no width cap of its own),
+     but keep tall/square art from dominating the page: cap the rendered
+     height and let object-fit letterbox against the page background so the
+     image stays centered and its aspect ratio is preserved. Wide art
+     (shorter than the cap at full width) is unaffected. */
+  max-height: 32rem;
+  object-fit: contain;
   margin: 0 auto;
 }
 

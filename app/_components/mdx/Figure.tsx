@@ -45,7 +45,11 @@ interface FigureProps {
   alt: string;
   /** Optional caption shown under the image. */
   caption?: string;
-  /** Max display width in px (default 640, matching the inline-SVG heroes). */
+  /**
+   * Optional cap on display width in px. Omitted by default so the figure
+   * fills the full content width; pass a value only to deliberately hold a
+   * single figure narrower than the column.
+   */
   maxWidth?: number;
   /** Eager-load + high fetch priority for an above-the-fold hero. */
   priority?: boolean;
@@ -55,7 +59,7 @@ export function Figure({
   slug,
   alt,
   caption,
-  maxWidth = 640,
+  maxWidth,
   priority = false,
 }: FigureProps) {
   const entry = imageManifest[slug];
@@ -85,7 +89,10 @@ export function Figure({
   const sources = entry.formats.slice(0, -1);
 
   return (
-    <figure className={styles.figure} style={{ maxWidth: `${maxWidth}px` }}>
+    <figure
+      className={styles.figure}
+      style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
+    >
       <picture>
         {sources.map((ext) => (
           <source
