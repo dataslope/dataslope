@@ -297,6 +297,11 @@ int main() {
 When you reverse or delete nodes, you are rewiring addresses. Draw the links before changing them; losing the only pointer to a node causes a memory leak.
 </Callout>
 
+<Figure
+  slug="a-risograph-of-a-linked-list-data-structure"
+  alt="A risograph of a linked list, its nodes chained one to the next"
+/>
+
 ## Practice: reverse a linked list
 
 Reversing a singly linked list in place is *the* classic pointer exercise — simple to state, unforgiving of sloppy thinking. The standard solution walks the list once with three pointers: `previous` (the already-reversed part), `current` (the node being flipped), and `next` (a bookmark so the rest of the list isn't lost when `current->next` is overwritten). Trace it by hand on `1->2->3->4` before you code: after one step, `previous` is `1`, `current` is `2`, and `1->next` is null.

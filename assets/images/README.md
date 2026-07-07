@@ -64,6 +64,18 @@ call to match.
 | `line-chart`         | Minimal line chart                      | `courses/time-series-analysis-python` |
 | `data-visualization` | Assortment of charts                    | `courses/mastering-ggplot2` · `interview-prep/data-scientist` |
 | `bi-dashboard`       | Business-intelligence dashboard         | `courses/sql-analytics-duckdb` · `interview-prep/analytics-engineer` |
+| `a-risograph-of-a-blueprint`                  | Architectural blueprint (class as a plan) | `courses/oop-blueprint-java` |
+| `a-risograph-of-a-gardener-stemming`          | Gardener pruning stems                     | `courses/natural-language-processing-python` (`stemming-and-lemmatization`) |
+| `a-risograph-of-a-linked-list-data-structure` | Linked list                                | `courses/mastering-dsa-cpp` (`linked-lists`) |
+| `a-risograph-of-a-pipeline`                   | Data pipeline                              | `interview-prep/data-engineer` (`pipelines`) |
+| `a-risograph-of-a-queue-data-structure`       | Queue (FIFO)                               | `courses/mastering-dsa-cpp` (`queues`) |
+| `a-risograph-of-a-string-data-structure`      | String of characters                       | `courses/python-basics` (`strings`) |
+| `a-risograph-of-a-warehouse`                  | Warehouse (data warehouse)                 | `interview-prep/analytics-engineer` (`dimensional-modeling`) |
+| `a-risograph-of-beautiful-sea`                | Calm sea                                    | `courses/seaborn-foundations` (`visual-storytelling`) |
+| `a-risograph-of-inside-a-data-center`         | Inside a data center                       | `courses/intro-sql-postgres` (`what-is-a-database`) |
+| `a-risograph-of-sorting`                      | Sorting into order                         | `courses/mastering-dsa-cpp` (`sorting-basic`) |
+| `a-risograph-of-the-boolean-data-type`        | Boolean (true / false)                     | `courses/python-basics` (`booleans`) |
+| `a-risograph-of-the-dictionary-data-type`     | Dictionary (key → value)                   | `courses/python-basics` (`dictionaries`) |
 
 To add more, drop `<slug>.<ext>` here and place a `<Figure slug="<slug>" alt="…" />`
 wherever it fits.

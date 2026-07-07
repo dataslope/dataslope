@@ -164,6 +164,11 @@ Insertion sort is O(n²) in the worst case (input sorted backward — every elem
 A stable sort keeps equal elements in their original relative order. Why care? Suppose you sort emails by date, then by sender: with a stable sort, each sender's messages stay date-ordered — the second sort preserves the first one's work on ties. Insertion sort is stable because it shifts only values *strictly greater* than the key. Selection sort is not stable in its typical swap-based form: the long-range swap can leapfrog one equal element over another.
 </Callout>
 
+<Figure
+  slug="a-risograph-of-sorting"
+  alt="A risograph of items being arranged into sorted order"
+/>
+
 ## Comparing basic sorts
 
 | Algorithm | Best | Average | Worst | Extra space | Stable? |
