@@ -93,3 +93,14 @@ export const TAILWIND_BROWSER_CDN = `https://cdn.jsdelivr.net/npm/@tailwindcss/b
 // fetches them directly inside the sandboxed preview iframe. See
 // esmResolve.ts for the specifier → URL mapping and the react pin.
 export const ESM_SH_ORIGIN = "https://esm.sh";
+
+// React type declarations for TSX intellisense. The TS language worker
+// lazily fetches this pinned set from jsDelivr and mounts it at
+// node_modules paths, so `import { useState } from "react"` resolves to
+// real typings (hooks signatures, JSX prop checking) inside the React
+// playground. The set is the closed dependency graph of @types/react:
+// index/global/jsx-runtime + csstype, plus @types/react-dom's client
+// entry. Keep the majors aligned with REACT_VERSION in esmResolve.ts.
+export const REACT_TYPES_VERSION = "19.2.17";
+export const REACT_DOM_TYPES_VERSION = "19.2.3";
+export const CSSTYPE_VERSION = "3.2.3";

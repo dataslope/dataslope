@@ -141,7 +141,15 @@ import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
-import { FileCode2, Rows3, Settings } from "lucide-react";
+import {
+  FileCode2,
+  PanelLeft,
+  PanelRight,
+  PanelTop,
+  Rows3,
+  Settings,
+  Zap,
+} from "lucide-react";
 import PlaygroundSplitEditors from "./PlaygroundSplitEditors";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
 import {
@@ -767,6 +775,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
+  // Mirror for timers/closures (the auto-run debounce) that must read
+  // the current run state without re-arming on every status change.
+  const statusStateRef = useRef<"loading" | "ready" | "running" | "error">(
+    "loading",
+  );
+  useEffect(() => {
+    statusStateRef.current = statusState;
+  }, [statusState]);
 
   // Smoothed boot fraction for the loading overlay's bar: determinate
   // once the adapter reports stage fractions, indeterminate sweep
@@ -929,6 +945,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // below) for callbacks — empty until its sync effect first runs;
   // readers fall back to the active file id.
   const outputFileIdRef = useRef<string>("");
+  // Pane layout elements (the drag resizer wires them up in an effect
+  // further down; declared here so earlier callbacks can reference the
+  // panes element).
+  const panesRef = useRef<HTMLDivElement | null>(null);
+  const editorPaneRef = useRef<HTMLDivElement | null>(null);
+  const resizerRef = useRef<HTMLDivElement | null>(null);
 
   // ─── CodePen-style split view (adapters with `splitEditors`) ─────────
   // Every workspace file gets its own always-visible editor stacked in
@@ -997,9 +1019,86 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [setActiveFileId, setActiveTabId],
   );
 
+  // ─── Auto-run on edit (preview adapters) ─────────────────────────────
+  // CodePen-style live feedback: a debounced re-run after edits (and one
+  // initial run once the runtime is ready) keeps the preview current
+  // without pressing Run. Cheap by construction — each run swaps the
+  // sandboxed iframe. Persisted per adapter; defaults ON.
+  const [autoRun, setAutoRunState] = useState<boolean>(hasPreview);
+  useEffect(() => {
+    if (!hasPreview) return;
+    try {
+      if (
+        window.localStorage.getItem(`playground_${adapter.id}_autorun`) ===
+        "false"
+      ) {
+        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setAutoRunState(false);
+      }
+    } catch {
+      /* private mode — keep the default. */
+    }
+  }, [adapter.id, hasPreview]);
+  const setAutoRun = useCallback(
+    (on: boolean) => {
+      setAutoRunState(on);
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_autorun`,
+          String(on),
+        );
+      } catch {
+        /* quota / private mode — ignore. */
+      }
+    },
+    [adapter.id],
+  );
+
+  // ─── Editor position (preview adapters): left / right / top ──────────
+  // The CodePen "change view" arrangements. Persisted per adapter.
+  const [editorPosition, setEditorPositionState] = useState<
+    "left" | "right" | "top"
+  >("left");
+  useEffect(() => {
+    if (!hasPreview) return;
+    try {
+      const stored = window.localStorage.getItem(
+        `playground_${adapter.id}_editorpos`,
+      );
+      if (stored === "right" || stored === "top") {
+        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setEditorPositionState(stored);
+      }
+    } catch {
+      /* private mode — keep the default. */
+    }
+  }, [adapter.id, hasPreview]);
+  const setEditorPosition = useCallback(
+    (pos: "left" | "right" | "top") => {
+      setEditorPositionState(pos);
+      // The drag resizer writes an inline grid template sized for the
+      // previous arrangement — drop it so the new arrangement's CSS
+      // takes over at its default proportions.
+      panesRef.current?.style.removeProperty("grid-template-columns");
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_editorpos`,
+          pos,
+        );
+      } catch {
+        /* quota / private mode — ignore. */
+      }
+    },
+    [adapter.id],
+  );
+
   // Latest run handler in a ref so the editor's keymap can call into it
-  // without being re-bound on every render.
-  const runRef = useRef<() => void>(() => undefined);
+  // without being re-bound on every render. `auto` marks debounced
+  // auto-runs, which skip user-facing side effects like the mobile
+  // pane switch.
+  const runRef = useRef<(opts?: { auto?: boolean }) => void>(() => undefined);
   // Secondary run action (⌘/Ctrl+Shift+Enter) — runs the Run dropdown's
   // first/canonical entry. Kept as a ref so the CodeMirror keymap stays
   // stable while the target entry updates as tabs/files change.
@@ -1932,7 +2031,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(
-    async (entryOverride?: string) => {
+    async (entryOverride?: string, opts?: { auto?: boolean }) => {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
     if (!rt) return;
@@ -2147,8 +2246,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } finally {
       // On narrow viewports the panes share the screen via a tab switcher;
       // surface the result tab automatically once the run is done so the
-      // user doesn't have to swipe back themselves.
-      setMobileTab("output");
+      // user doesn't have to swipe back themselves. Debounced auto-runs
+      // skip this — yanking the pane away mid-typing would be hostile.
+      if (!opts?.auto) setMobileTab("output");
     }
   },
   [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
@@ -2215,8 +2315,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // adapters resolve to the canonical entry even when a non-entry file
   // — e.g. a stylesheet pane — has focus).
   useEffect(() => {
-    runRef.current = () => {
-      void runCode(runButtonState.primaryEntry ?? undefined);
+    runRef.current = (opts) => {
+      void runCode(runButtonState.primaryEntry ?? undefined, opts);
     };
   }, [runCode, runButtonState]);
 
@@ -2229,6 +2329,35 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (secondary) void runCode(secondary.entryFilename);
     };
   }, [runButtonState, runCode]);
+
+  // Auto-run driver: re-fires on every real buffer edit (the store
+  // replaces the Map identity per change) and once when the runtime
+  // finishes loading, so the preview renders on page open. If a run is
+  // still in flight when the debounce fires, the timer re-arms — the
+  // last edit always wins.
+  const autoRunTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!hasPreview || !autoRun) return;
+    if (!workspaceReady || !loaded) return;
+    if (autoRunTimerRef.current !== null) {
+      window.clearTimeout(autoRunTimerRef.current);
+    }
+    const fire = () => {
+      autoRunTimerRef.current = null;
+      if (statusStateRef.current === "running") {
+        autoRunTimerRef.current = window.setTimeout(fire, 300);
+        return;
+      }
+      runRef.current({ auto: true });
+    };
+    autoRunTimerRef.current = window.setTimeout(fire, 700);
+    return () => {
+      if (autoRunTimerRef.current !== null) {
+        window.clearTimeout(autoRunTimerRef.current);
+        autoRunTimerRef.current = null;
+      }
+    };
+  }, [hasPreview, autoRun, workspaceReady, loaded, dirtyBuffers]);
 
   // ─── File tab management ────────────────────────────────────────────────
 
@@ -3009,9 +3138,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [outputs, scrollToLatestOutput]);
 
   // ─── Resizer ────────────────────────────────────────────────────────────
-  const panesRef = useRef<HTMLDivElement | null>(null);
-  const editorPaneRef = useRef<HTMLDivElement | null>(null);
-  const resizerRef = useRef<HTMLDivElement | null>(null);
+  // (panesRef / editorPaneRef / resizerRef are declared with the other
+  // refs near the top of the component.)
   useEffect(() => {
     const resizer = resizerRef.current;
     const panes = panesRef.current;
@@ -3030,11 +3158,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
     const onMove = (e: MouseEvent) => {
       if (!dragging) return;
-      const frac = Math.min(
-        0.8,
-        Math.max(0.2, startFrac + (e.clientX - startX) / panes.offsetWidth),
-      );
-      panes.style.gridTemplateColumns = `${frac * 100}% 1fr`;
+      // In the editors-right arrangement the editor pane sits in the
+      // second grid column, so a rightward drag SHRINKS it and the
+      // template lists the output track first.
+      const reversed = panes.dataset.editorPosition === "right";
+      const delta = ((reversed ? -1 : 1) * (e.clientX - startX)) / panes.offsetWidth;
+      const frac = Math.min(0.8, Math.max(0.2, startFrac + delta));
+      panes.style.gridTemplateColumns = reversed
+        ? `${(1 - frac) * 100}% ${frac * 100}%`
+        : `${frac * 100}% 1fr`;
     };
     const onUp = () => {
       if (!dragging) return;
@@ -4072,7 +4204,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </button>
         </div>
 
-        <div className="panes" data-mobile-tab={mobileTab} data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined} ref={panesRef}>
+        <div
+          className="panes"
+          data-mobile-tab={mobileTab}
+          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
+          data-editor-position={hasPreview ? editorPosition : undefined}
+          ref={panesRef}
+        >
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">
@@ -4114,6 +4252,86 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </Popover.Positioner>
                     </Popover.Portal>
                   </Popover.Root>
+                )}
+                {hasPreview && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className={`icon-btn${autoRun ? " active" : ""}`}
+                          aria-label={
+                            autoRun
+                              ? "Turn off auto-run on edit"
+                              : "Turn on auto-run on edit"
+                          }
+                          aria-pressed={autoRun}
+                          onClick={() => setAutoRun(!autoRun)}
+                        >
+                          <Zap size={14} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          {autoRun ? "Auto-run on edit: on" : "Auto-run on edit: off"}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {hasPreview && (
+                  <Menu.Root>
+                    <Menu.Trigger
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className="icon-btn"
+                          aria-label="Change view (editor position)"
+                          title="Change view"
+                        >
+                          {editorPosition === "right" ? (
+                            <PanelRight size={14} aria-hidden="true" />
+                          ) : editorPosition === "top" ? (
+                            <PanelTop size={14} aria-hidden="true" />
+                          ) : (
+                            <PanelLeft size={14} aria-hidden="true" />
+                          )}
+                        </button>
+                      )}
+                    />
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={6} align="start" side="bottom">
+                        <Menu.Popup className="bui-popup change-view-menu">
+                          <div className="change-view-title">Change View</div>
+                          {(
+                            [
+                              { pos: "left", label: "Editors left", Icon: PanelLeft },
+                              { pos: "top", label: "Editors top", Icon: PanelTop },
+                              { pos: "right", label: "Editors right", Icon: PanelRight },
+                            ] as const
+                          ).map(({ pos, label, Icon }) => (
+                            <Menu.Item
+                              key={pos}
+                              className={`change-view-item${
+                                editorPosition === pos ? " selected" : ""
+                              }`}
+                              onClick={() => setEditorPosition(pos)}
+                            >
+                              <Icon size={14} aria-hidden="true" />
+                              <span>{label}</span>
+                            </Menu.Item>
+                          ))}
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.Root>
                 )}
                 <Popover.Root>
                   <Popover.Trigger
@@ -4306,6 +4524,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onFocusFile={focusSplitFile}
                 onRun={() => runRef.current()}
                 onRunSecondary={() => runSecondaryRef.current()}
+                onAddFile={addNewFile}
                 registerView={registerSplitEditorView}
                 getRuntime={() => runtimeRef.current}
               />

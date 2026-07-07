@@ -78,6 +78,8 @@ interface EsbuildApi {
     target: string[];
     jsx: string;
     outdir: string;
+    sourcemap: string;
+    sourceRoot: string;
     define: Record<string, string>;
     plugins: EsbuildPlugin[];
     logLevel: string;
@@ -262,6 +264,13 @@ async function bundle(msg: InMessage): Promise<void> {
       // plugin rewrites to the pinned esm.sh URL like any bare import.
       jsx: "automatic",
       outdir: "/out",
+      // Inline sourcemaps so DevTools stack traces and breakpoints point
+      // at the user's pane sources (main.tsx:12) instead of bundle
+      // offsets. Costs bundle bytes in the srcdoc — fine at snippet
+      // scale. (Browser `error` events don't consume sourcemaps, so the
+      // output panel still reports bundle positions; DevTools maps.)
+      sourcemap: "inline",
+      sourceRoot: "dataslope://preview/",
       define: { "process.env.NODE_ENV": '"production"' },
       plugins: [vfsPlugin(files)],
       logLevel: "silent",

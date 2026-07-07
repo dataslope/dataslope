@@ -29,32 +29,89 @@ import { REACT_VERSION } from "./esmResolve";
 // web adapter uses (runtime/webPreview.ts). React itself is fetched by
 // the preview document from esm.sh as a native ES module.
 
+// The default workspace: a real multi-file project shape. main.tsx
+// mounts, App.tsx is the component the learner edits, styles come from
+// a plain CSS import — the structure every React tutorial and template
+// uses, one pane per file in the playground's split view.
+const DEFAULT_MAIN = `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`;
+
+const DEFAULT_APP = `import { useState } from "react";
+
+export function App() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <main className="card">
+      <h1>You clicked {count} times</h1>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+      <p>
+        Edit <code>App.tsx</code> and press Run — imports between the
+        panes bundle right in your browser.
+      </p>
+    </main>
+  );
+}
+`;
+
+const DEFAULT_STYLES = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  background: #f8fafc;
+  margin: 0;
+}
+
+.card {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 26rem;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 1rem;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+`;
+
 const EXAMPLES: ExampleSnippet[] = [
   {
     key: "hello",
     title: "Counter",
-    desc: "useState, events & JSX in one component",
-    code: `import { useState } from "react";
-import { createRoot } from "react-dom/client";
-
-function Counter() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div style={{ fontFamily: "system-ui", textAlign: "center", marginTop: 40 }}>
-      <h1>You clicked {count} times</h1>
-      <button
-        style={{ fontSize: 18, padding: "8px 20px", cursor: "pointer" }}
-        onClick={() => setCount(count + 1)}
-      >
-        Click me
-      </button>
-    </div>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<Counter />);
-`,
+    desc: "The main/App/styles starter trio",
+    code: DEFAULT_MAIN,
+    files: [
+      { filename: "App.tsx", content: DEFAULT_APP },
+      { filename: "styles.css", content: DEFAULT_STYLES },
+    ],
+    entryFilename: "main.tsx",
   },
   {
     key: "props_lists",
@@ -230,9 +287,147 @@ createRoot(document.getElementById("root")!).render(<NamePicker />);
   },
 ];
 
+// A curated starter set for the packages drawer. Nothing here is
+// "installed" — any bare npm import already resolves through esm.sh —
+// these entries exist for discoverability, each with a runnable
+// example. Versions are what esm.sh serves for the unpinned specifier.
 const PACKAGES: PackageInfo[] = [
-  // No package drawer entries — bare imports of any npm package resolve
-  // through esm.sh automatically (see packagesFooter).
+  {
+    cat: "UI Effects", icon: "🎉", color: "#f59e0b", name: "canvas-confetti", ver: "latest",
+    desc: "Performant confetti bursts on a canvas overlay",
+    example: `import confetti from "canvas-confetti";
+import { createRoot } from "react-dom/client";
+
+function Party() {
+  return (
+    <main style={{ fontFamily: "system-ui", textAlign: "center", marginTop: 60 }}>
+      <button
+        style={{ fontSize: 18, padding: "10px 24px", cursor: "pointer" }}
+        onClick={() => confetti({ particleCount: 120, spread: 70 })}
+      >
+        Celebrate 🎉
+      </button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Party />);
+`,
+  },
+  {
+    cat: "State Management", icon: "🐻", color: "#8b5cf6", name: "zustand", ver: "latest",
+    desc: "Tiny hook-based global state store",
+    example: `import { create } from "zustand";
+import { createRoot } from "react-dom/client";
+
+const useCounter = create<{ n: number; up: () => void }>((set) => ({
+  n: 0,
+  up: () => set((s) => ({ n: s.n + 1 })),
+}));
+
+function Display() {
+  const n = useCounter((s) => s.n);
+  return <h1>Count: {n}</h1>;
+}
+
+function Controls() {
+  const up = useCounter((s) => s.up);
+  return <button onClick={up}>Increment (shared store)</button>;
+}
+
+createRoot(document.getElementById("root")!).render(
+  <main style={{ fontFamily: "system-ui", margin: 24 }}>
+    <Display />
+    <Controls />
+  </main>,
+);
+`,
+  },
+  {
+    cat: "Utilities", icon: "🧵", color: "#0ea5e9", name: "clsx", ver: "latest",
+    desc: "Conditionally join className strings",
+    example: `import clsx from "clsx";
+import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Toggle() {
+  const [on, setOn] = useState(false);
+  return (
+    <button
+      className={clsx("pill", { active: on })}
+      style={{
+        fontSize: 16,
+        padding: "8px 20px",
+        borderRadius: 999,
+        border: "1px solid #cbd5e1",
+        background: on ? "#2563eb" : "white",
+        color: on ? "white" : "#0f172a",
+        cursor: "pointer",
+      }}
+      onClick={() => setOn(!on)}
+    >
+      {on ? "On" : "Off"} — classes: {clsx("pill", { active: on })}
+    </button>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <main style={{ fontFamily: "system-ui", margin: 24 }}>
+    <Toggle />
+  </main>,
+);
+`,
+  },
+  {
+    cat: "Dates & Time", icon: "📅", color: "#16a34a", name: "dayjs", ver: "latest",
+    desc: "2 KB immutable date library with a chainable API",
+    example: `import dayjs from "dayjs";
+import { createRoot } from "react-dom/client";
+
+const now = dayjs();
+
+createRoot(document.getElementById("root")!).render(
+  <main style={{ fontFamily: "system-ui", margin: 24 }}>
+    <h1>{now.format("dddd, MMMM D")}</h1>
+    <ul>
+      <li>ISO: {now.toISOString()}</li>
+      <li>In 30 days: {now.add(30, "day").format("YYYY-MM-DD")}</li>
+      <li>Start of week: {now.startOf("week").format("YYYY-MM-DD")}</li>
+    </ul>
+  </main>,
+);
+`,
+  },
+  {
+    cat: "Animation", icon: "🎞️", color: "#ec4899", name: "motion", ver: "latest",
+    desc: "Production-grade animation (Framer Motion's engine)",
+    example: `import { motion } from "motion/react";
+import { createRoot } from "react-dom/client";
+
+createRoot(document.getElementById("root")!).render(
+  <main
+    style={{
+      fontFamily: "system-ui",
+      display: "grid",
+      placeItems: "center",
+      minHeight: "80vh",
+    }}
+  >
+    <motion.div
+      initial={{ scale: 0, rotate: 0 }}
+      animate={{ scale: 1, rotate: 360 }}
+      transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
+      style={{
+        width: 120,
+        height: 120,
+        borderRadius: 24,
+        background: "linear-gradient(135deg, #6366f1, #ec4899)",
+      }}
+    />
+  </main>,
+);
+`,
+  },
 ];
 
 type WorkerOutMessage =
@@ -406,6 +601,15 @@ export const reactAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "tsx",
+  // Fresh workspaces open as the standard main/App/styles project shape
+  // with one always-visible editor per file, like the web playground.
+  defaultWorkspace: [
+    { filename: "main.tsx", content: DEFAULT_MAIN },
+    { filename: "App.tsx", content: DEFAULT_APP },
+    { filename: "styles.css", content: DEFAULT_STYLES },
+  ],
+  splitEditors: true,
+  hideFilesPane: true,
   findEntryFiles: findReactEntryFiles,
   // The bundle step runs per Run (fast at snippet scale, but real work).
   compiled: true,

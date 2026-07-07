@@ -51,6 +51,9 @@ export interface SplitEditorsProps {
   /** Mod-Enter / Mod-Shift-Enter inside any pane. */
   onRun: () => void;
   onRunSecondary: () => void;
+  /** Create a new workspace file (same handler as the tab bar's "+");
+   *  the new file appears as an additional pane. */
+  onAddFile: () => void;
   /** Expose each pane's EditorView so Format/Copy can target the
    *  active pane. Called with `null` on teardown. */
   registerView: (fileId: string, view: EditorView | null) => void;
@@ -285,17 +288,18 @@ function SplitEditor({
 /** The stacked pane list. Rendered by the playground in place of the
  *  single tabbed editor when the split view is on. */
 export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
-  const { files } = props;
-  // Stable pane order: HTML first, then CSS, then JS, then anything
-  // else — the CodePen convention — with filename ties broken
-  // alphabetically. Files keep their identity (keyed by id) so
-  // reordering tabs later doesn't remount editors.
+  const { files, onAddFile } = props;
+  // Stable pane order: entry-ish files first (HTML pages / TSX mounts),
+  // then styles, then scripts — the CodePen convention — with filename
+  // ties broken alphabetically. Files keep their identity (keyed by id)
+  // so reordering tabs later doesn't remount editors.
   const ordered = useMemo(() => {
     const rank = (filename: string): number => {
       if (/\.html?$/i.test(filename)) return 0;
-      if (/\.css$/i.test(filename)) return 1;
-      if (/\.(js|mjs|cjs)$/i.test(filename)) return 2;
-      return 3;
+      if (/\.(tsx|ts|jsx)$/i.test(filename)) return 1;
+      if (/\.css$/i.test(filename)) return 2;
+      if (/\.(js|mjs|cjs)$/i.test(filename)) return 3;
+      return 4;
     };
     return [...files].sort(
       (a, b) =>
@@ -309,6 +313,19 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
       {ordered.map((file) => (
         <SplitEditor key={file.id} {...props} file={file} />
       ))}
+      <div className="split-editor-footer">
+        <button
+          type="button"
+          className="split-editor-add"
+          onClick={onAddFile}
+          aria-label="Add a new file"
+        >
+          ＋ New file
+        </button>
+        <span className="split-editor-footer-hint">
+          rename or close files in the tabbed view
+        </span>
+      </div>
     </div>
   );
 }

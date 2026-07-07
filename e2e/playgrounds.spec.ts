@@ -154,6 +154,14 @@ test.describe("Playgrounds (fast)", () => {
     await page.goto("/playground/react");
     // First readiness wait covers the esbuild-wasm toolchain download.
     await waitForRuntimeReady(page);
+
+    // The react playground opens as the main/App/styles trio with one
+    // always-visible pane per file, and no Files rail.
+    await expect(page.locator(".split-editor-section")).toHaveCount(3, {
+      timeout: 30_000,
+    });
+    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
+
     await page.locator(".run-btn").first().click();
 
     const preview = page.frameLocator(".web-preview-slot iframe");

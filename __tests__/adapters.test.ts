@@ -391,6 +391,34 @@ describe("React adapter specifics", () => {
     expect(hello!.code).toContain("createRoot");
   });
 
+  it("seeds fresh workspaces with the main/App/styles trio and split editors", () => {
+    expect(reactAdapter.splitEditors).toBe(true);
+    expect(reactAdapter.hideFilesPane).toBe(true);
+    const names = (reactAdapter.defaultWorkspace ?? []).map((f) => f.filename);
+    expect(names).toEqual(["main.tsx", "App.tsx", "styles.css"]);
+    const main = reactAdapter.defaultWorkspace![0].content;
+    // The trio wires itself together with real imports.
+    expect(main).toContain('from "./App"');
+    expect(main).toContain('import "./styles.css"');
+    // The mount lives in main.tsx, so the Run button resolves there.
+    const entries = reactAdapter.findEntryFiles!(
+      reactAdapter.defaultWorkspace!.map((f) => ({
+        filename: f.filename,
+        content: f.content,
+      })),
+    );
+    expect(entries.map((e) => e.filename)).toEqual(["main.tsx"]);
+  });
+
+  it("packages drawer entries each ship a runnable example", () => {
+    expect(reactAdapter.packages.length).toBeGreaterThan(0);
+    for (const pkg of reactAdapter.packages) {
+      expect(pkg.example, `${pkg.name} needs an example`).toBeTruthy();
+      expect(pkg.example).toContain(`"${pkg.name}`);
+      expect(pkg.example).toContain("createRoot");
+    }
+  });
+
   it("hasImport detects both default and side-effect imports", () => {
     expect(
       reactAdapter.hasImport(`import { useState } from "react";`, "react"),

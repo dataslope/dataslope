@@ -4744,3 +4744,100 @@ html[data-playground-theme="dark"] .welcome h3 {
 .split-editor-host .cm-scroller {
   overflow: auto;
 }
+
+/* ─── Change View: editor position (preview playgrounds) ─────────────────
+   CodePen-style arrangements. "left" is the default grid; "right"
+   mirrors the columns (the resizer flips its math off the data
+   attribute); "top" stacks editor over output with a fixed split and no
+   drag handle. Settings mode keeps its own layout rules. */
+.panes[data-editor-position="right"]:not([data-settings-active]) .editor-pane {
+  grid-column: 2;
+  grid-row: 1;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+.panes[data-editor-position="right"]:not([data-settings-active]) .output-pane {
+  grid-column: 1;
+  grid-row: 1;
+}
+.panes[data-editor-position="right"]:not([data-settings-active]) .resizer {
+  right: auto;
+  left: -4px;
+}
+
+.panes[data-editor-position="top"]:not([data-settings-active]) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 55%) minmax(0, 1fr);
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .editor-pane {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .output-pane {
+  grid-column: 1;
+  grid-row: 2;
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .resizer {
+  display: none;
+}
+
+.change-view-menu {
+  padding: 6px;
+  min-width: 160px;
+}
+.change-view-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 4px 8px 6px;
+}
+.change-view-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+}
+.change-view-item:hover,
+.change-view-item[data-highlighted] {
+  background: var(--menu-item-hover);
+}
+.change-view-item.selected {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Split-stack footer: add-file affordance + file-management hint. */
+.split-editor-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.split-editor-add {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.split-editor-add:hover {
+  background: var(--menu-item-hover);
+}
+.split-editor-footer-hint {
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
