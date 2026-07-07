@@ -1,0 +1,257 @@
+---
+title: Project — Interactive Scoreboard
+description: A three-file capstone combining HTML structure, CSS layout, and JavaScript events.
+---
+
+Time to combine everything: a small but complete **scoreboard** for a
+two-team game night. Three files, three jobs — exactly how you'd
+structure this on disk in a real project.
+
+Here's a working reference to study first. Click around in the
+preview, then read all three tabs and trace how they connect:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Game night</h1>
+    <div class="board">
+      <section class="team">
+        <h2>Robots</h2>
+        <p class="score" id="score-a">0</p>
+        <button id="add-a">+1</button>
+      </section>
+      <section class="team">
+        <h2>Dinosaurs</h2>
+        <p class="score" id="score-b">0</p>
+        <button id="add-b">+1</button>
+      </section>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.board {
+  display: flex;
+  gap: 1rem;
+}
+
+.team {
+  flex: 1;
+  text-align: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.score {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+button {
+  font-size: 1.1rem;
+  padding: 0.3rem 1.2rem;
+  cursor: pointer;
+}
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `var scoreA = 0;
+var scoreB = 0;
+
+document.querySelector("#add-a").addEventListener("click", function () {
+  scoreA = scoreA + 1;
+  document.querySelector("#score-a").textContent = scoreA;
+});
+
+document.querySelector("#add-b").addEventListener("click", function () {
+  scoreB = scoreB + 1;
+  document.querySelector("#score-b").textContent = scoreB;
+});
+`,
+    },
+  ]}
+/>
+
+Notice the division of labour: the HTML never mentions colors, the
+CSS never mentions clicks, the JavaScript never invents markup — each
+file could be handed to a different person.
+
+## Your turn
+
+The challenge version below has the HTML finished, most of the CSS
+finished, and an empty script. Wire it up — and add one new feature
+the reference doesn't have: a **reset button**.
+
+<ChallengeCard
+  adapter="web"
+  title="Wire up the scoreboard"
+  entryFilename="index.html"
+  instructions={`Work in \`script.js\` (and peek at the HTML for the ids):
+
+1. The **+1 Home** button (\`#add-home\`) must increment the number shown in \`#score-home\`.
+2. The **+1 Away** button (\`#add-away\`) must increment the number shown in \`#score-away\`.
+3. The **Reset** button (\`#reset\`) must set **both** scores back to \`0\`.
+
+Scores always render as plain numbers (\`0\`, \`1\`, \`2\`, …).`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Scoreboard</h1>
+    <div class="board">
+      <section class="team">
+        <h2>Home</h2>
+        <p class="score" id="score-home">0</p>
+        <button id="add-home">+1 Home</button>
+      </section>
+      <section class="team">
+        <h2>Away</h2>
+        <p class="score" id="score-away">0</p>
+        <button id="add-away">+1 Away</button>
+      </section>
+    </div>
+    <button id="reset">Reset</button>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.board {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.team {
+  flex: 1;
+  text-align: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.score {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `// Keep each team's score in a variable, update the matching
+// element on click, and reset both to 0 on #reset.
+`,
+      solutionCode: `var home = 0;
+var away = 0;
+
+var homeEl = document.querySelector("#score-home");
+var awayEl = document.querySelector("#score-away");
+
+document.querySelector("#add-home").addEventListener("click", function () {
+  home = home + 1;
+  homeEl.textContent = home;
+});
+
+document.querySelector("#add-away").addEventListener("click", function () {
+  away = away + 1;
+  awayEl.textContent = away;
+});
+
+document.querySelector("#reset").addEventListener("click", function () {
+  home = 0;
+  away = 0;
+  homeEl.textContent = 0;
+  awayEl.textContent = 0;
+});
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "home",
+      name: "+1 Home raises the home score",
+      code: `document.querySelector("#add-home").click();
+document.querySelector("#add-home").click();
+await new Promise((r) => setTimeout(r, 30));
+const text = (document.querySelector("#score-home").textContent || "").trim();
+if (text !== "2") {
+  throw new Error("After two Home clicks the home score should read '2', got '" + text + "'.");
+}`,
+    },
+    {
+      id: "away",
+      name: "+1 Away raises the away score independently",
+      code: `document.querySelector("#add-away").click();
+await new Promise((r) => setTimeout(r, 30));
+const away = (document.querySelector("#score-away").textContent || "").trim();
+const home = (document.querySelector("#score-home").textContent || "").trim();
+if (away !== "1") {
+  throw new Error("After one Away click the away score should read '1', got '" + away + "'.");
+}
+if (home !== "2") {
+  throw new Error("Clicking Away must not change the home score (expected it to stay '2', got '" + home + "').");
+}`,
+    },
+    {
+      id: "reset",
+      name: "Reset returns both scores to 0",
+      code: `document.querySelector("#reset").click();
+await new Promise((r) => setTimeout(r, 30));
+const home = (document.querySelector("#score-home").textContent || "").trim();
+const away = (document.querySelector("#score-away").textContent || "").trim();
+if (home !== "0" || away !== "0") {
+  throw new Error("Reset should zero both scores — got home='" + home + "', away='" + away + "'.");
+}`,
+    },
+    {
+      id: "reset_then_add",
+      name: "Counting still works after a reset",
+      code: `document.querySelector("#add-home").click();
+await new Promise((r) => setTimeout(r, 30));
+const home = (document.querySelector("#score-home").textContent || "").trim();
+if (home !== "1") {
+  throw new Error("After reset + one Home click the score should read '1', got '" + home + "' — remember to reset the VARIABLES, not just the text.");
+}`,
+    },
+  ]}
+/>
+
+The last test is the sneaky one: if you reset only the *displayed
+text* but not the score *variables*, the next click jumps back to the
+old count. State lives in your variables; the DOM just displays it —
+a distinction that will matter again in the React lesson.
+
+Next, a popular shortcut for styling: [Tailwind CSS](/courses/intro-web-development/tailwind-quickstart).

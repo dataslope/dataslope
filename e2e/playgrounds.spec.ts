@@ -109,6 +109,72 @@ test.describe("Playgrounds (fast)", () => {
     expect(cells.find((c) => c.type === "stderr")).toBeUndefined();
   });
 
+  test("Web (HTML/CSS/JS) renders the live page preview", async ({ page }) => {
+    await page.goto("/playground/web");
+    await waitForRuntimeReady(page);
+
+    // The web playground opens CodePen-style: one always-visible pane
+    // per file of the default HTML/CSS/JS trio.
+    await expect(page.locator(".split-editor-section")).toHaveCount(3, {
+      timeout: 30_000,
+    });
+
+    // The Files rail/pane is hidden for the web playground — the panes
+    // themselves are the file surface.
+    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
+    await expect(
+      page.locator('button[aria-label="Files"]'),
+    ).toHaveCount(0);
+
+    await page.locator(".run-btn").first().click();
+
+    // The default trio renders inside the sandboxed preview iframe —
+    // the CSS and JS panes apply implicitly (no <link>/<script src>).
+    const preview = page.frameLocator(".web-preview-slot iframe");
+    await expect(preview.locator("h1")).toContainText(
+      "Hello, Web Playground!",
+      { timeout: 60_000 },
+    );
+
+    // script.js wired a click handler — the preview stays interactive.
+    await preview.locator("#greet").click();
+    await expect(preview.locator("#greet")).toContainText("Clicked 1 time");
+
+    // Its console.log crosses the postMessage bridge into a stdout cell.
+    await page.waitForFunction(
+      () => document.querySelectorAll(".out-cell.stdout").length > 0,
+      null,
+      { timeout: 30_000 },
+    );
+  });
+
+  test("React compiles TSX in-browser and renders an interactive preview", async ({
+    page,
+  }) => {
+    await page.goto("/playground/react");
+    // First readiness wait covers the esbuild-wasm toolchain download.
+    await waitForRuntimeReady(page);
+
+    // The react playground opens as the main/App/styles trio with one
+    // always-visible pane per file, and no Files rail.
+    await expect(page.locator(".split-editor-section")).toHaveCount(3, {
+      timeout: 30_000,
+    });
+    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
+
+    await page.locator(".run-btn").first().click();
+
+    const preview = page.frameLocator(".web-preview-slot iframe");
+    await expect(preview.locator("h1")).toContainText("You clicked 0 times", {
+      timeout: 120_000,
+    });
+
+    // The preview stays live after the run — clicking drives real
+    // React state updates inside the sandboxed document.
+    await preview.locator("button").click();
+    await expect(preview.locator("h1")).toContainText("You clicked 1 times");
+  });
+
   test("PHP runs the default example", async ({ page }) => {
     await page.goto("/playground/php");
     await waitForRuntimeReady(page);

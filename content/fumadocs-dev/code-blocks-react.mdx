@@ -1,0 +1,192 @@
+---
+title: Code Blocks — React
+description: React blocks compile TSX with esbuild-wasm in a worker and render into a live sandboxed preview.
+---
+
+The `react` adapter compiles TSX fully client-side: esbuild-wasm
+bundles the block's files in a Web Worker, bare imports (`react`,
+`react-dom/client`, any npm package) rewrite to pinned
+[esm.sh](https://esm.sh) URLs fetched by the sandboxed preview iframe,
+and `console.*` output streams back into the output panel. The
+toolchain (~3&nbsp;MB) downloads once on the first Run.
+
+## A counter component
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>You clicked {count} times</h1>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>You clicked {count} times</h1>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+    },
+  ]}
+/>
+```
+
+## Props and list rendering
+
+TypeScript works throughout — interfaces, generics, and typed props
+compile in the browser exactly like in a local toolchain.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+interface Milestone {
+  year: number;
+  event: string;
+}
+
+const MILESTONES: Milestone[] = [
+  { year: 2013, event: "React open-sourced" },
+  { year: 2015, event: "React Native released" },
+  { year: 2024, event: "React Compiler announced" },
+];
+
+function Timeline({ items }: { items: Milestone[] }) {
+  return (
+    <ol style={{ fontFamily: "system-ui" }}>
+      {items.map((m) => (
+        <li key={m.year}>
+          <strong>{m.year}</strong> — {m.event}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <Timeline items={MILESTONES} />,
+);
+
+console.log("Rendered", MILESTONES.length, "milestones");
+`,
+    },
+  ]}
+/>
+
+## Multi-file: components + a CSS import
+
+Relative imports resolve against the block's tabs, and
+`import "./styles.css"` comes back as a bundled stylesheet inlined
+into the preview document.
+
+<CodeBlock
+  adapter="react"
+  entryFilename="main.tsx"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import { Badge } from "./Badge";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(
+  <main className="stack">
+    <h1>Badges from a sibling file</h1>
+    <Badge tone="info">bundled</Badge>
+    <Badge tone="success">in the browser</Badge>
+  </main>,
+);
+`,
+    },
+    {
+      filename: "Badge.tsx",
+      starterCode: `export function Badge({
+  tone,
+  children,
+}: {
+  tone: "info" | "success";
+  children: React.ReactNode;
+}) {
+  return <span className={"badge badge-" + tone}>{children}</span>;
+}
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `.stack {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-info {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="react"
+  entryFilename="main.tsx"
+  files={[
+    { filename: "main.tsx", starterCode: `…` },
+    { filename: "Badge.tsx", starterCode: `…` },
+    { filename: "styles.css", starterCode: `…` },
+  ]}
+/>
+```

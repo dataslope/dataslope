@@ -9,7 +9,7 @@ import { OG_IMAGE } from "@/lib/site";
 import styles from "./home.module.css";
 
 const PLAYGROUND_DESCRIPTION =
-  "Free online coding playgrounds that run entirely in your browser — Python, R, SQL, JavaScript, TypeScript, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
+  "Free online coding playgrounds that run entirely in your browser — Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
 
 export const metadata: Metadata = {
   title: "Online Coding Playgrounds",
@@ -65,6 +65,18 @@ const CARDS: CardEntry[] = [
     href: "/playground/typescript",
     title: "TypeScript",
     desc: "Transpile TypeScript in the browser, then run it natively.",
+  },
+  {
+    id: "web",
+    href: "/playground/web",
+    title: "HTML/CSS/JS",
+    desc: "Build web pages with a live sandboxed preview — HTML, CSS, and JavaScript together.",
+  },
+  {
+    id: "react",
+    href: "/playground/react",
+    title: "React",
+    desc: "Write React with TypeScript JSX, compiled and bundled entirely in the browser via esbuild-wasm.",
   },
   {
     id: "php",

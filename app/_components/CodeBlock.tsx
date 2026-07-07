@@ -146,6 +146,12 @@ interface CodeBlockProps {
    *  hatch for imports the scan can't see — e.g. dynamic imports. Only
    *  meaningful for runtimes with optional package sets (Python). */
   packages?: string[];
+  /** Inject the pinned Tailwind in-browser compiler into the preview
+   *  document on every Run, so utility classes in the learner's markup
+   *  compile client-side. Only meaningful for preview adapters (web /
+   *  react); see `TAILWIND_BROWSER_CDN` in runtime/cdn.ts for the pin
+   *  and the "development-time compiler" caveat. */
+  tailwind?: boolean;
 }
 
 // Match the convention of the existing playground for shortcut hints.
@@ -379,6 +385,7 @@ function CodeBlockInner({
   datasets,
   showFileTabBar = false,
   packages,
+  tailwind = false,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -390,6 +397,14 @@ function CodeBlockInner({
   // Line-number compartment — reconfigured when the active file changes
   // so the gutter offset tracks that file's init line count.
   const lineNumberCompRef = useRef<Compartment | null>(null);
+  // Language compartment — reconfigured per active file for adapters
+  // whose workspaces mix languages (web: .html/.css/.js).
+  const languageCompRef = useRef<Compartment | null>(null);
+  // Slot the preview adapters (web / react) mount their sandboxed
+  // iframe into; always in the DOM for preview-capable adapters so the
+  // element exists by the time `runtime.run` needs it.
+  const previewHostRef = useRef<HTMLDivElement | null>(null);
+  const hasPreview = Boolean(adapter.outputCapabilities?.preview);
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
@@ -656,10 +671,15 @@ function CodeBlockInner({
     editorRef.current = view;
     themeCompRef.current = themeComp;
     lineNumberCompRef.current = lineNumberComp;
+    languageCompRef.current = languageComp;
 
     // Lazy-load the language extension so the editor mounts immediately
-    // and re-highlights once the language module resolves.
-    void loadLanguage(adapter.codeMirrorMode).then((ext) => {
+    // and re-highlights once the language module resolves. Mixed-language
+    // adapters pick the mode from the active file's extension.
+    const initialMode =
+      adapter.codeMirrorModeForFile?.(activeFilenameRef.current) ??
+      adapter.codeMirrorMode;
+    void loadLanguage(initialMode).then((ext) => {
       if (ext && editorRef.current === view) {
         view.dispatch({ effects: languageComp.reconfigure(ext) });
       }
@@ -678,6 +698,7 @@ function CodeBlockInner({
       editorRef.current = null;
       themeCompRef.current = null;
       lineNumberCompRef.current = null;
+      languageCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -790,6 +811,26 @@ function CodeBlockInner({
       effects: comp.reconfigure(lineNumbersWithOffset(activeInitLineCount)),
     });
   }, [activeInitLineCount]);
+
+  // Per-file syntax highlighting for adapters whose workspaces mix
+  // languages (web: .html/.css/.js). No-op for single-language adapters.
+  useEffect(() => {
+    if (!adapter.codeMirrorModeForFile) return;
+    const view = editorRef.current;
+    const comp = languageCompRef.current;
+    if (!view || !comp) return;
+    const mode =
+      adapter.codeMirrorModeForFile(activeFilename) ?? adapter.codeMirrorMode;
+    let cancelled = false;
+    void loadLanguage(mode).then((ext) => {
+      if (cancelled || !ext) return;
+      if (editorRef.current !== view) return;
+      view.dispatch({ effects: comp.reconfigure(ext) });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [adapter, activeFilename]);
 
   // ─── Run / Reset / Format ──────────────────────────────────────────
   // Snapshot every file's current content. Reads the active file from
@@ -996,6 +1037,11 @@ function CodeBlockInner({
           },
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
+            // Preview adapters render into the block-owned slot; each
+            // run replaces the previous iframe (which is also the
+            // teardown story for runaway scripts).
+            previewHost: hasPreview ? previewHostRef.current : undefined,
+            previewTailwind: hasPreview && tailwind ? true : undefined,
             // Mid-run waits (e.g. Python's deferred package set on the
             // first run, or an on-demand `import`) show the boot notice
             // for the duration instead of a bare "Running…" while
@@ -1038,12 +1084,14 @@ function CodeBlockInner({
   }, [
     adapter,
     blockDatasets,
+    hasPreview,
     isMultiFile,
     resolvedEntryFilename,
     snapshotAllFiles,
     effectiveSourceFor,
     reportPrepare,
     resetPrepare,
+    tailwind,
   ]);
 
   // Keep the ref pointing at the latest handler so the editor's keymap
@@ -1138,6 +1186,9 @@ function CodeBlockInner({
       persistSaveTimerRef.current = null;
     }
     setOutputs([]);
+    // Reset also tears down the live preview — removing the iframe
+    // kills its document (scripts, timers, listeners) immediately.
+    previewHostRef.current?.replaceChildren();
     setStatus("idle");
     setStatusMessage("");
     startTransition(() => {
@@ -1161,7 +1212,12 @@ function CodeBlockInner({
     setIsFormatting(true);
     const startedAt = performance.now();
     try {
-      const formatted = await adapter.formatCode(code);
+      // Pass the active filename so mixed-language workspaces (web:
+      // .html/.css/.js) format with the right dialect.
+      const formatted = await adapter.formatCode(
+        code,
+        activeFilenameRef.current,
+      );
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
@@ -1537,6 +1593,19 @@ function CodeBlockInner({
           </button>
         </div>
       </div>
+
+      {hasPreview && (
+        // Live page preview for the web/react adapters. Always mounted
+        // so the slot element exists before the first run; the runtime
+        // swaps a sandboxed iframe into the slot on every run, and CSS
+        // renders a placeholder while the slot is still empty.
+        <div className={challengeStyles.previewPanel} data-testid="web-preview">
+          <div className={challengeStyles.previewHeader}>
+            <span className={challengeStyles.previewLabel}>Preview</span>
+          </div>
+          <div className={challengeStyles.previewSlot} ref={previewHostRef} />
+        </div>
+      )}
 
       {(outputs.length > 0 || isBusy) && (
         // Same output panel as the challenge card (its styles are shared

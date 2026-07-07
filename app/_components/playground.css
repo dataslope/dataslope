@@ -4624,3 +4624,220 @@ html[data-playground-theme="dark"] .welcome h3 {
     transform: rotate(360deg);
   }
 }
+
+/* ─── Live page preview (web / react adapters) ───────────────────────────
+   The panel is always mounted for preview-capable adapters so the slot
+   element exists before the first run; the runtime swaps a sandboxed
+   iframe into `.web-preview-slot` on every run. While the slot is still
+   empty, a placeholder message renders in its stead. */
+.web-preview-panel {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg2);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.web-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.web-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.web-preview-slot {
+  /* User-resizable height; pages get a white canvas like a real tab. */
+  resize: vertical;
+  overflow: auto;
+  height: 320px;
+  min-height: 120px;
+  background: #ffffff;
+}
+.web-preview-slot:empty {
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  resize: none;
+  height: 160px;
+}
+.web-preview-slot:empty::after {
+  content: "Run your code to render the page preview.";
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.web-preview-slot > iframe.ds-web-preview-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+}
+
+/* ─── CodePen-style split editors (web playground) ───────────────────────
+   One always-visible editor per workspace file, stacked vertically in
+   the editor pane. Pane headers carry an uppercase language chip and
+   the filename; the focused pane gets the accent border. */
+.split-editor-stack {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.split-editor-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 88px;
+  border-bottom: 1px solid var(--border);
+}
+.split-editor-section:last-child {
+  border-bottom: none;
+}
+.split-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+}
+.split-editor-lang {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary);
+}
+.split-editor-section-active .split-editor-lang {
+  background: var(--primary);
+  color: #fff;
+}
+.split-editor-filename {
+  font-size: 11.5px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text-dim);
+}
+.split-editor-section-active .split-editor-filename {
+  color: var(--text);
+}
+.split-editor-host {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.split-editor-host .cm-editor {
+  height: 100%;
+}
+.split-editor-host .cm-scroller {
+  overflow: auto;
+}
+
+/* ─── Change View: editor position (preview playgrounds) ─────────────────
+   CodePen-style arrangements. "left" is the default grid; "right"
+   mirrors the columns (the resizer flips its math off the data
+   attribute); "top" stacks editor over output with a fixed split and no
+   drag handle. Settings mode keeps its own layout rules. */
+.panes[data-editor-position="right"]:not([data-settings-active]) .editor-pane {
+  grid-column: 2;
+  grid-row: 1;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+.panes[data-editor-position="right"]:not([data-settings-active]) .output-pane {
+  grid-column: 1;
+  grid-row: 1;
+}
+.panes[data-editor-position="right"]:not([data-settings-active]) .resizer {
+  right: auto;
+  left: -4px;
+}
+
+.panes[data-editor-position="top"]:not([data-settings-active]) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 55%) minmax(0, 1fr);
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .editor-pane {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .output-pane {
+  grid-column: 1;
+  grid-row: 2;
+}
+.panes[data-editor-position="top"]:not([data-settings-active]) .resizer {
+  display: none;
+}
+
+.change-view-menu {
+  padding: 6px;
+  min-width: 160px;
+}
+.change-view-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 4px 8px 6px;
+}
+.change-view-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+}
+.change-view-item:hover,
+.change-view-item[data-highlighted] {
+  background: var(--menu-item-hover);
+}
+.change-view-item.selected {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Split-stack footer: add-file affordance + file-management hint. */
+.split-editor-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.split-editor-add {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.split-editor-add:hover {
+  background: var(--menu-item-hover);
+}
+.split-editor-footer-hint {
+  font-size: 10.5px;
+  color: var(--text-dim);
+}

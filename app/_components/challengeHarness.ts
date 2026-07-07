@@ -469,12 +469,94 @@ const buildPhpHarness: HarnessBuilder = (tests) => {
   return lines.join("\n");
 };
 
+/**
+ * Shared core of the web/react preview harnesses. The generated script
+ * runs inside the sandboxed preview iframe, so tests can assert on the
+ * real DOM (`document.querySelector(...)`) — results travel through the
+ * preview's console bridge as the same sentinel lines every other
+ * harness prints, and the final `__dsPreviewHarnessDone()` call (a hook
+ * the bridge installs; see runtime/webPreview.ts) tells the preview
+ * runner the run is complete so every sentinel is captured first.
+ *
+ * Timing: the runner starts after the document's `load` event plus
+ * `settleDelayMs` — user scripts, DOMContentLoaded/load handlers, and
+ * (for react) the initial render commit have all happened by then. Test
+ * bodies may be async and are awaited in order, so a test can `await`
+ * a repaint after dispatching a click.
+ */
+function buildPreviewHarnessScript(
+  tests: NativeChallengeTest[],
+  settleDelayMs: number,
+): string {
+  const lines: string[] = [];
+  lines.push("(function () {");
+  lines.push('  "use strict";');
+  lines.push("  var __dstestRun = async function (tid, fn) {");
+  lines.push("    try { await fn();");
+  lines.push(
+    `      console.log("${HARNESS_RESULT_PREFIX}" + tid + ":PASS");`,
+  );
+  lines.push("    } catch (e) {");
+  lines.push("      var msg = e && e.message ? e.message : String(e);");
+  lines.push(
+    `      console.log("${HARNESS_RESULT_PREFIX}" + tid + ":FAIL:" + JSON.stringify(msg));`,
+  );
+  lines.push("    }");
+  lines.push("  };");
+  lines.push("  var __dstestAll = async function () {");
+  lines.push(`    console.log("${HARNESS_BEGIN}");`);
+  tests.forEach((t) => {
+    const body = t.code.trim() || "/* empty */";
+    lines.push(
+      `    await __dstestRun(${JSON.stringify(t.id)}, async function () {\n${body}\n    });`,
+    );
+  });
+  lines.push(
+    "    if (window.__dsPreviewHarnessDone) window.__dsPreviewHarnessDone();",
+  );
+  lines.push("  };");
+  lines.push(
+    `  var __dstestStart = function () { setTimeout(function () { void __dstestAll(); }, ${settleDelayMs}); };`,
+  );
+  lines.push('  if (document.readyState === "complete") __dstestStart();');
+  lines.push('  else window.addEventListener("load", __dstestStart);');
+  lines.push("})();");
+  return lines.join("\n");
+}
+
+/**
+ * Web (HTML/CSS/JS) harness — the entry file is an HTML document, so
+ * the harness is a `<script>` element appended after it. Content after
+ * `</html>` is legal: the parser relocates it into `<body>`, and script
+ * order guarantees it executes after every user script has been parsed.
+ */
+const buildWebHarness: HarnessBuilder = (tests) => {
+  const script = buildPreviewHarnessScript(tests, 0)
+    // Never let generated/test code terminate the wrapper tag early —
+    // `<\/` is an identity escape inside JS strings.
+    .replace(/<\/(script)/gi, "<\\/$1");
+  return `\n<script>\n${script}\n</script>`;
+};
+
+/**
+ * React harness — plain JS appended to the entry module and compiled
+ * along with it by esbuild. The extra settle delay gives React's
+ * initial `createRoot().render()` commit time to reach the DOM before
+ * assertions run (render is scheduled, not synchronous). Deliberately
+ * avoids top-level `await`: that would delay module evaluation, which
+ * delays the `load` event the harness itself waits on — a deadlock.
+ */
+const buildReactHarness: HarnessBuilder = (tests) =>
+  `\n;${buildPreviewHarnessScript(tests, 80)}\n`;
+
 const HARNESS_BUILDERS: Record<string, HarnessBuilder> = {
   python: buildPythonHarness,
   javascript: buildJsHarness,
   typescript: buildJsHarness,
   r: buildRHarness,
   php: buildPhpHarness,
+  web: buildWebHarness,
+  react: buildReactHarness,
 };
 
 /** Build the harness snippet for the given adapter for the subset of

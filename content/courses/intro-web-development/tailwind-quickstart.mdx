@@ -1,0 +1,152 @@
+---
+title: Tailwind CSS — Quickstart
+description: Utility-first styling — composing designs from small single-purpose classes instead of writing custom CSS.
+---
+
+You've written CSS by inventing class names (`.card`, `.tier`) and
+styling them in a stylesheet. **Tailwind CSS** flips that around: it
+ships thousands of tiny, single-purpose classes — *utilities* — and
+you compose designs by stacking them directly in your HTML:
+
+```html
+<button class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white">
+  Save changes
+</button>
+```
+
+Every class does exactly one thing you already know from the CSS
+lessons: `rounded-lg` sets a border-radius, `bg-blue-600` a
+background color, `px-4` horizontal padding, `py-2` vertical padding.
+Tailwind isn't a replacement for knowing CSS — it's a *shorthand* for
+it, and it's everywhere in industry.
+
+The blocks in this lesson have the Tailwind compiler enabled, so
+utility classes just work:
+
+<CodeBlock
+  adapter="web"
+  tailwind
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<body class="bg-slate-100 font-sans">
+  <main class="mx-auto mt-12 max-w-md rounded-2xl bg-white p-8 shadow-lg">
+    <h1 class="text-2xl font-bold text-slate-900">Utility-first</h1>
+    <p class="mt-2 text-slate-600">
+      Every class sets one property. Read them like a sentence:
+      margin, max width, rounding, background, padding, shadow.
+    </p>
+    <div class="mt-6 flex gap-3">
+      <button class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
+        Primary
+      </button>
+      <button class="rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50">
+        Secondary
+      </button>
+    </div>
+  </main>
+</body>
+`,
+    },
+  ]}
+/>
+
+Some utilities to try in the block above:
+
+- Spacing: `p-8`, `px-4`, `mt-6`, `gap-3` (numbers step by 0.25rem)
+- Typography: `text-2xl`, `font-bold`, `text-slate-600`
+- Layout: `flex`, `grid`, `items-center`, `justify-between`
+- Effects: `shadow-lg`, `rounded-2xl`, `hover:bg-blue-700`
+
+That last one shows a Tailwind superpower — **variants**. Prefixing a
+utility with `hover:`, `focus:`, or a breakpoint like `md:` applies
+it conditionally. Responsive design becomes `class="text-sm md:text-lg"`.
+
+<Callout type="info" title="How it runs here (and in real projects)">
+These lessons load Tailwind's official in-browser compiler, which
+scans your markup and generates CSS on the fly — perfect for learning
+and prototypes. Production projects run the same scan **at build
+time** instead, shipping only the handful of kilobytes of CSS the
+pages actually use.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Style the notification card"
+  tailwind
+  instructions={`Style the card using **only Tailwind utility classes** (don't add \`<style>\` blocks):
+
+1. The \`<main>\` element must be a flex container with items centered vertically: add \`flex\` and \`items-center\` (plus any spacing you like, e.g. \`gap-4 p-6\`).
+2. The button must have white text on a blue background: include \`text-white\` and \`bg-blue-600\`.
+3. The button must have rounded corners: include \`rounded-lg\` (any \`rounded-*\` utility passes).`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<body class="bg-slate-100 font-sans">
+  <!-- Add utility classes to <main> and <button> -->
+  <main class="">
+    <span>🔔</span>
+    <p>You have 3 unread messages.</p>
+    <button class="">View inbox</button>
+  </main>
+</body>
+`,
+      solutionCode: `<body class="bg-slate-100 font-sans">
+  <main class="mx-auto mt-10 flex max-w-md items-center gap-4 rounded-xl bg-white p-6 shadow">
+    <span>🔔</span>
+    <p class="flex-1 text-slate-700">You have 3 unread messages.</p>
+    <button class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white">
+      View inbox
+    </button>
+  </main>
+</body>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "flex_row",
+      name: "<main> is a centered flex row",
+      code: `// Tailwind's in-browser compiler generates its stylesheet just after
+// the page loads — poll briefly so the check never races it.
+const main = document.querySelector("main");
+let s = getComputedStyle(main);
+const deadline = Date.now() + 3000;
+while (s.display !== "flex" && Date.now() < deadline) {
+  await new Promise((r) => setTimeout(r, 100));
+  s = getComputedStyle(main);
+}
+if (s.display !== "flex") {
+  throw new Error("Add the 'flex' utility to <main> — computed display is " + s.display + ".");
+}
+if (s.alignItems !== "center") {
+  throw new Error("Add 'items-center' to <main> — computed align-items is " + s.alignItems + ".");
+}`,
+    },
+    {
+      id: "button_colors",
+      name: "The button is blue with white text",
+      code: `const s = getComputedStyle(document.querySelector("button"));
+if (s.color !== "rgb(255, 255, 255)") {
+  throw new Error("Add 'text-white' to the button — computed color is " + s.color + ".");
+}
+const bg = s.backgroundColor;
+if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") {
+  throw new Error("Add 'bg-blue-600' to the button — it has no background yet.");
+}`,
+    },
+    {
+      id: "button_rounded",
+      name: "The button has rounded corners",
+      code: `const s = getComputedStyle(document.querySelector("button"));
+const radius = parseFloat(s.borderTopLeftRadius);
+if (!radius || radius < 2) {
+  throw new Error("Add a rounded-* utility to the button — computed radius is " + s.borderTopLeftRadius + ".");
+}`,
+    },
+  ]}
+/>
+
+One more industry tool to taste: [React](/courses/intro-web-development/react-first-components).

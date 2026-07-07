@@ -61,6 +61,8 @@ const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/challenge-cards-cpp", label: "C++" },
   { path: "/fumadocs-dev/challenge-cards-csharp", label: "C#" },
   { path: "/fumadocs-dev/challenge-cards-php", label: "PHP" },
+  { path: "/fumadocs-dev/challenge-cards-web", label: "Web (HTML/CSS/JS)" },
+  { path: "/fumadocs-dev/challenge-cards-react", label: "React" },
   // SQL challenge cards register on the same window.__dsChallenges registry
   // and expose the same data-* attributes (see SqlChallengeCard).
   { path: "/fumadocs-dev/sql-challenge-cards-sqlite", label: "SQLite" },

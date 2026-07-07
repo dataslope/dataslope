@@ -1,0 +1,53 @@
+{
+    "title": "Intro to Web Development",
+    "description": "Build real web pages in your browser — HTML structure, CSS styling and layout, JavaScript interactivity, a taste of Tailwind and React. Every lesson has a live, editable page preview.",
+    "root": true,
+    "tags": {
+        "language": [
+            "html",
+            "css",
+            "javascript"
+        ],
+        "libraries": [
+            "react",
+            "tailwindcss"
+        ],
+        "domain": [
+            "web-development"
+        ],
+        "skills": [
+            "html-structure",
+            "css-layout",
+            "dom-manipulation",
+            "event-handling",
+            "components"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "how-the-web-works",
+        "---",
+        "html-structure",
+        "html-text-links-lists",
+        "html-forms",
+        "---",
+        "css-getting-started",
+        "css-box-model",
+        "css-flexbox-layout",
+        "---",
+        "js-dom-basics",
+        "js-events",
+        "---",
+        "project-interactive-scoreboard",
+        "---",
+        "tailwind-quickstart",
+        "react-first-components",
+        "---",
+        "next-steps"
+    ]
+}

@@ -1,0 +1,182 @@
+---
+title: Challenge Cards — React
+description: React challenges compile the learner's TSX in-browser and assert on the rendered DOM, including after interactions.
+---
+
+React challenge tests run inside the preview document after the
+initial render commits, so they can assert on rendered output and even
+dispatch clicks and await re-renders. Test bodies may be `async` — a
+small `setTimeout` wait after `.click()` lets React flush the update.
+
+## State + events
+
+<ChallengeCard
+  adapter="react"
+  title="Finish the click counter"
+  instructions={`The \`Counter\` component renders, but the button doesn't do anything yet.
+
+1. Add an \`onClick\` handler to the button that increments \`count\` by 1.
+2. Keep the count visible inside the \`<h1>\` element.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      {/* TODO: make this button increment count */}
+      <button>Increment</button>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "initial",
+      name: "Renders with Count: 0",
+      code: `const h1 = document.querySelector("h1");
+if (!h1) throw new Error("Render an <h1> element.");
+if (!/count:\\s*0/i.test(h1.textContent || "")) {
+  throw new Error("Before any clicks the heading should read 'Count: 0'.");
+}`,
+    },
+    {
+      id: "one_click",
+      name: "One click moves the count to 1",
+      code: `const button = document.querySelector("button");
+if (!button) throw new Error("Keep the <button> element.");
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if (!/count:\\s*1/i.test(h1.textContent || "")) {
+  throw new Error("After one click the heading should read 'Count: 1'. Got: " + h1.textContent);
+}`,
+    },
+    {
+      id: "three_clicks",
+      name: "Two more clicks reach 3",
+      code: `const button = document.querySelector("button");
+button.click();
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if (!/count:\\s*3/i.test(h1.textContent || "")) {
+  throw new Error("After three clicks total the heading should read 'Count: 3'. Got: " + h1.textContent);
+}`,
+    },
+  ]}
+/>
+
+## Rendering from props
+
+<ChallengeCard
+  adapter="react"
+  title="Render every item in the list"
+  instructions={`\`TodoList\` receives an array of todos but currently renders none of them.
+
+Render one \`<li>\` per todo inside the \`<ul>\`, showing the todo's \`label\`. Use the todo's \`id\` as the \`key\`.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+interface Todo {
+  id: number;
+  label: string;
+}
+
+const TODOS: Todo[] = [
+  { id: 1, label: "Learn JSX" },
+  { id: 2, label: "Render a list" },
+  { id: 3, label: "Ship it" },
+];
+
+function TodoList({ todos }: { todos: Todo[] }) {
+  return (
+    <ul style={{ fontFamily: "system-ui" }}>
+      {/* TODO: render one <li> per todo */}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <TodoList todos={TODOS} />,
+);
+`,
+      solutionCode: `import { createRoot } from "react-dom/client";
+
+interface Todo {
+  id: number;
+  label: string;
+}
+
+const TODOS: Todo[] = [
+  { id: 1, label: "Learn JSX" },
+  { id: 2, label: "Render a list" },
+  { id: 3, label: "Ship it" },
+];
+
+function TodoList({ todos }: { todos: Todo[] }) {
+  return (
+    <ul style={{ fontFamily: "system-ui" }}>
+      {todos.map((todo) => (
+        <li key={todo.id}>{todo.label}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <TodoList todos={TODOS} />,
+);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "count",
+      name: "Renders three <li> items",
+      code: `const items = document.querySelectorAll("ul li");
+if (items.length !== 3) {
+  throw new Error("Expected 3 list items, found " + items.length + ".");
+}`,
+    },
+    {
+      id: "labels",
+      name: "Each item shows its label",
+      code: `const texts = Array.from(document.querySelectorAll("ul li")).map(
+  (li) => (li.textContent || "").trim(),
+);
+for (const expected of ["Learn JSX", "Render a list", "Ship it"]) {
+  if (!texts.includes(expected)) {
+    throw new Error("Missing list item: '" + expected + "'. Got: " + texts.join(", "));
+  }
+}`,
+    },
+  ]}
+/>

@@ -29,6 +29,8 @@ const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/code-blocks-cpp", label: "C++" },
   { path: "/fumadocs-dev/code-blocks-java", label: "Java" },
   { path: "/fumadocs-dev/code-blocks-csharp", label: "C#" },
+  { path: "/fumadocs-dev/code-blocks-web", label: "Web (HTML/CSS/JS)" },
+  { path: "/fumadocs-dev/code-blocks-react", label: "React" },
 ];
 
 const CODE_BLOCK_PAGES: { path: string; label: string }[] = process.env

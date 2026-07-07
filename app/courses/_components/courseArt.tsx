@@ -74,6 +74,7 @@ export const COURSE_MOTIFS: Record<string, string> = {
   "mastering-ggplot2": "layers",
   "systems-programming-c": "memgrid",
   "csharp-linq-functional": "pipeline",
+  "intro-web-development": "browser",
 };
 
 /** Resolves a course's motif: bespoke per-slug shape first, then the domain
@@ -370,6 +371,17 @@ export function motifShapes(kind: string): React.ReactNode {
         <>
           <path d="M28 11l14 7-14 7-14-7z" {...S} strokeWidth={2} />
           <path d="M14 27l14 7 14-7M14 34l14 7 14-7" {...S} strokeWidth={2} />
+        </>
+      );
+    // A browser window with angle brackets on the canvas — web development.
+    case "browser":
+      return (
+        <>
+          <rect x={12} y={14} width={32} height={28} rx={3} {...S} />
+          <path d="M12 22h32" {...S} strokeWidth={2} />
+          <circle cx={16.5} cy={18} r={1.6} fill="currentColor" />
+          <circle cx={21.5} cy={18} r={1.6} fill="currentColor" />
+          <path d="M23 28l-4.5 4 4.5 4M33 28l4.5 4-4.5 4" {...S} strokeWidth={2} />
         </>
       );
     // Values flowing through a chain of stages — LINQ pipelines.

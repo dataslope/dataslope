@@ -1,0 +1,158 @@
+---
+title: HTML — Forms & Inputs
+description: Collecting user input with form, label, input, and button — and why labels matter.
+---
+
+Everything you've built so far only *shows* things. Forms are how
+pages *ask* for things: search boxes, sign-ups, checkout pages —
+they're all built from the same handful of elements.
+
+## The core four
+
+```html
+<form>
+  <label for="email">Email</label>
+  <input id="email" type="email" placeholder="ada@example.com" />
+  <button type="submit">Subscribe</button>
+</form>
+```
+
+- `<form>` groups related controls and defines what happens on submit.
+- `<input>` is the workhorse — its `type` attribute changes what it
+  accepts: `text`, `email`, `number`, `password`, `checkbox`, `date`…
+- `<label>` names a control. Its `for` attribute points at the
+  input's `id`, which is what links them.
+- `<button type="submit">` submits the form.
+
+<Callout type="info" title="Labels are not optional">
+Clicking a label focuses its input (try it below — great for tiny
+checkboxes), and screen readers announce the label when the input is
+focused. An unlabeled input is a guessing game for a lot of your
+users. Always pair them.
+</Callout>
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      label { display: block; margin-top: 0.75rem; font-weight: 600; }
+      input { padding: 0.35rem 0.5rem; font-size: 1rem; }
+      button { margin-top: 1rem; padding: 0.4rem 1.2rem; font-size: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Join the book club</h1>
+    <form>
+      <label for="name">Your name</label>
+      <input id="name" type="text" placeholder="Ada" />
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="ada@example.com" />
+
+      <label for="snacks">
+        <input id="snacks" type="checkbox" />
+        Bringing snacks
+      </label>
+
+      <button type="submit">Sign me up</button>
+    </form>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Submitting this form reloads the page (that's a form's default
+behaviour — it sends its data to a server). In the JavaScript lessons
+you'll intercept the submit event and handle the data yourself,
+which is how most modern pages do it.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Build a feedback form"
+  instructions={`Create a feedback form containing:
+
+1. A \`<form>\` element.
+2. A text input with the id \`author\`, properly paired with a \`<label for="author">\`.
+3. An email input (\`type="email"\`) with the id \`contact\`, also paired with a \`<label for="contact">\`.
+4. A submit button (\`<button type="submit">\`) inside the form.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <h1>Tell us what you think</h1>
+    <!-- Build the form here -->
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <body>
+    <h1>Tell us what you think</h1>
+    <form>
+      <label for="author">Your name</label>
+      <input id="author" type="text" />
+
+      <label for="contact">Email</label>
+      <input id="contact" type="email" />
+
+      <button type="submit">Send feedback</button>
+    </form>
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "form",
+      name: "The page contains a <form>",
+      code: `if (!document.querySelector("form")) {
+  throw new Error("Wrap the controls in a <form> element.");
+}`,
+    },
+    {
+      id: "author",
+      name: "A labeled text input with id 'author'",
+      code: `const input = document.querySelector("form input#author");
+if (!input) throw new Error("Add an <input id=\\"author\\"> inside the form.");
+const label = document.querySelector('label[for="author"]');
+if (!label) throw new Error("Pair it with <label for=\\"author\\">…</label>.");`,
+    },
+    {
+      id: "contact",
+      name: "A labeled email input with id 'contact'",
+      code: `const input = document.querySelector("form input#contact");
+if (!input) throw new Error("Add an <input id=\\"contact\\"> inside the form.");
+if ((input.getAttribute("type") || "").toLowerCase() !== "email") {
+  throw new Error("The contact input should have type=\\"email\\".");
+}
+if (!document.querySelector('label[for="contact"]')) {
+  throw new Error("Pair it with <label for=\\"contact\\">…</label>.");
+}`,
+    },
+    {
+      id: "submit",
+      name: "A submit button lives inside the form",
+      code: `const button = document.querySelector("form button");
+if (!button) throw new Error("Add a <button> inside the form.");
+if ((button.getAttribute("type") || "submit").toLowerCase() !== "submit") {
+  throw new Error("Give the button type=\\"submit\\".");
+}`,
+    },
+  ]}
+/>
+
+That's the essential HTML toolkit. Time to make it look like
+something: [CSS — getting started](/courses/intro-web-development/css-getting-started).

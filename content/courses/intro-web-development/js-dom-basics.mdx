@@ -1,0 +1,163 @@
+---
+title: JavaScript — Meet the DOM
+description: The document object, querySelector, and changing text, styles, and classes from code.
+---
+
+When the browser reads your HTML, it builds a live, in-memory model of
+the page called the **DOM** (*Document Object Model*) — a tree of
+objects, one per element. JavaScript can reach into that tree and
+change anything: text, attributes, styles, structure. Every "the page
+just updated" moment on the web is DOM manipulation.
+
+## Selecting elements
+
+The entry point is the global `document` object:
+
+```js
+var heading = document.querySelector("h1");        // first match
+var note    = document.querySelector(".note");     // by class
+var button  = document.querySelector("#save");     // by id
+var items   = document.querySelectorAll("li");     // ALL matches
+```
+
+`querySelector` takes exactly the selectors you learned in CSS — one
+language, two uses.
+
+## Changing what you selected
+
+```js
+heading.textContent = "New title";        // replace the text
+note.classList.add("visible");           // add / remove / toggle classes
+button.style.background = "tomato";      // set one inline style
+```
+
+Prefer `classList` over `style` for anything you already have CSS
+for — it keeps the "what it looks like" decision in the stylesheet.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      .done { text-decoration: line-through; color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <h1 id="title">Chore list</h1>
+    <ul>
+      <li>Water the plants</li>
+      <li>Answer three emails</li>
+      <li>Stretch</li>
+    </ul>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `// Select elements with the same selectors CSS uses.
+var title = document.querySelector("#title");
+var items = document.querySelectorAll("li");
+
+console.log("The list has", items.length, "chores");
+
+// Change text from code:
+title.textContent = "Chore list (" + items.length + " items)";
+
+// Mark the first chore as done by ADDING A CLASS —
+// the .done styling itself lives in the stylesheet.
+items[0].classList.add("done");
+
+console.log("First chore:", items[0].textContent);
+`,
+    },
+  ]}
+/>
+
+Note where the `<script src="script.js">` tag sits: at the **end of
+`<body>`**. Scripts run the moment the parser reaches them — placing
+them last guarantees every element above already exists, so
+`querySelector` finds what it's looking for.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Announce the daily special"
+  entryFilename="index.html"
+  instructions={`Work in \`script.js\` only:
+
+1. Select the element with the id \`special\` and set its \`textContent\` to exactly \`Tomato soup\`.
+2. Add the class \`featured\` to that same element (the styling already exists in the page).
+3. Log the string \`special updated\` to the console.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      .featured { background: #fef9c3; padding: 0.25rem 0.5rem; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <h1>Café menu</h1>
+    <p>Today's special: <span id="special">(to be decided)</span></p>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `// 1. select #special and set its text to "Tomato soup"
+
+// 2. add the class "featured" to it
+
+// 3. console.log("special updated")
+`,
+      solutionCode: `var special = document.querySelector("#special");
+
+special.textContent = "Tomato soup";
+special.classList.add("featured");
+
+console.log("special updated");
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "text",
+      name: "#special says 'Tomato soup'",
+      code: `const el = document.querySelector("#special");
+if ((el.textContent || "").trim() !== "Tomato soup") {
+  throw new Error("Expected #special to read 'Tomato soup', got '" + el.textContent + "'.");
+}`,
+    },
+    {
+      id: "class",
+      name: "#special carries the 'featured' class",
+      code: `const el = document.querySelector("#special");
+if (!el.classList.contains("featured")) {
+  throw new Error("Add the 'featured' class with classList.add(...).");
+}`,
+    },
+    {
+      id: "log",
+      name: "The console reports 'special updated'",
+      expect: { stdoutContains: "special updated" },
+    },
+  ]}
+  />
+
+The page changes — but only once, when the script runs. Next lesson
+makes it respond to the user: [events](/courses/intro-web-development/js-events).

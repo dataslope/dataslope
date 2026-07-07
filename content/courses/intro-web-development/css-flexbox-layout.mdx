@@ -1,0 +1,212 @@
+---
+title: CSS — Flexbox Layout
+description: Arranging boxes in rows and columns with display flex, gap, justify-content, and align-items.
+---
+
+By default, block elements stack top-to-bottom. **Flexbox** is the
+modern way to arrange them any other way: navigation bars, card rows,
+centered heroes, sidebar layouts.
+
+One rule changes everything:
+
+```css
+.container {
+  display: flex;
+}
+```
+
+The container's direct children become **flex items** and line up in
+a row. From there, a handful of container properties do most layout
+work on the web:
+
+| Property | What it controls |
+| --- | --- |
+| `flex-direction` | `row` (default) or `column` |
+| `gap` | space *between* items (no margin juggling) |
+| `justify-content` | distribution along the main axis — `flex-start`, `center`, `space-between`… |
+| `align-items` | alignment on the cross axis — `stretch`, `center`… |
+| `flex-wrap` | allow items to wrap onto new lines |
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand">PixelPress</span>
+      <a href="#">Articles</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+
+    <div class="cards">
+      <div class="card">Fast</div>
+      <div class="card">Simple</div>
+      <div class="card">Flexible</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: #0f172a;
+}
+
+.brand {
+  color: white;
+  font-weight: 700;
+  /* pushes everything after it to the right: */
+  margin-right: auto;
+}
+
+.navbar a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+.cards {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.card {
+  flex: 1;
+  padding: 2rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 10px;
+  background: #dbeafe;
+}
+`,
+    },
+  ]}
+/>
+
+Two patterns worth memorizing from that stylesheet:
+
+- **`margin-right: auto`** on one flex item absorbs all free space,
+  shoving its siblings to the far end — the classic navbar split.
+- **`flex: 1`** on the cards makes each one stretch to share the row
+  equally.
+
+And the most-searched CSS question of all time — *center something
+horizontally and vertically* — is three lines now:
+
+```css
+.parent { display: flex; justify-content: center; align-items: center; }
+```
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Lay out the pricing row"
+  entryFilename="index.html"
+  instructions={`Work in \`styles.css\` to arrange the three pricing tiers side by side:
+
+1. Make \`.tiers\` a flex container (\`display: flex\`).
+2. Put \`24px\` of space between the tiers using the \`gap\` property.
+3. Center the row's content horizontally with \`justify-content: center\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Plans</h1>
+    <div class="tiers">
+      <div class="tier">Free</div>
+      <div class="tier">Pro</div>
+      <div class="tier">Team</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.tiers {
+  /* make this a centered flex row with a 24px gap */
+}
+
+.tier {
+  padding: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+`,
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+.tiers {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+.tier {
+  padding: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "flex",
+      name: ".tiers is a flex container",
+      code: `const s = getComputedStyle(document.querySelector(".tiers"));
+if (s.display !== "flex") {
+  throw new Error("Set display: flex on .tiers — got display: " + s.display + ".");
+}`,
+    },
+    {
+      id: "gap",
+      name: "24px of gap between tiers",
+      code: `const s = getComputedStyle(document.querySelector(".tiers"));
+if (s.columnGap !== "24px") {
+  throw new Error("Expected gap: 24px, got " + s.columnGap + ".");
+}`,
+    },
+    {
+      id: "centered",
+      name: "The row is centered with justify-content",
+      code: `const s = getComputedStyle(document.querySelector(".tiers"));
+if (s.justifyContent !== "center") {
+  throw new Error("Expected justify-content: center, got " + s.justifyContent + ".");
+}`,
+    },
+  ]}
+/>
+
+Structure ✓ style ✓ — time for behaviour: [JavaScript meets the DOM](/courses/intro-web-development/js-dom-basics).

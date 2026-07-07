@@ -20,7 +20,12 @@
 // language service can reuse its incremental program state.
 
 import type tsModule from "typescript";
-import { TYPESCRIPT_CDN_BASE } from "./cdn";
+import {
+  CSSTYPE_VERSION,
+  REACT_DOM_TYPES_VERSION,
+  REACT_TYPES_VERSION,
+  TYPESCRIPT_CDN_BASE,
+} from "./cdn";
 import {
   cmTypeForTsKind,
   completionPrefixLength,
@@ -108,6 +113,79 @@ function ensureLibs(): Promise<void> {
   return libsPromise;
 }
 
+// ─── React type declarations (TSX entries only) ────────────────────────
+//
+// The React playground's completions come through this same worker.
+// When the cursor sits in a .tsx/.jsx file, lazily mount the pinned
+// @types/react graph at node_modules paths so Node10 module resolution
+// finds real typings for `react`, `react/jsx-runtime`, and
+// `react-dom/client` — hook signatures, prop checking, JSX intrinsics.
+// The set is closed (verified against the published packages): the only
+// out-of-package imports are csstype (from @types/react) and react
+// (from @types/react-dom). Best-effort like the libs: a failed fetch
+// answers completions without React typings rather than erroring.
+
+const typeFiles = new Map<string, string>();
+let reactTypesPromise: Promise<void> | null = null;
+
+const REACT_TYPE_FILES: Array<{ path: string; url: string }> = [
+  {
+    path: "/node_modules/@types/react/package.json",
+    url: `https://cdn.jsdelivr.net/npm/@types/react@${REACT_TYPES_VERSION}/package.json`,
+  },
+  {
+    path: "/node_modules/@types/react/index.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/@types/react@${REACT_TYPES_VERSION}/index.d.ts`,
+  },
+  {
+    path: "/node_modules/@types/react/global.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/@types/react@${REACT_TYPES_VERSION}/global.d.ts`,
+  },
+  {
+    path: "/node_modules/@types/react/jsx-runtime.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/@types/react@${REACT_TYPES_VERSION}/jsx-runtime.d.ts`,
+  },
+  {
+    path: "/node_modules/@types/react-dom/package.json",
+    url: `https://cdn.jsdelivr.net/npm/@types/react-dom@${REACT_DOM_TYPES_VERSION}/package.json`,
+  },
+  {
+    path: "/node_modules/@types/react-dom/index.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/@types/react-dom@${REACT_DOM_TYPES_VERSION}/index.d.ts`,
+  },
+  {
+    path: "/node_modules/@types/react-dom/client.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/@types/react-dom@${REACT_DOM_TYPES_VERSION}/client.d.ts`,
+  },
+  {
+    path: "/node_modules/csstype/package.json",
+    url: `https://cdn.jsdelivr.net/npm/csstype@${CSSTYPE_VERSION}/package.json`,
+  },
+  {
+    path: "/node_modules/csstype/index.d.ts",
+    url: `https://cdn.jsdelivr.net/npm/csstype@${CSSTYPE_VERSION}/index.d.ts`,
+  },
+];
+
+function ensureReactTypes(): Promise<void> {
+  if (!reactTypesPromise) {
+    reactTypesPromise = Promise.all(
+      REACT_TYPE_FILES.map(async ({ path, url }) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+        typeFiles.set(path, await res.text());
+      }),
+    ).then(
+      () => undefined,
+      (err) => {
+        reactTypesPromise = null; // allow a retry on the next request
+        throw err;
+      },
+    );
+  }
+  return reactTypesPromise;
+}
+
 // ─── Language service host over an in-memory workspace ─────────────────
 
 const COMPILER_OPTIONS: tsModule.CompilerOptions = {
@@ -119,6 +197,11 @@ const COMPILER_OPTIONS: tsModule.CompilerOptions = {
   allowJs: true,
   esModuleInterop: true,
   allowSyntheticDefaultImports: true,
+  // The React playground shares this worker for .tsx/.jsx entries; the
+  // option only changes how those extensions parse, so the JS/TS
+  // adapters are unaffected. (React's own typings aren't fetched — DOM
+  // and local-workspace completions still work inside components.)
+  jsx: ts.JsxEmit.ReactJSX,
   noEmit: true,
 };
 
@@ -128,7 +211,8 @@ const host: tsModule.LanguageServiceHost = {
   getScriptFileNames: () => [...scripts.keys()],
   getScriptVersion: (f) => String(scripts.get(f)?.version ?? 0),
   getScriptSnapshot: (f) => {
-    const content = scripts.get(f)?.content ?? libFiles.get(f);
+    const content =
+      scripts.get(f)?.content ?? libFiles.get(f) ?? typeFiles.get(f);
     return content === undefined
       ? undefined
       : ts.ScriptSnapshot.fromString(content);
@@ -136,8 +220,9 @@ const host: tsModule.LanguageServiceHost = {
   getCurrentDirectory: () => "/",
   getCompilationSettings: () => COMPILER_OPTIONS,
   getDefaultLibFileName: (opts) => `/__lib/${ts.getDefaultLibFileName(opts)}`,
-  fileExists: (f) => scripts.has(f) || libFiles.has(f),
-  readFile: (f) => scripts.get(f)?.content ?? libFiles.get(f),
+  fileExists: (f) => scripts.has(f) || libFiles.has(f) || typeFiles.has(f),
+  readFile: (f) =>
+    scripts.get(f)?.content ?? libFiles.get(f) ?? typeFiles.get(f),
   readDirectory: () => [],
   directoryExists: () => true,
   getDirectories: () => [],
@@ -169,6 +254,11 @@ const MAX_COMPLETIONS = 300;
 
 async function complete(msg: InMessage): Promise<void> {
   await ensureLibs();
+  // JSX entries additionally get the React typings — best-effort, so a
+  // CDN hiccup degrades to DOM/workspace completions instead of none.
+  if (/\.(tsx|jsx)$/i.test(msg.entry)) {
+    await ensureReactTypes().catch(() => {});
+  }
   syncScripts(msg.files);
 
   const entryContent = scripts.get(msg.entry)?.content ?? "";

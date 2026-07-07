@@ -39,8 +39,19 @@ export function newFileId(): string {
   return `f_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-/** Default initial file set for a freshly-created workspace. */
+/** Default initial file set for a freshly-created workspace. Adapters
+ *  with a `defaultWorkspace` (web: the CodePen-style HTML/CSS/JS trio)
+ *  get one file per entry; everything else gets the single canonical
+ *  `<exportBaseFilename>.<ext>` file. */
 export function defaultFiles(adapter: LanguageAdapter): PlaygroundFile[] {
+  const workspace = adapter.defaultWorkspace;
+  if (workspace && workspace.length > 0) {
+    return workspace.map((f) => ({
+      id: newFileId(),
+      filename: f.filename,
+      pristineFilename: f.filename,
+    }));
+  }
   const filename = primaryEntryFilename(adapter);
   return [
     { id: newFileId(), filename, pristineFilename: filename },

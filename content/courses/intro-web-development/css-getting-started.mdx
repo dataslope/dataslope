@@ -1,0 +1,178 @@
+---
+title: CSS — Getting Started
+description: Rules, selectors, and properties — and moving styles into their own stylesheet file.
+---
+
+CSS (*Cascading Style Sheets*) describes what your HTML **looks
+like**. A stylesheet is a list of **rules**, and every rule has the
+same shape:
+
+```css
+selector {
+  property: value;
+  property: value;
+}
+```
+
+- The **selector** picks which elements the rule applies to.
+- Each **declaration** (`property: value;`) sets one visual aspect.
+
+## The three selectors you'll use most
+
+```css
+p          { color: #334155; }   /* every <p> element        */
+.note      { background: #fef9c3; } /* every element with class="note" */
+#site-title { letter-spacing: 2px; } /* the ONE element with id="site-title" */
+```
+
+- **Element selectors** (`p`, `h1`, `li`) style every element of that
+  type.
+- **Class selectors** (`.note`) match the `class` attribute. Classes
+  are reusable — many elements can share one class, and one element
+  can carry several classes.
+- **ID selectors** (`#site-title`) match a unique `id`. IDs must be
+  unique per page; prefer classes for styling and save IDs for
+  linking and JavaScript.
+
+## A stylesheet in its own file
+
+Real projects keep CSS out of the HTML. The `<link>` element in the
+head pulls in `styles.css` — switch between the two tabs below:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1 id="site-title">The Daily Pixel</h1>
+    <p>A newsletter about tiny graphics and big ideas.</p>
+    <p class="note">New issues every Friday.</p>
+    <p>No spam, unsubscribe anytime.</p>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: Georgia, serif;
+  margin: 2.5rem;
+  color: #334155;
+}
+
+#site-title {
+  color: #0f172a;
+  letter-spacing: 1px;
+  border-bottom: 3px solid #f59e0b;
+  padding-bottom: 0.3rem;
+}
+
+.note {
+  background: #fef9c3;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+`,
+    },
+  ]}
+/>
+
+Experiments to try: change `Georgia, serif` to `system-ui,
+sans-serif`; give `.note` a `border`; add a `p { line-height: 1.7 }`
+rule and notice every paragraph react.
+
+## Colors
+
+You'll meet three common notations, all equivalent in power:
+named colors (`tomato`), hex (`#f59e0b`), and `rgb(245, 158, 11)`.
+Pick per taste; tools convert freely between them.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Style the announcement"
+  entryFilename="index.html"
+  instructions={`The HTML is finished — work only in \`styles.css\`:
+
+1. Give every paragraph (\`p\`) the color \`rgb(51, 65, 85)\`.
+2. Give elements with the class \`highlight\` the background color \`rgb(254, 249, 195)\`.
+3. Give the element with the id \`title\` a color of \`rgb(15, 23, 42)\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1 id="title">Community garden day</h1>
+    <p>Join us on Saturday to plant the spring beds.</p>
+    <p class="highlight">Bring gloves — we provide everything else.</p>
+    <p>Rain date: the following Sunday.</p>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `/* 1. every paragraph: color rgb(51, 65, 85) */
+
+/* 2. .highlight: background rgb(254, 249, 195) */
+
+/* 3. #title: color rgb(15, 23, 42) */
+`,
+      solutionCode: `p {
+  color: rgb(51, 65, 85);
+}
+
+.highlight {
+  background: rgb(254, 249, 195);
+}
+
+#title {
+  color: rgb(15, 23, 42);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "p_color",
+      name: "Paragraphs are colored rgb(51, 65, 85)",
+      code: `const p = document.querySelector("p");
+const color = getComputedStyle(p).color;
+if (color !== "rgb(51, 65, 85)") {
+  throw new Error("Expected paragraph color rgb(51, 65, 85), got " + color + ".");
+}`,
+    },
+    {
+      id: "highlight_bg",
+      name: ".highlight has the yellow background",
+      code: `const el = document.querySelector(".highlight");
+const bg = getComputedStyle(el).backgroundColor;
+if (bg !== "rgb(254, 249, 195)") {
+  throw new Error("Expected .highlight background rgb(254, 249, 195), got " + bg + ".");
+}`,
+    },
+    {
+      id: "title_color",
+      name: "#title is colored rgb(15, 23, 42)",
+      code: `const el = document.querySelector("#title");
+const color = getComputedStyle(el).color;
+if (color !== "rgb(15, 23, 42)") {
+  throw new Error("Expected #title color rgb(15, 23, 42), got " + color + ".");
+}`,
+    },
+  ]}
+/>
+
+Next: why everything on a page is secretly a rectangle — [the box model](/courses/intro-web-development/css-box-model).

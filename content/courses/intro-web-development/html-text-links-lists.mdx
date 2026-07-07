@@ -1,0 +1,150 @@
+---
+title: HTML — Text, Links & Lists
+description: Marking up meaning inside text, linking pages together with anchors and attributes, and building lists.
+---
+
+Structure isn't only headings. This lesson covers the elements you'll
+type most often: inline text markup, the anchor element that puts the
+"hyper" in hypertext, and lists.
+
+## Attributes
+
+Elements can carry **attributes** — name/value pairs inside the
+opening tag that configure the element:
+
+```html
+<a href="https://developer.mozilla.org">MDN Web Docs</a>
+```
+
+`href` is an attribute of the `<a>` (anchor) element: the destination
+this link points to. Attribute values always belong in quotes.
+
+## Inline text elements
+
+Block elements like `<p>` stack vertically; **inline** elements mark
+up meaning *within* a line of text:
+
+- `<strong>` — importance (rendered bold by default)
+- `<em>` — emphasis (rendered italic)
+- `<code>` — a fragment of code
+- `<a href="…">` — a link
+
+## Lists
+
+Two kinds you'll use constantly:
+
+- `<ul>` — an *unordered* list (bullets)
+- `<ol>` — an *ordered* list (numbers)
+
+Both contain only `<li>` (list item) children.
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <h1>Learning the web</h1>
+
+    <p>
+      I'm following a course on <em>web development</em>. The single
+      most useful reference is
+      <a href="https://developer.mozilla.org">MDN Web Docs</a> —
+      <strong>bookmark it now</strong>.
+    </p>
+
+    <h2>Languages, in order of appearance</h2>
+    <ol>
+      <li>HTML — structure</li>
+      <li>CSS — style</li>
+      <li>JavaScript — behaviour</li>
+    </ol>
+
+    <h2>Snacks that pair well with coding</h2>
+    <ul>
+      <li>Coffee</li>
+      <li>Apples</li>
+      <li>An unreasonable number of crackers</li>
+    </ul>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Click the link in the preview — it opens the real MDN site. Links,
+buttons, and text selection all behave like a normal page because the
+preview *is* a normal (sandboxed) page.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="A linked reading list"
+  instructions={`Build a small reading list:
+
+1. An \`<h1>\` with any title you like.
+2. An ordered list (\`<ol>\`) with **at least three** \`<li>\` items.
+3. At least one list item must contain a link (\`<a>\`) with an \`href\` attribute that starts with \`https://\`.
+4. Somewhere on the page, mark one phrase as important with \`<strong>\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <!-- Your reading list here -->
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <body>
+    <h1>My web-dev reading list</h1>
+    <p>The <strong>first three things</strong> I plan to read:</p>
+    <ol>
+      <li>
+        <a href="https://developer.mozilla.org/en-US/docs/Learn">MDN Learn web development</a>
+      </li>
+      <li>HTML living standard — the elements chapter</li>
+      <li>A blog post about how browsers render pages</li>
+    </ol>
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "ordered_list",
+      name: "An <ol> with at least three items",
+      code: `const items = document.querySelectorAll("ol li");
+if (items.length < 3) {
+  throw new Error("The ordered list needs at least three <li> items — found " + items.length + ".");
+}`,
+    },
+    {
+      id: "link",
+      name: "A list item contains an https:// link",
+      code: `const link = document.querySelector("ol li a");
+if (!link) throw new Error("Put an <a> link inside one of the list items.");
+const href = link.getAttribute("href") || "";
+if (!href.startsWith("https://")) {
+  throw new Error("The link's href should start with https:// — got '" + href + "'.");
+}`,
+    },
+    {
+      id: "strong",
+      name: "Something on the page is marked <strong>",
+      code: `const strong = document.querySelector("strong");
+if (!strong || !(strong.textContent || "").trim()) {
+  throw new Error("Wrap an important phrase in <strong>…</strong>.");
+}`,
+    },
+  ]}
+/>
+
+Next: collecting input from visitors with [forms](/courses/intro-web-development/html-forms).

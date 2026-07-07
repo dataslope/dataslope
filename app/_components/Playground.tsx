@@ -51,6 +51,7 @@ import type {
   OutputCell,
   PackageInfo,
   PlotlyFigure,
+  RunOptions,
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useCreepingBootFraction } from "./challengeShared";
@@ -140,7 +141,16 @@ import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
-import { FileCode2, Settings } from "lucide-react";
+import {
+  FileCode2,
+  PanelLeft,
+  PanelRight,
+  PanelTop,
+  Rows3,
+  Settings,
+  Zap,
+} from "lucide-react";
+import PlaygroundSplitEditors from "./PlaygroundSplitEditors";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
 import {
   deleteDataEntry,
@@ -187,6 +197,7 @@ function buildCapabilitiesBlurb(
   if (caps?.dataframes) items.push("data frames");
   if (caps?.charts) items.push("charts");
   if (caps?.figures) items.push("figures");
+  if (caps?.preview) items.push("a live page preview");
   if (items.length === 0) return "";
   if (items.length === 1) return `Supports text and ${items[0]}.`;
   if (items.length === 2)
@@ -764,6 +775,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
+  // Mirror for timers/closures (the auto-run debounce) that must read
+  // the current run state without re-arming on every status change.
+  const statusStateRef = useRef<"loading" | "ready" | "running" | "error">(
+    "loading",
+  );
+  useEffect(() => {
+    statusStateRef.current = statusState;
+  }, [statusState]);
 
   // Smoothed boot fraction for the loading overlay's bar: determinate
   // once the adapter reports stage fractions, indeterminate sweep
@@ -796,10 +815,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const clearOutputsForFile = useStore((s) => s.clearOutputsForFile);
 
   // Derived: the active file's outputs (the output pane is per-tab).
-  const outputs = useMemo(
-    () => outputsByFile.get(activeFileId) ?? [],
-    [outputsByFile, activeFileId],
-  );
+  // Declared below, next to `runButtonState` — the split view derives
+  // the output pane's source from the run-target (entry) file instead
+  // of the focused pane, and that needs the Run button's entry
+  // resolution to exist first.
 
   // Refs let stale closures (CodeMirror persist listener, async run loop)
   // read the latest workspace + file ids without being rebuilt.
@@ -915,11 +934,171 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const entryFocusDoneRef = useRef(false);
   const themeCompRef = useRef<Compartment | null>(null);
   const wrapCompRef = useRef<Compartment | null>(null);
+  const languageCompRef = useRef<Compartment | null>(null);
   const outputBodyRef = useRef<HTMLDivElement | null>(null);
+  // Slot the preview adapters (web / react) mount their sandboxed
+  // iframe into. Always in the DOM for preview-capable adapters so the
+  // element exists by the time `runtime.run` needs it.
+  const previewHostRef = useRef<HTMLDivElement | null>(null);
+  const hasPreview = Boolean(adapter.outputCapabilities?.preview);
+  // Ref mirror of `outputFileId` (derived next to `runButtonState`
+  // below) for callbacks — empty until its sync effect first runs;
+  // readers fall back to the active file id.
+  const outputFileIdRef = useRef<string>("");
+  // Pane layout elements (the drag resizer wires them up in an effect
+  // further down; declared here so earlier callbacks can reference the
+  // panes element).
+  const panesRef = useRef<HTMLDivElement | null>(null);
+  const editorPaneRef = useRef<HTMLDivElement | null>(null);
+  const resizerRef = useRef<HTMLDivElement | null>(null);
+
+  // ─── CodePen-style split view (adapters with `splitEditors`) ─────────
+  // Every workspace file gets its own always-visible editor stacked in
+  // the editor pane instead of the tabbed single editor. Defaults ON
+  // for the web playground; the user's choice persists per adapter.
+  // The default renders on the server too — localStorage is consulted
+  // in the mount effect below so hydration stays deterministic.
+  const splitAvailable = Boolean(adapter.splitEditors);
+  const [splitView, setSplitViewState] = useState<boolean>(splitAvailable);
+  useEffect(() => {
+    if (!splitAvailable) return;
+    try {
+      if (
+        window.localStorage.getItem(`playground_${adapter.id}_splitview`) ===
+        "false"
+      ) {
+        /* Same rationale as the persisted-settings hydration below: a
+           lazy useState initialiser would read localStorage during
+           render and mismatch the SSR markup. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setSplitViewState(false);
+      }
+    } catch {
+      /* private mode — keep the default. */
+    }
+  }, [adapter.id, splitAvailable]);
+  const splitActive = splitAvailable && splitView;
+  const splitActiveRef = useRef(splitActive);
+  useEffect(() => {
+    splitActiveRef.current = splitActive;
+  }, [splitActive]);
+  // Live EditorViews per pane, so Format/Copy can target the active one.
+  const splitViewsRef = useRef(new Map<string, EditorView>());
+  const setSplitView = useCallback(
+    (on: boolean) => {
+      setSplitViewState(on);
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_splitview`,
+          String(on),
+        );
+      } catch {
+        /* quota / private mode — ignore. */
+      }
+    },
+    [adapter.id],
+  );
+  const registerSplitEditorView = useCallback(
+    (fileId: string, view: EditorView | null) => {
+      if (view) splitViewsRef.current.set(fileId, view);
+      else splitViewsRef.current.delete(fileId);
+    },
+    [],
+  );
+  // Focusing a pane makes its file "active" — the Run button label,
+  // Format target, and completion filename all track the focused pane,
+  // exactly like focusing that file's tab. No doc juggling needed: the
+  // panes write through to the dirty buffers on every edit.
+  const focusSplitFile = useCallback(
+    (fileId: string) => {
+      if (activeFileIdRef.current === fileId) return;
+      activeFileIdRef.current = fileId;
+      setActiveFileId(fileId);
+      setActiveTabId(fileId);
+    },
+    [setActiveFileId, setActiveTabId],
+  );
+
+  // ─── Auto-run on edit (preview adapters) ─────────────────────────────
+  // CodePen-style live feedback: a debounced re-run after edits (and one
+  // initial run once the runtime is ready) keeps the preview current
+  // without pressing Run. Cheap by construction — each run swaps the
+  // sandboxed iframe. Persisted per adapter; defaults ON.
+  const [autoRun, setAutoRunState] = useState<boolean>(hasPreview);
+  useEffect(() => {
+    if (!hasPreview) return;
+    try {
+      if (
+        window.localStorage.getItem(`playground_${adapter.id}_autorun`) ===
+        "false"
+      ) {
+        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setAutoRunState(false);
+      }
+    } catch {
+      /* private mode — keep the default. */
+    }
+  }, [adapter.id, hasPreview]);
+  const setAutoRun = useCallback(
+    (on: boolean) => {
+      setAutoRunState(on);
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_autorun`,
+          String(on),
+        );
+      } catch {
+        /* quota / private mode — ignore. */
+      }
+    },
+    [adapter.id],
+  );
+
+  // ─── Editor position (preview adapters): left / right / top ──────────
+  // The CodePen "change view" arrangements. Persisted per adapter.
+  const [editorPosition, setEditorPositionState] = useState<
+    "left" | "right" | "top"
+  >("left");
+  useEffect(() => {
+    if (!hasPreview) return;
+    try {
+      const stored = window.localStorage.getItem(
+        `playground_${adapter.id}_editorpos`,
+      );
+      if (stored === "right" || stored === "top") {
+        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setEditorPositionState(stored);
+      }
+    } catch {
+      /* private mode — keep the default. */
+    }
+  }, [adapter.id, hasPreview]);
+  const setEditorPosition = useCallback(
+    (pos: "left" | "right" | "top") => {
+      setEditorPositionState(pos);
+      // The drag resizer writes an inline grid template sized for the
+      // previous arrangement — drop it so the new arrangement's CSS
+      // takes over at its default proportions.
+      panesRef.current?.style.removeProperty("grid-template-columns");
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_editorpos`,
+          pos,
+        );
+      } catch {
+        /* quota / private mode — ignore. */
+      }
+    },
+    [adapter.id],
+  );
 
   // Latest run handler in a ref so the editor's keymap can call into it
-  // without being re-bound on every render.
-  const runRef = useRef<() => void>(() => undefined);
+  // without being re-bound on every render. `auto` marks debounced
+  // auto-runs, which skip user-facing side effects like the mobile
+  // pane switch.
+  const runRef = useRef<(opts?: { auto?: boolean }) => void>(() => undefined);
   // Secondary run action (⌘/Ctrl+Shift+Enter) — runs the Run dropdown's
   // first/canonical entry. Kept as a ref so the CodeMirror keymap stays
   // stable while the target entry updates as tabs/files change.
@@ -1056,9 +1235,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         }
 
         // Read each file's content from OPFS into the dirty buffer.
-        // Files without OPFS content fall back to the first example as
-        // a sensible starter (matches the single-file behaviour from
-        // before Phase 5).
+        // Files without OPFS content fall back to the adapter's default
+        // workspace (web: the CodePen HTML/CSS/JS trio) or the first
+        // example as a sensible starter (matches the single-file
+        // behaviour from before Phase 5).
+        const defaultSeedFor = (filename: string): string =>
+          adapter.defaultWorkspace?.find((d) => d.filename === filename)
+            ?.content ?? "";
         for (const f of files) {
           const stored = await opfsReadFile(ws.id, f.id);
           if (cancelled) return;
@@ -1066,11 +1249,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             updateDirtyBuffer(f.id, stored);
           } else if (f.id === activeId) {
             const legacy = localStorage.getItem(storageKey("code"));
-            const seed = legacy ?? adapter.examples[0]?.code ?? "";
+            const seed =
+              legacy ??
+              (adapter.defaultWorkspace
+                ? defaultSeedFor(f.filename)
+                : (adapter.examples[0]?.code ?? ""));
             updateDirtyBuffer(f.id, seed);
             if (seed) opfsWriteFile(ws.id, f.id, seed);
           } else {
-            updateDirtyBuffer(f.id, "");
+            const seed = defaultSeedFor(f.filename);
+            updateDirtyBuffer(f.id, seed);
+            if (seed) opfsWriteFile(ws.id, f.id, seed);
           }
         }
 
@@ -1118,8 +1307,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           typeof window !== "undefined"
             ? localStorage.getItem(storageKey("code"))
             : null;
-        const seed = legacy ?? adapter.examples[0]?.code ?? "";
-        updateDirtyBuffer(activeId, seed);
+        for (const f of files) {
+          const workspaceSeed =
+            adapter.defaultWorkspace?.find((d) => d.filename === f.filename)
+              ?.content ?? "";
+          const seed =
+            f.id === activeId
+              ? (legacy ??
+                (adapter.defaultWorkspace
+                  ? workspaceSeed
+                  : (adapter.examples[0]?.code ?? "")))
+              : workspaceSeed;
+          updateDirtyBuffer(f.id, seed);
+        }
         setFiles(files);
         setActiveFileId(activeId);
         setActiveTabId(activeId);
@@ -1364,7 +1564,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     let cancelled = false;
 
-    if (editorHostRef.current && !editorRef.current) {
+    // The split view mounts one editor per file (PlaygroundSplitEditors)
+    // instead of this single tabbed editor; toggling back re-runs this
+    // effect and remounts it from the active file's dirty buffer.
+    if (!splitActive && editorHostRef.current && !editorRef.current) {
       // Read persisted settings directly so the editor mounts with the
       // same values the surrounding UI was hydrated with — otherwise the
       // editor would briefly render with default theme/wrapping and then
@@ -1401,11 +1604,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
       const view = new EditorView({
         // The editor mounts before the workspace bootstrap resolves; we
-        // start with the legacy localStorage entry (if any) for a
-        // zero-flash first paint, then the workspace effect dispatches
-        // a doc replacement with whatever the OPFS read returned.
+        // start with the active file's dirty buffer when one exists (a
+        // split→tabs toggle remounts mid-session), else the legacy
+        // localStorage entry for a zero-flash first paint; the workspace
+        // effect dispatches a doc replacement with whatever the OPFS
+        // read returned.
         doc:
+          dirtyBuffersRef.current.get(activeFileIdRef.current ?? "") ??
           localStorage.getItem(storageKey("code")) ??
+          adapter.defaultWorkspace?.[0]?.content ??
           adapter.examples[0]?.code ??
           "",
         parent: editorHostRef.current,
@@ -1479,6 +1686,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       editorRef.current = view;
       themeCompRef.current = themeComp;
       wrapCompRef.current = wrapComp;
+      languageCompRef.current = languageComp;
 
       void loadLanguage(adapter.codeMirrorMode).then((ext) => {
         if (ext && editorRef.current === view) {
@@ -1528,11 +1736,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       editorRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
+      languageCompRef.current = null;
     };
     // editorTheme is intentionally only consumed for the *initial* CM theme;
     // subsequent changes are pushed via Compartment reconfigure below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adapter]);
+  }, [adapter, splitActive]);
 
   // Pin this playground's runtime in the registry while mounted, so the
   // per-scope LRU eviction never terminates the engine under a live
@@ -1559,6 +1768,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // during the replacement so the change isn't echoed back as a "save".
   useEffect(() => {
     if (!workspaceReady) return;
+    if (splitActive) return; // per-file editors sync themselves
     if (activeTabId === SETTINGS_TAB_ID) return;
     const view = editorRef.current;
     if (!view) return;
@@ -1594,7 +1804,32 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       return;
     }
     view.focus();
-  }, [activeFileId, activeTabId, workspaceReady, showLoadingOverlay]);
+  }, [activeFileId, activeTabId, splitActive, workspaceReady, showLoadingOverlay]);
+
+  // Per-file syntax highlighting for adapters whose workspaces mix
+  // languages (web: .html/.css/.js side by side). Reconfigures the
+  // language compartment whenever the active tab changes; adapters
+  // without `codeMirrorModeForFile` keep the mode loaded at mount.
+  useEffect(() => {
+    if (!adapter.codeMirrorModeForFile) return;
+    if (!workspaceReady) return;
+    const filename = files.find((f) => f.id === activeFileId)?.filename;
+    if (!filename) return;
+    const mode =
+      adapter.codeMirrorModeForFile(filename) ?? adapter.codeMirrorMode;
+    const view = editorRef.current;
+    const comp = languageCompRef.current;
+    if (!view || !comp) return;
+    let cancelled = false;
+    void loadLanguage(mode).then((ext) => {
+      if (cancelled || !ext) return;
+      if (editorRef.current !== view) return;
+      view.dispatch({ effects: comp.reconfigure(ext) });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [adapter, activeFileId, files, workspaceReady]);
 
   // Push word-wrap changes into CodeMirror after init.
   useEffect(() => {
@@ -1796,14 +2031,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(
-    async (entryOverride?: string) => {
+    async (entryOverride?: string, opts?: { auto?: boolean }) => {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
-    if (!editor || !rt) return;
+    if (!rt) return;
+    // The split view has no single tabbed editor — its panes write
+    // through to the dirty buffers synchronously, so reads below fall
+    // back to the buffers instead.
+    if (!editor && !splitActiveRef.current) return;
     // Snapshot the active file id at run start: even if the user
     // switches tabs mid-run, the outputs should be routed to the file
     // whose code we actually executed.
-    const targetFileId = activeFileIdRef.current;
+    let targetFileId = activeFileIdRef.current;
     if (!targetFileId) return;
 
     // Resolve the entry file (chevron picks override the active tab,
@@ -1813,6 +2052,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const activeFile =
       filesRef.current.find((f) => f.id === targetFileId) ?? null;
     const entryFilename = entryOverride ?? activeFile?.filename;
+    // Split view: outputs belong to the file that actually RAN (the
+    // entry), not the focused pane, so the console reads as one stream
+    // and matches the pane the output panel derives from (see
+    // `outputFileId`).
+    if (splitActiveRef.current && entryFilename) {
+      const entryFile = filesRef.current.find(
+        (f) => f.filename === entryFilename,
+      );
+      if (entryFile) targetFileId = entryFile.id;
+    }
     let code: string;
     if (entryOverride && activeFile && entryOverride !== activeFile.filename) {
       const entryFile = filesRef.current.find(
@@ -1834,8 +2083,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       } else {
         code = "";
       }
-    } else {
+    } else if (editor) {
       code = editor.state.doc.toString();
+    } else {
+      // Split view, running the focused pane's own file: its buffer is
+      // kept current by the pane's write-through listener.
+      code = (activeFile && dirtyBuffersRef.current.get(activeFile.id)) ?? "";
     }
     if (!code.trim()) return;
 
@@ -1934,11 +2187,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           });
         }
       }
-      await rt.run(
-        code,
-        (cell) => collected.push(cell),
-        entryFilename ? { entryFilename } : undefined,
-      );
+      const runOptions: RunOptions = {};
+      if (entryFilename) runOptions.entryFilename = entryFilename;
+      // Preview adapters render into the surface-owned slot; each run
+      // replaces the previous iframe (which is also the teardown story).
+      if (hasPreview) runOptions.previewHost = previewHostRef.current;
+      await rt.run(code, (cell) => collected.push(cell), runOptions);
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
       const merged = mergeConsecutiveStdout(collected);
@@ -1951,7 +2205,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           runId,
         })),
       ]);
-      if (collected.length === 0) {
+      if (collected.length === 0 && !hasPreview) {
+        // Preview adapters "output" the page itself — a run with no
+        // console output is the normal case, not worth a toast.
         showToast("Code ran successfully — no output.");
       }
       // Keep the running overlay visible long enough for the 180ms CSS
@@ -1990,26 +2246,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } finally {
       // On narrow viewports the panes share the screen via a tab switcher;
       // surface the result tab automatically once the run is done so the
-      // user doesn't have to swipe back themselves.
-      setMobileTab("output");
+      // user doesn't have to swipe back themselves. Debounced auto-runs
+      // skip this — yanking the pane away mid-typing would be hostile.
+      if (!opts?.auto) setMobileTab("output");
     }
   },
-  [clearBeforeRun, collectWorkspaceFilesForRun, setOutputsForFile, showToast]);
+  [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
 
-  // Keep a fresh closure available for the CodeMirror keymap.
-  useEffect(() => {
-    runRef.current = () => {
-      void runCode();
-    };
-  }, [runCode]);
+  // (The Mod-Enter keymap closure is kept fresh next to
+  // `runSecondaryRef` below — it needs `runButtonState`, which is
+  // derived after the run handler.)
 
   const clearOutput = useCallback(() => {
-    const fileId = activeFileIdRef.current;
+    // Clear the pane the output panel is actually showing (split view
+    // shows the entry file's stream, not the focused pane's).
+    const fileId = outputFileIdRef.current ?? activeFileIdRef.current;
     if (fileId) clearOutputsForFile(fileId);
+    // Clearing also tears down the live preview — removing the iframe
+    // kills its document (scripts, timers, listeners) immediately.
+    if (hasPreview) previewHostRef.current?.replaceChildren();
     if (loaded) {
       setStatusState("ready");
     }
-  }, [clearOutputsForFile, loaded]);
+  }, [clearOutputsForFile, hasPreview, loaded]);
 
   // Build a filename → content map covering every code tab so the Run
   // button can detect entry-point declarations (`main`, `Main`,
@@ -2029,6 +2288,38 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter, files, activeFileId, fileContentsByPath],
   );
 
+  // The output pane's source file. Tabs mode: the active tab (per-tab
+  // output history). Split mode: the file a Run actually executes — the
+  // Run button's resolved entry — so the console reads as ONE stream
+  // regardless of which pane has focus (runCode routes its cells to the
+  // same id).
+  const outputFileId = useMemo(() => {
+    if (!splitActive) return activeFileId;
+    const entryName =
+      runButtonState.primaryEntry ??
+      files.find((f) => f.id === activeFileId)?.filename;
+    return files.find((f) => f.filename === entryName)?.id ?? activeFileId;
+  }, [splitActive, runButtonState, files, activeFileId]);
+
+  // Derived: the output pane's cells (see `outputFileId` above).
+  const outputs = useMemo(
+    () => outputsByFile.get(outputFileId) ?? [],
+    [outputsByFile, outputFileId],
+  );
+  useEffect(() => {
+    outputFileIdRef.current = outputFileId;
+  }, [outputFileId]);
+
+  // Keep a fresh closure available for the CodeMirror Mod-Enter keymap.
+  // Runs the same entry the visible Run button would (multi-entry
+  // adapters resolve to the canonical entry even when a non-entry file
+  // — e.g. a stylesheet pane — has focus).
+  useEffect(() => {
+    runRef.current = (opts) => {
+      void runCode(runButtonState.primaryEntry ?? undefined, opts);
+    };
+  }, [runCode, runButtonState]);
+
   // Keep the ⌘/Ctrl+Shift+Enter handler pointed at the Run dropdown's
   // first entry (the canonical/default file, runnable from any tab).
   // No-op when there's no secondary entry to run.
@@ -2038,6 +2329,35 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (secondary) void runCode(secondary.entryFilename);
     };
   }, [runButtonState, runCode]);
+
+  // Auto-run driver: re-fires on every real buffer edit (the store
+  // replaces the Map identity per change) and once when the runtime
+  // finishes loading, so the preview renders on page open. If a run is
+  // still in flight when the debounce fires, the timer re-arms — the
+  // last edit always wins.
+  const autoRunTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!hasPreview || !autoRun) return;
+    if (!workspaceReady || !loaded) return;
+    if (autoRunTimerRef.current !== null) {
+      window.clearTimeout(autoRunTimerRef.current);
+    }
+    const fire = () => {
+      autoRunTimerRef.current = null;
+      if (statusStateRef.current === "running") {
+        autoRunTimerRef.current = window.setTimeout(fire, 300);
+        return;
+      }
+      runRef.current({ auto: true });
+    };
+    autoRunTimerRef.current = window.setTimeout(fire, 700);
+    return () => {
+      if (autoRunTimerRef.current !== null) {
+        window.clearTimeout(autoRunTimerRef.current);
+        autoRunTimerRef.current = null;
+      }
+    };
+  }, [hasPreview, autoRun, workspaceReady, loaded, dirtyBuffers]);
 
   // ─── File tab management ────────────────────────────────────────────────
 
@@ -2356,7 +2676,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       clearOutputsForFile(f.id);
       if (wsId) void opfsDeleteFile(wsId, f.id);
     }
-    const fresh = defaultFiles(adapter);
+    // "Close All" always leaves a single empty tab to type into — even
+    // for adapters whose FRESH workspaces seed a multi-file default.
+    const fresh = defaultFiles(adapter).slice(0, 1);
     const newActive = fresh[0];
     filesRef.current = fresh;
     setFiles(fresh);
@@ -2582,13 +2904,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
 
       // Single-file fallback: drop new content into the active editor
-      // without disturbing other tabs.
+      // without disturbing other tabs. The split view has no single
+      // editor — write the buffer instead and let the active pane sync
+      // itself from it.
       const view = editorRef.current;
       if (view) {
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: ex.code },
         });
         view.focus();
+      } else {
+        const fileId = activeFileIdRef.current;
+        if (fileId) {
+          updateDirtyBuffer(fileId, ex.code);
+          const wsId = workspaceIdRef.current;
+          if (wsId) void opfsWriteFile(wsId, fileId, ex.code);
+        }
       }
       setMobileTab(MOBILE_EDITOR_TAB);
       showToast(`Loaded ${ex.title} in the editor.`);
@@ -2605,7 +2936,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const requestExample = useCallback(
     (ex: ExampleSnippet) => {
-      const current = editorRef.current?.state.doc.toString().trim() ?? "";
+      // Split view: the panes' contents live in the dirty buffers.
+      const current =
+        (splitActiveRef.current
+          ? dirtyBuffersRef.current.get(activeFileIdRef.current ?? "")
+          : editorRef.current?.state.doc.toString()
+        )?.trim() ?? "";
       // Prompt only when the editor has user content that isn't already
       // identical to the chosen example. We always allow the very first
       // example (index 0) load when the buffer matches the default code.
@@ -2667,7 +3003,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const exportCode = useCallback(
     (format: ExportFormat) => {
-      const code = editorRef.current?.state.doc.toString() ?? "";
+      // Split view: the panes' contents live in the dirty buffers.
+      const code = splitActiveRef.current
+        ? (dirtyBuffersRef.current.get(activeFileIdRef.current ?? "") ?? "")
+        : (editorRef.current?.state.doc.toString() ?? "");
       const blob = new Blob([code], { type: format.mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -2742,7 +3081,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   const copyEditor = useCallback(() => {
-    const code = editorRef.current?.state.doc.toString() ?? "";
+    // Split view: copy the focused pane's contents (its buffer is kept
+    // current by the pane's write-through listener).
+    const code = splitActiveRef.current
+      ? (dirtyBuffersRef.current.get(activeFileIdRef.current ?? "") ?? "")
+      : (editorRef.current?.state.doc.toString() ?? "");
     if (!code) {
       showToast("Editor is empty.", "warn");
       return;
@@ -2752,18 +3095,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const handleFormatCode = useCallback(async () => {
     if (!adapter.formatCode) return;
-    const code = editorRef.current?.state.doc.toString() ?? "";
+    // Tabs mode: the single editor. Split view: the focused pane's view.
+    const view = splitActiveRef.current
+      ? (splitViewsRef.current.get(activeFileIdRef.current ?? "") ?? null)
+      : editorRef.current;
+    if (!view) return;
+    const code = view.state.doc.toString();
     setIsFormatting(true);
     try {
-      const formatted = await adapter.formatCode(code);
+      // Pass the active filename so mixed-language workspaces (web:
+      // .html/.css/.js) format with the right dialect.
+      const activeFilename = filesRef.current.find(
+        (f) => f.id === activeFileIdRef.current,
+      )?.filename;
+      const formatted = await adapter.formatCode(code, activeFilename);
       if (formatted === code) {
         showToast("Already formatted — nothing to change.");
         return;
       }
-      editorRef.current?.dispatch({
+      view.dispatch({
         changes: {
           from: 0,
-          to: editorRef.current.state.doc.length,
+          to: view.state.doc.length,
           insert: formatted,
         },
       });
@@ -2785,9 +3138,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [outputs, scrollToLatestOutput]);
 
   // ─── Resizer ────────────────────────────────────────────────────────────
-  const panesRef = useRef<HTMLDivElement | null>(null);
-  const editorPaneRef = useRef<HTMLDivElement | null>(null);
-  const resizerRef = useRef<HTMLDivElement | null>(null);
+  // (panesRef / editorPaneRef / resizerRef are declared with the other
+  // refs near the top of the component.)
   useEffect(() => {
     const resizer = resizerRef.current;
     const panes = panesRef.current;
@@ -2806,11 +3158,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
     const onMove = (e: MouseEvent) => {
       if (!dragging) return;
-      const frac = Math.min(
-        0.8,
-        Math.max(0.2, startFrac + (e.clientX - startX) / panes.offsetWidth),
-      );
-      panes.style.gridTemplateColumns = `${frac * 100}% 1fr`;
+      // In the editors-right arrangement the editor pane sits in the
+      // second grid column, so a rightward drag SHRINKS it and the
+      // template lists the output track first.
+      const reversed = panes.dataset.editorPosition === "right";
+      const delta = ((reversed ? -1 : 1) * (e.clientX - startX)) / panes.offsetWidth;
+      const frac = Math.min(0.8, Math.max(0.2, startFrac + delta));
+      panes.style.gridTemplateColumns = reversed
+        ? `${(1 - frac) * 100}% ${frac * 100}%`
+        : `${frac * 100}% 1fr`;
     };
     const onUp = () => {
       if (!dragging) return;
@@ -3295,7 +3651,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </button>
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
-                          management here as a bottom-sheet instead. */}
+                          management here as a bottom-sheet instead.
+                          Adapters that hide the Files pane skip it here
+                          too. */}
+                      {!adapter.hideFilesPane && (
                       <Drawer.Root
                         swipeDirection="down"
                         open={activeMobileSubmenu === "files"}
@@ -3340,6 +3699,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </Drawer.Viewport>
                         </Drawer.Portal>
                       </Drawer.Root>
+                      )}
 
                       <Drawer.Root
                         swipeDirection="down"
@@ -3710,6 +4070,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         </AlertDialog.Root>
 
         <div className="playground-body">
+          {/* The icon rail only hosts the Editor/Files toggle pair, so
+              adapters that hide the Files pane drop the whole rail. */}
+          {!adapter.hideFilesPane && (
           <nav className="playground-icon-sidebar" aria-label="Panel navigation">
             <div className="playground-icon-sidebar-top">
               <Popover.Root>
@@ -3774,7 +4137,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Popover.Root>
             </div>
           </nav>
-          {filesPaneOpen && (
+          )}
+          {!adapter.hideFilesPane && filesPaneOpen && (
             <div className="playground-files-sidebar">
               <div className="playground-files-sidebar-header">
                 <span className="playground-files-sidebar-title">Files</span>
@@ -3794,8 +4158,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         {/* File tabs: one tab per workspace file. The active tab's
             editor + output pane appear directly below — switching tabs
             swaps both the editor doc and the output history so each
-            file feels like its own self-contained workspace. */}
-        {files.length > 0 && (
+            file feels like its own self-contained workspace.
+
+            The CodePen-style split view replaces the tabs with one
+            always-visible editor per file, so the bar only renders
+            there while the Settings tab is active (its close/return
+            affordances live in the bar). File management (add/rename/
+            close) happens in Tabs mode. */}
+        {files.length > 0 &&
+          (!splitActive || activeTabId === SETTINGS_TAB_ID) && (
           <TabBar
             tabs={fileTabDescriptors}
             activeTabId={activeTabId || activeFileId}
@@ -3833,7 +4204,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </button>
         </div>
 
-        <div className="panes" data-mobile-tab={mobileTab} data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined} ref={panesRef}>
+        <div
+          className="panes"
+          data-mobile-tab={mobileTab}
+          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
+          data-editor-position={hasPreview ? editorPosition : undefined}
+          ref={panesRef}
+        >
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">
@@ -3842,6 +4219,120 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </span>
               <div className="pane-bar-sep" />
               <div className="pane-editor-btn-group">
+                {splitAvailable && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className={`icon-btn${splitActive ? " active" : ""}`}
+                          aria-label={
+                            splitActive
+                              ? "Switch to tabbed editor"
+                              : "Switch to split editors"
+                          }
+                          aria-pressed={splitActive}
+                          onClick={() => setSplitView(!splitActive)}
+                        >
+                          <Rows3 size={14} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          {splitActive
+                            ? "Tabbed editor (manage files)"
+                            : "Split editors (CodePen-style)"}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {hasPreview && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className={`icon-btn${autoRun ? " active" : ""}`}
+                          aria-label={
+                            autoRun
+                              ? "Turn off auto-run on edit"
+                              : "Turn on auto-run on edit"
+                          }
+                          aria-pressed={autoRun}
+                          onClick={() => setAutoRun(!autoRun)}
+                        >
+                          <Zap size={14} aria-hidden="true" />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          {autoRun ? "Auto-run on edit: on" : "Auto-run on edit: off"}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {hasPreview && (
+                  <Menu.Root>
+                    <Menu.Trigger
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className="icon-btn"
+                          aria-label="Change view (editor position)"
+                          title="Change view"
+                        >
+                          {editorPosition === "right" ? (
+                            <PanelRight size={14} aria-hidden="true" />
+                          ) : editorPosition === "top" ? (
+                            <PanelTop size={14} aria-hidden="true" />
+                          ) : (
+                            <PanelLeft size={14} aria-hidden="true" />
+                          )}
+                        </button>
+                      )}
+                    />
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={6} align="start" side="bottom">
+                        <Menu.Popup className="bui-popup change-view-menu">
+                          <div className="change-view-title">Change View</div>
+                          {(
+                            [
+                              { pos: "left", label: "Editors left", Icon: PanelLeft },
+                              { pos: "top", label: "Editors top", Icon: PanelTop },
+                              { pos: "right", label: "Editors right", Icon: PanelRight },
+                            ] as const
+                          ).map(({ pos, label, Icon }) => (
+                            <Menu.Item
+                              key={pos}
+                              className={`change-view-item${
+                                editorPosition === pos ? " selected" : ""
+                              }`}
+                              onClick={() => setEditorPosition(pos)}
+                            >
+                              <Icon size={14} aria-hidden="true" />
+                              <span>{label}</span>
+                            </Menu.Item>
+                          ))}
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.Root>
+                )}
                 <Popover.Root>
                   <Popover.Trigger
                     openOnHover
@@ -4012,10 +4503,37 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 )}
               </div>
             </div>
-            <div
-              className="editor-wrap"
-              ref={editorHostRef}
-            />
+            {splitActive ? (
+              // CodePen-style split: one always-visible editor per
+              // file, stacked HTML → CSS → JS. Panes write straight
+              // through to the dirty buffers, so Run/Format/Copy read
+              // the same state the tabbed editor would.
+              <PlaygroundSplitEditors
+                adapter={adapter}
+                files={files}
+                buffers={dirtyBuffers}
+                activeFileId={activeFileId}
+                editorTheme={editorTheme}
+                wordWrap={wordWrap}
+                onChange={(fileId, content) => {
+                  updateDirtyBuffer(fileId, content);
+                  const wsId = workspaceIdRef.current;
+                  if (wsId) opfsWriteFile(wsId, fileId, content);
+                  markDirty();
+                }}
+                onFocusFile={focusSplitFile}
+                onRun={() => runRef.current()}
+                onRunSecondary={() => runSecondaryRef.current()}
+                onAddFile={addNewFile}
+                registerView={registerSplitEditorView}
+                getRuntime={() => runtimeRef.current}
+              />
+            ) : (
+              <div
+                className="editor-wrap"
+                ref={editorHostRef}
+              />
+            )}
             <div
               className="resizer"
               ref={resizerRef}
@@ -4057,7 +4575,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               aria-live="polite"
               aria-label="Program output"
             >
-              {outputs.length === 0 && statusState !== "running" ? (
+              {hasPreview && (
+                // Live page preview for the web/react adapters. Always
+                // mounted so the slot element exists before the first
+                // run; the runtime swaps a sandboxed iframe into the
+                // slot on every run, and CSS renders a placeholder
+                // while the slot is still empty.
+                <div className="web-preview-panel" data-testid="web-preview">
+                  <div className="web-preview-header">
+                    <span className="web-preview-label">Preview</span>
+                  </div>
+                  <div className="web-preview-slot" ref={previewHostRef} />
+                </div>
+              )}
+              {outputs.length === 0 && statusState !== "running" && !hasPreview ? (
                 <div className="welcome">
                   <div className="welcome-icon">
                     <DiamondMark size={40} />
