@@ -301,6 +301,11 @@ export interface LanguageAdapter {
    *  editor (stacked in the editor pane) instead of tabs. The user can
    *  flip between split and tabs; the preference persists per adapter. */
   splitEditors?: boolean;
+  /** Optional: hide the playground's Files pane (and its sidebar rail /
+   *  mobile sheet) for this adapter. The web playground sets this: its
+   *  split view already shows every file as a pane, so a separate
+   *  file-tree that can't "open" files anywhere would only confuse. */
+  hideFilesPane?: boolean;
   /** Optional: classify which workspace files contain entry points
    *  (i.e. `main()` / `Main()` / top-level statements). Used by the
    *  Run button to populate a split-button dropdown when multiple

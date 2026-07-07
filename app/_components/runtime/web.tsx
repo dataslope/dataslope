@@ -492,6 +492,9 @@ export const webAdapter: LanguageAdapter = {
     { filename: "script.js", content: DEFAULT_JS },
   ],
   splitEditors: true,
+  // The split panes already show every file; a separate file tree with
+  // nowhere to "open" files into would only confuse.
+  hideFilesPane: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (
     <>

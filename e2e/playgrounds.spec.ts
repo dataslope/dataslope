@@ -119,6 +119,13 @@ test.describe("Playgrounds (fast)", () => {
       timeout: 30_000,
     });
 
+    // The Files rail/pane is hidden for the web playground — the panes
+    // themselves are the file surface.
+    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
+    await expect(
+      page.locator('button[aria-label="Files"]'),
+    ).toHaveCount(0);
+
     await page.locator(".run-btn").first().click();
 
     // The default trio renders inside the sandboxed preview iframe —

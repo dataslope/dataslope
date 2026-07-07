@@ -945,6 +945,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         window.localStorage.getItem(`playground_${adapter.id}_splitview`) ===
         "false"
       ) {
+        /* Same rationale as the persisted-settings hydration below: a
+           lazy useState initialiser would read localStorage during
+           render and mismatch the SSR markup. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setSplitViewState(false);
       }
     } catch {
@@ -3515,7 +3519,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </button>
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
-                          management here as a bottom-sheet instead. */}
+                          management here as a bottom-sheet instead.
+                          Adapters that hide the Files pane skip it here
+                          too. */}
+                      {!adapter.hideFilesPane && (
                       <Drawer.Root
                         swipeDirection="down"
                         open={activeMobileSubmenu === "files"}
@@ -3560,6 +3567,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </Drawer.Viewport>
                         </Drawer.Portal>
                       </Drawer.Root>
+                      )}
 
                       <Drawer.Root
                         swipeDirection="down"
@@ -3930,6 +3938,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         </AlertDialog.Root>
 
         <div className="playground-body">
+          {/* The icon rail only hosts the Editor/Files toggle pair, so
+              adapters that hide the Files pane drop the whole rail. */}
+          {!adapter.hideFilesPane && (
           <nav className="playground-icon-sidebar" aria-label="Panel navigation">
             <div className="playground-icon-sidebar-top">
               <Popover.Root>
@@ -3994,7 +4005,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Popover.Root>
             </div>
           </nav>
-          {filesPaneOpen && (
+          )}
+          {!adapter.hideFilesPane && filesPaneOpen && (
             <div className="playground-files-sidebar">
               <div className="playground-files-sidebar-header">
                 <span className="playground-files-sidebar-title">Files</span>

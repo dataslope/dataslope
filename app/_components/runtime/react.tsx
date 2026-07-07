@@ -2,6 +2,7 @@ import type {
   CompletionRequest,
   CompletionResult,
   EmitOutput,
+  EntryFileInfo,
   ExampleSnippet,
   LanguageAdapter,
   LanguageRuntime,
@@ -345,6 +346,23 @@ class ReactPreviewRuntime implements LanguageRuntime {
   }
 }
 
+/** Entry points are the files that MOUNT the app — the ones calling
+ *  `createRoot`/`hydrateRoot` (or legacy `ReactDOM.render`). Running a
+ *  component-only file as the entry would bundle fine but render
+ *  nothing, so the Run button resolves to the mounting file even while
+ *  the user is editing `App.tsx`. */
+function findReactEntryFiles(
+  files: { filename: string; content: string }[],
+): EntryFileInfo[] {
+  return files
+    .filter(
+      (f) =>
+        /\.(tsx|ts|jsx|js|mjs)$/i.test(f.filename) &&
+        /\b(createRoot|hydrateRoot|ReactDOM\.render)\s*\(/.test(f.content),
+    )
+    .map((f) => ({ filename: f.filename, kind: "main" as const }));
+}
+
 function identifierFor(packageName: string): string {
   const leaf = packageName.split("/").pop() ?? packageName;
   const cleaned = leaf.replace(/[^a-zA-Z0-9_$]+(.)?/g, (_, c: string | undefined) =>
@@ -388,6 +406,7 @@ export const reactAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "tsx",
+  findEntryFiles: findReactEntryFiles,
   // The bundle step runs per Run (fast at snippet scale, but real work).
   compiled: true,
   // esbuild.wasm from jsDelivr, compressed.

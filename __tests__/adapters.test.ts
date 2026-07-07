@@ -345,6 +345,10 @@ describe("Web adapter specifics", () => {
     expect(extras).toEqual(["script.js", "styles.css"]);
   });
 
+  it("hides the playground Files pane (split panes already show every file)", () => {
+    expect(webAdapter.hideFilesPane).toBe(true);
+  });
+
   it("seeds fresh workspaces with the CodePen trio and offers split editors", () => {
     expect(webAdapter.splitEditors).toBe(true);
     const names = (webAdapter.defaultWorkspace ?? []).map((f) => f.filename);
@@ -394,6 +398,30 @@ describe("React adapter specifics", () => {
     expect(reactAdapter.hasImport(`import "./styles.css";`, "react")).toBe(
       false,
     );
+  });
+
+  it("classifies mounting files (createRoot/hydrateRoot) as entry points", () => {
+    const entries = reactAdapter.findEntryFiles!([
+      {
+        filename: "main.tsx",
+        content: `import { createRoot } from "react-dom/client";
+createRoot(document.getElementById("root")!).render(<App />);`,
+      },
+      {
+        filename: "App.tsx",
+        content: `export function App() { return <h1>hi</h1>; }`,
+      },
+      { filename: "styles.css", content: "h1 { color: red; }" },
+      {
+        filename: "legacy.jsx",
+        content: `ReactDOM.render(<App />, document.getElementById("root"));`,
+      },
+    ]);
+    expect(entries.map((e) => e.filename).sort()).toEqual([
+      "legacy.jsx",
+      "main.tsx",
+    ]);
+    expect(entries.every((e) => e.kind === "main")).toBe(true);
   });
 });
 
