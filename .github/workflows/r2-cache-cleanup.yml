@@ -51,12 +51,11 @@ jobs:
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
       # A non-production build survives only while BOTH hold: younger than
-      # THRESHOLD_HOURS and among the MAX_RECENT newest. Previews are only
-      # needed while someone is actively looking at a preview URL, so hours
-      # is plenty; the cap keeps burst days (10+ deploys) bounded at
-      # (MAX_RECENT + 1) build folders.
-      THRESHOLD_HOURS: "12"
-      MAX_RECENT: "6"
+      # THRESHOLD_HOURS and among the MAX_RECENT newest. 24 h keeps a PR's
+      # preview URL alive through next-morning review; the cap keeps burst
+      # days (10+ deploys) bounded at (MAX_RECENT + 1) build folders total.
+      THRESHOLD_HOURS: "24"
+      MAX_RECENT: "10"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
