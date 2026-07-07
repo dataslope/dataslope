@@ -11,39 +11,36 @@ referring to the same object," and "objects passed to methods" feel
 obvious.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="Small variable pills in a stack strip hold strings to balloon objects floating in a faint heap region; two strings rise to the same balloon and one cut string ends in red — references, sharing, and null"
+  aria-label="Three blue reference pills in a stack strip send thin lines toward a heap card: two lines meet the same green object, and the third stops at a dashed ring crossed in red — references can share one object or point to null"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
-    <rect x="300" y="26" width="310" height="150" rx="18" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="56" y="192" width="260" height="28" rx="9" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <polygon points="94.5,199 97.5,199 403.5,114 400.5,114" />
-    <polygon points="150.5,199 153.5,199 417.5,114 414.5,114" />
-    <polygon points="206.5,199 209.5,199 519.5,90 516.5,90" />
-    <polygon points="262.5,199 265.5,199 331.5,158 328.5,158" />
+    <rect x="70" y="40" width="120" height="150" rx="14" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="78" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
-    <rect x="134" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
-    <rect x="190" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
-    <rect x="246" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
-    <circle cx="410" cy="86" r="30" />
+    <rect x="298" y="32" width="282" height="166" rx="18" fillOpacity="0.08" />
+  </g>
+  <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
+    <line x1="162" y1="71" x2="384" y2="88" />
+    <line x1="162" y1="113" x2="385" y2="92" />
+    <line x1="162" y1="155" x2="248" y2="155" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="98" y="62" width="64" height="18" rx="9" />
+    <rect x="98" y="104" width="64" height="18" rx="9" />
+    <rect x="98" y="146" width="64" height="18" rx="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="520" cy="68" r="24" />
+    <circle cx="410" cy="90" r="26" />
   </g>
-  <g style={{ color: "var(--ds-blue-50)" }} fill="currentColor">
-    <circle cx="400" cy="76" r="5" fillOpacity="0.8" />
-    <circle cx="512" cy="60" r="4" fillOpacity="0.8" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="480" y="122" width="58" height="54" rx="12" />
   </g>
+  <circle cx="270" cy="155" r="11" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 4" />
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="332" cy="154" r="4.5" />
+    <rect x="254" y="152.5" width="32" height="5" rx="2.5" transform="rotate(-40 270 155)" />
   </g>
 </svg>
 

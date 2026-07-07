@@ -14,32 +14,43 @@ by hand to the production-grade adaptive solvers in SciPy, and
 shows you how to recognize when a problem is **stiff**.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="Green straight-line hops step along a faint smooth trajectory and drift away from it, leaving a small red gap at the end — Euler's method following one tangent at a time"
+  aria-label="A field of short tilted gray dashes fills a pale blue card, and one bold green curve threads through them from a solid starting dot, always following the local slope — an ODE solved by walking the direction field"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.18">
-    <path d="M80 190 C200 185 320 150 540 50 L540 60 C330 158 210 193 80 198 Z" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="25" width="500" height="170" rx="14" fillOpacity="0.07" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.55">
-    <polygon points="80,187 170,181 170,187 80,193" />
-    <polygon points="170,181 260,161 260,167 170,187" />
-    <polygon points="260,161 350,131 350,137 260,167" />
-    <polygon points="350,131 440,101 440,107 350,137" />
-    <polygon points="440,101 530,73 530,79 440,107" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
+    <line x1="101" y1="55" x2="119" y2="55" transform="rotate(-42 110 55)" />
+    <line x1="161" y1="55" x2="179" y2="55" transform="rotate(-36 170 55)" />
+    <line x1="221" y1="55" x2="239" y2="55" transform="rotate(-30 230 55)" />
+    <line x1="281" y1="55" x2="299" y2="55" transform="rotate(-24 290 55)" />
+    <line x1="341" y1="55" x2="359" y2="55" transform="rotate(-18 350 55)" />
+    <line x1="401" y1="55" x2="419" y2="55" transform="rotate(-13 410 55)" />
+    <line x1="461" y1="55" x2="479" y2="55" transform="rotate(-9 470 55)" />
+    <line x1="521" y1="55" x2="539" y2="55" transform="rotate(-6 530 55)" />
+    <line x1="101" y1="105" x2="119" y2="105" transform="rotate(-42 110 105)" />
+    <line x1="161" y1="105" x2="179" y2="105" transform="rotate(-36 170 105)" />
+    <line x1="221" y1="105" x2="239" y2="105" transform="rotate(-30 230 105)" />
+    <line x1="281" y1="105" x2="299" y2="105" transform="rotate(-24 290 105)" />
+    <line x1="341" y1="105" x2="359" y2="105" transform="rotate(-18 350 105)" />
+    <line x1="401" y1="105" x2="419" y2="105" transform="rotate(-13 410 105)" />
+    <line x1="461" y1="105" x2="479" y2="105" transform="rotate(-9 470 105)" />
+    <line x1="521" y1="105" x2="539" y2="105" transform="rotate(-6 530 105)" />
+    <line x1="101" y1="155" x2="119" y2="155" transform="rotate(-42 110 155)" />
+    <line x1="161" y1="155" x2="179" y2="155" transform="rotate(-36 170 155)" />
+    <line x1="221" y1="155" x2="239" y2="155" transform="rotate(-30 230 155)" />
+    <line x1="281" y1="155" x2="299" y2="155" transform="rotate(-24 290 155)" />
+    <line x1="341" y1="155" x2="359" y2="155" transform="rotate(-18 350 155)" />
+    <line x1="401" y1="155" x2="419" y2="155" transform="rotate(-13 410 155)" />
+    <line x1="461" y1="155" x2="479" y2="155" transform="rotate(-9 470 155)" />
+    <line x1="521" y1="155" x2="539" y2="155" transform="rotate(-6 530 155)" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.9">
-    <circle cx="80" cy="190" r="6" />
-    <circle cx="170" cy="184" r="6" />
-    <circle cx="260" cy="164" r="6" />
-    <circle cx="350" cy="134" r="6" />
-    <circle cx="440" cy="104" r="6" />
-    <circle cx="530" cy="76" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.7">
-    <circle cx="533" cy="60" r="2.5" />
-    <circle cx="532" cy="67" r="2.5" />
+  <path d="M100 168 C 240 130, 360 78, 530 56" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="100" cy="168" r="8" />
   </g>
 </svg>
 

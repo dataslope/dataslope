@@ -19,45 +19,33 @@ This chapter is about three intertwined ideas:
   to keep your invariants safe.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 220"
   role="img"
-  aria-label="An open container freely lets dots flow in and out, while the green container beside it wears a lid and padlock and a red dot simply bounces away — immutable collections refuse change"
+  aria-label="A blue box accepts a dropping dot and shows a dashed gap where another left, while the sealed green box beside it keeps its dots fixed and a red arrival simply ricochets off its border"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="75" y="92" width="170" height="88" rx="14" fillOpacity="0.12" />
-    <circle cx="115" cy="140" r="9" />
-    <circle cx="157" cy="140" r="9" />
-    <circle cx="199" cy="140" r="9" />
-    <circle cx="120" cy="40" r="8" />
-    <polygon points="112,80 128,80 120,92" fillOpacity="0.5" />
-    <circle cx="282" cy="128" r="8" fillOpacity="0.7" />
-    <polygon points="296,120 296,136 310,128" fillOpacity="0.5" />
+    <rect x="70" y="100" width="180" height="90" rx="14" fillOpacity="0.1" />
+    <circle cx="110" cy="146" r="9" />
+    <circle cx="150" cy="146" r="9" />
+    <circle cx="150" cy="26" r="8" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="120" cy="58" r="3" />
-    <circle cx="120" cy="72" r="3" />
-    <circle cx="252" cy="132" r="3" />
-    <circle cx="266" cy="130" r="3" />
+  <circle cx="190" cy="146" r="9" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 3" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="148.5" y="40" width="3" height="38" rx="1.5" />
+    <polygon points="144.5,76 155.5,76 150,87" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="395" y="92" width="170" height="88" rx="14" fillOpacity="0.15" />
-    <circle cx="435" cy="140" r="9" />
-    <circle cx="477" cy="140" r="9" />
-    <circle cx="519" cy="140" r="9" />
-    <rect x="395" y="78" width="170" height="14" rx="7" fillOpacity="0.55" />
-    <path d="M467 46 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0 Z M472 46 a8 8 0 1 1 16 0 a8 8 0 1 1 -16 0 Z" fillRule="evenodd" />
-    <rect x="460" y="46" width="40" height="28" rx="7" />
+  <g style={{ color: "var(--ds-green-500)" }}>
+    <rect x="384" y="94" width="192" height="102" rx="18" fill="none" stroke="currentColor" strokeWidth="2.5" />
+    <rect x="390" y="100" width="180" height="90" rx="14" fill="currentColor" fillOpacity="0.14" />
+    <circle cx="430" cy="146" r="9" fill="currentColor" />
+    <circle cx="470" cy="146" r="9" fill="currentColor" />
+    <circle cx="510" cy="146" r="9" fill="currentColor" />
   </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="480" cy="58" r="3.5" />
-    <rect x="478" y="60" width="4" height="7" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="566" cy="64" r="3" fillOpacity="0.5" />
-    <circle cx="578" cy="52" r="3" fillOpacity="0.6" />
-    <circle cx="590" cy="44" r="3" fillOpacity="0.7" />
-    <circle cx="602" cy="36" r="8" />
+  <g style={{ color: "var(--ds-red-500)" }}>
+    <circle cx="480" cy="20" r="8" fill="currentColor" />
+    <polyline points="480,36 480,86 509.6,56.4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
+    <polygon points="512.1,61.7 516,50 504.3,53.9" fill="currentColor" />
   </g>
 </svg>
 

@@ -16,43 +16,30 @@ away the *order*. A document becomes a tally of word counts — and a tally is
 just a vector of numbers, which is exactly what an algorithm can work with.
 
 <svg
-  viewBox="0 0 640 240"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="Word chips tumbled at random angles inside a bag become an ordered row of vector cells holding only their counts — two, one, one, and an empty slot — the order thrown away"
+  aria-label="A sentence of colored word chips loses its order as thin gray lines pour each chip into per-color count bars — three blue, two green, one yellow — a bag of words keeps only the counts"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="178" y="62" width="54" height="16" rx="8" opacity="0.2" />
-    <rect x="120" y="78" width="170" height="110" rx="26" opacity="0.1" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="99" y1="58" x2="260" y2="142" />
+    <line x1="225" y1="58" x2="260" y2="142" />
+    <line x1="339" y1="58" x2="260" y2="142" />
+    <line x1="165" y1="58" x2="320" y2="158" />
+    <line x1="399" y1="58" x2="320" y2="158" />
+    <line x1="282" y1="58" x2="380" y2="174" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="100" width="58" height="18" rx="9" fillOpacity="0.85" transform="rotate(-16 169 109)" />
-    <rect x="212" y="146" width="52" height="18" rx="9" fillOpacity="0.45" transform="rotate(-22 238 155)" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="205" y="112" width="46" height="18" rx="9" fillOpacity="0.85" transform="rotate(14 228 121)" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="152" y="140" width="40" height="18" rx="9" fillOpacity="0.85" transform="rotate(8 172 149)" />
-  </g>
-  <g fill="currentColor">
-    <rect x="312" y="128" width="44" height="6" rx="3" opacity="0.3" />
-    <polygon points="360,121 360,141 378,131" opacity="0.4" />
-    <rect x="398" y="107" width="48" height="48" rx="10" opacity="0.1" />
-    <rect x="452" y="107" width="48" height="48" rx="10" opacity="0.1" />
-    <rect x="506" y="107" width="48" height="48" rx="10" opacity="0.1" />
-    <rect x="560" y="107" width="48" height="48" rx="10" opacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="412" cy="131" r="4.5" fillOpacity="0.9" />
-    <circle cx="432" cy="131" r="4.5" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="476" cy="131" r="4.5" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="530" cy="131" r="4.5" fillOpacity="0.9" />
-  </g>
+  <rect x="70" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
+  <rect x="142" y="36" width="46" height="20" rx="10" fill="var(--ds-green-500)" />
+  <rect x="196" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
+  <rect x="262" y="36" width="40" height="20" rx="10" fill="var(--ds-yellow-500)" />
+  <rect x="310" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
+  <rect x="376" y="36" width="46" height="20" rx="10" fill="var(--ds-green-500)" />
+  <rect x="180" y="126" width="280" height="80" rx="12" fill="var(--ds-white)" />
+  <rect x="180" y="126" width="280" height="80" rx="12" fill="currentColor" opacity="0.05" />
+  <rect x="240" y="142" width="40" height="48" rx="4" fill="var(--ds-blue-500)" />
+  <rect x="300" y="158" width="40" height="32" rx="4" fill="var(--ds-green-500)" />
+  <rect x="360" y="174" width="40" height="16" rx="4" fill="var(--ds-yellow-500)" />
 </svg>
 
 ## The feature extraction process

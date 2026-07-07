@@ -12,62 +12,20 @@ the per-group top-N pattern analysts use constantly.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="Loose dots pour into a vessel and settle into layers sorted by size, while a yellow ladle skims the three biggest green dots off the top — and an equally large red dot left in the layer below hints at the tie that almost made the cut"
+  aria-label="Six horizontal bars sorted longest to shortest along a thin rail: the top three are solid green above a dashed yellow cut line, and the rest fade out in light blue below it — ORDER BY sorts, LIMIT keeps only the top of the list"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="62" cy="44" r="5" />
-    <circle cx="96" cy="28" r="7" />
-    <circle cx="128" cy="52" r="4" />
-    <circle cx="158" cy="30" r="6" />
-    <circle cx="118" cy="84" r="3.5" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <circle cx="184" cy="62" r="3" />
-    <circle cx="208" cy="84" r="3" />
-    <circle cx="228" cy="108" r="3" />
-  </g>
-  <g fill="currentColor" opacity="0.07">
-    <rect x="244" y="84" width="252" height="124" rx="16" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 252 58 Q 370 86 488 58 L 488 68 Q 370 96 252 68 Z" fillOpacity="0.55" />
-    <rect x="488" y="50" width="64" height="10" rx="5" fillOpacity="0.55" />
-  </g>
+  <line x1="132" y1="32" x2="132" y2="222" stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="306" cy="42" r="10" />
-    <circle cx="370" cy="48" r="10" />
-    <circle cx="434" cy="42" r="10" />
+    <rect x="140" y="36" width="380" height="20" rx="10" />
+    <rect x="140" y="66" width="330" height="20" rx="10" />
+    <rect x="140" y="96" width="290" height="20" rx="10" />
   </g>
+  <line x1="120" y1="131" x2="540" y2="131" stroke="var(--ds-yellow-500)" strokeWidth="3" strokeDasharray="12 8" strokeLinecap="round" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="294" cy="110" r="7" fillOpacity="0.6" />
-    <circle cx="350" cy="110" r="7" fillOpacity="0.6" />
-    <circle cx="462" cy="110" r="7" fillOpacity="0.6" />
-    <circle cx="286" cy="140" r="5.5" fillOpacity="0.45" />
-    <circle cx="330" cy="140" r="5.5" fillOpacity="0.45" />
-    <circle cx="374" cy="140" r="5.5" fillOpacity="0.45" />
-    <circle cx="418" cy="140" r="5.5" fillOpacity="0.45" />
-    <circle cx="460" cy="140" r="5.5" fillOpacity="0.45" />
-    <circle cx="280" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="316" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="352" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="388" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="424" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="460" cy="166" r="4" fillOpacity="0.3" />
-    <circle cx="276" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="308" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="340" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="372" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="404" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="436" cy="190" r="3" fillOpacity="0.18" />
-    <circle cx="466" cy="190" r="3" fillOpacity="0.18" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="406" cy="110" r="9.5" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="560" cy="120" r="3" />
-    <circle cx="586" cy="160" r="3" />
+    <rect x="140" y="142" width="230" height="20" rx="10" fillOpacity="0.3" />
+    <rect x="140" y="172" width="170" height="20" rx="10" fillOpacity="0.3" />
+    <rect x="140" y="202" width="110" height="20" rx="10" fillOpacity="0.3" />
   </g>
 </svg>
 
@@ -220,15 +178,15 @@ most common analytical patterns there is, and `QUALIFY` expresses it
 without an extra subquery.
 
 <svg
-  viewBox="0 0 640 195"
+  viewBox="0 0 640 210"
   role="img"
   aria-label="Three vertical lanes of dots sorted by size, each with a translucent green band hugging its own two largest — top-N applied within every group instead of once across the whole result"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
-    <rect x="98" y="24" width="92" height="156" rx="16" />
-    <rect x="274" y="24" width="92" height="156" rx="16" />
-    <rect x="450" y="24" width="92" height="156" rx="16" />
+    <rect x="98" y="24" width="92" height="170" rx="16" />
+    <rect x="274" y="24" width="92" height="170" rx="16" />
+    <rect x="450" y="24" width="92" height="170" rx="16" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="106" y="34" width="76" height="68" rx="13" fillOpacity="0.16" />

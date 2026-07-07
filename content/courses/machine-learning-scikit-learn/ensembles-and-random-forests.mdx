@@ -19,40 +19,20 @@ reach for first on tabular data. Understanding *why* averaging works is one
 of the most valuable intuitions in classical machine learning.
 
 <svg
-  viewBox="0 0 640 170"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A row of faint blue trees each casts a small vote dot — four green, one blue dissenter — and the votes stream into one large green consensus dot — a forest averages many unstable trees into a stable answer"
+  aria-label="Three wobbly light green lines each guess the trend differently inside one card, and their bold green average cuts smoothly through the middle — an ensemble averages many noisy models into one steady prediction"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="70,30 44,78 96,78" fillOpacity="0.2" />
-    <rect x="65" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
-    <polygon points="150,30 124,78 176,78" fillOpacity="0.28" />
-    <rect x="145" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
-    <polygon points="230,30 204,78 256,78" fillOpacity="0.2" />
-    <rect x="225" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
-    <polygon points="310,30 284,78 336,78" fillOpacity="0.28" />
-    <rect x="305" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
-    <polygon points="390,30 364,78 416,78" fillOpacity="0.2" />
-    <rect x="385" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="70" cy="124" r="7" />
-    <circle cx="150" cy="124" r="7" />
-    <circle cx="310" cy="124" r="7" />
-    <circle cx="390" cy="124" r="7" />
+    <rect x="90" y="30" width="460" height="150" rx="16" fillOpacity="0.08" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="230" cy="124" r="7" />
+  <g stroke="var(--ds-green-300)" strokeWidth="2.5" strokeLinecap="round" fill="none">
+    <path d="M120 150 C 200 100, 260 160, 330 100 C 390 55, 450 110, 520 60" />
+    <path d="M120 140 C 190 130, 270 80, 340 120 C 410 150, 460 70, 520 70" />
+    <path d="M120 160 C 210 140, 250 90, 320 130 C 400 170, 440 60, 520 50" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="445" cy="124" r="3" />
-    <circle cx="470" cy="124" r="3" />
-    <circle cx="495" cy="124" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="545" cy="124" r="20" />
-  </g>
+  <path d="M120 150 C 250 120, 390 85, 520 62" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" />
 </svg>
 
 ## The intuition: the wisdom of crowds

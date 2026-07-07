@@ -6,30 +6,28 @@ description: Subclassing, super(), method overriding, and duck typing
 A class can **inherit** from another, getting all its attributes and methods for free. The new class can add behavior, override behavior, or both. Inheritance is one of the pillars of object-oriented programming — but it's also easy to overuse.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="A green tracing sheet laid over a blue parent drawing: the parent's dot and bar show through for free, a new green square is added, and the inherited triangle is redrawn in the child's own yellow — inherit, extend, override"
+  aria-label="A blue parent card holding a circle and a square links down a thin line to a green child card holding the same blue circle, the square redone in yellow, and a brand-new green triangle — inherit, override, extend"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <line x1="320" y1="95" x2="320" y2="125" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="60" width="280" height="140" rx="12" fillOpacity="0.12" />
-    <circle cx="140" cy="100" r="12" fillOpacity="0.7" />
-    <rect x="180" y="92" width="100" height="16" rx="8" fillOpacity="0.5" />
-    <polygon points="130,160 160,132 190,160" fillOpacity="0.6" />
+    <rect x="200" y="25" width="240" height="70" rx="12" fillOpacity="0.12" />
+    <circle cx="250" cy="60" r="11" />
+    <rect x="300" y="48" width="24" height="24" rx="6" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="250" y="90" width="280" height="120" rx="12" fillOpacity="0.12" />
+    <rect x="160" y="125" width="320" height="80" rx="12" fillOpacity="0.12" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="300" cy="130" r="12" fillOpacity="0.28" />
-    <rect x="340" y="122" width="100" height="16" rx="8" fillOpacity="0.22" />
-    <polygon points="290,190 320,162 350,190" fillOpacity="0.18" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="440" y="120" width="26" height="26" rx="7" fillOpacity="0.9" />
+    <circle cx="230" cy="165" r="11" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="298,186 328,158 358,186" fillOpacity="0.9" />
+    <rect x="300" y="153" width="24" height="24" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="410,151 424,177 396,177" />
   </g>
 </svg>
 

@@ -14,55 +14,41 @@ For example:
 These are not row-by-row conditions. They are conditions about **groups after aggregation**. That is what `HAVING` is for.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 235"
   role="img"
-  aria-label="Three stacks of dots line up at a fairground measuring post with a dotted you-must-be-this-tall line; only the stack that reaches above the line earns the green check — HAVING measures each finished group and keeps the ones that qualify"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="Three groups of blue dots each feed a total bar below; a dashed yellow threshold line crosses the bars, and only the two green totals tall enough to reach it survive while the short red one falls out — HAVING measures each finished group and keeps the ones that qualify"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.14">
-    <rect x="70" y="208" width="500" height="7" rx="3.5" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="440" y="40" width="14" height="168" rx="5" />
-    <rect x="456" y="58" width="12" height="5" rx="2.5" />
-    <rect x="456" y="94" width="12" height="5" rx="2.5" />
-    <rect x="456" y="130" width="12" height="5" rx="2.5" />
-    <rect x="456" y="166" width="12" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 438 102 L 416 92 L 416 112 Z" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="96" cy="102" r="2.5" />
-    <circle cx="124" cy="102" r="2.5" />
-    <circle cx="152" cy="102" r="2.5" />
-    <circle cx="180" cy="102" r="2.5" />
-    <circle cx="208" cy="102" r="2.5" />
-    <circle cx="236" cy="102" r="2.5" />
-    <circle cx="264" cy="102" r="2.5" />
-    <circle cx="292" cy="102" r="2.5" />
-    <circle cx="320" cy="102" r="2.5" />
-    <circle cx="348" cy="102" r="2.5" />
-    <circle cx="376" cy="102" r="2.5" />
-    <circle cx="404" cy="102" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="118" cy="194" r="14" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="226" cy="194" r="14" fillOpacity="0.45" />
-    <circle cx="226" cy="164" r="14" fillOpacity="0.45" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="354" cy="194" r="14" />
-    <circle cx="354" cy="164" r="14" fillOpacity="0.85" />
-    <circle cx="354" cy="134" r="14" fillOpacity="0.7" />
-    <circle cx="354" cy="104" r="14" fillOpacity="0.9" />
-    <circle cx="354" cy="74" r="14" fillOpacity="0.75" />
+    <rect x="110" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
+    <circle cx="134" cy="48" r="5" />
+    <circle cx="152" cy="40" r="5" />
+    <circle cx="168" cy="50" r="5" />
+    <circle cx="142" cy="62" r="5" />
+    <circle cx="160" cy="60" r="5" />
+    <rect x="290" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
+    <circle cx="318" cy="50" r="5" />
+    <circle cx="342" cy="54" r="5" />
+    <rect x="470" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
+    <circle cx="494" cy="48" r="5" />
+    <circle cx="512" cy="42" r="5" />
+    <circle cx="528" cy="52" r="5" />
+    <circle cx="504" cy="62" r="5" />
+  </g>
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="150" y1="76" x2="150" y2="110" />
+    <line x1="330" y1="76" x2="330" y2="170" />
+    <line x1="510" y1="76" x2="510" y2="124" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 506 96 L 520 114 L 552 70 L 526 122 L 506 108 Z" />
+    <rect x="120" y="110" width="60" height="100" rx="5" />
+    <rect x="480" y="124" width="60" height="86" rx="5" />
   </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="300" y="170" width="60" height="40" rx="5" />
+  </g>
+  <line x1="80" y1="150" x2="560" y2="150" stroke="var(--ds-yellow-500)" strokeWidth="3.5" strokeDasharray="12 9" strokeLinecap="round" />
+  <rect x="90" y="210" width="460" height="3" rx="1.5" fill="var(--ds-gray-400)" />
 </svg>
 
 ## WHERE filters rows before groups exist

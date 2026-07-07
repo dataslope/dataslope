@@ -25,26 +25,23 @@ or not.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A tiny blue speck surrounded by loud concentric yellow broadcast rings faces a massive green boulder wearing barely a whisper of a ring — a huge sample can make a microscopic effect scream with significance while a big effect on little data hardly registers"
+  aria-label="A tiny blue speck ringed by loud yellow broadcast circles stands on a long sample bar, while a massive green boulder with barely a whisper of a ring stands on a short one — a huge sample can make a microscopic effect scream with significance while a big effect on little data hardly registers"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="166" width="520" height="4" rx="2" fill="currentColor" opacity="0.18" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M114 120 a66 66 0 1 0 132 0 a66 66 0 1 0 -132 0 M118 120 a62 62 0 1 0 124 0 a62 62 0 1 0 -124 0" fillRule="evenodd" fillOpacity="0.2" />
-    <path d="M132 120 a48 48 0 1 0 96 0 a48 48 0 1 0 -96 0 M136 120 a44 44 0 1 0 88 0 a44 44 0 1 0 -88 0" fillRule="evenodd" fillOpacity="0.4" />
-    <path d="M150 120 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M154 120 a26 26 0 1 0 52 0 a26 26 0 1 0 -52 0" fillRule="evenodd" fillOpacity="0.65" />
+  <g fill="none" stroke="var(--ds-yellow-500)">
+    <circle cx="180" cy="104" r="28" strokeWidth="4" strokeOpacity="0.9" />
+    <circle cx="180" cy="104" r="46" strokeWidth="4" strokeOpacity="0.55" />
+    <circle cx="180" cy="104" r="64" strokeWidth="4" strokeOpacity="0.3" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="120" r="5" />
+    <circle cx="180" cy="104" r="5" />
   </g>
-  <rect x="166" y="158" width="28" height="8" rx="4" fill="currentColor" opacity="0.25" />
+  <rect x="120" y="182" width="120" height="8" rx="4" fill="var(--ds-gray-400)" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="470" cy="122" r="38" fillOpacity="0.85" />
+    <circle cx="470" cy="104" r="38" />
   </g>
-  <g fill="currentColor" opacity="0.15">
-    <path d="M420 122 a50 50 0 1 0 100 0 a50 50 0 1 0 -100 0 M424 122 a46 46 0 1 0 92 0 a46 46 0 1 0 -92 0" fillRule="evenodd" />
-  </g>
-  <rect x="436" y="158" width="68" height="8" rx="4" fill="currentColor" opacity="0.25" />
+  <circle cx="470" cy="104" r="52" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
+  <rect x="452" y="182" width="36" height="8" rx="4" fill="var(--ds-gray-400)" />
 </svg>
 
 ## The problem: significance is not importance
@@ -298,31 +295,38 @@ to the p-value versus the estimated `d` as `n` grows.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three panels with ever taller stacks of data dots: beneath them the green effect-size bar stays exactly the same height in every panel while the red p-value bar collapses to a sliver — more data sharpens the magnitude but makes significance nearly automatic"
+  aria-label="Three panels with ever taller stacks of blue data dots: the green effect-size bar stays exactly the same height in every panel while the red p-value bar collapses to a sliver — more data sharpens the magnitude but makes significance nearly automatic"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="56" y="160" width="528" height="4" rx="2" fill="currentColor" opacity="0.18" />
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="120" cy="52" r="4" />
-    <circle cx="310" cy="52" r="4" />
-    <circle cx="322" cy="52" r="4" />
-    <circle cx="316" cy="42" r="4" />
-    <circle cx="500" cy="52" r="4" />
-    <circle cx="512" cy="52" r="4" />
-    <circle cx="524" cy="52" r="4" />
-    <circle cx="506" cy="42" r="4" />
-    <circle cx="518" cy="42" r="4" />
-    <circle cx="512" cy="32" r="4" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="56" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
+    <rect x="236" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
+    <rect x="416" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
+    <circle cx="118" cy="58" r="4.5" />
+    <circle cx="298" cy="58" r="4.5" />
+    <circle cx="310" cy="58" r="4.5" />
+    <circle cx="304" cy="48" r="4.5" />
+    <circle cx="478" cy="58" r="4.5" />
+    <circle cx="490" cy="58" r="4.5" />
+    <circle cx="502" cy="58" r="4.5" />
+    <circle cx="484" cy="48" r="4.5" />
+    <circle cx="496" cy="48" r="4.5" />
+    <circle cx="490" cy="38" r="4.5" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.7">
-    <rect x="92" y="112" width="26" height="48" rx="5" />
-    <rect x="282" y="112" width="26" height="48" rx="5" />
-    <rect x="472" y="112" width="26" height="48" rx="5" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="96" y="110" width="26" height="48" rx="5" />
+    <rect x="276" y="110" width="26" height="48" rx="5" />
+    <rect x="456" y="110" width="26" height="48" rx="5" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.7">
-    <rect x="126" y="84" width="26" height="76" rx="5" />
-    <rect x="316" y="124" width="26" height="36" rx="5" />
-    <rect x="506" y="152" width="26" height="8" rx="4" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="136" y="82" width="26" height="76" rx="5" />
+    <rect x="316" y="122" width="26" height="36" rx="5" />
+    <rect x="496" y="150" width="26" height="8" rx="4" />
+  </g>
+  <g fill="var(--ds-gray-400)">
+    <rect x="78" y="158" width="124" height="3" rx="1.5" />
+    <rect x="258" y="158" width="124" height="3" rx="1.5" />
+    <rect x="438" y="158" width="124" height="3" rx="1.5" />
   </g>
 </svg>
 

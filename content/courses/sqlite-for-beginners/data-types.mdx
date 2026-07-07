@@ -12,48 +12,45 @@ That sounds technical, but the beginner idea is simple:
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Five pantry jars on a shelf hold SQLite's storage classes — whole-number dots, decimal dot pairs, text bars, one raw blob, and a jar holding nothing at all — while one stray text bar leans inside the number jar, because SQLite's typing is a preference, not a wall"
+  aria-label="Five pantry jars on a shelf hold SQLite's storage classes — whole-number dots, decimal dot pairs, text bars, one raw blob, and a jar holding nothing at all — each jar's glass tinted to match what it stores"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.14">
     <rect x="40" y="190" width="560" height="8" rx="4" />
   </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="62" y="94" width="92" height="96" rx="12" />
-    <rect x="172" y="94" width="92" height="96" rx="12" />
-    <rect x="282" y="94" width="92" height="96" rx="12" />
-    <rect x="392" y="94" width="92" height="96" rx="12" />
-    <rect x="502" y="94" width="92" height="96" rx="12" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="72" y="80" width="72" height="15" rx="7" fillOpacity="0.9" />
+    <rect x="62" y="94" width="92" height="96" rx="12" fillOpacity="0.12" />
+    <rect x="72" y="72" width="72" height="15" rx="7" fillOpacity="0.9" />
     <circle cx="88" cy="166" r="9" fillOpacity="0.85" />
     <circle cx="112" cy="172" r="9" fillOpacity="0.6" />
     <circle cx="134" cy="162" r="9" fillOpacity="0.75" />
     <circle cx="98" cy="142" r="9" fillOpacity="0.5" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="116" y="118" width="34" height="9" rx="4.5" transform="rotate(24 133 122)" fillOpacity="0.85" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="182" y="80" width="72" height="15" rx="7" fillOpacity="0.9" />
+    <rect x="172" y="94" width="92" height="96" rx="12" fillOpacity="0.12" />
+    <rect x="182" y="72" width="72" height="15" rx="7" fillOpacity="0.9" />
     <circle cx="202" cy="164" r="9" fillOpacity="0.8" />
     <circle cx="215" cy="174" r="3.5" fillOpacity="0.8" />
     <circle cx="234" cy="148" r="9" fillOpacity="0.55" />
     <circle cx="247" cy="158" r="3.5" fillOpacity="0.55" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="292" y="80" width="72" height="15" rx="7" fillOpacity="0.9" />
+    <rect x="282" y="94" width="92" height="96" rx="12" fillOpacity="0.15" />
+    <rect x="292" y="72" width="72" height="15" rx="7" fillOpacity="0.9" />
     <rect x="296" y="166" width="56" height="9" rx="4.5" fillOpacity="0.8" />
     <rect x="304" y="150" width="40" height="9" rx="4.5" fillOpacity="0.6" />
     <rect x="298" y="134" width="48" height="9" rx="4.5" fillOpacity="0.4" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="402" y="80" width="72" height="15" rx="7" fillOpacity="0.9" />
+    <rect x="392" y="94" width="92" height="96" rx="12" fillOpacity="0.1" />
+    <rect x="402" y="72" width="72" height="15" rx="7" fillOpacity="0.9" />
     <path d="M 414 168 Q 408 144 430 138 Q 454 132 462 150 Q 470 170 448 176 Q 424 182 414 168 Z" fillOpacity="0.7" />
   </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="502" y="94" width="92" height="96" rx="12" />
+  </g>
   <g fill="currentColor" opacity="0.35">
-    <rect x="512" y="80" width="72" height="15" rx="7" />
+    <rect x="512" y="72" width="72" height="15" rx="7" />
   </g>
   <g fill="currentColor" opacity="0.2">
     <circle cx="532" cy="156" r="3" />
@@ -218,10 +215,10 @@ This does **not** mean types do not matter in SQLite. They still matter because 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Three display pedestals: one holds the number zero, one holds a real but empty text ribbon, and the third holds only a faint dotted ghost — zero and empty string are known values, NULL is the absence of a value"
+  aria-label="Three display pedestals: one holds a solid blue zero ring, one holds a real but empty green pill outline, and the third holds only a dashed gray circle — zero and empty string are known values, NULL is the absence of a value"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.16">
+  <g fill="var(--ds-gray-300)">
     <rect x="120" y="118" width="90" height="14" rx="5" />
     <rect x="138" y="132" width="54" height="20" rx="4" />
     <rect x="276" y="118" width="90" height="14" rx="5" />
@@ -230,26 +227,10 @@ This does **not** mean types do not matter in SQLite. They still matter because 
     <rect x="450" y="132" width="54" height="20" rx="4" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path fillRule="evenodd" d="M 165 56 A 26 26 0 1 0 165 108 A 26 26 0 1 0 165 56 Z M 165 70 A 12 12 0 1 1 165 94 A 12 12 0 1 1 165 70 Z" />
+    <path fillRule="evenodd" d="M 165 60 A 24 24 0 1 0 165 108 A 24 24 0 1 0 165 60 Z M 165 73 A 11 11 0 1 1 165 95 A 11 11 0 1 1 165 73 Z" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="289" y="92" width="64" height="14" rx="7" fillOpacity="0.4" />
-    <rect x="297" y="78" width="10" height="14" rx="4" fillOpacity="0.9" />
-    <rect x="335" y="78" width="10" height="14" rx="4" fillOpacity="0.9" />
-  </g>
-  <g fill="currentColor" opacity="0.22">
-    <circle cx="477" cy="66" r="3" />
-    <circle cx="491" cy="70" r="3" />
-    <circle cx="499" cy="82" r="3" />
-    <circle cx="495" cy="96" r="3" />
-    <circle cx="483" cy="103" r="3" />
-    <circle cx="469" cy="100" r="3" />
-    <circle cx="460" cy="89" r="3" />
-    <circle cx="463" cy="74" r="3" />
-  </g>
-  <g fill="currentColor" opacity="0.4">
-    <text x="478" y="92" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="18" fontWeight="600">?</text>
-  </g>
+  <rect x="286" y="70" width="72" height="28" rx="14" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" />
+  <circle cx="477" cy="84" r="22" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="6 6" />
 </svg>
 
 | Value | Meaning |

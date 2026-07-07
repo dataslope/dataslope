@@ -18,23 +18,25 @@ the end of this page you'll be able to simulate exactly why.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A two-by-two grid of outcomes: two calm green cells on the diagonal, a red exclamation cell where a false alarm rejects a true null, and a yellow crescent cell asleep while a real effect slips past — Type one cries wolf, Type two misses the wolf, and power is escaping the sleepy cell"
+  aria-label="A two-by-two grid of outcomes: green check cells on the diagonal, a red exclamation cell where a false alarm rejects a true null, and a yellow crescent cell asleep while a real effect slips past — Type one cries wolf, Type two misses the wolf"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="140" y="30" width="160" height="86" rx="14" fillOpacity="0.12" />
-    <circle cx="220" cy="73" r="10" fillOpacity="0.8" />
+    <rect x="140" y="30" width="160" height="86" rx="14" fillOpacity="0.15" />
     <rect x="330" y="130" width="160" height="86" rx="14" fillOpacity="0.15" />
-    <path d="M 392 172 L 404 184 L 424 156 L 430 162 L 405 194 L 386 178 Z" fillOpacity="0.9" />
+  </g>
+  <g fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M 206 74 L 216 86 L 236 60" />
+    <path d="M 396 174 L 406 186 L 426 160" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="330" y="30" width="160" height="86" rx="14" fillOpacity="0.15" />
-    <rect x="406" y="48" width="7" height="32" rx="3.5" />
-    <circle cx="409.5" cy="94" r="5" />
+    <rect x="330" y="30" width="160" height="86" rx="14" fillOpacity="0.12" />
+    <rect x="406" y="46" width="7" height="34" rx="3.5" />
+    <circle cx="409.5" cy="96" r="5" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="140" y="130" width="160" height="86" rx="14" fillOpacity="0.15" />
-    <path d="M206 173 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M216 167 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0" fillRule="evenodd" fillOpacity="0.9" />
+    <rect x="140" y="130" width="160" height="86" rx="14" fillOpacity="0.18" />
+    <path d="M218 173 m -17 0 a17 17 0 1 0 34 0 a17 17 0 1 0 -34 0 M227 168 m -14 0 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0" fillRule="evenodd" />
   </g>
 </svg>
 
@@ -195,22 +197,22 @@ effect. We'll draw both curves with Plotly.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two overlapping bells — the blue no-effect world and the green real-effect world — split by a red decision post: the yellow slice of the green bell stranded left of the post is a missed effect, and the green mass beyond it is power, the chance of catching what is really there"
+  aria-label="Two overlapping bells — the blue no-effect world and the green real-effect world — split by a solid red decision post: the yellow slice of the green bell stranded left of the post is a missed effect, and the green mass beyond it is power, the chance of catching what is really there"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="170" width="520" height="4" rx="2" fill="currentColor" opacity="0.18" />
+  <rect x="60" y="172" width="520" height="3" rx="1.5" fill="var(--ds-gray-400)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 80 170 C 140 170 150 60 230 60 C 310 60 320 170 380 170 Z" fillOpacity="0.25" />
+    <path d="M 78 170 C 138 170 148 58 228 58 C 308 58 318 170 378 170 Z" fillOpacity="0.22" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 260 170 C 320 170 330 60 410 60 C 490 60 500 170 560 170 Z" fillOpacity="0.2" />
-    <path d="M 330 170 L 330 116 C 346 88 372 62 410 62 C 488 62 498 170 558 170 Z" fillOpacity="0.45" />
+    <path d="M 258 170 C 318 170 328 58 408 58 C 488 58 498 170 558 170 Z" fillOpacity="0.18" />
+    <path d="M 330 170 L 330 114 C 346 86 370 60 408 60 C 486 60 496 170 556 170 Z" fillOpacity="0.45" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 262 170 C 292 170 306 142 330 118 L 330 170 Z" fillOpacity="0.65" />
+    <path d="M 260 170 C 290 170 304 142 330 116 L 330 170 Z" fillOpacity="0.7" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="328" y="52" width="4.5" height="118" rx="2.25" fillOpacity="0.85" />
+    <rect x="328" y="48" width="5" height="124" rx="2.5" />
   </g>
 </svg>
 

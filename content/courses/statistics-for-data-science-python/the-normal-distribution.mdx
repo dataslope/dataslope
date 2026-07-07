@@ -21,22 +21,13 @@ statistics.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A bell curve built from three nested translucent layers — a wide base, a middle shell, and a tight core around the yellow center post — with tick posts marking one, two, and three standard deviations and a lone red dot stranded beyond the last — the 68, 95, and 99.7 percent zones of the normal"
+  aria-label="A bell curve built from three nested translucent layers — a wide base, a middle shell, and a tight core around the yellow center post — with a lone red dot stranded beyond the widest layer — the 68, 95, and 99.7 percent zones of the normal"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="180" width="520" height="4" rx="2" fill="currentColor" opacity="0.2" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <path d="M 100 180 C 190 180 205 40 320 40 C 435 40 450 180 540 180 Z" fillOpacity="0.12" />
     <path d="M 180 180 C 235 180 240 60 320 60 C 400 60 405 180 460 180 Z" fillOpacity="0.18" />
     <path d="M 245 180 C 280 180 285 86 320 86 C 355 86 360 180 395 180 Z" fillOpacity="0.26" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <rect x="243" y="184" width="4" height="12" rx="2" />
-    <rect x="393" y="184" width="4" height="12" rx="2" />
-    <rect x="178" y="184" width="4" height="12" rx="2" />
-    <rect x="458" y="184" width="4" height="12" rx="2" />
-    <rect x="98" y="184" width="4" height="12" rx="2" />
-    <rect x="538" y="184" width="4" height="12" rx="2" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="317.5" y="48" width="5" height="132" rx="2.5" fillOpacity="0.75" />
@@ -319,27 +310,25 @@ print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue test score and a green height each drop from their own differently scaled rulers onto one shared z ruler below, landing at the same tick two standard deviations out — standardizing strips the units so unlike things can be compared on a common scale"
+  aria-label="A blue test score and a green height each slide down a thin line from their own differently scaled rulers onto one shared z ruler below, landing side by side at the same tick — standardizing strips the units so unlike things can be compared on a common scale"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.15">
-    <rect x="70" y="46" width="220" height="4" rx="2" />
-    <rect x="350" y="46" width="220" height="4" rx="2" />
+  <g fill="var(--ds-gray-300)">
+    <rect x="70" y="46" width="220" height="3" rx="1.5" />
+    <rect x="350" y="46" width="220" height="3" rx="1.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="252" cy="38" r="7" />
-    <circle cx="256" cy="66" r="2.5" fillOpacity="0.5" />
-    <circle cx="264" cy="90" r="2.5" fillOpacity="0.5" />
-    <circle cx="274" cy="114" r="2.5" fillOpacity="0.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="532" cy="38" r="7" />
-    <circle cx="500" cy="66" r="2.5" fillOpacity="0.5" />
-    <circle cx="436" cy="90" r="2.5" fillOpacity="0.5" />
-    <circle cx="362" cy="114" r="2.5" fillOpacity="0.5" />
   </g>
-  <rect x="80" y="140" width="480" height="5" rx="2.5" fill="currentColor" opacity="0.3" />
-  <g fill="currentColor" opacity="0.35">
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="254" y1="48" x2="446" y2="124" />
+    <line x1="528" y1="48" x2="460" y2="124" />
+  </g>
+  <rect x="80" y="140" width="480" height="4" rx="2" fill="var(--ds-gray-400)" />
+  <g fill="var(--ds-gray-400)">
     <rect x="118" y="148" width="4" height="12" rx="2" />
     <rect x="184" y="148" width="4" height="12" rx="2" />
     <rect x="250" y="148" width="4" height="12" rx="2" />
@@ -348,8 +337,6 @@ print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
     <rect x="450" y="148" width="4" height="12" rx="2" />
     <rect x="516" y="148" width="4" height="12" rx="2" />
   </g>
-  <text x="320" y="182" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fill="currentColor" opacity="0.5">0</text>
-  <text x="452" y="182" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fill="currentColor" opacity="0.5">+2</text>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="446" cy="132" r="6.5" />
   </g>

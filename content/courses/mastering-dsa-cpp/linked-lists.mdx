@@ -12,9 +12,15 @@ The price of this flexibility is the loss of the array's address formula. Nodes 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Four numbered nodes scattered across memory are threaded in order by a winding dotted path from a head flag to a red null ring — a linked list's logical order is not its memory order"
+  aria-label="Four blue nodes scattered across memory are threaded in logical order by thin curving lines from a yellow head marker to a red null ring — a linked list's order lives in its pointers, not its memory layout"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" fill="none">
+    <path d="M124 84 C 200 72, 240 62, 286 58" />
+    <path d="M292 69 C 265 105, 245 128, 224 142" />
+    <path d="M224 152 C 300 152, 380 135, 436 118" />
+    <path d="M464 110 C 500 96, 525 82, 546 70" />
+  </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <polygon points="102,46 118,46 110,60" />
   </g>
@@ -29,21 +35,6 @@ The price of this flexibility is the loss of the array's address formula. Nodes 
     <text x="300" y="61">2</text>
     <text x="210" y="159">3</text>
     <text x="450" y="119">4</text>
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="148" cy="78" r="2.5" />
-    <circle cx="186" cy="72" r="2.5" />
-    <circle cx="224" cy="67" r="2.5" />
-    <circle cx="262" cy="62" r="2.5" />
-    <circle cx="278" cy="81" r="2.5" />
-    <circle cx="255" cy="105" r="2.5" />
-    <circle cx="233" cy="130" r="2.5" />
-    <circle cx="258" cy="146" r="2.5" />
-    <circle cx="306" cy="138" r="2.5" />
-    <circle cx="354" cy="130" r="2.5" />
-    <circle cx="402" cy="122" r="2.5" />
-    <circle cx="487" cy="96" r="2.5" />
-    <circle cx="523" cy="80" r="2.5" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
     <path fillRule="evenodd" d="M560 64 m-12 0 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 M560 64 m-5.5 0 a5.5 5.5 0 1 1 11 0 a5.5 5.5 0 1 1 -11 0" />

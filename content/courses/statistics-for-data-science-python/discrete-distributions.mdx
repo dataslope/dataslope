@@ -22,30 +22,22 @@ when each one applies and when it doesn't.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A single yes-or-no Bernoulli pair at the top branches down into three children — a lollipop hill of success counts, a timeline of irregularly spaced event ticks, and a row of misses ending in the first green hit — binomial, Poisson, and geometric all grown from one tiny atom"
+  aria-label="A single yes-or-no Bernoulli pair at the top branches down three thin lines into its children — a lollipop hill of success counts, a row of event ticks, and a run of gray misses ending in the first green hit — binomial, Poisson, and geometric all grown from one tiny atom"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="308" y1="60" x2="160" y2="140" />
+    <line x1="320" y1="60" x2="320" y2="150" />
+    <line x1="332" y1="60" x2="490" y2="140" />
+  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="304" cy="44" r="12" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="336" cy="44" r="12" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="262" cy="76" r="2.5" />
-    <circle cx="216" cy="104" r="2.5" />
-    <circle cx="174" cy="132" r="2.5" />
-    <circle cx="320" cy="84" r="2.5" />
-    <circle cx="320" cy="114" r="2.5" />
-    <circle cx="320" cy="144" r="2.5" />
-    <circle cx="378" cy="76" r="2.5" />
-    <circle cx="424" cy="104" r="2.5" />
-    <circle cx="466" cy="132" r="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="64" y="200" width="180" height="4" rx="2" />
-    <rect x="250" y="200" width="140" height="4" rx="2" />
-    <rect x="430" y="200" width="160" height="4" rx="2" />
+  <circle cx="336" cy="44" r="12" fill="var(--ds-gray-300)" />
+  <g fill="var(--ds-gray-300)">
+    <rect x="64" y="200" width="180" height="3" rx="1.5" />
+    <rect x="250" y="200" width="140" height="3" rx="1.5" />
+    <rect x="430" y="200" width="160" height="3" rx="1.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="86" y="172" width="4" height="28" rx="2" fillOpacity="0.5" />
@@ -66,14 +58,14 @@ when each one applies and when it doesn't.
     <rect x="342" y="184" width="4" height="14" rx="2" />
     <rect x="376" y="184" width="4" height="14" rx="2" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="448" cy="190" r="7" />
-    <circle cx="480" cy="190" r="7" />
-    <circle cx="512" cy="190" r="7" />
-    <circle cx="544" cy="190" r="7" />
+  <g fill="var(--ds-gray-300)">
+    <circle cx="448" cy="188" r="7" />
+    <circle cx="480" cy="188" r="7" />
+    <circle cx="512" cy="188" r="7" />
+    <circle cx="544" cy="188" r="7" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="578" cy="190" r="8.5" />
+    <circle cx="578" cy="188" r="8.5" />
   </g>
 </svg>
 
@@ -354,10 +346,10 @@ more** — a spike worth staffing for?
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="One long timeline of irregularly arriving yellow event ticks sliced into three equal translucent windows that capture two, five, and one events — a fixed interval, a constant average rate, and a count that varies window to window is exactly the Poisson setting"
+  aria-label="One long timeline of irregularly arriving yellow event ticks sliced into three equal translucent windows, each topped by blue count dots for the two, five, and one events it captured — a fixed interval, a constant average rate, and a count that varies window to window is exactly the Poisson setting"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="60" y="108" width="520" height="5" rx="2.5" fill="currentColor" opacity="0.2" />
+  <rect x="60" y="110" width="520" height="3" rx="1.5" fill="var(--ds-gray-400)" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.12">
     <rect x="66" y="44" width="160" height="84" rx="12" />
     <rect x="240" y="44" width="160" height="84" rx="12" />
@@ -373,10 +365,15 @@ more** — a spike worth staffing for?
     <rect x="382" y="84" width="5" height="24" rx="2.5" />
     <rect x="500" y="84" width="5" height="24" rx="2.5" />
   </g>
-  <g fill="currentColor" opacity="0.55">
-    <text x="146" y="68" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="17">2</text>
-    <text x="320" y="68" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="17">5</text>
-    <text x="494" y="68" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="17">1</text>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="138" cy="60" r="4" />
+    <circle cx="154" cy="60" r="4" />
+    <circle cx="288" cy="60" r="4" />
+    <circle cx="304" cy="60" r="4" />
+    <circle cx="320" cy="60" r="4" />
+    <circle cx="336" cy="60" r="4" />
+    <circle cx="352" cy="60" r="4" />
+    <circle cx="494" cy="60" r="4" />
   </g>
 </svg>
 

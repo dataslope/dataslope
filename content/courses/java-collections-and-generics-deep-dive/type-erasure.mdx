@@ -13,41 +13,36 @@ This page lays them out so you don't have to learn each one by
 crash.
 
 <svg
-  viewBox="0 0 640 200"
+  viewBox="0 0 640 230"
   role="img"
-  aria-label="A container stamped with a solid green type seal crosses a tall wall and comes out the other side intact — except the seal has faded to a ghost, evaporating in little green puffs"
+  aria-label="Three blue boxes each wearing a different colored type badge funnel through a tall gray wall and come out as one identical box whose badge is only a dashed outline — every generic type erased to the same raw shape at runtime"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="190" y1="52" x2="300" y2="120" />
+    <line x1="190" y1="120" x2="300" y2="120" />
+    <line x1="190" y1="188" x2="300" y2="120" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="75" y="70" width="150" height="90" rx="14" fillOpacity="0.14" />
-    <circle cx="110" cy="118" r="9" />
-    <circle cx="150" cy="118" r="9" />
-    <circle cx="190" cy="118" r="9" />
-    <rect x="405" y="70" width="150" height="90" rx="14" fillOpacity="0.14" />
-    <circle cx="440" cy="118" r="9" />
-    <circle cx="480" cy="118" r="9" />
-    <circle cx="520" cy="118" r="9" />
+    <rect x="80" y="24" width="110" height="56" rx="12" fillOpacity="0.14" />
+    <rect x="80" y="92" width="110" height="56" rx="12" fillOpacity="0.14" />
+    <rect x="80" y="160" width="110" height="56" rx="12" fillOpacity="0.14" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="225" cy="70" r="15" />
+  <circle cx="182" cy="30" r="8" fill="var(--ds-green-500)" />
+  <circle cx="182" cy="98" r="8" fill="var(--ds-yellow-500)" />
+  <circle cx="182" cy="166" r="8" fill="var(--ds-blue-500)" fillOpacity="0.45" />
+  <rect x="300" y="16" width="14" height="198" rx="7" fill="currentColor" opacity="0.22" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="322" y="118.5" width="40" height="3" rx="1.5" />
+    <polygon points="360,114.5 371,120 360,125.5" />
   </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <text x="225" y="76" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fontWeight="700" textAnchor="middle">{"T"}</text>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="388" y="88" width="130" height="64" rx="12" fillOpacity="0.14" />
+    <circle cx="420" cy="120" r="7" />
+    <circle cx="446" cy="120" r="7" />
+    <circle cx="472" cy="120" r="7" />
   </g>
-  <rect x="308" y="30" width="18" height="150" rx="9" fill="currentColor" opacity="0.22" />
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="255" cy="115" r="3" />
-    <circle cx="280" cy="115" r="3" />
-    <circle cx="345" cy="115" r="3" />
-    <circle cx="370" cy="115" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="555" cy="70" r="15" fillOpacity="0.12" />
-    <text x="555" y="76" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fontWeight="700" textAnchor="middle" fillOpacity="0.3">{"T"}</text>
-    <circle cx="560" cy="44" r="3.5" fillOpacity="0.3" />
-    <circle cx="572" cy="30" r="3" fillOpacity="0.2" />
-    <circle cx="584" cy="18" r="2.5" fillOpacity="0.12" />
-  </g>
+  <circle cx="510" cy="94" r="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 3" />
 </svg>
 
 ## What erasure actually does

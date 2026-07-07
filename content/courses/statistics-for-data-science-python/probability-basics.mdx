@@ -20,40 +20,37 @@ the vocabulary and the handful of rules everything else rests on.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A six-wedge wheel with the three even faces lit blue under a yellow pointer, beside a fraction built from dots — three blue outcomes over six possible ones — probability as the share of the sample space an event covers"
+  aria-label="A six-wedge wheel with three faces lit blue under a yellow pointer, beside a fraction built from dots — three blue dots over a bar and six below it — probability as the share of the sample space an event covers"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.1">
+  <g fill="var(--ds-gray-200)">
     <path d="M 200 110 L 200 32 A 78 78 0 0 1 267.5 71 Z" />
     <path d="M 200 110 L 267.5 149 A 78 78 0 0 1 200 188 Z" />
     <path d="M 200 110 L 132.5 149 A 78 78 0 0 1 132.5 71 Z" />
   </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.55">
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <path d="M 200 110 L 267.5 71 A 78 78 0 0 1 267.5 149 Z" />
     <path d="M 200 110 L 200 188 A 78 78 0 0 1 132.5 149 Z" />
     <path d="M 200 110 L 132.5 71 A 78 78 0 0 1 200 32 Z" />
-  </g>
-  <g opacity="0.7">
-    <text x="246" y="116" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" style={{ fill: "var(--ds-white)" }}>2</text>
-    <text x="172" y="162" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" style={{ fill: "var(--ds-white)" }}>4</text>
-    <text x="172" y="72" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" style={{ fill: "var(--ds-white)" }}>6</text>
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <path d="M 190 12 L 210 12 L 200 32 Z" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="444" cy="82" r="7" />
-    <circle cx="480" cy="82" r="7" />
-    <circle cx="516" cy="82" r="7" />
+    <circle cx="452" cy="76" r="7" />
+    <circle cx="492" cy="76" r="7" />
+    <circle cx="532" cy="76" r="7" />
   </g>
-  <rect x="412" y="100" width="136" height="5" rx="2.5" fill="currentColor" opacity="0.4" />
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="420" cy="126" r="7" />
-    <circle cx="444" cy="126" r="7" />
-    <circle cx="468" cy="126" r="7" />
-    <circle cx="492" cy="126" r="7" />
+  <rect x="424" y="98" width="136" height="4" rx="2" fill="var(--ds-gray-500)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="436" cy="126" r="7" />
+    <circle cx="476" cy="126" r="7" />
     <circle cx="516" cy="126" r="7" />
-    <circle cx="540" cy="126" r="7" />
+  </g>
+  <g fill="var(--ds-gray-400)">
+    <circle cx="456" cy="150" r="7" />
+    <circle cx="496" cy="150" r="7" />
+    <circle cx="536" cy="150" r="7" />
   </g>
 </svg>
 
@@ -272,11 +269,11 @@ around; as the flip count climbs it homes in on 0.5.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A trail of coin-flip dots lurches far above and below the yellow one-half line at first, then settles into a tight hug of it as the flips pile up — the Law of Large Numbers stabilizes the long run without ever fixing the short run"
+  aria-label="A trail of coin-flip dots lurches far above and below the dark blue one-half line at first, then settles into a tight hug of it as the flips pile up — the Law of Large Numbers stabilizes the long run without ever fixing the short run"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="80" y="108" width="500" height="4" rx="2" fillOpacity="0.6" />
+  <g style={{ color: "var(--ds-blue-700)" }} fill="currentColor">
+    <rect x="80" y="108" width="500" height="4" rx="2" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
     <circle cx="90" cy="40" r="4.5" />
@@ -297,8 +294,8 @@ around; as the flip count climbs it homes in on 0.5.
     <circle cx="540" cy="112" r="4.5" />
     <circle cx="570" cy="110" r="4.5" />
   </g>
-  <g fill="currentColor" opacity="0.12">
-    <path d="M 80 30 C 240 30 380 96 580 102 L 580 118 C 380 124 240 190 80 190 Z" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 80 30 C 240 30 380 96 580 102 L 580 118 C 380 124 240 190 80 190 Z" fillOpacity="0.1" />
   </g>
 </svg>
 

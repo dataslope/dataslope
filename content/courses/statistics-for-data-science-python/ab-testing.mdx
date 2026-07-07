@@ -23,10 +23,10 @@ The full arc, start to finish:
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A stream of user dots reaches a yellow coin-flip diamond and splits into two lanes — a blue control panel and a green variant panel of identical crowds, the variant lighting up more converted dots and growing a longer result pill — randomize the split, and the only difference left to credit is the change itself"
+  aria-label="A stream of yellow user dots reaches a yellow coin-flip diamond and splits along two thin lines — a blue control panel and a green variant panel of identical crowds, the variant lighting up more converted dots and growing a longer result pill — randomize the split, and the only difference left to credit is the change itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.4">
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="56" cy="112" r="5" />
     <circle cx="80" cy="112" r="5" />
     <circle cx="104" cy="112" r="5" />
@@ -36,13 +36,9 @@ The full arc, start to finish:
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <path d="M 200 88 L 224 112 L 200 136 L 176 112 Z" fillOpacity="0.9" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="238" cy="92" r="2.5" />
-    <circle cx="258" cy="76" r="2.5" />
-    <circle cx="278" cy="63" r="2.5" />
-    <circle cx="238" cy="132" r="2.5" />
-    <circle cx="258" cy="148" r="2.5" />
-    <circle cx="278" cy="161" r="2.5" />
+  <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
+    <line x1="228" y1="104" x2="292" y2="62" />
+    <line x1="228" y1="120" x2="292" y2="162" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <rect x="296" y="30" width="180" height="64" rx="12" fillOpacity="0.13" />
@@ -405,36 +401,30 @@ method designed for continuous monitoring.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A wandering trail of daily p-value dots dips below the red significance line exactly once, where a yellow stop flag is eagerly planted, while the fainter future of the trail climbs right back up — peek long enough and noise alone will hand you a lucky dip to stop on"
+  aria-label="A thin blue p-value line wanders and dips below the red significance line exactly once, where a yellow stop flag is eagerly planted, while its fainter future climbs right back up — peek long enough and noise alone will hand you a lucky dip to stop on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="70" y="130" width="500" height="4" rx="2" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.85">
-    <circle cx="90" cy="60" r="4.5" />
-    <circle cx="120" cy="84" r="4.5" />
-    <circle cx="150" cy="70" r="4.5" />
-    <circle cx="180" cy="96" r="4.5" />
-    <circle cx="210" cy="110" r="4.5" />
-    <circle cx="240" cy="122" r="4.5" />
-    <circle cx="270" cy="142" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.3">
-    <circle cx="300" cy="126" r="4.5" />
-    <circle cx="330" cy="98" r="4.5" />
-    <circle cx="360" cy="108" r="4.5" />
-    <circle cx="390" cy="86" r="4.5" />
-    <circle cx="420" cy="96" r="4.5" />
-    <circle cx="450" cy="76" r="4.5" />
-    <circle cx="480" cy="88" r="4.5" />
-    <circle cx="510" cy="70" r="4.5" />
-    <circle cx="540" cy="80" r="4.5" />
-  </g>
+  <rect x="70" y="130" width="500" height="4" rx="2" fill="var(--ds-red-500)" />
+  <polyline
+    points="90,60 120,84 150,70 180,96 210,110 240,122 270,144"
+    fill="none"
+    stroke="var(--ds-blue-500)"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
+  <polyline
+    points="270,144 300,120 330,98 360,108 390,86 420,96 450,76 480,88 510,70 540,80"
+    fill="none"
+    stroke="var(--ds-blue-500)"
+    strokeWidth="3"
+    strokeOpacity="0.35"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M256 142 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0 M261 142 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0" fillRule="evenodd" fillOpacity="0.9" />
-    <rect x="268" y="158" width="4" height="28" rx="2" fillOpacity="0.8" />
-    <path d="M 272 158 L 294 164 L 272 170 Z" fillOpacity="0.8" />
+    <rect x="268" y="100" width="4" height="46" rx="2" />
+    <polygon points="272,100 296,108 272,116" />
   </g>
 </svg>
 

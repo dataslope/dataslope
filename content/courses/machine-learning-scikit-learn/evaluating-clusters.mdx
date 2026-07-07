@@ -14,37 +14,30 @@ single number decide for you.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="One highlighted dot floats between a blue cluster and a green cluster, a short dotted trail tying it to its own group and a long one stretching to the neighbor — the silhouette score measures exactly that gap"
+  aria-label="A ringed blue dot floats between two soft cluster blobs, joined by a short line to its own blue group and a much longer line to the green neighbor — the silhouette score measures exactly that difference"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="170" cy="100" r="70" fillOpacity="0.1" />
     <circle cx="140" cy="80" r="8" />
-    <circle cx="180" cy="60" r="8" />
-    <circle cx="200" cy="110" r="8" />
+    <circle cx="190" cy="65" r="8" />
+    <circle cx="200" cy="115" r="8" />
     <circle cx="150" cy="130" r="8" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="460" cy="90" r="8" />
-    <circle cx="500" cy="70" r="8" />
+    <circle cx="490" cy="100" r="70" fillOpacity="0.1" />
+    <circle cx="460" cy="85" r="8" />
+    <circle cx="505" cy="70" r="8" />
     <circle cx="520" cy="120" r="8" />
-    <circle cx="470" cy="140" r="8" />
+    <circle cx="470" cy="138" r="8" />
   </g>
+  <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
+    <line x1="270" y1="103" x2="209" y2="113" />
+    <line x1="290" y1="98" x2="450" y2="87" />
+  </g>
+  <circle cx="280" cy="100" r="16" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="3" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="268" cy="99" r="3" fillOpacity="0.45" />
-    <circle cx="236" cy="98" r="3" fillOpacity="0.45" />
-    <circle cx="204" cy="97" r="3" fillOpacity="0.45" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="340" cy="101" r="3" />
-    <circle cx="378" cy="102" r="3" />
-    <circle cx="416" cy="103" r="3" />
-    <circle cx="452" cy="104" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="300" cy="100" r="17" fillOpacity="0.25" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="300" cy="100" r="8" />
+    <circle cx="280" cy="100" r="9" />
   </g>
 </svg>
 

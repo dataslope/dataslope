@@ -11,38 +11,27 @@ sharpens your filtering vocabulary and explains *why* analysts filter as
 early as possible.
 
 <svg
-  viewBox="0 0 640 215"
+  viewBox="0 0 640 225"
   role="img"
-  aria-label="A translucent yellow cutting plane passes through a faint isometric slab of data, and the carved slice slides out to the right in solid blue carrying its green rows — WHERE lifts out exactly the part the question is about"
+  aria-label="A yellow cut mark runs across the top of a faint blue isometric cube of data, and past a solid gray arrow the carved slice stands alone as a solid blue slab — WHERE lifts out exactly the part the question asks about"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <path d="M 100 78 L 250 78 L 304 112 L 154 112 Z" opacity="0.16" />
-    <path d="M 154 112 L 304 112 L 304 178 L 154 178 Z" opacity="0.09" />
-    <path d="M 100 78 L 154 112 L 154 178 L 100 144 Z" opacity="0.2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="200,30 290,80 200,130 110,80" fillOpacity="0.3" />
+    <polygon points="110,80 200,130 200,210 110,160" fillOpacity="0.2" />
+    <polygon points="290,80 200,130 200,210 290,160" fillOpacity="0.12" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 312 56 L 334 70 L 334 186 L 312 172 Z" fillOpacity="0.45" />
+    <polygon points="238,56 260,68 181,112 159,100" />
   </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="362" cy="118" r="3" />
-    <circle cx="384" cy="118" r="3" />
-    <circle cx="406" cy="118" r="3" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="312" y="118.5" width="46" height="3" rx="1.5" />
+    <polygon points="356,114.5 367,120 356,125.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 438 70 L 482 70 L 536 104 L 492 104 Z" fillOpacity="0.6" />
-    <path d="M 492 104 L 536 104 L 536 170 L 492 170 Z" fillOpacity="0.35" />
-    <path d="M 438 70 L 492 104 L 492 170 L 438 136 Z" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="514" cy="124" r="5" />
-    <circle cx="514" cy="146" r="5" />
-    <circle cx="465" cy="112" r="5" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="80" cy="40" r="3" />
-    <circle cx="580" cy="50" r="3" />
-    <circle cx="600" cy="190" r="3" />
+    <polygon points="486,60 508,72 418,122 396,110" />
+    <polygon points="396,110 418,122 418,202 396,190" fillOpacity="0.65" />
+    <polygon points="418,122 508,72 508,152 418,202" fillOpacity="0.4" />
   </g>
 </svg>
 
@@ -207,34 +196,29 @@ classic, silent analytical bug.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Dots flow along a lane toward a yellow filter gate, but a dotted bypass arc carries red dots up and over the gate back into the output — an ungrouped OR quietly lets rows skip the filter"
+  aria-label="Gray rows flow along a lane toward a yellow filter gate and come out green, but a solid red bypass arc jumps one row up and over the gate straight into the output — an ungrouped OR quietly lets rows skip the filter"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.08">
-    <rect x="40" y="98" width="560" height="30" rx="15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="40" y="98" width="560" height="30" rx="15" fillOpacity="0.08" />
   </g>
-  <g fill="currentColor" opacity="0.35">
+  <g fill="var(--ds-gray-500)">
     <circle cx="80" cy="113" r="6" />
     <circle cx="124" cy="113" r="6" />
     <circle cx="168" cy="113" r="6" />
     <circle cx="212" cy="113" r="6" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="296" y="78" width="14" height="30" rx="5" />
-    <rect x="296" y="118" width="14" height="30" rx="5" />
+    <rect x="296" y="74" width="12" height="32" rx="5" />
+    <rect x="296" y="120" width="12" height="32" rx="5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="372" cy="113" r="6" />
     <circle cx="420" cy="113" r="6" />
   </g>
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="248" cy="92" r="4" fillOpacity="0.5" />
-    <circle cx="268" cy="64" r="4" fillOpacity="0.65" />
-    <circle cx="298" cy="44" r="4" fillOpacity="0.8" />
-    <circle cx="334" cy="50" r="4" fillOpacity="0.9" />
-    <circle cx="362" cy="72" r="4" />
-    <circle cx="382" cy="96" r="4" />
-    <circle cx="468" cy="113" r="6" />
+    <path d="M 240 100 C 280 30 430 30 470 90" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    <polygon points="462,88 478,84 472,104" />
     <circle cx="516" cy="113" r="6" />
   </g>
 </svg>

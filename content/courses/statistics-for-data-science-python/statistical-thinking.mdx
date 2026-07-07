@@ -40,23 +40,23 @@ thinking.
     <circle cx="63" cy="73" r="3.5" fillOpacity="0.6" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="148" y="100" width="432" height="4" rx="2" fillOpacity="0.55" />
+    <rect x="148" y="100" width="432" height="4" rx="2" />
   </g>
-  <g fill="currentColor">
-    <circle cx="160" cy="96" r="4" opacity="0.35" />
-    <circle cx="205" cy="114" r="4" opacity="0.35" />
-    <circle cx="250" cy="88" r="4" opacity="0.35" />
-    <circle cx="295" cy="106" r="4" opacity="0.35" />
-    <circle cx="340" cy="118" r="4" opacity="0.35" />
-    <circle cx="430" cy="104" r="4" opacity="0.35" />
-    <circle cx="475" cy="86" r="4" opacity="0.18" />
-    <circle cx="520" cy="112" r="4" opacity="0.18" />
-    <circle cx="565" cy="98" r="4" opacity="0.18" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="160" cy="96" r="4" fillOpacity="0.7" />
+    <circle cx="205" cy="114" r="4" fillOpacity="0.7" />
+    <circle cx="250" cy="88" r="4" fillOpacity="0.7" />
+    <circle cx="295" cy="106" r="4" fillOpacity="0.7" />
+    <circle cx="340" cy="118" r="4" fillOpacity="0.7" />
+    <circle cx="430" cy="104" r="4" fillOpacity="0.7" />
+    <circle cx="475" cy="86" r="4" fillOpacity="0.4" />
+    <circle cx="520" cy="112" r="4" fillOpacity="0.4" />
+    <circle cx="565" cy="98" r="4" fillOpacity="0.4" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="385" cy="78" r="14" fillOpacity="0.18" />
     <circle cx="385" cy="78" r="6.5" />
   </g>
+  <circle cx="385" cy="78" r="13" fill="none" stroke="var(--ds-blue-500)" strokeWidth="3" />
 </svg>
 
 <Callout type="info" title="What this page is and isn't">
@@ -152,13 +152,13 @@ trend whatsoever.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Scattered dots jitter evenly around a flat yellow truth line while a red arrow ribbon sweeps upward through one lucky run of them — the rising trend is a story the noise told, not a thing the process did"
+  aria-label="Scattered blue dots jitter evenly around a flat yellow truth line while a red arrow sweeps upward through one lucky run of them — the rising trend is a story the noise told, not a thing the process did"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="70" y="118" width="500" height="5" rx="2.5" fillOpacity="0.55" />
+    <rect x="70" y="118" width="500" height="4" rx="2" />
   </g>
-  <g fill="currentColor" opacity="0.4">
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.6">
     <circle cx="90" cy="108" r="3.5" />
     <circle cx="118" cy="132" r="3.5" />
     <circle cx="146" cy="114" r="3.5" />
@@ -177,9 +177,9 @@ trend whatsoever.
     <circle cx="510" cy="100" r="3.5" />
     <circle cx="538" cy="124" r="3.5" />
   </g>
+  <line x1="226" y1="139" x2="398" y2="92" stroke="var(--ds-red-500)" strokeWidth="4" strokeLinecap="round" />
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 226 144 L 396 98 L 396 88 L 226 134 Z" fillOpacity="0.45" />
-    <path d="M 398 78 L 420 92 L 398 102 Z" fillOpacity="0.85" />
+    <polygon points="394,84 398,104 418,87" />
   </g>
 </svg>
 

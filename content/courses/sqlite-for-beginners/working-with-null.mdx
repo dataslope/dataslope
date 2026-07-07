@@ -11,65 +11,39 @@ like a normal value. It is not zero. It is not an empty string. It is
 missing or unknown.
 
 <svg
-  viewBox="0 0 640 230"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A tiled mosaic where most tiles hold a colored dot, one tile is present but empty, and one tile is missing entirely with only dotted corners marking the gap — an empty value is still a value, but NULL is the tile that was never placed"
+  aria-label="A grid of light blue tiles where most hold a solid colored dot, one tile is present but empty, and one spot has no tile at all — only a dashed outline marks the gap — an empty value is still a value, but NULL is the tile that was never placed"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.1">
-    <rect x="130" y="24" width="70" height="40" rx="7" />
-    <rect x="210" y="24" width="70" height="40" rx="7" />
-    <rect x="290" y="24" width="70" height="40" rx="7" />
-    <rect x="370" y="24" width="70" height="40" rx="7" />
-    <rect x="450" y="24" width="70" height="40" rx="7" />
-    <rect x="130" y="74" width="70" height="40" rx="7" />
-    <rect x="210" y="74" width="70" height="40" rx="7" />
-    <rect x="290" y="74" width="70" height="40" rx="7" />
-    <rect x="450" y="74" width="70" height="40" rx="7" />
-    <rect x="130" y="124" width="70" height="40" rx="7" />
-    <rect x="210" y="124" width="70" height="40" rx="7" />
-    <rect x="290" y="124" width="70" height="40" rx="7" />
-    <rect x="370" y="124" width="70" height="40" rx="7" />
-    <rect x="450" y="124" width="70" height="40" rx="7" />
-    <rect x="130" y="174" width="70" height="40" rx="7" />
-    <rect x="210" y="174" width="70" height="40" rx="7" />
-    <rect x="290" y="174" width="70" height="40" rx="7" />
-    <rect x="370" y="174" width="70" height="40" rx="7" />
-    <rect x="450" y="174" width="70" height="40" rx="7" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="165" cy="44" r="8" fillOpacity="0.8" />
-    <circle cx="325" cy="44" r="8" fillOpacity="0.6" />
-    <circle cx="165" cy="144" r="8" fillOpacity="0.7" />
-    <circle cx="485" cy="194" r="8" fillOpacity="0.5" />
+    <rect x="136" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="232" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="328" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="424" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="136" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="232" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="328" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="424" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="136" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="232" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <rect x="424" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
+    <circle cx="176" cy="52" r="9" />
+    <circle cx="464" cy="52" r="9" />
+    <circle cx="272" cy="172" r="9" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="245" cy="44" r="8" fillOpacity="0.7" />
-    <circle cx="485" cy="94" r="8" fillOpacity="0.8" />
-    <circle cx="245" cy="194" r="8" fillOpacity="0.6" />
-    <circle cx="405" cy="144" r="8" fillOpacity="0.7" />
+    <circle cx="272" cy="52" r="9" />
+    <circle cx="176" cy="112" r="9" />
+    <circle cx="464" cy="172" r="9" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="485" cy="44" r="8" fillOpacity="0.8" />
-    <circle cx="165" cy="94" r="8" fillOpacity="0.6" />
-    <circle cx="325" cy="94" r="8" fillOpacity="0.75" />
-    <circle cx="325" cy="194" r="8" fillOpacity="0.6" />
-    <circle cx="405" cy="44" r="8" fillOpacity="0.55" />
+    <circle cx="368" cy="52" r="9" />
+    <circle cx="272" cy="112" r="9" />
+    <circle cx="464" cy="112" r="9" />
+    <circle cx="176" cy="172" r="9" />
   </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="485" cy="144" r="8" fillOpacity="0.7" />
-    <circle cx="245" cy="94" r="8" fillOpacity="0.55" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="374" cy="78" r="2.5" />
-    <circle cx="406" cy="78" r="2.5" />
-    <circle cx="436" cy="78" r="2.5" />
-    <circle cx="374" cy="94" r="2.5" />
-    <circle cx="436" cy="94" r="2.5" />
-    <circle cx="374" cy="110" r="2.5" />
-    <circle cx="406" cy="110" r="2.5" />
-    <circle cx="436" cy="110" r="2.5" />
-  </g>
+  <rect x="328" y="150" width="80" height="44" rx="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
 </svg>
 
 ## NULL is not zero or empty text
@@ -304,37 +278,26 @@ values.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A hopping dotted trail checks a line of cups: the first two are empty holes, the third holds a green value, and the trail stops there and carries it to the result — COALESCE takes the first value that is not NULL"
+  aria-label="A scan line hops across four slots: the first two hold only dashed empty rings, the third holds a solid green value where the arrow stops, and the fourth is never reached — COALESCE takes the first value that is not NULL"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.14">
-    <path d="M 80 80 L 144 80 L 136 122 Q 135 128 129 128 L 95 128 Q 89 128 88 122 Z" />
-    <path d="M 196 80 L 260 80 L 252 122 Q 251 128 245 128 L 211 128 Q 205 128 204 122 Z" />
-    <path d="M 312 80 L 376 80 L 368 122 Q 367 128 361 128 L 327 128 Q 321 128 320 122 Z" />
-    <path d="M 428 80 L 492 80 L 484 122 Q 483 128 477 128 L 443 128 Q 437 128 436 122 Z" />
+  <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="148" y1="68" x2="192" y2="68" />
+    <line x1="264" y1="68" x2="306" y2="68" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="96" cy="56" r="2.5" />
-    <circle cx="112" cy="44" r="2.5" />
-    <circle cx="128" cy="56" r="2.5" />
-    <circle cx="180" cy="44" r="2.5" />
-    <circle cx="212" cy="56" r="2.5" />
-    <circle cx="228" cy="44" r="2.5" />
-    <circle cx="244" cy="56" r="2.5" />
-    <circle cx="296" cy="44" r="2.5" />
-    <circle cx="328" cy="56" r="2.5" />
+  <polygon points="304,62.5 304,73.5 315,68" fill="var(--ds-gray-400)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
+    <rect x="196" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
+    <rect x="312" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
+    <rect x="428" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
   </g>
+  <circle cx="112" cy="68" r="12" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
+  <circle cx="228" cy="68" r="12" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="344" cy="104" r="11" />
-    <circle cx="344" cy="32" r="8" fillOpacity="0.85" />
+    <circle cx="344" cy="68" r="12" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="460" cy="104" r="9" fillOpacity="0.4" />
-  </g>
-  <g fill="currentColor" opacity="0.45">
-    <text x="122" y="112" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="600">?</text>
-    <text x="238" y="112" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="600">?</text>
-  </g>
+  <circle cx="460" cy="68" r="12" fill="var(--ds-gray-300)" />
 </svg>
 
 <SqlCodeBlock

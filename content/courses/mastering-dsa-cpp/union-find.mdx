@@ -13,33 +13,31 @@ That structure is **Union-Find**, also called **Disjoint Set Union (DSU)**. It a
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two translucent sets, each with members linking up to their representative, merge along a dotted arrow into one set where the old green root now answers to the surviving blue one"
+  aria-label="Two translucent sets whose members link up to their roots along thin lines merge across a thin gray arrow into one set, where the old green root now answers to the surviving blue one — union by attaching one tree under another"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
+    <line x1="124" y1="114" x2="150" y2="76" />
+    <line x1="172" y1="118" x2="150" y2="76" />
+    <line x1="310" y1="124" x2="310" y2="80" />
+    <line x1="500" y1="114" x2="530" y2="68" />
+    <line x1="556" y1="108" x2="530" y2="68" />
+    <line x1="548" y1="134" x2="556" y2="108" />
+  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="150" cy="100" r="56" fillOpacity="0.1" />
     <circle cx="150" cy="76" r="9" />
     <circle cx="124" cy="114" r="5.5" fillOpacity="0.7" />
     <circle cx="172" cy="118" r="5.5" fillOpacity="0.7" />
   </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="133" cy="101" r="1.8" />
-    <circle cx="142" cy="88" r="1.8" />
-    <circle cx="164" cy="104" r="1.8" />
-    <circle cx="157" cy="90" r="1.8" />
-    <circle cx="310" cy="109" r="1.8" />
-    <circle cx="310" cy="94" r="1.8" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="310" cy="100" r="44" fillOpacity="0.1" />
     <circle cx="310" cy="80" r="8" />
     <circle cx="310" cy="124" r="5.5" fillOpacity="0.7" />
   </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="380" cy="100" r="3" />
-    <circle cx="400" cy="100" r="3" />
-    <circle cx="420" cy="100" r="3" />
-    <polygon points="432,92 432,108 444,100" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="372" y="98.5" width="48" height="3" rx="1.5" />
+    <polygon points="418,94.5 429,100 418,105.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
     <circle cx="530" cy="100" r="62" fillOpacity="0.1" />
@@ -49,13 +47,6 @@ That structure is **Union-Find**, also called **Disjoint Set Union (DSU)**. It a
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="556" cy="108" r="8" />
     <circle cx="548" cy="134" r="5.5" fillOpacity="0.7" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="548" cy="95" r="1.8" />
-    <circle cx="539" cy="82" r="1.8" />
-    <circle cx="552" cy="121" r="1.8" />
-    <circle cx="510" cy="99" r="1.8" />
-    <circle cx="520" cy="84" r="1.8" />
   </g>
 </svg>
 

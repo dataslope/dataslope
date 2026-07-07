@@ -13,61 +13,45 @@ Aggregate functions can summarize a whole table into one answer. That is useful,
 `GROUP BY` is how you ask SQLite to split rows into groups first, then summarize each group.
 
 <svg
-  viewBox="0 0 640 240"
+  viewBox="0 0 640 235"
   role="img"
-  aria-label="Mixed laundry dots tumble down dotted trails into three baskets sorted by color, and each basket wears a little tag with its count — GROUP BY sorts rows into piles first, then summarizes each pile"
+  aria-label="A mixed row of blue, green, and yellow dots fans along thin lines into three tinted cards sorted by color, and each card condenses into one solid bar sized to its contents — GROUP BY sorts rows into piles first, then summarizes each pile"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="30" r="10" fillOpacity="0.85" />
-    <circle cx="334" cy="22" r="10" fillOpacity="0.7" />
-    <circle cx="436" cy="40" r="10" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="238" cy="40" r="10" fillOpacity="0.85" />
-    <circle cx="498" cy="24" r="10" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="386" cy="30" r="10" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="160" cy="64" r="2.5" />
-    <circle cx="166" cy="84" r="2.5" />
-    <circle cx="170" cy="104" r="2.5" />
-    <circle cx="316" cy="56" r="2.5" />
-    <circle cx="306" cy="76" r="2.5" />
-    <circle cx="298" cy="96" r="2.5" />
-    <circle cx="396" cy="60" r="2.5" />
-    <circle cx="404" cy="80" r="2.5" />
-    <circle cx="410" cy="100" r="2.5" />
-    <circle cx="490" cy="52" r="2.5" />
-    <circle cx="480" cy="74" r="2.5" />
-    <circle cx="472" cy="96" r="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.16">
-    <path d="M 110 140 L 238 140 L 222 216 Q 220 224 212 224 L 136 224 Q 128 224 126 216 Z" />
-    <path d="M 274 140 L 402 140 L 386 216 Q 384 224 376 224 L 300 224 Q 292 224 290 216 Z" />
-    <path d="M 438 140 L 566 140 L 550 216 Q 548 224 540 224 L 464 224 Q 456 224 454 216 Z" />
+  <g stroke="var(--ds-gray-300)" strokeWidth="2">
+    <line x1="300" y1="50" x2="161" y2="88" />
+    <line x1="300" y1="50" x2="321" y2="88" />
+    <line x1="300" y1="50" x2="481" y2="88" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="152" cy="172" r="11" fillOpacity="0.9" />
-    <circle cx="178" cy="180" r="11" fillOpacity="0.7" />
-    <circle cx="164" cy="200" r="11" fillOpacity="0.5" />
-    <rect x="206" y="124" width="26" height="22" rx="6" fillOpacity="0.3" />
+    <circle cx="140" cy="32" r="6" />
+    <circle cx="220" cy="32" r="6" />
+    <circle cx="340" cy="32" r="6" />
+    <circle cx="460" cy="32" r="6" />
+    <rect x="96" y="88" width="130" height="76" rx="12" fillOpacity="0.12" />
+    <circle cx="128" cy="120" r="6.5" />
+    <circle cx="152" cy="114" r="6.5" />
+    <circle cx="176" cy="122" r="6.5" />
+    <circle cx="140" cy="140" r="6.5" />
+    <rect x="116" y="182" width="88" height="14" rx="7" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="322" cy="176" r="11" fillOpacity="0.9" />
-    <circle cx="350" cy="186" r="11" fillOpacity="0.6" />
-    <rect x="370" y="124" width="26" height="22" rx="6" fillOpacity="0.3" />
+    <circle cx="260" cy="32" r="6" />
+    <circle cx="380" cy="32" r="6" />
+    <rect x="256" y="88" width="130" height="76" rx="12" fillOpacity="0.12" />
+    <circle cx="300" cy="124" r="6.5" />
+    <circle cx="330" cy="118" r="6.5" />
+    <rect x="290" y="182" width="48" height="14" rx="7" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="498" cy="184" r="11" fillOpacity="0.9" />
-    <rect x="534" y="124" width="26" height="22" rx="6" fillOpacity="0.35" />
-  </g>
-  <g fill="currentColor" opacity="0.55">
-    <text x="219" y="141" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="700">3</text>
-    <text x="383" y="141" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="700">2</text>
-    <text x="547" y="141" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="700">1</text>
+    <circle cx="180" cy="32" r="6" />
+    <circle cx="300" cy="32" r="6" />
+    <circle cx="420" cy="32" r="6" />
+    <rect x="416" y="88" width="130" height="76" rx="12" fillOpacity="0.15" />
+    <circle cx="448" cy="120" r="6.5" />
+    <circle cx="474" cy="114" r="6.5" />
+    <circle cx="500" cy="124" r="6.5" />
+    <rect x="444" y="182" width="68" height="14" rx="7" />
   </g>
 </svg>
 

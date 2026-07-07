@@ -8,37 +8,39 @@ Searching means locating a target value in a collection, and it splits the world
 That second idea, binary search, carries a warning label earned over decades. Jon Bentley reported in *Programming Pearls* that when he asked professional programmers to write it, the majority produced buggy versions — and Donald Knuth notes that although the idea was first published in 1946, the first published version that worked correctly for arrays of *every* size did not appear until 1962. Sixteen years to get a dozen lines right. This page teaches you the algorithm *and* the traps.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="An open dictionary where each probe at the middle of a highlighted page range halves it — the bands shrink step by step until a green entry is pinned down — searching sorted data"
+  aria-label="A sorted row of cells with one green target, and below it three successively halved blue range bands, each probed at its yellow midpoint, converging to a final green sliver — binary search closing in"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor">
-    <rect x="90" y="50" width="220" height="140" rx="10" opacity="0.07" />
-    <rect x="330" y="50" width="220" height="140" rx="10" opacity="0.07" />
-    <rect x="318" y="46" width="4" height="148" rx="2" opacity="0.2" />
-  </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="104" y="70" width="432" height="16" rx="8" fillOpacity="0.15" />
-    <rect x="320" y="98" width="216" height="16" rx="8" fillOpacity="0.25" />
-    <rect x="320" y="126" width="108" height="16" rx="8" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="78" r="4.5" />
-    <circle cx="428" cy="106" r="4.5" />
-    <circle cx="374" cy="134" r="4.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="356" cy="86" r="2" />
-    <circle cx="392" cy="92" r="2" />
-    <circle cx="410" cy="116" r="2" />
-    <circle cx="392" cy="123" r="2" />
-    <circle cx="383" cy="142" r="2" />
-    <circle cx="392" cy="148" r="2" />
+    <rect x="90" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="128" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="166" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="204" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="242" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="280" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="318" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="356" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="432" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="470" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
+    <rect x="508" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="374" y="154" width="54" height="16" rx="8" fillOpacity="0.3" />
-    <circle cx="401" cy="162" r="5.5" />
+    <rect x="394" y="40" width="34" height="26" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="92" width="452" height="14" rx="7" fillOpacity="0.15" />
+    <rect x="316" y="120" width="226" height="14" rx="7" fillOpacity="0.25" />
+    <rect x="316" y="148" width="113" height="14" rx="7" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="316" cy="99" r="5" />
+    <circle cx="429" cy="127" r="5" />
+    <circle cx="372" cy="155" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="394" y="176" width="34" height="14" rx="7" />
   </g>
 </svg>
 

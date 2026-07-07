@@ -13,45 +13,18 @@ summarizes the whole picture in one number.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A dotted ROC curve bows high above a faint diagonal of chance dots, with the area beneath it shaded translucent blue and one green operating point marked — the model judged at every threshold at once"
+  aria-label="A bold blue ROC curve bows high above the dashed diagonal of chance, the whole area beneath it washed light blue — the model judged at every threshold at once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="84,191 94,148 108,112 128,84 154,64 186,50 222,41 262,35 306,31 352,29 400,28 450,28 502,28 556,28 556,191" fillOpacity="0.1" />
-  </g>
   <g fill="currentColor" opacity="0.25">
-    <rect x="80" y="25" width="4" height="170" rx="2" />
-    <rect x="80" y="191" width="480" height="4" rx="2" />
+    <rect x="80" y="25" width="3" height="168" rx="1.5" />
+    <rect x="80" y="190" width="480" height="3" rx="1.5" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="143" cy="171" r="3" />
-    <circle cx="202" cy="150" r="3" />
-    <circle cx="261" cy="130" r="3" />
-    <circle cx="320" cy="110" r="3" />
-    <circle cx="379" cy="90" r="3" />
-    <circle cx="438" cy="69" r="3" />
-    <circle cx="497" cy="49" r="3" />
-    <circle cx="540" cy="34" r="3" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M84 190 C 88 130, 100 80, 150 52 C 210 22, 340 24, 556 26 L556 190 Z" fillOpacity="0.1" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="84" cy="191" r="3.5" />
-    <circle cx="94" cy="148" r="3.5" />
-    <circle cx="108" cy="112" r="3.5" />
-    <circle cx="128" cy="84" r="3.5" />
-    <circle cx="154" cy="64" r="3.5" />
-    <circle cx="186" cy="50" r="3.5" />
-    <circle cx="222" cy="41" r="3.5" />
-    <circle cx="262" cy="35" r="3.5" />
-    <circle cx="306" cy="31" r="3.5" />
-    <circle cx="352" cy="29" r="3.5" />
-    <circle cx="400" cy="28" r="3.5" />
-    <circle cx="450" cy="28" r="3.5" />
-    <circle cx="502" cy="28" r="3.5" />
-    <circle cx="556" cy="28" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="154" cy="64" r="7" />
-  </g>
+  <line x1="84" y1="190" x2="556" y2="26" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="8 7" strokeLinecap="round" />
+  <path d="M84 190 C 88 130, 100 80, 150 52 C 210 22, 340 24, 556 26" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinecap="round" />
 </svg>
 
 ## Two rates that move with the threshold

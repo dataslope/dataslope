@@ -16,9 +16,6 @@ covers running totals, moving averages, and the row-comparison functions
   aria-label="A staircase of stacked bars climbs left to right, each step carrying the previous blue total with today's green slice added on top, while a yellow dot walks the rising edge — a running total accumulating row by row"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g fill="currentColor" opacity="0.2">
-    <rect x="80" y="204" width="490" height="5" rx="2.5" />
-  </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <rect x="104" y="176" width="56" height="26" rx="6" />
   </g>
@@ -184,41 +181,30 @@ back to. That is expected, and it is why the first `change` is also
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A blue row glances backward to its green predecessor and forward to its yellow successor along dotted arcs, while the very first row's backward glance finds only a hollow red ring — LAG and LEAD read neighboring rows, and the first row has nothing behind it"
+  aria-label="A blue row reaches back along a solid green arc to its predecessor and forward along a solid yellow arc to its successor, while the first row's backward arc finds only a hollow red ring — LAG and LEAD read neighboring rows, and the first row has nothing behind it"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 56 92 m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0 M 56 92 m -4.5 0 a 4.5 4.5 0 1 1 9 0 a 4.5 4.5 0 1 1 -9 0" fillRule="evenodd" fillOpacity="0.6" />
+  <circle cx="56" cy="100" r="8" fill="none" stroke="var(--ds-red-500)" strokeWidth="3.5" />
+  <path d="M 112 88 Q 90 62 68 86" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round" />
+  <polygon points="62,82 74,82 68,96" fill="var(--ds-gray-400)" />
+  <g fill="var(--ds-gray-500)">
+    <circle cx="124" cy="100" r="8" />
+    <circle cx="192" cy="100" r="8" />
+    <circle cx="464" cy="100" r="8" />
+    <circle cx="532" cy="100" r="8" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="84" cy="74" r="2" />
-    <circle cx="98" cy="66" r="2" />
-    <circle cx="112" cy="62" r="2" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="124" cy="92" r="8" />
-    <circle cx="192" cy="92" r="8" />
-    <circle cx="464" cy="92" r="8" />
-    <circle cx="532" cy="92" r="8" />
-  </g>
+  <path d="M 316 86 Q 294 56 272 84" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
+  <polygon points="266,80 278,80 272,94" fill="var(--ds-green-500)" />
+  <path d="M 340 86 Q 362 56 384 84" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="3" strokeLinecap="round" />
+  <polygon points="378,80 390,80 384,94" fill="var(--ds-yellow-500)" />
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="260" cy="92" r="9" />
+    <circle cx="260" cy="100" r="9" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="328" cy="92" r="12" />
+    <circle cx="328" cy="100" r="12" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="396" cy="92" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="306" cy="66" r="2.5" fillOpacity="0.7" />
-    <circle cx="288" cy="58" r="2.5" fillOpacity="0.7" />
-    <circle cx="270" cy="66" r="2.5" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="350" cy="66" r="2.5" fillOpacity="0.8" />
-    <circle cx="368" cy="58" r="2.5" fillOpacity="0.8" />
-    <circle cx="386" cy="66" r="2.5" fillOpacity="0.8" />
+    <circle cx="396" cy="100" r="9" />
   </g>
 </svg>
 
@@ -233,7 +219,7 @@ out noise.
 <svg
   viewBox="0 0 640 185"
   role="img"
-  aria-label="A translucent yellow frame slides along a row of jagged bars three at a time, leaving behind its ghost from the previous step, while a calm curve of green dots rises above the noise — a moving average smoothing the series"
+  aria-label="A translucent yellow frame slides along a row of jagged bars three at a time, leaving behind its ghost from the previous step — a moving window smoothing the series"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.22">
@@ -252,18 +238,8 @@ out noise.
     <rect x="110" y="48" width="146" height="128" rx="14" fillOpacity="0.12" />
     <rect x="260" y="42" width="146" height="134" rx="14" fillOpacity="0.32" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="133" cy="46" r="4" fillOpacity="0.5" />
-    <circle cx="183" cy="42" r="4" fillOpacity="0.6" />
-    <circle cx="233" cy="40" r="4.5" fillOpacity="0.7" />
-    <circle cx="283" cy="36" r="4.5" fillOpacity="0.8" />
-    <circle cx="333" cy="32" r="5" />
-    <circle cx="383" cy="30" r="4.5" fillOpacity="0.8" />
-    <circle cx="433" cy="32" r="4" fillOpacity="0.65" />
-    <circle cx="483" cy="30" r="4" fillOpacity="0.5" />
-  </g>
   <g fill="currentColor" opacity="0.2">
-    <rect x="60" y="170" width="500" height="4" rx="2" />
+    <rect x="60" y="170" width="500" height="2.5" rx="1.25" />
   </g>
 </svg>
 

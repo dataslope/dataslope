@@ -6,45 +6,24 @@ description: Functions that wrap other functions, and the @ syntax
 A **decorator** is just a function that takes another function and returns a new one. The `@decorator` syntax is sugar for that pattern. Decorators power Flask's `@app.route`, Django's `@login_required`, dataclasses, `@property`, caching, logging, retry logic, and countless other patterns in production Python.
 
 <svg
-  viewBox="0 0 640 200"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="The same blue ƒ box before and after the wrapping station: it comes out nested inside translucent green gift wrap with ribbon and bow, still visible within — a decorator wraps a function in new behavior without changing the function itself"
+  aria-label="A solid blue square rides a thin gray arrow and reappears unchanged inside a bold green frame — a decorator wraps a function in new behavior without touching the function itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="70" width="80" height="80" rx="16" fillOpacity="0.9" />
+    <rect x="120" y="70" width="70" height="70" rx="14" />
   </g>
-  <g style={{ color: "var(--ds-blue-50)" }} fill="currentColor">
-    <text x="130" y="124" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontStyle="italic" fontSize="30">ƒ</text>
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="192" cy="110" r="3" />
-    <circle cx="214" cy="110" r="3" />
-    <circle cx="236" cy="110" r="3" />
-    <polygon points="254,102 270,110 254,118" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="280" y="44" width="80" height="132" rx="14" fillOpacity="0.15" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="376" cy="110" r="3" />
-    <circle cx="396" cy="110" r="3" />
+  <g fill="var(--ds-gray-400)">
+    <rect x="220" y="103.5" width="90" height="3" rx="1.5" />
+    <polygon points="308,99.5 319,105 308,110.5" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="420" y="46" width="130" height="130" rx="20" fillOpacity="0.2" />
+    <rect x="370" y="40" width="130" height="130" rx="20" fillOpacity="0.15" />
   </g>
+  <rect x="370" y="40" width="130" height="130" rx="20" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="451" y="77" width="68" height="68" rx="14" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-blue-50)" }} fill="currentColor">
-    <text x="485" y="121" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontStyle="italic" fontSize="26">ƒ</text>
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="477" y="46" width="16" height="130" fillOpacity="0.45" />
-    <rect x="420" y="103" width="130" height="16" fillOpacity="0.45" />
-    <circle cx="471" cy="38" r="8" fillOpacity="0.7" />
-    <circle cx="499" cy="38" r="8" fillOpacity="0.7" />
-    <circle cx="485" cy="42" r="5" />
+    <rect x="400" y="70" width="70" height="70" rx="14" />
   </g>
 </svg>
 
