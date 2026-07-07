@@ -41,17 +41,29 @@ down (smaller ones are left as-is).
 
 ## Slugs referenced by the content
 
-These slugs are already placed in the pages below. Add the matching
-`<slug>.<ext>` to light them up. Rename freely — the slug is just the filename;
-update the `<Figure slug="…">` call to match.
+These slugs are placed in the pages below, and each has a matching
+`<slug>.png` source in this folder. A slug can be reused on more than one page.
+Rename freely — the slug is just the filename; update the `<Figure slug="…">`
+call to match.
 
-| Slug           | Image                                   | Placed on |
-| -------------- | --------------------------------------- | --------- |
-| `panda`        | Panda in sunglasses (pandas mascot)     | `courses/data-analysis-python-pandas` · `interview-prep/data-analyst` |
-| `conversation` | People talking / speech bubbles         | `courses/natural-language-processing-python` · `interview-prep` (landing) |
-| `penguins`     | Penguin family (Palmer Penguins vibe)   | `courses/seaborn-foundations` |
-| `us-map`       | US map with plotted points              | `courses/intro-data-viz-plotly` |
-| `playground`   | Playground (slide, swings)              | `courses/python-basics` |
+| Slug                 | Image                                   | Placed on |
+| -------------------- | --------------------------------------- | --------- |
+| `panda`              | Panda in sunglasses (pandas mascot)     | `courses/data-analysis-python-pandas` · `interview-prep/data-analyst` |
+| `conversation`       | People talking / speech bubbles         | `courses/natural-language-processing-python` · `interview-prep` (landing) |
+| `penguins`           | Penguin family (Palmer Penguins vibe)   | `courses/seaborn-foundations` |
+| `us-map`             | US map with plotted points              | `courses/intro-data-viz-plotly` |
+| `playground`         | Playground (slide, swings)              | `courses/python-basics` |
+| `programmer-duck`    | Programmer duck (rubber-duck debugging) | `courses/beginners-javascript` · `courses/java-programming-for-beginners` |
+| `control-flow`       | Branching control-flow arrows           | `courses/c-programming-for-beginners` · `courses/typescript-from-scratch` |
+| `calculator`         | Calculator                              | `courses/scientific-computing-python` |
+| `cpu`                | CPU chip                                | `courses/systems-programming-c` |
+| `ram`                | Stick of RAM (memory)                   | `courses/from-zero-to-cpp` |
+| `stack`              | Stack data structure (LIFO)             | `courses/mastering-dsa-cpp` · `courses/java-collections-and-generics-deep-dive` |
+| `gpu`                | GPU                                     | `courses/machine-learning-scikit-learn` · `interview-prep/machine-learning-engineer` |
+| `box-plot`           | Minimal box plot                        | `courses/statistics-for-data-science-python` |
+| `line-chart`         | Minimal line chart                      | `courses/time-series-analysis-python` |
+| `data-visualization` | Assortment of charts                    | `courses/mastering-ggplot2` · `interview-prep/data-scientist` |
+| `bi-dashboard`       | Business-intelligence dashboard         | `courses/sql-analytics-duckdb` · `interview-prep/analytics-engineer` |
 
 To add more, drop `<slug>.<ext>` here and place a `<Figure slug="<slug>" alt="…" />`
 wherever it fits.
