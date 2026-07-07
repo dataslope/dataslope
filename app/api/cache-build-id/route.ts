@@ -13,7 +13,10 @@
  * running Worker itself, so it exposes its build ID here: the cleanup job fetches
  * https://dataslope.com/api/cache-build-id and preserves that folder regardless of
  * age. `OPEN_NEXT_BUILD_ID` is the exact value the R2 override uses for the key,
- * so this can't drift from the actual folder name.
+ * so this can't drift from the actual folder name. On Cloudflare Workers Builds
+ * that value is the deployed commit SHA (next.config.ts sets `generateBuildId` to
+ * `WORKERS_CI_COMMIT_SHA`), which is also how the cleanup job maps every other
+ * folder to the branch/PR it belongs to.
  *
  * The build ID is not sensitive — Next.js already exposes it in page payloads and
  * `/_next/static/<buildId>/…` asset URLs. `/api/` is disallowed in robots.ts.

@@ -19,6 +19,18 @@ initOpenNextCloudflareForDev();
 const nextConfig: NextConfig = {
   // Treat MDX files under content/ as page sources via fumadocs-mdx.
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+  // Name the OpenNext build ID after the deployed commit SHA when building on
+  // Cloudflare Workers Builds. The R2 incremental cache keys every object as
+  // `incremental-cache/<buildId>/…` (see open-next.config.ts), so this makes a
+  // cache folder's name equal to the commit it was built from. That's what lets
+  // the scheduled cleanup workflow map each folder back to a commit — and via
+  // the GitHub API to the open pull request (branch) it belongs to — so it can
+  // keep only the latest commit per active branch and drop merged/closed ones
+  // (.github/workflows/r2-cache-cleanup.yml). `WORKERS_CI_COMMIT_SHA` is the
+  // full commit SHA injected by Workers Builds; off-CI (local `next build` /
+  // `next dev`) it's unset, so we return null and Next falls back to its default
+  // random build ID — no behavior change outside CI.
+  generateBuildId: async () => process.env.WORKERS_CI_COMMIT_SHA || null,
   // Tell Next.js to rewrite barrel imports from these icon packages
   // into deep specifier-level imports so we don't pull whole index
   // graphs into every page's chunk.
