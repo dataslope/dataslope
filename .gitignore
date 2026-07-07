@@ -63,11 +63,6 @@ script-runner-src/__pycache__/
 # `scripts/build-svg-gallery-data.mjs` on build + dev).
 /public/svg-gallery/
 
-# Optimized course/interview illustrations (rebuilt by
-# `scripts/build-course-art.mjs` on postinstall + build + dev from the
-# committed source PNGs in assets/course-art/).
-/public/course-art/
-
 # Server-side search index, bundled into the Worker (rebuilt by
 # `scripts/build-search-index.mjs` on postinstall + build + dev). The
 # committed `.d.ts` sibling is kept so typecheck/lint pass before it exists.
@@ -77,11 +72,6 @@ script-runner-src/__pycache__/
 # `scripts/build-brand-fallbacks.mjs` on postinstall + build + dev). The
 # committed `.d.ts` sibling is kept so typecheck/lint pass before it exists.
 /lib/generated/brand-fallbacks.js
-
-# Course-art manifest (rebuilt by `scripts/build-course-art.mjs` on
-# postinstall + build + dev). The committed `.d.ts` sibling is kept so
-# typecheck/lint pass before it exists.
-/lib/generated/course-art.js
 
 # Output of scripts/check-mermaid-errors.mjs (regenerated on demand).
 /mermaid-check-results.json

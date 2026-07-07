@@ -10,9 +10,15 @@ reference each `slug`.
 2. Run `npm run build:course-art` (also runs automatically on `dev`, `build`,
    and `postinstall`). It:
    - crushes each PNG and writes an optimized `.png` + `.webp` pair to
-     `public/course-art/` (both gitignored — regenerated from these sources),
-   - records each image's intrinsic size in `lib/generated/course-art.js`.
-3. Any `<Illustration slug="panda" … />` in the content then renders the image.
+     `public/course-art/`,
+   - records each image's source hash + intrinsic size in
+     `lib/generated/course-art.js`.
+3. **Commit** the generated `public/course-art/*` and the updated manifest
+   alongside the source PNG. Unlike the repo's other generated assets these are
+   committed on purpose — the script only re-encodes a source whose content
+   hash changed, so deploys serve the committed outputs with no rebuild and no
+   per-commit re-encoding. If nothing changed the script is a no-op.
+4. Any `<Illustration slug="panda" … />` in the content then renders the image.
    Until a slug's PNG exists, that placement shows a small hint in `next dev`
    and renders nothing in production — so a page can reference art before it's
    drawn.
