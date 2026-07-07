@@ -21,9 +21,11 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 // URLs (the per-commit / per-branch `*.workers.dev` Workers Builds previews)
 // fall through to a re-render and 500 on exactly those `node:fs` pages. R2 is
 // read from identically on production and preview deployments, so previews
-// render correctly too. For this traffic it stays comfortably inside R2's
-// free tier (a few MB of HTML/RSC; ~1 object per page written per deploy via
-// the populate step; reads are rare behind the edge `s-maxage` cache).
+// render correctly too. Each deploy's populate step writes a full copy of the
+// cache under a new build ID — ~1–1.4 GB (one HTML+RSC `.cache` object per
+// prerendered page) — so stale build folders are pruned on a schedule by
+// .github/workflows/r2-cache-cleanup.yml. Reads are rare behind the edge
+// `s-maxage` cache.
 //
 // IMPORTANT: the R2 cache must be POPULATED at deploy time. `npm run cf:deploy`
 // (`opennextjs-cloudflare deploy`) and `npm run cf:preview` do this; if you
