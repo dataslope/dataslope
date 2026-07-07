@@ -1,0 +1,91 @@
+name: Optimize images
+
+# Regenerates the optimized public/images/* + manifest whenever a raster source
+# (or the optimizer itself) changes, and commits the result back to the branch —
+# so you only ever commit the source image, never the optimized derivatives.
+#
+# How it fits with Cloudflare Workers Builds (this repo's deploy CI):
+#   • Pushing a source image triggers a Cloudflare build. Because
+#     `build:images` runs in the `build` chain, that build regenerates and
+#     serves the new image on its own — the site is correct immediately, even
+#     before this workflow's commit lands.
+#   • This workflow's job is bookkeeping: commit the optimized outputs + manifest
+#     back to git so the repo reflects exactly what's served AND future deploys
+#     that don't touch images skip re-encoding (the incremental win — see
+#     scripts/build-images.mjs). It marks its commit `[skip ci]`.
+#   • No loop: it triggers only on `assets/images/**` / the optimizer, while its
+#     commit only touches `public/images/**` + the manifest. (A commit pushed
+#     with GITHUB_TOKEN also can't retrigger Actions.)
+#
+# To avoid the (harmless, image-step-is-a-no-op) extra Cloudflare build on the
+# commit-back, set that generated path as a non-triggering "Build watch path"
+# in the Cloudflare Workers Builds settings, or rely on it honoring `[skip ci]`.
+
+# Runs on every branch, including main: PR-branch runs keep outputs in sync
+# before merge (so a merge commit is a no-op here), and a direct push of an
+# image to main still gets its outputs committed. Caveat: if main is ever
+# protected against direct pushes, a stale-outputs push to main will fail this
+# job's push step — regenerate locally (or via workflow_dispatch on the source
+# branch) in that case.
+on:
+  push:
+    paths:
+      - "assets/images/**"
+      - "scripts/build-images.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: optimize-images-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    # Defensive: never react to our own commit-back.
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # Install the locked toolchain (sharp + its prebuilt binary) without the
+      # heavy postinstall build steps — the optimizer only needs sharp and node
+      # built-ins. Using the lockfile keeps the encoder identical to local/deploy
+      # runs, so the committed bytes match.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Regenerate optimized images
+        run: node scripts/build-images.mjs
+
+      - name: Commit optimized images if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images lib/generated/images.js
+          if git diff --cached --quiet; then
+            echo "Optimized images already up to date — nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(images): regenerate optimized assets [skip ci]"
+          branch="${{ github.ref_name }}"
+          for i in 1 2 3; do
+            if git pull --rebase --autostash origin "$branch" \
+              && git push origin "HEAD:$branch"; then
+              echo "Pushed optimized images."
+              exit 0
+            fi
+            echo "Push attempt $i failed; retrying…"
+            sleep "$((2 ** i))"
+          done
+          echo "::error::Could not push optimized images after 3 attempts."
+          exit 1
