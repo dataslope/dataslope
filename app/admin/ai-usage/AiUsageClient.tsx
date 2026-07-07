@@ -1,22 +1,28 @@
 "use client";
 
 /**
- * AI usage section — how much Ask AI chat and inline completion the site
- * served on a given UTC day, per user and in total. This is the page to
- * watch while testing the AI features with test users: counters move as
- * completions/chats land (usage is recorded post-response via waitUntil, so
- * allow a beat before refreshing).
+ * AI usage section — how much Ask AI chat, inline completion, and suggested
+ * questions the site served over a chosen date window, per user and in total.
+ * This is the page to watch while testing the AI features with test users:
+ * counters move as completions/chats land (usage is recorded post-response via
+ * waitUntil, so allow a beat before refreshing).
  *
- * Data comes from `GET /api/admin/ai-usage` (admin-enforced server-side).
- * The day picker refetches; global history shows the recent daily totals
- * against the configured site-wide cap. Presentation follows the soft
- * design kit in `_components/shared.tsx`; the numeric tables keep their
- * tabular layout on mobile and scroll horizontally (the ui Table wrapper is
- * already overflow-x-auto).
+ * The window is driven by a range toggle (Day / Week / Month / Total) plus an
+ * "as of" date that anchors the end of the window; Total drops the lower bound
+ * and always ends today. The date math is done in UTC to match how usage is
+ * bucketed server-side (`ai_usage_daily.day` is a UTC 'YYYY-MM-DD').
+ *
+ * Data comes from `GET /api/admin/ai-usage?start&end` (admin-enforced
+ * server-side), which returns per-user rows summed over the window plus the
+ * site-wide per-day totals against the configured daily cap. Presentation
+ * follows the soft design kit in `_components/shared.tsx`; the numeric tables
+ * keep their tabular layout on mobile and scroll horizontally (the ui Table
+ * wrapper is already overflow-x-auto).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +63,59 @@ const compact = new Intl.NumberFormat("en", {
 /** Full figure for table columns (rendered with tabular-nums to align). */
 const full = new Intl.NumberFormat("en");
 
+// ─── Date window ──────────────────────────────────────────────────────────
+
+type Range = "day" | "week" | "month" | "total";
+
+/** The toggle options, with the trailing span each covers (in days). Total has
+ *  no fixed span — it drops the lower bound entirely. */
+const RANGES: { key: Range; label: string; span: number }[] = [
+  { key: "day", label: "Day", span: 1 },
+  { key: "week", label: "Week", span: 7 },
+  { key: "month", label: "Month", span: 30 },
+  { key: "total", label: "Total", span: 0 },
+];
+
+/** Today as a UTC 'YYYY-MM-DD' — matches how the server buckets usage. */
+function todayUtc(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Shift a UTC 'YYYY-MM-DD' by whole days. */
+function addDaysUtc(day: string, delta: number): string {
+  const d = new Date(`${day}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Inclusive [start, end] for a range anchored at the window's end date.
+ *  Total has no lower bound (start = null) and always ends today. */
+function windowFor(
+  range: Range,
+  anchor: string,
+): { start: string | null; end: string } {
+  if (range === "total") return { start: null, end: todayUtc() };
+  return { start: addDaysUtc(anchor, -(RANGES.find((r) => r.key === range)!.span - 1)), end: anchor };
+}
+
+/** Pretty UTC day, e.g. "Jul 7, 2026". */
+const fmtDay = (d: string) =>
+  new Date(`${d}T00:00:00Z`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+
+/** Human label for the resolved window, shown next to the controls. */
+function windowLabel(start: string | null, end: string): string {
+  if (!start) return "All time";
+  if (start === end) return fmtDay(end);
+  return `${fmtDay(start)} – ${fmtDay(end)}`;
+}
+
+// ─── Tiles ─────────────────────────────────────────────────────────────────
+
 function StatTile({
   label,
   value,
@@ -96,7 +155,7 @@ function CapMeter({ fraction }: { fraction: number }) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={pct}
-      aria-label="Share of today's global token cap used"
+      aria-label="Share of a day's global token cap used"
       className={`mt-1 h-1.5 w-full overflow-hidden rounded-full ${tone.track}`}
     >
       <div
@@ -107,27 +166,70 @@ function CapMeter({ fraction }: { fraction: number }) {
   );
 }
 
+/** Segmented Day / Week / Month / Total control. */
+function RangeToggle({
+  value,
+  onChange,
+}: {
+  value: Range;
+  onChange: (r: Range) => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Usage range"
+      className="inline-flex rounded-lg bg-zinc-500/[0.07] p-0.5 dark:bg-white/[0.07]"
+    >
+      {RANGES.map((r) => {
+        const active = r.key === value;
+        return (
+          <button
+            key={r.key}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(r.key)}
+            className={cn(
+              "rounded-md px-3 py-1 text-sm font-medium transition-colors",
+              active
+                ? "bg-white text-foreground shadow-sm dark:bg-white/[0.12]"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {r.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function AiUsageClient() {
   const { data: session, isPending: sessionPending } = useSession();
   const [report, setReport] = useState<AiUsageReport | null>(null);
-  const [day, setDay] = useState("");
+  const [range, setRange] = useState<Range>("day");
+  // Empty until the first load resolves, then synced to the server's `end`.
+  // Starting empty avoids an SSR/client `new Date()` hydration mismatch.
+  const [anchor, setAnchor] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
 
-  // Monotonic sequence: flipping the day picker quickly fires overlapping
+  // Monotonic sequence: flipping the range/date quickly fires overlapping
   // fetches, and a slow stale response must not overwrite the newer report
-  // (or snap the picker back to the stale day).
+  // (or snap the picker back to the stale window).
   const loadSeq = useRef(0);
 
-  const load = useCallback(async (requestedDay?: string) => {
+  const load = useCallback(async (nextRange: Range, nextAnchor: string) => {
     const seq = ++loadSeq.current;
+    const win = windowFor(nextRange, nextAnchor || todayUtc());
     setLoading(true);
     setError(null);
     setDenied(false);
     try {
-      const qs = requestedDay ? `?day=${requestedDay}` : "";
-      const res = await fetch(`/api/admin/ai-usage${qs}`);
+      const qs = new URLSearchParams();
+      if (win.start) qs.set("start", win.start);
+      qs.set("end", win.end);
+      const res = await fetch(`/api/admin/ai-usage?${qs.toString()}`);
       if (seq !== loadSeq.current) return; // superseded by a newer load
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
@@ -140,7 +242,9 @@ export function AiUsageClient() {
         const data = (await res.json()) as AiUsageReport;
         if (seq !== loadSeq.current) return;
         setReport(data);
-        setDay(data.day);
+        // Keep the picker in sync with the resolved window end (the server is
+        // the source of truth for "today").
+        setAnchor(data.end);
       }
     } catch {
       if (seq !== loadSeq.current) return;
@@ -152,8 +256,19 @@ export function AiUsageClient() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void load();
+    if (!sessionPending && session) void load(range, anchor);
+    // Mount-only: subsequent loads are driven by the controls' handlers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionPending, session, load]);
+
+  const selectRange = (r: Range) => {
+    setRange(r);
+    void load(r, anchor);
+  };
+  const selectAnchor = (a: string) => {
+    setAnchor(a);
+    if (a) void load(range, a);
+  };
 
   if (sessionPending) return <CenteredNote>Loading…</CenteredNote>;
   if (!session) return <SignInPrompt />;
@@ -166,16 +281,29 @@ export function AiUsageClient() {
     );
   }
 
-  // The `global` totals only cover the server's recent-days window — a day
-  // older than that has no entry, which must read as "no data", not "0
-  // tokens" (the per-user table below may show real usage for it).
-  const dayEntry = report?.global.find((g) => g.day === report.day);
-  const dayTotal = dayEntry?.totalTok ?? 0;
-  const dayInWindow = dayEntry !== undefined;
-  const chatRequests =
-    report?.users.reduce((sum, u) => sum + u.requests, 0) ?? 0;
-  const completions =
-    report?.users.reduce((sum, u) => sum + u.completions, 0) ?? 0;
+  const isSingleDay = report ? report.start === report.end : range === "day";
+  // Once loaded, describe the window the server actually returned; before the
+  // first response, describe the window the current controls will request.
+  const pending = windowFor(range, anchor || todayUtc());
+  const label = report
+    ? windowLabel(report.start, report.end)
+    : windowLabel(pending.start, pending.end);
+
+  const hasTokenData = (report?.activeDays ?? 0) > 0;
+  const capPct = report ? Math.round((report.peakDayTok / report.globalCap) * 100) : 0;
+  const chatRequests = report?.users.reduce((s, u) => s + u.requests, 0) ?? 0;
+  const completions = report?.users.reduce((s, u) => s + u.completions, 0) ?? 0;
+
+  const tokenDetail = !report
+    ? undefined
+    : !hasTokenData
+      ? "No site-wide usage in this window"
+      : isSingleDay
+        ? `${Math.round((report.totalTok / report.globalCap) * 100)}% of the ${compact.format(report.globalCap)} daily cap`
+        : `busiest day ${capPct}% of the ${compact.format(report.globalCap)} daily cap · ${report.activeDays} active ${report.activeDays === 1 ? "day" : "days"}`;
+
+  const userCount = report?.users.length ?? 0;
+  const dailyTruncated = report ? report.activeDays > report.daily.length : false;
 
   return (
     <>
@@ -184,25 +312,34 @@ export function AiUsageClient() {
         description="Ask AI chat, inline-completion, and suggested-question spend, per user and site-wide."
       />
       <div className="flex flex-col gap-5 sm:gap-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <label htmlFor="ai-usage-day" className="text-sm font-medium">
-            Day (UTC)
-          </label>
-          <Input
-            id="ai-usage-day"
-            type="date"
-            value={day}
-            onChange={(e) => {
-              setDay(e.target.value);
-              if (e.target.value) void load(e.target.value);
-            }}
-            className={`${softInputClass} w-40`}
-          />
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <RangeToggle value={range} onChange={selectRange} />
+          <div className="flex items-center gap-2">
+            <label htmlFor="ai-usage-day" className="text-sm font-medium">
+              As of (UTC)
+            </label>
+            <Input
+              id="ai-usage-day"
+              type="date"
+              value={anchor}
+              disabled={range === "total"}
+              title={
+                range === "total"
+                  ? "Total covers all time — pick another range to filter by date"
+                  : "The last day the window includes"
+              }
+              onChange={(e) => selectAnchor(e.target.value)}
+              className={`${softInputClass} w-40 disabled:opacity-50`}
+            />
+          </div>
+          <span className="text-sm text-muted-foreground">
+            Showing <span className="font-medium text-foreground">{label}</span>
+          </span>
           <Button
             variant="ghost"
             size="sm"
-            className={quietActionClass}
-            onClick={() => void load(day || undefined)}
+            className={`${quietActionClass} ml-auto`}
+            onClick={() => void load(range, anchor)}
             disabled={loading}
           >
             <RefreshCw className={loading ? "animate-spin" : undefined} />
@@ -215,17 +352,11 @@ export function AiUsageClient() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatTile
             label="Tokens used"
-            value={loading ? "…" : dayInWindow ? compact.format(dayTotal) : "—"}
-            detail={
-              report
-                ? dayInWindow
-                  ? `${Math.round((dayTotal / report.globalCap) * 100)}% of the ${compact.format(report.globalCap)} daily cap`
-                  : "Totals are only kept for recent days"
-                : undefined
-            }
+            value={loading ? "…" : hasTokenData ? compact.format(report!.totalTok) : "—"}
+            detail={tokenDetail}
           >
-            {report && dayInWindow && (
-              <CapMeter fraction={dayTotal / report.globalCap} />
+            {report && hasTokenData && (
+              <CapMeter fraction={report.peakDayTok / report.globalCap} />
             )}
           </StatTile>
           <StatTile
@@ -238,7 +369,7 @@ export function AiUsageClient() {
           />
           <StatTile
             label="Active users"
-            value={loading ? "…" : compact.format(report?.users.length ?? 0)}
+            value={loading ? "…" : compact.format(userCount)}
           />
         </div>
 
@@ -248,9 +379,7 @@ export function AiUsageClient() {
             description={
               loading
                 ? "Loading…"
-                : `${report?.users.length ?? 0} ${
-                    (report?.users.length ?? 0) === 1 ? "user" : "users"
-                  } with AI activity on ${report?.day ?? "—"}`
+                : `${userCount} ${userCount === 1 ? "user" : "users"} with AI activity · ${label}`
             }
           />
           <PanelBody>
@@ -261,7 +390,7 @@ export function AiUsageClient() {
               </p>
             ) : !report || report.users.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">
-                No AI activity on this day.
+                No AI activity in this window.
               </p>
             ) : (
               <Table>
@@ -339,18 +468,19 @@ export function AiUsageClient() {
               </Table>
             )}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              Tokens are input + output as reported by the provider (or a
-              char/4 estimate when it doesn&apos;t report usage). Usage is
-              recorded just after each response finishes, so very recent
-              activity can take a moment to appear.
+              Counts are summed across the selected window. Tokens are input +
+              output as reported by the provider (or a char/4 estimate when it
+              doesn&apos;t report usage). Usage is recorded just after each
+              response finishes, so very recent activity can take a moment to
+              appear.
             </p>
           </PanelBody>
         </Panel>
 
         <Panel>
           <PanelHeader
-            title="Recent days"
-            description="Site-wide daily token totals against the global cap."
+            title="Daily totals"
+            description="Site-wide token total per day against the global daily cap."
           />
           <PanelBody>
             {loading ? (
@@ -358,39 +488,47 @@ export function AiUsageClient() {
                 <Loader2 className="mr-2 inline size-4 animate-spin" />
                 Loading…
               </p>
-            ) : !report || report.global.length === 0 ? (
+            ) : !report || report.daily.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                No usage recorded yet.
+                No usage recorded in this window.
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className={headRowClass}>
-                    <TableHead className={theadClass}>Day</TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
-                      Tokens
-                    </TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
-                      % of cap
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {report.global.map((g) => (
-                    <TableRow key={g.day} className={rowClass}>
-                      <TableCell className={`${cellClass} font-medium`}>
-                        {g.day}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {full.format(g.totalTok)}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {Math.round((g.totalTok / report.globalCap) * 100)}%
-                      </TableCell>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow className={headRowClass}>
+                      <TableHead className={theadClass}>Day</TableHead>
+                      <TableHead className={`${theadClass} text-right`}>
+                        Tokens
+                      </TableHead>
+                      <TableHead className={`${theadClass} text-right`}>
+                        % of cap
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {report.daily.map((g) => (
+                      <TableRow key={g.day} className={rowClass}>
+                        <TableCell className={`${cellClass} font-medium`}>
+                          {g.day}
+                        </TableCell>
+                        <TableCell className={`${cellClass} text-right tabular-nums`}>
+                          {full.format(g.totalTok)}
+                        </TableCell>
+                        <TableCell className={`${cellClass} text-right tabular-nums`}>
+                          {Math.round((g.totalTok / report.globalCap) * 100)}%
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {dailyTruncated && (
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Showing the {report.daily.length} most recent days of{" "}
+                    {report.activeDays} with usage in this window.
+                  </p>
+                )}
+              </>
             )}
           </PanelBody>
         </Panel>
