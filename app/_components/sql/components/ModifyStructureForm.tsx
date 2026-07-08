@@ -26,16 +26,25 @@ import {
   GripVertical,
   Hash,
   Plus,
+  Table,
   Trash2,
   Zap,
 } from "lucide-react";
 import type { ModifyColumnDraft } from "../types";
 import type { TableColumnInfo, SqliteEngine } from "../../runtime/sqlite";
 import { COLUMN_TYPES, FK_ACTIONS } from "../constants";
-import { withCurrentTypeOption } from "../utils/columnTypeSelector";
+import type { ColumnTypeGroup } from "../utils/columnTypeSelector";
 import { DdlViewer } from "./DdlViewer";
 import { GenExprEditor } from "./GenExprEditor";
 import { ColumnHeaderPopover } from "./PragmaSettingsTab";
+import { StructureCombobox, FkCombobox } from "./StructureCombobox";
+
+/** SQLite type affinities, surfaced as a single flat group in the type
+ *  combobox. Freeform entry keeps any custom declared type (e.g.
+ *  `VARCHAR(15)`) that an imported schema may carry. */
+const SQLITE_TYPE_GROUPS: ColumnTypeGroup[] = [
+  { label: "", types: COLUMN_TYPES },
+];
 
 function newDraftId(): string {
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
@@ -164,23 +173,18 @@ export function ModifyColumnRow({
         </label>
       </td>
       <td>
-        <label className="sql-modify-cell-field">
-          <select
-            className="sql-modify-col-type sql-modify-col-type-select"
-            value={col.type}
-            onChange={(e) => onChange({ type: e.target.value })}
-            aria-label="Column type"
-          >
-            {/* SQLite columns can declare any type (e.g. `VARCHAR(15)` from an
-                imported schema); surface the current value so the native
-                select doesn't render blank and silently lose it. */}
-            {withCurrentTypeOption(COLUMN_TYPES, col.type).map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* SQLite columns can declare any type (e.g. `VARCHAR(15)` from an
+            imported schema); the freeform combobox preserves whatever is
+            typed while still offering the built-in affinities. */}
+        <StructureCombobox
+          value={col.type}
+          onChange={(type) => onChange({ type })}
+          groups={SQLITE_TYPE_GROUPS}
+          placeholder="e.g. TEXT"
+          ariaLabel="Column type"
+          triggerAriaLabel="Open type list"
+          freeform
+        />
       </td>
       <td>
         <ColumnFlag
@@ -232,41 +236,21 @@ export function ModifyColumnRow({
         </label>
       </td>
       <td>
-        <label className="sql-modify-cell-field">
-          <select
-            className="sql-modify-col-type sql-modify-fk-table"
-            value={col.fkTable}
-            onChange={(e) =>
-              onChange({ fkTable: e.target.value, fkColumn: "" })
-            }
-            aria-label="Foreign key target table"
-          >
-            <option value="">(none)</option>
-            {knownTables.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
+        <FkCombobox
+          value={col.fkTable}
+          onChange={(fkTable) => onChange({ fkTable, fkColumn: "" })}
+          options={knownTables}
+          placeholder="(none)"
+          ariaLabel="Foreign key target table"        />
       </td>
       <td>
-        <label className="sql-modify-cell-field">
-          <select
-            className="sql-modify-col-type sql-modify-fk-column"
-            value={col.fkColumn}
-            onChange={(e) => onChange({ fkColumn: e.target.value })}
-            aria-label="Foreign key target column"
-            disabled={!col.fkTable}
-          >
-            <option value="">(column)</option>
-            {fkTargetColumns.map((c) => (
-              <option key={c.cid} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <FkCombobox
+          value={col.fkColumn}
+          onChange={(fkColumn) => onChange({ fkColumn })}
+          options={fkTargetColumns.map((c) => c.name)}
+          placeholder="(column)"
+          ariaLabel="Foreign key target column"          disabled={!col.fkTable}
+        />
       </td>
       <td>
         <label className="sql-modify-cell-field">
@@ -569,11 +553,18 @@ export function ModifyStructureForm({
     <div className="sql-modify-body" ref={formBodyRef}>
       <label className="sql-modify-field">
         <span className="sql-modify-field-label">Table name</span>
-        <input
-          className="sql-rename-input"
-          value={state.newName}
-          onChange={(e) => onChange({ ...state, newName: e.target.value })}
-        />
+        <div className="sql-modify-table-name-wrap">
+          <Table
+            size={14}
+            className="sql-modify-table-name-icon"
+            aria-hidden="true"
+          />
+          <input
+            className="sql-rename-input sql-modify-table-name-input"
+            value={state.newName}
+            onChange={(e) => onChange({ ...state, newName: e.target.value })}
+          />
+        </div>
       </label>
 
       {/* Tab strip */}
@@ -628,22 +619,35 @@ export function ModifyStructureForm({
                   >
                     <table className="sql-modify-table">
                       <thead>
+                        <tr className="sql-modify-group-row">
+                          <th aria-hidden="true" />
+                          <th aria-hidden="true" />
+                          <th aria-hidden="true" />
+                          <th className="sql-modify-group-label" colSpan={4}>
+                            Constraints
+                          </th>
+                          <th aria-hidden="true" />
+                          <th className="sql-modify-group-label" colSpan={4}>
+                            Foreign key
+                          </th>
+                          <th aria-hidden="true" />
+                        </tr>
                         <tr>
                           <th className="sql-modify-th-drag" />
                           <th>Name</th>
                           <th style={{ minWidth: "90px" }}>
                             Type <ColumnHeaderPopover pragma="type" />
                           </th>
-                          <th>
+                          <th className="sql-modify-th-center">
                             Not null <ColumnHeaderPopover pragma="notNull" />
                           </th>
-                          <th>
+                          <th className="sql-modify-th-center">
                             Primary <ColumnHeaderPopover pragma="primary" />
                           </th>
-                          <th>
+                          <th className="sql-modify-th-center">
                             Unique <ColumnHeaderPopover pragma="unique" />
                           </th>
-                          <th>
+                          <th className="sql-modify-th-center">
                             Auto-
                             <br />
                             increment{" "}
@@ -654,10 +658,10 @@ export function ModifyStructureForm({
                             <ColumnHeaderPopover pragma="defaultValue" />
                           </th>
                           <th>
-                            FK table <ColumnHeaderPopover pragma="fkTable" />
+                            Table <ColumnHeaderPopover pragma="fkTable" />
                           </th>
                           <th>
-                            FK column <ColumnHeaderPopover pragma="fkColumn" />
+                            Column <ColumnHeaderPopover pragma="fkColumn" />
                           </th>
                           <th>
                             On delete <ColumnHeaderPopover pragma="onDelete" />
@@ -665,7 +669,7 @@ export function ModifyStructureForm({
                           <th>
                             On update <ColumnHeaderPopover pragma="onUpdate" />
                           </th>
-                          <th>Actions</th>
+                          <th aria-label="Actions" />
                         </tr>
                       </thead>
                       <tbody>
