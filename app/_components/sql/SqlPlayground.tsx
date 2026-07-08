@@ -3359,7 +3359,7 @@ function SqlPlaygroundInner() {
         >
           <Dialog.Portal>
             <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
-            <Dialog.Popup className="sql-modify-drawer">
+            <Dialog.Popup className="sql-modify-drawer sql-structure-drawer">
               <header className="sql-modify-drawer-header">
                 <div className="sql-modify-drawer-heading">
                   <Dialog.Title className="sql-modify-drawer-title">

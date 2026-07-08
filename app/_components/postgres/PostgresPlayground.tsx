@@ -36,6 +36,7 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   ChevronDown,
+  Columns3,
   Database,
   FilePlus,
   FileJson,
@@ -159,6 +160,8 @@ import { SqlIconSidebar } from "../sql/components/SqlIconSidebar";
 import { GenExprEditor } from "../sql/components/GenExprEditor";
 import { ToastList } from "../sql/components/ToastList";
 import { ColumnFlag } from "../sql/components/ModifyStructureForm";
+import { FkCombobox } from "../sql/components/StructureCombobox";
+import { StructureTableHeader } from "../sql/components/StructureTableHeader";
 import { QueryHistoryPane } from "../sql/components/QueryHistoryPane";
 import { useQueryHistory } from "../sql/hooks/useQueryHistory";
 import {
@@ -718,41 +721,25 @@ function PgStructureColumnRow({
         </label>
       </td>
       <td>
-        <label className="sql-modify-cell-field">
-          <select
-            className="sql-modify-col-type sql-modify-fk-table"
-            value={col.fkTable}
-            onChange={(e) =>
-              onChange({ fkTable: e.target.value, fkColumn: "" })
-            }
-            aria-label="Foreign key target table"
-          >
-            <option value="">(none)</option>
-            {knownTables.map((table) => (
-              <option key={table} value={table}>
-                {table}
-              </option>
-            ))}
-          </select>
-        </label>
+        <FkCombobox
+          value={col.fkTable}
+          onChange={(fkTable) => onChange({ fkTable, fkColumn: "" })}
+          options={knownTables}
+          placeholder="(none)"
+          ariaLabel="Foreign key target table"
+          noneLabel="— none"
+        />
       </td>
       <td>
-        <label className="sql-modify-cell-field">
-          <select
-            className="sql-modify-col-type sql-modify-fk-column"
-            value={col.fkColumn}
-            onChange={(e) => onChange({ fkColumn: e.target.value })}
-            aria-label="Foreign key target column"
-            disabled={!col.fkTable}
-          >
-            <option value="">(column)</option>
-            {fkTargetColumns.map((target) => (
-              <option key={target.name} value={target.name}>
-                {target.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <FkCombobox
+          value={col.fkColumn}
+          onChange={(fkColumn) => onChange({ fkColumn })}
+          options={fkTargetColumns.map((target) => target.name)}
+          placeholder="(column)"
+          ariaLabel="Foreign key target column"
+          noneLabel="— none"
+          disabled={!col.fkTable}
+        />
       </td>
       <td>
         <label className="sql-modify-cell-field">
@@ -4116,7 +4103,7 @@ function PostgresPlaygroundInner() {
         >
           <Dialog.Portal>
             <Dialog.Backdrop className="confirm-backdrop sql-modify-backdrop" />
-            <Dialog.Popup className="sql-modify-drawer">
+            <Dialog.Popup className="sql-modify-drawer sql-structure-drawer">
               <header className="sql-modify-drawer-header">
                 <div className="sql-modify-drawer-heading">
                   <Dialog.Title className="sql-modify-drawer-title">
@@ -4137,9 +4124,16 @@ function PostgresPlaygroundInner() {
               {viewStructureDialog && (
                 <div className="sql-modify-body" ref={viewStructureBodyRef}>
                   <label className="sql-modify-field">
-                    <span className="sql-modify-field-label">Table name</span>
+                    <span className="sql-modify-field-label">
+                      <Table
+                        size={13}
+                        className="sql-modify-field-icon"
+                        aria-hidden="true"
+                      />
+                      Table name
+                    </span>
                     <input
-                      className={`sql-rename-input${pgStructureValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
+                      className={`sql-rename-input sql-modify-table-name-input${pgStructureValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
                       value={viewStructureDialog.newTableName}
                       onChange={(e) =>
                         setViewStructureDialog((prev) =>
@@ -4160,6 +4154,19 @@ function PostgresPlaygroundInner() {
                     return (
                       <>
                         <div className="sql-modify-columns">
+                          <div className="sql-modify-cols-header">
+                            <span className="sql-modify-cols-title">
+                              <Columns3
+                                size={13}
+                                className="sql-modify-cols-icon"
+                                aria-hidden="true"
+                              />
+                              Columns
+                            </span>
+                            <span className="sql-modify-cols-count">
+                              {regularCols.length}
+                            </span>
+                          </div>
                           <DndContext
                             sensors={pgStructureSensors}
                             collisionDetection={closestCenter}
@@ -4186,28 +4193,7 @@ function PostgresPlaygroundInner() {
                             >
                               <div className="sql-modify-table-wrap">
                                 <table className="sql-modify-table">
-                                  <thead>
-                                    <tr>
-                                      <th
-                                        className="sql-modify-drag-cell"
-                                        aria-label="Drag handle"
-                                      />
-                                      <th>Name</th>
-                                      <th>Type</th>
-                                      <th>Not null</th>
-                                      <th>Primary</th>
-                                      <th>Unique</th>
-                                      <th title="Identity / serial (auto-incrementing) column">
-                                        Identity
-                                      </th>
-                                      <th>Default</th>
-                                      <th>FK table</th>
-                                      <th>FK column</th>
-                                      <th>On delete</th>
-                                      <th>On update</th>
-                                      <th>Actions</th>
-                                    </tr>
-                                  </thead>
+                                  <StructureTableHeader />
                                   <tbody>
                                     {regularCols.map((col) => (
                                       <PgStructureColumnRow
@@ -4504,28 +4490,7 @@ function PostgresPlaygroundInner() {
                             >
                               <div className="sql-modify-table-wrap">
                                 <table className="sql-modify-table">
-                                  <thead>
-                                    <tr>
-                                      <th
-                                        className="sql-modify-drag-cell"
-                                        aria-label="Drag handle"
-                                      />
-                                      <th>Name</th>
-                                      <th>Type</th>
-                                      <th>Not null</th>
-                                      <th>Primary</th>
-                                      <th>Unique</th>
-                                      <th title="Identity / serial (auto-incrementing) column">
-                                        Identity
-                                      </th>
-                                      <th>Default</th>
-                                      <th>FK table</th>
-                                      <th>FK column</th>
-                                      <th>On delete</th>
-                                      <th>On update</th>
-                                      <th>Actions</th>
-                                    </tr>
-                                  </thead>
+                                  <StructureTableHeader />
                                   <tbody>
                                     {regularCols.map((col) => (
                                       <PgStructureColumnRow
