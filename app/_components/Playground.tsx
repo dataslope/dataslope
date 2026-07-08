@@ -11,7 +11,8 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
-import { EditorState, Compartment } from "@codemirror/state";
+import { EditorState, Compartment, StateEffect } from "@codemirror/state";
+import { unifiedMergeView } from "@codemirror/merge";
 import {
   EditorView,
   keymap,
@@ -41,6 +42,10 @@ import {
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
+import {
+  registerAiEditHandler,
+  type AiEditSuggestion,
+} from "./ai/editSuggestions";
 import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
@@ -96,6 +101,7 @@ import {
 import { usePlaygroundThemeSync } from "./playgroundThemeSync";
 import { useIsFramed } from "./useIsFramed";
 import {
+  CopyIcon,
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
   LOADING_QUIPS,
@@ -149,6 +155,7 @@ import {
   Rows3,
   Settings,
   Zap,
+  ZapOff,
 } from "lucide-react";
 import PlaygroundSplitEditors from "./PlaygroundSplitEditors";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
@@ -583,30 +590,6 @@ function mergeConsecutiveStdout<T extends { type: string; content: string }>(
   return result;
 }
 
-// Small clipboard / "copy to clipboard" glyph reused by the editor and
-// output cell headers. Stroked rather than filled so it visually matches
-// the existing pane-bar icons.
-function CopyIcon() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      width="13"
-      height="13"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="5" y="5" width="9" height="9" rx="1.5" />
-      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
-    </svg>
-  );
-}
-
-
-
 export interface PlaygroundProps {
   adapter: LanguageAdapter;
 }
@@ -917,9 +900,38 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const suppressPersistRef = useRef(false);
 
   const [workspaceReady, setWorkspaceReady] = useState(false);
+  // Mirrored into a ref for callbacks registered outside the render cycle
+  // (e.g. the Ask AI edit handler in ai/editSuggestions.ts).
+  const workspaceReadyRef = useRef(false);
+  useEffect(() => {
+    workspaceReadyRef.current = workspaceReady;
+  }, [workspaceReady]);
+
+  // ─── Open editor tabs ───────────────────────────────────────────────
+  // The tab strip shows a SUBSET of the workspace's files: closing a tab
+  // only hides its editor — the file stays in the workspace (Files pane,
+  // OPFS, and the run/bundle staging), so cross-file imports keep
+  // resolving. Deleting a file for real happens in the Files pane or the
+  // tab's "Delete File" menu item. Persisted in the workspace manifest.
+  const [openTabIds, setOpenTabIdsState] = useState<string[]>([]);
+  const openTabIdsRef = useRef<string[]>([]);
+  const setOpenTabIds = useCallback(
+    (next: string[] | ((prev: string[]) => string[])) => {
+      const value =
+        typeof next === "function" ? next(openTabIdsRef.current) : next;
+      openTabIdsRef.current = value;
+      setOpenTabIdsState(value);
+    },
+    [],
+  );
 
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatPopoverOpen, setFormatPopoverOpen] = useState(false);
+  // Split view: the id of the file whose pane-header Format button is
+  // currently running, so only that pane shows the spinner.
+  const [formattingSplitId, setFormattingSplitId] = useState<string | null>(
+    null,
+  );
   const outputCounter = useRef(0);
   // Monotonic per-run id stamped on every cell a run appends, so the
   // output pane can render one merged frame per run (see outputGroups).
@@ -987,6 +999,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setSplitView = useCallback(
     (on: boolean) => {
       setSplitViewState(on);
+      // Switching views can change the editor arrangement (tabbed pins
+      // the editor left) — drop the resizer's inline grid template so
+      // the new arrangement's CSS takes over at default proportions.
+      panesRef.current?.style.removeProperty("grid-template-columns");
       try {
         window.localStorage.setItem(
           `playground_${adapter.id}_splitview`,
@@ -1093,6 +1109,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [adapter.id],
   );
+  // On split-capable adapters the tabbed (manage files) view always
+  // pins the editor to the left; the stored arrangement only applies
+  // while the split panes are showing. Non-split preview adapters keep
+  // their arrangement in both views.
+  const editorPinnedLeft = splitAvailable && !splitActive;
+  const effectiveEditorPosition = editorPinnedLeft ? "left" : editorPosition;
 
   // Latest run handler in a ref so the editor's keymap can call into it
   // without being re-bound on every render. `auto` marks debounced
@@ -1219,9 +1241,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         const manifest = loadManifest(adapter.id, ws.id);
         let files: PlaygroundFile[];
         let activeId: string;
+        let openIds: string[] | null = null;
         if (manifest) {
           files = manifest.files;
           activeId = manifest.activeFileId;
+          openIds = manifest.openTabIds;
         } else {
           files = defaultFiles(adapter);
           activeId = files[0].id;
@@ -1266,6 +1290,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         if (cancelled) return;
         setWorkspace(ws.id, ws.name);
         setFiles(files);
+        setOpenTabIds(openIds ?? files.map((f) => f.id));
         setActiveFileId(activeId);
         setActiveTabId(activeId);
         // Sync refs eagerly so the editor's persist listener can use them
@@ -1321,6 +1346,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           updateDirtyBuffer(f.id, seed);
         }
         setFiles(files);
+        setOpenTabIds(files.map((f) => f.id));
         setActiveFileId(activeId);
         setActiveTabId(activeId);
         activeFileIdRef.current = activeId;
@@ -1336,13 +1362,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);
 
-  // Persist the manifest whenever files or active file change. Skipped
-  // until the workspace has finished bootstrapping so the initial
-  // hydration doesn't immediately overwrite a freshly-loaded manifest.
+  // Persist the manifest whenever files, open tabs, or the active file
+  // change. Skipped until the workspace has finished bootstrapping so the
+  // initial hydration doesn't immediately overwrite a freshly-loaded
+  // manifest. Dangling tab ids (files replaced by an example load) are
+  // filtered out at write time.
   useEffect(() => {
     if (!workspaceReady || !workspaceId) return;
-    saveManifest(adapter.id, workspaceId, files, activeFileId);
-  }, [adapter.id, workspaceId, files, activeFileId, workspaceReady]);
+    saveManifest(
+      adapter.id,
+      workspaceId,
+      files,
+      activeFileId,
+      openTabIds.filter((id) => files.some((f) => f.id === id)),
+    );
+  }, [adapter.id, workspaceId, files, activeFileId, openTabIds, workspaceReady]);
+
+  // Whatever activates a file (tab click, Files pane, split-pane focus,
+  // the Ask AI edit handler, workspace hydration) must end with that
+  // file's tab open — centralized here so no activation path can strand
+  // an active-but-closed file.
+  useEffect(() => {
+    if (!workspaceReady || !activeFileId) return;
+    if (!files.some((f) => f.id === activeFileId)) return;
+    if (openTabIds.includes(activeFileId)) return;
+    setOpenTabIds((prev) =>
+      prev.includes(activeFileId) ? prev : [...prev, activeFileId],
+    );
+  }, [activeFileId, files, openTabIds, setOpenTabIds, workspaceReady]);
 
   // Load uploaded data files from OPFS once the workspace is ready.
   useEffect(() => {
@@ -2401,6 +2448,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const next = [...filesRef.current, newFile];
     filesRef.current = next;
     setFiles(next);
+    setOpenTabIds((prev) => [...prev, id]);
     updateDirtyBuffer(id, "");
     if (wsId) opfsWriteFile(wsId, id, "");
     activeFileIdRef.current = id;
@@ -2412,6 +2460,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setActiveFileId,
     setActiveTabId,
     setFiles,
+    setOpenTabIds,
     updateDirtyBuffer,
   ]);
 
@@ -2452,35 +2501,76 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
   }, [activeTabId, setActiveTabId]);
 
+  /** Close a file's editor TAB. The file itself stays in the workspace
+   *  (Files pane, OPFS, dirty buffer, and the run/bundle staging), so
+   *  cross-file imports keep resolving — closing `styles.css` must not
+   *  break `import "./styles.css"`. Reopen from the Files pane; delete
+   *  for real with `deleteWorkspaceFile`. */
   const closeFileTab = useCallback(
     (fileId: string) => {
       if (fileId === SETTINGS_TAB_ID) {
         closeSettingsTab();
         return;
       }
-      const current = filesRef.current;
-      if (current.length <= 1) {
-        // Refuse to close the last file — the playground needs at
-        // least one editor target. Could be relaxed later by recreating
-        // a default file on close.
-        showToast("Can't close the last file.", "warn");
+      const open = openTabIdsRef.current;
+      if (!open.includes(fileId)) return;
+      if (open.length <= 1) {
+        // Refuse to close the last open tab — the playground needs at
+        // least one editor target.
+        showToast("Can't close the last open tab.", "warn");
         return;
       }
-      const wsId = workspaceIdRef.current;
-      const remaining = current.filter((f) => f.id !== fileId);
-      filesRef.current = remaining;
-      setFiles(remaining);
-      clearDirtyBuffer(fileId);
-      clearOutputsForFile(fileId);
-      if (wsId) void opfsDeleteFile(wsId, fileId);
+      const remaining = open.filter((id) => id !== fileId);
+      setOpenTabIds(remaining);
       if (activeFileIdRef.current === fileId) {
         // Pick a neighbour: prefer the tab that visually replaces the
         // closed one — i.e. the previous tab in tab order, falling back
         // to the first remaining tab.
-        const closedIdx = current.findIndex((f) => f.id === fileId);
+        const closedIdx = open.indexOf(fileId);
         const next =
-          remaining[Math.max(0, Math.min(closedIdx - 1, remaining.length - 1))]
-            ?.id ?? remaining[0].id;
+          remaining[Math.max(0, Math.min(closedIdx - 1, remaining.length - 1))] ??
+          remaining[0];
+        activeFileIdRef.current = next;
+        setActiveFileId(next);
+        setActiveTabId(next);
+      }
+    },
+    [closeSettingsTab, setActiveFileId, setActiveTabId, setOpenTabIds, showToast],
+  );
+
+  /** Permanently delete a workspace file: its tab, dirty buffer, output
+   *  history, and OPFS copy. Reached from the Files pane's Delete (which
+   *  confirms first) and the tab context menu's "Delete File". */
+  const deleteWorkspaceFile = useCallback(
+    (fileId: string) => {
+      const current = filesRef.current;
+      if (current.length <= 1) {
+        // Refuse to delete the last file — the playground needs at
+        // least one editor target.
+        showToast("Can't delete the last file.", "warn");
+        return;
+      }
+      if (!current.some((f) => f.id === fileId)) return;
+      const wsId = workspaceIdRef.current;
+      const remaining = current.filter((f) => f.id !== fileId);
+      filesRef.current = remaining;
+      setFiles(remaining);
+      const openBefore = openTabIdsRef.current;
+      const remainingOpen = openBefore.filter((id) => id !== fileId);
+      setOpenTabIds(remainingOpen);
+      clearDirtyBuffer(fileId);
+      clearOutputsForFile(fileId);
+      if (wsId) void opfsDeleteFile(wsId, fileId);
+      markDirty();
+      if (activeFileIdRef.current === fileId) {
+        // Prefer the neighbouring OPEN tab; when the deleted file held
+        // the only open tab, fall back to the first remaining file (the
+        // activation effect reopens its tab).
+        const closedIdx = openBefore.indexOf(fileId);
+        const next =
+          remainingOpen[
+            Math.max(0, Math.min(closedIdx - 1, remainingOpen.length - 1))
+          ] ?? remaining[0].id;
         activeFileIdRef.current = next;
         setActiveFileId(next);
         setActiveTabId(next);
@@ -2489,10 +2579,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [
       clearDirtyBuffer,
       clearOutputsForFile,
-      closeSettingsTab,
+      markDirty,
       setActiveFileId,
       setActiveTabId,
       setFiles,
+      setOpenTabIds,
       showToast,
     ],
   );
@@ -2543,8 +2634,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   /** Reorder the file tabs after a drag-and-drop drop. The generic
    *  TabBar hands us the new tab order (TabDescriptors); we project it
-   *  back onto the `files` array via id lookup so the manifest stays
-   *  authoritative. */
+   *  back onto the OPEN-TAB list via id lookup. The `files` array keeps
+   *  its own (creation) order — the tab strip owns tab order, the Files
+   *  pane renders a sorted tree regardless. */
   const reorderFileTabs = useCallback(
     (nextDescriptors: TabDescriptor[]) => {
       // Sync the settings tab's new position so it stays where the user
@@ -2554,19 +2646,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       );
       if (newSettingsIdx >= 0) setSettingsTabIndex(newSettingsIdx);
 
-      const byId = new Map(filesRef.current.map((f) => [f.id, f]));
-      const next: PlaygroundFile[] = [];
-      for (const d of nextDescriptors) {
-        const f = byId.get(d.id);
-        if (f) next.push(f);
-      }
-      // Defensive: ensure we didn't drop any files (e.g. a transient
-      // mismatch between descriptors and the file list).
-      if (next.length !== filesRef.current.length) return;
-      filesRef.current = next;
-      setFiles(next);
+      const known = new Set(filesRef.current.map((f) => f.id));
+      const nextOpen = nextDescriptors
+        .map((d) => d.id)
+        .filter((id) => id !== SETTINGS_TAB_ID && known.has(id));
+      // Defensive: ensure we didn't drop any tabs (e.g. a transient
+      // mismatch between descriptors and the open-tab list).
+      const currentOpen = openTabIdsRef.current.filter((id) => known.has(id));
+      if (nextOpen.length !== currentOpen.length) return;
+      setOpenTabIds(nextOpen);
     },
-    [setFiles, setSettingsTabIndex],
+    [setOpenTabIds, setSettingsTabIndex],
   );
 
   /** Duplicate the file tab identified by `fileId`. The copy is
@@ -2611,6 +2701,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const next = [...current.slice(0, idx + 1), copy, ...current.slice(idx + 1)];
       filesRef.current = next;
       setFiles(next);
+      // Open the duplicate's tab right after the source's (or at the
+      // end when the source's own tab is closed).
+      setOpenTabIds((prev) => {
+        const at = prev.indexOf(fileId);
+        return at >= 0
+          ? [...prev.slice(0, at + 1), newId, ...prev.slice(at + 1)]
+          : [...prev, newId];
+      });
 
       // Mirror the source's current buffer into the duplicate so the
       // user sees identical contents on switch. Read from the latest
@@ -2628,74 +2726,26 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setActiveFileId,
       setActiveTabId,
       setFiles,
+      setOpenTabIds,
       updateDirtyBuffer,
     ],
   );
 
-  /** Close every file tab except `fileId`. The kept tab becomes the
-   *  active tab. Mirrors the SQL playground's "Close Others". */
+  /** Close every OPEN TAB except `fileId`'s — the other files stay in
+   *  the workspace (reopen them from the Files pane). The kept tab
+   *  becomes the active tab. */
   const closeOtherFileTabs = useCallback(
     (fileId: string) => {
-      const current = filesRef.current;
-      const keep = current.find((f) => f.id === fileId);
-      if (!keep) return;
-      if (current.length <= 1) return;
+      if (!filesRef.current.some((f) => f.id === fileId)) return;
+      if (openTabIdsRef.current.length <= 1) return;
       flushActiveFileToBuffer();
-      const wsId = workspaceIdRef.current;
-      for (const f of current) {
-        if (f.id === fileId) continue;
-        clearDirtyBuffer(f.id);
-        clearOutputsForFile(f.id);
-        if (wsId) void opfsDeleteFile(wsId, f.id);
-      }
-      const next = [keep];
-      filesRef.current = next;
-      setFiles(next);
-      activeFileIdRef.current = keep.id;
-      setActiveFileId(keep.id);
-      setActiveTabId(keep.id);
+      setOpenTabIds([fileId]);
+      activeFileIdRef.current = fileId;
+      setActiveFileId(fileId);
+      setActiveTabId(fileId);
     },
-    [
-      clearDirtyBuffer,
-      clearOutputsForFile,
-      flushActiveFileToBuffer,
-      setActiveFileId,
-      setActiveTabId,
-      setFiles,
-    ],
+    [flushActiveFileToBuffer, setActiveFileId, setActiveTabId, setOpenTabIds],
   );
-
-  /** Close every file tab and replace them with a single fresh default
-   *  file. Mirrors the SQL playground's "Close All", which always
-   *  leaves the user with one empty tab to type into. */
-  const closeAllFileTabs = useCallback(() => {
-    const current = filesRef.current;
-    const wsId = workspaceIdRef.current;
-    for (const f of current) {
-      clearDirtyBuffer(f.id);
-      clearOutputsForFile(f.id);
-      if (wsId) void opfsDeleteFile(wsId, f.id);
-    }
-    // "Close All" always leaves a single empty tab to type into — even
-    // for adapters whose FRESH workspaces seed a multi-file default.
-    const fresh = defaultFiles(adapter).slice(0, 1);
-    const newActive = fresh[0];
-    filesRef.current = fresh;
-    setFiles(fresh);
-    updateDirtyBuffer(newActive.id, "");
-    if (wsId) opfsWriteFile(wsId, newActive.id, "");
-    activeFileIdRef.current = newActive.id;
-    setActiveFileId(newActive.id);
-    setActiveTabId(newActive.id);
-  }, [
-    adapter,
-    clearDirtyBuffer,
-    clearOutputsForFile,
-    setActiveFileId,
-    setActiveTabId,
-    setFiles,
-    updateDirtyBuffer,
-  ]);
 
   // ─── Merge workspace tabs into the Files pane ─────────────────────────
   //
@@ -2779,16 +2829,41 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (path: string) => {
       const tabId = tabIdForFilesPath(path);
       if (tabId) {
-        // Delete-from-Files-pane on a code file maps to "close the
-        // tab". `closeFileTab` already refuses to drop the last
+        // Delete-from-Files-pane on a code file removes it for real
+        // (tab + buffer + OPFS) — the panel confirmed with the user
+        // first. `deleteWorkspaceFile` refuses to drop the last
         // remaining file (the editor needs at least one target) and
         // surfaces its own toast.
-        closeFileTab(tabId);
+        deleteWorkspaceFile(tabId);
         return;
       }
       handleFilesDelete(path);
     },
-    [closeFileTab, handleFilesDelete, tabIdForFilesPath],
+    [deleteWorkspaceFile, handleFilesDelete, tabIdForFilesPath],
+  );
+
+  /** Files-pane "Open in editor" for a workspace code file: (re)open
+   *  its tab and activate it. Data files have no editor — the panel
+   *  only offers this for paths that resolve to a workspace tab. */
+  const handleOpenFileFromPane = useCallback(
+    (path: string) => {
+      const tabId = tabIdForFilesPath(path);
+      if (!tabId) return;
+      flushActiveFileToBuffer();
+      setOpenTabIds((prev) =>
+        prev.includes(tabId) ? prev : [...prev, tabId],
+      );
+      activeFileIdRef.current = tabId;
+      setActiveFileId(tabId);
+      setActiveTabId(tabId);
+    },
+    [
+      flushActiveFileToBuffer,
+      setActiveFileId,
+      setActiveTabId,
+      setOpenTabIds,
+      tabIdForFilesPath,
+    ],
   );
 
   const mergedHandleFilesRename = useCallback(
@@ -2880,6 +2955,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
         setFiles(newFiles);
         filesRef.current = newFiles;
+        setOpenTabIds(newFiles.map((f) => f.id));
         setActiveFileId(entryFile.id);
         setActiveTabId(entryFile.id);
         activeFileIdRef.current = entryFile.id;
@@ -2929,6 +3005,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setActiveFileId,
       setActiveTabId,
       setFiles,
+      setOpenTabIds,
       showToast,
       updateDirtyBuffer,
     ],
@@ -3132,6 +3209,259 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
   }, [adapter, showToast]);
 
+  // Per-pane Copy/Format for the split view — each pane header carries
+  // its own buttons so it's unambiguous which file they act on.
+  const copySplitFile = useCallback(
+    (fileId: string) => {
+      const code =
+        dirtyBuffersRef.current.get(fileId) ??
+        splitViewsRef.current.get(fileId)?.state.doc.toString() ??
+        "";
+      if (!code) {
+        showToast("Editor is empty.", "warn");
+        return;
+      }
+      void copyToClipboard(code, "Code");
+    },
+    [copyToClipboard, showToast],
+  );
+
+  const formatSplitFile = useCallback(
+    async (fileId: string) => {
+      if (!adapter.formatCode) return;
+      const view = splitViewsRef.current.get(fileId);
+      if (!view) return;
+      const code = view.state.doc.toString();
+      setFormattingSplitId(fileId);
+      try {
+        // Pass the pane's filename so mixed-language workspaces (web:
+        // .html/.css/.js) format with the right dialect.
+        const filename = filesRef.current.find(
+          (f) => f.id === fileId,
+        )?.filename;
+        const formatted = await adapter.formatCode(code, filename);
+        if (formatted === code) {
+          showToast("Already formatted — nothing to change.");
+          return;
+        }
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        });
+        showToast("Code formatted.", "info");
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        showToast(
+          reason ? `Formatting failed: ${reason}` : "Formatting failed.",
+          "warn",
+        );
+      } finally {
+        setFormattingSplitId(null);
+      }
+    },
+    [adapter, showToast],
+  );
+
+  // ─── AI-suggested edit review (Ask AI panel → in-editor diff) ──────────
+  // The Ask AI widget can propose complete new contents for a workspace
+  // file (see ai/editSuggestions.ts). We open a CodeMirror unified merge
+  // view over the target file's editor: the doc becomes the proposal, the
+  // previous contents are the diff baseline, and the built-in per-chunk
+  // Accept/Reject controls let the user pick changes. A banner above the
+  // editor finishes the review ("Keep result") or reverts everything.
+  interface AiReviewState {
+    fileId: string;
+    filename: string;
+    /** The file's contents when the review opened — "Revert all" target. */
+    original: string;
+    /** Compartment holding the merge extension in the target view. */
+    comp: Compartment;
+    /** Which editor family hosted the review (split pane vs tabbed). */
+    split: boolean;
+  }
+  const [aiReview, setAiReview] = useState<AiReviewState | null>(null);
+  const aiReviewRef = useRef<AiReviewState | null>(null);
+  useEffect(() => {
+    aiReviewRef.current = aiReview;
+  }, [aiReview]);
+  // A suggestion accepted by the handler but not yet materialized in an
+  // editor — applied by the effect below AFTER the tab-switch doc sync.
+  const [pendingAiEdit, setPendingAiEdit] = useState<{
+    fileId: string;
+    filename: string;
+    content: string;
+  } | null>(null);
+
+  /** The live EditorView showing `fileId`, if any. */
+  const viewForFile = useCallback((fileId: string): EditorView | null => {
+    if (splitActiveRef.current) {
+      return splitViewsRef.current.get(fileId) ?? null;
+    }
+    return activeFileIdRef.current === fileId ? editorRef.current : null;
+  }, []);
+
+  const endAiReview = useCallback(
+    (keep: boolean) => {
+      const review = aiReviewRef.current;
+      if (!review) return;
+      const view = viewForFile(review.fileId);
+      if (view) {
+        if (!keep) {
+          view.dispatch({
+            changes: {
+              from: 0,
+              to: view.state.doc.length,
+              insert: review.original,
+            },
+          });
+        }
+        view.dispatch({ effects: review.comp.reconfigure([]) });
+        view.focus();
+      } else if (!keep) {
+        // The review's editor is gone (tab switched / view remounted) —
+        // restore the file's buffer directly.
+        updateDirtyBuffer(review.fileId, review.original);
+        const wsId = workspaceIdRef.current;
+        if (wsId) opfsWriteFile(wsId, review.fileId, review.original);
+      }
+      setAiReview(null);
+    },
+    [updateDirtyBuffer, viewForFile],
+  );
+
+  // Materialize a pending suggestion once the target editor is showing the
+  // file (the tab-switch doc sync above runs first — effect order matters).
+  useEffect(() => {
+    if (!pendingAiEdit) return;
+    const view = viewForFile(pendingAiEdit.fileId);
+    if (!view) return; // wait for the view to mount / tab to activate
+    const original = view.state.doc.toString();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- consume-once queue: the pending suggestion is cleared the moment it materializes
+    setPendingAiEdit(null);
+    if (original === pendingAiEdit.content) {
+      showToast("The file already matches the AI suggestion.");
+      return;
+    }
+    const comp = new Compartment();
+    // Baseline first, then swap the doc to the proposal — the merge view
+    // recomputes the diff on doc changes, and the write-through persist
+    // listeners treat the proposal like any edit (so Run previews it).
+    view.dispatch({
+      effects: StateEffect.appendConfig.of(
+        comp.of(unifiedMergeView({ original, mergeControls: true })),
+      ),
+    });
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: pendingAiEdit.content },
+    });
+    setAiReview({
+      fileId: pendingAiEdit.fileId,
+      filename: pendingAiEdit.filename,
+      original,
+      comp,
+      split: splitActiveRef.current,
+    });
+  }, [pendingAiEdit, activeFileId, splitActive, showToast, viewForFile]);
+
+  // A review can't survive its editor: switching tabs away (tabbed mode)
+  // or toggling the split/tabbed layout replaces or remounts the view, so
+  // treat either as "revert the suggestion".
+  useEffect(() => {
+    const review = aiReviewRef.current;
+    if (!review) return;
+    const detached =
+      review.split !== splitActive ||
+      (!review.split && activeFileId !== review.fileId) ||
+      !files.some((f) => f.id === review.fileId);
+    if (!detached) return;
+    // The tabbed editor may now show ANOTHER file with the merge extension
+    // still attached — strip it before restoring the reviewed file's buffer.
+    if (!review.split && editorRef.current) {
+      editorRef.current.dispatch({ effects: review.comp.reconfigure([]) });
+    }
+    updateDirtyBuffer(review.fileId, review.original);
+    const wsId = workspaceIdRef.current;
+    if (wsId && files.some((f) => f.id === review.fileId)) {
+      opfsWriteFile(wsId, review.fileId, review.original);
+    }
+    setAiReview(null);
+  }, [activeFileId, splitActive, files, updateDirtyBuffer]);
+
+  // Filenames the model may create when the user asked for a new file.
+  const SAFE_NEW_FILENAME = /^[A-Za-z0-9_][A-Za-z0-9._/-]{0,99}$/;
+
+  useEffect(() => {
+    return registerAiEditHandler(adapter.id, (suggestion: AiEditSuggestion) => {
+      if (!workspaceReadyRef.current) {
+        return { ok: false, reason: "unavailable" };
+      }
+      if (aiReviewRef.current) return { ok: false, reason: "busy" };
+      const existing =
+        filesRef.current.find((f) => f.filename === suggestion.filename) ??
+        filesRef.current.find(
+          (f) => f.filename.split("/").pop() === suggestion.filename,
+        );
+      flushActiveFileToBuffer();
+      if (!existing) {
+        // A brand-new file: no baseline to diff against — create it with
+        // the proposed contents and open it.
+        if (
+          !SAFE_NEW_FILENAME.test(suggestion.filename) ||
+          suggestion.filename.includes("..") ||
+          filesRef.current.length >= 50
+        ) {
+          return { ok: false, reason: "unavailable" };
+        }
+        const wsId = workspaceIdRef.current;
+        const id = newFileId();
+        const file: PlaygroundFile = {
+          id,
+          filename: suggestion.filename,
+          pristineFilename: suggestion.filename,
+        };
+        const next = [...filesRef.current, file];
+        filesRef.current = next;
+        setFiles(next);
+        setOpenTabIds((prev) => [...prev, id]);
+        updateDirtyBuffer(id, suggestion.content);
+        if (wsId) opfsWriteFile(wsId, id, suggestion.content);
+        markDirty();
+        activeFileIdRef.current = id;
+        setActiveFileId(id);
+        setActiveTabId(id);
+        showToast(`Created ${suggestion.filename} from the AI suggestion.`, "info");
+        return { ok: true };
+      }
+      const current = dirtyBuffersRef.current.get(existing.id) ?? "";
+      if (current === suggestion.content) {
+        return { ok: false, reason: "unchanged" };
+      }
+      if (splitActiveRef.current) {
+        focusSplitFile(existing.id);
+      } else {
+        activeFileIdRef.current = existing.id;
+        setActiveFileId(existing.id);
+        setActiveTabId(existing.id);
+      }
+      setPendingAiEdit({
+        fileId: existing.id,
+        filename: existing.filename,
+        content: suggestion.content,
+      });
+      return { ok: true };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    adapter.id,
+    flushActiveFileToBuffer,
+    focusSplitFile,
+    markDirty,
+    setActiveFileId,
+    setActiveTabId,
+    setFiles,
+    showToast,
+    updateDirtyBuffer,
+  ]);
+
   // Auto-scroll output on new cells.
   useEffect(() => {
     scrollToLatestOutput();
@@ -3245,14 +3575,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () => {
-      const multiple = files.length > 1;
+      // The tab strip shows the OPEN tabs only — a subset of the
+      // workspace files (closing a tab keeps the file; reopen it from
+      // the Files pane).
+      const byId = new Map(files.map((f) => [f.id, f]));
+      const openFiles = openTabIds
+        .map((id) => byId.get(id))
+        .filter((f): f is PlaygroundFile => Boolean(f));
+      const multiple = openFiles.length > 1;
       // The context-menu closures defer to `useCallback` handlers
       // that intentionally read refs internally. The handlers only
       // run on user click — never during render — so the
       // `react-hooks/refs` rule's transitive check is a false alarm
       // here.
       // eslint-disable-next-line react-hooks/refs
-      const list: TabDescriptor[] = files.map((f) => {
+      const list: TabDescriptor[] = openFiles.map((f) => {
         // PlaygroundFile.filename may be a multi-segment path
         // (e.g. "src/utils.py"); the tab strip is too narrow for the
         // full path, so we show only the leaf and let the Files pane
@@ -3273,9 +3610,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           });
         }
         extras.push({
-          key: "close-all",
-          label: "Close All",
-          onSelect: () => closeAllFileTabs(),
+          key: "delete-file",
+          label: "Delete File",
+          onSelect: () => deleteWorkspaceFile(f.id),
         });
         return {
           id: f.id,
@@ -3311,10 +3648,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       return list;
     },
     [
-      closeAllFileTabs,
       closeOtherFileTabs,
+      deleteWorkspaceFile,
       duplicateFileTab,
       files,
+      openTabIds,
       settingsOpen,
       settingsTabIndex,
     ],
@@ -3340,6 +3678,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     onCreateFolder: handleFilesCreateFolder,
     onCreateFile: handleFilesCreateFile,
     onMove: mergedHandleFilesMove,
+    // Workspace code files open back into the editor (closed tabs are
+    // still listed here); data files have no editor to open into.
+    onOpenFile: handleOpenFileFromPane,
+    canOpenFile: (path: string) => Boolean(tabIdForFilesPath(path)),
   };
 
   return (
@@ -4208,7 +4550,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           className="panes"
           data-mobile-tab={mobileTab}
           data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
-          data-editor-position={hasPreview ? editorPosition : undefined}
+          data-editor-position={hasPreview ? effectiveEditorPosition : undefined}
           ref={panesRef}
         >
           <div className="editor-pane" ref={editorPaneRef}>
@@ -4219,40 +4561,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </span>
               <div className="pane-bar-sep" />
               <div className="pane-editor-btn-group">
-                {splitAvailable && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className={`icon-btn${splitActive ? " active" : ""}`}
-                          aria-label={
-                            splitActive
-                              ? "Switch to tabbed editor"
-                              : "Switch to split editors"
-                          }
-                          aria-pressed={splitActive}
-                          onClick={() => setSplitView(!splitActive)}
-                        >
-                          <Rows3 size={14} aria-hidden="true" />
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          {splitActive
-                            ? "Tabbed editor (manage files)"
-                            : "Split editors (CodePen-style)"}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
                 {hasPreview && (
                   <Popover.Root>
                     <Popover.Trigger
@@ -4272,7 +4580,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           aria-pressed={autoRun}
                           onClick={() => setAutoRun(!autoRun)}
                         >
-                          <Zap size={14} aria-hidden="true" />
+                          {autoRun ? (
+                            <Zap size={14} aria-hidden="true" />
+                          ) : (
+                            <ZapOff size={14} aria-hidden="true" />
+                          )}
                         </button>
                       )}
                     />
@@ -4285,20 +4597,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </Popover.Portal>
                   </Popover.Root>
                 )}
-                {hasPreview && (
-                  <Menu.Root>
-                    <Menu.Trigger
+                {(hasPreview || splitAvailable) && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
                       render={(triggerProps) => (
                         <button
                           {...triggerProps}
                           type="button"
                           className="icon-btn"
-                          aria-label="Change view (editor position)"
-                          title="Change view"
+                          aria-label="Change view"
                         >
-                          {editorPosition === "right" ? (
+                          {effectiveEditorPosition === "right" ? (
                             <PanelRight size={14} aria-hidden="true" />
-                          ) : editorPosition === "top" ? (
+                          ) : effectiveEditorPosition === "top" ? (
                             <PanelTop size={14} aria-hidden="true" />
                           ) : (
                             <PanelLeft size={14} aria-hidden="true" />
@@ -4306,59 +4620,96 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </button>
                       )}
                     />
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={6} align="start" side="bottom">
-                        <Menu.Popup className="bui-popup change-view-menu">
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="start" side="bottom">
+                        <Popover.Popup className="bui-popup change-view-menu">
                           <div className="change-view-title">Change View</div>
-                          {(
-                            [
-                              { pos: "left", label: "Editors left", Icon: PanelLeft },
-                              { pos: "top", label: "Editors top", Icon: PanelTop },
-                              { pos: "right", label: "Editors right", Icon: PanelRight },
-                            ] as const
-                          ).map(({ pos, label, Icon }) => (
-                            <Menu.Item
-                              key={pos}
-                              className={`change-view-item${
-                                editorPosition === pos ? " selected" : ""
-                              }`}
-                              onClick={() => setEditorPosition(pos)}
-                            >
-                              <Icon size={14} aria-hidden="true" />
-                              <span>{label}</span>
-                            </Menu.Item>
-                          ))}
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.Root>
+                          {hasPreview &&
+                            (
+                              [
+                                { pos: "left", label: "Editors left", Icon: PanelLeft },
+                                { pos: "top", label: "Editors top", Icon: PanelTop },
+                                { pos: "right", label: "Editors right", Icon: PanelRight },
+                              ] as const
+                            ).map(({ pos, label, Icon }) => (
+                              <button
+                                key={pos}
+                                type="button"
+                                className={`change-view-item${
+                                  effectiveEditorPosition === pos ? " selected" : ""
+                                }`}
+                                disabled={editorPinnedLeft}
+                                // eslint-disable-next-line react-hooks/refs -- click handler; setEditorPosition touches panesRef only on invocation
+                                onClick={() => setEditorPosition(pos)}
+                              >
+                                <Icon size={14} aria-hidden="true" />
+                                <span>{label}</span>
+                              </button>
+                            ))}
+                          {hasPreview && editorPinnedLeft && (
+                            <div className="change-view-hint">
+                              The tabbed editor keeps the editor on the left.
+                            </div>
+                          )}
+                          {splitAvailable && (
+                            <>
+                              <div className="change-view-sep" role="separator" />
+                              <div className="change-view-title">Editor Layout</div>
+                              <button
+                                type="button"
+                                className={`change-view-item${splitActive ? " selected" : ""}`}
+                                aria-pressed={splitActive}
+                                onClick={() => setSplitView(true)}
+                              >
+                                <Rows3 size={14} aria-hidden="true" />
+                                <span>Split editors (CodePen-style)</span>
+                              </button>
+                              <button
+                                type="button"
+                                className={`change-view-item${!splitActive ? " selected" : ""}`}
+                                aria-pressed={!splitActive}
+                                onClick={() => setSplitView(false)}
+                              >
+                                <FileCode size={14} aria-hidden="true" />
+                                <span>Tabbed editor (manage files)</span>
+                              </button>
+                            </>
+                          )}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
                 )}
-                <Popover.Root>
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="icon-btn"
-                        aria-label="Copy code to clipboard"
-                        onClick={copyEditor}
-                      >
-                        <CopyIcon />
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                      <Popover.Popup className="bui-popup pane-btn-popover">
-                        Copy code
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-                {adapter.formatCode && (
+                {/* Split view: Copy/Format live in each pane's header
+                    instead, so it's unambiguous which file they act on. */}
+                {!splitActive && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className="icon-btn"
+                          aria-label="Copy code to clipboard"
+                          onClick={copyEditor}
+                        >
+                          <CopyIcon />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          Copy code
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {!splitActive && adapter.formatCode && (
                   <Popover.Root
                     open={isFormatting ? false : formatPopoverOpen}
                     onOpenChange={setFormatPopoverOpen}
@@ -4503,6 +4854,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 )}
               </div>
             </div>
+            {aiReview && (
+              <div className="ai-review-bar" role="region" aria-label="AI suggested changes">
+                <Wand2 size={13} aria-hidden="true" />
+                <span className="ai-review-text">
+                  AI suggested changes to{" "}
+                  <code>{aiReview.filename}</code> — accept or reject each
+                  chunk in the editor.
+                </span>
+                <div className="ai-review-actions">
+                  <button
+                    type="button"
+                    className="ai-review-btn ai-review-keep"
+                    onClick={() => endAiReview(true)}
+                    title="Finish the review, keeping the changes as shown in the editor"
+                  >
+                    Keep result
+                  </button>
+                  <button
+                    type="button"
+                    className="ai-review-btn ai-review-revert"
+                    onClick={() => endAiReview(false)}
+                    title="Restore the file to how it was before the suggestion"
+                  >
+                    Revert all
+                  </button>
+                </div>
+              </div>
+            )}
             {splitActive ? (
               // CodePen-style split: one always-visible editor per
               // file, stacked HTML → CSS → JS. Panes write straight
@@ -4527,6 +4906,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onAddFile={addNewFile}
                 registerView={registerSplitEditorView}
                 getRuntime={() => runtimeRef.current}
+                onCopyFile={copySplitFile}
+                onFormatFile={
+                  adapter.formatCode
+                    ? (fileId) => void formatSplitFile(fileId)
+                    : undefined
+                }
+                formattingFileId={formattingSplitId}
               />
             ) : (
               <div

@@ -2,11 +2,16 @@
 // validators (lib/workspaces/types.ts) and the retention/quota policy
 // (lib/workspaces/policy.ts). Route handlers stay thin wrappers over these —
 // the same convention as adminPromotion.test.ts / polarBilling.test.ts.
+import { readdirSync, existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
   BUNDLE_FILENAME_MAX,
   BUNDLE_MAX_FILES,
+  CODE_PLAYGROUND_IDS,
+  SQL_PLAYGROUND_IDS,
+  isKnownPlayground,
   manifestForBundle,
   parseManifest,
   validateBundle,
@@ -57,6 +62,33 @@ function sqlBundle(overrides: Partial<WorkspaceBundle> = {}): WorkspaceBundle {
     ...overrides,
   };
 }
+
+describe("known playgrounds", () => {
+  // CODE_PLAYGROUND_IDS + SQL_PLAYGROUND_IDS must cover every playground
+  // route: the save/share endpoints reject anything else with "Unknown
+  // playground", so a route missing from the lists ships with broken
+  // sharing (this is exactly how the web playground regressed).
+  it("covers every app/playground/<id> route", () => {
+    const dir = path.join(process.cwd(), "app", "playground");
+    const routeIds = readdirSync(dir, { withFileTypes: true })
+      .filter(
+        (entry) =>
+          entry.isDirectory() &&
+          existsSync(path.join(dir, entry.name, "page.tsx")),
+      )
+      .map((entry) => entry.name)
+      .sort();
+    expect(routeIds.length).toBeGreaterThan(0);
+    for (const id of routeIds) {
+      expect(isKnownPlayground(id), `playground "${id}"`).toBe(true);
+    }
+  });
+
+  it("lists no playground twice or in both families", () => {
+    const all = [...CODE_PLAYGROUND_IDS, ...SQL_PLAYGROUND_IDS];
+    expect(new Set(all).size).toBe(all.length);
+  });
+});
 
 describe("validateBundle", () => {
   it("accepts a well-formed code bundle", () => {

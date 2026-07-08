@@ -11,10 +11,10 @@
  *   - User edits here write through synchronously (`onChange` mirrors
  *     the main editor's persist listener: buffer + OPFS + dirty mark),
  *     so Run / snapshot paths that read buffers are always current.
- *   - External writes (loading an example, Close All) flow back in via
- *     the `buffers` prop: each editor replaces its doc when the buffer
- *     diverges, with a suppress flag so the replacement isn't echoed
- *     back out as a user edit.
+ *   - External writes (loading an example, an AI-suggestion revert)
+ *     flow back in via the `buffers` prop: each editor replaces its doc
+ *     when the buffer diverges, with a suppress flag so the replacement
+ *     isn't echoed back out as a user edit.
  *
  * Focusing an editor reports the file as "active" so the Run button
  * label, Format target, and completion filename all track the pane the
@@ -28,10 +28,13 @@ import { history, defaultKeymap, historyKeymap, indentWithTab } from "@codemirro
 import { indentOnInput, bracketMatching, indentUnit } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+import { Popover } from "@base-ui-components/react/popover";
+import { Wand2 } from "lucide-react";
 
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 import { languageCompletion } from "./completion/languageCompletion";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
+import { CopyIcon } from "./playgroundShared";
 import type { PlaygroundFile } from "./playgroundTabs";
 import type { LanguageAdapter, LanguageRuntime } from "./types";
 
@@ -58,6 +61,13 @@ export interface SplitEditorsProps {
    *  active pane. Called with `null` on teardown. */
   registerView: (fileId: string, view: EditorView | null) => void;
   getRuntime: () => LanguageRuntime | null;
+  /** Copy THIS pane's contents (each header carries its own button so
+   *  it's unambiguous which file is copied). */
+  onCopyFile: (fileId: string) => void;
+  /** Format THIS pane's contents. Absent when the adapter can't format. */
+  onFormatFile?: (fileId: string) => void;
+  /** File id whose per-pane Format is running (spinner + disable). */
+  formattingFileId: string | null;
 }
 
 /** Uppercase language chip for a pane header, CodePen-style. */
@@ -89,6 +99,49 @@ function paneLabel(filename: string): string {
   }
 }
 
+/** Pane-header icon button with the standard hover-popover tooltip
+ *  (same Base UI pattern as the pane-bar icon buttons). */
+function HeaderIconButton({
+  label,
+  onClick,
+  disabled,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Popover.Root>
+      <Popover.Trigger
+        openOnHover
+        delay={150}
+        closeDelay={100}
+        render={(triggerProps) => (
+          <button
+            {...triggerProps}
+            type="button"
+            className="icon-btn"
+            aria-label={label}
+            disabled={disabled}
+            onClick={onClick}
+          >
+            {children}
+          </button>
+        )}
+      />
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={6} align="center" side="bottom">
+          <Popover.Popup className="bui-popup pane-btn-popover">
+            {label}
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
 interface SplitEditorProps extends Omit<SplitEditorsProps, "files"> {
   file: PlaygroundFile;
 }
@@ -106,6 +159,9 @@ function SplitEditor({
   onRunSecondary,
   registerView,
   getRuntime,
+  onCopyFile,
+  onFormatFile,
+  formattingFileId,
 }: SplitEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -250,9 +306,10 @@ function SplitEditor({
     }
   }, [wordWrap]);
 
-  // External buffer changes (example load, Close All, workspace
-  // hydration) → replace the doc. User edits round-trip through the
-  // store and compare equal here, so this never fights the cursor.
+  // External buffer changes (example load, workspace hydration, an
+  // AI-suggestion revert) → replace the doc. User edits round-trip
+  // through the store and compare equal here, so this never fights the
+  // cursor.
   const bufferValue = buffers.get(file.id);
   useEffect(() => {
     const view = viewRef.current;
@@ -279,6 +336,44 @@ function SplitEditor({
       <header className="split-editor-header">
         <span className="split-editor-lang">{paneLabel(file.filename)}</span>
         <span className="split-editor-filename">{file.filename}</span>
+        <div className="split-editor-actions">
+          <HeaderIconButton
+            label={`Copy ${file.filename}`}
+            onClick={() => onCopyFile(file.id)}
+          >
+            <CopyIcon />
+          </HeaderIconButton>
+          {onFormatFile && (
+            <HeaderIconButton
+              label={`Format ${file.filename}`}
+              disabled={formattingFileId !== null}
+              onClick={() => onFormatFile(file.id)}
+            >
+              {formattingFileId === file.id ? (
+                <svg
+                  viewBox="0 0 13 13"
+                  width={13}
+                  height={13}
+                  className="run-btn-spinner"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="6.5"
+                    cy="6.5"
+                    r="5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeDasharray="15 9"
+                  />
+                </svg>
+              ) : (
+                <Wand2 size={13} aria-hidden="true" />
+              )}
+            </HeaderIconButton>
+          )}
+        </div>
       </header>
       <div className="split-editor-host" ref={hostRef} />
     </section>
@@ -310,9 +405,14 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
 
   return (
     <div className="split-editor-stack" role="group" aria-label="Editors">
-      {ordered.map((file) => (
-        <SplitEditor key={file.id} {...props} file={file} />
-      ))}
+      {/* The panes wrapper stacks editors vertically beside the preview;
+          the editors-top arrangement flips it to CodePen-style columns
+          via CSS keyed off .panes[data-editor-position="top"]. */}
+      <div className="split-editor-panes">
+        {ordered.map((file) => (
+          <SplitEditor key={file.id} {...props} file={file} />
+        ))}
+      </div>
       <div className="split-editor-footer">
         <button
           type="button"
@@ -323,7 +423,7 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
           ＋ New file
         </button>
         <span className="split-editor-footer-hint">
-          rename or close files in the tabbed view
+          rename or close files in the tabbed editor (Change View)
         </span>
       </div>
     </div>

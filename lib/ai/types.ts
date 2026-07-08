@@ -148,3 +148,15 @@ export type AskAiStreamEvent =
   | { type: "delta"; text: string }
   | { type: "done"; tier: MemberTier; model: string }
   | { type: "error"; message: string };
+
+/**
+ * Response body for `GET /api/ai/usage` — today's Ask AI chat quota for the
+ * signed-in member, so the panel can show "N prompts left today".
+ * `requestsRemaining` is clamped to ≥ 0.
+ */
+export interface AskAiUsageResponse {
+  tier: MemberTier;
+  requestsUsed: number;
+  requestsLimit: number;
+  requestsRemaining: number;
+}

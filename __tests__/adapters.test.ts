@@ -391,9 +391,11 @@ describe("React adapter specifics", () => {
     expect(hello!.code).toContain("createRoot");
   });
 
-  it("seeds fresh workspaces with the main/App/styles trio and split editors", () => {
-    expect(reactAdapter.splitEditors).toBe(true);
-    expect(reactAdapter.hideFilesPane).toBe(true);
+  it("seeds fresh workspaces with the main/App/styles trio in the regular tabbed layout", () => {
+    // The React playground uses the standard tabbed editor + files pane
+    // (like JS/TS) — the split panes and hidden files rail are web-only.
+    expect(reactAdapter.splitEditors).toBeUndefined();
+    expect(reactAdapter.hideFilesPane).toBeUndefined();
     const names = (reactAdapter.defaultWorkspace ?? []).map((f) => f.filename);
     expect(names).toEqual(["main.tsx", "App.tsx", "styles.css"]);
     const main = reactAdapter.defaultWorkspace![0].content;

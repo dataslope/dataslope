@@ -32,7 +32,7 @@ import { REACT_VERSION } from "./esmResolve";
 // The default workspace: a real multi-file project shape. main.tsx
 // mounts, App.tsx is the component the learner edits, styles come from
 // a plain CSS import — the structure every React tutorial and template
-// uses, one pane per file in the playground's split view.
+// uses, one tab per file in the playground's tabbed editor.
 const DEFAULT_MAIN = `import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./styles.css";
@@ -602,14 +602,15 @@ export const reactAdapter: LanguageAdapter = {
   exportBaseFilename: "main",
   defaultFileExtension: "tsx",
   // Fresh workspaces open as the standard main/App/styles project shape
-  // with one always-visible editor per file, like the web playground.
+  // in the regular tabbed editor + files pane layout (like JS/TS): the
+  // mount point stays fixed in main.tsx while the learner works in
+  // App.tsx, and Run always resolves to the mounting file via
+  // findReactEntryFiles below.
   defaultWorkspace: [
     { filename: "main.tsx", content: DEFAULT_MAIN },
     { filename: "App.tsx", content: DEFAULT_APP },
     { filename: "styles.css", content: DEFAULT_STYLES },
   ],
-  splitEditors: true,
-  hideFilesPane: true,
   findEntryFiles: findReactEntryFiles,
   // The bundle step runs per Run (fast at snippet scale, but real work).
   compiled: true,

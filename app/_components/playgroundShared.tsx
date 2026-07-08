@@ -24,6 +24,29 @@ import {
 import { setSiteTheme } from "./siteTheme";
 import type { RuntimeInfo } from "./types";
 
+/** Small clipboard / "copy to clipboard" glyph shared by the editor
+ *  pane bar, output cell headers, and the split-editor pane headers.
+ *  Stroked rather than filled so it visually matches the pane-bar
+ *  icons. */
+export function CopyIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="5" y="5" width="9" height="9" rx="1.5" />
+      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
+    </svg>
+  );
+}
+
 /** Built-in defaults for the per-language playground settings. Used
  *  both when hydrating an unconfigured playground from localStorage and
  *  when the user clicks "Restore default settings", so the two paths

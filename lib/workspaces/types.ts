@@ -34,7 +34,10 @@ export const SQL_PLAYGROUND_IDS: readonly SqlDialect[] = [
 ];
 
 /** Code playgrounds (one per `app/playground/<id>` route). Kept as a literal
- *  list — the Worker cannot enumerate the route tree at request time. */
+ *  list — the Worker cannot enumerate the route tree at request time.
+ *  Guarded against drift by __tests__/workspacesCloud.test.ts, which compares
+ *  this list to the actual `app/playground/<id>` directories: forgetting to
+ *  add a new playground here breaks its Save/Share with "Unknown playground". */
 export const CODE_PLAYGROUND_IDS: readonly string[] = [
   "c",
   "cpp",
@@ -44,7 +47,9 @@ export const CODE_PLAYGROUND_IDS: readonly string[] = [
   "php",
   "python",
   "r",
+  "react",
   "typescript",
+  "web",
 ];
 
 export function isKnownPlayground(id: string): boolean {

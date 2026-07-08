@@ -86,6 +86,12 @@ export function suggestNextFilename(
 interface ManifestPayload {
   files: PlaygroundFile[];
   activeFileId: string;
+  /** Ids of the files whose editor tabs are open, in tab order. The tab
+   *  strip shows a SUBSET of the workspace files — closing a tab hides
+   *  its editor without deleting the file. Absent in manifests written
+   *  before this field existed (and by the share-materialize path):
+   *  loadManifest then defaults to "all files open". */
+  openTabIds?: string[];
 }
 
 function manifestKey(adapterId: string, workspaceId: string): string {
@@ -95,7 +101,7 @@ function manifestKey(adapterId: string, workspaceId: string): string {
 export function loadManifest(
   adapterId: string,
   workspaceId: string,
-): ManifestPayload | null {
+): (ManifestPayload & { openTabIds: string[] }) | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(manifestKey(adapterId, workspaceId));
@@ -121,7 +127,22 @@ export function loadManifest(
       cleaned.some((f) => f.id === parsed.activeFileId)
         ? parsed.activeFileId
         : cleaned[0].id;
-    return { files: cleaned, activeFileId };
+    // Sanitize the open-tab list: known ids only, de-duplicated, and
+    // always including the active file. A missing/empty list (older
+    // manifests, share materialize) opens every file.
+    const known = new Set(cleaned.map((f) => f.id));
+    let openTabIds = Array.isArray(parsed.openTabIds)
+      ? [
+          ...new Set(
+            parsed.openTabIds.filter(
+              (id): id is string => typeof id === "string" && known.has(id),
+            ),
+          ),
+        ]
+      : [];
+    if (openTabIds.length === 0) openTabIds = cleaned.map((f) => f.id);
+    if (!openTabIds.includes(activeFileId)) openTabIds.push(activeFileId);
+    return { files: cleaned, activeFileId, openTabIds };
   } catch {
     return null;
   }
@@ -132,10 +153,11 @@ export function saveManifest(
   workspaceId: string,
   files: PlaygroundFile[],
   activeFileId: string,
+  openTabIds?: string[],
 ): void {
   if (typeof window === "undefined") return;
   try {
-    const payload: ManifestPayload = { files, activeFileId };
+    const payload: ManifestPayload = { files, activeFileId, openTabIds };
     window.localStorage.setItem(
       manifestKey(adapterId, workspaceId),
       JSON.stringify(payload),
