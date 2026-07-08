@@ -10,19 +10,19 @@ description: A hands-on, browser-based tour of data structures and algorithms us
 />
 
 Think of a number between 1 and a million. If I'm allowed yes/no
-questions, I can guess it in twenty tries — not because I'm clever,
+questions, I can guess it in twenty tries, not because I'm clever,
 but because every question of the form "is it bigger than 500,000?"
 throws away *half* of the remaining possibilities. Halving is
 ruthless: a million numbers collapse to one in just 20 steps, and a
 *trillion* takes only 40.
 
-That trick — and a few dozen like it — is what this course is about.
+That trick, and a few dozen like it, is what this course is about.
 Data structures and algorithms are the difference between a program
 that answers instantly and one that is still grinding when the heat
 death of the universe arrives.
 
 Here is the twenty-questions trick as a real C++ program. **This whole
-course runs in your browser** — every snippet compiles with `clang++`
+course runs in your browser**, every snippet compiles with `clang++`
 to WebAssembly and executes right on the page. Press *Run* and watch
 the halving happen:
 
@@ -53,7 +53,7 @@ using namespace std;`,
 Now edit the code: change `1000000` to `1000000000000` (a trillion)
 and run it again. The answer barely moves. That stubborn refusal to
 grow is called *logarithmic time*, and it is the engine inside binary
-search, balanced trees, and heaps — all of which you will build in
+search, balanced trees, and heaps, all of which you will build in
 this course. Everything here is editable like that: break the
 examples, fix them, and make them yours.
 
@@ -65,12 +65,12 @@ can reason about memory layout, but its Standard Template Library (STL)
 gives you battle-tested containers and algorithms so you never have to
 re-implement a hash table just to solve a problem. By the end of this
 course you will both *use* the STL fluently and be able to *implement
-the same structures from scratch* — the two skills are complementary.
+the same structures from scratch*, the two skills are complementary.
 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Four small exhibits — an array of cells, a linked chain, a tree, and a graph constellation — the structures this course teaches you to build and use"
+  aria-label="Four small exhibits, an array of cells, a linked chain, a tree, and a graph constellation, the structures this course teaches you to build and use"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -122,7 +122,7 @@ the same structures from scratch* — the two skills are complementary.
 Each page mixes prose with three kinds of interactive widgets:
 
 1. **Executable code blocks** like the one above. No installation, no
-   toolchain setup. Edit any block and click *Run* — the fastest way
+   toolchain setup. Edit any block and click *Run*, the fastest way
    to learn an algorithm is to poke it and watch what changes.
 2. **Challenge cards.** Small coding exercises with tests and a model
    solution. Most ask you to write only the interesting few lines;
@@ -133,7 +133,7 @@ Each page mixes prose with three kinds of interactive widgets:
    still teaches you something.
 
 The course assumes you can read basic C++ (variables, loops,
-functions) but nothing more — the second page is a refresher on
+functions) but nothing more, the second page is a refresher on
 exactly the slice of the language we use. If you are coming from
 Python or JavaScript, you will be fine; the refresher exists for you.
 
@@ -151,7 +151,7 @@ data so that the algorithms you care about become fast. Choose a hash
 table and membership checks become O(1); choose a sorted array and you
 can binary-search in O(log n); choose a heap and you can always pull
 the minimum in O(log n). Every chapter of this course pairs a structure
-with the operations it makes cheap — and, just as importantly, the
+with the operations it makes cheap, and, just as importantly, the
 ones it makes expensive. There is no free lunch in this subject, only
 trades, and the craft is in knowing which trade your problem wants.
 
@@ -190,12 +190,12 @@ stacks and queues.
 How to write and reason about recursive functions, why binary search
 is a 30-line algorithm with a *lot* of off-by-one traps, and the
 classic sorting algorithms: bubble, selection, insertion, merge, and
-quicksort — culminating in `std::sort` (introsort).
+quicksort, culminating in `std::sort` (introsort).
 
 ### 4. Hashing and trees
 Hash tables and `std::unordered_map`, binary trees and their
 traversals, binary search trees, binary heaps and `std::priority_queue`,
-and the trie — a tree keyed by characters.
+and the trie, a tree keyed by characters.
 
 ### 5. Graphs
 Adjacency-list and adjacency-matrix representations, BFS and DFS,
@@ -203,7 +203,7 @@ Dijkstra's shortest paths, and the union-find structure that powers
 Kruskal's MST and dynamic connectivity.
 
 ### 6. Algorithmic paradigms
-Dynamic programming, greedy algorithms, and backtracking — three
+Dynamic programming, greedy algorithms, and backtracking, three
 families of techniques that, together, solve a remarkable fraction of
 real-world combinatorial problems.
 
@@ -213,7 +213,7 @@ algorithms, string algorithms, computational geometry, randomized and
 parallel algorithms, and where to practice (competitive programming
 judges, system design, low-latency engineering).
 
-Along the way you will also meet the people behind the algorithms —
+Along the way you will also meet the people behind the algorithms,
 Tony Hoare inventing quicksort as a side effect of a Russian
 translation project, Edsger Dijkstra working out his shortest-path
 algorithm over coffee, a graduate student named David Huffman

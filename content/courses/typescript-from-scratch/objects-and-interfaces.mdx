@@ -3,7 +3,7 @@ title: Objects and Interfaces
 description: Structural typing for objects, interfaces, and the power of shape-based compatibility
 ---
 
-Objects are the workhorses of JavaScript — key-value maps that bundle
+Objects are the workhorses of JavaScript, key-value maps that bundle
 related data and behavior. TypeScript brings *structure* to these bundles
 by letting you declare the **shape** of an object: which properties it
 has, what type each property holds, whether a property is optional or
@@ -19,7 +19,7 @@ not their declared name.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A workshop shadow board: painted silhouettes mark each required tool, a blue bar and a green disc hang over their matching outlines, a triangle outline waits empty beside a red alert dot, and a yellow extra tool hangs off the board — an interface as the painted shape an object must fill"
+  aria-label="A workshop shadow board: painted silhouettes mark each required tool, a blue bar and a green disc hang over their matching outlines, a triangle outline waits empty beside a red alert dot, and a yellow extra tool hangs off the board, an interface as the painted shape an object must fill"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -80,7 +80,7 @@ not their declared name.
 
 ## Object type literals
 
-The simplest way to type an object is an **object type literal** — a
+The simplest way to type an object is an **object type literal**, a
 curly-brace block listing the property names and their types:
 
 <CodeBlock
@@ -99,8 +99,8 @@ console.log("y:", point.y);
 />
 
 **What the compiler now knows:** `point` has exactly two properties, `x`
-and `y`, both `number`s. If you write `point.z`, the compiler rejects it
-— `z` does not exist on type `{ x: number; y: number }`.
+and `y`, both `number`s. If you write `point.z`, the compiler rejects it,
+`z` does not exist on type `{ x: number; y: number }`.
 
 You can nest object types arbitrarily:
 
@@ -199,7 +199,7 @@ consumers.
 
 ## Optional properties
 
-A property marked with `?` is **optional** — it may be present or absent:
+A property marked with `?` is **optional**, it may be present or absent:
 
 <CodeBlock
   adapter="typescript"
@@ -235,7 +235,7 @@ property" case explicitly, preventing `TypeError`s at runtime.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="On a small shadow board two outlines hold their green and blue tools while a third spot simply stays empty and raises no alarm — optional properties may be filled or left absent"
+  aria-label="On a small shadow board two outlines hold their green and blue tools while a third spot simply stays empty and raises no alarm, optional properties may be filled or left absent"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -357,7 +357,7 @@ matches the index signature `[key: string]: number`. If `count` were a
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A wall of identical pigeonholes accepts only green discs: one green-tinted slot is reserved by name, several wait empty, and a red triangle hovering outside fits none — an index signature gives every key the same value type"
+  aria-label="A wall of identical pigeonholes accepts only green discs: one green-tinted slot is reserved by name, several wait empty, and a red triangle hovering outside fits none, an index signature gives every key the same value type"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -510,14 +510,14 @@ console.log("user:", user);
 This is useful when augmenting third-party types (e.g., adding custom
 properties to `Window` or `NodeJS.Process`). But it can also be
 confusing, so use it sparingly. Declaration merging is one of the main
-reasons to prefer `interface` over `type` for public APIs — if users need
+reasons to prefer `interface` over `type` for public APIs, if users need
 to extend your types, they can re-declare the interface in their own
 code.
 
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Two capsules each carrying one porthole slide down and fuse into a single two-tone capsule with both portholes — declaring the same interface name twice merges its members into one shape"
+  aria-label="Two capsules each carrying one porthole slide down and fuse into a single two-tone capsule with both portholes, declaring the same interface name twice merges its members into one shape"
   style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -833,7 +833,7 @@ before they reach production.
 Interfaces support optional properties (`?`), readonly properties
 (`readonly`), index signatures (`[key: string]: T`), extension
 (`extends`), and declaration merging. TypeScript's structural type system
-means compatibility is based on shape, not name — a powerful and flexible
+means compatibility is based on shape, not name, a powerful and flexible
 model.
 
 In the next chapter, [Type Aliases and

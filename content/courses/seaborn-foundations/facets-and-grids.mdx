@@ -1,11 +1,11 @@
 ---
 title: Facets and Grids
-description: Small multiples — splitting data by category into a grid of panels with col and row, the FacetGrid workflow underneath, and when a grid becomes too much.
+description: Small multiples, splitting data by category into a grid of panels with col and row, the FacetGrid workflow underneath, and when a grid becomes too much.
 ---
 
 One of the most powerful moves in all of visualization is the **small
 multiple**: instead of cramming every group onto one busy chart, draw the
-*same* chart many times — once per group — and lay the copies out in a grid.
+*same* chart many times, once per group, and lay the copies out in a grid.
 The eye compares panels effortlessly, because only the data changes from
 cell to cell, never the encoding.
 
@@ -15,7 +15,7 @@ function through two keywords: `col` and `row`.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="One crowded chart tangles three colored trends together; beside it the same data sits in three calm stacked panels, one trend each — faceting splits the groups apart"
+  aria-label="One crowded chart tangles three colored trends together; beside it the same data sits in three calm stacked panels, one trend each, faceting splits the groups apart"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="40" width="200" height="140" rx="12" fill="currentColor" opacity="0.08" />
@@ -70,7 +70,7 @@ function through two keywords: `col` and `row`.
 
 ## Faceting is just `col` and `row`
 
-We've used `col` already. Add `row` and you get a 2-D grid — one panel for
+We've used `col` already. Add `row` and you get a 2-D grid, one panel for
 every *combination* of the two faceting variables:
 
 <CodeBlock
@@ -97,8 +97,8 @@ sns.relplot(
   ]}
 />
 
-Each panel holds the same scatter plot for its slice of the data, and —
-crucially — every panel **shares the same axes by default**, so a point in
+Each panel holds the same scatter plot for its slice of the data, and,
+crucially, every panel **shares the same axes by default**, so a point in
 one cell is directly comparable to a point in another. That shared scale is
 what makes small multiples honest.
 
@@ -143,13 +143,13 @@ sns.relplot(
 
 The figure-level functions do their faceting through a class called
 **`FacetGrid`**. You rarely call it directly, but understanding its
-three-step workflow demystifies what `relplot` and friends are doing — and
+three-step workflow demystifies what `relplot` and friends are doing, and
 lets you build custom grids when you need them.
 
 Starting from the full tidy dataset, the workflow runs:
 
 1. **Split** by the facet variables (`col=` and/or `row=`).
-2. Lay out an **empty grid of axes** — one cell per category combination.
+2. Lay out an **empty grid of axes**, one cell per category combination.
 3. **`map()`** a plotting function onto each data subset.
 4. Every cell **draws the same plot** for its slice of the data.
 5. **`add_legend()`** and final touches.
@@ -186,18 +186,18 @@ function do it.
 
 <Callout type="tip" title="Three grid classes, one idea">
 Seaborn has three grid classes: **`FacetGrid`** (same plot across category
-panels — this page), **`PairGrid`** (every variable against every other —
+panels, this page), **`PairGrid`** (every variable against every other,
 the pair-plots chapter), and **`JointGrid`** (one center plot with marginal
-distributions — the joint-plots chapter). All three follow the same
+distributions, the joint-plots chapter). All three follow the same
 "set up the grid, then `map` plots onto it" pattern.
 </Callout>
 
-## Shared scales — usually keep them
+## Shared scales, usually keep them
 
 By default facets share x- and y-limits. That's almost always what you want,
 because it keeps panels comparable. Occasionally one group's range dwarfs the
 others and you'll want to free a scale with `sharey=False` (via
-`facet_kws={"sharey": False}` on the figure-level functions) — but do it
+`facet_kws={"sharey": False}` on the figure-level functions), but do it
 *consciously*, and tell your reader, because un-shared axes make panels look
 similar when they aren't.
 
@@ -206,10 +206,10 @@ similar when they aren't.
 
 - To make the figure render faster.
   > Shared limits are about interpretation, not performance.
-- [o] So panels are directly comparable — a position in one panel means the same as the same position in another.
+- [o] So panels are directly comparable, a position in one panel means the same as the same position in another.
   > A common scale is what lets the eye compare small multiples honestly; otherwise two panels could look alike while representing very different ranges.
 - Because Seaborn cannot compute separate limits per panel.
-  > It can — \`sharey=False\`/\`sharex=False\` do exactly that; shared limits are a deliberate default.
+  > It can, \`sharey=False\`/\`sharex=False\` do exactly that; shared limits are a deliberate default.
 - To save vertical space.
   > Any space difference is incidental; the real reason is comparability across panels.
 
@@ -229,13 +229,13 @@ weakness as well as its strength.
   categories produces 50+ unreadable thumbnails. Group rare categories
   together, filter to the ones you care about, or pick a different view.
 - **Sparse cells.** If some category combinations have almost no data, those
-  panels are nearly empty and waste space — consider a single faceting
+  panels are nearly empty and waste space, consider a single faceting
   dimension instead of two.
 
 <Callout type="warn" title="Facet count = col × row">
 Before adding a `row`, do the multiplication. A `col` with 4 levels and a
 `row` with 5 is already 20 panels. Small multiples are a scalpel, not a
-firehose — a few well-chosen facets beat a wall of thumbnails.
+firehose, a few well-chosen facets beat a wall of thumbnails.
 </Callout>
 
 ## Your turn
@@ -302,7 +302,7 @@ g = sns.relplot(
 - Overlaying every group's data in a single set of axes using different colors.
   > That's what \`hue\` does. Faceting gives each group its *own* panel rather than overlaying them.
 - [o] Splitting the data by one or two categorical variables and drawing the same plot once per group, arranged in a grid.
-  > Faceting (\`col\`/\`row\`) repeats one chart across panels — one per category (combination) — so groups can be compared side by side.
+  > Faceting (\`col\`/\`row\`) repeats one chart across panels, one per category (combination), so groups can be compared side by side.
 - Computing summary statistics for each group.
   > Faceting is about layout, not aggregation; the per-panel plot may or may not aggregate.
 - Changing the color palette across the figure.
@@ -318,14 +318,14 @@ do you get?
 
 - 7, one per category level.
   > Faceting isn't additive across the two dimensions.
-- [o] 12 — the product of the levels (3 × 4).
+- [o] 12, the product of the levels (3 × 4).
   > A 2-D facet grid has one panel for every *combination* of col and row levels, so 3 × 4 = 12.
 - 1, with all groups overlaid.
   > Overlaying is \`hue\`; \`col\`/\`row\` produce separate panels.
 - 3, ignoring the row variable.
   > Both faceting variables apply; the row variable multiplies the panel count.
 
-The grid size is \`col\` levels × \`row\` levels — which is exactly why grids
+The grid size is \`col\` levels × \`row\` levels, which is exactly why grids
 can explode if you're not careful.`}
 />
 
@@ -343,7 +343,7 @@ can explode if you're not careful.`}
   > Reshaping is a pandas concern done before plotting; \`map\` only draws.
 
 The workflow is: construct the grid, \`map\` a plot onto each subset, then
-\`add_legend()\` — which is precisely what \`relplot\` automates.`}
+\`add_legend()\`, which is precisely what \`relplot\` automates.`}
 />
 
 <MultipleChoice
@@ -352,7 +352,7 @@ result, and a better approach?
 
 - A single clear chart; no problem at all.
   > Faceting on 60 levels makes 60 panels, which is the opposite of clear.
-- [o] About 60 tiny, unreadable panels — better to filter to a few categories of interest or group the rare ones.
+- [o] About 60 tiny, unreadable panels, better to filter to a few categories of interest or group the rare ones.
   > Each level becomes its own panel, so high-cardinality faceting produces a wall of thumbnails; reducing the number of facets restores readability.
 - Seaborn automatically picks the 5 most important categories.
   > Seaborn faithfully facets every level; it won't silently drop categories for you.
@@ -364,6 +364,6 @@ group, or choose a different view.`}
 />
 
 You can now break a dataset into comparable panels and know when not to.
-Two specialized grids remain — the all-pairs **pair plot** and the
-margin-equipped **joint plot** — which apply this same "set up a grid, map
+Two specialized grids remain, the all-pairs **pair plot** and the
+margin-equipped **joint plot**, which apply this same "set up a grid, map
 plots onto it" idea to specific questions.

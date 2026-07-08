@@ -11,12 +11,12 @@ vectors. Why is that fast?
 The answer is **move semantics**: the language can *transfer*
 ownership of internal storage from one object to another without
 copying the contents. This chapter is about the intuition, not the
-full template machinery — that comes later if you go deep.
+full template machinery, that comes later if you go deep.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A heavy grid of blue dots stays exactly where it is while a thin handle arcs from a faded old box to a crisp green one — moving transfers ownership of the buffer instead of copying its contents"
+  aria-label="A heavy grid of blue dots stays exactly where it is while a thin handle arcs from a faded old box to a crisp green one, moving transfers ownership of the buffer instead of copying its contents"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -83,19 +83,19 @@ The buffer is unchanged. `a` is left in a valid but empty state
 (safe to destroy or reassign). `b` now owns the data. Total work:
 copying a few pointers and integers. Done.
 
-## `std::move` is not the operation — it's a *cast*
+## `std::move` is not the operation, it's a *cast*
 
 The name is a bit misleading. `std::move(x)` does **not** itself
 move anything. It just tells the compiler "treat `x` as if it were
 an rvalue (a temporary, eligible for moving from)."
 
-The actual move happens when something *accepts* an rvalue — like a
+The actual move happens when something *accepts* an rvalue, like a
 move constructor or move assignment operator. Many standard library
 types (vector, string, unique_ptr, ...) have move operations defined
 that pillage the source's internals.
 
 ```cpp
-std::vector<int> a = make_a_huge_vector();    // returns by value — typically moved
+std::vector<int> a = make_a_huge_vector();    // returns by value, typically moved
 std::vector<int> b = std::move(a);            // a's buffer transferred to b
 // a is now valid but unspecified; safe to assign to or destroy.
 ```
@@ -136,7 +136,7 @@ struct Tracer {
   ]}
 />
 
-The first `push_back` prints `COPY` — `t` has a name, you might
+The first `push_back` prints `COPY`, `t` has a name, you might
 still use it, so the vector must duplicate it. The second prints
 `move`, because `std::move(t)` granted permission to pillage. The
 third constructs a nameless temporary and moves it in; no cast was
@@ -194,7 +194,7 @@ This is the practical takeaway every beginner needs:
 So write:
 
 ```cpp
-std::vector<int> read_numbers();   // good — return by value
+std::vector<int> read_numbers();   // good, return by value
 ```
 
 not:
@@ -210,15 +210,15 @@ The simpler signature is also the more efficient one.
 
 Briefly, because the names matter:
 
-- An **lvalue** is something that has a name and an address — a
+- An **lvalue** is something that has a name and an address, a
   variable, a member access. You can take `&x`.
 - An **rvalue** (more precisely, an *xvalue* or *prvalue*) is a
-  temporary or an expression treated as one — a function result, a
+  temporary or an expression treated as one, a function result, a
   literal, the result of `std::move`.
 
 Move operations are bound to rvalues, so casting an lvalue with
 `std::move` lets you opt-in to moving. Use it when you genuinely
-want to give up an object's contents — and *don't* use it on
+want to give up an object's contents, and *don't* use it on
 return values that the compiler can already optimize, or on `const`
 objects (it silently downgrades to a copy).
 
@@ -271,5 +271,5 @@ needs no special members*.
   > A vector's *handle* is small (a few pointers/sizes); the heap buffer it owns can be huge.`}
 />
 
-Next: how to *think about* algorithms and data structures — what
+Next: how to *think about* algorithms and data structures, what
 they cost and when to reach for which.

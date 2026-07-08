@@ -1,6 +1,6 @@
 "use client";
 
-// Stage 3 (Decompose) — engine adapter contract shared by the three
+// Stage 3 (Decompose), engine adapter contract shared by the three
 // SQL playground shells (SQLite / Postgres / DuckDB).
 //
 // The full Stage 3 plan is to migrate the three ~5–6 kLOC playground

@@ -16,10 +16,10 @@ import { CloudStorageSection } from "./CloudStorageSection";
 /**
  * The account area is the canonical example of the report's rule: auth gates
  * *actions/areas*, never *content*. This page is personalized and so is read
- * client-side from the session — it does not turn any lesson dynamic.
+ * client-side from the session, it does not turn any lesson dynamic.
  *
  * Membership: the plan comes off the session (`user.plan`, flipped by the
- * Polar webhook — lib/billing/polar.ts). Free members get an Upgrade button
+ * Polar webhook, lib/billing/polar.ts). Free members get an Upgrade button
  * (Polar hosted checkout); Pro members get the billing portal. Returning
  * from checkout (`?checkout=success`) polls the session with the cookie
  * cache bypassed until the webhook's plan flip is visible, then reloads.
@@ -35,7 +35,7 @@ export function AccountClient() {
   const [activation, setActivation] = useState<"idle" | "waiting" | "slow">(
     "idle",
   );
-  // Billing period picked on the pricing page while signed out — the sign-in
+  // Billing period picked on the pricing page while signed out, the sign-in
   // detour lands here, and the Upgrade button must honor the original choice
   // (an annual pick must not silently become a monthly checkout).
   const [period, setPeriod] = useState<CheckoutPeriod>("monthly");
@@ -48,7 +48,7 @@ export function AccountClient() {
 
   // Detect the checkout return via window.location (not useSearchParams, so
   // the page keeps prerendering statically without a Suspense boundary).
-  // Require the exact value Polar sends (lib/billing/polar.ts) — a stale or
+  // Require the exact value Polar sends (lib/billing/polar.ts), a stale or
   // hand-typed `?checkout=` must not flash a "payment received" notice.
   useEffect(() => {
     const value = new URLSearchParams(window.location.search).get("checkout");
@@ -59,7 +59,7 @@ export function AccountClient() {
     void waitForProActivation().then((activated) => {
       if (cancelled) return;
       if (activated) {
-        // Session cookie now carries the new plan — reload with a clean URL.
+        // Session cookie now carries the new plan, reload with a clean URL.
         window.location.replace("/account");
       } else {
         setActivation("slow");
@@ -96,7 +96,7 @@ export function AccountClient() {
 
   const { user } = session;
   // `plan` is a server-defined additional field, not on the client's user
-  // type. Admins are treated as Pro everywhere (lib/ai/tier.ts) — reflect
+  // type. Admins are treated as Pro everywhere (lib/ai/tier.ts), reflect
   // that here rather than offering them a pointless upgrade.
   const plan = ((user as { plan?: string }).plan ?? "free").toLowerCase();
   const isAdmin = (user as { role?: string }).role === "admin";
@@ -108,7 +108,7 @@ export function AccountClient() {
       await signOut();
       router.refresh();
     } catch {
-      // Network failure — leave the session as-is; the button re-enables.
+      // Network failure, leave the session as-is; the button re-enables.
     }
     setSigningOut(false);
   }
@@ -183,7 +183,7 @@ export function AccountClient() {
         >
           {activation === "waiting"
             ? "Thanks for upgrading! Finalizing your Pro membership…"
-            : "Payment received — your Pro membership will be active within a few minutes. Feel free to keep browsing."}
+            : "Payment received, your Pro membership will be active within a few minutes. Feel free to keep browsing."}
         </p>
       )}
 
@@ -206,8 +206,8 @@ export function AccountClient() {
           {billingBusy
             ? "Opening checkout…"
             : period === "annual"
-              ? "Upgrade to Pro — $40/year"
-              : "Upgrade to Pro — $4.99/month"}
+              ? "Upgrade to Pro, $40/year"
+              : "Upgrade to Pro, $4.99/month"}
         </button>
       )}
 
@@ -232,7 +232,7 @@ export function AccountClient() {
       </button>
     </div>
 
-    {/* Cloud saves + share links (all playgrounds) — the quota is
+    {/* Cloud saves + share links (all playgrounds), the quota is
         account-wide, so this is where users see and free up everything. */}
     <CloudStorageSection />
     </>

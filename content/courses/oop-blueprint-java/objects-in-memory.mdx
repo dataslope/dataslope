@@ -6,14 +6,14 @@ description: How the JVM lays out objects on the heap, what a reference really i
 You can write a lot of Java without thinking about memory. But ten
 minutes of looking at how the JVM actually represents objects will
 clear up more confusions than any number of pages of prose. We will
-not go deep — just deep enough to make `null`, "two variables
+not go deep, just deep enough to make `null`, "two variables
 referring to the same object," and "objects passed to methods" feel
 obvious.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three blue reference pills in a stack strip send thin lines toward a heap card: two lines meet the same green object, and the third stops at a dashed ring crossed in red — references can share one object or point to null"
+  aria-label="Three blue reference pills in a stack strip send thin lines toward a heap card: two lines meet the same green object, and the third stops at a dashed ring crossed in red, references can share one object or point to null"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -127,7 +127,7 @@ both variables point to the *same* heap object? It does *not* check
 whether the contents are equal. (For content equality you call
 `.equals(...)`, which we'll meet later.)
 
-## A *new* object is a different object — even with the same contents
+## A *new* object is a different object, even with the same contents
 
 <CodeBlock
   adapter="java"
@@ -188,7 +188,7 @@ flowchart TD
 ```
 
 Trying to send a message to `null` produces a
-`NullPointerException` — the JVM's way of saying "you asked nothing
+`NullPointerException`, the JVM's way of saying "you asked nothing
 to do something."
 
 <CodeBlock
@@ -227,7 +227,7 @@ Hoare, who added the null reference to the ALGOL W language in 1965
 "simply because it was so easy to implement," publicly called it his
 **billion-dollar mistake** in 2009, estimating that the crashes and
 vulnerabilities it enabled have cost the industry at least that much.
-Modern Java code tries hard to *avoid* `null` for "no value here" —
+Modern Java code tries hard to *avoid* `null` for "no value here",
 preferring constructors that never produce a half-built object,
 default values, and `java.util.Optional`. We will see those
 techniques later.
@@ -310,8 +310,8 @@ class Dog {
   ]}
 />
 
-That subtle difference — mutating the pointed-to object vs.
-reassigning the local reference — is the source of a *lot* of bugs in
+That subtle difference, mutating the pointed-to object vs.
+reassigning the local reference, is the source of a *lot* of bugs in
 beginner Java code. Look at every method that takes an object and
 ask: "Does this method mutate the object, or just look at it?" The
 answer affects everything.
@@ -359,7 +359,7 @@ flowchart TD
 ```
 
 When you draw a diagram like this for the program you are writing,
-you are not "doing math" — you are *seeing the system*. We will draw
+you are not "doing math", you are *seeing the system*. We will draw
 many of them.
 
 ## Test your understanding
@@ -369,9 +369,9 @@ many of them.
 
 - Zero
   > \`new Dog(...)\` allocated one.
-- [o] One — both \`a\` and \`b\` are references to the same object
+- [o] One, both \`a\` and \`b\` are references to the same object
   > Assigning one reference to another copies the reference, not the underlying object.
-- Two — Java duplicates on assignment
+- Two, Java duplicates on assignment
   > Java never silently duplicates objects.
 - It depends on the garbage collector
   > Allocation count is determined by your code, not the GC.`}
@@ -397,7 +397,7 @@ many of them.
   > Java passes references *by value*; reassigning the parameter does not affect the caller's variable.
 - The original object is freed immediately
   > The GC decides when, not the language.
-- [o] The caller's variable still points at the original object — only the local parameter changed
+- [o] The caller's variable still points at the original object, only the local parameter changed
   > The parameter is a separate local variable holding its own copy of the reference.
 - The program throws a \`NullPointerException\`
   > No exception; reassignment is legal.`}

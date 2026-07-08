@@ -148,7 +148,7 @@ const results = await Promise.all([
 const elapsed = (performance.now() - start).toFixed(1);
 
 for (const r of results) {
-  console.log(\`  \${r.name}: \${r.loadedInMs}ms — \${JSON.stringify(r.data)}\`);
+  console.log(\`  \${r.name}: \${r.loadedInMs}ms, \${JSON.stringify(r.data)}\`);
 }
 console.log(\`\\nTotal wall time: \${elapsed}ms (parallel)\`);
 `,
@@ -164,7 +164,7 @@ const url =
   "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv";
 const text: string = await (await fetch(url)).text();
 
-// Minimal CSV parse — this dataset has no quoted/embedded commas.
+// Minimal CSV parse, this dataset has no quoted/embedded commas.
 const [header, ...rows] = text.trim().split(/\\r?\\n/);
 const cols: string[] = header.split(",");
 
@@ -184,7 +184,7 @@ console.log("first 5 rows:", data.slice(0, 5));
     title: "Node.js Modules",
     desc: "Typed access to crypto, path, os",
     code: `// almostnode shims Node.js core modules. We import via require()
-// so types come from declaration merging at runtime — the TS compiler
+// so types come from declaration merging at runtime, the TS compiler
 // emits this exactly as written.
 const path: typeof import("node:path") = require("node:path");
 const crypto: typeof import("node:crypto") = require("node:crypto");
@@ -203,7 +203,7 @@ console.log("platform =>", os.platform());
     key: "multi_file",
     title: "Multi-File Modules",
     desc: "Split logic across .ts files",
-    code: `// utils.ts sits alongside this file in the workspace — the import
+    code: `// utils.ts sits alongside this file in the workspace, the import
 // resolves through almostnode's VirtualFS via TypeScript's CommonJS
 // emit. Edit either tab and re-run.
 import { greet, shout } from "./utils";
@@ -299,20 +299,20 @@ type WorkerOutMessage =
 
 class TypeScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
-  // Text files from the last `prepareFileSystem` snapshot — cross-file
+  // Text files from the last `prepareFileSystem` snapshot, cross-file
   // context for the language-service completions (imports of sibling
   // workspace files resolve against these).
   private stagedText = new Map<string, string>();
 
   constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook —
+  /** Free the runtime by terminating its worker. Registry-eviction hook,
    *  the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
   }
 
-  /** Intellisense via the shared TS language service worker — separate
+  /** Intellisense via the shared TS language service worker, separate
    *  from the execution worker so analysis never queues behind a
    *  long-running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
@@ -396,7 +396,7 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   // CodeMirror v5 exposes TypeScript via the `text/typescript` MIME alias.
   codeMirrorMode: "text/typescript",
-  // web_fmt configured for 2-space indentation (see formatCode) — keep in sync.
+  // web_fmt configured for 2-space indentation (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,

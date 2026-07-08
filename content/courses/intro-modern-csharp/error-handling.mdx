@@ -1,6 +1,6 @@
 ---
 title: Error Handling
-description: How C# represents things that go wrong — and how to respond without crashing the program
+description: How C# represents things that go wrong, and how to respond without crashing the program
 ---
 
 So far our programs have assumed everything works: files exist,
@@ -9,12 +9,12 @@ programs aren't that lucky.
 
 C# splits "things that go wrong" into two camps:
 
-1. **Expected failures** that you can predict and check for — these
+1. **Expected failures** that you can predict and check for, these
    should be handled with **regular control flow** (return values,
    `TryParse`, `bool` flags).
 2. **Exceptional failures** that you can't easily prevent and
-   shouldn't have to write a defensive check for at every call site
-   — these use the **exception system**.
+   shouldn't have to write a defensive check for at every call site,
+these use the **exception system**.
 
 The discipline of knowing which is which is most of what "good
 error handling" means.
@@ -22,7 +22,7 @@ error handling" means.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue line of execution snaps at a red cross, drops into a green catching curve, and climbs back up to continue to a safe green end — an exception thrown, caught, and handled"
+  aria-label="A blue line of execution snaps at a red cross, drops into a green catching curve, and climbs back up to continue to a safe green end, an exception thrown, caught, and handled"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }}>
@@ -148,7 +148,7 @@ Rules:
 - The **most specific** `catch` blocks should come first. The
   runtime picks the first matching one.
 - A `finally` block **always runs**, whether or not an exception
-  was thrown — perfect for cleanup.
+  was thrown, perfect for cleanup.
 
 ## Throwing your own exceptions
 
@@ -207,7 +207,7 @@ This is a really common beginner trap:
       filename: "main.cs",
       starterCode: `using System;
 
-// BAD — using exceptions as if they were "if not a number"
+// BAD, using exceptions as if they were "if not a number"
 int ParseOrZero(string s)
 {
     try
@@ -238,7 +238,7 @@ of `TryParse` is to *not* throw for the perfectly ordinary case
       filename: "main.cs",
       starterCode: `using System;
 
-// GOOD — use TryParse for an expected failure
+// GOOD, use TryParse for an expected failure
 int ParseOrZero(string s) => int.TryParse(s, out var n) ? n : 0;
 
 Console.WriteLine(ParseOrZero("42"));
@@ -266,7 +266,7 @@ specific exceptions you actually know how to handle.
       filename: "main.cs",
       starterCode: `using System;
 
-// BAD — hides everything, including bugs
+// BAD, hides everything, including bugs
 try
 { /* important work */
 }
@@ -274,7 +274,7 @@ catch
 { /* nothing */
 }
 
-// BETTER — handle what you know; let the rest bubble up
+// BETTER, handle what you know; let the rest bubble up
 try
 { /* important work */
 }
@@ -312,7 +312,7 @@ void Risky()
     {
         Console.WriteLine($"logging: {ex.Message}");
         throw; // re-throws preserving the original stack trace
-        // throw ex;    // BAD — resets the stack trace
+        // throw ex;    // BAD, resets the stack trace
     }
 }
 
@@ -363,7 +363,7 @@ Console.WriteLine(maybeName ?? "(none)");
 />
 
 Modern C# (with nullable reference types) lets the compiler warn
-you when a variable could be null — making
+you when a variable could be null, making
 `NullReferenceException` largely a thing of the past if you pay
 attention to the warnings.
 

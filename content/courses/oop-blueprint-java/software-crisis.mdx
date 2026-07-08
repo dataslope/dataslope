@@ -12,7 +12,7 @@ into in the 1960s.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two monolithic slabs joined by a tangle of crossing wires, one of them red, while beside them three small cells connect through single tidy green sockets — the software crisis and the modular way out"
+  aria-label="Two monolithic slabs joined by a tangle of crossing wires, one of them red, while beside them three small cells connect through single tidy green sockets, the software crisis and the modular way out"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.22">
@@ -51,7 +51,7 @@ into in the 1960s.
 
 In the early days of computing, programs were tiny. A complete program
 might be a few hundred lines of FORTRAN or assembly, written by one
-person, doing one thing — compute a ballistic trajectory, sort a
+person, doing one thing, compute a ballistic trajectory, sort a
 payroll file, control a thermostat. Code at that size is easy to keep
 in your head.
 
@@ -67,13 +67,13 @@ flowchart TD
 
 By the late 1960s a single program could be hundreds of thousands of
 lines long, written by dozens of people over years, modified long
-after the original authors had left. The tools of the previous decade
-— global variables, GOTO statements, subroutines that all shared the
-same data — simply did not scale to that size.
+after the original authors had left. The tools of the previous decade,
+global variables, GOTO statements, subroutines that all shared the
+same data, simply did not scale to that size.
 
 <IllustrationPrompt subject="Fred Brooks, author of The Mythical Man-Month" photo />
 
-The most famous casualty was IBM's **OS/360** — the operating system
+The most famous casualty was IBM's **OS/360**, the operating system
 for the System/360 mainframe family, and one of the largest software
 projects ever attempted at the time. It consumed thousands of
 programmer-years and still shipped late and over budget. Its manager,
@@ -93,7 +93,7 @@ safely.
 <Callout type="info" title="Where the term comes from">
 The phrase *"software crisis"* was used at the **1968 NATO Software
 Engineering Conference**. The same conference introduced the term
-*"software engineering"* itself — and the conference report admits the
+*"software engineering"* itself, and the conference report admits the
 name was chosen to be deliberately **provocative**: in 1968, the idea
 that writing software could be an engineering discipline, with the
 rigor of bridge-building, was closer to an aspiration than a fact.
@@ -112,7 +112,7 @@ miniature version of what that felt like.
     {
       filename: "main.java",
       starterCode: `public class Main {
-  // Imagine these as "global" data — every procedure can read and write them.
+  // Imagine these as "global" data, every procedure can read and write them.
   static String customerName;
   static double customerBalance;
   static boolean customerIsPremium;
@@ -136,7 +136,7 @@ miniature version of what that felt like.
     customerIsPremium = false;
 
     deposit(50);
-    withdraw(200); // overdraws — no protection
+    withdraw(200); // overdraws, no protection
     applyMonthlyFee();
 
     System.out.println(customerName + " balance: " + customerBalance);
@@ -155,7 +155,7 @@ procedures, and many programmers. Several painful patterns emerge:
   could be *anywhere*.
 - **Invariants are not protected.** Nothing prevents `withdraw` from
   making the balance negative. The rule "balance must be ≥ 0" is not
-  enforced by the data — it has to be remembered by every author of
+  enforced by the data, it has to be remembered by every author of
   every function.
 - **Procedures and data are scattered.** There is no single place to
   look to find "everything about a customer."
@@ -216,7 +216,7 @@ By the early 1970s, the industry had a vocabulary for the symptoms:
 
 Stand back and the requirements for *any* solution become clear:
 
-1. **Data should have an owner** — code that touches a piece of data
+1. **Data should have an owner**, code that touches a piece of data
    should be small, named, and findable.
 2. **Invariants should be enforced by the type itself**, not by every
    caller's discipline.
@@ -271,7 +271,7 @@ that idea. That happens in the next page.
 - A single global database that all functions share
   > That is closer to the problem than the solution.
 - [o] Units of code that own their data, enforce their own rules, and can be composed into larger systems
-  > This is essentially the definition of an object — which is where OOP enters the story.
+  > This is essentially the definition of an object, which is where OOP enters the story.
 - More clever \`GOTO\` statements
   > \`GOTO\`-heavy code was part of what made systems unmaintainable.`}
 />

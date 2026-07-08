@@ -1,6 +1,6 @@
 ---
 title: The Memory Model
-description: Stack, heap, globals, and code — where your data lives, who manages it, and how long it stays alive.
+description: Stack, heap, globals, and code, where your data lives, who manages it, and how long it stays alive.
 ---
 
 We've already met the **stack** in detail. Let's now zoom out and
@@ -18,8 +18,8 @@ questions:
 | --- | --- | --- |
 | Text segment | compiled machine code | whole program, read-only |
 | Data segment | globals, statics, string literals | whole program |
-| Heap | whatever `new` allocates | until you free it — **you** manage it |
-| Stack | function calls and locals | end of scope — auto-managed |
+| Heap | whatever `new` allocates | until you free it, **you** manage it |
+| Stack | function calls and locals | end of scope, auto-managed |
 
 <svg
   viewBox="0 0 640 260"
@@ -52,7 +52,7 @@ questions:
 
 ### 1. Text (code) segment
 
-The compiled machine code of your program. Read-only — the OS marks
+The compiled machine code of your program. Read-only, the OS marks
 those pages so that trying to write to them crashes the program.
 You don't directly interact with this region.
 
@@ -94,7 +94,7 @@ int main() {
   ]}
 />
 
-Notice `call_count` keeps incrementing — it lives in the data
+Notice `call_count` keeps incrementing, it lives in the data
 segment, not in the function's stack frame. A `static` local is a
 hidden global with restricted visibility.
 
@@ -159,7 +159,7 @@ flowchart TD
 ```
 
 When the function returns, the stack pointer `p` is destroyed. But
-the heap object stays alive forever — unless something explicitly
+the heap object stays alive forever, unless something explicitly
 calls `delete`. That's a **memory leak**. We'll spend a whole later
 chapter on smart pointers that prevent this automatically.
 
@@ -183,7 +183,7 @@ gantt
 ```
 
 Globals span the whole program. Stack locals span only the function
-call. Heap objects span between `new` and `delete` — which can be
+call. Heap objects span between `new` and `delete`, which can be
 anywhere.
 
 ## Storage duration vs scope
@@ -196,7 +196,7 @@ These two ideas often get mixed up:
 For a normal local variable they overlap perfectly. For a `static`
 local, the scope is small (only inside the function) but the
 storage duration is global. For a heap object, the storage duration
-is "until you free it" — but if you lose the pointer to it before
+is "until you free it", but if you lose the pointer to it before
 freeing it, you've leaked it.
 
 ## Why C++ exposes all this
@@ -236,7 +236,7 @@ flowchart TD
     V -- pointer --> A
 ```
 
-The *vector handle* lives on the stack — three small fields: a
+The *vector handle* lives on the stack, three small fields: a
 pointer to the data, the current size, and the current capacity.
 The actual elements live on the heap. When the vector goes out of
 scope, its destructor automatically frees the heap data. **You
@@ -327,7 +327,7 @@ container/pointer to do it for you.
   > Normal locals live there; \`static\` locals do not.
 - On the heap, allocated by \`new\` each call.
   > They are allocated once for the whole program.
-- [o] In the data segment, alongside globals — its memory survives between calls.
+- [o] In the data segment, alongside globals, its memory survives between calls.
   > A \`static\` local is essentially a hidden global with restricted scope.
 - In CPU registers.
   > Registers are too small and too temporary for this.`}
@@ -374,5 +374,5 @@ container/pointer to do it for you.
   > It applies to every variable, in every region.`}
 />
 
-Next: pointers and references — the language tools that let you
+Next: pointers and references, the language tools that let you
 *name* memory.

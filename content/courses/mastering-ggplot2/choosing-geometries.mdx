@@ -10,7 +10,7 @@ vocabulary. The goal is not to memorize a list but to develop a reflex:
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two variable chips send thin lines down to a shelf of five small geom cards — dots, a line, bars, a boxplot, and an area — with the bar card ringed in yellow: the variables choose the geom"
+  aria-label="Two variable chips send thin lines down to a shelf of five small geom cards, dots, a line, bars, a boxplot, and an area, with the bar card ringed in yellow: the variables choose the geom"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -60,7 +60,7 @@ you want to show:
 | 2 continuous | `geom_point`, `geom_line` |
 | 1 categorical + 1 continuous | `geom_boxplot`, `geom_col`, `geom_violin` |
 
-This is a starting point, not a law — but it resolves most "which geom
+This is a starting point, not a law, but it resolves most "which geom
 do I use?" questions.
 
 ## One continuous variable: distributions
@@ -164,7 +164,7 @@ ggplot(mpg, aes(x = class, y = hwy)) +
   ]}
 />
 
-## geom_bar vs. geom_col — a crucial distinction
+## geom_bar vs. geom_col, a crucial distinction
 
 Both draw bars, but they answer different questions, and mixing them up
 is a top-five beginner error:
@@ -195,7 +195,7 @@ ggplot(sales, aes(x = product, y = revenue)) +
 />
 
 If you tried `geom_bar()` on this data expecting bars of height
-`revenue`, you would instead get three bars all of height **1** —
+`revenue`, you would instead get three bars all of height **1**,
 because each product appears once, so the *count* is 1. The fix is
 `geom_col()` (or, equivalently, `geom_bar(stat = "identity")`, which
 the next section explains).
@@ -211,7 +211,7 @@ If your data already has the y-values, you almost always want
   markdown={`You have a data frame with columns \`product\` and \`revenue\`, one row per product, and you want bar heights equal to \`revenue\`. Which geom is correct?
 
 - [o] \`geom_col()\`, because the bar heights are values you already have in the \`revenue\` column.
-  > \`geom_col()\` draws bars at the supplied y-values — exactly what you want.
+  > \`geom_col()\` draws bars at the supplied y-values, exactly what you want.
 - \`geom_bar()\`, because it always reads the y column for heights.
   > \`geom_bar()\` ignores y and counts rows; each product appears once, giving bars of height 1.
 - \`geom_histogram()\`, because revenue is numeric.
@@ -244,7 +244,7 @@ continuous) points directly to boxplots or violins.`}
 The data frame `sales` already has the heights you want (`revenue`), one
 row per `product`. Build a ggplot object called `p` that draws a bar
 chart with `product` on x and bar heights equal to `revenue`. Pick the
-geom that uses *supplied* heights — not the one that counts rows.
+geom that uses *supplied* heights, not the one that counts rows.
 
 <ChallengeCard
   adapter="r"
@@ -299,5 +299,5 @@ print(p)
   categorical + continuous → boxplot/violin/col.
 - **`geom_bar()`** counts rows (needs only x); **`geom_col()`** uses
   supplied y-values. Confusing them is a classic bug.
-- Geoms are interchangeable views — start from the question and the
+- Geoms are interchangeable views, start from the question and the
   variables, not from a chart name.

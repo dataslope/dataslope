@@ -41,7 +41,7 @@ export function cmTypeForTsKind(kind: string): string {
   return KIND_TO_CM_TYPE[kind] ?? "variable";
 }
 
-/** Length of the identifier fragment immediately before `offset` —
+/** Length of the identifier fragment immediately before `offset`,
  *  the prefix a completion should replace. */
 export function completionPrefixLength(text: string, offset: number): number {
   const before = text.slice(Math.max(0, offset - 200), offset);

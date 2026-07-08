@@ -3,7 +3,7 @@ import type { Completion } from "@codemirror/autocomplete";
 // Pre-boot completion fallback for the R playground surfaces. Once WebR
 // is running, `LanguageRuntime.complete()` answers from R's own
 // completion engine (utils:::.completeToken) and this list is suppressed
-// — see `languageCompletion.ts`. Curated for the base-R vocabulary the
+//, see `languageCompletion.ts`. Curated for the base-R vocabulary the
 // learn content leans on.
 
 const kw = (label: string): Completion => ({ label, type: "keyword" });

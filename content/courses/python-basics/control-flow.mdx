@@ -5,12 +5,12 @@ description: if, elif, else, the conditional expression, and structural pattern 
 
 Every decision in software is a conditional. From "should I cache this result?" to "is the user authorized?" to "which HTTP status code do I return?", control flow is the engine that routes execution through different paths. Python's control flow is straightforward: `if`, `elif`, `else`, and (since Python 3.10) a `match` statement for pattern matching.
 
-Every snippet on this page runs in your browser — no setup required.
+Every snippet on this page runs in your browser, no setup required.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue dot at the top fans out toward three branch cards, but only the green line is solid and only its card holds a landed dot — an if, elif, else chain runs exactly one branch"
+  aria-label="A blue dot at the top fans out toward three branch cards, but only the green line is solid and only its card holds a landed dot, an if, elif, else chain runs exactly one branch"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5" fill="none">
@@ -31,7 +31,7 @@ Every snippet on this page runs in your browser — no setup required.
 
 ## Real-world impact
 
-Conditionals are not just syntax — they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.
+Conditionals are not just syntax, they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.
 
 ```mermaid
 flowchart TD
@@ -360,7 +360,7 @@ for c in [200, 404, 500, 999]:
 />
 
 <Callout type="info" title="Why no switch before 3.10?">
-Before Python 3.10, Python deliberately had no `switch`. The community preferred chained `if`/`elif` or, for value-to-value mappings, a dict lookup. The `match` statement was added not to replace those patterns, but to enable **structural pattern matching** — destructuring complex data shapes in one expression.
+Before Python 3.10, Python deliberately had no `switch`. The community preferred chained `if`/`elif` or, for value-to-value mappings, a dict lookup. The `match` statement was added not to replace those patterns, but to enable **structural pattern matching**, destructuring complex data shapes in one expression.
 </Callout>
 
 ## Dict-based dispatch (alternative to switch)
@@ -399,7 +399,7 @@ if (n := len(items)) > 10:
     print(f"Too many items: {n}")
 ```
 
-It saves a line by combining the assignment and the check. Use sparingly — only when it genuinely improves readability.
+It saves a line by combining the assignment and the check. Use sparingly, only when it genuinely improves readability.
 </Callout>
 
 ## Challenges

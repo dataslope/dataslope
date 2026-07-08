@@ -2,12 +2,12 @@
  * Build-time data for the `/courses` catalog page.
  *
  * Reads every course folder's `meta.json` under `content/courses/` (the same
- * source of truth the homepage cards use — see `getCourses` in `app/page.tsx`)
+ * source of truth the homepage cards use, see `getCourses` in `app/page.tsx`)
  * and enriches it with the description and a "most popular" rank for the
  * catalog's default sort.
  *
- * The popularity ranking is a hand-curated stand-in — the repo has no
- * analytics data — ordered roughly "friendliest entry points first". Replace
+ * The popularity ranking is a hand-curated stand-in, the repo has no
+ * analytics data, ordered roughly "friendliest entry points first". Replace
  * with real engagement figures when they exist. Courses missing from the list
  * sort after every ranked course, alphabetically.
  */
@@ -20,7 +20,7 @@ export interface CatalogCourse {
   title: string;
   description: string;
   tags: CourseTags;
-  /** 1 = most popular. `Infinity` (serialised as a large number) never — see
+  /** 1 = most popular. `Infinity` (serialised as a large number) never, see
    *  POPULARITY_ORDER; unranked courses get rank 1000 + alphabetical index. */
   popularity: number;
 }
@@ -90,7 +90,7 @@ export async function getCourseCatalog(): Promise<CatalogCourse[]> {
         popularity: RANK.get(entry.name) ?? 1000,
       });
     } catch {
-      // No meta.json or unreadable — skip
+      // No meta.json or unreadable, skip
     }
   }
 

@@ -14,7 +14,7 @@
  *
  * This module has the two halves that make those blocks actionable:
  *
- *  1. `parseAiEditSuggestions` — extract tagged blocks from a completed
+ *  1. `parseAiEditSuggestions`, extract tagged blocks from a completed
  *     assistant message. A plain answer with no tagged block yields [] and
  *     the panel renders it exactly as before; the review UI appears ONLY
  *     when the model actually returned updated code.
@@ -31,7 +31,7 @@ export interface AiEditSuggestion {
   content: string;
 }
 
-// ```lang file=name.ext   — the tag may appear anywhere in the info string
+// ```lang file=name.ext, the tag may appear anywhere in the info string
 // after the fence; the filename runs to the next whitespace or backtick.
 const FENCE_RE = /^```[^\n`]*?\bfile=([^\s`]+)[^\n`]*\n([\s\S]*?)^```[ \t]*$/gm;
 
@@ -52,7 +52,7 @@ export function parseAiEditSuggestions(markdown: string): AiEditSuggestion[] {
   while ((match = FENCE_RE.exec(markdown)) !== null) {
     const filename = match[1].trim().slice(0, MAX_FILENAME);
     if (!filename) continue;
-    // Strip exactly one trailing newline — the fence terminator's — so the
+    // Strip exactly one trailing newline, the fence terminator's, so the
     // proposed contents round-trip byte-identical to what the model wrote.
     const content = match[2].replace(/\n$/, "");
     byFile.set(filename, content);

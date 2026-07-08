@@ -7,7 +7,7 @@ import type {
 } from "../types";
 import { getMagoFmt } from "./magoFmt";
 
-// PHP (via php-wasm) runs inside a dedicated Web Worker — see php-worker.ts.
+// PHP (via php-wasm) runs inside a dedicated Web Worker, see php-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -16,7 +16,7 @@ const EXAMPLES: ExampleSnippet[] = [
     desc: "Basic echo, math & strings",
     code: `<?php
 // Hello, PHP Playground!
-echo "PHP " . PHP_VERSION . " — running entirely in your browser.\\n";
+echo "PHP " . PHP_VERSION . ", running entirely in your browser.\\n";
 echo "π ≈ " . M_PI . "\\n";
 echo "e ≈ " . M_E . "\\n\\n";
 
@@ -183,7 +183,7 @@ function bye(string $name): string {
 const PACKAGES: PackageInfo[] = [
   // All PHP standard-library functions and constants (str_replace,
   // sprintf, M_PI, array_map, json_decode, etc.) are globally available
-  // without any require or include — there are no packages to install.
+  // without any require or include, there are no packages to install.
 ];
 
 // ─── Worker-based runtime ────────────────────────────────────────────────
@@ -203,7 +203,7 @@ class PhpWorkerRuntime implements LanguageRuntime {
 
     constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook —
+  /** Free the runtime by terminating its worker. Registry-eviction hook,
    *  the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
@@ -265,10 +265,10 @@ export const phpAdapter: LanguageAdapter = {
     engine: "php-wasm",
     engineUrl: "https://github.com/seanmorris/php-wasm",
     notes:
-      "PHP compiled to WebAssembly — runs entirely in the browser, no server roundtrip.",
+      "PHP compiled to WebAssembly, runs entirely in the browser, no server roundtrip.",
   },
   codeMirrorMode: "php",
-  // mago_fmt (PSR-12) (see formatCode) — keep in sync.
+  // mago_fmt (PSR-12) (see formatCode), keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -287,7 +287,7 @@ export const phpAdapter: LanguageAdapter = {
       >
         PHP standard library
       </a>{" "}
-      and are always available — no <code>require</code> needed.
+      and are always available, no <code>require</code> needed.
     </>
   ),
   // PHP doesn't have a per-call import statement that maps cleanly to

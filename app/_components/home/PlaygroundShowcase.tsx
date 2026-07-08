@@ -101,8 +101,8 @@ export function PlaygroundShowcase() {
   const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
 
   const subtitle = isSql
-    ? `A full in-browser SQL workbench — query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
-    : `A full in-browser ${name} playground — write and run real ${name} instantly. Pick any language from the switcher below.`;
+    ? `A full in-browser SQL workbench, query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
+    : `A full in-browser ${name} playground, write and run real ${name} instantly. Pick any language from the switcher below.`;
 
   return (
     <div className="px-4 sm:px-6">

@@ -10,7 +10,7 @@ remembers a value and gives it a name.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Three labelled boxes holding colored balls; in the last box a faded ball gives way to a new one arriving along a curved path — reassigning a variable"
+  aria-label="Three labelled boxes holding colored balls; in the last box a faded ball gives way to a new one arriving along a curved path, reassigning a variable"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -74,10 +74,10 @@ finds.
 JavaScript has three keywords for declaring variables. In modern
 code, only two are commonly used:
 
-- `const` — declares a variable whose *binding* cannot be
+- `const`, declares a variable whose *binding* cannot be
   reassigned.
-- `let` — declares a variable whose binding can be reassigned.
-- `var` — the old, original keyword, kept for backwards
+- `let`, declares a variable whose binding can be reassigned.
+- `var`, the old, original keyword, kept for backwards
   compatibility. Avoid it in new code.
 
 The rule of thumb is simple and powerful:
@@ -104,8 +104,8 @@ console.log("counter:", counter);
 
 // 'const' protects the binding, NOT the value:
 const list = [1, 2, 3];
-// list = [4, 5];   // Would be an error — reassignment.
-list.push(4); // Fine — we are mutating the array itself.
+// list = [4, 5];   // Would be an error, reassignment.
+list.push(4); // Fine, we are mutating the array itself.
 console.log("list:", list);
 `,
     },
@@ -121,10 +121,10 @@ array), you can still change its contents.
 
 Three words that beginners often mix up:
 
-- **Declaration** — telling JavaScript a variable exists. `let x;`
-- **Initialisation** — giving the variable its first value at
+- **Declaration**, telling JavaScript a variable exists. `let x;`
+- **Initialisation**, giving the variable its first value at
   declaration. `let x = 5;`
-- **Assignment** — changing the value of an already-declared
+- **Assignment**, changing the value of an already-declared
   variable. `x = 7;` (no `let`/`const` keyword).
 
 <CodeBlock
@@ -132,7 +132,7 @@ Three words that beginners often mix up:
   files={[
     {
       filename: "main.js",
-      starterCode: `let x; // declaration only — x is undefined
+      starterCode: `let x; // declaration only, x is undefined
 console.log(x); // undefined
 
 x = 5; // assignment
@@ -212,8 +212,8 @@ y = x - 1;
 
 | After line | `x` | `y` | `z` |
 | ---: | ---: | ---: | ---: |
-| 1 | 5 | — | — |
-| 2 | 5 | 10 | — |
+| 1 | 5 |, |, |
+| 2 | 5 | 10 |, |
 | 3 | 5 | 10 | 15 |
 | 4 | 15 | 10 | 15 |
 | 5 | 15 | 14 | 15 |
@@ -335,7 +335,7 @@ actionCount += 1;
 actionCount += 1;
 console.log("After 3 actions:", userName, isLoggedIn, actionCount);
 
-// "User logs out" — back to (almost) the initial state.
+// "User logs out", back to (almost) the initial state.
 userName = "guest";
 isLoggedIn = false;
 // We deliberately keep actionCount, to remember the session.
@@ -347,8 +347,8 @@ console.log("After logout:", userName, isLoggedIn, actionCount);
 
 That is a tiny **state machine**: three variables, evolving over
 time, in response to events. Almost every interactive program in
-the world — your email client, your phone's home screen, a video
-game, this very web page — is, at its core, a much bigger version
+the world, your email client, your phone's home screen, a video
+game, this very web page, is, at its core, a much bigger version
 of this.
 
 ## Challenge
@@ -437,7 +437,7 @@ console.log({ balance, deposits, withdrawals });
 - [o] Use \`const\` by default; switch to \`let\` only when you actually need to reassign; avoid \`var\`
   > \`const\` documents that the binding won't change, which makes code easier to read and reason about. \`let\` is reserved for the cases where you really do reassign. \`var\` is kept only for legacy reasons.
 - Use \`const\` for primitives and \`let\` for objects
-  > The primitive-vs-object distinction is the wrong criterion; the right question is whether you intend to reassign the variable. \`const\` works perfectly for objects and arrays — it just prevents rebinding the variable to a different object, not mutating the object itself.
+  > The primitive-vs-object distinction is the wrong criterion; the right question is whether you intend to reassign the variable. \`const\` works perfectly for objects and arrays, it just prevents rebinding the variable to a different object, not mutating the object itself.
 
-The right rule has nothing to do with the value's type — it's about whether you intend to reassign the variable.`}
+The right rule has nothing to do with the value's type, it's about whether you intend to reassign the variable.`}
 />

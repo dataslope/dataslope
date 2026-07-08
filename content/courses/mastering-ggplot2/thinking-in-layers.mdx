@@ -11,7 +11,7 @@ people who *copy* ggplot code from people who *write* it.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="An exploded isometric stack of three layer planes — blue points at the bottom, a green trend in the middle, a yellow title bar on top — threaded by a thin gray axis, with a small gray arrow to the flat combined chart they produce"
+  aria-label="An exploded isometric stack of three layer planes, blue points at the bottom, a green trend in the middle, a yellow title bar on top, threaded by a thin gray axis, with a small gray arrow to the flat combined chart they produce"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="250" y1="14" x2="250" y2="216" stroke="var(--ds-gray-300)" strokeWidth="2" />
@@ -52,9 +52,9 @@ bottom to top:
 
 They render from the bottom up:
 
-1. **Base** — `ggplot(data, aes)` sets up the coordinate space + scales.
-2. **Layer 1** — `geom_point` draws the raw points.
-3. **Layer 2** — `geom_smooth` draws a trend line on top.
+1. **Base**, `ggplot(data, aes)` sets up the coordinate space + scales.
+2. **Layer 1**, `geom_point` draws the raw points.
+3. **Layer 2**, `geom_smooth` draws a trend line on top.
 4. The **final composited plot**.
 
 The base `ggplot()` call sets up the shared space; each `+ geom_*()`
@@ -130,7 +130,7 @@ ggplot(mpg, aes(displ, hwy)) +
 The first layer drew every car in grey. The second layer used a
 *different data frame* (`big`) to redraw just the large-engine cars in
 red on top. Two layers, two data sources, one coherent plot. There is
-no equivalent of "the chart function" here — you are *composing*.
+no equivalent of "the chart function" here, you are *composing*.
 
 <Callout type="info" title="Why layering scales so well">
 Adding detail to a ggplot is *additive*: you append a layer instead of
@@ -143,7 +143,7 @@ not *rewriting*.
 ## Layers are objects you can store and reuse
 
 Because a ggplot is a value, you can build it incrementally in
-variables — handy for experimenting:
+variables, handy for experimenting:
 
 <CodeBlock
   adapter="r"
@@ -185,7 +185,7 @@ replace.`}
   markdown={`Why can you give a single \`geom_point()\` layer its own \`data =\` argument that differs from the data in \`ggplot()\`?
 
 - You cannot; all layers must use the same data.
-  > Layers may each carry their own data and mappings — a key source of ggplot2's flexibility.
+  > Layers may each carry their own data and mappings, a key source of ggplot2's flexibility.
 - Because \`data =\` in a geom deletes the base data.
   > It does not delete anything; it simply overrides the data *for that one layer*.
 - [o] Because each layer is independent and may override the base data and mappings, letting one layer draw a different subset on top of the rest.
@@ -209,16 +209,16 @@ grey "all points" layer with a red "highlighted subset" layer.`}
 - One version will fail to render.
   > Both render fine; they only differ in stacking.
 
-Layer order controls compositing — a small but real design lever for
+Layer order controls compositing, a small but real design lever for
 emphasis and readability.`}
 />
 
 ## Key takeaways
 
 - A ggplot is a **stack of layers** composited bottom-to-top with `+`.
-- **Layer order matters** where layers overlap — later layers draw on
+- **Layer order matters** where layers overlap, later layers draw on
   top.
 - Each layer can carry its **own data and mappings**, enabling
   highlights and overlays that traditional APIs make painful.
 - You build plots by **addition**, storing partial plots in variables
-  and bolting on layers — complexity grows without rewrites.
+  and bolting on layers, complexity grows without rewrites.

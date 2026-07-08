@@ -4,9 +4,9 @@ description: What happens to a generic type at runtime, why arrays and generics 
 ---
 
 Generics are a *compile-time* feature in Java. At runtime, the JVM
-knows almost nothing about them. This was a deliberate choice — it
+knows almost nothing about them. This was a deliberate choice, it
 let Java 5 add generics without breaking any class file that
-predated them — but it has a small bag of consequences that every
+predated them, but it has a small bag of consequences that every
 working Java programmer eventually trips on.
 
 This page lays them out so you don't have to learn each one by
@@ -15,7 +15,7 @@ crash.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three blue boxes each wearing a different colored type badge funnel through a tall gray wall and come out as one identical box whose badge is only a dashed outline — every generic type erased to the same raw shape at runtime"
+  aria-label="Three blue boxes each wearing a different colored type badge funnel through a tall gray wall and come out as one identical box whose badge is only a dashed outline, every generic type erased to the same raw shape at runtime"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -118,7 +118,7 @@ to know the parameter"), but not the specific form.
 
 ## Consequence 2: you cannot create an array of a generic type
 
-The JVM tracks element types for arrays at runtime — that is what
+The JVM tracks element types for arrays at runtime, that is what
 makes `new String[10]` refuse a `Date`. Because generics are erased,
 the compiler cannot generate a meaningful element-type check for
 `new T[10]`. So it forbids it.
@@ -136,7 +136,7 @@ the compiler cannot generate a meaningful element-type check for
     // Workarounds:
     Object[] raw = new Object[10];
     @SuppressWarnings("unchecked")
-    String[] cast = (String[]) new String[10]; // OK — String is concrete
+    String[] cast = (String[]) new String[10]; // OK, String is concrete
 
     System.out.println("ok: " + raw.length + ", " + cast.length);
   }
@@ -146,7 +146,7 @@ the compiler cannot generate a meaningful element-type check for
   ]}
 />
 
-In practice you almost never want a generic array — you want a
+In practice you almost never want a generic array, you want a
 `List<T>` or `Map<K,V>`. That's the JCF's whole point.
 
 ## Consequence 3: you cannot overload by type parameter
@@ -155,7 +155,7 @@ Because both forms erase to the same bytecode signature, the
 following is forbidden:
 
 ```
-// Not allowed — both erase to printer(List)
+// Not allowed, both erase to printer(List)
 public void printer(List<String>  xs) { ... }
 public void printer(List<Integer> xs) { ... }
 ```
@@ -166,7 +166,7 @@ the compiler *can* tell apart.
 
 ## Consequence 4: static fields do not "see" the type parameter
 
-There is only one `Class` object per generic class — not one per
+There is only one `Class` object per generic class, not one per
 parameterization. So static state is shared across all
 parameterizations.
 
@@ -250,25 +250,25 @@ it *keeps*:
   `javac` generates extra "bridge" methods to keep polymorphism
   working. You can see them with `javap -v`.
 - **Compile-time safety.** This is the big one. The *whole point* of
-  generics — the cast that never fails — survives erasure intact.
+  generics, the cast that never fails, survives erasure intact.
 
 ## When erasure bites you in real life
 
 Three patterns where erasure most often shows up in working code:
 
-1. **You want to ask "is this a List of X?"** You can't — only
+1. **You want to ask "is this a List of X?"** You can't, only
    `instanceof List<?>`. If you need the element type, you have to
    pass a `Class<X>` token.
 2. **You want to create a `T[]` inside a generic class.** You
-   can't — return `List<T>`, or take a `Class<T>` to do it
+   can't, return `List<T>`, or take a `Class<T>` to do it
    reflectively (`Array.newInstance`).
 3. **You want different `static` fields per parameterization.** You
-   can't — and probably don't want to.
+   can't, and probably don't want to.
 
 ## Passing a Class&lt;T&gt; token: the standard workaround
 
-When you genuinely need the type at runtime — for reading from JSON,
-constructing arrays, looking up in a registry — accept a
+When you genuinely need the type at runtime, for reading from JSON,
+constructing arrays, looking up in a registry, accept a
 `Class<T>` parameter:
 
 <CodeBlock
@@ -314,9 +314,9 @@ and many reflective APIs.
 <MultipleChoice
   markdown={`What does \`new ArrayList<String>().getClass() == new ArrayList<Integer>().getClass()\` return at runtime?
 
-- \`false\` — they are different parameterized types
+- \`false\`, they are different parameterized types
   > That would be true if Java kept type parameters at runtime, but it doesn't.
-- [o] \`true\` — both share the same erasure (\`ArrayList\`)
+- [o] \`true\`, both share the same erasure (\`ArrayList\`)
   > Generics are erased; the runtime class is the same regardless of the type parameter.
 - A compile error
   > It compiles.
@@ -329,7 +329,7 @@ and many reflective APIs.
 
 - Arrays don't allow size 10
   > Arrays allow any non-negative size.
-- [o] Arrays carry their element type at runtime, but \`T\` is erased — the JVM can't enforce the element type, so the language forbids the construction
+- [o] Arrays carry their element type at runtime, but \`T\` is erased, the JVM can't enforce the element type, so the language forbids the construction
   > Use \`List<T>\` (or a \`Class<T>\` token plus \`Array.newInstance\`) instead.
 - It would always throw \`ClassCastException\`
   > It would create *unsafe* arrays, which is precisely why it's banned at compile time.

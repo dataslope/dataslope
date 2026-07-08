@@ -6,7 +6,7 @@ description: "Before you learn a plotting library, learn what makes a chart good
 A good chart is a *thought made visible*. A bad chart is a
 distraction at best, a lie at worst. Both use the same software,
 the same data, even sometimes the same chart type. The difference
-is in the *choices* — and most of the choices follow a handful of
+is in the *choices*, and most of the choices follow a handful of
 principles that have been refined over a century.
 
 This page is about those principles. We won't write much code on
@@ -16,7 +16,7 @@ what you learn here.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two chart cards hold the same four bars: on the left they sit buried under gridlines and a heavy frame; past a solid gray arrow the right card keeps only clean green bars — declutter until the story is all that remains"
+  aria-label="Two chart cards hold the same four bars: on the left they sit buried under gridlines and a heavy frame; past a solid gray arrow the right card keeps only clean green bars, declutter until the story is all that remains"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="30" width="220" height="160" rx="14" fill="currentColor" opacity="0.05" />
@@ -93,7 +93,7 @@ Different questions call for different charts:
 | How does a numeric variable differ by group? | boxplot, violin, dot plot |
 | How do counts compare across categories? | bar chart |
 | How does something change over time? | line chart |
-| How is a whole made of parts? | bar chart (yes — almost always better than a pie) |
+| How is a whole made of parts? | bar chart (yes, almost always better than a pie) |
 
 Bar charts are dramatically underrated. Pie charts and 3D charts
 are wildly overrated. The eye is bad at angles and worse at
@@ -119,7 +119,7 @@ A chart's job is to *show data*. Everything else is competition.
 Color is powerful and easily abused.
 
 - **Categorical hues** (red, blue, green, ...): use to distinguish
-  *unordered* categories. Keep the count low — most people can
+  *unordered* categories. Keep the count low, most people can
   hold ~7 colors apart, and many fewer if the chart is small or
   the dots are tiny.
 - **Sequential color scales** (light → dark single hue): use for
@@ -135,7 +135,7 @@ Two additional rules:
    prefer that.
 2. **Be colorblind-friendly.** Avoid red/green as the only
    distinguishing pair. Use palettes like `viridis` or
-   `RColorBrewer`'s color-safe sets — modern R plotting tools
+   `RColorBrewer`'s color-safe sets, modern R plotting tools
    make this almost free.
 
 ## Order matters
@@ -179,8 +179,8 @@ will absorb none of them. If you have two things to say, make
 two charts. The eye is a serial reader; charts are best when
 they are crisp and singular.
 
-Start from a single question — *what is the one thing you want the
-reader to take away?* — and let it drive every decision:
+Start from a single question, *what is the one thing you want the
+reader to take away?*, and let it drive every decision:
 
 1. Settle on a single, clear takeaway.
 2. Encode that takeaway in *position* if you can.
@@ -189,7 +189,7 @@ reader to take away?* — and let it drive every decision:
 
 The result is a chart that doesn't need explaining.
 
-A bad chart and a good chart, same data — look at them and pick
+A bad chart and a good chart, same data, look at them and pick
 the one you'd put in a report.
 
 <CodeBlock
@@ -268,7 +268,7 @@ The data is the same. The reader's experience is not.
   > Pixel count has nothing to do with whether a chart communicates accurately; the issue is how the human eye reads the encoded values.
 - They cannot show more than two categories.
   > Pie charts can show many categories, but with more slices the angle differences become even harder to judge accurately.
-- [o] The eye reads angles and areas poorly — bar charts (which use position/length) are usually clearer and more accurate.
+- [o] The eye reads angles and areas poorly, bar charts (which use position/length) are usually clearer and more accurate.
   > Almost any time you'd reach for a pie chart, a sorted bar chart is better.
 - R does not support them.
   > R supports pie charts via \`pie()\` in base R; the objection is perceptual accuracy, not software support.`}

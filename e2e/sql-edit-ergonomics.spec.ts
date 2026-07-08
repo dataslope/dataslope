@@ -64,7 +64,7 @@ for (const { id, route, table } of ENGINES) {
     const commit = page.locator(".sql-edit-commit-btn");
     await expect(commit).toBeVisible();
 
-    // (1) Per-cell discard reverts just this cell — no commit, no DB write.
+    // (1) Per-cell discard reverts just this cell, no commit, no DB write.
     await nameCell.hover();
     await discard.click();
     await expect(nameCell.locator(".sql-cell-discard")).toHaveCount(0);
@@ -82,7 +82,7 @@ for (const { id, route, table } of ENGINES) {
 
     // The chord committed (not re-ran the query): a success toast confirms the
     // UPDATE, and the pending-edit footer clears. We don't assert the edited
-    // row's *position* after refetch — an unordered LIMIT re-fetch can reorder
+    // row's *position* after refetch, an unordered LIMIT re-fetch can reorder
     // rows under MVCC (sql-edit-refetch.spec.ts likewise asserts only the count).
     await expect(
       page.locator(".toast-title", { hasText: "Updated 1 cell" }),

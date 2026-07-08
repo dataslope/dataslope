@@ -1,9 +1,9 @@
 // Guards the `<Figure>` placements across content/ (the optimized raster
-// images pipeline — scripts/build-images.mjs + app/_components/mdx/Figure.tsx).
+// images pipeline, scripts/build-images.mjs + app/_components/mdx/Figure.tsx).
 //
 // In production a `<Figure>` whose slug has no generated image renders
 // nothing at all (by design, so placements can be authored before artwork
-// lands) — which means a typo'd slug ships an invisibly missing image with
+// lands), which means a typo'd slug ships an invisibly missing image with
 // zero signal. This suite turns that silent failure into a red test: every
 // placed slug must be "known", i.e. present in the generated manifest
 // (lib/generated/images.js) or listed as pending in the assets/images/README
@@ -92,7 +92,7 @@ describe("<Figure> placements", () => {
       expect(
         known.has(p.slug ?? ""),
         `${p.file} references slug "${p.slug}", which is neither in ` +
-          `lib/generated/images.js nor in the assets/images/README.md table — ` +
+          `lib/generated/images.js nor in the assets/images/README.md table, ` +
           `it would silently render nothing in production`,
       ).toBe(true);
     }

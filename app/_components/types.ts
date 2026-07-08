@@ -98,7 +98,7 @@ export interface RunOptions {
   /** Host element for live page previews (web / react adapters). The
    *  surface owns this element (an always-mounted slot in its output
    *  area); the runtime replaces its children with a sandboxed iframe
-   *  on every run, which doubles as the teardown story — swapping the
+   *  on every run, which doubles as the teardown story, swapping the
    *  document kills the previous run's scripts. Adapters without a
    *  preview channel ignore it; preview adapters fall back to a hidden
    *  off-DOM host when the surface doesn't supply one (code still
@@ -111,7 +111,7 @@ export interface RunOptions {
    *  `TAILWIND_BROWSER_CDN` in `runtime/cdn.ts` for the pin. */
   previewTailwind?: boolean;
   /** Optional transient status line for waits that happen *inside* a
-   *  run — e.g. Python's deferred package set still installing on the
+   *  run, e.g. Python's deferred package set still installing on the
    *  first run after the two-phase boot, or R installing a `library()`
    *  on demand. Surfaces in the caller's status text; adapters that
    *  never wait mid-run simply ignore it.
@@ -129,7 +129,7 @@ export interface RunOptions {
 export interface CompletionItemDetail {
   label: string;
   /** CodeMirror completion kind ("function", "variable", "class",
-   *  "keyword", "property", "namespace", …) — drives the popup icon. */
+   *  "keyword", "property", "namespace", …), drives the popup icon. */
   type?: string;
   /** Short annotation rendered after the label (e.g. a type or
    *  signature), the way desktop IDEs annotate suggestions. */
@@ -189,7 +189,7 @@ export interface LanguageRuntime {
    *  (e.g. `"utils.py"`, `"data/sales.csv"`).
    *
    *  Runtimes that don't support multi-file execution simply omit this
-   *  hook — the playground falls back to single-file `run(code, …)`
+   *  hook, the playground falls back to single-file `run(code, …)`
    *  semantics in that case.
    *
    *  Implementations should mirror the supplied snapshot exactly: files
@@ -212,7 +212,7 @@ export interface LanguageRuntime {
   /** Optional: tear the runtime down and free its resources (terminate
    *  the backing Web Worker, close the WASM instance). Called by the
    *  runtime registry when this runtime is evicted to bound how many
-   *  language VMs stay resident at once — after it runs, the instance
+   *  language VMs stay resident at once, after it runs, the instance
    *  must not be used again. Runtimes that cannot release their
    *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
    *  this hook, which also exempts them from eviction. */
@@ -226,7 +226,7 @@ export interface LanguageRuntime {
    *  a run succeeds.
    *
    *  `options.packages` adds importable module names (e.g. `"pandas"`,
-   *  `"sklearn"`) to warm even though no source imports them — the
+   *  `"sklearn"`) to warm even though no source imports them, the
    *  escape hatch for content whose instructions ask the learner to
    *  write the import themselves, or for dynamic imports the scan can't
    *  see. `options.force` skips the needs-analysis and warms the full
@@ -277,7 +277,7 @@ export interface LanguageAdapter {
     charts?: boolean;
     figures?: boolean;
     /** The runtime renders a live page preview (sandboxed iframe) in
-     *  addition to console text — the web / react adapters. Surfaces
+     *  addition to console text, the web / react adapters. Surfaces
      *  use this to mount their preview slot and mention the preview
      *  in the empty-state blurb. */
     preview?: boolean;
@@ -287,17 +287,17 @@ export interface LanguageAdapter {
   exportFormats: ExportFormat[];
   /** Base filename (without extension) used when exporting, e.g. "script". */
   exportBaseFilename: string;
-  /** Default file extension (no dot) for new tabs in this playground —
+  /** Default file extension (no dot) for new tabs in this playground,
    *  e.g. "py", "js", "cpp". Used to seed the initial workspace file
    *  and to suggest names for "+" new tabs. */
   defaultFileExtension: string;
   /** Optional: seed fresh playground workspaces with this multi-file
-   *  set instead of a single `<exportBaseFilename>.<ext>` file — the
+   *  set instead of a single `<exportBaseFilename>.<ext>` file, the
    *  web adapter uses it for its CodePen-style HTML/CSS/JS trio. The
    *  first entry is the initial active file. */
   defaultWorkspace?: ExampleFile[];
   /** Optional: the playground offers a CodePen-style split view for
-   *  this adapter — every workspace file gets its own always-visible
+   *  this adapter, every workspace file gets its own always-visible
    *  editor (stacked in the editor pane) instead of tabs. The user can
    *  flip between split and tabs; the preference persists per adapter. */
   splitEditors?: boolean;
@@ -307,7 +307,7 @@ export interface LanguageAdapter {
    *  file-tree that can't "open" files anywhere would only confuse. */
   hideFilesPane?: boolean;
   /** Optional: disable adding new files to the workspace for this
-   *  adapter. The HTML/CSS/JS playground sets this — it's a fixed
+   *  adapter. The HTML/CSS/JS playground sets this, it's a fixed
    *  index.html / styles.css / script.js trio, so the "+ New file"
    *  affordances (the tab strip's "+" and the split view's footer
    *  button) are hidden. Existing files can still be renamed or closed. */
@@ -332,7 +332,7 @@ export interface LanguageAdapter {
   coldDownloadMB?: number;
   /** True for languages that compile on every run (Java, C, C++, C#), so
    *  the first-run boot copy doesn't promise that "later runs are
-   *  instant" — they still pay a per-run compile step even once the
+   *  instant", they still pay a per-run compile step even once the
    *  runtime is warm. Omit (falsy) for interpreted runtimes. */
   compiled?: boolean;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
@@ -340,17 +340,17 @@ export interface LanguageAdapter {
   /** Build the snippet inserted at the top of the editor when the user
    *  clicks a package in the packages drawer. */
   importSnippet(packageName: string): string;
-  /** Returns true if `code` already imports `packageName` — used to skip
+  /** Returns true if `code` already imports `packageName`, used to skip
    *  the insertion (and surface a "already imported" toast) when the
    *  relevant import statement is present. */
   hasImport(code: string, packageName: string): boolean;
   /** Initialise the runtime. Called once after scripts/stylesheets load.
    *  `setLoadingMessage` reports boot progress: a human-readable stage
    *  line plus an optional coarse overall fraction (0..1) where the
-   *  adapter can estimate one — the UI renders a determinate-ish bar
+   *  adapter can estimate one, the UI renders a determinate-ish bar
    *  when fractions arrive and falls back to a spinner when they don't.
    *  Report stage *floors* (the UI animates within a stage) and never
-   *  report 1 — resolving the promise is what means "ready". */
+   *  report 1, resolving the promise is what means "ready". */
   init(
     setLoadingMessage: (message: string, fraction?: number) => void,
   ): Promise<LanguageRuntime>;

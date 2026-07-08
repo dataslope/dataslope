@@ -1,6 +1,6 @@
 ---
 title: K-Means Clustering
-description: The flagship unsupervised algorithm — how a simple loop of "assign points, move centers, repeat" discovers groups in unlabeled data, when it works beautifully, and when it quietly lies to you.
+description: The flagship unsupervised algorithm, how a simple loop of "assign points, move centers, repeat" discovers groups in unlabeled data, when it works beautifully, and when it quietly lies to you.
 ---
 
 So far every model in this course has had a teacher. We handed it `X` *and*
@@ -13,17 +13,17 @@ set of documents nobody has sorted. There is no `y`. There is only `X`.
 situation. Give it a cloud of points and a number `k`, and it carves the
 cloud into `k` groups so that points in the same group are close together
 and points in different groups are far apart. Nobody told it what the
-groups *mean* — it just finds structure that was already sitting in the
+groups *mean*, it just finds structure that was already sitting in the
 data, waiting to be noticed.
 
 This is your entry point into **unsupervised learning**, and the ideas
-here — distance, centers, "similar things belong together" — echo through
+here, distance, centers, "similar things belong together", echo through
 everything that follows.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three star centroids in blue, green, and yellow each hold a small constellation of nearby dots — k-means alternates assigning points and moving centers"
+  aria-label="Three star centroids in blue, green, and yellow each hold a small constellation of nearby dots, k-means alternates assigning points and moving centers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -52,7 +52,7 @@ everything that follows.
 <Callout type="info" title="Unsupervised: there is no answer key">
 In supervised learning you can check your work: predict, compare to the
 true label, measure the error. Clustering has no labels to check against.
-That freedom is powerful but unnerving — there is no single "right" answer,
+That freedom is powerful but unnerving, there is no single "right" answer,
 and judging a clustering takes more care than judging a classifier. We
 build that judgment here and sharpen it on the **Evaluating Clusters** page.
 </Callout>
@@ -64,7 +64,7 @@ say, five playlists that each appeal to a coherent group. Nobody has
 labeled the listeners as "jazz fan" or "workout-music person." All you have
 is behavior: how much each person listens to each genre, time of day,
 session length. You suspect there are natural *types* of listener in
-there — but which ones, and who belongs to which?
+there, but which ones, and who belongs to which?
 
 This is the core unsupervised question: **given unlabeled examples, can we
 group them so that members of a group resemble each other?** That grouping
@@ -81,7 +81,7 @@ The applications are everywhere:
   expression pattern without anyone labeling them first.
 
 K-means is the workhorse for all of these because it is fast, simple, and
-scales to large datasets — qualities we will pay for with some strong
+scales to large datasets, qualities we will pay for with some strong
 assumptions later.
 
 ## The intuition: centers and the points that belong to them
@@ -104,7 +104,7 @@ no idea where they should go. It uses a loop:
 That is the entire algorithm. Each round, points get reassigned to whatever
 center is now closest, and each center drifts toward the middle of its
 flock. The two steps chase each other until they reach an agreement nobody
-wants to leave — a stable configuration where no point would rather switch
+wants to leave, a stable configuration where no point would rather switch
 and no center wants to move.
 
 ```mermaid
@@ -122,7 +122,7 @@ The name "k-means" is literal: each center is the **mean** of its assigned
 points. Why the mean? Because the mean is exactly the point that minimizes
 the total squared distance to a set of points. So every update step is
 guaranteed to reduce (or hold) the total spread of points around their
-centers. That is why the loop always settles — it can only make things
+centers. That is why the loop always settles, it can only make things
 tighter, never looser.
 </Callout>
 
@@ -130,10 +130,10 @@ tighter, never looser.
 
 Let us generate four blobs of points and let k-means rediscover them. The
 `make_blobs` generator gives us labeled blobs, but we will **throw the
-labels away** and pretend we only have the raw points — because that is the
+labels away** and pretend we only have the raw points, because that is the
 real clustering situation. Synthetic clusters are the clearest way to learn
 the algorithm: because *we* chose the true number of clusters and their
-round shape, we can check whether k-means actually recovered them — a luxury
+round shape, we can check whether k-means actually recovered them, a luxury
 real unlabeled data never gives you.
 
 <CodeBlock
@@ -162,7 +162,7 @@ print("Final cluster centers:\\n", np.round(kmeans.cluster_centers_, 2))
 
 `fit_predict` does two things at once: it runs the loop to find the centers
 (`fit`) and then returns the cluster label for every point (`predict`).
-Those labels are just arbitrary integers `0, 1, 2, 3` — they are group
+Those labels are just arbitrary integers `0, 1, 2, 3`, they are group
 *names*, not a ranking. Cluster `0` is not "better" than cluster `3`; they
 are simply different buckets.
 
@@ -228,14 +228,14 @@ does *not* look like this.
 
 Step 1 of the loop is "pick `k` starting centers," and that choice
 matters more than you might expect. The loop is guaranteed to settle, but
-it can settle into a **bad** arrangement if it started in an unlucky place —
+it can settle into a **bad** arrangement if it started in an unlucky place,
 two centers landing in the same blob while a real blob gets none. The
 algorithm finds a *local* optimum, not necessarily the *global* best.
 
 The standard defense is to **run the whole thing several times from
 different random starts and keep the best result.** That is exactly what
 `n_init=10` does: ten independent runs, and k-means returns the one with
-the tightest clusters. "Tightest" is measured by **inertia** — the total
+the tightest clusters. "Tightest" is measured by **inertia**, the total
 squared distance from every point to its own center. Lower inertia means
 points hug their centers more closely.
 
@@ -249,7 +249,7 @@ from sklearn.cluster import KMeans
 
 X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
 
-# n_init=1 means a single random start — vulnerable to a bad draw.
+# n_init=1 means a single random start, vulnerable to a bad draw.
 # n_init=10 keeps the best of 10 starts.
 # We try several seeds and watch how much the final inertia varies.
 for n in [1, 10]:
@@ -268,7 +268,7 @@ for n in [1, 10]:
 
 With `n_init=10` the result is rock-steady across seeds; with `n_init=1` it
 wobbles, and sometimes lands on a noticeably worse (higher-inertia)
-solution. This is why the spec — and good practice — always sets
+solution. This is why the spec, and good practice, always sets
 `n_init=10` (or more). It is cheap insurance against the starting-point
 lottery.
 
@@ -277,7 +277,7 @@ By default scikit-learn does not place the initial centers purely at
 random; it uses an initialization called **k-means++** that spreads the
 starting centers out, making a good outcome far more likely. Combined with
 `n_init`, this is why modern k-means rarely gets stuck. You do not need to
-configure it — it is the default — but it is worth knowing your tool is
+configure it, it is the default, but it is worth knowing your tool is
 already helping you here.
 </Callout>
 
@@ -290,7 +290,7 @@ back with a straight face. Choosing `k` is the central practical struggle
 of k-means.
 
 A natural instinct is "just minimize inertia." But that instinct fails,
-and understanding *why* is illuminating. Inertia always drops as `k` grows —
+and understanding *why* is illuminating. Inertia always drops as `k` grows,
 more centers means every point can be closer to one. Push it to the
 extreme: if `k` equals the number of points, every point is its own center
 and inertia is exactly zero. That clustering is useless. So you cannot pick
@@ -300,7 +300,7 @@ cluster."
 ### The elbow method
 
 Instead of chasing the minimum, we look at the *shape* of the inertia
-curve as `k` increases. Adding clusters helps a lot at first — splitting a
+curve as `k` increases. Adding clusters helps a lot at first, splitting a
 big mixed blob into real groups slashes inertia. But once you have captured
 the genuine groups, extra clusters only carve up already-tight groups, and
 inertia barely improves. The curve bends sharply at the "right" `k` and
@@ -344,7 +344,7 @@ plt.show()
 Read the numbers and the plot together. Inertia plummets from `k=1` to
 `k=4` as real blobs get their own centers, then the drops shrink to almost
 nothing. The curve looks like an arm bent at the elbow, and the elbow sits
-right at `k=4` — the true number of blobs. You did not need labels to find
+right at `k=4`, the true number of blobs. You did not need labels to find
 it; the geometry told you.
 
 <Callout type="warn" title="The elbow is a judgment call, not a formula">
@@ -358,7 +358,7 @@ customer segments, `k=5` may beat whatever the curve whispers.
 
 The silhouette score is a second, complementary way to choose `k` that
 actually measures how well-separated the clusters are. We deliberately do
-not open that box here — it gets its own careful treatment on the
+not open that box here, it gets its own careful treatment on the
 **Evaluating Clusters** page. For now, know it exists and that the elbow is
 your first, quickest sanity check.
 
@@ -430,14 +430,14 @@ print("Smaller age spread = age actually influenced the clustering.")
 On the raw features the clusters ignore age (large within-cluster age
 spread) because income drowns it out. After standardizing, age gets a real
 say and the clusters tighten on both features. **For any distance-based
-method — k-means, k-nearest neighbors, hierarchical clustering — scale your
+method, k-means, k-nearest neighbors, hierarchical clustering, scale your
 features first unless you have a deliberate reason not to.**
 
 <Callout type="danger" title="Forgetting to scale is the #1 clustering bug">
 The most common way a real-world clustering goes silently wrong is feeding
 in unscaled features. The algorithm runs without error, returns
 clusters, and they are dominated by whichever feature happens to have the
-biggest numbers — often something arbitrary like a dollar amount or a count.
+biggest numbers, often something arbitrary like a dollar amount or a count.
 Always standardize before clustering on distances, and be suspicious of any
 clustering where you did not.
 </Callout>
@@ -446,7 +446,7 @@ clustering where you did not.
 
 Synthetic blobs make the mechanics clear, but real data clusters too. The
 California housing dataset describes ~20,000 districts with eight numeric
-columns and **no target** — exactly the unlabeled situation clustering is
+columns and **no target**, exactly the unlabeled situation clustering is
 for. The columns live on wildly different scales (`Population` runs into the
 thousands while `Latitude` sits near 35), so this is the danger callout
 above made concrete: scale first, or `Population` alone decides everything.
@@ -466,7 +466,7 @@ from sklearn.preprocessing import StandardScaler
 # All 8 columns are features; there is no target to predict here.
 print("districts:", housing.shape[0], " columns:", list(housing.columns))
 
-# These ranges are nowhere near comparable — scaling is mandatory.
+# These ranges are nowhere near comparable, scaling is mandatory.
 print(np.round(housing[["Population", "Latitude"]].describe().loc[["min", "max"]], 2))
 
 # Standardize every column to mean 0, std 1, THEN cluster.
@@ -487,8 +487,8 @@ print(np.round(housing_labeled.groupby("cluster")[["MedInc", "Latitude", "Longit
   ]}
 />
 
-Each of the six clusters is a coherent slice of California — a band of
-latitude/longitude with a characteristic income level — discovered with no
+Each of the six clusters is a coherent slice of California, a band of
+latitude/longitude with a characteristic income level, discovered with no
 labels at all. Crucially, this only works because of `StandardScaler`: drop
 it and `Population` (values in the thousands) swamps `Latitude` and
 `Longitude` (values near 35), and the "clusters" become little more than a
@@ -500,7 +500,7 @@ the elbow method from earlier is exactly how you would replace the arbitrary
 
 Here is the honest, load-bearing limitation. K-means assigns each point to
 its nearest center, which means every cluster is effectively a **ball**
-around its center — a roughly round, convex region. When the real groups
+around its center, a roughly round, convex region. When the real groups
 are round-ish blobs, perfect. But when the true shape is a crescent, a
 ring, or a long thin band, "nearest center" is the wrong rule, and k-means
 fails in a way that looks confident and is completely wrong.
@@ -538,14 +538,14 @@ plt.show()
 K-means slices the two moons with a roughly straight boundary, splitting
 each crescent down the middle and mixing the two real groups together. It
 *cannot* do better, because no placement of two centers makes "nearest
-center" trace a crescent. The algorithm did not malfunction — it did
+center" trace a crescent. The algorithm did not malfunction, it did
 exactly what it always does, and what it does is wrong for this shape.
 
 <Callout type="danger" title="K-means assumes round, similarly-sized clusters">
 K-means implicitly assumes clusters are **convex, roughly spherical, and
 similar in size and density.** When that holds, it is fast and excellent.
-When it does not — crescents, rings, elongated streaks, or one giant
-cluster beside a tiny one — k-means produces confident nonsense. This is
+When it does not, crescents, rings, elongated streaks, or one giant
+cluster beside a tiny one, k-means produces confident nonsense. This is
 not a bug to fix with more iterations; it is built into the "nearest
 center" rule. For such shapes, reach for density- or connectivity-based
 methods (DBSCAN, or the **Hierarchical Clustering** page next).
@@ -553,19 +553,19 @@ methods (DBSCAN, or the **Hierarchical Clustering** page next).
 
 This is why we make you *see* the failure. A model that fails loudly is
 safe; one that fails silently while returning plausible output is
-dangerous. K-means on the moons fails silently — the output is two clusters,
+dangerous. K-means on the moons fails silently, the output is two clusters,
 they just happen to be the wrong two. Building the instinct to ask "is this
 shape even appropriate for k-means?" is worth more than any amount of API
 fluency.
 
-## When to use k-means — and when not to
+## When to use k-means, and when not to
 
 **Reach for k-means when:**
 
 - You expect roughly round, comparably-sized groups.
 - You have a sensible guess for `k`, or you can find one with the elbow and
   silhouette.
-- The dataset is large and you need something fast — k-means scales to
+- The dataset is large and you need something fast, k-means scales to
   millions of points where many alternatives choke.
 - You want representative "prototype" points (the centroids) for each group,
   e.g. for compression or summarization.
@@ -574,7 +574,7 @@ fluency.
 
 - Clusters are non-spherical, nested, or wildly different in size or
   density (use DBSCAN or hierarchical methods).
-- You genuinely have no idea about `k` and no way to pick it — k-means
+- You genuinely have no idea about `k` and no way to pick it, k-means
   forces a choice.
 - Your features are mostly categorical. Means and Euclidean distance are
   built for numeric data; one-hot then clustering on distances is shaky.
@@ -584,7 +584,7 @@ fluency.
 
 <Callout type="info" title="Real-world reality check">
 In industry, k-means is often the *first* thing tried on an unlabeled
-dataset precisely because it is fast and simple — a quick way to ask "is
+dataset precisely because it is fast and simple, a quick way to ask "is
 there any obvious structure here?" The danger is stopping there. A
 responsible workflow tries k-means, *looks at the clusters* (plot them,
 inspect a few members), checks whether the spherical assumption is
@@ -606,7 +606,7 @@ plausible, and only then trusts the result or switches methods.
   minimizes within-cluster spread under its spherical assumption. Whether
   that matches reality depends entirely on whether the assumption fits.
 - **"Running it once is enough."** A single random start can land in a poor
-  local optimum. `n_init` (multiple restarts) is there for a reason —
+  local optimum. `n_init` (multiple restarts) is there for a reason,
   keep it at 10 or more.
 - **"Scaling is optional."** For a distance-based method it is essential.
   Skipping it lets the largest-magnitude feature hijack the result.
@@ -621,7 +621,7 @@ plausible, and only then trusts the result or switches methods.
   instructions={`You are given \`X\`: 300 unlabeled points that form 3 blobs
 (the true labels are hidden from you, as in real clustering).
 
-1. Standardize \`X\` with \`StandardScaler\` into \`X_scaled\` — distance-based
+1. Standardize \`X\` with \`StandardScaler\` into \`X_scaled\`, distance-based
    methods need features on a comparable scale.
 2. Fit \`KMeans\` with \`n_clusters=3\`, \`n_init=10\`, \`random_state=0\` on
    \`X_scaled\`. Store the per-point cluster labels in \`labels\` (use
@@ -761,13 +761,13 @@ Multiple initializations are cheap insurance against an unlucky starting configu
 <MultipleChoice
   markdown={`You compute inertia for \`k = 1, 2, ..., 10\` and notice it keeps decreasing as \`k\` grows. Can you choose the best \`k\` by simply picking the one with the lowest inertia?
 
-- Yes — lowest inertia is always the best clustering
+- Yes, lowest inertia is always the best clustering
   > Minimizing inertia across different values of \`k\` always points to the highest \`k\` tried, because adding more centers always reduces inertia. The minimum is only meaningful at a fixed \`k\`.
-- [o] No — inertia always decreases as \`k\` increases (reaching zero when every point is its own cluster), so you look for the "elbow" where the decrease sharply slows instead
-  > Minimizing inertia alone always pushes \`k\` toward the number of points, which is useless. The elbow — the bend after which extra clusters barely help — is the informative signal.
-- No — inertia is meaningless and should never be used
-  > Inertia is a useful diagnostic — it measures how tightly points cluster around their centers. The issue is not that inertia is meaningless but that comparing raw inertia across different values of \`k\` does not identify the best number of clusters.
-- Yes — but only if you also standardize the features
+- [o] No, inertia always decreases as \`k\` increases (reaching zero when every point is its own cluster), so you look for the "elbow" where the decrease sharply slows instead
+  > Minimizing inertia alone always pushes \`k\` toward the number of points, which is useless. The elbow, the bend after which extra clusters barely help, is the informative signal.
+- No, inertia is meaningless and should never be used
+  > Inertia is a useful diagnostic, it measures how tightly points cluster around their centers. The issue is not that inertia is meaningless but that comparing raw inertia across different values of \`k\` does not identify the best number of clusters.
+- Yes, but only if you also standardize the features
   > Standardizing features is important for k-means (so all features contribute equally to distance), but it does not change the fundamental problem that inertia always decreases as \`k\` increases. You still cannot pick \`k\` by minimizing inertia even on scaled data.
 
 Inertia is useful for finding the elbow, not for being minimized across different \`k\`.`}
@@ -780,19 +780,19 @@ Inertia is useful for finding the elbow, not for being minimized across differen
   > The number of samples does not change the fundamental limitation. K-means uses "nearest center" assignments, which always produce convex, approximately spherical regions regardless of how much data is provided.
 - You forgot to set \`random_state\`
   > Setting \`random_state\` only makes results reproducible; it does not change the type of clusters k-means can find. The failure on crescent shapes occurs regardless of the random seed.
-- [o] K-means assigns points to the nearest center, so its clusters are effectively round regions — it cannot capture crescent shapes no matter how it is tuned
+- [o] K-means assigns points to the nearest center, so its clusters are effectively round regions, it cannot capture crescent shapes no matter how it is tuned
   > The "nearest center" rule carves space into convex, roughly spherical regions. Non-spherical shapes like crescents violate that assumption, so k-means mixes the true groups. A connectivity- or density-based method is appropriate instead.
 - The inertia was too low
-  > Low inertia means points are close to their centers, which sounds desirable. But on crescent-shaped data the problem is not inertia — it is that "nearest center" can only produce spherical regions that are the wrong shape for these clusters.
+  > Low inertia means points are close to their centers, which sounds desirable. But on crescent-shaped data the problem is not inertia, it is that "nearest center" can only produce spherical regions that are the wrong shape for these clusters.
 
-This failure is structural, not a tuning problem — it reflects k-means's spherical-cluster assumption.`}
+This failure is structural, not a tuning problem, it reflects k-means's spherical-cluster assumption.`}
 />
 
 <MultipleChoice
   markdown={`You cluster customers using \`age\` (roughly 18–80) and \`annual_income\` (roughly 20,000–200,000) without scaling. What is the likely consequence?
 
 - Age will dominate because it has fewer digits
-  > K-means uses Euclidean distance, which is driven by the absolute magnitude of differences, not the number of digits. Income's values are thousands of times larger than age values, so income — not age — dominates the distances.
+  > K-means uses Euclidean distance, which is driven by the absolute magnitude of differences, not the number of digits. Income's values are thousands of times larger than age values, so income, not age, dominates the distances.
 - The clustering will be unaffected by feature scale
   > K-means distance calculations are directly affected by feature scale. A feature with values in the tens of thousands contributes far more to Euclidean distance than one with values in the tens, even if both are equally informative.
 - [o] Income will dominate the distance calculations because its values are far larger, so the clusters form almost entirely along income and age is effectively ignored

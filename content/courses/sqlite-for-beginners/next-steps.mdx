@@ -4,14 +4,14 @@ description: A recap of what you've learned, how the pieces fit together, and wh
 ---
 
 You started this course not sure what a database really *was*. Now
-you can reason about tables, keys, relationships, and queries — and,
+you can reason about tables, keys, relationships, and queries, and,
 more importantly, you understand **why** each of those ideas exists.
 That conceptual foundation is the hard part, and you have it.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A thin path climbs through three small cards — a blue table, a green joined pair, and yellow aggregate bars — then continues past the last card as a solid green arrow pointing onward and upward"
+  aria-label="A thin path climbs through three small cards, a blue table, a green joined pair, and yellow aggregate bars, then continues past the last card as a solid green arrow pointing onward and upward"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path
@@ -51,28 +51,28 @@ That conceptual foundation is the hard part, and you have it.
 
 The course moved deliberately from "why" to "how" to "how to think":
 
-1. **What a database is and why SQLite** — from Codd's 1970 paper
+1. **What a database is and why SQLite**, from Codd's 1970 paper
    to the engine in your pocket.
-2. **Relational foundations** — tables, keys, types, relationships.
-3. **First queries** — creating tables and inserting rows.
-4. **Querying data** — `SELECT`, `WHERE`, `ORDER BY`, `NULL`.
-5. **Summarizing data** — aggregates, `GROUP BY`, `HAVING`.
-6. **Connecting tables** — foreign keys, joins, many-to-many.
-7. **Exploring & organizing data** — profiling, single-source-of-truth,
+2. **Relational foundations**, tables, keys, types, relationships.
+3. **First queries**, creating tables and inserting rows.
+4. **Querying data**, `SELECT`, `WHERE`, `ORDER BY`, `NULL`.
+5. **Summarizing data**, aggregates, `GROUP BY`, `HAVING`.
+6. **Connecting tables**, foreign keys, joins, many-to-many.
+7. **Exploring & organizing data**, profiling, single-source-of-truth,
    and the hidden query execution order.
 
 Each layer rested on the one before it. Joins only made sense once
 keys did; organizing data only made sense once you felt the pain of
 duplication; the execution order tied the whole querying story
 together. (And if you skipped the **Interesting discussions**
-pages — spreadsheets vs. databases, and how applications store
-information — they are worth a read now that the rest is in place.)
+pages, spreadsheets vs. databases, and how applications store
+information, they are worth a read now that the rest is in place.)
 
 ## The big ideas worth keeping
 
 If you remember only a handful of things, make it these:
 
-- **A database stores each fact once, in a structured place** — that
+- **A database stores each fact once, in a structured place**, that
   is what separates it from a spreadsheet and prevents data from
   contradicting itself.
 - **Keys connect tables.** A primary key names a row; a foreign key
@@ -82,7 +82,7 @@ If you remember only a handful of things, make it these:
 - **SQL is declarative.** You describe *what* you want; the database
   figures out *how*. The logical execution order explains the rest.
 - **SQLite is a real database that lives in a single file.** No
-  server, no setup — yet the SQL you learned here is the same SQL
+  server, no setup, yet the SQL you learned here is the same SQL
   used by the biggest systems in the world.
 
 <Callout type="success" title="You can now read real queries">
@@ -103,12 +103,12 @@ Concepts solidify by *doing*. A few ways to keep going:
   league, or your music library. Ask: what are the entities and how
   do they relate?
 - **Ask questions of data.** Take any dataset and write five
-  questions, then answer each with a query — counts, averages,
+  questions, then answer each with a query, counts, averages,
   filters, joins.
 
 <SqlCodeBlock
   dialect="sqlite"
-  title="One last query — bringing it together"
+  title="One last query, bringing it together"
   initSql={`CREATE TABLE customers (
   id INTEGER PRIMARY KEY, name TEXT
 );
@@ -118,7 +118,7 @@ CREATE TABLE orders (
 INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
 INSERT INTO orders (id, customer_id, amount) VALUES
   (101,1,42),(102,1,18),(103,2,99),(104,2,15),(105,2,30);`}
-  starterCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort —
+  starterCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort,
 -- every major idea from the course in one readable query.
 SELECT
   c.name,
@@ -144,15 +144,15 @@ This was a *foundations* course, focused on SQL and relational
 thinking. When you are ready to go further, natural next topics
 include:
 
-- **More SQL depth** — `CASE` expressions, window functions, richer
+- **More SQL depth**, `CASE` expressions, window functions, richer
   date and text handling with `strftime`, and set operations like
   `UNION`.
-- **Indexes and performance** — how databases find rows quickly, and
+- **Indexes and performance**, how databases find rows quickly, and
   when to add an index. (You met the *why*; the *how* is a deep
   field.)
-- **Designing larger schemas** — modeling real applications with many
+- **Designing larger schemas**, modeling real applications with many
   related entities.
-- **Using SQLite from code** — how applications open a SQLite file
+- **Using SQLite from code**, how applications open a SQLite file
   and run the queries you now understand, on phones, browsers,
   desktops, and servers.
 

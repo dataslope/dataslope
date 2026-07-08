@@ -1,6 +1,6 @@
 ---
 title: Set Operations and Joins
-description: Distinct, Union, Intersect, Except, Concat, Zip, Join — the operators that combine two sequences
+description: Distinct, Union, Intersect, Except, Concat, Zip, Join, the operators that combine two sequences
 ---
 
 So far our operators have transformed *one* sequence at a time. This
@@ -55,7 +55,7 @@ Console.WriteLine(string.Join(",", xs.Distinct())); // 3,1,4,5,9,2,6
 />
 
 Equality is determined by the type's `Equals` / `GetHashCode`. For
-records this means *value equality* — two `Person("Ada", 36)`
+records this means *value equality*, two `Person("Ada", 36)`
 records are equal.
 
 `DistinctBy` (since .NET 6) lets you de-duplicate by a *key*:
@@ -123,7 +123,7 @@ flowchart TD
 `-By` variants exist: `UnionBy`, `IntersectBy`, `ExceptBy` (taking a
 key selector), all introduced in .NET 6.
 
-## Concat — gluing end to end
+## Concat, gluing end to end
 
 `Concat` does not deduplicate; it just appends the second sequence
 to the first.
@@ -148,7 +148,7 @@ Console.WriteLine(string.Join(",", a.Concat(b))); // 1,2,3,3,4,5
 Use `Concat` when order matters and duplicates are okay. Use `Union`
 when you want a set.
 
-## Zip — pairing two sequences
+## Zip, pairing two sequences
 
 `Zip` walks two sequences in parallel and combines each pair with a
 function.
@@ -173,7 +173,7 @@ foreach (var p in pairs)
   ]}
 />
 
-Output: three lines. `Zip` stops at the **shorter** sequence — there
+Output: three lines. `Zip` stops at the **shorter** sequence, there
 is no `Dmitri(?)`. There's also a no-lambda overload that returns
 tuples:
 
@@ -202,12 +202,12 @@ A common use of `Zip`: pair items with their index without using
 var indexed = items.Zip(Enumerable.Range(0, int.MaxValue));
 ```
 
-(Modern code can use `Select((x, i) => ...)` for this — but `Zip` is
+(Modern code can use `Select((x, i) => ...)` for this, but `Zip` is
 a useful general tool.)
 
-## Join — relational join
+## Join, relational join
 
-`Join` matches elements of two sequences by a key — the LINQ
+`Join` matches elements of two sequences by a key, the LINQ
 equivalent of a SQL `INNER JOIN`.
 
 <CodeBlock
@@ -320,7 +320,7 @@ Console.WriteLine(string.Join(", ", active));
   ]}
 />
 
-The shape — *union, except, order* — comes up constantly in
+The shape, *union, except, order*, comes up constantly in
 "compute the active members" / "find the new entries" / "diff two
 lists" kinds of problems.
 
@@ -385,13 +385,13 @@ public static class Roster
 - \`Concat\` only works on arrays; \`Union\` works on any \`IEnumerable<T>\`.
   > Both work on any \`IEnumerable<T>\`; that is not the difference.
 - \`Union\` always produces a longer sequence than \`Concat\`.
-  > The opposite is often true — \`Union\` deduplicates and can be shorter than \`Concat\`.
+  > The opposite is often true, \`Union\` deduplicates and can be shorter than \`Concat\`.
 - [o] \`Concat\` preserves every element including duplicates between the two sequences; \`Union\` deduplicates so each value appears at most once.
   > \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
 - \`Concat\` requires both sequences to have the same element type; \`Union\` does not.
   > Both require compatible element types (typically the same type or a common base type).
 
 Use \`Concat\` when you want a stitched-together list and duplicates are
-fine. Use \`Union\` when you want set semantics — each value at most
+fine. Use \`Union\` when you want set semantics, each value at most
 once.`}
 />

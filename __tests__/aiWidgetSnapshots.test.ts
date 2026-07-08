@@ -30,7 +30,7 @@ describe("describeChallenge", () => {
     expect(out).toContain("print(1)");
     expect(out).toContain("Latest output:");
     expect(out).toContain("1/2 tests passed");
-    expect(out).toContain("[fail] prints 2 — expected 2, got nothing");
+    expect(out).toContain("[fail] prints 2, expected 2, got nothing");
   });
 
   it("notes when Check Answer hasn't run", () => {

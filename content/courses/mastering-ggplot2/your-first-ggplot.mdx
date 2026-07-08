@@ -10,7 +10,7 @@ any basic ggplot as an English sentence.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three solid building-block chips — blue data, green aesthetic mapping, yellow point geom — joined by small gray plus marks, with a thin gray arrow to the scatter-plot panel they build"
+  aria-label="Three solid building-block chips, blue data, green aesthetic mapping, yellow point geom, joined by small gray plus marks, with a thin gray arrow to the scatter-plot panel they build"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -64,11 +64,11 @@ any basic ggplot as an English sentence.
 
 ## The skeleton
 
-Almost every ggplot follows the same shape — three pieces:
+Almost every ggplot follows the same shape, three pieces:
 
-1. `ggplot(data, aes(...))` — name the **data** and the **mappings**.
-2. `+ geom_*()` — add at least one **geometry**.
-3. `+ ...` — optionally add more components.
+1. `ggplot(data, aes(...))`, name the **data** and the **mappings**.
+2. `+ geom_*()`, add at least one **geometry**.
+3. `+ ...`, optionally add more components.
 
 ## Step 1: an empty plot
 
@@ -87,7 +87,7 @@ ggplot(mpg, aes(x = displ, y = hwy))
   ]}
 />
 
-Run it. You get **axes but no points**. That is not a bug — it is the
+Run it. You get **axes but no points**. That is not a bug, it is the
 grammar being honest. You told ggplot2 *what the data is* and *what
 maps to x and y*, so it drew the coordinate system and scaled the
 axes. But you never said *what marks to draw*, so it draws no marks.
@@ -95,7 +95,7 @@ axes. But you never said *what marks to draw*, so it draws no marks.
 <Callout type="info" title="A blank panel is informative">
 The empty plot proves that **data + mappings** is a real, separate
 stage. The axes already span the right range because the scales were
-computed from the data — before any geometry existed.
+computed from the data, before any geometry existed.
 </Callout>
 
 ## Step 2: add a geometry
@@ -143,7 +143,7 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   ]}
 />
 
-One new word — `color = drv` — and you get colored points **plus** a
+One new word, `color = drv`, and you get colored points **plus** a
 legend, for free. This is the payoff from the intro: mappings produce
 their own legends.
 
@@ -204,7 +204,7 @@ most layers want the same x and y. Put a mapping inside a geom when
 
 <Callout type="warn" title="Mind the + placement">
 The `+` must end the line, not begin the next one. Write
-`geom_point() +` then a newline — never a line that *starts* with `+`.
+`geom_point() +` then a newline, never a line that *starts* with `+`.
 A leading `+` makes R think the previous statement was finished and
 throws an error.
 </Callout>
@@ -213,7 +213,7 @@ throws an error.
   markdown={`Running \`ggplot(mpg, aes(x = displ, y = hwy))\` with no geom produces axes but no points. Why?
 
 - It is an error that happens to render.
-  > It renders intentionally — no error occurred.
+  > It renders intentionally, no error occurred.
 - The data failed to load.
   > The data loaded fine; the axes were scaled from it.
 - [o] Data and mappings define the coordinate space and scales, but *marks* are only drawn by a geometry, which has not been added yet.
@@ -229,7 +229,7 @@ separate stage from *drawing marks*.`}
   markdown={`You want a scatter plot where x and y are shared by all layers but a \`geom_point\` layer is colored by \`drv\` and a \`geom_smooth\` layer is **not**. Where should \`color = drv\` go?
 
 - In \`ggplot(aes(...))\`, so every layer shares it.
-  > That would color the smoother too, fitting a separate line per drivetrain — not what we asked for.
+  > That would color the smoother too, fitting a separate line per drivetrain, not what we asked for.
 - Nowhere; you cannot do this in ggplot2.
   > You can, by scoping the mapping to a single layer.
 - [o] Inside \`geom_point(aes(color = drv))\`, so only that layer uses the color mapping.
@@ -253,7 +253,7 @@ the previous ones untouched and simply added the next.
 **Start with data + mappings**
 
 `ggplot(mpg, aes(x = displ, y = hwy))` draws the axes and scales from the
-data — but no marks yet.
+data, but no marks yet.
 
 </Step>
 <Step>
@@ -284,7 +284,7 @@ mappings declared once in `ggplot()`.
 ## Key takeaways
 
 - The ggplot skeleton is `ggplot(data, aes(...)) + geom_*()`.
-- `ggplot()` alone draws axes from the data and mappings — geometries
+- `ggplot()` alone draws axes from the data and mappings, geometries
   draw the actual marks.
 - Read a ggplot as a sentence: *take this data, map these columns,
   draw these marks*.

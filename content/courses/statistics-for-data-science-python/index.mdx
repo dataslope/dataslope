@@ -1,6 +1,6 @@
 ---
 title: Welcome
-description: A practical, intuition-first statistics course for data scientists who already know Python and Pandas — built around reasoning under uncertainty, not memorizing formulas.
+description: A practical, intuition-first statistics course for data scientists who already know Python and Pandas, built around reasoning under uncertainty, not memorizing formulas.
 ---
 
 <Figure
@@ -17,14 +17,14 @@ data says?*"
 
 That second question is where statistics lives. Two teams can run the
 exact same query on the exact same table and walk away with opposite
-conclusions — one ships a feature, the other kills it — because one
+conclusions, one ships a feature, the other kills it, because one
 of them mistook a random wiggle for a real signal. Statistics is the
 discipline that keeps you from fooling yourself.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A large light blue population circle full of gray dots holds a small ringed sample of solid blue dots; a gray arrow leads to a green bell over a confidence bar whose yellow true-value dot sits inside but off center — reasoning honestly from the sample you have to the population you care about"
+  aria-label="A large light blue population circle full of gray dots holds a small ringed sample of solid blue dots; a gray arrow leads to a green bell over a confidence bar whose yellow true-value dot sits inside but off center, reasoning honestly from the sample you have to the population you care about"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -81,7 +81,7 @@ and derivations you memorize for an exam and forget by Friday. This
 course is the opposite. For every idea we ask:
 
 - **What problem does it solve?** Why was it invented?
-- **When should you use it — and when should you *not*?**
+- **When should you use it, and when should you *not*?**
 - **What do people get wrong about it?**
 - **Where does it show up in real data-science work?**
 
@@ -104,7 +104,7 @@ By the time you finish, you'll be able to:
   treating every number as exact.
 - Pick the right **summary statistics** and know when a mean lies to you.
 - Use **probability and probability distributions** to model how data behaves.
-- Understand **sampling** — why a sample of 1,000 can speak for millions, and how it goes wrong.
+- Understand **sampling**, why a sample of 1,000 can speak for millions, and how it goes wrong.
 - Build and interpret **confidence intervals** and **the bootstrap**.
 - Run and *correctly interpret* **hypothesis tests** with `scipy.stats`.
 - Explain what a **p-value** really is (and the four things it is *not*).
@@ -117,15 +117,15 @@ By the time you finish, you'll be able to:
 We move from *describing* data, to *modeling* uncertainty, to *making
 inferences* and *testing claims*, and finally to *applying* it all.
 
-Each section builds on the one before it. The middle of the course —
+Each section builds on the one before it. The middle of the course,
 **sampling distributions**, the **central limit theorem**, **confidence
-intervals**, and **p-values** — is the conceptual heart. If those
+intervals**, and **p-values**, is the conceptual heart. If those
 four ideas click, everything else is application.
 
 ## The tools we use
 
 Every code block on every page is runnable. **This whole course runs
-in your browser** — there's nothing to install. Edit any block, click
+in your browser**, there's nothing to install. Edit any block, click
 **Run**, and the output appears underneath, computed by a real Python
 interpreter (Pyodide) loaded into this page. We lean on four libraries
 you'll use constantly as a working data scientist:
@@ -144,13 +144,13 @@ you'll use constantly as a working data scientist:
 In 1973 the statistician Francis Anscombe published four small
 datasets in a paper called *Graphs in Statistical Analysis*. They have
 become legendary, because they share almost the *exact same* summary
-statistics — same mean of `x`, same mean of `y`, same standard
-deviations, same correlation, even the same fitted regression line —
+statistics, same mean of `x`, same mean of `y`, same standard
+deviations, same correlation, even the same fitted regression line,
 yet they could hardly be more different.
 
 The block below loads **Anscombe's quartet** (`I`, `II`, `III`, `IV`)
 and computes those summaries for all four. Run it. Notice how
-suspiciously identical every row is — to two decimal places, they're
+suspiciously identical every row is, to two decimal places, they're
 the same dataset.
 
 <CodeBlock
@@ -187,7 +187,7 @@ Now the twist. The summaries are nearly identical, but the *data* is
 not. **Plot the four groups** and they look completely different: one
 is a tidy line, one is a smooth curve, one is a perfect line wrecked by
 a single outlier, and one is a vertical stack rescued by one stray
-point. Try it — replace the code above with this and run it:
+point. Try it, replace the code above with this and run it:
 
 <CodeBlock
   adapter="python"
@@ -202,7 +202,7 @@ aq = pd.read_csv("anscombe.csv")`,
       starterCode: `# Identical summaries, four completely different pictures.
 fig = px.scatter(
     aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
-    trendline="ols", title="Anscombe's quartet — same stats, different data",
+    trendline="ols", title="Anscombe's quartet, same stats, different data",
 )
 fig.show()
 `,
@@ -213,19 +213,19 @@ fig.show()
 That single comparison is the whole argument for this course in one
 screen. A data scientist who trusts the summary numbers alone calls all
 four datasets the same and is wrong four times over. The fix is not
-more math — it's the discipline to *look*, to quantify uncertainty, and
+more math, it's the discipline to *look*, to quantify uncertainty, and
 to know which statistic answers which question. By the end of the
-course, every tool in that exercise — correlation, regression lines,
-`scipy.stats` tests, and especially how to *interpret* them — will be
+course, every tool in that exercise, correlation, regression lines,
+`scipy.stats` tests, and especially how to *interpret* them, will be
 second nature.
 
 ## How the interactive widgets work
 
 You'll meet three kinds of interactive elements:
 
-1. **Code blocks** — editable, runnable Python. Change anything, re-run, experiment.
-2. **Challenge cards** — small problems with tests. Write a solution, click **Submit**, and see which tests pass. These are where the learning sticks, so do them.
-3. **Multiple-choice questions** — quick conceptual checks with an explanation for every option.
+1. **Code blocks**, editable, runnable Python. Change anything, re-run, experiment.
+2. **Challenge cards**, small problems with tests. Write a solution, click **Submit**, and see which tests pass. These are where the learning sticks, so do them.
+3. **Multiple-choice questions**, quick conceptual checks with an explanation for every option.
 
 <Callout type="info" title="Each code block runs on its own">
 Variables you define in one code block are not shared with the next
@@ -236,7 +236,7 @@ is self-contained.
 ## A note on honesty
 
 Statistics has a reputation for being a tool people use to lie. The
-truth is the opposite: statistics is the toolkit for *not* lying — to
+truth is the opposite: statistics is the toolkit for *not* lying, to
 others, and especially to yourself. The whole field is a set of
 disciplined habits for staying humble about what a pile of numbers can
 and cannot prove.

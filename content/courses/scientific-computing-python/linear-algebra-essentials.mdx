@@ -8,7 +8,7 @@ scientific problem reduces to a linear algebra problem**. A
 nonlinear least squares fit? A sequence of linear systems. A PDE
 discretization? A sparse linear system. A neural network training
 step? A chain of matrix multiplies and a linear solve. Eigenvalue
-problems? They are everywhere — vibration modes, principal
+problems? They are everywhere, vibration modes, principal
 component analysis, page ranking, quantum mechanics.
 
 This page is the working tour of the linear algebra primitives in
@@ -19,7 +19,7 @@ eigenvalue by hand.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A square grid of dots and its sheared copy joined by dotted tethers, with one dark blue arrow pointing the same way in both — a matrix as a transformation of space, and the direction it preserves"
+  aria-label="A square grid of dots and its sheared copy joined by dotted tethers, with one dark blue arrow pointing the same way in both, a matrix as a transformation of space, and the direction it preserves"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.08">
@@ -72,7 +72,7 @@ chapter is about *using* them.
 The single most-used routine in scientific Python is
 `numpy.linalg.solve(A, b)`. It solves $A x = b$ where $A$ is square
 and (numerically) non-singular. It calls LAPACK's `dgesv`, which
-uses LU factorization with partial pivoting — the backward-stable
+uses LU factorization with partial pivoting, the backward-stable
 algorithm we mentioned in the stability chapter.
 
 <CodeBlock
@@ -93,15 +93,15 @@ print("residual ||A x - b|| =", np.linalg.norm(A @ x - b))
   ]}
 />
 
-The residual is at machine epsilon — that is the right answer to
+The residual is at machine epsilon, that is the right answer to
 seven sig figs. **Never compute `np.linalg.inv(A) @ b`** as a
 substitute. It is slower, less stable, and rarely what you want.
 
 ## Special structure: trust SciPy
 
 A general `solve` works on any non-singular matrix. But many real
-problems have structure — symmetric, positive-definite, banded,
-triangular, sparse — and dedicated solvers can be ten or a hundred
+problems have structure, symmetric, positive-definite, banded,
+triangular, sparse, and dedicated solvers can be ten or a hundred
 times faster. **Use them.**
 
 | Structure | NumPy / SciPy call | Speedup vs general |
@@ -259,7 +259,7 @@ print("||v||_∞ =", np.linalg.norm(v, np.inf))  # 4
 A = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 print("\\n||A||_F =", np.linalg.norm(A, "fro"))  # Frobenius
 print("rank(A) =", np.linalg.matrix_rank(A))  # 2  (rows are linearly dependent)
-print("κ(A)    =", np.linalg.cond(A))  # huge — A is nearly singular
+print("κ(A)    =", np.linalg.cond(A))  # huge, A is nearly singular
 `,
     },
   ]}
@@ -271,7 +271,7 @@ $x = A^{-1} b$.
 
 ## Least squares
 
-When $A$ is *not* square — say it has more rows than columns —
+When $A$ is *not* square, say it has more rows than columns,
 $A x = b$ generally has no exact solution. The **least-squares
 solution** minimizes $\|A x - b\|^2$. This is how you fit any
 linear model to data.
@@ -320,7 +320,7 @@ There are two ways to solve $\min_x \lVert A x - b \rVert$. The
 textbook route forms the **normal equations** $A^\mathsf{T} A\,x =
 A^\mathsf{T} b$ and solves them. The robust route hands $A$ and $b$
 straight to `lstsq`, which goes through a QR or SVD factorization
-instead. They usually agree — but the normal equations *square the
+instead. They usually agree, but the normal equations *square the
 condition number*, so on poorly scaled data they can disagree badly.
 
 <CodeBlock
@@ -355,7 +355,7 @@ Notice that $\kappa(A^\mathsf{T}A)$ is the *square* of $\kappa(A)$:
 forming the normal equations throws away half your significant
 digits before you even solve. On this raw data the two answers still
 roughly agree, but the gap grows fast as features become correlated
-or badly scaled. The standard fix is **standardization** — center
+or badly scaled. The standard fix is **standardization**, center
 each column and divide by its standard deviation so every feature
 sits on a comparable scale.
 
@@ -433,8 +433,8 @@ element matrices are almost always sparse.
   title="Solve a tridiagonal system from scratch"
   instructions={`Implement the **Thomas algorithm** for solving a tridiagonal system $T x = d$ where $T$ has subdiagonal \`a\` (length $n-1$), diagonal \`b\` (length $n$), and superdiagonal \`c\` (length $n-1$).
 
-The algorithm is two passes — a forward elimination and a back
-substitution — and runs in $O(n)$ time, vs $O(n^3)$ for a dense
+The algorithm is two passes, a forward elimination and a back
+substitution, and runs in $O(n)$ time, vs $O(n^3)$ for a dense
 \`solve\`. It is the basis of every implicit 1-D PDE solver.
 
 Return the solution \`x\` as a NumPy array of length $n$. Do not
@@ -521,7 +521,7 @@ assert np.allclose(got, expected, atol=1e-9), "thomas disagrees with numpy"`,
   markdown={`When you call \`np.linalg.solve(A, b)\` for a $1000 \\times 1000$ general matrix, what numerical algorithm is being executed under the hood?
 
 - Cramer's rule
-  > Cramer's rule requires computing $n+1$ determinants, each costing $O(n^3)$, giving $O(n^4)$ total — catastrophically slow and numerically unstable for large $n$.
+  > Cramer's rule requires computing $n+1$ determinants, each costing $O(n^3)$, giving $O(n^4)$ total, catastrophically slow and numerically unstable for large $n$.
 - Direct matrix inversion
   > Computing \`np.linalg.inv(A)\` and multiplying is explicitly called out in the text as slower, less stable, and rarely what you want; \`solve\` uses LU factorization instead.
 - [o] LU factorization with partial pivoting, then forward and back substitution
@@ -538,7 +538,7 @@ Knowing what your library is actually doing lets you predict its runtime and sta
 - It is the only factorization that exists for SPD matrices
   > LU and QR also exist for SPD matrices; Cholesky is preferred because it is faster and more stable, not because it is the only option.
 - [o] It requires roughly half the operations of LU, needs no pivoting (because it is unconditionally stable for SPD inputs), and uses half the storage
-  > SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD — covariance matrices, mass matrices, Laplacians — switch to Cholesky.
+  > SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD, covariance matrices, mass matrices, Laplacians, switch to Cholesky.
 - It allows complex eigenvalues
   > SPD matrices have strictly real positive eigenvalues by definition; complex eigenvalues are not a feature of Cholesky.
 - It is required to compute inverses

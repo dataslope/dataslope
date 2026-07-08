@@ -1,11 +1,11 @@
 ---
 title: Themes and Context
-description: set_theme, styles, and contexts — control the overall look and scale your plots for the medium.
+description: set_theme, styles, and contexts, control the overall look and scale your plots for the medium.
 ---
 
 Every chart you have drawn so far inherited a look from a single call:
 `sns.set_theme()`. That one line is Seaborn's **global styling entry
-point**. It does not attach to a chart or return an object — it changes
+point**. It does not attach to a chart or return an object, it changes
 matplotlib's defaults so that *every* plot you draw afterward picks up the
 same style, sizing, and colors. Set it once near the top of your work and
 forget about it.
@@ -24,13 +24,13 @@ sns.set_theme(
 
 We will spend this page on **style** (the canvas) and **context** (the
 scale), because those two carry most of the visual decision-making. We
-mention `palette=` only in passing — choosing colors well is a topic of its
+mention `palette=` only in passing, choosing colors well is a topic of its
 own, covered in depth on the color palettes page.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="The same small blue bar chart on three light blue panels that step up in size from left to right, each topped by a yellow title capsule that grows to match — one context dial scaling fonts, bars, and spacing from paper to poster"
+  aria-label="The same small blue bar chart on three light blue panels that step up in size from left to right, each topped by a yellow title capsule that grows to match, one context dial scaling fonts, bars, and spacing from paper to poster"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -67,14 +67,14 @@ color and whether gridlines are drawn. Seaborn ships five:
 | `"dark"` | gray | no | making bright colors pop |
 | `"ticks"` | white | no (adds tick marks) | a tidy publication look |
 
-The choice is not cosmetic noise — it answers a real question: **does my
+The choice is not cosmetic noise, it answers a real question: **does my
 reader need to look up numbers, or just see the pattern?** Gridded styles
 (`darkgrid`, `whitegrid`) lay down reference lines so a reader can trace a
 point back to the axis. Grid-free styles (`white`, `ticks`) remove that
 scaffolding and put all the visual weight on the data itself.
 
 Let's draw the *same* simple plot under three styles so the difference is
-about the canvas, not the data. First `whitegrid` — the workhorse for most
+about the canvas, not the data. First `whitegrid`, the workhorse for most
 analysis:
 
 <CodeBlock
@@ -95,7 +95,7 @@ sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
   ]}
 />
 
-Now `white` — the same points on a bare white canvas with no grid. Cleaner,
+Now `white`, the same points on a bare white canvas with no grid. Cleaner,
 more "finished", but you can no longer read an approximate body mass by
 eye:
 
@@ -117,7 +117,7 @@ sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
   ]}
 />
 
-And `ticks` — like `white`, but with short tick marks on the axes that give
+And `ticks`, like `white`, but with short tick marks on the axes that give
 the eye just enough of a reference without a full grid. This is a favorite
 for publication figures:
 
@@ -150,7 +150,7 @@ approximate values off the axes, but you also want a clean white background
 rather than the default gray. Which \`style\` fits best?
 
 - \`"dark"\`
-  > That gives a gray background with no gridlines — neither the white canvas nor the readable reference lines you want.
+  > That gives a gray background with no gridlines, neither the white canvas nor the readable reference lines you want.
 - [o] \`"whitegrid"\`
   > A white background with light gridlines lets readers trace points back to the axes while keeping the canvas clean.
 - \`"white"\`
@@ -159,13 +159,13 @@ rather than the default gray. Which \`style\` fits best?
   > This is the default and does have gridlines, but on a gray background rather than the white one you asked for.
 
 Pick a gridded style when readers need to look up values, and a white
-background when you want a clean print look — \`whitegrid\` gives you both.`}
+background when you want a clean print look, \`whitegrid\` gives you both.`}
 />
 
 ## Context: scaling everything for the medium
 
 A chart that looks perfectly balanced in a notebook can be unreadable when
-projected onto a screen at the front of a room — the text is too small, the
+projected onto a screen at the front of a room, the text is too small, the
 lines too thin. The fix is **context**. It scales the *sizes* of elements
 (fonts, line widths, marker sizes) up or down as a group, without touching
 the style or the data.
@@ -198,7 +198,7 @@ sns.scatterplot(data=tips, x="total_bill", y="tip")
 />
 
 Now the **same plot** at `talk` context. The data, the axes, and the style
-are identical — only the element *sizes* grew. The labels, tick numbers,
+are identical, only the element *sizes* grew. The labels, tick numbers,
 and even the points scale up so they stay legible from a distance:
 
 <CodeBlock
@@ -225,7 +225,7 @@ audience reads it effortlessly.
 
 <Callout type="tip" title="Style and context are independent dials">
 `style` answers *what should the canvas look like?* and `context` answers
-*how big should everything be?* They do not interfere — you mix and match
+*how big should everything be?* They do not interfere, you mix and match
 freely, e.g. `set_theme(style="ticks", context="talk")` for a clean,
 slide-sized figure. `font_scale=1.2` is a quick way to nudge just the text
 larger on top of whatever context you chose.
@@ -251,7 +251,7 @@ matching element sizes to where the chart will be seen.`}
 
 ## A lighter frame with `despine`
 
-Even after picking a style, plots carry a full rectangular border — a
+Even after picking a style, plots carry a full rectangular border, a
 **spine** on all four sides. The top and right spines rarely add anything;
 they just box the data in. `sns.despine()` removes them, leaving only the
 left and bottom axes. The result feels lighter and more open, and it draws
@@ -284,7 +284,7 @@ sns.despine()
 The combination of **`style="ticks"` + `despine()`** is a classic
 publication look: a clean white canvas, small tick marks for reference, and
 only two axis lines. Notice that `despine()` does nothing on a gridded style
-where the spines are already faint — it shines on `white` and `ticks`.
+where the spines are already faint, it shines on `white` and `ticks`.
 
 <Callout type="info" title="despine has options">
 By default `despine()` removes the top and right spines. You can also offset
@@ -295,7 +295,7 @@ are the 90% case.
 
 ## Styling just one plot, temporarily
 
-`set_theme` is global, which is exactly what you want most of the time — one
+`set_theme` is global, which is exactly what you want most of the time, one
 consistent look for everything. But occasionally you want **one** plot to
 differ without disturbing the rest of your session. Seaborn gives you two
 context managers for that: `axes_style` (for the style) and
@@ -320,7 +320,7 @@ with sns.axes_style("white"):
   ]}
 />
 
-`plotting_context` works the same way for sizing — wrap a single plot in
+`plotting_context` works the same way for sizing, wrap a single plot in
 `with sns.plotting_context("talk"):` to scale up just that one figure. Reach
 for these only when you genuinely need a one-off; for the look of your whole
 analysis, set it once with `set_theme` and move on.
@@ -328,7 +328,7 @@ analysis, set it once with `set_theme` and move on.
 <Callout type="warn" title="set_theme is global and sticky">
 Because `set_theme` mutates matplotlib's defaults, it affects **every plot
 drawn after it**, until you call it again. Two consequences: (1) a plot drawn
-*before* `set_theme` keeps the old look — order matters; and (2) in a long
+*before* `set_theme` keeps the old look, order matters; and (2) in a long
 session, a `set_theme` buried in the middle silently restyles everything
 below it. Set it once at the very top. (Every block on this page repeats it
 only because each block runs on its own.)
@@ -346,7 +346,7 @@ only because each block runs on its own.)
    \`sns.relplot\` (for example, \`total_bill\` on x and \`tip\` on y) and assign
    the result to a variable named \`g\`.
 
-You are not tested on the style itself — just that you called \`set_theme\`
+You are not tested on the style itself, just that you called \`set_theme\`
 and produced a Seaborn grid.`}
   files={[
     {
@@ -386,7 +386,7 @@ which controls the **size** of fonts, lines, and markers?
 - \`palette\` controls the background; \`font_scale\` controls the sizes.
   > \`palette\` sets the data colors and \`font_scale\` nudges only text, so neither is the background-vs-element-size pairing being asked about.
 - [o] \`style\` controls the background and gridlines; \`context\` controls the element sizes.
-  > \`style\` is the canvas (darkgrid, whitegrid, white, dark, ticks) and \`context\` is the scale (paper, notebook, talk, poster) — two independent dials.
+  > \`style\` is the canvas (darkgrid, whitegrid, white, dark, ticks) and \`context\` is the scale (paper, notebook, talk, poster), two independent dials.
 - \`context\` controls the background; \`style\` controls the sizes.
   > This reverses the two: \`context\` scales element sizes and \`style\` sets the background and gridlines.
 - \`style\` controls both the background and the element sizes.
@@ -400,7 +400,7 @@ which controls the **size** of fonts, lines, and markers?
 then draw five charts. Which statement is true?
 
 - Only the first chart picks up the white style; the rest revert to the default.
-  > The change is persistent, not one-shot — it stays in effect until you call \`set_theme\` again.
+  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
 - The charts keep the default style until you also pass a \`context\`.
   > \`style\` takes effect on its own; \`context\` and \`palette\` are independent, optional settings.
 - [o] All five charts use the white style, because \`set_theme\` changes the global defaults for the rest of the session.
@@ -420,7 +420,7 @@ then draw five charts. Which statement is true?
 - [o] It removes the top and right axis spines for a lighter frame, and you call it *after* the plotting command.
   > \`despine\` strips the two spines that usually just box in the data; because it acts on the current figure, it runs after you have drawn the plot.
 - It applies a global theme like \`set_theme\`, so you call it once at the top.
-  > \`despine\` is not a global theme setter — it modifies the spines of the figure that already exists.
+  > \`despine\` is not a global theme setter, it modifies the spines of the figure that already exists.
 - It scales the figure up for presentation.
   > Scaling for a medium is what \`context\` does; \`despine\` only removes spines.
 
@@ -430,5 +430,5 @@ especially well with \`style="ticks"\`.`}
 
 You can now control the overall look in one place: pick a `style` for the
 canvas, a `context` for the medium, and reach for `despine()` to lighten the
-frame. Next we go deep on the one dial we deliberately skipped — **color
+frame. Next we go deep on the one dial we deliberately skipped, **color
 palettes**, and how to choose colors that inform rather than decorate.

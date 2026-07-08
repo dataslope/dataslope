@@ -1,10 +1,10 @@
 ---
-title: Challenge Cards — Python
+title: "Challenge Cards: Python"
 description: Sandbox for the `<ChallengeCard>` Python variations.
 ---
 
 This page hosts the Python variations of `<ChallengeCard>`. Each card
-runs entirely in your browser via Pyodide — there's no server-side
+runs entirely in your browser via Pyodide, there's no server-side
 execution.
 
 For other languages, see:
@@ -22,7 +22,7 @@ For other languages, see:
 
 ## 1. Pandas groupby
 
-The canonical example from the design handoff — a pandas groupby
+The canonical example from the design handoff, a pandas groupby
 challenge with init code, a hint, and six tests.
 
 <ChallengeCard
@@ -50,7 +50,7 @@ _data = {
 }
 df = pd.DataFrame(_data)
 `,
-      starterCode: `# df is already loaded — explore it first
+      starterCode: `# df is already loaded, explore it first
 print(df.head())
 print()
 
@@ -93,7 +93,7 @@ assert not missing, f"Missing columns: {', '.join(sorted(missing))}"`,
     {
       id: "grouped_by_category",
       name: "Grouped by category (4 rows)",
-      description: "One row per category — should have exactly 4 rows",
+      description: "One row per category, should have exactly 4 rows",
       code: `assert len(summary) == 4, f"Expected 4 rows (one per category), got {len(summary)}"`,
     },
     {
@@ -148,7 +148,7 @@ _data = {
 }
 df = pd.DataFrame(_data)
 `,
-      starterCode: `# df is already loaded — explore it first
+      starterCode: `# df is already loaded, explore it first
 print(df.head())
 print()
 
@@ -191,7 +191,7 @@ assert not missing, f"Missing columns: {', '.join(sorted(missing))}"`,
     {
       id: "grouped_by_category",
       name: "Grouped by category (4 rows)",
-      description: "One row per category — should have exactly 4 rows",
+      description: "One row per category, should have exactly 4 rows",
       code: `assert len(summary) == 4, f"Expected 4 rows (one per category), got {len(summary)}"`,
     },
     {
@@ -302,7 +302,7 @@ assert math.isclose(mean, 74/7, rel_tol=1e-9), f"Expected {74/7}, got {mean}"`,
 
 ## 3. FizzBuzz with stdout-based tests
 
-Demonstrates the second test mode — `expect.stdoutLines` — used as the
+Demonstrates the second test mode, `expect.stdoutLines`, used as the
 common case for compiled languages. Works for Python too, of course.
 
 <ChallengeCard

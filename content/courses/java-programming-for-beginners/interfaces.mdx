@@ -1,6 +1,6 @@
 ---
 title: Interfaces
-description: '"Can-do" relationships — describing capabilities a class promises to provide, independent of any class hierarchy'
+description: '"Can-do" relationships, describing capabilities a class promises to provide, independent of any class hierarchy'
 ---
 
 Inheritance models **is-a** ("a Circle *is a* Shape"). But many
@@ -11,7 +11,7 @@ relationships in real code are more like **can-do** ("this thing
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue rail carries three identical notches; below, three completely different bodies — a blue circle, a green square already clicked into place, and a yellow hexagon — each grown the same trapezoid tab, the one shape the rail accepts"
+  aria-label="A blue rail carries three identical notches; below, three completely different bodies, a blue circle, a green square already clicked into place, and a yellow hexagon, each grown the same trapezoid tab, the one shape the rail accepts"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="100" y="40" width="440" height="26" rx="10" fill="var(--ds-blue-500)" fillOpacity="0.18" />
@@ -39,7 +39,7 @@ relationships in real code are more like **can-do** ("this thing
 ## What is an interface?
 
 An interface is a *contract*. It says: "any class that implements me
-promises to provide these methods." It does not say *how* — only
+promises to provide these methods." It does not say *how*, only
 *what*.
 
 ```java
@@ -103,7 +103,7 @@ constructor, and (traditionally) no method bodies.
   ]}
 />
 
-Notice that `say` takes a `Greeter` — not a `FormalGreeter` or a
+Notice that `say` takes a `Greeter`, not a `FormalGreeter` or a
 `CasualGreeter`. The method works with any current *or future* class
 that implements `Greeter`. This is the same polymorphism we saw with
 inheritance, but achieved without `extends`.
@@ -120,7 +120,7 @@ overlap, but the differences matter.
 | Constructors | Yes | No |
 | State | Yes (instance fields) | No |
 | How many can a class have? | Extends *one* | Implements *many* |
-| Code reuse | Strong — shared fields + methods | Limited (default methods only) |
+| Code reuse | Strong, shared fields + methods | Limited (default methods only) |
 
 **The single most important difference:** a class can `implements`
 **many** interfaces but `extends` **only one** class.
@@ -161,7 +161,7 @@ public interface Comparable<T> {
 
 Any class that implements `Comparable` can be sorted by
 `Collections.sort` or `Arrays.sort`. The library has no idea what
-your class is — it just trusts the contract.
+your class is, it just trusts the contract.
 
 <CodeBlock
   adapter="java"
@@ -219,7 +219,7 @@ It works because `Book` honors the `Comparable` contract.
 
 ## Default methods
 
-Since Java 8, interfaces may carry **default methods** — methods
+Since Java 8, interfaces may carry **default methods**, methods
 with a body that subclasses inherit unless they override. This lets
 interfaces evolve over time without breaking existing
 implementations.
@@ -240,7 +240,7 @@ implementations.
 interface Greeter {
   String greet(String name);
 
-  // default method — implementers get this for free
+  // default method, implementers get this for free
   default String greetLoudly(String name) { return greet(name).toUpperCase(); }
 }
 

@@ -43,7 +43,7 @@ export async function GET(
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
       // The raw Markdown only changes on deploy (which purges the edge
-      // cache), so let the CDN hold it as long as it likes — every CDN hit
+      // cache), so let the CDN hold it as long as it likes, every CDN hit
       // is a free read instead of a metered ISR Read.
       "Cache-Control": "public, s-maxage=31536000, stale-while-revalidate",
     },

@@ -3,11 +3,11 @@ import { test, expect, type Page } from "@playwright/test";
 // ─────────────────────────────────────────────────────────────────────
 // Update 1: In the Schema pane, when a table/view name is clipped with a
 // CSS ellipsis, the row's hover tooltip (the native `title`) leads with the
-// FULL name so it's readable on hover — e.g.
-//   "very_long_name — Double-click to preview, click to expand".
+// FULL name so it's readable on hover, e.g.
+//   "very_long_name, Double-click to preview, click to expand".
 // Names that already fit keep the plain hint. The schema row (`SchemaItem`)
-// is shared by all three engines, so SQLite — which uses a local sample and
-// needs no CDN — exercises the same code path.
+// is shared by all three engines, so SQLite, which uses a local sample and
+// needs no CDN, exercises the same code path.
 // ─────────────────────────────────────────────────────────────────────
 
 async function runSql(page: Page, sql: string) {
@@ -24,7 +24,7 @@ async function runSql(page: Page, sql: string) {
 
 const HINT = /^Double-click to preview, click to (expand|collapse)$/;
 
-test("schema tree — clipped table names lead the tooltip with the full name", async ({
+test("schema tree, clipped table names lead the tooltip with the full name", async ({
   page,
 }) => {
   test.setTimeout(180_000);
@@ -56,7 +56,7 @@ test("schema tree — clipped table names lead the tooltip with the full name", 
   await expect(longRow).toHaveAttribute(
     "title",
     new RegExp(
-      `^${longName} — Double-click to preview, click to (expand|collapse)$`,
+      `^${longName}, Double-click to preview, click to (expand|collapse)$`,
     ),
   );
 });

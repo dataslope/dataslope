@@ -8,7 +8,7 @@
  * next lazy sweep), never a dangling object reference.
  *
  * Retention is enforced by callers via `isExpired` (lib/workspaces/policy.ts)
- * — this module only provides the primitives (list / purge / touch).
+ *, this module only provides the primitives (list / purge / touch).
  */
 
 import type { R2Bucket } from "@cloudflare/workers-types";
@@ -292,7 +292,7 @@ export function partitionExpired<T>(
 // Guest share-creation budget (per-IP + global daily counters)
 // ---------------------------------------------------------------------------
 
-/** Salted SHA-256 of the client IP — the counter key stores no raw IPs. */
+/** Salted SHA-256 of the client IP, the counter key stores no raw IPs. */
 export async function hashIp(ip: string, salt: string): Promise<string> {
   const data = new TextEncoder().encode(`${salt}:${ip}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
@@ -339,7 +339,7 @@ export async function reserveGuestShare(
         "You've reached today's guest share limit. Sign in (it's free) to keep sharing.",
     };
   }
-  // Prune counters older than a week in the same round trip — the table
+  // Prune counters older than a week in the same round trip, the table
   // stays a few hundred rows without any scheduled job.
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -352,7 +352,7 @@ export async function reserveGuestShare(
     return {
       ok: false,
       message:
-        "Sharing is busy right now — please try again tomorrow, or sign in to share without the guest limit.",
+        "Sharing is busy right now, please try again tomorrow, or sign in to share without the guest limit.",
     };
   }
   return { ok: true };

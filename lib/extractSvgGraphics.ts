@@ -1,15 +1,15 @@
 /**
  * Pure extraction of custom inline `<svg>` graphics from a single lesson's MDX
- * source — the parsing core behind the build-time SVG gallery (lib/svgGallery.ts).
+ * source, the parsing core behind the build-time SVG gallery (lib/svgGallery.ts).
  *
  * Kept free of any Fumadocs `source` / filesystem dependency so it can be unit
  * tested directly (lib/svgGallery.ts layers the page-URL/course grouping on top).
  *
  * Parsing pipeline: the leading YAML frontmatter is blanked out (a handful of
- * lessons carry JSX-like text — `<Animal>`, `<T,>` — in their title/description,
+ * lessons carry JSX-like text, `<Animal>`, `<T,>`, in their title/description,
  * which a frontmatter-unaware MDX parser would choke on), then the body is parsed
- * with the same micromark extensions the real build relies on — GFM, math, MDX,
- * and Mermaid — so every lesson parses and `<svg>` source offsets line up.
+ * with the same micromark extensions the real build relies on, GFM, math, MDX,
+ * and Mermaid, so every lesson parses and `<svg>` source offsets line up.
  *
  * IDs are computed with the very helpers `remarkSvgLabels` uses, so each ID here
  * is byte-for-byte the label the plugin stamps under the graphic on its page
@@ -35,7 +35,7 @@ import {
 import { jsxSvgToHtml } from "./jsxSvgToHtml";
 
 export interface ExtractedSvg {
-  /** Globally-unique, content-hashed ID — identical to the on-page label. */
+  /** Globally-unique, content-hashed ID, identical to the on-page label. */
   id: string;
   /** Render-ready SVG markup (JSX-isms rewritten to valid HTML). */
   html: string;
@@ -61,7 +61,7 @@ function collectSvgNodes(node: AnyNode, out: AnyNode[]): void {
   if (!Array.isArray(children)) return;
   for (const child of children) {
     if (child.type === "mdxJsxFlowElement" && child.name === "svg") {
-      // Don't recurse into a graphic's own subtree — nested shapes aren't
+      // Don't recurse into a graphic's own subtree, nested shapes aren't
       // separately referenceable figures.
       out.push(child);
     } else {

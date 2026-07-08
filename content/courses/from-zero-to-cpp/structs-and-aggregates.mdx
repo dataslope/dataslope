@@ -1,17 +1,17 @@
 ---
 title: Structs and Aggregates
-description: Bundling related values into a single named type — the gateway to object-oriented programming.
+description: Bundling related values into a single named type, the gateway to object-oriented programming.
 ---
 
 Once your programs grow past a few variables, you'll find yourself
 passing the *same* group of values around together: a point's `x`
 and `y`, a person's `name`, `age`, `email`. C++ lets you give that
-group a name — a **struct** — and then treat it as one thing.
+group a name, a **struct**, and then treat it as one thing.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Loose faint shapes on the left are gathered into one compartmented bento box where a circle, a square, and a triangle each get their own slot — a struct bundles related values into a single thing"
+  aria-label="Loose faint shapes on the left are gathered into one compartmented bento box where a circle, a square, and a triangle each get their own slot, a struct bundles related values into a single thing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -93,7 +93,7 @@ flowchart LR
 ```
 
 The compiler may insert **padding** to align fields properly. Don't
-worry about that yet — just know `sizeof(Point)` may be slightly
+worry about that yet, just know `sizeof(Point)` may be slightly
 larger than the sum of its parts.
 
 ## Initialization shapes
@@ -106,7 +106,7 @@ Point d{.x = 3.0, .y = 4.0};   // designated initializers (C++20)
 ```
 
 The third and fourth forms are the safest and most readable. Always
-*explicitly* initialize structs — uninitialized fields are a classic
+*explicitly* initialize structs, uninitialized fields are a classic
 source of silent bugs.
 
 ## Passing structs to functions
@@ -230,7 +230,7 @@ Conventionally:
 - Use `struct` for plain data bundles (no invariants, no methods, or
   trivial methods).
 - Use `class` when you have *invariants* to protect (data that must
-  always satisfy some condition) — which leads us straight into the
+  always satisfy some condition), which leads us straight into the
   object-oriented chapter.
 
 ## Challenges
@@ -314,4 +314,4 @@ int main() {
 />
 
 Next: the leap from passive data bundles to active objects with
-behaviour — classes.
+behaviour, classes.

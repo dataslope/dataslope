@@ -50,7 +50,7 @@ export interface UseSavedQueriesResult {
  * Saved-query ("starred") store. When `storageKey` is provided the (capped)
  * list is persisted to localStorage and restored on the next load; without a
  * key it behaves as a plain in-memory store. The list is loaded via a lazy
- * initializer — it only renders inside the (lazily-shown) History pane, so a
+ * initializer, it only renders inside the (lazily-shown) History pane, so a
  * differing server/client value causes no hydration mismatch (mirrors
  * `useQueryHistory`).
  */

@@ -1,6 +1,6 @@
 ---
 title: Hyperparameter Tuning
-description: The difference between what a model learns and what you choose for it — and how to choose well without quietly cheating on the test set.
+description: The difference between what a model learns and what you choose for it, and how to choose well without quietly cheating on the test set.
 ---
 
 Every model you have built so far had two kinds of knobs, even if you only
@@ -14,13 +14,13 @@ group: the `n_neighbors=5` in `KNeighborsClassifier`, the `max_depth` you
 used to tame an overfitting decision tree, the `C` you can hand to
 `LogisticRegression`. None of those values were learned from the data. You
 picked them. This page is about picking them *deliberately*, with evidence,
-instead of guessing — and about the one mistake that can make a careful
+instead of guessing, and about the one mistake that can make a careful
 tuning process worse than useless.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two slider knobs you set by hand feed a grid of candidate scores in which one green cell glows as the best combination — hyperparameter tuning searches the grid with evidence instead of guesswork"
+  aria-label="Two slider knobs you set by hand feed a grid of candidate scores in which one green cell glows as the best combination, hyperparameter tuning searches the grid with evidence instead of guesswork"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -92,22 +92,22 @@ parameters they govern:
 
 | Model | A hyperparameter (you set it) | A parameter (the model learns it) |
 | --- | --- | --- |
-| `KNeighborsClassifier` | `n_neighbors` | *(none — KNN just stores the data)* |
+| `KNeighborsClassifier` | `n_neighbors` | *(none, KNN just stores the data)* |
 | `DecisionTreeClassifier` | `max_depth`, `min_samples_leaf` | each split's feature and threshold |
 | `LinearRegression` | *(few; it is barely tunable)* | slope(s) and intercept |
 | `LogisticRegression` | `C` (regularization strength) | the coefficients |
 | `RandomForestClassifier` | `n_estimators`, `max_depth` | every split in every tree |
 
-Notice that KNN has essentially *no* learned parameters — it just memorizes
-the training set — and yet it has a crucial hyperparameter, `n_neighbors`.
+Notice that KNN has essentially *no* learned parameters, it just memorizes
+the training set, and yet it has a crucial hyperparameter, `n_neighbors`.
 That alone should convince you the two ideas are independent. A model can
 be almost all hyperparameter (KNN) or almost all parameter
 (`LinearRegression`).
 
 Let us watch a single hyperparameter change a model's behavior, without any
 parameter ever being "wrong." We will sweep `n_neighbors` on the
-[Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset —
-predicting one of three species from four body measurements — and watch the
+[Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset,
+predicting one of three species from four body measurements, and watch the
 cross-validated accuracy move.
 
 <CodeBlock
@@ -140,8 +140,8 @@ for k in [1, 5, 15, 50]:
 
 The data never changed. The algorithm never changed. Only the
 hyperparameter changed, and the model's quality rose and then fell. With
-`k=1` the model overfits — it trusts the single nearest point and its
-noise. With `k=50` it underfits — it averages over so many neighbors that
+`k=1` the model overfits, it trusts the single nearest point and its
+noise. With `k=50` it underfits, it averages over so many neighbors that
 it blurs the real boundaries. Somewhere in between is a sweet spot. Tuning
 is the disciplined search for that spot.
 
@@ -164,7 +164,7 @@ allowed to be. If you let the model choose its own flexibility using the
 training data, it will always choose **maximum** flexibility, because more
 flexibility always fits the training data better. A tree with no depth
 limit can memorize every training row and score a perfect 1.000. The
-training data, by itself, can never warn you that this is a bad idea —
+training data, by itself, can never warn you that this is a bad idea,
 overfitting looks like success from the inside.
 
 So you need a *second* opinion: a way to ask "how does this setting do on
@@ -183,7 +183,7 @@ generalization. You must judge hyperparameters on held-out data.
 ## Three pots of data, three different jobs
 
 Here is the cleanest way to keep the roles straight. Honest tuning needs
-data split into three jobs — though, as we will see, cross-validation lets
+data split into three jobs, though, as we will see, cross-validation lets
 you collapse the first two.
 
 ```mermaid
@@ -206,7 +206,7 @@ flowchart LR
 The validation set exists because tuning *is itself a form of learning*.
 When you try ten values of `C` and keep the best, you have used the
 validation data to make a decision. If that decision were made on the test
-set, the test set would no longer be unseen — you would have leaked it,
+set, the test set would no longer be unseen, you would have leaked it,
 slowly, one comparison at a time.
 
 <Callout type="danger" title="Never tune on the test set">
@@ -229,7 +229,7 @@ scores for a far steadier signal.
 
 This is why tuning in scikit-learn is built on cross-validation: it lets
 you choose hyperparameters honestly *without* permanently sacrificing a
-validation set. You still keep a final test set aside — cross-validation
+validation set. You still keep a final test set aside, cross-validation
 replaces the *validation* split, not the *test* split.
 
 ```mermaid
@@ -255,9 +255,9 @@ cross-validation for *every combination*, then reports the winner.
 The "grid" is just the set of all combinations. If you give it 3 values of
 one hyperparameter and 2 of another, that is 3 × 2 = 6 combinations, and
 with 5-fold cross-validation that is 6 × 5 = 30 model fits. Keep grids
-small — the work multiplies fast.
+small, the work multiplies fast.
 
-A grid over two hyperparameters — say `C` and `max_depth` — is every
+A grid over two hyperparameters, say `C` and `max_depth`, is every
 combination of their values:
 
 | | `max_depth=2` | `max_depth=4` |
@@ -311,7 +311,7 @@ print(f"Best CV accuracy: {search.best_score_:.3f}")
 
 Three things to notice. First, `GridSearchCV` is itself an estimator: you
 call `.fit()` on it just like a model. Second, it only ever saw the
-*training* data — the test set is still sealed. Third, it cross-validated
+*training* data, the test set is still sealed. Third, it cross-validated
 each candidate depth and kept the one with the highest average score.
 
 ### Reading the results: `best_params_`, `best_score_`, `best_estimator_`
@@ -319,24 +319,24 @@ each candidate depth and kept the one with the highest average score.
 After fitting, a `GridSearchCV` exposes three attributes you will use
 constantly:
 
-- `best_params_` — the winning combination, as a dictionary.
-- `best_score_` — the winner's *mean cross-validated* score (this is a
+- `best_params_`, the winning combination, as a dictionary.
+- `best_score_`, the winner's *mean cross-validated* score (this is a
   validation-style number, **not** a test-set number).
-- `best_estimator_` — the model with the best settings, already **refit on
+- `best_estimator_`, the model with the best settings, already **refit on
   the entire training set** for you. You can call `.predict()` and
   `.score()` on it directly.
 
 <Callout type="info" title="best_score_ is a validation score, not a test score">
 `best_score_` is the cross-validated score of the winning setting on the
 training data. Because you *chose* that setting to maximize this very
-number, it is slightly optimistic — the search peeked at all those folds to
+number, it is slightly optimistic, the search peeked at all those folds to
 pick a winner. The honest performance number comes from the untouched test
 set, which we evaluate next.
 </Callout>
 
 ### The final, once-only test evaluation
 
-Now — and only now, after the search has chosen everything — we unlock the
+Now, and only now, after the search has chosen everything, we unlock the
 test set. We evaluate `best_estimator_` on it exactly once.
 
 <CodeBlock
@@ -383,14 +383,14 @@ number. The CV score is what you *optimized*; the test score is what you
 <Callout type="tip" title="GridSearchCV refits the winner for you">
 By default `GridSearchCV` sets `refit=True`, so after the search it
 automatically retrains the best setting on the *full* training set and
-stores it as `best_estimator_`. You do not need to refit by hand — just use
+stores it as `best_estimator_`. You do not need to refit by hand, just use
 `search.best_estimator_` (or call `search.predict(...)`, which delegates to
 it).
 </Callout>
 
 ## Tuning a `Pipeline`: name the step, then the parameter
 
-Real models are usually a `Pipeline` — preprocessing plus an estimator —
+Real models are usually a `Pipeline`, preprocessing plus an estimator,
 because that is how you avoid data leakage (the pipelines chapter covers
 *why* in depth). You can tune hyperparameters *inside* a pipeline. The only
 new thing is the naming convention: write the **step name**, two
@@ -438,7 +438,7 @@ print(f"Test accuracy:    {search.best_estimator_.score(X_test, y_test):.3f}")
 />
 
 Because the scaler lives *inside* the pipeline, cross-validation refits it
-on each fold's training portion only — no test-fold statistics leak into
+on each fold's training portion only, no test-fold statistics leak into
 the scaling. This is the leak-free way to tune a model that needs
 preprocessing, and it is why we almost always tune pipelines rather than
 bare estimators.
@@ -446,7 +446,7 @@ bare estimators.
 <Callout type="warn" title="Scale inside the pipeline, not before the search">
 If you scale the whole dataset once and *then* run `GridSearchCV`, every
 cross-validation fold has been scaled using statistics that include its own
-validation rows — a subtle leak that inflates `best_score_`. Putting the
+validation rows, a subtle leak that inflates `best_score_`. Putting the
 scaler inside the `Pipeline` lets each fold scale itself correctly. The
 pipelines chapter returns to this; for now, the rule is: preprocessing goes
 inside the thing you cross-validate.
@@ -467,7 +467,7 @@ fraction of the time, because usually only one or two hyperparameters
 really matter and random sampling explores their values well.
 
 <Callout type="info" title="Grid vs. random, a rule of thumb">
-Reach for **`GridSearchCV`** when the search space is small — a handful of
+Reach for **`GridSearchCV`** when the search space is small, a handful of
 combinations you want to check exhaustively. Reach for
 **`RandomizedSearchCV`** when the space is large and a full grid would be
 too slow; cap the work with `n_iter` and let it sample. Both use
@@ -481,7 +481,7 @@ grows past a few dozen combinations.
 
 <Callout type="info" title="Why no setting wins everywhere: the No Free Lunch theorem">
 Wolpert and Macready's 1997 **No Free Lunch** theorem proves that, averaged
-over all possible problems, no learning algorithm beats any other — every
+over all possible problems, no learning algorithm beats any other, every
 method that wins on some datasets loses on others. That is the deep reason
 tuning cannot be skipped: there is no universally best `max_depth` or `C` to
 memorize, so you have to search for what works on *your* data.
@@ -492,7 +492,7 @@ memorize, so you have to search for what works on *your* data.
 Here is the trap that catches even experienced practitioners. You run a
 search, get a great `best_score_`, and you are tempted to keep going:
 nudge the grid, add a value, re-run, watch the number climb. Each
-improvement feels real. It is not — or at least, not entirely.
+improvement feels real. It is not, or at least, not entirely.
 
 When you optimize hard against the validation signal (whether a single
 validation set or the cross-validation folds), you start fitting the
@@ -511,7 +511,7 @@ flowchart TD
 
 This is precisely why the final test set must stay sealed through the
 entire tuning process. The cross-validated `best_score_` can be
-optimistic — it is the number you *chose to maximize* — and only a test set
+optimistic, it is the number you *chose to maximize*, and only a test set
 that played no part in any decision can tell you how much of your
 improvement was real.
 
@@ -526,8 +526,8 @@ validation data.
 
 ## When NOT to bother tuning much
 
-Hyperparameter tuning is not free — it costs compute, time, and a little of
-your sanity — and it is not always worth it.
+Hyperparameter tuning is not free, it costs compute, time, and a little of
+your sanity, and it is not always worth it.
 
 - **A simple model with few hyperparameters.** `LinearRegression` has
   almost nothing to tune. Do not invent a grid for a model that has no
@@ -695,7 +695,7 @@ assert 0.8 < test_score <= 1.0, f"test_score {test_score} is not a valid, strong
 - The coefficients a logistic regression fits to each feature
   > Fitted coefficients are learned from data during training, which makes them parameters, not hyperparameters.
 
-The test is always "who set this value?" — you (hyperparameter) or \`.fit()\` (parameter).`}
+The test is always "who set this value?", you (hyperparameter) or \`.fit()\` (parameter).`}
 />
 
 <MultipleChoice
@@ -725,7 +725,7 @@ Hyperparameters must be judged on data the model did not train on, which is why 
 - A random number used to seed the search
   > \`best_score_\` is a measured performance score, not a seed.
 
-Because that setting was chosen to maximize this very number, it is slightly optimistic — the untouched test set gives the honest estimate.`}
+Because that setting was chosen to maximize this very number, it is slightly optimistic, the untouched test set gives the honest estimate.`}
 />
 
 <MultipleChoice

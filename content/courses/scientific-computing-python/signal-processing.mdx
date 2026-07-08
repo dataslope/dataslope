@@ -1,10 +1,10 @@
 ---
 title: Signal Processing
-description: Fourier analysis, filtering, and convolution — the computational toolkit for time-series data
+description: Fourier analysis, filtering, and convolution, the computational toolkit for time-series data
 ---
 
-Any signal — an audio waveform, a stock price, an EEG trace, a
-radar return — can be decomposed into the building blocks it is
+Any signal, an audio waveform, a stock price, an EEG trace, a
+radar return, can be decomposed into the building blocks it is
 made of. **Signal processing** is the toolkit for doing that
 decomposition, removing what you don't want, and extracting what
 you do.
@@ -16,7 +16,7 @@ but as a function of *frequency*.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A dotted wave enters a box marked with a function glyph and comes out as a few descending frequency bars — the Fourier transform turning a signal in time into a spectrum in frequency"
+  aria-label="A dotted wave enters a box marked with a function glyph and comes out as a few descending frequency bars, the Fourier transform turning a signal in time into a spectrum in frequency"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
@@ -73,7 +73,7 @@ X_k = \sum_{n=0}^{N-1} x_n \, e^{-2\pi i k n / N}, \quad k = 0, \dots, N-1.
 $$
 
 A naive evaluation costs $O(N^2)$ multiplications. The **Fast
-Fourier Transform** computes the same result in $O(N \log N)$ — a
+Fourier Transform** computes the same result in $O(N \log N)$, a
 speed-up that turned spectral analysis from a research project
 into a routine operation.
 
@@ -297,7 +297,7 @@ plt.show()
 />
 
 The bright diagonal stripe traces the instantaneous frequency
-rising linearly from 100 to 800 Hz — exactly the chirp law we
+rising linearly from 100 to 800 Hz, exactly the chirp law we
 wrote down. The spectrogram is how everything from speech
 recognition to gravitational-wave analysis visualizes
 non-stationary signals.
@@ -395,7 +395,7 @@ def denoise(x, fs, cutoff=30.0, order=6):
   ]}
 />
 
-This pattern — generate → measure → filter → quantify — is the
+This pattern, generate → measure → filter → quantify, is the
 template for almost every signal-processing experiment.
 
 ## Practice: recover a hidden frequency
@@ -474,7 +474,7 @@ assert abs(dominant_frequency(sig, fs) - 200.0) < 1.0`,
 - The FFT shows a peak at 700 Hz
   > A tone at 700 Hz exceeds the Nyquist limit of 500 Hz for a 1000 Hz sample rate; the FFT cannot distinguish it from its alias at 300 Hz and will not show a correct 700 Hz peak.
 - [o] The 700 Hz tone is *aliased* to $|700 - 1000| = 300$ Hz because it lies above the Nyquist limit $f_s/2 = 500$ Hz
-  > The Nyquist–Shannon theorem says you can only faithfully represent frequencies below $f_s/2$. A 700 Hz sinusoid sampled at 1000 Hz is indistinguishable from a 300 Hz sinusoid — they alias. To detect 700 Hz, raise the sample rate above 1400 Hz.
+  > The Nyquist–Shannon theorem says you can only faithfully represent frequencies below $f_s/2$. A 700 Hz sinusoid sampled at 1000 Hz is indistinguishable from a 300 Hz sinusoid, they alias. To detect 700 Hz, raise the sample rate above 1400 Hz.
 - The FFT shows two peaks: one at 700 Hz and one at 300 Hz
   > Aliasing maps the 700 Hz tone to exactly 300 Hz; a single alias peak appears at 300 Hz, not two separate peaks at both frequencies.
 - The FFT returns NaN

@@ -6,7 +6,7 @@
  * (Q1): Better Auth + D1, social login first (Google + GitHub), self-hosted so
  * all user data lives in our own D1 tables.
  *
- * IMPORTANT — one instance per request. The D1 binding only exists at request
+ * IMPORTANT, one instance per request. The D1 binding only exists at request
  * time (via `getCloudflareContext()`), and the report flags reusing a single
  * D1/Kysely connection across requests as the classic Workers footgun. So this
  * is a *factory*: the route handler calls `createAuth(env, request)` fresh on
@@ -16,7 +16,7 @@
  * Auth gates *actions* (save, share, AI), never *content*: the ~800 `/learn`
  * lessons stay statically prerendered and are read with no session. The session
  * is read client-side (lib/auth/client.ts) so anonymous readers still get the
- * exact same cached static HTML. Keep auth out of middleware.ts — it has rough
+ * exact same cached static HTML. Keep auth out of middleware.ts, it has rough
  * edges on the Workers runtime (a known OpenNext limitation); do auth work in
  * route handlers / server components instead.
  */
@@ -41,7 +41,7 @@ export function parseList(raw: string | undefined): string[] {
 /**
  * Domain attribute for the OAuth `state` cookie, derived from BETTER_AUTH_URL.
  *
- * Why it exists: a social sign-in spans two requests — the sign-in POST sets a
+ * Why it exists: a social sign-in spans two requests, the sign-in POST sets a
  * signed one-time `state` cookie, then the provider redirects back to the
  * callback, which requires that cookie (Better Auth's login-CSRF check). By
  * default the cookie is host-only, while the callback always lands on the
@@ -49,12 +49,12 @@ export function parseList(raw: string | undefined): string[] {
  * dataslope.com and www.dataslope.com serve this app with no canonical
  * redirect, so a sign-in started on www set its cookie on www, Google returned
  * to the apex where the cookie doesn't exist, and the callback failed with
- * `?error=state_mismatch` — reproducibly, on every first attempt from www. The
+ * `?error=state_mismatch`, reproducibly, on every first attempt from www. The
  * failure redirect lands on the apex /sign-in, which is why *retrying* always
  * worked. Scoping the state cookie to the registrable domain (`Domain=
  * dataslope.com` covers the apex and every subdomain) lets a flow started on
  * any *.dataslope.com host complete on the apex callback. Session cookies are
- * deliberately left host-only — this widens only the short-lived random nonce.
+ * deliberately left host-only, this widens only the short-lived random nonce.
  *
  * Returns undefined (host-only cookie, today's behavior) when BETTER_AUTH_URL
  * is unset or its host is not a dotted DNS name: browsers reject a Domain
@@ -77,26 +77,26 @@ export function oauthStateCookieDomain(
 }
 
 /**
- * Resolve who is an admin for this request. Two config sources, which merge —
+ * Resolve who is an admin for this request. Two config sources, which merge,
  * both grant admin regardless of the `role` column, which solves the bootstrap
  * problem (there's no admin to promote the first one yet):
  *
- *   - `ADMIN_EMAILS`   — email addresses (the friendly path: you know them up
+ *   - `ADMIN_EMAILS`, email addresses (the friendly path: you know them up
  *     front, and it works for people who already signed up). Better Auth's
  *     admin plugin only understands user *ids*, so we resolve emails → ids
  *     against D1 here.
- *   - `ADMIN_USER_IDS` — literal Better Auth user ids (no DB lookup needed).
+ *   - `ADMIN_USER_IDS`, literal Better Auth user ids (no DB lookup needed).
  *
  * Signing in additionally *promotes* a config-listed user's `role` column to
  * 'admin' (see the sign-in hooks in createAuth), so the session the client
- * reads — the avatar menu's /admin shortcut, the account page's Pro display,
- * the Pro tier in lib/ai/tier.ts — reflects admin status without hand-editing
+ * reads, the avatar menu's /admin shortcut, the account page's Pro display,
+ * the Pro tier in lib/ai/tier.ts, reflects admin status without hand-editing
  * D1. These allowlists then act as the safety net for endpoints in between.
  *
  * The email→id lookup is one indexed D1 read, and `adminUserIds` is only ever
  * consulted inside the admin plugin's own endpoints (`/api/auth/admin/*`). So
- * we only run it for those requests; every other auth request — crucially the
- * hot `get-session` path that the cookie cache deliberately keeps off D1 —
+ * we only run it for those requests; every other auth request, crucially the
+ * hot `get-session` path that the cookie cache deliberately keeps off D1,
  * skips it. (With no request to inspect we resolve unconditionally.)
  */
 async function resolveAdminUserIds(
@@ -122,26 +122,26 @@ async function resolveAdminUserIds(
 
 /** Build a request-scoped Better Auth instance bound to this request's D1. */
 export async function createAuth(env: CloudflareEnv, request?: Request) {
-  // Require BETTER_AUTH_SECRET explicitly — never boot on a fallback key.
+  // Require BETTER_AUTH_SECRET explicitly, never boot on a fallback key.
   //
   // Better Auth HMAC-signs the short-lived OAuth `state` cookie (and the session
   // cookie) with this secret. A social sign-in spans *two separate requests*:
-  // `/api/auth/sign-in/social` sets the signed state cookie, then — seconds to
-  // minutes later, after the Google consent screen — `/api/auth/callback/google`
+  // `/api/auth/sign-in/social` sets the signed state cookie, then, seconds to
+  // minutes later, after the Google consent screen, `/api/auth/callback/google`
   // must re-verify that cookie's signature against the SAME secret. Those two
   // requests can land on different Worker isolates or straddle a new deployment.
   // If the secret differs across the round-trip, the signature no longer
   // verifies, Better Auth treats the state cookie as missing, and the sign-in
   // aborts with `error=state_mismatch` (the user silently ends up signed out).
   //
-  // Passing `undefined` here does NOT fail — Better Auth falls back to a
+  // Passing `undefined` here does NOT fail, Better Auth falls back to a
   // built-in key whose selection depends on `process.env.NODE_ENV`, which is not
   // reliably set on the Workers runtime. That turns a missing/misdelivered
   // binding into intermittent, deploy-correlated `state_mismatch` failures that
   // are miserable to debug. So fail closed and loud instead: a clear error at
   // request time beats cookies signed with a key that won't verify later.
   // (Rotating this secret intentionally invalidates all in-flight sign-ins and
-  // existing sessions — expected, and rare.)
+  // existing sessions, expected, and rare.)
   if (!env.BETTER_AUTH_SECRET) {
     throw new Error(
       "BETTER_AUTH_SECRET is not set. Set it with `wrangler secret put " +
@@ -178,7 +178,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
   const stateCookieDomain = oauthStateCookieDomain(env.BETTER_AUTH_URL);
 
   return betterAuth({
-    // D1 via the Kysely SQLite dialect — the most Cloudflare-native path, with
+    // D1 via the Kysely SQLite dialect, the most Cloudflare-native path, with
     // full ownership of the tables (schema in /migrations). One dialect per
     // call = one connection per request.
     database: {
@@ -193,14 +193,14 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // CSRF origin allow-list. Better Auth always trusts `baseURL` (pinned to
     // https://dataslope.com so OAuth callbacks resolve). Preview deployments,
     // though, are served from the account's *.workers.dev subdomain, which is
-    // therefore NOT trusted — so email/password sign-in and sign-up on a preview
+    // therefore NOT trusted, so email/password sign-in and sign-up on a preview
     // fail the origin check with "Invalid origin". Trust the request's own
     // origin when it's a workers.dev host, so previews work without per-URL
     // config, plus any explicit TRUSTED_ORIGINS extras (custom preview/staging
     // domains). This function's result is merged with the defaults, so baseURL
     // stays trusted. It's not a production CSRF hole: production runs on the
     // custom domain (never the workers.dev branch), and session cookies are
-    // SameSite=Lax. NOTE: social login still can't *complete* on a preview —
+    // SameSite=Lax. NOTE: social login still can't *complete* on a preview,
     // its OAuth redirect_uri is pinned to baseURL, so Google/GitHub return to
     // production; use email/password to exercise auth on a preview URL.
     trustedOrigins: (req) => {
@@ -217,7 +217,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     },
     // Where failed OAuth callbacks land. Without this, Better Auth bounces
     // them through its built-in /api/auth/error page, which in production
-    // redirects to `/?error=<code>` — stranding codes like `state_mismatch`
+    // redirects to `/?error=<code>`, stranding codes like `state_mismatch`
     // in the home page URL with no UI that reads them. The most common
     // occurrence isn't even a real failure: a *duplicate* callback request
     // (back button, browser re-fetch) whose one-time state was already
@@ -228,7 +228,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // callback case) is immediately redirected on to /account.
     onAPIError: { errorURL: "/sign-in" },
     // Email + password sign-in. Passwords are hashed by Better Auth and stored
-    // in the `account` table (providerId "credential") — the existing schema
+    // in the `account` table (providerId "credential"), the existing schema
     // already has the `password` column, so no migration change is needed.
     //
     // Verification + reset are gated on a configured email sender (Resend, via
@@ -263,10 +263,10 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     //   - `domain`: scope it to the registrable domain instead of host-only,
     //     so a flow started on www.dataslope.com survives Google returning to
     //     the pinned apex callback. (workers.dev previews still can't complete
-    //     social login — Google only redirects to the registered production
+    //     social login, Google only redirects to the registered production
     //     URI, and no cookie scope spans workers.dev → dataslope.com.)
     //   - `maxAge`: Better Auth sets the cookie to 5 minutes but honours the
-    //     server-side state for 10 — someone who sits on Google's account
+    //     server-side state for 10, someone who sits on Google's account
     //     chooser for 6 minutes would fail the cookie check with the same
     //     stale-attempt error. Align the cookie with the 10-minute window.
     //
@@ -284,7 +284,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // Membership tier, surfaced on the session so the "Ask AI" endpoint can
     // pick the model by plan (free → cheaper OpenRouter model; pro → OpenAI).
     // Backed by the `plan` column added in migrations/0003. `input: false` means
-    // users can't set their own plan via the sign-up/update API — it's changed
+    // users can't set their own plan via the sign-up/update API, it's changed
     // server-side only (a future billing webhook, or an admin). Defaults to
     // 'free'. See lib/ai/tier.ts, which also honours a PRO_USER_EMAILS allowlist
     // and admins as a bootstrap before billing exists.
@@ -300,14 +300,14 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     },
     // Complete the ADMIN_EMAILS / ADMIN_USER_IDS bootstrap: config-listed
     // admins get their `role` column promoted to 'admin' when they sign in,
-    // so the session the client reads carries admin status — which surfaces
+    // so the session the client reads carries admin status, which surfaces
     // the /admin shortcut in the avatar menu and, since admins are treated
     // as Pro (lib/ai/tier.ts), the full Pro feature set. See
     // lib/auth/adminBootstrap.ts for the promotion semantics (one-way,
     // no-op for everyone not config-listed).
     //
     // The promotion runs as a request-level *before* hook on the sign-in and
-    // OAuth-callback endpoints — not a session.create database hook — so the
+    // OAuth-callback endpoints, not a session.create database hook, so the
     // role is already 'admin' when the handler reads the user row. That
     // matters because the handler seeds the 5-minute session cookie cache
     // from that read: a database hook fires after the read, which would leave
@@ -332,7 +332,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     databaseHooks: {
       user: {
         create: {
-          // New sign-ups don't have a row for the hook above to promote —
+          // New sign-ups don't have a row for the hook above to promote,
           // write role 'admin' into the INSERT itself, so even the first
           // session's cookie cache carries the admin role.
           before: async (user) => {
@@ -349,7 +349,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // Admin capabilities (list/remove/ban users) for the gated /admin
     // dashboard. The `removeUser` action is a hard delete: it drops the `user`
     // row, which cascades to that user's `session` + `account` rows (see the
-    // ON DELETE CASCADE in migrations/0001) and frees their unique email — so a
+    // ON DELETE CASCADE in migrations/0001) and frees their unique email, so a
     // removed user can immediately sign up again with OAuth or email/password.
     // Authorization is enforced *server-side* on every `admin.*` endpoint, so
     // the dashboard staying a statically-prerendered, client-read page (the
@@ -357,7 +357,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // non-admin who loads /admin simply gets 403s and an empty screen.
     //
     // Polar billing (Pro subscriptions) mounts checkout/portal/webhook
-    // endpoints when configured — see lib/billing/polar.ts. Like every other
+    // endpoints when configured, see lib/billing/polar.ts. Like every other
     // integration here it's fail-safe: with no POLAR_* config the plugin
     // simply isn't registered and auth runs exactly as before.
     plugins: (() => {
@@ -370,7 +370,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     session: {
       // Cache the session in a short-lived signed cookie so the common
       // "who am I" check is served from the cookie instead of a D1 read on
-      // every request — D1's tight write/read budget rewards this, and it
+      // every request, D1's tight write/read budget rewards this, and it
       // keeps auth cheap at the edge.
       cookieCache: { enabled: true, maxAge: 5 * 60 },
     },

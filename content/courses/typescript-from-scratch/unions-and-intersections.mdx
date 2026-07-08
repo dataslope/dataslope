@@ -18,7 +18,7 @@ This chapter covers: **union types**, **intersection types**,
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Two streams, one blue and one yellow, fork together into a single broad green channel that carries beads of both colors downstream — a union accepts values from either branch"
+  aria-label="Two streams, one blue and one yellow, fork together into a single broad green channel that carries beads of both colors downstream, a union accepts values from either branch"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -178,7 +178,7 @@ The type `Person` has *both* the `name` property from `Named` *and* the
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A Venn diagram of a blue set and a yellow set whose overlapping lens is highlighted green: blue shapes sit in the blue-only region, yellow shapes in the yellow-only region, a green bead rests inside the shared lens, and a red square sits outside both circles — an intersection admits only values that satisfy every constraint"
+  aria-label="A Venn diagram of a blue set and a yellow set whose overlapping lens is highlighted green: blue shapes sit in the blue-only region, yellow shapes in the yellow-only region, a green bead rests inside the shared lens, and a red square sits outside both circles, an intersection admits only values that satisfy every constraint"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -207,7 +207,7 @@ The type `Person` has *both* the `name` property from `Named` *and* the
   </g>
 </svg>
 
-Intersections are useful for **mixins** — combining multiple interfaces
+Intersections are useful for **mixins**, combining multiple interfaces
 or types into one:
 
 <CodeBlock
@@ -278,7 +278,7 @@ For primitive types, intersections can produce an *empty* set:
     {
       filename: "main.ts",
       starterCode: `type Impossible = string & number;
-// Impossible is 'never' — no value is both a string and a number
+// Impossible is 'never', no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
 // const y: Impossible = 42;       // ❌ Type 'number' is not assignable to type 'never'
@@ -290,7 +290,7 @@ console.log("Impossible is never:", true);
 />
 
 `string & number` is `never` (the bottom type) because no value can be
-both a string and a number. This is a compile-time error — the compiler
+both a string and a number. This is a compile-time error, the compiler
 knows the type is uninhabited.
 
 ## Discriminated unions: tagged unions for type-safe variants
@@ -336,7 +336,7 @@ data.
 **What bugs does this prevent?** Without the discriminator, you'd have to
 manually check which properties exist (e.g., `"radius" in shape`). With
 discriminated unions, the compiler does it for you, and the narrowing is
-*exhaustive* — if you add a new variant, the compiler will tell you
+*exhaustive*, if you add a new variant, the compiler will tell you
 everywhere you need to handle it.
 
 ## Exhaustiveness checking with discriminated unions
@@ -379,7 +379,7 @@ console.log(handleResult(pending));
 />
 
 If you add a fourth variant (say, `Timeout`) to `Result`, the compiler
-will complain in `handleResult` — the `else` branch no longer handles all
+will complain in `handleResult`, the `else` branch no longer handles all
 cases. This forces you to update the code.
 
 A common idiom for exhaustiveness checking is to use a `never`-typed
@@ -523,7 +523,7 @@ this at declaration time in most cases.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Two puzzle pieces, one blue and one yellow, each with a protruding tab facing the other so they can never interlock, and a small red cross marks the gap between them — conflicting constraints intersect to never, the type with no values"
+  aria-label="Two puzzle pieces, one blue and one yellow, each with a protruding tab facing the other so they can never interlock, and a small red cross marks the gap between them, conflicting constraints intersect to never, the type with no values"
   style={{ display: "block", width: "100%", maxWidth: "420px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -568,7 +568,7 @@ connect({ host: "example.com", port: 443 });
 />
 
 This is more ergonomic than forcing callers to always provide a full
-`Config` object, but still type-safe — you can't pass a `boolean` or an
+`Config` object, but still type-safe, you can't pass a `boolean` or an
 array.
 
 ## Practice: a result type with discriminated union
@@ -663,7 +663,7 @@ try {
 - A value that is neither a string nor a number
   > A union type expands what is acceptable; it cannot exclude both members. A type that excludes certain types uses negation patterns or \`never\`, not a union.
 - [o] A value that is either a string or a number
-  > Union types represent "this or that" — the value can be either member of the union.
+  > Union types represent "this or that", the value can be either member of the union.
 - A value that is only a string
   > The union \`string | number\` accepts both strings and numbers, not just strings. A type of only \`string\` would be annotated as \`string\` alone.
 
@@ -676,7 +676,7 @@ Union types widen the set of acceptable values.`}
 - A value that is either A or B
   > "Either A or B" describes a union (\`A | B\`), not an intersection. An intersection requires a value to satisfy both types at once.
 - [o] A value that has all properties from both A and B
-  > Intersection types merge properties — the result must satisfy both constraints.
+  > Intersection types merge properties, the result must satisfy both constraints.
 - A value that has no properties
   > An intersection of two object types combines their properties; it does not remove them. A type with no properties would be \`{}\` or \`Record<never, never>\`.
 - A value that is compatible with neither A nor B
@@ -699,6 +699,6 @@ mixins and combining constraints. Together, they're the building blocks
 for complex, expressive type systems.
 
 In the next chapter, [Type Narrowing](./type-narrowing), we'll see how
-the compiler tracks control flow to refine union types — how `typeof`,
+the compiler tracks control flow to refine union types, how `typeof`,
 `instanceof`, `in`, and custom type guards let you safely work with
 values of union types.

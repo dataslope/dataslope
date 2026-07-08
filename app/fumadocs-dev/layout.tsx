@@ -1,5 +1,5 @@
 /**
- * Layout for the Fumadocs-powered `/fumadocs-dev` route — the
+ * Layout for the Fumadocs-powered `/fumadocs-dev` route, the
  * development-only component gallery (code blocks, challenge cards,
  * loading states, …) that used to live at `/learn`.
  *

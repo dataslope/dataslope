@@ -5,7 +5,7 @@ description: True, false, and the operators that let a program reason about comb
 
 A **boolean** is a value that is either `true` or `false`. There
 are only two of them. They are the smallest, simplest, and possibly
-the most important type in the language — because *every decision a
+the most important type in the language, because *every decision a
 program ever makes* is, at the bottom, a boolean.
 
 <svg
@@ -60,8 +60,8 @@ expressions**.
       starterCode: `console.log(5 === 5); // true
 console.log(5 === "5"); // false (different types)
 console.log(3 < 4); // true
-console.log("apple" < "banana"); // true — strings compare lexicographically
-console.log("a" < "B"); // false — uppercase letters come before lowercase in Unicode
+console.log("apple" < "banana"); // true, strings compare lexicographically
+console.log("a" < "B"); // false, uppercase letters come before lowercase in Unicode
 `,
     },
   ]}
@@ -93,12 +93,12 @@ operators:
       starterCode: `const isAdmin = true;
 const isActive = false;
 
-console.log(isAdmin && isActive); // false — needs both
-console.log(isAdmin || isActive); // true  — needs at least one
-console.log(!isAdmin); // false — flip
+console.log(isAdmin && isActive); // false, needs both
+console.log(isAdmin || isActive); // true, needs at least one
+console.log(!isAdmin); // false, flip
 console.log(!isActive); // true
 
-// Combine them — parentheses make precedence obvious:
+// Combine them, parentheses make precedence obvious:
 const canEdit = isAdmin && (isActive || !isActive);
 console.log(canEdit); // true
 `,
@@ -199,8 +199,8 @@ console.log(withDefault(undefined)); // "default"
 function withDefaultOr(value) {
   return value || "default";
 }
-console.log(withDefaultOr("")); // "default" — empty string got replaced!
-console.log(withDefaultOr(0)); // "default" — zero got replaced!
+console.log(withDefaultOr("")); // "default", empty string got replaced!
+console.log(withDefaultOr(0)); // "default", zero got replaced!
 `,
     },
   ]}
@@ -211,7 +211,7 @@ Pick `??` when you specifically mean "fall back if missing", and
 
 ## Truthy and falsy, revisited
 
-Recall from *Values and Types* — every value can be used in a
+Recall from *Values and Types*, every value can be used in a
 boolean context. The **falsy** values are:
 
 - `false`
@@ -241,14 +241,14 @@ greet("Ada");
 greet("");
 greet();
 greet(null);
-greet(0); // careful — 0 is falsy! we treat it like "no name"
+greet(0); // careful, 0 is falsy! we treat it like "no name"
 `,
     },
   ]}
 />
 
 The `if (name)` check covers all "missing or empty" cases at once.
-This is concise and idiomatic — just remember it also rules out
+This is concise and idiomatic, just remember it also rules out
 `0` and `false`, which sometimes matters.
 
 ## De Morgan's laws (very useful!)
@@ -278,7 +278,7 @@ const isAdmin = true;
 const isActive = false;
 
 console.log(!(isAdmin && isActive)); // true
-console.log(!isAdmin || !isActive); // true — same result
+console.log(!isAdmin || !isActive); // true, same result
 
 // Original:
 //   if (!(name || email)) ...
@@ -289,7 +289,7 @@ const name = "";
 const email = "";
 
 console.log(!(name || email)); // true
-console.log(!name && !email); // true — same result
+console.log(!name && !email); // true, same result
 `,
     },
   ]}
@@ -306,7 +306,7 @@ const result = condition ? valueIfTrue : valueIfFalse;
 ```
 
 Use it for small, single-line choices. For anything more
-complicated, use a regular `if`/`else` — readability beats
+complicated, use a regular `if`/`else`, readability beats
 cleverness.
 
 <CodeBlock
@@ -333,7 +333,7 @@ console.log(describeNumber(7));
 
 Below is a small example that combines comparisons, logical
 operators, truthy/falsy, and the ternary. It models a "can this
-user post a comment?" rule. Read each `canComment` line carefully —
+user post a comment?" rule. Read each `canComment` line carefully,
 it expresses a fairly complex business rule in a single, readable
 line.
 
@@ -461,13 +461,13 @@ console.log(isLeapYear(2023));
   markdown={`What does "short-circuit evaluation" mean for the \`&&\` operator?
 
 - Both sides are always evaluated, but only the first matters
-  > Both sides are always evaluated when the left is truthy, but when the left is falsy the right side is never reached — the whole point of short-circuiting is that the right-hand side may not be evaluated at all.
+  > Both sides are always evaluated when the left is truthy, but when the left is falsy the right side is never reached, the whole point of short-circuiting is that the right-hand side may not be evaluated at all.
 - [o] The right side is evaluated **only** if the left side is truthy; otherwise the left side is returned without ever touching the right
-  > \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\` — \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
+  > \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\`, \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
 - It produces a shorter machine-code instruction
   > Short-circuit evaluation is a runtime behaviour, not a machine-code optimisation; it has nothing to do with instruction size.
 - It only works for boolean values, not truthy/falsy ones
-  > Short-circuit evaluation applies to all values using their truthy/falsy interpretation — not just the literals \`true\` and \`false\`.
+  > Short-circuit evaluation applies to all values using their truthy/falsy interpretation, not just the literals \`true\` and \`false\`.
 
 Short-circuit evaluation is what lets \`a || b\` work as a default-value pattern and \`a && b\` work as a safe-call pattern.`}
 />

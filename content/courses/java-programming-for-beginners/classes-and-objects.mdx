@@ -1,6 +1,6 @@
 ---
 title: Classes and Objects
-description: The most important page in the course — what a class is, what an object is, and why every Java program after this looks completely different
+description: The most important page in the course, what a class is, what an object is, and why every Java program after this looks completely different
 ---
 
 A **class** is a blueprint. An **object** is a thing built from
@@ -11,7 +11,7 @@ matter of vocabulary.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A blue stencil card with one circular cut-out links by thin gray lines to three solid circles of different colors and sizes — one class, pressed into many objects"
+  aria-label="A blue stencil card with one circular cut-out links by thin gray lines to three solid circles of different colors and sizes, one class, pressed into many objects"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -95,8 +95,8 @@ class Dog {
 
 Pay attention to the punctuation:
 
-- `class Dog { ... }` — the blueprint.
-- `new Dog("Rex", 4)` — calls the constructor, which builds an
+- `class Dog { ... }`, the blueprint.
+- `new Dog("Rex", 4)`, calls the constructor, which builds an
   object.
 - `rex` and `luna` are **two different objects**. Each has its own
   `name` and `age`. Calling `rex.haveBirthday()` changes `rex.age`,
@@ -123,7 +123,7 @@ flowchart LR
 
 The variables `rex` and `luna` live in the stack frame of `main`.
 The actual `Dog` objects live on the heap. Each variable holds a
-*reference* — an arrow — to its own object.
+*reference*, an arrow, to its own object.
 
 This is the *reference type* picture from the variables lesson, now
 applied to a class you wrote yourself.
@@ -147,7 +147,7 @@ A class declaration typically has three sections:
 | --- | --- |
 | **Fields** | The state every instance carries |
 | **Constructor(s)** | How to bring a valid new instance into existence |
-| **Methods** | The behavior — what every instance can do |
+| **Methods** | The behavior, what every instance can do |
 
 We will meet *static* members in a future page; ignore them for now.
 
@@ -206,12 +206,12 @@ has more than one class, we will show each in its own file.
 
 A few things to notice:
 
-- `private final` fields — `private` means no code outside `Book`
+- `private final` fields, `private` means no code outside `Book`
   can touch them; `final` means they cannot be reassigned after the
   constructor finishes. We are saying: a `Book`'s title, author,
   and year are *part of its identity* and must not change.
-- `title()`, `author()`, `year()` are **accessor methods** (getters)
-  — they answer questions about state without exposing the fields
+- `title()`, `author()`, `year()` are **accessor methods** (getters),
+they answer questions about state without exposing the fields
   themselves.
 - `olderThan(Book other)` takes another `Book` as a parameter.
   Because the comparison happens *inside* `Book` itself, it can
@@ -225,14 +225,14 @@ refers to **the object the method was called on**. When you write
 `luna.describe()`, inside the *same* method body, `this` is `luna`.
 
 You usually do not have to type `this`. You *must* type it when you
-have a parameter or local variable with the same name as a field —
+have a parameter or local variable with the same name as a field,
 which is why constructors so often look like `this.name = name;`.
 
 ## `null` and what happens when there's no object
 
 A reference variable that does not yet point to any object holds the
 special value `null`. Calling a method on `null` throws a
-`NullPointerException` — Java's most famous error.
+`NullPointerException`, Java's most famous error.
 
 <CodeBlock
   adapter="java"
@@ -261,8 +261,8 @@ We will return to exceptions later. For now: when you see
 wasn't there*.
 
 You are in good company when it bites you. The inventor of the null
-reference, Tony Hoare — the same computer scientist who gave us
-quicksort — publicly apologized for it at a 2009 conference, calling
+reference, Tony Hoare, the same computer scientist who gave us
+quicksort, publicly apologized for it at a 2009 conference, calling
 null his "billion-dollar mistake": he added it to the ALGOL W
 language in 1965 "simply because it was so easy to implement," and
 estimates the resulting decades of crashes and vulnerabilities have
@@ -291,8 +291,8 @@ reference.
   > That would be relevant only for static members.
 - The most recently created \`Dog\`
   > No, it refers to the specific receiver.
-- [o] The specific \`Dog\` object the method was called on — that is, \`rex\`
-  > \`this\` always refers to the receiver — the object on the left of the dot in the call.
+- [o] The specific \`Dog\` object the method was called on, that is, \`rex\`
+  > \`this\` always refers to the receiver, the object on the left of the dot in the call.
 - A reserved field automatically present on every object
   > It's a keyword, not a field.`}
 />

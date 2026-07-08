@@ -1,4 +1,4 @@
-// /admin/test-users — create disposable, pre-verified accounts on either
+// /admin/test-users, create disposable, pre-verified accounts on either
 // plan for exercising member-gated features (AI autocomplete, Ask AI tiers).
 import type { Metadata } from "next";
 import { TestUsersClient } from "./TestUsersClient";

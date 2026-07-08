@@ -1,12 +1,12 @@
 ---
 title: Linear Regression
-description: The straight line through your data — the simplest, most interpretable way to predict a number, and the foundation every other regression model is measured against.
+description: The straight line through your data, the simplest, most interpretable way to predict a number, and the foundation every other regression model is measured against.
 ---
 
 So far our models have predicted *categories*: which species, which class.
 Now we predict a **number**: the price of a diamond, a house's value,
 tomorrow's temperature. That family of tasks is called **regression**, and
-the place everyone starts — for good reason — is **linear regression**.
+the place everyone starts, for good reason, is **linear regression**.
 
 Linear regression is old, simple, and almost embarrassingly interpretable.
 It will not win competitions on messy data. But it is the model you reach
@@ -17,7 +17,7 @@ and the rest of regression is variations on a theme.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A very thin gray line of best fit rises through scattered blue dots, with thin yellow residual ticks connecting each dot to the line — linear regression minimizes those gaps"
+  aria-label="A very thin gray line of best fit rises through scattered blue dots, with thin yellow residual ticks connecting each dot to the line, linear regression minimizes those gaps"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -49,7 +49,7 @@ and the rest of regression is variations on a theme.
 
 <Callout type="info" title="Where this sits in the workflow">
 Nothing about the four-move workflow changes here. We still **load**,
-**split**, **train**, and **evaluate** — we are simply swapping the
+**split**, **train**, and **evaluate**, we are simply swapping the
 estimator line for `LinearRegression` and predicting a number instead of a
 class. If that shape is not yet automatic, revisit **Your First Model, End
 to End** first.
@@ -59,7 +59,7 @@ to End** first.
 
 You have a feature and a number that seems to move with it. Square footage
 and price. Study hours and exam score. Advertising spend and sales. You
-want a rule that, given the feature, predicts the number — and ideally a
+want a rule that, given the feature, predicts the number, and ideally a
 rule you can *read*, so you can say "each extra square foot is worth about
 this much."
 
@@ -80,7 +80,7 @@ Prediction is then just arithmetic:
 > predicted y = intercept + slope × feature
 
 The intercept is where the line crosses the vertical axis (the prediction
-when the feature is zero). The slope is how steeply the line rises — how
+when the feature is zero). The slope is how steeply the line rises, how
 much the prediction changes for each one-unit increase in the feature.
 
 But which line? Infinitely many lines pass *near* a cloud of points. Linear
@@ -89,12 +89,12 @@ possible. For each point, the error is the vertical gap between the real
 value and the line's prediction (the "residual"). We square each gap so
 that positives and negatives cannot cancel, and so that large misses are
 penalized hard. The chosen line is the one whose squared gaps add up to the
-smallest possible total. That criterion has a name — **least squares** — and
+smallest possible total. That criterion has a name, **least squares**, and
 it is what `LinearRegression` solves for you.
 
 Least squares is also one of the oldest ideas in the field. Adrien-Marie
 Legendre published the method in 1805, but Carl Friedrich Gauss claimed to
-have used it earlier — and famously put it to work in 1801 to predict where
+have used it earlier, and famously put it to work in 1801 to predict where
 the newly discovered asteroid Ceres would reappear after slipping behind the
 sun. His least-squares forecast was strikingly accurate, and the method has
 anchored statistics ever since.
@@ -114,7 +114,7 @@ Squaring the residuals does two useful things: it removes the sign (so a
 miss of +3 and a miss of -3 both count as 9, not cancel to 0), and it
 punishes big misses far more than small ones (a miss of 4 costs 16, four
 times as much as a miss of 2). The result is a line that especially dislikes
-being badly wrong on any single point — which is usually what we want, but
+being badly wrong on any single point, which is usually what we want, but
 note the flip side: it makes the line sensitive to outliers, a weakness we
 return to below.
 </Callout>
@@ -122,7 +122,7 @@ return to below.
 ## One feature: see the line being fit
 
 Let us make this concrete with a single feature so we can *draw* the line.
-We will use the **diamonds** dataset — 53,940 real diamonds — and ask the
+We will use the **diamonds** dataset, 53,940 real diamonds, and ask the
 most intuitive question imaginable: how does a diamond's **price** depend on
 its **carat** (its weight)? Bigger stones cost more; the relationship is
 close to a straight line. We fit a `LinearRegression` and plot the points
@@ -170,22 +170,22 @@ print(f"intercept = {model.intercept_:.2f}")
 
 The red line is the single straight line that minimizes the total squared
 vertical distance to all those points. No other line does better by that
-measure. Notice it does not pass through every point — it cannot, real
-diamonds scatter widely — it threads through their *middle*. The slope comes
+measure. Notice it does not pass through every point, it cannot, real
+diamonds scatter widely, it threads through their *middle*. The slope comes
 out to several thousand dollars per carat: that is the model's estimate of
 what one extra carat is worth.
 
 <Callout type="info" title="coef_ and intercept_: where the learning lives">
 After `.fit()`, everything the model learned is stored in two attributes:
 `model.coef_` (the slope, or one slope per feature) and `model.intercept_`
-(the constant). That is the *entire* model — two-ish numbers. You could
+(the constant). That is the *entire* model, two-ish numbers. You could
 write the predictions on paper. This radical simplicity is linear
 regression's superpower.
 </Callout>
 
 ## Reading the coefficients
 
-The coefficients are not just machinery — they are the *answer* to a
+The coefficients are not just machinery, they are the *answer* to a
 business question. Let us pull them out and interpret them in plain
 language.
 
@@ -226,11 +226,11 @@ print(f"At carat = {carat_new}:  by hand = {by_hand:.2f}, by model = {by_model:.
 There is the whole interpretation: **the slope is the price of one unit of
 the feature.** Here the feature is carat and the target is dollars, so the
 slope reads "each additional carat adds about that many dollars to the
-predicted price." (Notice the intercept is *negative* — the line, extended
+predicted price." (Notice the intercept is *negative*, the line, extended
 back to zero weight, dips below zero. That is a reminder the model is a
 local approximation, not literal truth at carat = 0.) That single, readable
-sentence is why linear regression survives in fields — economics, medicine,
-policy — where being able to *explain* the model matters as much as its
+sentence is why linear regression survives in fields, economics, medicine,
+policy, where being able to *explain* the model matters as much as its
 accuracy.
 
 <Callout type="tip" title="Prediction is a weighted sum">
@@ -238,8 +238,8 @@ With several features, the model becomes
 `y = intercept + w1*x1 + w2*x2 + w3*x3 + ...`. Each prediction is just a
 **weighted sum** of the features plus a constant, where the weights are the
 coefficients. "Linear" literally means this: outputs are a straight, additive
-combination of inputs. No feature is squared, multiplied by another, or bent
-— unless you add such terms yourself.
+combination of inputs. No feature is squared, multiplied by another, or bent,
+unless you add such terms yourself.
 </Callout>
 
 ## Many features: the diamonds dataset
@@ -247,7 +247,7 @@ combination of inputs. No feature is squared, multiplied by another, or bent
 Real problems have many features at once. The diamonds dataset measures each
 stone several ways, and beyond carat we can hand the model the numeric
 columns `carat`, `depth`, `table`, and the three physical dimensions `x`,
-`y`, `z`. The model now fits a flat plane through six-dimensional space —
+`y`, `z`. The model now fits a flat plane through six-dimensional space,
 impossible to picture, but the math and the code are identical.
 
 <CodeBlock
@@ -288,7 +288,7 @@ Each coefficient says how the prediction moves per unit of that feature,
 **holding the others fixed**. A large positive coefficient on carat means
 heavier stones push the predicted price up; a negative coefficient means
 that feature pulls it down. The biggest magnitudes flag the features the
-model leans on most — though, importantly, magnitude alone can mislead when
+model leans on most, though, importantly, magnitude alone can mislead when
 features are on different scales, which is one reason scaling matters (its
 own page).
 
@@ -336,7 +336,7 @@ print(f"R-squared on the test set: {model.score(X_test, y_test):.3f}")
   ]}
 />
 
-The predictions are in the right ballpark but clearly imperfect — price also
+The predictions are in the right ballpark but clearly imperfect, price also
 depends on cut, color, and clarity, which this numeric-only model never
 sees. That `.score()` returns **R²** (R-squared), not accuracy, because the
 target is a number.
@@ -345,7 +345,7 @@ target is a number.
 You will notice `.score()` gives R² here, and you may have heard of MAE
 (mean absolute error) and MSE (mean squared error) too. Each answers "how
 wrong is the model?" in a different way and carries its own gotchas. We are
-deliberately **not** unpacking them here — the full treatment, including
+deliberately **not** unpacking them here, the full treatment, including
 when R² lies and which error metric to trust, lives on the **Regression
 Metrics** page. For now, just know that higher R² is better (1.0 is
 perfect, 0 means no better than guessing the mean) and that one number
@@ -376,7 +376,7 @@ Use it when you want a **fast, interpretable baseline**, when the
 relationship looks roughly straight on a scatter plot, when you need to
 *explain* the effect of each feature in plain units, or when you have few
 samples and a flexible model would just overfit. It is almost always the
-right *first* model — beat it before you complicate things.
+right *first* model, beat it before you complicate things.
 </Callout>
 
 ## When NOT to use it
@@ -384,8 +384,8 @@ right *first* model — beat it before you complicate things.
 The same simplicity that makes linear regression clear also makes it the
 wrong choice for genuinely curvy or interaction-heavy problems.
 
-- **Clearly nonlinear data.** If the scatter plot bends — a U-shape, a
-  saturating curve, a cycle — a straight line cannot capture it and will be
+- **Clearly nonlinear data.** If the scatter plot bends, a U-shape, a
+  saturating curve, a cycle, a straight line cannot capture it and will be
   biased everywhere. Either engineer features (add an `x²` term, take a log)
   or switch to a flexible model like a decision tree or a gradient-boosted
   ensemble.
@@ -393,12 +393,12 @@ wrong choice for genuinely curvy or interaction-heavy problems.
   another (a discount matters more on expensive items), the additive
   assumption breaks. Tree-based models handle interactions natively.
 - **Many redundant features.** Heavy multicollinearity makes coefficients
-  wild and untrustworthy. Regularized cousins — Ridge and Lasso — tame this
+  wild and untrustworthy. Regularized cousins, Ridge and Lasso, tame this
   by penalizing large coefficients, and they are the usual next step.
 - **Heavy outliers you cannot clean.** Squared error makes a few extreme
   points dominate the fit. Robust regressors exist for this.
 
-The fix is rarely "abandon regression" — it is "use a regression that fits
+The fix is rarely "abandon regression", it is "use a regression that fits
 the shape of your data." Linear regression is the floor, not the ceiling.
 
 Here is the failure mode made visible. We fit a straight line to data that
@@ -437,13 +437,13 @@ print(f"R-squared: {model.score(X, y):.3f}  (low -- the line misses the bend)")
   ]}
 />
 
-The line is the *best possible* straight line, and it is still badly wrong —
+The line is the *best possible* straight line, and it is still badly wrong,
 too high in the middle, too low at the ends. No amount of fitting fixes
 this, because the assumption itself (straightness) is violated. That low R²
 is the model honestly telling you "I am the wrong shape for this data."
 
 <Callout type="danger" title="A common misconception: low R² means broken code">
-A disappointing R² usually does not mean you made a mistake — it often means
+A disappointing R² usually does not mean you made a mistake, it often means
 **linear regression is the wrong model for this data**, or the features
 genuinely do not explain the target. The fix is a better model or better
 features, not more fiddling with `LinearRegression`. Reading the *residuals*
@@ -475,17 +475,17 @@ features, not more fiddling with `LinearRegression`. Reading the *residuals*
 Linear regression is everywhere a number must be predicted *and explained*:
 
 - **Economics and finance.** Estimating how income, interest rates, or
-  prices respond to inputs — where the coefficient *is* the headline result
+  prices respond to inputs, where the coefficient *is* the headline result
   ("a 1% rate rise reduces demand by X").
 - **Medicine and epidemiology.** Relating risk factors to outcomes in a way
   regulators and clinicians can scrutinize line by line.
 - **Real estate and pricing.** A transparent first estimate of value from
-  size, location, and age — easy to audit and defend.
+  size, location, and age, easy to audit and defend.
 - **Forecasting baselines.** Before anyone deploys a complex model, a linear
   baseline sets the bar that complexity has to clear to be worth it.
 
 In every case the appeal is the same pair of virtues: it is **fast** and it
-is **honest about what it learned** — you can read the rule straight off the
+is **honest about what it learned**, you can read the rule straight off the
 coefficients.
 
 ## Your turn
@@ -495,8 +495,8 @@ coefficients.
   title="Fit a line, read its slope, and predict a price"
   category="regression · linear regression"
   estimatedTime="~7 min"
-  instructions={`Build a one-feature linear regression on the diamonds data —
-predicting \`price\` from \`carat\` — and pull out what it learned.
+  instructions={`Build a one-feature linear regression on the diamonds data,
+predicting \`price\` from \`carat\`, and pull out what it learned.
 
 1. Build \`X\` from the single column \`carat\` (use \`diamonds[["carat"]]\`)
    and \`y\` from \`price\`.
@@ -605,7 +605,7 @@ assert abs(pred_at_1_5 - expected) < 1e-6, f"Expected {expected}, got {pred_at_1
 - It connects the first and last data points
   > Connecting the first and last points is an arbitrary geometric rule that minimizes nothing in particular. The least-squares line is determined by all data points together, minimizing the total squared residuals.
 - It passes through as many points as possible
-  > Maximizing the number of exact hits is a different criterion — it would produce a line that is heavily influenced by coincidences in the data. Least squares minimizes the total squared vertical distance for all points.
+  > Maximizing the number of exact hits is a different criterion, it would produce a line that is heavily influenced by coincidences in the data. Least squares minimizes the total squared vertical distance for all points.
 - It maximizes the correlation between two features
   > Linear regression predicts a target from features; it does not maximize correlation between two input features. Maximizing correlation is not the criterion; minimizing squared prediction error is.
 
@@ -634,7 +634,7 @@ The slope/coefficient is a per-unit effect, which is what makes the model interp
   > Linear regression can fit poorly when the relationship is not approximately linear. A low R² on genuinely curved data is the model correctly reporting that a straight line is a poor fit, not a sign of a coding error.
 - The test set is too small to compute R²
   > R² can be computed on any size dataset. The issue here is not the size of the test set but the mismatch between the assumed linear relationship and the actual curved one.
-- [o] A straight line cannot capture a curved relationship, so the model is the wrong shape — you need transformed features or a more flexible model
+- [o] A straight line cannot capture a curved relationship, so the model is the wrong shape, you need transformed features or a more flexible model
   > Linear regression assumes a roughly straight, additive relationship. On genuinely curved data it is biased everywhere, and a low R² is the model honestly reporting that mismatch.
 - R² cannot be computed for nonlinear data
   > R² can always be computed from any set of actual and predicted values; there is no restriction about the data's shape. A low or negative R² is the result, not an error in the calculation.
@@ -663,7 +663,7 @@ The additive weighted-sum form is exactly what the word "linear" refers to.`}
 - Outliers are always removed before fitting
   > Outlier removal is an optional preprocessing step, not something linear regression performs automatically. When outliers are not removed, the squared-error criterion gives them disproportionate influence on the fitted line.
 - Squaring makes all errors equal to one
-  > Squaring does not normalize errors to one — it amplifies them. A residual of 2 becomes 4, a residual of 10 becomes 100. Squaring makes large errors contribute proportionally more, not equally.
+  > Squaring does not normalize errors to one, it amplifies them. A residual of 2 becomes 4, a residual of 10 becomes 100. Squaring makes large errors contribute proportionally more, not equally.
 - Linear regression ignores points that are far from the line
   > Linear regression does the opposite: squared error gives far-away points extra influence. Robust regression methods exist precisely to reduce the impact of outliers, but standard least squares does not.
 - [o] Squaring a large residual produces a very large penalty, so a single far-off point can pull the whole line toward itself

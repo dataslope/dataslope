@@ -349,7 +349,7 @@ bye <- function(name) {
 
 const PACKAGES: PackageInfo[] = [
   // Base R packages (base, stats, graphics, utils) are auto-loaded in
-  // every R session and need no library() call — they are omitted here.
+  // every R session and need no library() call, they are omitted here.
   // Tidyverse
   {
     cat: "Tidyverse", icon: "🧰", color: "#34d399", name: "tidyverse", ver: "2.0",
@@ -376,7 +376,7 @@ mtcars |>
   },
   {
     cat: "Tidyverse", icon: "🎨", color: "#34d399", name: "ggplot2", ver: "3.5",
-    desc: "Declarative graphics — layered grammar of plots",
+    desc: "Declarative graphics, layered grammar of plots",
     example: `library(ggplot2)
 
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -454,7 +454,7 @@ print(fit)
   },
   {
     cat: "Modelling", icon: "🧮", color: "#a78bfa", name: "MASS", ver: "7.3",
-    desc: "Modern Applied Statistics with S — rlm, lda, qda, mvrnorm",
+    desc: "Modern Applied Statistics with S, rlm, lda, qda, mvrnorm",
     example: `library(MASS)
 
 fit <- rlm(stack.loss ~ ., data = stackloss)
@@ -464,7 +464,7 @@ print(summary(fit)$coefficients)
   // Visualization
   {
     cat: "Visualization", icon: "🌊", color: "#f472b6", name: "lattice", ver: "0.22",
-    desc: "Trellis graphics — multi-panel conditioning plots",
+    desc: "Trellis graphics, multi-panel conditioning plots",
     example: `library(lattice)
 
 xyplot(mpg ~ wt | factor(cyl), data = mtcars,
@@ -775,7 +775,7 @@ const CREATED_FILES_PATH = "/tmp/.pg_created_files";
 // 2. print(): base R prints every row of a plain data.frame, which can freeze
 //    the page for large frames. We override the print generic (an ordinary
 //    search-path lookup, unlike an S3 method which UseMethod won't pick up from
-//    an attached env) to show the first 10 and last 5 rows with an ellipsis —
+//    an attached env) to show the first 10 and last 5 rows with an ellipsis,
 //    the same Jupyter-style truncation already used for auto-printed frames
 //    (see dataFrameToHtml). Only plain data.frames are affected; tibbles,
 //    data.tables, etc. keep their own already-truncating print methods.
@@ -863,7 +863,7 @@ class WebRRuntime implements LanguageRuntime {
   constructor(private webR: WebRInstance) {}
 
   /** Free the R heap by shutting the webR session down. Registry-eviction
-   *  hook — the instance must not be used after this. Also un-registers
+   *  hook, the instance must not be used after this. Also un-registers
    *  this session from the styler formatter so a later Format click
    *  starts a fresh session instead of talking to a dead one. */
   dispose(): void {
@@ -877,7 +877,7 @@ class WebRRuntime implements LanguageRuntime {
   // one Rgui/ESS use). WebR exposes it like any other R code, so
   // completions cover keywords, base functions, user globals from the
   // previous run, package exports (`::`), list/data.frame components
-  // (`$`), and function arguments (`name=`) — with zero extra download.
+  // (`$`), and function arguments (`name=`), with zero extra download.
   // This mirrors the official webR REPL's CodeMirror wiring.
 
   private ensureCompletionSetup(): Promise<boolean> {
@@ -886,7 +886,7 @@ class WebRRuntime implements LanguageRuntime {
         .evalRVoid(
           // func = TRUE appends "(" to function completions (stripped
           // below, but it's what tells us the completion IS a function);
-          // fuzzy stays off — CodeMirror does its own fuzzy filtering.
+          // fuzzy stays off, CodeMirror does its own fuzzy filtering.
           "utils::rc.settings(ops = TRUE, ns = TRUE, args = TRUE, func = TRUE, fuzzy = FALSE)",
         )
         .then(
@@ -969,7 +969,7 @@ class WebRRuntime implements LanguageRuntime {
       try {
         await this.webR.FS.mkdir(cur);
       } catch {
-        // Directory already exists — ignore.
+        // Directory already exists, ignore.
       }
     }
   }
@@ -1014,7 +1014,7 @@ class WebRRuntime implements LanguageRuntime {
     const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
     if (toInstall.length === 0) return "";
     for (const p of toInstall) this.installedPackages.add(p);
-    // A real mid-run download — surface the boot notice for the duration
+    // A real mid-run download, surface the boot notice for the duration
     // (the main thread debounces it, so a fast install doesn't flash).
     const label = `Installing R package${toInstall.length > 1 ? "s" : ""}: ${toInstall.join(", ")}…`;
     onStatus?.(label, true);
@@ -1112,7 +1112,7 @@ unlink("${CREATED_FILES_PATH}")`,
             }
           }
         } catch {
-          /* not a data frame — fall through to text print */
+          /* not a data frame, fall through to text print */
         }
 
         if (!emittedHtml) {
@@ -1139,7 +1139,7 @@ unlink("${CREATED_FILES_PATH}")`,
               bmp.close();
             }
           } catch {
-            /* print failed — ignore */
+            /* print failed, ignore */
           }
         }
       }
@@ -1150,7 +1150,7 @@ unlink("${CREATED_FILES_PATH}")`,
 
   /**
    * Returns files created during the run that should appear in the Files
-   * pane — currently the destinations written by our download.file()
+   * pane, currently the destinations written by our download.file()
    * override, recorded in CREATED_FILES_PATH. Paths are returned relative
    * to the WebR home directory (the playground's working directory) so they
    * line up with the names shown in the Files pane. The tracking list is
@@ -1163,7 +1163,7 @@ unlink("${CREATED_FILES_PATH}")`,
     try {
       listBytes = await this.webR.FS.readFile(CREATED_FILES_PATH);
     } catch {
-      // No download happened this run — the tracking file doesn't exist.
+      // No download happened this run, the tracking file doesn't exist.
       return out;
     }
 
@@ -1185,7 +1185,7 @@ unlink("${CREATED_FILES_PATH}")`,
           : (abs.split("/").pop() ?? abs);
         if (rel) out.set(rel, bytes);
       } catch {
-        // File was removed before we read it back — skip it.
+        // File was removed before we read it back, skip it.
       }
     }
 
@@ -1202,7 +1202,7 @@ unlink("${CREATED_FILES_PATH}")`,
 // ─── styler-based code formatter ─────────────────────────────────────────
 //
 // The playground's "Format code" button calls rAdapter.formatCode(), which
-// pretty-prints the buffer with the {styler} package *inside WebR* — so, like
+// pretty-prints the buffer with the {styler} package *inside WebR*, so, like
 // everything else here, formatting runs entirely client-side in WebAssembly
 // with no server round-trip. styler and its dependency closure are served as
 // pre-built Wasm binaries from the same WebR CRAN-like repo used for ggplot2,
@@ -1218,7 +1218,7 @@ unlink("${CREATED_FILES_PATH}")`,
 let activeWebR: WebRInstance | null = null;
 let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;
 
-/** Forget `webR` if the formatter is set to reuse it — called when the
+/** Forget `webR` if the formatter is set to reuse it, called when the
  *  runtime that owns the session is disposed (registry eviction), so a
  *  later Format click lazily starts a fresh session instead of hitting a
  *  terminated worker. */
@@ -1263,7 +1263,7 @@ function ensureStyler(webR: WebRInstance): Promise<void> {
       await webR.installPackages(["styler"]);
       // Ensure /tmp exists (R_SESSION_SETUP makes it for the runtime, but a
       // dedicated formatter session skips that) and disable styler's on-disk
-      // cache — snippets are small, so it buys little and only litters the FS.
+      // cache, snippets are small, so it buys little and only litters the FS.
       await webR.evalRVoid(
         `suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 suppressMessages(try(styler::cache_deactivate(verbose = FALSE), silent = TRUE))`,
@@ -1282,7 +1282,7 @@ async function safeUnlink(webR: WebRInstance, paths: string[]): Promise<void> {
     try {
       await webR.FS.unlink(p);
     } catch {
-      /* file may not exist — ignore */
+      /* file may not exist, ignore */
     }
   }
 }
@@ -1324,7 +1324,7 @@ async function formatRWithStyler(code: string): Promise<string> {
   try {
     errBytes = await webR.FS.readFile(FMT_ERR);
   } catch {
-    errBytes = null; // no error file written — formatting succeeded
+    errBytes = null; // no error file written, formatting succeeded
   }
   if (errBytes && errBytes.byteLength > 0) {
     const msg = new TextDecoder().decode(errBytes).trim();
@@ -1349,12 +1349,12 @@ export const rAdapter: LanguageAdapter = {
     version: "4.6.0",
     engine: "WebR 0.6.0",
     engineUrl: "https://docs.r-wasm.org/webr/latest/",
-    notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
+    notes: "Runs entirely in the browser via WebAssembly, no server roundtrip.",
   },
   codeMirrorMode: "r",
   // R WASM image + base VFS, compressed transfer (webR 0.6).
   coldDownloadMB: 15,
-  // styler's tidyverse style (see formatCode) — keep in sync.
+  // styler's tidyverse style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,

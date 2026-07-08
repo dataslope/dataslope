@@ -1,5 +1,5 @@
 /**
- * Unit tests for the web-preview composition helpers (pure functions —
+ * Unit tests for the web-preview composition helpers (pure functions,
  * no iframe/browser machinery). The run lifecycle itself is exercised
  * end-to-end by the Playwright specs against real browsers.
  */

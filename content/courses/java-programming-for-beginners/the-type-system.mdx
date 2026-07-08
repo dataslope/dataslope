@@ -25,7 +25,7 @@ A whole category of bugs is caught before the program even starts.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three outlined type slots each hold a snugly matching solid shape — circle in circle, square in square, triangle in triangle — while a blue circle hovering over the last square slot is refused with a red cross: values only fit their declared type"
+  aria-label="Three outlined type slots each hold a snugly matching solid shape, circle in circle, square in square, triangle in triangle, while a blue circle hovering over the last square slot is refused with a red cross: values only fit their declared type"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="140" cy="130" r="28" fill="none" stroke="var(--ds-blue-500)" strokeWidth="2.5" />
@@ -145,7 +145,7 @@ int    a = 5;
 double b = a;        // OK: every int fits in a double
 ```
 
-The other direction — fitting a bigger type into a smaller one —
+The other direction, fitting a bigger type into a smaller one,
 *could* lose information, so Java refuses unless you explicitly
 ask:
 
@@ -169,7 +169,7 @@ horizontal velocity was converted to a 16-bit integer. Ariane 5 flew
 faster than Ariane 4, the value no longer fit, the conversion
 overflowed, the resulting error shut down the guidance computers, and
 the rocket was lost. Java's insistence that narrowing conversions be
-explicit — visible, greppable, reviewable — exists precisely so that
+explicit, visible, greppable, reviewable, exists precisely so that
 this kind of silent information loss cannot hide in a million-line
 codebase.
 
@@ -216,7 +216,7 @@ support (the `""` literal, the `+` concatenation operator) that
 beginners often think of it as primitive. Worth knowing:
 
 - A string literal `"hello"` is an instance of the `String` class.
-- Strings are **immutable** — once created, their contents cannot
+- Strings are **immutable**, once created, their contents cannot
   change. `s = s + "!"` does not change the old string; it creates a
   new one and points `s` at it.
 - Common methods: `s.length()`, `s.toUpperCase()`, `s.toLowerCase()`,
@@ -342,5 +342,5 @@ where F is the \`double\` value and R is the cast-to-int value.`}
 />
 
 Types are how Java holds the structure of your program steady while
-it grows. Next we learn how programs *make decisions* — `if`,
+it grows. Next we learn how programs *make decisions*, `if`,
 `else`, and the various forms of looping.

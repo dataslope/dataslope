@@ -11,10 +11,10 @@ then the concept checks.
 
 ### Batch vs online (real-time) inference?
 
-**Batch** precomputes predictions on a schedule and stores them — simple,
+**Batch** precomputes predictions on a schedule and stores them, simple,
 cheap, high-throughput, but stale and unable to use request-time
 features. **Online** serves predictions per request behind a low-latency
-service — fresh and contextual, but you own latency budgets, scaling, and
+service, fresh and contextual, but you own latency budgets, scaling, and
 availability. Choose by the latency and freshness the product needs;
 hybrids (cached batch features + online scoring) are common.
 
@@ -37,7 +37,7 @@ production underperforms. Fix it by sharing one feature-computation path
 
 Track **operational** health (latency, error rate, throughput) and
 **model** health: input feature distributions (data drift), prediction
-distribution, and — when labels arrive — live accuracy/precision. Alert
+distribution, and, when labels arrive, live accuracy/precision. Alert
 on drift and degradation, log inputs/predictions for debugging, and have
 a retraining + rollback path.
 
@@ -61,16 +61,16 @@ ready for instant **rollback**.
 In **A/B testing** real users receive predictions from one of two (or
 more) model variants, and business metrics (click-through, conversion)
 are compared. In **shadow testing** the challenger runs silently in
-parallel — users only see the champion's predictions. A/B tests measure
+parallel, users only see the champion's predictions. A/B tests measure
 real impact; shadow tests verify parity in outputs and latency before any
 user exposure.
 
 ### How do you trigger model retraining?
 
-Common triggers: (1) **schedule** — retrain weekly/monthly regardless;
-(2) **drift alert** — statistical test on input or output distribution
-exceeds a threshold; (3) **performance degradation** — live accuracy or
-a proxy metric drops below a threshold; (4) **data volume** — enough new
+Common triggers: (1) **schedule**, retrain weekly/monthly regardless;
+(2) **drift alert**, statistical test on input or output distribution
+exceeds a threshold; (3) **performance degradation**, live accuracy or
+a proxy metric drops below a threshold; (4) **data volume**, enough new
 labeled examples have accumulated. Automated pipelines combine monitoring
 with training orchestration (Airflow, Kubeflow, SageMaker Pipelines).
 
@@ -130,17 +130,17 @@ distribution). Careful logging and held-out exploration help mitigate these.
 
 ### How do you reduce model serving latency?
 
-Techniques: (1) **model compression** — pruning, knowledge distillation,
+Techniques: (1) **model compression**, pruning, knowledge distillation,
 quantization; (2) **batching requests** at the server to amortize overhead;
 (3) **caching** repeated inputs (hashing the feature vector); (4)
-**hardware** — GPU/TPU for neural models, specialized inference runtimes
+**hardware**, GPU/TPU for neural models, specialized inference runtimes
 (TensorRT, ONNX Runtime); (5) **co-locating** the model with calling
 services to cut network hops; (6) using simpler, smaller models for
 latency-sensitive paths.
 
 ### When should you use GPU vs CPU for model serving?
 
-GPUs excel at high-throughput, parallelizable workloads — large batch
+GPUs excel at high-throughput, parallelizable workloads, large batch
 neural inference, transformer models, image/video processing. CPUs are
 better for low-latency single-request serving of lightweight models
 (tree ensembles, logistic regression, small embeddings), where the GPU
@@ -170,7 +170,7 @@ models in production while retaining accuracy close to a large teacher.
 An ML continuous integration and continuous delivery (CI/CD) pipeline
 typically includes: (1) **data validation** on new data; (2) **unit and
 integration tests** for feature transforms and preprocessing code; (3)
-**training run** on a versioned dataset; (4) **evaluation gate** — the new
+**training run** on a versioned dataset; (4) **evaluation gate**, the new
 model must beat the incumbent on a holdout set; (5) **model registry
 promotion**; (6) **staged rollout** (canary, then full).
 Infrastructure-as-code (Terraform, CDK) provisions training and serving
@@ -215,7 +215,7 @@ incumbent (rollback). It is the standard step after shadow validation.
 
 Keep the previous model artifact in the registry with its serving
 configuration. Most serving platforms (SageMaker, Vertex, Kubernetes +
-Seldon) support blue/green or weighted traffic switching — flipping back
+Seldon) support blue/green or weighted traffic switching, flipping back
 to the old version is a configuration change, not a re-deployment. Ensure
 that any downstream state (feature store writes, A/B assignment logs) is
 accounted for when rolling back.
@@ -231,22 +231,22 @@ model version.
 
 ### Sketch a fraud detection ML system.
 
-Key components: (1) **feature engineering** — transaction amount,
+Key components: (1) **feature engineering**, transaction amount,
 merchant category, time-since-last-transaction, velocity features (number
 of transactions in last 1 h / 24 h), device and location signals;
-(2) **model** — gradient boosting for tabular data or a neural network
-for sequence modeling; (3) **serving** — low-latency online inference
-(sub-100 ms at authorization time); (4) **labels** — confirmed fraud
-from chargebacks (delayed); (5) **monitoring** — precision/recall with
+(2) **model**, gradient boosting for tabular data or a neural network
+for sequence modeling; (3) **serving**, low-latency online inference
+(sub-100 ms at authorization time); (4) **labels**, confirmed fraud
+from chargebacks (delayed); (5) **monitoring**, precision/recall with
 a delayed label pipeline, distribution drift on velocity features.
 
 ### Sketch a recommendation / ranking system.
 
-The standard two-stage design: (1) **retrieval** — a lightweight model
+The standard two-stage design: (1) **retrieval**, a lightweight model
 (embedding nearest-neighbour search) narrows millions of items to
-hundreds of candidates; (2) **ranking** — a heavier model (gradient
+hundreds of candidates; (2) **ranking**, a heavier model (gradient
 boosting or neural network) scores each candidate on click/purchase
-probability using rich cross features; (3) **re-ranking** — business
+probability using rich cross features; (3) **re-ranking**, business
 rules (diversity, freshness, promotions); (4) **feature store** for
 real-time user and item features; (5) A/B testing on ranking model
 variants tied to business metrics (revenue, engagement).
@@ -267,7 +267,7 @@ flowchart TD
 
 **Offline** features are computed in batch jobs over historical data
 (Spark, BigQuery) and stored in the offline store for training. **Online**
-features are computed in real time at request time — either looked up from
+features are computed in real time at request time, either looked up from
 the online store (pre-computed and refreshed) or computed on-the-fly from
 request context (e.g., session recency). Consistency between offline
 training features and online serving features is the core challenge.
@@ -296,7 +296,7 @@ $$\text{PSI} = \sum_i (\text{cur}_i - \text{ref}_i)\,\ln\frac{\text{cur}_i}{\tex
 The `compute_psi` function below implements exactly this: it bins the
 reference (training) distribution into deciles via `np.percentile`,
 compares the fraction of examples per bucket between `reference` and
-`current`, and returns the summed PSI value — the demo prints a `stable`
+`current`, and returns the summed PSI value, the demo prints a `stable`
 case under 0.1 and a `drifted` case above 0.2.
 
 <CodeBlock
@@ -340,7 +340,7 @@ replicas warm up.
   markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and the trade-off?
 
 - Batch inference: precompute nothing and recompute per request offline.
-  > "Batch" means precomputing on a schedule — it can't answer a live 50 ms request on fresh inputs by itself.
+  > "Batch" means precomputing on a schedule, it can't answer a live 50 ms request on fresh inputs by itself.
 - [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity vs batch's simplicity.
   > Sub-second per-request predictions require an online service, taking on latency/availability/scaling concerns.
 - It doesn't matter; latency is never a modeling concern.
@@ -359,7 +359,7 @@ replicas warm up.
 - Overfitting; fix with more regularization.
   > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
 - Label leakage; fix by removing the label.
-  > Leakage is using future/target info as a feature — a different failure.`}
+  > Leakage is using future/target info as a feature, a different failure.`}
 />
 
 <MultipleChoice
@@ -367,7 +367,7 @@ replicas warm up.
 
 - The model file became corrupted; redeploy the same model.
   > Static artifacts don't rot; redeploying won't help if the input distribution shifted.
-- [o] Data/concept drift — the input distribution or input→label relationship shifted; monitor and retrain on recent data.
+- [o] Data/concept drift, the input distribution or input→label relationship shifted; monitor and retrain on recent data.
   > Real-world distributions change, so a once-good model decays; production ML monitors and retrains/alerts on drift.
 - Nothing is wrong; model metrics never change in production.
   > Silent degradation from drift is one of the most common production failures.

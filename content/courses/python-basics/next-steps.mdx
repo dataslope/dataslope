@@ -8,7 +8,7 @@ You now know enough Python to write real programs: variables and collections, co
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="An abstract arrangement of brand shapes — a pale blue disc, a bold green ring overlapping it, a solid yellow circle, a small blue dot, and a tilted yellow bar — closing the course on a playful, open-ended note"
+  aria-label="An abstract arrangement of brand shapes, a pale blue disc, a bold green ring overlapping it, a solid yellow circle, a small blue dot, and a tilted yellow bar, closing the course on a playful, open-ended note"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -148,9 +148,9 @@ asyncio.run(main())
 
 Python dominates backend web development. The big three:
 
-- **[FastAPI](https://fastapi.tiangolo.com/)** — Modern, typed HTTP APIs with automatic OpenAPI docs. Uses async under the hood. The current favorite for new API projects.
-- **[Flask](https://flask.palletsprojects.com/)** — Tiny, minimal, flexible. Great for small services and learning.
-- **[Django](https://www.djangoproject.com/)** — Full-stack framework with batteries included: ORM, admin panel, auth, forms, migrations. Powers Instagram, Spotify, and countless others.
+- **[FastAPI](https://fastapi.tiangolo.com/)**, Modern, typed HTTP APIs with automatic OpenAPI docs. Uses async under the hood. The current favorite for new API projects.
+- **[Flask](https://flask.palletsprojects.com/)**, Tiny, minimal, flexible. Great for small services and learning.
+- **[Django](https://www.djangoproject.com/)**, Full-stack framework with batteries included: ORM, admin panel, auth, forms, migrations. Powers Instagram, Spotify, and countless others.
 
 ```python
 # FastAPI example (install with: pip install fastapi uvicorn)
@@ -176,12 +176,12 @@ def read_item(item_id: int, q: str = None):
 
 Python's killer app. The ecosystem is massive:
 
-- **[pandas](https://pandas.pydata.org/)** / **[polars](https://pola.rs/)** — DataFrames for tabular data.
-- **[NumPy](https://numpy.org/)** — Numerical arrays, the foundation of scientific Python.
-- **[Matplotlib](https://matplotlib.org/)** / **[Plotly](https://plotly.com/)** / **[Seaborn](https://seaborn.pydata.org/)** — Visualization.
-- **[scikit-learn](https://scikit-learn.org/)** — Classical machine learning (regression, classification, clustering, etc.).
-- **[PyTorch](https://pytorch.org/)** / **[TensorFlow](https://www.tensorflow.org/)** — Deep learning.
-- **[Jupyter](https://jupyter.org/)** — Interactive notebooks for exploration and prototyping.
+- **[pandas](https://pandas.pydata.org/)** / **[polars](https://pola.rs/)**, DataFrames for tabular data.
+- **[NumPy](https://numpy.org/)**, Numerical arrays, the foundation of scientific Python.
+- **[Matplotlib](https://matplotlib.org/)** / **[Plotly](https://plotly.com/)** / **[Seaborn](https://seaborn.pydata.org/)**, Visualization.
+- **[scikit-learn](https://scikit-learn.org/)**, Classical machine learning (regression, classification, clustering, etc.).
+- **[PyTorch](https://pytorch.org/)** / **[TensorFlow](https://www.tensorflow.org/)**, Deep learning.
+- **[Jupyter](https://jupyter.org/)**, Interactive notebooks for exploration and prototyping.
 
 <CodeBlock
   adapter="python"
@@ -205,18 +205,18 @@ print(df[df["age"] > 28])
 />
 
 <Callout type="success" title="Python owns data">
-If you work with data — analysis, visualization, modeling, ETL pipelines — Python is the lingua franca. pandas, NumPy, and scikit-learn are the most-used libraries on PyPI. Learning them opens doors to data science, ML engineering, and analytics roles.
+If you work with data, analysis, visualization, modeling, ETL pipelines, Python is the lingua franca. pandas, NumPy, and scikit-learn are the most-used libraries on PyPI. Learning them opens doors to data science, ML engineering, and analytics roles.
 </Callout>
 
 ### Automation and scripting
 
 Python excels at gluing systems together:
 
-- **[requests](https://requests.readthedocs.io/)** — HTTP requests (APIs, scraping).
-- **[BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)** / **[lxml](https://lxml.de/)** — HTML/XML parsing.
-- **[Selenium](https://www.selenium.dev/documentation/)** / **[Playwright](https://playwright.dev/python/)** — Browser automation.
-- **[Click](https://click.palletsprojects.com/)** / **[Typer](https://typer.tiangolo.com/)** — Building CLI tools.
-- **[schedule](https://schedule.readthedocs.io/)** / **[APScheduler](https://apscheduler.readthedocs.io/)** — Task scheduling.
+- **[requests](https://requests.readthedocs.io/)**, HTTP requests (APIs, scraping).
+- **[BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)** / **[lxml](https://lxml.de/)**, HTML/XML parsing.
+- **[Selenium](https://www.selenium.dev/documentation/)** / **[Playwright](https://playwright.dev/python/)**, Browser automation.
+- **[Click](https://click.palletsprojects.com/)** / **[Typer](https://typer.tiangolo.com/)**, Building CLI tools.
+- **[schedule](https://schedule.readthedocs.io/)** / **[APScheduler](https://apscheduler.readthedocs.io/)**, Task scheduling.
 
 ```python
 # Example: fetch JSON from an API
@@ -238,8 +238,8 @@ If you want to share your code or publish a library:
 
 For self-contained executables (to share with non-Python users), look at:
 
-- **[PyInstaller](https://pyinstaller.org/)** — Bundles Python + your code + dependencies into a single executable.
-- **[shiv](https://shiv.readthedocs.io/)** / **[pex](https://pex.readthedocs.io/)** — Python-based executable zip archives.
+- **[PyInstaller](https://pyinstaller.org/)**, Bundles Python + your code + dependencies into a single executable.
+- **[shiv](https://shiv.readthedocs.io/)** / **[pex](https://pex.readthedocs.io/)**, Python-based executable zip archives.
 
 <Callout type="info" title="uv makes publishing easy">
 \`uv\` (from Astral) supports \`uv publish\` to push packages to PyPI in one command. As the Python tooling ecosystem modernizes, workflows that used to require multiple tools are converging into single, fast commands.
@@ -249,10 +249,10 @@ For self-contained executables (to share with non-Python users), look at:
 
 Modern Python projects use a suite of automated tools to enforce code quality:
 
-- **[ruff](https://docs.astral.sh/ruff/)** — Linting, import sorting, and (as of 2024) formatting. Replaces `flake8`, `isort`, `black`, and more. Rust-based, instant.
-- **[mypy](https://mypy.readthedocs.io/)** / **[pyright](https://microsoft.github.io/pyright/)** — Static type checking.
-- **[pre-commit](https://pre-commit.com/)** — Runs linters/formatters automatically before every commit.
-- **[uv](https://docs.astral.sh/uv/)** — Replaces `pip`, `pip-tools`, and `venv` with one fast Rust binary.
+- **[ruff](https://docs.astral.sh/ruff/)**, Linting, import sorting, and (as of 2024) formatting. Replaces `flake8`, `isort`, `black`, and more. Rust-based, instant.
+- **[mypy](https://mypy.readthedocs.io/)** / **[pyright](https://microsoft.github.io/pyright/)**, Static type checking.
+- **[pre-commit](https://pre-commit.com/)**, Runs linters/formatters automatically before every commit.
+- **[uv](https://docs.astral.sh/uv/)**, Replaces `pip`, `pip-tools`, and `venv` with one fast Rust binary.
 
 Example `.pre-commit-config.yaml`:
 
@@ -305,7 +305,7 @@ If you want to cement what you've learned, try building:
 5. **A library you publish to PyPI**: Write tests, set up `pyproject.toml`, push to GitHub with a CI workflow (GitHub Actions), and publish with `twine` or `uv publish`.
 
 <Callout type="success" title="Build to learn">
-The fastest way to internalize Python is to build something that matters to you. Pick a small, concrete project — a tool you'd actually use — and build it. You'll learn more from one real project than from ten tutorials.
+The fastest way to internalize Python is to build something that matters to you. Pick a small, concrete project, a tool you'd actually use, and build it. You'll learn more from one real project than from ten tutorials.
 </Callout>
 
 ## Roadmap by interest
@@ -326,7 +326,7 @@ Depending on where you want to go:
 
 - You now know everything there is to know about Python.
   > Nobody does. Python is huge, the ecosystem keeps moving, and there are always new frameworks and techniques to explore.
-- [o] You have a solid foundation — core syntax, collections, functions, classes, generators, decorators — and you're ready to start building real projects.
+- [o] You have a solid foundation, core syntax, collections, functions, classes, generators, decorators, and you're ready to start building real projects.
   > That's exactly what a "basics" course is for. The fundamentals you've learned here apply to every Python project you'll touch.
 - You should keep reading tutorials before writing any real code.
   > The opposite is true. The best way to consolidate what you've learned is to build something, even something small.
@@ -335,7 +335,7 @@ Depending on where you want to go:
 />
 
 <Callout type="info" title="Keep going">
-You've finished Python Basics. The next step is to pick a direction — web, data, ML, automation, whatever excites you — and start building. The fundamentals you've learned here will serve you everywhere. Good luck, and happy hacking.
+You've finished Python Basics. The next step is to pick a direction, web, data, ML, automation, whatever excites you, and start building. The fundamentals you've learned here will serve you everywhere. Good luck, and happy hacking.
 </Callout>
 
 Thank you for reading. Whatever you build next, make it count.

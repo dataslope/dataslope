@@ -68,7 +68,7 @@ export function HomeFooter() {
     <footer className="mt-24">
       <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pb-28">
         <div className="ds-footer-grid">
-          {/* Column 1 — logo (no wordmark) + GitHub at the bottom. */}
+          {/* Column 1, logo (no wordmark) + GitHub at the bottom. */}
           <div className="flex flex-col justify-between gap-8">
             <Link href="/" aria-label="Dataslope home" className="inline-flex">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -96,7 +96,7 @@ export function HomeFooter() {
             </a>
           </div>
 
-          {/* Column 2 — development pages. */}
+          {/* Column 2, development pages. */}
           <div className="flex flex-col gap-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Development
@@ -106,7 +106,7 @@ export function HomeFooter() {
             ))}
           </div>
 
-          {/* Column 3 — resources. */}
+          {/* Column 3, resources. */}
           <div className="flex flex-col gap-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Resources

@@ -1,13 +1,13 @@
 ---
 title: Encapsulation
-description: Hiding internal state behind a small, deliberate interface — and why that one habit is the foundation of every other OOP idea
+description: Hiding internal state behind a small, deliberate interface, and why that one habit is the foundation of every other OOP idea
 ---
 
 **Encapsulation** is the practice of *hiding an object's internal
 state* and only allowing the world to interact with it through a
 small, deliberate set of methods. It is the first and most important
-discipline of OOP. Everything else in this course — inheritance,
-polymorphism, composition, design patterns — only pays off if your
+discipline of OOP. Everything else in this course, inheritance,
+polymorphism, composition, design patterns, only pays off if your
 objects are well-encapsulated.
 
 The word itself is a metaphor. A capsule has a shell that protects
@@ -18,7 +18,7 @@ shell of methods, and the data inside is none of your business.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A cell with a translucent membrane keeps its state dots inside; a yellow message enters only through a blue gate — state hidden, methods exposed"
+  aria-label="A cell with a translucent membrane keeps its state dots inside; a yellow message enters only through a blue gate, state hidden, methods exposed"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -68,8 +68,8 @@ flowchart LR
 ```
 
 All access to the balance goes through the methods. Inside `deposit`
-and `withdraw`, the class can enforce its rules — no negative deposits,
-no overdrafts — once, in one place.
+and `withdraw`, the class can enforce its rules, no negative deposits,
+no overdrafts, once, in one place.
 
 ## The two failure modes
 
@@ -91,7 +91,7 @@ Look at this *anti-example* and notice every way it can go wrong.
 }
 
 class OpenAccount {
-  public double balance; // public field — total exposure
+  public double balance; // public field, total exposure
 }
 `,
     },
@@ -126,7 +126,7 @@ Encapsulation fixes both at once.
 }
 
 class BankAccount {
-  private double balance; // hidden — outsiders cannot touch it
+  private double balance; // hidden, outsiders cannot touch it
 
   public void deposit(double amount) {
     if (amount <= 0)
@@ -202,7 +202,7 @@ A `BankAccount` should not have `setBalance(double)`. That throws
 away the whole point. It should have `deposit` and `withdraw`,
 methods named after *what the world is actually allowed to do.* The
 right question to ask when designing a class is **"what should
-callers be able to do?"** — not **"what fields does it have?"**.
+callers be able to do?"**, not **"what fields does it have?"**.
 
 <Callout type="info" title="`final` fields lean on encapsulation">
 `private final` is a very common combination: the field is invisible
@@ -231,10 +231,10 @@ allowed temperature range and a current setting. Outsiders can
     t.setTarget(75);
     System.out.println(t.describe());
 
-    t.setTarget(120); // out of range — clamped
+    t.setTarget(120); // out of range, clamped
     System.out.println(t.describe());
 
-    t.setTarget(-10); // out of range — clamped
+    t.setTarget(-10); // out of range, clamped
     System.out.println(t.describe());
   }
 }
@@ -245,7 +245,7 @@ allowed temperature range and a current setting. Outsiders can
       starterCode: `public class Thermostat {
   private final int minF;
   private final int maxF;
-  private int target; // not final — changes over time
+  private int target; // not final, changes over time
 
   public Thermostat(int minF, int maxF, int initialTarget) {
     if (minF >= maxF)
@@ -377,7 +377,7 @@ balance=20
 - Public fields take up more memory
   > Access modifiers do not change storage size.
 - Public fields cannot be read
-  > They can be read and written from anywhere — that's the problem.
+  > They can be read and written from anywhere, that's the problem.
 - [o] Any code anywhere can modify the field, so the class cannot enforce its own invariants
   > Encapsulation exists precisely so the *class* owns the rules about its data.
 - The compiler refuses to compile a class with public fields
@@ -388,7 +388,7 @@ balance=20
   markdown={`Which is the *best* sign that a class is well-encapsulated?
 
 - It has a getter and setter for every field
-  > That is often a sign of *bad* encapsulation — the API mirrors the storage instead of the behavior.
+  > That is often a sign of *bad* encapsulation, the API mirrors the storage instead of the behavior.
 - Its constructors throw exceptions on invalid input
   > Helpful, but only part of the picture.
 - [o] Its public methods are named for behaviors callers actually need, and its fields are \`private\`
@@ -407,5 +407,5 @@ balance=20
 - [o] Because it is internal plumbing that callers never need to see, and hiding it keeps the public API small and intentional
   > Keeping helpers private prevents accidental coupling to internal details.
 - Because \`public\` methods cannot call \`private\` ones
-  > Public methods *can* call private methods of the same class — that is normal.`}
+  > Public methods *can* call private methods of the same class, that is normal.`}
 />

@@ -13,7 +13,7 @@ Garbage cannot get in if the schema forbids it.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A green shield arc curves in front of a table, deflecting red shards while the clean data inside stays intact — quality enforced by the design itself"
+  aria-label="A green shield arc curves in front of a table, deflecting red shards while the clean data inside stays intact, quality enforced by the design itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -150,7 +150,7 @@ flowchart TD
 If a due date is stored as arbitrary text, the database cannot know
 whether `soon` is a valid date.
 
-Encoding meaning into data is not a pedantic habit — entire missions
+Encoding meaning into data is not a pedantic habit, entire missions
 have failed for lack of it. In 1999, NASA lost the Mars Climate
 Orbiter, a $125 million spacecraft, because one piece of ground
 software produced thruster data in pound-force units while the
@@ -160,8 +160,8 @@ just numbers, and they were silently wrong by a factor of about 4.45.
 The spacecraft skimmed too deep into the Martian atmosphere and was
 destroyed. A database column is a chance to do better: a type, a
 clear name like `total_cents` or `mass_kg`, and a constraint together
-say not just *here is a number* but *here is what this number means*
-— so that the wrong kind of value cannot quietly pass for the right
+say not just *here is a number* but *here is what this number means*,
+so that the wrong kind of value cannot quietly pass for the right
 one.
 
 ## Normalization protects consistency

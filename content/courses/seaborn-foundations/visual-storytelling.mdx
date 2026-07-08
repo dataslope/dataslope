@@ -1,10 +1,10 @@
 ---
 title: Telling a Story with Data
-description: From exploration to communication — choose the right chart, cut the clutter, and guide the reader's eye.
+description: From exploration to communication, choose the right chart, cut the clutter, and guide the reader's eye.
 ---
 
 Up to now most of your charts have been for an audience of one: **you**.
-Exploratory charts are fast, messy, and disposable — you draw twenty of them
+Exploratory charts are fast, messy, and disposable, you draw twenty of them
 to *find* the interesting thing. But the moment you want to *show* that
 thing to someone else, the job changes completely. The chart stops being a
 tool for looking and becomes a tool for **persuading**.
@@ -18,7 +18,7 @@ different.
 
 <Figure
   slug="a-risograph-of-beautiful-sea"
-  alt="A risograph of a calm, beautiful sea — a reminder that a good explanatory chart should feel effortless to read"
+  alt="A risograph of a calm, beautiful sea, a reminder that a good explanatory chart should feel effortless to read"
 />
 
 <svg
@@ -69,7 +69,7 @@ different.
 
 Before any polish, the picture has to be the *right kind* of picture. Most
 chart choices follow directly from the **question** you are asking and the
-**types** of the variables involved. This table is your starting map — it
+**types** of the variables involved. This table is your starting map, it
 covers the families this course teaches:
 
 | Your question | Chart family | Seaborn entry point |
@@ -84,7 +84,7 @@ covers the families this course teaches:
 Read it as *question → family*. "Relationship between two numbers" almost
 always means a scatter (or a line, if the x-axis is ordered like time). "One
 distribution" means a histogram, KDE, or ECDF. "Compare a number across
-groups" means bar, box, or violin — depending on how much of the
+groups" means bar, box, or violin, depending on how much of the
 distribution you want to show. The point is to let the *question* pick the
 chart, not habit or whichever function you remember first.
 
@@ -138,7 +138,7 @@ sns.despine()
 ## Guide the reader's eye
 
 A cluttered chart treats every mark as equally important. An explanatory
-chart does not — it has *one* point to make, and it should steer attention
+chart does not, it has *one* point to make, and it should steer attention
 straight to it. The most effective tool is **contrast**: make the one thing
 you care about stand out and let everything else recede.
 
@@ -186,12 +186,12 @@ g.figure.subplots_adjust(top=0.88)
 
 A short text annotation can do the same job: one arrow or label on the
 single most important point says "look here" far more clearly than hoping
-the reader finds it. The principle is the same either way — **spend
+the reader finds it. The principle is the same either way, **spend
 contrast on the one thing that matters, and nothing else.**
 
 ## Be honest
 
-A chart that misleads — even by accident — costs you the reader's trust the
+A chart that misleads, even by accident, costs you the reader's trust the
 moment they notice. A few rules keep you honest:
 
 - **Do not truncate axes to exaggerate.** Starting a bar chart's y-axis at
@@ -219,13 +219,13 @@ job. Two habits cover most of it:
 - **Use colorblind-friendly palettes.** Roughly 1 in 12 men has some form of
   color-vision deficiency, and the default red/green contrast is exactly the
   hard case. Seaborn ships a `palette="colorblind"` option designed to stay
-  distinguishable. (Choosing palettes well — qualitative, sequential,
-  diverging, and colorblind-safe — is the subject of the color palettes
+  distinguishable. (Choosing palettes well, qualitative, sequential,
+  diverging, and colorblind-safe, is the subject of the color palettes
   page.)
 - **Never rely on color *alone*.** If color is the only thing separating two
   groups, anyone who can't distinguish those colors loses the message.
-  Reinforce it with a second channel — different marker shapes (`style=`),
-  direct labels, or facets (`col=`) — so the distinction survives in
+  Reinforce it with a second channel, different marker shapes (`style=`),
+  direct labels, or facets (`col=`), so the distinction survives in
   grayscale too.
 
 <MultipleChoice
@@ -234,7 +234,7 @@ example, one red line and one green line with no other difference)?
 
 - Seaborn cannot draw two colors on the same axes.
   > Seaborn draws multiple colors easily; the concern is whether every reader can *tell them apart*.
-- [o] Readers with color-vision deficiency — or anyone viewing it in grayscale — may not be able to tell the groups apart.
+- [o] Readers with color-vision deficiency, or anyone viewing it in grayscale, may not be able to tell the groups apart.
   > Color alone fails for colorblind readers and in black-and-white printouts; a second channel like marker shape or a direct label keeps the distinction readable.
 - Colored lines are always less accurate than black lines.
   > Accuracy comes from the data and encoding, not the line color; the issue is perceptual distinguishability.
@@ -248,7 +248,7 @@ depend on a reader perceiving specific colors.`}
 ## Make the title say the message
 
 On an exploratory chart, a title like "Body mass vs. flipper length" is
-fine — it just names the axes for you. On an **explanatory** chart, that is
+fine, it just names the axes for you. On an **explanatory** chart, that is
 a wasted line. The title is the most-read text on the figure, so spend it on
 the **takeaway**, not a restatement of the axes.
 
@@ -256,7 +256,7 @@ the **takeaway**, not a restatement of the axes.
 - Message-stating (explanatory): *"Heavier penguins have longer flippers"*
 
 The second title tells the reader what to conclude *before* they have
-decoded a single dot — and the chart then confirms it. A good test: if your
+decoded a single dot, and the chart then confirms it. A good test: if your
 title could sit on top of a completely different dataset's chart, it is
 naming axes, not stating a message.
 
@@ -282,7 +282,7 @@ chart, it is only naming axes.`}
 Let's build a single explanatory figure end to end. The message: **heavier
 penguins tend to have longer flippers.** We pick the right chart (a scatter,
 since both variables are numeric), declutter (clean style, despine), keep it
-to a modest size, label the axes with units, and — most importantly — give
+to a modest size, label the axes with units, and, most importantly, give
 it a message-style title.
 
 <CodeBlock
@@ -323,7 +323,7 @@ chart you *explored* with and a chart you can *show*.
 <Callout type="tip" title="The explanatory checklist">
 Before you ship a chart: (1) does the chart *type* fit the question? (2)
 have you removed everything that isn't carrying meaning? (3) does *one*
-element stand out as the point? (4) is it honest — full axes, distribution
+element stand out as the point? (4) is it honest, full axes, distribution
 shown, units labeled? (5) does the *title* state the message? Five quick
 questions turn an exploratory sketch into a communicative figure.
 </Callout>
@@ -396,7 +396,7 @@ ax.set_title("Heavier penguins have longer flippers")
 - Exploratory charts must be black and white; explanatory charts must be colorful.
   > Color is a design choice in both; it does not define the distinction.
 - Explanatory charts always contain more data than exploratory ones.
-  > Explanatory charts usually contain *less* — they remove everything that isn't carrying the message.
+  > Explanatory charts usually contain *less*, they remove everything that isn't carrying the message.
 
 The split is about audience and intent: discovering for yourself versus
 communicating to others.`}
@@ -407,7 +407,7 @@ communicating to others.`}
 reader's attention to the single most important group?
 
 - Give every group its own bright, distinct color.
-  > Coloring everything makes all groups compete equally, so nothing stands out — the opposite of guiding attention.
+  > Coloring everything makes all groups compete equally, so nothing stands out, the opposite of guiding attention.
 - [o] Use one accent color (or a short annotation) for that group and gray out the rest.
   > A single point of contrast against neutral context makes the eye land on the important element immediately while the rest still provides background.
 - Add gridlines and a heavy border to frame the chart.
@@ -433,7 +433,7 @@ clearer." Why is this a problem?
 - Truncating the axis is fine for bars but not for line plots.
   > It is the reverse: truncation can be a legitimate zoom on a *position*-based line plot, but it distorts length-based bars.
 
-Bars compare lengths, so a non-zero baseline inflates differences — keep bar
+Bars compare lengths, so a non-zero baseline inflates differences, keep bar
 axes anchored at zero.`}
 />
 
@@ -446,7 +446,7 @@ improvement for accessibility?
   > Thicker lines do not help a reader who cannot distinguish red from green; the groups still differ only by color.
 - Switch the background to dark.
   > A dark background changes the look but does not add a non-color way to tell the two lines apart.
-- [o] Add a second distinguishing channel — different line styles or direct labels — and use a colorblind-friendly palette.
+- [o] Add a second distinguishing channel, different line styles or direct labels, and use a colorblind-friendly palette.
   > Encoding the difference with more than color (a dashed vs. solid line, or labeling each line) keeps the groups distinguishable for colorblind readers and in grayscale.
 - Remove the legend so readers focus on the lines.
   > Removing the legend makes the colors *harder* to interpret, not easier, and still leaves color as the only cue.
@@ -457,5 +457,5 @@ labels, or facets, and prefer a colorblind-safe palette.`}
 
 That completes the foundations: you can shape your data, pick the right
 chart, read what it reveals and hides, polish it, and edit it down to a clear
-message. From here it is practice — and the capstone is where you put the
+message. From here it is practice, and the capstone is where you put the
 whole workflow together on a fresh dataset.

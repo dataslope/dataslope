@@ -1,6 +1,6 @@
 ---
 title: Objects and Classes
-description: Your first Java class, instances, fields, and methods — and the difference between a blueprint and the thing built from it
+description: Your first Java class, instances, fields, and methods, and the difference between a blueprint and the thing built from it
 ---
 
 A **class** is a blueprint. An **object** is a thing built from that
@@ -11,7 +11,7 @@ words up.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A stencil sheet with a circular cut-out beside three solid circles printed from it, each carrying its own small state dot — the class is the description, objects are the things built from it"
+  aria-label="A stencil sheet with a circular cut-out beside three solid circles printed from it, each carrying its own small state dot, the class is the description, objects are the things built from it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -41,7 +41,7 @@ words up.
 Imagine an architect's blueprint for a house. The blueprint says
 "three bedrooms, two bathrooms, a kitchen." You cannot live in the
 blueprint. You can only live in a *house built from the blueprint*.
-And from the same blueprint you can build many houses — same shape,
+And from the same blueprint you can build many houses, same shape,
 different addresses, different colors, different families inside.
 
 ```mermaid
@@ -125,7 +125,7 @@ convention:
 | --- | --- |
 | **Fields** | The state every instance carries |
 | **Constructor(s)** | How to bring a valid new instance into existence |
-| **Methods** | The behavior — the messages instances respond to |
+| **Methods** | The behavior, the messages instances respond to |
 | (sometimes) **Static members** | Things that belong to the class as a whole, not to instances |
 
 We will meet static members in a later page. For now, almost
@@ -191,7 +191,7 @@ A few things are worth pointing out in `Book`:
   field is assigned in the constructor, it cannot be reassigned. We
   will study both ideas in detail in *Encapsulation*.
 - The methods `title()`, `author()`, `year()` are sometimes called
-  **accessors** or **getters** — they answer questions about the
+  **accessors** or **getters**, they answer questions about the
   object's state.
 - `olderThan(Book other)` takes another `Book` as a parameter and
   compares the two. Inside that method, `this.year` refers to *this
@@ -206,7 +206,7 @@ Every non-static method has an implicit parameter called `this`. It is
 `rex.describe()`, inside `describe`, `this` is `rex`. When you write
 `luna.describe()`, inside the *same* method body, `this` is `luna`.
 
-You usually don't have to type `this` — Java assumes it — but you
+You usually don't have to type `this`, Java assumes it, but you
 *must* type it when you have a parameter or local variable with the
 same name as a field, which is why constructors often look like
 `this.name = name;`.
@@ -247,7 +247,7 @@ class Counter {
   title="Build a Rectangle class"
   instructions={`Create a \`Rectangle\` with a \`width\` and \`height\` (both \`double\`). It must support \`area()\` and \`perimeter()\` methods.
 
-\`Main.java\` is already wired up — it constructs a \`Rectangle\` with width \`4\` and height \`3\` and prints two lines:
+\`Main.java\` is already wired up, it constructs a \`Rectangle\` with width \`4\` and height \`3\` and prints two lines:
 
 \`\`\`
 area: 12.0
@@ -391,7 +391,7 @@ a=3, b=1
   > Each instance has its own copy of the fields.
 - It is set to 0
   > Not modified at all.
-- [o] It stays the same — each object has its own copy of the fields
+- [o] It stays the same, each object has its own copy of the fields
   > \`age\` belongs to each instance individually.
 - The program raises an error
   > No error; instance fields are independent.`}

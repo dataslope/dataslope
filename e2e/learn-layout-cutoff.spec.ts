@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 /**
  * Regression test for the "top of the page is cut off" glitch on the /learn
- * (and /interview) routes — the same intermittent, refresh-fixed family as the
+ * (and /interview) routes, the same intermittent, refresh-fixed family as the
  * black-border bug in `learn-border-color.spec.ts`, one cascade layer up.
  *
  * Background
@@ -21,13 +21,13 @@ import { test, expect } from "@playwright/test";
  * after `md:hidden`, `flex` wins and the mobile navbar paints on desktop. Its
  * height is `--fd-header-height`, which is 0px on desktop, so the logo + search +
  * sidebar-toggle overflow a zero-height sticky bar and the top of the page looks
- * sliced off — the "negative top margin" symptom — until a hard refresh restores
+ * sliced off, the "negative top margin" symptom, until a hard refresh restores
  * the server cascade.
  *
  * The fix (`app/docs.css`) re-asserts the desktop-hidden invariant in an
  * *unlayered* rule (`@media (min-width: 48rem) { #nd-subnav { display: none } }`).
  * Unlayered styles outrank every `@layer`, so this beats the base-`flex` utility
- * regardless of how the App Router orders the chunks — while leaving the navbar
+ * regardless of how the App Router orders the chunks, while leaving the navbar
  * visible below 48rem, where it is the only navigation. (The companion
  * root-cause mitigation is `experimental.cssChunking: 'strict'` in next.config.)
  *
@@ -36,7 +36,7 @@ import { test, expect } from "@playwright/test";
  * Reproducing the non-deterministic chunk-order race by timing alone would be
  * flaky. Instead we reproduce the *cascade state* it produces, deterministically:
  * we append the base `flex` utility back into `@layer utilities` after the page
- * has loaded — the exact thing the reorder does — and assert the navbar stays
+ * has loaded, the exact thing the reorder does, and assert the navbar stays
  * hidden on desktop. Without the fix the appended rule wins and the navbar shows
  * (cutting off the top); with it, the unlayered rule holds.
  */
@@ -87,7 +87,7 @@ test("learn route: the mobile navbar is still shown below 48rem (fix does not ov
   await page.goto("/fumadocs-dev");
   await expect(page.locator("#nd-page")).toBeVisible();
 
-  // On mobile the navbar is the only navigation — the desktop-hide rule is
+  // On mobile the navbar is the only navigation, the desktop-hide rule is
   // scoped to ≥48rem, so it must remain visible here, even under the reorder.
   await page.evaluate((css) => {
     const s = document.createElement("style");

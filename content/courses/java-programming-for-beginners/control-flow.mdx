@@ -1,6 +1,6 @@
 ---
 title: Control Flow
-description: How programs make decisions and repeat themselves — if/else, switch, while, do-while, for, and the loops that quietly run the world
+description: How programs make decisions and repeat themselves, if/else, switch, while, do-while, for, and the loops that quietly run the world
 ---
 
 A program made only of straight-line statements is uninteresting. The
@@ -157,7 +157,7 @@ condition is checked **before** each pass.
 />
 
 `do-while` is the same, except the condition is checked **after**
-each pass — so the block always runs at least once.
+each pass, so the block always runs at least once.
 
 ```mermaid
 flowchart TB
@@ -177,9 +177,9 @@ flowchart TB
 
 `for` is the workhorse of loops. It packages three things on one line:
 
-1. **Initialization** — runs once at the start.
-2. **Condition** — checked before each pass.
-3. **Update** — runs at the end of each pass.
+1. **Initialization**, runs once at the start.
+2. **Condition**, checked before each pass.
+3. **Update**, runs at the end of each pass.
 
 <CodeBlock
   adapter="java"
@@ -287,7 +287,7 @@ run it and check.
   ]}
 />
 
-This is a *nested loop* — a loop inside a loop. Each value of the
+This is a *nested loop*, a loop inside a loop. Each value of the
 outer `i` triggers a full inner sweep over `j`. Read it slowly. The
 ability to mentally execute a nested loop is one of the major
 beginner milestones.
@@ -302,7 +302,7 @@ beginner milestones.
 - [o] \`while\` checks the condition before the first iteration; \`do-while\` checks after, so its body always runs at least once
   > The difference is purely *when* the condition is tested: before vs after the body.
 - \`do-while\` cannot have a condition
-  > It must have one — it's the trailing condition.`}
+  > It must have one, it's the trailing condition.`}
 />
 
 <MultipleChoice
@@ -323,7 +323,7 @@ beginner milestones.
 FizzBuzz started life as a children's counting game, but it has a
 strange second career in software. In 2007, developer Imran Ghory
 wrote that a surprising share of candidates applying for programming
-jobs — including some with degrees — could not solve it on a
+jobs, including some with degrees, could not solve it on a
 whiteboard, and proposed it as a minimal screening question. Jeff
 Atwood's follow-up post, "Why Can't Programmers.. Program?", turned
 it into the most famous interview question in the industry. The task

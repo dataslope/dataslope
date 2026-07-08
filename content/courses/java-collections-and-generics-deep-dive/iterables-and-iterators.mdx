@@ -1,6 +1,6 @@
 ---
 title: Iterables and Iterators
-description: The single contract — Iterable / Iterator — that unifies every container in the framework, and the for-each loop that rides on top of it
+description: The single contract, Iterable / Iterator, that unifies every container in the framework, and the for-each loop that rides on top of it
 ---
 
 If you ask "what makes the Java Collections Framework feel coherent?"
@@ -54,7 +54,7 @@ That is it. Two interfaces, four methods.
 
 - `Iterable<E>` says "I can produce a fresh `Iterator<E>` on
   demand."
-- `Iterator<E>` says "I am a cursor — ask me if there are more
+- `Iterator<E>` says "I am a cursor, ask me if there are more
   elements, then ask me for the next one."
 
 Every `List`, `Set`, `Queue`, and `Deque` in the JCF implements
@@ -164,7 +164,7 @@ public class IntRange implements Iterable<Integer> {
 Three observations:
 
 - The `Iterator` is created *fresh* by every call to `iterator()`.
-  That is why you can iterate the same `IntRange` twice — each
+  That is why you can iterate the same `IntRange` twice, each
   walk gets its own cursor.
 - `next()` is required to throw `NoSuchElementException` when called
   past the end. The contract is precise; library code relies on it.
@@ -195,7 +195,7 @@ public class Main {
     xs.add("b");
     xs.add("c");
 
-    // Two simultaneous walks — each has its own iterator,
+    // Two simultaneous walks, each has its own iterator,
     // so each has its own cursor.
     for (String outer : xs) {
       for (String inner : xs) {
@@ -212,9 +212,9 @@ public class Main {
 A list with a single cursor inside it could never produce that
 nested-loop output.
 
-**2. Streaming sources.** Some "iterables" are not collections at all
-— they are *generators*. A live stream of events, a file's lines, a
-network response — each can implement `Iterable` and produce a
+**2. Streaming sources.** Some "iterables" are not collections at all,
+they are *generators*. A live stream of events, a file's lines, a
+network response, each can implement `Iterable` and produce a
 cursor that pulls one element at a time. No need to materialize the
 whole sequence in memory.
 
@@ -256,7 +256,7 @@ public class Main {
 />
 
 Why does this matter? Because mutating a list with `list.remove(i)`
-inside a for-each loop is **forbidden** — it throws
+inside a for-each loop is **forbidden**, it throws
 `ConcurrentModificationException`.
 
 ## ConcurrentModificationException: the fail-fast guarantee
@@ -328,7 +328,7 @@ public class Main {
     for (Integer v : m.values())
       System.out.println("value: " + v);
 
-    // entries (preferred — one walk over both)
+    // entries (preferred, one walk over both)
     for (Map.Entry<String, Integer> e : m.entrySet()) {
       System.out.println(e.getKey() + " -> " + e.getValue());
     }
@@ -361,7 +361,7 @@ This is exactly how `Arrays.asList` and friends work conceptually.
     for (int n : it)
       System.out.println(n);
 
-    // Walk it a second time — fresh iterator, starts over.
+    // Walk it a second time, fresh iterator, starts over.
     int total = 0;
     for (int n : it)
       total += n;
@@ -412,7 +412,7 @@ public class IntArrayIterable implements Iterable<Integer> {
 - \`Countdown\` takes one constructor argument: \`int start\` (assume \`start >= 1\`).
 - \`Countdown\` implements \`Iterable<Integer>\`.
 - Iterating a \`Countdown(3)\` should produce \`3\`, \`2\`, \`1\` in that order.
-- It must be safe to iterate the same \`Countdown\` twice — each walk should start over.
+- It must be safe to iterate the same \`Countdown\` twice, each walk should start over.
 
 Expected output:
 
@@ -526,7 +526,7 @@ public class Countdown implements Iterable<Integer> {
   markdown={`Which is the preferred way to iterate both keys and values of a \`Map\` exactly once?
 
 - Iterate \`keySet()\` and call \`get(key)\` for each
-  > That walks the map twice — once for keys, once for the lookups.
+  > That walks the map twice, once for keys, once for the lookups.
 - Iterate \`values()\`
   > That gives you values without keys.
 - [o] Iterate \`entrySet()\` and read \`getKey()\` / \`getValue()\` on each entry

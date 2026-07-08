@@ -4,12 +4,12 @@ description: Why raw data is rarely enough, where uncertainty and randomness com
 ---
 
 You have the data. It's clean, it's in a DataFrame, the chart renders.
-So why do you need statistics at all — can't you just *read off the
+So why do you need statistics at all, can't you just *read off the
 answer*?
 
 Sometimes, yes. If you want to know *how many orders shipped
 yesterday*, you count them. Done. But almost every interesting
-question in data science isn't about the rows you have — it's about a
+question in data science isn't about the rows you have, it's about a
 larger reality you can't see directly. "Will this checkout redesign
 increase conversion?" "Are our two warehouses really performing
 differently?" "Is churn going up, or did we just have a noisy month?"
@@ -19,7 +19,7 @@ short page is about why.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A small bright window frames a handful of solid blue dots inside a vast faint field of dots; a red dot waits just outside the frame and the ringed yellow point you actually care about sits far away — your dataset is one lit slice of a much larger world"
+  aria-label="A small bright window frames a handful of solid blue dots inside a vast faint field of dots; a red dot waits just outside the frame and the ringed yellow point you actually care about sits far away, your dataset is one lit slice of a much larger world"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="40" y="24" width="560" height="172" rx="16" fill="currentColor" opacity="0.06" />
@@ -83,16 +83,16 @@ flowchart TD
 ```
 
 A spreadsheet of 500 surveyed customers can tell you, exactly, how
-those 500 people answered. But you don't care about those 500 people —
+those 500 people answered. But you don't care about those 500 people,
 you care about the *hundreds of thousands* you didn't survey. Crossing
 from "what these 500 said" to "what our customers think" is not a
 Pandas operation. It's a *statistical* one, and it can only be done
 with an honest accounting of uncertainty.
 
 <Callout type="info" title="Description vs. inference">
-Counting, averaging, and charting what you have is **description** —
+Counting, averaging, and charting what you have is **description**,
 it's always exactly true about your data. Using that data to make
-claims about something bigger is **inference** — and inference is
+claims about something bigger is **inference**, and inference is
 never certain. This course is mostly about doing inference *honestly*.
 </Callout>
 
@@ -109,7 +109,7 @@ sources:
   answers, timestamps get logged in the wrong timezone, a survey
   question is read two different ways.
 - **The world itself is variable.** Real processes have natural
-  spread. Daily sales aren't a constant 100 — they're 95, 110, 88,
+  spread. Daily sales aren't a constant 100, they're 95, 110, 88,
   130, even if *nothing* about the business changed.
 
 <CodeBlock
@@ -121,7 +121,7 @@ sources:
 
 rng = np.random.default_rng(42)
 
-# Imagine the "true" average daily sales is exactly 100 — nothing changes.
+# Imagine the "true" average daily sales is exactly 100, nothing changes.
 # But each day, ordinary randomness pushes the number around.
 week = rng.normal(loc=100, scale=12, size=7).round(0)
 
@@ -144,7 +144,7 @@ story you like. Statistics is what stops you.
 Randomness is the reason a difference between two numbers might mean
 **nothing**. This is the single most important habit this course will
 build: when you see that Group A's average is higher than Group B's,
-your first thought should not be "*A is better*" — it should be
+your first thought should not be "*A is better*", it should be
 "*could this gap just be luck?*"
 
 <CodeBlock
@@ -166,7 +166,7 @@ for trial in range(5):
         f"gap={a.mean() - b.mean():+5.2f}"
     )
 
-print("\\nSame underlying truth every time — the gap is just noise.")
+print("\\nSame underlying truth every time, the gap is just noise.")
 `,
     },
   ]}
@@ -175,14 +175,14 @@ print("\\nSame underlying truth every time — the gap is just noise.")
 Watch the `gap` column: +2, then −3, then +1... There's no real
 difference anywhere, yet the gap is never exactly zero. **Random
 variation manufactures fake differences for free.** Your job is to
-tell those apart from real ones — and that requires a model of how big
+tell those apart from real ones, and that requires a model of how big
 "normal" random wiggles can get. That model is what probability and
 sampling distributions give you.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Five repeated experiments drawn from one identical process: paired blue and green dots wobble around the same center line, their yellow gaps flipping direction at random, and one run's red gap looks big enough to be a discovery — random variation manufactures differences for free"
+  aria-label="Five repeated experiments drawn from one identical process: paired blue and green dots wobble around the same center line, their yellow gaps flipping direction at random, and one run's red gap looks big enough to be a discovery, random variation manufactures differences for free"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="318" y="24" width="4" height="164" rx="2" fill="var(--ds-gray-400)" />
@@ -221,7 +221,7 @@ sampling distributions give you.
 <Callout type="warn" title="The most common mistake in data work">
 Treating any difference as meaningful just because it's nonzero. With
 real data, two groups *always* differ a little. The question is never
-"are they different?" — it's "are they different by *more than chance
+"are they different?", it's "are they different by *more than chance
 can explain*?"
 </Callout>
 
@@ -243,9 +243,9 @@ flowchart TD
     E -->|"no, or too small"| G["Hold / gather more data"]
 ```
 
-Notice that "describe it" is just one box. A huge share of the value —
+Notice that "describe it" is just one box. A huge share of the value,
 and almost everything that separates a senior data scientist from a
-dashboard — lives in the "quantify uncertainty" step. That's the step
+dashboard, lives in the "quantify uncertainty" step. That's the step
 this course is about.
 
 ## Why data science leans so heavily on statistical reasoning
@@ -261,7 +261,7 @@ just noisy?" is a question about sampling variability.
 Nearly every hard question in data science reduces to the same shape:
 *"I observed something in a noisy, partial sample. How much of it is
 real, and how confident can I be?"* Statistical reasoning is the
-general-purpose tool for that shape — which is why it shows up
+general-purpose tool for that shape, which is why it shows up
 everywhere.
 </Callout>
 
@@ -271,13 +271,13 @@ everywhere.
   markdown={`You survey 500 customers and find 62% prefer the new design. What is the *honest* way to describe this result?
 
 - Exactly 62% of all our customers prefer the new design
-  > The 62% is exactly true only of the 500 people you surveyed. Extending it to all customers requires accounting for sampling uncertainty — a different 500 would give a different number.
+  > The 62% is exactly true only of the 500 people you surveyed. Extending it to all customers requires accounting for sampling uncertainty, a different 500 would give a different number.
 - [o] In this sample, 62% preferred it; the true population preference is probably near 62% but uncertain, and we'd want to quantify that uncertainty
   > This separates what the data literally says (a fact about the sample) from the claim about the population (an inference that carries uncertainty).
 - The survey proves the new design is better
   > "Proves" is far too strong, and "better" is a different question from "preferred." A single sample with no uncertainty estimate proves nothing.
 - 62% is meaningless because it's only 500 people
-  > 500 is actually a useful sample size. The number isn't meaningless — it just needs an honest uncertainty estimate attached, which is exactly what statistics provides.
+  > 500 is actually a useful sample size. The number isn't meaningless, it just needs an honest uncertainty estimate attached, which is exactly what statistics provides.
 
 The whole course is about attaching honest uncertainty to numbers like this.`}
 />
@@ -285,10 +285,10 @@ The whole course is about attaching honest uncertainty to numbers like this.`}
 <MultipleChoice
   markdown={`Daily sales for an unchanged business are 95, 110, 88, 130, 102. A manager points at 88 and 130 and says "something happened mid-week!" What's the best statistical response?
 
-- They're right — a 42-unit swing must have a cause
+- They're right, a 42-unit swing must have a cause
   > A swing existing doesn't mean a *cause* exists. Stable processes routinely produce swings this size purely from natural variation.
 - [o] That swing is well within the normal random variation of a stable process, so there's no reason to invent a cause yet
-  > Recognizing that ordinary processes have spread — and that picking the extremes exaggerates it — is the core instinct this page is building.
+  > Recognizing that ordinary processes have spread, and that picking the extremes exaggerates it, is the core instinct this page is building.
 - We should remove 88 and 130 as outliers
   > These aren't errors to delete; they're ordinary draws from a variable process. Deleting them would hide the real variability.
 - We can't say anything without more data
@@ -301,20 +301,20 @@ Cherry-picking the highest and lowest points is how noise gets mistaken for sign
   markdown={`Which of these is a question that *description alone* can answer, with no statistical inference needed?
 
 - Will next month's revenue beat this month's?
-  > This is about the future/unobserved — it requires inference and uncertainty, not just description.
+  > This is about the future/unobserved, it requires inference and uncertainty, not just description.
 - Do our premium users churn less than free users in general?
   > "In general" reaches beyond your data to the broader population, which is inference.
 - [o] How many orders are in this table that shipped yesterday?
-  > This is a fact entirely contained in the data you already have — you just count it. No leap to a larger population is involved.
+  > This is a fact entirely contained in the data you already have, you just count it. No leap to a larger population is involved.
 - Is the new layout better than the old one?
-  > Comparing "better" generalizes from a sample to future users — an inferential, statistical question.
+  > Comparing "better" generalizes from a sample to future users, an inferential, statistical question.
 
 Description is exact but limited to the rows you have; inference is uncertain but answers the questions you usually care about.`}
 />
 
 <Callout type="tip" title="Carry this forward">
 For the rest of the course, train one reflex: whenever you see a
-number, ask *"this is a fact about my sample — what is it trying to
+number, ask *"this is a fact about my sample, what is it trying to
 tell me about the world, and how sure can I be?"* Everything else is
 machinery in service of that question.
 </Callout>

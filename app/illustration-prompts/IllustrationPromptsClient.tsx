@@ -3,10 +3,10 @@
 /**
  * Interactive shell for the `/illustration-prompts` gallery. The entry data is
  * collected at build time by the server component (see `page.tsx` and
- * `lib/illustrationPromptsGallery.ts`) and passed in as a prop — the payload is
+ * `lib/illustrationPromptsGallery.ts`) and passed in as a prop, the payload is
  * small (~80 short prompts), so unlike the SVG gallery there is no static JSON
- * asset or client fetch. Everything here — the light/dark toggle and the
- * per-card copy buttons — is client-side.
+ * asset or client fetch. Everything here, the light/dark toggle and the
+ * per-card copy buttons, is client-side.
  */
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { Check, Copy, Moon, Search, Sun } from "lucide-react";
@@ -142,7 +142,7 @@ export function IllustrationPromptsClient({
         );
       })
       .catch(() => {
-        // Clipboard unavailable (e.g. insecure context) — ignore.
+        // Clipboard unavailable (e.g. insecure context), ignore.
       });
   }, []);
 
@@ -193,7 +193,7 @@ export function IllustrationPromptsClient({
           </div>
           <p className={styles.subtitle}>
             Placeholder prompts for the custom line-art illustrations across the{" "}
-            <code>/learn</code> and <code>/interview</code> pages —{" "}
+            <code>/learn</code> and <code>/interview</code> pages,{" "}
             <span className={styles.count}>{data.totalIllustrations}</span>{" "}
             illustration{data.totalIllustrations === 1 ? "" : "s"} to draw,
             placed in <span className={styles.count}>{data.totalLessons}</span>{" "}

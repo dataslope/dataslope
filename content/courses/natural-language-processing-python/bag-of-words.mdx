@@ -3,7 +3,7 @@ title: "From Text to Features: Bag-of-Words"
 description: Algorithms need numbers, not words. The bag-of-words model turns each document into a vector of word counts over a shared vocabulary. Building a document-term matrix by hand, binary vs. count features, and the limitations (lost order, sparsity, no semantics) that motivate n-grams and beyond.
 ---
 
-Everything so far has produced *words* — clean tokens, roots, tags, n-grams.
+Everything so far has produced *words*, clean tokens, roots, tags, n-grams.
 But most algorithms that *use* text, from a spam filter to a clustering
 routine, do not consume words. They consume **numbers**. The bridge from a
 list of tokens to a row of numbers is called **feature extraction**, and the
@@ -12,13 +12,13 @@ model.
 
 The name is the whole idea: take a document, throw all its words into a bag,
 and shake it. You keep *which* words appear and *how many times*, but you throw
-away the *order*. A document becomes a tally of word counts — and a tally is
+away the *order*. A document becomes a tally of word counts, and a tally is
 just a vector of numbers, which is exactly what an algorithm can work with.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A sentence of colored word chips loses its order as thin gray lines pour each chip into per-color count bars — three blue, two green, one yellow — a bag of words keeps only the counts"
+  aria-label="A sentence of colored word chips loses its order as thin gray lines pour each chip into per-color count bars, three blue, two green, one yellow, a bag of words keeps only the counts"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -49,9 +49,9 @@ a fixed sequence of steps.
 
 1. **Documents** come in (`doc1`, `doc2`, `doc3`).
 2. **Tokenize and clean** each document.
-3. **Build the vocabulary** — all distinct words across the corpus.
+3. **Build the vocabulary**, all distinct words across the corpus.
 4. **Count** each vocabulary word in each document.
-5. **Document-term matrix** — rows = documents, columns = words, cells = counts.
+5. **Document-term matrix**, rows = documents, columns = words, cells = counts.
 6. **Feed the matrix** to a classifier.
 
 The output is a **document-term matrix**: one row per document, one column per
@@ -129,7 +129,7 @@ display(dtm)
 That table *is* the bag-of-words representation. Read doc1's row: "the" appears
 twice (a 2 in the "the" column), "cat", "sat", "on", and "mat" once each, and
 every other vocabulary word zero times. The sentence has become a row of
-integers — and crucially, all three rows have the **same length** (the size of
+integers, and crucially, all three rows have the **same length** (the size of
 the vocabulary), so they can be compared, added, and fed to an algorithm
 uniformly.
 
@@ -143,7 +143,7 @@ each document against it.
 
 ## Counts vs. presence (binary bag-of-words)
 
-Sometimes you care only *whether* a word appears, not how often — for short
+Sometimes you care only *whether* a word appears, not how often, for short
 texts or spam-style signals, presence is enough and is less swayed by length.
 That variant is **binary** bag-of-words: each cell is 1 or 0 instead of a
 count.
@@ -180,7 +180,7 @@ print("binary vector:", binary_vector(spam, vocab))
 
 The count vector records that "free" appeared three times (a strong spam
 signal); the binary vector just records that it appeared at all. Which is
-better depends on the task — another small pipeline choice, in the spirit of
+better depends on the task, another small pipeline choice, in the spirit of
 the previous page.
 
 <Callout type="tip" title="In practice you'd reach for a vectorizer">
@@ -188,7 +188,7 @@ Building bag-of-words by hand, as we just did, is the right way to *understand*
 it. In real projects you would typically use a ready-made vectorizer (such as
 scikit-learn's `CountVectorizer`) that does tokenizing, vocabulary-building, and
 counting in one step and returns an efficient sparse matrix. The mechanics are
-identical to what you just coded — vocabulary, then per-document counts — so you
+identical to what you just coded, vocabulary, then per-document counts, so you
 now know exactly what such a tool produces under the hood.
 </Callout>
 
@@ -208,12 +208,12 @@ meet.
 - **It has no notion of meaning.** "great" and "excellent" are different
   columns with nothing connecting them; the model has no idea they are
   near-synonyms. Capturing meaning is what **word embeddings** (like Word2Vec)
-  were invented for — conceptually, they place similar words near each other in
+  were invented for, conceptually, they place similar words near each other in
   a numeric space so "great" and "excellent" are close rather than unrelated.
   That is a topic for later study; bag-of-words remains the right first model
   to understand.
 
-<Callout type="warn" title="Bag-of-words throws away order — on purpose">
+<Callout type="warn" title="Bag-of-words throws away order, on purpose">
 The "bag" metaphor is a literal description: order is gone. For many tasks
 (topic detection, spam filtering) that loss is acceptable and the simplicity is
 worth it. For tasks where order is meaning (sentiment, where "not good" must
@@ -230,7 +230,7 @@ document-term matrix correspond to?
 - [o] One word in the shared vocabulary, with each cell counting that word's occurrences in a document
   > Rows are documents and columns are vocabulary words; a cell is the count (or presence) of that word in that document. The shared columns make all document vectors comparable.
 - One sentence in a document
-  > Sentences are not the unit of bag-of-words; the model does not track sentence boundaries — each column is a word from the shared vocabulary.
+  > Sentences are not the unit of bag-of-words; the model does not track sentence boundaries, each column is a word from the shared vocabulary.
 - One character in the text
   > Bag-of-words operates at the word level, not the character level; each column represents a vocabulary word, not an individual character.
 
@@ -250,7 +250,7 @@ where position \`i\` holds the number of times \`vocab[i]\` appears in \`tokens\
 Words in \`tokens\` that are not in \`vocab\` are simply ignored.
 
 For example, with \`vocab = ["cat", "dog", "fish"]\` and
-\`tokens = ["dog", "cat", "dog", "bird"]\`, the result is \`[1, 2, 0]\` — one
+\`tokens = ["dog", "cat", "dog", "bird"]\`, the result is \`[1, 2, 0]\`, one
 "cat", two "dog", zero "fish", and "bird" ignored.
 
 Tip: \`collections.Counter\` makes this clean (it returns 0 for missing keys).`}
@@ -317,7 +317,7 @@ assert out == [0, 0, 0], "Got: " + repr(out)`,
 - [o] Because most algorithms operate on numbers, not words, so each document must be turned into a fixed-length numeric vector before it can be fed to them
   > Feature extraction bridges words and math. A bag-of-words vector gives every document the same numeric shape (one entry per vocabulary word), which is exactly what classifiers and clustering algorithms require.
 - Because it makes the text easier for humans to read
-  > A bag-of-words vector — a list of word counts — is harder for humans to read than the original sentence; readability for humans is not the goal.
+  > A bag-of-words vector, a list of word counts, is harder for humans to read than the original sentence; readability for humans is not the goal.
 - Because it translates the document into another language
   > Bag-of-words does not translate; it represents a document numerically within its original language by counting word occurrences against a shared vocabulary.
 
@@ -329,11 +329,11 @@ The point is to produce numeric features an algorithm can consume.`}
 What does this reveal, and how is it commonly addressed?
 
 - It is a bug in the counting code
-  > Both sentences use the same three words exactly once each, so identical count vectors are the correct, intended output of bag-of-words — there is no counting error.
+  > Both sentences use the same three words exactly once each, so identical count vectors are the correct, intended output of bag-of-words, there is no counting error.
 - [o] Bag-of-words discards word order, so different orderings of the same words collapse together; adding n-gram (e.g., bigram) features puts some local order back
   > The bag keeps counts but not order, so both sentences have identical word tallies. When order matters, bigram/trigram features ("bites man" vs "bites dog") restore enough of it to distinguish them.
 - It means the two sentences have different vocabularies
-  > The two sentences share the same three words — "dog", "bites", "man" — so they have identical vocabularies, which is exactly why their vectors are the same.
+  > The two sentences share the same three words, "dog", "bites", "man", so they have identical vocabularies, which is exactly why their vectors are the same.
 - It proves bag-of-words cannot be used for any real task
   > Despite this limitation, bag-of-words is widely used for topic detection, spam filtering, and search; order often matters less than word presence for those tasks.
 
@@ -363,7 +363,7 @@ at it?
 - A sparsity problem, fixed by stopword removal
   > Sparsity refers to having mostly zero counts in a high-dimensional vector; giving "great" and "excellent" separate columns is a *semantic* limitation, not a sparsity issue, and stopword removal does not close the meaning gap.
 - [o] It captures no *meaning*/similarity between words; word embeddings (e.g., Word2Vec) address it by placing similar words close together in a numeric space
-  > Bag-of-words treats every word as an independent dimension, so synonyms are unrelated. Embeddings encode semantic similarity numerically, so related words end up near each other — a more advanced topic, but the conceptual fix for this exact limitation.
+  > Bag-of-words treats every word as an independent dimension, so synonyms are unrelated. Embeddings encode semantic similarity numerically, so related words end up near each other, a more advanced topic, but the conceptual fix for this exact limitation.
 - A word-order problem, fixed by n-grams
   > Losing word order is a separate bag-of-words limitation; here the problem is that "great" and "excellent" are treated as unrelated columns despite being synonyms, which n-grams do not address.
 - There is no limitation here
@@ -374,6 +374,6 @@ Bag-of-words has no semantics; embeddings are the conceptual answer to that gap.
 
 You can now turn documents into numeric features. But raw counts have the same
 weakness we met when counting words: the most common words dominate and tell you
-the least. The next page fixes that with **TF-IDF** — a way to weight each word
-by how *distinctive* it is — before we assemble everything into a working
+the least. The next page fixes that with **TF-IDF**, a way to weight each word
+by how *distinctive* it is, before we assemble everything into a working
 classifier.

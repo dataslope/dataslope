@@ -4,7 +4,7 @@ import { test, expect, type Locator } from "@playwright/test";
 //  - Update 1: the header workspace badge is hidden on mobile.
 //  - Update 5 (prior batch): the database selector is in the SQL mobile drawer.
 //  - Backdrop dismiss: while a sub-sheet is open the parent menu acts as a
-//    backdrop — tapping any row just closes the sub-sheet without opening the
+//    backdrop, tapping any row just closes the sub-sheet without opening the
 //    tapped item.
 test.use({ viewport: { width: 390, height: 844 } });
 

@@ -7,7 +7,7 @@ This page exists to exercise the DataFrame renderer with outputs that are
 much larger than the usual examples. Every frame below should render in a
 single OUTPUT cell, interleaved with prints in execution order, as a
 compact Jupyter-style table (600-weight header row and index column,
-subtle row striping, no cell borders) truncated in the middle — head rows
+subtle row striping, no cell borders) truncated in the middle, head rows
 … tail rows, and head columns … tail columns. Wide tables scroll
 horizontally inside the output cell instead of stretching the page.
 
@@ -112,7 +112,7 @@ print(row_total)
 ## R: 500 rows × 41 columns
 
 The R runtime truncates frames itself: ten head rows, an ellipsis row,
-five tail rows — and for wide frames the first and last ten columns with
+five tail rows, and for wide frames the first and last ten columns with
 an ellipsis column between. The footer states the full dimensions.
 
 <CodeBlock

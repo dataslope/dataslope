@@ -6,7 +6,7 @@
  * Why this exists
  * ---------------
  * `@mdx-js/mdx` (micromark) strips a base indentation from the continuation
- * lines of a multi-line JSX attribute expression while tokenizing — so a
+ * lines of a multi-line JSX attribute expression while tokenizing, so a
  * formatted snippet authored as
  *
  *   starterCode={`if (age >= 18) {
@@ -29,7 +29,7 @@
  * The estree `TemplateLiteral` quasis still carry a `range` (`start`/`end`
  * offsets) into the *original* source. We slice the original source back out
  * and restore each quasi's `raw` (and re-derive `cooked`), so the compiled
- * output — and therefore the editor — faithfully reflects the authored,
+ * output, and therefore the editor, faithfully reflects the authored,
  * formatted indentation. Zero content changes required.
  *
  * Scoped to the props that render as editable/inspectable code so prose

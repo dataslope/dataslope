@@ -1,6 +1,6 @@
 ---
 title: Interesting Discussions
-description: Optional asides for the curious — where R came from, why ggplot2 has a "2", the story behind the penguins, and Anscombe's quartet, the single best argument for plotting at all.
+description: Optional asides for the curious, where R came from, why ggplot2 has a "2", the story behind the penguins, and Anscombe's quartet, the single best argument for plotting at all.
 ---
 
 The main course is about the grammar. This page is for the curious:
@@ -10,7 +10,7 @@ are worth knowing. Read it in any order, skip it freely.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A main line of blue stops runs left to right while two stops branch off along thin lines to a green card above and a yellow card below — optional side stories hanging off the course's main path"
+  aria-label="A main line of blue stops runs left to right while two stops branch off along thin lines to a green card above and a yellow card below, optional side stories hanging off the course's main path"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
@@ -41,7 +41,7 @@ University of Auckland, New Zealand. The name is a small double joke: it
 plays on their shared initial "**R**," and it nods one letter back from
 **S**, the statistical language created by **John Chambers** at Bell
 Labs that R was designed to be compatible with. R was released as free
-software and grew into the lingua franca of academic statistics — fertile
+software and grew into the lingua franca of academic statistics, fertile
 ground for an ambitious idea like a grammar of graphics to take root.
 
 ## A little more on the "2"
@@ -52,20 +52,20 @@ ggplot2 (2007) are genuinely *different* implementations, not a version
 bump. Wickham found the first design awkward and rewrote it from
 scratch with the layered `+` syntax you use today. The original
 `ggplot` is long retired; nobody installs it. When people say "ggplot"
-in conversation, they almost always mean ggplot2 — the "2" has faded
+in conversation, they almost always mean ggplot2, the "2" has faded
 into a quirk of the name.
 
 ## The penguins you have been plotting
 
 <IllustrationPrompt subject="a Gentoo penguin standing on Antarctic ice" />
 
-Several examples in this course use the **Palmer Penguins** data set —
+Several examples in this course use the **Palmer Penguins** data set,
 body measurements for three penguin species in Antarctica. It is worth
 knowing where it comes from. The measurements were collected by
 **Dr. Kristen Gorman** at the **Palmer Station** Long-Term Ecological
 Research site in Antarctica. They were packaged into a friendly R data
 set by **Allison Horst** as a deliberate, ethically-clean alternative
-to *Fisher's iris* — a flower data set long used for teaching, but tied
+to *Fisher's iris*, a flower data set long used for teaching, but tied
 to its author's promotion of eugenics. Penguins do the same teaching
 job (three groups, several numeric measurements that separate them) with
 a far better backstory, which is why the visualization community
@@ -85,8 +85,8 @@ ggplot(penguins, aes(bill_length_mm, bill_depth_mm, color = species)) +
 <IllustrationPrompt subject="Francis Anscombe" photo />
 
 Of every story in this course, this is the one to remember. In 1973 the
-statistician **Francis Anscombe** published four small data sets — now
-called **Anscombe's quartet** — engineered to share nearly identical
+statistician **Francis Anscombe** published four small data sets, now
+called **Anscombe's quartet**, engineered to share nearly identical
 summary statistics. Each of the four has the *same* mean of x, mean of
 y, variance, correlation, and best-fit regression line, to two decimal
 places. By the numbers, they are indistinguishable.
@@ -139,7 +139,7 @@ ggplot(long, aes(x, y)) +
   ]}
 />
 
-Same regression line in every panel — yet one set is a clean linear
+Same regression line in every panel, yet one set is a clean linear
 trend, one is a curve, one is a perfect line dragged off by a single
 outlier, and one is a vertical stack with one far-right point. The
 numbers hid all of that. **The plot revealed it instantly.**
@@ -154,8 +154,8 @@ service of that one habit.
 
 ## ggplot2 and the tidyverse
 
-ggplot2 is part of the **tidyverse**, a family of R packages — `dplyr`,
-`tidyr`, `readr`, and others — that share conventions and a common
+ggplot2 is part of the **tidyverse**, a family of R packages, `dplyr`,
+`tidyr`, `readr`, and others, that share conventions and a common
 philosophy about "tidy" data (one variable per column, one observation
 per row). This course keeps such detours minimal; our subject is
 ggplot2 itself. But in real projects you will usually see data prepared
@@ -169,9 +169,9 @@ pattern.
 - Correlation is always a useless statistic.
   > Correlation is useful; the lesson is that summaries alone can mislead, not that they are worthless.
 - Four data sets can never share the same mean.
-  > They can — that is the whole construction; the quartet was *engineered* to share summaries.
+  > They can, that is the whole construction; the quartet was *engineered* to share summaries.
 - [o] Data sets with nearly identical summary statistics can have completely different shapes, so you should plot the data and not rely on summaries alone.
-  > Identical numbers, four different pictures — the case for looking at your data.
+  > Identical numbers, four different pictures, the case for looking at your data.
 - Regression lines are unreliable and should be avoided.
   > Regression is fine; the point is to pair it with a plot so you can see whether it fits.
 

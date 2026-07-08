@@ -8,8 +8,8 @@
  * so the sidebar scopes itself to the course being read.
  *
  * This layout lives inside the required `[...slug]` catch-all (rather than
- * at `app/courses/`) so the `/courses` index — the custom course-catalog
- * page in `app/courses/page.tsx` — is NOT wrapped in the docs chrome.
+ * at `app/courses/`) so the `/courses` index, the custom course-catalog
+ * page in `app/courses/page.tsx`, is NOT wrapped in the docs chrome.
  *
  * The Tailwind/Fumadocs CSS is imported here (not in `app/layout.tsx`)
  * so it's scoped to the lesson bundle and doesn't leak into the

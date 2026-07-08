@@ -1,12 +1,12 @@
 ---
 title: James Gosling and the Language Built for Toasters
-description: How a secret Sun Microsystems project for smart appliances accidentally produced the language that runs the modern internet — and the bytecode idea that made it possible
+description: How a secret Sun Microsystems project for smart appliances accidentally produced the language that runs the modern internet, and the bytecode idea that made it possible
 ---
 
 <IllustrationPrompt subject="Bjarne Stroustrup" photo />
 
 By the late 1980s, the object-oriented ideas from the last page had
-finally reached industry — mostly through **C++**, created by
+finally reached industry, mostly through **C++**, created by
 **Bjarne Stroustrup** at Bell Labs, which grafted classes onto the
 wildly popular C language. C++ was fast, it ran everywhere C ran,
 and for a while it looked like the future of all serious software.
@@ -18,7 +18,7 @@ C++ source for Windows, Mac, and Unix. In practice every platform
 had different libraries, different conventions, different sizes for
 built-in types, different ways to draw pixels and talk to the
 network. A serious cross-platform C++ product was really several
-near-identical codebases in a trench coat — the same bug fixed five
+near-identical codebases in a trench coat, the same bug fixed five
 times, in five slightly different ways, for five platforms.
 
 ```mermaid
@@ -39,7 +39,7 @@ with `delete`, never forgetting, never returning it twice, never
 touching it after returning it. A careful programmer can manage that
 in a small program. In a five-million-line system written by a
 hundred people over ten years, a single forgotten `delete` could
-ruin everyone's week — and regularly did.
+ruin everyone's week, and regularly did.
 
 Hold those two pains in mind. Now for the toasters.
 
@@ -49,7 +49,7 @@ Hold those two pains in mind. Now for the toasters.
 
 In 1991, a small team inside **Sun Microsystems** set up a secret
 project, code-named **Green**. The goal had nothing to do with
-enterprise software or the web — the web barely existed. The goal
+enterprise software or the web, the web barely existed. The goal
 was software for **consumer electronics**: TVs, set-top boxes, the
 "interactive devices" that everyone in Silicon Valley believed were
 about to take over the living room. The team was led by a Canadian
@@ -58,7 +58,7 @@ computer scientist named **James Gosling**.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three very different abstract housings — a wide blue box, a tall yellow capsule, and a blue hexagon — all carry the same small green chip, joined by one thin green thread: one language written for every kind of device"
+  aria-label="Three very different abstract housings, a wide blue box, a tall yellow capsule, and a blue hexagon, all carry the same small green chip, joined by one thin green thread: one language written for every kind of device"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <polyline points="170,110 330,96 490,120" fill="none" stroke="var(--ds-green-500)" strokeWidth="2" strokeOpacity="0.45" />
@@ -83,7 +83,7 @@ cheaper one appeared. Software written in C++ for this year's TV
 chip had to be recompiled, retested, and often partly rewritten for
 next year's. For a company hoping to ship millions of devices, that
 was unacceptable. Gosling's team needed programs that would
-**outlive the chip** they were written for — and that were small,
+**outlive the chip** they were written for, and that were small,
 reliable, and safe enough to run unattended in someone's living
 room. (You cannot ship a debugger to a toaster.)
 
@@ -102,28 +102,28 @@ memory-safe, and eventually realized he had been *building a new
 language by accident*. So he embraced the inevitable and built one
 from scratch. He called it **Oak**, after a tree outside his office
 window. When the lawyers discovered "Oak" was already trademarked,
-the team brainstormed a new name — and, the story goes, settled on
+the team brainstormed a new name, and, the story goes, settled on
 **Java**, with all its coffee associations, somewhere between the
 whiteboard and the espresso machine.
 
 ## What Gosling kept, what he removed
 
 Gosling knew C and C++ deeply, and Java's design reads as a direct
-reaction to them. He kept the *surface* — the curly braces, the
-semicolons, the familiar C-family look — so that millions of
+reaction to them. He kept the *surface*, the curly braces, the
+semicolons, the familiar C-family look, so that millions of
 existing programmers would feel at home. Then he ripped out every
 feature that, in his experience, caused catastrophic production
 bugs.
 
 | Idea | C++ | Java |
 | --- | --- | --- |
-| Manual memory management | Yes — `new`/`delete` | **No** — automatic garbage collection |
-| Pointer arithmetic | Yes | **Removed** — too dangerous |
-| Multiple inheritance | Yes | **Removed** — replaced by interfaces |
-| Operator overloading | Yes | **Removed** — too easy to abuse |
-| Compiled to machine code? | Yes | **No** — compiled to *bytecode* |
+| Manual memory management | Yes, `new`/`delete` | **No**, automatic garbage collection |
+| Pointer arithmetic | Yes | **Removed**, too dangerous |
+| Multiple inheritance | Yes | **Removed**, replaced by interfaces |
+| Operator overloading | Yes | **Removed**, too easy to abuse |
+| Compiled to machine code? | Yes | **No**, compiled to *bytecode* |
 | Same program runs everywhere? | Theoretically | **Yes**, by design |
-| Classes | Optional (you can write C-style) | **Mandatory** — every method lives in a class |
+| Classes | Optional (you can write C-style) | **Mandatory**, every method lives in a class |
 
 This conservatism is why Java looks "boring" to fans of exotic
 languages. It is also exactly why Java still runs banks, airlines,
@@ -146,12 +146,12 @@ boring *on purpose*.
 ## The big idea: write once, run anywhere
 
 The most radical decision is the one that solved the chip-churn
-problem — and, as a side effect, the entire industry's
+problem, and, as a side effect, the entire industry's
 cross-platform pain.
 
 A C++ compiler produces **machine code**: instructions for one
 specific CPU on one specific operating system. Java's compiler,
-`javac`, produces something else: **bytecode** — instructions for a
+`javac`, produces something else: **bytecode**, instructions for a
 *fictional* CPU, stored in `.class` files. To run the program, each
 real machine runs a small program called the **Java Virtual
 Machine** (JVM), which reads the bytecode and executes it.
@@ -159,7 +159,7 @@ Machine** (JVM), which reads the bytecode and executes it.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue source card compiles through a thin gray arrow into one solid blue bytecode capsule, which fans along thin lines into three differently shaped machines — and sits inside each one unchanged: write once, run anywhere"
+  aria-label="A blue source card compiles through a thin gray arrow into one solid blue bytecode capsule, which fans along thin lines into three differently shaped machines, and sits inside each one unchanged: write once, run anywhere"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -202,7 +202,7 @@ flowchart LR
 
 Same `Hello.class`, every platform. All the machine-specific magic
 lives inside the JVM, and providing a JVM for every platform that
-matters is Sun's problem (now Oracle's) — not yours. Sun compressed
+matters is Sun's problem (now Oracle's), not yours. Sun compressed
 the whole ambition into a slogan: **write once, run anywhere**.
 Programmers who lived through the rough early years joked it was
 really "write once, debug everywhere," but the joke conceded the
@@ -210,7 +210,7 @@ point: for the first time, a mainstream language genuinely let you
 compile your program once and run the same artifact on radically
 different machines.
 
-The JVM does far more than execute bytecode — it manages memory for
+The JVM does far more than execute bytecode, it manages memory for
 you (the **garbage collector** that replaced `delete`), verifies
 code before running it, and quietly recompiles your hottest code to
 native speed while the program runs. Those ideas each get proper
@@ -218,7 +218,7 @@ attention in the *How Programs Execute* chapter later in the course.
 
 ## See it run
 
-Enough claims — let's test one. The block below is a complete Java
+Enough claims, let's test one. The block below is a complete Java
 program. When you run it, your browser compiles the source with
 `javac` and executes the resulting bytecode on a real JVM. The
 program asks the JVM what platform it *thinks* it is running on.
@@ -241,10 +241,10 @@ program asks the JVM what platform it *thinks* it is running on.
 />
 
 Look at the `os.name` line. The JVM honestly reports the platform it
-is hosted on — but notice that *your code never had to know*. The
+is hosted on, but notice that *your code never had to know*. The
 exact same `.class` file produced here would run, unchanged, on a
 Linux server in a data center or a point-of-sale terminal in a
-supermarket. That is the toaster problem, solved — for every
+supermarket. That is the toaster problem, solved, for every
 computer on Earth.
 
 <MultipleChoice
@@ -255,7 +255,7 @@ computer on Earth.
 - [o] Because each platform has its own JVM that knows how to execute bytecode
   > The platform-specific work is done by the JVM, not by your program.
 - Because operating systems can directly execute bytecode
-  > They cannot — bytecode is not native machine code.
+  > They cannot, bytecode is not native machine code.
 - Because Java is interpreted in the browser
   > The browser here happens to host a JVM, but any JVM anywhere runs the same file.`}
 />
@@ -263,7 +263,7 @@ computer on Earth.
 ## The accident that made it famous
 
 Here is the punchline of the whole story: the smart-TV revolution
-the Green team was betting on *did not happen* — not for another
+the Green team was betting on *did not happen*, not for another
 twenty years. By 1994 the project was searching for a reason to
 exist. And then the team noticed something. A brand-new kind of
 program was emerging on the young **World Wide Web**: code that
@@ -271,8 +271,8 @@ could be downloaded from a server and run on *any* user's machine,
 whatever hardware they happened to own. Nobody could know in advance
 what kind of computer would receive it. Sound familiar?
 
-The exact properties Java had grown for toasters — compact,
-portable, sandboxed, safe to run on a stranger's device — were
+The exact properties Java had grown for toasters, compact,
+portable, sandboxed, safe to run on a stranger's device, were
 precisely what the web needed. In 1995 Sun released Java publicly,
 along with a browser called HotJava that could run small Java
 programs ("applets") embedded in web pages. Netscape, the dominant
@@ -283,8 +283,8 @@ just a page. People had never seen anything like it.
 Applets themselves would eventually fade away, but they put Java on
 every desk in the industry at the exact moment the industry was
 desperate for a portable, memory-safe, object-oriented language. The
-toaster language ended up running banks. How that conquest unfolded
-— universities, enterprises, Android, and a decade-long lawsuit — is
+toaster language ended up running banks. How that conquest unfolded,
+universities, enterprises, Android, and a decade-long lawsuit, is
 a great story, and it is waiting in the **Interesting discussions**
 section at the end of this course.
 
@@ -292,7 +292,7 @@ section at the end of this course.
   markdown={`Which of these C++ features did Gosling deliberately remove from Java?
 
 - Classes
-  > Java *kept* classes — and made them mandatory.
+  > Java *kept* classes, and made them mandatory.
 - Functions
   > Java has methods, which are essentially functions inside classes.
 - [o] Manual memory management with explicit \`new\` and \`delete\`
@@ -302,7 +302,7 @@ section at the end of this course.
 />
 
 That is the whole origin story: a crisis, an idea, and an accident.
-You now know *why* Java looks the way it does — why everything lives
+You now know *why* Java looks the way it does, why everything lives
 in a class, why there is no `delete`, why there is a virtual machine
 under your code. From here on, we set the history aside and start
 building the thinking skills the rest of the course runs on.

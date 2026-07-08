@@ -1,17 +1,17 @@
 ---
 title: Plotting Systems That Don't Scale
-description: Why traditional, command-by-command plotting APIs become unmanageable as charts grow — the problem the Grammar of Graphics was created to solve.
+description: Why traditional, command-by-command plotting APIs become unmanageable as charts grow, the problem the Grammar of Graphics was created to solve.
 ---
 
 Before we touch any ggplot2 code, it helps to understand the *pain*
 that ggplot2 was designed to remove. If you have used base R graphics,
-`matplotlib`, or a spreadsheet chart wizard, you have felt this pain —
+`matplotlib`, or a spreadsheet chart wizard, you have felt this pain,
 maybe without naming it.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two single-purpose chart widgets branch into four, then into eight ever-smaller widgets — one per chart type — ending in a red dashed empty slot for the chart no function covers"
+  aria-label="Two single-purpose chart widgets branch into four, then into eight ever-smaller widgets, one per chart type, ending in a red dashed empty slot for the chart no function covers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -102,7 +102,7 @@ a canvas:
 > second set of points in red. Now add a title. Now adjust the y-axis
 > limits so nothing gets clipped.
 
-Here is what that looks like in **base R** — a perfectly capable
+Here is what that looks like in **base R**, a perfectly capable
 system that nonetheless makes you manage every detail by hand:
 
 <CodeBlock
@@ -133,7 +133,7 @@ This works. But look closely at everything *you* had to do:
 - Manually build a lookup table mapping cylinder values to colors.
 - Manually convert `cyl` to a character to index that table.
 - Manually construct a legend that **repeats** the same color and
-  shape information — and which has no automatic connection to the
+  shape information, and which has no automatic connection to the
   points. If you change the colors above, you must remember to change
   them in the legend too.
 
@@ -176,12 +176,12 @@ read out drawing commands. You say something like:
 That sentence is **structured**. It names a data set, some
 *mappings* from columns to visual properties, and a couple of *kinds
 of marks*. It says nothing about color lookup tables or legend
-coordinates — those should be *consequences* of the description, not
+coordinates, those should be *consequences* of the description, not
 things you manage.
 
 What if you could write the chart the way you describe it, and let the
 system work out the drawing? That is exactly the promise of a
-**grammar** of graphics — and the subject of the next page.
+**grammar** of graphics, and the subject of the next page.
 
 <MultipleChoice
   markdown={`In the base R example above, why did we have to build a legend manually with the same colors and shapes as the points?
@@ -193,7 +193,7 @@ system work out the drawing? That is exactly the promise of a
 - Legends are only needed for line charts.
   > Legends are needed whenever a visual property encodes a variable, regardless of chart type.
 - The legend updates itself whenever the colors change.
-  > That is precisely what does *not* happen here — changing the colors would silently desync the legend.
+  > That is precisely what does *not* happen here, changing the colors would silently desync the legend.
 
 In traditional plotting APIs, the legend is just more ink on the
 canvas. Nothing ties it to the fact that color *means* cylinder count,
@@ -206,7 +206,7 @@ so you become responsible for keeping it consistent.`}
   commands one at a time.
 - They do not separate a chart's **meaning** from its **drawing**, so
   the two get tangled.
-- As charts grow — more variables, groups, panels, transformations —
+- As charts grow, more variables, groups, panels, transformations,
   the code grows faster and becomes fragile.
 - We want to *describe* charts structurally and let the system handle
   the drawing. That desire leads directly to the Grammar of Graphics.

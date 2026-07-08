@@ -2,7 +2,7 @@ import type { Completion } from "@codemirror/autocomplete";
 
 // Static completion tier for the C playground surfaces. There is no
 // practical in-browser C language server (clangd.wasm needs ~26 MB +
-// cross-origin isolation — see the feasibility report in
+// cross-origin isolation, see the feasibility report in
 // agent-outputs/), so the honest ceiling is keywords, the common libc
 // surface with signatures, and document-word completion (wired in
 // `languageCompletion.ts`).

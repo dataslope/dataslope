@@ -100,7 +100,7 @@ function SwapIcon({ id }: { id: string }) {
 function SwapLabel({ name, align }: { name: string; align: "left" | "right" }) {
   return (
     <span
-      // Desktop only — on mobile the names are hidden to keep the diagram
+      // Desktop only, on mobile the names are hidden to keep the diagram
       // tight. The fixed width keeps each circle's position constant as the
       // label cross-fades between names of different lengths, so the beams
       // (which are only recomputed on container resize) stay aligned.
@@ -131,7 +131,7 @@ interface NodeItem {
 }
 
 /** A language node: its circle plus a rotating label. `side` decides which
- *  edge of the diagram it lives on — left-column labels sit to the left of the
+ *  edge of the diagram it lives on, left-column labels sit to the left of the
  *  circle (right-aligned), right-column labels to the right (left-aligned).
  *  `active` gates the rotation (false while the section is offscreen). */
 const BeamNode = forwardRef<
@@ -177,7 +177,7 @@ BeamNode.displayName = "BeamNode";
 export function BeamSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   // Icon/label rotation drives AnimatePresence cross-fades on eight nodes
-  // every 2.8s forever — pause it while the diagram is offscreen, and skip
+  // every 2.8s forever, pause it while the diagram is offscreen, and skip
   // it under prefers-reduced-motion. (The beams themselves pause in
   // AnimatedBeam, and the FlickeringGrid backdrop already self-gates.)
   const sectionInView = useInView(containerRef as RefObject<Element>);
@@ -200,7 +200,7 @@ export function BeamSection() {
       ref={containerRef}
       className="relative mx-auto flex h-[24rem] w-full max-w-2xl items-center justify-between overflow-hidden px-6 sm:px-10"
     >
-      {/* Left column — labels hug the right edge so they sit beside the circle. */}
+      {/* Left column, labels hug the right edge so they sit beside the circle. */}
       <div className="flex flex-col items-end justify-center gap-6">
         <BeamNode ref={left1} active={rotationActive} side="left" label="Python and R" delay={0} items={[{ id: "python", name: "Python" }, { id: "r", name: "R" }]} />
         <BeamNode ref={left2} active={rotationActive} side="left" label="JavaScript and TypeScript" delay={700} items={[{ id: "javascript", name: "JavaScript" }, { id: "typescript", name: "TypeScript" }]} />
@@ -229,7 +229,7 @@ export function BeamSection() {
         />
       </Circle>
 
-      {/* Right column — labels hug the left edge, beside the circle. */}
+      {/* Right column, labels hug the left edge, beside the circle. */}
       <div className="flex flex-col items-start justify-center gap-6">
         <BeamNode ref={right1} active={rotationActive} side="right" label="Java and C#" delay={350} items={[{ id: "java", name: "Java" }, { id: "csharp", name: "C#" }]} />
         <BeamNode ref={right2} active={rotationActive} side="right" label="SQLite" items={[{ id: "sqlite", name: "SQLite" }]} />

@@ -1,6 +1,6 @@
 ---
 title: Interesting Discussions
-description: Stories and side-quests that did not fit the main path — weather forecasting, the hardware ladder, a Turing Award for floating point, and three famous disasters caused by rounding error
+description: Stories and side-quests that did not fit the main path, weather forecasting, the hardware ladder, a Turing Award for floating point, and three famous disasters caused by rounding error
 ---
 
 The main chapters keep a brisk pace so you spend your time computing.
@@ -12,7 +12,7 @@ several connect directly to the numerical ideas you have already met.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A main line of blue stops runs left to right while two of them branch up and down along thin lines to a green and a yellow side card — optional discussions hanging off the course's main path"
+  aria-label="A main line of blue stops runs left to right while two of them branch up and down along thin lines to a green and a yellow side card, optional discussions hanging off the course's main path"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
@@ -44,17 +44,17 @@ forecast. They discretized the atmosphere over North America into a
 coarse grid, used a simplified set of equations (the *barotropic
 vorticity equation*), and ran a 24-hour forecast.
 
-It took about 24 hours to compute — a forecast that finished just in
+It took about 24 hours to compute, a forecast that finished just in
 time to be irrelevant. But it was *qualitatively correct*, and it
 launched a research program that, decades later, underlies every
 weather app on your phone. The deep lesson was not about speed: it
 was that **discretizing a continuous physical field onto a grid and
 stepping it forward in time was a viable scientific method**. That
-pattern outlasted ENIAC and outlasted FORTRAN — it is still how a
+pattern outlasted ENIAC and outlasted FORTRAN, it is still how a
 modern supercomputer thinks about the atmosphere.
 
-You met the smallest possible version of this idea — diffusion on a
-1-D grid — in the stability discussions. The 1950 forecast was the
+You met the smallest possible version of this idea, diffusion on a
+1-D grid, in the stability discussions. The 1950 forecast was the
 same idea at continental scale.
 
 ## The hardware ladder
@@ -81,7 +81,7 @@ and each unlocked a research program that ran for a decade or two.
 The 2013 Nobel Prize in Chemistry went to Martin Karplus, Michael
 Levitt, and Arieh Warshel "for the development of multiscale models
 for complex chemical systems." The award was not for a new chemical
-discovery — it was for the *numerical methods* that let chemists
+discovery, it was for the *numerical methods* that let chemists
 simulate enzymes on a computer. Computational chemistry and
 computational fluid dynamics are now research disciplines in their
 own right, the clearest sign that simulation has become a full
@@ -94,7 +94,7 @@ partner to theory and experiment.
 The reason `0.1 + 0.2` behaves identically on your phone, your
 laptop, and a supercomputer is a 1985 standard called **IEEE 754**.
 Its principal architect, the mathematician **William Kahan**, won the
-1989 Turing Award — computing's highest honor — for his work on it,
+1989 Turing Award, computing's highest honor, for his work on it,
 and is widely called "the father of floating point." Before IEEE 754,
 every manufacturer rounded differently, special values like infinity
 and NaN were handled inconsistently, and a program that ran correctly
@@ -117,17 +117,17 @@ A Patriot missile battery tracked time by counting tenths of a second
 in a 24-bit register. But $0.1$ has no exact binary representation,
 so each tick carried a tiny rounding error. After about **100 hours**
 of continuous uptime, the accumulated drift in the system clock grew
-to roughly a third of a second — enough to misplace a fast-moving
+to roughly a third of a second, enough to misplace a fast-moving
 target by hundreds of meters. The battery failed to intercept an
 incoming Scud missile, and **28 soldiers were killed**. The bug was
-*accumulated round-off in a long calculation* — the precision wall,
+*accumulated round-off in a long calculation*, the precision wall,
 in its deadliest form.
 </Callout>
 
 <Callout type="warn" title="The Pentium FDIV bug, 1994">
 Intel's Pentium processor shipped with a flaw in the lookup table
 used by its floating-point division unit. For certain divisions it
-returned wrong results — a famous example being $4195835 / 3145727$,
+returned wrong results, a famous example being $4195835 / 3145727$,
 which came out wrong in about the fifth significant digit. Once the
 bug became public, Intel was forced to offer replacements, at a cost
 of about **$475 million**. The lesson: even the *hardware* that
@@ -143,21 +143,21 @@ floating-point value (related to the rocket's horizontal velocity)
 was converted to a 16-bit signed integer. Ariane 5 flew faster than
 its predecessor, the value no longer fit in 16 bits, the conversion
 **overflowed**, and the guidance computer shut down. This is the
-*range* failure of finite precision — a number that left the
-representable interval — rather than a *rounding* failure.
+*range* failure of finite precision, a number that left the
+representable interval, rather than a *rounding* failure.
 </Callout>
 
 Three failures, three distinct lessons: error accumulates, hardware
 can be wrong, and a finite format has edges you can fall off.
-Recognizing these failure modes — and writing code that guards
-against them — is a large part of what separates a programmer who
+Recognizing these failure modes, and writing code that guards
+against them, is a large part of what separates a programmer who
 uses NumPy from a computational scientist.
 
 ## Where to read more
 
 Each of these threads has a vast literature. If you want primary
 sources, search for the GAO report on the Patriot failure, the
-Lions report on Ariane 5, and Kahan's own writing on IEEE 754 — all
+Lions report on Ariane 5, and Kahan's own writing on IEEE 754, all
 freely available, and all far more detailed than these summaries.
 The point of this page is not completeness but motivation: the
 numerical care this course teaches is not pedantry. People have died

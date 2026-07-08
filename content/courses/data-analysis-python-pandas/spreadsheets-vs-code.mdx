@@ -1,13 +1,13 @@
 ---
 title: Spreadsheets vs Code
-description: A side-by-side look at how the same analysis feels in Excel versus Pandas — and why analysts increasingly choose code even when the data is small.
+description: A side-by-side look at how the same analysis feels in Excel versus Pandas, and why analysts increasingly choose code even when the data is small.
 ---
 
 The previous chapter ended on a cliffhanger: spreadsheet work
 leaves no reproducible trail, and that is the gap code was built to
 close. This chapter makes the comparison concrete with side-by-side
 scenarios so you can feel, in your bones, where each tool wins and
-where each one loses — and it opens with the most expensive
+where each one loses, and it opens with the most expensive
 spreadsheet mistake in modern economics.
 
 ## A five-row error that shaped austerity policy
@@ -24,7 +24,7 @@ In 2013 a graduate student named **Thomas Herndon**, trying to
 reproduce the finding for a class assignment, asked for the original
 spreadsheet. When he finally got it, he found that an Excel formula
 meant to average a column of countries had been written to stop a
-few rows short — it **accidentally omitted five countries** from the
+few rows short, it **accidentally omitted five countries** from the
 calculation (along with some debatable weighting choices). Correct
 the formula and the dramatic cliff at 90% softens into something far
 less alarming. A selection error inside a single spreadsheet cell
@@ -32,7 +32,7 @@ had helped shape real fiscal policy, and it took an outsider with a
 copy of the file *years later* to catch it.
 
 That is the whole argument of this chapter in one story. Not that
-spreadsheets are evil — they are wonderful — but that a manual,
+spreadsheets are evil, they are wonderful, but that a manual,
 click-by-click analysis is nearly impossible to audit, and the
 errors hide in plain sight. Code is not immune to bugs, but a script
 is a *written record of exactly what was done*, which means it can
@@ -41,7 +41,7 @@ be re-run, reviewed line by line, and corrected.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Side by side: a spreadsheet grid with one hand-edited yellow cell under a mouse pointer, versus stacked lines of code with a green run button — manual clicks against a rerunnable script"
+  aria-label="Side by side: a spreadsheet grid with one hand-edited yellow cell under a mouse pointer, versus stacked lines of code with a green run button, manual clicks against a rerunnable script"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="318" y="30" width="4" height="170" rx="2" fill="currentColor" opacity="0.08" />
@@ -139,7 +139,7 @@ path is:
 
 The "code" version takes more upfront learning. There is no
 pretending otherwise. But once the learning is paid for, every
-repeated run is essentially free — and the script is itself a
+repeated run is essentially free, and the script is itself a
 **record of how the analysis was done**.
 
 That is the central trade-off:
@@ -154,7 +154,7 @@ That is the central trade-off:
 | Easy to share visually           | Yes                    | Requires hosting  |
 | Easy for non-coders to edit      | Yes                    | No                |
 
-There is no winner in the abstract — only winners *for a given
+There is no winner in the abstract, only winners *for a given
 problem*.
 
 <Callout type="info" title="The 'recurring' test">
@@ -234,7 +234,7 @@ no oral history.
 In Excel, a refresh means an analyst manually re-doing the
 work, or building a fragile chain of `Power Query` /
 `VBA` / `OFFSET` formulas that one person on the team understands.
-In Pandas, refreshing is `python report.py` — or scheduling that
+In Pandas, refreshing is `python report.py`, or scheduling that
 command to run automatically every morning.
 
 ## Where spreadsheets still win
@@ -245,9 +245,9 @@ overkill for:
 - **Quick exploratory totals on a tiny file.** Excel is faster
   for "how much did I spend at the grocery store last month?"
 - **Sharing a working model with a non-technical stakeholder.**
-  The CFO wants to *play with* the model — change assumptions,
+  The CFO wants to *play with* the model, change assumptions,
   see results. A spreadsheet is the right vehicle.
-- **Visual layout.** Excel is also a layout tool — borders,
+- **Visual layout.** Excel is also a layout tool, borders,
   shading, merged cells, embedded charts. For documents whose
   appearance matters, it is still hard to beat.
 
@@ -258,7 +258,7 @@ presentation for humans).**
 ## A hybrid example
 
 Pandas can write `.xlsx` files directly. So you can do the
-intelligence in code and the presentation in Excel — best of
+intelligence in code and the presentation in Excel, best of
 both worlds. (We will return to this in the *Exporting Cleaned
 Data* chapter.)
 
@@ -307,8 +307,8 @@ the audience can read it.
 | Steve emails the result | Source lives in git |
 | Nobody can audit what he did | Anyone can audit and rerun |
 
-That right-hand pipeline — *same inputs, same outputs, audit
-trail* — is the whole game. Pandas is the most popular tool for
+That right-hand pipeline, *same inputs, same outputs, audit
+trail*, is the whole game. Pandas is the most popular tool for
 building it in the Python world.
 
 ## What to take away
@@ -332,7 +332,7 @@ building it in the Python world.
   > Code is often *more* verbose than a handful of spreadsheet clicks for a simple task; the chapter's argument is about reproducibility, not terseness.
 - Code is more fun
   > Enjoyment is subjective and not the chapter's stated reason; the practical case rests on reproducibility and auditability.
-- [o] Code-based analyses are *reproducible* — re-running on next week's data gives the same results without manual effort
+- [o] Code-based analyses are *reproducible*, re-running on next week's data gives the same results without manual effort
   > Reproducibility is the single biggest selling point of moving from spreadsheets to code, even if you never touch a dataset larger than 1,000 rows.
 - Code uses less memory
   > Memory efficiency is a secondary concern; a small CSV loaded into Excel and into Pandas uses comparable RAM.
@@ -352,7 +352,7 @@ Speed and scale matter too, but the everyday win is reproducibility.`}
 - If you have meetings on Mondays, use Pandas
   > Meeting schedules have no bearing on the chapter's heuristic, which is purely about how often the analysis will be repeated.
 
-It is a rule of thumb, not a law — but a useful one.`}
+It is a rule of thumb, not a law, but a useful one.`}
 />
 
 <MultipleChoice

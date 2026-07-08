@@ -1,11 +1,11 @@
 // Resolve a signed-in user's membership tier for model selection.
 //
 // A user is "pro" when ANY of these hold:
-//   - their `user.plan` column is 'pro' (the real membership field — set by a
+//   - their `user.plan` column is 'pro' (the real membership field, set by a
 //     future billing webhook, or manually by an admin);
 //   - their email is in the `PRO_USER_EMAILS` allowlist (bootstrap before a
 //     billing system exists, mirroring how ADMIN_EMAILS grants admin);
-//   - they're an admin (role 'admin' or in the ADMIN_EMAILS allowlist) — admins
+//   - they're an admin (role 'admin' or in the ADMIN_EMAILS allowlist), admins
 //     get the better model for free.
 // Everyone else (including users with no session) is "free".
 import type { MemberTier } from "./types";

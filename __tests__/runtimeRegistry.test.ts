@@ -5,7 +5,7 @@
  * caller of `getSharedRuntime` subscribes to the in-flight boot's
  * progress (not just the first caller), late subscribers get the
  * current stage replayed, subscriptions end when the boot settles, and
- * failed boots stay retryable. Fake adapters drive `init` by hand — no
+ * failed boots stay retryable. Fake adapters drive `init` by hand, no
  * real runtimes are constructed.
  */
 import { describe, expect, it, vi } from "vitest";
@@ -26,7 +26,7 @@ type Report = (message: string, fraction?: number) => void;
  *  to `init` plus resolve/reject handles for the init promise. The
  *  registry only reads `id` and `init`, so the cast is safe. When
  *  `disposable`, the runtime carries a `dispose` spy (making it an
- *  eviction candidate — see the eviction suite below). */
+ *  eviction candidate, see the eviction suite below). */
 function fakeAdapter(id: string, opts: { disposable?: boolean } = {}) {
   let report: Report = () => {};
   let resolve!: (runtime: LanguageRuntime) => void;
@@ -144,7 +144,7 @@ describe("getSharedRuntime boot progress", () => {
 
 describe("runtime eviction", () => {
   // The registry treats scope as an opaque string, so each test runs in
-  // its own private scope — module-level registry state can't bleed
+  // its own private scope, module-level registry state can't bleed
   // between tests.
   let scopeSeq = 0;
   const freshScope = () => `evict-test-${++scopeSeq}` as RuntimeScope;

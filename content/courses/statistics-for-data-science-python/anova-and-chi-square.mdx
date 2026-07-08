@@ -1,18 +1,18 @@
 ---
 title: ANOVA and Chi-Square
-description: Two essential tests beyond the t-test — one-way ANOVA for comparing the means of three or more groups, and chi-square tests for categorical data (independence and goodness-of-fit), with the intuition, the assumptions, and how to read the results.
+description: Two essential tests beyond the t-test, one-way ANOVA for comparing the means of three or more groups, and chi-square tests for categorical data (independence and goodness-of-fit), with the intuition, the assumptions, and how to read the results.
 ---
 
 The t-test compares **two** means. But real questions rarely stop at two.
 Does conversion differ across **four** landing pages? Do delivery times
 differ across **three** warehouses? And what about questions that aren't
-about means at all — is **device type** related to **whether a user
+about means at all, is **device type** related to **whether a user
 churns**? Those are counts of categories, not averages.
 
 This page covers the two tools that handle these cases:
 
-- **One-way ANOVA** — compares the means of **3+ groups** at once.
-- **Chi-square tests** — work with **categorical** data: are two
+- **One-way ANOVA**, compares the means of **3+ groups** at once.
+- **Chi-square tests**, work with **categorical** data: are two
   categorical variables associated (independence), and does a category's
   counts match an expected pattern (goodness-of-fit)?
 
@@ -22,7 +22,7 @@ the right one and reading the result honestly.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three colored group humps stand above one shared axis, each raising a post to its own mean — ANOVA asks a single global question: are the posts farther apart than the width of the humps can explain?"
+  aria-label="Three colored group humps stand above one shared axis, each raising a post to its own mean, ANOVA asks a single global question: are the posts farther apart than the width of the humps can explain?"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="168" width="520" height="2.5" rx="1.25" fill="currentColor" opacity="0.18" />
@@ -40,12 +40,12 @@ the right one and reading the result honestly.
   </g>
 </svg>
 
-## Part A — One-way ANOVA: comparing 3+ group means
+## Part A, One-way ANOVA: comparing 3+ group means
 
 ### Why not just run a bunch of t-tests?
 
 The tempting move with four groups is to t-test every pair: A vs B, A vs
-C, A vs D, B vs C, B vs D, C vs D — six tests. The problem is the
+C, A vs D, B vs C, B vs D, C vs D, six tests. The problem is the
 **multiplicity** of chances to be wrong. Each test at α = 0.05 carries a
 5% false-positive risk. Run six and the chance that *at least one* fires
 by pure luck climbs well above 5%.
@@ -84,10 +84,10 @@ print(f"That is FAR above the 5% you thought you were risking.")
   ]}
 />
 
-That inflation is the heart of the **multiple comparisons problem** —
+That inflation is the heart of the **multiple comparisons problem**,
 we'll formalize it in *Errors and Power*. ANOVA's job is to ask the
-**single, global** question first — *"is there any difference among these
-groups at all?"* — with one test at one α, so your false-positive rate
+**single, global** question first, *"is there any difference among these
+groups at all?"*, with one test at one α, so your false-positive rate
 stays where you set it.
 
 <Callout type="warn" title="Misconception: just run all the pairwise t-tests">
@@ -106,7 +106,7 @@ ANOVA's test statistic, **F**, compares two kinds of spread:
 
 The intuition: if the groups truly have the same mean, then the group
 averages should differ only as much as the noise *inside* the groups
-would predict — so between-spread ≈ within-spread and **F ≈ 1**. But if
+would predict, so between-spread ≈ within-spread and **F ≈ 1**. But if
 some groups are genuinely shifted, the group means spread out *more* than
 within-group noise alone can explain, pushing **F well above 1**.
 
@@ -171,12 +171,12 @@ else:
 - H₁: **at least one** group mean differs from the rest.
 
 A large F with a small p-value says the group means are spread out more
-than within-group noise can explain — so you reject H₀ and conclude
+than within-group noise can explain, so you reject H₀ and conclude
 *some* difference exists. Crucially, that is *all* it tells you.
 
 <Callout type="danger" title="Misconception: ANOVA tells you WHICH group differs">
 It does not. A significant ANOVA says *"at least one group is
-different"* — it's an **omnibus** test. To find out *which* pairs differ,
+different"*, it's an **omnibus** test. To find out *which* pairs differ,
 you run **post-hoc** comparisons (e.g. Tukey's HSD) that correct for
 multiplicity. Think of ANOVA as the smoke alarm: it tells you there's a
 fire somewhere, not which room.
@@ -186,7 +186,7 @@ fire somewhere, not which room.
 One-way ANOVA assumes **independent** observations, **approximately
 normal** within-group values (the CLT helps for larger groups), and
 **roughly equal variances** across groups (homogeneity of variance). If
-variances differ a lot, a Welch-style ANOVA is the robust analogue —
+variances differ a lot, a Welch-style ANOVA is the robust analogue,
 same spirit as preferring Welch's t-test. If normality is badly violated
 with small groups, the **Kruskal–Wallis** test is the nonparametric
 counterpart (a cousin of the methods in *Correlation and Nonparametric
@@ -208,7 +208,7 @@ Tests*).
 ANOVA is the smoke alarm: it signals a difference exists somewhere, then post-hoc tests locate it.`}
 />
 
-## Part B — Chi-square: tests for categorical data
+## Part B, Chi-square: tests for categorical data
 
 ANOVA and t-tests need **numbers** (heights, times, dollars). But masses
 of real data are **categorical**: device type, subscription tier,
@@ -250,7 +250,7 @@ Let's test whether **device type** is associated with **churn**.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three device columns split into red churn tiles above blue stay tiles, all crossed by one dashed yellow line marking the counts expected if the variables were unrelated — the first column's solid red tile bulging past the line is exactly the deviation a chi-square test adds up"
+  aria-label="Three device columns split into red churn tiles above blue stay tiles, all crossed by one dashed yellow line marking the counts expected if the variables were unrelated, the first column's solid red tile bulging past the line is exactly the deviation a chi-square test adds up"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
@@ -316,7 +316,7 @@ else:
 
 `chi2_contingency` returns four things: the statistic, the p-value, the
 degrees of freedom, and the **expected** counts table. A small p-value
-means observed and expected diverge more than chance would allow — so the
+means observed and expected diverge more than chance would allow, so the
 variables are related. Notice the expected table: it's what each cell
 *would* look like if device had no bearing on churn. Chi-square is just a
 measure of how far reality strays from that "no relationship" world.
@@ -324,14 +324,14 @@ measure of how far reality strays from that "no relationship" world.
 <Callout type="danger" title="Misconception: feed proportions or percentages into chi-square">
 Chi-square tests work on **raw counts**, never proportions or
 percentages. The test's entire logic rests on *how many* observations
-fall in each cell — 30-out-of-100 carries far less evidence than
+fall in each cell, 30-out-of-100 carries far less evidence than
 3,000-out-of-10,000, even though both are "30%." If you pass in
 percentages, the math is meaningless. Always build the table from
 **counts** (which is exactly what `pd.crosstab` gives you).
 </Callout>
 
 <Callout type="warn" title="Chi-square tests EXISTENCE, not STRENGTH">
-A significant chi-square tells you an association **exists** — it says
+A significant chi-square tells you an association **exists**, it says
 nothing about how **strong** it is. With a huge sample, even a trivial,
 practically irrelevant association becomes "significant." To measure
 *strength*, use an effect size for tables like **Cramér's V** (a
@@ -388,14 +388,14 @@ else:
 />
 
 The hypotheses: H₀ says the counts follow the expected proportions;
-H₁ says they don't. Same logic as before — observed vs expected — just
+H₁ says they don't. Same logic as before, observed vs expected, just
 for one variable against a reference pattern instead of two variables
 against each other.
 
 <Callout type="warn" title="Watch out for small expected counts">
 The chi-square approximation gets unreliable when **expected** counts in
 cells are very small (a common rule of thumb: be wary if any expected
-count is below 5). With sparse tables — rare categories, small samples —
+count is below 5). With sparse tables, rare categories, small samples,
 the p-value can be off. Fixes include combining small categories or using
 **Fisher's exact test** for 2×2 tables. Note this is about *expected*
 counts, not observed ones.
@@ -404,7 +404,7 @@ counts, not observed ones.
 <MultipleChoice
   markdown={`You have a table showing the **percentage** of users in each subscription tier who churned. You want a chi-square test of independence between tier and churn. What must you do first?
 
-- Nothing — chi-square works directly on percentages
+- Nothing, chi-square works directly on percentages
   > Chi-square's logic depends on the number of observations per cell, so percentages alone are not valid input. Sample size information is lost when you only have percentages.
 - [o] Convert back to raw counts per cell, because chi-square requires counts, not percentages
   > The test weighs evidence by how many observations fall in each cell, so you must reconstruct the actual counts (e.g. via a crosstab) before running it.
@@ -416,7 +416,7 @@ counts, not observed ones.
 Chi-square needs counts because the strength of evidence depends on how many observations there are, which percentages hide.`}
 />
 
-## Challenge 1 — One-way ANOVA across three groups
+## Challenge 1, One-way ANOVA across three groups
 
 <ChallengeCard
   adapter="python"
@@ -427,7 +427,7 @@ Chi-square needs counts because the strength of evidence depends on how many obs
 - Store the F-statistic as a float **\`F_stat\`** and the p-value as a float **\`p_value\`**.
 - Set a string **\`conclusion\`** to **\`"at least one differs"\`** if the result is significant at \`alpha = 0.05\`, otherwise **\`"no difference detected"\`**.
 
-Use the right \`scipy.stats\` function for comparing 3+ group means — do **not** run separate t-tests.`}
+Use the right \`scipy.stats\` function for comparing 3+ group means, do **not** run separate t-tests.`}
   files={[
     {
       filename: "main.py",
@@ -485,7 +485,7 @@ assert conclusion == expected`,
   ]}
 />
 
-## Challenge 2 — Chi-square test of independence
+## Challenge 2, Chi-square test of independence
 
 <ChallengeCard
   adapter="python"
@@ -570,7 +570,7 @@ assert associated == bool(p_value <= alpha)`,
 2. **Thinking a significant ANOVA names the group.** It's an omnibus
    "*something* differs"; use post-hoc tests to find which.
 3. **Feeding proportions/percentages into chi-square.** It needs raw
-   **counts** — the sample size is part of the evidence.
+   **counts**, the sample size is part of the evidence.
 4. **Reading chi-square as strength of association.** It tests
    *existence*, not *size*; use Cramér's V for magnitude.
 5. **Ignoring small expected counts.** Below ~5 per cell, the chi-square
@@ -606,7 +606,7 @@ The motivation is controlling the family-wise false-positive rate, which many se
 - The p-value divided by the significance level
   > The p-value is derived from F via the F-distribution; it is an output, not an input to the statistic.
 
-F contrasts how far apart the group means sit against the noise inside the groups — signal over noise, again.`}
+F contrasts how far apart the group means sit against the noise inside the groups, signal over noise, again.`}
 />
 
 <MultipleChoice
@@ -661,7 +661,7 @@ A significant ANOVA is the start of the investigation, not the end; post-hoc com
   statistic **F = between-group variance ÷ within-group variance** is
   signal over noise, and a large F (small p) means at least one group
   differs.
-- Don't replace ANOVA with **many t-tests** — that inflates false
+- Don't replace ANOVA with **many t-tests**, that inflates false
   positives (*Errors and Power*). And ANOVA is an **omnibus** test: it
   says *something* differs, not *which* (use post-hoc tests).
 - **Chi-square** handles **categorical** data: **independence** (two

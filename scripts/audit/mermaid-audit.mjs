@@ -130,7 +130,7 @@ function classify(chart) {
   const maxOut = Math.max(0, ...outDeg.values());
   const maxIn = Math.max(0, ...inDeg.values());
 
-  // Cycle detection (DFS) — a back-edge means a decision/loop flow (keep).
+  // Cycle detection (DFS), a back-edge means a decision/loop flow (keep).
   const adj = new Map();
   for (const [s, d] of edges) {
     if (!adj.has(s)) adj.set(s, []);

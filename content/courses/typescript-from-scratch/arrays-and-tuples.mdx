@@ -3,7 +3,7 @@ title: Arrays and Tuples
 description: Homogeneous collections and fixed-length sequences with precise type tracking
 ---
 
-JavaScript arrays are wonderfully flexible — you can mix numbers,
+JavaScript arrays are wonderfully flexible, you can mix numbers,
 strings, objects, even other arrays in a single list. But this
 flexibility is also a liability: if you expect an array of numbers and
 accidentally receive an array of strings, JavaScript won't complain until
@@ -22,7 +22,7 @@ between arrays and tuples?** **What bugs does this prevent?**
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A rail of identical blue squares runs on past a dashed continuation — an array holds any number of one type — while below, a tray with exactly three slots holds a green square, a blue circle, and a yellow triangle in fixed positions — a tuple gives each slot its own type"
+  aria-label="A rail of identical blue squares runs on past a dashed continuation, an array holds any number of one type, while below, a tray with exactly three slots holds a green square, a blue circle, and a yellow triangle in fixed positions, a tuple gives each slot its own type"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -90,7 +90,7 @@ console.log("First name:", names[0]);
 />
 
 **What the compiler now knows:** Every element of `numbers` is a
-`number`. If you write `numbers.push("six")`, the compiler rejects it —
+`number`. If you write `numbers.push("six")`, the compiler rejects it,
 `"six"` is not a `number`. The type annotation acts as a contract: "this
 array holds only numbers."
 
@@ -132,7 +132,7 @@ const scores = [95, 87, 92];
 // Inferred as string[]
 const colors = ["red", "green", "blue"];
 
-// Inferred as (number | string)[] — a mixed array
+// Inferred as (number | string)[], a mixed array
 const mixed = [1, "two", 3];
 
 console.log("scores:", scores);
@@ -144,8 +144,8 @@ console.log("mixed:", mixed);
 />
 
 Notice the last case: `mixed` is inferred as `(number | string)[]`,
-meaning each element is *either* a number or a string. This is correct —
-the array holds both — but it also means you lose precision. If you index
+meaning each element is *either* a number or a string. This is correct,
+the array holds both, but it also means you lose precision. If you index
 into `mixed`, TypeScript knows the result is `number | string`, not
 specifically `number`. You'll need to narrow the type before you can do
 math with it (we'll cover narrowing in [Type
@@ -190,7 +190,7 @@ documentation.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Four blue squares sit safely inside a green outlined display case while a red square outside is stopped at the wall with a red cross — a readonly array can be viewed and iterated but never mutated"
+  aria-label="Four blue squares sit safely inside a green outlined display case while a red square outside is stopped at the wall with a red cross, a readonly array can be viewed and iterated but never mutated"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }}>
@@ -277,7 +277,7 @@ console.log(\`\${name} is \${age} years old.\`);
 
 **What the compiler now knows:** `person[0]` is *specifically* a `string`,
 not `string | number`. `person[1]` is *specifically* a `number`. If you
-try to assign `person = [30, "Alice"]`, the compiler rejects it — the
+try to assign `person = [30, "Alice"]`, the compiler rejects it, the
 order matters.
 
 Tuples shine when a function returns multiple values:
@@ -395,7 +395,7 @@ iterate over it, `push` to it (if the tuple is mutable), etc.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A single tray slot holds one fixed green square, then a rail of identical blue squares stretches away past a dashed continuation — a tuple's required head followed by a rest element of any length"
+  aria-label="A single tray slot holds one fixed green square, then a rail of identical blue squares stretches away past a dashed continuation, a tuple's required head followed by a rest element of any length"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -539,7 +539,7 @@ if (result !== 5) throw new Error("Expected 5, got " + result);
 TypeScript's array type does *not* track length. If you declare `numbers:
 number[]`, the compiler doesn't know if the array has 0, 1, or 100
 elements. By default it optimistically types `numbers[0]` as plain
-`number` even though the array might be empty — and with the
+`number` even though the array might be empty, and with the
 `noUncheckedIndexedAccess` compiler option (from the
 [tsconfig chapter](./setup-and-tsconfig)) it honestly reports
 `number | undefined`. Tuples, by contrast, *do* track
@@ -615,5 +615,5 @@ bugs: indexing beyond tuple bounds, pushing the wrong type into an array,
 accidentally mutating a collection you meant to keep immutable.
 
 In the next chapter, [Objects and Interfaces](./objects-and-interfaces),
-we'll see how to type structured data — objects with named properties,
+we'll see how to type structured data, objects with named properties,
 each with its own type.

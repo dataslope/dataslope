@@ -1,6 +1,6 @@
 ---
 title: "Classic Forecasting: A Step-by-Step Guide to AR, MA, and ARIMA Models"
-description: Building AR, MA, ARMA, and ARIMA models with statsmodels — what each part means, why an MA model is not a moving average, choosing (p,d,q) from ACF/PACF, fitting and forecasting with widening uncertainty, and reading residual diagnostics.
+description: Building AR, MA, ARMA, and ARIMA models with statsmodels, what each part means, why an MA model is not a moving average, choosing (p,d,q) from ACF/PACF, fitting and forecasting with widening uncertainty, and reading residual diagnostics.
 ---
 
 Everything so far has been preparation. We learned to make a series
@@ -12,7 +12,7 @@ output, and produce a forecast with honest uncertainty bands.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three colored strands — blue, yellow, and green — braid together into a single forecasting line that flies onward as an arrow inside a widening pale band of uncertainty: AR, I, and MA meshing into ARIMA"
+  aria-label="Three colored strands, blue, yellow, and green, braid together into a single forecasting line that flies onward as an arrow inside a widening pale band of uncertainty: AR, I, and MA meshing into ARIMA"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ output, and produce a forecast with honest uncertainty bands.
 An ARIMA model is built from two simple ideas about where the next value
 comes from.
 
-**AR(p) — autoregressive.** "Regress the series on its own recent *values*."
+**AR(p), autoregressive.** "Regress the series on its own recent *values*."
 Each value is a weighted sum of the last `p` values plus a random shock:
 
 `y(t) = c + φ₁·y(t-1) + φ₂·y(t-2) + ... + φₚ·y(t-p) + ε(t)`
@@ -65,7 +65,7 @@ This captures **momentum / persistence**: a high value tends to be followed
 by another high value. The `φ` weights say how strongly the past pulls the
 present.
 
-**MA(q) — moving average.** "Regress the series on its own recent *shocks*."
+**MA(q), moving average.** "Regress the series on its own recent *shocks*."
 Each value is the current shock plus a weighted sum of the last `q` shocks
 (the past forecast errors):
 
@@ -80,7 +80,7 @@ This is the single most confusing name collision in time series. The
 *smoother of past values*. The **MA(q) model** here is a forecasting model
 built from past *shocks* (errors), and it has nothing to do with averaging a
 window. Same two words, completely different objects. When someone says "MA"
-in a modeling context, they mean the shock-based model — not a rolling mean.
+in a modeling context, they mean the shock-based model, not a rolling mean.
 </Callout>
 
 Let's confirm AR and MA models *recover* the coefficients we baked into
@@ -131,7 +131,7 @@ print("Both recovered the true coefficients closely. The model 'learned the rule
 
 ## Putting it together: ARIMA(p, d, q)
 
-- **ARMA(p, q)** simply uses AR *and* MA terms together — on a **stationary**
+- **ARMA(p, q)** simply uses AR *and* MA terms together, on a **stationary**
   series.
 - **ARIMA(p, d, q)** is ARMA applied to a series that has been **differenced
   `d` times**, with forecasts integrated back. That `d` is what lets ARIMA
@@ -156,11 +156,11 @@ So the three numbers are exactly the three skills from the last pages:
 The classical recipe for building an ARIMA, named after the statisticians
 who formalized it:
 
-1. **Stationarize** — transform (log) and difference until stationary → `d`.
-2. **Identify** — read the ACF/PACF of the stationary series → `p`, `q`.
-3. **Fit** — estimate the model.
-4. **Diagnose** — check the residuals are white noise; if not, revise.
-5. **Forecast** — project forward with uncertainty.
+1. **Stationarize**, transform (log) and difference until stationary → `d`.
+2. **Identify**, read the ACF/PACF of the stationary series → `p`, `q`.
+3. **Fit**, estimate the model.
+4. **Diagnose**, check the residuals are white noise; if not, revise.
+5. **Forecast**, project forward with uncertainty.
 
 ```mermaid
 flowchart TD
@@ -175,8 +175,8 @@ flowchart TD
 ## Fitting and forecasting
 
 Time for a real forecast. We'll use a simulated series with a trend and
-autoregressive noise — deliberately *non-seasonal*, so a plain ARIMA can
-handle it well — fit on a training portion, and forecast the rest.
+autoregressive noise, deliberately *non-seasonal*, so a plain ARIMA can
+handle it well, fit on a training portion, and forecast the rest.
 
 <CodeBlock
   adapter="python"
@@ -236,22 +236,22 @@ print("further out -- uncertainty compounds the further ahead you predict.")
 />
 
 Two things to notice. First, we fit on **train** and forecast the
-**held-out** months — never touching the test data during fitting. Second,
+**held-out** months, never touching the test data during fitting. Second,
 the uncertainty band **fans out** with the horizon: predicting next month is
 far easier than predicting two years out, and an honest forecast says so.
 
 <Callout type="warn" title="Confidence intervals widen for a reason">
 A forecast's uncertainty *compounds* with distance. Each step ahead is built
 on the predicted (uncertain) steps before it, so errors accumulate. A
-forecast reported without widening intervals — a single confident line
-stretching years into the future — is hiding how little it really knows.
+forecast reported without widening intervals, a single confident line
+stretching years into the future, is hiding how little it really knows.
 Always look at the bands, not just the central line.
 </Callout>
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue trail of observations climbs to a thin yellow post where the data ends, and a green cone fans wider and wider around the forecast dots beyond it — uncertainty compounds with every step ahead, and an honest forecast admits it"
+  aria-label="A blue trail of observations climbs to a thin yellow post where the data ends, and a green cone fans wider and wider around the forecast dots beyond it, uncertainty compounds with every step ahead, and an honest forecast admits it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="44" y="175" width="552" height="3" rx="1.5" fill="currentColor" opacity="0.2" />
@@ -285,7 +285,7 @@ Always look at the bands, not just the central line.
 
 ACF/PACF suggest candidate orders, but often several are plausible. The
 **AIC** (Akaike Information Criterion) scores a fitted model by its fit
-*penalized* for complexity — **lower is better**. It's a fast way to compare
+*penalized* for complexity, **lower is better**. It's a fast way to compare
 candidate `(p, d, q)` orders.
 
 <CodeBlock
@@ -330,14 +330,14 @@ AIC is an *in-sample* criterion: it measures how well the model fits the data
 it was trained on, with a complexity penalty. A model can have the best AIC
 and still forecast the future poorly (it tuned itself to the training noise).
 AIC is a fine way to *shortlist* orders, but it is **no substitute for
-testing on held-out future data** — which is the entire subject of the next
+testing on held-out future data**, which is the entire subject of the next
 page. Never report AIC as if it were forecast accuracy.
 </Callout>
 
 ## Diagnose the residuals
 
 A fitted model's residuals (`actual - fitted`) should look like **white
-noise** — no leftover autocorrelation, roughly normal, constant variance. If
+noise**, no leftover autocorrelation, roughly normal, constant variance. If
 the residuals still have structure, the model missed something. statsmodels
 bundles the standard four-panel check.
 
@@ -386,16 +386,16 @@ print("under-fits this series -- a SEASONAL model (SARIMA) is what it's asking f
   ]}
 />
 
-The residual ACF still has a spike near lag 12 — the yearly seasonality plain
+The residual ACF still has a spike near lag 12, the yearly seasonality plain
 ARIMA can't capture. That's the residual diagnostic doing its job: telling
 you the model is incomplete and pointing at *seasonality* as the culprit.
 The fix is a **seasonal** ARIMA (SARIMA), which adds seasonal AR/I/MA terms
-at the period — conceptually just "do the AR/I/MA trick at lag 12 too."
+at the period, conceptually just "do the AR/I/MA trick at lag 12 too."
 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A residual line jitters quietly along the zero line until it leaps into one sharp red peak at the twelfth lag — the model confessing that it is missing a seasonal term"
+  aria-label="A residual line jitters quietly along the zero line until it leaps into one sharp red peak at the twelfth lag, the model confessing that it is missing a seasonal term"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -428,11 +428,11 @@ at the period — conceptually just "do the AR/I/MA trick at lag 12 too."
 </svg>
 
 <MultipleChoice
-  markdown={`A teammate says, "I'll use an MA(2) model — that's just a 2-period moving average of the data, right?" What's the correction?
+  markdown={`A teammate says, "I'll use an MA(2) model, that's just a 2-period moving average of the data, right?" What's the correction?
 
 - They're right; MA(2) is a 2-period rolling mean
   > These are different objects that unfortunately share a name. A rolling mean averages past *values*; an MA(2) *model* is built from past *shocks*.
-- [o] No — an MA(q) *model* expresses each value as a function of past *shocks* (forecast errors), which is unrelated to a rolling average of past values
+- [o] No, an MA(q) *model* expresses each value as a function of past *shocks* (forecast errors), which is unrelated to a rolling average of past values
   > The MA in "MA model" refers to a moving average *of the error terms*, a forecasting construct. The \`rolling(2).mean()\` smoother averages observed values. Confusing them is a classic trap.
 - They're right, but only if the window is centered
   > Centering is a property of a rolling-mean smoother and irrelevant to an MA model. The two aren't the same thing under any windowing choice.
@@ -465,8 +465,8 @@ PACF cut-off -> \`p\`, ACF cut-off -> \`q\`, and the number of differences for s
   instructions={`The \`train\` series (108 monthly points) is loaded. Fit an \`ARIMA\` with order \`(1, 1, 1)\` and produce a **12-step** forecast.
 
 Set:
-- \`fitted\` — the fitted results object (from \`ARIMA(train, order=(1,1,1)).fit()\`)
-- \`forecast\` — the 12-step point forecast as a Series (use \`fitted.forecast(steps=12)\`)
+- \`fitted\`, the fitted results object (from \`ARIMA(train, order=(1,1,1)).fit()\`)
+- \`forecast\`, the 12-step point forecast as a Series (use \`fitted.forecast(steps=12)\`)
 
 The forecast should have exactly 12 values, all finite, continuing monthly after the last training date.`}
   files={[
@@ -531,9 +531,9 @@ assert forecast.index[0] == train.index[-1] + pd.offsets.MonthBegin(1)`,
   instructions={`Compare two candidate models for the loaded \`train\` series by their **AIC** (lower is better). Compute the AIC of \`ARIMA(train, order=(1,1,1))\` and \`ARIMA(train, order=(0,1,1))\`, then choose the better order.
 
 Produce a dict \`pick\`:
-- \`"aic_111"\` — AIC of the (1,1,1) model (float)
-- \`"aic_011"\` — AIC of the (0,1,1) model (float)
-- \`"best_order"\` — the tuple with the **lower** AIC (either \`(1,1,1)\` or \`(0,1,1)\`)
+- \`"aic_111"\`, AIC of the (1,1,1) model (float)
+- \`"aic_011"\`, AIC of the (0,1,1) model (float)
+- \`"best_order"\`, the tuple with the **lower** AIC (either \`(1,1,1)\` or \`(0,1,1)\`)
 
 Decide \`best_order\` consistently from your two AICs (lower wins).`}
   files={[
@@ -595,7 +595,7 @@ assert pick["best_order"] == lower, "best_order must be the lower-AIC model"`,
 - The next few future values
   > Using future values would be leakage and is impossible at prediction time. AR uses only the *past*.
 - [o] A weighted sum of the series' own recent past *values*
-  > "Autoregressive" means regressing the series on its own lagged values — each prediction is a weighted combination of recent observations plus a shock.
+  > "Autoregressive" means regressing the series on its own lagged values, each prediction is a weighted combination of recent observations plus a shock.
 - A weighted sum of recent forecast *errors*
   > That describes the *MA* part (past shocks), not the AR part. AR uses past values; MA uses past errors.
 - A rolling average of the data
@@ -614,7 +614,7 @@ The AR component predicts from a weighted sum of recent past *values* (the MA co
 - Because the training data runs out
   > The training data is fixed; that's not what drives the widening. It's the *compounding* of forecast uncertainty step by step.
 - Because of a plotting artifact
-  > The widening is a real statistical property of multi-step forecasts, computed from the model — not a quirk of the chart.
+  > The widening is a real statistical property of multi-step forecasts, computed from the model, not a quirk of the chart.
 
 Multi-step forecasts compound uncertainty, so intervals must widen the further ahead you predict.`}
 />
@@ -622,35 +622,35 @@ Multi-step forecasts compound uncertainty, so intervals must widen the further a
 <MultipleChoice
   markdown={`A model has the **lowest AIC** among your candidates. Can you conclude it will forecast the future most accurately?
 
-- Yes — lowest AIC always means best forecasts
+- Yes, lowest AIC always means best forecasts
   > AIC measures *in-sample* fit with a complexity penalty, not out-of-sample accuracy. The lowest-AIC model can still forecast worse on unseen data.
-- [o] No — AIC is an in-sample criterion; the only way to judge forecast accuracy is to test on held-out future data
+- [o] No, AIC is an in-sample criterion; the only way to judge forecast accuracy is to test on held-out future data
   > AIC is a useful shortlisting tool, but it rewards fitting the training data. Genuine forecast skill must be measured out-of-sample, on data the model never saw.
 - Yes, as long as the AIC is negative
   > The sign of AIC is meaningless on its own (it depends on scale); negativity says nothing about forecast accuracy. Only out-of-sample testing settles that.
 - No, because AIC can't be computed for ARIMA
-  > AIC is routinely reported for ARIMA fits. The issue isn't computability — it's that in-sample AIC isn't the same as out-of-sample accuracy.
+  > AIC is routinely reported for ARIMA fits. The issue isn't computability, it's that in-sample AIC isn't the same as out-of-sample accuracy.
 
 AIC compares in-sample fit-vs-complexity; forecast accuracy requires out-of-sample validation, which AIC cannot replace.`}
 />
 
 <Callout type="success" title="Key takeaways">
 - **AR(p)** predicts from past **values**; **MA(q)** predicts from past
-  **shocks** (errors). An **MA model is *not* a rolling mean** — same name,
+  **shocks** (errors). An **MA model is *not* a rolling mean**, same name,
   different thing.
 - **ARIMA(p, d, q)** = AR + `d` differences + MA, integrating forecasts back
   to the original scale. Read **`p` from the PACF**, **`q` from the ACF**,
   **`d` from differencing**.
 - Fit with `ARIMA(series, order=(p,d,q)).fit()`; forecast with
   `.forecast(steps)` or `.get_forecast(steps).conf_int()`. Intervals
-  **widen** with the horizon — uncertainty compounds.
-- **AIC** (lower is better) shortlists orders but is **in-sample** — never a
+  **widen** with the horizon, uncertainty compounds.
+- **AIC** (lower is better) shortlists orders but is **in-sample**, never a
   substitute for out-of-sample testing.
 - **Check residuals**: leftover structure (e.g. a lag-12 spike) means the
-  model is incomplete — seasonality calls for a **seasonal** ARIMA.
+  model is incomplete, seasonality calls for a **seasonal** ARIMA.
 </Callout>
 
 We just did something subtly important: we fit on a *training* slice and
-forecast a *held-out* future slice. That discipline — and the ways analysts
-accidentally break it — is the most important topic in this entire course.
+forecast a *held-out* future slice. That discipline, and the ways analysts
+accidentally break it, is the most important topic in this entire course.
 Let's give it the attention it deserves.

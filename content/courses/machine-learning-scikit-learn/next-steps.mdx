@@ -3,7 +3,7 @@ title: Where to Go Next
 description: A look back at the arc you have travelled, the handful of habits worth keeping forever, and an honest map of where the road continues from here.
 ---
 
-You have arrived at the end of the course — and at the beginning of being
+You have arrived at the end of the course, and at the beginning of being
 genuinely dangerous with machine learning. Take a moment to appreciate how
 far you have come. When you started, "machine learning" was a phrase you
 kept hearing. Now you can frame a problem, split data without fooling
@@ -19,7 +19,7 @@ road ahead.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three layered translucent blue peaks overlapping on the horizon — the course ends where the real climb begins"
+  aria-label="Three layered translucent blue peaks overlapping on the horizon, the course ends where the real climb begins"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -47,17 +47,17 @@ flowchart TD
     H --> I["Putting It Together<br/>the practical workflow, pitfalls"]
 ```
 
-Notice the shape of it. We began with **foundations** — what machine
+Notice the shape of it. We began with **foundations**, what machine
 learning actually is, and the language of features and targets. Then,
 immediately, **generalization**: the single most important idea in the
 field, that a model must be judged on data it has never seen. Everything
 after that was, in a sense, a refinement of that one idea.
 
-From there the path forked into **regression** and **classification** — the
-two great families of supervised learning — each paired with the metrics
+From there the path forked into **regression** and **classification**, the
+two great families of supervised learning, each paired with the metrics
 that tell you whether the model is any good and, just as important, what
-those metrics quietly leave out. We went **deeper into models** — trees,
-nearest neighbors, the ensembles that combine them — always asking not just
+those metrics quietly leave out. We went **deeper into models**, trees,
+nearest neighbors, the ensembles that combine them, always asking not just
 *how* each works but *when* to reach for it and when not to.
 
 Then came the unglamorous, essential craft of **data preparation**:
@@ -70,7 +70,7 @@ repeatable **workflow** and a catalog of the **pitfalls** that sink projects.
 <Callout type="success" title="The thread through all of it">
 If you trace a single thread through the entire course, it is this: **be
 honest about what your model has and has not seen, and skeptical of any
-number that flatters you.** That posture — more than any algorithm — is what
+number that flatters you.** That posture, more than any algorithm, is what
 makes the difference between someone who produces trustworthy models and
 someone who produces good-looking ones.
 </Callout>
@@ -96,7 +96,7 @@ model would get. A number means nothing without a reference point. The
 baseline is what turns a raw score into an actual verdict about skill.
 
 **Prefer intuition over memorization.** You will forget the exact arguments
-to `RandomForestClassifier` — that is what documentation is for. What you
+to `RandomForestClassifier`, that is what documentation is for. What you
 should *keep* is the understanding of what problem each tool solves, why it
 exists, and when it is the wrong choice. Tools make sense only against the
 job they were built for.
@@ -107,9 +107,9 @@ have leaked?" The most valuable thing you can bring to a model is doubt
 pointed at the right place.
 
 <Callout type="tip" title="When in doubt, return to generalization">
-Almost every hard question in applied machine learning — Is my model
+Almost every hard question in applied machine learning, Is my model
 overfitting? Is this score trustworthy? Did I leak something? Should I tune
-more? — is a question about **generalization**. When you are stuck, ask:
+more?, is a question about **generalization**. When you are stuck, ask:
 *how will this behave on data it has never seen, and is my evidence about
 that honest?* That question is the compass.
 </Callout>
@@ -117,7 +117,7 @@ that honest?* That question is the compass.
 ## Where the road continues
 
 This was a foundations course, and it was foundations *on purpose*. That
-means there is a great deal more to learn — and you are now equipped to
+means there is a great deal more to learn, and you are now equipped to
 learn almost all of it far faster than you could have before. Here is an
 honest map of the territory ahead.
 
@@ -131,17 +131,17 @@ discipline you already know.
 - **Gradient boosting** (`GradientBoostingClassifier`, and libraries like
   XGBoost and LightGBM) builds trees sequentially, each correcting the last.
   It is, for tabular data, frequently the most accurate classical approach
-  there is — and a natural next stop after random forests.
+  there is, and a natural next stop after random forests.
 - **Support vector machines** (`SVC`, `SVR`) find the widest possible margin
   between classes and, through the "kernel trick," carve out boundaries that
   are far from straight. Powerful, elegant, and instructive.
 - **Naive Bayes**, **regularized linear models** (ridge, lasso, elastic
-  net), and more — each with a niche where it shines.
+  net), and more, each with a niche where it shines.
 
 <Callout type="info" title="New algorithms, same rules">
 Every model above plugs into exactly the workflow you already know: split,
 baseline, pipeline, cross-validate, tune, test once, interpret. When you
-meet a new algorithm, you are not starting over — you are slotting one new
+meet a new algorithm, you are not starting over, you are slotting one new
 \`fit\`/\`predict\` object into machinery you have already mastered. That is
 the payoff of learning foundations first.
 </Callout>
@@ -149,7 +149,7 @@ the payoff of learning foundations first.
 ### Deeper into evaluation
 
 Evaluation is a rabbit hole that rewards every minute you spend in it. There
-are metrics beyond the ones we covered — average precision, log loss,
+are metrics beyond the ones we covered, average precision, log loss,
 calibration of predicted probabilities (does "70% confident" actually mean
 right 70% of the time?), and cost-sensitive evaluation for when different
 errors carry very different prices. There are also nested cross-validation
@@ -160,20 +160,20 @@ more you can trust what you build.
 ### Domain specialization
 
 The same foundations branch into specialized fields, each with its own data
-shapes and conventions — but the core discipline travels with you.
+shapes and conventions, but the core discipline travels with you.
 
 - **Time-series forecasting** trades random splits for time-ordered ones and
   adds its own toolkit for trend and seasonality.
 - **Natural language processing** turns text into features (and, at the
-  frontier, uses large language models — but classical text features take
+  frontier, uses large language models, but classical text features take
   you a long way).
-- **Recommender systems**, **anomaly detection**, and more — each a domain,
+- **Recommender systems**, **anomaly detection**, and more, each a domain,
   each built on the same honest-evaluation bedrock.
 
 ### A gentle note on deep learning
 
-You may be wondering where **deep learning** — neural networks, the
-technology behind modern image and language models — fits into all this.
+You may be wondering where **deep learning**, neural networks, the
+technology behind modern image and language models, fits into all this.
 Here is the honest answer: it builds directly on everything you just
 learned.
 
@@ -181,13 +181,13 @@ Deep learning did not replace these foundations; it *extends* them. A neural
 network is still trained on data, still evaluated on a held-out set, still
 prone to overfitting, still in need of honest metrics and a sealed test set.
 Train/test splits, overfitting, the bias-variance tradeoff, the danger of
-leakage, the importance of a baseline — every one of these ideas applies to
+leakage, the importance of a baseline, every one of these ideas applies to
 deep learning *unchanged*. The practitioners who struggle most with neural
 networks are usually the ones who skipped the foundations you now have.
 
 <Callout type="warn" title="Foundations first, frontier second">
-Deep learning is genuinely exciting, and it is a reasonable next destination
-— but it makes far more sense *on top of* what you have built here than as a
+Deep learning is genuinely exciting, and it is a reasonable next destination,
+but it makes far more sense *on top of* what you have built here than as a
 replacement for it. The honest-evaluation habits, the workflow, the
 skepticism toward flattering numbers: all of it carries straight over. Walk
 in with these foundations and the frontier is approachable. Skip them and it
@@ -197,7 +197,7 @@ well prepared to learn it elsewhere.
 
 ## How to keep learning
 
-The fastest way to get better from here is not more reading — it is
+The fastest way to get better from here is not more reading, it is
 *doing*. A few suggestions:
 
 - **Find a dataset you actually care about** and run the full workflow on it
@@ -205,8 +205,8 @@ The fastest way to get better from here is not more reading — it is
   than any exercise.
 - **Enter a friendly competition** to feel the discipline of a strict
   held-out evaluation, where you cannot fool yourself even if you try.
-- **Reproduce a result**, then deliberately break it — introduce a leak,
-  remove the baseline, tune against the test set — and watch how the numbers
+- **Reproduce a result**, then deliberately break it, introduce a leak,
+  remove the baseline, tune against the test set, and watch how the numbers
   lie. Learning to recognize the lie from the inside is invaluable.
 - **Read other people's pipelines** and ask of each step: why is this here,
   and what would go wrong without it?
@@ -222,7 +222,7 @@ improving.
 ## One last challenge
 
 You started this course running a five-line program you did not yet
-understand. Let us end with one you understand completely — a compact
+understand. Let us end with one you understand completely, a compact
 capstone that exercises the whole workflow: split, build a leak-free
 pipeline, judge it with cross-validation, and confirm the result on a sealed
 test set. Nothing here should be mysterious anymore.
@@ -347,11 +347,11 @@ assert test_score > 0.9, f"Expected strong held-out accuracy, got {test_score}"`
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Looking back across the whole course, which idea was positioned as the single most important — the one nearly every other topic refines?
+  markdown={`Looking back across the whole course, which idea was positioned as the single most important, the one nearly every other topic refines?
 
 - That random forests are the best model for most problems
   > No single model is universally best; the course repeatedly stressed matching the tool to the problem, not crowning a favorite.
-- [o] That a model must be judged on data it has never seen — the principle of generalization
+- [o] That a model must be judged on data it has never seen, the principle of generalization
   > Generalization was placed right after the foundations and revisited on nearly every page, because honest evaluation on unseen data underpins everything else.
 - That more data and more features always improve a model
   > The pitfalls chapter showed this is false; irrelevant features and unrepresentative data can hurt, so this was a misconception to correct, not a central principle.
@@ -383,7 +383,7 @@ The whole point of learning foundations first is that new algorithms slot into m
   > Train/test splits, overfitting, leakage, and honest metrics all apply unchanged to neural networks, so the foundations are extended, not replaced.
 - It is entirely unrelated and shares none of these concepts
   > Deep learning shares the core discipline of training data, held-out evaluation, and overfitting; it is far from unrelated.
-- [o] It builds directly on them — splits, overfitting, leakage, baselines, and honest evaluation all carry over unchanged
+- [o] It builds directly on them, splits, overfitting, leakage, baselines, and honest evaluation all carry over unchanged
   > A neural network is still trained on data and judged on held-out data, still overfits, and still needs honest metrics, so the habits from this course transfer straight across.
 - It only applies to numeric tabular data, unlike classical ML
   > Deep learning is most associated with images, text, and audio rather than being limited to tabular data; regardless, the evaluation foundations still apply.

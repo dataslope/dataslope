@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 // ─────────────────────────────────────────────────────────────────────
-// "Explain" toolbar action — shows the query's execution plan in a
+// "Explain" toolbar action, shows the query's execution plan in a
 // read-only modal. SQLite uses EXPLAIN QUERY PLAN; Postgres/DuckDB use
 // plain EXPLAIN. The shared `ExplainPlanDialog` + pure `utils/explain.ts`
 // render the plan uniformly across all three engines.

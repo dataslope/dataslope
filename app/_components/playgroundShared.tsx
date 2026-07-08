@@ -73,14 +73,14 @@ export const LOADING_QUIPS: string[] = [
   "Stretching before the first execution lap…",
   "Teaching the heap some new manners…",
   "Wiring up the standard library, one cable at a time…",
-  "Loading dependencies — and a healthy dose of optimism…",
+  "Loading dependencies, and a healthy dose of optimism…",
   "Fetching brain cells from the CDN…",
-  "Spinning up the hamster wheel — please clap…",
+  "Spinning up the hamster wheel, please clap…",
   "Composing a haiku for your first run…",
   "Reticulating splines (it's a thing)…",
   "Brewing a fresh pot of bytes…",
   "Untangling pointers (don't ask)…",
-  "Rolling 1d20 against load times — nat 20!",
+  "Rolling 1d20 against load times, nat 20!",
   "Counting to infinity. Twice. Quickly.",
   "Reading the manual. Don't tell anyone.",
   "Compressing entropy into adorable little packets…",
@@ -233,15 +233,15 @@ export interface SettingsPanelProps {
    *  theme preview card (`"python"`, `"r"`, `"sqlite"`, …). */
   language: string;
   /** Optional override for the "Use Different Font Size for Outputs"
-   *  row label — the SQL playground uses "Results" instead. */
+   *  row label, the SQL playground uses "Results" instead. */
   outputFontSizeLabel?: string;
   /** Whether to render the output/result font-size controls. */
   showOutputFontSizeControls?: boolean;
   /** Optional override for the "Clear Output Before Running" row label
-   *  — the SQL playground says "Clear Results Before Running". */
+   *, the SQL playground says "Clear Results Before Running". */
   clearBeforeRunLabel?: string;
   /** Whether to render the "Clear Output/Results Before Running" row.
-   *  SQL playgrounds set this to false — the option only applies to
+   *  SQL playgrounds set this to false, the option only applies to
    *  non-SQL playgrounds where outputs are appended. Defaults to true. */
   showClearBeforeRunRow?: boolean;
   onRestoreDefaults: () => void;
@@ -249,14 +249,14 @@ export interface SettingsPanelProps {
   /** Wipe every browser-side storage surface this app uses
    *  (localStorage + sessionStorage + OPFS + IndexedDB + caches) and
    *  reload. More thorough than `onClearLocalStorage`. Optional so
-   *  callers can opt into surfacing the action — when omitted the row
+   *  callers can opt into surfacing the action, when omitted the row
    *  is hidden. */
   onClearAllLocalData?: () => void;
-  /** Optional extra rows appended inside the General tab — used by the
+  /** Optional extra rows appended inside the General tab, used by the
    *  SQL playground to surface a per-DB "Reset query tabs" action. */
   extraGeneralRows?: ReactNode;
   /** Optional extra action buttons prepended inside the `.settings-actions`
-   *  group — used by the SQL playground to surface "Reset query tabs" next
+   *  group, used by the SQL playground to surface "Reset query tabs" next
    *  to the other destructive actions so all three form one grouped button. */
   extraActionRows?: ReactNode;
   /** Optional extra settings tabs rendered after "Editor Themes". Each
@@ -274,7 +274,7 @@ export interface SettingsPanelProps {
 
 /** Tabbed settings UI body (General + Editor Themes + extra tabs)
  *  shared across all playgrounds. Rendered inline inside a tab pane in
- *  every playground — the legacy modal-dialog form has been retired in
+ *  every playground, the legacy modal-dialog form has been retired in
  *  favour of the "Settings as a tab" affordance. */
 export function SettingsPanelContent({
   fontSize,

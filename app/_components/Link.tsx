@@ -8,7 +8,7 @@
  * each prefetch that missed the edge cache was billed as an ISR Read + Edge
  * Request + Fast Origin Transfer, so the viewport fan-out across our many
  * static pages exhausted the free quota. The site now runs on Cloudflare
- * (Workers + OpenNext), which has no ISR-read meter — prerendered pages and
+ * (Workers + OpenNext), which has no ISR-read meter, prerendered pages and
  * their prefetch (`.rsc`) payloads are served as free static assets with
  * unlimited bandwidth and don't count against the Workers request limit. So
  * the charge that forced prefetch off no longer exists, and we re-enable it.
@@ -19,7 +19,7 @@
  * `prefetch={false}` explicitly at the call site. Use the same opt-out for
  * any new link-dense grid/list.
  *
- * Note: Fumadocs sidebar/TOC links don't go through this wrapper — their
+ * Note: Fumadocs sidebar/TOC links don't go through this wrapper, their
  * prefetching is tamed separately via `sidebar={{ prefetch: false }}` on
  * `DocsLayout` in the docs-route layouts (courses/fumadocs-dev/interview-prep).
  */

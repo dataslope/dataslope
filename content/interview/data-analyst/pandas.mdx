@@ -1,6 +1,6 @@
 ---
 title: Pandas
-description: Data Analyst pandas interview questions — selection, groupby, merging, and missing data — with answers, a concept check, and a runnable challenge.
+description: Data Analyst pandas interview questions, selection, groupby, merging, and missing data, with answers, a concept check, and a runnable challenge.
 ---
 
 When the Data Analyst screen isn't SQL, it's usually **pandas**. Review
@@ -63,9 +63,9 @@ print(result)   # DataFrame`,
 
 ### When do you use `merge` vs `concat` vs `join`?
 
-- **`merge`** — SQL-style joins on key columns (`how="inner"|"left"|...`).
-- **`concat`** — stack DataFrames vertically (more rows) or horizontally (more columns), aligning on the index.
-- **`join`** — convenience for merging on the **index**.
+- **`merge`**, SQL-style joins on key columns (`how="inner"|"left"|...`).
+- **`concat`**, stack DataFrames vertically (more rows) or horizontally (more columns), aligning on the index.
+- **`join`**, convenience for merging on the **index**.
 
 Reach for `merge` for "combine on a key," `concat` for "stack these together."
 
@@ -183,7 +183,7 @@ df_long = df.melt(
 
 `pivot_table` is like a spreadsheet pivot: it groups by index and columns
 and applies an aggregation function (default `mean`). `pivot` is a
-simpler reshape with no aggregation — it requires unique (index, columns)
+simpler reshape with no aggregation, it requires unique (index, columns)
 combinations or it raises an error.
 
 ```python
@@ -347,7 +347,7 @@ df = pd.DataFrame({
     "amount": [100, 80, 120, 50],
 })`,
       starterCode: `subset = df[df["region"] == "North"].copy()
-subset["amount"] = 0   # safe — won't touch df
+subset["amount"] = 0   # safe, won't touch df
 print("subset:", subset["amount"].tolist())
 print("df unchanged:", df["amount"].tolist())`,
     },
@@ -377,7 +377,7 @@ print(df)`,
 ### Why is vectorization preferred over `apply` with a lambda?
 
 Pandas and NumPy vectorized operations run in compiled C code and process
-all elements in one call — typically 10-100x faster than a Python-level
+all elements in one call, typically 10-100x faster than a Python-level
 loop inside `apply`. Use `apply` only when no vectorized equivalent
 exists.
 
@@ -480,7 +480,7 @@ df["price"] = df["price"].ffill()
 ### How do you perform a conditional column assignment similar to SQL CASE?
 
 Use `numpy.where` for a single condition or `numpy.select` for multiple
-conditions — both are vectorized.
+conditions, both are vectorized.
 
 <CodeBlock
   adapter="python"
@@ -601,9 +601,9 @@ combined = pd.concat([df_jan, df_feb, df_mar], ignore_index=True)
 
 ### What is the difference between `map`, `apply`, and `DataFrame.map`?
 
-- `Series.map(func)` — applies a function or lookup element-by-element on a single Series.
-- `DataFrame.apply(func, axis=0|1)` — applies a function along an axis (column-wise or row-wise).
-- `DataFrame.map(func)` (pandas 2.1+, formerly `applymap`) — applies element-by-element across an entire DataFrame.
+- `Series.map(func)`, applies a function or lookup element-by-element on a single Series.
+- `DataFrame.apply(func, axis=0|1)`, applies a function along an axis (column-wise or row-wise).
+- `DataFrame.map(func)` (pandas 2.1+, formerly `applymap`), applies element-by-element across an entire DataFrame.
 
 Use `Series.map` for single-column lookups or value substitution, `apply` for
 row or column-level logic, and `DataFrame.map` for element-wise
@@ -642,7 +642,7 @@ print(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
 - The original DataFrame's row numbers (0, 1, 2, …).
   > Aggregating collapses each group to one value; the original row positions are gone.
 - [o] The distinct \`region\` values (the grouping keys).
-  > \`groupby\` uses the group keys as the index of the aggregated result — here, one entry per region.
+  > \`groupby\` uses the group keys as the index of the aggregated result, here, one entry per region.
 - A default \`RangeIndex\` with no labels.
   > Only if you call \`.reset_index()\`; the grouped result is labeled by the group keys by default.
 - The \`amount\` values.

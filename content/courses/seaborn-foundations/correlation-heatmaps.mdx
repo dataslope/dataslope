@@ -1,23 +1,23 @@
 ---
 title: Correlation Heatmaps
-description: sns.heatmap on a correlation matrix — seeing every pairwise linear relationship at once, with the right colors.
+description: sns.heatmap on a correlation matrix, seeing every pairwise linear relationship at once, with the right colors.
 ---
 
 A scatter plot compares *two* variables. But a dataset with six numeric
-columns has fifteen pairs — far too many scatter plots to scan one at a
+columns has fifteen pairs, far too many scatter plots to scan one at a
 time. A **heatmap** collapses all of those pairwise relationships into a
 single colored grid you can read in one glance.
 
 `sns.heatmap` takes a **2-D matrix** of numbers and draws each cell as a
 colored square, with the color encoding the cell's value. Its most common
-job by far is rendering a **correlation matrix** — a square table whose
+job by far is rendering a **correlation matrix**, a square table whose
 cell at row *i*, column *j* is the correlation between variable *i* and
 variable *j*.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A five-by-five grid of cells, solid along its diagonal and perfectly mirrored across it, with one red pair marking a negative relationship — every pairwise correlation in a single symmetric glance"
+  aria-label="A five-by-five grid of cells, solid along its diagonal and perfectly mirrored across it, with one red pair marking a negative relationship, every pairwise correlation in a single symmetric glance"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -103,13 +103,13 @@ sns.heatmap(corr, annot=True)
 
 To read it: pick a row and a column, find where they cross, and that cell's
 color and number are their correlation. `flipper_length_mm` and
-`body_mass_g` light up strongly — long-flippered penguins are heavier —
+`body_mass_g` light up strongly, long-flippered penguins are heavier,
 while `bill_depth_mm` runs *negative* against the size variables.
 
 ## The key lesson: choose a colormap that matches the data
 
 A heatmap's whole message is carried by **color**, so the colormap is not
-decoration — it is the encoding. And correlation is a special kind of
+decoration, it is the encoding. And correlation is a special kind of
 number: it is **signed**, running from −1 to +1, with **0 as a meaningful
 midpoint** that means "no linear relationship."
 
@@ -144,9 +144,9 @@ extreme. A strong negative and a strong positive correlation look clearly
 
 <Callout type="danger" title="Why a sequential colormap misleads here">
 A **sequential** map (like `"viridis"` or `"Blues"`) runs from low to high
-along a *single* direction — it is built for data with a natural floor, such
+along a *single* direction, it is built for data with a natural floor, such
 as counts or magnitudes. Drop a correlation matrix onto it and −0.9 and
-+0.9 — opposite relationships — get pushed to *opposite ends of one ramp*,
++0.9, opposite relationships, get pushed to *opposite ends of one ramp*,
 as if −0.9 were simply "less" than +0.9. The crucial sign distinction, and
 the special status of zero, both vanish. Signed data needs a diverging map
 centered at its midpoint. (We dig much deeper into choosing palettes in the
@@ -158,7 +158,7 @@ So the reading rules for a correlation heatmap are:
 - **Saturation / brightness** → *strength* (pale ≈ 0, vivid ≈ ±1).
 - **Hue (which color)** → *direction* (one color positive, the other
   negative).
-- **The diagonal is always 1.0** — every variable with itself — so ignore
+- **The diagonal is always 1.0**, every variable with itself, so ignore
   it; the story is in the off-diagonal cells.
 
 <MultipleChoice
@@ -166,11 +166,11 @@ So the reading rules for a correlation heatmap are:
 Which colormap is the right choice, and why?
 
 - A sequential map like \`"viridis"\`, because it looks modern and is easy to read.
-  > A sequential ramp encodes a single low-to-high direction, so it would place −0.9 and +0.9 at opposite ends as if one were merely "less" than the other — erasing the sign.
+  > A sequential ramp encodes a single low-to-high direction, so it would place −0.9 and +0.9 at opposite ends as if one were merely "less" than the other, erasing the sign.
 - [o] A diverging map like \`"vlag"\` centered at 0, because correlation is signed with a meaningful zero midpoint.
   > Diverging maps use two hues meeting at a neutral middle, so positive and negative correlations read as genuinely different directions and zero is visibly neutral.
 - Any colormap works; the annotations carry the meaning, so color is just decoration.
-  > Color *is* the encoding in a heatmap — it is what lets you scan the whole grid at a glance. If you only trust the numbers, you have given up the heatmap's main advantage.
+  > Color *is* the encoding in a heatmap, it is what lets you scan the whole grid at a glance. If you only trust the numbers, you have given up the heatmap's main advantage.
 - A reversed sequential map, so high values are dark.
   > Reversing direction still leaves a single-direction ramp; it cannot represent a midpoint or distinguish the two signs the way a diverging map does.
 
@@ -182,8 +182,8 @@ centered on that midpoint.`}
 
 Correlation is the famous case, but `heatmap` will color *any* 2-D matrix
 where both axes are meaningful. A natural source is a **pivot table**:
-reshape a tidy table into a grid and color the cells. The `flights` data —
-monthly airline passengers over a span of years — is perfect:
+reshape a tidy table into a grid and color the cells. The `flights` data,
+monthly airline passengers over a span of years, is perfect:
 
 <CodeBlock
   adapter="python"
@@ -215,7 +215,7 @@ heatmap is the exception we flagged back on the tidy-data page: it needs a
 **wide matrix**, because its two axes *are* the row and column labels and
 each cell *is* a value. `pivot` (the reverse of `melt`) is how you reshape
 long data into that grid. Passenger counts here are non-negative magnitudes,
-so the default **sequential** colormap is the correct choice — sequential
+so the default **sequential** colormap is the correct choice, sequential
 for one-directional magnitudes, diverging only for signed data like
 correlations.
 </Callout>
@@ -224,23 +224,23 @@ correlations.
 
 <Callout type="danger" title="Correlation only sees STRAIGHT-line relationships">
 Pearson's *r* measures **linear** association only. A relationship can be
-strong, clean, and obvious to the eye yet have *r* ≈ 0 — for example a
+strong, clean, and obvious to the eye yet have *r* ≈ 0, for example a
 perfect U-shape (`y = x²`), where the upward and downward halves cancel out.
 This is the heatmap's blind spot: a near-zero, pale cell does **not** mean
 "no relationship," only "no *straight-line* relationship." (Remember
 Anscombe's quartet: wildly different scatters can share the same
-correlation.) A heatmap is a fast triage tool — confirm anything
+correlation.) A heatmap is a fast triage tool, confirm anything
 interesting with an actual scatter plot.
 </Callout>
 
 A second, practical pitfall: **a huge matrix is unreadable.** Thirty
-variables make a 30×30 grid of 900 tiny cells — far too dense to scan, and
+variables make a 30×30 grid of 900 tiny cells, far too dense to scan, and
 the annotations become unreadable. Two fixes:
 
 - **Select the variables that matter** before computing `.corr()`, rather
   than dumping every column in.
 - **Mask the redundant half.** A correlation matrix is symmetric, so the
-  upper and lower triangles are mirror images — half the grid is repeated.
+  upper and lower triangles are mirror images, half the grid is repeated.
   You can hide the upper triangle by passing a boolean `mask` built with
   NumPy's `np.triu` (the **tri**angle, **u**pper). Cells where the mask is
   `True` are left blank:
@@ -269,7 +269,7 @@ sns.heatmap(corr, mask=mask, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
 />
 
 With the duplicated half hidden, each pair appears exactly once and the eye
-has far less to wade through — a small change that makes a large matrix
+has far less to wade through, a small change that makes a large matrix
 legible.
 
 ## Your turn
@@ -345,7 +345,7 @@ correlation heatmap?
 - Because diverging colormaps are colorblind-safe and sequential ones never are.
   > Colorblind-safety depends on the specific palette, not on whether it is diverging or sequential; that is a separate concern from matching signed data.
 - Because Seaborn refuses to draw a correlation matrix with a sequential map.
-  > Seaborn will happily use a sequential map — it just *misleads*, collapsing the sign distinction. The choice is yours to make correctly.
+  > Seaborn will happily use a sequential map, it just *misleads*, collapsing the sign distinction. The choice is yours to make correctly.
 
 A diverging, zero-centered map encodes both the sign and the strength of
 correlation faithfully.`}
@@ -375,17 +375,17 @@ illegible wall of tiny cells. What is a reasonable fix?
 - Make the figure smaller so it all fits on screen at once.
   > Shrinking the figure makes each cell *smaller*, worsening the legibility problem rather than relieving it.
 - [o] Select the variables you actually care about before computing \`.corr()\`, and/or mask the redundant upper triangle.
-  > Fewer, chosen variables yield a smaller grid, and masking the mirror-image half removes duplicated cells — both make a dense matrix readable.
+  > Fewer, chosen variables yield a smaller grid, and masking the mirror-image half removes duplicated cells, both make a dense matrix readable.
 - Turn off \`annot\` and rely on guessing the values from color.
   > Removing the numbers may de-clutter slightly, but 625 cells are still too many to scan; the grid is too large regardless of annotations.
 - Switch to a sequential colormap to compress the range.
   > A colormap change affects how values are *colored*, not how many cells there are; the matrix is still 25×25 and unreadable.
 
-For an overcrowded matrix, reduce what you plot — pick variables and/or mask
+For an overcrowded matrix, reduce what you plot, pick variables and/or mask
 the symmetric half.`}
 />
 
 You can now read every pairwise *linear* relationship in a dataset from a
-single grid — and you know exactly where that view goes blind. Next we keep
+single grid, and you know exactly where that view goes blind. Next we keep
 exploring many variables together with **pairwise relationship** plots,
 which restore the scatter that the heatmap had to leave out.

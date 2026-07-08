@@ -4,7 +4,7 @@
  *
  * Each test in `ChallengeTest[]` is one of two shapes:
  *
- *   1. **Native test** — `{ id, name, description, code }` where `code`
+ *   1. **Native test**, `{ id, name, description, code }` where `code`
  *      is a snippet of the target language that `throw`s/`assert`s on
  *      failure and is silent on success. The harness wraps every test
  *      with a try/catch idiom and frames each result with a sentinel
@@ -14,11 +14,11 @@
  *        __DSTEST__:<id>:FAIL:<json-encoded detail>
  *
  *      Anything between the `__DSTEST_BEGIN__` sentinel and the end of
- *      stdout belongs to the harness — the component strips those
+ *      stdout belongs to the harness, the component strips those
  *      lines from the user-visible output and parses them into test
  *      results.
  *
- *   2. **Stdout-based test** — `{ id, name, description, expect }`
+ *   2. **Stdout-based test**, `{ id, name, description, expect }`
  *      where `expect` declares expectations against the user code's
  *      captured stdout/stderr. Useful for compiled languages (C, C++,
  *      Java, C#) where injecting a per-test harness into a single
@@ -33,7 +33,7 @@
  */
 
 /** Declarative stdout / stderr expectation for a single test case.
- *  All listed fields are conjunctive — the test passes only when every
+ *  All listed fields are conjunctive, the test passes only when every
  *  field matches. Use one or more of these together. */
 export interface StdoutExpect {
   /** Stdout must equal this string exactly (after trimming trailing
@@ -96,7 +96,7 @@ export function isNativeTest(t: ChallengeTest): t is NativeChallengeTest {
 }
 
 /** Human-readable, one-check-per-line summary of a declarative stdout
- *  expectation — shown by the test-details popover where a native test
+ *  expectation, shown by the test-details popover where a native test
  *  would show its code. */
 export function stdoutExpectSummary(e: StdoutExpect): string {
   const lines: string[] = [];
@@ -313,7 +313,7 @@ export function evaluateStdoutExpect(
 type HarnessBuilder = (tests: NativeChallengeTest[]) => string;
 
 /**
- * Python harness — uses a per-test wrapper function so the assertion
+ * Python harness, uses a per-test wrapper function so the assertion
  * can read globals defined by the learner's code (e.g. `summary`) while
  * still isolating exceptions per test. Detail strings are JSON-encoded
  * so newlines / quotes in error messages round-trip cleanly.
@@ -358,12 +358,12 @@ const buildPythonHarness: HarnessBuilder = (tests) => {
 };
 
 /**
- * JavaScript / TypeScript harness — used by both adapters since their
+ * JavaScript / TypeScript harness, used by both adapters since their
  * runtime surface for `console.log` and exception handling is the same.
  * Test bodies execute inside an async function so `return`/`await` are
  * legal and lexical bindings don't pollute the global scope. The runtime
  * wraps user code (and this harness) in an async function with top-level
- * `await` support, so each test is awaited in turn — this lets test code
+ * `await` support, so each test is awaited in turn, this lets test code
  * `await` Promises (e.g. asserting on a callback wrapped in a Promise).
  */
 const buildJsHarness: HarnessBuilder = (tests) => {
@@ -393,12 +393,12 @@ const buildJsHarness: HarnessBuilder = (tests) => {
 };
 
 /**
- * R harness — same shape as the Python one, using `tryCatch` for the
+ * R harness, same shape as the Python one, using `tryCatch` for the
  * pass / fail framing. Test bodies should call `stop("…")` (or any
  * function that calls it, e.g. `stopifnot()`) to signal failure.
  *
  * Note: R identifiers cannot begin with `_`, so the helper names use
- * a leading `.` (which is conventional for "hidden" R variables) —
+ * a leading `.` (which is conventional for "hidden" R variables),
  * `.dstest_run`, `.dstest_t0`, etc. Using the `__dstest…` form the
  * other harnesses share would cause R's parser to fail with
  * "unexpected input" on line 1 of the snippet.
@@ -434,7 +434,7 @@ const buildRHarness: HarnessBuilder = (tests) => {
 };
 
 /**
- * PHP harness — runs each test body inline inside a try/catch so the
+ * PHP harness, runs each test body inline inside a try/catch so the
  * snippet can see file-scope variables defined by the learner's code
  * (PHP closures would otherwise require explicit `use(...)` captures).
  * Snippets should `throw new Exception("…")` on failure.
@@ -472,14 +472,14 @@ const buildPhpHarness: HarnessBuilder = (tests) => {
 /**
  * Shared core of the web/react preview harnesses. The generated script
  * runs inside the sandboxed preview iframe, so tests can assert on the
- * real DOM (`document.querySelector(...)`) — results travel through the
+ * real DOM (`document.querySelector(...)`), results travel through the
  * preview's console bridge as the same sentinel lines every other
  * harness prints, and the final `__dsPreviewHarnessDone()` call (a hook
  * the bridge installs; see runtime/webPreview.ts) tells the preview
  * runner the run is complete so every sentinel is captured first.
  *
  * Timing: the runner starts after the document's `load` event plus
- * `settleDelayMs` — user scripts, DOMContentLoaded/load handlers, and
+ * `settleDelayMs`, user scripts, DOMContentLoaded/load handlers, and
  * (for react) the initial render commit have all happened by then. Test
  * bodies may be async and are awaited in order, so a test can `await`
  * a repaint after dispatching a click.
@@ -525,26 +525,26 @@ function buildPreviewHarnessScript(
 }
 
 /**
- * Web (HTML/CSS/JS) harness — the entry file is an HTML document, so
+ * Web (HTML/CSS/JS) harness, the entry file is an HTML document, so
  * the harness is a `<script>` element appended after it. Content after
  * `</html>` is legal: the parser relocates it into `<body>`, and script
  * order guarantees it executes after every user script has been parsed.
  */
 const buildWebHarness: HarnessBuilder = (tests) => {
   const script = buildPreviewHarnessScript(tests, 0)
-    // Never let generated/test code terminate the wrapper tag early —
+    // Never let generated/test code terminate the wrapper tag early,
     // `<\/` is an identity escape inside JS strings.
     .replace(/<\/(script)/gi, "<\\/$1");
   return `\n<script>\n${script}\n</script>`;
 };
 
 /**
- * React harness — plain JS appended to the entry module and compiled
+ * React harness, plain JS appended to the entry module and compiled
  * along with it by esbuild. The extra settle delay gives React's
  * initial `createRoot().render()` commit time to reach the DOM before
  * assertions run (render is scheduled, not synchronous). Deliberately
  * avoids top-level `await`: that would delay module evaluation, which
- * delays the `load` event the harness itself waits on — a deadlock.
+ * delays the `load` event the harness itself waits on, a deadlock.
  */
 const buildReactHarness: HarnessBuilder = (tests) =>
   `\n;${buildPreviewHarnessScript(tests, 80)}\n`;
@@ -561,7 +561,7 @@ const HARNESS_BUILDERS: Record<string, HarnessBuilder> = {
 
 /** Build the harness snippet for the given adapter for the subset of
  *  tests that are native (have a `code` field). Stdout-based tests are
- *  ignored here — they're evaluated separately after the run.
+ *  ignored here, they're evaluated separately after the run.
  *
  *  Returns an empty string when there are no native tests, so the
  *  caller can avoid invoking the harness machinery entirely. */

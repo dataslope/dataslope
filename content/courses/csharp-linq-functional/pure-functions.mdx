@@ -1,6 +1,6 @@
 ---
 title: Pure Functions
-description: The smallest, most important idea in functional programming — and why it's the foundation of everything that follows
+description: The smallest, most important idea in functional programming, and why it's the foundation of everything that follows
 ---
 
 If you remember only one idea from this entire course, make it this
@@ -8,13 +8,13 @@ one: **a pure function is a function whose output depends only on its
 inputs, and which has no observable side effects.**
 
 That's it. Pure functions are the atom of functional programming.
-LINQ, immutability, composition, parallelism, testing, caching —
+LINQ, immutability, composition, parallelism, testing, caching,
 they all get easier when the building blocks are pure.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Two identical runs through a blue box give identical outputs, while a third run through a red box gives a different shape — pure versus impure"
+  aria-label="Two identical runs through a blue box give identical outputs, while a third run through a red box gives a different shape, pure versus impure"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -97,13 +97,13 @@ static List<int> Doubled(IEnumerable<int> xs)
     return result;
 }
 
-// IMPURE: reads from "outside" — the current time.
+// IMPURE: reads from "outside", the current time.
 static long NowMs() => DateTime.UtcNow.Ticks;
 
 // IMPURE: writes to the console.
 static void Greet(string name) => Console.WriteLine($"Hello, {name}");
 
-// IMPURE: mutates the input list — a hidden side effect.
+// IMPURE: mutates the input list, a hidden side effect.
 static void AppendOne(List<int> xs) => xs.Add(1);
 
 Console.WriteLine(Add(2, 3));
@@ -120,7 +120,7 @@ Console.WriteLine(string.Join(",", box));
 />
 
 `Add` and `Doubled` are pure. `NowMs`, `Greet`, and `AppendOne` are
-not — and each is impure in a *different* way.
+not, and each is impure in a *different* way.
 
 ## The four superpowers of pure functions
 
@@ -160,7 +160,7 @@ between tests, and reason about ordering. Pure tests are free.
 ### 2. They're safe to run in parallel
 
 Two threads calling a pure function with the same input cannot
-interfere — there's nothing shared to interfere with. This is why
+interfere, there's nothing shared to interfere with. This is why
 `PLINQ` (parallel LINQ) works: the operators are assumed to be pure.
 
 ### 3. They're cacheable (memoizable)
@@ -333,13 +333,13 @@ public static class MathCore
   markdown={`Which of these C# methods is **pure**?
 
 - \`static int RollDie() => new Random().Next(1, 7);\`
-  > Not pure — it reads from a random number generator (hidden state), so two calls with no arguments can give different results.
+  > Not pure, it reads from a random number generator (hidden state), so two calls with no arguments can give different results.
 - [o] \`static int Triple(int x) => x * 3;\`
   > Output depends only on the input, and the method has no side effects.
 - \`static int LogAndReturn(int x) { System.Console.WriteLine(x); return x; }\`
-  > Not pure — it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
+  > Not pure, it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
 - \`static void Add(System.Collections.Generic.List<int> xs, int x) => xs.Add(x);\`
-  > Not pure — it mutates its argument and returns void, so it produces effects rather than a value.
+  > Not pure, it mutates its argument and returns void, so it produces effects rather than a value.
 
 A pure function must satisfy *both* rules: same inputs → same output,
 and no side effects of any kind. The only method here that meets both

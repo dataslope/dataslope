@@ -11,7 +11,7 @@ often, expressed in the idioms a C# reviewer would actually accept.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three small panels of miniature patterns: a dashed maybe-circle beside a solid one, a value forking along thin lines to success or failure, and three dots folding into one — Option, Result, and fold"
+  aria-label="Three small panels of miniature patterns: a dashed maybe-circle beside a solid one, a value forking along thin lines to success or failure, and three dots folding into one, Option, Result, and fold"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -222,7 +222,7 @@ This is the trick behind the *configurable* pipeline helpers in the
 previous chapter. Instead of passing a separator to every call, you
 build a specialized helper once and reuse it.
 
-## Pattern 5: Pipeline as data — discriminated unions
+## Pattern 5: Pipeline as data, discriminated unions
 
 Modeling *states of the world* with a discriminated union (a sealed
 hierarchy of records) replaces brittle bool/enum flags. With C#
@@ -256,7 +256,7 @@ public abstract record Payment
 />
 
 If you add a new payment kind, the compiler can warn you about
-non-exhaustive `switch` expressions — a small but lovely *FP-style*
+non-exhaustive `switch` expressions, a small but lovely *FP-style*
 safety net inside a C# program.
 
 ## Pattern 6: Combinators
@@ -270,10 +270,10 @@ combinator** library.
   title="Validator combinators"
   instructions={`A *validator* is a function from a value to a (possibly empty) list of error messages. Implement these rules in \`Validator.cs\`:
 
-- \`NonEmpty(field)\` — yields the error \`"{field} is empty"\` when the value is null or an empty string.
-- \`MaxLen(field, max)\` — yields \`"{field} too long"\` when \`value.Length > max\`.
-- \`NoDigits(field)\` — yields \`"{field} contains digits"\` when the value contains any digit character.
-- \`All(rules)\` — a *combinator* that runs every rule and concatenates their errors in argument order.
+- \`NonEmpty(field)\`, yields the error \`"{field} is empty"\` when the value is null or an empty string.
+- \`MaxLen(field, max)\`, yields \`"{field} too long"\` when \`value.Length > max\`.
+- \`NoDigits(field)\`, yields \`"{field} contains digits"\` when the value contains any digit character.
+- \`All(rules)\`, a *combinator* that runs every rule and concatenates their errors in argument order.
 
 A rule that passes returns an **empty** sequence (no error).`}
   entryFilename="Program.cs"
@@ -364,7 +364,7 @@ public static class Validator<T>
   ]}
 />
 
-`All` is a combinator — it makes a bigger rule out of smaller rules.
+`All` is a combinator, it makes a bigger rule out of smaller rules.
 Each individual rule stays focused. The library composes naturally
 because every rule has the same type signature.
 
@@ -396,7 +396,7 @@ expressive *without* abandoning the strengths of the OO model.
 - It runs all steps in parallel and collects every error at once.
   > That's *applicative* composition, a different combinator. \`Bind\` is sequential.
 - It catches exceptions inside each step and converts them to errors.
-  > A useful helper, but not what \`Bind\` itself does — it just propagates the existing \`Err\` value.
+  > A useful helper, but not what \`Bind\` itself does, it just propagates the existing \`Err\` value.
 - [o] It chains an operation that *returns* a \`Result\` onto a previous \`Result\`, automatically short-circuiting on the first error.
   > \`Bind\` lets you write \`a.Bind(Step2).Bind(Step3)\` where each step may fail. As soon as one step returns \`Err\`, every subsequent \`Bind\` skips its function and threads the error to the end of the pipeline.
 - It converts a synchronous result into an async one.

@@ -1,6 +1,6 @@
 ---
 title: The dplyr Verbs
-description: Five small verbs — `filter`, `select`, `mutate`, `arrange`, `summarise` — plus the pipe operator. With these, you can express almost any tabular data manipulation in clear, readable English.
+description: Five small verbs, `filter`, `select`, `mutate`, `arrange`, `summarise`, plus the pipe operator. With these, you can express almost any tabular data manipulation in clear, readable English.
 ---
 
 So far we've been doing data manipulation in base R: bracket
@@ -34,7 +34,7 @@ thing.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A four-row table card passes along solid gray arrows through three more stages: rows drop away, bars narrow, and the survivors settle longest-first — filter, select, and arrange transforming one data frame verb by verb"
+  aria-label="A four-row table card passes along solid gray arrows through three more stages: rows drop away, bars narrow, and the survivors settle longest-first, filter, select, and arrange transforming one data frame verb by verb"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -117,13 +117,13 @@ mtcars |>
   head()
 ```
 
-The second version reads like an English instruction sentence —
+The second version reads like an English instruction sentence,
 which is exactly the point. R has two pipes: the native `|>`
 (added in R 4.1) and the older `%>%` from the `magrittr` package
 (used widely with `dplyr`). They're nearly equivalent for our
 purposes; we'll use `|>` throughout.
 
-## `filter()` — keep rows
+## `filter()`, keep rows
 
 <CodeBlock
   adapter="r"
@@ -153,11 +153,11 @@ Notice we wrote `mpg`, not `mtcars$mpg`. Inside the dplyr verbs,
 column names refer to columns of the data frame you piped in.
 That's a major usability win.
 
-`filter()` also handles NAs gracefully — it silently drops rows
+`filter()` also handles NAs gracefully, it silently drops rows
 where the condition is `NA`, which is almost always what you
 want.
 
-## `select()` — keep columns
+## `select()`, keep columns
 
 <CodeBlock
   adapter="r"
@@ -201,7 +201,7 @@ mtcars |>
 `where()`. They make column selection in wide datasets very
 ergonomic.
 
-## `mutate()` — add or change columns
+## `mutate()`, add or change columns
 
 <CodeBlock
   adapter="r"
@@ -225,7 +225,7 @@ mtcars |>
 />
 
 `mutate()` is for *adding* derived columns. The new columns can
-reference any existing column — and any new column defined
+reference any existing column, and any new column defined
 earlier in the same `mutate()` call.
 
 To *replace* a column, mutate with the same name:
@@ -247,7 +247,7 @@ mtcars |>
   ]}
 />
 
-## `arrange()` — sort rows
+## `arrange()`, sort rows
 
 <CodeBlock
   adapter="r"
@@ -276,9 +276,9 @@ mtcars |>
   ]}
 />
 
-## `summarise()` — collapse to a single row
+## `summarise()`, collapse to a single row
 
-`summarise()` (or `summarize()` — both spellings work) takes a
+`summarise()` (or `summarize()`, both spellings work) takes a
 data frame and returns a *single row* containing summary
 statistics:
 
@@ -304,7 +304,7 @@ mtcars |>
 
 By itself, this isn't more interesting than `mean()` etc. on
 their own. The magic happens when you combine it with
-`group_by()` — which is the entire next page.
+`group_by()`, which is the entire next page.
 
 ## Putting it together: a small pipeline
 

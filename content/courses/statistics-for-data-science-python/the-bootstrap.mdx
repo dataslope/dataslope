@@ -1,6 +1,6 @@
 ---
 title: The Bootstrap
-description: Resampling your own data with replacement to approximate a sampling distribution — getting standard errors and confidence intervals for awkward statistics like the median, with no formulas and no normality assumptions.
+description: Resampling your own data with replacement to approximate a sampling distribution, getting standard errors and confidence intervals for awkward statistics like the median, with no formulas and no normality assumptions.
 ---
 
 In *Confidence Intervals* every interval leaned on a formula: a known
@@ -8,7 +8,7 @@ standard error and a critical value from the t or normal distribution.
 That works beautifully for the mean. But what's the standard error of a
 **median**? A **trimmed mean**? A **correlation**, a **ratio of two
 quantities**, the **90th percentile**? For most interesting statistics
-the textbook formula is ugly, fragile, or simply doesn't exist — and
+the textbook formula is ugly, fragile, or simply doesn't exist, and
 the normality assumptions behind the clean formulas may not hold for
 your messy data anyway.
 
@@ -16,13 +16,13 @@ The **bootstrap** is the workaround, and it's one of the most liberating
 ideas in modern statistics: instead of deriving a formula, you let the
 computer *simulate* the sampling distribution by **resampling your own
 data with replacement**. With a few lines of NumPy you get a standard
-error and a confidence interval for almost any statistic — no calculus,
+error and a confidence interval for almost any statistic, no calculus,
 no distributional assumptions, no lookup tables.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="One row of sample dots loops down a solid arrow into three resamples, where touching pairs reveal observations drawn twice while others vanish, and each resample sends a thin line to its green statistic dot piling into a small hump — resampling your own data with replacement fakes the sampling distribution you cannot collect"
+  aria-label="One row of sample dots loops down a solid arrow into three resamples, where touching pairs reveal observations drawn twice while others vanish, and each resample sends a thin line to its green statistic dot piling into a small hump, resampling your own data with replacement fakes the sampling distribution you cannot collect"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -73,7 +73,7 @@ no distributional assumptions, no lookup tables.
 
 Recall the fundamental problem from *Sampling Distributions*: to know how
 much a statistic wobbles, you'd want to draw many fresh samples from the
-population and watch the statistic vary. But you can't — you only have
+population and watch the statistic vary. But you can't, you only have
 *one* sample, and the population is hidden.
 
 The bootstrap's trick is a bold substitution: **treat your sample as if
@@ -81,7 +81,7 @@ it were the population.** Your sample is your single best picture of the
 population, so drawing new samples *from your sample* mimics drawing new
 samples from the population. The only wrinkle is that to keep each
 resample the same size as the original, you must draw **with
-replacement** — the same observation can appear more than once (and some
+replacement**, the same observation can appear more than once (and some
 won't appear at all). That's what makes each resample *different* and
 recreates the sampling variability.
 
@@ -107,7 +107,7 @@ and its percentiles give a confidence interval directly.
 
 <Callout type="info" title="Why 'with replacement' is non-negotiable">
 If you resampled *without* replacement at the original size, you'd just
-shuffle the same values and get the identical statistic every time — zero
+shuffle the same values and get the identical statistic every time, zero
 variability, useless. Sampling **with replacement** lets some points
 repeat and others drop out, so each resample is a slightly different
 "plausible world." That variation across resamples is exactly what
@@ -122,13 +122,13 @@ The percentile bootstrap is short enough to state in full:
 2. Draw a **resample**: pick `n` values from it *with replacement*.
 3. Compute your statistic (mean, median, whatever) on that resample and
    record it.
-4. Repeat steps 2-3 a large number of times — call it `B` (often
+4. Repeat steps 2-3 a large number of times, call it `B` (often
    2,000-10,000).
 5. The recorded values form the **bootstrap distribution**. Its
    **standard deviation** estimates the standard error; its **2.5th and
    97.5th percentiles** are a **95% confidence interval**.
 
-That's it. The same five steps work for any statistic — you only change
+That's it. The same five steps work for any statistic, you only change
 the function in step 3.
 
 ```mermaid
@@ -146,7 +146,7 @@ Let's implement it from scratch with NumPy. `rng.choice(data,
 size=len(data), replace=True)` draws one resample. We loop `B` times,
 take the mean each time, and read off the percentiles. As a sanity
 check, we'll compare the bootstrap CI for the mean against the classic
-t-interval from *Confidence Intervals* — they should land in nearly the
+t-interval from *Confidence Intervals*, they should land in nearly the
 same place, which is reassuring evidence the bootstrap isn't magic, just
 simulation.
 
@@ -186,7 +186,7 @@ print()
 print(f"bootstrap 95% CI = ({ci_low:.3f}, {ci_high:.3f})")
 print(f"t-based   95% CI = ({t_low:.3f}, {t_high:.3f})")
 print()
-print("The two CIs nearly agree — the bootstrap reproduces the formula")
+print("The two CIs nearly agree, the bootstrap reproduces the formula")
 print("for the mean, then generalizes to statistics that HAVE no formula.")
 `,
     },
@@ -195,7 +195,7 @@ print("for the mean, then generalizes to statistics that HAVE no formula.")
 
 The bootstrap standard error and the `s / √n` formula match closely,
 and the two intervals overlap almost exactly. For the mean, the
-bootstrap is just a more roundabout way to get the familiar answer — the
+bootstrap is just a more roundabout way to get the familiar answer, the
 payoff comes when there *is* no familiar answer.
 
 <Callout type="tip" title="Vectorize when B is large">
@@ -209,7 +209,7 @@ production.
 
 ## The payoff: a CI for the median, which has no easy formula
 
-The mean has a tidy standard error. The **median** does not — its
+The mean has a tidy standard error. The **median** does not, its
 formula is awkward and depends on the unknown density of the data at the
 median. With the bootstrap you don't care: you resample, take the
 *median* of each resample, and read off the percentiles. The procedure
@@ -252,7 +252,7 @@ print(f"observed median  = {np.median(data):,.0f}")
 print(f"bootstrap SE     = {boot_se:,.0f}")
 print(f"95% percentile CI= ({ci_low:,.0f}, {ci_high:,.0f})")
 print()
-print("No median-SE formula needed — the resampling did the work.")
+print("No median-SE formula needed, the resampling did the work.")
 `,
     },
   ]}
@@ -260,7 +260,7 @@ print("No median-SE formula needed — the resampling did the work.")
 
 The histogram *is* the sampling distribution of the median,
 reconstructed from a single dataset. The red lines mark the 2.5th and
-97.5th percentiles — the 95% CI. You'll often notice the bootstrap
+97.5th percentiles, the 95% CI. You'll often notice the bootstrap
 distribution of the median looks chunky or stepped; that's a real
 property of the median on a finite sample (it can only land on actual
 data values), and it's a hint about one of the bootstrap's limits, which
@@ -268,7 +268,7 @@ we'll get to.
 
 <Callout type="success" title="One engine, any statistic">
 The same five lines compute a CI for the mean, the median, a trimmed
-mean, the 90th percentile, a correlation, or a ratio — swap the function
+mean, the 90th percentile, a correlation, or a ratio, swap the function
 in the resample loop and nothing else changes. That generality is why
 the bootstrap is a data scientist's Swiss-army knife: when you can't find
 (or trust) a formula, you can almost always bootstrap.
@@ -279,7 +279,7 @@ the bootstrap is a data scientist's Swiss-army knife: when you can't find
 The synthetic income data made the point; a real dataset makes it stick.
 The **Palmer penguins** dataset records body mass for 123 Gentoo
 penguins. What's a 95% confidence interval for their *median* mass? No
-formula required — resample and read off the percentiles.
+formula required, resample and read off the percentiles.
 
 <CodeBlock
   adapter="python"
@@ -313,10 +313,10 @@ print(f"based on n = {len(gentoo_mass)} Gentoo penguins")
 The interval is the honest version of "the typical Gentoo weighs about
 5 kg": a range that accounts for the fact that these 123 penguins are
 just a sample of all Gentoo penguins. Notice the CI is narrow because the
-sample is decent-sized and body mass isn't wildly skewed — exactly the
+sample is decent-sized and body mass isn't wildly skewed, exactly the
 conditions where the bootstrap behaves well.
 
-## When to use the bootstrap — and when to be careful
+## When to use the bootstrap, and when to be careful
 
 The bootstrap is general, but it is **not** magic. It estimates
 sampling variability *by reusing the data you have*, so it inherits that
@@ -326,12 +326,12 @@ data's flaws and runs out of information when the sample is thin.
 
 - Your statistic has **no clean standard-error formula** (median,
   trimmed mean, ratio, correlation, percentile, Gini, etc.).
-- The **assumptions behind a formula are shaky** — skewed data, unknown
-  shape — and you'd rather not trust a normal approximation.
+- The **assumptions behind a formula are shaky**, skewed data, unknown
+  shape, and you'd rather not trust a normal approximation.
 - You want a quick, assumption-light **sanity check** on a formula-based
   interval.
 
-**Be cautious — or don't — when:**
+**Be cautious, or don't, when:**
 
 - **`n` is very small.** With, say, 8 points, your sample is a poor
   stand-in for the population, so the bootstrap distribution is built on
@@ -355,8 +355,8 @@ flowchart TD
 
 <Callout type="danger" title="The bootstrap cannot create information">
 The single most important caveat: the bootstrap **does not add new data
-and does not fix a bad sample.** If your sample is biased — collected
-unfairly, or too small to represent the population — every resample
+and does not fix a bad sample.** If your sample is biased, collected
+unfairly, or too small to represent the population, every resample
 carries that same bias, and the bootstrap will hand you a confident
 interval around the *wrong* center. Resampling estimates *precision*
 (how much the statistic wobbles), not *accuracy* (whether you're aimed
@@ -442,7 +442,7 @@ assert 0.5 * ref < got < 2.0 * ref`,
 <ChallengeCard
   adapter="python"
   title="Bootstrap standard error of the mean"
-  instructions={`Using the provided \`data\` and \`rng\`, build the bootstrap distribution of the **mean** with \`B = 4000\` resamples, then return the **bootstrap standard error** — the **standard deviation of the bootstrap means** — in a float variable named \`boot_se\`.
+  instructions={`Using the provided \`data\` and \`rng\`, build the bootstrap distribution of the **mean** with \`B = 4000\` resamples, then return the **bootstrap standard error**, the **standard deviation of the bootstrap means**, in a float variable named \`boot_se\`.
 
 - Each iteration resamples \`len(data)\` values **with replacement** and records the mean.
 - \`boot_se = float(np.std(boot_means, ddof=1))\`.
@@ -498,7 +498,7 @@ assert abs(boot_se - formula_se) < 0.30 * formula_se`,
 />
 
 <Callout type="tip" title="More resamples reduces simulation noise (not sampling noise)">
-`B` — the number of resamples — controls only the **Monte Carlo** noise
+`B`, the number of resamples, controls only the **Monte Carlo** noise
 of the bootstrap itself: a bigger `B` makes your estimated SE and CI
 *stable* across reruns, but it does **not** make your estimate more
 *accurate*. The accuracy is capped by your original sample size `n`.
@@ -513,7 +513,7 @@ usually plenty.
   markdown={`What is the defining mechanic of the bootstrap?
 
 - Drawing many fresh samples directly from the population
-  > That's the procedure you *wish* you could run but can't — the population is hidden and you can't redraw from it. The bootstrap's whole point is to substitute for this with the data you already have.
+  > That's the procedure you *wish* you could run but can't, the population is hidden and you can't redraw from it. The bootstrap's whole point is to substitute for this with the data you already have.
 - [o] Repeatedly resampling your observed data **with replacement** and recomputing the statistic on each resample
   > Treating the sample as a stand-in for the population and resampling it with replacement reconstructs the statistic's sampling variability without any formula.
 - Fitting a normal distribution to the data and reading off percentiles
@@ -530,7 +530,7 @@ The engine is resampling-with-replacement plus recomputing the statistic each ti
 - Because sampling without replacement would be too slow to compute
   > Speed isn't the issue. The problem with sampling the full size *without* replacement is statistical, not computational.
 - [o] Without replacement at size $n$ you'd just reorder the same values and get the identical statistic every time, producing zero variability
-  > Replacement lets observations repeat or drop out, so each resample differs — that variation is what recreates the sampling distribution.
+  > Replacement lets observations repeat or drop out, so each resample differs, that variation is what recreates the sampling distribution.
 - Because replacement guarantees each resample contains every original value
   > Replacement does the opposite: some values appear multiple times and others not at all. It doesn't guarantee full coverage of the original data.
 - Because it makes the resamples larger than the original sample
@@ -543,11 +543,11 @@ Replacement is what injects the variability that mimics drawing new samples.`}
   markdown={`The bootstrap is especially valuable for a statistic like the **median** mainly because:
 
 - The median is impossible to compute without resampling
-  > The median itself is trivial to compute directly. What's hard is its *standard error* and confidence interval — that's where the bootstrap helps.
+  > The median itself is trivial to compute directly. What's hard is its *standard error* and confidence interval, that's where the bootstrap helps.
 - [o] The median has no simple standard-error formula, yet the bootstrap gives it a CI with the same procedure used for any other statistic
   > Statistics without clean variance formulas are exactly where the bootstrap shines, since you only swap the function computed on each resample.
 - The median is always normally distributed, so the formula is easy
-  > The sampling distribution of the median is generally not normal, which is part of why a tidy formula is hard — the opposite of this claim.
+  > The sampling distribution of the median is generally not normal, which is part of why a tidy formula is hard, the opposite of this claim.
 - The bootstrap makes the median more accurate than the mean
   > The bootstrap estimates the *uncertainty* of a statistic; it doesn't make one statistic more accurate than another. Accuracy depends on the data and which summary you need.
 
@@ -558,11 +558,11 @@ Awkward statistics with no easy formula are the bootstrap's home turf.`}
   markdown={`For which statistic is the ordinary bootstrap **least** trustworthy?
 
 - The sample mean of 500 observations
-  > With a healthy sample size, the bootstrap handles the mean very well — it closely matches the formula-based interval. This is a comfortable case, not a problem case.
+  > With a healthy sample size, the bootstrap handles the mean very well, it closely matches the formula-based interval. This is a comfortable case, not a problem case.
 - The median of 200 observations
   > The bootstrap handles the median well at this sample size; in fact it's a flagship use case. This isn't where it breaks down.
 - [o] The maximum of the sample
-  > A resample can never exceed the largest observed value, so the bootstrap cannot reconstruct the distribution of the maximum, which lives in the extreme tail — it systematically misrepresents it.
+  > A resample can never exceed the largest observed value, so the bootstrap cannot reconstruct the distribution of the maximum, which lives in the extreme tail, it systematically misrepresents it.
 - A trimmed mean of 300 observations
   > Trimmed means are smooth, formula-resistant statistics that the bootstrap estimates well. They're a good fit, not a failure case.
 
@@ -576,18 +576,18 @@ Extreme-order statistics like the max (and heavy tails generally) are where plai
   > The bootstrap can't fix a biased sample. Every resample is drawn from the same skewed data, so the bias is baked into all of them and into the interval's center.
 - The interval is invalid and cannot be computed
   > It computes fine and is a valid interval *for the biased sampling process*. The issue isn't that it errors out; it's what the interval is centered on.
-- [o] It quantifies the **precision** of the mean for *this biased sample*, but it's centered on the wrong value — the bootstrap estimates wobble, not whether you're aimed at the truth
+- [o] It quantifies the **precision** of the mean for *this biased sample*, but it's centered on the wrong value, the bootstrap estimates wobble, not whether you're aimed at the truth
   > Resampling captures sampling variability, not sampling bias, so a tight interval can sit confidently around a biased estimate; only better data fixes the aim.
 - A larger number of resamples B would remove the bias
   > Increasing $B$ only reduces the bootstrap's own simulation noise. Bias comes from how the original data were collected and is untouched by more resampling.
 
-The bootstrap measures precision, not accuracy — it can't rescue a sample that was collected unfairly.`}
+The bootstrap measures precision, not accuracy, it can't rescue a sample that was collected unfairly.`}
 />
 
 <Callout type="success" title="Key takeaways">
-- The bootstrap **resamples your data with replacement**, treating the sample as a stand-in for the population, to approximate a statistic's **sampling distribution** — no formula, no normality assumption.
+- The bootstrap **resamples your data with replacement**, treating the sample as a stand-in for the population, to approximate a statistic's **sampling distribution**, no formula, no normality assumption.
 - The **standard deviation** of the bootstrap distribution estimates the **standard error**; its **2.5th and 97.5th percentiles** give a **95% percentile confidence interval**.
-- It works for **any statistic** — median, trimmed mean, ratio, correlation, percentile — by swapping one function in the resample loop.
+- It works for **any statistic**, median, trimmed mean, ratio, correlation, percentile, by swapping one function in the resample loop.
 - It struggles with **very small `n`**, **extreme-based statistics** (max/min), **heavy tails**, and **dependent data**.
 - It estimates **precision, not accuracy**: it does **not** create new information or fix a **biased** sample. `B` controls only simulation noise; only more real data improves the estimate.
 </Callout>
@@ -595,5 +595,5 @@ The bootstrap measures precision, not accuracy — it can't rescue a sample that
 You now have two complementary routes to a confidence interval: the
 formula-based intervals of *Confidence Intervals* when assumptions hold,
 and the assumption-light bootstrap when they don't. Both rest on the
-same foundation — the *Sampling Distributions* and *Standard Error* ideas
+same foundation, the *Sampling Distributions* and *Standard Error* ideas
 that describe how a statistic varies from sample to sample.

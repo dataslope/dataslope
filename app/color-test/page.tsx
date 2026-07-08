@@ -59,7 +59,7 @@ const SWATCH_DEFS: SwatchDef[] = [
       label: `${hue} ${step}`,
     })),
   ),
-  // Decorative / categorical ramps (teal, purple, orange) — non-semantic,
+  // Decorative / categorical ramps (teal, purple, orange), non-semantic,
   // for charts (Mermaid mindmaps) and illustrations. 500 = the base hue.
   ...(["teal", "purple", "orange"] as const).flatMap((hue) =>
     [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((step) => ({
@@ -241,7 +241,7 @@ export default function ColorTestPage() {
         <Section title="Typography">
           <div className={styles.typoStack}>
             <div className={styles.typoCard}>
-              <h3 className={styles.typoCardTitle}>Sans-serif — UI Font</h3>
+              <h3 className={styles.typoCardTitle}>Sans-serif, UI Font</h3>
               <div
                 className={styles.typoSamples}
                 style={{ fontFamily: "var(--font-ui)" }}
@@ -258,7 +258,7 @@ export default function ColorTestPage() {
                 <p
                   style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.6 }}
                 >
-                  Body text — The quick brown fox jumps over the lazy dog. Pack
+                  Body text, The quick brown fox jumps over the lazy dog. Pack
                   my box with five dozen liquor jugs.
                 </p>
                 <p
@@ -268,7 +268,7 @@ export default function ColorTestPage() {
                     lineHeight: 1.6,
                   }}
                 >
-                  Muted body — Secondary descriptions and helper text appear
+                  Muted body, Secondary descriptions and helper text appear
                   here, blended toward the background.
                 </p>
                 <p
@@ -278,14 +278,14 @@ export default function ColorTestPage() {
                     lineHeight: 1.6,
                   }}
                 >
-                  Dimmed caption — Timestamps, metadata, and low-priority labels
+                  Dimmed caption, Timestamps, metadata, and low-priority labels
                   rendered at reduced opacity.
                 </p>
               </div>
             </div>
 
             <div className={styles.cmCard}>
-              <h3 className={styles.typoCardTitle}>Monospace — Code Font</h3>
+              <h3 className={styles.typoCardTitle}>Monospace, Code Font</h3>
               <pre className={styles.codeBlock}>
                 <code>
                   <span style={{ color: "var(--theme-primary)" }}>def </span>

@@ -20,7 +20,7 @@ Report both when the gap between them is itself informative.
 
 Two variables can move together because of a **confounder** or
 coincidence, not because one causes the other. Ice-cream sales correlate
-with drownings — both are driven by hot weather (the confounder), not by
+with drownings, both are driven by hot weather (the confounder), not by
 each other. To argue causation you need a controlled experiment (A/B
 test) or a careful causal-inference design.
 
@@ -29,13 +29,13 @@ test) or a careful causal-inference design.
 When the sample isn't representative of the population, conclusions don't
 generalize. Surveying only app users about a feature ignores people who
 churned because of it (**survivorship bias**); a web poll captures only
-the engaged (**self-selection**). The fix is sampling design — random or
-stratified sampling — not more data.
+the engaged (**self-selection**). The fix is sampling design, random or
+stratified sampling, not more data.
 
 ### A metric went up 20% week-over-week. How do you investigate?
 
 State assumptions, then decompose: (1) is it real or an artifact
-(tracking change, bot traffic, a deploy)? (2) segment it — which
+(tracking change, bot traffic, a deploy)? (2) segment it, which
 region/platform/cohort drove it? (3) check seasonality / day-of-week and
 compare to the same period last year; (4) look for a denominator change
 (did traffic drop, inflating a rate?). Conclude with the most likely
@@ -134,7 +134,7 @@ Common methods:
 - **Z-score**: values whose $z = \frac{x - \bar{x}}{s}$ exceeds 2-3 in absolute value, i.e. more than 2-3 standard deviations from the mean.
 - **Visual**: box plots or scatter plots reveal extreme points quickly.
 
-Always investigate outliers before removing them — they may be data
+Always investigate outliers before removing them, they may be data
 errors or genuinely important observations.
 
 The snippet below applies both rules to the `amount` column: it builds
@@ -191,16 +191,16 @@ effect size alongside p-values.
 ### What is a Type I and a Type II error?
 
 - **Type I error (false positive)**: you reject the null hypothesis when
-  it is actually true — concluding the treatment works when it doesn't.
+  it is actually true, concluding the treatment works when it doesn't.
   Controlled by the significance level (alpha, often 0.05).
 - **Type II error (false negative)**: you fail to reject the null when it
-  is actually false — missing a real effect. Controlled by statistical
+  is actually false, missing a real effect. Controlled by statistical
   power (typically 80%).
 
 |                          | $H_0$ is true                                | $H_0$ is false                              |
 | ------------------------ | -------------------------------------------- | ------------------------------------------- |
-| **Reject $H_0$**         | Type I error (false positive) — rate $\alpha$ | Correct decision — power $= 1 - \beta$       |
-| **Fail to reject $H_0$** | Correct decision — rate $1 - \alpha$          | Type II error (false negative) — rate $\beta$ |
+| **Reject $H_0$**         | Type I error (false positive), rate $\alpha$ | Correct decision, power $= 1 - \beta$       |
+| **Fail to reject $H_0$** | Correct decision, rate $1 - \alpha$          | Type II error (false negative), rate $\beta$ |
 
 ### What is statistical power?
 
@@ -242,7 +242,7 @@ print(f"Required n per group: {n:.0f}")`,
 
 **Correlation** is a general term for the linear association between two
 variables. The **Pearson correlation coefficient** ($r$) quantifies it on
-the range $-1 \le r \le 1$ — from $-1$ (perfect negative) to $+1$
+the range $-1 \le r \le 1$, from $-1$ (perfect negative) to $+1$
 (perfect positive), with 0 meaning no linear relationship. Spearman rank
 correlation is used when the relationship is monotonic but not linear, or
 when data is ordinal.
@@ -280,12 +280,12 @@ print(f"Spearman r: {r_spearman:.3f}")`,
 
 ### What chart type would you choose for each scenario?
 
-- **Trend over time** — line chart.
-- **Comparing categories** — bar chart (or horizontal bar for many categories).
-- **Part-of-whole** — stacked bar chart; pie chart only for 2-4 slices.
-- **Distribution of a continuous variable** — histogram or box plot.
-- **Relationship between two continuous variables** — scatter plot.
-- **Heatmap** — correlation matrix or pivot-style table with color encoding.
+- **Trend over time**, line chart.
+- **Comparing categories**, bar chart (or horizontal bar for many categories).
+- **Part-of-whole**, stacked bar chart; pie chart only for 2-4 slices.
+- **Distribution of a continuous variable**, histogram or box plot.
+- **Relationship between two continuous variables**, scatter plot.
+- **Heatmap**, correlation matrix or pivot-style table with color encoding.
 
 ### How do you choose which metric to track for a product change?
 
@@ -299,7 +299,7 @@ detect the expected effect size.
 ### What is the difference between a dashboard and a report?
 
 A **dashboard** is a living view updated continuously (or on a schedule)
-for ongoing monitoring — it answers "what is happening now?" A **report**
+for ongoing monitoring, it answers "what is happening now?" A **report**
 is typically a one-time or periodic document that answers a specific
 question, includes context and narrative, and is consumed linearly.
 Dashboards are for operational decisions; reports are for deeper analysis
@@ -311,7 +311,7 @@ Keep it to the key metrics decision-makers act on. Group related key
 performance indicators (KPIs).
 Use consistent scales and color conventions. Add clear titles and data
 freshness labels. Avoid clutter: every element should earn its place.
-Design for the audience — an executive view differs from an ops team view.
+Design for the audience, an executive view differs from an ops team view.
 
 ### How do you explain a complex statistical finding in plain language?
 
@@ -324,7 +324,7 @@ informs.
 ### What is a pivot table in a spreadsheet and when do you use it?
 
 A pivot table summarizes a flat data table by grouping rows into
-categories and applying aggregations (sum, count, average) — the
+categories and applying aggregations (sum, count, average), the
 spreadsheet equivalent of `GROUP BY`. Use it for quick exploratory
 aggregation, cross-tabs, and reporting without writing code.
 
@@ -357,7 +357,7 @@ shift when the formula is copied down a column.
 State your confidence explicitly ("based on the last 90 days of data"),
 report ranges not just point estimates, name the main assumptions, and
 quantify how sensitive the conclusion is to those assumptions. Avoid
-false precision — rounding "12.37% lift" to "about 12%" is often more
+false precision, rounding "12.37% lift" to "about 12%" is often more
 honest when the confidence interval is wide.
 
 ### What is the difference between a histogram and a bar chart?
@@ -393,7 +393,7 @@ cohort.
 - The mean, because it uses every value.
   > The mean is pulled upward by the high earners, so it overstates the typical household in a right-skewed distribution.
 - [o] The median, because it's robust to the skew/outliers.
-  > The median (50th percentile) reflects the middle household and isn't dragged by extreme values — the better "typical" summary here.
+  > The median (50th percentile) reflects the middle household and isn't dragged by extreme values, the better "typical" summary here.
 - The maximum, because it shows the range.
   > The max describes an extreme, not a typical value.
 - The mode, because it's always the best center.
@@ -405,7 +405,7 @@ cohort.
 
 - The data must be wrong.
   > The correlation can be perfectly real; the *causal interpretation* is what's flawed.
-- [o] A confounder — bigger cities have both more fires (hence more damage) and more firefighters — drives both variables.
+- [o] A confounder, bigger cities have both more fires (hence more damage) and more firefighters, drives both variables.
   > City size is a lurking variable correlated with both; correlation doesn't establish that one variable causes the other.
 - Firefighters genuinely cause damage; the data proves it.
   > Observational correlation can't establish causation, especially with an obvious confounder present.

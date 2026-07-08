@@ -21,7 +21,7 @@ toward small examples and clear rules.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A faint base card branches into three colored child cards that all carry the same white dot, yet each emits a different little shape below — shared interface, different behavior at runtime"
+  aria-label="A faint base card branches into three colored child cards that all carry the same white dot, yet each emits a different little shape below, shared interface, different behavior at runtime"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -69,7 +69,7 @@ public:
     const std::string& name() const { return name_; }
 
     virtual std::string sound() const { return "(generic sound)"; }
-    virtual ~Animal() = default;     // important — see below
+    virtual ~Animal() = default;     // important, see below
 
 protected:
     std::string name_;
@@ -90,12 +90,12 @@ public:
 
 Three new keywords to absorb:
 
-- `: public Animal` — `Dog` and `Cat` are **derived** from
+- `: public Animal`, `Dog` and `Cat` are **derived** from
   `Animal`. They inherit its public members.
-- `virtual` — marks `sound` as overridable; calls go through a
+- `virtual`, marks `sound` as overridable; calls go through a
   runtime dispatch mechanism (the *vtable*) so the correct override
   runs even via a base-class pointer or reference.
-- `override` — tells the compiler "this is meant to override a
+- `override`, tells the compiler "this is meant to override a
   virtual function." If the signature doesn't match a base virtual,
   you get a compile error instead of a silent mismatch.
 
@@ -168,7 +168,7 @@ polymorphism**.
 ## How the compiler does this
 
 For each class with virtual functions, the compiler builds a small
-hidden table — the **vtable** — listing the address of each virtual
+hidden table, the **vtable**, listing the address of each virtual
 function for that class. Each object of that class stores a
 **vptr** to its class's vtable.
 
@@ -180,7 +180,7 @@ flowchart LR
 
 When you call `a->sound()`, the compiler emits "look up `sound` in
 `a`'s vtable and call it." That's the one indirect call that gives
-you polymorphism — small but not free, which is why virtual is
+you polymorphism, small but not free, which is why virtual is
 opt-in in C++.
 
 ## Virtual destructors: don't forget
@@ -189,7 +189,7 @@ If you ever delete a derived object through a base-class pointer:
 
 ```cpp
 Animal* a = new Dog("Rex");
-delete a;     // calls ~Animal — but Dog parts may leak unless dtor is virtual
+delete a;     // calls ~Animal, but Dog parts may leak unless dtor is virtual
 ```
 
 A non-virtual destructor would only run `~Animal`, leaving any
@@ -201,13 +201,13 @@ why we wrote `virtual ~Animal() = default;` above.
 
 The base class above used `protected:` for `name_`. `protected` is
 like `private` but also accessible from derived classes. Use it
-sparingly — it weakens encapsulation. Often it's better to keep
+sparingly, it weakens encapsulation. Often it's better to keep
 fields `private` and let derived classes call public methods.
 
 ## Inheritance versus composition
 
 It's tempting to use inheritance whenever two classes share fields
-or behaviour. Often the better tool is **composition** — one class
+or behaviour. Often the better tool is **composition**, one class
 *has* the other as a member.
 
 ```cpp
@@ -224,16 +224,16 @@ class Car {
 A useful rule: ask "is the relationship really 'is-a' in every
 sense?" If a `Square` *is-a* `Rectangle`, then you should be able
 to use a `Square` wherever a `Rectangle` is expected. (Famously,
-this fails in many ways — set a "rectangle's" width and its height
-changes too — which is why "Square inherits from Rectangle" is a
+this fails in many ways, set a "rectangle's" width and its height
+changes too, which is why "Square inherits from Rectangle" is a
 textbook OOP anti-example.)
 
 That test has a name: the **Liskov Substitution Principle**, after
 computer scientist Barbara Liskov, who formulated the idea in a 1987
 keynote. The principle says a derived class must be usable anywhere
 its base class is expected, *without the caller noticing any broken
-promises*. Liskov went on to win the 2008 Turing Award — computing's
-highest honor — in part for this work on data abstraction. When a
+promises*. Liskov went on to win the 2008 Turing Award, computing's
+highest honor, in part for this work on data abstraction. When a
 hierarchy starts requiring "well, unless it's actually a Square"
 checks in calling code, the substitution principle is being
 violated, and composition is usually the way out.
@@ -253,7 +253,7 @@ public:
 };
 ```
 
-A class with at least one pure virtual is **abstract** — you cannot
+A class with at least one pure virtual is **abstract**, you cannot
 create an instance of it directly. It serves as an **interface**
 that derived classes must implement.
 
@@ -396,5 +396,5 @@ int main() {
   > It has real semantic consequences.`}
 />
 
-Next: how to *own* resources properly — the RAII pattern that
+Next: how to *own* resources properly, the RAII pattern that
 underpins all robust C++ programs.

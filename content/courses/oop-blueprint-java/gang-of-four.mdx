@@ -3,8 +3,8 @@ title: The Gang of Four
 description: How four authors taught a generation of programmers to speak in patterns and design reusable software
 ---
 
-By the late 1980s, object-oriented languages were everywhere — C++,
-Smalltalk, Objective-C, Eiffel — and object-oriented programmers were
+By the late 1980s, object-oriented languages were everywhere, C++,
+Smalltalk, Objective-C, Eiffel, and object-oriented programmers were
 making a curious discovery. Across companies, across industries,
 across countries, they kept *solving the same design problems*. And
 they kept solving them in *the same handful of ways*.
@@ -17,14 +17,14 @@ hard-coding which one. Compilers and report generators and shell
 parsers all needed a way to walk a tree of structured data and *do
 something* at each node.
 
-Programmers gave these recurring solutions informal names — *observer*,
-*factory*, *visitor* — and traded them in conference talks and
+Programmers gave these recurring solutions informal names, *observer*,
+*factory*, *visitor*, and traded them in conference talks and
 hallways like folklore.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three tinted panels from different domains each hold the same three-dot structure joined by thin solid lines, and in the last panel a yellow ring finally circles it — recurring design solutions appearing everywhere, waiting to be named"
+  aria-label="Three tinted panels from different domains each hold the same three-dot structure joined by thin solid lines, and in the last panel a yellow ring finally circles it, recurring design solutions appearing everywhere, waiting to be named"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -62,25 +62,25 @@ hallways like folklore.
 
 <IllustrationPrompt subject="the Gang of Four: Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides" photo />
 
-In **1994**, four authors — **Erich Gamma, Richard Helm, Ralph
-Johnson, and John Vlissides** — published a book called
+In **1994**, four authors, **Erich Gamma, Richard Helm, Ralph
+Johnson, and John Vlissides**, published a book called
 ***Design Patterns: Elements of Reusable Object-Oriented Software***.
 They became known, with affection, as the **Gang of Four**, or
-**GoF** — a tongue-in-cheek nickname borrowed from the infamous
+**GoF**, a tongue-in-cheek nickname borrowed from the infamous
 Chinese political faction, pinned on them because nobody wanted to
 keep saying all four surnames.
 
 The book did not invent the patterns. It *cataloged* them: 23 of them,
 each with a name, a problem, a solution structure, and the trade-offs
 involved. For the first time, two programmers could say "let's use
-**Strategy** here" and *both know what the other meant* — even if
+**Strategy** here" and *both know what the other meant*, even if
 they'd never met. The catalog struck a nerve: it became one of the
 best-selling computer science books ever published and has never been
 out of print since.
 
 The authors themselves kept shaping how you program today. Erich
-Gamma went on to co-write **JUnit** with Kent Beck — the testing
-framework that spawned imitations in nearly every language — then led
+Gamma went on to co-write **JUnit** with Kent Beck, the testing
+framework that spawned imitations in nearly every language, then led
 the development of the **Eclipse** IDE's Java tooling, and later
 moved to Microsoft to lead the team that built **Visual Studio
 Code**. If you have ever run a unit test or opened VS Code, you have
@@ -104,7 +104,7 @@ borrows its vocabulary from this book.
 ## Why patterns mattered for *reusability*
 
 The GoF subtitle was *Elements of Reusable Object-Oriented Software*.
-That word — **reusable** — is the point. The whole book is organized
+That word, **reusable**, is the point. The whole book is organized
 around a small number of design principles that make software easier
 to reuse and to change:
 
@@ -232,8 +232,8 @@ one tiny example.
 ## What "reusable" really means
 
 A common misconception is that "reusable" means "I can copy this code
-into another project." That is the weakest form of reuse — sometimes
-called **copy-paste reuse** — and it doesn't scale.
+into another project." That is the weakest form of reuse, sometimes
+called **copy-paste reuse**, and it doesn't scale.
 
 What the GoF and the OOP tradition mean by *reusable* is bigger:
 
@@ -261,7 +261,7 @@ There are at least these candidates: `Menu`, `Drink`, `Customer`,
 `Barista`, `Order`, `OrderQueue`, `Payment`. Each one knows *some*
 things and does *some* things. Resist the temptation to put all the
 logic on `Barista` just because the barista does most of the visible
-work — give the `OrderQueue` its own behaviors, give `Order` its own
+work, give the `OrderQueue` its own behaviors, give `Order` its own
 "is this paid?" logic, and so on.
 
 ```mermaid
@@ -296,12 +296,12 @@ We will return to this exercise more formally later in the course.
 
 - Four early Smalltalk designers at Xerox PARC
   > That team includes Kay, Ingalls, and Goldberg, but is not the Gang of Four.
-- [o] Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides — authors of *Design Patterns* (1994)
+- [o] Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, authors of *Design Patterns* (1994)
   > They are the four authors of the book that named and cataloged the classic OOP design patterns.
 - Four students who founded a software consultancy in the 1970s
   > No, the term refers specifically to the authors of *Design Patterns*.
 - Four engineers credited with creating the Java language
-  > Java was led by James Gosling at Sun Microsystems — that team is not the GoF.`}
+  > Java was led by James Gosling at Sun Microsystems, that team is not the GoF.`}
 />
 
 <MultipleChoice
@@ -311,7 +311,7 @@ We will return to this exercise more formally later in the course.
   > The GoF actually argue the opposite.
 - [o] "Favor object composition over class inheritance"
   > This is one of the book's most famous and frequently cited principles.
-- "Avoid interfaces — they add too much indirection"
+- "Avoid interfaces, they add too much indirection"
   > GoF heavily favor programming to interfaces.
 - "Make every method static so it is easier to call"
   > Static-heavy designs run *against* OOP, which is about objects with state and behavior.`}

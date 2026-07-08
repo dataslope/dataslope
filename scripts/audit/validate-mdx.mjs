@@ -29,7 +29,7 @@ const files = args.length
 let failures = 0;
 for (const file of files) {
   let src = readFileSync(file, "utf8");
-  // Strip leading YAML frontmatter — the real loader parses it separately, so
+  // Strip leading YAML frontmatter, the real loader parses it separately, so
   // `<…>` in a description must not be compiled as MDX/JSX.
   src = src.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   try {

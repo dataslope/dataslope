@@ -103,11 +103,11 @@ export interface SchemaItemProps {
    *  is derived from their CREATE VIEW statement, not editable. */
   onModifyStructure?: (name: string) => void;
   onStructure?: (name: string, kind: "table" | "view") => void;
-  /** Tables only — opens the Add Row drawer. */
+  /** Tables only, opens the Add Row drawer. */
   onAddRow?: (name: string) => void;
   onCount: (name: string, kind: "table" | "view") => void;
   onCopy: (name: string) => void;
-  /** Tables only — Truncate is meaningless on a view. */
+  /** Tables only, Truncate is meaningless on a view. */
   onTruncate?: (name: string) => void;
   onDrop: (name: string, kind: "table" | "view") => void;
   onViewDDL: (name: string, kind: "table" | "view") => void;
@@ -220,7 +220,7 @@ function SchemaItemImpl({
   const baseHint = `Double-click to preview, click to ${expanded ? "collapse" : "expand"}`;
   // When the name is clipped, surface the full name first so it's readable
   // on hover even though the row only shows a truncated label.
-  const itemHint = nameTruncated ? `${name} — ${baseHint}` : baseHint;
+  const itemHint = nameTruncated ? `${name}, ${baseHint}` : baseHint;
   return (
     <div className="sql-tree-entity">
       <ContextMenu.Root>

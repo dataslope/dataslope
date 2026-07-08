@@ -12,7 +12,7 @@ In this chapter, you'll learn the **`Result<T, E>` pattern**, a type-safe altern
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Two corridors: in the top one the blue path drops through a hidden gap in the floor to a red cross below, while in the bottom one the path forks openly into a green success box and a red failure box — exceptions hide failure in the floor, Result puts both outcomes in plain sight"
+  aria-label="Two corridors: in the top one the blue path drops through a hidden gap in the floor to a red cross below, while in the bottom one the path forks openly into a green success box and a red failure box, exceptions hide failure in the floor, Result puts both outcomes in plain sight"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -278,7 +278,7 @@ Let's build a pipeline that parses input, validates it, and computes a result:
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A green line threads the first two blue stations on the success rail, then turns red mid-chain and slides down a bypass past the last station straight to the red exit ring — andThen short-circuits the rest of the chain on the first failure"
+  aria-label="A green line threads the first two blue stations on the success rail, then turns red mid-chain and slides down a bypass past the last station straight to the red exit ring, andThen short-circuits the rest of the chain on the first failure"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -366,7 +366,7 @@ Notice:
 1. Each step is a separate function that returns `Result`.
 2. `andThen` chains steps that might fail.
 3. `map` transforms the final success value.
-4. Errors propagate automatically — no manual `if` checks at every step.
+4. Errors propagate automatically, no manual `if` checks at every step.
 
 ```mermaid
 graph TD
@@ -552,7 +552,7 @@ export function map<T, E, U>(
 - **Third-party code**: If a library throws, you might catch at the boundary and convert to `Result`.
 
 Use `Result` for:
-- **Expected failures**: Validation errors, missing files, network timeouts, user input errors — anything that's part of normal operation.
+- **Expected failures**: Validation errors, missing files, network timeouts, user input errors, anything that's part of normal operation.
 - **Composable operations**: When you want to chain multiple steps and handle errors uniformly.
 - **Explicit contracts**: When the caller *must* know a function can fail.
 
@@ -622,4 +622,4 @@ You've learned how to:
 
 ---
 
-**Next**: [Scalable Architecture](./scalable-architecture) — structuring large TypeScript systems with layered architecture and dependency inversion.
+**Next**: [Scalable Architecture](./scalable-architecture), structuring large TypeScript systems with layered architecture and dependency inversion.

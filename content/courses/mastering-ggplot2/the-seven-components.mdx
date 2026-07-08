@@ -1,6 +1,6 @@
 ---
 title: The Seven Components
-description: The seven building blocks of every ggplot — data, mappings, geometries, statistics, scales, coordinates, and facets — plus the theme that styles them.
+description: The seven building blocks of every ggplot, data, mappings, geometries, statistics, scales, coordinates, and facets, plus the theme that styles them.
 ---
 
 This page is the conceptual spine of the whole course. Read it
@@ -18,7 +18,7 @@ using the built-in `mpg` data set (fuel-economy records for 234 cars).
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Seven component tokens — a data square, paired mapping circles, a geometry triangle, a statistic diamond, a scale ruler, coordinate axes, and a facet grid — ring a finished mini chart, each tied to it by a thin gray spoke"
+  aria-label="Seven component tokens, a data square, paired mapping circles, a geometry triangle, a statistic diamond, a scale ruler, coordinate axes, and a facet grid, ring a finished mini chart, each tied to it by a thin gray spoke"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -68,7 +68,7 @@ using the built-in `mpg` data set (fuel-economy records for 234 cars).
 
 **The table of values the chart describes.** Without data there is
 nothing to show. In ggplot2 the data is almost always a *data frame*
-(or tibble) — rows are observations, columns are variables.
+(or tibble), rows are observations, columns are variables.
 
 <CodeBlock
   adapter="r"
@@ -92,7 +92,7 @@ mapping is a *correspondence*, written inside `aes()`.
 
 ## 3. Geometries (geoms)
 
-**The kind of mark used to represent each row** — points, lines, bars,
+**The kind of mark used to represent each row**, points, lines, bars,
 boxes. The geom is what you literally see on the canvas.
 
 ## 4. Statistics (stats)
@@ -113,7 +113,7 @@ the *visible face* of scales.
 ## 6. Coordinates
 
 **The space the marks are placed in.** Usually Cartesian (x across, y
-up), but it could be flipped, or polar — which, as we saw, turns a
+up), but it could be flipped, or polar, which, as we saw, turns a
 stacked bar into a pie.
 
 ## 7. Facets
@@ -129,7 +129,7 @@ without changing what it *means*.
 
 ## Seeing all seven at once
 
-Here is one plot. Run it, then read the annotated breakdown below — try
+Here is one plot. Run it, then read the annotated breakdown below, try
 to point to where each component lives.
 
 <CodeBlock
@@ -165,7 +165,7 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) + # data + mappings
 <Callout type="info" title="You only write what you need">
 You rarely specify all seven. ggplot2 fills in sensible defaults: an
 unspecified scale, coordinate system, and theme are chosen for you. A
-minimal plot is often just **data + mappings + one geometry** — the
+minimal plot is often just **data + mappings + one geometry**, the
 other components quietly take their defaults.
 </Callout>
 
@@ -185,7 +185,7 @@ practice. Take your time with these.
   > Coordinates place marks in space; they do not assign variables to color.
 
 The *mapping* says "this column controls color." The *scale* later
-decides which specific colors that becomes — two different components
+decides which specific colors that becomes, two different components
 working together.`}
 />
 
@@ -197,7 +197,7 @@ working together.`}
 - The scale.
   > Scales translate data values to visual values; they do not bin or count.
 - [o] The statistic.
-  > A statistic transforms the data before drawing — here, binning the values and counting them per bin.
+  > A statistic transforms the data before drawing, here, binning the values and counting them per bin.
 - The facet.
   > Facets split data into panels; they do not summarize values within a panel.
 
@@ -212,7 +212,7 @@ values (a plain bar chart of given heights).`}
 - ggplot2 cannot use scales, coordinates, or themes unless you import extra packages.
   > Those components are always available; they are just optional to write.
 - Those other components do nothing useful.
-  > They are essential — they are simply applied *by default* when unspecified.
+  > They are essential, they are simply applied *by default* when unspecified.
 - [o] ggplot2 supplies sensible defaults for the unspecified components (a default scale, Cartesian coordinates, a default theme).
   > You only write the components you want to change; the rest take defaults.
 - Minimal plots secretly disable the other components.
@@ -230,5 +230,5 @@ only the parts that differ from the defaults.`}
   actual visual values; the two are distinct.
 - **Statistics** transform data before drawing; some geoms draw raw
   data, others summarize first.
-- You only write the components you want to change — the rest take
+- You only write the components you want to change, the rest take
   sensible **defaults**.

@@ -1,18 +1,18 @@
 ---
 title: Generalization, Overfitting, and Underfitting
-description: The central tension of machine learning — a model must be flexible enough to learn the pattern but disciplined enough not to memorize the noise.
+description: The central tension of machine learning, a model must be flexible enough to learn the pattern but disciplined enough not to memorize the noise.
 ---
 
 A model's job is not to describe the data it was trained on. Its job is to
-work on data it has **never seen**. That ability — to perform well on new,
-unseen examples — is called **generalization**, and it is the entire point
+work on data it has **never seen**. That ability, to perform well on new,
+unseen examples, is called **generalization**, and it is the entire point
 of machine learning. Everything in this chapter is about the two ways
 generalization fails, how to recognize them, and what to do about them.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two panels with the same blue and green dots: on the left a calm straight band accepts a little noise; on the right a frantic dotted boundary zigzags to thread every single dot — generalization versus overfitting"
+  aria-label="Two panels with the same blue and green dots: on the left a calm straight band accepts a little noise; on the right a frantic dotted boundary zigzags to thread every single dot, generalization versus overfitting"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -81,7 +81,7 @@ flowchart TD
     C -. "high variance" .-> C
 ```
 
-The two failure modes sit on opposite ends of a single dial — **model
+The two failure modes sit on opposite ends of a single dial, **model
 complexity**. Turn it too low and the model is too rigid to capture the
 pattern (**underfitting**). Turn it too high and the model is flexible
 enough to memorize noise (**overfitting**). The art is finding the middle.
@@ -152,17 +152,17 @@ plt.show()
 Look at the three panels:
 
 - **Degree 1 (underfit).** The straight line is too rigid to follow the
-  curve. It is wrong in a *systematic* way — consistently above the data in
+  curve. It is wrong in a *systematic* way, consistently above the data in
   some regions, below it in others. This is **high bias**.
 - **Degree 4 (good fit).** The curve tracks the true green pattern closely
   without chasing individual dots. This generalizes.
 - **Degree 15 (overfit).** The wild orange curve passes through nearly
-  every training dot — including the noisy ones — and lurches violently
+  every training dot, including the noisy ones, and lurches violently
   between them. It has memorized the sample, not the pattern. This is
   **high variance**.
 
 <Callout type="warn" title="Overfitting looks like success on the training data">
-The degree-15 model has the *lowest* error on the training points — it
+The degree-15 model has the *lowest* error on the training points, it
 nearly touches every one. If training error were your scorecard, you would
 pick the worst model. This is exactly why we hold data back.
 </Callout>
@@ -223,7 +223,7 @@ Notice the two curves behave completely differently:
 
 - **Training error (blue) falls monotonically.** More flexibility always
   lets the model fit the training data better. Training error alone can
-  *never* warn you about overfitting — it only ever improves.
+  *never* warn you about overfitting, it only ever improves.
 - **Test error (orange) is U-shaped.** It drops as the model gains enough
   flexibility to capture the real pattern, bottoms out at the sweet spot,
   then rises as the model starts fitting noise.
@@ -297,7 +297,7 @@ is just as real and easier to miss. An underfit model is **too simple to
 capture the pattern**, so it is wrong even on the training data. Symptoms:
 
 - Training score is mediocre (not just test score).
-- Training and test scores are similar — there is no gap to chase.
+- Training and test scores are similar, there is no gap to chase.
 - Adding more training data does not help; the model lacks the capacity to
   use it.
 
@@ -316,7 +316,7 @@ both, small gap → you are done.
 
 When you have diagnosed overfitting, the toolbox is:
 
-1. **Use a simpler model** — fewer features, lower degree, shallower tree,
+1. **Use a simpler model**, fewer features, lower degree, shallower tree,
    stronger regularization (e.g. a smaller `C` in `LogisticRegression`).
 2. **Get more training data.** With enough examples, the noise averages out
    and even a flexible model struggles to memorize it.
@@ -325,7 +325,7 @@ When you have diagnosed overfitting, the toolbox is:
 4. **Hold out and cross-validate honestly** so you actually notice the gap
    instead of celebrating the training score.
 
-We will not chase every knob here — later chapters cover regularization and
+We will not chase every knob here, later chapters cover regularization and
 cross-validation. The goal of this page is the *diagnosis*: knowing what
 overfitting and underfitting look like, and that the test set is how you
 tell them apart.
@@ -334,12 +334,12 @@ tell them apart.
 
 - **"A model that scores 100% is the best model."** On training data, a
   perfect score is usually a symptom of overfitting, not excellence.
-- **"Overfitting means the model is too big."** Not exactly — it means the
+- **"Overfitting means the model is too big."** Not exactly, it means the
   model is too flexible *relative to the amount and cleanliness of the
   data*. The same model can overfit a tiny dataset and generalize on a
   large one.
 - **"If test error is higher than training error, something is broken."** A
-  small gap is normal and expected — the model has a slight home-field
+  small gap is normal and expected, the model has a slight home-field
   advantage on data it trained on. Only a *large* gap signals trouble.
 - **"More features always help."** Each extra feature is another dimension
   in which the model can memorize noise. Irrelevant features make
@@ -356,7 +356,7 @@ the train–test gap before shipping.
 
 A famous cautionary tale is **Google Flu Trends**, launched in 2008 to
 predict flu outbreaks from search queries. It worked impressively at first,
-then drifted badly — by some seasons it overshot real flu rates by roughly
+then drifted badly, by some seasons it overshot real flu rates by roughly
 double. A 2014 *Science* analysis ("The Parable of Google Flu") argued the
 model had latched onto search patterns that did not generalize as behavior
 and the world shifted under it. A model that does not keep generalizing is a
@@ -451,7 +451,7 @@ assert best_degree == expected, f"best_degree {best_degree} != argmin {expected}
   > Training error does not rise with complexity; a more flexible model always has at least as much capacity to fit the training points, so it can only stay the same or improve on that data.
 - It is U-shaped, falling then rising
   > The U-shape is the behavior of *test* error, not training error. Training error decreases monotonically as complexity grows because a more flexible model can always fit the training data at least as well.
-- [o] It tends to fall continuously — more flexibility always lets the model fit the training data better
+- [o] It tends to fall continuously, more flexibility always lets the model fit the training data better
   > Training error decreases monotonically with complexity, which is exactly why it cannot, on its own, warn you about overfitting.
 - It stays perfectly flat
   > Training error does not stay flat; as complexity increases the model has more capacity to fit (and eventually memorize) the training examples, so the error can only stay the same or decrease.
@@ -463,13 +463,13 @@ Because training error only improves with complexity, you need a separate held-o
   markdown={`A model scores 0.99 on training data and 0.78 on test data. What is happening?
 
 - Underfitting
-  > Underfitting shows up as *both* training and test scores being low and close together — the model is too simple to capture the pattern at all. A training score of 0.99 rules out underfitting.
-- [o] Overfitting — the large gap between strong training and weaker test performance is its signature
+  > Underfitting shows up as *both* training and test scores being low and close together, the model is too simple to capture the pattern at all. A training score of 0.99 rules out underfitting.
+- [o] Overfitting, the large gap between strong training and weaker test performance is its signature
   > A big train-minus-test gap means the model captured noise specific to the training sample. Trust the 0.78 and reduce complexity or add data.
 - The model generalizes perfectly
   > A model that generalizes well shows a *small* gap between training and test scores, not a 21-point difference. The large gap here is a strong signal that the model memorized training-specific noise.
 - The test set must be broken
-  > A lower test score than training score is normal and expected; only a *large* gap signals overfitting. The pattern here — near-perfect training, noticeably lower test — is the classic overfitting signature, not a data problem.
+  > A lower test score than training score is normal and expected; only a *large* gap signals overfitting. The pattern here, near-perfect training, noticeably lower test, is the classic overfitting signature, not a data problem.
 
 The pattern "great on train, much worse on test" is the textbook definition of overfitting.`}
 />
@@ -478,11 +478,11 @@ The pattern "great on train, much worse on test" is the textbook definition of o
   markdown={`A model scores 0.71 on training data and 0.70 on test data. Which description fits best?
 
 - Overfitting
-  > Overfitting shows up as a large gap between a high training score and a lower test score — the model memorizes training data but fails to generalize. When both scores are similarly mediocre, the model is too simple, not too flexible.
-- [o] Likely underfitting — both scores are mediocre and close together, suggesting the model is too simple to capture the pattern
+  > Overfitting shows up as a large gap between a high training score and a lower test score, the model memorizes training data but fails to generalize. When both scores are similarly mediocre, the model is too simple, not too flexible.
+- [o] Likely underfitting, both scores are mediocre and close together, suggesting the model is too simple to capture the pattern
   > When training and test scores are both low and nearly equal, there is no gap to blame on memorization; the model lacks the capacity to learn the pattern.
 - Perfect generalization, nothing to improve
-  > Perfect generalization means the model performs well on both training and test data with a small gap. Scores of 0.71 and 0.70 are mediocre — the model is underperforming, not succeeding.
+  > Perfect generalization means the model performs well on both training and test data with a small gap. Scores of 0.71 and 0.70 are mediocre, the model is underperforming, not succeeding.
 - Data leakage
   > Data leakage typically causes the test score to be unrealistically high (close to the inflated training score), not both scores to be uniformly mediocre. The pattern here points to underfitting, not leakage.
 
@@ -499,16 +499,16 @@ Low-and-equal scores point to a model that is too rigid, not too flexible.`}
 - [o] Decrease \`max_depth\` (or otherwise constrain the tree), making the model simpler
   > Limiting depth reduces the tree's flexibility so it can no longer carve out tiny regions around individual noisy points.
 - Train on the test set as well
-  > Training on the test set destroys it as an honest evaluation benchmark and does not reduce overfitting — it just hides it. The test set must remain untouched until final evaluation.
+  > Training on the test set destroys it as an honest evaluation benchmark and does not reduce overfitting, it just hides it. The test set must remain untouched until final evaluation.
 
-Overfitting is fought by reducing capacity, adding data, or regularizing — not by adding flexibility.`}
+Overfitting is fought by reducing capacity, adding data, or regularizing, not by adding flexibility.`}
 />
 
 <MultipleChoice
   markdown={`Why is "the model achieved 100% accuracy on the training data" usually a warning sign rather than good news?
 
 - Because 100% accuracy is mathematically impossible
-  > A perfect score on training data is mathematically possible and very common with sufficiently flexible models — for example, an unconstrained decision tree routinely reaches 100% training accuracy by memorizing each row.
+  > A perfect score on training data is mathematically possible and very common with sufficiently flexible models, for example, an unconstrained decision tree routinely reaches 100% training accuracy by memorizing each row.
 - [o] Because a perfect training score often means the model memorized the training data, including its noise, and will likely generalize poorly
   > Perfectly fitting the training set, noise and all, is the hallmark of overfitting. The honest signal is the held-out test score.
 - Because scikit-learn caps accuracy at 99%
@@ -523,13 +523,13 @@ A flawless training score should prompt you to check the test score, not to cele
   markdown={`Underfitting and overfitting are best described as:
 
 - Two unrelated bugs
-  > They are not bugs — they are structural properties of model complexity. Understanding that they live on opposite ends of one dial is precisely what lets you diagnose and fix them.
+  > They are not bugs, they are structural properties of model complexity. Understanding that they live on opposite ends of one dial is precisely what lets you diagnose and fix them.
 - The same thing under different names
-  > Underfitting and overfitting are opposites: one is caused by too little model capacity and the other by too much. The fixes are also opposite — more complexity for underfitting, less for overfitting.
-- [o] Opposite ends of the model-complexity dial — too simple versus too flexible — with good generalization in between
+  > Underfitting and overfitting are opposites: one is caused by too little model capacity and the other by too much. The fixes are also opposite, more complexity for underfitting, less for overfitting.
+- [o] Opposite ends of the model-complexity dial, too simple versus too flexible, with good generalization in between
   > They are the two ways the complexity dial can be mis-set. Underfitting is too little capacity; overfitting is too much.
 - Problems that only occur in deep learning
-  > Underfitting and overfitting appear in every machine learning algorithm — linear models, decision trees, KNN, and others — not just deep learning. The examples on this page use polynomial regression and decision trees.
+  > Underfitting and overfitting appear in every machine learning algorithm, linear models, decision trees, KNN, and others, not just deep learning. The examples on this page use polynomial regression and decision trees.
 
 Seeing them as one dial with a sweet spot in the middle is the key mental model.`}
 />

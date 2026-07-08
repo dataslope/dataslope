@@ -1,6 +1,6 @@
 ---
 title: Arrays
-description: A row of boxes, all the same type, accessed by index — and what happens when you walk off the end
+description: A row of boxes, all the same type, accessed by index, and what happens when you walk off the end
 ---
 
 So far we've worked with one variable at a time. But many problems
@@ -12,7 +12,7 @@ the same type.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Six cells touching side by side with no gaps — one contiguous block of memory — above an address ruler, with a marker pointing at the first cell"
+  aria-label="Six cells touching side by side with no gaps, one contiguous block of memory, above an address ruler, with a marker pointing at the first cell"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -111,7 +111,7 @@ int data[10];   // exactly 10 ints, forever
 ```
 
 If you need a list that resizes, you need to **manage memory
-yourself** with `malloc` and `realloc` — the topic of the dynamic
+yourself** with `malloc` and `realloc`, the topic of the dynamic
 memory chapter.
 
 ## Walking an array with a loop
@@ -145,7 +145,7 @@ int main(void) {
 Two new tricks above:
 
 - `sizeof(data) / sizeof(data[0])` computes the number of elements at
-  compile time. (It works *only* on a real array, not on a pointer —
+  compile time. (It works *only* on a real array, not on a pointer,
   more on that subtlety in the pointers chapter.)
 - `(double)sum / n` casts so we get a real average, not an integer
   one.
@@ -326,7 +326,7 @@ int main(void) {
 />
 
 `grid[3][4]` is laid out as 12 consecutive integers in **row-major**
-order — row 0, then row 1, then row 2. Knowing the layout helps you
+order, row 0, then row 1, then row 2. Knowing the layout helps you
 reason about cache performance and pointer arithmetic later.
 
 ## Passing arrays to functions
@@ -454,7 +454,7 @@ for (int i = 0; i <= 10; i++) {
 - It runs an infinite loop.
   > The loop counter \`i\` still increases each pass and stops once \`i > 10\`, so it terminates; the bug is the out-of-bounds write, not non-termination.
 - [o] It writes one element past the end of the array (\`data[10]\`), which is undefined behavior and may corrupt other memory.
-  > Valid indices are \`0..9\`. Writing \`data[10]\` clobbers whatever happens to live in the next 4 bytes — possibly another variable, possibly internal bookkeeping. This is the classic off-by-one bug.
+  > Valid indices are \`0..9\`. Writing \`data[10]\` clobbers whatever happens to live in the next 4 bytes, possibly another variable, possibly internal bookkeeping. This is the classic off-by-one bug.
 - It runs correctly because C will resize the array.
   > C arrays do **not** resize. The size is fixed at declaration.
 

@@ -1,6 +1,6 @@
 ---
 title: Maps
-description: HashMap, LinkedHashMap, TreeMap, EnumMap — and the Map interface that powers almost every "lookup by key" you'll ever write
+description: HashMap, LinkedHashMap, TreeMap, EnumMap, and the Map interface that powers almost every "lookup by key" you'll ever write
 ---
 
 A **map** is a *function* from keys to values. If `Set` answers "is
@@ -14,7 +14,7 @@ maps under the skin.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A ledger card ties four blue diamond keys along thin gray lines to three green value capsules — two keys share one value — and a yellow ring lights one key, its line, and its value end to end"
+  aria-label="A ledger card ties four blue diamond keys along thin gray lines to three green value capsules, two keys share one value, and a yellow ring lights one key, its line, and its value end to end"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="140" y="24" width="360" height="176" rx="16" fill="currentColor" opacity="0.05" />
@@ -41,7 +41,7 @@ maps under the skin.
 
 ## The Map interface
 
-`Map<K, V>` is its own root — it does not extend `Collection`,
+`Map<K, V>` is its own root, it does not extend `Collection`,
 because its elements are *pairs* (`Map.Entry<K, V>`), not single
 values.
 
@@ -63,7 +63,7 @@ classDiagram
     SortedMap <|-- NavigableMap
 ```
 
-The three views — `keySet()`, `values()`, `entrySet()` — are how you
+The three views, `keySet()`, `values()`, `entrySet()`, are how you
 iterate a map. Of those, `entrySet()` is almost always what you want.
 
 ## HashMap
@@ -98,7 +98,7 @@ public class Main {
 
 `merge(key, defaultValue, remapping)` is the single most useful
 `HashMap` method most people never learn. It atomically combines
-"insert if absent, update if present" — perfect for histograms.
+"insert if absent, update if present", perfect for histograms.
 
 ## How HashMap actually works
 
@@ -119,7 +119,7 @@ flowchart LR
 - Internally there is an `Object[] table` of *buckets*.
 - A key's bucket index is computed from its `hashCode`.
 - If two keys hash to the same bucket (a *collision*), they are
-  stored in a linked list inside that bucket — or, since Java 8, a
+  stored in a linked list inside that bucket, or, since Java 8, a
   red-black tree once the chain grows past 8 entries.
 - When the table is too full (the *load factor*, default `0.75`, is
   exceeded), the table doubles and every entry is rehashed into a
@@ -130,7 +130,7 @@ This explains a lot:
 - Why `put` and `get` are `O(1)` *average* but worst-case `O(log n)`
   (post-Java-8) after collisions.
 - Why a bad `hashCode` (constant, or near-constant) destroys
-  performance — every operation falls back to walking a long chain.
+  performance, every operation falls back to walking a long chain.
 - Why a `HashMap` uses more memory than you'd guess: it has empty
   buckets to keep the load factor low.
 
@@ -140,8 +140,8 @@ Alexander Klink and Julian Wälde demonstrated **hash flooding**:
 because the string hash functions of most web platforms were
 predictable, an attacker could precompute thousands of parameter
 names that all collide into the same bucket and stuff them into a
-single POST request. Every insert then crawled one enormous chain —
-quadratic total work — so a few hundred kilobytes of crafted request
+single POST request. Every insert then crawled one enormous chain,
+quadratic total work, so a few hundred kilobytes of crafted request
 could pin a CPU core for minutes. PHP, Python, Ruby, ASP.NET, and
 Java servers were all vulnerable, and vendors scrambled out patches.
 Java's deeper fix arrived in Java 8: once a bucket's chain grows past
@@ -183,7 +183,7 @@ public class Main {
 />
 
 Use it when the *order in which entries were added* matters for
-display or determinism — for example, JSON-like response objects.
+display or determinism, for example, JSON-like response objects.
 
 ## TreeMap
 
@@ -207,7 +207,7 @@ public class Main {
     grades.put(80, "B");
     grades.put(90, "A");
 
-    // "What grade does a 75 earn?" — floor: largest key <= 75
+    // "What grade does a 75 earn?", floor: largest key <= 75
     int score = 75;
     Map.Entry<Integer, String> band = grades.floorEntry(score);
     System.out.println(score + " -> " + band.getValue());
@@ -221,7 +221,7 @@ public class Main {
   ]}
 />
 
-This is what makes `TreeMap` shine for *ranges* and *bands* — pricing
+This is what makes `TreeMap` shine for *ranges* and *bands*, pricing
 tiers, age groups, time windows.
 
 ## EnumMap
@@ -308,7 +308,7 @@ present, put an empty list, then add."
 `TreeMap` does *not* allow `null` keys (it would crash in
 `compareTo`). The immutable `Map.of(...)` factories do not allow
 `null` keys or values at all. Reading `map.get(k)` returns `null`
-both when the key is absent *and* when the key's value is `null` —
+both when the key is absent *and* when the key's value is `null`,
 use `containsKey` to distinguish.
 
 ## Multi-file example: an in-memory cache

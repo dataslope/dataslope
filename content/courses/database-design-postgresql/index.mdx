@@ -1,12 +1,12 @@
 ---
 title: Welcome
-description: A design-focused course on relational data modeling and PostgreSQL schema design — for people who can already query a database and now want to design one well.
+description: A design-focused course on relational data modeling and PostgreSQL schema design, for people who can already query a database and now want to design one well.
 ---
 
 Welcome to **Database Design with PostgreSQL**. If you can already
-write a `SELECT` with a `JOIN`, filter rows, and group results — but
+write a `SELECT` with a `JOIN`, filter rows, and group results, but
 you have never been the person who *decided what the tables should be
-in the first place* — this course is built for you.
+in the first place*, this course is built for you.
 
 Before anything else, you should know one thing about how this course
 works: **every SQL example runs live, in your browser, on a real
@@ -16,7 +16,7 @@ the date to your own birthday and run it again.
 
 <SqlCodeBlock
   dialect="postgres"
-  title="Your first query — change the date and run again"
+  title="Your first query, change the date and run again"
   starterCode={`-- December 10, 1815: Ada Lovelace's birthday.
 -- Replace it with yours, then press Run.
 SELECT
@@ -26,8 +26,8 @@ SELECT
 
 That editor is not a screenshot or a simulation. It is PostgreSQL
 itself, compiled to WebAssembly (a project called PGlite), booting
-inside the page you are reading. Every concept in this course —
-keys, constraints, relationships, normalization — comes with blocks
+inside the page you are reading. Every concept in this course,
+keys, constraints, relationships, normalization, comes with blocks
 like this one, so you never have to take our word for anything. When
 we claim the database will reject a bad row, you will watch it happen.
 
@@ -41,7 +41,7 @@ This course is entirely about that second question.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A thin trail climbs from left to right past colored milestone circles toward a larger final one — the course as a journey from first table to finished design"
+  aria-label="A thin trail climbs from left to right past colored milestone circles toward a larger final one, the course as a journey from first table to finished design"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -77,8 +77,8 @@ This course is entirely about that second question.
 
 You will feel at home here if:
 
-- You can read and write basic SQL — `SELECT`, `WHERE`, `JOIN`,
-  `GROUP BY` — but schema design still feels like guesswork.
+- You can read and write basic SQL, `SELECT`, `WHERE`, `JOIN`,
+  `GROUP BY`, but schema design still feels like guesswork.
 - You have inherited a messy database and wondered *why* it is so
   painful to change.
 - You are about to start a project and want to design the tables
@@ -89,12 +89,12 @@ You will feel at home here if:
 
 We assume you already understand the basics of querying. We do
 **not** assume you understand *why* databases are structured the way
-they are — and that "why" is the heart of this course.
+they are, and that "why" is the heart of this course.
 
 This is a **design and modeling** course, so it deliberately spends
 little time on the *operational* side of databases: administration,
 backups, query tuning, replication, security hardening, ORMs. Those
-topics matter, but they are a different discipline — and they make
+topics matter, but they are a different discipline, and they make
 far more sense *after* you can design a clean schema, which is
 exactly what you will be able to do by the end.
 
@@ -110,13 +110,13 @@ By the end of the course you will be able to:
   **constraints** to protect data integrity.
 - Model **one-to-many**, **many-to-many**, **one-to-one**, and
   **self-referencing** relationships correctly.
-- Apply **normalization** — and know when to deliberately break it.
+- Apply **normalization**, and know when to deliberately break it.
 - Evolve a schema safely as requirements change.
 
 Along the way you will also pick up some of the field's history: the
 1970 paper that invented the relational model, the reason third
 normal form has a jingle, and how a Berkeley research project from
-the 1980s ended up running — of all places — inside this browser tab.
+the 1980s ended up running, of all places, inside this browser tab.
 (The longer stories live in the [Interesting
 Discussions](/courses/database-design-postgresql/the-relational-revolution)
 section near the end of the course.)
@@ -130,7 +130,7 @@ Two kinds of interactive elements appear throughout:
    row the schema protects. Watching PostgreSQL refuse bad data
    teaches more than any paragraph about it.
 2. **Multiple-choice questions** with an explanation for every
-   choice. They are not exams — they are a way to catch a
+   choice. They are not exams, they are a way to catch a
    misunderstanding while the page is still in front of you.
 
 Some pages also include small **challenges**: you write a few lines
@@ -147,7 +147,7 @@ it up itself. For a single long-lived workspace, open the
 ## A first taste of design thinking
 
 Here are two ways to store the same information. Both "work." Run
-the block and read the comments — by the end of this course you will
+the block and read the comments, by the end of this course you will
 be able to explain precisely why a professional would never ship the
 first design.
 
@@ -175,5 +175,5 @@ FROM
 />
 
 That repeated email looks harmless with two rows. The next page shows
-what it costs with two million — and what database design actually
+what it costs with two million, and what database design actually
 means.

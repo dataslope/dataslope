@@ -22,7 +22,7 @@ import {
 } from "./webPreview";
 import { TAILWIND_BROWSER_CDN } from "./cdn";
 
-// The web (HTML/CSS/JS) playground runs on native browser primitives —
+// The web (HTML/CSS/JS) playground runs on native browser primitives,
 // no downloaded runtime at all. Each Run composes the workspace's entry
 // document (inlining `<link>`/`<script src>` references to sibling
 // tabs), injects a console bridge, and swaps the result into a
@@ -32,13 +32,13 @@ import { TAILWIND_BROWSER_CDN } from "./cdn";
 // architecture and the sandboxing rules.
 
 // The CodePen-style default workspace: three panes, three languages,
-// implicit composition. The HTML pane is a body fragment — the CSS and
+// implicit composition. The HTML pane is a body fragment, the CSS and
 // JS tabs apply automatically (see composeWebDocument), no <link> or
 // <script src> boilerplate required.
 const DEFAULT_HTML = `<div class="card">
   <h1>Hello, Web Playground!</h1>
   <p>
-    Edit any pane and press Run — the HTML, CSS, and JS tabs compose
+    Edit any pane and press Run, the HTML, CSS, and JS tabs compose
     into one live page, CodePen-style.
   </p>
   <button id="greet">Click me</button>
@@ -94,7 +94,7 @@ button.addEventListener("click", () => {
   button.textContent = "Clicked " + clicks + (clicks === 1 ? " time" : " times");
 });
 
-console.log("Scripts run too — check the console output below.");
+console.log("Scripts run too, check the console output below.");
 `;
 
 const EXAMPLES: ExampleSnippet[] = [
@@ -200,7 +200,7 @@ button.addEventListener("click", () => {
         console.log("count is now", count);
       });
 
-      console.log("Ready — click the button in the preview!");
+      console.log("Ready, click the button in the preview!");
     </script>
   </body>
 </html>
@@ -321,7 +321,7 @@ button.addEventListener("click", () => {
       ctx.closePath();
       ctx.fill();
 
-      console.log("Scene drawn — 6 shapes on a 360×200 canvas.");
+      console.log("Scene drawn, 6 shapes on a 360×200 canvas.");
     </script>
   </body>
 </html>
@@ -335,7 +335,7 @@ button.addEventListener("click", () => {
 <html>
   <head>
     <!-- Tailwind's official in-browser compiler (a development-time
-         tool — real projects compile Tailwind at build time). -->
+         tool, real projects compile Tailwind at build time). -->
     <script src="${TAILWIND_BROWSER_CDN}"></script>
   </head>
   <body class="bg-slate-100 font-sans">
@@ -358,7 +358,7 @@ button.addEventListener("click", () => {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // No installable packages — the preview is the platform. External
+  // No installable packages, the preview is the platform. External
   // libraries load the way real pages load them: a `<script src>` /
   // `<link>` tag pointing at a CDN (see the Tailwind example).
 ];
@@ -460,7 +460,7 @@ export const webAdapter: LanguageAdapter = {
     version: "Living Standard",
     engine: "Sandboxed iframe preview (native browser)",
     notes:
-      "Pages render in a sandboxed iframe with a unique opaque origin — no runtime download at all. " +
+      "Pages render in a sandboxed iframe with a unique opaque origin, no runtime download at all. " +
       "Root-level .css/.js tabs apply automatically, CodePen-style (reference a file explicitly with " +
       "<link>/<script src> to control its position instead); console output and errors stream into " +
       "the output panel.",
@@ -473,7 +473,7 @@ export const webAdapter: LanguageAdapter = {
     if (/\.html?$/i.test(filename)) return "htmlmixed";
     return undefined;
   },
-  // web_fmt (markup_fmt/malva/biome) at 2-space indentation — keep in
+  // web_fmt (markup_fmt/malva/biome) at 2-space indentation, keep in
   // sync with formatCode below.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -496,13 +496,13 @@ export const webAdapter: LanguageAdapter = {
   // nowhere to "open" files into would only confuse.
   hideFilesPane: true,
   // The HTML/CSS/JS playground is a fixed index.html / styles.css /
-  // script.js trio — hide the "+ New file" affordances so the workspace
+  // script.js trio, hide the "+ New file" affordances so the workspace
   // stays the CodePen-style three-pane shape.
   disableAddFile: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (
     <>
-      The preview is a real (sandboxed) browser page — bring in any
+      The preview is a real (sandboxed) browser page, bring in any
       library the way real pages do, with a CDN tag like{" "}
       <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
         &lt;script src=&quot;…&quot;&gt;&lt;/script&gt;
@@ -519,7 +519,7 @@ export const webAdapter: LanguageAdapter = {
     return format(code, filename ?? "index.html", WEB_FMT_2SPACE);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    // Nothing to download or instantiate — the browser is the runtime.
+    // Nothing to download or instantiate, the browser is the runtime.
     setLoadingMessage("Preparing web preview…");
     return new WebPreviewRuntime();
   },

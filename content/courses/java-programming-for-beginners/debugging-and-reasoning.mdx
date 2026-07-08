@@ -1,11 +1,11 @@
 ---
 title: Debugging and Reasoning About Programs
-description: The skills that separate frustrated beginners from professional engineers — reading stack traces, forming hypotheses, and using invariants
+description: The skills that separate frustrated beginners from professional engineers, reading stack traces, forming hypotheses, and using invariants
 ---
 
 Every program you ever write will, at some point, do something you
 didn't expect. **Debugging is not a special skill reserved for
-experts** — it is one of the most ordinary parts of being a
+experts**, it is one of the most ordinary parts of being a
 programmer. What separates beginners from professionals is not how
 *much* their code breaks, but how *quickly and confidently* they
 diagnose what went wrong.
@@ -16,7 +16,7 @@ non-syntax skill on the entire course.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A code card under diagnosis: the first three line bars already carry small green checks, the suspect line burns solid red inside a yellow ring, and the lines below wait untouched — debugging as calm elimination"
+  aria-label="A code card under diagnosis: the first three line bars already carry small green checks, the suspect line burns solid red inside a yellow ring, and the lines below wait untouched, debugging as calm elimination"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="150" y="24" width="340" height="182" rx="14" fill="currentColor" opacity="0.05" />
@@ -41,11 +41,11 @@ non-syntax skill on the entire course.
 Before any technique, this:
 
 > *When my program does something I didn't expect, it is not
-> "broken" — it is doing exactly what I told it to do. The bug is in
+> "broken", it is doing exactly what I told it to do. The bug is in
 > my understanding of the code, not in the code itself.*
 
 A computer does not have moods. It does not get tired. If your
-function returned `-1` when you expected `7`, there is a *reason* —
+function returned `-1` when you expected `7`, there is a *reason*,
 a deterministic chain of cause and effect that you can, in
 principle, trace.
 
@@ -54,13 +54,13 @@ Debugging is the disciplined process of finding that chain.
 <IllustrationPrompt subject="Grace Hopper" photo />
 
 The word itself comes with a museum piece. On September 9, 1947,
-operators of the Harvard Mark II computer — a team that included
-computing pioneer Grace Hopper — traced a malfunction to an actual
+operators of the Harvard Mark II computer, a team that included
+computing pioneer Grace Hopper, traced a malfunction to an actual
 moth crushed inside one of the machine's relays. They taped the
 insect into the logbook with the note *"First actual case of bug
 being found."* The joke only works because "bug" was already old
-engineering slang — Thomas Edison was complaining about "bugs" in
-his inventions in the 1870s — but the moth made it immortal, and the
+engineering slang, Thomas Edison was complaining about "bugs" in
+his inventions in the 1870s, but the moth made it immortal, and the
 logbook page, moth and all, now lives in the Smithsonian. Take
 comfort in this: the very first computers shipped with bugs, and
 the very first programmers spent their days hunting them. You are
@@ -82,7 +82,7 @@ step 1.
 
 ## Reading a stack trace
 
-When an exception escapes, the JVM prints a **stack trace** —
+When an exception escapes, the JVM prints a **stack trace**,
 the chain of method calls that was active at the moment of the
 crash. Read it from **top to bottom**.
 
@@ -113,11 +113,11 @@ Exception in thread "main" java.lang.NullPointerException ...
 
 Three precise pieces of information:
 
-- **The exception type:** `NullPointerException` — a reference was
+- **The exception type:** `NullPointerException`, a reference was
   null and we dereferenced it.
-- **The top frame:** `Main.printLength(Main.java:7)` — the
+- **The top frame:** `Main.printLength(Main.java:7)`, the
   *actual* line that crashed.
-- **The chain below:** how we got there — `main` called
+- **The chain below:** how we got there, `main` called
   `printLength`.
 
 Don't be intimidated. The top line *almost always* tells you the
@@ -126,7 +126,7 @@ file and line number to look at first.
 ## The most useful technique: print debugging
 
 You can attach professional debuggers, set breakpoints, watch
-variables — and you should learn how, eventually. But the single
+variables, and you should learn how, eventually. But the single
 most-used debugging technique in the world is **printing values**.
 
 <CodeBlock
@@ -158,7 +158,7 @@ most-used debugging technique in the world is **printing values**.
 />
 
 The `DBG ...` lines let you *see the computation happen*. You stop
-guessing what `max` was on iteration 3 — you can read it. Almost
+guessing what `max` was on iteration 3, you can read it. Almost
 every bug in a small program gives itself up to two well-placed
 prints.
 
@@ -168,7 +168,7 @@ Discipline tips:
   grep for and easy to remove.
 - Print *both the value and what it's supposed to mean*:
   `System.out.println("after sort: xs = " + Arrays.toString(xs));`
-- Remove them before committing — or convert them into proper log
+- Remove them before committing, or convert them into proper log
   statements.
 
 ## Rubber-duck debugging
@@ -285,10 +285,10 @@ difference is the bug.
   markdown={`When you read a Java stack trace, which line is generally the most useful place to start?
 
 - The bottom-most line
-  > That's usually \`main\` — too far up.
+  > That's usually \`main\`, too far up.
 - A middle line, picked at random
   > Not useful.
-- [o] The top-most line — it points to the actual statement that threw the exception
+- [o] The top-most line, it points to the actual statement that threw the exception
   > A stack trace reads top-to-bottom, so the top frame is where the error actually occurred.
 - The line that mentions \`Thread.run\`
   > That's framework plumbing, not your code.`}

@@ -1,7 +1,7 @@
 import { snippetCompletion, type Completion } from "@codemirror/autocomplete";
 
 // Static completion tier for the Java playground surfaces. No client-side
-// Java language server exists (Eclipse JDT-LS has no browser port — see
+// Java language server exists (Eclipse JDT-LS has no browser port, see
 // the feasibility report in agent-outputs/), so this is keywords, the
 // common JDK vocabulary, and a few high-value snippets; document-word
 // completion (wired in `languageCompletion.ts`) covers the rest.

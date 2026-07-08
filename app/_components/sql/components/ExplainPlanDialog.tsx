@@ -4,7 +4,7 @@ import { Dialog } from "@base-ui-components/react/dialog";
 import { X } from "lucide-react";
 
 /**
- * Shared read-only "Query plan" modal — shows the formatted output of an
+ * Shared read-only "Query plan" modal, shows the formatted output of an
  * EXPLAIN run (the plan text) in a monospace `<pre>`, with a Copy action.
  * Used by all three SQL playgrounds; only the per-engine EXPLAIN run +
  * formatting (pure `utils/explain.ts`) lives in each playground.

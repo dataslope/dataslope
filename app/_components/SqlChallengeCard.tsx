@@ -1,17 +1,17 @@
 "use client";
 
 /**
- * `SqlChallengeCard` — the SQL counterpart to `<ChallengeCard>`.
+ * `SqlChallengeCard`, the SQL counterpart to `<ChallengeCard>`.
  *
  * Why a separate component? SQL exercises don't fit the
  * "interpreter-with-stdout" model used by Python / JS / R: there is no
  * `print()` to inspect; the natural artefact is a result set returned
  * by the user's SELECT. Tests check that result set's shape (row
- * count, columns, exact values) — not stdout.
+ * count, columns, exact values), not stdout.
  *
  * Supported dialects: SQLite (via `@sqlite.org/sqlite-wasm`), DuckDB
  * (via `@duckdb/duckdb-wasm`), and PostgreSQL (via PGlite). All run
- * entirely in the browser — there is no server-side execution.
+ * entirely in the browser, there is no server-side execution.
  *
  * Lifecycle:
  *   1. On first user action, lazy-instantiate the engine for the
@@ -111,7 +111,7 @@ export type SqlDialect = "sqlite" | "duckdb" | "postgres";
 
 /** Generic result-set shape. Mirrors `QueryExecResult` from
  *  sqlite-wasm so existing playground helpers can be reused without
- *  glue — but typed locally so this module doesn't depend on the
+ *  glue, but typed locally so this module doesn't depend on the
  *  larger sqlite-wasm surface. */
 export interface SqlResult {
   columns: string[];
@@ -157,7 +157,7 @@ export interface SqlChallengeTest {
 }
 
 /** Human-readable, one-check-per-line summary of a SQL test's
- *  declarative expectations — shown by the test-details popover where a
+ *  declarative expectations, shown by the test-details popover where a
  *  code-based test would show its code. */
 export function sqlTestChecksSummary(t: SqlChallengeTest): string {
   const lines: string[] = [];
@@ -317,7 +317,7 @@ export function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLi
   }
 }
 
-/** Human-readable engine name for a dialect — used in the boot loader
+/** Human-readable engine name for a dialect, used in the boot loader
  *  copy ("Setting up the DuckDB runtime…"). */
 export function sqlDialectDisplayName(dialect: SqlDialect): string {
   return dialect === "sqlite"
@@ -328,7 +328,7 @@ export function sqlDialectDisplayName(dialect: SqlDialect): string {
 }
 
 /** Approximate cold-download size (MB) of each dialect's in-browser
- *  WASM engine — feeds the boot notice's "downloads once (~N MB)" hint.
+ *  WASM engine, feeds the boot notice's "downloads once (~N MB)" hint.
  *  Ballpark figures (SQLite ~1 MB, PGlite ~3 MB, DuckDB ~5–10 MB), in
  *  the same spirit as `LanguageAdapter.coldDownloadMB` for the other
  *  runtimes. */
@@ -354,7 +354,7 @@ const bootedSqlDialects = new Set<SqlDialect>();
 
 /** Boot-progress snapshot consumed by `<TableViewer>` to render the
  *  shared `<RuntimeBootNotice>` while a dialect's WASM engine downloads
- *  and seeds. `null` once the engine is ready (or if the boot failed —
+ *  and seeds. `null` once the engine is ready (or if the boot failed,
  *  the error surfaces in the result pane instead). */
 export interface SqlEngineBootState {
   cold: boolean;
@@ -372,7 +372,7 @@ export interface UseSqlEngineBootOptions {
 /** Shared engine-boot lifecycle for `<SqlChallengeCard>` and
  *  `<SqlCodeBlock>`. Owns the per-block engine promise (boot + seed
  *  folded into one cached promise so every caller awaits the same
- *  fully-seeded engine — see the race note below), the live engine
+ *  fully-seeded engine, see the race note below), the live engine
  *  label, and the boot-progress state that drives the branded boot
  *  loader. Keeping it here lets both card components surface the same
  *  loading affordance the non-SQL blocks already show. */
@@ -382,12 +382,12 @@ export function useSqlEngineBoot({
   remoteInitSql,
 }: UseSqlEngineBootOptions) {
   // The promise (not the resolved engine) is cached so two near-
-  // simultaneous callers — e.g. the mount-time table-viewer boot and a
-  // Run click — share one boot. Seeding (`initSql`) is folded INTO the
+  // simultaneous callers, e.g. the mount-time table-viewer boot and a
+  // Run click, share one boot. Seeding (`initSql`) is folded INTO the
   // promise so every caller awaits the same fully-seeded engine; an
   // earlier design flipped a "seeded" flag before `await
   // engine.exec(initSql)` resolved, letting a second caller query a
-  // table that didn't exist yet — invisible on in-process SQLite but
+  // table that didn't exist yet, invisible on in-process SQLite but
   // reliably racy on DuckDB, whose multi-second WASM download widens the
   // window.
   const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
@@ -403,7 +403,7 @@ export function useSqlEngineBoot({
     () => `Starting the ${sqlDialectDisplayName(dialect)} engine…`,
   );
   // True once the engine has downloaded and we're running the (tiny) seed
-  // SQL. The cold-download size is the engine wasm — not the data — so it's
+  // SQL. The cold-download size is the engine wasm, not the data, so it's
   // suppressed in this phase to avoid implying the few sample rows are MBs.
   const [bootSeeding, setBootSeeding] = useState(false);
 
@@ -415,7 +415,7 @@ export function useSqlEngineBoot({
       setBootMessage(`Starting the ${sqlDialectDisplayName(dialect)} engine…`);
       setBootSeeding(false);
       enginePromiseRef.current = (async () => {
-        // Start the dataset download while the engine boots — the two
+        // Start the dataset download while the engine boots, the two
         // are independent and the WASM fetch usually dominates. The
         // no-op catch keeps an engine-boot failure from leaving this
         // promise's rejection unhandled; awaiting it below still throws.
@@ -443,7 +443,7 @@ export function useSqlEngineBoot({
           return engine;
         },
         (err) => {
-          // Don't poison the cache with a failed init — let the next
+          // Don't poison the cache with a failed init, let the next
           // attempt try again.
           enginePromiseRef.current = null;
           setBooting(false);
@@ -455,7 +455,7 @@ export function useSqlEngineBoot({
     return enginePromiseRef.current;
   }, [dialect, initSql, remoteInitSql]);
 
-  /** Destroy the current engine (if any) — used on unmount so the
+  /** Destroy the current engine (if any), used on unmount so the
    *  underlying WASM workers don't leak. */
   const destroyEngine = useCallback(() => {
     const p = enginePromiseRef.current;
@@ -467,7 +467,7 @@ export function useSqlEngineBoot({
   }, []);
 
   /** Destroy the current engine and re-arm boot state so the next
-   *  `ensureEngine()` boots + re-seeds a fresh instance — used by Reset. */
+   *  `ensureEngine()` boots + re-seeds a fresh instance, used by Reset. */
   const resetEngine = useCallback(() => {
     const old = enginePromiseRef.current;
     enginePromiseRef.current = null;
@@ -513,7 +513,7 @@ export async function fetchRemoteInitSql(
   if (dialect === "postgres") {
     // Scripts authored for a full Postgres server may open with psql
     // meta-commands / CREATE DATABASE lines that can never run in
-    // PGlite — strip them before execution.
+    // PGlite, strip them before execution.
     const { preparePostgresScriptForPglite } = await import("./runtime/postgres");
     return preparePostgresScriptForPglite(script);
   }
@@ -563,11 +563,11 @@ export function qualifiedTable(
 function valueEquals(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a == null || b == null) return a == b;
-  // Coerce numeric strings to numbers and vice versa — PGlite tends to
+  // Coerce numeric strings to numbers and vice versa, PGlite tends to
   // return numeric-typed columns as JS numbers while sqlite-wasm
   // returns them as strings for INTEGER columns wider than 2^53. For a
   // learner-facing test framework, treating "42" and 42 as equal is
-  // the principle of least surprise. Blank strings are excluded —
+  // the principle of least surprise. Blank strings are excluded,
   // Number("") is 0, which would make '' compare equal to 0.
   if (typeof a === "number" && typeof b === "string") {
     return b.trim() !== "" && Number(b) === a;
@@ -612,7 +612,7 @@ function compareRowSets(
     return { equal: true };
   }
   // Order-independent: greedy match each actual row to a not-yet-used
-  // expected row. n^2 in the row count — fine for teaching-scale
+  // expected row. n^2 in the row count, fine for teaching-scale
   // result sets (under ~1000 rows).
   const used = new Array(expected.length).fill(false);
   for (const aRow of actual) {
@@ -659,7 +659,7 @@ async function evaluateSqlTest(
   const r = ctx.finalResult;
 
   if (test.expectedRowCount !== undefined) {
-    if (!r) return fail("No result set produced — did your query SELECT something?");
+    if (!r) return fail("No result set produced, did your query SELECT something?");
     if (r.values.length !== test.expectedRowCount) {
       return fail(
         `Expected ${test.expectedRowCount} row(s), got ${r.values.length}.`,
@@ -799,7 +799,7 @@ function languageIconKeyForDialect(d: SqlDialect): string {
   return d;
 }
 
-// Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
+// Sine-wave running overlay, mirrors `<CodeBlock>`'s RunOverlay so the
 // SQL challenge card shows the same blue-wave hint while running/submitting.
 export function RunOverlay({ active }: { active: boolean }) {
   return (
@@ -856,7 +856,7 @@ export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "
 // ─── Table viewer hook ────────────────────────────────────────────────
 
 /** Fetch a single page of a table's rows. Asks for `pageSize + 1` rows
- *  so the caller can tell — without a second COUNT(*) round-trip —
+ *  so the caller can tell, without a second COUNT(*) round-trip,
  *  whether more rows remain past this page. Works for every dialect
  *  because `LIMIT … OFFSET …` is supported by SQLite, DuckDB, and
  *  Postgres alike. Errors are returned, not thrown, so one broken table
@@ -942,7 +942,7 @@ export function useSqlTableViewer({
   // times before React commits the `loadingMore` flag).
   const inFlightRef = useRef<Set<number>>(new Set());
   // Invalidates in-flight refreshes: a Reset destroys the engine and
-  // immediately starts a refresh against the fresh one — without this,
+  // immediately starts a refresh against the fresh one, without this,
   // a slower refresh that was already in flight (e.g. the mount-time
   // boot on DuckDB) could land last and show the pre-reset rows.
   const refreshSeqRef = useRef(0);
@@ -1043,7 +1043,7 @@ export function useSqlTableViewer({
     [dialect, ensureEngine, pageSize],
   );
 
-  /** Clear all entries and re-arm the loading skeleton — used by Reset,
+  /** Clear all entries and re-arm the loading skeleton, used by Reset,
    *  which destroys and re-seeds the engine. Also invalidates any
    *  refresh still in flight so it can't resurrect the cleared rows. */
   const clear = useCallback(() => {
@@ -1053,7 +1053,7 @@ export function useSqlTableViewer({
     setInitializing(enabled);
   }, [enabled]);
 
-  /** Lower the skeleton without populating tables — used when engine
+  /** Lower the skeleton without populating tables, used when engine
    *  bootstrap fails so the skeleton doesn't spin forever. */
   const markInitDone = useCallback(() => setInitializing(false), []);
 
@@ -1087,11 +1087,11 @@ export default function SqlChallengeCard({
   const editorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Theme compartments — stored so the dark/light sync effect can
+  // Theme compartments, stored so the dark/light sync effect can
   // reconfigure the CM theme without remounting the editor.
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
-  // Lang/completion compartments — stored so the completion-schema
+  // Lang/completion compartments, stored so the completion-schema
   // refresh can reconfigure without remounting the editor.
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
@@ -1112,7 +1112,7 @@ export default function SqlChallengeCard({
     [dialect, title, starterCode],
   );
 
-  // Each card owns its own engine instance — sharing across cards would
+  // Each card owns its own engine instance, sharing across cards would
   // let one challenge's CREATE TABLE leak into another's checks. The
   // shared hook owns the cached boot+seed promise, the live engine
   // label, and the boot-progress state that drives the boot loader.
@@ -1193,7 +1193,7 @@ export default function SqlChallengeCard({
         // Schema-aware completion (same engine as the SQL playgrounds).
         // Seeded with an empty schema so keyword completion works right
         // away; reconfigured with live tables/columns once the card's
-        // engine boots — see `refreshCompletionSchema` below.
+        // engine boots, see `refreshCompletionSchema` below.
         completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
@@ -1227,7 +1227,7 @@ export default function SqlChallengeCard({
           ...closeBracketsKeymap,
           // Completion keys before `defaultKeymap` so arrows move the
           // popup selection. Enter is removed so it always inserts a
-          // newline; Tab accepts instead — matching the SQL playgrounds.
+          // newline; Tab accepts instead, matching the SQL playgrounds.
           ...completionKeymap.filter((b) => b.key !== "Enter"),
           { key: "Tab", run: acceptCompletion },
           ...defaultKeymap,
@@ -1263,7 +1263,7 @@ export default function SqlChallengeCard({
           view.dispatch({ effects: languageComp.reconfigure(langExt) });
         }
       } catch {
-        // SQL language extension is optional — editor still works
+        // SQL language extension is optional, editor still works
         // without syntax highlighting.
       }
     })();
@@ -1307,14 +1307,14 @@ export default function SqlChallengeCard({
           ],
         });
       } catch {
-        // Completion schema is a nicety — never surface as an error.
+        // Completion schema is a nicety, never surface as an error.
       }
     },
     [dialect],
   );
 
   // Ask AI context: the card registers itself so the assistant can see the
-  // challenge the user is looking at — instructions, their current SQL, the
+  // challenge the user is looking at, instructions, their current SQL, the
   // last error/result, test results, and the live database schema.
   useAskAiSource({
     kind: "challenge",
@@ -1359,7 +1359,7 @@ export default function SqlChallengeCard({
   // Mount the read-only solution editor lazily when the modal opens.
   // We keep the doc editable at the contenteditable level (relying on
   // `readOnly` to block insertions) so the user can click into the
-  // editor and select text — including Mod-A select-all, wired via
+  // editor and select text, including Mod-A select-all, wired via
   // the default keymap below since `editable.of(false)` would
   // otherwise disable keyboard focus and shortcuts.
   useEffect(() => {
@@ -1463,7 +1463,7 @@ export default function SqlChallengeCard({
       sql: string,
       // The caller's run sequence (from `++runSeqRef.current`). Owning
       // the increment in the caller lets it guard its own post-await
-      // state updates too — a newer run/check/reset supersedes both
+      // state updates too, a newer run/check/reset supersedes both
       // this execution's streaming updates and the caller's final ones.
       mySeq: number,
     ): Promise<{
@@ -1497,7 +1497,7 @@ export default function SqlChallengeCard({
       const elapsedMs = performance.now() - startedAt;
       // The "last meaningful result" is the last result set with
       // columns. DML statements come back with empty columns so they
-      // shouldn't shadow a preceding SELECT — but if the user only ran
+      // shouldn't shadow a preceding SELECT, but if the user only ran
       // DML, we still want to show *something*.
       let last: SqlResult | null = null;
       for (const r of results) {
@@ -1539,7 +1539,7 @@ export default function SqlChallengeCard({
       }
       setStatus("ready");
       setStatusMessage("Done");
-      // The run may have created/dropped tables — refresh the
+      // The run may have created/dropped tables, refresh the
       // completion schema (and the viewer when enabled).
       try {
         const engine = await ensureEngine();
@@ -1556,7 +1556,7 @@ export default function SqlChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      // Only the latest run owns the busy spinner — a superseded run
+      // Only the latest run owns the busy spinner, a superseded run
       // clearing it would re-enable Submit mid-flight for its successor.
       if (runSeqRef.current === mySeq) setActiveAction(null);
     }
@@ -1646,7 +1646,7 @@ export default function SqlChallengeCard({
     // SAME engine. Because tests may want to inspect post-DML state,
     // we evaluate `runAfterSql` BEFORE running the solution so the
     // learner's mutations are still visible. The solution SELECT
-    // shouldn't mutate state — and if it did, every test's expectation
+    // shouldn't mutate state, and if it did, every test's expectation
     // would be against the solution-mutated state, which would be a
     // bug in the exercise authoring anyway.
     let solutionResult: SqlResult | null = null;
@@ -1821,7 +1821,7 @@ export default function SqlChallengeCard({
   // ─── Reset ──────────────────────────────────────────────────────────
   // Reset restores the starter code AND re-seeds the database so
   // INSERT/UPDATE/DELETE exercises can be retried from a clean slate.
-  // We do this by destroying the engine and clearing the seed flag —
+  // We do this by destroying the engine and clearing the seed flag,
   // `ensureEngine()` will boot a fresh instance on the next user
   // action, and the table-viewer effect will repopulate the panel.
   const reset = useCallback(() => {
@@ -1899,7 +1899,7 @@ export default function SqlChallengeCard({
         toasts.show("Clipboard unavailable in this browser.", "warn");
       }
     } catch {
-      toasts.show("Couldn't copy SQL — clipboard blocked.", "warn");
+      toasts.show("Couldn't copy SQL, clipboard blocked.", "warn");
     }
   }, [toasts]);
 
@@ -1920,7 +1920,7 @@ export default function SqlChallengeCard({
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
-        toasts.show("Already formatted — nothing to change.");
+        toasts.show("Already formatted, nothing to change.");
       } else {
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: formatted },
@@ -1930,7 +1930,7 @@ export default function SqlChallengeCard({
     } catch {
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
-      toasts.show("Couldn't format — SQL may have a syntax error.", "warn");
+      toasts.show("Couldn't format, SQL may have a syntax error.", "warn");
     } finally {
       setIsFormatting(false);
     }
@@ -2208,7 +2208,7 @@ export default function SqlChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
-          {/* Runtime status — shows "Loading PGlite", "Loading
+          {/* Runtime status, shows "Loading PGlite", "Loading
               DuckDB-WASM", etc. while the SQL engine is fetching its
               WASM bundle on first run. Once the engine is warm this
               stays hidden. */}
@@ -2410,7 +2410,7 @@ function SolutionModal({
         copiedTimerRef.current = null;
       }, 1500);
     } catch {
-      /* clipboard blocked — leave the label unchanged */
+      /* clipboard blocked, leave the label unchanged */
     }
   }, [source]);
 
@@ -2433,7 +2433,7 @@ function SolutionModal({
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
             <div className={styles.modalSubtitle}>
-              One valid answer — there may be others.
+              One valid answer, there may be others.
             </div>
           </div>
           <div className={styles.modalActions}>
@@ -2496,7 +2496,7 @@ function SolutionModal({
   // Portal to <body> so the backdrop's `position: fixed` is sized to the
   // viewport. Left inline, an ancestor with a transform/filter (e.g. the home
   // hero's BlurFade) becomes the containing block and the backdrop shrinks to
-  // that ancestor — see app/_components/ChallengeCard.module.css (.modalBackdrop).
+  // that ancestor, see app/_components/ChallengeCard.module.css (.modalBackdrop).
   return typeof document === "undefined"
     ? modal
     : createPortal(modal, document.body);
@@ -2511,7 +2511,7 @@ function cellText(v: unknown): string {
   return String(v);
 }
 
-/** Virtualised SQL result table — used both by the main result pane
+/** Virtualised SQL result table, used both by the main result pane
  *  and the per-table viewer at the bottom of the card. The query
  *  result set is in memory by the time we render (executeSql returns
  *  the full Promise<SqlResult>), so we just render the rows currently
@@ -2545,7 +2545,7 @@ export function VirtualizedResultTable({
   loadingMore?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  // Stable row identity — TanStack Table keys rows by index when no
+  // Stable row identity, TanStack Table keys rows by index when no
   // explicit id is supplied, which is fine here since the result set
   // never re-sorts in this component.
   const data = useMemo(
@@ -2629,7 +2629,7 @@ export function VirtualizedResultTable({
                     : flexRender(h.column.columnDef.header, h.getContext())}
                 </th>
               ))}
-              {/* Filler column — absorbs the leftover width so the data
+              {/* Filler column, absorbs the leftover width so the data
                   columns only take the space their content needs instead
                   of stretching across the card. */}
               <th className={styles.sqlResultFiller} aria-hidden />
@@ -2726,7 +2726,7 @@ export function TableViewerPane({
         {entry.loadingMore
           ? "Loading more rows…"
           : entry.hasMore
-            ? `${r.values.length} rows loaded — scroll for more`
+            ? `${r.values.length} rows loaded, scroll for more`
             : `${r.values.length} row${r.values.length === 1 ? "" : "s"}`}
       </div>
     </div>
@@ -2799,7 +2799,7 @@ export function TableViewer({
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
   // While the engine cold-boots there are no tables (and any result tab
-  // is only showing "Running…"), so the boot loader takes the panel —
+  // is only showing "Running…"), so the boot loader takes the panel,
   // mirroring how the non-SQL blocks show the notice before first output.
   const showBootNotice = bootState != null && entries.length === 0;
   const showSkeleton =
@@ -2895,8 +2895,8 @@ export function TableViewer({
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
-              {/* Mirrors TableViewerPane's layout — table first, then the
-                  row-count footnote — so the Result tab reads exactly like
+              {/* Mirrors TableViewerPane's layout, table first, then the
+                  row-count footnote, so the Result tab reads exactly like
                   the table tabs. The execution time rides along in the
                   footnote instead of a separate info bar above the table. */}
               {resultTabData.error ? (
@@ -2931,7 +2931,7 @@ export function TableViewer({
                   {resultTabData.message}
                   {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
                 </div>
-              ) : null /* No "Running…" text — the blue wave overlay below
+              ) : null /* No "Running…" text, the blue wave overlay below
                           signals the run; .resultPaneBusy reserves height. */}
               <RunOverlay active={resultTabData.loading} />
             </div>

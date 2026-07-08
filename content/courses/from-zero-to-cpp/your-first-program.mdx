@@ -1,6 +1,6 @@
 ---
 title: Your First Program
-description: Reading "Hello, World!" line by line — what every piece actually does.
+description: Reading "Hello, World!" line by line, what every piece actually does.
 ---
 
 Now that you know the machine and the pipeline, let's slow down on a
@@ -27,7 +27,7 @@ int main() {
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Four glyph chips — a hash, double angle brackets, braces, and a zero — float around a small program card, joined to it by dotted leaders: Hello World exploded into its parts"
+  aria-label="Four glyph chips, a hash, double angle brackets, braces, and a zero, float around a small program card, joined to it by dotted leaders: Hello World exploded into its parts"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -70,7 +70,7 @@ int main() {
   </g>
 </svg>
 
-## Line 1 — `#include <iostream>`
+## Line 1, `#include <iostream>`
 
 A **preprocessor directive** (we met these in the last chapter). It
 tells the preprocessor to paste the entire contents of the standard
@@ -81,7 +81,7 @@ input/output**. It is what makes `std::cout` exist.
 If you remove this line, the program fails with a compiler error
 like *"`std::cout` was not declared in this scope."*
 
-## Line 3 — `int main()`
+## Line 3, `int main()`
 
 The **entry point** of every standalone C++ program. When the
 operating system launches your executable, it ultimately calls a
@@ -107,7 +107,7 @@ or **block**. Variables declared inside a block exist only until
 the matching closing brace. We will use scope rules constantly when
 we discuss lifetimes and resource management.
 
-## Line 4 — `std::cout << "Hello, World!\n";`
+## Line 4, `std::cout << "Hello, World!\n";`
 
 A single C++ statement that does a *lot*.
 
@@ -116,7 +116,7 @@ A single C++ statement that does a *lot*.
   `std::cout`, `std::string`, `std::vector`, and so on. Namespaces
   prevent collisions between libraries that happen to pick the same
   short names.
-- `cout` is the name of the standard **output stream object** — a
+- `cout` is the name of the standard **output stream object**, a
   pre-existing object that represents *the place where text goes
   when you print it*.
 - `<<` is the **stream insertion operator**. Despite the symbol it
@@ -137,7 +137,7 @@ flowchart TD
     OS --> T[Terminal / browser console]
 ```
 
-## Line 5 — `return 0;`
+## Line 5, `return 0;`
 
 Hand control back to the operating system with exit status `0`. If
 you `return 1;` instead, scripts that called your program (like a
@@ -294,7 +294,7 @@ int main() {
 <ChallengeCard
   adapter="cpp"
   title="Sum of 1..N"
-  instructions={`Write a program that prints \`5050\` followed by a newline. (That is the sum of all integers from 1 to 100 inclusive.) Use a loop, not a formula — we want practice with loops.`}
+  instructions={`Write a program that prints \`5050\` followed by a newline. (That is the sum of all integers from 1 to 100 inclusive.) Use a loop, not a formula, we want practice with loops.`}
   files={[
     {
       filename: "main.cpp",

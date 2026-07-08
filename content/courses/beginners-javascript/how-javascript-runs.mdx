@@ -1,6 +1,6 @@
 ---
 title: How JavaScript Runs
-description: The call stack, the event loop, tasks, and microtasks — the machinery that decides what runs when.
+description: The call stack, the event loop, tasks, and microtasks, the machinery that decides what runs when.
 ---
 
 So far we've written code and pressed Run, and it has Just Worked.
@@ -10,9 +10,9 @@ from "I know exactly why this prints in that order."
 
 We'll focus on three structures:
 
-1. The **call stack** — what's currently executing.
-2. The **task queue** (a.k.a. macrotask queue) — things waiting to start.
-3. The **microtask queue** — promise reactions, very high priority.
+1. The **call stack**, what's currently executing.
+2. The **task queue** (a.k.a. macrotask queue), things waiting to start.
+3. The **microtask queue**, promise reactions, very high priority.
 
 Sitting on top of them: the **event loop**, the bit that ties
 them together.
@@ -20,7 +20,7 @@ them together.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="A blue dot circling a thin ring beside a stack of blue bars, while two queues of squares feed the ring along thin curved lines — the event loop, call stack, and task queues"
+  aria-label="A blue dot circling a thin ring beside a stack of blue bars, while two queues of squares feed the ring along thin curved lines, the event loop, call stack, and task queues"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -78,7 +78,7 @@ This is the most important sentence in the whole chapter:
 There is no parallelism happening inside your JS code. If a
 function takes 5 seconds, *nothing else* in your program runs
 during those 5 seconds. (We'll see why slow blocking code is a
-problem — and how async solves it without adding more threads.)
+problem, and how async solves it without adding more threads.)
 
 ## The call stack
 
@@ -90,7 +90,7 @@ top."
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Blue slabs stacked like pancakes, narrowing toward the top, with a green dot beside the topmost slab — the frame currently running"
+  aria-label="Blue slabs stacked like pancakes, narrowing toward the top, with a green dot beside the topmost slab, the frame currently running"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -140,8 +140,8 @@ sequenceDiagram
     Note over Stack: []
 ```
 
-If you push too many frames without returning — for example, with
-an infinitely recursive function — you get the famous
+If you push too many frames without returning, for example, with
+an infinitely recursive function, you get the famous
 "Maximum call stack size exceeded" error.
 
 <CodeBlock
@@ -166,7 +166,7 @@ try {
 ## Synchronous code blocks everything
 
 While a function is on the stack, *nothing else can run*. Not
-timers, not network responses, not clicks — nothing.
+timers, not network responses, not clicks, nothing.
 
 <CodeBlock
   adapter="javascript"
@@ -189,7 +189,7 @@ console.log("B"); // logs after ~500ms
 />
 
 This is exactly why long synchronous work in a browser freezes
-the UI — the browser also can't process clicks while the stack is
+the UI, the browser also can't process clicks while the stack is
 busy. The fix isn't "make it faster"; it's "don't block the
 thread." That's what asynchronous APIs let you do.
 
@@ -317,7 +317,7 @@ back to the caller; "after demo()" runs because we're still on
 the same stack. Only once the stack empties does the microtask
 run `C`.
 
-Don't worry if Promises feel hand-wavy — the next chapter is all
+Don't worry if Promises feel hand-wavy, the next chapter is all
 about them. The point right now is: **`await` is a scheduling
 hint, not magic parallelism.**
 
@@ -496,16 +496,16 @@ console.log("D");
 
 What does it print?
 
-*Hint: the two \`console.log\` calls are synchronous and run first; then ask which kind of callback the event loop drains first — a promise (microtask) or a \`setTimeout\` (task).*
+*Hint: the two \`console.log\` calls are synchronous and run first; then ask which kind of callback the event loop drains first, a promise (microtask) or a \`setTimeout\` (task).*
 
 - A B C D
   > This would be the order if callbacks ran the instant they were scheduled. They don't: \`setTimeout\` and the promise \`.then\` are both deferred until the synchronous code finishes, so \`B\` and \`C\` cannot appear before \`D\`.
 - A D B C
-  > The two synchronous logs \`A\` and \`D\` are in the right place, but this assumes the \`setTimeout\` callback (\`B\`) runs before the promise callback (\`C\`). It's the other way around — microtasks run before tasks.
+  > The two synchronous logs \`A\` and \`D\` are in the right place, but this assumes the \`setTimeout\` callback (\`B\`) runs before the promise callback (\`C\`). It's the other way around, microtasks run before tasks.
 - [o] A D C B
   > \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout\` callback \`B\`. Even though \`setTimeout\` is scheduled before the promise, microtasks always win against macrotasks.
 - A C D B
-  > This puts \`C\` before \`D\`, but \`D\` is synchronous and the promise callback \`C\` is a microtask — microtasks only run after all the synchronous code (including \`D\`) has finished.
+  > This puts \`C\` before \`D\`, but \`D\` is synchronous and the promise callback \`C\` is a microtask, microtasks only run after all the synchronous code (including \`D\`) has finished.
 
 The crucial rule: microtasks (promises, \`queueMicrotask\`) run between every task. \`setTimeout(..., 0)\` is a *task*, so it has to wait its turn.`}
 />

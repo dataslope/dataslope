@@ -37,7 +37,7 @@ mysterious.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A console window with a green prompt chevron and a blue typed line, and a thin gray arrow dropping to the green line printed below — type a line, run it, see the result"
+  aria-label="A console window with a green prompt chevron and a blue typed line, and a thin gray arrow dropping to the green line printed below, type a line, run it, see the result"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="120" y="30" width="400" height="160" rx="14" fill="currentColor" opacity="0.07" />
@@ -79,7 +79,7 @@ The `>` is the **R prompt**. It is R saying "I am ready for an
 instruction." You type one, press Enter, and R either evaluates it
 and shows the result, or prints an error.
 
-In WebR, we replace the prompt with a friendly code editor — but
+In WebR, we replace the prompt with a friendly code editor, but
 the semantics are the same. Each time you click **Run**, R reads
 your code, evaluates it top to bottom, and prints the output.
 
@@ -117,7 +117,7 @@ Both are useful; they are easy to confuse at first.
 # Explicit printing: same effect, but you typed the verb
 print(2 + 2)
 
-# Assignment: NO automatic output — result is stored, not shown
+# Assignment: NO automatic output, result is stored, not shown
 x <- 3 + 3
 
 # Now explicitly show what's in x
@@ -131,7 +131,7 @@ Notice the third line, `x <- 3 + 3`. Nothing appeared in the
 output, because the *value* of that expression was assigned to a
 name (`x`) instead of being printed. This is the most common
 "why didn't anything happen?" confusion for beginners. The answer
-is always: it *did* happen — you just stored the result.
+is always: it *did* happen, you just stored the result.
 
 ## The two ways to print: `print()` versus `cat()`
 
@@ -170,12 +170,12 @@ Use `print()` when you want to *inspect* a value. Use `cat()` when
 you want to *write a sentence*. As a rule of thumb: if you are
 building a message with multiple pieces, use `cat()`.
 
-The `"\n"` is a **newline** character — without it, multiple
+The `"\n"` is a **newline** character, without it, multiple
 `cat()` calls would all run together on a single line.
 
 ## Comments
 
-Anything after a `#` on a line is a **comment** — R ignores it.
+Anything after a `#` on a line is a **comment**, R ignores it.
 Comments are notes you leave for the next human to read your code
 (often yourself, three months from now).
 
@@ -314,7 +314,7 @@ data analysis: defines named columns, applies a vectorized
 calculation (`bmi <- weights / (heights / 100)^2`), and walks
 through results to print human-readable output.
 
-Notice that the BMI calculation itself is vectorized — *no loop
+Notice that the BMI calculation itself is vectorized, *no loop
 was needed* to compute the four BMIs. The loop only appeared when
 we wanted to print four different sentences. This is the texture
 of real R code: vectorize the math, loop only when you really need
@@ -323,14 +323,14 @@ per-element behavior.
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Which of these lines shows output by **auto-printing** — i.e. without an explicit print call?
+  markdown={`Which of these lines shows output by **auto-printing**, i.e. without an explicit print call?
 
 - \`x <- 5\`
-  > Assignment produces no automatic output — the result is stored, not printed.
+  > Assignment produces no automatic output, the result is stored, not printed.
 - [o] \`5 + 3\`
   > An unassigned expression auto-prints its result.
 - \`# print("hello")\`
-  > That is a comment — everything after \`#\` is ignored.
+  > That is a comment, everything after \`#\` is ignored.
 - \`print(5)\`
   > This does show output, but through an explicit \`print()\` call rather than auto-printing.`}
 />
@@ -339,11 +339,11 @@ per-element behavior.
   markdown={`Which of these lines shows output through an **explicit** print call?
 
 - \`x <- 5\`
-  > Assignment produces no automatic output — the result is stored, not printed.
+  > Assignment produces no automatic output, the result is stored, not printed.
 - \`5 + 3\`
-  > This does show output, but by auto-printing an unassigned expression — there is no explicit call.
+  > This does show output, but by auto-printing an unassigned expression, there is no explicit call.
 - \`# print("hello")\`
-  > That is a comment — everything after \`#\` is ignored.
+  > That is a comment, everything after \`#\` is ignored.
 - [o] \`print(5)\`
   > \`print()\` explicitly outputs its argument.`}
 />
@@ -369,7 +369,7 @@ result <- 2 + 2
 \`\`\`
 
 - Because R does not handle integer arithmetic.
-  > R handles integer and floating-point arithmetic without issue; \`2 + 2\` evaluates to \`4\` correctly — the result is simply stored silently.
+  > R handles integer and floating-point arithmetic without issue; \`2 + 2\` evaluates to \`4\` correctly, the result is simply stored silently.
 - [o] Because the result of the expression was assigned to the variable \`result\` instead of being printed.
   > Assignment is silent. To see the value, add a separate line: \`print(result)\` or just \`result\`.
 - Because of a parsing error.
@@ -380,9 +380,9 @@ result <- 2 + 2
 
 ## Mini challenge: write a tiny program
 
-Write a short program that defines two vectors — `cities` (a
+Write a short program that defines two vectors, `cities` (a
 character vector) and `temperatures_c` (a numeric vector of
-celsius temperatures of the same length) — and prints one line
+celsius temperatures of the same length), and prints one line
 per city in the format:
 
 ```text

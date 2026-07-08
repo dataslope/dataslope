@@ -1,7 +1,7 @@
 // Route-land runtime warm-up.
 //
 // `<CodeBlock>` / `<ChallengeCard>` historically warmed their shared
-// runtime only when scrolled within 200 px of the viewport — so a
+// runtime only when scrolled within 200 px of the viewport, so a
 // reader who spends thirty seconds on a page's intro paragraph paid the
 // whole Pyodide download *after* reaching the first block instead of
 // during the read. This module starts that boot when the page lands:
@@ -16,7 +16,7 @@
 //     the next one behind it, instead of competing for bandwidth.
 //   - Data-saver guard: no land-time downloads when the user enabled
 //     Save-Data or sits on a 2g-class connection. The scroll-into-view
-//     warm-up and Run itself still work for everyone — this gate only
+//     warm-up and Run itself still work for everyone, this gate only
 //     skips the *speculative* download.
 //
 // The IntersectionObserver warm-up in the blocks stays as the fallback
@@ -32,7 +32,7 @@ import {
 } from "../runtimeRegistry";
 
 const requested = new Set<string>();
-// Sequential boot chain — see "one heavy boot at a time" above.
+// Sequential boot chain, see "one heavy boot at a time" above.
 let bootChain: Promise<void> = Promise.resolve();
 
 // When the registry evicts a runtime, forget that we warmed it so a later
@@ -62,7 +62,7 @@ function dataSaverActive(): boolean {
 function whenIdle(callback: () => void): void {
   if (typeof requestIdleCallback === "function") {
     // The timeout bounds how long a busy main thread can defer the
-    // warm-up — past that, starting the download wins over idleness.
+    // warm-up, past that, starting the download wins over idleness.
     requestIdleCallback(() => callback(), { timeout: 4000 });
   } else {
     setTimeout(callback, 1500);

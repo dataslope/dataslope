@@ -1,6 +1,6 @@
 ---
 title: Immutability
-description: Why values that never change make programs simpler, safer, and easier to compose — and how modern C# expresses immutability ergonomically
+description: Why values that never change make programs simpler, safer, and easier to compose, and how modern C# expresses immutability ergonomically
 ---
 
 A value is **immutable** if it cannot change after it is constructed.
@@ -9,7 +9,7 @@ Y=2 }` forever. To get a "modified" version, you build a *new* point.
 
 This sounds wasteful. It is not. It is the single most reliable
 weapon against an entire family of bugs that every programmer has
-written at least once — and once you stop fighting it, you'll find
+written at least once, and once you stop fighting it, you'll find
 your code gets *simpler*, not more complex.
 
 <svg
@@ -57,7 +57,7 @@ static decimal Total(List<decimal> cart)
     decimal sum = 0;
     foreach (var item in cart)
         sum += item;
-    cart.Add(99m); // "Tax line" — but we mutate the caller's cart!
+    cart.Add(99m); // "Tax line", but we mutate the caller's cart!
     return sum;
 }
 
@@ -72,7 +72,7 @@ Console.WriteLine($"cart now has {myCart.Count} items: {string.Join(", ", myCart
 />
 
 The caller passed in a cart with three items. The function computed
-the total — *and silently added a fourth item*. Now anywhere else in
+the total, *and silently added a fourth item*. Now anywhere else in
 the program that touches `myCart` sees four items. That bug is
 called **aliasing**: two pieces of code share a reference to the
 same mutable object, and one of them quietly changes what the other
@@ -120,7 +120,7 @@ record Money(decimal Amount, string Currency);
 />
 
 `a` is unchanged. `c` is a brand-new record. Equality compares
-*contents*, not references — which is what you want for value types.
+*contents*, not references, which is what you want for value types.
 
 ### `readonly` fields and `init` setters
 
@@ -151,8 +151,8 @@ class Config
 
 ### Immutable collections
 
-The mutable defaults — `List<T>`, `Dictionary<TKey,TValue>`,
-`HashSet<T>` — have immutable cousins in
+The mutable defaults, `List<T>`, `Dictionary<TKey,TValue>`,
+`HashSet<T>`, have immutable cousins in
 `System.Collections.Immutable`. An immutable list returns a *new*
 list when you "add" to it.
 
@@ -218,7 +218,7 @@ objects expensive?"*. The honest answer:
 - For small records and short pipelines, **no**. Modern GC is
   optimized for short-lived allocations.
 - For very large collections updated millions of times per second,
-  **yes** — and that's why C# offers both immutable and mutable
+  **yes**, and that's why C# offers both immutable and mutable
   collections, and `Span<T>` for hot loops.
 - Most "performance fixes" by switching to mutation come at the cost
   of bugs that take far more time to diagnose than they save.
@@ -236,7 +236,7 @@ From most immutable to most mutable:
 4. Mutable `class`
 
 The closer to the top, the easier it is to reason about. A `record`
-that contains a mutable `List<int>` is *not really* immutable — you
+that contains a mutable `List<int>` is *not really* immutable, you
 can still call `.Add` on the inner list. True immutability requires
 "immutability all the way down".
 
@@ -331,7 +331,7 @@ public record Money(decimal Amount, string Currency)
 - [o] Immutable values cannot be aliased into incorrect states, because nothing can change them after construction.
   > Aliasing only causes bugs when one of the aliases *mutates* the shared object. If the object is immutable, no aliased reference can ever observe an unexpected change.
 
-Immutability doesn't *forbid* sharing references — it makes shared
+Immutability doesn't *forbid* sharing references, it makes shared
 references *safe*. Two pieces of code that both hold the same
 \`Money(10, "USD")\` cannot interfere with each other, because neither
 can change it.`}

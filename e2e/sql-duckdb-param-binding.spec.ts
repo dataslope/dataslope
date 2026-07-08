@@ -7,7 +7,7 @@ import { test, expect, type Page } from "@playwright/test";
 // quote-escaped literals; they now bind values as positional `?` parameters.
 // This spec drives a real edit through that path on DuckDB and asserts a
 // commit round-trips a value containing single quotes, double quotes and an
-// ampersand — i.e. that prepared-statement binding works in duckdb-wasm and
+// ampersand, i.e. that prepared-statement binding works in duckdb-wasm and
 // needs no manual escaping. (The shared edit/commit UI is covered for all
 // three engines by sql-edit-ergonomics / sql-edit-undo.)
 // ─────────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ test("DuckDB: committed edit with quotes round-trips via param binding", async (
   // The exact string (quotes and all) is back in the grid. The post-commit
   // re-fetch is a real `SELECT * FROM customers ORDER BY customer_id` against
   // DuckDB, so seeing the value proves the prepared-statement UPDATE bound and
-  // persisted it without corruption — no manual escaping required.
+  // persisted it without corruption, no manual escaping required.
   await expect(
     page.locator(".sql-result-table").getByText(TRICKY, { exact: true }),
   ).toBeVisible({ timeout: 40_000 });

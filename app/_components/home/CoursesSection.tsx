@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Home page Courses section — reuses the `/courses` catalog's course card
+ * Home page Courses section, reuses the `/courses` catalog's course card
  * verbatim (app/courses/_components/CourseCard.tsx) so the two surfaces stay
  * visually identical. Shows the four most popular courses by default, with
  * topic buttons (the domain tags common enough to carry a filter) that swap
@@ -14,7 +14,7 @@ import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseCard } from "@/app/courses/_components/CourseCard";
 
-// (Type-only import cycle with lib/courseCatalog is fine — erased at build.)
+// (Type-only import cycle with lib/courseCatalog is fine, erased at build.)
 export interface CourseTags {
   language?: string[];
   libraries?: string[];
@@ -84,7 +84,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
 
       {/* Topic buttons: "Recommended" (default) + the biggest domains. The
           default is a hand-curated ranking (lib/courseCatalog.ts), so it is
-          not labelled "Most popular" — there are no usage analytics yet. */}
+          not labelled "Most popular", there are no usage analytics yet. */}
       <div className="mb-4 flex flex-wrap justify-center gap-2">
         <button
           type="button"
@@ -107,7 +107,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
         ))}
       </div>
 
-      {/* Up to four cards — the same card component the /courses catalog
+      {/* Up to four cards, the same card component the /courses catalog
           renders. Cards carry their own vertical padding (py-6), so the grid
           only adds a column gap. */}
       <div className="grid gap-x-10 sm:grid-cols-2">

@@ -1,11 +1,11 @@
 ---
 title: Data Frames
-description: R's spreadsheet-on-steroids. A data frame is just a collection of equal-length vectors — but that simple idea is enough to organize 90% of the data you'll ever work with.
+description: R's spreadsheet-on-steroids. A data frame is just a collection of equal-length vectors, but that simple idea is enough to organize 90% of the data you'll ever work with.
 ---
 
 A real dataset rarely lives as a single vector. It lives as a
 **table**: rows for observations, columns for variables. In R,
-that table is called a **data frame** — and it's the central data
+that table is called a **data frame**, and it's the central data
 structure for nearly all statistical and data work.
 
 A data frame is, fundamentally, just **a list of equal-length
@@ -15,7 +15,7 @@ columns must have the same length. That's it.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Four test tubes of identical height stand side by side, each filled to the same level with a different colored liquid — a data frame is equal-length column vectors standing side by side"
+  aria-label="Four test tubes of identical height stand side by side, each filled to the same level with a different colored liquid, a data frame is equal-length column vectors standing side by side"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -71,7 +71,7 @@ print(employees)
 />
 
 When you `print` a data frame in WebR, you get a real rendered
-HTML table. Each column has its own type — `name` and `dept` are
+HTML table. Each column has its own type, `name` and `dept` are
 character, `salary` is numeric, `remote` is logical.
 
 Each column is a vector, and the data frame stacks them
@@ -140,7 +140,7 @@ mean(employees$salary) # use it like any vector
   ]}
 />
 
-Once you've grabbed a column, you're back in vector land — every
+Once you've grabbed a column, you're back in vector land, every
 trick from the last four pages works.
 
 ## Indexing rows and columns: `[row, col]`
@@ -194,14 +194,14 @@ print(employees)
   ]}
 />
 
-Vectorized arithmetic works exactly as you'd hope —
+Vectorized arithmetic works exactly as you'd hope,
 `employees$salary * 0.10` produces a new vector of bonuses, which
 is then stored as a new column.
 
 ## Built-in datasets: your sandbox
 
 R comes with dozens of built-in datasets you can experiment with
-freely — `mtcars`, `airquality`, and others load with a single
+freely, `mtcars`, `airquality`, and others load with a single
 `data()` call and need no setup. We lean on those throughout the
 course:
 
@@ -221,7 +221,7 @@ head(airquality)
 />
 
 When we want a friendly table of *categorical* groups, we reach for
-the **Palmer penguins** — body measurements of 333 penguins from
+the **Palmer penguins**, body measurements of 333 penguins from
 three Antarctic species. It is not built into R, so we stage it as a
 CSV; the setup line that reads it is shown above the editable code:
 
@@ -252,7 +252,7 @@ is finding them.
 - An Excel file
   > An Excel file is a file format, not an in-memory data structure; R reads Excel files with packages like \`readxl\`, producing a data frame.
 - [o] A list of equal-length vectors (one per column), displayed as a table
-  > Each column is a vector — possibly of a different type — and they all share the same length.
+  > Each column is a vector, possibly of a different type, and they all share the same length.
 - A SQL table
   > A SQL table is a database object stored in a relational database engine; a data frame is an in-memory R object with a similar tabular shape but without database semantics.`}
 />

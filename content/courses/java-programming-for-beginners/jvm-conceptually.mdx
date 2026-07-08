@@ -1,9 +1,9 @@
 ---
 title: The JVM, Conceptually
-description: A mental model of the Java Virtual Machine — what it is, what it does, and the parts worth understanding early
+description: A mental model of the Java Virtual Machine, what it is, what it does, and the parts worth understanding early
 ---
 
-The Java Virtual Machine — **JVM** — is the program that runs your
+The Java Virtual Machine, **JVM**, is the program that runs your
 program. Without it, your `.class` files are just data. With it,
 they come alive. This page builds an intuition for the JVM at the
 level a thoughtful beginner needs: enough to reason about programs,
@@ -12,7 +12,7 @@ not enough to write a JIT compiler.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A faint gray class file rides a thin arrow into a green-walled chamber where the same block turns solid blue inside a live green ring, and out the other side stream small colored results — the JVM bringing compiled code to life"
+  aria-label="A faint gray class file rides a thin arrow into a green-walled chamber where the same block turns solid blue inside a live green ring, and out the other side stream small colored results, the JVM bringing compiled code to life"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.25">
@@ -48,8 +48,8 @@ not enough to write a JIT compiler.
 
 Your CPU is a physical machine: it has its own instruction set,
 registers, and quirks. A **virtual machine** is a *software*
-machine — it has its own instruction set (bytecode), its own model
-of memory, and its own rules — and it runs on top of any real
+machine, it has its own instruction set (bytecode), its own model
+of memory, and its own rules, and it runs on top of any real
 machine that hosts it.
 
 ```mermaid
@@ -71,14 +71,14 @@ shielded from platform differences.
 A JVM is a hefty piece of software. Conceptually, it provides four
 services to your program:
 
-1. **A class loader** — finds and loads `.class` files on demand.
-2. **A memory manager** — allocates objects on the heap, manages
+1. **A class loader**, finds and loads `.class` files on demand.
+2. **A memory manager**, allocates objects on the heap, manages
    stack frames per call, and **garbage collects** memory that is no
    longer reachable.
-3. **An execution engine** — interprets bytecode, and (over time)
+3. **An execution engine**, interprets bytecode, and (over time)
    *compiles hot methods* to native CPU instructions for speed
    (this is the JIT).
-4. **A standard library and runtime** — the classes in `java.lang`,
+4. **A standard library and runtime**, the classes in `java.lang`,
    `java.util`, `java.io`, etc. that ship with every JVM.
 
 ```mermaid
@@ -94,7 +94,7 @@ flowchart TD
     EE <--> RT
 ```
 
-When people say "the JVM," they may mean any of these pieces — the
+When people say "the JVM," they may mean any of these pieces, the
 context usually tells you which.
 
 ## Interpreter + JIT, intuitively
@@ -134,23 +134,23 @@ even though they "start out being interpreted."
 For a beginner, three regions are worth knowing:
 
 - **Stack** (one per thread). Holds the chain of *active method
-  calls* — every call gets a "stack frame" with its parameters and
+  calls*, every call gets a "stack frame" with its parameters and
   local variables. Tiny, fast, automatic.
 - **Heap** (one shared region). Every object you create with `new`
   lives here. Big, shared between threads, garbage collected.
-- **Method area / metaspace.** Holds loaded classes themselves —
+- **Method area / metaspace.** Holds loaded classes themselves,
   their fields, methods, bytecode, constants.
 
 A snapshot of what each region holds while `main` is calling `add`:
 
-- **Stack** (per thread) — a pile of frames, newest on top:
+- **Stack** (per thread), a pile of frames, newest on top:
   `main thread bottom` → `frame: main(args)` → `frame: add(a=2, b=3)`.
-- **Heap** (shared) — the live objects: `Account #1 (balance=500)`,
+- **Heap** (shared), the live objects: `Account #1 (balance=500)`,
   `Account #2 (balance=250)`, `String 'Ada'`.
-- **Method area** — the loaded classes themselves: `class Account`,
+- **Method area**, the loaded classes themselves: `class Account`,
   `class String`, `class Main`.
 
-We dedicate the next page entirely to stack vs heap — for now, the
+We dedicate the next page entirely to stack vs heap, for now, the
 three regions are what matter.
 
 ## Garbage collection, intuitively

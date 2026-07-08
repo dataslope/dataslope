@@ -27,7 +27,7 @@ import {
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
- *  not-available row (red ✕) — kept in place so the rows line up across plans
+ *  not-available row (red ✕), kept in place so the rows line up across plans
  *  for direct comparison. */
 type Feature = {
   text: string;
@@ -50,7 +50,7 @@ interface Plan {
   features: Feature[];
   cta: string;
   href: string;
-  /** The promoted tier — green CTA + inline badge (no border/shadow). */
+  /** The promoted tier, green CTA + inline badge (no border/shadow). */
   highlighted?: boolean;
   badge?: string;
   /** CTA starts a Polar checkout (signed-in users) instead of navigating. */
@@ -62,7 +62,7 @@ const FEATURE_COUNT = 9;
 const PLANS: Plan[] = [
   {
     name: "Guest",
-    description: "Jump straight in — no account needed.",
+    description: "Jump straight in, no account needed.",
     priceMonthly: "$0",
     priceAnnual: "$0",
     noteMonthly: "No sign-in required",
@@ -75,7 +75,7 @@ const PLANS: Plan[] = [
       {
         icon: HardDrive,
         text: "Save workspaces locally",
-        note: "Browser only — no cloud persistence",
+        note: "Browser only, no cloud persistence",
       },
       { text: "No cloud storage", included: false },
       {
@@ -194,7 +194,7 @@ function FeatureRow({
   feature: Feature;
   last: boolean;
   /** Hide on mobile (shown only in the desktop comparison grid) because the
-   *  feature is identical to the Guest plan's — the mobile layout replaces
+   *  feature is identical to the Guest plan's, the mobile layout replaces
    *  these repeats with an "Everything in Guest, plus" line. */
   mobileHidden?: boolean;
 }) {
@@ -228,7 +228,7 @@ function FeatureRow({
 
 /**
  * CTA for the Pro column. Where it sends the visitor depends on who they are:
- * signed out → /sign-in (an account is required — the Polar customer is
+ * signed out → /sign-in (an account is required, the Polar customer is
  * keyed to the user id); already Pro → /account (manage the subscription);
  * signed-in free member → straight into Polar's hosted checkout for the
  * period selected by the monthly/annual toggle. If billing isn't configured
@@ -242,7 +242,7 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const sessionUser = session?.user as
     | { plan?: string; role?: string }
     | undefined;
-  // Admins are treated as Pro everywhere (lib/ai/tier.ts) — route them to
+  // Admins are treated as Pro everywhere (lib/ai/tier.ts), route them to
   // their account page rather than into a checkout for a plan they already
   // effectively have, mirroring app/account/AccountClient.tsx.
   const isPro =
@@ -252,11 +252,11 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   async function handleClick() {
     setError(null);
     // While the first session fetch is in flight a signed-in user would be
-    // misrouted to /sign-in (which bounces to /account, never checkout) —
+    // misrouted to /sign-in (which bounces to /account, never checkout),
     // ignore clicks until the session state is known.
     if (isPending) return;
     if (!session) {
-      // Remember the chosen billing period across the sign-in detour — the
+      // Remember the chosen billing period across the sign-in detour, the
       // buyer lands on /account afterwards, whose Upgrade button honors it
       // (otherwise an annual purchase silently becomes monthly). The explicit
       // ?next= pins that destination: sign-in otherwise returns the user to
@@ -414,14 +414,14 @@ export function PricingSection({
             Pricing
           </h2>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
-            Every course, interview track, and playground is free to use — and
+            Every course, interview track, and playground is free to use, and
             anyone can share a playground with a link. Create a free account
             for cloud saves, or go Pro for storage that never expires.
           </p>
         </div>
       )}
 
-      {/* Monthly / annual billing toggle — only the paid tier's price reacts. */}
+      {/* Monthly / annual billing toggle, only the paid tier's price reacts. */}
       <div className="mb-10 flex items-center justify-center">
         <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/10 dark:bg-white/5">
           {(["monthly", "annual"] as const).map((option) => {

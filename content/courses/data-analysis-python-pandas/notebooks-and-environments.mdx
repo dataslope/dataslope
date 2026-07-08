@@ -1,6 +1,6 @@
 ---
 title: Notebooks and Environments
-description: Conceptually understanding scripts vs notebooks, virtual environments, packages, and reproducibility — even though Dataslope handles the setup for you.
+description: Conceptually understanding scripts vs notebooks, virtual environments, packages, and reproducibility, even though Dataslope handles the setup for you.
 ---
 
 You will write Python code on Dataslope without ever installing
@@ -13,7 +13,7 @@ it.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A notebook page of alternating cells — blue code blocks each followed by their green output, one of which is a tiny chart, with small yellow run triangles down the margin"
+  aria-label="A notebook page of alternating cells, blue code blocks each followed by their green output, one of which is a tiny chart, with small yellow run triangles down the margin"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="180" y="25" width="280" height="195" rx="14" fill="currentColor" opacity="0.07" />
@@ -66,13 +66,13 @@ it with `python my_script.py`. Scripts are great for:
 - Code that other code imports.
 - Anything that runs in production.
 - Anything you want to version-control cleanly (a `.py` is just
-  text — git loves it).
+  text, git loves it).
 
 ### Notebooks (`.ipynb` files)
 
 A document made of *cells*. Each cell holds either prose
 (Markdown) or code. You run cells one at a time, and the output
-of each cell — text, tables, plots — is displayed *inline*. The
+of each cell, text, tables, plots, is displayed *inline*. The
 notebook saves the code, the output, and the prose together.
 
 Notebooks are great for:
@@ -121,15 +121,15 @@ This is fine for the first project. Then:
 - Project B needs `pandas==2.1` because of a new feature.
 - They cannot coexist in the shared directory.
 
-The solution is a **virtual environment** — a separate, isolated
+The solution is a **virtual environment**, a separate, isolated
 library directory per project. Tools that create them:
 
-- **`venv`** — built into Python. Standard, no-frills.
-- **`virtualenv`** — the original, still widely used.
-- **`conda`** — also manages non-Python dependencies (compilers,
+- **`venv`**, built into Python. Standard, no-frills.
+- **`virtualenv`**, the original, still widely used.
+- **`conda`**, also manages non-Python dependencies (compilers,
   C libraries). Popular in data science because many scientific
   packages need C libraries.
-- **`uv`** / **`poetry`** / **`pipenv`** — newer tools that add
+- **`uv`** / **`poetry`** / **`pipenv`**, newer tools that add
   lockfiles and dependency management.
 
 ```mermaid
@@ -153,7 +153,7 @@ directory.
 
 ## Packages, `pip`, and `requirements.txt`
 
-Python's package ecosystem is on the **PyPI** index — over 500,000
+Python's package ecosystem is on the **PyPI** index, over 500,000
 packages, available with one `pip install` command.
 
 A `requirements.txt` file is a plain-text list of the packages a
@@ -187,9 +187,9 @@ prefer lockfiles.
 When you open a Jupyter notebook you see:
 
 - **A toolbar** with run, stop, restart kernel, save.
-- **A kernel** — the long-running Python process that holds your
+- **A kernel**, the long-running Python process that holds your
   variables in memory.
-- **Cells** — blocks of code or Markdown.
+- **Cells**, blocks of code or Markdown.
 
 The kernel is the key concept. Every cell you run *modifies the
 state of the kernel*. If you define `df` in cell 5 and then run
@@ -201,7 +201,7 @@ A common notebook bug:
 1. You write cells in order: 1, 2, 3.
 2. You re-run cell 2 after editing it.
 3. You forget to re-run cell 3.
-4. Cell 3's output is now stale — the variable it shows was
+4. Cell 3's output is now stale, the variable it shows was
    computed *before* your edit.
 
 The cure is to occasionally **restart the kernel and run all
@@ -223,12 +223,12 @@ flowchart TD
 Reproducibility is a layered concept. A truly reproducible
 analysis pins:
 
-1. **Code** — version-controlled in git.
-2. **Data** — either stored alongside the code or referenced by
+1. **Code**, version-controlled in git.
+2. **Data**, either stored alongside the code or referenced by
    a stable URL.
-3. **Environment** — a `requirements.txt` or lockfile capturing
+3. **Environment**, a `requirements.txt` or lockfile capturing
    every package version.
-4. **Runtime** — sometimes even the Python version itself
+4. **Runtime**, sometimes even the Python version itself
    (`.python-version`) and the OS (Docker).
 
 Most working analysts get layers 1 and 3 right and ignore 2 and
@@ -241,7 +241,7 @@ For the entirety of this course:
 
 - The Python interpreter is **Pyodide**, a build of CPython 3.13
   compiled to WebAssembly. It runs inside your browser.
-- The package set is fixed and curated — pandas, NumPy, SciPy,
+- The package set is fixed and curated, pandas, NumPy, SciPy,
   matplotlib, plotly, scikit-learn, and others.
 - There are no virtual environments to create, no `pip install`
   to run.
@@ -310,11 +310,11 @@ Restart-and-run-all is a wonderful habit; if your notebook does not run cleanly 
 - The DataFrame's column names
   > Column names are part of the data structure, not an artifact that lets someone reproduce an analysis from scratch on a new machine.
 - The kernel's memory dump
-  > A memory dump captures in-memory state but is not portable or reproducible — the next person cannot simply load a memory dump and re-run the analysis.
+  > A memory dump captures in-memory state but is not portable or reproducible, the next person cannot simply load a memory dump and re-run the analysis.
 - [o] Code in git + data with a stable reference + a pinned environment (\`requirements.txt\` or lockfile)
   > Code, data, and environment together let someone else reproduce your work months or years later.
 - A screenshot of the notebook
-  > A screenshot shows outputs but not the code that produced them, and it cannot be re-run — it is documentation, not a reproducibility artifact.
+  > A screenshot shows outputs but not the code that produced them, and it cannot be re-run, it is documentation, not a reproducibility artifact.
 
 Forgetting any of the three usually breaks reproducibility in subtle ways.`}
 />

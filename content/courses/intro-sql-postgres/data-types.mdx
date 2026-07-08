@@ -3,14 +3,14 @@ title: Data Types
 description: Why every column has a type, the handful of types you will use constantly, and how types quietly protect your data from nonsense.
 ---
 
-Every column in a relational table has a **data type** — a declared
+Every column in a relational table has a **data type**, a declared
 kind of value it is allowed to hold. This page demystifies types so
 they feel like a helpful guardrail rather than a hurdle.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three table columns each accept only one shape of value — round numbers, bar text, diamond dates"
+  aria-label="Three table columns each accept only one shape of value, round numbers, bar text, diamond dates"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -49,11 +49,11 @@ as a date, and `"someday"` is rejected.
 flowchart TD
     V["A value you<br/>try to store"] --> T{"Does it match<br/>the column's type?"}
     T -->|"yes"| OK["Stored"]
-    T -->|"no"| NO["Rejected — caught early"]
+    T -->|"no"| NO["Rejected, caught early"]
 ```
 
 This is the database fending off one of the five nightmares from
-the first pages of the course — nonsense values —
+the first pages of the course, nonsense values,
 **protecting** your data by refusing invalid values *at the moment
 they are entered*, before they can pollute reports and break logic.
 
@@ -80,7 +80,7 @@ unacceptable when counting cents.
 
 ## Types shape what operations make sense
 
-A column's type does not just restrict storage — it also decides
+A column's type does not just restrict storage, it also decides
 what you can *do* with the values:
 
 - You can do arithmetic on `INTEGER` and `NUMERIC` (`price * 2`).
@@ -130,7 +130,7 @@ FROM
 />
 
 Notice you could compute `price * 2` because `price` is a number.
-You could *not* do that with the `name` column — and that is the
+You could *not* do that with the `name` column, and that is the
 type system quietly steering you toward correct, meaningful queries.
 
 ## Check your understanding

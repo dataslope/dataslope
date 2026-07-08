@@ -1,17 +1,17 @@
 ---
 title: Reproducible Analytical Workflows
-description: Why an analysis must give the same answer twice, and how to build queries that do — deterministic ordering, idempotent setup, views, and SQL as the documentation of your logic.
+description: Why an analysis must give the same answer twice, and how to build queries that do, deterministic ordering, idempotent setup, views, and SQL as the documentation of your logic.
 ---
 
 A number that cannot be reproduced cannot be trusted. If you run the same
-analysis tomorrow — or a colleague runs it on their machine — it should
+analysis tomorrow, or a colleague runs it on their machine, it should
 produce the same result, and you should be able to explain exactly how it
 was computed. This page is about **reproducibility**: the habits that turn
 a one-off query into analysis others can rely on.
 
 <Callout type="info" title="An optional deep dive">
-This is one of the course's *Interesting discussions*. The techniques here
-— stable ordering, idempotent setup, views — are about turning correct
+This is one of the course's *Interesting discussions*. The techniques here,
+stable ordering, idempotent setup, views, are about turning correct
 queries into *trustworthy, repeatable* work. Nothing in the core path
 depends on it, so read it whenever the topic matters to you.
 </Callout>
@@ -19,7 +19,7 @@ depends on it, so read it whenever the topic matters to you.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three colored station dots ride a thin loop whose gray arrowhead marks the direction of travel, and a geometric equals sign points to a stack of three identical green result chips — a reproducible workflow returns the same answer every lap"
+  aria-label="Three colored station dots ride a thin loop whose gray arrowhead marks the direction of travel, and a geometric equals sign points to a stack of three identical green result chips, a reproducible workflow returns the same answer every lap"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="240" cy="110" r="72" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
@@ -71,7 +71,7 @@ actually holds.
 ## Determinism: make ordering and ties stable
 
 The quietest reproducibility bug is **non-deterministic ordering**. If two
-rows tie on the sort key, SQL may return them in either order — so a
+rows tie on the sort key, SQL may return them in either order, so a
 "top 10" can change between runs even on identical data. Always add a
 **tiebreaker** to make the order total and stable.
 
@@ -108,14 +108,14 @@ tiebreaker makes "top 3" a single, defensible answer.
 ## Idempotent setup: safe to re-run
 
 Reproducible analyses often (re)build their inputs. Setup steps should be
-**idempotent** — running them twice does no harm. DuckDB's `CREATE OR
+**idempotent**, running them twice does no harm. DuckDB's `CREATE OR
 REPLACE` and `CREATE ... IF NOT EXISTS` make scripts safe to re-run
 without "already exists" errors.
 
 <SqlCodeBlock
   dialect="duckdb"
   title="CREATE OR REPLACE makes rebuilds safe"
-  starterCode={`-- Run this block twice — it never errors, and the result is identical.
+  starterCode={`-- Run this block twice, it never errors, and the result is identical.
 CREATE OR REPLACE TABLE clean_orders AS
 SELECT
   *
@@ -139,13 +139,13 @@ ORDER BY
 />
 
 Because the table is *replaced*, re-running the analysis from scratch
-always yields the same `clean_orders` — no leftover state, no surprises.
+always yields the same `clean_orders`, no leftover state, no surprises.
 
 ## Views: name a query so it stays consistent
 
 A **view** is a saved query that behaves like a table. Define a metric
-once as a view, and everyone who reads from it gets the *same definition*
-— no copy-pasted SQL drifting out of sync. Views are how teams keep a
+once as a view, and everyone who reads from it gets the *same definition*,
+no copy-pasted SQL drifting out of sync. Views are how teams keep a
 metric's meaning consistent.
 
 <SqlCodeBlock
@@ -194,7 +194,7 @@ query follows.
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Three blue readers draw from one yellow named definition along thin solid lines, while below two gray copy-pasted chips have drifted out of line under a red slash — a view keeps everyone computing the same metric"
+  aria-label="Three blue readers draw from one yellow named definition along thin solid lines, while below two gray copy-pasted chips have drifted out of line under a red slash, a view keeps everyone computing the same metric"
   style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -240,7 +240,7 @@ flowchart TB
 ```
 
 Put together, these habits mean your analysis is not a lucky result you
-got once — it is a repeatable, explainable process.
+got once, it is a repeatable, explainable process.
 
 ## Check your understanding
 
@@ -292,5 +292,5 @@ A view centralizes a metric's definition so everyone computes it the same
 way.`}
 />
 
-That completes the analytical toolkit — from mindset to metrics to
+That completes the analytical toolkit, from mindset to metrics to
 reproducible workflows. Let us wrap up and look at where to go next.

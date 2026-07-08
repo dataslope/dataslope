@@ -5,7 +5,7 @@ description: What the ACF and PACF measure, how 'tails off' vs 'cuts off' distin
 
 A stationary series still has a personality: each value echoes the ones
 before it in a particular way. The **ACF** and **PACF** plots are how we
-*listen* to those echoes — and reading them is how forecasters propose
+*listen* to those echoes, and reading them is how forecasters propose
 model orders without brute-force search. Master these two plots and the
 otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 *read off a chart*.
@@ -13,7 +13,7 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into small solid gray dots — an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
+  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into small solid gray dots, an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -50,7 +50,7 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 
 - The **ACF** (Autocorrelation Function) measures the correlation between
   the series and itself `k` steps earlier, for each lag `k`. It captures the
-  **total** relationship at that lag — direct *and* indirect.
+  **total** relationship at that lag, direct *and* indirect.
 - The **PACF** (Partial Autocorrelation Function) measures the correlation
   at lag `k` **after removing** the influence of all the shorter lags in
   between. It captures only the **direct** relationship.
@@ -58,7 +58,7 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 Why does "direct vs total" matter so much? Picture an AR(1) series where
 each value is `0.7 ×` the previous one. Then `y(t)` is directly tied to
 `y(t-1)`. But `y(t-1)` is tied to `y(t-2)`, so `y(t)` is *indirectly*
-correlated with `y(t-2)` too — through the chain — even though there's no
+correlated with `y(t-2)` too, through the chain, even though there's no
 direct link. The **ACF** at lag 2 sees that indirect echo and is nonzero;
 the **PACF** at lag 2 strips the chain away and reveals the truth: no direct
 lag-2 relationship.
@@ -66,7 +66,7 @@ lag-2 relationship.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two solid links join three dots in a chain while a faint arc of small dots leaps directly from the first to the last; a green ring pins the middle dot in place — the ACF counts the leaping indirect echo, the PACF holds the middleman fixed and keeps only direct ties"
+  aria-label="Two solid links join three dots in a chain while a faint arc of small dots leaps directly from the first to the last; a green ring pins the middle dot in place, the ACF counts the leaping indirect echo, the PACF holds the middleman fixed and keeps only direct ties"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="158" width="520" height="4" rx="2" fill="currentColor" opacity="0.15" />
@@ -105,7 +105,7 @@ Here is the single most useful table in classical forecasting. For a
 | --- | --- | --- | --- |
 | **AR(p)** | tails off (gradual decay) | **cuts off** after lag `p` | order `p` = number of PACF spikes |
 | **MA(q)** | **cuts off** after lag `q` | tails off (gradual decay) | order `q` = number of ACF spikes |
-| **ARMA(p,q)** | tails off | tails off | neither cuts cleanly — try small `p`, `q` |
+| **ARMA(p,q)** | tails off | tails off | neither cuts cleanly, try small `p`, `q` |
 | **white noise** | all ~0 (within bands) | all ~0 | nothing to model |
 | **non-stationary** | decays *very slowly* / lingers | (irrelevant) | **difference first**, then re-read |
 
@@ -209,7 +209,7 @@ print("Two PACF spikes => AR order p = 2. The ACF still just tails off.")
   ]}
 />
 
-### MA(1): the mirror image — ACF cuts off at lag 1
+### MA(1): the mirror image, ACF cuts off at lag 1
 
 <CodeBlock
   adapter="python"
@@ -250,9 +250,9 @@ print("and the PACF is the one that tails off. One ACF spike => MA order q = 1."
   markdown={`The ACF of a stationary series **tails off** gradually, while the PACF shows two strong spikes (lags 1 and 2) and then drops inside the bands. Which model does the cheat-sheet suggest?
 
 - MA(2)
-  > For an MA(q), the *ACF* cuts off and the PACF tails off — the reverse of what's described. Here the PACF cuts off, so it isn't MA.
+  > For an MA(q), the *ACF* cuts off and the PACF tails off, the reverse of what's described. Here the PACF cuts off, so it isn't MA.
 - [o] AR(2)
-  > A PACF that cuts off after lag 2 (with the ACF tailing off) is the signature of an autoregressive process of order 2 — two direct lag dependencies.
+  > A PACF that cuts off after lag 2 (with the ACF tailing off) is the signature of an autoregressive process of order 2, two direct lag dependencies.
 - ARMA(2,2)
   > ARMA shows *both* plots tailing off with no clean cut. Here the PACF clearly cuts off at 2, pointing to a pure AR(2).
 - White noise
@@ -264,7 +264,7 @@ A sharp PACF cut-off (with a tailing ACF) names an AR model, and two spikes mean
 ## The significance bands: which spikes are real?
 
 Every ACF/PACF plot draws a shaded band, roughly `±1.96/√n`. Spikes *inside*
-the band are statistically indistinguishable from zero — noise. Spikes
+the band are statistically indistinguishable from zero, noise. Spikes
 *poking outside* are "significant." When we say a plot "cuts off after lag
 `p`," we mean the spikes are significant up through lag `p` and then duck
 inside the band.
@@ -272,7 +272,7 @@ inside the band.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Lollipop spikes around a shaded zero band: the first two rise clear of it in blue, the rest hide inside as small gray stems, and one lone red spike pokes far out down the row — only the overall pattern, not a single stray spike, names a model"
+  aria-label="Lollipop spikes around a shaded zero band: the first two rise clear of it in blue, the rest hide inside as small gray stems, and one lone red spike pokes far out down the row, only the overall pattern, not a single stray spike, names a model"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="94" width="520" height="52" rx="10" fill="currentColor" opacity="0.08" />
@@ -336,17 +336,17 @@ inside the band.
 <Callout type="warn" title="Don't over-read the bands">
 With many lags plotted, a few spikes will breach the band *by chance* alone
 (plot 40 lags and ~2 false alarms at the 5% level are expected). So don't
-seize on a lone significant spike at lag 17. Look for the *overall pattern* —
-a clean cut-off or a smooth decay — and treat an isolated far-out spike with
+seize on a lone significant spike at lag 17. Look for the *overall pattern*,
+a clean cut-off or a smooth decay, and treat an isolated far-out spike with
 suspicion unless it's at a meaningful lag (like the seasonal period).
 </Callout>
 
 ## You must difference FIRST
 
-The cheat-sheet's fine print — "of the **stationary** series" — is not
+The cheat-sheet's fine print, "of the **stationary** series", is not
 optional. On a **non-stationary** (trending) series, the ACF decays *very
 slowly*, lingering near 1 across many lags. That slow decay is not an AR
-signature; it's the plot *screaming "I'm non-stationary — difference me."*
+signature; it's the plot *screaming "I'm non-stationary, difference me."*
 Reading model orders off an undifferenced series is the most common ACF/PACF
 mistake.
 
@@ -403,7 +403,7 @@ print("including a spike near lag 12 -- the leftover SEASONAL signal.")
 
 The raw ACF's slow linear-ish decay is a non-stationarity alarm, not a model
 order. Only after making the series stationary do the spikes mean what the
-cheat-sheet says — and notice the lingering spike near lag 12, the
+cheat-sheet says, and notice the lingering spike near lag 12, the
 fingerprint of seasonality you'd address with a seasonal term.
 
 <MultipleChoice
@@ -418,7 +418,7 @@ fingerprint of seasonality you'd address with a seasonal term.
 - The data has been over-differenced
   > Over-differencing produces a strong *negative* lag-1 autocorrelation, not many large *positive* ones. This pattern points to *under*-differencing (still non-stationary).
 
-A slowly decaying, persistently high ACF signals non-stationarity — difference first, then read the plots.`}
+A slowly decaying, persistently high ACF signals non-stationarity, difference first, then read the plots.`}
 />
 
 ## Practice
@@ -508,8 +508,8 @@ print("matches statsmodels:", matches)
   title="Read the AR order off the PACF"
   instructions={`A stationary series \`s\` was generated as a pure AR process. Use the **PACF** to identify its order. Compute the PACF at lags 1..8 (via \`statsmodels.tsa.stattools.pacf(s, nlags=8, method="ywm")\`) and the significance band \`±1.96/sqrt(len(s))\`. Then produce:
 
-- \`sig_lags\` — the list of lags in 1..8 whose \`|PACF|\` exceeds the band
-- \`p_hat\` — the AR order, taken as the number of the **leading** lags (1 and 2) that are significant
+- \`sig_lags\`, the list of lags in 1..8 whose \`|PACF|\` exceeds the band
+- \`p_hat\`, the AR order, taken as the number of the **leading** lags (1 and 2) that are significant
 
 The PACF here is significant at lags 1 and 2 and then cuts off (later lags fall within the band, give or take the occasional chance spike), so this is an **AR(2)** and \`p_hat\` should be 2.`}
   files={[
@@ -585,13 +585,13 @@ PACF strips out the chain-of-middlemen (indirect) correlations, leaving only the
 - ACF tails off; PACF cuts off after lag q
   > That's the *AR* signature, reversed. For MA the ACF cuts off and the PACF tails off.
 - [o] ACF cuts off after lag q; PACF tails off
-  > A moving-average process correlates only with the most recent \`q\` shocks, so the ACF drops to ~0 past lag q, while the PACF decays gradually — the mirror image of an AR process.
+  > A moving-average process correlates only with the most recent \`q\` shocks, so the ACF drops to ~0 past lag q, while the PACF decays gradually, the mirror image of an AR process.
 - Both cut off after lag q
   > If both cut off cleanly you wouldn't have a pure MA; that pattern doesn't match any standard single-order process. MA cuts the ACF and tails the PACF.
 - Both tail off
   > Both tailing off is the *ARMA* signature, not pure MA. For MA, the ACF specifically cuts off.
 
-MA(q): the ACF cuts off after lag q and the PACF tails off — the reverse of AR(p).`}
+MA(q): the ACF cuts off after lag q and the PACF tails off, the reverse of AR(p).`}
 />
 
 <MultipleChoice
@@ -620,11 +620,11 @@ A non-stationary ACF lingers near 1 and hides the short-lag pattern, so the chea
   names the model; the number of spikes is the order.
 - Spikes inside the **`±1.96/√n`** band are noise; don't over-read a lone
   far-out spike (some are false alarms).
-- **Always difference to stationarity first** — a slowly-decaying ACF means
+- **Always difference to stationarity first**, a slowly-decaying ACF means
   "non-stationary," not "high-order AR."
 </Callout>
 
 You can now propose `(p, d, q)` by eye: `d` from how many differences reach
 stationarity, `p` from the PACF cut-off, `q` from the ACF cut-off. Time to
-hand those orders to an actual model and make a forecast — AR, MA, and their
+hand those orders to an actual model and make a forecast, AR, MA, and their
 union, ARIMA.

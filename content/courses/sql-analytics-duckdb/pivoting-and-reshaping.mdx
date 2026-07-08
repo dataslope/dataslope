@@ -1,11 +1,11 @@
 ---
 title: Pivoting and Reshaping
-description: Long vs. wide data, and how analysts move between them — manual pivots with conditional aggregation, DuckDB's PIVOT and UNPIVOT, and when each shape is the right one.
+description: Long vs. wide data, and how analysts move between them, manual pivots with conditional aggregation, DuckDB's PIVOT and UNPIVOT, and when each shape is the right one.
 ---
 
 The same data can wear two shapes. **Long** (or "tidy") data has one
 measurement per row; **wide** data spreads a category across columns.
-Analysts constantly reshape between them — long is great for computing,
+Analysts constantly reshape between them, long is great for computing,
 wide is great for reading. This page explains the two shapes, why they
 matter, and how to pivot in DuckDB both by hand and with the dedicated
 `PIVOT` syntax.
@@ -13,7 +13,7 @@ matter, and how to pivot in DuckDB both by hand and with the dedicated
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A tall one-value-per-row strip beside the same data landed as a short wide grid, every colored cell finding its own column — the same data turned ninety degrees from long to wide"
+  aria-label="A tall one-value-per-row strip beside the same data landed as a short wide grid, every colored cell finding its own column, the same data turned ninety degrees from long to wide"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,7 +58,7 @@ is its own row:
 | East | Q1 | 200 |
 | East | Q2 | 90 |
 
-In **wide** form, the quarters become columns — a little report:
+In **wide** form, the quarters become columns, a little report:
 
 | region | Q1 | Q2 |
 | --- | --- | --- |
@@ -71,7 +71,7 @@ flowchart LR
     Wide -- "UNPIVOT<br/>(collapse columns<br/>back into rows)" --> Long
 ```
 
-Neither is "correct" — they serve different goals:
+Neither is "correct", they serve different goals:
 
 - **Long** is ideal for *computation*: it groups, aggregates, and feeds
   charts cleanly, and adding a new category needs no schema change.
@@ -119,14 +119,14 @@ ORDER BY
   region;`}
 />
 
-One row per region, one column per quarter — a wide cross-tab built from
+One row per region, one column per quarter, a wide cross-tab built from
 long data. The shape is exactly the side-by-side metrics pattern, now seen
 as *pivoting*.
 
 ## DuckDB's `PIVOT` statement
 
 Writing a `FILTER` per column is tedious when there are many categories.
-DuckDB's `PIVOT` does it declaratively — you name the column to spread and
+DuckDB's `PIVOT` does it declaratively, you name the column to spread and
 the aggregate, and DuckDB discovers the distinct values for you.
 
 <SqlCodeBlock
@@ -158,7 +158,7 @@ quarters in advance.
 
 ## Going the other way: `UNPIVOT`
 
-Sometimes data arrives wide — a spreadsheet with a column per month — but
+Sometimes data arrives wide, a spreadsheet with a column per month, but
 you need it long to compute on it. `UNPIVOT` collapses those columns back
 into rows.
 
@@ -187,7 +187,7 @@ ORDER BY
   month;`}
 />
 
-Now each region-month is a row again — ready to `GROUP BY`, aggregate, or
+Now each region-month is a row again, ready to `GROUP BY`, aggregate, or
 chart. Reshaping wide-to-long is often the *first* step when you import a
 spreadsheet someone built for reading rather than computing.
 
@@ -204,7 +204,7 @@ A good rule: **compute in long, present in wide.**
 <svg
   viewBox="0 0 640 165"
   role="img"
-  aria-label="A green compute card where a tall long-format strip condenses into one green value, then a solid gray arrow into a yellow present card where a wide row of cells sits above an open eye — compute in long form, present in wide form"
+  aria-label="A green compute card where a tall long-format strip condenses into one green value, then a solid gray arrow into a yellow present card where a wide row of cells sits above an open eye, compute in long form, present in wide form"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -249,7 +249,7 @@ A good rule: **compute in long, present in wide.**
 - They store fundamentally different information.
   > They are two layouts of the *same* information, interchangeable via PIVOT/UNPIVOT.
 
-Wide spreads a category into columns; long keeps one value per row — same
+Wide spreads a category into columns; long keeps one value per row, same
 data, different layout.`}
 />
 
@@ -278,7 +278,7 @@ into wide columns.`}
   > Collapsing the month columns to rows yields tidy long data, the ideal shape for trend computation.
 - Delete all but one month column.
   > Discarding data destroys the trend you are trying to compute.
-- Nothing — wide data is already ideal for computing trends.
+- Nothing, wide data is already ideal for computing trends.
   > Wide data is good for reading, but computing trends is far easier in long form.
 
 "Compute in long, present in wide": unpivot the wide spreadsheet first.`}

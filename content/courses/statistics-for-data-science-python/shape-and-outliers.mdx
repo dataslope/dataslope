@@ -1,6 +1,6 @@
 ---
 title: Shape and Outliers
-description: Reading the shape of a distribution — skewness, modality, and tail heaviness — and a disciplined way to find outliers and decide what to actually do with them.
+description: Reading the shape of a distribution, skewness, modality, and tail heaviness, and a disciplined way to find outliers and decide what to actually do with them.
 ---
 
 Center and spread compress a distribution into two numbers, but they
@@ -8,8 +8,8 @@ can't tell you what it *looks* like. Is it a tidy hill? A long tail
 dragging to the right? Two separate humps that got mixed together? Does
 it throw out the occasional wild value? Those questions are about
 **shape**, and shape decides which statistics are even valid to use.
-This page reads shape three ways — **skewness**, **modality**, and
-**tail heaviness** — and then tackles the most misunderstood topic in
+This page reads shape three ways, **skewness**, **modality**, and
+**tail heaviness**, and then tackles the most misunderstood topic in
 applied statistics: **outliers**, and what to actually do about them.
 
 The headline you should carry in: an outlier is a *question*, not a
@@ -19,7 +19,7 @@ delete.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A dune-shaped distribution peaks on the left and drags a long tail to the right, while one red point sits far down the tail — skew is named for the tail, and an outlier is a question, not a verdict"
+  aria-label="A dune-shaped distribution peaks on the left and drags a long tail to the right, while one red point sits far down the tail, skew is named for the tail, and an outlier is a question, not a verdict"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -94,14 +94,14 @@ print("\\nPositive skew -> mean above median. Negative -> mean below.")
 
 Notice the `mean − median` column tracks the skew sign exactly. That's
 the cheap field test from *Measures of Center*: you don't need to
-compute a skewness coefficient to suspect skew — just compare the mean
+compute a skewness coefficient to suspect skew, just compare the mean
 and median.
 
 ## Modality: how many peaks
 
 **Modality** counts the peaks (modes) in a distribution.
 **Unimodal** data has one hump. **Bimodal** data has two, and
-**multimodal** more — and a second peak is almost always a *story*: two
+**multimodal** more, and a second peak is almost always a *story*: two
 populations got mixed into one column. Heights of a mixed-gender group,
 response times split between cache-hit and cache-miss, purchase amounts
 from two customer segments. When you see two peaks, the right move is
@@ -111,7 +111,7 @@ honestly describes a two-humped distribution.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two translucent humps, one blue and one green, hide inside a single column of data while the yellow mean post stands in the empty valley between them — a bimodal shape means two groups got mixed together, and one center describes nobody"
+  aria-label="Two translucent humps, one blue and one green, hide inside a single column of data while the yellow mean post stands in the empty valley between them, a bimodal shape means two groups got mixed together, and one center describes nobody"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="154" width="500" height="3" rx="1.5" fill="var(--ds-gray-400)" />
@@ -152,7 +152,7 @@ fig.update_layout(showlegend=False)
 fig.show()
 
 print(f"Mean of the mixed column: {mixed.mean():.1f} cm")
-print("...which lands in the VALLEY between the peaks — describing nobody.")
+print("...which lands in the VALLEY between the peaks, describing nobody.")
 `,
     },
   ]}
@@ -160,7 +160,7 @@ print("...which lands in the VALLEY between the peaks — describing nobody.")
 
 <Callout type="danger" title="A single center can describe nobody">
 The mean of that bimodal column falls in the empty valley *between* the
-two humps — no actual person is near it, exactly like the "average of a
+two humps, no actual person is near it, exactly like the "average of a
 teacher and a billionaire." Bimodality is the clearest case where
 summarizing before plotting misleads you. When a mean lands where the
 data is sparse, suspect mixed groups.
@@ -168,7 +168,7 @@ data is sparse, suspect mixed groups.
 
 ## Tail heaviness: kurtosis (lightly)
 
-The last shape question is how **heavy the tails** are — how often you
+The last shape question is how **heavy the tails** are, how often you
 get values far from the center. **Kurtosis** measures this. You rarely
 need the exact number; what matters is the intuition: heavy-tailed
 distributions produce extreme values *far more often* than a normal
@@ -209,31 +209,31 @@ Financial returns, insurance losses, network delays, and file sizes
 often have heavy tails. If you assume normal-sized wiggles, you'll be
 blindsided by "impossible" extremes that are actually routine for the
 distribution. Heavy tails are also why a single robust spread (IQR) can
-beat the standard deviation — one fat-tailed draw can dominate the SD.
+beat the standard deviation, one fat-tailed draw can dominate the SD.
 </Callout>
 
 ## Outliers: what they are (and aren't)
 
 An **outlier** is a value that sits far from the rest of the data. That
-is *all* the definition says — "far away." It does **not** say "wrong,"
+is *all* the definition says, "far away." It does **not** say "wrong,"
 "error," or "delete me." Outliers come in three flavors, and they call
 for opposite responses:
 
 1. **Errors:** a typo, a unit mix-up (kg vs lb), a sensor glitch, a
    `-999` sentinel someone used for "missing." These should be fixed or
-   removed — *once you've confirmed they're errors*.
+   removed, *once you've confirmed they're errors*.
 2. **Sentinels / structural junk:** placeholder values like `0`,
    `9999`, or `1970-01-01` standing in for "unknown." Handle them as
    missing data, not as real measurements.
 3. **Genuine extreme values:** a real whale customer, a real fraud
    case, a real record-breaking day. These are often the **most
-   important rows in the dataset** — deleting them throws away the
+   important rows in the dataset**, deleting them throws away the
    signal you're being paid to find.
 
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="A cluster of ordinary green dots on the left and one red point far away on the right, held under a blue magnifying lens — an outlier is simply far away, which earns it an investigation, not a deletion"
+  aria-label="A cluster of ordinary green dots on the left and one red point far away on the right, held under a blue magnifying lens, an outlier is simply far away, which earns it an investigation, not a deletion"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -263,7 +263,7 @@ for opposite responses:
 The single most damaging habit in data cleaning. Auto-deleting outliers
 hides fraud, removes your best customers, erases the rare events you
 most need to model, and quietly biases every downstream estimate. The
-correct default is **investigate, then decide** — never delete on sight.
+correct default is **investigate, then decide**, never delete on sight.
 </Callout>
 
 ### Two rules for *flagging* outliers
@@ -274,18 +274,18 @@ candidates:
 **The 1.5×IQR rule (box-plot fences).** Compute `Q1`, `Q3`, and
 `IQR = Q3 − Q1`. Anything below `Q1 − 1.5×IQR` or above
 `Q3 + 1.5×IQR` is flagged. Because it's built on quartiles, it's
-**robust** — the outliers themselves don't move the fences — so it
+**robust**, the outliers themselves don't move the fences, so it
 works on skewed data.
 
 **The z-score rule.** Compute each point's `z = (x − mean) / std` and
 flag anything with `|z| > 3` (sometimes 2). It asks "how many standard
 deviations from the mean?" But it's built on the **mean and standard
-deviation**, which the outliers *themselves* inflate — so on skewed or
+deviation**, which the outliers *themselves* inflate, so on skewed or
 contaminated data it can hide the very points it's meant to catch.
 
 | Rule | Built on | Behavior |
 | --- | --- | --- |
-| 1.5×IQR | `Q1`, `Q3`, `IQR` | Robust — outliers don't move the fences. Good on skewed data. |
+| 1.5×IQR | `Q1`, `Q3`, `IQR` | Robust, outliers don't move the fences. Good on skewed data. |
 | z-score (`\|z\| > 3`) | mean and std | Outliers inflate both; assumes roughly normal, so it can miss or over-flag on skew. |
 
 The two rules **often disagree**, and seeing how is genuinely
@@ -333,7 +333,7 @@ print("more, because the extremes inflate the std the z-rule depends on.")
   ]}
 />
 
-A box plot draws those IQR fences for you — the "whiskers" extend to
+A box plot draws those IQR fences for you, the "whiskers" extend to
 the last point inside the fence, and anything beyond is plotted as an
 individual outlier dot.
 
@@ -388,7 +388,7 @@ flowchart TD
 ```
 
 <Callout type="tip" title="Practical outlier hygiene">
-1. **Always look** at the flagged rows individually — pull them up and
+1. **Always look** at the flagged rows individually, pull them up and
    read them. 2. **Diagnose** the cause before acting. 3. If they're
    real, **keep them and switch to robust statistics** (median, IQR,
    MAD) rather than deleting. 4. If you must remove or cap, **report
@@ -401,13 +401,13 @@ flowchart TD
   markdown={`A column of purchase amounts has a few values near \\$50,000 while most are under \\$200. Investigation shows these are real bulk orders from genuine wholesale customers. What's the appropriate action?
 
 - Delete them so they don't distort the average purchase amount
-  > These are real, important customers, not errors — deleting them discards genuine revenue signal and biases your summaries downward.
+  > These are real, important customers, not errors, deleting them discards genuine revenue signal and biases your summaries downward.
 - [o] Keep them, and report robust summaries (median, IQR) alongside the mean so the bulk orders don't dominate the headline number
   > Since the values are genuine, the right move is to retain them and lean on outlier-resistant statistics so a few large orders don't distort the typical-customer picture.
 - Replace them with the mean of the other values
   > Overwriting real measurements with the mean fabricates data and erases the very wholesale behavior you'd want to understand.
 - Assume they are data-entry errors because they are so large
-  > "Large" is not evidence of an error, and the investigation already confirmed they are legitimate — so treating them as errors would be wrong.
+  > "Large" is not evidence of an error, and the investigation already confirmed they are legitimate, so treating them as errors would be wrong.
 
 Genuine extremes are kept; you change the *statistics* you report, not the data.`}
 />
@@ -455,15 +455,15 @@ print(flag_outliers_iqr(s))
 
 Compute (using the 25th and 75th percentiles):
 
-- \`q1\`, \`q3\` — the lower and upper quartiles
+- \`q1\`, \`q3\`, the lower and upper quartiles
 - \`iqr\` = \`q3 - q1\`
 - \`lower_fence\` = \`q1 - 1.5 * iqr\`
 - \`upper_fence\` = \`q3 + 1.5 * iqr\`
 
 Then produce:
 
-- **\`outliers\`** — a Python \`list\` of the values in \`readings\` that fall **below \`lower_fence\` or above \`upper_fence\`** (strictly outside the fences).
-- **\`n_outliers\`** — an \`int\`, the count of those outliers.
+- **\`outliers\`**, a Python \`list\` of the values in \`readings\` that fall **below \`lower_fence\` or above \`upper_fence\`** (strictly outside the fences).
+- **\`n_outliers\`**, an \`int\`, the count of those outliers.
 
 Use the provided \`readings\` Series.`}
   files={[
@@ -547,7 +547,7 @@ assert sorted(outliers) == sorted(_expected)`,
   markdown={`A distribution has a long tail stretching toward *high* values and most of its mass on the left. How is it described, and how do the mean and median compare?
 
 - Left-skewed, with the mean below the median
-  > A tail toward high values is a *right* skew, and it pulls the mean above the median — this option has both the name and the direction reversed.
+  > A tail toward high values is a *right* skew, and it pulls the mean above the median, this option has both the name and the direction reversed.
 - [o] Right-skewed, with the mean above the median
   > The long tail points toward the high values, which defines a right (positive) skew and drags the mean above the median.
 - Symmetric, since the peak is on one side
@@ -595,25 +595,25 @@ Sentinel codes masquerade as outliers; recognizing them as "missing" is part of 
   > Kurtosis is about *tail heaviness*, not asymmetry; a perfectly symmetric distribution can still have very heavy tails. Skew is a separate measure.
 - It measures how many peaks (modes) a distribution has
   > Counting peaks is *modality*; kurtosis instead describes how often values land far out in the tails.
-- [o] Positive excess kurtosis indicates heavier tails than a normal distribution — extreme values occur more often than a normal model predicts
+- [o] Positive excess kurtosis indicates heavier tails than a normal distribution, extreme values occur more often than a normal model predicts
   > Heavy tails mean "rare" large deviations show up more frequently than the normal distribution would suggest, which is exactly what positive excess kurtosis flags.
 - A normal distribution has an excess kurtosis of 3
   > By the excess-kurtosis convention (\`scipy.stats.kurtosis\` default), a normal distribution reads ~0; the value 3 is the *raw* kurtosis before subtracting 3.
 
-Kurtosis is about the tails; skew is about asymmetry — don't conflate them.`}
+Kurtosis is about the tails; skew is about asymmetry, don't conflate them.`}
 />
 
 <Callout type="success" title="Key takeaways">
 - **Shape** decides which statistics are valid; center and spread alone
-  can't reveal it — plot the distribution.
+  can't reveal it, plot the distribution.
 - **Skew** is named for the long tail: right-skew → mean above median;
   left-skew → mean below median.
 - A second peak (**bimodality**) usually means two groups mixed
-  together — split them; no single center fits.
+  together, split them; no single center fits.
 - **Kurtosis** is tail heaviness: heavy tails make "rare" extremes
   routine.
 - **Outliers are questions, not verdicts.** Flag with the robust
   **1.5×IQR** rule (or z-scores, cautiously); then **investigate and
-  decide** — fix errors, treat sentinels as missing, and *keep* genuine
+  decide**, fix errors, treat sentinels as missing, and *keep* genuine
   extremes while switching to robust statistics. Never auto-delete.
 </Callout>

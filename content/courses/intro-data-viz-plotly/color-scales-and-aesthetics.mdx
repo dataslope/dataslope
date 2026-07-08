@@ -3,7 +3,7 @@ title: Color Scales and Aesthetics
 description: How to pick a color palette that conveys meaning and respects your audience
 ---
 
-We have talked about color in passing — now we focus on it
+We have talked about color in passing, now we focus on it
 deliberately. Color is the most over-used and abused encoding in
 data visualization. A well-chosen palette is invisible: the reader
 just *reads* the chart. A poorly-chosen one fights the data and
@@ -105,7 +105,7 @@ that, the eye starts confusing similar hues.
 
 ### Sequential palettes
 
-For **ordered, one-sided** data — low to high, with no special
+For **ordered, one-sided** data, low to high, with no special
 midpoint. Sequential palettes vary in *luminance* of a single hue
 (or smoothly through related hues).
 
@@ -140,13 +140,13 @@ fig.show()
 
 ### Diverging palettes
 
-For **two-sided** data with a meaningful midpoint — correlations
+For **two-sided** data with a meaningful midpoint, correlations
 around 0, year-over-year change, deviations from a baseline.
 Diverging palettes use *two* hues for the extremes and white (or
 neutral) for the midpoint.
 
 Good diverging palettes: `"RdBu"`, `"RdBu_r"` (reversed),
-`"PiYG"`, `"BrBG"`, `"Spectral"` (use carefully — borderline).
+`"PiYG"`, `"BrBG"`, `"Spectral"` (use carefully, borderline).
 
 <CodeBlock
   adapter="python"
@@ -173,7 +173,7 @@ fig = px.bar(
     color_continuous_scale="RdBu",
     color_continuous_midpoint=0,
     template="simple_white",
-    title="Year-over-year change — diverging palette centered at 0",
+    title="Year-over-year change, diverging palette centered at 0",
     labels={"yoy_pct": "YoY change (%)", "product": "Product"},
 )
 fig.show()
@@ -192,7 +192,7 @@ We mentioned this already, but it's important enough to repeat:
 **avoid Jet, rainbow, and any palette that is not perceptually
 uniform.** They create false visual structure that looks like
 data features but isn't. `Viridis` is the modern default for a
-reason — it's specifically designed to be smooth and uniform.
+reason, it's specifically designed to be smooth and uniform.
 
 ## Accessibility: colorblind-safe palettes
 
@@ -202,7 +202,7 @@ Plotly palettes are colorblind-safe by design:
 
 - `"Viridis"`, `"Cividis"`, `"Plasma"`, `"Magma"` (sequential)
 - `"BrBG"`, `"PuOr"`, `"PRGn"` (diverging)
-- `"Safe"`, `"Plotly"` (qualitative — both reasonably safe)
+- `"Safe"`, `"Plotly"` (qualitative, both reasonably safe)
 
 If your chart uses red-vs-green to convey "bad vs good," fix it.
 Either use a colorblind-safe palette or double-encode with shape
@@ -236,7 +236,7 @@ fig = px.line(
     line_group="country",
     color_discrete_map={"Germany": "#d62728", "Other": "lightgray"},
     template="simple_white",
-    title="Life expectancy in Europe — Germany highlighted",
+    title="Life expectancy in Europe, Germany highlighted",
     labels={"year": "Year", "lifeExp": "Life expectancy"},
 )
 fig.show()
@@ -256,9 +256,9 @@ provide *context* without competing for attention.
 - **Diverging palettes for data with a meaningful midpoint**
   (always set `color_continuous_midpoint`).
 - **Avoid rainbow / Jet** for any quantitative data.
-- **Test in grayscale** — if the chart still works in B&W, you've
+- **Test in grayscale**, if the chart still works in B&W, you've
   used color carefully.
-- **Highlight, don't decorate** — if only one series matters,
+- **Highlight, don't decorate**, if only one series matters,
   color only that one.
 
 ## Check your understanding
@@ -267,10 +267,10 @@ provide *context* without competing for attention.
   markdown={`Which color palette family should you use for **unordered categorical** data with 5-7 categories?
 
 - A sequential palette like **Viridis**.
-  > Sequential palettes vary in luminance from light to dark, implying an ordering of magnitude — which is misleading for categories that have no inherent rank.
+  > Sequential palettes vary in luminance from light to dark, implying an ordering of magnitude, which is misleading for categories that have no inherent rank.
 - A diverging palette like **RdBu**.
   > Diverging palettes are designed for data with a meaningful midpoint (such as correlation coefficients or year-over-year change), not for unordered categories.
-- [o] A **qualitative** palette like **Plotly** or **Vivid** — distinct hues with no implied ordering.
+- [o] A **qualitative** palette like **Plotly** or **Vivid**, distinct hues with no implied ordering.
   > Qualitative palettes use different *hues* so the eye sees the categories as distinct, with no implied order or magnitude. For more than ~7 categories, even good qualitative palettes start running out of distinguishable hues and you should reach for facets instead.
 - A grayscale ramp.
   > A grayscale ramp implies an ordering from light (less) to dark (more), just as a sequential palette does; it is inappropriate for unordered categories where no ranking exists.
@@ -286,7 +286,7 @@ Color hue = categories. Color intensity = quantity. Don't mix them up.`}
 - It makes the chart smaller.
   > The midpoint setting controls the color anchor, not the chart's physical dimensions.
 - [o] Centering the white anchor at the meaningful zero makes the reader instantly see positive vs negative, and the chart's coloring directly mirrors the data's sign.
-  > If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral" — it means "average," which is a different and often confusing message. **color_continuous_midpoint=0** (in Plotly Express) makes the encoding honest.
+  > If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral", it means "average," which is a different and often confusing message. **color_continuous_midpoint=0** (in Plotly Express) makes the encoding honest.
 - White is more accessible than other colors.
   > Accessibility is about contrast and colorblind safety, not about centering on white; a diverging palette centered at white works for design reasons (white = neutral midpoint), not accessibility reasons.
 
@@ -297,7 +297,7 @@ Diverging data deserves diverging palettes, centered at the meaningful midpoint.
   markdown={`A reasonable design move for a chart with **30 lines** where you want to spotlight just one is:
 
 - Use a different color for all 30 lines.
-  > Assigning 30 distinct colors creates a "Christmas tree" chart where every line competes for attention and none stands out — the opposite of highlighting.
+  > Assigning 30 distinct colors creates a "Christmas tree" chart where every line competes for attention and none stands out, the opposite of highlighting.
 - Add a 3-D effect.
   > A 3-D effect adds visual complexity and perspective distortion without conveying any additional data; it does not help the reader identify the important line.
 - [o] Color the one important line in a bright hue and color the other 29 light gray.
@@ -305,7 +305,7 @@ Diverging data deserves diverging palettes, centered at the meaningful midpoint.
 - Drop 29 lines and only show the important one.
   > Removing the 29 context lines would eliminate the reader's ability to judge whether the highlighted line is normal or unusual; graying them out preserves context while reducing visual noise.
 
-Sometimes the context lines are essential — dropping them would hide whether the highlighted line is normal or unusual. Graying them keeps the context but lowers its visual weight.`}
+Sometimes the context lines are essential, dropping them would hide whether the highlighted line is normal or unusual. Graying them keeps the context but lowers its visual weight.`}
 />
 
 <MultipleChoice
@@ -320,5 +320,5 @@ Sometimes the context lines are essential — dropping them would hide whether t
 - About 50%.
   > Fifty percent would mean roughly half the male population is colorblind, which would make it normal rather than a minority condition warranting design accommodations; the actual figure is around 8%.
 
-Accessibility isn't a niche concern — it's a meaningful slice of every audience.`}
+Accessibility isn't a niche concern, it's a meaningful slice of every audience.`}
 />

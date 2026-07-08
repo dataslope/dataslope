@@ -1,5 +1,5 @@
 ---
-title: Capstone Project — Mini Library System
+title: "Capstone Project: Mini Library System"
 description: A multi-file challenge that pulls together classes, encapsulation, collections, polymorphism, and exception handling into one small program
 ---
 
@@ -20,7 +20,7 @@ implementation. Use the provided `Main.java` to drive your design.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A blue catalog card of book bars and a yellow card of member dots feed along thin gray lines into one green loans ledger, where each row pairs a book with a borrower and a green check — the capstone checkout system"
+  aria-label="A blue catalog card of book bars and a yellow card of member dots feed along thin gray lines into one green loans ledger, where each row pairs a book with a borrower and a green check, the capstone checkout system"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -53,7 +53,7 @@ implementation. Use the provided `Main.java` to drive your design.
 ## The system, in plain English
 
 A `Library` has a catalog of `Book`s. A `Member` may borrow a copy
-of a book — but only if a copy is available. When a member borrows
+of a book, but only if a copy is available. When a member borrows
 a book, the available-copy count for that book goes down by one;
 when they return it, the count goes back up.
 
@@ -121,7 +121,7 @@ return ok? false
 - Method \`void addBook(Book b)\` puts it in the catalog.
 - Method \`List<Book> catalog()\` returns the books as a sorted-by-title \`List\` (use a \`TreeMap\` or sort yourself).
 - Method \`void borrow(Member m, String title)\` looks up the book, calls \`borrowOne()\`, and calls \`m.addLoan(book)\`. Throws \`BorrowException\` with message \`"unknown book: " + title\` if the title isn't in the catalog.
-- Method \`void returnBook(Member m, String title)\` looks up the book, calls \`m.removeLoan(book)\` — if it returns false, throw \`BorrowException("not on loan to this member: " + title)\`. Otherwise call \`book.returnOne()\`.
+- Method \`void returnBook(Member m, String title)\` looks up the book, calls \`m.removeLoan(book)\`, if it returns false, throw \`BorrowException("not on loan to this member: " + title)\`. Otherwise call \`book.returnOne()\`.
 
 The given \`Main.java\` drives the behavior. Don't change it.`}
   entryFilename="Main.java"
@@ -380,14 +380,14 @@ classDiagram
   This is exactly the "single place that owns the rule" pattern.
 - **Visibility:** `borrowOne` and `returnOne` are *package-private*,
   not `public`. They are intended for `Library` to use, not random
-  outside code — outside code goes through `Library.borrow`.
+  outside code, outside code goes through `Library.borrow`.
 - **Custom exception:** `BorrowException` is a domain-specific
   unchecked exception. The service throws it; the UI layer
   (`Main`) catches it and turns it into user-facing output.
 - **Map for lookup:** the catalog is a `Map<String, Book>` because
-  we look books up by title — exactly the case for a Map.
-- **Polymorphism / interfaces:** not used heavily here, on purpose
-  — they shine when there's a *choice* of implementations. Adding
+  we look books up by title, exactly the case for a Map.
+- **Polymorphism / interfaces:** not used heavily here, on purpose,
+they shine when there's a *choice* of implementations. Adding
   a `BookRepository` interface with both in-memory and persistent
   versions would be the natural next step.
 

@@ -1,6 +1,6 @@
 ---
 title: Choosing the Right Chart
-description: A decision-oriented guide to picking a chart that answers your question — without misleading the reader.
+description: A decision-oriented guide to picking a chart that answers your question, without misleading the reader.
 ---
 
 The right chart depends on *the question you're answering*.
@@ -10,7 +10,7 @@ charts and their failure modes.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A teal decision diamond with a question mark fans out along thin lines to four small chart thumbnails — bars, a line, a scatter, and a histogram — pick the chart that answers the question"
+  aria-label="A teal decision diamond with a question mark fans out along thin lines to four small chart thumbnails, bars, a line, a scatter, and a histogram, pick the chart that answers the question"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
@@ -95,14 +95,14 @@ Best for: comparing a numeric metric across distinct categories.
 
 **Don't:**
 - Use 3D bars.
-- Compare too many categories — top-N + "Other" is often
+- Compare too many categories, top-N + "Other" is often
   better.
 
 ### Histograms
 Best for: showing the distribution of a single numeric column.
 
 **Do:**
-- Try several bin counts (10, 30, 100) — different bin choices
+- Try several bin counts (10, 30, 100), different bin choices
   reveal different patterns.
 - Annotate the median or mean if it adds context.
 
@@ -115,7 +115,7 @@ Best for: comparing distributions across several groups.
 
 **Do:**
 - Show all points (`points="all"` in Plotly) when sample sizes
-  are small — boxes alone can be misleading.
+  are small, boxes alone can be misleading.
 
 **Don't:**
 - Use box plots for fewer than ~10 points per group.
@@ -128,7 +128,7 @@ Best for: relationships between two numeric variables.
 - Add a trend line if you're showing a relationship.
 
 **Don't:**
-- Read causation from a scatter — only correlation.
+- Read causation from a scatter, only correlation.
 
 ### Line charts
 Best for: change over time, with continuous x-axis.
@@ -171,7 +171,7 @@ Before you ship a chart, ask:
 - Is the title a *statement* of what the reader should take
   away, not just a description of what the axes are?
 
-A great title — "Sales grew 18% in Q4 despite flat units" —
+A great title, "Sales grew 18% in Q4 despite flat units",
 does more for understanding than a beautiful chart with the
 title "Sales over time".
 
@@ -186,11 +186,11 @@ When you show an average, also show how much it varies:
 
 Hiding uncertainty makes patterns look stronger than they are.
 
-## When in doubt — show the data
+## When in doubt, show the data
 
 If you can't decide between two charts, pick the one that shows
 *more* of the underlying data. Strip plots, jittered scatter,
-overlaid points on top of boxes — when in doubt, **show the
+overlaid points on top of boxes, when in doubt, **show the
 points**.
 
 ## Check your understanding
@@ -199,13 +199,13 @@ points**.
   markdown={`You want to show how monthly active users changed over the last 12 months. Best chart?
 
 - Pie chart
-  > A pie chart shows parts of a whole at one point in time — it cannot display change across twelve months.
+  > A pie chart shows parts of a whole at one point in time, it cannot display change across twelve months.
 - Stacked bar
   > A stacked bar is for composition across categories, not for showing how a single metric moves over time.
-- [o] Line chart — time is continuous and a line emphasizes the trend
+- [o] Line chart, time is continuous and a line emphasizes the trend
   > Lines are the default for time-series.
 - Box plot
-  > A box plot summarizes a distribution (median, quartiles, outliers) — it is designed for comparing groups, not for showing change over time.
+  > A box plot summarizes a distribution (median, quartiles, outliers), it is designed for comparing groups, not for showing change over time.
 
 Lines and time go together.`}
 />
@@ -220,7 +220,7 @@ Lines and time go together.`}
 - [o] Horizontal bar chart sorted by value
   > Bars rank cleanly by length; horizontal accommodates long category names.
 - Histogram
-  > A histogram shows the distribution of a continuous numeric variable — it is not designed for comparing named categories.
+  > A histogram shows the distribution of a continuous numeric variable, it is not designed for comparing named categories.
 
 Bars and categories go together.`}
 />
@@ -229,13 +229,13 @@ Bars and categories go together.`}
   markdown={`A scatter plot of 100,000 points looks like a black blob. Best fix?
 
 - Increase the figure size
-  > A larger canvas does not reduce the density of overlapping points — 100,000 dots still cover the same relative area regardless of figure size.
+  > A larger canvas does not reduce the density of overlapping points, 100,000 dots still cover the same relative area regardless of figure size.
 - Plot fewer columns
   > Plotting fewer columns addresses a different problem (too many variables); it does nothing about the overplotting caused by having 100,000 observations in a single scatter.
 - [o] Lower the opacity (or use a 2D density / hexbin plot) so the structure becomes visible
-  > Overplotting is a perceptual problem — transparency and density plots are the standard fixes.
+  > Overplotting is a perceptual problem, transparency and density plots are the standard fixes.
 - Change the color palette
-  > Changing the palette rearranges which colors overlap, but the fundamental overplotting problem — too many points in the same screen space — remains.
+  > Changing the palette rearranges which colors overlap, but the fundamental overplotting problem, too many points in the same screen space, remains.
 
 Density is information; "ink" alone is not.`}
 />
@@ -243,14 +243,14 @@ Density is information; "ink" alone is not.`}
 <MultipleChoice
   markdown={`A reporter shows two bar charts. The first starts the y-axis at 80; the second starts at 0. Both use the same data. Which is more *honest*?
 
-- The y=80 chart — it shows detail
-  > Showing detail by truncating the axis distorts the visual ratio between bars — a 5% difference can look like a 200% difference when the axis starts at 80 instead of 0.
+- The y=80 chart, it shows detail
+  > Showing detail by truncating the axis distorts the visual ratio between bars, a 5% difference can look like a 200% difference when the axis starts at 80 instead of 0.
 - Both are equally honest
   > The two charts encode the same numbers but produce different visual impressions; starting at 80 inflates the apparent magnitude of differences, so they are not equally honest.
-- [o] The y=0 chart, in most cases — starting at zero preserves correct visual proportions, especially for additive quantities. A truncated axis can dramatically exaggerate small changes.
+- [o] The y=0 chart, in most cases, starting at zero preserves correct visual proportions, especially for additive quantities. A truncated axis can dramatically exaggerate small changes.
   > There are rare cases (e.g., temperature with a meaningful baseline) where truncation is fine, but the *default* is to start at zero.
-- The y=80 chart — it is more zoomed in
-  > "Zoomed in" is a misleading framing — a truncated baseline is not the same as zooming, and for bar charts specifically it distorts the visual message about relative magnitudes.
+- The y=80 chart, it is more zoomed in
+  > "Zoomed in" is a misleading framing, a truncated baseline is not the same as zooming, and for bar charts specifically it distorts the visual message about relative magnitudes.
 
 Axis choices are editorial choices.`}
 />

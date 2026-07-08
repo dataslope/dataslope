@@ -55,7 +55,7 @@ export function parseCsv(text: string): {
 /** Every SQLite database file starts with the 16-byte magic header
  *  "SQLite format 3\0". The unified database-import flow sniffs this to
  *  decide whether the picked file is a binary SQLite database or a SQL
- *  text dump — the filename extension is deliberately ignored so any
+ *  text dump, the filename extension is deliberately ignored so any
  *  extension (.db3, .bak, …) imports correctly. */
 const SQLITE_MAGIC = "SQLite format 3\0";
 
@@ -78,7 +78,7 @@ export function tableNameFromFilename(filename: string): string {
   return base || "imported_table";
 }
 
-/** File extensions DuckDB can read directly through a replacement scan —
+/** File extensions DuckDB can read directly through a replacement scan,
  *  i.e. `SELECT * FROM 'file.ext'` works without an explicit `read_*`
  *  wrapper. Used by the Files panel to decide whether to offer a
  *  "Create Table" action for a given file. */

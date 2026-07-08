@@ -1,18 +1,18 @@
 ---
 title: Loading and Generating Data
-description: Where analytical data comes from — tables, literal VALUES, files, and DuckDB's range() generator — plus CREATE TABLE AS, the analyst's favorite way to capture a result.
+description: Where analytical data comes from, tables, literal VALUES, files, and DuckDB's range() generator, plus CREATE TABLE AS, the analyst's favorite way to capture a result.
 ---
 
 Before you can analyze data, it has to exist somewhere DuckDB can read it.
 This page surveys the handful of ways analysts get data *in*, and
 introduces two DuckDB conveniences you will use constantly: the `range()`
 generator and `CREATE TABLE AS`. These let you build realistic practice
-datasets in seconds — no files required.
+datasets in seconds, no files required.
 
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Three sources — a yellow file card, a green generator capsule with counting squares, and a blue VALUES capsule with literal dots — converge along thin lines into one solid arrow that fills a blue table grid"
+  aria-label="Three sources, a yellow file card, a green generator capsule with counting squares, and a blue VALUES capsule with literal dots, converge along thin lines into one solid arrow that fills a blue table grid"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -67,7 +67,7 @@ flowchart TB
     DB --> Q["Analytical<br/>queries"]
 ```
 
-For real work, **files** dominate — analysts point DuckDB at a CSV or
+For real work, **files** dominate, analysts point DuckDB at a CSV or
 Parquet export and query it directly. In this browser course we lean on
 **generated** rows, because they let every example be self-contained and
 reproducible. Both teach the same SQL.
@@ -75,7 +75,7 @@ reproducible. Both teach the same SQL.
 ## Literal rows with `VALUES`
 
 The simplest source is data you type yourself. You have seen this in
-`INSERT`, but `VALUES` can also stand alone as a tiny table — handy for
+`INSERT`, but `VALUES` can also stand alone as a tiny table, handy for
 quick experiments.
 
 <SqlCodeBlock
@@ -96,14 +96,14 @@ ORDER BY
   visitors DESC;`}
 />
 
-No `CREATE TABLE` needed — `VALUES` becomes a table inline. Analysts use
+No `CREATE TABLE` needed, `VALUES` becomes a table inline. Analysts use
 this to sketch a quick example or test an idea.
 
 ## Generating rows with `range()`
 
 DuckDB's `range(start, stop)` produces the integers from `start` up to
 **but not including** `stop`. Combined with arithmetic, it can fabricate
-realistic-looking datasets of any size — perfect for practice and for
+realistic-looking datasets of any size, perfect for practice and for
 testing a query's behavior at scale.
 
 <SqlCodeBlock
@@ -119,7 +119,7 @@ ORDER BY
 />
 
 <Callout type="info" title="range() is exclusive of the end">
-`range(1, 13)` yields `1, 2, ..., 12` — twelve values, not thirteen. If
+`range(1, 13)` yields `1, 2, ..., 12`, twelve values, not thirteen. If
 you want 1 through 100, write `range(1, 101)`. This off-by-one is the most
 common `range()` mistake.
 </Callout>
@@ -127,7 +127,7 @@ common `range()` mistake.
 <svg
   viewBox="0 0 640 140"
   role="img"
-  aria-label="A translucent blue band covers a row of twelve solid dots from one to twelve, while a thirteenth dot waits ghosted in red just outside the band's right edge — range includes its start but excludes its end"
+  aria-label="A translucent blue band covers a row of twelve solid dots from one to twelve, while a thirteenth dot waits ghosted in red just outside the band's right edge, range includes its start but excludes its end"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -173,7 +173,7 @@ ORDER BY
 />
 
 That same pattern, with `range(1, 1000001)`, would give you a million
-rows for a stress test — generated instantly, no file in sight.
+rows for a stress test, generated instantly, no file in sight.
 
 ## Capturing a result with `CREATE TABLE AS`
 
@@ -206,8 +206,8 @@ ORDER BY
 />
 
 Here the `initSql` step used CTAS to build `daily_sales` once; the main
-query just reads it. This separation — **build the dataset, then ask
-questions of it** — mirrors how real analysis is organized.
+query just reads it. This separation, **build the dataset, then ask
+questions of it**, mirrors how real analysis is organized.
 
 ```mermaid
 flowchart LR
@@ -229,7 +229,7 @@ FROM 'sales_2024.parquet'
 GROUP BY region;
 ```
 
-No import step, no schema declaration — DuckDB infers the columns and
+No import step, no schema declaration, DuckDB infers the columns and
 scans the file. This "query the file in place" ability is a big reason
 analysts love it. The browser sandbox here has no file system, so we
 generate data instead, but the **SQL you practice is identical**.
@@ -237,7 +237,7 @@ generate data instead, but the **SQL you practice is identical**.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A green query capsule touches a blue file card directly, and a result row drops straight out of the file's bottom edge — the file is queried in place with no import step in between"
+  aria-label="A green query capsule touches a blue file card directly, and a result row drops straight out of the file's bottom edge, the file is queried in place with no import step in between"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -284,13 +284,13 @@ gives 1 through N.`}
 - It defines an empty table with columns but no rows.
   > CTAS both defines the table *and* fills it with the query's result rows.
 - [o] It runs the \`SELECT\` and stores its entire result as a new table named \`daily_sales\`.
-  > CREATE TABLE AS SELECT (CTAS) captures a query result as a reusable table — an analyst staple.
+  > CREATE TABLE AS SELECT (CTAS) captures a query result as a reusable table, an analyst staple.
 - It deletes \`daily_sales\` if it already exists.
   > CTAS creates and populates a table; it is not a delete operation.
 - It exports the result to a CSV file.
   > CTAS stores the result as a database table, not a file.
 
-CTAS is "run this query and freeze its result as a table" — ideal for
+CTAS is "run this query and freeze its result as a table", ideal for
 capturing a cleaned or generated dataset.`}
 />
 
@@ -311,5 +311,5 @@ applies unchanged to files and warehouse tables.`}
 />
 
 You can now bring data into DuckDB and conjure practice datasets at will.
-With data in hand, the real fun begins — let us learn how an analyst
+With data in hand, the real fun begins, let us learn how an analyst
 *profiles* an unfamiliar dataset.

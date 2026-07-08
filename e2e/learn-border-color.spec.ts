@@ -18,7 +18,7 @@ import { test, expect } from "@playwright/test";
  * The Next.js App Router does not order segment CSS deterministically on a
  * client-side navigation into /learn; when the preflight rule ends up applied
  * after Fumadocs's, its `border: 0 solid` shorthand resets border-color back to
- * `currentColor` and every border relying on the default paints black — until a
+ * `currentColor` and every border relying on the default paints black, until a
  * hard refresh restores the server cascade. (Verified empirically: appending a
  * late `@layer base { * { border: 0 solid } }` to a loaded /learn page flips the
  * universal border default from gray to the black text color.)
@@ -34,7 +34,7 @@ import { test, expect } from "@playwright/test";
  * Reproducing the non-deterministic chunk-order race by timing alone would be
  * flaky. Instead we reproduce the *cascade state* it produces, deterministically:
  * we append the preflight's universal `border: 0 solid` rule back into
- * `@layer base` after the page has loaded — the exact thing the reorder does —
+ * `@layer base` after the page has loaded, the exact thing the reorder does,
  * and assert that a width-only border (one that relies on the default color)
  * still resolves to the Fumadocs gray token rather than the black text color.
  * Without the fix the appended rule wins and the border goes black; with it, the
@@ -52,7 +52,7 @@ async function readBorderColors(evaluate: <T>(fn: () => T) => Promise<T>) {
 
     // Probe: border width + style only (never the `border` shorthand, which
     // would itself set border-color inline). Its color comes purely from the
-    // cascade — the base-layer preflight default or the components-layer fix.
+    // cascade, the base-layer preflight default or the components-layer fix.
     const el = document.createElement("div");
     el.style.borderStyle = "solid";
     el.style.borderWidth = "1px";

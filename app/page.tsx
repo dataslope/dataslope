@@ -14,9 +14,9 @@ import { JsonLd } from "./_components/JsonLd";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { organizationLd, websiteLd } from "@/lib/structuredData";
 
-const HOME_TITLE = "Dataslope — Learn Python, SQL, C++ in your browser";
+const HOME_TITLE = "Dataslope, Learn Python, SQL, C++ in your browser";
 const HOME_DESCRIPTION =
-  "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.";
+  "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 
 export const metadata: Metadata = {
   // `absolute` opts out of the root layout's "%s · DataSlope" template so the
@@ -76,7 +76,7 @@ function countMatches(haystacks: string[], pattern: RegExp): number {
 // round number for display (the grid renders them with a trailing "+").
 async function getHomeStats(courses: CatalogCourse[]): Promise<HomeStats> {
   const contentDir = path.join(process.cwd(), "content");
-  // Courses + the fumadocs-dev demo pages + interview prep — the same corpus
+  // Courses + the fumadocs-dev demo pages + interview prep, the same corpus
   // that lived under content/learn + content/interview before the split, so
   // the figures stay comparable across the route restructuring.
   const [courseMdx, devMdx, interviewMdx] = await Promise.all([
@@ -116,7 +116,7 @@ async function getHomeStats(courses: CatalogCourse[]): Promise<HomeStats> {
 }
 
 export default async function Home() {
-  // Popularity-sorted catalog (shared with /courses) — the Courses section
+  // Popularity-sorted catalog (shared with /courses), the Courses section
   // shows the top four and filters by topic client-side.
   const courses = await getCourseCatalog();
   const stats = await getHomeStats(courses);

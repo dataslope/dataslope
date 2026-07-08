@@ -10,7 +10,7 @@ Exceptions are Python's way of encoding **expected failure paths**: file not fou
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue dot running along a thin line meets a red break, drops onto a soft green catch pad below, and the path continues along a thin gray arrow — an exception raised, caught by except, and the program moves on"
+  aria-label="A blue dot running along a thin line meets a red break, drops onto a soft green catch pad below, and the path continues along a thin gray arrow, an exception raised, caught by except, and the program moves on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -85,14 +85,14 @@ You **choose** which to catch. If you catch `FileNotFoundError`, you're saying "
 This is the **EAFP** philosophy: **Easier to Ask for Forgiveness than Permission**.
 
 ```python
-# LBYL (Look Before You Leap) — Pythonic but verbose
+# LBYL (Look Before You Leap), Pythonic but verbose
 if os.path.exists(path):
     with open(path) as f:
         data = f.read()
 else:
     data = None
 
-# EAFP (Easier to Ask for Forgiveness than Permission) — Pythonic
+# EAFP (Easier to Ask for Forgiveness than Permission), Pythonic
 try:
     with open(path) as f:
         data = f.read()
@@ -242,13 +242,13 @@ except ValueError as e:
 />
 
 <Callout type="tip" title="Which exception type to raise?">
-- `ValueError` — Right type, wrong value (`int("oops")`, `math.sqrt(-1)`)
-- `TypeError` — Wrong type entirely (`len(5)`)
-- `KeyError` / `IndexError` — Missing dict key / list index
-- `AttributeError` — Missing attribute
-- `FileNotFoundError` / `PermissionError` — Filesystem trouble
-- `RuntimeError` — Generic "something else went wrong"
-- Custom exception — Domain-specific error (`InsufficientFundsError`, `RateLimitExceeded`)
+- `ValueError`, Right type, wrong value (`int("oops")`, `math.sqrt(-1)`)
+- `TypeError`, Wrong type entirely (`len(5)`)
+- `KeyError` / `IndexError`, Missing dict key / list index
+- `AttributeError`, Missing attribute
+- `FileNotFoundError` / `PermissionError`, Filesystem trouble
+- `RuntimeError`, Generic "something else went wrong"
+- Custom exception, Domain-specific error (`InsufficientFundsError`, `RateLimitExceeded`)
 </Callout>
 
 ## `raise ... from ...` to preserve cause
@@ -284,9 +284,9 @@ except ConfigError as e:
 Without `from`, the original `ValueError` is hidden. With `from`, the traceback shows both exceptions and their relationship.
 
 <Callout type="tip" title="raise from vs bare raise">
-- `raise NewError(...) from e` — Wraps `e` in a higher-level error. Both appear in the traceback, with `from` marking the causal relationship.
-- `raise NewError(...)` — Replaces `e` with a new error. The original is lost (unless you manually include its message).
-- `raise` (no arguments) — Re-raises the current exception. Useful in `except` blocks when you want to log and re-raise.
+- `raise NewError(...) from e`, Wraps `e` in a higher-level error. Both appear in the traceback, with `from` marking the causal relationship.
+- `raise NewError(...)`, Replaces `e` with a new error. The original is lost (unless you manually include its message).
+- `raise` (no arguments), Re-raises the current exception. Useful in `except` blocks when you want to log and re-raise.
 </Callout>
 
 ## Custom exception classes

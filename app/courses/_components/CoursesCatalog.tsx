@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The `/courses` catalog — implements the "2a — Refined sidebar" mockup from
+ * The `/courses` catalog, implements the "2a, Refined sidebar" mockup from
  * the courses-page redesign: a borderless 224px filter sidebar (search,
  * mono language icons, bar-style level meters, counts) next to a hairline-
  * separated course list with single-shade motif art.

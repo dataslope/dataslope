@@ -4,7 +4,7 @@ description: Why a random train/test split is catastrophic for time series, how 
 ---
 
 This is the most important page in the course. You can fit a flawless ARIMA
-and still ship a disaster — if you *evaluate* it wrong. The discipline that
+and still ship a disaster, if you *evaluate* it wrong. The discipline that
 separates a real forecaster from someone with a good-looking notebook is
 **honest validation**: measuring a model's true ability to project into a
 future it has never seen. Get this wrong and every accuracy number you report
@@ -13,7 +13,7 @@ is a comfortable fiction.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two timelines: on top, a solid blue training stretch is separated from the green test stretch by one yellow divider and earns a green check; below, blue and green pieces interleave at random and earn a red cross — validation must split time in order, never shuffled"
+  aria-label="Two timelines: on top, a solid blue training stretch is separated from the green test stretch by one yellow divider and earns a green check; below, blue and green pieces interleave at random and earn a red cross, validation must split time in order, never shuffled"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -64,14 +64,14 @@ this entire course, make it this.
 
 ## The cardinal sin: a random split
 
-The default split in nearly every ML tutorial — shuffle the rows, take 80%
-for training and 20% for testing — is **catastrophic** for time series. When
+The default split in nearly every ML tutorial, shuffle the rows, take 80%
+for training and 20% for testing, is **catastrophic** for time series. When
 you randomly assign rows, a test point from March ends up *surrounded in the
 training set* by February and April. The model gets to peek at both sides of
 every test point. It will score brilliantly in evaluation and collapse in
 production, where the future genuinely doesn't exist yet.
 
-Line the two schemes up month by month and the flaw is obvious — under the
+Line the two schemes up month by month and the flaw is obvious, under the
 random split, every `TEST` month is hemmed in by `train` months on both
 sides; under the chronological split, all training is in the past and all
 testing is in the future:
@@ -136,14 +136,14 @@ print("That gap is pure data leakage. The chronological number is the real one."
   ]}
 />
 
-The random hold-out reports a tiny error — and it's a lie. It only achieved
+The random hold-out reports a tiny error, and it's a lie. It only achieved
 that by interpolating between training points that lie in the test point's
 *future*. In production those future points don't exist, so the method can't
 work, and the honest chronological number is many times larger. **The random
 split didn't measure forecasting; it measured interpolation.**
 
 <MultipleChoice
-  markdown={`Why is k-fold cross-validation with random folds — the standard for ordinary tabular data — the *wrong* choice for time series?
+  markdown={`Why is k-fold cross-validation with random folds, the standard for ordinary tabular data, the *wrong* choice for time series?
 
 - It's too slow for large time series
   > Speed isn't the problem. The flaw is that random folds destroy the temporal ordering that the evaluation must respect.
@@ -152,7 +152,7 @@ split didn't measure forecasting; it measured interpolation.**
 - It can only be used for classification
   > k-fold works for regression too; the issue is specifically temporal leakage, not the task type.
 - It requires shuffling, which pandas can't do
-  > pandas shuffles fine. The point is that shuffling a time series is exactly what *causes* the leakage — it's a correctness problem, not a tooling one.
+  > pandas shuffles fine. The point is that shuffling a time series is exactly what *causes* the leakage, it's a correctness problem, not a tooling one.
 
 Random folds mix future into training, leaking information; time series needs splits that keep train strictly before test.`}
 />
@@ -215,7 +215,7 @@ print("unit of error counts equally; MAPE to compare across different scales.")
 
 <Callout type="warn" title="MAPE has sharp edges">
 MAPE divides by the actual value, so it **blows up when the truth is near
-zero** and is **undefined at exactly zero**. It's also asymmetric — it
+zero** and is **undefined at exactly zero**. It's also asymmetric, it
 punishes over-forecasting and under-forecasting unequally. It's wonderful for
 comparing a model across products of wildly different sales volumes, but a
 poor choice for series that pass through zero (temperatures in Celsius,
@@ -226,7 +226,7 @@ percentage genuinely makes sense.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two error buckets: the left holds a handful of small, even green squares, while the right is dominated by one huge red square beside two tiny blue ones — squaring errors makes a single blunder dominate the RMSE score"
+  aria-label="Two error buckets: the left holds a handful of small, even green squares, while the right is dominated by one huge red square beside two tiny blue ones, squaring errors makes a single blunder dominate the RMSE score"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -256,7 +256,7 @@ percentage genuinely makes sense.
 
 ## Beyond one split: walk-forward backtesting
 
-A single train/test split gives *one* estimate of forecast skill — and one
+A single train/test split gives *one* estimate of forecast skill, and one
 estimate is noisy. Maybe that particular tail happened to be easy or hard.
 **Backtesting** (time-series cross-validation) re-runs the forecast across
 *many* successive cut-off points and averages the skill. The iron rule holds
@@ -270,14 +270,14 @@ in every fold: **train is always strictly before test.**
 
 This is the **expanding-window** (anchored) scheme: the training
 set grows each fold while the test window marches forward. A **rolling-window**
-scheme instead keeps the training window a fixed *size* and slides it — useful
+scheme instead keeps the training window a fixed *size* and slides it, useful
 when old history stops being relevant. Either way, you get several honest
 out-of-sample scores instead of one.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three stacked timelines show a blue training bar growing longer in each fold while a green test block marches further into the future past a yellow cut mark — walk-forward backtesting, where training always ends before testing begins"
+  aria-label="Three stacked timelines show a blue training bar growing longer in each fold while a green test block marches further into the future past a yellow cut mark, walk-forward backtesting, where training always ends before testing begins"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -363,7 +363,7 @@ print("know how lucky or unlucky that single tail was. Many folds = a stable est
 
 Each fold trains only on its past and is scored on its future; averaging the
 folds gives a far steadier estimate of real skill than any single split. And
-notice we backtested a **baseline** (seasonal-naive) — because the real
+notice we backtested a **baseline** (seasonal-naive), because the real
 question is never "what's my error?" but "**do I beat the baseline on the same
 honest test?**"
 
@@ -372,12 +372,12 @@ honest test?**"
 
 - Each fold must contain the same number of points
   > Equal sizes are convenient but not the defining requirement. In expanding-window backtesting the training set deliberately grows each fold.
-- [o] In every fold, all training timestamps come strictly *before* all test timestamps — the model only ever learns from the past
+- [o] In every fold, all training timestamps come strictly *before* all test timestamps, the model only ever learns from the past
   > Keeping train entirely before test in every fold is exactly what prevents future leakage and mirrors real forecasting. It's the non-negotiable property.
 - The folds must be chosen randomly for fairness
   > Random folds are precisely what breaks time-series validation by leaking the future. Fairness here means temporal order, not randomness.
 - Each test point must appear in the training set of another fold
-  > A test point appearing in any fold's *training* set means the model trained on data it's later tested on — leakage. Test points must stay out of all training sets that precede them in time.
+  > A test point appearing in any fold's *training* set means the model trained on data it's later tested on, leakage. Test points must stay out of all training sets that precede them in time.
 
 The essential property is temporal: train strictly precedes test in every fold, so the model never sees the future.`}
 />
@@ -404,7 +404,7 @@ it won't have at prediction time:
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="The yellow divider guards the split above the ground, but a red pipe siphons from the green future side, dips beneath the timeline, and surfaces with an arrow inside the blue training side — preprocessing computed on the whole series leaks the future even when the split looks correct"
+  aria-label="The yellow divider guards the split above the ground, but a red pipe siphons from the green future side, dips beneath the timeline, and surfaces with an arrow inside the blue training side, preprocessing computed on the whole series leaks the future even when the split looks correct"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -472,7 +472,7 @@ The split is the famous leak, but the subtle ones live in preprocessing.
 Before trusting any backtest, ask of every transformation: *"could this step
 have seen data from the test period?"* Scalers, imputers, decompositions,
 feature lags, and hyperparameter choices must all be derived from the
-training data of each fold — never from the whole series.
+training data of each fold, never from the whole series.
 </Callout>
 
 ## Practice
@@ -482,9 +482,9 @@ training data of each fold — never from the whole series.
   title="Implement the three error metrics in NumPy"
   instructions={`Code the forecasting metrics from scratch. Given true and predicted arrays, implement:
 
-- \`mae(y_true, y_pred)\` — mean absolute error
-- \`rmse(y_true, y_pred)\` — root mean squared error
-- \`mape(y_true, y_pred)\` — mean absolute percentage error (as a percent, i.e. multiplied by 100)
+- \`mae(y_true, y_pred)\`, mean absolute error
+- \`rmse(y_true, y_pred)\`, root mean squared error
+- \`mape(y_true, y_pred)\`, mean absolute percentage error (as a percent, i.e. multiplied by 100)
 
 Then evaluate them on the provided \`y_true\` and \`y_pred\` and store the results (as plain floats) in a dict \`scores\` with keys \`"mae"\`, \`"rmse"\`, \`"mape"\`.`}
   files={[
@@ -651,10 +651,10 @@ assert tr[0] == 0 and tr[-1] == 59 and te[0] == 60 and te[-1] == 71`,
 
 Compute the test-set **MAE** for two forecasts of those 24 months:
 
-- \`mae_snaive\` — the seasonal-naive forecast: each test month equals the value from the same month one year earlier. For this 24-month horizon that is the **last 12 training months repeated twice** (\`np.tile(train.values[-12:], 2)\`).
-- \`mae_mean\` — a trivial flat forecast equal to the training mean, repeated 24 times.
+- \`mae_snaive\`, the seasonal-naive forecast: each test month equals the value from the same month one year earlier. For this 24-month horizon that is the **last 12 training months repeated twice** (\`np.tile(train.values[-12:], 2)\`).
+- \`mae_mean\`, a trivial flat forecast equal to the training mean, repeated 24 times.
 
-Set \`baseline_wins\` to \`True\` if the seasonal-naive MAE is lower than the flat-mean MAE (it should be — seasonality matters here).`}
+Set \`baseline_wins\` to \`True\` if the seasonal-naive MAE is lower than the flat-mean MAE (it should be, seasonality matters here).`}
   files={[
     {
       filename: "main.py",
@@ -752,14 +752,14 @@ A great-in-testing, bad-in-production gap on temporal data points to leakage fro
 <MultipleChoice
   markdown={`You standardize your features using the mean and standard deviation computed over the **entire** dataset, then do a chronological train/test split. Is this safe?
 
-- Yes — a chronological split is all you need
+- Yes, a chronological split is all you need
   > A chronological split fixes the *split*, but the scaler already peeked. Computing global statistics over all data lets the test period's distribution leak into training.
-- [o] No — the scaler's statistics include the test period, leaking future information; fit the scaler on the training data only
+- [o] No, the scaler's statistics include the test period, leaking future information; fit the scaler on the training data only
   > Any transform whose parameters are learned from the whole series (mean, std, min/max, imputation values) leaks the future. Scalers must be fit on train and merely *applied* to test.
 - Yes, as long as you don't shuffle
   > Not shuffling preserves order, but the global scaler still saw the test distribution. Order and preprocessing are two separate leakage channels.
 - It only matters for classification problems
-  > Scaling leakage affects forecasting and regression just as much. The principle — derive all transforms from training data only — is universal.
+  > Scaling leakage affects forecasting and regression just as much. The principle, derive all transforms from training data only, is universal.
 
 Even with a chronological split, fitting a scaler (or imputer) on the full series leaks the future; learn such parameters from training data alone.`}
 />
@@ -772,7 +772,7 @@ Even with a chronological split, fitting a scaler (or imputer) on the full serie
 - [o] One split gives a single, noisy estimate that may have landed on an unusually easy or hard period; averaging several folds yields a more stable, trustworthy measure of skill
   > Different tails of history vary in difficulty. Multiple folds average over that luck, so the reported skill is less dependent on which single window you happened to hold out.
 - Backtesting lets you train on the test set
-  > Backtesting does the opposite — it rigorously keeps train before test in every fold. It never trains on test data.
+  > Backtesting does the opposite, it rigorously keeps train before test in every fold. It never trains on test data.
 - It makes the model itself more accurate
   > Backtesting is an *evaluation* procedure; it measures skill, it doesn't change the model's accuracy. Its value is a more reliable estimate.
 
@@ -787,7 +787,7 @@ Multiple folds average away the luck of a single holdout, giving a steadier esti
 - RMSE
   > RMSE squares errors but never divides by the actual value, so values near zero don't destabilize it.
 - [o] MAPE
-  > MAPE divides each error by the actual value, so it explodes as the truth approaches zero and is undefined at exactly zero — exactly the situation described.
+  > MAPE divides each error by the actual value, so it explodes as the truth approaches zero and is undefined at exactly zero, exactly the situation described.
 - They are all equally appropriate here
   > They are not: only MAPE involves dividing by the (near-zero) actual, which makes it blow up. MAE and RMSE are fine here.
 
@@ -797,14 +797,14 @@ MAPE divides by the actual value, so series that pass through zero make it unsta
 <MultipleChoice
   markdown={`You try 30 different \`(p, d, q)\` combinations and keep the one with the lowest error **on your test set**. What's the hidden problem?
 
-- Nothing — picking the best test score is the goal
+- Nothing, picking the best test score is the goal
   > If the *test* set chose your model, it's no longer an untouched measure of generalization. You've let it train your decision, so its score is optimistic.
 - [o] The test set has now influenced model selection, so its score is optimistic; you need a separate validation set (or nested CV), and the final test set should be evaluated only once
-  > Selecting among many models by test performance is a form of leakage — the test set tuned your choice. Hold out a separate validation set for tuning and reserve the test set for a single, final, honest estimate.
+  > Selecting among many models by test performance is a form of leakage, the test set tuned your choice. Hold out a separate validation set for tuning and reserve the test set for a single, final, honest estimate.
 - 30 combinations is too few to be reliable
   > The count isn't the issue; even choosing among two by test score leaks. The problem is *using the test set to choose at all*.
 - ARIMA orders should never be compared
-  > Comparing orders is normal and useful — just not on the final test set. Use a validation split or information criteria for selection.
+  > Comparing orders is normal and useful, just not on the final test set. Use a validation split or information criteria for selection.
 
 Choosing a model by its test-set score lets the test set tune you; use a separate validation set and touch the test set only once.`}
 />
@@ -814,17 +814,17 @@ Choosing a model by its test-set score lets the test set tune you; use a separat
   fantasy accuracy. Time series demands **chronological** splits: train is the
   past, test is the future.
 - **Backtest** with **walk-forward** folds (expanding or rolling window) for a
-  stable skill estimate — and in every fold, **train strictly precedes test**.
+  stable skill estimate, and in every fold, **train strictly precedes test**.
 - Code metrics by hand: **MAE** (robust, in-units), **RMSE** (punishes big
   misses), **MAPE** (scale-free percent, but **breaks near zero**).
 - Leakage hides in **preprocessing** too: fit scalers/imputers/decompositions
   on **train only**, avoid future-aware features (centered windows, leads,
   bfill/interpolate as inputs), and never tune on the **test** set.
-- Always compare to a **baseline** on the *same* honest backtest — skill is
+- Always compare to a **baseline** on the *same* honest backtest, skill is
   relative.
 </Callout>
 
 You now have every piece: shaping a timeline, reshaping its resolution,
 handling gaps, decomposing structure, achieving stationarity, reading
-ACF/PACF, fitting ARIMA, and — above all — validating honestly. The capstone
+ACF/PACF, fitting ARIMA, and, above all, validating honestly. The capstone
 threads them into one end-to-end pipeline.

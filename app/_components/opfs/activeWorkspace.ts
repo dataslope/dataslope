@@ -8,7 +8,7 @@
  *
  *   1. Look up the active workspace ID for the playground in
  *      `sessionStorage` (per-tab, so two tabs of the same playground
- *      can independently target different workspaces — required for
+ *      can independently target different workspaces, required for
  *      Phase 5 multi-tab support).
  *   2. If the stored ID is still in the registry, return it.
  *   3. Otherwise auto-create a default workspace
@@ -16,7 +16,7 @@
  *      `sessionStorage`.
  *
  * When OPFS is not supported, the helper still returns a workspace
- * entry so callers have something to wire through to the engine —
+ * entry so callers have something to wire through to the engine,
  * `createWorkspace` simply records a registry-only entry in that case
  * and the engine falls back to in-memory mode.
  */
@@ -30,7 +30,7 @@ import {
 } from "./workspace";
 
 const SESSION_KEY_PREFIX = "playground_active_ws_";
-// Per-tab store for a *draft* (unsaved) workspace — one that has OPFS backing
+// Per-tab store for a *draft* (unsaved) workspace, one that has OPFS backing
 // but is intentionally kept out of the saved-workspaces registry until the
 // user makes a change and clicks Save. Stored as the full entry (not just the
 // id) so a reload in the same tab restores the same draft instead of spawning
@@ -68,7 +68,7 @@ export function markWorkspaceDirty(workspaceId: string): void {
   try {
     window.localStorage.setItem(`${DIRTY_KEY_PREFIX}${workspaceId}`, "1");
   } catch {
-    /* quota / private mode — ignore */
+    /* quota / private mode, ignore */
   }
 }
 
@@ -122,7 +122,7 @@ export function setActiveWorkspaceId(
  * Switches the active workspace for a playground and reloads the page.
  * Uses a reload (rather than tearing down + re-bootstrapping the engine
  * and editor in place) because every workspace switch needs to rebuild
- * the runtime / database state from scratch — a reload is both simpler
+ * the runtime / database state from scratch, a reload is both simpler
  * and indistinguishable from an in-place re-bootstrap from the user's
  * perspective.
  */
@@ -194,12 +194,12 @@ export async function ensureActiveWorkspace(
       const opened = await openWorkspace(storedId);
       return { ...(opened ?? entry), saved: true };
     }
-    // Not registered — restore the draft if it's the one this tab created.
+    // Not registered, restore the draft if it's the one this tab created.
     const draft = getDraftWorkspace(playgroundId);
     if (draft && draft.id === storedId) {
       return { ...draft, saved: false };
     }
-    // Stale session pointer — fall through to create a fresh draft.
+    // Stale session pointer, fall through to create a fresh draft.
   }
 
   const defaultName = DEFAULT_NAMES[playgroundId] ?? `Default ${playgroundId}`;

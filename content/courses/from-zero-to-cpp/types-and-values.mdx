@@ -1,6 +1,6 @@
 ---
 title: Types and Values
-description: How C++ thinks about types — categories, conversions, and why static typing is your friend.
+description: How C++ thinks about types, categories, conversions, and why static typing is your friend.
 ---
 
 In the previous chapter we said every variable has a *type*, and a
@@ -12,7 +12,7 @@ recognize where every type fits.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A sorting panel with circle, square, and triangle holes; matching colored pieces drop toward their own openings while a red square that fits nowhere rests on top — a type only accepts values of the right shape"
+  aria-label="A sorting panel with circle, square, and triangle holes; matching colored pieces drop toward their own openings while a red square that fits nowhere rests on top, a type only accepts values of the right shape"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -66,20 +66,20 @@ flowchart TD
 C++ types break down into a small family of categories:
 
 - **Fundamental**
-  - Integral — `int`, `char`, `bool`, ...
-  - Floating-point — `float`, `double`, `long double`
-  - `void` — "no value"
-  - `std::nullptr_t` — just for `nullptr`
+  - Integral, `int`, `char`, `bool`, ...
+  - Floating-point, `float`, `double`, `long double`
+  - `void`, "no value"
+  - `std::nullptr_t`, just for `nullptr`
 - **Compound**
-  - Pointer — `T*`
-  - Reference — `T&`
-  - Array — `T[n]`
-  - Function — `int(int)`
+  - Pointer, `T*`
+  - Reference, `T&`
+  - Array, `T[n]`
+  - Function, `int(int)`
   - Class / struct
   - Enumeration
 
 Most of your day will be spent with `int`, `double`, `bool`,
-`std::string`, `std::vector`, and your own classes — but it helps
+`std::string`, `std::vector`, and your own classes, but it helps
 to know the rest exists.
 
 ## Integral types in detail
@@ -233,7 +233,7 @@ predecessor, the value no longer fit, the unguarded conversion
 overflowed, and the guidance computer shut itself down mid-flight.
 The conversion had been left unprotected because, on Ariane 4, the
 value *provably* couldn't overflow. Types are promises about the
-values that can appear — and the Ariane team learned that a promise
+values that can appear, and the Ariane team learned that a promise
 made for one rocket does not transfer to another.
 
 ## Truthiness
@@ -355,7 +355,7 @@ using StringMap = std::map<std::string, std::string>;
 StringMap config;   // much shorter than spelling std::map<...> again
 ```
 
-Aliases are just names — they don't create new types. But they make
+Aliases are just names, they don't create new types. But they make
 code dramatically more readable.
 
 ## Reading C++ types right to left
@@ -377,7 +377,7 @@ Practice this on small examples; the same pattern scales up.
 <ChallengeCard
   adapter="cpp"
   title="Average of a vector"
-  instructions={`Implement \`double average(const std::vector<int>& xs)\` that returns the mean of \`xs\`. Pay attention to the types: \`xs.size()\` is \`std::size_t\` and the sum is \`int\` — you'll need a cast or careful arithmetic to get the right \`double\` result. The fixed input prints exactly \`3\` on success.`}
+  instructions={`Implement \`double average(const std::vector<int>& xs)\` that returns the mean of \`xs\`. Pay attention to the types: \`xs.size()\` is \`std::size_t\` and the sum is \`int\`, you'll need a cast or careful arithmetic to get the right \`double\` result. The fixed input prints exactly \`3\` on success.`}
   files={[
     {
       filename: "main.cpp",
@@ -431,7 +431,7 @@ int main() {
 - The CPU does not support double equality at all.
   > It does; the issue is that the values being compared may not be exactly equal due to rounding.
 - The compiler always emits a warning, so the operation is forbidden.
-  > It is not forbidden — but the result is often surprising.
+  > It is not forbidden, but the result is often surprising.
 - [o] Floating-point arithmetic is approximate; many decimal values cannot be represented exactly in binary, so the comparison may fail even for inputs that look mathematically equal.
   > Use a tolerance (\`std::abs(a-b) < eps\`) for floating-point equality.
 - It is dangerous only on 32-bit systems.
@@ -477,5 +477,5 @@ int main() {
   > \`constexpr\` is useful in everyday code too.`}
 />
 
-Next: how to control the flow of a program — `if`, `while`, `for`,
+Next: how to control the flow of a program, `if`, `while`, `for`,
 `switch`, and how to think about them as *decisions* and *loops*.

@@ -1,6 +1,6 @@
 ---
 title: Vectorized Thinking
-description: How to express a calculation as array operations — and why that is the whole point of NumPy
+description: How to express a calculation as array operations, and why that is the whole point of NumPy
 ---
 
 There is one habit that separates a programmer using NumPy from a
@@ -25,7 +25,7 @@ will assume you think in arrays.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A translucent blue band sweeps across a lattice of cells in a single pass: cells behind it already green, cells ahead still faint — one vectorized operation applied to every element at once"
+  aria-label="A translucent blue band sweeps across a lattice of cells in a single pass: cells behind it already green, cells ahead still faint, one vectorized operation applied to every element at once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.55">
@@ -117,8 +117,8 @@ flowchart TD
     SIMD --> Mem["contiguous memory"]
 ```
 
-Every NumPy *universal function* (ufunc) — `np.sin`, `np.add`,
-`np.exp`, `np.minimum`, ... — is a compiled C loop that processes
+Every NumPy *universal function* (ufunc), `np.sin`, `np.add`,
+`np.exp`, `np.minimum`, ..., is a compiled C loop that processes
 contiguous blocks of memory using the CPU's vector instructions
 (SSE, AVX, NEON). You get the speed of FORTRAN because the inner
 loop *is* the FORTRAN-equivalent inner loop.
@@ -129,7 +129,7 @@ The full hierarchy of "things that go fast":
 | --- | --- | --- |
 | Python `for` over a list | Interpreted bytecode | ~$10^{-6}$ s |
 | Python `for` over an ndarray | Same, plus boxing/unboxing | ~$10^{-6}$ s |
-| `np.vectorize` | Cosmetic wrapper around a Python function — *not* fast | ~$10^{-6}$ s |
+| `np.vectorize` | Cosmetic wrapper around a Python function, *not* fast | ~$10^{-6}$ s |
 | NumPy ufunc / arithmetic | Compiled SIMD loop | ~$10^{-9}$ s |
 | BLAS routine (matmul, etc.) | Heavily tuned blocked algorithm | ~$10^{-10}$ s |
 | GPU | Massively parallel | ~$10^{-11}$ s |
@@ -201,8 +201,8 @@ lines.
 rng = np.random.default_rng(0)
 pts = rng.uniform(0, 10, size=(8, 2))  # 8 points in 2-D
 
-# pts[:, None, :] has shape (8, 1, 2)  — column of point pairs
-# pts[None, :, :] has shape (1, 8, 2)  — row of point pairs
+# pts[:, None, :] has shape (8, 1, 2), column of point pairs
+# pts[None, :, :] has shape (1, 8, 2), row of point pairs
 # Their difference broadcasts to shape (8, 8, 2)
 diff = pts[:, None, :] - pts[None, :, :]
 D = np.sqrt((diff**2).sum(axis=-1))  # collapse the coord axis
@@ -302,7 +302,7 @@ def logistic_map_trajectory(r: float, x0: float, n: int) -> np.ndarray:
 
     The recurrence is sequential and therefore *not* vectorizable
     along time. Vectorization shines for *ensemble* runs over many r
-    or x0 in parallel — see the second example.
+    or x0 in parallel, see the second example.
     """
     x = np.empty(n)
     x[0] = x0
@@ -315,7 +315,7 @@ def logistic_map_trajectory(r: float, x0: float, n: int) -> np.ndarray:
 />
 
 But the *parameter sweep* over many `r` values *is* embarrassingly
-parallel, and that part vectorizes beautifully — every $r$
+parallel, and that part vectorizes beautifully, every $r$
 trajectory runs independently:
 
 <CodeBlock
@@ -349,7 +349,7 @@ plt.show()
 />
 
 We ran 1000 independent trajectories simultaneously, with no
-explicit parallelism — broadcasting did it for us.
+explicit parallelism, broadcasting did it for us.
 
 ## Memory layout matters
 
@@ -358,7 +358,7 @@ NumPy arrays are *contiguous* by default and laid out in **C order**
 arrays (column-major) exist for compatibility with old libraries.
 
 The order matters because accessing memory in the order it is laid
-out is roughly $10\times$ faster than jumping around — CPU caches
+out is roughly $10\times$ faster than jumping around, CPU caches
 work best on contiguous reads.
 
 <CodeBlock
@@ -398,7 +398,7 @@ one can be a free speedup.
   title="Nearest neighbor without loops"
   instructions={`Given a query point \`q\` of shape \`(d,)\` and a cloud \`points\` of shape \`(n, d)\`, implement \`nearest_index(q, points)\` that returns the **integer index** of the row of \`points\` closest to \`q\` in Euclidean distance.
 
-Do it **without any explicit Python loop** — broadcast \`q\` against \`points\`, square, sum along the coordinate axis, and use \`argmin\`.`}
+Do it **without any explicit Python loop**, broadcast \`q\` against \`points\`, square, sum along the coordinate axis, and use \`argmin\`.`}
   files={[
     {
       filename: "main.py",
@@ -465,7 +465,7 @@ When you sit down to translate a formula into NumPy, ask:
 4. **Is there an existing ufunc?** Reach for `np.where`, `np.clip`,
    `np.minimum`, `np.einsum`, before you start writing a loop.
 5. **Did I accidentally fall back to Python?** Look for `for`
-   loops, `map`, list comprehensions, or `np.vectorize` — if you
+   loops, `map`, list comprehensions, or `np.vectorize`, if you
    see them, ask whether they can be lifted into a ufunc.
 
 ## Check your understanding
@@ -477,7 +477,7 @@ When you sit down to translate a formula into NumPy, ask:
   > Indexing with \`None\` inserts a new axis rather than reducing dimensions; the result is still an array, not a scalar.
 - An array of shape \`(1, n)\`
   > The \`None\` in \`x[:, None]\` goes at the second position (after the colon), inserting a length-1 axis there and yielding shape \`(n, 1)\`, not \`(1, n)\`. Placing \`None\` first as in \`x[None, :]\` gives shape \`(1, n)\`.
-- [o] An array of shape \`(n, 1)\` — a "column vector" view of \`x\`
+- [o] An array of shape \`(n, 1)\`, a "column vector" view of \`x\`
   > \`None\` (a synonym for \`np.newaxis\`) inserts a length-1 axis at that position. Combined with \`y[None, :]\`, this is the standard idiom for outer-product-style broadcasting.
 - A copy of \`x\` with no change in shape
   > \`x[:, None]\` creates a view with a new axis inserted; the shape changes from \`(n,)\` to \`(n, 1)\`, so it is neither a copy nor an unchanged shape.
@@ -488,9 +488,9 @@ This idiom is one of the most common ways to set up a broadcast.`}
 <MultipleChoice
   markdown={`A colleague's NumPy code uses \`np.vectorize\` to call a complicated Python function over an array of shape \`(10**6,)\`. They report it is "as fast as native NumPy." What is most likely going on?
 
-- They are correct — \`np.vectorize\` is a compiled inner loop
+- They are correct, \`np.vectorize\` is a compiled inner loop
   > \`np.vectorize\` is explicitly documented as a convenience wrapper that calls the Python function once per element; no compilation occurs and it runs at Python-loop speed.
-- [o] They are mistaken — \`np.vectorize\` is a cosmetic wrapper around a Python loop and runs at Python speed. It looks like NumPy but is not vectorized in the compiled sense
+- [o] They are mistaken, \`np.vectorize\` is a cosmetic wrapper around a Python loop and runs at Python speed. It looks like NumPy but is not vectorized in the compiled sense
   > \`np.vectorize\` exists to give a "ufunc-shaped" API to a Python function, not to speed it up. The docs explicitly warn it is "provided primarily for convenience, not for performance."
 - They are benchmarking the wrong array
   > Benchmarking the wrong array is a possible error, but the question asks what is *most likely* going on; the more fundamental issue is that \`np.vectorize\` is inherently slow regardless of the input.

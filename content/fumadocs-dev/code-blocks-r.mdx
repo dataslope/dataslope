@@ -1,9 +1,9 @@
 ---
-title: Code Blocks — R
+title: "Code Blocks: R"
 description: Run R in the browser via WebR. Data frames render as tables, plots render as inline images.
 ---
 
-R runs through **WebR 4.5** — a full WebAssembly build of R that loads
+R runs through **WebR 4.5**, a full WebAssembly build of R that loads
 on demand the first time you click Run.
 
 ## Vectors and summary statistics
@@ -41,7 +41,7 @@ cat("sd:", round(sd(x), 3), "\\n")
 ## Data frames render as tables
 
 When the last expression of a block evaluates to a `data.frame`, the
-runtime renders it as an HTML table — the same UX as in the
+runtime renders it as an HTML table, the same UX as in the
 [R Playground](/playground/r).
 
 The initialization code below seeds a small dataset; the editable
@@ -181,7 +181,7 @@ bye <- function(name) {
 
 ## Initialization code
 
-`initCode` is read-only setup prepended to your snippet on every Run — handy
+`initCode` is read-only setup prepended to your snippet on every Run, handy
 for imports or sample data without cluttering the part you edit. Init of 3
 lines or fewer shows a compact read-only header; 4 lines or more collapses
 behind a "Click to expand" toggle.

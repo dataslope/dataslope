@@ -1,12 +1,12 @@
 ---
 title: Control Flow
-description: How programs make decisions and repeat work — if, switch, while, for, and how to think about them as flowcharts.
+description: How programs make decisions and repeat work, if, switch, while, for, and how to think about them as flowcharts.
 ---
 
 So far our programs have executed top to bottom, one line at a time.
 Real programs need to **make decisions** and **repeat work**. The
-constructs that let them do so — `if`, `switch`, `while`, `for`,
-`break`, `continue`, `return` — are collectively called **control
+constructs that let them do so, `if`, `switch`, `while`, `for`,
+`break`, `continue`, `return`, are collectively called **control
 flow**.
 
 A useful mental model: at every moment, the CPU is following exactly
@@ -16,7 +16,7 @@ one path through your program. Control-flow statements are
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A thin footpath forks at a yellow diamond: one branch arcs over the top, the other circles a small loop before both rejoin and reach a green flag — decisions and repetition along a program's single path"
+  aria-label="A thin footpath forks at a yellow diamond: one branch arcs over the top, the other circles a small loop before both rejoin and reach a green flag, decisions and repetition along a program's single path"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -151,9 +151,9 @@ if (logged_in) {
 
 Conditions can be combined with:
 
-- `&&` — logical AND (true only if both sides are true)
-- `||` — logical OR (true if either side is true)
-- `!` — logical NOT (flips true/false)
+- `&&`, logical AND (true only if both sides are true)
+- `||`, logical OR (true if either side is true)
+- `!`, logical NOT (flips true/false)
 
 Both `&&` and `||` are **short-circuited**: the right side is only
 evaluated if the left side could not already determine the answer.
@@ -326,7 +326,7 @@ int main() {
 />
 
 The variable declared inside the `for` header (here `i`) is **scoped
-to the loop only**. After the loop, `i` is gone. Good — that's
+to the loop only**. After the loop, `i` is gone. Good, that's
 exactly the smallest-scope principle we mentioned earlier.
 
 ## Range-based `for`
@@ -600,4 +600,4 @@ int main() {
   > A called function cannot see the caller's local variables.`}
 />
 
-Next: how to package code into reusable units — *functions*.
+Next: how to package code into reusable units, *functions*.

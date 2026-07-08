@@ -1,16 +1,16 @@
 ---
 title: Exporting Cleaned Data
-description: Saving your work — CSV, Excel, Parquet — and the choices that decide whether your colleagues will love you tomorrow.
+description: Saving your work, CSV, Excel, Parquet, and the choices that decide whether your colleagues will love you tomorrow.
 ---
 
 After all the loading, cleaning, and transforming, you need
-to *hand off* the result. Pandas can write to dozens of formats
-— this page covers the ones that matter most.
+to *hand off* the result. Pandas can write to dozens of formats,
+this page covers the ones that matter most.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A cleaned table wearing a green check badge pours down a thin arrow and fans into three destination cards — comma-separated blue text, green columnar bars, and a yellow spreadsheet grid — one result, exported three ways"
+  aria-label="A cleaned table wearing a green check badge pours down a thin arrow and fans into three destination cards, comma-separated blue text, green columnar bars, and a yellow spreadsheet grid, one result, exported three ways"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -57,7 +57,7 @@ to *hand off* the result. Pandas can write to dozens of formats
   </g>
 </svg>
 
-## CSV — the universal lowest common denominator
+## CSV, the universal lowest common denominator
 
 <CodeBlock
   adapter="python"
@@ -86,18 +86,18 @@ print(roundtrip)
   ]}
 />
 
-**`index=False`** is almost always what you want — otherwise you
+**`index=False`** is almost always what you want, otherwise you
 get a mystery unnamed column when someone re-reads the file.
 
 ### CSV gotchas
 
 - Text fields containing commas need quoting (Pandas handles
   this automatically).
-- Dates become strings — must re-parse on load.
+- Dates become strings, must re-parse on load.
 - Dtypes are guessed on re-read, which can change them.
 - Very large files become slow.
 
-## Excel — the format your stakeholders want
+## Excel, the format your stakeholders want
 
 <CodeBlock
   adapter="python"
@@ -145,7 +145,7 @@ print("Multi-sheet workbook written.")
 Excel preserves types better than CSV but the files are bigger
 and the format is messier under the hood.
 
-## Parquet — the analyst's favorite
+## Parquet, the analyst's favorite
 
 <CodeBlock
   adapter="python"
@@ -177,11 +177,11 @@ print(back.dtypes)
 
 Parquet is:
 
-- **Columnar** — fast for analytics queries.
-- **Typed** — datetimes stay datetimes; categories stay
+- **Columnar**, fast for analytics queries.
+- **Typed**, datetimes stay datetimes; categories stay
   categories.
-- **Compressed** — files are often 10× smaller than CSV.
-- **Standard** — readable by Pandas, Spark, DuckDB, R, etc.
+- **Compressed**, files are often 10× smaller than CSV.
+- **Standard**, readable by Pandas, Spark, DuckDB, R, etc.
 
 The only downside: non-technical users can't open a `.parquet`
 in Excel without help.
@@ -194,7 +194,7 @@ in Excel without help.
 | Excel   | ⚠️ (via Excel) | ⚠️ | Larger | Slow |
 | Parquet | ❌ | ✅ | Small | Fast |
 | JSON    | ✅ | ⚠️ | Large | Slow |
-| Pickle  | ❌ | ✅ (Pandas-only) | Medium | Fast — but unsafe across versions |
+| Pickle  | ❌ | ✅ (Pandas-only) | Medium | Fast, but unsafe across versions |
 
 A common pattern: **Parquet for internal handoffs; CSV/Excel
 for sharing with humans.**
@@ -237,7 +237,7 @@ print("Wrote", fname)
 `sales_clean_2024-03-18.csv` is much friendlier than
 `sales_clean (3).csv`.
 
-## Round-tripping — verify your export
+## Round-tripping, verify your export
 
 Before declaring "done", read the file back and confirm:
 
@@ -269,7 +269,7 @@ is "...no, the dtypes changed."
 
 - **CSV** writes NaN as an empty string by default; control
   with `na_rep="NA"` if needed.
-- **CSV** has no concept of "category" type — it becomes a
+- **CSV** has no concept of "category" type, it becomes a
   plain string column on re-read.
 - **Parquet** preserves both NaN and category type, which is
   why it's preferred for intermediate storage.
@@ -379,10 +379,10 @@ A small habit that saves a lot of confusion downstream.`}
   markdown={`Which format would you choose for an intermediate file that another Pandas script will load tomorrow?
 
 - CSV
-  > CSV does not preserve dtypes — datetimes become strings and categories become plain strings on re-read, requiring extra parsing work each time the file is loaded.
+  > CSV does not preserve dtypes, datetimes become strings and categories become plain strings on re-read, requiring extra parsing work each time the file is loaded.
 - Excel
   > Excel files are larger than Parquet, slower to read and write, and do not faithfully preserve all Pandas dtypes such as \`category\`.
-- [o] Parquet — preserves dtypes (datetimes, categories), is smaller, and reads faster
+- [o] Parquet, preserves dtypes (datetimes, categories), is smaller, and reads faster
   > Parquet is the modern default for analyst-to-analyst handoffs.
 - JSON
   > JSON is verbose, slow to parse at scale, and does not preserve typed columns reliably; it is suited for hierarchical data, not flat tabular exchanges.
@@ -397,7 +397,7 @@ Parquet has become the standard for analytical data exchange.`}
   > A non-technical stakeholder cannot open a \`.parquet\` file in Excel or any standard spreadsheet tool without additional software.
 - Pickle
   > Pickle is a Python-only binary format; a stakeholder who wants to open the data in Excel cannot use it, and Pickle files carry security risks when shared.
-- [o] Excel (.xlsx) or CSV — formats they can open without code
+- [o] Excel (.xlsx) or CSV, formats they can open without code
   > Match the format to the consumer.
 - HDF5
   > HDF5 is a scientific binary format requiring specialized software; a stakeholder building a pivot table in Excel cannot open it.

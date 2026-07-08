@@ -1,7 +1,7 @@
 /**
  * AI inline code completion endpoint (pro members only).
  *
- * POST — one fill-in-the-middle suggestion for the editor's ghost text
+ * POST, one fill-in-the-middle suggestion for the editor's ghost text
  * (app/_components/ai/inlineCompletion.ts). The tier gate is enforced HERE,
  * not just in the client: guests get 401, signed-in free members get 403.
  * Suggestions are non-streaming (a few lines at most), use the same
@@ -9,9 +9,9 @@
  * see lib/ai/models.ts + wrangler.jsonc), and bill against completion-specific
  * daily budgets (migration 0004) plus the shared global token ceiling.
  *
- * GET — a cheap capability probe: `{ enabled: boolean }`. The editor extension
+ * GET, a cheap capability probe: `{ enabled: boolean }`. The editor extension
  * calls it once per page load to avoid firing doomed POSTs for guests/free
- * members. It's advisory only — POST re-checks the session and tier itself.
+ * members. It's advisory only, POST re-checks the session and tier itself.
  *
  * `force-dynamic` for the same reason as app/api/ai/chat/route.ts: reads the
  * session, talks to an external API, must run per request.
@@ -42,7 +42,7 @@ function json(data: unknown, status = 200): Response {
 }
 
 /** How long we'll wait on the provider. An inline suggestion that arrives
- *  after this is stale anyway — the user has moved on. */
+ *  after this is stale anyway, the user has moved on. */
 const PROVIDER_TIMEOUT_MS = 12_000;
 
 export async function GET(request: Request): Promise<Response> {
@@ -55,7 +55,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  // Cookie-authenticated mutation that spends provider tokens — same
+  // Cookie-authenticated mutation that spends provider tokens, same
   // cross-site posture as the shares/workspaces routes.
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
@@ -63,7 +63,7 @@ export async function POST(request: Request): Promise<Response> {
   // --- Auth gate: guests are blocked outright. ---
   // Cookie cache bypassed: this endpoint spends provider tokens per request,
   // and the cached session outlives bans/plan changes by up to five minutes.
-  // (The advisory GET probe above stays on the cheap cached path — the POST
+  // (The advisory GET probe above stays on the cheap cached path, the POST
   // re-checks everything anyway.)
   const auth = await createAuth(env, request);
   const session = await auth.api.getSession({
@@ -127,7 +127,7 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: decision.message }, decision.status ?? 429);
   }
 
-  // --- Call the provider (bounded — a late suggestion is a useless one). ---
+  // --- Call the provider (bounded, a late suggestion is a useless one). ---
   const messages = buildCompletionMessages({ language, filename, prefix, suffix });
   const abort = new AbortController();
   const timeout = setTimeout(() => abort.abort(), PROVIDER_TIMEOUT_MS);
@@ -158,7 +158,7 @@ export async function POST(request: Request): Promise<Response> {
   );
   const inTok = result.inputTokens || approxInput;
   const outTok = result.outputTokens || estimateTokens(result.text);
-  // A failed write undercounts usage against the daily budgets — it must not
+  // A failed write undercounts usage against the daily budgets, it must not
   // fail the response, but log it so undercounting is visible in the Worker
   // logs rather than silent.
   const write = recordCompletionUsage(env, user.id, day, inTok, outTok).catch(

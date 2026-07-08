@@ -1,17 +1,17 @@
 ---
 title: Position Scales
-description: Controlling the x and y axes — limits, breaks, transformations like log scales, and why zooming with a scale is different from zooming with coordinates.
+description: Controlling the x and y axes, limits, breaks, transformations like log scales, and why zooming with a scale is different from zooming with coordinates.
 ---
 
 The x and y axes are **position scales**, and they are the scales you
-will adjust most often. This page covers limits, breaks, labels, and —
-most importantly — *transformations* like the log scale, plus a subtle
+will adjust most often. This page covers limits, breaks, labels, and,
+most importantly, *transformations* like the log scale, plus a subtle
 trap about how scales filter data.
 
 <svg
   viewBox="0 0 640 224"
   role="img"
-  aria-label="The same six data points drawn in two panels: on a linear position scale they hug the bottom axis then shoot upward, while after a log transform — shown by a thin gray arrow — they fall on an evenly spaced straight line"
+  aria-label="The same six data points drawn in two panels: on a linear position scale they hug the bottom axis then shoot upward, while after a log transform, shown by a thin gray arrow, they fall on an evenly spaced straight line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -118,7 +118,7 @@ ggplot(df, aes(size, score)) +
 />
 
 Same data, same mapping, same geom. Only the **scale's
-transformation** changed — and the chart went from unreadable to clear.
+transformation** changed, and the chart went from unreadable to clear.
 
 **Skewed data (1 ... 100000) → `scale_x_log10` transforms the spacing →
 an evenly spread axis where equal gaps mean 10x steps.**
@@ -133,7 +133,7 @@ while changing only the spacing. Let the scale do the transform.
 ## The zoom trap: scale limits remove data
 
 Here is a subtle but important behavior. Setting `limits` on a position
-scale does **not** just zoom — it **drops** any data outside the range
+scale does **not** just zoom, it **drops** any data outside the range
 *before* statistics run. Watch what it does to a smoother:
 
 <CodeBlock
@@ -155,8 +155,8 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 The large-engine cars are *gone*, and the smoother never saw them. If
-all you wanted was to **zoom** — keep all the data but look at a
-sub-region — you must use the *coordinate system* instead, which we
+all you wanted was to **zoom**, keep all the data but look at a
+sub-region, you must use the *coordinate system* instead, which we
 cover in the next section:
 
 <CodeBlock
@@ -228,7 +228,7 @@ the data and its natural units remain intact.`}
 - They are identical in every way.
   > They differ crucially in how they treat out-of-range data.
 - The scale version zooms; the coord version deletes data.
-  > It is the reverse — the scale version is the one that deletes data.
+  > It is the reverse, the scale version is the one that deletes data.
 - [o] The scale version *removes* data outside the range before stats are computed (so a smoother changes), while the coord version *zooms* the view and keeps all data in the calculations.
   > Scale limits filter; coordinate limits zoom.
 - Only \`coord_cartesian\` works on the x-axis.
@@ -245,6 +245,6 @@ when I zoomed?" bugs. Scale limits filter; coordinate limits zoom.`}
 - A **log transformation** belongs on the *scale*, so the axis keeps
   its original units while changing spacing.
 - **Scale limits remove** out-of-range data *before* stats run;
-  **`coord_cartesian()` zooms** while keeping all data — choose
+  **`coord_cartesian()` zooms** while keeping all data, choose
   deliberately.
 - Discrete position scales let you **reorder and relabel** categories.

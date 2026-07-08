@@ -1,14 +1,14 @@
 ---
 title: Exploratory Statistical Analysis
-description: A disciplined EDA workflow that uses statistics to understand distributions, relationships, missingness, and outliers — while keeping a hard wall between exploration that generates hypotheses and confirmation that tests them on fresh data.
+description: A disciplined EDA workflow that uses statistics to understand distributions, relationships, missingness, and outliers, while keeping a hard wall between exploration that generates hypotheses and confirmation that tests them on fresh data.
 ---
 
 Before you test anything, you have to *look*. **Exploratory data
 analysis** (EDA) is the open-ended, curious first pass over a fresh
 dataset: what's in here, how is each variable distributed, what's
 missing, what relates to what, and what's surprising? You already do a
-version of this with Pandas. This page adds the *statistical* discipline
-— summaries that quantify spread and skew, relationships measured rather
+version of this with Pandas. This page adds the *statistical* discipline,
+summaries that quantify spread and skew, relationships measured rather
 than eyeballed, and a clear sense of which findings are real signal
 versus which are the kind of noise *Why Statistics Matters* warned you
 about.
@@ -21,7 +21,7 @@ statistics is to keep those two activities on opposite sides of a wall.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A messy playground of little charts on one side of a gray wall, a clean green interval with a stroked check on the other, and one yellow hypothesis arc jumping over the top — explore freely, then confirm on data that never saw the exploring"
+  aria-label="A messy playground of little charts on one side of a gray wall, a clean green interval with a stroked check on the other, and one yellow hypothesis arc jumping over the top, explore freely, then confirm on data that never saw the exploring"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="312" y="44" width="16" height="146" rx="8" fill="var(--ds-gray-300)" />
@@ -67,7 +67,7 @@ conflating them is how analyses go wrong.
   Output: *interesting questions and candidate hypotheses.* Nothing here
   is a conclusion.
 - **Confirmatory (hypothesis-testing):** state a *specific*, pre-declared
-  hypothesis and test it — ideally on **data you have not yet looked at.**
+  hypothesis and test it, ideally on **data you have not yet looked at.**
   Output: *a defensible claim with a p-value, an effect size, and a
   confidence interval.*
 
@@ -90,7 +90,7 @@ data that did not participate in suggesting it.
 <Callout type="danger" title="The cardinal sin: testing a hypothesis on the data that suggested it">
 If you scan the data, notice "Tuesday signups convert unusually well,"
 and then run a test on the *same* data asking whether Tuesday converts
-better — your p-value is a lie. You already know the answer is "yes" in
+better, your p-value is a lie. You already know the answer is "yes" in
 this dataset; that's *why* the pattern caught your eye. Testing it here
 inflates false positives exactly like the multiple-comparisons trap in
 *Statistical Fallacies* (the "garden of forking paths"). Confirm on new
@@ -107,24 +107,24 @@ That slice never influenced your hypothesis, so the test is honest.
 ## The EDA pipeline
 
 A disciplined exploration moves through a rough sequence. It's iterative,
-not linear — findings send you back upstream — but the stages give you a
+not linear, findings send you back upstream, but the stages give you a
 checklist so you don't miss something basic.
 
-Here is that checklist as a walkthrough — the question each stage answers:
+Here is that checklist as a walkthrough, the question each stage answers:
 
 <Steps>
 <Step>
 
 **Understand the shape**
 
-Rows, columns, and dtypes — what *is* this table before you analyze it?
+Rows, columns, and dtypes, what *is* this table before you analyze it?
 
 </Step>
 <Step>
 
 **Each variable alone**
 
-Distributions and summaries, one column at a time — center, spread, and skew.
+Distributions and summaries, one column at a time, center, spread, and skew.
 
 </Step>
 <Step>
@@ -145,7 +145,7 @@ Separate data-entry errors from real, meaningful extremes.
 
 **Relationships**
 
-How variables move together — group-bys and correlations.
+How variables move together, group-bys and correlations.
 
 </Step>
 <Step>
@@ -158,14 +158,14 @@ Turn what you saw into hunches to confirm *later*, on fresh data.
 </Steps>
 
 We'll walk this with a real dataset. The tips dataset records
-restaurant bills, tips, party size, day, and a few categorical traits —
+restaurant bills, tips, party size, day, and a few categorical traits,
 small enough to reason about, rich enough to be interesting.
 
 ## Step 1-2: the shape and each variable's distribution
 
 Start by orienting yourself: how big is the table, what are the columns,
 and what does each one look like on its own. `df.describe()` gives a
-fast statistical snapshot of the numeric columns — center, spread, and
+fast statistical snapshot of the numeric columns, center, spread, and
 the quartiles that hint at skew.
 
 <CodeBlock
@@ -189,12 +189,12 @@ print(tips.describe().round(2))
 
 Read `describe()` like a statistician, not just a reader of numbers. For
 `total_bill`: is the mean well above the median? That signals **right
-skew** (a few big bills pulling the average up) — the lesson from *Shape
+skew** (a few big bills pulling the average up), the lesson from *Shape
 and Outliers*. Compare the standard deviation to the mean to gauge
 relative spread. The 25th-to-75th percentile range tells you where the
 bulk of the data lives.
 
-For categorical columns, `describe()` won't help — use `value_counts`
+For categorical columns, `describe()` won't help, use `value_counts`
 to see the categories and how (im)balanced they are.
 
 <CodeBlock
@@ -254,7 +254,7 @@ fig2.show()
 <Callout type="info" title="What you're hunting for in distributions">
 Shape (symmetric vs skewed), center, spread, and anything weird:
 suspicious spikes, impossible values, a long tail. Each oddity is a
-*question* to chase — "why is there a cluster at exactly zero?" — not
+*question* to chase, "why is there a cluster at exactly zero?", not
 something to silently smooth over.
 </Callout>
 
@@ -301,14 +301,14 @@ Dropping rows with missing values is only safe if data is missing
 *completely at random*. Often it isn't: maybe high bills are the ones
 where the tip went unrecorded, so `dropna()` would silently bias your
 average tip downward. Always ask *why* a value is missing before
-deciding how to handle it — the mechanism matters more than the count.
+deciding how to handle it, the mechanism matters more than the count.
 </Callout>
 
 We injected those gaps to make a point, but real datasets arrive with
 their own holes. The **Palmer penguins** dataset is a clean example:
 two penguins are missing every body measurement (they were never fully
 recorded), and eleven are missing `sex`. The same `isna()` checks read
-that out directly — no simulation needed.
+that out directly, no simulation needed.
 
 <CodeBlock
   adapter="python"
@@ -324,7 +324,7 @@ print(missing[missing > 0])
 
 rows_with_holes = penguins.isna().any(axis=1).sum()
 print(f"\\nRows with at least one missing value: {rows_with_holes} of {len(penguins)}")
-print("The 2 penguins missing every measurement are a clue, not noise —")
+print("The 2 penguins missing every measurement are a clue, not noise.")
 print("ask WHY before you drop them.")
 `,
     },
@@ -334,13 +334,13 @@ print("ask WHY before you drop them.")
 The 11 missing `sex` values outnumber the 2 missing measurements, which
 is itself a finding: sex was harder to record than size. Whether you
 drop, impute, or keep those rows depends entirely on the question you're
-asking — but you can only make that call after you've *looked* at the
+asking, but you can only make that call after you've *looked* at the
 pattern.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A data grid of solid blue cells pocked with empty holes: in the left block the holes scatter randomly, but in the rightmost column they stack up together, ringed in red — missingness with a pattern is information, and dropping those rows would quietly bias everything"
+  aria-label="A data grid of solid blue cells pocked with empty holes: in the left block the holes scatter randomly, but in the rightmost column they stack up together, ringed in red, missingness with a pattern is information, and dropping those rows would quietly bias everything"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
@@ -395,7 +395,7 @@ pattern.
 ## Step 4: outliers
 
 Outliers are either **data errors** to fix or **real extremes** that
-carry information — and EDA is where you tell them apart. A common
+carry information, and EDA is where you tell them apart. A common
 quick rule is the **1.5 × IQR** fence: points beyond the quartiles by
 more than 1.5 times the interquartile range are flagged for inspection
 (not automatic deletion).
@@ -435,7 +435,7 @@ print("but be aware they'll pull the mean around.")
 <Callout type="danger" title="Don't delete outliers reflexively">
 "Removing outliers" to make a chart prettier is a classic way to lie
 with data. A high value is only an *error* if it's actually impossible
-or mis-entered. A genuine \\$50 bill from a big party is real signal —
+or mis-entered. A genuine \\$50 bill from a big party is real signal,
 deleting it distorts the truth. Investigate first; delete only with a
 documented reason.
 </Callout>
@@ -473,7 +473,7 @@ print("lunches) wobble a lot. Each gap is a hypothesis to test later.")
 />
 
 A correlation matrix scans all numeric pairs at once. It's the fastest
-way to spot which variables travel together — and a natural source of
+way to spot which variables travel together, and a natural source of
 hypotheses.
 
 <CodeBlock
@@ -519,7 +519,7 @@ association only, and never implies causation.
 
 ## Step 6: forming hypotheses (to confirm later)
 
-This is the *output* of EDA — a short list of specific, testable
+This is the *output* of EDA, a short list of specific, testable
 hypotheses, each tagged "not yet confirmed." From the exploration above,
 honest candidates might be:
 
@@ -527,8 +527,8 @@ honest candidates might be:
 - *Dinner parties tip a different percentage than lunch parties.*
 - *Larger parties tip a lower percentage* (a real, often-cited effect).
 
-Each is a hypothesis you'd take to a **confirmatory** test — a t-test, an
-ANOVA, or a chi-square from the *Hypothesis Testing* section — run
+Each is a hypothesis you'd take to a **confirmatory** test, a t-test, an
+ANOVA, or a chi-square from the *Hypothesis Testing* section, run
 **once**, on data that didn't generate the idea. Until then, they are
 leads, full stop.
 
@@ -553,7 +553,7 @@ flowchart TD
 - Meaningless, because EDA findings are always noise
   > EDA findings are not worthless; they are exactly how good hypotheses are born. They simply must be confirmed before they count as conclusions.
 
-EDA generates hypotheses; confirmation tests them — on different data.`}
+EDA generates hypotheses; confirmation tests them, on different data.`}
 />
 
 ## Practice
@@ -567,7 +567,7 @@ EDA generates hypotheses; confirmation tests them — on different data.`}
 - Group by \`day\` and compute the **mean** tip percentage per day.
 - Store the result in a pandas \`Series\` named \`tip_pct_by_day\`, indexed by day, with the mean tip percentage as values.
 
-This grouped summary is a *generated hypothesis* — "tip % varies by day" — not yet a confirmed conclusion.`}
+This grouped summary is a *generated hypothesis*, "tip % varies by day", not yet a confirmed conclusion.`}
   files={[
     {
       filename: "main.py",
@@ -629,7 +629,7 @@ Produce two variables:
 - \`best_pair\`: a tuple of two column-name strings \`(col_a, col_b)\` for the most correlated distinct pair.
 - \`best_r\`: a Python \`float\`, their Pearson correlation.
 
-The pair order within the tuple does not matter for grading. This is the strongest relationship EDA surfaces — a hypothesis worth confirming, not yet a conclusion.`}
+The pair order within the tuple does not matter for grading. This is the strongest relationship EDA surfaces, a hypothesis worth confirming, not yet a conclusion.`}
   files={[
     {
       filename: "main.py",
@@ -707,7 +707,7 @@ assert abs(best_r - corr.max()) < 1e-9`,
 - To prove your hypothesis is correct using the data you have
   > Using your data to "prove" the hypothesis it suggested is precisely the trap EDA must avoid; proof requires a separate confirmatory test.
 - To clean the data only, with no analysis
-  > Cleaning is part of it, but EDA also examines distributions, relationships, and outliers to surface hypotheses — far more than cleaning alone.
+  > Cleaning is part of it, but EDA also examines distributions, relationships, and outliers to surface hypotheses, far more than cleaning alone.
 
 Exploration generates; confirmation tests. Keep the two separate.`}
 />
@@ -720,7 +720,7 @@ Exploration generates; confirmation tests. Keep the two separate.`}
 - Because the sample is always too small for a t-test
   > Sample size is a separate concern; even with a large sample, testing the hypothesis on the data that suggested it inflates false positives.
 - [o] Because the hypothesis was chosen *because* it stood out in this data, so testing it on the same data inflates the false-positive rate
-  > Selecting a pattern by eye and then testing it on the same data is the garden of forking paths — you implicitly ran many comparisons and reported the winner.
+  > Selecting a pattern by eye and then testing it on the same data is the garden of forking paths, you implicitly ran many comparisons and reported the winner.
 - Because p-values are never trustworthy
   > P-values are trustworthy when the hypothesis is pre-specified and tested on independent data; the issue here is the circular reuse of one dataset.
 
@@ -760,7 +760,7 @@ Correlation matrices generate leads; treat each cell as a hypothesis, not a resu
 <Callout type="success" title="Key takeaways">
 - EDA is **hypothesis-generating**: understand distributions, missingness, outliers, and relationships, then form candidate questions.
 - Keep a wall between **exploratory** (look freely) and **confirmatory** (test a pre-stated hypothesis on fresh/held-out data).
-- **Never test a hypothesis on the same data that suggested it** — it inflates false positives (the garden of forking paths).
+- **Never test a hypothesis on the same data that suggested it**, it inflates false positives (the garden of forking paths).
 - Read `describe()` for skew and spread; use `value_counts` for balance; quantify missingness and ask *why*; flag outliers but don't delete reflexively.
-- Correlation matrices and `groupby` summaries surface leads — confirm them later with the tools from *Hypothesis Testing*.
+- Correlation matrices and `groupby` summaries surface leads, confirm them later with the tools from *Hypothesis Testing*.
 </Callout>

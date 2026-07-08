@@ -1,10 +1,10 @@
 ---
-title: Classification Metrics — Beyond Accuracy
+title: "Classification Metrics: Beyond Accuracy"
 description: Accuracy is the metric everyone reaches for first and the one that misleads most often. The confusion matrix, precision, recall, and F1 tell the real story.
 ---
 
 When a model predicts categories, the obvious question is "how often is it
-right?" — its **accuracy**. Accuracy is intuitive, easy to compute, and
+right?", its **accuracy**. Accuracy is intuitive, easy to compute, and
 genuinely useful sometimes. It is also responsible for more bad models
 shipped with confidence than any other number in machine learning. This
 chapter explains why, and gives you the tools that do not lie: the
@@ -13,7 +13,7 @@ chapter explains why, and gives you the tools that do not lie: the
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="A two-by-two confusion matrix: green diagonal cells collect the correct predictions while a few red dots sit in the faint red off-diagonal cells — the four outcomes hiding behind every accuracy number"
+  aria-label="A two-by-two confusion matrix: green diagonal cells collect the correct predictions while a few red dots sit in the faint red off-diagonal cells, the four outcomes hiding behind every accuracy number"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-300)">
@@ -90,8 +90,8 @@ print("Defaulters it actually caught:", int((y_pred[y_test == 1] == 1).sum()))
 
 A high accuracy, and it caught **zero** defaulters. The accuracy is high
 only because the repaid class is huge and easy. On any problem where the
-rare class is the one you care about — fraud, disease, defaults,
-defects — accuracy alone is dangerously misleading.
+rare class is the one you care about, fraud, disease, defaults,
+defects, accuracy alone is dangerously misleading.
 
 <Callout type="danger" title="Accuracy hides what matters on imbalanced data">
 On imbalanced problems, a useless majority-class predictor can post a
@@ -116,12 +116,12 @@ flowchart TD
     B -->|no| TN["True Negative<br/>(correct pass)"]
 ```
 
-- **True Positive (TP)** — predicted positive, and it was. A correct catch.
-- **False Positive (FP)** — predicted positive, but it was negative. A false
+- **True Positive (TP)**, predicted positive, and it was. A correct catch.
+- **False Positive (FP)**, predicted positive, but it was negative. A false
   alarm. (Statisticians call this a Type I error.)
-- **False Negative (FN)** — predicted negative, but it was positive. A
+- **False Negative (FN)**, predicted negative, but it was positive. A
   missed case. (A Type II error.)
-- **True Negative (TN)** — predicted negative, and it was. A correct pass.
+- **True Negative (TN)**, predicted negative, and it was. A correct pass.
 
 The **confusion matrix** simply counts these four outcomes. scikit-learn
 lays it out with actual classes as rows and predicted classes as columns.
@@ -186,7 +186,7 @@ $$
   positive prediction and ignoring every other real case.
 - **When it matters most.** When **false positives are costly**. A spam
   filter that sends a real, important email to the junk folder (FP) has
-  failed badly — so spam filters prize precision. Likewise a model that
+  failed badly, so spam filters prize precision. Likewise a model that
   flags customers for an expensive intervention.
 
 ## Recall: when misses are expensive
@@ -202,7 +202,7 @@ $$
   "few positives slip through."
 - **What it does *not* measure.** How many false alarms you raised getting
   there. A model can reach perfect recall by predicting positive for
-  *everyone* — catching all real cases and drowning in false positives.
+  *everyone*, catching all real cases and drowning in false positives.
 - **When it matters most.** When **false negatives are costly**. A cancer
   screen that misses a real tumor (FN) can cost a life, so screening prizes
   recall even at the price of more false alarms (which a follow-up test can
@@ -211,13 +211,13 @@ $$
 <Callout type="warn" title="Precision and recall pull in opposite directions">
 You can almost always raise one by sacrificing the other. Flag more cases as
 positive and recall rises while precision falls; flag fewer and the reverse
-happens. A single number cannot capture a classifier — you need at least
+happens. A single number cannot capture a classifier, you need at least
 this pair, chosen around which mistake hurts more.
 </Callout>
 
 ## The threshold is the dial
 
-Most classifiers do not really output a class — they output a
+Most classifiers do not really output a class, they output a
 **probability**, and a threshold (0.5 by default) turns it into a class.
 Moving that threshold is exactly how you trade precision against recall.
 
@@ -254,13 +254,13 @@ for t in [0.2, 0.35, 0.5, 0.65, 0.8]:
 
 Read the table top to bottom: as the threshold rises, the model demands more
 confidence before saying "positive," so precision climbs and recall falls.
-There is no universally correct threshold — it depends on whether a false
+There is no universally correct threshold, it depends on whether a false
 alarm or a missed case is worse for *your* problem. The default 0.5 is just
 a convention, not a law.
 
 ## F1: one number when you must have one
 
-Sometimes you genuinely need a single score — to rank models, to early-stop
+Sometimes you genuinely need a single score, to rank models, to early-stop
 a search. Averaging precision and recall with a plain mean is too forgiving
 (a model with precision 1.0 and recall 0.0 would score 0.5). The **F1
 score** uses the *harmonic* mean, which stays low unless **both** are
@@ -273,7 +273,7 @@ $$
 - **What it measures.** A balance of precision and recall that punishes
   lopsidedness. F1 is high only when neither is being sacrificed.
 - **What it does *not* measure.** The true negatives, and your actual
-  relative cost of FP versus FN — F1 weights precision and recall equally,
+  relative cost of FP versus FN, F1 weights precision and recall equally,
   which may not match your real priorities.
 - **When it can mislead.** If false positives and false negatives have very
   different costs, the equal weighting in F1 is wrong for you, and you
@@ -310,7 +310,7 @@ print(classification_report(y_test, y_pred, target_names=["negative", "positive"
   ]}
 />
 
-Look at the positive row specifically — its precision and recall are the
+Look at the positive row specifically, its precision and recall are the
 honest report card on the rare, important class, the one accuracy was
 hiding. The `macro avg` averages each metric across classes treating them
 equally (good for imbalance); the `weighted avg` weights by support (closer
@@ -335,7 +335,7 @@ flowchart TD
     B -->|"both matter"| F1["Use F1 or precision-recall together"]
 ```
 
-The metric is not a technicality — it is a statement of values. "We must not
+The metric is not a technicality, it is a statement of values. "We must not
 miss a real case" means recall. "We must not cry wolf" means precision. Pick
 the metric that matches the cost of being wrong in your world.
 
@@ -344,15 +344,15 @@ the metric that matches the cost of being wrong in your world.
 - **"High accuracy means a good classifier."** Only when classes are
   balanced *and* both errors cost the same. Otherwise it can be a mirage.
 - **"Precision and recall are basically the same thing."** They answer
-  opposite questions — trustworthiness of positive predictions versus
-  coverage of real positives — and improving one often worsens the other.
+  opposite questions, trustworthiness of positive predictions versus
+  coverage of real positives, and improving one often worsens the other.
 - **"F1 is always the best single metric."** F1 assumes FP and FN matter
   equally. When they do not, F1 quietly optimizes the wrong thing.
 - **"The 0.5 threshold is fixed."** It is an arbitrary default. Tuning the
   threshold to your costs is one of the cheapest, highest-impact moves in
   applied classification.
 - **"Recall of 100% means the model is great."** Predicting positive for
-  everything achieves it — with disastrous precision. Always read the pair.
+  everything achieves it, with disastrous precision. Always read the pair.
 
 ## Real-world applications
 
@@ -360,7 +360,7 @@ A fraud team tunes for recall (catch the fraud) while capping false
 positives so they do not freeze honest customers. An email provider tunes
 spam filters for precision (never lose a real email). A medical screen
 maximizes recall and lets a cheap confirmatory test clean up the false
-alarms. In each case the confusion matrix — not accuracy — is the artifact
+alarms. In each case the confusion matrix, not accuracy, is the artifact
 the team actually argues over.
 
 ## Your turn
@@ -377,7 +377,7 @@ the team actually argues over.
    \`confusion_matrix(y_test, y_pred)\`.
 2. Unpack it into \`tn, fp, fn, tp\` (use \`cm.ravel()\`).
 3. Compute \`precision\` and \`recall\` **for the positive class** from those
-   four counts using the formulas (not by re-calling sklearn) —
+   four counts using the formulas (not by re-calling sklearn),
    \`precision = tp / (tp + fp)\` and \`recall = tp / (tp + fn)\`.
 
 The tests confirm your hand-computed precision and recall match
@@ -461,10 +461,10 @@ Accuracy near the base rate of the majority class is a classic warning sign on i
   markdown={`**Precision** for the positive class is defined as:
 
 - TP / (TP + FN)
-  > That formula is recall (sensitivity), not precision. The denominator counts true positives plus false negatives — all actual positives — measuring how many real positives were caught.
+  > That formula is recall (sensitivity), not precision. The denominator counts true positives plus false negatives, all actual positives, measuring how many real positives were caught.
 - (TP + TN) / total
   > That is overall accuracy, not precision. It counts all correct predictions (both classes) divided by the total, ignoring the distinction between false positives and false negatives.
-- [o] TP / (TP + FP) — of everything predicted positive, the fraction that truly was
+- [o] TP / (TP + FP), of everything predicted positive, the fraction that truly was
   > Precision measures how trustworthy a positive prediction is; its denominator is all the positive *predictions*, so false alarms (FP) lower it.
 - TN / (TN + FP)
   > That formula is specificity (true negative rate), not precision. It measures how well the model avoids false alarms among all actual negatives, which is a different concept.
@@ -477,7 +477,7 @@ Precision is about the quality of positive predictions, penalized by false posit
 
 - Because false alarms are the main danger
   > When false alarms are the main danger, you optimize for precision (avoiding unnecessary positive predictions), not recall. In cancer screening, a false alarm means more tests, which is acceptable; a missed tumor is the greater risk.
-- [o] Because a false negative — missing a real case — is the most costly error, and recall measures the fraction of real positives caught
+- [o] Because a false negative, missing a real case, is the most costly error, and recall measures the fraction of real positives caught
   > Recall (TP / (TP + FN)) directly tracks missed cases. In screening, a missed tumor is far worse than a false alarm that a follow-up test can rule out.
 - Because recall ignores the positive class
   > Recall is specifically about the positive class: it measures the fraction of actual positives the model correctly identified (TP / (TP + FN)).
@@ -506,7 +506,7 @@ Threshold is the dial that trades precision against recall in opposite direction
   markdown={`Why does the **F1 score** use the harmonic mean of precision and recall rather than a simple average?
 
 - The harmonic mean is easier to compute
-  > The harmonic mean is not simpler to compute than the arithmetic mean — it requires more steps. The reason it is used is its mathematical property of penalizing lopsided scores, not computational convenience.
+  > The harmonic mean is not simpler to compute than the arithmetic mean, it requires more steps. The reason it is used is its mathematical property of penalizing lopsided scores, not computational convenience.
 - [o] The harmonic mean stays low unless *both* precision and recall are reasonably high, so it punishes models that sacrifice one for the other
   > A plain average would reward a lopsided model (e.g. precision 1.0, recall 0.0 averages to 0.5); the harmonic mean drives such a score near zero.
 - It makes F1 always equal to accuracy
@@ -524,7 +524,7 @@ F1 is designed to resist being fooled by one strong component masking a weak one
   > 100% recall alone provides no information about the model's precision. A classifier that predicts "positive" for everything achieves perfect recall with zero discriminative value.
 - Precision is also 100%
   > Recall and precision are independent metrics that do not imply each other. A model can reach 100% recall by flagging every single case as positive, which typically produces very low precision.
-- [o] Nothing about overall quality — predicting "positive" for every case also achieves 100% recall, while destroying precision
+- [o] Nothing about overall quality, predicting "positive" for every case also achieves 100% recall, while destroying precision
   > Recall alone can be maxed out trivially by flagging everything positive. It must be read together with precision to judge a classifier.
 - Accuracy is 100%
   > High recall does not imply high accuracy. A classifier that predicts "positive" for every example gets perfect recall but will have low accuracy on any dataset where most cases are actually negative.

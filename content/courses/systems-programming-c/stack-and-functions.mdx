@@ -6,7 +6,7 @@ description: Call frames, recursion, stack overflow, and the lifetime of local v
 Every time you call a function in C, the runtime pushes a **stack
 frame** that holds the function's parameters, local variables, and
 the return address it needs to come back to its caller. When the
-function returns, that frame is popped — and every local in it is
+function returns, that frame is popped, and every local in it is
 gone.
 
 This page makes that mechanism concrete enough that you can predict
@@ -86,11 +86,11 @@ flowchart TB
     F3 --> F2["<code>fib(5)</code> frame<br/>(n=5, return addr to main)"]
     F2 --> F1["<code>fib(4)</code> frame<br/>(n=4, return addr to <code>fib(5)</code>)"]
     F1 --> F0["<code>fib(3)</code> frame<br/>(n=3, return addr to <code>fib(4)</code>)"]
-    F0 --> SP["stack pointer<br/>(top of stack — grows downward)"]
+    F0 --> SP["stack pointer<br/>(top of stack, grows downward)"]
     SP --> Z["Low addresses"]
 ```
 
-The stack typically grows from high addresses to low — every call
+The stack typically grows from high addresses to low, every call
 *subtracts* from the stack pointer, every return adds back. On WASI
 the direction is the same conceptually even if the linear memory
 layout differs.
@@ -129,14 +129,14 @@ int main(void) {
 />
 
 The addresses of `x` in `main`, `middle`, and `inner` should be
-decreasing (or sometimes increasing — the direction is
+decreasing (or sometimes increasing, the direction is
 platform-dependent), and the difference between consecutive frames
 shows roughly how big each frame is.
 
 ## Recursion uses the stack
 
 Each recursive call pushes a new frame. A function that recurses `n`
-times uses `n` frames at peak — so a recursion depth limit is really
+times uses `n` frames at peak, so a recursion depth limit is really
 a *stack size* limit.
 
 <CodeBlock
@@ -169,13 +169,13 @@ them). The total *work* explodes; the peak *stack depth* is only `n`.
 
 ## Stack overflow
 
-When recursion is too deep — or a function declares a huge local
-array — you hit the end of the stack region and the program crashes
+When recursion is too deep, or a function declares a huge local
+array, you hit the end of the stack region and the program crashes
 with a stack overflow.
 
 The error is common enough to have a website named after it. When
 Jeff Atwood and Joel Spolsky launched their programming Q&A site in
-2008, they let readers vote on the name, and *Stack Overflow* won —
+2008, they let readers vote on the name, and *Stack Overflow* won,
 a knowing joke that the place you go when your program crashes
 should be named after one of the crashes. The bug earned that fame
 honestly: it is one of the few failures that can happen *before
@@ -186,7 +186,7 @@ trivially easy to write.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Call-frame trays fill a well past the dashed red stack-limit line, and the trays above the line turn red and tip over — recursion deep enough to overflow the stack"
+  aria-label="Call-frame trays fill a well past the dashed red stack-limit line, and the trays above the line turn red and tip over, recursion deep enough to overflow the stack"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -252,7 +252,7 @@ int main(void) {
   ]}
 />
 
-## Iteration vs recursion — same algorithm, different memory shape
+## Iteration vs recursion, same algorithm, different memory shape
 
 Many recursive algorithms have iterative equivalents that use O(1)
 stack instead of O(n). Compare:
@@ -264,14 +264,14 @@ stack instead of O(n). Compare:
       filename: "main.c",
       starterCode: `#include <stdio.h>
 
-// Recursive — uses n stack frames.
+// Recursive, uses n stack frames.
 long fact_rec(int n) {
   if (n <= 1)
     return 1;
   return n * fact_rec(n - 1);
 }
 
-// Iterative — uses one stack frame regardless of n.
+// Iterative, uses one stack frame regardless of n.
 long fact_iter(int n) {
   long product = 1;
   for (int i = 2; i <= n; i++)
@@ -294,8 +294,8 @@ the stack and easier for an optimizer to reduce to a tight loop.
 
 ## Tail calls
 
-In `return f(...)` — where the recursive call is the *very last*
-thing the function does — a sufficiently aggressive optimizer can
+In `return f(...)`, where the recursive call is the *very last*
+thing the function does, a sufficiently aggressive optimizer can
 **reuse the current frame** instead of pushing a new one. This is
 called *tail-call optimization* (TCO). C compilers will sometimes
 perform it at higher optimization levels but the language does not
@@ -324,7 +324,7 @@ The single most important stack rule:
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A green pointer card still aims its thin arrow at a faded local inside a dashed scope that has already ended, and a red cross blocks the way in — a dangling pointer to a returned function's local"
+  aria-label="A green pointer card still aims its thin arrow at a faded local inside a dashed scope that has already ended, and a red cross blocks the way in, a dangling pointer to a returned function's local"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-400)" }}>
@@ -441,7 +441,7 @@ This *caller owns the buffer* idiom is everywhere in C APIs: think
 <ChallengeCard
   adapter="c"
   title="Compute base^exp iteratively"
-  instructions={`Implement \`long my_pow(int base, int exp)\` for non-negative \`exp\` using a loop — not recursion. \`my_pow(2, 10)\` must return \`1024\`. The provided \`main\` prints results.`}
+  instructions={`Implement \`long my_pow(int base, int exp)\` for non-negative \`exp\` using a loop, not recursion. \`my_pow(2, 10)\` must return \`1024\`. The provided \`main\` prints results.`}
   files={[
     {
       filename: "main.c",

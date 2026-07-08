@@ -1,13 +1,13 @@
 ---
 title: SQL
-description: Data Engineer SQL interview questions — window functions, CTEs, deduplication, and optimization — with answers, concept checks, and runnable challenges.
+description: Data Engineer SQL interview questions, window functions, CTEs, deduplication, and optimization, with answers, concept checks, and runnable challenges.
 ---
 
 Engineering SQL screens go deeper than analyst ones: window functions,
 deduplication, and reasoning about performance. Review the Q&A, then run
 the challenges.
 
-> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted — most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted, most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
 
 ## Q&A
 
@@ -15,9 +15,9 @@ the challenges.
 
 All number rows within a partition; they differ on **ties**:
 
-- **`ROW_NUMBER`** — always distinct (1, 2, 3, 4), ties broken arbitrarily.
-- **`RANK`** — ties share a rank, then it **skips** (1, 2, 2, 4).
-- **`DENSE_RANK`** — ties share a rank, **no skip** (1, 2, 2, 3).
+- **`ROW_NUMBER`**, always distinct (1, 2, 3, 4), ties broken arbitrarily.
+- **`RANK`**, ties share a rank, then it **skips** (1, 2, 2, 4).
+- **`DENSE_RANK`**, ties share a rank, **no skip** (1, 2, 2, 3).
 
 The query below runs all three over the same `players` table ordered by
 `score` so you can compare `rn`, `rnk`, and `dr` side by side on the
@@ -71,8 +71,8 @@ top-to-bottom, which makes multi-step transformations far more readable. A corre
 runs per outer row and can be a performance trap. CTEs shine for staging
 steps and recursive queries.
 
-The block below computes the same per-`user_id` `SUM(amount)` two ways —
-once as a nested subquery and once as a named `user_totals` CTE — to
+The block below computes the same per-`user_id` `SUM(amount)` two ways,
+once as a nested subquery and once as a named `user_totals` CTE, to
 contrast readability for the same `total > 1000` filter.
 
 ```sql
@@ -100,7 +100,7 @@ pre-aggregate before joining, and partition/prune large tables.
 
 `UNION` concatenates two result sets **and removes duplicates** (an
 expensive sort/hash); `UNION ALL` keeps everything, including duplicates.
-Prefer `UNION ALL` unless you specifically need dedup — it skips the
+Prefer `UNION ALL` unless you specifically need dedup, it skips the
 distinct step.
 
 The block below combines `user_id` from `app_users` and `legacy_users`
@@ -341,7 +341,7 @@ An index is a data structure (B-tree by default in most relational database mana
 
 ### What is a covering index?
 
-A covering index includes **all columns** a query needs — both the filter columns and the `SELECT` columns — so the engine can satisfy the query entirely from the index without touching the base table. This eliminates the "table lookup" step and is a major optimization for read-heavy queries.
+A covering index includes **all columns** a query needs, both the filter columns and the `SELECT` columns, so the engine can satisfy the query entirely from the index without touching the base table. This eliminates the "table lookup" step and is a major optimization for read-heavy queries.
 
 ### What is partition pruning?
 
@@ -349,10 +349,10 @@ When a table is partitioned (e.g., by `event_date`) and a query filters on that 
 
 ### What are INNER, LEFT, RIGHT, and FULL OUTER JOINs?
 
-- **`INNER JOIN`** — returns only rows with a match in **both** tables.
-- **`LEFT JOIN`** — all rows from the left table; nulls on the right for non-matches.
-- **`RIGHT JOIN`** — all rows from the right table; nulls on the left.
-- **`FULL OUTER JOIN`** — all rows from both; nulls where either side has no match.
+- **`INNER JOIN`**, returns only rows with a match in **both** tables.
+- **`LEFT JOIN`**, all rows from the left table; nulls on the right for non-matches.
+- **`RIGHT JOIN`**, all rows from the right table; nulls on the left.
+- **`FULL OUTER JOIN`**, all rows from both; nulls where either side has no match.
 
 ```sql
 -- LEFT JOIN: all customers returned; order columns are NULL for customers
@@ -364,16 +364,16 @@ LEFT JOIN orders o ON o.customer_id = c.customer_id;
 
 ### How do you join two large tables efficiently at scale?
 
-The two main strategies are **sort-merge join** (both tables sorted on the join key, then merged linearly — great for already-sorted data) and **hash join** (smaller table hashed into memory, larger table probed — common default in column-store engines). At scale, co-locating/bucketing both tables on the same key avoids expensive shuffle, and broadcasting a small dimension table to every partition avoids a distributed join entirely.
+The two main strategies are **sort-merge join** (both tables sorted on the join key, then merged linearly, great for already-sorted data) and **hash join** (smaller table hashed into memory, larger table probed, common default in column-store engines). At scale, co-locating/bucketing both tables on the same key avoids expensive shuffle, and broadcasting a small dimension table to every partition avoids a distributed join entirely.
 
 ### What are transaction isolation levels?
 
 SQL defines four standard levels that trade consistency for concurrency:
 
-1. **Read Uncommitted** — can read uncommitted ("dirty") data from other transactions.
-2. **Read Committed** — only reads committed data; default in most RDBMS.
-3. **Repeatable Read** — same row read twice in a transaction returns the same value.
-4. **Serializable** — full isolation; transactions behave as if run one at a time.
+1. **Read Uncommitted**, can read uncommitted ("dirty") data from other transactions.
+2. **Read Committed**, only reads committed data; default in most RDBMS.
+3. **Repeatable Read**, same row read twice in a transaction returns the same value.
+4. **Serializable**, full isolation; transactions behave as if run one at a time.
 
 Higher isolation prevents more anomalies (dirty reads, non-repeatable reads, phantom reads) but reduces throughput.
 
@@ -383,7 +383,7 @@ A **window frame** restricts which rows within the current window partition are 
 
 ### How do you read an EXPLAIN plan?
 
-Look at (1) **node types** — sequential scan vs index scan vs hash join vs sort — and their cost estimates; (2) **row estimates** — large underestimates lead the planner to choose bad strategies; (3) **actual vs estimated rows** (in `EXPLAIN ANALYZE`) to spot where statistics are stale; (4) **sort/hash spills** that indicate memory pressure. Fix by updating statistics, adding indexes, rewriting correlated subqueries, or pushing filters earlier.
+Look at (1) **node types**, sequential scan vs index scan vs hash join vs sort, and their cost estimates; (2) **row estimates**, large underestimates lead the planner to choose bad strategies; (3) **actual vs estimated rows** (in `EXPLAIN ANALYZE`) to spot where statistics are stale; (4) **sort/hash spills** that indicate memory pressure. Fix by updating statistics, adding indexes, rewriting correlated subqueries, or pushing filters earlier.
 
 ### What is a correlated subquery, and why can it be slow?
 
@@ -391,7 +391,7 @@ A **correlated subquery** references a column from the outer query. The engine r
 
 The block below computes each employee's `dept_avg` salary first as a
 correlated subquery (re-run per row) and then as a `dept_avgs` CTE joined
-once — the same result with far less repeated work.
+once, the same result with far less repeated work.
 
 ```sql
 -- Slow correlated subquery
@@ -410,7 +410,7 @@ JOIN dept_avgs d ON d.department = e.department;
 
 ### What is the difference between a clustered and a non-clustered index?
 
-A **clustered index** physically orders the table's rows on disk in the index's key order — there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
+A **clustered index** physically orders the table's rows on disk in the index's key order, there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
 
 ### How do you write a query that returns only rows that exist in one table but not another?
 
@@ -440,7 +440,7 @@ FROM user_revenue;
 
 ### What is the difference between PERCENT_RANK and CUME_DIST?
 
-Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` is $\text{PERCENT\_RANK} = \dfrac{\text{rank} - 1}{N - 1}$ — the fraction of rows **ranked below** the current row. `CUME_DIST` is $\text{CUME\_DIST} = \dfrac{\text{rank}}{N}$ — the fraction of rows with a value **less than or equal to** the current row, where $N$ is the total number of rows. `CUME_DIST` is always $\geq$ `PERCENT_RANK` and the last row always has $\text{CUME\_DIST} = 1$.
+Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` is $\text{PERCENT\_RANK} = \dfrac{\text{rank} - 1}{N - 1}$, the fraction of rows **ranked below** the current row. `CUME_DIST` is $\text{CUME\_DIST} = \dfrac{\text{rank}}{N}$, the fraction of rows with a value **less than or equal to** the current row, where $N$ is the total number of rows. `CUME_DIST` is always $\geq$ `PERCENT_RANK` and the last row always has $\text{CUME\_DIST} = 1$.
 
 ### What is a materialized view, and when would you use one?
 
@@ -455,11 +455,11 @@ SELECT COALESCE(phone, email, 'no contact') AS contact
 FROM users;
 ```
 
-`NULLIF(a, b)` is the inverse — it returns NULL when `a = b`, useful to avoid division-by-zero: `revenue / NULLIF(units, 0)`.
+`NULLIF(a, b)` is the inverse, it returns NULL when `a = b`, useful to avoid division-by-zero: `revenue / NULLIF(units, 0)`.
 
 ### What is CROSS JOIN and when is it appropriate?
 
-A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from the left paired with every row from the right). It is appropriate when you intentionally want every combination — for example, pairing every product with every store region in a planning matrix, or generating a full date-by-segment spine before left-joining actual data.
+A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from the left paired with every row from the right). It is appropriate when you intentionally want every combination, for example, pairing every product with every store region in a planning matrix, or generating a full date-by-segment spine before left-joining actual data.
 
 ## Concept checks
 
@@ -467,11 +467,11 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
   markdown={`Two orders in the same region are tied on \`amount\`. You need both to get the **same** rank, and the next distinct amount to skip a number (1, 2, 2, 4). Which function do you want?
 
 - \`ROW_NUMBER()\`
-  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily — it never repeats a value.
+  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily, it never repeats a value.
 - [o] \`RANK()\`
-  > \`RANK()\` gives tied rows the same rank and then skips, producing 1, 2, 2, 4 — exactly the pattern described.
+  > \`RANK()\` gives tied rows the same rank and then skips, producing 1, 2, 2, 4, exactly the pattern described.
 - \`DENSE_RANK()\`
-  > \`DENSE_RANK()\` also ties rows together but does *not* skip — it yields 1, 2, 2, 3.
+  > \`DENSE_RANK()\` also ties rows together but does *not* skip, it yields 1, 2, 2, 3.
 - \`NTILE(4)\`
   > \`NTILE\` buckets rows into a fixed number of groups; it isn't a tie-aware ranking.`}
 />
@@ -482,7 +482,7 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
 - They're interchangeable for deduplication.
   > They differ on ties: two rows with the *same* \`event_time\` would both get rank 1 under \`RANK\`, so you'd keep both.
 - [o] \`ROW_NUMBER()\` guarantees a single row per partition even on ties, so filtering to \`= 1\` keeps exactly one.
-  > It assigns distinct numbers within each partition no matter what — exactly what "one row per user" needs.
+  > It assigns distinct numbers within each partition no matter what, exactly what "one row per user" needs.
 - \`RANK()\` can't be used in a window at all.
   > \`RANK()\` is a valid window function; it's just the wrong tie behavior for dedup.
 - \`ROW_NUMBER()\` sorts the whole table, which is required.
@@ -530,7 +530,7 @@ ORDER BY region, rnk;`}
 <SqlChallengeCard
   dialect="duckdb"
   title="Most recent event per user"
-  instructions={`The table \`events\` has columns \`user_id\`, \`event_time\`, and \`status\`, with several rows per user. Return exactly **one row per user** — the row with the most recent \`event_time\`. Columns: \`user_id\`, \`event_time\`, \`status\`.`}
+  instructions={`The table \`events\` has columns \`user_id\`, \`event_time\`, and \`status\`, with several rows per user. Return exactly **one row per user**, the row with the most recent \`event_time\`. Columns: \`user_id\`, \`event_time\`, \`status\`.`}
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
   (1, TIMESTAMP '2024-01-03 09:00', 'active'),

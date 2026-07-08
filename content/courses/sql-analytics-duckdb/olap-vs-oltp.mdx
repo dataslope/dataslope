@@ -1,11 +1,11 @@
 ---
-title: OLAP vs. OLTP — a Needle and a Net
-description: The same SQL keywords serve two very different jobs. Why analytical (OLAP) work scans columns while transactional (OLTP) work touches rows — and why that difference rewards a column-oriented, vectorized engine like DuckDB.
+title: "OLAP vs. OLTP: a Needle and a Net"
+description: The same SQL keywords serve two very different jobs. Why analytical (OLAP) work scans columns while transactional (OLTP) work touches rows, and why that difference rewards a column-oriented, vectorized engine like DuckDB.
 ---
 
 Most people meet SQL inside an **application**: a website saves a user's
 order, then reads it back on the "My Orders" page. That is real, useful
-SQL — but it is a *different job* from what an analyst does, even though
+SQL, but it is a *different job* from what an analyst does, even though
 both use the word `SELECT`. This page makes the difference precise,
 because almost every habit you build in this course flows from it: the
 shape of analytical questions, and the kind of engine that answers them
@@ -14,7 +14,7 @@ fast.
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Two cards: on the left one solid blue row lights up among gray rows — transactional SQL grabbing a single record; on the right one whole green column lights up among gray columns and condenses into a single green value — analytical SQL scanning a column to summarize it"
+  aria-label="Two cards: on the left one solid blue row lights up among gray rows, transactional SQL grabbing a single record; on the right one whole green column lights up among gray columns and condenses into a single green value, analytical SQL scanning a column to summarize it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -59,7 +59,7 @@ Think of a busy online store.
 
 Same keywords, opposite shape. An application query is a **needle**: find
 this one row, fast. An analytical query is a **net**: drag it across the
-whole ocean and weigh the catch. These two patterns have formal names —
+whole ocean and weigh the catch. These two patterns have formal names,
 **OLTP** (*Online Transaction Processing*, the needle) and **OLAP**
 (*Online Analytical Processing*, the net). You will not be quizzed on the
 acronyms, but what each workload *demands* explains everything that
@@ -82,11 +82,11 @@ This course lives entirely on the OLAP side of that table.
 
 ## What the analyst is really doing
 
-When you write SQL for analysis you are not maintaining the data — you are
+When you write SQL for analysis you are not maintaining the data, you are
 **interrogating** it. A typical analytical query **reads** data but rarely
 changes it; it **touches many rows to produce few** (a thousand orders
 become one average); and it **cares about columns, not rows** ("average
-`amount`" reads one column across every row). It is also *exploratory* —
+`amount`" reads one column across every row). It is also *exploratory*,
 you rarely know the final query in advance, so you run one, look, and let
 the result suggest the next.
 
@@ -96,7 +96,7 @@ single diamond is the answer; the *pattern across diamonds* is.
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="A net, not a needle — 53,940 diamonds, five lines out"
+  title="A net, not a needle, 53,940 diamonds, five lines out"
   starterCode={`SELECT
   cut,
   COUNT(*) AS n,
@@ -117,7 +117,7 @@ individual stones to see the shape of the whole.
 
 ## Why the *physical* shape differs: rows vs. columns
 
-Here is the idea that ties everything together — and the reason a tool
+Here is the idea that ties everything together, and the reason a tool
 like DuckDB feels fast for analysis. A database can store a table two ways.
 
 - **Row storage** keeps all of a row's values together. Perfect for OLTP:
@@ -139,7 +139,7 @@ Column store (good for OLAP) keeps each column together instead:
 ```
 
 When the diamonds query needed only `cut`, `carat`, and `price`, a column
-store reads *only* those stripes — never the columns it does not touch. On
+store reads *only* those stripes, never the columns it does not touch. On
 a wide table that can mean reading a small fraction of the data instead of
 all of it. That single design choice is most of why purpose-built
 analytical engines crush row-oriented databases on summary queries.
@@ -147,7 +147,7 @@ analytical engines crush row-oriented databases on summary queries.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="The same table stored two ways: on the left each row keeps its four mixed-color values side by side and one whole row is lit for a point read; on the right every column's values stand together as one vertical stripe and only the green column stripe glows — a column store reads just what the question needs"
+  aria-label="The same table stored two ways: on the left each row keeps its four mixed-color values side by side and one whole row is lit for a point read; on the right every column's values stand together as one vertical stripe and only the green column stripe glows, a column store reads just what the question needs"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -227,7 +227,7 @@ analytical engines crush row-oriented databases on summary queries.
 
 Storing data by column is only half the story. The other half is how the
 engine *processes* it. A traditional database often walks one row at a
-time, evaluating the whole query for each row — a lot of bookkeeping per
+time, evaluating the whole query for each row, a lot of bookkeeping per
 value. A modern analytical engine instead processes a **batch** of values
 from a column at once, in a tight loop the CPU can run efficiently. This
 is called **vectorized execution**, and column storage is what makes it
@@ -235,17 +235,17 @@ natural: the values are already lined up together, ready to stream through
 in chunks.
 
 Column storage plus vectorized execution is the lineage of decades of
-column-store research — notably **MonetDB**, built at the CWI research
+column-store research, notably **MonetDB**, built at the CWI research
 institute in Amsterdam, and the **C-Store** project associated with
 Michael Stonebraker. DuckDB, which this course runs on, inherits exactly
-this design — and it was created at the very same Amsterdam institute that
+this design, and it was created at the very same Amsterdam institute that
 produced MonetDB. (More on DuckDB's origins on the next page.)
 
 <Callout type="info" title="You write the same SQL either way">
 Reassuringly, you do **not** change your SQL to get these benefits. You
 write the same `SELECT ... GROUP BY` you already know; the engine's
 columnar storage and vectorized execution do the rest. The lesson is not
-"write different SQL for OLAP" — it is that the *questions* you ask, and
+"write different SQL for OLAP", it is that the *questions* you ask, and
 the *engine* you ask them on, are tuned for analysis.
 </Callout>
 
@@ -259,7 +259,7 @@ the *engine* you ask them on, are tuned for analysis.
 - Show the details of order #4821 on a confirmation page.
   > Fetching one specific row to display is an OLTP read, not an analytical summary.
 - [o] Compare average order value between first-time and returning customers across the last year.
-  > This scans many rows to produce a small comparison — the essence of analytical (OLAP) SQL.
+  > This scans many rows to produce a small comparison, the essence of analytical (OLAP) SQL.
 - Update the shipping status of order #91 to "shipped".
   > Updating one row's state is transactional application work.
 
@@ -273,13 +273,13 @@ comparison; transactional questions read or change a few specific rows.`}
 - It compresses rows so transactions commit faster.
   > Faster commits help OLTP writes, not the analytical reads in question; this also misstates how column stores help.
 - [o] A query that needs only a few columns can read just those columns and skip the rest of each row.
-  > Storing each column together lets the engine read \`price\` alone instead of every value in every row — a huge saving on wide tables.
+  > Storing each column together lets the engine read \`price\` alone instead of every value in every row, a huge saving on wide tables.
 - It guarantees every query touches every column.
   > That is the opposite of the benefit; column stores let queries *avoid* unneeded columns.
 - It removes the need to write \`GROUP BY\`.
   > Storage layout does not change the SQL you write; you still use \`GROUP BY\`.
 
-Column stores shine when a query reads a few columns across many rows —
+Column stores shine when a query reads a few columns across many rows,
 the typical analytical pattern.`}
 />
 
@@ -289,7 +289,7 @@ the typical analytical pattern.`}
 - Running each query on a separate CPU core.
   > That describes parallelism across cores; vectorization is about processing batches of values per operation, regardless of core count.
 - [o] Processing a batch of column values at a time in a tight loop, instead of evaluating the whole query one row at a time.
-  > Batching values cuts per-row overhead, and column storage lines the values up ready to stream — together they make scans fast.
+  > Batching values cuts per-row overhead, and column storage lines the values up ready to stream, together they make scans fast.
 - Storing each row as a single vector on disk.
   > That is closer to row storage; vectorized execution is about *processing* batches, and pairs with column storage.
 - Converting SQL into spreadsheet formulas.

@@ -3,14 +3,14 @@ title: Numbers
 description: Integers, floats, complex numbers, arithmetic, and the math module
 ---
 
-Python ships with three numeric types: arbitrary-precision integers, IEEE 754 floats, and complex numbers. The operators are familiar, but there are a few surprises—especially around floating-point precision.
+Python ships with three numeric types: arbitrary-precision integers, IEEE 754 floats, and complex numbers. The operators are familiar, but there are a few surprises-especially around floating-point precision.
 
-Every snippet on this page runs in your browser—no setup required.
+Every snippet on this page runs in your browser-no setup required.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A train of digit cells grows straight out past the fixed box meant to bound it, a float hovers in a fuzzy halo just off the ruler's ticks, and one number lives on its own little plane — ints without limits, floats approximate, complex numbers two-dimensional"
+  aria-label="A train of digit cells grows straight out past the fixed box meant to bound it, a float hovers in a fuzzy halo just off the ruler's ticks, and one number lives on its own little plane, ints without limits, floats approximate, complex numbers two-dimensional"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -68,7 +68,7 @@ Numbers are everywhere in code:
 - **Machine learning:** weights, gradients, loss values, learning rates.
 - **Games:** positions, velocities, health points, scores.
 
-Understanding the quirks of Python's numeric types—especially the precision limits of floats—will save you from subtle bugs.
+Understanding the quirks of Python's numeric types-especially the precision limits of floats-will save you from subtle bugs.
 
 ## Integers
 
@@ -138,7 +138,7 @@ print(0.1 + 0.2 == 0.3)
 />
 
 <Callout type="warn" title="Why does 0.1 + 0.2 ≠ 0.3?">
-In binary, `0.1` is an infinitely repeating fraction (like `1/3` is `0.333...` in decimal). A 64-bit float can only store a finite approximation. When you add two approximations, the error compounds. This is not a Python bug—it's how all IEEE 754 floating-point arithmetic works.
+In binary, `0.1` is an infinitely repeating fraction (like `1/3` is `0.333...` in decimal). A 64-bit float can only store a finite approximation. When you add two approximations, the error compounds. This is not a Python bug-it's how all IEEE 754 floating-point arithmetic works.
 
 **For safe float comparisons, use `math.isclose`:**
 
@@ -154,7 +154,7 @@ IEEE 754 is the industry-standard specification for floating-point arithmetic, d
 
 ### When to avoid floats: finance
 
-For exact decimal arithmetic—like money—use `decimal.Decimal`:
+For exact decimal arithmetic-like money-use `decimal.Decimal`:
 
 <CodeBlock
   adapter="python"
@@ -468,7 +468,7 @@ print(round_to_cents("0.004"))
 <ChallengeCard
   adapter="python"
   title="Greatest common divisor"
-  instructions={`Define a function \`gcd(a, b)\` that returns the greatest common divisor of two positive integers using the Euclidean algorithm. Do **not** use \`math.gcd\`—implement it yourself using a loop or recursion.`}
+  instructions={`Define a function \`gcd(a, b)\` that returns the greatest common divisor of two positive integers using the Euclidean algorithm. Do **not** use \`math.gcd\`, implement it yourself using a loop or recursion.`}
   files={[
     {
       filename: "main.py",
@@ -599,7 +599,7 @@ print(compound_interest(1000, 0.05, 10))
 - A very large integer
   > Python does return a very large integer, but the more precise answer specifies there is no overflow.
 - [o] A very large integer with no overflow
-  > Python's \`int\` has arbitrary precision—no overflow, no wraparound.
+  > Python's \`int\` has arbitrary precision-no overflow, no wraparound.
 - \`OverflowError\`
   > Python's integers never overflow (limited only by memory).
 - \`inf\` (infinity)

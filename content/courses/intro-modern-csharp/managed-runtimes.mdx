@@ -1,6 +1,6 @@
 ---
 title: Managed Runtimes
-description: A conceptual look at what the .NET runtime actually does for you — and why "managed" is a deal you almost always want
+description: A conceptual look at what the .NET runtime actually does for you, and why "managed" is a deal you almost always want
 ---
 
 We've used the words "runtime" and "managed" for several chapters
@@ -8,13 +8,13 @@ now. This page makes them concrete. By the end you should be able
 to point at the .NET runtime and say *exactly* what it does for you
 and why that matters.
 
-We'll stay conceptual — no deep internals. The goal is intuition,
+We'll stay conceptual, no deep internals. The goal is intuition,
 not a reading list of CLR source code.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Bright shapes stand on a floor while faded ghost shapes linger further along; a green collector slides along a thin motion line toward the ghosts — the garbage collector tidying memory"
+  aria-label="Bright shapes stand on a floor while faded ghost shapes linger further along; a green collector slides along a thin motion line toward the ghosts, the garbage collector tidying memory"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="168" width="520" height="4" rx="2" fill="currentColor" opacity="0.18" />
@@ -52,7 +52,7 @@ enforcing safety rules, handling exceptions, talking to the
 operating system.
 
 You can have an *unmanaged* runtime (think of the very thin one
-behind a C program — basically just the C standard library and
+behind a C program, basically just the C standard library and
 some startup glue), or a *managed* one (the .NET runtime, the JVM,
 the V8 JavaScript engine).
 
@@ -128,7 +128,7 @@ Console.WriteLine("done");
 ### Type safety: the runtime catches you
 
 The compiler catches *many* type errors before the program runs.
-But some can only be detected at runtime — for example, casting an
+But some can only be detected at runtime, for example, casting an
 object to a wrong type, or indexing an array out of bounds.
 
 In an unmanaged language, doing the wrong thing might silently
@@ -170,13 +170,13 @@ catch (InvalidCastException ex)
 />
 
 The runtime *refuses* to do the unsafe thing. That refusal is the
-gift of a managed environment — bugs become visible immediately
+gift of a managed environment, bugs become visible immediately
 instead of festering in memory you didn't know you damaged.
 
 ### Method dispatch and the type system
 
 When you call `someObject.DoThing()`, the runtime sometimes needs
-to figure out *which* `DoThing` to actually call — for example, if
+to figure out *which* `DoThing` to actually call, for example, if
 `someObject` is a `Dog` stored in an `Animal` variable, calling
 `Bark` should go to `Dog.Bark`, not some generic `Animal.Bark`.
 
@@ -187,7 +187,7 @@ scenes so this lookup is fast and correct.
 ### Exceptions: a managed control flow
 
 When something goes wrong in C#, you can `throw` an exception.
-The runtime then "unwinds the stack" — pops method frames one by
+The runtime then "unwinds the stack", pops method frames one by
 one, looking for a `catch` block that wants this kind of exception.
 
 ```mermaid
@@ -206,7 +206,7 @@ write is `throw`, `try`, `catch`, and `finally`.
 ### Threading and the OS
 
 When you ask the runtime to read a file or open a network
-connection, it uses platform-specific code under the hood — but
+connection, it uses platform-specific code under the hood, but
 exposes the same API on Windows, Linux, and macOS. Your code stays
 the same. Same for threads: you say `Task.Run(...)` and the
 runtime handles the messy details of OS threads.
@@ -223,8 +223,8 @@ The price of all this convenience:
 | One binary runs on many CPUs | A JIT warm-up cost at startup |
 | Same API across OSes | A runtime must be installed (or embedded) |
 
-For the kinds of software you'll write in this course — and for
-the vast majority of professional software — this trade is
+For the kinds of software you'll write in this course, and for
+the vast majority of professional software, this trade is
 overwhelmingly worth it. The bugs you *avoid* with a managed
 runtime would have cost you far more time than the runtime
 overhead ever will.
@@ -251,7 +251,7 @@ helps to ask "which of these layers is doing this?"
 
 This course runs C# *in your browser* using a special version of
 the .NET runtime compiled to **WebAssembly** (WASM). The runtime
-behaves the same — same GC, same exceptions, same type system —
+behaves the same, same GC, same exceptions, same type system,
 but instead of running on Windows or Linux, it runs inside the
 browser's WASM sandbox. From your perspective as a programmer,
 that's invisible. You just write C#.

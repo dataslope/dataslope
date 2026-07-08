@@ -299,7 +299,7 @@ export function ModifyColumnRow({
 
 /** Row for a single generated (computed) column inside the Columns tab.
  *  Generated columns cannot be reordered or have their name/type changed
- *  here — only the expression and storage type (Virtual/Stored) are editable. */
+ *  here, only the expression and storage type (Virtual/Stored) are editable. */
 function GeneratedColumnRow({
   col,
   onChange,

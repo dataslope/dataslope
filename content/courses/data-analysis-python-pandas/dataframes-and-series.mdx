@@ -1,14 +1,14 @@
 ---
 title: DataFrames and Series
-description: Pandas's two core data structures — a labeled 2-D table and a labeled 1-D column — and the deep symmetry between them.
+description: Pandas's two core data structures, a labeled 2-D table and a labeled 1-D column, and the deep symmetry between them.
 ---
 
 Pandas has two protagonists. Almost every operation in the
 library returns one or the other.
 
-- **`DataFrame`** — a 2-D table of rows × columns, with both
+- **`DataFrame`**, a 2-D table of rows × columns, with both
   row labels (the **index**) and column labels.
-- **`Series`** — a 1-D array of values, with a single set of
+- **`Series`**, a 1-D array of values, with a single set of
   labels (also called an index).
 
 A DataFrame is essentially a dictionary of Series that all share
@@ -17,7 +17,7 @@ the same row index.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A blue column slides out of a faint grid, carrying its little row labels along with it — a DataFrame is a stack of Series that all share one index"
+  aria-label="A blue column slides out of a faint grid, carrying its little row labels along with it, a DataFrame is a stack of Series that all share one index"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -91,7 +91,7 @@ flowchart LR
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# A Series — a single labeled column
+# A Series, a single labeled column
 s = pd.Series(
     [120, 95, 140, 80], index=["Aiko", "Bilal", "Chen", "Diego"], name="salary"
 )
@@ -102,7 +102,7 @@ print("dtype:", s.dtype)
 print("index:", list(s.index))
 print()
 
-# A DataFrame — a dict of Series with a shared index
+# A DataFrame, a dict of Series with a shared index
 df = pd.DataFrame(
     {
         "salary": [120, 95, 140, 80],
@@ -168,7 +168,7 @@ selects a list (and even a list of one is still a list).
 ## Operations are vectorized
 
 The big practical benefit of a Series is that you can do math on
-the whole thing at once — no for-loop required.
+the whole thing at once, no for-loop required.
 
 <CodeBlock
   adapter="python"
@@ -287,7 +287,7 @@ df = pd.DataFrame(
     index=["Aiko", "Bilal", "Chen", "Diego"],
 )
 
-# .mean() on a DataFrame returns a Series — one mean per column
+# .mean() on a DataFrame returns a Series, one mean per column
 print(df.mean())
 print()
 
@@ -326,7 +326,7 @@ Memorize this once and you will stop being surprised.
   markdown={`Calling \`df["salary"]\` returns:
 
 - A NumPy array
-  > \`series.values\` returns a NumPy array, but \`df["salary"]\` itself returns a Series — a labeled 1-D structure with an index, not a raw array.
+  > \`series.values\` returns a NumPy array, but \`df["salary"]\` itself returns a Series, a labeled 1-D structure with an index, not a raw array.
 - A list
   > A list is a plain Python data structure with no index or dtype; \`df["salary"]\` returns a Pandas Series with full label-awareness.
 - [o] A Series
@@ -341,7 +341,7 @@ Single-bracket vs double-bracket is one of the most common surprises in Pandas.`
   markdown={`When you add two Series with different indexes, what happens?
 
 - It throws an error
-  > Pandas does not raise an error when adding Series with different indexes; it silently produces NaN for non-matching labels — which can itself be a silent bug if unexpected.
+  > Pandas does not raise an error when adding Series with different indexes; it silently produces NaN for non-matching labels, which can itself be a silent bug if unexpected.
 - The values are added position by position
   > Position-based addition is what NumPy arrays do, not Pandas Series; Pandas's distinctive behavior is to align by index *label* before operating.
 - [o] Pandas aligns the two Series by index label, then adds the matching values; non-matching labels produce NaN

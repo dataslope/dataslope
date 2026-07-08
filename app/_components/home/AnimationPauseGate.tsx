@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
  * everything inside. Paused animations freeze in place and resume mid-cycle
  * on re-entry.
  *
- * JS-driven animations (motion springs, rAF loops, timers) are unaffected —
+ * JS-driven animations (motion springs, rAF loops, timers) are unaffected,
  * those pause themselves (see AnimatedBeam, BeamSection, TypingAnimation,
  * and statsBentoBackgrounds).
  */

@@ -8,12 +8,12 @@
  *
  * Design language: surfaces are flat tinted panels (no borders, no shadows)
  * on the page background, tables separate rows with hairline dividers, and
- * row actions are quiet ghost buttons — the only loud elements are primary
+ * row actions are quiet ghost buttons, the only loud elements are primary
  * CTAs and the Pro badge. Everything is styled for both themes and collapses
  * to single-column layouts on mobile (tables become card lists at the call
  * sites).
  *
- * Security model (unchanged): these are presentation-only — every action
+ * Security model (unchanged): these are presentation-only, every action
  * hits a server-authorized endpoint (Better Auth `admin.*`, or requireAdmin
  * on our own /api/admin routes), so a non-admin who opens any /admin page
  * just sees an access-denied notice and can't read or mutate anything.
@@ -87,7 +87,7 @@ export function PanelBody({
   );
 }
 
-/** Filled input styling (no border) — pass via `className` on ui/Input. */
+/** Filled input styling (no border), pass via `className` on ui/Input. */
 export const softInputClass =
   "rounded-lg border-transparent bg-zinc-500/[0.07] shadow-none dark:bg-white/[0.07] dark:border-transparent";
 
@@ -174,7 +174,7 @@ export function SignInPrompt() {
 /**
  * "You don't have admin access" panel. When the current session is an
  * impersonation session (the admin became a test user and came back here),
- * offer the way out — otherwise an impersonating admin would be locked out
+ * offer the way out, otherwise an impersonating admin would be locked out
  * of the dashboard until the impersonation session expires.
  */
 export function AccessDeniedCard({
@@ -250,7 +250,7 @@ export function PlanBadge({ plan }: { plan: string | null | undefined }) {
   );
 }
 
-/** Soft status badge — state is carried by tint AND the label, never color
+/** Soft status badge, state is carried by tint AND the label, never color
  *  alone. */
 export function StatusBadge({ banned }: { banned: boolean | null | undefined }) {
   return banned ? (
@@ -268,7 +268,7 @@ export function StatusBadge({ banned }: { banned: boolean | null | undefined }) 
  * Flip a user's plan via Better Auth's admin update endpoint (server-side
  * admin check included). Returns an error message, or null on success.
  * Note: an already-signed-in session may keep the old plan for up to five
- * minutes (the session cookie cache) — impersonation and fresh sign-ins see
+ * minutes (the session cookie cache), impersonation and fresh sign-ins see
  * the new plan immediately.
  */
 export async function setUserPlan(

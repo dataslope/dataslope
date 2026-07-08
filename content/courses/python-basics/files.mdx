@@ -3,14 +3,14 @@ title: Files and I/O
 description: Reading and writing files, the with statement, and pathlib
 ---
 
-Every real program touches files — reading config, writing logs, parsing CSV data, fetching JSON from an API, exporting reports. Python's file API is small, consistent, and powerful.
+Every real program touches files, reading config, writing logs, parsing CSV data, fetching JSON from an API, exporting reports. Python's file API is small, consistent, and powerful.
 
 The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A document card filled with faint lines sends a thin gray arrow to three clean colored bars — opening a file reads its contents out line by line"
+  aria-label="A document card filled with faint lines sends a thin gray arrow to three clean colored bars, opening a file reads its contents out line by line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="100" y="30" width="150" height="140" rx="10" fill="currentColor" opacity="0.07" />
@@ -41,11 +41,11 @@ The two core ideas: **`open()` returns a file object**, and **the `with` stateme
 
 File operations are everywhere in production code:
 
-- **Configuration** — `.env` files, `config.json`, YAML settings
-- **Logging** — Persistent debug and error trails
-- **Data ingestion** — CSV exports from Excel, JSON from APIs, XML from legacy systems
-- **Persistence** — Storing application state, caching expensive computations
-- **Interprocess communication** — Unix sockets, named pipes, temp files
+- **Configuration**, `.env` files, `config.json`, YAML settings
+- **Logging**, Persistent debug and error trails
+- **Data ingestion**, CSV exports from Excel, JSON from APIs, XML from legacy systems
+- **Persistence**, Storing application state, caching expensive computations
+- **Interprocess communication**, Unix sockets, named pipes, temp files
 
 Mastering file I/O means you can build scripts that process data, integrate with other tools, and persist state across runs.
 
@@ -63,12 +63,12 @@ flowchart TD
 ```
 
 <Callout type="info" title="The 'with' statement: always use it">
-The `with` statement is Python's **context manager** protocol. For files, it guarantees the file is closed when the block exits — even if an exception is raised. **Always** open files in a `with` block unless you have a very specific reason not to.
+The `with` statement is Python's **context manager** protocol. For files, it guarantees the file is closed when the block exits, even if an exception is raised. **Always** open files in a `with` block unless you have a very specific reason not to.
 </Callout>
 
 ## Opening a file
 
-Every snippet on this page runs in your browser — no setup required.
+Every snippet on this page runs in your browser, no setup required.
 
 <CodeBlock
   adapter="python"
@@ -128,10 +128,10 @@ print(contents)
 
 Other reading methods:
 
-- `f.read()` — Reads the **entire file** as one string
-- `f.read(n)` — Reads up to `n` characters
-- `f.readline()` — Reads **one line** (including the trailing `\n`)
-- `f.readlines()` — Returns a **list of all lines** (avoid for huge files)
+- `f.read()`, Reads the **entire file** as one string
+- `f.read(n)`, Reads up to `n` characters
+- `f.readline()`, Reads **one line** (including the trailing `\n`)
+- `f.readlines()`, Returns a **list of all lines** (avoid for huge files)
 
 <CodeBlock
   adapter="python"
@@ -194,7 +194,7 @@ with open("output.txt") as f:
   ]}
 />
 
-`f.write(s)` writes the string `s` and returns the number of characters written. It does **not** add a newline automatically — you must include `\n` yourself.
+`f.write(s)` writes the string `s` and returns the number of characters written. It does **not** add a newline automatically, you must include `\n` yourself.
 
 <CodeBlock
   adapter="python"
@@ -244,15 +244,15 @@ The default encoding is platform-dependent: UTF-8 on macOS/Linux, often CP1252 o
 
 ## The context manager protocol (why 'with' works)
 
-Under the hood, `with open(...) as f:` calls `f.__enter__()` at the start and `f.__exit__(...)` at the end — even if an exception is raised. Compare:
+Under the hood, `with open(...) as f:` calls `f.__enter__()` at the start and `f.__exit__(...)` at the end, even if an exception is raised. Compare:
 
 ```python
-# Manual close (FRAGILE — f.close() never runs if read() raises)
+# Manual close (FRAGILE, f.close() never runs if read() raises)
 f = open("data.txt")
 data = f.read()
 f.close()
 
-# Context manager (ROBUST — f is always closed)
+# Context manager (ROBUST, f is always closed)
 with open("data.txt") as f:
     data = f.read()
 # f is now closed, guaranteed
@@ -321,12 +321,12 @@ print("Parts:", nested.parts)
 
 Other useful `Path` methods:
 
-- `p.exists()` — True if the path exists
-- `p.is_file()`, `p.is_dir()` — Type checks
-- `p.mkdir(parents=True, exist_ok=True)` — Create directories
-- `p.glob("*.txt")` — Find files matching a pattern
-- `p.read_text(encoding="utf-8")` — Read entire file
-- `p.write_text(s, encoding="utf-8")` — Write entire file
+- `p.exists()`, True if the path exists
+- `p.is_file()`, `p.is_dir()`, Type checks
+- `p.mkdir(parents=True, exist_ok=True)`, Create directories
+- `p.glob("*.txt")`, Find files matching a pattern
+- `p.read_text(encoding="utf-8")`, Read entire file
+- `p.write_text(s, encoding="utf-8")`, Write entire file
 
 ## Working with JSON
 
@@ -399,7 +399,7 @@ On Windows, the default text mode translates `\n` to `\r\n`, which doubles the l
 ### Reading a real CSV file
 
 Writing your own three-row CSV is one thing. Most of the time, though, the file
-already exists — someone else exported it, and your job is to read it. The block
+already exists, someone else exported it, and your job is to read it. The block
 below does exactly that with a real dataset: **344 records of Antarctic penguins**
 from the Palmer Station research program in Antarctica. The `datasets` setting
 hands the file to your program as `penguins.csv`, so your code just opens it like
@@ -425,7 +425,7 @@ print("First row:", rows[0]["species"], "on", rows[0]["island"])
   ]}
 />
 
-Notice that every value `csv` hands back is a **string** — even the numeric
+Notice that every value `csv` hands back is a **string**, even the numeric
 columns like `body_mass_g`. That is true of CSV everywhere: a CSV file is just
 text, so converting fields to numbers is your responsibility. Here we read the
 body-mass column, skip the blank cells that real data always contains, and

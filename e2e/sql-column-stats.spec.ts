@@ -51,7 +51,7 @@ function statValue(page: Page, label: string): Locator {
     .locator(".sql-col-stats-value");
 }
 
-// id, amount (10/20/30/NULL), category ('a'×3, 'b'×1) — standard SQL that
+// id, amount (10/20/30/NULL), category ('a'×3, 'b'×1), standard SQL that
 // every engine accepts, with known stats we can assert exactly.
 const SETUP = [
   "CREATE TABLE stest (id INTEGER, amount INTEGER, category TEXT);",

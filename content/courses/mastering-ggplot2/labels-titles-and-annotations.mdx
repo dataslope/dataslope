@@ -1,6 +1,6 @@
 ---
 title: Labels, Titles, and Annotations
-description: Turning a correct chart into a communicative one — labs(), titles, direct annotations, and reference lines that guide the reader's eye.
+description: Turning a correct chart into a communicative one, labs(), titles, direct annotations, and reference lines that guide the reader's eye.
 ---
 
 A chart can be *technically correct* and still fail to communicate. The
@@ -41,7 +41,7 @@ effect.
 
 ## labs(): one place for all the text
 
-`labs()` sets every text label on the plot — axis titles, the legend
+`labs()` sets every text label on the plot, axis titles, the legend
 title, the plot title, subtitle, and caption. Notice that the legend
 title comes from the *aesthetic name*, so you label it by naming the
 aesthetic:
@@ -70,7 +70,7 @@ ggplot(mpg, aes(displ, hwy, color = drv)) +
 
 <Callout type="info" title="Make the title the takeaway, not the topic">
 "Bigger engines are less fuel-efficient" tells the reader the
-*conclusion*. "MPG vs. displacement" only names the axes — information
+*conclusion*. "MPG vs. displacement" only names the axes, information
 the axis labels already provide. A good title states what you want the
 reader to *learn*, turning a chart into an argument.
 </Callout>
@@ -89,7 +89,7 @@ flowchart TD
 
 Legends cost the reader a glance back and forth. Often it is clearer to
 write **directly on the plot** with `annotate()`, which adds a single
-text label or shape at coordinates you choose — *not* tied to the data:
+text label or shape at coordinates you choose, *not* tied to the data:
 
 <CodeBlock
   adapter="r"
@@ -121,7 +121,7 @@ shaded regions, and arrows that explain.
 ## Reference lines guide the eye
 
 Horizontal, vertical, and diagonal reference lines give the reader a
-baseline to compare against — an average, a target, a threshold:
+baseline to compare against, an average, a target, a threshold:
 
 <CodeBlock
   adapter="r"
@@ -144,9 +144,9 @@ ggplot(mpg, aes(displ, hwy)) +
   ]}
 />
 
-- `geom_hline(yintercept = ...)` — horizontal line (a target/average)
-- `geom_vline(xintercept = ...)` — vertical line (a date, a cutoff)
-- `geom_abline(slope =, intercept =)` — any diagonal (e.g. `y = x`)
+- `geom_hline(yintercept = ...)`, horizontal line (a target/average)
+- `geom_vline(xintercept = ...)`, vertical line (a date, a cutoff)
+- `geom_abline(slope =, intercept =)`, any diagonal (e.g. `y = x`)
 
 The dashed line instantly answers "which cars are above average?"
 without the reader doing arithmetic.
@@ -155,7 +155,7 @@ without the reader doing arithmetic.
 
 Step back and see what these tools share: none of them change the
 *analysis*. They change how readily a reader *extracts the message*.
-This is the last mile of the grammar — once the components correctly
+This is the last mile of the grammar, once the components correctly
 encode the data, labels and annotations make the encoding *legible*.
 
 <MultipleChoice
@@ -164,7 +164,7 @@ encode the data, labels and annotations make the encoding *legible*.
 - With a special \`legend.title\` argument.
   > \`legend.title\` is a *theme* element for styling, not for setting the text in \`labs()\`.
 - You cannot change a legend title.
-  > You can — by naming the aesthetic that produced it.
+  > You can, by naming the aesthetic that produced it.
 - [o] By setting the argument named after the aesthetic, e.g. \`labs(color = "Drivetrain")\`.
   > The legend title is the aesthetic's name, so you set it via that aesthetic in \`labs()\`.
 - By editing the data column name only.
@@ -208,12 +208,12 @@ not on information the axes already carry.`}
 
 ## Key takeaways
 
-- `labs()` sets **all** plot text — title, subtitle, caption, axis
+- `labs()` sets **all** plot text, title, subtitle, caption, axis
   titles, and legend titles (named by their aesthetic).
 - Make the **title the takeaway**, not a restatement of the axes.
 - `annotate()` adds **one-off** text or shapes from supplied
   coordinates; `geom_text()` labels **every row**.
 - Reference lines (`geom_hline/vline/abline`) give the reader a
   **baseline** to compare against.
-- This layer changes **legibility, not analysis** — the final mile of
+- This layer changes **legibility, not analysis**, the final mile of
   the grammar.

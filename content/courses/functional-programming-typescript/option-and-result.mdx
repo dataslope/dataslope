@@ -20,16 +20,16 @@ The problem they solve is old and expensive. Tony Hoare, who
 introduced the null reference into ALGOL W in 1965, publicly
 apologized for it in 2009, calling it his "billion-dollar mistake"
 for the decades of crashes and vulnerabilities it enabled. The
-industry's verdict is now in: every major language designed since —
+industry's verdict is now in: every major language designed since,
 Rust's `Option`, Swift's optionals, Kotlin's nullable types, Haskell
-and ML's `Maybe` before them all — replaces the invisible null with
+and ML's `Maybe` before them all, replaces the invisible null with
 a type the compiler can see. That is exactly what we're about to
 build, in about six lines of TypeScript.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two stacks of slabs: on the left a red dot leaps over the whole stack along a dashed arc, on the right the red dot rides inside a green carrier straight through every layer — exceptions bypass your functions while Result passes failure through them as a value"
+  aria-label="Two stacks of slabs: on the left a red dot leaps over the whole stack along a dashed arc, on the right the red dot rides inside a green carrier straight through every layer, exceptions bypass your functions while Result passes failure through them as a value"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -88,7 +88,7 @@ function findUser(id: string): Option<{ name: string }> {
 const r1 = findUser("u1");
 const r2 = findUser("u2");
 
-// You CANNOT just do r1.value — the type doesn't have a .value yet
+// You CANNOT just do r1.value, the type doesn't have a .value yet
 if (r1.kind === "some") console.log("found:", r1.value.name);
 if (r2.kind === "none") console.log("not found");
 `,
@@ -234,8 +234,8 @@ function parseAge(s: string): Result<string, number> {
   ]}
 />
 
-The error type is *generic*. You can use a string, an enum, or —
-best of all — a discriminated union of structured errors:
+The error type is *generic*. You can use a string, an enum, or,
+best of all, a discriminated union of structured errors:
 
 ```ts
 type ParseError =
@@ -245,8 +245,8 @@ type ParseError =
 ```
 
 With an error union like this, the caller can `switch` on the
-failure exhaustively, render a precise message for each case, and —
-because it's all just data — log it, serialize it, or translate it
+failure exhaustively, render a precise message for each case, and,
+because it's all just data, log it, serialize it, or translate it
 at a service boundary. Errors stop being opaque strings and become
 part of your domain model, designed with the same care as the happy
 path. The [Type-Driven Design](./type-driven-design) chapter pushes
@@ -392,7 +392,7 @@ code. From there inward, you work in the type system.
   title="Find a user's manager's email"
   instructions={`In \`lookups.ts\`, implement \`emailOfManagerOf(id)\`
 using \`flatMap\` and \`map\` on \`Option\`. **Do not use \`if\` or
-\`switch\` inside this function** — chain the helpers.
+\`switch\` inside this function**, chain the helpers.
 
 The helpers \`findUser\`, \`managerOf\`, \`emailOf\` are already
 provided.
@@ -508,7 +508,7 @@ export function emailOfManagerOf(id: string): Option<string> {
 - It is faster than \`throw\` at runtime
   > Possibly, but speed isn't the point.
 - It hides errors from the caller
-  > The opposite — it makes errors *unhideable*.
+  > The opposite, it makes errors *unhideable*.
 - [o] The error possibility appears in the function's return type, so the caller is forced by the compiler to handle it
   > With exceptions, a function's failure modes are invisible in its type. With \`Result<E, A>\`, the failure is part of the signature; you literally cannot read \`.value\` without first checking \`.kind\`.
 - It eliminates the need for the \`try\`/\`catch\` keyword

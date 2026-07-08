@@ -1,6 +1,6 @@
 ---
 title: Parameters, Arguments, and Return Values
-description: The contract between a function and its callers — what goes in, what comes out, and the small details that matter.
+description: The contract between a function and its callers, what goes in, what comes out, and the small details that matter.
 ---
 
 A function is a contract: *"if you give me these inputs, I will
@@ -26,7 +26,7 @@ In writing about JavaScript precisely, this distinction is useful.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Three colored balls dropping through slots into a blue machine, which sends a single green square out of its side — arguments in, return value out"
+  aria-label="Three colored balls dropping through slots into a blue machine, which sends a single green square out of its side, arguments in, return value out"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -67,7 +67,7 @@ In writing about JavaScript precisely, this distinction is useful.
 ## Arguments are matched by position
 
 When you call a function, JavaScript binds each argument to the
-parameter in the same position — first to first, second to second.
+parameter in the same position, first to first, second to second.
 
 <CodeBlock
   adapter="javascript"
@@ -79,7 +79,7 @@ parameter in the same position — first to first, second to second.
 }
 
 console.log(divide(10, 2)); // 5
-console.log(divide(2, 10)); // 0.2  — order matters!
+console.log(divide(2, 10)); // 0.2, order matters!
 `,
     },
   ]}
@@ -140,8 +140,8 @@ not pass anything for it (or passes `undefined`).
 
 console.log(greet("Ada")); // "Hello, Ada!"
 console.log(greet("Ada", "Welcome")); // "Welcome, Ada!"
-console.log(greet("Ada", undefined)); // "Hello, Ada!" — undefined triggers the default
-console.log(greet("Ada", null)); // "null, Ada!"  — null does NOT trigger the default
+console.log(greet("Ada", undefined)); // "Hello, Ada!", undefined triggers the default
+console.log(greet("Ada", null)); // "null, Ada!", null does NOT trigger the default
 `,
     },
   ]}
@@ -225,7 +225,7 @@ things to know:
 - `return;` without a value, or no `return` at all, gives the
   caller `undefined`.
 - A function can have many `return` statements.
-- Anywhere in the body — including from inside a loop, an `if`, or
+- Anywhere in the body, including from inside a loop, an `if`, or
   a nested block.
 
 <CodeBlock
@@ -237,7 +237,7 @@ things to know:
   for (const n of numbers) {
     if (n < 0) return n; // exit the function the moment we find one
   }
-  return null; // ran out of numbers — return null
+  return null; // ran out of numbers, return null
 }
 
 console.log(findFirstNegative([1, 2, -3, 4])); // -3
@@ -248,7 +248,7 @@ console.log(findFirstNegative([1, 2, 3, 4])); // null
 />
 
 The early `return` inside the `for` loop is idiomatic. There's no
-need to set a flag and break — `return` does both at once.
+need to set a flag and break, `return` does both at once.
 
 ## Returning more than one value: object destructuring
 
@@ -358,7 +358,7 @@ console.log(typeof f === "function"); // true
 // Functions compare by reference:
 const g = () => 1;
 const h = () => 1;
-console.log(g === h); // false — two different function values, even with same body
+console.log(g === h); // false, two different function values, even with same body
 console.log(g === g); // true
 `,
     },
@@ -478,7 +478,7 @@ if (JSON.stringify(r) !== "[2,5]") throw new Error("expected [2,5], got " + JSON
 - The missing arguments are filled in with \`null\`
   > Missing arguments become \`undefined\`, not \`null\`; these are two distinct values in JavaScript, and confusing them is a common source of subtle bugs.
 - [o] The missing parameters are bound to \`undefined\`; the call still proceeds. (If you want a different default, use \`= defaultValue\` in the parameter list.)
-  > JavaScript is forgiving about argument counts — missing parameters become \`undefined\` and the function runs anyway. This is why default parameter values (\`function f(x = 10)\`) are so useful: they make missing arguments behave the way you actually want.
+  > JavaScript is forgiving about argument counts, missing parameters become \`undefined\` and the function runs anyway. This is why default parameter values (\`function f(x = 10)\`) are so useful: they make missing arguments behave the way you actually want.
 - The first argument is duplicated to fill the slots
   > JavaScript has no argument-duplication behaviour; each missing parameter independently receives \`undefined\`.
 

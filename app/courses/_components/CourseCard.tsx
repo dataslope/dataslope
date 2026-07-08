@@ -4,7 +4,7 @@
  * description, then a difficulty + language meta line aligned on a fixed
  * grid column (so language icons line up across rows).
  *
- * `LangIcon` and `LevelBars` are exported too — the catalog's filter sidebar
+ * `LangIcon` and `LevelBars` are exported too, the catalog's filter sidebar
  * reuses them as row glyphs.
  */
 import type { IconType } from "react-icons";
@@ -20,7 +20,7 @@ import { CourseGlyph } from "./courseArt";
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 const HOVER_BG = "hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.08]";
 
-/** Neutral database glyph for "sql" — the shared language-icon registry only
+/** Neutral database glyph for "sql", the shared language-icon registry only
  *  has per-engine marks (SQLite/PostgreSQL/DuckDB); path from the mockup. */
 function SqlIcon({ size = 16 }: { size?: number }) {
   return (
@@ -87,7 +87,7 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      // Dense index list — don't viewport-prefetch every course row
+      // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
       className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}

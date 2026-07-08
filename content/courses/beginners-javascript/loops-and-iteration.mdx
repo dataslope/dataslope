@@ -1,9 +1,9 @@
 ---
 title: Loops and Iteration
-description: Repeating work without repeating yourself — `while`, `for`, `for...of`, `for...in`, and the higher-level array methods.
+description: Repeating work without repeating yourself, `while`, `for`, `for...of`, `for...in`, and the higher-level array methods.
 ---
 
-The second great power of control flow — after **decisions** — is
+The second great power of control flow, after **decisions**, is
 **repetition**. Almost every interesting program needs to do the
 same kind of thing many times: process every file in a folder,
 every row in a table, every pixel on a screen, every customer in a
@@ -16,7 +16,7 @@ just as importantly, when to use which.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A row of squares being colored in one at a time, a marker over the current square, and a smooth arrow sweeping from the end of the row back to the start — a loop repeating over items"
+  aria-label="A row of squares being colored in one at a time, a marker over the current square, and a smooth arrow sweeping from the end of the row back to the start, a loop repeating over items"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -152,7 +152,7 @@ Same behaviour; just less compactly written.
 
 ## `for...of`: walk every element
 
-When you have an array (or any **iterable** — strings, Sets, Maps,
+When you have an array (or any **iterable**, strings, Sets, Maps,
 etc.) and you want to do something for each element, `for...of` is
 usually the clearest choice. You don't have to manage an index at
 all.
@@ -168,7 +168,7 @@ for (const color of colors) {
   console.log("color:", color);
 }
 
-// Works on strings too — each character is yielded:
+// Works on strings too, each character is yielded:
 for (const ch of "hello") {
   console.log(ch);
 }
@@ -202,7 +202,7 @@ properly in the objects chapter.
 
 ## `for...in`: walk an object's keys
 
-`for...in` walks the **keys** of an object — useful when you want
+`for...in` walks the **keys** of an object, useful when you want
 to look at every named property. It is not appropriate for arrays
 (use `for...of` for those).
 
@@ -245,7 +245,7 @@ let found;
 for (const n of numbers) {
   if (n > 50) {
     found = n;
-    break; // stop immediately — no need to keep looking
+    break; // stop immediately, no need to keep looking
   }
 }
 console.log("first > 50:", found);
@@ -326,18 +326,18 @@ chapter to these, but here is a small taste:
       filename: "main.js",
       starterCode: `const numbers = [1, 2, 3, 4, 5];
 
-// forEach — just run a function for each element
+// forEach, just run a function for each element
 numbers.forEach((n) => console.log("element:", n));
 
-// map — produce a new array of the same length
+// map, produce a new array of the same length
 const squared = numbers.map((n) => n * n);
 console.log("squared:", squared);
 
-// filter — produce a new array with only the elements that pass a test
+// filter, produce a new array with only the elements that pass a test
 const evens = numbers.filter((n) => n % 2 === 0);
 console.log("evens:", evens);
 
-// reduce — collapse the array into a single value
+// reduce, collapse the array into a single value
 const total = numbers.reduce((acc, n) => acc + n, 0);
 console.log("total:", total);
 `,
@@ -381,14 +381,14 @@ for (let row = 1; row <= 5; row++) {
 
 Be mindful of cost: nesting an N-element loop inside another
 N-element loop runs the inner body N×N times. For N=10 that's
-100 — fine. For N=10,000 that's 100,000,000 — possibly too slow.
+100, fine. For N=10,000 that's 100,000,000, possibly too slow.
 
 ## Beware the infinite loop
 
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="A closed ring of blue dots with a single red dot trapped on it — a loop with no way out"
+  aria-label="A closed ring of blue dots with a single red dot trapped on it, a loop with no way out"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.75">
@@ -416,7 +416,7 @@ Always ask: *how does this loop end?* Common mistakes:
 let i = 0;
 while (i < 5) {
   console.log(i);
-  // Oops — forgot i++. This runs forever.
+  // Oops, forgot i++. This runs forever.
 }
 
 // (b) Updating the wrong way
@@ -531,7 +531,7 @@ for (let i = 0; i < expected.length; i++) {
   markdown={`Which loop is the *cleanest* way to do something for every element of an array, when you don't need the index?
 
 - A \`while\` loop with a manual counter
-  > A \`while\` loop with a counter works but requires you to initialise the counter, manage the condition, and increment manually — three things that can each go wrong when all you want is "do this for every element".
+  > A \`while\` loop with a counter works but requires you to initialise the counter, manage the condition, and increment manually, three things that can each go wrong when all you want is "do this for every element".
 - A \`for (let i = 0; i < arr.length; i++)\` loop
   > The index-based \`for\` loop is the right choice when you need the index, but when you only need the elements it forces you to write index arithmetic that doesn't add any meaning.
 - A \`for...in\` loop
@@ -539,5 +539,5 @@ for (let i = 0; i < expected.length; i++) {
 - [o] A \`for...of\` loop: \`for (const item of arr) { ... }\`
   > \`for...of\` walks each element directly, with no index arithmetic to get wrong. Use it whenever you don't need the index. If you do need the index, either fall back to the classic \`for (let i ...)\` loop or use \`arr.entries()\` for destructured \`[index, item]\` pairs.
 
-The other forms work, but \`for...of\` expresses the intent most clearly. (And \`for...in\` is for object keys, not array elements — using it on arrays is a common bug.)`}
+The other forms work, but \`for...of\` expresses the intent most clearly. (And \`for...in\` is for object keys, not array elements, using it on arrays is a common bug.)`}
 />

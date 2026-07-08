@@ -11,7 +11,7 @@ has narrow rules for when it's worth using.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Top row: identical blue circles growing steadily in size; bottom row: equal-sized green marks in different shapes — the size channel above the shape channel"
+  aria-label="Top row: identical blue circles growing steadily in size; bottom row: equal-sized green marks in different shapes, the size channel above the shape channel"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
@@ -51,7 +51,7 @@ We met `size=` in the chapter on bubble charts. The summary:
       initCode: `import pandas as pd
 import plotly.express as px
 
-# Palmer Penguins — the friendly stand-in for the iris dataset.
+# Palmer Penguins, the friendly stand-in for the iris dataset.
 penguins = pd.read_csv("penguins.csv").dropna(
     subset=["bill_depth_mm", "bill_length_mm", "flipper_length_mm"]
 )`,
@@ -73,7 +73,7 @@ fig.show()
 />
 
 The reader instantly sees that *Gentoo* penguins have the largest
-flippers — without needing to read any individual value.
+flippers, without needing to read any individual value.
 
 ### When `size` goes wrong
 
@@ -171,7 +171,7 @@ fig = px.scatter(
     log_x=True,
     size_max=55,
     template="simple_white",
-    title="Gapminder 2007 — 4 encodings (color & symbol redundant)",
+    title="Gapminder 2007, 4 encodings (color & symbol redundant)",
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
@@ -208,10 +208,10 @@ Always start your design by asking *which variable matters most*, and give it po
   > Redundant encoding is a deliberate accessibility technique when the chart must work in grayscale or for colorblind viewers; it is wasteful only when there is no such reason.
 - Always; redundancy is good.
   > Automatically making every encoding redundant wastes a visual channel that could encode an additional variable, and can add clutter without benefit when accessibility is not a concern.
-- [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers** — the shape carries the categorical info even if color fails.
+- [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers**, the shape carries the categorical info even if color fails.
   > Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
 - Only when you have exactly two categories.
-  > The accessibility rationale for redundant encoding — making the chart work without color — applies to any number of categories, not just two.
+  > The accessibility rationale for redundant encoding, making the chart work without color, applies to any number of categories, not just two.
 
 Use redundancy as a tool, not a habit.`}
 />
@@ -228,5 +228,5 @@ Use redundancy as a tool, not a habit.`}
 - 2 only.
   > Two shapes are trivially distinguishable, but the practical limit is higher than two; up to about 6 distinct shapes can be reliably told apart before confusion sets in.
 
-Shape is a *weak* perceptual channel — keep it small or skip it.`}
+Shape is a *weak* perceptual channel, keep it small or skip it.`}
 />

@@ -57,7 +57,7 @@ export function SqlTabBar({
 }: SqlTabBarProps) {
   // Track where the settings (extra) tab sits within the full descriptor
   // list so the user can drag it anywhere among the query tabs.
-  // Infinity means "append at the end" — the natural starting position.
+  // Infinity means "append at the end", the natural starting position.
   const [settingsIdx, setSettingsIdx] = useState<number>(Infinity);
 
   // Reset position to the end whenever the settings tab is removed so
@@ -71,7 +71,7 @@ export function SqlTabBar({
     () => {
       const queryDescriptors = tabs.map<TabDescriptor>((tab) => {
         // ER-diagram, view-data, and query-history tabs are transient
-        // — duplicate and rename don't make sense. SqlTab used to hide
+        //, duplicate and rename don't make sense. SqlTab used to hide
         // these entries selectively; we mirror that via per-descriptor
         // flags here so the wider TabBar contract stays uniform.
         const isViewData = tab.kind === "view-data";
@@ -163,7 +163,7 @@ export function SqlTabBar({
         }
 
         // Project the descriptor order back onto the QueryTab[] model
-        // — the descriptors are derived from `tabs`, so we can recover
+        //, the descriptors are derived from `tabs`, so we can recover
         // the originals via id lookup. Non-QueryTab `extraTabs` are
         // skipped so reordering only affects the persisted tab list.
         const byId = new Map(tabs.map((t) => [t.id, t]));

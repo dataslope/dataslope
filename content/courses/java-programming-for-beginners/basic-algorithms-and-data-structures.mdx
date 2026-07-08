@@ -1,12 +1,12 @@
 ---
 title: Basic Algorithms and Data Structures
-description: The handful of classic patterns every programmer learns to recognize — linear and binary search, simple sorts, and the stack and queue
+description: The handful of classic patterns every programmer learns to recognize, linear and binary search, simple sorts, and the stack and queue
 ---
 
 So far we have used data structures (lists, sets, maps) and
 written ad-hoc loops. This page introduces the **classic algorithms
 and structures** that show up in real software again and again. We
-will not get formal — no Big-O notation lectures — but we *will*
+will not get formal, no Big-O notation lectures, but we *will*
 develop intuition for *which idea to reach for* and *why it works*.
 
 <svg
@@ -85,7 +85,7 @@ what you want, or run out.
 
 Linear search:
 
-- Works on **any** collection — sorted, unsorted, anything iterable.
+- Works on **any** collection, sorted, unsorted, anything iterable.
 - In the worst case, looks at *every* element. Doubling the
   collection roughly doubles the time.
 - Is exactly what `List.contains(...)` and `List.indexOf(...)` do
@@ -105,7 +105,7 @@ Searching for `17` in `[2, 5, 8, 11, 17, 23, 31, 42]`:
 
 1. Middle of the whole list is `11`. `17 > 11`, so search the right half: `[17, 23, 31, 42]`.
 2. Middle is `23`. `17 < 23`, so search the left half: `[17]`.
-3. Middle is `17`. Match — found it.
+3. Middle is `17`. Match, found it.
 
 A list of 1 million elements is fully searched in **20** comparisons
 (2^20 ≈ 1M). A list of 1 billion: about **30** comparisons.
@@ -144,18 +144,18 @@ A list of 1 million elements is fully searched in **20** comparisons
 <IllustrationPrompt subject="Joshua Bloch" photo />
 
 Look closely at the line `int mid = lo + (hi - lo) / 2;`. The
-"obvious" way to take a midpoint is `(lo + hi) / 2` — and that
+"obvious" way to take a midpoint is `(lo + hi) / 2`, and that
 obvious way is a famous bug. In 2006, Joshua Bloch (author of
 *Effective Java*) revealed that the binary search shipped in the
 JDK itself had carried this flaw for nine years: when `lo` and `hi`
 are both large, their *sum* overflows the `int` range, goes
 negative, and the search crashes or misbehaves. His blog post was
-cheekily titled "Extra, Extra — Read All About It: Nearly All Binary
+cheekily titled "Extra, Extra, Read All About It: Nearly All Binary
 Searches and Mergesorts are Broken." The deeper lesson he drew goes
 back to Jon Bentley's *Programming Pearls*, which reported that
 when professional programmers were asked to write a binary search
 from scratch, the large majority produced a buggy one. Binary search
-is three lines of idea and a minefield of off-by-one details — which
+is three lines of idea and a minefield of off-by-one details, which
 is exactly why programmers package such algorithms into libraries
 once, test them hard, and reuse them forever.
 
@@ -204,7 +204,7 @@ public class Main {
 
 Selection sort takes time proportional to the *square* of the list
 length. For 10,000 elements, fine. For 10,000,000 elements, way too
-slow — for that you'd use the JDK's built-in `Arrays.sort`, which
+slow, for that you'd use the JDK's built-in `Arrays.sort`, which
 is `O(n log n)`.
 
 The general rule: **you almost never write a sort in production
@@ -218,7 +218,7 @@ A **data structure** is *how* something is stored. An **abstract
 data type** (ADT) is *what operations it supports*. Two ADTs you
 will meet everywhere:
 
-### Stack — Last In, First Out (LIFO)
+### Stack, Last In, First Out (LIFO)
 
 You push items on top; you pop them off the top.
 
@@ -237,7 +237,7 @@ flowchart TB
 Stacks model call frames (we saw it on the stack-and-heap page!),
 undo history, brace matching in parsers, depth-first search.
 
-### Queue — First In, First Out (FIFO)
+### Queue, First In, First Out (FIFO)
 
 You enqueue items at the back; you dequeue from the front. Like a
 line at a coffee shop.
@@ -250,7 +250,7 @@ flowchart TD
 Queues model task scheduling, message buffers, breadth-first
 search.
 
-Java has classes for both — `Deque` (often used as a stack via
+Java has classes for both, `Deque` (often used as a stack via
 `ArrayDeque`) and `Queue` (often `LinkedList` or `ArrayDeque`):
 
 <CodeBlock
@@ -300,7 +300,7 @@ A working programmer's mental table of first-resort tools:
 | "Process items in last-in-first-out order" | `Deque` as a stack |
 | "Find an item in a sorted list" | binary search |
 | "Sort a list" | `Collections.sort` |
-| "I'll iterate a million times — does \`contains\` need to be fast?" | use a Set, not a List |
+| "I'll iterate a million times, does \`contains\` need to be fast?" | use a Set, not a List |
 
 You will, of course, run into problems that don't fit this table.
 But this table covers an *astonishing* fraction of day-to-day code.
@@ -315,7 +315,7 @@ But this table covers an *astonishing* fraction of day-to-day code.
 - [o] Each step compares the target to the middle element and then *discards an entire half* of the remaining range based on the ordering; without an ordering, you cannot rule out a half
   > Ruling out a half only works if the data is ordered so "too big" and "too small" mean something.
 - Java's binary search throws an exception on unsorted input
-  > Behavior is *undefined*, but it doesn't necessarily throw — it can simply return wrong answers.`}
+  > Behavior is *undefined*, but it doesn't necessarily throw, it can simply return wrong answers.`}
 />
 
 <MultipleChoice
@@ -324,7 +324,7 @@ But this table covers an *astonishing* fraction of day-to-day code.
 - Lost forever
   > It is still there.
 - The next-to-last to come out
-  > No — it's the very next one.
+  > No, it's the very next one.
 - [o] The first one to come out when you pop
   > LIFO means last-in, first-out: the most recent push is on top and pops first.
 - Sorted to the bottom

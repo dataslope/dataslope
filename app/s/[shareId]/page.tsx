@@ -1,9 +1,9 @@
 // Public landing page for a playground share link (/s/<id>).
 //
 // Server-rendered per request (the share row lives in D1 and expiry is
-// enforced at read time — an expired or revoked link 404s here exactly like
+// enforced at read time, an expired or revoked link 404s here exactly like
 // the API). The page shows only the D1 metadata (name, playground, manifest
-// summary) — the bundle payload is fetched from R2 only when the visitor
+// summary), the bundle payload is fetched from R2 only when the visitor
 // clicks "Open a copy".
 //
 // Shares are user content: `robots` is noindex (and /s/ is disallowed in
@@ -78,7 +78,7 @@ export async function generateMetadata({
   if (!share) {
     return { title: "Shared playground", robots: { index: false } };
   }
-  const title = `${share.name} — shared ${share.playgroundLabel} playground`;
+  const title = `${share.name}, shared ${share.playgroundLabel} playground`;
   const description = `Open your own copy of “${share.name}”, a ${share.playgroundLabel} playground shared on DataSlope. Runs entirely in your browser.`;
   return {
     title: { absolute: title },
@@ -196,7 +196,7 @@ export default async function SharePage({
               <ManifestSummary manifest={share.manifest} />
 
               <p className="mt-8 text-sm leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-                DataSlope playgrounds run entirely in your browser — nothing to
+                DataSlope playgrounds run entirely in your browser, nothing to
                 install, no server executing your code. This link holds a
                 snapshot the sharer chose to publish; it may stop working if
                 they revoke it or it expires.

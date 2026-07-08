@@ -1,10 +1,10 @@
 ---
 title: Next Steps
-description: A recap of the mental models you built — and where to take them next.
+description: A recap of the mental models you built, and where to take them next.
 ---
 
 You started this course able to make *a* chart. You are leaving it able to
-choose the *right* chart — and to say what it reveals, what it hides, and
+choose the *right* chart, and to say what it reveals, what it hides, and
 when it would break. That shift, from calling functions to reasoning about
 data, is the whole point. Let's name what you now carry with you, and then
 look at where to go from here.
@@ -12,7 +12,7 @@ look at where to go from here.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three small chart cards step upward — blue scatter dots, green histogram bars, and a yellow box plot — the toolkit assembled and pointing onward"
+  aria-label="Three small chart cards step upward, blue scatter dots, green histogram bars, and a yellow box plot, the toolkit assembled and pointing onward"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -41,7 +41,7 @@ look at where to go from here.
 ## What you can now do
 
 - **Get the data shape right first.** You reach for **tidy/long** data by
-  default — one variable per column, one observation per row — and you know
+  default, one variable per column, one observation per row, and you know
   to `melt` a wide table before fighting with a plot. Most "why won't this
   work?" moments are a shape problem, not a parameter problem.
 - **Interrogate every chart.** You ask the three questions of anything you
@@ -61,8 +61,8 @@ look at where to go from here.
   figure, and the axes-level ones (`scatterplot`, `histplot`, `boxplot`,
   `heatmap`, ...) when you are placing one chart on an Axes you control.
 - **Use aesthetics to communicate, not decorate.** Themes, contexts, and
-  color palettes are tools in service of a message — a diverging palette
-  centered at zero, a message-style title, clear labels — not garnish you
+  color palettes are tools in service of a message, a diverging palette
+  centered at zero, a message-style title, clear labels, not garnish you
   add at the end.
 
 <Callout type="success" title="The one habit that outlasts the syntax">
@@ -78,7 +78,7 @@ it.
 
 ### The seaborn objects interface
 
-Everything in this course used Seaborn's **function interface** —
+Everything in this course used Seaborn's **function interface**,
 `relplot`, `catplot`, and friends. Seaborn also ships a newer, more
 composable **objects interface**, imported as `seaborn.objects`. Instead of
 choosing a function up front, you start a `Plot` describing your data and
@@ -102,7 +102,7 @@ so.Plot(tips, x="total_bill", y="tip").add(so.Dots())
 />
 
 The idea is that `so.Plot(...)` sets up *what* you are plotting and
-`.add(...)` says *how* to draw it — and you can chain more `.add(...)`
+`.add(...)` says *how* to draw it, and you can chain more `.add(...)`
 calls, statistical transforms, and scales to build a figure up piece by
 piece. It is the same statistical thinking you already have, expressed as a
 **grammar of layers** rather than a menu of functions. If you have met
@@ -112,13 +112,13 @@ not, the mental model you built here transfers directly.
 <Callout type="info" title="Same foundations, new grammar">
 The objects interface is worth growing into, not a prerequisite to redo.
 Tidy data, the chart families, and the reveal/hide/break questions all
-apply unchanged — only the way you *spell* a plot becomes more composable.
+apply unchanged, only the way you *spell* a plot becomes more composable.
 </Callout>
 
 The phrase "grammar of graphics" is not marketing. It traces to a real book:
 Leland Wilkinson's 1999 *The Grammar of Graphics*, which argued that the
 sprawl of named chart types ("bar chart", "scatter plot", "pie chart") could
-be replaced by a small set of composable parts — data, a mapping from columns
+be replaced by a small set of composable parts, data, a mapping from columns
 to visual properties, geometric marks, statistical transforms, and scales.
 Hadley Wickham turned that idea into R's **ggplot2**, and Seaborn's objects
 interface brings the same layered grammar to Python. The lineage is worth
@@ -134,12 +134,12 @@ sentence you assemble from grammar, not a template you pick off a shelf.
   available. You touched this whenever you set a title or adjusted spacing.
 - **Statistical modeling for what plots only hint at.** A chart can *suggest*
   a relationship; tools like `statsmodels` or `scikit-learn` let you
-  *quantify* it — fit the regression, test whether a difference is real,
+  *quantify* it, fit the regression, test whether a difference is real,
   estimate uncertainty. Visualization and modeling are partners: plot to
   form the hypothesis, model to test it, plot again to communicate it.
 - **Practice on your own data.** The fastest way to cement all of this is to
   point it at a dataset *you* care about. Load it, run the EDA loop from the
-  capstone — glance, question, chart, notice, repeat — and make one figure
+  capstone, glance, question, chart, notice, repeat, and make one figure
   you would actually show someone.
 
 ## Check your understanding
@@ -158,7 +158,7 @@ should reach for?
   > Function names are just lookup. What matters is matching the chart to the variable types and the question being asked.
 
 Chart choice flows from the variable types you have and the question you are
-asking — the through-line of the entire course.`}
+asking, the through-line of the entire course.`}
 />
 
 <MultipleChoice
@@ -169,7 +169,7 @@ throughout this course?
 - It abandons tidy data, so you no longer need a long-format table.
   > The objects interface expects the same tidy/long input. Tidy data remains the foundation regardless of which interface draws the plot.
 - [o] You start a \`Plot\` describing the data and roles, then compose the figure by adding layers with \`.add(...)\`, rather than picking one function up front.
-  > It expresses a chart as a composable grammar of layers — \`so.Plot(...).add(...)\` — instead of selecting a single ready-made function, while relying on the same statistical thinking.
+  > It expresses a chart as a composable grammar of layers, \`so.Plot(...).add(...)\`, instead of selecting a single ready-made function, while relying on the same statistical thinking.
 - It removes the need to think about what a chart reveals or hides.
   > The interface changes how you *spell* a plot, not the judgment behind it. The reveal/hide/break questions apply just as much.
 - It only works for interactive web dashboards, not static figures.
@@ -182,7 +182,7 @@ unchanged.`}
 
 ## One last challenge
 
-No new concept — just you, a dataset, and a chart of your choosing. Pick any
+No new concept, just you, a dataset, and a chart of your choosing. Pick any
 built-in dataset (`tips`, `mpg`, or `iris` are all good), decide what
 question to ask, and draw the chart that answers it. The only requirement is
 that you assign your plot to `g` so the check can confirm you made
@@ -191,7 +191,7 @@ that you assign your plot to `g` so the check can confirm you made
 <ChallengeCard
   adapter="python"
   title="Make a chart of your choice"
-  instructions={`Load any built-in dataset — \`tips\`, \`mpg\`, or \`iris\` — and
+  instructions={`Load any built-in dataset, \`tips\`, \`mpg\`, or \`iris\`, and
 draw **any chart you like** that tells you something about it. A scatter, a
 histogram, a box plot, a pair plot: your call. The point is to run the loop
 one more time on your own.
@@ -233,6 +233,6 @@ g = sns.relplot(data=df, x="total_bill", y="tip", hue="time", height=4)
 />
 
 That is the loop you will run for the rest of your data life: get the shape
-right, ask what you want to see, draw it, read it honestly, and — when it
-matters — polish it for someone else. You have the foundations now. Go make
+right, ask what you want to see, draw it, read it honestly, and, when it
+matters, polish it for someone else. You have the foundations now. Go make
 pictures that tell the truth about your data.

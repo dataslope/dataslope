@@ -5,12 +5,12 @@ description: Learn the LIFO stack ADT, std::stack, vector-backed stacks, balance
 
 Some problems care only about *the most recent thing*. Which bracket needs closing next? The one opened last. Which page does the browser's back button return to? The one visited last. Which function resumes when the current one returns? The one that called it. Whenever "most recent first" is the rule, the right structure is a stack: **last in, first out**, like a stack of cafeteria plates where you only ever touch the top.
 
-The idea is old enough to predate most of computing's vocabulary. Alan Turing described subroutine calls in his 1945 ACE report using operations he called "bury" and "unbury." In the 1950s, the German computer scientists Friedrich Bauer and Klaus Samelson worked out the same principle for evaluating expressions and named it the *Keller* — the "cellar," because values are dropped in and the last one dropped is the first one fetched. Bauer later received the IEEE Computer Pioneer Award for the stack principle. Today the stack is so central that the dedicated memory region for function calls is simply called *the stack*, and the most famous programming Q&A site on the internet is named after what happens when it fills up.
+The idea is old enough to predate most of computing's vocabulary. Alan Turing described subroutine calls in his 1945 ACE report using operations he called "bury" and "unbury." In the 1950s, the German computer scientists Friedrich Bauer and Klaus Samelson worked out the same principle for evaluating expressions and named it the *Keller*, the "cellar," because values are dropped in and the last one dropped is the first one fetched. Bauer later received the IEEE Computer Pioneer Award for the stack principle. Today the stack is so central that the dedicated memory region for function calls is simply called *the stack*, and the most famous programming Q&A site on the internet is named after what happens when it fills up.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Plates drop down a translucent vertical tube and settle in a stack, with a thin blue push arrow pointing into the opening and a thin blue pop arrow pointing back out of it — last in, first out"
+  aria-label="Plates drop down a translucent vertical tube and settle in a stack, with a thin blue push arrow pointing into the opening and a thin blue pop arrow pointing back out of it, last in, first out"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="280" y="36" width="80" height="180" rx="16" fill="currentColor" opacity="0.08" />
@@ -126,7 +126,7 @@ For `std::stack` backed by `std::deque`, `push`, `pop`, `top`, and `empty` are O
 
 ## Balanced parentheses
 
-Here is the stack's signature party trick, and the warm-up question of a thousand interviews: is `{[()]}` balanced? The insight is that a closing bracket must match the *most recently opened, not yet closed* bracket — exactly the item a stack keeps on top. So: push every opener; on every closer, check that the top is its partner and pop it. If a closer arrives with the wrong opener on top (or no opener at all), the string is unbalanced. If anything is left on the stack at the end, some opener was never closed.
+Here is the stack's signature party trick, and the warm-up question of a thousand interviews: is `{[()]}` balanced? The insight is that a closing bracket must match the *most recently opened, not yet closed* bracket, exactly the item a stack keeps on top. So: push every opener; on every closer, check that the top is its partner and pop it. If a closer arrives with the wrong opener on top (or no opener at all), the string is unbalanced. If anything is left on the stack at the end, some opener was never closed.
 
 ```mermaid
 flowchart TD
@@ -209,7 +209,7 @@ This same algorithm, scaled up, is how your compiler checks that every `{` in yo
 
 ## Function call stack
 
-Every function call needs a place to remember local variables and where to return — and calls finish in reverse order of starting, which is LIFO by definition. So the machine keeps a stack of *frames*, pushing one per call and popping it on return. This is Turing's "bury and unbury" and Bauer's cellar, built into every CPU you own.
+Every function call needs a place to remember local variables and where to return, and calls finish in reverse order of starting, which is LIFO by definition. So the machine keeps a stack of *frames*, pushing one per call and popping it on return. This is Turing's "bury and unbury" and Bauer's cellar, built into every CPU you own.
 
 ```mermaid
 sequenceDiagram
@@ -247,11 +247,11 @@ int main() {
   ]}
 />
 
-When `factorial(5)` runs, five frames pile up before the first multiplication happens — which is why a recursion that never reaches its base case ends in a *stack overflow*. The recursion page returns to this in depth.
+When `factorial(5)` runs, five frames pile up before the first multiplication happens, which is why a recursion that never reaches its base case ends in a *stack overflow*. The recursion page returns to this in depth.
 
 ## Expression evaluation
 
-Bauer and Samelson's original cellar was built to evaluate arithmetic, and the cleanest descendant of that idea is *postfix* notation, where operators follow their operands: `23+4*` means `(2+3)*4`. Postfix needs no parentheses and no precedence rules — you just scan left to right, push numbers, and when an operator appears, pop two values, apply it, and push the result. Watch the stack do all the bookkeeping:
+Bauer and Samelson's original cellar was built to evaluate arithmetic, and the cleanest descendant of that idea is *postfix* notation, where operators follow their operands: `23+4*` means `(2+3)*4`. Postfix needs no parentheses and no precedence rules, you just scan left to right, push numbers, and when an operator appears, pop two values, apply it, and push the result. Watch the stack do all the bookkeeping:
 
 <CodeBlock
   adapter="cpp"

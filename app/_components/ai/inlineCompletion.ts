@@ -1,18 +1,18 @@
 "use client";
 
-// AI inline completion ("ghost text") for CodeMirror v6 — the editor-side
+// AI inline completion ("ghost text") for CodeMirror v6, the editor-side
 // half of app/api/ai/complete. Appended to the extension list of every
 // language-runtime editor (CodeBlock, ChallengeCard, Playground).
 //
 // Behaviour: after a short typing pause a fill-in-the-middle suggestion is
 // fetched and rendered as dimmed ghost text at the cursor. Tab accepts it,
 // Escape dismisses it, and typing "through" the suggestion consumes it
-// character by character. Everything is best-effort — a slow or failed fetch
+// character by character. Everything is best-effort, a slow or failed fetch
 // simply shows nothing.
 //
 // Gating: the feature is pro-only. The extension asks `GET /api/ai/complete`
 // once whether this visitor may use completions and stays inert when not
-// (guests, free members, unconfigured provider) — and the server enforces the
+// (guests, free members, unconfigured provider), and the server enforces the
 // same rule on every POST regardless, so the probe is purely to avoid firing
 // doomed requests. The probe result is cached module-wide: "enabled" for the
 // page's lifetime, "disabled" with a short TTL so signing in without a full
@@ -41,7 +41,7 @@ const DEBOUNCE_MS = 600;
 const FAILURE_COOLDOWN_MS = 60_000;
 /** Re-probe interval while access is denied (covers signing in mid-page). */
 const DENIED_PROBE_TTL_MS = 5 * 60_000;
-/** Client-side context caps — generous; the server re-trims to its budgets. */
+/** Client-side context caps, generous; the server re-trims to its budgets. */
 const PREFIX_CHAR_CAP = 8_000;
 const SUFFIX_CHAR_CAP = 4_000;
 
@@ -110,7 +110,7 @@ class GhostTextWidget extends WidgetType {
   override toDOM(): HTMLElement {
     const span = document.createElement("span");
     span.className = "cm-aiGhostText";
-    // Purely visual preview — keep it out of the accessibility tree so
+    // Purely visual preview, keep it out of the accessibility tree so
     // screen readers don't announce unaccepted code.
     span.setAttribute("aria-hidden", "true");
     span.textContent = this.text;
@@ -184,7 +184,7 @@ const ghostTheme = EditorView.baseTheme({
 // ─── Accept / dismiss keys ────────────────────────────────────────────────
 //
 // Highest precedence so Tab wins over indentWithTab and Escape wins over
-// panel/tooltip handlers — but only while a suggestion is showing; both
+// panel/tooltip handlers, but only while a suggestion is showing; both
 // return false otherwise so the regular bindings still fire.
 
 const suggestionKeymap = Prec.highest(
@@ -244,7 +244,7 @@ function fetchPlugin(config: InlineCompletionConfig) {
           if (userTyped && !update.state.field(suggestionField)) {
             this.schedule();
           } else if (!userTyped) {
-            // Programmatic doc replacement (tab switch, reset) — stand down.
+            // Programmatic doc replacement (tab switch, reset), stand down.
             this.cancelPending();
           }
         } else if (update.selectionSet) {
@@ -253,7 +253,7 @@ function fetchPlugin(config: InlineCompletionConfig) {
         if (update.focusChanged && !update.view.hasFocus) {
           this.cancelPending();
           if (update.state.field(suggestionField)) {
-            // Can't dispatch from inside update() — defer the clear.
+            // Can't dispatch from inside update(), defer the clear.
             setTimeout(() => {
               if (this.destroyed) return;
               if (this.view.state.field(suggestionField, false)) {
@@ -351,7 +351,7 @@ function fetchPlugin(config: InlineCompletionConfig) {
           });
           if (!res.ok) {
             if (res.status === 401 || res.status === 403 || res.status === 429) {
-              // Not (or no longer) entitled today — stop asking this page load.
+              // Not (or no longer) entitled today, stop asking this page load.
               hardDisabled = true;
             } else {
               cooldownUntil = Date.now() + FAILURE_COOLDOWN_MS;
@@ -379,7 +379,7 @@ function fetchPlugin(config: InlineCompletionConfig) {
 
 /**
  * AI inline completion extension for one editor. Append to the editor's
- * extension list unconditionally — it gates itself (pro members only) and is
+ * extension list unconditionally, it gates itself (pro members only) and is
  * inert for everyone else.
  */
 export function aiInlineCompletion(config: InlineCompletionConfig): Extension {

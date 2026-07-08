@@ -1,11 +1,11 @@
-/* Runtime boot notice — the first-execution loading affordance shared by
+/* Runtime boot notice, the first-execution loading affordance shared by
    <CodeBlock> and <ChallengeCard> (and showcased on
    /learn/runtime-loading-states).
 
    Self-contained theming: the notice maps a small token subset to the
    global --ds-* brand ramp (app/brand.css, available at :root) with a
    :global(html.dark) override, so it renders correctly both embedded in
-   a code block / challenge card AND standalone on a gallery page —
+   a code block / challenge card AND standalone on a gallery page,
    without depending on the surrounding code-block or challenge-card
    token scopes. */
 

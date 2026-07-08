@@ -1,6 +1,6 @@
 ---
 title: Expressions and Aliases
-description: Computing new values inside a query — arithmetic, text, and functions — and naming the results so your output reads clearly.
+description: Computing new values inside a query, arithmetic, text, and functions, and naming the results so your output reads clearly.
 ---
 
 A query does not just hand back stored values; it can **compute new
@@ -12,7 +12,7 @@ name.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two value dots feed along thin lines into a blue machine marked with a multiplication cross, and the computed result comes out wearing a green name tag — an expression with an alias"
+  aria-label="Two value dots feed along thin lines into a blue machine marked with a multiplication cross, and the computed result comes out wearing a green name tag, an expression with an alias"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -56,7 +56,7 @@ name.
 ## Calculated columns
 
 Anywhere you can name a column, you can instead write an
-**expression** — a small calculation. The database evaluates it for
+**expression**, a small calculation. The database evaluates it for
 each row:
 
 <SqlCodeBlock
@@ -81,13 +81,13 @@ FROM
   sales;`}
 />
 
-`price * qty` is not stored anywhere — it is computed fresh for each
+`price * qty` is not stored anywhere, it is computed fresh for each
 row and returned as a new column named `line_total`. This is how
 queries turn raw data into answers.
 
 ## Aliases make output readable
 
-That `AS line_total` is an **alias** — a name you give a result
+That `AS line_total` is an **alias**, a name you give a result
 column. Without it, a computed column gets an ugly auto-name like
 `?column?`. Aliases are not decoration; they make results
 self-explanatory and let later parts of bigger queries refer to the
@@ -99,7 +99,7 @@ flowchart TD
 ```
 
 <Callout type="info" title="The word AS is optional, but be kind">
-PostgreSQL lets you write the alias without `AS` —
+PostgreSQL lets you write the alias without `AS`,
 `price * qty line_total` works. Including `AS` is clearer for
 readers, so this course always writes it. (One caution: alias names
 with spaces or capitals need double quotes, e.g.
@@ -163,7 +163,7 @@ FROM
 />
 
 Here one expression multiplies price by quantity, adds 8% tax, and
-`ROUND(..., 2)` trims it to two decimal places — a realistic little
+`ROUND(..., 2)` trims it to two decimal places, a realistic little
 calculation, expressed in a single readable line.
 
 ## Expressions work in WHERE and ORDER BY too
@@ -191,7 +191,7 @@ ORDER BY
 />
 
 The database computes `price * qty` to decide which rows pass the
-filter and how to sort them — even though you wrote that expression
+filter and how to sort them, even though you wrote that expression
 in three different clauses.
 
 ## Check your understanding
@@ -201,7 +201,7 @@ in three different clauses.
 
 - It is permanently saved as a new column in the table.
   > Computed columns are not written back to the table; they exist only in the query's result.
-- [o] Nowhere permanently — it is computed for each row and returned only in the result.
+- [o] Nowhere permanently, it is computed for each row and returned only in the result.
   > Expressions are evaluated on the fly per row, producing values that appear in the result but do not change storage.
 - In a separate table created automatically.
   > No new table is created; the value lives only in the returned result set.

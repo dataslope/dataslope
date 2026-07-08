@@ -10,7 +10,7 @@ not quite a pointer, but it *becomes* one almost any time you use it.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Six array cells measured by a teal bracket that spans their full length; past a gray function boundary the same cells reappear in gray, and only a bare blue arrow marks the first one — the length is lost when an array decays to a pointer"
+  aria-label="Six array cells measured by a teal bracket that spans their full length; past a gray function boundary the same cells reappear in gray, and only a bare blue arrow marks the first one, the length is lost when an array decays to a pointer"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-teal-500)" }}>
@@ -92,7 +92,7 @@ flowchart TD
 ## `a[i]` *is* `*(a + i)`
 
 Indexing in C is sugar for pointer arithmetic. The expression `a[i]`
-is defined as `*(a + i)`. The `+ i` part is *typed* — it advances by
+is defined as `*(a + i)`. The `+ i` part is *typed*, it advances by
 `i * sizeof(*a)` bytes, not by `i` bytes.
 
 <CodeBlock
@@ -116,11 +116,11 @@ int main(void) {
 />
 
 Yes, `2[a]` is valid C: by definition `i[a] == *(i + a) == *(a + i)
-== a[i]`. Do not write that in real code — but knowing it explains
+== a[i]`. Do not write that in real code, but knowing it explains
 *why* arrays and pointers feel so interchangeable.
 
 It also explains a question every beginner asks: why does indexing
-start at 0 instead of 1? Because the index is not a position — it is
+start at 0 instead of 1? Because the index is not a position, it is
 an **offset**. `a[0]` means "zero elements past the start," which is
 the start itself. Edsger Dijkstra wrote a famously opinionated 1982
 note, *"Why numbering should start at zero"* (EWD831), defending the
@@ -165,7 +165,7 @@ almost always also take a length parameter.
 
 <Callout type="warn" title="Always pass the length">
 There is no portable, automatic way to ask a `T *` "how many elements
-do you point at?" — you have to track it yourself. This is the
+do you point at?", you have to track it yourself. This is the
 single most important convention to internalize in C.
 </Callout>
 
@@ -247,7 +247,7 @@ int main(void) {
 />
 
 The idiom `sizeof(array) / sizeof(array[0])` works *only* where the
-array's type is in scope — that is, where it has *not* yet decayed.
+array's type is in scope, that is, where it has *not* yet decayed.
 Hence we compute `n` in `main` and pass it down, never inside `sum`.
 
 ## 2D arrays vs arrays of pointers
@@ -262,7 +262,7 @@ int *rows[3];             // 3 pointers, each pointing at its own row
 
 The first is one allocation of `3 * 4 * sizeof(int) = 48` bytes laid
 out in row-major order. The second is three separate allocations
-(plus an array of three pointers) — flexible but with poorer cache
+(plus an array of three pointers), flexible but with poorer cache
 behavior.
 
 <CodeBlock
@@ -300,7 +300,7 @@ and is cache-friendly.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A green thread visits a three-by-four grid row by row, and the same order lays the tiles out as one flat twelve-cell strip below — the yellow cell at row one, column two lands at flat offset six, row-major order"
+  aria-label="A green thread visits a three-by-four grid row by row, and the same order lays the tiles out as one flat twelve-cell strip below, the yellow cell at row one, column two lands at flat offset six, row-major order"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.16">
@@ -363,17 +363,17 @@ and is cache-friendly.
   </g>
 </svg>
 
-## Bounds checking — there isn't any
+## Bounds checking, there isn't any
 
 C arrays do not check bounds. Writing `a[100]` for a 10-element array
-will quietly stomp on whatever memory follows the array — a heap
+will quietly stomp on whatever memory follows the array, a heap
 metadata structure, another variable, the return address on the
 stack. That is *the* C bug.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Four blue array cells end at a gray fence post, but a tilted red block has slammed down one slot past the end, half covering the green value that lives in the neighbouring memory — an out-of-bounds write"
+  aria-label="Four blue array cells end at a gray fence post, but a tilted red block has slammed down one slot past the end, half covering the green value that lives in the neighbouring memory, an out-of-bounds write"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -410,7 +410,7 @@ int main(void) {
   int *p = a;
 
   printf("Before: sentinel = %d\\n", sentinel);
-  // Deliberate out-of-bounds write — undefined behavior!
+  // Deliberate out-of-bounds write, undefined behavior!
   // The result depends entirely on what the compiler chose to place after \`a\`.
   p[3] = 42;
   printf("After:  sentinel = %d\\n", sentinel);
@@ -555,7 +555,7 @@ int main(void) {
   markdown={`Inside \`void f(int a[], size_t n)\`, what does \`sizeof(a)\` give you?
 
 - The total number of bytes in the original array.
-  > That information is lost on the way in — the array has decayed.
+  > That information is lost on the way in, the array has decayed.
 - [o] The size of a pointer (because \`a\` has decayed to \`int *\`).
   > This is why you must pass the length as a separate parameter.
 - The number of elements in the array.
@@ -570,7 +570,7 @@ int main(void) {
 - 3 bytes
   > Pointer subtraction is measured in *elements*, not bytes.
 - \`3 * sizeof(int)\`
-  > Same — that would be the byte distance, not the element count.
+  > Same, that would be the byte distance, not the element count.
 - [o] 3 elements
   > \`p\` points three ints past the start of \`a\`.
 - Undefined behavior
@@ -586,6 +586,6 @@ int main(void) {
   > There is no such exception in C; that is a Java behavior.
 - The write silently fails and leaves memory unchanged.
   > The write goes through; what it stomps on depends on the layout.
-- [o] It is undefined behavior — it may crash, may overwrite unrelated data, or may appear to work.
+- [o] It is undefined behavior, it may crash, may overwrite unrelated data, or may appear to work.
   > Out-of-bounds memory access is one of the most dangerous C bugs.`}
 />

@@ -1,11 +1,11 @@
 ---
 title: Data Modeling with Collections
-description: Picking the right shape — list, set, map, map-of-list, map-of-set — for real-world domains
+description: Picking the right shape, list, set, map, map-of-list, map-of-set, for real-world domains
 ---
 
 Most code, in the end, is some collection nested inside some other
 collection. The shape you choose is a modeling decision, not a
-performance one — pick wrongly and your code will be full of awkward
+performance one, pick wrongly and your code will be full of awkward
 loops and edge cases; pick well and most queries become one method
 call.
 
@@ -14,7 +14,7 @@ This chapter is about the **shape** of your data.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A data card models two blue keys, each indenting into its own child chips; a thin gray arrow from outside lands directly on one green chip ringed in yellow — the right nesting makes the lookup a single call"
+  aria-label="A data card models two blue keys, each indenting into its own child chips; a thin gray arrow from outside lands directly on one green chip ringed in yellow, the right nesting makes the lookup a single call"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="170" y="28" width="300" height="180" rx="14" fill="currentColor" opacity="0.05" />
@@ -92,8 +92,8 @@ class Library {
 ```
 
 This works, but every query is `O(n)`, every "is this duplicate?"
-check is hand-written, and the *intent* — "lookup by artist", "set
-of unique genres" — is hidden inside loop bodies.
+check is hand-written, and the *intent*, "lookup by artist", "set
+of unique genres", is hidden inside loop bodies.
 
 ### Second pass: shape per query
 
@@ -194,7 +194,7 @@ to query it**.
 Most "real" data is graph-shaped. You'll mainly model two flavors of
 relationship with collections:
 
-### 1:N — one parent, many children
+### 1:N, one parent, many children
 
 `Map<ParentKey, List<Child>>` (ordered) or
 `Map<ParentKey, Set<Child>>` (unique).
@@ -205,7 +205,7 @@ Example: orders per customer.
 Map<CustomerId, List<Order>> ordersByCustomer = new HashMap<>();
 ```
 
-### N:M — many on both sides
+### N:M, many on both sides
 
 Two complementary maps form a bidirectional index:
 
@@ -222,7 +222,7 @@ become `O(1)`.
 ## Typed value objects beat strings
 
 A subtle but huge win: don't let your maps and lists be keyed by
-loose primitives. `Map<String, Order>` is fine — until you also have
+loose primitives. `Map<String, Order>` is fine, until you also have
 `Map<String, Customer>` and accidentally pass a customer's email
 where an order id was expected.
 
@@ -258,7 +258,7 @@ public class Main {
   ]}
 />
 
-This is *type-driven data modeling* — letting the type system carry
+This is *type-driven data modeling*, letting the type system carry
 information that comments and convention used to carry.
 
 ## Practice

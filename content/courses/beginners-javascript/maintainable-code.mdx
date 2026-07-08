@@ -4,7 +4,7 @@ description: Naming, structure, comments, and the habits that make code a pleasu
 ---
 
 Code is read far more often than it's written. The code you write
-today, your future self — and your teammates — will read for
+today, your future self, and your teammates, will read for
 years. *Maintainable code* is code that's easy to understand,
 modify, and trust without re-deriving how it works.
 
@@ -151,8 +151,8 @@ nameable, and reusable. That's almost always the right trade.
 
 ## Avoid deep nesting with early returns
 
-Pyramids of `if`s are exhausting to read. **Early returns** —
-also called *guard clauses* — flatten the code.
+Pyramids of `if`s are exhausting to read. **Early returns**,
+also called *guard clauses*, flatten the code.
 
 <CodeBlock
   adapter="javascript"
@@ -247,7 +247,7 @@ invaluable in three situations:
 1. **Why, not what.** "We retry up to 3 times because the upstream
    API flakes ~5% of calls." The code shows *what* happens; the
    comment explains *why*.
-2. **Warnings to future readers.** "Don't add `await` here — it
+2. **Warnings to future readers.** "Don't add `await` here, it
    would cause a deadlock with the lock above."
 3. **Public API documentation.** A function exposed to other
    modules deserves a short description of its purpose, inputs,
@@ -264,20 +264,20 @@ for (const user of users) { ... }
 ```
 
 If the code says it, the comment is noise. Worse, comments
-*lie* — when the code changes, comments rot.
+*lie*, when the code changes, comments rot.
 
 ## Consistent style
 
 Most teams adopt a style guide and a formatter (Prettier, ESLint)
 that applies it automatically. The specific rules matter less than
-the *consistency* — a lesson the industry learned the expensive
+the *consistency*, a lesson the industry learned the expensive
 way. Programmers have burned astonishing amounts of energy on
 style wars, none more famous than **tabs versus spaces**: a
 decades-long holy war over which invisible character should indent
 code. It escalated to the point that when Stack Overflow ran its
 2017 Developer Survey, an analyst noticed that developers who
 indent with spaces reported notably *higher salaries* than
-tab-indenters — a correlation, of course, not a cause, but it says
+tab-indenters, a correlation, of course, not a cause, but it says
 something that anyone checked. The grown-up resolution is the one
 modern teams use: pick either, configure the formatter, and never
 discuss it again. Two strong personal habits the formatter can't
@@ -334,12 +334,12 @@ console.log(typeof fetchData, typeof loadUser, typeof loadUserClean);
 
 Two principles:
 
-- If you catch an error, *do something* with it — log, wrap,
+- If you catch an error, *do something* with it, log, wrap,
   recover. Don't silently discard.
 - Add *context* when re-throwing: which operation? which inputs?
   Future-you will thank present-you.
 
-## Don't comment out code — delete it
+## Don't comment out code, delete it
 
 Modern version control (Git) keeps your old code safe. Leaving
 big blocks of commented-out code makes files harder to read and
@@ -434,7 +434,7 @@ console.log(doStuff(data, "a"));
   ]}
 />
 
-After — same behaviour, far clearer:
+After, same behaviour, far clearer:
 
 <CodeBlock
   adapter="javascript"
@@ -569,7 +569,7 @@ console.log(enrollStudent(null));
   markdown={`Which of these is the strongest sign that a function is doing too much?
 
 - It is more than 10 lines long
-  > Line count is a noisy heuristic; a ten-line function can be perfectly cohesive, and a five-line function can be doing three unrelated things — the true signal is whether the function has a single, clear purpose.
+  > Line count is a noisy heuristic; a ten-line function can be perfectly cohesive, and a five-line function can be doing three unrelated things, the true signal is whether the function has a single, clear purpose.
 - It uses both \`if\` and \`for\`
   > Using multiple control flow constructs is completely normal and says nothing about whether a function is doing too much; many single-purpose functions naturally contain both conditions and loops.
 - [o] You can't describe its purpose in a single short sentence without using the word "and"

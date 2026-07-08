@@ -1,6 +1,6 @@
 /**
  * Renders an optimized raster image (Recraft topic art, a photo, a diagram, a
- * screenshot — anything under `assets/images/`) inside a lesson or landing page:
+ * screenshot, anything under `assets/images/`) inside a lesson or landing page:
  *
  * ```mdx
  * <Figure slug="panda" alt="A giant panda, mascot for the pandas library" priority />
@@ -18,7 +18,7 @@
  * illustrations.
  *
  * A slug with no generated image (its source hasn't been added yet) renders a
- * small "pending" hint while developing and nothing at all in production — so a
+ * small "pending" hint while developing and nothing at all in production, so a
  * placement can be authored before its artwork exists without shipping a broken
  * or placeholder box to learners.
  */
@@ -39,7 +39,7 @@ const MIME: Record<string, string> = {
 };
 
 interface FigureProps {
-  /** Image slug — the source filename without extension (e.g. "panda"). */
+  /** Image slug, the source filename without extension (e.g. "panda"). */
   slug: string;
   /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;
@@ -76,7 +76,7 @@ export function Figure({
       >
         <ImageIcon className={styles.pendingIcon} aria-hidden="true" />
         <span>
-          Image <code>{slug}</code> pending — add a raster source named{" "}
+          Image <code>{slug}</code> pending, add a raster source named{" "}
           <code>{slug}</code> under <code>assets/images/</code> and run{" "}
           <code>npm run build:images</code>.
         </span>

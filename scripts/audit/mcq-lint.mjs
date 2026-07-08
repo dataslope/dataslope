@@ -80,7 +80,7 @@ for (const file of files) {
     // duplicate choice texts (normalized)
     const seen = new Map();
     for (const c of choices) {
-      // Case-SENSITIVE exact compare — `Number` vs `number` is a real,
+      // Case-SENSITIVE exact compare, `Number` vs `number` is a real,
       // intentional distinction in some questions. Skip fence-only keys.
       const key = c.text.replace(/\s+/g, " ").trim();
       if (!key || /^(`{3,}|~{3,})/.test(key)) continue;

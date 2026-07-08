@@ -7,7 +7,7 @@ Functions are the atoms of computation. In JavaScript, they're
 wonderfully flexible: parameters can have any type, return values can
 vary, functions are first-class values passed around like data.
 TypeScript brings **structure** to this flexibility by letting you
-declare the *signature* of a function — what types it accepts, what type
+declare the *signature* of a function, what types it accepts, what type
 it returns, whether parameters are optional or have defaults. The
 compiler then enforces these signatures at every call site, turning
 argument mismatches into compile-time errors, not runtime surprises.
@@ -19,7 +19,7 @@ default parameters**, **rest parameters**, **function type expressions**,
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue function bar has one shaped notch per parameter — round and square — with the matching yellow circle and green square hovering ready to drop in, while a red triangle finds no notch at all; a green result pill exits on the right — a signature enforced at the call site"
+  aria-label="A blue function bar has one shaped notch per parameter, round and square, with the matching yellow circle and green square hovering ready to drop in, while a red triangle finds no notch at all; a green result pill exits on the right, a signature enforced at the call site"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -81,7 +81,7 @@ a `number`. If you call `add("10", 20)`, the compiler halts compilation.
 The type annotation acts as a contract between the function and its
 callers.
 
-You can also omit the return type annotation — TypeScript infers it from
+You can also omit the return type annotation, TypeScript infers it from
 the `return` statements:
 
 <CodeBlock
@@ -105,7 +105,7 @@ they prevent accidental changes to the inferred type.
 
 ## Optional parameters
 
-A parameter marked with `?` is **optional** — callers can omit it:
+A parameter marked with `?` is **optional**, callers can omit it:
 
 <CodeBlock
   adapter="typescript"
@@ -128,7 +128,7 @@ console.log(greet("Bob", "Hi"));
 
 Inside the function, `greeting` has type `string | undefined`, so you
 must handle both cases. This forces you to think about the "parameter not
-provided" scenario — no more `undefined is not a function` errors at
+provided" scenario, no more `undefined is not a function` errors at
 runtime.
 
 ## Default parameters
@@ -189,7 +189,7 @@ you can iterate, map, reduce, etc.
 ## Function type expressions
 
 So far, we've annotated function *declarations*. But functions are
-first-class values in JavaScript — you can assign them to variables, pass
+first-class values in JavaScript, you can assign them to variables, pass
 them as arguments, return them from other functions. To annotate a
 *function value*, you use a **function type expression**:
 
@@ -210,7 +210,7 @@ console.log("multiply(3, 4):", multiply(3, 4));
   ]}
 />
 
-The syntax `(a: number, b: number) => number` is a **function type** — it
+The syntax `(a: number, b: number) => number` is a **function type**, it
 describes the shape of a function. You can use it anywhere you'd use a
 type: in `type` aliases, in parameter positions, in return positions.
 
@@ -236,7 +236,7 @@ console.log("applyTwice(square, 3):", applyTwice(square, 3)); // 3² = 9, 9² = 
 />
 
 **What bugs does this prevent?** If you pass a function with the wrong
-signature — say, `(x: string) => string` — the compiler rejects it. The
+signature, say, `(x: string) => string`, the compiler rejects it. The
 type annotation on `fn` acts as a compile-time guarantee.
 
 ## Call signatures in interfaces
@@ -279,7 +279,7 @@ properties (e.g., a function with a `.version` property).
 }
 
 // Object.assign merges the function with the extra property in one
-// step, so the compiler can verify the combined shape — no casts.
+// step, so the compiler can verify the combined shape, no casts.
 const increment: CallableWithVersion = Object.assign(
   (x: number) => x + 1,
   { version: "1.0.0" },
@@ -360,7 +360,7 @@ return `T | undefined` to signal absence).
 
 ## Function overloads
 
-TypeScript supports **function overloads** — multiple signatures for the
+TypeScript supports **function overloads**, multiple signatures for the
 same function. This is useful when a function has several distinct call
 patterns:
 
@@ -395,7 +395,7 @@ Callers see only the overloads; the implementation is hidden.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two solid faceplates with different openings both feed one faint capsule holding a circle and a square, which emits a single green result — overload signatures are the public faces of one hidden implementation"
+  aria-label="Two solid faceplates with different openings both feed one faint capsule holding a circle and a square, which emits a single green result, overload signatures are the public faces of one hidden implementation"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -430,7 +430,7 @@ Callers see only the overloads; the implementation is hidden.
 
 **When to use overloads:** When a function has *distinct* parameter
 patterns that can't be expressed with a single union type. Overloads make
-the types more precise at call sites. But if a union works, prefer it —
+the types more precise at call sites. But if a union works, prefer it,
 overloads add complexity.
 
 ## Contextual typing of callbacks
@@ -460,7 +460,7 @@ console.log("asStrings:", asStrings);
 You didn't annotate `n` with `: number`, but TypeScript knows `n` is a
 `number` because `numbers.map` expects a callback of type `(value:
 number, index: number, array: number[]) => U`. This is one of
-TypeScript's most powerful inference features — callbacks "just work"
+TypeScript's most powerful inference features, callbacks "just work"
 without manual annotations.
 
 ## Practice: multi-file function composition
@@ -578,7 +578,7 @@ fetchUser(123, { timeout: 5000 }).then((data) => console.log(data));
 The signature tells you everything: `id` is a `number`, `options` is a
 `FetchOptions` object (with optional `timeout` and `retries`), and the
 function returns a `Promise<string>`. The compiler enforces this
-documentation — if you pass a string `id`, it's a compile error. **Typed
+documentation, if you pass a string `id`, it's a compile error. **Typed
 signatures are machine-checked documentation.**
 
 ## Check your understanding
@@ -628,5 +628,5 @@ callback parameter types automatically.
 
 In the next chapter, [Unions and
 Intersections](./unions-and-intersections), we'll see how to combine
-types — "this type *or* that type" (unions) and "this type *and* that
-type" (intersections) — to model complex APIs.
+types, "this type *or* that type" (unions) and "this type *and* that
+type" (intersections), to model complex APIs.

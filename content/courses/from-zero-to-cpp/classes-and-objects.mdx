@@ -1,6 +1,6 @@
 ---
 title: Classes and Objects
-description: Bundling data with the operations that act on it — the foundation of object-oriented programming.
+description: Bundling data with the operations that act on it, the foundation of object-oriented programming.
 ---
 
 A struct that holds data is useful. But often the data only makes
@@ -14,7 +14,7 @@ data and behaviour together is the central idea of
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A faint blueprint panel with outlined parts stamps out three crisp colored cards, each carrying the same dot and bar in its own color — one class, many objects built from it"
+  aria-label="A faint blueprint panel with outlined parts stamps out three crisp colored cards, each carrying the same dot and bar in its own color, one class, many objects built from it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -62,7 +62,7 @@ struct BankAccount {
 };
 ```
 
-The trouble: any code anywhere can do `account.balance = -1e9;` —
+The trouble: any code anywhere can do `account.balance = -1e9;`,
 nothing protects the rule that balances should not go negative.
 
 A class lets us say: "the balance belongs to the account; outside
@@ -138,8 +138,8 @@ always sensible; the implementation guards that promise.
 
 ## Objects vs. classes
 
-A **class** is a *type* — a description. An **object** is a *value*
-of that type — a specific instance.
+A **class** is a *type*, a description. An **object** is a *value*
+of that type, a specific instance.
 
 ```cpp
 BankAccount a(100.0);    // a is an object
@@ -182,8 +182,8 @@ modify the object. Methods without `const` may modify it.
 ```cpp
 class Timer {
 public:
-    void start();                  // modifies — non-const
-    double seconds() const;        // observes — const
+    void start();                  // modifies, non-const
+    double seconds() const;        // observes, const
 };
 ```
 
@@ -298,7 +298,7 @@ int main() {
 
 - They are the same thing.
   > They are distinct concepts.
-- [o] A class is a type — a blueprint describing data and operations. An object is an *instance* of that type, with its own copy of the data.
+- [o] A class is a type, a blueprint describing data and operations. An object is an *instance* of that type, with its own copy of the data.
   > Code creates many objects from one class.
 - An object is a class with no methods.
   > That is incorrect.
@@ -319,5 +319,5 @@ int main() {
   > That is what \`private:\` does.`}
 />
 
-Next: why we hide fields — *encapsulation* and the idea of an
+Next: why we hide fields, *encapsulation* and the idea of an
 *invariant*.

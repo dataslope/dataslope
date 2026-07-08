@@ -1,6 +1,6 @@
 ---
 title: String Operations
-description: The .str accessor — vectorized string methods that operate on whole columns of text without writing a loop.
+description: The .str accessor, vectorized string methods that operate on whole columns of text without writing a loop.
 ---
 
 Real-world data is full of text: names, addresses, product
@@ -11,7 +11,7 @@ accessor.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Ragged text bars trailing faint whitespace chunks come out clean, even, and green on the other side — string methods cleaning a whole column at once"
+  aria-label="Ragged text bars trailing faint whitespace chunks come out clean, even, and green on the other side, string methods cleaning a whole column at once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -90,7 +90,7 @@ print(normalized)
 
 ## Search and contains
 
-`.contains` returns a boolean mask — perfect for filters:
+`.contains` returns a boolean mask, perfect for filters:
 
 <CodeBlock
   adapter="python"
@@ -157,7 +157,7 @@ print(emails.str[:5])  # first 5 chars
   ]}
 />
 
-`.split(..., expand=True)` is one of the most useful patterns —
+`.split(..., expand=True)` is one of the most useful patterns,
 it lets you turn one column into many in a single call.
 
 ## Extract with regex
@@ -192,7 +192,7 @@ print(parsed)
 Named groups become column names. This is hugely useful for
 turning log files into a real DataFrame.
 
-## Replace — substrings and regex
+## Replace, substrings and regex
 
 <CodeBlock
   adapter="python"
@@ -266,7 +266,7 @@ print(comments.str.split().str.len())
 
 ## A small cleaning example
 
-Bringing several pieces together — normalizing employee names:
+Bringing several pieces together, normalizing employee names:
 
 <CodeBlock
   adapter="python"
@@ -300,7 +300,7 @@ print(clean)
 
 ## Working with NaN in string columns
 
-By default, string methods *propagate* NaN — a NaN input yields
+By default, string methods *propagate* NaN, a NaN input yields
 a NaN output. Boolean methods (`contains`, `startswith`) can
 optionally fill NaN with True/False using `na=`.
 
@@ -322,7 +322,7 @@ print(s.str.contains("Engineer", na=False))  # NaN → False
 />
 
 This `na=False` is *essential* when using `.contains` inside a
-boolean filter — otherwise you get cryptic errors about NaN in
+boolean filter, otherwise you get cryptic errors about NaN in
 boolean indexers.
 
 ## Cleaning a messy column end-to-end
@@ -416,7 +416,7 @@ assert pd.isna(clean.iloc[5])`,
   > Pandas does not require the \`.str\` accessor; you can call \`.apply(str.upper)\` instead, but \`.str\` is the idiomatic, more readable approach.
 - It is faster than Python loops
   > Speed is a benefit, but the primary reason to use \`.str\` is that it exposes Python's string methods as vectorized column operations with clean, readable syntax.
-- [o] It provides vectorized string operations on whole columns of text — clean syntax and far faster than writing a Python for-loop over each value
+- [o] It provides vectorized string operations on whole columns of text, clean syntax and far faster than writing a Python for-loop over each value
   > \`.str.upper()\` on a million-row column is one call, not a million.
 - It works only on integers
   > The \`.str\` accessor is specifically for string (object or StringDtype) columns; it does not work on integer columns.
@@ -431,8 +431,8 @@ The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
   > Returning True for a NaN value would silently include rows with missing data in a filter, which is rarely the intended behavior.
 - Return False everywhere
   > Returning False would silently exclude NaN rows from a filter; the actual default behavior is to propagate the NaN, making the missing position visible.
-- [o] Propagate the NaN — the result has NaN at that position by default
-  > Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean — required if you want to use the result as a filter mask.
+- [o] Propagate the NaN, the result has NaN at that position by default
+  > Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean, required if you want to use the result as a filter mask.
 - Throw an error
   > \`str.contains\` does not raise an error when it encounters NaN; it returns NaN at that position by default, which only becomes a problem if you try to use the result as a boolean filter.
 
@@ -445,8 +445,8 @@ Forgetting \`na=False\` is a classic gotcha when filtering string columns that c
 - It is faster than not expanding
   > Performance is similar either way; the difference is in the return type, not speed.
 - It returns a Series of lists
-  > Without \`expand=True\`, the result is a Series of lists (one list per row) — \`expand=True\` is what converts it into a DataFrame.
-- [o] It returns a DataFrame, one column per split piece — perfect for splitting one column into many
+  > Without \`expand=True\`, the result is a Series of lists (one list per row), \`expand=True\` is what converts it into a DataFrame.
+- [o] It returns a DataFrame, one column per split piece, perfect for splitting one column into many
   > Useful for emails, names, addresses, anything with predictable delimiters.
 - It removes the @ sign
   > The split delimiter is used as the splitting boundary and does not appear in the resulting pieces, but the motivation for \`expand=True\` is the DataFrame output, not delimiter removal.

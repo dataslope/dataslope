@@ -15,7 +15,7 @@ Aggregate functions can summarize a whole table into one answer. That is useful,
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="A mixed row of blue, green, and yellow dots fans along thin lines into three tinted cards sorted by color, and each card condenses into one solid bar sized to its contents — GROUP BY sorts rows into piles first, then summarizes each pile"
+  aria-label="A mixed row of blue, green, and yellow dots fans along thin lines into three tinted cards sorted by color, and each card condenses into one solid bar sized to its contents, GROUP BY sorts rows into piles first, then summarizes each pile"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -160,7 +160,7 @@ bucket "Low":     Low, Low, Low         -> COUNT(*) = 3
 
 Each bucket then contributes exactly one row to the result: its
 label and its summary. Six rows in, three rows out. When a grouped
-query ever surprises you, redraw the buckets on paper — the
+query ever surprises you, redraw the buckets on paper, the
 confusion almost always dissolves.
 
 <MultipleChoice

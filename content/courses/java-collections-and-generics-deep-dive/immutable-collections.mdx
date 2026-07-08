@@ -1,13 +1,13 @@
 ---
 title: Immutable Collections
-description: Why "no one can change it" is one of the most powerful properties a collection can have — and how Java gives it to you
+description: Why "no one can change it" is one of the most powerful properties a collection can have, and how Java gives it to you
 ---
 
 A *mutable* collection is the default in Java, and most days that is
 exactly what you want. But when a collection crosses a trust
-boundary — returned from a library, stored in a cache, shared
+boundary, returned from a library, stored in a cache, shared
 between threads, used as a map key, exposed to "the rest of the
-codebase" — mutability becomes a liability.
+codebase", mutability becomes a liability.
 
 This chapter is about three intertwined ideas:
 
@@ -15,7 +15,7 @@ This chapter is about three intertwined ideas:
   `Map.of`.
 - **Unmodifiable views** over a mutable collection
   (`Collections.unmodifiableList`).
-- **Defensive copies** — what you do at the boundaries of your code
+- **Defensive copies**, what you do at the boundaries of your code
   to keep your invariants safe.
 
 <svg
@@ -57,7 +57,7 @@ other software-engineering vice:
 - Someone you didn't expect mutates a list you handed out, and your
   internal invariant breaks much later, in unrelated code.
 - A `HashSet` element is mutated *after* being added, and now its
-  hash points to the wrong bucket — silently lost forever.
+  hash points to the wrong bucket, silently lost forever.
 - A second thread sees your collection halfway through a mutation
   and reads garbage.
 
@@ -100,7 +100,7 @@ public class Main {
   ]}
 />
 
-These factories return purpose-built, compact implementations — not
+These factories return purpose-built, compact implementations, not
 just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 
 ### A few rules to know
@@ -141,7 +141,7 @@ public class Main {
 
 Before Java 9, the idiomatic way to publish a "read-only" collection
 was `Collections.unmodifiableList(list)`. It is still common, and
-still useful — but it is a **view**, not a copy:
+still useful, but it is a **view**, not a copy:
 
 <CodeBlock
   adapter="java"

@@ -3,12 +3,12 @@
  *
  * Covers the URL building / caching helpers in runtime/remoteDatasets.ts
  * and the PGlite script preparation in runtime/postgres.ts. The fetch
- * tests stub the global fetch — no network access required.
+ * tests stub the global fetch, no network access required.
  *
  * The persistent-cache tests additionally stub a fake `caches` (Cache
  * API) global and use vi.resetModules() to simulate separate JS
  * contexts (main thread vs. workers vs. a later visit): each context
- * gets its own module instance — and so its own in-flight memo — while
+ * gets its own module instance, and so its own in-flight memo, while
  * sharing the origin's cache storage.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -30,13 +30,13 @@ const MODULE_PATH = "../app/_components/runtime/remoteDatasets";
 type RemoteDatasetsModule = typeof import("../app/_components/runtime/remoteDatasets");
 
 /** Import a fresh module instance (fresh in-flight memo), as another
- *  worker — or a hard-reloaded page — would get. */
+ *  worker, or a hard-reloaded page, would get. */
 async function freshModule(): Promise<RemoteDatasetsModule> {
   vi.resetModules();
   return import(MODULE_PATH);
 }
 
-// The cache name is part of the module's storage contract — the sweep
+// The cache name is part of the module's storage contract, the sweep
 // logic must keep exactly this cache and delete older versions.
 const DATASET_CACHE_NAME = "dataslope-datasets-v1";
 
@@ -115,7 +115,7 @@ describe("rawGitHubUrl", () => {
       ref: DATASETS_REF,
     });
     // A branch head would let persistently cached entries go stale
-    // silently — the caching design relies on the ref being immutable
+    // silently, the caching design relies on the ref being immutable
     // (a commit SHA, or a version tag once the repo starts tagging).
     expect(DATASETS_REF).not.toBe("main");
     expect(DATASETS_REF).toMatch(/^([0-9a-f]{40}|v.+)$/);
@@ -287,7 +287,7 @@ describe("persistent Cache API layer", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // A different context (worker, or the next visit): fresh module
-    // instance — empty memo — but the same origin cache storage.
+    // instance, empty memo, but the same origin cache storage.
     const second = await (await freshModule()).fetchDatasetText(
       "cache/answer.sql",
     );
@@ -374,7 +374,7 @@ describe("persistent Cache API layer", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // A second read in the SAME context re-reads from the Cache API
-    // (memo evicted to free the multi-MB buffer) — not the network.
+    // (memo evicted to free the multi-MB buffer), not the network.
     const second = await mod.fetchDatasetBytes("parquet/big.parquet");
     expect(Array.from(second.slice(0, 3))).toEqual([1, 2, 3]);
     expect(fetchMock).toHaveBeenCalledTimes(1);

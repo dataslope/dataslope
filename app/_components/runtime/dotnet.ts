@@ -5,7 +5,7 @@
 // C/C++, CheerpJ for Java and php-wasm for PHP.
 //
 // The runtime bundle lives in cdn-assets/_dotnet/ (served via
-// jsDelivr — see cdn.ts) and ships:
+// jsDelivr, see cdn.ts) and ships:
 //   - dotnet.js              (Microsoft's Mono boot script, ES module)
 //   - dotnet.runtime.js      (the JS half of the runtime)
 //   - dotnet.native.js       (the Emscripten-generated JS)

@@ -1,5 +1,5 @@
 /**
- * Catch-all route for `/fumadocs-dev` — renders an MDX page resolved from
+ * Catch-all route for `/fumadocs-dev`, renders an MDX page resolved from
  * the Fumadocs `devSource` loader (the development-only component gallery
  * that used to live at `/learn`).
  *
@@ -56,7 +56,7 @@ export default async function FumadocsDevPage(props: FumadocsDevPageProps) {
 
   return (
     // All pages in this collection are loose top-level demo pages (no `root`
-    // course folders), so there's no breadcrumb or Course JSON-LD here —
+    // course folders), so there's no breadcrumb or Course JSON-LD here,
     // this section is a flat, dev-only gallery.
     <DocsPage toc={toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>

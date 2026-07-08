@@ -39,7 +39,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Figure,
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
-    // Fumadocs Steps/Step — a numbered vertical walkthrough. Registered
+    // Fumadocs Steps/Step, a numbered vertical walkthrough. Registered
     // globally so lessons can drop `<Steps>…<Step>` in without an import,
     // matching the convention used by the components above.
     Steps,

@@ -1,6 +1,6 @@
 ---
 title: Variables and Memory
-description: What really happens when you write int x = 5 — and the picture of memory you should carry around in your head from now on
+description: What really happens when you write int x = 5, and the picture of memory you should carry around in your head from now on
 ---
 
 A **variable** is a name for a place in memory where a value lives.
@@ -10,7 +10,7 @@ pictures.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Four memory cells, each hanging under its own colored name tag: one holds a blue dot, one a green square, one waits empty as a dashed outline, and a yellow value drops down a thin arrow into the last — variables are named places"
+  aria-label="Four memory cells, each hanging under its own colored name tag: one holds a blue dot, one a green square, one waits empty as a dashed outline, and a yellow value drops down a thin arrow into the last, variables are named places"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="1.5">
@@ -163,7 +163,7 @@ just know that:
   *reference* to a value living somewhere else.
 
 This distinction will come back to bite you in subtle ways. Be
-patient — every Java programmer eventually internalizes it.
+patient, every Java programmer eventually internalizes it.
 
 ## What `final` means
 
@@ -212,7 +212,7 @@ in. Outside that block, the name is unknown.
       System.out.println("outer = " + outer);
     }
 
-    // 'inner' does not exist here — uncommenting the next line breaks the
+    // 'inner' does not exist here, uncommenting the next line breaks the
     // build: System.out.println("inner outside = " + inner);
 
     System.out.println("outer = " + outer);
@@ -236,7 +236,7 @@ other across different parts of the program.
 - [o] It declares a variable x of type int and stores the value 5 in it
   > Declaration + initial assignment.
 - It defines a function called x
-  > No — this is a variable declaration, not a function.`}
+  > No, this is a variable declaration, not a function.`}
 />
 
 <MultipleChoice
@@ -308,5 +308,5 @@ where \`P = 2 * (width + height)\` and \`A = width * height\`.`}
 />
 
 Variables are the *workspace* of every program. We now move on to
-the *labels* — Java's type system — which is what makes Java
+the *labels*, Java's type system, which is what makes Java
 especially trustworthy for big software.

@@ -1,17 +1,17 @@
 ---
 title: Summary Statistics
-description: Mean, median, standard deviation, quantiles — the small set of numbers that lets you describe an entire column in a single sentence.
+description: Mean, median, standard deviation, quantiles, the small set of numbers that lets you describe an entire column in a single sentence.
 ---
 
 When you can't look at every value in a column (and you usually
-can't — even 100 numbers is too many to mentally hold), you need
+can't, even 100 numbers is too many to mentally hold), you need
 to **summarize** it. A handful of summary statistics, chosen well,
 can carry an enormous amount of information.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A translucent green hump rises over a rug of small green dots that trail off to the right — a long-tailed distribution's center and spread at a glance"
+  aria-label="A translucent green hump rises over a rug of small green dots that trail off to the right, a long-tailed distribution's center and spread at a glance"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -73,8 +73,8 @@ flowchart TB
       filename: "main.r",
       starterCode: `incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
 
-mean(incomes) # average — pulled up by the 250
-median(incomes) # middle value — robust to outliers
+mean(incomes) # average, pulled up by the 250
+median(incomes) # middle value, robust to outliers
 `,
     },
   ]}
@@ -88,7 +88,7 @@ The mean and the median tell different stories. Both are
 - **Median** is the middle value when sorted. Half the data is
   below, half is above. It is *robust to outliers*.
 
-In our income example, the mean (\$68k) is misleading — it makes
+In our income example, the mean (\$68k) is misleading, it makes
 the typical person sound wealthier than they are. The median
 (\$49.5k) is closer to what most people earn.
 
@@ -260,7 +260,7 @@ sapply(1:4, function(i) {
 
 All four datasets have *nearly identical* means and standard
 deviations. But if you plotted them (try it!), they look
-completely different — one is roughly linear, one is curved, one
+completely different, one is roughly linear, one is curved, one
 has a single outlier dominating the line, and one has all its
 variation in a single point.
 
@@ -280,7 +280,7 @@ a plot.
 - [o] median
   > The median only depends on the *position* of values, not their magnitude. A single extreme value can pull the mean a lot but barely move the median.
 - range
-  > Range measures *spread*, not center, and it is the most outlier-sensitive of all — it is defined entirely by the two most extreme values.`}
+  > Range measures *spread*, not center, and it is the most outlier-sensitive of all, it is defined entirely by the two most extreme values.`}
 />
 
 <MultipleChoice
@@ -291,7 +291,7 @@ a plot.
 - has higher values
   > Both columns have the same mean (50), so neither has systematically higher values; the difference is in variability, not location.
 - [o] has values that are more spread out around 50
-  > Standard deviation measures typical distance from the mean — bigger sd means values are scattered farther from the center.
+  > Standard deviation measures typical distance from the mean, bigger sd means values are scattered farther from the center.
 - has fewer NAs
   > Missing values are tracked separately (e.g., with \`is.na()\`) and have no systematic relationship to the standard deviation.`}
 />
@@ -300,11 +300,11 @@ a plot.
   markdown={`Anscombe's quartet is famous because it shows:
 
 - That R has poor numerical precision.
-  > Anscombe's quartet was constructed by hand in 1973, long before R existed, specifically to demonstrate the limits of summary statistics — not any computing platform's precision.
-- [o] Four very different datasets can share nearly identical summary statistics — proving you must visualize, not just summarize.
+  > Anscombe's quartet was constructed by hand in 1973, long before R existed, specifically to demonstrate the limits of summary statistics, not any computing platform's precision.
+- [o] Four very different datasets can share nearly identical summary statistics, proving you must visualize, not just summarize.
   > It's the canonical reminder that summaries compress; plots reveal.
 - That correlation always implies causation.
-  > The quartet demonstrates that identical statistics can mask completely different relationships — correlation vs. causation is a separate (though related) lesson.
+  > The quartet demonstrates that identical statistics can mask completely different relationships, correlation vs. causation is a separate (though related) lesson.
 - That outliers should be removed.
   > One of the four datasets does contain an influential point, but the quartet's lesson is about visualizing data, not a prescription to remove outliers.`}
 />
@@ -313,7 +313,7 @@ a plot.
 
 Write a function `describe()` that takes a numeric vector and
 returns a named numeric vector of (n, mean, median, sd, min, max,
-iqr) — ignoring NAs throughout.
+iqr), ignoring NAs throughout.
 
 <ChallengeCard
   adapter="r"
@@ -373,5 +373,5 @@ if (!isTRUE(all.equal(unname(r["mean"]), 2))) stop("mean should ignore NAs")`,
 />
 
 Summary statistics compress a column into a few numbers. The
-next page is about *seeing* the column's full shape — the world
+next page is about *seeing* the column's full shape, the world
 of distributions.

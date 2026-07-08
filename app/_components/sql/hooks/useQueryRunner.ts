@@ -101,7 +101,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       if (!engine) return;
       const trimmed = sql.trim();
       if (!trimmed) {
-        showToast("Nothing to run — the query is empty.", "warn");
+        showToast("Nothing to run, the query is empty.", "warn");
         return;
       }
       setStatusState("running");
@@ -111,7 +111,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         explicitPageSize !== undefined ? explicitPageSize : globalPageSizeRef.current;
       const noComments = stripSqlComments(trimmed);
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
-      // editable, just like opening the table from the sidebar — but only
+      // editable, just like opening the table from the sidebar, but only
       // for an actual table (not a view), so edits never fail on commit.
       const isTable = (name: string) =>
         useEngineStore.getState().tables.includes(name);
@@ -546,7 +546,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const engine = engineRef.current;
       if (!engine) return;
       const tabId = activeTabIdRef.current;
-      // Strip generated columns — SQLite rejects INSERTs that target them.
+      // Strip generated columns, SQLite rejects INSERTs that target them.
       const cached = useEngineStore.getState().columnsByEntity[tableName] ?? [];
       const generatedCols = new Set(
         cached.filter((col) => col.generated !== null).map((col) => col.name),

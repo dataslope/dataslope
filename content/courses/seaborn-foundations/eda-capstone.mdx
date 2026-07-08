@@ -1,16 +1,16 @@
 ---
 title: "Capstone: A Full EDA"
-description: "Put it all together — explore the penguins dataset end to end, from first glance to a communication-ready figure."
+description: "Put it all together, explore the penguins dataset end to end, from first glance to a communication-ready figure."
 ---
 
 Every chapter so far taught one chart family in isolation. Real
-**exploratory data analysis (EDA)** does not work one chart at a time — it
+**exploratory data analysis (EDA)** does not work one chart at a time, it
 is a *loop*. You glance at the raw table, ask a question, draw the chart
 that answers it, notice something new, and ask the next question. The skill
 is not knowing twenty chart types; it is knowing which one to reach for at
 each step, and reading what it reveals before moving on.
 
-This page is a full pass through that loop on the **penguins** dataset —
+This page is a full pass through that loop on the **penguins** dataset,
 344 penguins measured across three species and three islands. We'll go from
 "what is even in this table?" to a single, polished figure you could drop
 into a report. Along the way you will write a lot of the code yourself.
@@ -18,7 +18,7 @@ into a report. Along the way you will write a lot of the code yourself.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A route of thin blue lines climbs through five milestone badges — a data table, one variable's hump, group bars, paired dots, and a mini pair grid — to the small blue flag of a finished, polished figure"
+  aria-label="A route of thin blue lines climbs through five milestone badges, a data table, one variable's hump, group bars, paired dots, and a mini pair grid, to the small blue flag of a finished, polished figure"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,11 +58,11 @@ into a report. Along the way you will write a lot of the code yourself.
 <Callout type="info" title="The EDA loop, in one breath">
 **Glance** at the data, look at **one variable** at a time, **compare
 groups**, study **relationships** between pairs, then zoom out to **all
-pairs at once** — and finally turn your best finding into a figure that
+pairs at once**, and finally turn your best finding into a figure that
 *communicates*. Each step narrows the question for the next.
 </Callout>
 
-## Step 1 — First glance
+## Step 1, First glance
 
 Before any chart, look at the table itself. Three quick checks answer
 "what am I working with?": the **shape** (how many rows and columns), the
@@ -96,14 +96,14 @@ print(penguins.isna().sum())
 
 Read the output top to bottom. The **shape** is `(344, 7)`: 344 penguins,
 seven columns. The **head** shows the columns split cleanly into *who the
-penguin is* (`species`, `island`, `sex` — categorical labels) and *how it
+penguin is* (`species`, `island`, `sex`, categorical labels) and *how it
 was measured* (`bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`,
-`body_mass_g` — numbers). That split is the single most useful thing to
+`body_mass_g`, numbers). That split is the single most useful thing to
 notice, because it tells you which charts are even possible: numeric
 columns can go on a scatter plot's axes; categorical columns can color or
 split it.
 
-The **missing-value count** shows a handful of `NaN`s — two penguins are
+The **missing-value count** shows a handful of `NaN`s, two penguins are
 missing every measurement, and a few more are missing `sex`. This is
 normal, and Seaborn quietly drops missing rows per plot, so we can keep
 moving. But now we *know* the holes are there instead of being surprised
@@ -113,14 +113,14 @@ later.
 The moment you can sort a table's columns into "labels" and "numbers" you
 already know your options: a histogram or box plot for one numeric column,
 a scatter for two numeric columns, `hue`/`col` for the categorical ones.
-The data types drive the chart choice — not the other way around.
+The data types drive the chart choice, not the other way around.
 </Callout>
 
-## Step 2 — One variable at a time
+## Step 2, One variable at a time
 
 With the lay of the land clear, start *narrow*: look at a single numeric
 column on its own. A **histogram** (via `displot` with `kind="hist"`)
-turns one column of numbers into a shape — where values pile up, how spread
+turns one column of numbers into a shape, where values pile up, how spread
 out they are, whether there is more than one peak.
 
 Here is `body_mass_g`, the penguins' weight:
@@ -146,12 +146,12 @@ sns.displot(penguins, x="body_mass_g", kind="hist", bins=20, height=4)
 
 The shape is not a single tidy hump. There is a big cluster of lighter
 penguins on the left and a smaller, heavier group trailing off to the
-right — a hint that *more than one kind of penguin* is mixed into this
+right, a hint that *more than one kind of penguin* is mixed into this
 column. That hint is exactly the kind of thing EDA exists to surface: a
 single-variable plot raised a question ("who are the heavy ones?") that the
 next steps will answer.
 
-Now you try the same move on a different column — and split it by species
+Now you try the same move on a different column, and split it by species
 so the groups show up in color.
 
 <ChallengeCard
@@ -215,13 +215,13 @@ only hinted at: the right-hand group is almost entirely one species. A
 single variable, split by a category, already starts separating the
 penguins into kinds.
 
-## Step 3 — Comparing groups
+## Step 3, Comparing groups
 
 The histogram suggested the species differ. The natural next question is
 *by how much, and on which measurements?* When one axis is a **category**
 and the other is a **number**, that is a job for `catplot`. A
-**box plot** (`kind="box"`) summarizes each group's spread — the box is the
-middle 50%, the line is the median, the whiskers reach most of the rest —
+**box plot** (`kind="box"`) summarizes each group's spread, the box is the
+middle 50%, the line is the median, the whiskers reach most of the rest,
 so you can line the groups up and compare centers and overlap at a glance.
 
 Body mass by species:
@@ -253,7 +253,7 @@ sns.catplot(
 
 Now the suspicion is confirmed and quantified: **Gentoo** penguins are
 clearly heavier than **Adelie** and **Chinstrap**, whose boxes sit lower
-and overlap each other heavily. The box plot earns its keep here — three
+and overlap each other heavily. The box plot earns its keep here, three
 distributions compared in one glance, with medians and spread visible at
 once. (Swap `kind="box"` for `kind="violin"` to see each group's full
 density shape instead of a five-number summary.)
@@ -317,18 +317,18 @@ g = sns.catplot(
   ]}
 />
 
-Your island plot shows that **Biscoe** runs heavier than the others — but
+Your island plot shows that **Biscoe** runs heavier than the others, but
 be careful with the *why*. Islands are not equally stocked with species
 (Gentoo live only on Biscoe), so "Biscoe penguins are heavy" is really
 "Gentoo live on Biscoe, and Gentoo are heavy." A grouping variable can be a
 stand-in for a different cause. EDA is as much about catching these
 confounds as about finding patterns.
 
-## Step 4 — Relationships between pairs
+## Step 4, Relationships between pairs
 
 Single variables and group comparisons are warm-ups. The richest questions
 in this dataset are about how two measurements move *together*. Back to the
-**scatter plot** (`relplot`), now armed with what we know — color by
+**scatter plot** (`relplot`), now armed with what we know, color by
 species so the structure is unmistakable.
 
 Flipper length against body mass:
@@ -367,7 +367,7 @@ relationship is shared across groups that nonetheless occupy different
 parts of it.
 
 When a relationship looks linear, it is natural to ask for the *line*.
-`lmplot` draws a scatter plus a fitted regression line per group — a quick
+`lmplot` draws a scatter plus a fitted regression line per group, a quick
 way to compare trends. Try it on the two bill measurements, which (you may
 recall from earlier) hide a surprise when you split by species.
 
@@ -434,17 +434,17 @@ g = sns.lmplot(
 />
 
 Look at the three fitted lines. *Within* each species, longer bills are
-also **deeper** — every line slopes upward. Yet if you erased the colors
+also **deeper**, every line slopes upward. Yet if you erased the colors
 and fitted one line to the whole cloud, the trend would look flat or even
 *downward*, because Gentoo (long, shallow bills) pull the overall picture
-sideways. That reversal — a within-group trend that vanishes or flips when
-groups are pooled — is **Simpson's paradox**, and `lmplot` with `hue` makes
+sideways. That reversal, a within-group trend that vanishes or flips when
+groups are pooled, is **Simpson's paradox**, and `lmplot` with `hue` makes
 it visible in a single chart.
 
-## Step 5 — All pairs at once
+## Step 5, All pairs at once
 
 You have been picking pairs of columns by hand. With only four numeric
-columns there are not that many pairs — so why not look at *all of them at
+columns there are not that many pairs, so why not look at *all of them at
 once?* A **pair plot** draws every numeric column against every other in a
 grid, with each variable's own distribution down the diagonal. It is the
 fastest way to scan an entire numeric dataset for structure.
@@ -501,13 +501,13 @@ sns.heatmap(corr, annot=True, cmap="vlag", center=0, square=True)
   ]}
 />
 
-Two choices make this heatmap honest. The palette `"vlag"` is **diverging**
-— it runs from one color through white to another — and `center=0` pins
+Two choices make this heatmap honest. The palette `"vlag"` is **diverging**,
+it runs from one color through white to another, and `center=0` pins
 white to zero, so positive correlations read as one hue and negative ones
 as the opposite, with strength shown by intensity. A sequential palette, or
 forgetting `center=0`, would make a `+0.1` and a `-0.1` look misleadingly
 different in size. The bright cell between flipper length and body mass
-(near `+0.87`) is the strong relationship you already saw as a scatter — now
+(near `+0.87`) is the strong relationship you already saw as a scatter, now
 quantified.
 
 That `corr` matrix has structure worth understanding directly, not just
@@ -566,16 +566,16 @@ corr = penguins.corr(numeric_only=True)
 />
 
 The diagonal being exactly `1` and the matrix being square are not
-coincidences — they fall out of what correlation *is*. Knowing that lets
+coincidences, they fall out of what correlation *is*. Knowing that lets
 you read a heatmap critically: the diagonal carries no information (it is
 always the brightest, "perfect" color), so your eye should go straight to
 the **off-diagonal** cells where the real relationships live.
 
-## Step 6 — Communicate the finding
+## Step 6, Communicate the finding
 
 Exploration is for *you*; a final figure is for *someone else*. The last
 move of an EDA is to take the single most important thing you found and
-draw it so a reader gets it in seconds — with a **message-style title** that
+draw it so a reader gets it in seconds, with a **message-style title** that
 states the takeaway, not just the variable names.
 
 Our cleanest finding was that the species separate by **bill shape**. Here
@@ -617,7 +617,7 @@ g.figure.subplots_adjust(top=0.9)
 />
 
 Compare this to the bare scatter from Step 4. The data is identical; what
-changed is that a reader no longer has to *derive* the point — the title
+changed is that a reader no longer has to *derive* the point, the title
 hands it to them, and the labels read in plain English. That is the
 difference between an **exploratory** figure (terse, fast, for yourself) and
 an **explanatory** one (titled, labeled, for an audience). Both are
@@ -626,7 +626,7 @@ legitimate; knowing which you are making is the skill.
 <Callout type="tip" title="Title with the verb, not the nouns">
 "`bill_length_mm` vs `bill_depth_mm`" describes the axes. "Penguin species
 separate cleanly by bill shape" describes the *finding*. For a figure meant
-to persuade or inform, prefer the sentence with a verb in it — it tells the
+to persuade or inform, prefer the sentence with a verb in it, it tells the
 reader what to take away before they finish reading the axes.
 </Callout>
 
@@ -639,7 +639,7 @@ sense **first**, before drawing any chart?
 - Fit a regression line to the two columns whose names sound related.
   > Fitting a model before you know the data's shape, types, and missing values risks modeling noise or a column that is half empty. Looking comes before fitting.
 - [o] Inspect \`.shape\`, \`.head()\`, and \`.isna().sum()\` to learn the size, the columns, and where values are missing.
-  > These three checks tell you how big the data is, which columns are numeric versus categorical, and where the holes are — the facts that decide which charts are even possible.
+  > These three checks tell you how big the data is, which columns are numeric versus categorical, and where the holes are, the facts that decide which charts are even possible.
 - Immediately draw a pair plot of every column against every other.
   > A pair plot is a great *overview*, but on an unknown table it can be huge or fail on non-numeric columns; a quick look at the table's shape and types should come first.
 - Pick a color palette so your charts look polished from the start.
@@ -681,13 +681,13 @@ palette with \`center=0\` (for example \`cmap="vlag", center=0\`)?
   > The palette does not remove the diagonal. The diagonal is always \`1\` and you simply learn to look past it; that is unrelated to centering the colors.
 
 A diverging palette centered at zero encodes the *sign* of a correlation in
-the hue and its *strength* in the intensity — the honest way to color a
+the hue and its *strength* in the intensity, the honest way to color a
 matrix that spans negative to positive.`}
 />
 
 You have now run a complete EDA: you sized up the table, examined single
 variables, compared groups, studied relationships, scanned all pairs at
 once, and turned your best finding into a figure built to communicate. That
-loop — glance, question, chart, notice, repeat — is the whole job, and you
+loop, glance, question, chart, notice, repeat, is the whole job, and you
 can now run it on any tidy dataset. The final page steps back to recap the
 mental models you built and points you toward where to take them next.

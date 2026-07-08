@@ -13,7 +13,7 @@ order items, and order items point to products.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Four entity containers zigzag across the canvas like a constellation, joined by thin links — reading a whole model as one story"
+  aria-label="Four entity containers zigzag across the canvas like a constellation, joined by thin links, reading a whole model as one story"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -277,7 +277,7 @@ erDiagram
 Practice the checklist on it. The entities are `artist`, `album`,
 `track`, and `genre`. The sentences: one artist records zero or many
 albums; one album contains zero or many tracks; one genre classifies
-zero or many tracks. The foreign keys predict the joins — and the
+zero or many tracks. The foreign keys predict the joins, and the
 query below follows exactly the path the diagram promises, from
 artist through album to track.
 
@@ -306,7 +306,7 @@ LIMIT
 Browse the **Tables** viewer above the editor and you can verify the
 diagram against reality: every `album` row carries an `artist_id`,
 exactly as the `FK` marker predicted. Try rewriting the query to join
-`track` to `genre` instead — the diagram already tells you which
+`track` to `genre` instead, the diagram already tells you which
 columns to match.
 
 Now prove you can navigate the diagram on your own. The challenge

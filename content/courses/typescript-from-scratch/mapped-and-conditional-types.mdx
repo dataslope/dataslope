@@ -3,14 +3,14 @@ title: Mapped & Conditional Types
 description: Transform and filter types with mapped types, conditional logic, and the infer keyword.
 ---
 
-You've learned how to build generic types that work with any input. But what if you need to *transform* a type systematically — taking every property and making it optional, or readonly, or changing its value type? What if you need *conditional logic* at the type level — "if this type extends that, then produce X, otherwise Y"?
+You've learned how to build generic types that work with any input. But what if you need to *transform* a type systematically, taking every property and making it optional, or readonly, or changing its value type? What if you need *conditional logic* at the type level, "if this type extends that, then produce X, otherwise Y"?
 
 These questions lead us to **mapped types** and **conditional types**, two of TypeScript's most powerful metaprogramming tools. They let you write type-level functions that inspect, filter, and reshape other types. They're the building blocks behind the standard library's utility types (which we'll tour in the next chapter), and they're essential for modeling complex, real-world constraints.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Five colored property squares pass through one wide blue transform bar: each comes out below wearing a small white badge, and the last thread simply stops at the bar — a mapped type transforms every property uniformly and can drop keys as it goes"
+  aria-label="Five colored property squares pass through one wide blue transform bar: each comes out below wearing a small white badge, and the last thread simply stops at the bar, a mapped type transforms every property uniformly and can drop keys as it goes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -265,7 +265,7 @@ Conditional types become powerful when combined with generics. You can build typ
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A rail reaches a blue gate with a diamond window and splits in two: the small yellow diamond that fits the window rides the upper branch toward the green terminal, while the lower branch leads to the yellow terminal — a conditional type picks one of two branches with an extends test"
+  aria-label="A rail reaches a blue gate with a diamond window and splits in two: the small yellow diamond that fits the window rides the upper branch toward the green terminal, while the lower branch leads to the yellow terminal, a conditional type picks one of two branches with an extends test"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -374,7 +374,7 @@ The `infer` keyword lets you **extract** parts of a type inside a conditional. I
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A small gray crane grips the green pearl it has just lifted out of a blue capsule, leaving a hollow white ring behind — infer names the type packed inside a wrapper so you can carry it away"
+  aria-label="A small gray crane grips the green pearl it has just lifted out of a blue capsule, leaving a hollow white ring behind, infer names the type packed inside a wrapper so you can carry it away"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -619,8 +619,8 @@ You've learned how to:
 - Leverage **distributive** behavior to process unions member-by-member.
 - Use **`infer`** to extract parts of a type.
 
-These are the foundational tools for advanced type modeling. In the next chapter, we'll tour the standard library's **utility types** — and you'll see that they're all built from mapped and conditional types. There's no magic; you now have the tools to build them yourself.
+These are the foundational tools for advanced type modeling. In the next chapter, we'll tour the standard library's **utility types**, and you'll see that they're all built from mapped and conditional types. There's no magic; you now have the tools to build them yourself.
 
 ---
 
-**Next**: [Utility Types](./utility-types) — a practical tour of `Partial`, `Pick`, `ReturnType`, and friends, plus how they're implemented.
+**Next**: [Utility Types](./utility-types), a practical tour of `Partial`, `Pick`, `ReturnType`, and friends, plus how they're implemented.

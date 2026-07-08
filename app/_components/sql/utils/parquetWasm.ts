@@ -1,4 +1,4 @@
-// Shared parquet-wasm singleton — guarantees the WASM binary is
+// Shared parquet-wasm singleton, guarantees the WASM binary is
 // fetched from CDN at most once per page load regardless of whether
 // the first caller is an import or an export operation.
 

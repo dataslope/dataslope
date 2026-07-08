@@ -5,14 +5,14 @@ description: A beginner's model of CPUs, memory, and what really happens between
 
 Before we keep writing C++, we need a mental model of what a computer
 actually *is* and how it runs a program. You do not need to be an
-electrical engineer to write good code — but the more accurate your
+electrical engineer to write good code, but the more accurate your
 mental model, the easier every later concept (variables, pointers,
 the stack) will be.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue CPU disc exchanges thin read and write arrows with a column of memory pills while clock ticks pulse beneath it — processor, memory, and the beat that drives them"
+  aria-label="A blue CPU disc exchanges thin read and write arrows with a column of memory pills while clock ticks pulse beneath it, processor, memory, and the beat that drives them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -80,8 +80,8 @@ flowchart LR
 2. **A CPU** is a small worker that does *one tiny operation at a
    time*: copy this box into that box, add the numbers in these two
    boxes, jump back ten boxes, and so on.
-3. **Input/Output devices** — the keyboard, the screen, the disk, the
-   network — let memory and the outside world exchange data.
+3. **Input/Output devices**, the keyboard, the screen, the disk, the
+   network, let memory and the outside world exchange data.
 
 Everything more complicated is built on top of those three ideas.
 
@@ -128,7 +128,7 @@ int main() {
 
 The `sizeof` operator tells you, in bytes, how big a type is on the
 machine the program is currently running on. Try running the block
-above — the numbers depend on the CPU. (On the in-browser WebAssembly
+above, the numbers depend on the CPU. (On the in-browser WebAssembly
 target, pointers are 4 bytes.)
 
 ## The CPU's instruction loop
@@ -198,13 +198,13 @@ Within its address space, your program organises memory into a few
 distinct regions. You will hear about these for the rest of the
 course, so it helps to meet them now:
 
-- **Text / code** — the actual machine instructions of your program.
+- **Text / code**, the actual machine instructions of your program.
   Usually read-only.
-- **Data** — global variables, string literals, and other things that
+- **Data**, global variables, string literals, and other things that
   exist for the entire run of the program.
-- **Heap** — memory you ask for *while the program runs*, often with
+- **Heap**, memory you ask for *while the program runs*, often with
   `new` (or `malloc` in C). It stays alive until you release it.
-- **Stack** — a tidy area used for *function calls* and *local
+- **Stack**, a tidy area used for *function calls* and *local
   variables*. Each time you call a function, the CPU grows the
   stack by a small "frame"; when the function returns, the frame is
   popped off.
@@ -331,14 +331,14 @@ detail to keep in mind for the next several chapters.
 <MultipleChoice
   markdown={`Why does C++ care so much about *where* memory comes from (stack vs heap)?
 
-- It does not — they are interchangeable.
+- It does not, they are interchangeable.
   > They are not. The lifetime, cost, and management rules differ.
 - The stack is faster to read than the heap.
   > Allocation on the stack is much faster, but reads from either can be cached and equally fast.
 - [o] Because the lifetime, allocation cost, and management rules of stack and heap memory are different, and C++ exposes those differences so you can reason about them.
   > C++ trades convenience for control on purpose.
 - Only the heap can be freed; the stack lives forever.
-  > It is the other way around — stack frames are freed automatically when functions return.`}
+  > It is the other way around, stack frames are freed automatically when functions return.`}
 />
 
 Next: *how* your source code becomes machine instructions in the

@@ -1,6 +1,6 @@
 ---
 title: From FORTRAN to Python
-description: How the languages of scientific computing — FORTRAN, MATLAB, and finally Python — shaped the way scientists think about numbers, and why the SciPy stack won
+description: How the languages of scientific computing, FORTRAN, MATLAB, and finally Python, shaped the way scientists think about numbers, and why the SciPy stack won
 ---
 
 The first decade of computational science was written in *machine
@@ -10,12 +10,12 @@ could hand-tune, and a radical idea took hold: a scientist should
 write the *formula they meant*, and a translator program should
 produce the machine code. That idea gave us FORTRAN, then MATLAB,
 and finally the scientific Python stack you are running right now.
-This chapter is that lineage — three languages, one continuous idea.
+This chapter is that lineage, three languages, one continuous idea.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A solid blue hub links by thin lines to a formula card, a data grid card, and a rising chart card — Python sitting at the center of scientific work, gluing math, data, and plots together"
+  aria-label="A solid blue hub links by thin lines to a formula card, a data grid card, and a rising chart card, Python sitting at the center of scientific work, gluing math, data, and plots together"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
@@ -52,18 +52,18 @@ This chapter is that lineage — three languages, one continuous idea.
 
 <IllustrationPrompt subject="John Backus" photo />
 
-A team led by **John Backus** at IBM started work on FORTRAN — the
-**FOR**mula **TRAN**slator — in 1954 and released the first compiler
+A team led by **John Backus** at IBM started work on FORTRAN, the
+**FOR**mula **TRAN**slator, in 1954 and released the first compiler
 in 1957 for the IBM 704. The goal was radical for its time: a
 scientist should write `Y(I) = A * X(I) + B` in a loop and have the
 compiler generate machine code as efficient as hand-written
 assembly. Backus argued that without that efficiency, no one would
-have used the language — and he was right. It became the first widely
+have used the language, and he was right. It became the first widely
 used high-level language, and programs that once took weeks to
 hand-code could now be written in an afternoon.
 
 That choice still reaches into your browser. NumPy's `@` operator
-dispatches to a routine called **DGEMM** in the BLAS library —
+dispatches to a routine called **DGEMM** in the BLAS library,
 FORTRAN-lineage code, hand-tuned for every generation of CPU since
 the 1970s. LAPACK and BLAS, both rooted in FORTRAN, sit under
 virtually every NumPy and SciPy install.
@@ -96,7 +96,7 @@ roughly: NumPy (Python) → BLAS (C wrapper) → LAPACK (FORTRAN) → CPU
 vector instructions. Sixty years of optimization, hidden behind a
 single `@`. Three FORTRAN ideas survive almost unchanged: **arrays
 as the primary data type**, **fast numerical inner loops**, and
-**shared standard libraries** (BLAS, LAPACK, ODEPACK, MINPACK — still
+**shared standard libraries** (BLAS, LAPACK, ODEPACK, MINPACK, still
 the workhorses inside SciPy).
 
 ## MATLAB: a calculator that thought in matrices
@@ -108,7 +108,7 @@ the University of New Mexico. He wanted students to use the new
 FORTRAN libraries LINPACK and EISPACK *without* having to learn
 FORTRAN, so he wrote a tiny interactive program that let them type
 expressions like `A * x` and `eig(A)` at a prompt. He called it
-**MATLAB** — "matrix laboratory." By 1984 it had been rewritten in
+**MATLAB**, "matrix laboratory." By 1984 it had been rewritten in
 C, commercialized by MathWorks, and was on its way to becoming the
 lingua franca of engineering education.
 
@@ -167,7 +167,7 @@ came from libraries, not from the language itself: **Travis
 Oliphant** unified the earlier Numeric and Numarray packages into
 **NumPy** in 2005–2006, and **SciPy** (started 2001 by Eric Jones,
 Travis Oliphant, and Pearu Peterson) wrapped the venerable FORTRAN
-libraries — BLAS, LAPACK, ODEPACK, MINPACK, QUADPACK — behind
+libraries, BLAS, LAPACK, ODEPACK, MINPACK, QUADPACK, behind
 familiar calls like `solve`, `eig`, `fft`, and `quad`.
 
 ```mermaid
@@ -197,7 +197,7 @@ Four forces converged:
   your simulation could parse log files, scrape an API, serve a web
   page, and email you when the job finished.
 - **The ecosystem compounded.** Once NumPy existed, every new tool
-  used NumPy arrays — pandas, scikit-learn, scikit-image, AstroPy.
+  used NumPy arrays, pandas, scikit-learn, scikit-image, AstroPy.
   Each new library made the platform more valuable, a textbook
   network effect.
 
@@ -282,8 +282,8 @@ plt.show()
 
 Six imports, twenty lines, one complete signal-processing experiment
 with a quantitative quality metric and a publishable plot. That
-composability — arrays first, vectorized math second, a deep
-willingness to call out to C or FORTRAN when speed matters — is the
+composability, arrays first, vectorized math second, a deep
+willingness to call out to C or FORTRAN when speed matters, is the
 *style* that unites every field now built on scientific Python. One
 short bridge chapter remains, on the single idea that underlies all
 the numerical work to come: every number on a computer is slightly
@@ -299,7 +299,7 @@ wrong, and good science means controlling the wrongness.
 - Because Python compiles to FORTRAN at runtime
   > Python is interpreted and never compiled to FORTRAN; the connection is that NumPy's inner loops call pre-compiled FORTRAN library routines at the C level.
 - [o] Because NumPy's heaviest routines dispatch to BLAS, LAPACK, and related libraries, most of which are FORTRAN code that has been hand-tuned for decades
-  > NumPy is Python at the interface and FORTRAN/C at the core. \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This layering — interpreted glue on compiled kernels — is the secret to scientific Python's performance.
+  > NumPy is Python at the interface and FORTRAN/C at the core. \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This layering, interpreted glue on compiled kernels, is the secret to scientific Python's performance.
 - Because FORTRAN syntax is hidden inside Python source files
   > Python source files contain only Python; there is no FORTRAN syntax inside them.
 
@@ -307,7 +307,7 @@ Interpreted glue on top of compiled numerical kernels is what makes scientific P
 />
 
 <MultipleChoice
-  markdown={`Which of the following is the *best* explanation of why Python — a slow, interpreted, dynamically typed language — became the platform of choice for fast scientific computation?
+  markdown={`Which of the following is the *best* explanation of why Python, a slow, interpreted, dynamically typed language, became the platform of choice for fast scientific computation?
 
 - Python's interpreter is secretly very fast
   > CPython is a slow interpreter compared with compiled languages; Python's success comes from calling fast C and FORTRAN code, not from a fast interpreter.

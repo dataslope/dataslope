@@ -1,6 +1,6 @@
 ---
 title: Objects
-description: Bags of named values — how to create them, read them, change them, and compose them into real-world data models.
+description: Bags of named values, how to create them, read them, change them, and compose them into real-world data models.
 ---
 
 If an **array** is an ordered list of values, an **object** is an
@@ -15,7 +15,7 @@ language itself is built around them.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A rounded panel holding three labelled slots, each key chip joined by a thin line to a different colored value — an object as a bag of named values"
+  aria-label="A rounded panel holding three labelled slots, each key chip joined by a thin line to a different colored value, an object as a bag of named values"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -50,7 +50,7 @@ language itself is built around them.
 
 ## Creating objects
 
-The classic syntax — **object literal** notation:
+The classic syntax, **object literal** notation:
 
 <CodeBlock
   adapter="javascript"
@@ -73,7 +73,7 @@ console.log(typeof user); // "object"
 
 Each entry is a **property** with a **key** (the name) and a
 **value**. Keys are strings (with very rare exceptions you can
-ignore for now). Values can be anything — numbers, strings,
+ignore for now). Values can be anything, numbers, strings,
 booleans, arrays, other objects, even functions.
 
 ## Reading properties: dot vs bracket notation
@@ -98,9 +98,9 @@ console.log(user["name"]); // "Ada"
 console.log(user["favourite color"]); // bracket required: key has a space
 
 const key = "age";
-console.log(user[key]); // 28 — bracket required for dynamic keys
+console.log(user[key]); // 28, bracket required for dynamic keys
 
-console.log(user.email); // undefined — missing property
+console.log(user.email); // undefined, missing property
 `,
     },
   ]}
@@ -155,7 +155,7 @@ const age = 28;
 // Long form:
 const user1 = { name: name, age: age };
 
-// Shorthand — these are exactly equivalent:
+// Shorthand, these are exactly equivalent:
 const user2 = { name, age };
 
 console.log(user1);
@@ -225,7 +225,7 @@ console.log(Object.keys(scores)); // ["math","science","history"]
 // Values
 console.log(Object.values(scores)); // [90, 87, 73]
 
-// Both at once — array of [key, value] pairs
+// Both at once, array of [key, value] pairs
 console.log(Object.entries(scores)); // [["math",90],...]
 
 // Loop with for...of + entries() and destructuring
@@ -296,7 +296,7 @@ function describe1(user) {
   return user.name + " (" + user.age + ")";
 }
 
-// With destructuring — the parameter list tells you exactly what
+// With destructuring, the parameter list tells you exactly what
 // the function reads from its input.
 function describe2({ name, age }) {
   return name + " (" + age + ")";
@@ -333,7 +333,7 @@ copy.color = "blue";
 console.log("base:", base); // unchanged
 console.log("copy:", copy);
 
-// Rest in destructuring — "everything else":
+// Rest in destructuring, "everything else":
 const { color, ...rest } = merged;
 console.log("color:", color); // "red"
 console.log("rest: ", rest); // { size: "L", material: "cotton" }
@@ -343,7 +343,7 @@ console.log("rest: ", rest); // { size: "L", material: "cotton" }
 />
 
 A note: this is a **shallow** copy. If a property's value is itself
-an object or array, the *reference* is copied — both the original
+an object or array, the *reference* is copied, both the original
 and the copy will share that nested object. We'll revisit this in
 the *nested data* chapter.
 
@@ -360,7 +360,7 @@ objects.
       starterCode: `const a = { count: 0 };
 const b = a;
 b.count = 99;
-console.log("a:", a); // { count: 99 } — surprising if you weren't expecting it
+console.log("a:", a); // { count: 99 }, surprising if you weren't expecting it
 console.log(a === b); // true
 
 const c = { ...a }; // copy
@@ -387,8 +387,8 @@ considered equal unless they are *literally the same object*.
 const b = { x: 1 };
 const c = a;
 
-console.log(a === b); // false — different objects, same contents
-console.log(a === c); // true  — same reference
+console.log(a === b); // false, different objects, same contents
+console.log(a === c); // true, same reference
 
 // To compare contents, you need a deep-equality check, which JavaScript
 // doesn't have built in. A common trick (for simple data) is to compare
@@ -409,10 +409,10 @@ Objects let you give *meaning* to a group of related values
 without inventing a custom data type. Compare:
 
 ```javascript
-// Loosely-grouped values — easy to mix up
+// Loosely-grouped values, easy to mix up
 function move(playerName, x, y, hp, isAlive) { ... }
 
-// Grouped in an object — meaning is obvious, hard to mis-order
+// Grouped in an object, meaning is obvious, hard to mis-order
 function move(player) { ... }
 const player = { name: "Ada", x: 10, y: 20, hp: 100, isAlive: true };
 ```
@@ -476,7 +476,7 @@ module.exports = { newPlayer, move, hit, describe };
 Notice that each function takes a player object and returns a
 **new** player object instead of mutating the old one. The driver
 then *reassigns* `p` to the new value. This is a very common
-modern style — sometimes called **immutable updates** — and it
+modern style, sometimes called **immutable updates**, and it
 keeps the state of the program much easier to reason about.
 
 ## Challenge
@@ -567,7 +567,7 @@ if (JSON.stringify(updates) !== '{"age":29}') throw new Error("updates was mutat
 - It throws an error because objects can't be spread
   > Object spread (\`{...obj}\`) has been valid JavaScript since ES2018; it is one of the most widely used features of modern JS and works on any plain object.
 - [o] It creates a new object combining the properties of \`base\` and \`updates\`. Where both objects have the same key, the later one (\`updates\`) wins.
-  > Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow* — nested objects and arrays are still shared by reference.
+  > Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow*, nested objects and arrays are still shared by reference.
 - It modifies \`base\` in place by adding the properties of \`updates\`
   > The spread syntax inside \`{ }\` creates a new object literal; neither \`base\` nor \`updates\` is mutated, which is exactly what makes this pattern useful for immutable-style updates.
 

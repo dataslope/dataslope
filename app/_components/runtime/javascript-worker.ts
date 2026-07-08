@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-// Web Worker that executes JavaScript code via almostnode — a browser-
+// Web Worker that executes JavaScript code via almostnode, a browser-
 // native Node.js runtime. The worker accepts multi-file workspaces,
 // stages them into almostnode's VirtualFS, and runs the entry file with
 // CommonJS semantics (`require()`, `module.exports`, 40+ Node module
@@ -78,7 +78,7 @@ async function handleRun(
 }
 
 // Serialise concurrent run requests so async user code can't interleave
-// across runs — matches the behaviour of the legacy worker.
+// across runs, matches the behaviour of the legacy worker.
 let queue: Promise<unknown> = Promise.resolve();
 function enqueue(task: () => Promise<void>): void {
   queue = queue.then(task, task).catch(() => {});

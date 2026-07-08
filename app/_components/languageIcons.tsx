@@ -1,5 +1,5 @@
 /**
- * Shared programming-language icon registry used across the app — the
+ * Shared programming-language icon registry used across the app, the
  * playground header switcher (`Playground.tsx`), the playground index
  * card list (`/playground/page.tsx`), and the embedded MDX code blocks
  * (`CodeBlock.tsx`). Centralising the lookup means a logo or brand
@@ -27,7 +27,7 @@ import {
 import { RiPhpFill } from "react-icons/ri";
 
 /** Custom inline icon for the C playground. Mirrors the Streamline
- *  "C language logo (solid)" mark — kept as a tiny inline component so
+ *  "C language logo (solid)" mark, kept as a tiny inline component so
  *  the C playground can opt into a more recognisable language glyph
  *  than the generic devicon. */
 function CLanguageLogoSolidIcon({ size }: { size?: number }) {

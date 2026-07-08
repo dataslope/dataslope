@@ -4,7 +4,7 @@ description: Why WHERE cannot filter on a SUM or COUNT, and how HAVING lets you 
 ---
 
 You can group rows and summarize each group. Now: how do you keep
-only the groups whose *summary* meets a condition — "departments
+only the groups whose *summary* meets a condition, "departments
 with more than 2 people," "products that sold over \$1000"? You
 cannot use `WHERE` for this, and the reason why reveals something
 deep about how queries run.
@@ -12,7 +12,7 @@ deep about how queries run.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A bar chart of group totals measured against a thin yellow threshold line — only the groups whose summary clears the line stay colored"
+  aria-label="A bar chart of group totals measured against a thin yellow threshold line, only the groups whose summary clears the line stay colored"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -41,8 +41,8 @@ deep about how queries run.
 
 ## Why WHERE can't do it
 
-`WHERE` runs **before** grouping. At that moment, the groups — and
-therefore their `COUNT`s and `SUM`s — **do not exist yet.** Asking
+`WHERE` runs **before** grouping. At that moment, the groups, and
+therefore their `COUNT`s and `SUM`s, **do not exist yet.** Asking
 `WHERE COUNT(*) > 2` is like asking about a total before anything
 has been added up.
 
@@ -86,12 +86,12 @@ ORDER BY
 />
 
 Only Engineering (3 people) survives. Sales (2) and Marketing (1)
-are filtered out *as groups*. Notice `HAVING` uses an aggregate —
-`COUNT(*)` — which is exactly what `WHERE` could not do.
+are filtered out *as groups*. Notice `HAVING` uses an aggregate,
+`COUNT(*)`, which is exactly what `WHERE` could not do.
 
 ## WHERE and HAVING together
 
-They are not rivals — they work as a team, each at its own stage:
+They are not rivals, they work as a team, each at its own stage:
 
 - `WHERE` filters **rows** before grouping ("only count full-time
   staff").
@@ -124,7 +124,7 @@ ORDER BY
   avg_salary DESC;`}
 />
 
-Read the three commented steps top to bottom — they are the actual
+Read the three commented steps top to bottom, they are the actual
 order the database works in. The intern row is removed first, *then*
 groups form, *then* the average-pay filter runs on those groups.
 
@@ -138,13 +138,13 @@ grouping step.
 
 ## The full clause order so far
 
-You have now met the core query clauses. Here is their fixed order —
+You have now met the core query clauses. Here is their fixed order,
 and, helpfully, roughly the order the database executes them:
 
 **`FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY` → `LIMIT`**
 
 We will revisit this execution order in detail in the **Composing
-Queries** section — for now, knowing where `HAVING` fits is the key
+Queries** section, for now, knowing where `HAVING` fits is the key
 takeaway.
 
 ## Check your understanding
@@ -189,7 +189,7 @@ takeaway.
 - [o] The full-time filter goes in \`WHERE\`; the average-salary condition goes in \`HAVING\`.
   > Row-level filters belong in \`WHERE\`, and conditions on aggregates belong in \`HAVING\`.
 - Neither can be expressed in SQL.
-  > Both are easily expressed — one in \`WHERE\`, the other in \`HAVING\`.
+  > Both are easily expressed, one in \`WHERE\`, the other in \`HAVING\`.
 
 Per-row conditions go in \`WHERE\`; conditions on aggregated values go in \`HAVING\`.`}
 />
@@ -199,7 +199,7 @@ Per-row conditions go in \`WHERE\`; conditions on aggregated values go in \`HAVI
 <SqlChallengeCard
   dialect="postgres"
   title="Repeat customers only"
-  instructions={`The \`orders\` table has a \`customer\` column. Return each customer who has placed **more than one** order, with the columns \`customer\` and \`order_count\`, sorted from the highest order count to the lowest. The starter already groups and counts — add the group filter.`}
+  instructions={`The \`orders\` table has a \`customer\` column. Return each customer who has placed **more than one** order, with the columns \`customer\` and \`order_count\`, sorted from the highest order count to the lowest. The starter already groups and counts, add the group filter.`}
   initSql={`CREATE TABLE orders (
   id       SERIAL PRIMARY KEY,
   customer TEXT NOT NULL,

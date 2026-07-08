@@ -1,6 +1,6 @@
 ---
 title: Reshaping Data
-description: How to flip data between "wide" and "long" forms — the missing skill that turns most messy real-world data into something tidy you can actually work with.
+description: How to flip data between "wide" and "long" forms, the missing skill that turns most messy real-world data into something tidy you can actually work with.
 ---
 
 You'll often receive data in a shape that's friendly for humans
@@ -10,8 +10,8 @@ turning wide tables into long ones, or vice versa.
 The `tidyr` package provides two verbs that cover almost every
 case:
 
-- **`pivot_longer()`** — wide → long (more rows, fewer columns)
-- **`pivot_wider()`** — long → wide (fewer rows, more columns)
+- **`pivot_longer()`**, wide → long (more rows, fewer columns)
+- **`pivot_wider()`**, long → wide (fewer rows, more columns)
 
 You'll use `pivot_longer()` *much* more often than
 `pivot_wider()`, because the wild typically delivers data wide
@@ -20,7 +20,7 @@ and your tools want it long.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A wide two-row table and a tall two-column table hold exactly the same colored cells, three of which tumble through the air mid-move — reshaping changes the shape, never the values"
+  aria-label="A wide two-row table and a tall two-column table hold exactly the same colored cells, three of which tumble through the air mid-move, reshaping changes the shape, never the values"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -167,7 +167,7 @@ Notice `year` is now a proper integer column, not the string
 
 ## `pivot_wider()`: long → wide
 
-Sometimes you really do want wide format — usually for display, or
+Sometimes you really do want wide format, usually for display, or
 to compute differences between columns.
 
 <CodeBlock
@@ -246,7 +246,7 @@ Notice what just happened: long form is great for *computing*
 
 ## Separating combined columns
 
-Sometimes a single column holds two variables glued together —
+Sometimes a single column holds two variables glued together,
 "2022-Q1", "Male-30", "USA_Sales". The `separate_wider_delim()`
 function splits them:
 
@@ -304,7 +304,7 @@ flowchart TB
   markdown={`A table has columns \`country\`, \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\`. To turn it into a tidy long form with columns \`country\`, \`year\`, \`gdp\`, you would use:
 
 - \`pivot_wider()\`
-  > \`pivot_wider()\` goes in the opposite direction — it spreads rows into new columns, making a table wider rather than longer.
+  > \`pivot_wider()\` goes in the opposite direction, it spreads rows into new columns, making a table wider rather than longer.
 - \`group_by()\`
   > \`group_by()\` marks groups for downstream aggregation; it does not reshape the table or change the number of columns.
 - [o] \`pivot_longer()\`
@@ -319,7 +319,7 @@ flowchart TB
 - [o] \`pivot_wider(names_from = year, values_from = gdp)\`
   > Year's *values* become the new column *names*; gdp's values fill them.
 - \`pivot_longer(cols = year)\`
-  > \`pivot_longer()\` would make the table longer (more rows), not wider — the opposite of what is needed here.
+  > \`pivot_longer()\` would make the table longer (more rows), not wider, the opposite of what is needed here.
 - \`summarise(gdp = mean(gdp))\`
   > \`summarise()\` reduces rows to a single aggregate value; it does not spread a column's values into new columns.
 - \`mutate(year = as.character(year))\`
@@ -333,7 +333,7 @@ flowchart TB
   > ggplot reads data from a data frame, not a matrix; and having one column per measurement makes mapping aesthetics impossible when there are multiple metrics.
 - [o] Long form, because ggplot maps **columns** to visual properties (one column per variable).
   > Long form is what makes \`aes(color = metric)\`-style mappings work cleanly.
-- Either — ggplot doesn't care.
+- Either, ggplot doesn't care.
   > ggplot does care: each aesthetic mapping names one column, so all values for a given variable must live in one column (long form), not spread across many columns (wide form).
 - A matrix, not a data frame.
   > ggplot2 expects a data frame (or tibble) as input; while a matrix can be coerced, ggplot's grammar is designed around named columns in a data frame.`}
@@ -401,5 +401,5 @@ if (!all(need %in% names(sales_long))) stop("missing required columns")`,
 />
 
 We can now wrangle, group, summarize, and reshape. The next
-section is about *what to do* with all that capability — the
+section is about *what to do* with all that capability, the
 art of exploratory data analysis.

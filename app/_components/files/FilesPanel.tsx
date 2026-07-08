@@ -26,7 +26,7 @@ import {
 
 export interface VirtualFile {
   /** Slash-separated path, e.g. "data/sales.csv". The leading "/" is
-   *  implicit — paths are always relative to the virtual filesystem root. */
+   *  implicit, paths are always relative to the virtual filesystem root. */
   path: string;
   /** Size in bytes (0 for folders). */
   size: number;
@@ -55,7 +55,7 @@ interface FilesPanelProps {
   onCreateFile?: (parentPath: string, name: string) => void;
   onMove: (sourcePath: string, destFolderPath: string) => void;
   /** Called when the user opens a file into the editor (double-click or
-   *  the "Open in Editor" context item). Only rendered when provided —
+   *  the "Open in Editor" context item). Only rendered when provided,
    *  playgrounds use it to (re)open a workspace code file's tab. */
   onOpenFile?: (path: string) => void;
   /** Predicate gating the open-file affordance per file (e.g. only
@@ -63,12 +63,12 @@ interface FilesPanelProps {
    *  file offers it as long as `onOpenFile` is provided. */
   canOpenFile?: (path: string) => boolean;
   /** Called when the user chooses to open/query a file. Only rendered when
-   *  provided — use to surface a runtime-specific "open" action. */
+   *  provided, use to surface a runtime-specific "open" action. */
   onOpenQuery?: (path: string) => void;
   /** Label for the open-query menu item (defaults to "Query with SELECT"). */
   openQueryLabel?: string;
   /** Called when the user chooses to create a table from a file. Only
-   *  rendered when provided — use to surface a runtime-specific "import as
+   *  rendered when provided, use to surface a runtime-specific "import as
    *  table" action. */
   onCreateTable?: (path: string) => void;
   /** Predicate gating the create-table menu item per file (e.g. only for

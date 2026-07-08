@@ -8,11 +8,11 @@ the warehouse-modeling vocabulary interviewers expect.
 
 ## Q&A
 
-### Normalization vs denormalization — what's the trade-off?
+### Normalization vs denormalization, what's the trade-off?
 
 **Normalization** removes redundancy by splitting data into related
-tables (each fact stored once) — great for OLTP write integrity.
-**Denormalization** repeats data to avoid joins — common in analytics,
+tables (each fact stored once), great for OLTP write integrity.
+**Denormalization** repeats data to avoid joins, common in analytics,
 where reads dominate. The trade-off: denormalizing buys read speed at the
 cost of storage and the risk of copies disagreeing (update anomalies).
 
@@ -39,9 +39,9 @@ JOIN customers c ON c.customer_id = o.customer_id;
 ### Star vs snowflake schema?
 
 A **star** schema has a central fact table joined directly to
-**denormalized** dimension tables — simple, fast, fewer joins. A
+**denormalized** dimension tables, simple, fast, fewer joins. A
 **snowflake** further **normalizes** dimensions into sub-tables (e.g.
-product → category → department) — less redundancy but more joins. Stars
+product → category → department), less redundancy but more joins. Stars
 are the default for **Business Intelligence (BI)**; snowflake when
 dimensions are large or shared.
 
@@ -66,16 +66,16 @@ filter and group by (customer, product, date).
 
 The grain is **what one row represents** (one order? one order line? one
 customer-day?). Defining it first prevents double-counting and ambiguous
-aggregations — every measure and foreign key must make sense at that
+aggregations, every measure and foreign key must make sense at that
 grain.
 
 ### How do you preserve history when a dimension attribute changes (SCD)?
 
 Use a **Slowly Changing Dimension (SCD)**:
 
-- **Type 1** — overwrite (no history).
-- **Type 2** — add a new row with effective-date ranges + a "current" flag (full history; facts join to the version that was current at the time).
-- **Type 3** — keep a "previous value" column (limited history).
+- **Type 1**, overwrite (no history).
+- **Type 2**, add a new row with effective-date ranges + a "current" flag (full history; facts join to the version that was current at the time).
+- **Type 3**, keep a "previous value" column (limited history).
 
 Type 2 is the standard when point-in-time accuracy matters.
 
@@ -120,13 +120,13 @@ ORDER BY f.order_id;`}
 
 ### What is 1NF, 2NF, and 3NF?
 
-**First Normal Form (1NF):** each column holds a single atomic value; no repeating groups or arrays in a column. **Second Normal Form (2NF):** 1NF plus every non-key column depends on the **entire** primary key (eliminates partial dependencies — relevant when the key is composite). **Third Normal Form (3NF):** 2NF plus no non-key column depends on another non-key column (eliminates transitive dependencies). OLTP schemas are typically designed to 3NF; analytical schemas often intentionally violate higher normal forms for query performance.
+**First Normal Form (1NF):** each column holds a single atomic value; no repeating groups or arrays in a column. **Second Normal Form (2NF):** 1NF plus every non-key column depends on the **entire** primary key (eliminates partial dependencies, relevant when the key is composite). **Third Normal Form (3NF):** 2NF plus no non-key column depends on another non-key column (eliminates transitive dependencies). OLTP schemas are typically designed to 3NF; analytical schemas often intentionally violate higher normal forms for query performance.
 
 ### What are the three types of fact tables?
 
-1. **Transaction fact** — one row per discrete event (an order, a click). The most common type.
-2. **Periodic snapshot** — one row per entity per time period (account balance at end of each month), capturing state at regular intervals.
-3. **Accumulating snapshot** — one row per business process instance (a loan application) with multiple date stamps updated as the process advances through stages.
+1. **Transaction fact**, one row per discrete event (an order, a click). The most common type.
+2. **Periodic snapshot**, one row per entity per time period (account balance at end of each month), capturing state at regular intervals.
+3. **Accumulating snapshot**, one row per business process instance (a loan application) with multiple date stamps updated as the process advances through stages.
 
 ### What is a surrogate key, and why prefer it over a natural key?
 
@@ -148,21 +148,21 @@ JOIN dim_product p ON p.product_key = f.product_key;
 
 ### What is a conformed dimension?
 
-A dimension shared — with identical structure and values — across multiple fact tables and data marts. For example, a `dim_date` used by both `fact_sales` and `fact_inventory` allows users to drill across both subjects consistently. Conformed dimensions are the foundation of an enterprise data warehouse "bus architecture."
+A dimension shared, with identical structure and values, across multiple fact tables and data marts. For example, a `dim_date` used by both `fact_sales` and `fact_inventory` allows users to drill across both subjects consistently. Conformed dimensions are the foundation of an enterprise data warehouse "bus architecture."
 
 ### What is the difference between additive, semi-additive, and non-additive measures?
 
 - **Additive:** can be summed across any dimension (e.g., revenue, units sold).
-- **Semi-additive:** can be summed across some dimensions but not all — typically not time (e.g., account balance can be summed across accounts but averaging or taking a point-in-time snapshot is correct across time).
+- **Semi-additive:** can be summed across some dimensions but not all, typically not time (e.g., account balance can be summed across accounts but averaging or taking a point-in-time snapshot is correct across time).
 - **Non-additive:** cannot be meaningfully summed across any dimension (e.g., ratios, percentages, distinct counts). Store the numerator and denominator separately and compute the ratio in the query.
 
 ### What is OLTP vs OLAP, and how does schema design differ?
 
-**OLTP (Online Transaction Processing)** serves many concurrent short read/write transactions — normalized (3NF) to minimize redundancy and lock contention. **OLAP (Online Analytical Processing)** serves complex analytical queries over large data volumes — typically denormalized (star/snowflake) to minimize joins and maximize columnar scan efficiency. OLTP rows are narrow and updated frequently; OLAP tables are wide and mostly append-only.
+**OLTP (Online Transaction Processing)** serves many concurrent short read/write transactions, normalized (3NF) to minimize redundancy and lock contention. **OLAP (Online Analytical Processing)** serves complex analytical queries over large data volumes, typically denormalized (star/snowflake) to minimize joins and maximize columnar scan efficiency. OLTP rows are narrow and updated frequently; OLAP tables are wide and mostly append-only.
 
 ### What is SCD Type 0?
 
-**Type 0** means the attribute **never changes** — it is fixed at the time the dimension row is created and any upstream changes are ignored. Useful for attributes that are definitionally immutable, such as a customer's original sign-up date or a product's first release year. No special logic is needed; a simple insert-once strategy suffices.
+**Type 0** means the attribute **never changes**, it is fixed at the time the dimension row is created and any upstream changes are ignored. Useful for attributes that are definitionally immutable, such as a customer's original sign-up date or a product's first release year. No special logic is needed; a simple insert-once strategy suffices.
 
 ### How does SCD Type 2 work in practice?
 
@@ -200,7 +200,7 @@ A single physical dimension table used multiple times in the same schema under d
 
 ### What is a bridge table and when do you need one?
 
-A **bridge table** (also called an association table) resolves **many-to-many** relationships between a fact table and a dimension — for example, an order that belongs to multiple promotions simultaneously. The bridge table has a surrogate key, the fact foreign key, and the dimension foreign key. Without it you would either fan out fact rows (inflating counts) or store comma-separated lists (violating 1NF).
+A **bridge table** (also called an association table) resolves **many-to-many** relationships between a fact table and a dimension, for example, an order that belongs to multiple promotions simultaneously. The bridge table has a surrogate key, the fact foreign key, and the dimension foreign key. Without it you would either fan out fact rows (inflating counts) or store comma-separated lists (violating 1NF).
 
 The query below joins `fact_orders` through `order_promotion_bridge` to
 `dim_promotion`, showing how an order tied to multiple promotions fans out
@@ -220,7 +220,7 @@ JOIN dim_promotion p          ON p.promo_key  = b.promo_key;
 
 ### What is the difference between a wide table and a narrow table approach in analytics?
 
-A **wide table** (one row per entity, many columns) is fully denormalized — fast to query, easy to understand in a BI tool, but adds columns for every new attribute and can become unwieldy. A **narrow table** keeps fewer columns per row and uses keys to join to attribute tables, more normalized and flexible but requiring more joins. Modern cloud warehouses with columnar storage and cheap compute tolerate wide tables well; the trade-off is schema evolution vs query simplicity.
+A **wide table** (one row per entity, many columns) is fully denormalized, fast to query, easy to understand in a BI tool, but adds columns for every new attribute and can become unwieldy. A **narrow table** keeps fewer columns per row and uses keys to join to attribute tables, more normalized and flexible but requiring more joins. Modern cloud warehouses with columnar storage and cheap compute tolerate wide tables well; the trade-off is schema evolution vs query simplicity.
 
 ### What is a data vault, and when would you choose it over a star schema?
 
@@ -228,7 +228,7 @@ A **data vault** separates hubs (business keys), links (relationships), and sate
 
 ### What does "grain mismatch" mean, and how do you fix it?
 
-A grain mismatch occurs when you join two fact tables at different grains — for example, a daily budget table joined to a transaction-level sales table — causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
+A grain mismatch occurs when you join two fact tables at different grains, for example, a daily budget table joined to a transaction-level sales table, causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
 
 The example below has transaction-grain `fact_sales` and daily-grain
 `fact_budget`; the query rolls `fact_sales` up to one row per
@@ -274,15 +274,15 @@ ORDER BY b.sale_date, b.region;`}
 
 ### What are slowly-changing dimension types 4 and 6?
 
-**Type 4** offloads historical values to a separate "mini-dimension" or history table, while the main dimension keeps only current values — used when historical attributes are large or queried infrequently. **Type 6** ("hybrid") combines Types 1, 2, and 3: it versions rows like Type 2 but also carries a current-value column on every row (like Type 1) so the latest attribute is always available without an extra join for users who only need current state.
+**Type 4** offloads historical values to a separate "mini-dimension" or history table, while the main dimension keeps only current values, used when historical attributes are large or queried infrequently. **Type 6** ("hybrid") combines Types 1, 2, and 3: it versions rows like Type 2 but also carries a current-value column on every row (like Type 1) so the latest attribute is always available without an extra join for users who only need current state.
 
 ### How do you handle late-arriving dimension members?
 
-Create a **dummy or unknown dimension row** (e.g., surrogate key = -1) to stand in for the missing member. Facts that arrive before the dimension record is available reference this placeholder. Once the true dimension row is inserted, you can optionally update the fact table's foreign key in a reconciliation step — or accept the unknown row as the historical truth if strict point-in-time accuracy is required.
+Create a **dummy or unknown dimension row** (e.g., surrogate key = -1) to stand in for the missing member. Facts that arrive before the dimension record is available reference this placeholder. Once the true dimension row is inserted, you can optionally update the fact table's foreign key in a reconciliation step, or accept the unknown row as the historical truth if strict point-in-time accuracy is required.
 
 ### What is a factless fact table?
 
-A fact table with **no numeric measures** — it records only that an event happened (e.g., a student attending a class, a promotion being applied to a product). It is used for coverage or eligibility analysis: which products were covered by a promotion? which students attended which sessions?
+A fact table with **no numeric measures**, it records only that an event happened (e.g., a student attending a class, a promotion being applied to a product). It is used for coverage or eligibility analysis: which products were covered by a promotion? which students attended which sessions?
 
 ### What is a mini-dimension?
 
@@ -294,15 +294,15 @@ An **insert-only** strategy appends a new row for every state change, preserving
 
 ### What is the difference between a bus matrix and a data mart?
 
-A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps business processes (rows) against conformed dimensions (columns), documenting which dimensions are shared across which subject areas. A **data mart** is the physical implementation — a subset of the warehouse focused on one business domain (e.g., sales, finance). Conformed dimensions in the bus matrix allow data marts to be combined ("drilled across") without double-counting.
+A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps business processes (rows) against conformed dimensions (columns), documenting which dimensions are shared across which subject areas. A **data mart** is the physical implementation, a subset of the warehouse focused on one business domain (e.g., sales, finance). Conformed dimensions in the bus matrix allow data marts to be combined ("drilled across") without double-counting.
 
 ### Why use a date dimension table instead of date functions?
 
-A `dim_date` table pre-computes every calendar attribute — fiscal week, quarter, holiday flag, day-of-week name — so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
+A `dim_date` table pre-computes every calendar attribute, fiscal week, quarter, holiday flag, day-of-week name, so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
 
 The query below joins `fact_orders` to `dim_date` and groups by the
 pre-computed `fiscal_quarter` while filtering out holidays with
-`is_holiday = false` — no inline date arithmetic required.
+`is_holiday = false`, no inline date arithmetic required.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -345,7 +345,7 @@ A **measure** is a raw numeric column on a fact table (e.g., `revenue`, `quantit
 
 ### What is the purpose of a surrogate key sequence vs a UUID?
 
-An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered — ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers.
+An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered, ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers.
 
 ### How do you model a many-to-many relationship between facts and dimensions?
 
@@ -373,9 +373,9 @@ GROUP BY p.promo_name;
   markdown={`An analytics table repeats the full customer name and address on **every** order row ("denormalized"). What's the main trade-off?
 
 - It saves storage at the cost of correctness.
-  > Denormalization generally *increases* storage (repeated data) — it isn't a storage win.
+  > Denormalization generally *increases* storage (repeated data), it isn't a storage win.
 - [o] Faster reads (no join needed) at the cost of redundancy and update anomalies.
-  > It trades write-time/consistency concerns for read performance — common and often correct in analytics.
+  > It trades write-time/consistency concerns for read performance, common and often correct in analytics.
 - It guarantees the data is always consistent.
   > The opposite: repeating data risks the copies disagreeing (update anomalies).
 - It only matters for OLTP systems, never analytics.
@@ -386,9 +386,9 @@ GROUP BY p.promo_name;
   markdown={`A customer moves to a new city. You must keep historical orders attributed to the city they lived in **at the time**, while new orders use the new city. Which approach fits?
 
 - SCD Type 1 (overwrite the old value).
-  > Type 1 overwrites history, so past orders would all show the new city — losing the point-in-time truth.
+  > Type 1 overwrites history, so past orders would all show the new city, losing the point-in-time truth.
 - [o] SCD Type 2 (new dimension row with effective-date ranges and a current flag).
-  > Type 2 versions the dimension so each fact joins to the row current when it occurred — the standard way to preserve history.
+  > Type 2 versions the dimension so each fact joins to the row current when it occurred, the standard way to preserve history.
 - Delete the customer and re-insert them.
   > That breaks referential integrity with historical facts and still loses the time context.
 - Store the city only on the fact table and drop the dimension.

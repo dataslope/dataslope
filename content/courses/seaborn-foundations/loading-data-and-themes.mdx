@@ -3,7 +3,7 @@ title: Loading Data and Setting a Theme
 description: Meet Seaborn's built-in datasets and make every chart look good with one call to set_theme.
 ---
 
-Before you can practice plotting, you need data — and you would rather not
+Before you can practice plotting, you need data, and you would rather not
 go hunting for CSV files for every exercise. Seaborn solves this for you:
 it ships with a handful of small, clean, **already-tidy** datasets that
 load in an instant. Every example and challenge in this course is built on
@@ -18,7 +18,7 @@ to make it presentable.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three small green dataset cards stacked in a column feed along a solid gray arrow into a themed chart canvas — a light blue panel with white grid lines and a rising blue data line"
+  aria-label="Three small green dataset cards stacked in a column feed along a solid gray arrow into a themed chart canvas, a light blue panel with white grid lines and a rising blue data line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -57,7 +57,7 @@ to make it presentable.
 ## Loading a built-in dataset
 
 `sns.load_dataset("name")` fetches a named dataset and hands you back an
-ordinary pandas `DataFrame` — the same kind of table you already know how
+ordinary pandas `DataFrame`, the same kind of table you already know how
 to filter, group, and describe. There is nothing to download or install;
 it just works in your browser.
 
@@ -80,7 +80,7 @@ display(tips.head())
 />
 
 Because the result is a regular DataFrame, every pandas habit you have
-still applies — `.shape`, `.head()`, `.describe()`, `.groupby(...)`, and so
+still applies, `.shape`, `.head()`, `.describe()`, `.groupby(...)`, and so
 on. Seaborn just gives you a convenient, reliable starting table.
 
 ## The datasets we'll use
@@ -89,39 +89,39 @@ A few small built-ins show up again and again in this course. Knowing
 their columns ahead of time means you can read every example without
 guessing. Here are the ones to know.
 
-**`tips`** (244 rows) — one row per restaurant bill. A classic for
+**`tips`** (244 rows), one row per restaurant bill. A classic for
 relating a numeric variable to several categories.
 
-* `total_bill`, `tip` — numeric (dollars)
-* `sex`, `smoker`, `day`, `time` — categorical
-* `size` — party size (small integer)
+* `total_bill`, `tip`, numeric (dollars)
+* `sex`, `smoker`, `day`, `time`, categorical
+* `size`, party size (small integer)
 
-**`penguins`** (344 rows) — body measurements of three penguin species.
+**`penguins`** (344 rows), body measurements of three penguin species.
 Great for scatter plots and group comparisons. It contains a few missing
 values, which Seaborn quietly drops when plotting.
 
-* `species`, `island`, `sex` — categorical
-* `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, `body_mass_g` —
+* `species`, `island`, `sex`, categorical
+* `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, `body_mass_g`,
   numeric
 
-**`mpg`** (398 rows) — fuel efficiency of cars from the 1970s–80s. A good
+**`mpg`** (398 rows), fuel efficiency of cars from the 1970s–80s. A good
 mix of numeric and categorical columns.
 
-* `mpg`, `displacement`, `horsepower`, `weight`, `acceleration` — numeric
-* `cylinders`, `model_year`, `origin`, `name` — categorical-ish
+* `mpg`, `displacement`, `horsepower`, `weight`, `acceleration`, numeric
+* `cylinders`, `model_year`, `origin`, `name`, categorical-ish
 
-**`iris`** (150 rows) — the most famous dataset in statistics: four flower
+**`iris`** (150 rows), the most famous dataset in statistics: four flower
 measurements across three species.
 
-* `sepal_length`, `sepal_width`, `petal_length`, `petal_width` — numeric
-* `species` — categorical
+* `sepal_length`, `sepal_width`, `petal_length`, `petal_width`, numeric
+* `species`, categorical
 
-**`flights`** (144 rows) — monthly airline passengers from 1949 to 1960.
+**`flights`** (144 rows), monthly airline passengers from 1949 to 1960.
 Its ordered time axis makes it perfect for line plots and heatmaps.
 
-* `year` — numeric (ordered)
-* `month` — categorical (ordered)
-* `passengers` — numeric
+* `year`, numeric (ordered)
+* `month`, categorical (ordered)
+* `passengers`, numeric
 
 Let's actually look at a couple of them rather than just listing columns.
 
@@ -158,8 +158,8 @@ display(flights.head())
 <Callout type="info" title="Why some blocks read a CSV instead of load_dataset">
 You'll notice the `penguins` block above used
 `pd.read_csv("penguins.csv")` while the `flights` block used
-`sns.load_dataset("flights")`. They reach the *same* kind of object — a
-pandas DataFrame — but by different roads. `sns.load_dataset` downloads
+`sns.load_dataset("flights")`. They reach the *same* kind of object, a
+pandas DataFrame, but by different roads. `sns.load_dataset` downloads
 from Seaborn's online example repository each time. For the two datasets
 this course leans on most, **penguins** and **diamonds**, we instead stage
 a pinned, cached copy and read it as a local file, so those examples load
@@ -169,7 +169,7 @@ code that follows is exactly the same either way.
 
 <Callout type="tip" title="See what's available">
 Curious what else ships with Seaborn? `sns.get_dataset_names()` returns the
-full list. Stick to the small ones above for fast, snappy exercises — a few
+full list. Stick to the small ones above for fast, snappy exercises, a few
 listed datasets are large enough to slow a plot down.
 </Callout>
 
@@ -186,7 +186,7 @@ spartan. Watch what a bare plot looks like with no theme applied.
       filename: "main.py",
       starterCode: `import seaborn as sns
 
-# No set_theme() here — this is the unstyled matplotlib default.
+# No set_theme() here, this is the unstyled matplotlib default.
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
@@ -195,7 +195,7 @@ sns.scatterplot(data=tips, x="total_bill", y="tip")
   ]}
 />
 
-Now add **one line** — `sns.set_theme()` — before the same plot. You get a
+Now add **one line**, `sns.set_theme()`, before the same plot. You get a
 soft gray background, clean white gridlines, a tuned color palette, and
 slightly larger, more readable text. Nothing about the *data* changed; only
 its presentation did.
@@ -218,9 +218,9 @@ sns.scatterplot(data=tips, x="total_bill", y="tip")
 />
 
 The difference is purely cosmetic, but cosmetics matter when you are trying
-to *see* and to *communicate*. `set_theme()` bundles several choices —
+to *see* and to *communicate*. `set_theme()` bundles several choices,
 **style** (backgrounds and gridlines), **context** (how big everything is),
-and **palette** (the default colors) — into one sensible default. The next
+and **palette** (the default colors), into one sensible default. The next
 sections let you steer each of those.
 
 <Callout type="info" title="Why a function and not a setting?">
@@ -232,19 +232,19 @@ because each block on this page runs on its own.
 
 ## Styles: backgrounds and gridlines
 
-The **style** controls the "canvas" — the background color and whether
+The **style** controls the "canvas", the background color and whether
 gridlines are drawn. Pass it as `set_theme(style=...)`. There are five
 choices:
 
-* `"darkgrid"` — gray background with white gridlines (the default). Grid
+* `"darkgrid"`, gray background with white gridlines (the default). Grid
   helps read values; the muted background keeps data colors popping.
-* `"whitegrid"` — white background with light gridlines. Cleaner, common
+* `"whitegrid"`, white background with light gridlines. Cleaner, common
   for print.
-* `"white"` — white background, no grid.
-* `"dark"` — gray background, no grid.
-* `"ticks"` — white background, no grid, with small tick marks on the axes.
+* `"white"`, white background, no grid.
+* `"dark"`, gray background, no grid.
+* `"ticks"`, white background, no grid, with small tick marks on the axes.
 
-Here is `whitegrid` — a white canvas with subtle gridlines.
+Here is `whitegrid`, a white canvas with subtle gridlines.
 
 <CodeBlock
   adapter="python"
@@ -265,7 +265,7 @@ sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 />
 
 Compare that with `ticks`, which drops the grid entirely and adds tick
-marks on the axes — a tidy, minimal look favored in many publications.
+marks on the axes, a tidy, minimal look favored in many publications.
 
 <CodeBlock
   adapter="python"
@@ -285,7 +285,7 @@ sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
   ]}
 />
 
-And `dark` — a gray background with no gridlines, which can make brightly
+And `dark`, a gray background with no gridlines, which can make brightly
 colored points stand out.
 
 <CodeBlock
@@ -320,7 +320,7 @@ gridlines and small tick marks on the axes?
 - \`"darkgrid"\`
   > That is the default: a gray background with white gridlines.
 - [o] \`"ticks"\`
-  > \`"ticks"\` removes the grid and adds short tick marks on the axes — a minimal look common in publications.
+  > \`"ticks"\` removes the grid and adds short tick marks on the axes, a minimal look common in publications.
 - \`"dark"\`
   > \`"dark"\` is a gray background with no grid and no tick marks.
 
@@ -330,8 +330,8 @@ only \`ticks\` adds axis tick marks to an otherwise grid-free canvas.`}
 
 ## Contexts: scaling for the medium
 
-The **context** controls *size* — how large the fonts, lines, and markers
-are — without changing the style. The idea is to match the medium: a chart
+The **context** controls *size*, how large the fonts, lines, and markers
+are, without changing the style. The idea is to match the medium: a chart
 on a slide needs bigger text than the same chart in a journal figure. Pass
 it as `set_theme(context=...)`, from smallest to largest: `"paper"`,
 `"notebook"` (the default), `"talk"`, `"poster"`.
@@ -354,8 +354,8 @@ sns.scatterplot(data=tips, x="total_bill", y="tip")
   ]}
 />
 
-Now the **same plot** at `talk` context. Everything — labels, ticks, the
-points themselves — scales up, so it stays legible when projected to a
+Now the **same plot** at `talk` context. Everything, labels, ticks, the
+points themselves, scales up, so it stays legible when projected to a
 room. Notice that the data and the style are identical; only the *sizes*
 grew.
 
@@ -408,7 +408,7 @@ summary numbers:
 2. Store the **mean of the \`"mpg"\` column**, rounded to **1 decimal
 place**, in a variable named \`mean_mpg\` (use Python's \`round(value, 1)\`).
 
-You do not need to draw anything — just create the two variables.`}
+You do not need to draw anything, just create the two variables.`}
   files={[
     {
       filename: "main.py",
@@ -455,11 +455,11 @@ mean_mpg = round(mpg["mpg"].mean(), 1)
 - A Seaborn-specific chart object that you then display.
   > \`load_dataset\` loads *data*, not a chart. Nothing is plotted by this call.
 - [o] An ordinary pandas \`DataFrame\` containing the penguins data.
-  > It hands back a normal DataFrame, so all your pandas tools — \`.head()\`, \`.groupby()\`, filtering — work on it directly.
+  > It hands back a normal DataFrame, so all your pandas tools, \`.head()\`, \`.groupby()\`, filtering, work on it directly.
 - A NumPy array of raw values with no column names.
   > The result is a labeled DataFrame with named columns, not a bare array.
 - A file path string pointing to a CSV on disk.
-  > You get the loaded table itself, ready to use — there is no file to open.
+  > You get the loaded table itself, ready to use, there is no file to open.
 
 \`load_dataset\` is just a convenient way to get a clean, tidy pandas
 DataFrame to practice on.`}
@@ -470,7 +470,7 @@ DataFrame to practice on.`}
 Which statement is true?
 
 - Only the first chart after the call is affected; later charts revert to the default.
-  > The change is persistent, not one-shot — it stays in effect until you call \`set_theme\` again.
+  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
 - Nothing changes until you also pass a \`style\` argument.
   > \`context\` works on its own; \`style\` and \`palette\` are independent, optional settings.
 - [o] All three charts use the larger \`poster\` sizing, because \`set_theme\` changes the global defaults for the rest of the session.

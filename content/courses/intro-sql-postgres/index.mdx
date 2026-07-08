@@ -1,24 +1,24 @@
 ---
 title: Welcome
-description: A friendly, visual, zero-prerequisite introduction to SQL, relational databases, and PostgreSQL — for people who have never written a query before.
+description: A friendly, visual, zero-prerequisite introduction to SQL, relational databases, and PostgreSQL, for people who have never written a query before.
 ---
 
 Welcome to **Introduction to SQL and Relational Databases with
 PostgreSQL**. If the words *database*, *query*, and *table* feel
-vague — or if you have only ever organized information in a
-spreadsheet — you are in exactly the right place. This course
+vague, or if you have only ever organized information in a
+spreadsheet, you are in exactly the right place. This course
 assumes **no programming experience, no database experience, and no
 SQL experience.**
 
 Before we say another word about what you will learn, here is the
 most important fact about this course: **it runs in your browser.**
 Every page contains live SQL editors backed by a real PostgreSQL
-engine — no server, no signup, nothing to install. The block below
+engine, no server, no signup, nothing to install. The block below
 is one of them. Click **Run** right now:
 
 <SqlCodeBlock
   dialect="postgres"
-  title="Your very first query — click Run"
+  title="Your very first query, click Run"
   initSql={`CREATE TABLE pets (
   name    TEXT,
   species TEXT,
@@ -47,12 +47,12 @@ pets table, but only the cats, sorted from oldest to youngest."*
 
 Now change one thing: in the editor above, replace `'cat'` with
 `'dog'` and click **Run** again. Different question, different
-answer — that is the entire rhythm of working with a database, and
+answer, that is the entire rhythm of working with a database, and
 you have already done it. Everything else in this course is about
 doing it with precision and confidence.
 
 <Callout type="info" title="Nothing to install, nothing to break">
-The SQL blocks run on **PGlite** — actual PostgreSQL compiled to
+The SQL blocks run on **PGlite**, actual PostgreSQL compiled to
 WebAssembly, living entirely inside your browser tab. Each block
 sets up its own tiny database, so you can edit anything, run
 anything, and never damage anything. Experimenting is the whole
@@ -115,7 +115,7 @@ You will feel at home here if any of these sound like you:
   query" and quietly wondered what they actually mean.
 - You manage information in spreadsheets, but they have started to
   feel slow, fragile, or hard to keep consistent.
-- You are curious about data roles — analyst, engineer, scientist —
+- You are curious about data roles, analyst, engineer, scientist,
   and you want to understand the foundation everyone builds on.
 - You tried a SQL tutorial once and bounced off a wall of syntax
   with no explanation of *why* any of it exists.
@@ -138,11 +138,11 @@ By the end of the course you will be able to:
   **relationships** between tables.
 - Sketch a simple **data model** and read an **entity-relationship
   diagram**.
-- Think analytically about data — the skill that outlasts any
+- Think analytically about data, the skill that outlasts any
   particular tool.
 
 This is a **foundations** course about SQL and relational thinking.
-It deliberately spends little time on database administration —
+It deliberately spends little time on database administration,
 deployment, replication, tuning, security hardening. Those matter,
 but they make far more sense *after* the ideas taught here.
 
@@ -151,22 +151,22 @@ but they make far more sense *after* the ideas taught here.
 We believe in **motivation before mechanism**: every piece of SQL
 in this course is introduced to answer a question you already care
 about. The first two pages after this one build the conceptual
-ground — what a database actually is, and where SQL and PostgreSQL
+ground, what a database actually is, and where SQL and PostgreSQL
 came from (the history is shorter and stranger than you might
 expect). From the third section onward, you are writing queries on
 every page. Near the end, an **Interesting discussions** section
-collects a couple of optional deep-dives — spreadsheets versus
-databases, and how real applications talk to databases — that are
+collects a couple of optional deep-dives, spreadsheets versus
+databases, and how real applications talk to databases, that are
 worth reading whenever curiosity strikes.
 
 ## The three kinds of interactive widgets
 
 You will meet three kinds of interactive elements:
 
-1. **Runnable SQL blocks** — like the one above. Some pre-load
+1. **Runnable SQL blocks**, like the one above. Some pre-load
    sample tables for you; edit the query, click *Run*, and inspect
    the result.
-2. **Challenge cards.** Small problems with tests — write a query,
+2. **Challenge cards.** Small problems with tests, write a query,
    run the tests, and see which ones pass. They are designed to be
    two-to-five-minute confidence builders, not exams.
 3. **Multiple-choice questions.** Quick conceptual checks, with an
@@ -175,7 +175,7 @@ You will meet three kinds of interactive elements:
 
 <Callout type="info" title="Each SQL block is independent">
 Tables you create in one runnable block are **not** visible to the
-next block, even on the same page — every block that needs data
+next block, even on the same page, every block that needs data
 sets it up itself. If you want a single long-lived workspace to
 experiment in, open the
 [PostgreSQL Playground](/playground/postgres) in a new tab.

@@ -1,13 +1,13 @@
 /* Standalone executable code-block, intended to be embedded inside
    long-form learning pages (e.g. fumadocs MDX). Visually compact, no
-   sidebars / toolbars / themes / packages drawer — just an editor, a
+   sidebars / toolbars / themes / packages drawer, just an editor, a
    Run button, a Reset button, and a stdout/stderr panel. Multiple
    blocks targeting the same language adapter share a single runtime
    via the registry, so a page with five Python blocks loads one
    Pyodide worker, not five.
 
    The card chrome (header, editor frame, action bar, init drawer) is
-   shared with the challenge card via `ChallengeCard.module.css` — see
+   shared with the challenge card via `ChallengeCard.module.css`, see
    `CodeBlock.tsx`, which renders the root as `.card` + `.outputScope`.
    This stylesheet therefore only owns what's unique to the code block:
    the output panel, DataFrame tables, the running-wave overlay, and the
@@ -42,7 +42,7 @@
   position: relative;
 }
 
-/* Icon-only buttons (copy output cell) — sized to match the
+/* Icon-only buttons (copy output cell), sized to match the
    surrounding cell-header text controls. */
 .iconBtn {
   background: transparent;
@@ -221,7 +221,7 @@
   box-sizing: border-box;
   padding: 0.75rem 2.25rem 0.75rem 0.875rem;
   border-radius: 8px;
-  /* Dark theme — pulls from the same Tailwind tokens as the rest of
+  /* Dark theme, pulls from the same Tailwind tokens as the rest of
      the block. */
   background: var(--cb-slate-900);
   color: var(--cb-slate-200);
@@ -328,7 +328,7 @@
 }
 
 .toastTitle {
-  /* `Toast.Title` renders an <h2>, and the toast is portaled to <body> —
+  /* `Toast.Title` renders an <h2>, and the toast is portaled to <body>,
      outside the /learn docs container. There the docs' bare
      `h1–h6 { font-family: var(--font-sans) }` rule applies its tightened
      heading tracking to this <h2> and wins over the value set on

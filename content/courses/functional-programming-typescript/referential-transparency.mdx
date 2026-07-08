@@ -1,6 +1,6 @@
 ---
 title: Referential Transparency
-description: When an expression can be replaced by its value without changing the program's meaning — and why that's a superpower.
+description: When an expression can be replaced by its value without changing the program's meaning, and why that's a superpower.
 ---
 
 **Referential transparency** is a fancy name for a simple idea:
@@ -17,7 +17,7 @@ Impure functions don't.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A perfectly level balance scale weighing a small ƒ capsule with its input dot against a plain green value circle — an expression and the value it evaluates to are interchangeable"
+  aria-label="A perfectly level balance scale weighing a small ƒ capsule with its input dot against a plain green value circle, an expression and the value it evaluates to are interchangeable"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.3">
@@ -66,8 +66,8 @@ console.log(a, b, c); // all 18
   ]}
 />
 
-Every transformation we just did — substituting `square(3)` for `9`,
-factoring out the common subexpression — is *safe* because `square`
+Every transformation we just did, substituting `square(3)` for `9`,
+factoring out the common subexpression, is *safe* because `square`
 is pure. You don't even have to think about it.
 
 Compare with an impure function:
@@ -108,14 +108,14 @@ factor out `nextId()` as a common subexpression. The expression is
 Once you know an expression is referentially transparent, an
 enormous toolbox opens up. You can:
 
-- **Inline** it freely — replace a function call with its body
-- **Hoist** it — move it earlier or later in a function
-- **Cache** it — compute it once, reuse the result
-- **Parallelize** it — run it on another thread without coordination
-- **Reorder** it — swap independent expressions without changing
+- **Inline** it freely, replace a function call with its body
+- **Hoist** it, move it earlier or later in a function
+- **Cache** it, compute it once, reuse the result
+- **Parallelize** it, run it on another thread without coordination
+- **Reorder** it, swap independent expressions without changing
   meaning
-- **Factor** it — extract common subexpressions into named values
-- **Substitute** equals for equals — anywhere you see `expr1`, if
+- **Factor** it, extract common subexpressions into named values
+- **Substitute** equals for equals, anywhere you see `expr1`, if
   `expr1 === expr2`, you can substitute
 
 These are exactly the optimizations a compiler wants to do. They
@@ -162,7 +162,7 @@ You evaluated that in your head using *substitution*: replace
 not have to ask "what's the value of any other variable at that
 moment?" because nothing else exists.
 
-That mode of reading code — top-down substitution, no hidden state —
+That mode of reading code, top-down substitution, no hidden state,
 is what makes purely functional code so easy to reason about,
 especially compared to imperative code where every line might depend
 on something invisible.
@@ -249,7 +249,7 @@ console.log(distanceCSE({ x: 0, y: 0 }, { x: 3, y: 4 }));
 />
 
 The refactor from `distance` to `distanceCSE` is *only* safe because
-`a.x - b.x` is referentially transparent — it has no side effects
+`a.x - b.x` is referentially transparent, it has no side effects
 and depends only on its inputs. In an imperative world where reading
 a property might trigger code, you couldn't do this without
 analysis.
@@ -272,17 +272,17 @@ sumOfSquares(xs)
 ```
 
 Each `=` is a substitution. The proof writes itself. This is what
-the FP community means when it says "you can *reason about* the code"
-— not "stare at it harder" but literally *prove* properties of it by
+the FP community means when it says "you can *reason about* the code",
+not "stare at it harder" but literally *prove* properties of it by
 substitution.
 
 ## What breaks referential transparency
 
 Anything impure:
 
-- `Date.now()` — different result every call
-- `Math.random()` — different result every call
-- `console.log(...)` — same return value but the side effect matters
+- `Date.now()`, different result every call
+- `Math.random()`, different result every call
+- `console.log(...)`, same return value but the side effect matters
 - mutation of a captured variable
 - exceptions on some inputs (technically: the call has no value at all)
 
@@ -309,7 +309,7 @@ console.log("b:", b);
   ]}
 />
 
-Both produce the same string, but the *programs* are different —
+Both produce the same string, but the *programs* are different,
 because the side effect (logging) happens a different number of
 times. If anyone is observing those logs, the programs are *not*
 equivalent. That's what "referentially opaque" means in practice.
@@ -325,7 +325,7 @@ exposing the randomness as an input.
   files={[
     {
       filename: "main.ts",
-      starterCode: `// Before: not referentially transparent — output depends on the RNG
+      starterCode: `// Before: not referentially transparent, output depends on the RNG
 function pickWinner(candidates: readonly string[]): string {
   const idx = Math.floor(Math.random() * candidates.length);
   return candidates[idx];
@@ -365,7 +365,7 @@ console.log("random winner:", winner);
 The first version cannot be tested, replayed, or reasoned about
 without simulating the RNG. The second version is fully
 deterministic and the actual random sampling moves to the program's
-edge — exactly the same pattern as in [Pure Functions](./pure-functions).
+edge, exactly the same pattern as in [Pure Functions](./pure-functions).
 
 ---
 

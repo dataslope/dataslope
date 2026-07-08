@@ -44,7 +44,7 @@ for (const { id, route, table } of ENGINES) {
       .waitFor({ state: "visible", timeout: 150_000 });
 
     // Open the whole table (no LIMIT) so the edit's re-fetch goes through the
-    // lazy path, which re-orders by primary key — the edited row keeps its
+    // lazy path, which re-orders by primary key, the edited row keeps its
     // place instead of being pushed out of a LIMIT window by Postgres MVCC.
     await runSql(page, `SELECT * FROM ${table};`);
     const nameCell = page

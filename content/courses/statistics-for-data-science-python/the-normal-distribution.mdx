@@ -1,19 +1,19 @@
 ---
 title: The Normal Distribution
-description: Why the bell curve shows up everywhere, the 68-95-99.7 empirical rule, z-scores and standardization, converting between raw values, z-scores, and percentiles — and the real danger of assuming data is normal when it isn't.
+description: Why the bell curve shows up everywhere, the 68-95-99.7 empirical rule, z-scores and standardization, converting between raw values, z-scores, and percentiles, and the real danger of assuming data is normal when it isn't.
 ---
 
-If you learn one distribution deeply, make it the **Normal** — the
+If you learn one distribution deeply, make it the **Normal**, the
 symmetric bell curve. Not because the world is secretly all bell curves
 (it isn't, and we'll be blunt about that), but because the normal is the
 hub the rest of statistics connects to. Confidence intervals, z-scores,
-the central limit theorem, most hypothesis tests — they all speak
+the central limit theorem, most hypothesis tests, they all speak
 "normal." Get fluent here and the inference chapters become much easier.
 
 This page does three things. First, *why* the normal appears so often
 (a preview of the central limit theorem). Second, the practical fluency:
 the **68–95–99.7 rule**, **z-scores**, and converting freely between raw
-values, z-scores, and percentiles. Third — and just as important — *when
+values, z-scores, and percentiles. Third, and just as important, *when
 the normal is the wrong model*, because assuming normality on skewed or
 heavy-tailed data is one of the most expensive mistakes in applied
 statistics.
@@ -21,7 +21,7 @@ statistics.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A bell curve built from three nested translucent layers — a wide base, a middle shell, and a tight core around the yellow center post — with a lone red dot stranded beyond the widest layer — the 68, 95, and 99.7 percent zones of the normal"
+  aria-label="A bell curve built from three nested translucent layers, a wide base, a middle shell, and a tight core around the yellow center post, with a lone red dot stranded beyond the widest layer, the 68, 95, and 99.7 percent zones of the normal"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -45,7 +45,7 @@ countless genetic and environmental nudges; measurement error is the sum
 of many tiny perturbations; a daily total is the sum of many
 transactions. Whenever a quantity is the accumulation of lots of small,
 roughly independent contributions, its distribution drifts toward a bell
-curve — *regardless* of what the individual pieces look like.
+curve, *regardless* of what the individual pieces look like.
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
 The deep reason is the **central limit theorem (CLT)**: sums and
 **averages** of many independent values are approximately normal, even
 when the underlying data is not. This is why the normal governs *sample
-means* — and therefore confidence intervals and tests — even for decidedly
+means*, and therefore confidence intervals and tests, even for decidedly
 non-normal raw data. We give the CLT its own page later; for now, just
 hold the idea: *averaging manufactures bell curves*.
 </Callout>
@@ -151,7 +151,7 @@ print(f"mean = {mu:.1f} mm,  std = {sigma:.1f} mm")
   ]}
 />
 
-It's not a textbook-perfect bell — real data never is — but the fitted
+It's not a textbook-perfect bell, real data never is, but the fitted
 normal tracks the histogram closely. That "close enough" is what lets us
 use normal-based tools on measurements like this. Mixing all three
 species together would *break* it: you'd get the lumpy, multi-peaked
@@ -178,7 +178,7 @@ flowchart TD
   A["Normal centered at mu"] --> B["mu ± 1 sigma<br/>~68% of values"]
   A --> C["mu ± 2 sigma<br/>~95% of values"]
   A --> D["mu ± 3 sigma<br/>~99.7% of values"]
-  D --> E["Outside 3 sigma<br/>~0.3% — rare"]
+  D --> E["Outside 3 sigma<br/>~0.3%, rare"]
 ```
 
 <CodeBlock
@@ -204,7 +204,7 @@ print("\\n68-95-99.7 are the rounded versions of these exact numbers.")
 ### Shading the empirical-rule bands
 
 Seeing the bands cements the intuition. The width of each band is the
-same multiple of σ for every normal — only the scale changes.
+same multiple of σ for every normal, only the scale changes.
 
 <CodeBlock
   adapter="python"
@@ -249,7 +249,7 @@ print(f"~95% of scores fall between {mu - 2 * sigma} and {mu + 2 * sigma}.")
 
 <Callout type="danger" title="Misconception: the empirical rule applies to all data">
 68–95–99.7 is a fact about the **normal** distribution **only**. Apply
-it to skewed income data and you'll badly miscount the tails — "within
+it to skewed income data and you'll badly miscount the tails, "within
 2σ" might capture far less than 95%, and the mean ± 2σ can even dip below
 zero for a strictly positive quantity. Before invoking the empirical
 rule, confirm the data is actually roughly normal. On non-normal data it
@@ -258,7 +258,7 @@ simply isn't true.
 
 ## Standardization and z-scores
 
-Different normals live on different scales — test scores around 100,
+Different normals live on different scales, test scores around 100,
 heights around 170 cm, temperatures around 20°C. **Standardization**
 puts them all on one common ruler by converting each value to a
 **z-score**: how many standard deviations it sits from its mean.
@@ -269,7 +269,7 @@ A z-score of 0 is exactly average; +2 is two standard deviations above
 the mean; −1.5 is one and a half below. Once a value is a z-score, you've
 stripped away the units, and you can compare a test score to a height to
 a temperature on equal footing. The distribution of z-scores is the
-**standard normal**: μ = 0, σ = 1 — `stats.norm()` with no
+**standard normal**: μ = 0, σ = 1, `stats.norm()` with no
 arguments.
 
 ```mermaid
@@ -295,7 +295,7 @@ z = (x - mu) / sigma
 print(f"z-score of {x}: {z:.2f}  (it's {z:.0f} SDs above the mean)")
 
 # The percentile: what fraction of people score BELOW 130?
-# Two equivalent routes — standardize then use the standard normal,
+# Two equivalent routes, standardize then use the standard normal,
 # or just use the original distribution's cdf directly.
 pct_via_z = stats.norm().cdf(z)
 pct_direct = stats.norm(loc=mu, scale=sigma).cdf(x)
@@ -310,7 +310,7 @@ print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue test score and a green height each slide down a thin line from their own differently scaled rulers onto one shared z ruler below, landing side by side at the same tick — standardizing strips the units so unlike things can be compared on a common scale"
+  aria-label="A blue test score and a green height each slide down a thin line from their own differently scaled rulers onto one shared z ruler below, landing side by side at the same tick, standardizing strips the units so unlike things can be compared on a common scale"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-300)">
@@ -355,7 +355,7 @@ z-score locates you; the CDF tells you what fraction is below.
 
 ### Converting in all directions
 
-The three quantities — raw value, z-score, percentile — are
+The three quantities, raw value, z-score, percentile, are
 interchangeable. Pick the right tool for the direction you need:
 
 - **value → z**: `z = (x - mu) / sigma`
@@ -398,8 +398,8 @@ print(f"Rebuild from z: mu + z*sigma = {mu + z_90 * sigma:.1f}")
 
 For three students who scored **900, 1050, and 1300**, compute:
 
-- **\`z_scores\`** — a list of their z-scores \`(x - mu) / sigma\`, in the same order (a list of 3 \`float\`s).
-- **\`percentiles\`** — a list of the fraction scoring **at or below** each value, using \`stats.norm(...).cdf(...)\`, in the same order (a list of 3 \`float\`s).
+- **\`z_scores\`**, a list of their z-scores \`(x - mu) / sigma\`, in the same order (a list of 3 \`float\`s).
+- **\`percentiles\`**, a list of the fraction scoring **at or below** each value, using \`stats.norm(...).cdf(...)\`, in the same order (a list of 3 \`float\`s).
 
 Hints:
 
@@ -468,7 +468,7 @@ assert all(abs(a - b) < 1e-9 for a, b in zip(percentiles, expected))`,
   title="Find the cutoff for the top 5%"
   instructions={`A standardized aptitude test is **Normal** with mean **1050** and standard deviation **200**. A scholarship goes to the **top 5%** of scorers.
 
-Find the **minimum score** needed to be in the top 5% — i.e. the value with **95%** of scores at or below it (the 95th percentile).
+Find the **minimum score** needed to be in the top 5%, i.e. the value with **95%** of scores at or below it (the 95th percentile).
 
 - Build \`d = stats.norm(loc=1050, scale=200)\`.
 - The top 5% starts at the 95th percentile: \`d.ppf(0.95)\`.
@@ -524,7 +524,7 @@ produces confidently wrong answers:
 
 - **Skewed**: income, house prices, time-on-site, and most counts have a
   long right tail. The mean sits above the median, and "mean ± 2σ" can
-  fall below zero — nonsense for a positive quantity.
+  fall below zero, nonsense for a positive quantity.
 - **Heavy-tailed**: financial returns, insurance claims, and network
   traffic produce extreme events *far* more often than a normal predicts.
   A "6-sigma" market move should be astronomically rare under normality,
@@ -536,7 +536,7 @@ produces confidently wrong answers:
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A symmetric blue bell mask laid over red skewed data that does not fit it — the red bulk leans left of the bell's center and a long red tail escapes far beyond the bell's edge — assuming normality hides exactly the tail that hurts you"
+  aria-label="A symmetric blue bell mask laid over red skewed data that does not fit it, the red bulk leans left of the bell's center and a long red tail escapes far beyond the bell's edge, assuming normality hides exactly the tail that hurts you"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="50" y="152" width="540" height="4" rx="2" fill="currentColor" opacity="0.18" />
@@ -581,7 +581,7 @@ fig.add_trace(
 )
 fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines", name="fitted normal"))
 fig.update_layout(
-    title="A normal forced onto skewed income data — it doesn't fit",
+    title="A normal forced onto skewed income data, it doesn't fit",
     xaxis_title="income",
     yaxis_title="density",
 )
@@ -589,7 +589,7 @@ fig.show()
 
 # The tell: the normal puts real probability BELOW zero, which is impossible.
 print(
-    f"\\nFitted normal says P(income < 0) = {fitted.cdf(0):.3f} — impossible for income!"
+    f"\\nFitted normal says P(income < 0) = {fitted.cdf(0):.3f}, impossible for income!"
 )
 `,
     },
@@ -599,7 +599,7 @@ print(
 <Callout type="danger" title="The most expensive misconception: 'everything is normal'">
 Assuming normality by default is a leading cause of underestimated risk.
 A normal model assigns near-zero probability to extreme events, so it
-**systematically under-prepares you for tails** — exactly where the
+**systematically under-prepares you for tails**, exactly where the
 costly surprises live (market crashes, viral spikes, fraud bursts).
 Before you assume normal, look at a histogram, check skew, and consider
 whether the quantity is bounded or heavy-tailed. We'll cover principled
@@ -608,7 +608,7 @@ ways to check and choose a model in *Working with Distributions*.
 
 <Callout type="tip" title="A practical reflex">
 The normal earns its keep most reliably for **averages and sums** (via
-the CLT) — which is why it underpins *inference about means* even when
+the CLT), which is why it underpins *inference about means* even when
 raw data is skewed. For the **raw data itself**, treat normality as a
 hypothesis to verify, not a given. "Is this approximately normal?" is a
 question you answer with a plot, not an assumption you make for
@@ -652,7 +652,7 @@ A z-score locates the value; the CDF converts that location into a probability.`
 
 - The rule only works for small samples
   > Sample size isn't the issue; the empirical rule is about the *shape* of the distribution, not how much data you have.
-- [o] The empirical rule holds for the normal distribution, and skewed income data violates that assumption — the actual coverage will differ and mean − 2σ may even be negative
+- [o] The empirical rule holds for the normal distribution, and skewed income data violates that assumption, the actual coverage will differ and mean − 2σ may even be negative
   > Because the rule is a property of the symmetric normal curve, applying it to a long-tailed, strictly positive variable misstates the tail coverage and can produce an impossible (negative) lower bound.
 - The rule requires the data to be in dollars
   > Units are irrelevant; the rule's validity depends on the distribution being approximately normal.
@@ -668,13 +668,13 @@ The empirical rule is a normal-distribution fact, not a universal one.`}
 - \`(x - mu) / sigma\`, and that is the percentile
   > That formula gives the *z-score* (a position), not a percentile; you still need to pass it through the CDF.
 - [o] Compute \`z = (x - mu) / sigma\`, then \`stats.norm().cdf(z)\` (equivalently \`stats.norm(loc=mu, scale=sigma).cdf(x)\`)
-  > Standardizing locates the value in SD units and the standard-normal CDF turns that location into the fraction below — and applying the CDF to the original distribution directly gives the identical result.
+  > Standardizing locates the value in SD units and the standard-normal CDF turns that location into the fraction below, and applying the CDF to the original distribution directly gives the identical result.
 - \`stats.norm(loc=mu, scale=sigma).ppf(x)\`
   > \`ppf\` expects a probability (0 to 1), so feeding it a raw score is invalid and would not return a percentile.
 - \`stats.norm().pdf((x - mu) / sigma)\`
   > The PDF returns a density height at that z-score, not the cumulative fraction below it.
 
-Value to z (subtract mean, divide by σ), then z to percentile (CDF) — that's the standard pipeline.`}
+Value to z (subtract mean, divide by σ), then z to percentile (CDF), that's the standard pipeline.`}
 />
 
 <MultipleChoice
@@ -684,7 +684,7 @@ Value to z (subtract mean, divide by σ), then z to percentile (CDF) — that's 
   > The normal has a well-defined mean; that's not the issue.
 - Because financial returns are always perfectly normal
   > They are typically *heavy-tailed*, not normal, which is precisely the source of the problem.
-- [o] Real returns are heavy-tailed, so extreme moves occur far more often than a normal predicts — the normal assigns near-zero probability to events that actually recur
+- [o] Real returns are heavy-tailed, so extreme moves occur far more often than a normal predicts, the normal assigns near-zero probability to events that actually recur
   > A normal's tails fall off extremely fast, so a "many-sigma" move it deems essentially impossible shows up in markets every few years, leaving a normal-based model under-prepared for crashes.
 - Because the standard deviation of returns is always zero
   > Returns have substantial, nonzero variability; a zero standard deviation would be the opposite problem.
@@ -696,7 +696,7 @@ Light normal tails systematically understate the frequency of the rare, costly e
 - The normal arises when **many small independent effects add up**; the
   **CLT** is why it governs sums and averages even when raw data isn't
   normal.
-- **68–95–99.7**: ~68% within 1σ, ~95% within 2σ, ~99.7% within 3σ —
+- **68–95–99.7**: ~68% within 1σ, ~95% within 2σ, ~99.7% within 3σ,
   but only for **normal** data.
 - A **z-score** `z = (x − μ) / σ` is a *position* (SDs from the mean),
   not a probability; convert with `norm.cdf` (z → percentile) and
@@ -704,6 +704,6 @@ Light normal tails systematically understate the frequency of the rare, costly e
 - Move freely among **raw value ↔ z-score ↔ percentile**; use the direct
   `norm(loc, scale).cdf`/`.ppf` when you want to skip the z step.
 - **Do not assume normality by default.** Skewed, heavy-tailed, and
-  bounded data break the model — and assuming normal there
+  bounded data break the model, and assuming normal there
   underestimates the tails where the expensive surprises live.
 </Callout>

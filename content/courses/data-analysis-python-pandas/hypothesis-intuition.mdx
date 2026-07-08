@@ -14,13 +14,13 @@ every analyst eventually faces:
 - "Two variables look correlated. Could it be coincidence?"
 
 This page introduces the *intuition* behind hypothesis-style
-reasoning — without diving deep into formal tests. (Those are
+reasoning, without diving deep into formal tests. (Those are
 the subject of a dedicated statistics course.)
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two overlapping clouds of blue and green dots whose vertical mean lines sit close together beneath a teal question mark — is the gap between groups real signal or just noise?"
+  aria-label="Two overlapping clouds of blue and green dots whose vertical mean lines sit close together beneath a teal question mark, is the gap between groups real signal or just noise?"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,19 +58,19 @@ the subject of a dedicated statistics course.)
 ## The core question: noise vs signal
 
 Real-world measurements always wiggle. Sales aren't 100 every
-day — they're 95, 110, 102, 88, 130. So when one group looks
+day, they're 95, 110, 102, 88, 130. So when one group looks
 "different" from another, you have to ask:
 
 ```mermaid
 flowchart TD
   A["Observed difference<br/>between two groups"] --> B{"Is it bigger<br/>than random wiggle?"}
-  B -- "Yes" --> C["Signal — worth investigating"]
-  B -- "No"  --> D["Noise — don't over-interpret"]
+  B -- "Yes" --> C["Signal, worth investigating"]
+  B -- "No"  --> D["Noise, don't over-interpret"]
 ```
 
 The whole craft is in answering that "?".
 
-## Exploratory feel — same dataset, different samples
+## Exploratory feel, same dataset, different samples
 
 <CodeBlock
   adapter="python"
@@ -93,7 +93,7 @@ print(f"Difference: {a.mean() - b.mean():.2f}")
   ]}
 />
 
-Re-run the cell a few times mentally with different seeds —
+Re-run the cell a few times mentally with different seeds,
 you'll get differences of -5, +3, -2, +6, etc., even though the
 two groups come from the exact same underlying process.
 
@@ -104,7 +104,7 @@ without any "real" effect.
 
 A common framing:
 
-- **Null hypothesis (H₀):** Boring story — "nothing is going
+- **Null hypothesis (H₀):** Boring story, "nothing is going
   on; the two groups are really the same; the difference we see
   is just luck."
 - **Alternative hypothesis (H₁):** "Something is going on."
@@ -140,7 +140,7 @@ happening, not about your actual hypothesis.
 
 ## A simple t-test (conceptual)
 
-You don't need to memorise this — most teams use libraries.
+You don't need to memorise this, most teams use libraries.
 
 <CodeBlock
   adapter="python"
@@ -209,10 +209,10 @@ Only then can you act on it.
 
 This is more important than any one statistical test.
 
-## Confounders — the silent killer
+## Confounders, the silent killer
 
 A classic mistake: "City A drinks more coffee and has more car
-accidents — so coffee causes accidents." Maybe. Or maybe both
+accidents, so coffee causes accidents." Maybe. Or maybe both
 are driven by *population size*. Population is a **confounder**.
 
 Mitigation: think hard about what *else* could explain the
@@ -235,14 +235,14 @@ covariate; use stratified sampling).
 <MultipleChoice
   markdown={`Your A/B test shows a 1% improvement with p = 0.03 on 2,000 users. Your colleague claims "this proves the feature works." What's the best response?
 
-- Agree — p < 0.05
-  > p < 0.05 is a conventional threshold, not proof the effect is large or real enough to act on — a 1% improvement may be too small to matter, and confounders could explain it.
-- Disagree — p > 0.001
+- Agree, p < 0.05
+  > p < 0.05 is a conventional threshold, not proof the effect is large or real enough to act on, a 1% improvement may be too small to matter, and confounders could explain it.
+- Disagree, p > 0.001
   > p = 0.03 does cross the standard 0.05 threshold, so blanket disagreement based on it not reaching 0.001 would be incorrect.
-- [o] Push back gently — significance is real, but 1% is small, and there may be confounders (time of day, version drift, holiday traffic). Investigate effect size and replicability before shipping company-wide.
+- [o] Push back gently, significance is real, but 1% is small, and there may be confounders (time of day, version drift, holiday traffic). Investigate effect size and replicability before shipping company-wide.
   > P-values are one input. Effect size, practical significance, replicability, and confounders matter at least as much.
 - Re-run with smaller sample
-  > A smaller sample would reduce statistical power, making it harder to detect the effect — not a useful diagnostic step here.
+  > A smaller sample would reduce statistical power, making it harder to detect the effect, not a useful diagnostic step here.
 
 Analysts protect their team from over-interpreting noisy results.`}
 />
@@ -253,8 +253,8 @@ Analysts protect their team from over-interpreting noisy results.`}
 - Ice cream causes drowning
   > No plausible mechanism connects ice cream consumption to drowning risk directly; assuming causation from correlation is the classic error this example warns against.
 - Drowning causes ice cream sales
-  > Reverse causation is also unsupported — drowning incidents don't trigger ice cream purchases.
-- [o] A confounding variable — hot summer weather increases both
+  > Reverse causation is also unsupported, drowning incidents don't trigger ice cream purchases.
+- [o] A confounding variable, hot summer weather increases both
   > The textbook example of confounding.
 - The data is wrong
   > Dismissing a consistent pattern as data error without evidence is not a useful analytical response.
@@ -280,14 +280,14 @@ Misinterpreting p-values is one of the most common errors in applied analytics.`
 <MultipleChoice
   markdown={`A very large dataset shows a "statistically significant" difference of 0.001 between two groups. What should you conclude?
 
-- Definitely a real effect — ship it
+- Definitely a real effect, ship it
   > Statistical significance does not guarantee practical importance; with a very large dataset even a 0.001 difference can be statistically significant while being irrelevant to any real decision.
 - The data must be corrupt
-  > A tiny but statistically significant difference is consistent with clean data and a large sample — there is no reason to suspect corruption.
-- [o] The difference may be real but is so small it is probably not practically meaningful — large samples can detect trivially small effects
+  > A tiny but statistically significant difference is consistent with clean data and a large sample, there is no reason to suspect corruption.
+- [o] The difference may be real but is so small it is probably not practically meaningful, large samples can detect trivially small effects
   > Big samples make tiny signals reach significance. Always ask: "Is this difference big enough to matter for my decision?"
 - It is just noise
-  > A statistically significant result — even a tiny one — is unlikely to be pure noise; the issue is that "significant" and "important" are different questions.
+  > A statistically significant result, even a tiny one, is unlikely to be pure noise; the issue is that "significant" and "important" are different questions.
 
 Statistical significance and practical significance are different questions.`}
 />
@@ -296,7 +296,7 @@ Statistical significance and practical significance are different questions.`}
   markdown={`Which is the most useful safeguard against fooling yourself with data?
 
 - Always trusting the p-value
-  > Relying solely on the p-value ignores effect size, confounders, and replication — the very issues that lead analysts to fool themselves.
+  > Relying solely on the p-value ignores effect size, confounders, and replication, the very issues that lead analysts to fool themselves.
 - Computing more decimal places
   > Extra precision in the p-value (e.g., 0.0312 vs 0.03) adds no meaningful information and does not guard against the underlying biases.
 - [o] Combining: a clear hypothesis stated in advance, a check for confounders, an effect-size threshold that matters in your domain, and replication

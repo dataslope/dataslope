@@ -82,7 +82,7 @@ export const ShimmerButton = React.forwardRef<
           )}
         />
 
-        {/* backdrop — inset by --cut on every side, so its corner radius has to
+        {/* backdrop, inset by --cut on every side, so its corner radius has to
             shrink by the same amount to stay concentric with the outer border.
             Reusing the full --radius here left the inner fill looking rounder
             than the edge (a mismatched, uneven shimmer ring at the corners). */}

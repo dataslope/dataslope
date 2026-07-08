@@ -9,7 +9,7 @@ export {};
 // Singletons here are worker-level, separate from those in browsercc.ts
 // (which is main-thread-only). This means a C and a C++ playground open at
 // the same time each get their own worker with their own browsercc instance,
-// which is fine — the ~95 MB toolchain is cached by the browser across both.
+// which is fine, the ~95 MB toolchain is cached by the browser across both.
 //
 // Protocol:
 //   Main → Worker  { kind: "init" }
@@ -217,7 +217,7 @@ async function runCode(
 
   if (language === "cpp") {
     // The ~10 MB precompiled header is fetched in the background at boot.
-    // On a fast first C++ run it may still be downloading — surface the
+    // On a fast first C++ run it may still be downloading, surface the
     // boot notice for the wait (the main thread debounces it, so an
     // already-cached PCH doesn't flash anything).
     post({
@@ -281,7 +281,7 @@ async function runCode(
     });
 }
 
-// Serialise requests — browsercc is not reentrant within a single worker.
+// Serialise requests, browsercc is not reentrant within a single worker.
 let workQueue: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(task: () => Promise<T>): Promise<T> {

@@ -3,19 +3,19 @@ title: Syntax and Indentation
 description: How Python uses whitespace, PEP 8 style, and the tabs vs spaces convention
 ---
 
-On the last page we met the Zen of Python — "Readability counts." This page
+On the last page we met the Zen of Python, "Readability counts." This page
 is where that aphorism becomes a law of the language. Python uses **indentation
 itself** to delimit blocks of code, which means whitespace is not cosmetic in
 Python; it is syntax. Here we cover what counts as a block, what PEP 8 has to
-say about style, and how to keep your editor honest. (The deeper story — why
+say about style, and how to keep your editor honest. (The deeper story, why
 Guido van Rossum made this divisive choice, and the legendary tabs-versus-spaces
-war it touched off — waits for you in *The Story of Python* near the end of the
+war it touched off, waits for you in *The Story of Python* near the end of the
 course.)
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three code bars each hover over their own terrace of a descending staircase while one red bar tilts off the edge between levels — in Python the indentation is the structure, and a misaligned line has nowhere to stand"
+  aria-label="Three code bars each hover over their own terrace of a descending staircase while one red bar tilts off the edge between levels, in Python the indentation is the structure, and a misaligned line has nowhere to stand"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -140,7 +140,7 @@ Tools that enforce this for you:
 
 You may have heard that tabs versus spaces is a holy war among programmers.
 For Python the practical answer is short: **use four spaces, and let your editor
-insert them when you press Tab.** PEP 8 is explicit about it —
+insert them when you press Tab.** PEP 8 is explicit about it,
 
 > Spaces are the preferred indentation method. Tabs should be used solely to
 > remain consistent with code that is already indented with tabs.
@@ -149,7 +149,7 @@ So write new code with four spaces; if you join a project that already uses
 tabs, match it. Either way, configure your editor to insert one or the other
 automatically and you will never produce the mixed indentation that triggers a
 `TabError`. The longer, surprisingly heated history of *why* this argument
-exists at all is one of the deep-dives in *The Story of Python* later on — it is
+exists at all is one of the deep-dives in *The Story of Python* later on, it is
 genuinely entertaining, but it should never slow down your actual work.
 
 ## Continuation lines

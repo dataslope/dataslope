@@ -66,7 +66,7 @@ export function HomeClient({
             {/* The visible "heading" is the animated marquee; give screen
                 readers and the document outline a real h1 instead. */}
             <h1 className="sr-only">
-              Dataslope — learn Python, SQL, R, JavaScript and more in your
+              Dataslope, learn Python, SQL, R, JavaScript and more in your
               browser
             </h1>
             <AnimationPauseGate>
@@ -104,7 +104,7 @@ export function HomeClient({
               subtitle={
                 <>
                   Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,
-                  SQLite, Postgres, and DuckDB —{" "}
+                  SQLite, Postgres, and DuckDB,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>
                     free
                   </Highlighter>

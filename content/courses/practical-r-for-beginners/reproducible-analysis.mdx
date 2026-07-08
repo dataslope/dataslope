@@ -1,6 +1,6 @@
 ---
 title: "Deeper History: Reproducible Analysis"
-description: Why "click around in a spreadsheet" is no longer a defensible way to analyze important data — and how R, R Markdown, and Quarto have made reproducibility the norm in modern science and business.
+description: Why "click around in a spreadsheet" is no longer a defensible way to analyze important data, and how R, R Markdown, and Quarto have made reproducibility the norm in modern science and business.
 ---
 
 In 2010, two Harvard economists published a famous paper titled
@@ -26,13 +26,13 @@ been cited in support of trillion-dollar policy decisions.
 
 This is the **reproducibility problem**. It is not a small academic
 inconvenience; it is one of the central crises of modern empirical
-work. And it is one of the reasons R — and the surrounding culture
-of *scripted* analysis — matters.
+work. And it is one of the reasons R, and the surrounding culture
+of *scripted* analysis, matters.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="An upside-down tower of ever wider slabs balances precariously on one tiny red cell, with two yellow fragments slipping off the top — trillion-dollar conclusions resting on a single unchecked spreadsheet error"
+  aria-label="An upside-down tower of ever wider slabs balances precariously on one tiny red cell, with two yellow fragments slipping off the top, trillion-dollar conclusions resting on a single unchecked spreadsheet error"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
@@ -70,7 +70,7 @@ Consider a typical "real-world" analysis done in Excel:
 
 Now ask the analyst, six months later, "Can you redo this with the
 Q4 data?" They have to remember every step. Did they filter out
-"test" — or "Test"? Did they multiply column B by C, or D by C? Was
+"test", or "Test"? Did they multiply column B by C, or D by C? Was
 that pivot table summing or averaging? Did they manually fix a few
 cells they thought looked wrong?
 
@@ -85,8 +85,8 @@ flowchart TD
 ```
 
 Multiply this by every analyst in every company, every year, and
-you have an enormous body of "facts" — quoted in board meetings, in
-peer-reviewed papers, in news headlines — that **nobody can re-run
+you have an enormous body of "facts", quoted in board meetings, in
+peer-reviewed papers, in news headlines, that **nobody can re-run
 to verify**.
 
 ## What "reproducible" really means
@@ -102,11 +102,11 @@ tables, and figures as the published result.
 
 The bar is high on purpose. If a result is reproducible, you can:
 
-- **Verify** the work — catch errors, like Herndon did.
-- **Update** the work when new data arrives — without redoing every
+- **Verify** the work, catch errors, like Herndon did.
+- **Update** the work when new data arrives, without redoing every
   step from memory.
 - **Adapt** the work to a related question by editing the script.
-- **Teach** the work — the code itself shows future students how
+- **Teach** the work, the code itself shows future students how
   the analysis was done.
 
 R was not the first language to enable this, but it was one of the
@@ -152,7 +152,7 @@ comparison. Code is a written record; clicks are not.
 
 R's contribution to reproducibility goes beyond "just write
 scripts." It is the broader idea of **literate programming for
-data analysis** — where a *single document* contains the narrative,
+data analysis**, where a *single document* contains the narrative,
 the code, the output, and the figures, and the document re-runs
 itself each time you render it.
 
@@ -185,7 +185,7 @@ sales |>
 When you render this file, R runs every code chunk, captures the
 output and any plots, and produces a polished HTML, PDF, or Word
 document. The narrative around the numbers, and the numbers
-themselves, are guaranteed to be in sync — *because they are
+themselves, are guaranteed to be in sync, *because they are
 generated together*.
 
 ```mermaid
@@ -201,7 +201,7 @@ flowchart LR
 
 Many peer-reviewed papers, government reports, and corporate
 analyses are now built this way. The published PDF you read is *not
-a typed-up summary of an analysis* — it *is* the analysis, frozen
+a typed-up summary of an analysis*, it *is* the analysis, frozen
 into a printable form.
 
 ## A small example: code that documents itself
@@ -251,9 +251,9 @@ script is a *recipe*, not a frozen artifact.
 
 **Reproducibility is not about replication.** *Replication* is when
 a different team gathers different data and confirms the same
-finding — that is a separate (and also vital) scientific practice.
+finding, that is a separate (and also vital) scientific practice.
 Reproducibility just means "given the same inputs, can we get the
-same outputs?" It is a much lower bar — but it is shockingly often
+same outputs?" It is a much lower bar, but it is shockingly often
 not met.
 
 ## A workflow worth practicing
@@ -276,7 +276,7 @@ Every step lives in code. Every step is rerunnable. The output of
 the pipeline (a report, a chart, a number) is always a function of
 inputs you can point to.
 
-This is the modern way of working with data — and R is, in many
+This is the modern way of working with data, and R is, in many
 ways, where this culture was born and is most thoroughly
 institutionalized.
 
@@ -303,7 +303,7 @@ institutionalized.
 - It eliminates the need to know R.
   > R Markdown and Quarto still require writing R (or Python, Julia, etc.) in the code chunks; the format adds prose-weaving capabilities, not a no-code interface.
 - [o] It interleaves prose, code, and computed output into a single document that is regenerated from the data every time it is rendered.
-  > This means the narrative explanation and the actual numbers in your report are always in sync — there is no opportunity for a stale copy-pasted figure to disagree with the text.
+  > This means the narrative explanation and the actual numbers in your report are always in sync, there is no opportunity for a stale copy-pasted figure to disagree with the text.
 - It encrypts your data automatically.
   > Neither R Markdown nor Quarto provides encryption; security of underlying data files is a separate concern managed at the file-system or infrastructure level.`}
 />
@@ -314,7 +314,7 @@ institutionalized.
 - A study that, when repeated with new participants, gives the same finding.
   > That is *replication*, a separate concept.
 - An analysis that produces only one possible answer no matter the data.
-  > Reproducibility is not about a unique answer — different data legitimately produce different results; the point is that given the same inputs, anyone can get the same outputs.
+  > Reproducibility is not about a unique answer, different data legitimately produce different results; the point is that given the same inputs, anyone can get the same outputs.
 - [o] An analysis where another person, given the same raw data and the same code, can rerun the pipeline and obtain the same final numbers, tables, and figures.
   > Reproducibility is about *given the same inputs, getting the same outputs*. Replication is a stricter and separate scientific practice.
 - An analysis whose findings have been confirmed by a peer-reviewed journal.
@@ -336,8 +336,8 @@ two-row data frame in a variable called `by_region`.
 <ChallengeCard
   adapter="r"
   title="Scripted version of a manual analysis"
-  instructions={`Using \`sales\` (provided), create a data frame \`by_region\` with two rows — one for "East" and one for "West" — and two columns: \`region\` and \`total_revenue\` (the sum of \`units * price\`).
-You may use base R or dplyr — either is fine.`}
+  instructions={`Using \`sales\` (provided), create a data frame \`by_region\` with two rows, one for "East" and one for "West", and two columns: \`region\` and \`total_revenue\` (the sum of \`units * price\`).
+You may use base R or dplyr, either is fine.`}
   files={[
     {
       filename: "main.r",
@@ -396,7 +396,7 @@ print(by_region)
 
 This is the last of the optional history chapters, and a fitting
 place to end: reproducibility is the cultural value that ties the
-whole R story together — from Fisher checking his arithmetic twice by
+whole R story together, from Fisher checking his arithmetic twice by
 hand, to Bell Labs making data a first-class object, to a graduate
 student catching a trillion-dollar spreadsheet error. The final page
 points you toward where to go next.

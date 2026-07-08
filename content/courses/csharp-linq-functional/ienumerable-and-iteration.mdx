@@ -5,8 +5,8 @@ description: The single most important interface in LINQ, the iterator pattern u
 
 LINQ is built on a single, deceptively small interface:
 `IEnumerable<T>`. Every collection type you'll ever use in
-C# — `List<T>`, `T[]`, `Dictionary<TKey, TValue>.Values`,
-`HashSet<T>`, the output of every LINQ operator — is an
+C#, `List<T>`, `T[]`, `Dictionary<TKey, TValue>.Values`,
+`HashSet<T>`, the output of every LINQ operator, is an
 `IEnumerable<T>`.
 
 This page is about what that interface actually *is*, what it
@@ -16,7 +16,7 @@ understand this, every later page in the course makes more sense.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A row of cells where only the first few have been opened to reveal colored dots, the rest still closed, with a cursor under the next one — a sequence yielding one element at a time"
+  aria-label="A row of cells where only the first few have been opened to reveal colored dots, the rest still closed, with a cursor under the next one, a sequence yielding one element at a time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -119,7 +119,7 @@ using (var e = nums.GetEnumerator())
 />
 
 When you call a LINQ operator like `Where(...)`, you receive
-something that *implements* `IEnumerable<T>` — but the elements have
+something that *implements* `IEnumerable<T>`, but the elements have
 not been computed yet. They are computed on demand, one at a time,
 as `MoveNext()` is called. This is the foundation of
 [deferred execution](./deferred-execution), which we'll cover in
@@ -149,7 +149,7 @@ static IEnumerable<int> Naturals()
     }
 }
 
-// Infinite source — but we only consume 5.
+// Infinite source, but we only consume 5.
 foreach (var n in Naturals())
 {
     if (n > 5)
@@ -162,8 +162,8 @@ foreach (var n in Naturals())
 />
 
 Read that carefully. `Naturals()` would loop forever if you let it.
-But because `IEnumerable<T>` is *pull-based* — values are only
-produced when the consumer asks — it is safe to define and even
+But because `IEnumerable<T>` is *pull-based*, values are only
+produced when the consumer asks, it is safe to define and even
 safer to use with operators that stop early.
 
 ## A custom operator written from scratch
@@ -247,7 +247,7 @@ foreach (var n in seq)
 
 The source method runs **twice**. If `Source()` were reading from a
 file or making HTTP calls, that's two disk reads or two network
-trips — usually not what you want.
+trips, usually not what you want.
 
 The fix is to **materialize** the sequence once, into a real
 collection:
@@ -323,7 +323,7 @@ A useful rule:
 > exactly once, at the end, when you need to consume the result more
 > than once or want to know the count.**
 
-## `IReadOnlyCollection`, `ICollection`, `IList` — quick map
+## `IReadOnlyCollection`, `ICollection`, `IList`, quick map
 
 It's worth a glance at how the broader hierarchy looks. Most of the
 time you should *type your variables as `IEnumerable<T>`* unless you
@@ -339,10 +339,10 @@ classDiagram
     IReadOnlyList~T~ <|.. ReadOnlyCollection~T~
 ```
 
-- `IEnumerable<T>` — can iterate.
-- `IReadOnlyCollection<T>` — can iterate + has `Count`.
-- `IReadOnlyList<T>` — adds indexing.
-- `ICollection<T>` / `IList<T>` — add mutation.
+- `IEnumerable<T>`, can iterate.
+- `IReadOnlyCollection<T>`, can iterate + has `Count`.
+- `IReadOnlyList<T>`, adds indexing.
+- `ICollection<T>` / `IList<T>`, add mutation.
 
 If your method only needs to iterate, **accept `IEnumerable<T>`**.
 If you need `Count` but no mutation, accept
@@ -355,14 +355,14 @@ you've locked your caller into one concrete type for no reason.
 - The returned sequence has a known \`Count\` property you can read cheaply.
   > \`IEnumerable<T>\` does not expose \`Count\`; calling \`.Count()\` may walk the entire sequence (potentially expensive).
 - You can iterate the returned sequence multiple times and always get the same results.
-  > The sequence might be backed by a \`yield\` method, a network stream, or a one-shot reader. Iterating twice can re-run the source — or fail.
+  > The sequence might be backed by a \`yield\` method, a network stream, or a one-shot reader. Iterating twice can re-run the source, or fail.
 - [o] You can call \`foreach\` over the result and read elements one at a time.
   > That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
 - The results are already in memory and indexing is O(1).
-  > Indexing isn't part of \`IEnumerable<T>\` at all — that's \`IList<T>\` or arrays. And the elements may be computed on demand rather than stored.
+  > Indexing isn't part of \`IEnumerable<T>\` at all, that's \`IList<T>\` or arrays. And the elements may be computed on demand rather than stored.
 
 \`IEnumerable<T>\` is intentionally minimal: *"you can ask me for the
-next element until I say I'm done."* Anything beyond that — counting,
-indexing, re-iterating — depends on the concrete type you happen to
+next element until I say I'm done."* Anything beyond that, counting,
+indexing, re-iterating, depends on the concrete type you happen to
 have.`}
 />

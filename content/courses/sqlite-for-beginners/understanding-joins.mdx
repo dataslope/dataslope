@@ -59,7 +59,7 @@ Read the `ON` line as: "match an order to a customer when the order's `customer_
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue row card and a green row card sit apart, each holding a yellow key dot on its facing edge; below a solid arrow they have clicked into one long card sharing a single yellow key at the seam — a join snaps two rows together where their key values meet"
+  aria-label="A blue row card and a green row card sit apart, each holding a yellow key dot on its facing edge; below a solid arrow they have clicked into one long card sharing a single yellow key at the seam, a join snaps two rows together where their key values meet"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -154,8 +154,8 @@ Each pairing is tested against `o.customer_id = c.id`, and only the matches surv
 | Pairing          | Test    | Outcome | Result row          |
 | ---------------- | ------- | ------- | ------------------- |
 | order 101 + Ada  | `1 = 1` | keep    | Ada, 101, 42        |
-| order 101 + Grace | `1 = 2` | discard | —                   |
-| order 102 + Ada  | `2 = 1` | discard | —                   |
+| order 101 + Grace | `1 = 2` | discard |, |
+| order 102 + Ada  | `2 = 1` | discard |, |
 | order 102 + Grace | `2 = 2` | keep    | Grace, 102, 99      |
 
 <MultipleChoice

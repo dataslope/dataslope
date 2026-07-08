@@ -17,7 +17,7 @@ these types relate to each other?**
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three boxes: the first has no lid and its contents tumble out anywhere, the second is shut tight with a small yellow padlock that demands a check before use, and the third is only a dashed empty outline — any ignores the rules, unknown locks them, never holds nothing at all"
+  aria-label="Three boxes: the first has no lid and its contents tumble out anywhere, the second is shut tight with a small yellow padlock that demands a check before use, and the third is only a dashed empty outline, any ignores the rules, unknown locks them, never holds nothing at all"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -67,8 +67,8 @@ these types relate to each other?**
 ## The type hierarchy: top and bottom
 
 Imagine the type system as a lattice. At the very top sits a type that
-accepts *every* value — the **top type**. At the very bottom sits a type
-that accepts *no* values — the **bottom type**. Every other type falls
+accepts *every* value, the **top type**. At the very bottom sits a type
+that accepts *no* values, the **bottom type**. Every other type falls
 somewhere in between.
 
 ```mermaid
@@ -169,7 +169,7 @@ supposed to prevent. **Avoid `any` whenever possible.**
 ## `unknown`: the safe top type
 
 The type `unknown` is the *type-safe* alternative to `any`. Like `any`,
-it accepts every value — but unlike `any`, you can't *do* anything with
+it accepts every value, but unlike `any`, you can't *do* anything with
 an `unknown` value until you narrow it:
 
 <CodeBlock
@@ -254,12 +254,12 @@ console.log("safeUnknown([1,2,3]):", safeUnknown([1, 2, 3]));
   ]}
 />
 
-The `safeUnknown` function is longer, but it's correct — it handles all
+The `safeUnknown` function is longer, but it's correct, it handles all
 cases without crashing.
 
 ## `never`: the empty type
 
-The type `never` represents the **empty set** — a type with no values. No
+The type `never` represents the **empty set**, a type with no values. No
 value is assignable to `never` (except `never` itself). Where does this
 come up?
 
@@ -282,7 +282,7 @@ function infiniteLoop(): never {
   }
 }
 
-// These functions have no return value — they don't return at all
+// These functions have no return value, they don't return at all
 console.log("About to throw...");
 try {
   throwError("Something went wrong");
@@ -325,7 +325,7 @@ console.log("area({ kind: 'circle' }):", area({ kind: "circle" }));
   ]}
 />
 
-In the `default` branch, `shape` is type `never` — the compiler has
+In the `default` branch, `shape` is type `never`, the compiler has
 eliminated all possible cases, so no value can reach here. If you add a
 new variant (say, `{ kind: "triangle" }`), the `default` line will
 error, forcing you to handle it.
@@ -338,7 +338,7 @@ error, forcing you to handle it.
     {
       filename: "main.ts",
       starterCode: `type Impossible = string & number;
-// Impossible is 'never' — no value is both a string and a number
+// Impossible is 'never', no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
 
@@ -406,7 +406,7 @@ We drew the line between `void` and `undefined` back in
 one-sentence recap here: `void` says "callers shouldn't use this
 return value at all," while `undefined` makes the absence of a value
 an explicit, inspectable part of the contract. What's new on this
-page is seeing where `void` sits in the lattice — it's a deliberate
+page is seeing where `void` sits in the lattice, it's a deliberate
 blind spot, not a real point on the `unknown`-to-`never` axis.
 
 ## Type relationships: assignability
@@ -454,7 +454,7 @@ console.log("Type relationships demonstrated");
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Colored value dots rest on the wide top shelf where anything fits, thin arrows fall to the middle type shelves, and the tiny dashed shelf at the bottom holds nothing yet sends arrows up to the shelves above — anything fits in unknown, nothing fits in never, and never fits anywhere"
+  aria-label="Colored value dots rest on the wide top shelf where anything fits, thin arrows fall to the middle type shelves, and the tiny dashed shelf at the bottom holds nothing yet sends arrows up to the shelves above, anything fits in unknown, nothing fits in never, and never fits anywhere"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -633,7 +633,7 @@ try {
 - A value that is \`null\` or \`undefined\`
   > \`null\` and \`undefined\` are their own distinct types; \`never\` is the empty type that contains no values at all.
 - [o] A type with no values (the empty set)
-  > \`never\` is the bottom type — no value can inhabit it.
+  > \`never\` is the bottom type, no value can inhabit it.
 - A value that is both \`string\` and \`number\`
   > An intersection of disjoint primitives like \`string & number\` does resolve to \`never\`, but \`never\` itself represents the empty set, not a combined value.
 
@@ -642,10 +642,10 @@ try {
 
 ## Summary
 
-`any` is the escape hatch — it disables type checking entirely. Use it
+`any` is the escape hatch, it disables type checking entirely. Use it
 sparingly, and only when you have no better option. `unknown` is the
-type-safe top type — it accepts any value but forces you to narrow before
-use. `never` is the bottom type — it represents impossible values,
+type-safe top type, it accepts any value but forces you to narrow before
+use. `never` is the bottom type, it represents impossible values,
 unreachable code, and exhaustiveness checks. `void` is a return-type
 marker for side-effect functions.
 

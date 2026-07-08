@@ -4,7 +4,7 @@
  * cookie-authenticated mutations, and the "live state" read that evaluates
  * read-time retention (lazily purging whatever it finds expired).
  *
- * Import this ONLY from route handlers / server components — it touches D1,
+ * Import this ONLY from route handlers / server components, it touches D1,
  * R2 and Workers types. Client code imports lib/workspaces/types + policy.
  */
 
@@ -48,8 +48,8 @@ export function workspacesBucket(env: CloudflareEnv): R2Bucket | null {
 
 /**
  * Same-origin check for cookie-authenticated mutations (POST/PUT/DELETE).
- * Browsers attach the Origin header to every cross-site POST — including
- * plain multipart form submissions, which need no CORS preflight — so a
+ * Browsers attach the Origin header to every cross-site POST, including
+ * plain multipart form submissions, which need no CORS preflight, so a
  * mismatch means a cross-site request riding the user's cookies. A missing
  * Origin (curl, server-to-server) is allowed: those clients don't carry
  * ambient credentials.
@@ -102,7 +102,7 @@ export async function readBundleUpload(
 ): Promise<UploadResult> {
   // Cheap pre-check before buffering anything. The multipart framing adds a
   // little overhead on top of the payload, hence the slack. A missing or
-  // non-positive Content-Length is rejected outright — browsers always send
+  // non-positive Content-Length is rejected outright, browsers always send
   // one for FormData bodies, and chunked uploads would otherwise buffer
   // unbounded bytes into memory before the size check below.
   const contentLength = Number(request.headers.get("Content-Length") ?? "0");
@@ -157,7 +157,7 @@ export async function readBundleUpload(
   const bytes = await file.arrayBuffer();
   if (bytes.byteLength > maxBytes) return tooLarge(maxBytes);
   const head = new Uint8Array(bytes.slice(0, 2));
-  // gzip magic — the payload must be the gzipped JSON document, not raw JSON.
+  // gzip magic, the payload must be the gzipped JSON document, not raw JSON.
   if (bytes.byteLength < 18 || head[0] !== 0x1f || head[1] !== 0x8b) {
     return { ok: false, status: 400, message: "Malformed upload." };
   }

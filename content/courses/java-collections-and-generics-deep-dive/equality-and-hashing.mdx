@@ -1,6 +1,6 @@
 ---
 title: Equality and Hashing
-description: The equals / hashCode contract — what every Set, Map, and contains() check secretly depends on, and the bugs that lurk when you get it wrong
+description: The equals / hashCode contract, what every Set, Map, and contains() check secretly depends on, and the bugs that lurk when you get it wrong
 ---
 
 Almost every interesting method on a `Set` or `Map` answers the same
@@ -19,7 +19,7 @@ once and for all.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Left: two equal blue squares with matching green hash notches funnel into one bucket that stores a single copy with a green check; right: the same pair with mismatched notch colors splits into two buckets holding duplicates, flagged by a red cross — equals and hashCode must agree"
+  aria-label="Left: two equal blue squares with matching green hash notches funnel into one bucket that stores a single copy with a green check; right: the same pair with mismatched notch colors splits into two buckets holding duplicates, flagged by a red cross, equals and hashCode must agree"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="318.5" y="28" width="3" height="174" rx="1.5" fill="currentColor" opacity="0.1" />
@@ -57,8 +57,8 @@ once and for all.
 ## What collections actually do with equals
 
 `List.contains(x)`, `List.indexOf(x)`, `List.remove(x)`,
-`Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`
-— all of them, under the hood, call `equals` to compare candidates.
+`Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`,
+all of them, under the hood, call `equals` to compare candidates.
 
 `==` compares **identity** (same object in memory). `.equals` compares
 **value** (logically the same thing). For a sane container,
@@ -90,7 +90,7 @@ would essentially never work.
 
 Hashing turns an arbitrary object into an `int` "fingerprint." A
 `HashSet` or `HashMap` uses that fingerprint to jump *directly* to
-the bucket where the element should live — instead of scanning all
+the bucket where the element should live, instead of scanning all
 buckets.
 
 A lookup for `new Customer("ada@…")` flows through these stages:
@@ -99,7 +99,7 @@ A lookup for `new Customer("ada@…")` flows through these stages:
 2. `bucket = 8132917 mod N` picks the bucket, say `5`.
 3. Bucket `5` holds only 1–2 candidates.
 4. Walk those candidates, calling `equals(x)` on each.
-5. Hit or miss — in `O(1)` on average.
+5. Hit or miss, in `O(1)` on average.
 
 So a hash collection's lookup is two steps:
 
@@ -107,8 +107,8 @@ So a hash collection's lookup is two steps:
 2. `equals()` → which candidate in that bucket is *actually* the
    target
 
-If `hashCode` lies — say, returns a different value for two objects
-that are `.equals` — the second step never even runs, because the
+If `hashCode` lies, say, returns a different value for two objects
+that are `.equals`, the second step never even runs, because the
 collection looks in the wrong bucket and concludes "not present."
 
 ## The contract
@@ -144,7 +144,7 @@ public class Main {
     Set<Point> seen = new HashSet<>();
     seen.add(new Point(1, 2));
 
-    // Should be true — but the set will say "no."
+    // Should be true, but the set will say "no."
     System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
   }
 }
@@ -177,7 +177,7 @@ public class Main {
 Run that. The set says `false`. Why? Because `Point` inherited
 `Object.hashCode`, which is essentially the object's memory address.
 Two `Point(1,2)`s are equal by `.equals`, but their `hashCode`s are
-different — so the second one lands in a different bucket, and the
+different, so the second one lands in a different bucket, and the
 set never even reaches the `.equals` step.
 
 **Whenever you override `equals`, override `hashCode`.** Always.
@@ -197,7 +197,7 @@ public class Main {
   public static void main(String[] args) {
     Set<Point> seen = new HashSet<>();
     seen.add(new Point(1, 2));
-    seen.add(new Point(1, 2)); // duplicate — should be ignored
+    seen.add(new Point(1, 2)); // duplicate, should be ignored
     seen.add(new Point(3, 4));
 
     System.out.println("size = " + seen.size());
@@ -280,7 +280,7 @@ by hand is such a constant source of bugs.
 
 A hash-based collection assumes that its keys' hashcodes do not
 change while they are in the collection. If you mutate a field that
-participates in `hashCode`, the element becomes "lost" — it is still
+participates in `hashCode`, the element becomes "lost", it is still
 there, but the collection looks for it in the wrong bucket.
 
 <CodeBlock
@@ -313,7 +313,7 @@ public class Main {
 
     System.out.println("contains? " + set.contains(n)); // true
     n.first = "Linus";                                  // mutated key!
-    System.out.println("contains? " + set.contains(n)); // false — lost
+    System.out.println("contains? " + set.contains(n)); // false, lost
   }
 }
 `,
@@ -334,7 +334,7 @@ strongly recommended rule is:
 > If `x.compareTo(y) == 0`, then `x.equals(y)` should be true.
 
 If this is violated, a `TreeSet` will silently behave differently from
-a `HashSet` for the same data — almost always a bug. We'll meet
+a `HashSet` for the same data, almost always a bug. We'll meet
 `Comparable` in detail in its own chapter.
 
 ## A multi-file challenge: a uniqueness service
@@ -348,7 +348,7 @@ This is one of the most common real uses of `equals`/`hashCode`: a
   instructions={`Write a class \`Email\` that wraps a \`String\` address and a \`UniquenessTracker\` that uses a \`Set<Email>\` to detect duplicates.
 
 - \`Email\` is constructed from one \`String\`. Two \`Email\`s are equal if their addresses are equal **case-insensitively** ("Ada@x.com" equals "ada@x.com").
-- The \`hashCode\` must agree — use the *lowercased* address.
+- The \`hashCode\` must agree, use the *lowercased* address.
 - \`UniquenessTracker\` has \`boolean register(Email e)\` returning \`true\` on the first time the email is seen and \`false\` afterward.
 
 Expected output:

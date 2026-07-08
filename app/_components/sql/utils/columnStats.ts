@@ -3,7 +3,7 @@ import { formatCellValue } from "./cellUtils";
 /**
  * Pure, dependency-light column-statistics helper for the result grid's
  * "Column statistics" inspector. It runs over the rows currently held in a
- * result set (the loaded rows — most learning queries fit in one page) and is
+ * result set (the loaded rows, most learning queries fit in one page) and is
  * engine-agnostic: it inspects the runtime JavaScript values, so it works
  * identically for SQLite, PostgreSQL and DuckDB results.
  *
@@ -64,9 +64,9 @@ export interface ColumnStats {
    *  as two distinct values (the key is type-aware), so cardinality is exact. */
   distinct: number;
   kind: ColumnStatsKind;
-  /** Numeric aggregates — present only when `kind === "numeric"`. */
+  /** Numeric aggregates, present only when `kind === "numeric"`. */
   numeric?: NumericColumnStats;
-  /** String length aggregates — present only when `kind === "text"`. */
+  /** String length aggregates, present only when `kind === "text"`. */
   text?: TextColumnStats;
   /** Up to `topN` most frequent non-null values, most-frequent first. */
   top: ColumnTopValue[];
@@ -93,7 +93,7 @@ export function asFiniteNumber(v: unknown): number | null {
 }
 
 /** Type-aware distinct key so cross-type values (number `1` vs string `"1"`)
- *  never collapse. Blobs are keyed by length (a deliberate approximation —
+ *  never collapse. Blobs are keyed by length (a deliberate approximation,
  *  binary columns are summarised by size, not byte-compared). */
 function distinctKey(v: unknown): string {
   if (typeof v === "number") return `n:${v}`;
@@ -209,7 +209,7 @@ export function computeColumnStats(
     // All strings, and at least one isn't numeric → a genuine text column.
     kind = "text";
   } else if (otherCount === 0 && blobCount === 0 && boolCount === 0) {
-    // A mix of numbers and numeric/non-numeric strings — still text-ish.
+    // A mix of numbers and numeric/non-numeric strings, still text-ish.
     kind = stringCount > 0 ? "text" : "numeric";
   } else {
     kind = "mixed";

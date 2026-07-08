@@ -8,7 +8,7 @@ Every `for` loop in Python is powered by the **iterator protocol**. Understandin
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A blue capsule crowded with pale dots releases through a small slot onto a thin gray arrow, where solid green dots line up one after another — an iterator hands over one value per next call and keeps the rest waiting"
+  aria-label="A blue capsule crowded with pale dots releases through a small slot onto a thin gray arrow, where solid green dots line up one after another, an iterator hands over one value per next call and keeps the rest waiting"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -81,7 +81,7 @@ sequenceDiagram
 ```
 
 <Callout type="warn" title="Iterables vs Iterators">
-An **iterable** is anything with an \`__iter__\` method: lists, tuples, strings, dicts, files, generators, your own classes. An **iterator** is what \`iter()\` returns — it has both \`__iter__\` (returning self) and \`__next__\`. Many beginners confuse the two. A list is iterable but not an iterator. Calling \`iter(list)\` gives you an iterator.
+An **iterable** is anything with an \`__iter__\` method: lists, tuples, strings, dicts, files, generators, your own classes. An **iterator** is what \`iter()\` returns, it has both \`__iter__\` (returning self) and \`__next__\`. Many beginners confuse the two. A list is iterable but not an iterator. Calling \`iter(list)\` gives you an iterator.
 </Callout>
 
 ## Manually driving an iterator
@@ -167,7 +167,7 @@ for x in countdown(5):
 Each `yield` **pauses** the function and hands a value to the caller. The next `next()` call resumes the function right after that `yield`, with all local state (variables, the instruction pointer) intact.
 
 <Callout type="info" title="Generators are lazy">
-Calling a generator function does NOT run any code. It returns a generator object. Code runs only when you iterate, pulling one value at a time. This is why generators can represent infinite sequences — you never build the whole thing in memory.
+Calling a generator function does NOT run any code. It returns a generator object. Code runs only when you iterate, pulling one value at a time. This is why generators can represent infinite sequences, you never build the whole thing in memory.
 </Callout>
 
 ## Generator state is preserved
@@ -334,7 +334,7 @@ for item in it:
 
 `yield from` is both cleaner and faster. It also correctly delegates sub-generator methods (`.send()`, `.throw()`) for advanced use cases.
 
-## `itertools` — generator building blocks
+## `itertools`, generator building blocks
 
 The `itertools` module is a treasure chest of lazy functions. A small sample:
 
@@ -401,7 +401,7 @@ Once exhausted, a generator cannot be restarted:
 
 g = gen()
 print(list(g))  # [1, 2]
-print(list(g))  # []  — already exhausted
+print(list(g))  # [], already exhausted
 `,
     },
   ]}
@@ -608,7 +608,7 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 - The body runs immediately and returns the first value.
   > Calling a generator function runs none of the body; it just builds the generator object.
 - [o] No code in the body runs; you get back a generator object, and the body runs lazily as you iterate.
-  > \`yield\` makes the function lazy — nothing runs until you call \`next()\` or loop over it.
+  > \`yield\` makes the function lazy, nothing runs until you call \`next()\` or loop over it.
 - It raises \`StopIteration\` if the body is empty.
   > \`StopIteration\` is raised when iteration is exhausted, not when the generator is created.
 - It returns a list of every value the function yields.

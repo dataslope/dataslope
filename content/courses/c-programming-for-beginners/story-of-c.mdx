@@ -11,16 +11,16 @@ Jersey, a programmer named **Ken Thompson** wanted to play a game.
 The game was called *Space Travel*, and the only computer he could
 sneak it onto was a discarded **PDP-7**: a refrigerator-sized machine
 with about 9 KB of memory. To make the game playable, Ken started
-writing a small operating system for the PDP-7 from scratch — with
+writing a small operating system for the PDP-7 from scratch, with
 help from a colleague named **Dennis Ritchie**. They jokingly named it
 **UNIX**, a pun on a much bigger, much more troubled OS called
 *Multics* that they had been working on.
 
-That side project — half operating system, half playground — went on
+That side project, half operating system, half playground, went on
 to change computing forever, and it forced the invention of the
 language this course teaches. But to feel *why* C was such a big
 deal, you need to know what programming was like before it. So let's
-rewind — briefly — about a hundred and thirty years.
+rewind, briefly, about a hundred and thirty years.
 
 ## The long road to "just type instructions"
 
@@ -28,8 +28,8 @@ rewind — briefly — about a hundred and thirty years.
 
 For most of human history, "computing" meant moving beads on an
 abacus or doing arithmetic on paper. In the 1800s, **Charles
-Babbage** designed mechanical machines — the *Difference Engine* and
-the *Analytical Engine* — that could in principle calculate
+Babbage** designed mechanical machines, the *Difference Engine* and
+the *Analytical Engine*, that could in principle calculate
 automatically by turning gears, and his collaborator **Ada Lovelace**
 wrote what is widely considered the first algorithm intended for a
 machine. The machines were never fully built in their lifetimes, but
@@ -45,7 +45,7 @@ memory as data. A program, it turns out, is just data.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A punch card with a clipped corner and rows of holes, a few punched out in color — the earliest physical shape of a program"
+  aria-label="A punch card with a clipped corner and rows of holes, a few punched out in color, the earliest physical shape of a program"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M140 64 L164 40 H486 A14 14 0 0 1 500 54 V206 A14 14 0 0 1 486 220 H154 A14 14 0 0 1 140 206 Z" fill="currentColor" opacity="0.07" />
@@ -91,7 +91,7 @@ memory as data. A program, it turns out, is just data.
   </g>
 </svg>
 
-How did you program these machines? Directly in **machine code** —
+How did you program these machines? Directly in **machine code**,
 the raw numeric patterns the CPU understands:
 
 ```text
@@ -105,20 +105,20 @@ that. Change the third instruction and every address after it might
 shift, so every jump had to be recalculated by hand. A single
 mistyped bit could crash the program in ways indistinguishable from
 a hardware fault. **It was no way to live**, and the first
-programmers — brilliant, patient, frustrated — invented their way
+programmers, brilliant, patient, frustrated, invented their way
 out of it one layer at a time.
 
 The first layer was **assembly language**: short names for the raw
 patterns, like `MOV AL, 5` instead of `10110000 00000101`, with a
 small program (the *assembler*) translating names back into bits.
-Far better — but each line was still one machine instruction, and
+Far better, but each line was still one machine instruction, and
 assembly for an Intel chip was useless on anything else.
 
 The second layer, in the late 1950s, was the **high-level language**:
 write something closer to math or English, and let a program called
 a **compiler** translate it into machine code. **FORTRAN** (1957)
 let scientists write `SUM = A + B` instead of a dozen instructions,
-and — crucially — the same source could be compiled for different
+and, crucially, the same source could be compiled for different
 machines. **COBOL** followed for business, **Lisp** for symbolic
 computation, **ALGOL** with ideas (block structure, recursion) that
 nearly every later language borrowed.
@@ -132,7 +132,7 @@ and functions.
 
 But there was a hole in the middle. FORTRAN crunched numbers; COBOL
 shuffled business records; neither could write the **software that
-runs the computer itself** — operating systems, compilers, drivers —
+runs the computer itself**, operating systems, compilers, drivers,
 because that work needs direct, byte-level control of memory and
 hardware. So for two more decades, the answer to "what do I write an
 operating system in?" remained: *assembly*. Which kept operating
@@ -150,7 +150,7 @@ Which brings us back to that office in New Jersey.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A lineage of circles growing from faint to solid along a thin trail — small languages evolving into C — with two companion dots and a spark beside the largest circle"
+  aria-label="A lineage of circles growing from faint to solid along a thin trail, small languages evolving into C, with two companion dots and a spark beside the largest circle"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -184,12 +184,12 @@ Which brings us back to that office in New Jersey.
 The first version of UNIX was written entirely in **assembly
 language** for the PDP-7, then rewritten in assembly for a newer
 machine called the **PDP-11**. Each time UNIX moved to a new
-computer, the entire OS had to be re-translated by hand — exactly
+computer, the entire OS had to be re-translated by hand, exactly
 the pain the whole industry was stuck with.
 
 Ken Thompson tried to escape using an existing high-level language
 called **B** (itself derived from **BCPL**), but B had no notion of
-data **types** — every value was a single machine word. That made it
+data **types**, every value was a single machine word. That made it
 hopeless for code that needed to deal with bytes, characters, and
 structures of mixed-size data, which is most of what an operating
 system does.
@@ -205,15 +205,15 @@ arrays, pointers, structs), kept it small, and called the result
 timeline
     title The C family tree
     1837 : Babbage designs the Analytical Engine
-    1945 : ENIAC — programs as raw machine code
-    1957 : FORTRAN — the compiler is born
-    1967 : BCPL — typeless systems language
+    1945 : ENIAC, programs as raw machine code
+    1957 : FORTRAN, the compiler is born
+    1967 : BCPL, typeless systems language
     1969 : B by Ken Thompson at Bell Labs
     1972 : C by Dennis Ritchie at Bell Labs
     1973 : UNIX rewritten in C
     1978 : K&R, "The C Programming Language", published
     1989 : ANSI C (C89) standardized
-    2024 : C23 — modern cleanups
+    2024 : C23, modern cleanups
 ```
 
 ## Why C succeeded where others did not
@@ -231,14 +231,14 @@ Several deliberate decisions made C uniquely well suited to its job:
    about addresses directly. This is dangerous, but it is also
    *necessary* for writing operating systems, drivers, and runtimes.
 4. **It was portable.** Once a C compiler existed for a new CPU, every
-   C program — including the UNIX operating system itself — could be
+   C program, including the UNIX operating system itself, could be
    moved to that CPU. Suddenly UNIX could run on machines from many
    different vendors.
 
 In 1973, Ken Thompson and Dennis Ritchie rewrote the UNIX kernel in
 C. This was the first time anyone had written a serious operating
 system in a high-level language. Most experts at the time said it
-couldn't be done — the result, they predicted, would be too slow and
+couldn't be done, the result, they predicted, would be too slow and
 too bulky. They were wrong.
 
 <Callout type="info" title="The book that taught the world">
@@ -258,7 +258,7 @@ industry already fluent in C. By the 1980s C was the default language
 for systems programming everywhere.
 
 Today, decades later, an astonishing amount of the software you use
-every day is written in C — or in something built on top of C:
+every day is written in C, or in something built on top of C:
 
 - **Operating system kernels.** Linux, the BSDs, the core of macOS
   (XNU), and large parts of Windows are written in C.
@@ -266,20 +266,20 @@ every day is written in C — or in something built on top of C:
   the firmware inside almost every electronic device.
 - **Language runtimes.** The reference implementation of Python
   (CPython), the V8 JavaScript engine that powers Chrome and Node.js,
-  the Ruby interpreter (MRI), the PHP interpreter — all written in C
+  the Ruby interpreter (MRI), the PHP interpreter, all written in C
   or C++.
-- **Databases.** SQLite, PostgreSQL, MySQL, Redis — all C.
+- **Databases.** SQLite, PostgreSQL, MySQL, Redis, all C.
 - **Compilers.** GCC and large parts of LLVM are written in C/C++.
 - **Network infrastructure.** Web servers (nginx, Apache), TCP/IP
-  stacks, OpenSSL, curl — all C.
+  stacks, OpenSSL, curl, all C.
 
 When you load a web page, dozens of C programs collaborate to make
 that happen.
 
 ## How C influenced everything that came after
 
-Almost every popular language in use today inherits ideas — and
-syntax — from C:
+Almost every popular language in use today inherits ideas, and
+syntax, from C:
 
 ```mermaid
 graph TD
@@ -303,11 +303,11 @@ Those came from C. The `if (...) { ... } else { ... }` shape? C. The
 `for (int i = 0; i < n; i++)` loop? C. The `printf`-style format
 strings? C. The way functions take typed parameters and return a
 value? C. The `\n` for newline, the `==` for equality, the `&&` for
-logical AND — all C.
+logical AND, all C.
 
 When you learn C, you are learning the **grammar** that the rest of
-the industry has been speaking — sometimes consciously, sometimes
-not — for fifty years.
+the industry has been speaking, sometimes consciously, sometimes
+not, for fifty years.
 
 ## Why learning C is worth your time
 
@@ -318,7 +318,7 @@ But if you want to **understand programming itself**, C is unmatched.
 Here is what learning C will give you that most other languages will
 not:
 
-- A real mental model of **memory** — what a variable is, where it
+- A real mental model of **memory**, what a variable is, where it
   lives, who owns it, when it disappears.
 - An understanding of **what the CPU does** when you write a loop, a
   function call, or an `if` statement.
@@ -326,8 +326,8 @@ not:
   from you, and at what cost.
 - The vocabulary to read systems code: kernels, drivers,
   cryptographic libraries, virtual machines, language runtimes.
-- A baseline for picking up other systems languages — C++, Rust, Go,
-  Zig — much faster than you otherwise would.
+- A baseline for picking up other systems languages, C++, Rust, Go,
+  Zig, much faster than you otherwise would.
 
 <Callout type="success" title="The big idea">
 C is the layer where the cleanly abstracted world of "variables and
@@ -337,12 +337,12 @@ Learning C lets you stand on that border and look in both directions.
 
 ## A short word from Dennis Ritchie
 
-> *"C is quirky, flawed, and an enormous success."* — Dennis M. Ritchie
+> *"C is quirky, flawed, and an enormous success."*, Dennis M. Ritchie
 
 He was right on all three counts. C has rough edges. Some of its
 defaults are dangerous. Modern languages fix many of its mistakes.
-But the central idea — *a small, portable, low-level language that
-treats memory honestly* — has never been seriously displaced. Fifty
+But the central idea, *a small, portable, low-level language that
+treats memory honestly*, has never been seriously displaced. Fifty
 years later, we are still building on top of it.
 
 In the next chapter, we'll zoom into the machine itself: what happens
@@ -352,7 +352,7 @@ when a program runs. Then, finally, we'll write some code of our own.
   markdown={`What was the main problem with writing programs directly in machine code (binary)?
 
 - It was too slow for the CPU to execute.
-  > Machine code is literally what the CPU executes — speed of execution is not the issue. The issue is for humans, not the machine.
+  > Machine code is literally what the CPU executes, speed of execution is not the issue. The issue is for humans, not the machine.
 - It used too much electricity.
   > Power consumption is a hardware concern unrelated to the representation of programs. Early computers were power-hungry, but that had nothing to do with writing in machine code.
 - [o] It was extremely difficult for humans to read, write, and debug.
@@ -367,7 +367,7 @@ Machine code is the native language of the CPU, so it always runs at full speed.
   markdown={`Why was C originally created at Bell Labs?
 
 - To replace FORTRAN as the language of scientific computing.
-  > FORTRAN was designed for numerical and scientific computation. C was designed to write operating systems — a very different domain, requiring direct memory and hardware control.
+  > FORTRAN was designed for numerical and scientific computation. C was designed to write operating systems, a very different domain, requiring direct memory and hardware control.
 - [o] To make it possible to rewrite the UNIX operating system in a portable, high-level language.
   > UNIX was originally written in assembly for the PDP-7 and PDP-11. C was designed to give Thompson and Ritchie a language high-level enough to be productive in, but low-level enough to write an operating system in.
 - To teach programming in universities.
@@ -384,7 +384,7 @@ C's first big customer was UNIX itself: rewriting the UNIX kernel in C in 1973 w
 - The Linux kernel.
   > The Linux kernel is written almost entirely in C, so it is not the exception this question asks for.
 - The reference Python interpreter (CPython).
-  > CPython, the standard Python implementation, is written in C — that is why it is called *C*Python.
+  > CPython, the standard Python implementation, is written in C, that is why it is called *C*Python.
 - The SQLite database engine.
   > SQLite is a well-known example of a database engine implemented in C.
 - [o] An HTML web page.

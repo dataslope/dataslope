@@ -1,9 +1,9 @@
 /**
- * Display labels for content tag slugs — shared by the homepage course cards
+ * Display labels for content tag slugs, shared by the homepage course cards
  * (`app/_components/home/CoursesSection.tsx`) and the `/courses` catalog.
  *
  * Proper display labels for tag slugs whose casing isn't just "capitalize
- * each word" — languages, tools, and libraries with established names.
+ * each word", languages, tools, and libraries with established names.
  * Anything not listed falls back to title-casing the hyphenated slug
  * (e.g. "exploratory-data-analysis" → "Exploratory Data Analysis").
  */

@@ -13,7 +13,7 @@
 //   </MobileMenuSheet>
 //
 // Any <MobileMenuAction> closes the whole sheet after firing (via the
-// context below) so a tap both runs the action and dismisses the menu —
+// context below) so a tap both runs the action and dismisses the menu,
 // matching the language playgrounds' behaviour.
 
 import {
@@ -148,7 +148,7 @@ export interface MobileMenuActionProps {
   /** Show a trailing chevron (use when the action opens another surface,
    *  e.g. a tab/dialog). */
   chevron?: boolean;
-  /** Keep the sheet open after firing (rare — most actions dismiss it). */
+  /** Keep the sheet open after firing (rare, most actions dismiss it). */
   keepOpen?: boolean;
 }
 

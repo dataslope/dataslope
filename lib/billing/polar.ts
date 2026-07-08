@@ -1,16 +1,16 @@
 /**
- * Polar billing for the Pro plan (merchant of record — Polar is the seller,
+ * Polar billing for the Pro plan (merchant of record, Polar is the seller,
  * handles global VAT/sales tax, and pays out; we never touch card data).
  *
  * Built on the official Better Auth plugin (@polar-sh/better-auth), which
  * mounts three endpoints under the existing /api/auth/* catch-all:
  *
- *   POST /api/auth/checkout          — creates a Polar checkout session for
+ *   POST /api/auth/checkout, creates a Polar checkout session for
  *                                      the signed-in user (slug "pro") and
  *                                      returns its URL; the client redirects.
- *   GET|POST /api/auth/customer/portal — customer portal URL (invoices,
+ *   GET|POST /api/auth/customer/portal, customer portal URL (invoices,
  *                                      cancel/renew) for the signed-in user.
- *   POST /api/auth/polar/webhooks    — Polar → us. Signature-verified
+ *   POST /api/auth/polar/webhooks, Polar → us. Signature-verified
  *                                      (standardwebhooks HMAC, pure-JS crypto
  *                                      → Workers-safe); this is the ONLY
  *                                      writer that flips `user.plan` from
@@ -19,25 +19,25 @@
  * The link between the two systems is Better Auth's user id: checkout is
  * created with `externalCustomerId = user.id` (done by the plugin), so every
  * webhook's customer carries `externalId = user.id` and plan updates are one
- * indexed D1 UPDATE. No extra tables, no schema change — `user.plan` +
+ * indexed D1 UPDATE. No extra tables, no schema change, `user.plan` +
  * lib/ai/tier.ts already treat the column as the source of truth, exactly as
  * the "future billing webhook" comments in migrations/0003 anticipated.
  *
  * We deliberately key everything off the `customer.state_changed` event: it
  * fires on every subscription transition (created, renewed, canceled at
  * period end, revoked, past-due grace expiry) and carries the FULL current
- * state, so plan derivation is a pure function of the latest event — no
+ * state, so plan derivation is a pure function of the latest event, no
  * event-ordering bookkeeping. An admin's manual plan switch for a paying
  * customer is therefore overwritten by the next state event, which is the
  * correct precedence (billing owns paid status).
  *
- * Config (all optional — billing is inert until set, matching how social
+ * Config (all optional, billing is inert until set, matching how social
  * login / email / AI degrade):
- *   POLAR_ACCESS_TOKEN   secret — org access token (sandbox or production).
- *   POLAR_WEBHOOK_SECRET secret — from the webhook endpoint you create in
+ *   POLAR_ACCESS_TOKEN   secret, org access token (sandbox or production).
+ *   POLAR_WEBHOOK_SECRET secret, from the webhook endpoint you create in
  *                        Polar pointing at /api/auth/polar/webhooks.
- *   POLAR_PRO_PRODUCT_ID var    — the Polar product that grants Pro.
- *   POLAR_SERVER         var    — "sandbox" while testing; anything else
+ *   POLAR_PRO_PRODUCT_ID var, the Polar product that grants Pro.
+ *   POLAR_SERVER         var, "sandbox" while testing; anything else
  *                        (including unset) means production.
  */
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
@@ -86,7 +86,7 @@ function proProductIds(env: CloudflareEnv): string[] {
 }
 
 /** Apply one customer-state snapshot to the user's `plan` column. Customers
- *  without an externalId were not created through our checkout — nothing to
+ *  without an externalId were not created through our checkout, nothing to
  *  update. */
 export async function applyCustomerState(
   env: CloudflareEnv,
@@ -129,7 +129,7 @@ export function polarPlugin(env: CloudflareEnv) {
     ],
     successUrl: CHECKOUT_SUCCESS_URL,
     // The webhook maps customers to users via externalCustomerId, which only
-    // exists for signed-in checkouts — so anonymous checkout is off.
+    // exists for signed-in checkouts, so anonymous checkout is off.
     authenticatedUsersOnly: true,
   });
   // Portal return lands the user back on their account page.
@@ -137,7 +137,7 @@ export function polarPlugin(env: CloudflareEnv) {
 
   // Customer creation happens lazily at first checkout (the plugin passes
   // externalCustomerId), NOT on sign-up: createCustomerOnSignUp would put a
-  // Polar API round-trip — and Polar availability — on the sign-up path.
+  // Polar API round-trip, and Polar availability, on the sign-up path.
   if (env.POLAR_WEBHOOK_SECRET) {
     return polar({
       client,

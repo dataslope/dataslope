@@ -1,6 +1,6 @@
 // Same self-contained, flat auth chrome as /sign-in (design option "2a"): a
 // top-left brand lockup plus a single centered card, styled with the shared
-// auth CSS module — no tailwind.css / HomeNav / HomeFooter. Global resets come
+// auth CSS module, no tailwind.css / HomeNav / HomeFooter. Global resets come
 // from app/globals.css (imported in the root layout).
 import type { Metadata } from "next";
 import Link from "../_components/Link";

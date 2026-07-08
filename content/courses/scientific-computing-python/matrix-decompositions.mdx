@@ -1,6 +1,6 @@
 ---
 title: Matrix Decompositions
-description: LU, QR, Cholesky, SVD — the factorizations behind every numerical linear algebra routine
+description: LU, QR, Cholesky, SVD, the factorizations behind every numerical linear algebra routine
 ---
 
 When you call `solve`, `lstsq`, `eig`, or `inv`, you are not running
@@ -17,7 +17,7 @@ look at what it tells us.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A solid blue three-by-three grid of cells, a geometric equals sign, then a green lower-triangular grid times a yellow upper-triangular grid with their empty corners left faint — one matrix factored into two structured pieces"
+  aria-label="A solid blue three-by-three grid of cells, a geometric equals sign, then a green lower-triangular grid times a yellow upper-triangular grid with their empty corners left faint, one matrix factored into two structured pieces"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -93,7 +93,7 @@ cheapest factorization that solves your problem.
 
 LU factors $A$ into a lower-triangular $L$ and upper-triangular $U$
 (with a row-permutation matrix $P$ if pivoting is used). Once you
-have $PA = LU$, every linear solve is two triangular sweeps —
+have $PA = LU$, every linear solve is two triangular sweeps,
 $O(n^2)$ instead of $O(n^3)$. This is why you should **factor
 once, solve many times**.
 
@@ -197,7 +197,7 @@ $\|A x - b\|^2$ becomes solving the much-easier triangular system
 $R x = Q^T b$.
 
 It is also how **Gram–Schmidt orthogonalization** is done in
-practice — modified Gram–Schmidt is unstable, but Householder QR
+practice, modified Gram–Schmidt is unstable, but Householder QR
 (what NumPy uses) is rock solid.
 
 <CodeBlock
@@ -223,7 +223,7 @@ print("True coefficients : [1.000, -2.000, 0.000, 0.500]")
   ]}
 />
 
-NumPy's `np.linalg.lstsq` does exactly this dance for you — but
+NumPy's `np.linalg.lstsq` does exactly this dance for you, but
 seeing it explicitly makes it obvious that least squares is *just*
 QR plus a triangular solve.
 
@@ -236,10 +236,10 @@ is the most informative factorization in numerical analysis.
 
 The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
 
-- **Rank** — the number of nonzero singular values (numerically:
+- **Rank**, the number of nonzero singular values (numerically:
   those above some tolerance)
-- **Condition number** — $\sigma_1 / \sigma_n$
-- **Best low-rank approximation** — truncate to the top $k$
+- **Condition number**, $\sigma_1 / \sigma_n$
+- **Best low-rank approximation**, truncate to the top $k$
   singular values for the closest rank-$k$ approximation in
   Frobenius and 2-norm (Eckart–Young theorem)
 
@@ -355,7 +355,7 @@ print("\\nAgree?", np.allclose(exp_via_eig, exp_direct))
   ]}
 />
 
-In practice **always prefer `scipy.linalg.expm`** — it uses scaling-
+In practice **always prefer `scipy.linalg.expm`**, it uses scaling-
 and-squaring with a Padé approximant, which is far more robust than
 diagonalization (and works for non-diagonalizable matrices too).
 
@@ -414,7 +414,7 @@ def pca_via_svd(X, n_components):
 
 Twenty lines, a fully working PCA implementation that scales to
 the limit of NumPy's SVD. Notice that there are no eigenvalue
-computations — SVD on the centered data is the preferred numerical
+computations, SVD on the centered data is the preferred numerical
 route.
 
 ## Decision tree: which factorization?
@@ -527,7 +527,7 @@ assert abs(got - expected) < 1e-8`,
 - Compute \`np.linalg.inv(A)\` once and multiply
   > Computing the inverse costs the same $O(n^3)$ as LU factorization, is less numerically stable than the factorize-then-solve approach, and the resulting dense inverse matrix itself requires $O(n^2)$ storage per solve multiply.
 - Use the SVD because it generalizes
-  > SVD costs roughly $4n^3$ — about 6× more than LU — so reaching for it when a standard LU solve suffices wastes significant compute time.
+  > SVD costs roughly $4n^3$, about 6× more than LU, so reaching for it when a standard LU solve suffices wastes significant compute time.
 
 "Factor once, solve many times" is the most common performance win in numerical linear algebra.`}
 />
@@ -536,9 +536,9 @@ assert abs(got - expected) < 1e-8`,
   markdown={`Why is the SVD the right tool to compute the *numerical* rank of a matrix that is theoretically rank-deficient but has been perturbed by tiny floating-point noise?
 
 - It runs faster than Gaussian elimination
-  > The SVD costs roughly $4n^3$ — several times more than Gaussian elimination — so speed is not the motivation; stability and the ability to threshold small singular values is.
+  > The SVD costs roughly $4n^3$, several times more than Gaussian elimination, so speed is not the motivation; stability and the ability to threshold small singular values is.
 - [o] The singular values reveal exactly how much "signal" exists in each direction; you can set a tolerance (e.g. $\\sigma_k < \\epsilon \\, \\sigma_1$) and count the singular values above it
-  > Algebraic rank from row reduction is binary and unstable. The SVD turns rank into a continuous measurement — singular values — which you can threshold sensibly to get a robust numerical rank.
+  > Algebraic rank from row reduction is binary and unstable. The SVD turns rank into a continuous measurement, singular values, which you can threshold sensibly to get a robust numerical rank.
 - The SVD always returns integer singular values
   > Singular values are real non-negative numbers; for a noisy or near-rank-deficient matrix they are almost never integers.
 - The QR decomposition gives the same answer faster

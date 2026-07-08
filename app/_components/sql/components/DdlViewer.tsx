@@ -13,7 +13,7 @@ import { indentUnit } from "@codemirror/language";
 import { sql as sqlLang, SQLite, PostgreSQL } from "@codemirror/lang-sql";
 import { themeFor } from "../../cmExtensions";
 
-// Replace the entire editor document — the v6 idiom for what v5 called
+// Replace the entire editor document, the v6 idiom for what v5 called
 // `editor.setValue(s)`. Centralised so all call sites read the same.
 function replaceDoc(view: EditorView, value: string): void {
   view.dispatch({
@@ -22,7 +22,7 @@ function replaceDoc(view: EditorView, value: string): void {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// DdlViewer — read-only EditorView mounted inside the View DDL dialog so
+// DdlViewer, read-only EditorView mounted inside the View DDL dialog so
 // the SQL is syntax-highlighted and the user can scroll / select with
 // their keyboard.
 // ────────────────────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ export function DdlViewer({
       parent: hostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
-        // Note: NOT calling EditorView.editable.of(false) — that strips
+        // Note: NOT calling EditorView.editable.of(false), that strips
         // `contenteditable` from the editor, which in turn drops focus,
         // breaking Mod-a select-all and most clipboard interactions.
         // `EditorState.readOnly.of(true)` already prevents writes.

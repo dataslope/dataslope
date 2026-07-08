@@ -3,7 +3,7 @@
 /**
  * Cloud-backup state + actions for the unified workspace menu.
  *
- * Cloud saves and local workspaces share the same id — `saveCloudWorkspace`
+ * Cloud saves and local workspaces share the same id, `saveCloudWorkspace`
  * PUTs to /api/workspaces/<local workspace id>, and materializing a cloud
  * save pins the local copy to the cloud id (`createWorkspace({ id })`). So a
  * cloud row whose id matches a local workspace IS that workspace's backup,
@@ -40,9 +40,9 @@ import type { WorkspaceEntry } from "../opfs/workspace";
 
 export interface CloudBackups {
   /** False when the browser can't gzip bundles OR the server has no cloud
-   *  storage configured (503) — hide all cloud UI in both cases. */
+   *  storage configured (503), hide all cloud UI in both cases. */
   available: boolean;
-  /** Session resolved to signed-out — show the sign-in row instead. */
+  /** Session resolved to signed-out, show the sign-in row instead. */
   signedOut: boolean;
   /** Cloud saves for this playground; empty until the first fetch lands. */
   metas: CloudWorkspaceMeta[];
@@ -67,12 +67,12 @@ export function useCloudBackups(
   const [items, setItems] = useState<CloudWorkspaceMeta[] | null>(null);
   const [usage, setUsage] = useState<CloudUsage | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Cloud storage not configured on the server (503) — treat exactly like an
+  // Cloud storage not configured on the server (503), treat exactly like an
   // unsupported browser and render no cloud UI at all.
   const [unavailable, setUnavailable] = useState(false);
   // Server said 401 while the *client* session cookie still looks valid
   // (expired/revoked server-side). The client session alone would keep
-  // `signedOut` false, leaving the menu on "Checking backups…" forever —
+  // `signedOut` false, leaving the menu on "Checking backups…" forever,
   // this flag forces the sign-in row instead.
   const [authLost, setAuthLost] = useState(false);
 
@@ -85,7 +85,7 @@ export function useCloudBackups(
       setAuthLost(false);
     } catch (err) {
       if (err instanceof CloudApiError && err.status === 401) {
-        setItems(null); // session expired mid-flight — fall back to signed-out
+        setItems(null); // session expired mid-flight, fall back to signed-out
         setAuthLost(true);
       } else if (err instanceof CloudApiError && err.status === 503) {
         setUnavailable(true);
@@ -95,7 +95,7 @@ export function useCloudBackups(
     }
   }, []);
 
-  // Initial fetch once the session resolves — the badge shows a backup dot
+  // Initial fetch once the session resolves, the badge shows a backup dot
   // without the menu ever being opened.
   useEffect(() => {
     if (!session || unavailable || !isCloudSupported()) return;
@@ -128,7 +128,7 @@ export function useCloudBackups(
   };
 }
 
-/** True when the workspace was opened after its last backup was written —
+/** True when the workspace was opened after its last backup was written,
  *  the backup may be missing recent changes. (Same heuristic the old Cloud
  *  dialog used for its clobber guard: the registry tracks opens, not edits.) */
 export function isBackupStale(
@@ -146,7 +146,7 @@ export async function backUpWorkspace(
 ): Promise<CloudWorkspaceMeta> {
   const bundle = await buildBundle();
   if (!bundle) {
-    throw new Error("The playground is still loading — try again in a moment.");
+    throw new Error("The playground is still loading, try again in a moment.");
   }
   return saveCloudWorkspace(workspaceId, bundle);
 }
@@ -155,7 +155,7 @@ export async function backUpWorkspace(
  * Opens a cloud save on this device. Family-specific, same as the old Cloud
  * dialog: SQL bundles are replayed into the session database after a reload
  * (local workspaces untouched); code bundles materialize into a local
- * workspace under the cloud id and become active. Never resolves on success —
+ * workspace under the cloud id and become active. Never resolves on success,
  * both paths end in a navigation.
  */
 export async function openCloudSave(

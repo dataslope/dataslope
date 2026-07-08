@@ -3,14 +3,14 @@ title: Type Inference
 description: How TypeScript deduces types automatically from your code
 ---
 
-TypeScript's compiler doesn't just check types — it can **infer** them. When you write `const x = 42`, you don't need to write `const x: number = 42` because the compiler sees the initializer and deduces the type on its own. This is **type inference**: the compiler walks your code and figures out what the types must be based on how values are used, returned, and passed around.
+TypeScript's compiler doesn't just check types, it can **infer** them. When you write `const x = 42`, you don't need to write `const x: number = 42` because the compiler sees the initializer and deduces the type on its own. This is **type inference**: the compiler walks your code and figures out what the types must be based on how values are used, returned, and passed around.
 
 Good inference means you write fewer annotations while keeping full type safety. The trick is knowing when the compiler can figure it out on its own and when you should step in with an explicit type.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three shapes standing in low sunlight cast their exact silhouettes onto the ground without anyone drawing them, and one square additionally wears a dashed hand-drawn outline — the compiler infers a type from each value, and annotations are simply drawn on top"
+  aria-label="Three shapes standing in low sunlight cast their exact silhouettes onto the ground without anyone drawing them, and one square additionally wears a dashed hand-drawn outline, the compiler infers a type from each value, and annotations are simply drawn on top"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -106,7 +106,7 @@ This is called **widening**: the compiler expands a narrow literal type into a b
 
 ## Contextual typing
 
-Sometimes the compiler infers types by looking at **context** — where a value is being used. This is especially common with callbacks.
+Sometimes the compiler infers types by looking at **context**, where a value is being used. This is especially common with callbacks.
 
 <CodeBlock
   adapter="typescript"
@@ -131,14 +131,14 @@ function onClick(handler: (e: ClickEvent) => void) {
 
 onClick((e) => {
   console.log(\`Clicked at (\${e.x}, \${e.y})\`);
-  // 'e' is inferred as ClickEvent — no annotation needed!
+  // 'e' is inferred as ClickEvent, no annotation needed!
 });
 `,
     },
   ]}
 />
 
-You didn't write `(n: number)` or `(e: ClickEvent)` — the compiler figured it out from the **signature** of `map` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
+You didn't write `(n: number)` or `(e: ClickEvent)`, the compiler figured it out from the **signature** of `map` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
 
 <Callout type="success" title="Less noise, same safety">
 Contextual typing is one of the reasons TypeScript code stays readable. You get full type checking on callback parameters without cluttering every arrow function with explicit annotations.
@@ -205,7 +205,7 @@ if (result !== null) {
   ]}
 />
 
-**Rule of thumb:** Let the compiler infer types inside function bodies (local variables, intermediate results). Annotate types at **module boundaries** — function parameters, return types, and exported values — so your API is explicit and self-documenting.
+**Rule of thumb:** Let the compiler infer types inside function bodies (local variables, intermediate results). Annotate types at **module boundaries**, function parameters, return types, and exported values, so your API is explicit and self-documenting.
 
 ## Best-common-type inference for arrays
 
@@ -214,7 +214,7 @@ When you initialize an array with mixed values, the compiler tries to find a **b
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="A gray jar holds blue circles and a yellow square, and its lid label shows one small chip of each kind; a green triangle standing outside appears nowhere on the label — the inferred element type is the union of exactly what the array was given"
+  aria-label="A gray jar holds blue circles and a yellow square, and its lid label shows one small chip of each kind; a green triangle standing outside appears nowhere on the label, the inferred element type is the union of exactly what the array was given"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -261,7 +261,7 @@ console.log(\`points: { x: number; y: number }[] =\`, JSON.stringify(points));
   ]}
 />
 
-If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose — and the inference is locked in at the moment of initialization, so a union you created by accident follows the array around forever:
+If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose, and the inference is locked in at the moment of initialization, so a union you created by accident follows the array around forever:
 
 <CodeBlock
   adapter="typescript"
@@ -284,7 +284,7 @@ console.log(strict); // [42, 100]
   ]}
 />
 
-Note what inference does *not* do: it never widens beyond the evidence. `const nums = [42]` is inferred as `number[]`, so `nums.push("hello")` is already an error with no annotation needed. You only reach for an explicit annotation when the initializer's evidence is wrong about your intent — usually because a value snuck in that shouldn't be there at all.
+Note what inference does *not* do: it never widens beyond the evidence. `const nums = [42]` is inferred as `number[]`, so `nums.push("hello")` is already an error with no annotation needed. You only reach for an explicit annotation when the initializer's evidence is wrong about your intent, usually because a value snuck in that shouldn't be there at all.
 
 ## How inference walks expressions
 
@@ -434,7 +434,7 @@ Literal types are inferred for \`const\` bindings unless you provide an explicit
 
 ## Recap
 
-Type inference is what makes TypeScript feel lightweight. The compiler deduces types from initializers, context, return statements, and array contents, so you don't have to annotate every single variable. But inference isn't magic — it follows clear rules:
+Type inference is what makes TypeScript feel lightweight. The compiler deduces types from initializers, context, return statements, and array contents, so you don't have to annotate every single variable. But inference isn't magic, it follows clear rules:
 
 - **Variables:** Inferred from the initializer. `const` narrows to literal types; `let` widens to the general type.
 - **Callbacks:** Inferred from the function signature that expects them (contextual typing).
@@ -443,4 +443,4 @@ Type inference is what makes TypeScript feel lightweight. The compiler deduces t
 
 The best practice is to **annotate at module boundaries** (function parameters, return types, exported values) and **let the compiler infer inside implementations** (local variables, intermediate results). This keeps your code concise and maintainable while preserving full type safety.
 
-Next up: [Structural Typing](./structural-typing), where we explore how TypeScript compares types by their *shape*, not their name — and why that matters for reusability and flexibility.
+Next up: [Structural Typing](./structural-typing), where we explore how TypeScript compares types by their *shape*, not their name, and why that matters for reusability and flexibility.

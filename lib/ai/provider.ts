@@ -65,7 +65,7 @@ export interface CompleteChatResult {
 
 /**
  * One non-streaming chat completion. Used by AI inline autocomplete
- * (app/api/ai/complete), where the whole answer is a few lines — buffering a
+ * (app/api/ai/complete), where the whole answer is a few lines, buffering a
  * stream would just add latency and parsing for nothing. Same
  * `/chat/completions` contract as streamChat, minus `stream`; the low
  * temperature keeps suggestions deterministic enough to feel like completion

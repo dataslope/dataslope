@@ -24,14 +24,14 @@ import { REACT_VERSION } from "./esmResolve";
 
 // The React playground compiles TSX fully client-side: esbuild-wasm
 // bundles the workspace tabs in a dedicated worker (bare imports rewrite
-// to pinned esm.sh URLs and stay external — see esmResolve.ts), and the
+// to pinned esm.sh URLs and stay external, see esmResolve.ts), and the
 // resulting ES module runs inside the same sandboxed iframe preview the
 // web adapter uses (runtime/webPreview.ts). React itself is fetched by
 // the preview document from esm.sh as a native ES module.
 
 // The default workspace: a real multi-file project shape. main.tsx
 // mounts, App.tsx is the component the learner edits, styles come from
-// a plain CSS import — the structure every React tutorial and template
+// a plain CSS import, the structure every React tutorial and template
 // uses, one tab per file in the playground's tabbed editor.
 const DEFAULT_MAIN = `import { createRoot } from "react-dom/client";
 import { App } from "./App";
@@ -50,7 +50,7 @@ export function App() {
       <h1>You clicked {count} times</h1>
       <button onClick={() => setCount(count + 1)}>Click me</button>
       <p>
-        Edit <code>App.tsx</code> and press Run — imports between the
+        Edit <code>App.tsx</code> and press Run, imports between the
         panes bundle right in your browser.
       </p>
     </main>
@@ -133,7 +133,7 @@ const LANGUAGES: Language[] = [
 function LanguageRow({ name, year }: Language) {
   return (
     <li>
-      <strong>{name}</strong> — since {year}
+      <strong>{name}</strong>, since {year}
     </li>
   );
 }
@@ -274,7 +274,7 @@ function NamePicker() {
       />
       {name && (
         <p>
-          The heading re-renders on every keystroke — the input's value
+          The heading re-renders on every keystroke, the input's value
           lives in React state.
         </p>
       )}
@@ -288,7 +288,7 @@ createRoot(document.getElementById("root")!).render(<NamePicker />);
 ];
 
 // A curated starter set for the packages drawer. Nothing here is
-// "installed" — any bare npm import already resolves through esm.sh —
+// "installed", any bare npm import already resolves through esm.sh,
 // these entries exist for discoverability, each with a runnable
 // example. Versions are what esm.sh serves for the unpinned specifier.
 const PACKAGES: PackageInfo[] = [
@@ -366,7 +366,7 @@ function Toggle() {
       }}
       onClick={() => setOn(!on)}
     >
-      {on ? "On" : "Off"} — classes: {clsx("pill", { active: on })}
+      {on ? "On" : "Off"}, classes: {clsx("pill", { active: on })}
     </button>
   );
 }
@@ -458,7 +458,7 @@ class ReactPreviewRuntime implements LanguageRuntime {
       try {
         text.set(path, decoder.decode(bytes));
       } catch {
-        // Undecodable bytes — the bundler just won't see this file.
+        // Undecodable bytes, the bundler just won't see this file.
       }
     }
     this.stagedText = text;
@@ -507,7 +507,7 @@ class ReactPreviewRuntime implements LanguageRuntime {
   ): Promise<void> {
     const entry = options?.entryFilename ?? "main.tsx";
     // Consume-and-clear (see the web adapter for why), overlaying the
-    // entry with the code actually passed to this run — it may carry a
+    // entry with the code actually passed to this run, it may carry a
     // merged init prelude or a challenge harness the staged copy lacks.
     const files = this.stagedText;
     this.stagedText = new Map();
@@ -541,7 +541,7 @@ class ReactPreviewRuntime implements LanguageRuntime {
   }
 }
 
-/** Entry points are the files that MOUNT the app — the ones calling
+/** Entry points are the files that MOUNT the app, the ones calling
  *  `createRoot`/`hydrateRoot` (or legacy `ReactDOM.render`). Running a
  *  component-only file as the entry would bundle fine but render
  *  nothing, so the Run button resolves to the mounting file even while
@@ -590,7 +590,7 @@ export const reactAdapter: LanguageAdapter = {
     if (/\.ts$/i.test(filename)) return "text/typescript";
     return undefined; // .tsx/.jsx → the adapter's "tsx" mode
   },
-  // web_fmt at 2-space indentation — keep in sync with formatCode.
+  // web_fmt at 2-space indentation, keep in sync with formatCode.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -618,11 +618,11 @@ export const reactAdapter: LanguageAdapter = {
   coldDownloadMB: 3,
   packagesFooter: (
     <>
-      Import any npm package by name —{" "}
+      Import any npm package by name,{" "}
       <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
         import confetti from &quot;canvas-confetti&quot;
       </code>{" "}
-      — and the bundler resolves it to an ES module from{" "}
+, and the bundler resolves it to an ES module from{" "}
       <a href="https://esm.sh" target="_blank" rel="noreferrer">
         esm.sh
       </a>
@@ -648,7 +648,7 @@ export const reactAdapter: LanguageAdapter = {
       // Deadline backstop: the worker reports its own boot failures via
       // `init-error`, but if the worker chunk itself dies before the
       // protocol is up (and the bundler's bootstrap swallows the `error`
-      // event), nothing would ever settle — fail loudly instead of
+      // event), nothing would ever settle, fail loudly instead of
       // leaving surfaces stuck on "Loading…" forever. Generous budget:
       // the ~10 MB WASM download must fit on slow connections.
       const deadline = window.setTimeout(() => {
@@ -656,7 +656,7 @@ export const reactAdapter: LanguageAdapter = {
         worker.terminate();
         reject(
           new Error(
-            "The React build toolchain did not finish loading — check your connection and try again.",
+            "The React build toolchain did not finish loading, check your connection and try again.",
           ),
         );
       }, 120_000);

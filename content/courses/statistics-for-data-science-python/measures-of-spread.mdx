@@ -1,18 +1,18 @@
 ---
 title: Measures of Spread
-description: Range, variance, standard deviation, IQR, MAD, and the coefficient of variation — why how spread out the data is matters as much as where its center sits.
+description: Range, variance, standard deviation, IQR, MAD, and the coefficient of variation, why how spread out the data is matters as much as where its center sits.
 ---
 
 Two delivery services both average a 30-minute wait. One always
 arrives between 28 and 32 minutes. The other swings from 5 minutes to
-an hour. Same center, wildly different experience — and if you only
+an hour. Same center, wildly different experience, and if you only
 reported the average, you'd call them identical. A measure of
 **center** tells you where the data sits; a measure of **spread** tells
 you how much it *moves*. You almost never understand a column from its
 center alone.
 
 Spread is where risk, reliability, and surprise live. A model's error,
-a process's consistency, a portfolio's volatility, a sensor's noise —
+a process's consistency, a portfolio's volatility, a sensor's noise,
 all of these are spread, not center. This page builds the vocabulary:
 **range**, **variance**, **standard deviation**, the **IQR**, the
 **MAD**, and the **coefficient of variation**, plus the one divisor
@@ -21,7 +21,7 @@ detail (`n−1`) that trips up almost everyone.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two rows of deliveries share one solid yellow average line: the top row's green dots huddle inside a tight capsule while the bottom row's blue dots scatter edge to edge inside a wide one — same center, completely different spread"
+  aria-label="Two rows of deliveries share one solid yellow average line: the top row's green dots huddle inside a tight capsule while the bottom row's blue dots scatter edge to edge inside a wide one, same center, completely different spread"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -100,8 +100,8 @@ on what should be ages means a data-entry bug).
 
 But the range has a fatal flaw for serious use: it depends on *only the
 two most extreme points*, so a single outlier or typo can blow it up.
-It also tends to grow as you collect more data — more observations mean
-more chances to see an extreme — so it's not comparable across
+It also tends to grow as you collect more data, more observations mean
+more chances to see an extreme, so it's not comparable across
 different sample sizes.
 
 <CodeBlock
@@ -135,19 +135,19 @@ gut-check, never as your primary spread measure.
 Most spread measures ask the same question: *on average, how far are
 the points from the center?* The natural idea is to take each point's
 distance from the mean and average those distances. But the raw
-deviations sum to zero (positives and negatives cancel — that's what
+deviations sum to zero (positives and negatives cancel, that's what
 "balance point" means). To stop the cancellation, we **square** each
 deviation before averaging.
 
 That average of squared deviations is the **variance**. It's a real,
-honest spread number, but it's in *squared units* — square dollars,
-square minutes — which nobody can interpret. So we take the square root
+honest spread number, but it's in *squared units*, square dollars,
+square minutes, which nobody can interpret. So we take the square root
 and get the **standard deviation**, which is back in the original units
 and reads as a typical distance from the mean.
 
 `s = √( Σ(xᵢ − x̄)² / (n − 1) )`
 
-You will rarely compute this by hand — `numpy` and `pandas` do it — but
+You will rarely compute this by hand, `numpy` and `pandas` do it, but
 the shape matters: square the distances, average them, square-root back.
 
 <CodeBlock
@@ -178,7 +178,7 @@ print(f"NumPy std agrees:          {data.std():.3f}")
 The standard deviation is in the **same units as your data** and means
 roughly "the typical amount a value differs from the mean." If daily
 sales average 100 with an SD of 12, a day of 112 or 88 is unremarkable;
-a day of 150 is about four SDs out — genuinely unusual. For roughly
+a day of 150 is about four SDs out, genuinely unusual. For roughly
 bell-shaped data, about two-thirds of values fall within one SD of the
 mean and about 95% within two SDs (we'll make this precise in *The
 Normal Distribution*).
@@ -192,21 +192,21 @@ rather than mathematical. When you compute spread from a **sample**
 `n−1`, not `n`.
 
 Why? Because you measured the deviations from the **sample mean**, not
-the true population mean — and the sample mean is, by construction, the
+the true population mean, and the sample mean is, by construction, the
 point that sits as close as possible to your sample's points. Your data
 hugs its own mean a little more tightly than it hugs the real
 population mean. So squared deviations from the sample mean are
 *systematically a bit too small*, and dividing by `n` would
 **underestimate** the true spread. Dividing by the smaller number
 `n−1` nudges the estimate up to compensate. People say the sample mean
-"uses up one degree of freedom" — once you know the mean and `n−1` of
+"uses up one degree of freedom", once you know the mean and `n−1` of
 the values, the last value is determined, so only `n−1` deviations are
 truly free to vary.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Five scattered points joined by thin solid spokes to the blue ring of the center they define themselves, while the yellow true center floats a little way off to the side — data always hugs its own mean most tightly, which is why sample spread divides by n minus one to push the estimate back up"
+  aria-label="Five scattered points joined by thin solid spokes to the blue ring of the center they define themselves, while the yellow true center floats a little way off to the side, data always hugs its own mean most tightly, which is why sample spread divides by n minus one to push the estimate back up"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -234,7 +234,7 @@ truly free to vary.
 In NumPy, `ddof` is what gets subtracted from `n` in the divisor.
 `ddof=0` divides by `n` (the **population** formula). `ddof=1` divides
 by `n−1` (the **sample** formula). **pandas defaults to `ddof=1`**
-(sample), while **NumPy defaults to `ddof=0`** (population) — a classic
+(sample), while **NumPy defaults to `ddof=0`** (population), a classic
 source of "why don't my numbers match?" bugs.
 </Callout>
 
@@ -256,7 +256,7 @@ print("\\nVariance the same way:")
 print("np.var ddof=0 :", round(np.var(sample), 4))
 print("np.var ddof=1 :", round(np.var(sample, ddof=1), 4))
 
-print("\\nThe ddof=1 values are LARGER — they correct the underestimate.")
+print("\\nThe ddof=1 values are LARGER, they correct the underestimate.")
 print("pandas matches np with ddof=1, NOT np's default.")
 `,
     },
@@ -273,15 +273,15 @@ deviations," check the divisor first.
 
 For large `n` the difference between dividing by `n` and `n−1` is tiny
 (1000 vs 999 barely moves the answer). It matters most for small
-samples — exactly when you're most at risk of underestimating spread.
+samples, exactly when you're most at risk of underestimating spread.
 
 ## IQR: the robust spread
 
 Just as the median is a robust center, the **interquartile range
 (IQR)** is a robust spread. It's the range of the *middle 50%* of the
 data: the 75th percentile minus the 25th percentile (`Q3 − Q1`).
-Because it ignores the top and bottom 25%, no single outlier — however
-extreme — can move it. That makes it the spread of choice for skewed,
+Because it ignores the top and bottom 25%, no single outlier, however
+extreme, can move it. That makes it the spread of choice for skewed,
 outlier-prone data, and it's the engine behind box plots and the
 `1.5×IQR` outlier rule we'll meet in *Shape and Outliers*.
 
@@ -319,7 +319,7 @@ print("The lone 9000 barely touches the IQR but explodes the std.")
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Sorted dots on a line with the middle half wrapped in a green capsule that one far-flung red value cannot stretch, while the red band of the standard deviation below runs all the way out to reach it — the IQR shrugs off the outlier that wrecks the std"
+  aria-label="Sorted dots on a line with the middle half wrapped in a green capsule that one far-flung red value cannot stretch, while the red band of the standard deviation below runs all the way out to reach it, the IQR shrugs off the outlier that wrecks the std"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="79" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -392,7 +392,7 @@ print(f"Std dev for comparison  : {data.std(ddof=1):.1f}  <- outlier-driven")
 
 ## CV: comparing spread across different scales
 
-Here's a trap. Is a standard deviation of 5 "big"? You can't say — it
+Here's a trap. Is a standard deviation of 5 "big"? You can't say, it
 depends entirely on the scale. An SD of 5 on human heights (cm) is
 modest; an SD of 5 on a 1-to-10 satisfaction score is enormous. Raw
 standard deviations are **not comparable across variables measured in
@@ -400,8 +400,8 @@ different units or at different magnitudes**.
 
 The **coefficient of variation (CV)** fixes this by dividing the
 standard deviation by the mean: `CV = std / mean`. It's a *unitless*,
-relative measure of spread — "how big is the spread compared to the
-typical value?" — which lets you compare the variability of things on
+relative measure of spread, "how big is the spread compared to the
+typical value?", which lets you compare the variability of things on
 totally different scales.
 
 <CodeBlock
@@ -430,7 +430,7 @@ print("Relative to their size, visits are far more variable than prices.")
 
 <Callout type="warn" title="Misconception: a bigger standard deviation means more spread, period">
 Only within the *same* variable. Comparing the SD of revenue (millions)
-to the SD of conversion rate (a fraction) tells you nothing — the
+to the SD of conversion rate (a fraction) tells you nothing, the
 revenue SD is bigger purely because the numbers are bigger. To compare
 variability across different scales, use the **CV**. (Caveat: the CV
 needs a meaningful, positive mean; it's not appropriate when the mean is
@@ -441,7 +441,7 @@ near zero or the data can go negative, like temperatures in Celsius.)
   markdown={`Stock A has a mean daily price of \\$500 with a standard deviation of \\$20. Stock B has a mean price of \\$10 with a standard deviation of \\$3. Which stock is *relatively* more volatile, and what should you compute to decide?
 
 - Stock A, because its standard deviation (\\$20) is larger
-  > A larger raw standard deviation reflects the larger price level, not greater relative volatility — \\$20 on a \\$500 stock is a small percentage move.
+  > A larger raw standard deviation reflects the larger price level, not greater relative volatility, \\$20 on a \\$500 stock is a small percentage move.
 - [o] Stock B, because its coefficient of variation (3/10 = 0.30) is far higher than A's (20/500 = 0.04)
   > Dividing each standard deviation by its mean puts both on a comparable, unitless footing, and B's spread is 30% of its price versus 4% for A.
 - They are equally volatile because volatility is absolute
@@ -525,13 +525,13 @@ print("A center alone ('Gentoo are bigger') would hide that.")
   title="Compute and compare spread for two groups"
   instructions={`You're given two pandas Series, \`group_a\` and \`group_b\`, of measurements on the *same* scale.
 
-**Part 1 — spread of group A.** Build a dict **\`spread_a\`** with these keys (all values plain Python \`float\`):
+**Part 1, spread of group A.** Build a dict **\`spread_a\`** with these keys (all values plain Python \`float\`):
 
-- \`"std"\` — the **sample** standard deviation (\`ddof=1\`)
-- \`"iqr"\` — the interquartile range, using \`scipy.stats.iqr\`
-- \`"cv"\` — the coefficient of variation, using \`scipy.stats.variation\` with \`ddof=1\`
+- \`"std"\`, the **sample** standard deviation (\`ddof=1\`)
+- \`"iqr"\`, the interquartile range, using \`scipy.stats.iqr\`
+- \`"cv"\`, the coefficient of variation, using \`scipy.stats.variation\` with \`ddof=1\`
 
-**Part 2 — compare.** Set a string **\`more_variable\`** to \`"a"\` if \`group_a\` has the larger sample standard deviation, otherwise \`"b"\`.
+**Part 2, compare.** Set a string **\`more_variable\`** to \`"a"\` if \`group_a\` has the larger sample standard deviation, otherwise \`"b"\`.
 
 Use the provided Series. Make sure every dict value is a \`float\` (not a NumPy scalar).`}
   files={[
@@ -626,7 +626,7 @@ Whenever two "standard deviations" differ slightly on identical data, suspect th
   markdown={`Why do we divide by \`n−1\` instead of \`n\` when estimating spread from a *sample*?
 
 - To make the standard deviation smaller and more conservative
-  > Dividing by the smaller \`n−1\` makes the estimate *larger*, not smaller — the opposite of this claim.
+  > Dividing by the smaller \`n−1\` makes the estimate *larger*, not smaller, the opposite of this claim.
 - Because the population is always smaller than the sample
   > The population is the larger thing we're estimating; the \`n−1\` correction has nothing to do with population size.
 - [o] Deviations are measured from the sample mean, which hugs the sample too tightly, so dividing by \`n\` would underestimate the true spread; \`n−1\` corrects for that
@@ -641,7 +641,7 @@ The phrase "one degree of freedom is used up by estimating the mean" is shorthan
   markdown={`A dataset of file sizes is strongly right-skewed with a few enormous files. You want a spread measure that the giant files won't dominate. Which is the best choice?
 
 - The range (max − min)
-  > The range is defined by the two most extreme points, so the giant files would dominate it completely — the worst choice here.
+  > The range is defined by the two most extreme points, so the giant files would dominate it completely, the worst choice here.
 - The standard deviation
   > Squaring deviations makes the standard deviation especially sensitive to extreme values, so the giant files would inflate it heavily.
 - [o] The interquartile range (IQR)
@@ -679,20 +679,20 @@ Variance and SD carry the same information; the SD is just in human-readable uni
 - Only when the data is perfectly symmetric
   > Symmetry is not a requirement for the CV; the binding requirement is a meaningful, positive mean.
 
-The CV answers "how big is the spread relative to the typical value?" — useful precisely across different scales.`}
+The CV answers "how big is the spread relative to the typical value?", useful precisely across different scales.`}
 />
 
 <Callout type="success" title="Key takeaways">
-- **Spread matters as much as center** — risk, reliability, and surprise
+- **Spread matters as much as center**, risk, reliability, and surprise
   all live in how much the data moves, not where it sits.
 - **Range** = max − min: quick but fragile and outlier-driven.
 - **Variance** = average squared deviation (squared units);
   **standard deviation** = its square root, in the data's own units and
   readable as a typical distance from the mean.
 - Use **`ddof=1`** for sample spread (pandas' default); NumPy defaults to
-  `ddof=0` — a common mismatch.
+  `ddof=0`, a common mismatch.
 - **IQR** and **MAD** are robust spreads (middle 50% / median distance):
   pair them with the median on skewed data.
-- **CV = std / mean** is unitless — the right tool for comparing
+- **CV = std / mean** is unitless, the right tool for comparing
   variability across different scales (when the mean is positive).
 </Callout>

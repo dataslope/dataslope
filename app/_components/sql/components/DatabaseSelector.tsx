@@ -32,7 +32,7 @@ export interface DatabaseSelectorSample {
 }
 
 export interface DatabaseSelectorProps {
-  /** Currently selected id — either a sample id or one of the
+  /** Currently selected id, either a sample id or one of the
    *  blank-database / sentinel ids the host wires up. */
   value: string;
   /** Text rendered inside the trigger. Usually the active sample's

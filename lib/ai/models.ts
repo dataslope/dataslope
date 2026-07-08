@@ -1,6 +1,6 @@
 // Per-tier model + provider resolution for "Ask AI".
 //
-// Base URL, model id, and API key are all required per tier — there are no
+// Base URL, model id, and API key are all required per tier, there are no
 // hardcoded fallbacks, so the actual provider/model lives entirely in env
 // (wrangler.jsonc `vars` for the base URL + model id, `wrangler secret put`
 // for the API key) and can change without touching this file. A tier missing
@@ -19,7 +19,7 @@ export interface ResolvedModel {
   apiKey: string;
   /** Model id, e.g. "deepseek/deepseek-v4-flash" (OpenRouter). */
   model: string;
-  /** Max output tokens — the single biggest per-request cost lever. */
+  /** Max output tokens, the single biggest per-request cost lever. */
   maxTokens: number;
   /** Approx per-day token budget (input + output) for this tier. */
   dailyTokenBudget: number;
@@ -34,7 +34,7 @@ export type TierLimits = Pick<
   "maxTokens" | "dailyTokenBudget" | "dailyRequestBudget" | "contextBudget"
 >;
 
-/** Non-secret per-tier limits. Provider/model have no defaults — see wrangler.jsonc. */
+/** Non-secret per-tier limits. Provider/model have no defaults, see wrangler.jsonc. */
 const LIMITS: Record<MemberTier, TierLimits> = {
   free: {
     maxTokens: 800,
@@ -50,7 +50,7 @@ const LIMITS: Record<MemberTier, TierLimits> = {
   },
 };
 
-/** A tier's non-secret limits, independent of provider configuration —
+/** A tier's non-secret limits, independent of provider configuration,
  *  used by the usage endpoint to report "prompts left today" even in
  *  environments where the provider vars aren't set. */
 export function limitsForTier(tier: MemberTier): TierLimits {
@@ -88,7 +88,7 @@ function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null 
  *
  * Fallback is asymmetric, by cost: a pro member whose provider isn't fully
  * configured (key, base URL, and model all set) degrades to the FREE
- * provider — cheaper, so a half-wired environment still answers — while
+ * provider, cheaper, so a half-wired environment still answers, while
  * keeping pro budgets and output cap. A free member never silently upgrades
  * to the pro provider: in an environment with only the expensive AI_PRO_*
  * vars set, that would route every free-tier request to the priciest model,

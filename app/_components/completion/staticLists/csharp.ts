@@ -3,7 +3,7 @@ import { snippetCompletion, type Completion } from "@codemirror/autocomplete";
 // Static completion tier for the C# playground surfaces. Roslyn's
 // CompletionService could in principle run on the existing .NET WASM
 // bundle, but it adds tens of MB of Features/Workspaces assemblies (see
-// the feasibility report in agent-outputs/) — deliberately skipped, so
+// the feasibility report in agent-outputs/), deliberately skipped, so
 // C# gets the same curated tier as the other compiled languages.
 
 const kw = (label: string): Completion => ({ label, type: "keyword" });

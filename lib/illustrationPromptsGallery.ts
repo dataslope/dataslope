@@ -5,12 +5,12 @@
  * `content/interview/`, finds
  * each `<IllustrationPrompt …>` placeholder, and groups the placements by their
  * semantic file slug (see `lib/illustrationPrompt.ts`) so the gallery shows one
- * card per distinct illustration to be drawn — with its target file name, the
+ * card per distinct illustration to be drawn, with its target file name, the
  * exact generation prompt, and deep links to every lesson that uses it.
  *
  * Unlike the SVG gallery (a multi-hundred-kB payload that had to be offloaded to
- * a static JSON asset to stay off the ISR read meter), this data set is tiny —
- * ~80 short prompts — so the page renders it directly as a prerendered server
+ * a static JSON asset to stay off the ISR read meter), this data set is tiny,
+ * ~80 short prompts, so the page renders it directly as a prerendered server
  * component (see `app/illustration-prompts/page.tsx`); no separate data file or
  * client fetch is needed.
  *

@@ -6,13 +6,13 @@ description: Before writing a line of R, what does it mean to "think computation
 This is the most important page in the course.
 
 If you skim everything else and only read one page carefully, make
-it this one — because the mental shift it describes is the
+it this one, because the mental shift it describes is the
 difference between *using R well* and *fighting it forever*.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Five loose blue squares scattered at odd angles pass along a solid gray arrow and line up as one tidy stacked column inside a rounded card — thinking in whole collections instead of single values"
+  aria-label="Five loose blue squares scattered at odd angles pass along a solid gray arrow and line up as one tidy stacked column inside a rounded card, thinking in whole collections instead of single values"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -43,11 +43,11 @@ time. "What is 5 times 7? Thirty-five. Write that down. Next:
 what is 8 times 9? Seventy-two. Write that down."
 
 When you do arithmetic on a computer, you think one **collection**
-at a time. "I have a column of widths and a column of heights — I
+at a time. "I have a column of widths and a column of heights, I
 want a column of areas. Compute it."
 
-That subtle shift — from *number at a time* to *collection at a
-time* — is the entire essence of **computational thinking** for
+That subtle shift, from *number at a time* to *collection at a
+time*, is the entire essence of **computational thinking** for
 data analysis.
 
 ```mermaid
@@ -83,7 +83,7 @@ rectangles.
 widths <- c(5, 7, 2)
 heights <- c(4, 3, 8)
 
-# Compute the area of each rectangle — in ONE expression
+# Compute the area of each rectangle, in ONE expression
 areas <- widths * heights
 
 print(areas)
@@ -111,7 +111,7 @@ To see why, imagine you suddenly had 1,000 rectangles instead of 3.
 
 In the hand-arithmetic way of thinking, you would need to do
 multiplications 1,000 times. With a spreadsheet, you could drag a
-formula down 1,000 rows. With R, your code does not change at all —
+formula down 1,000 rows. With R, your code does not change at all,
 just the input does:
 
 <CodeBlock
@@ -136,7 +136,7 @@ summary(areas)
 
 The line `areas <- widths * heights` is **byte-for-byte identical**
 to the one in the previous example. Three rectangles or three
-thousand — the computer does the work either way. *The code
+thousand, the computer does the work either way. *The code
 describes the operation, not the count.*
 
 This is huge. It means the same code you write to explore a tiny
@@ -160,14 +160,14 @@ fancy. For our purposes it just means cultivating a few habits:
    inspected and verified.
 4. **Trust the computer for the tedious parts, but check the
    important parts.** Computers do not get tired or make
-   transcription errors — but they will happily compute the wrong
+   transcription errors, but they will happily compute the wrong
    thing if you ask them to.
 5. **Treat data as something to *interrogate*, not just *report on*.**
    A dataset is not the answer to a question; it is a thing you
    investigate to develop an answer.
 
-These habits are not specific to R. Anyone working with data —
-in Python, in SQL, in a spreadsheet, even with paper — benefits
+These habits are not specific to R. Anyone working with data,
+in Python, in SQL, in a spreadsheet, even with paper, benefits
 from them. But R is *especially* well-suited to them, because the
 language is shaped around the idea that collections are the basic
 unit of work.
@@ -206,7 +206,7 @@ median(heights)
 sd(heights)
 ```
 
-This is the "many in, one out" direction — the basic gesture of
+This is the "many in, one out" direction, the basic gesture of
 statistics.
 
 ```mermaid
@@ -253,7 +253,7 @@ sales <- c(
 avg_sales <- mean(sales)
 cat("Annual average:", avg_sales, "\\n\\n")
 
-# Step 2: combine elementwise (sales vs. average) — the result is a
+# Step 2: combine elementwise (sales vs. average), the result is a
 #         logical vector, one TRUE/FALSE per month
 above_avg <- sales > avg_sales
 
@@ -306,7 +306,7 @@ expression first.**
   markdown={`Which statement best captures the **shift** from hand arithmetic to computational thinking?
 
 - "Computers are faster, but the way you think about a problem stays exactly the same."
-  > The shift to computation is not just about speed; it requires a fundamentally different mental model — thinking in collections rather than individual values.
+  > The shift to computation is not just about speed; it requires a fundamentally different mental model, thinking in collections rather than individual values.
 - "Computers think in numbers; humans think in patterns."
   > This is a vague contrast that does not capture the actual shift described in the lesson, which is about operating on whole collections versus one value at a time.
 - [o] "Hand arithmetic operates one number at a time; computational thinking operates on whole collections at a time."
@@ -345,13 +345,13 @@ expression first.**
 
 Given a vector of temperatures in Fahrenheit, compute a vector of
 the same length giving the temperature in Celsius. The formula is
-`C = (F - 32) * 5 / 9`. **Do not use a loop** — write one
+`C = (F - 32) * 5 / 9`. **Do not use a loop**, write one
 vectorized expression.
 
 <ChallengeCard
   adapter="r"
   title="Convert Fahrenheit to Celsius (vectorized)"
-  instructions={`Given the vector \`temps_f\` (already loaded), create a vector \`temps_c\` of the same length, where each element is the Celsius equivalent of the corresponding Fahrenheit value. Use a single vectorized expression — no loops, no \`sapply\`.`}
+  instructions={`Given the vector \`temps_f\` (already loaded), create a vector \`temps_c\` of the same length, where each element is the Celsius equivalent of the corresponding Fahrenheit value. Use a single vectorized expression, no loops, no \`sapply\`.`}
   files={[
     {
       filename: "main.r",

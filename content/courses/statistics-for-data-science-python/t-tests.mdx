@@ -1,31 +1,31 @@
 ---
 title: t-Tests
-description: How to compare means under uncertainty with one-sample, two-sample (Welch), and paired t-tests — the t-statistic as signal divided by noise, the assumptions that matter, and how to interpret t, p, an interval, and an effect size.
+description: How to compare means under uncertainty with one-sample, two-sample (Welch), and paired t-tests, the t-statistic as signal divided by noise, the assumptions that matter, and how to interpret t, p, an interval, and an effect size.
 ---
 
 You already know the big idea from *Hypothesis Testing*: a difference
 between two averages might be real, or it might be the kind of wiggle
 random sampling hands you for free. The **t-test** is the workhorse for
-deciding which — specifically, for questions about **means**.
+deciding which, specifically, for questions about **means**.
 
 Three flavors cover almost everything you'll meet as a data scientist:
 
-- **One-sample** — is this group's average different from a fixed target?
+- **One-sample**, is this group's average different from a fixed target?
   ("Do our servers really respond in 200 ms on average?")
-- **Two-sample (independent)** — do two *separate* groups have different
+- **Two-sample (independent)**, do two *separate* groups have different
   averages? ("Did the new onboarding flow change average revenue per
   user?")
-- **Paired** — did the *same* units change between two conditions?
+- **Paired**, did the *same* units change between two conditions?
   ("Did each patient's blood pressure drop after the drug?")
 
 This page is about picking the right one, running it with `scipy.stats`,
-and — the part that actually matters — reading the result like a careful
+and, the part that actually matters, reading the result like a careful
 analyst instead of a p-value vending machine.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two jittered dot columns with their mean bars at different heights and a yellow bracket measuring the gap, beside a literal fraction of that yellow gap pill over a row of noisy dots — the t statistic is just signal divided by noise"
+  aria-label="Two jittered dot columns with their mean bars at different heights and a yellow bracket measuring the gap, beside a literal fraction of that yellow gap pill over a row of noisy dots, the t statistic is just signal divided by noise"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -69,7 +69,7 @@ Strip away the bookkeeping and it's just a ratio:
 
 `t = (difference you observed) / (noise in that difference)`
 
-The numerator is the **signal** — how far the means are apart. The
+The numerator is the **signal**, how far the means are apart. The
 denominator is the **standard error**, the typical size of the random
 wobble you'd expect even if nothing were going on (you met the standard
 error in *Standard Error*). So:
@@ -90,7 +90,7 @@ flowchart TD
 The t-distribution then translates that ratio into a **p-value**: if
 there were truly no difference, how often would noise alone produce a
 |t| at least this big? Small p-value, surprising-under-the-null, you
-reject. That's the whole machine — the three tests below differ only in
+reject. That's the whole machine, the three tests below differ only in
 *what difference* goes on top and *what noise* goes on the bottom.
 
 <Callout type="info" title="Why 't' and not just a z-score?">
@@ -98,7 +98,7 @@ When you don't know the true population spread (you almost never do) you
 estimate it from the sample. That estimate is itself noisy, especially
 for small samples, so the t-distribution has slightly fatter tails than
 the normal to stay honest about that extra uncertainty. With large
-samples the t-distribution is indistinguishable from the normal — the
+samples the t-distribution is indistinguishable from the normal, the
 fat tails only matter when n is small.
 </Callout>
 
@@ -124,7 +124,7 @@ We'll take them one at a time.
 from some fixed value you care about?
 
 A cloud team promises a **200 ms** average API response time. You pull a
-random sample of 50 real requests. The sample averages a bit above 200 —
+random sample of 50 real requests. The sample averages a bit above 200,
 but is that a genuine breach of the promise, or just a slow afternoon?
 
 <CodeBlock
@@ -188,7 +188,7 @@ print(f"95% CI for the true mean: ({ci.low:.1f}, {ci.high:.1f}) ms")
 print()
 print("If 200 is OUTSIDE this interval, the data is hard to square")
 print("with a 200 ms average. The interval also tells you the plausible")
-print("RANGE of the true mean — far more useful than a yes/no verdict.")
+print("RANGE of the true mean, far more useful than a yes/no verdict.")
 `,
     },
   ]}
@@ -197,7 +197,7 @@ print("RANGE of the true mean — far more useful than a yes/no verdict.")
 <Callout type="tip" title="Always report the interval, not just the p-value">
 A p-value answers "is it different from the target?" A confidence
 interval answers "different by *how much*, and how precisely do I know
-that?" The interval contains strictly more information — it even tells
+that?" The interval contains strictly more information, it even tells
 you the test's verdict (reject exactly when the target falls outside the
 interval). We dig into intervals in *Confidence Intervals* and into
 "how big is the effect?" in *Effect Sizes*.
@@ -206,8 +206,8 @@ interval). We dig into intervals in *Confidence Intervals* and into
 ## Two-sample t-test: comparing two independent groups
 
 **The question it answers:** do two *separate* groups have different
-average values? The groups contain **different units** — different users,
-different customers, different machines — with no natural pairing between
+average values? The groups contain **different units**, different users,
+different customers, different machines, with no natural pairing between
 them.
 
 This is the engine of most A/B tests. Group A saw the old page, group B
@@ -218,7 +218,7 @@ saw the new one; did average revenue per user differ?
 There are two versions of the two-sample t-test:
 
 - **Student's** t-test assumes the two groups have the **same variance**.
-- **Welch's** t-test does **not** — it allows the groups to have different
+- **Welch's** t-test does **not**, it allows the groups to have different
   spreads.
 
 In real data the variances are basically never identical, and Welch's
@@ -227,7 +227,7 @@ protecting you when they aren't. So the modern recommendation is simple:
 **use Welch's by default.** In `scipy.stats` that means passing
 `equal_var=False`.
 
-<Callout type="warn" title="scipy's default is the OLD default — override it">
+<Callout type="warn" title="scipy's default is the OLD default, override it">
 `stats.ttest_ind(a, b)` defaults to `equal_var=True` (Student's), which
 quietly assumes equal variances. Unless you have a strong reason to
 believe the spreads are equal, pass **`equal_var=False`** to get Welch's
@@ -269,7 +269,7 @@ print(f"Using Welch: {decision}")
 />
 
 Notice the two p-values differ. When the spreads and group sizes are
-unequal, Student's test can be *miscalibrated* — its p-value is not quite
+unequal, Student's test can be *miscalibrated*, its p-value is not quite
 the error rate it claims. Welch's stays honest. The cost of using Welch
 when variances really are equal is negligible, which is why it's the
 sensible default.
@@ -315,7 +315,7 @@ print("The p-value says whether the gap is real; the CI and d say how big.")
 
 <Callout type="info" title="Effect size, briefly">
 **Cohen's d** rescales the difference in means into units of standard
-deviation, so |d| ≈ 0.2 is small, 0.5 medium, 0.8 large — independent of
+deviation, so |d| ≈ 0.2 is small, 0.5 medium, 0.8 large, independent of
 your measurement units. A microscopic difference can be "significant" in
 a huge sample yet have a tiny d. We treat effect sizes properly in
 *Effect Sizes*; for now, just remember a p-value alone never tells you if
@@ -354,7 +354,7 @@ print(f"Welch t = {res.statistic:.1f},  p = {res.pvalue:.2e}")
   ]}
 />
 
-The gap is enormous — Gentoo flippers average about 27 mm longer — and
+The gap is enormous, Gentoo flippers average about 27 mm longer, and
 the p-value is so small it's printed in scientific notation. This is the
 *easy* case: a difference this large in samples this size leaves no doubt
 the species differ. Real analyses are rarely this clean, which is exactly
@@ -368,7 +368,7 @@ conditions, did it change?
 This is the before/after design: the same patient's weight before and
 after a program, the same server's latency before and after a config
 change, the same user's spend last month and this month. The two columns
-line up **row by row** — each row is one unit.
+line up **row by row**, each row is one unit.
 
 ### Why pairing is a superpower
 
@@ -404,7 +404,7 @@ that to ourselves.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Six people's before dots on the left connect by thin lines to their after dots on the right; the two columns overlap so much their group means almost match, yet every single trail tilts upward — pairing each unit with itself reveals the change that group comparison drowns in noise"
+  aria-label="Six people's before dots on the left connect by thin lines to their after dots on the right; the two columns overlap so much their group means almost match, yet every single trail tilts upward, pairing each unit with itself reveals the change that group comparison drowns in noise"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -473,8 +473,8 @@ print(
   ]}
 />
 
-Now watch the power gain. Same numbers, but analyzed the *wrong* way — as
-two independent groups — the person-to-person spread swamps the signal.
+Now watch the power gain. Same numbers, but analyzed the *wrong* way, as
+two independent groups, the person-to-person spread swamps the signal.
 
 <CodeBlock
   adapter="python"
@@ -506,7 +506,7 @@ print("When the data is paired, IGNORING the pairing throws away power.")
 <Callout type="danger" title="Misconception: pairing vs independence is interchangeable">
 It is not. Using an **unpaired** test on paired data discards the
 matching and usually *loses* power (you may miss a real effect). Using a
-**paired** test on data that isn't actually matched is worse — it's
+**paired** test on data that isn't actually matched is worse, it's
 simply invalid, because you'd be pairing rows that have no relationship.
 The rule: if each row is one unit measured under both conditions, pair it
 (`ttest_rel`). If the two groups are different units, don't
@@ -520,14 +520,14 @@ Every t-test rests on three assumptions. They are not equally fragile.
 | Assumption | What it means | How fragile? |
 | --- | --- | --- |
 | **Independence** | Observations don't influence each other (within a group / across pairs) | **Critical.** No test fixes broken independence. |
-| **Approximate normality** | The *sampling distribution of the mean* is roughly normal | Forgiving, thanks to the CLT — large n rescues it. |
+| **Approximate normality** | The *sampling distribution of the mean* is roughly normal | Forgiving, thanks to the CLT, large n rescues it. |
 | **Equal variances** | The two groups have the same spread | Only for Student's. **Use Welch's and stop worrying.** |
 
 ### The normality assumption is widely misunderstood
 
 The t-test does **not** require your *raw data* to be normally
 distributed. It requires the **sampling distribution of the mean** to be
-approximately normal — and the **central limit theorem** (see *Central
+approximately normal, and the **central limit theorem** (see *Central
 Limit Theorem*) makes that happen automatically as the sample grows,
 *even for skewed data*. The cell below shows it: clearly non-normal raw
 data, yet the one-sample t-test behaves correctly because n is large
@@ -564,13 +564,13 @@ print("and the CLT delivers that for large n.")
 <Callout type="warn" title="When normality DOES bite">
 The CLT needs enough data to work. With a **small** sample (say n < 15)
 that is **heavily skewed or has extreme outliers**, the t-test can be
-unreliable — the sampling distribution hasn't had a chance to become
+unreliable, the sampling distribution hasn't had a chance to become
 normal. That's exactly when you reach for a **nonparametric** alternative
 like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 *Correlation and Nonparametric Tests*.
 </Callout>
 
-## When to use a t-test — and when not to
+## When to use a t-test, and when not to
 
 **Reach for a t-test when:**
 
@@ -582,7 +582,7 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 **Look elsewhere when:**
 
 - You're comparing **3 or more** group means → one-way **ANOVA** (running
-  many t-tests inflates false positives — see *ANOVA and Chi-Square*).
+  many t-tests inflates false positives, see *ANOVA and Chi-Square*).
 - Your outcome is **categorical** (counts, yes/no) → **chi-square**
   (*ANOVA and Chi-Square*), not a t-test.
 - The sample is **small and badly skewed / outlier-ridden**, or the data
@@ -592,7 +592,7 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
   and a *d* (*Confidence Intervals*, *Effect Sizes*).
 
 <MultipleChoice
-  markdown={`A fitness study records each participant's resting heart rate **before** and **after** an 8-week program — the same people both times. Which t-test fits, and why?
+  markdown={`A fitness study records each participant's resting heart rate **before** and **after** an 8-week program, the same people both times. Which t-test fits, and why?
 
 - A two-sample independent t-test, because there are two columns of numbers
   > Two columns does not mean two independent groups. Here each row is the *same person* measured twice, so the columns are matched, not independent.
@@ -606,7 +606,7 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 When the same units are measured twice, pair the test to harness each unit as its own control.`}
 />
 
-## Challenge 1 — Run the right two-sample test
+## Challenge 1, Run the right two-sample test
 
 <ChallengeCard
   adapter="python"
@@ -617,7 +617,7 @@ When the same units are measured twice, pair the test to harness each unit as it
 - Store the p-value as a float named **\`p_value\`**.
 - Set a boolean **\`reject\`** to whether the result is significant at \`alpha = 0.05\` (reject when \`p_value <= alpha\`).
 
-Pick the right \`scipy.stats\` function and the right keyword argument — you should not compute anything by hand.`}
+Pick the right \`scipy.stats\` function and the right keyword argument, you should not compute anything by hand.`}
   files={[
     {
       filename: "main.py",
@@ -675,7 +675,7 @@ assert reject == bool(p_value <= alpha)`,
   ]}
 />
 
-## Challenge 2 — Decide from a paired test
+## Challenge 2, Decide from a paired test
 
 <ChallengeCard
   adapter="python"
@@ -687,7 +687,7 @@ assert reject == bool(p_value <= alpha)`,
 - Store the **mean improvement** (\`before - after\`, so a positive number means it got faster) as a float named **\`mean_improvement\`**.
 - Set a string **\`verdict\`** to **\`"faster"\`** if the test is significant at \`alpha = 0.05\` **and** \`mean_improvement > 0\`; otherwise **\`"no clear change"\`**.
 
-Use the paired \`scipy.stats\` function — do not treat the two columns as independent groups.`}
+Use the paired \`scipy.stats\` function, do not treat the two columns as independent groups.`}
   files={[
     {
       filename: "main.py",
@@ -747,7 +747,7 @@ assert verdict == expected`,
 
 <Callout type="danger" title="Five t-test traps">
 1. **Unpaired when the data is paired (or vice versa).** Match the test
-   to the design — same units twice means paired.
+   to the design, same units twice means paired.
 2. **Assuming equal variances by default.** Real groups rarely have
    identical spreads; use Welch's (`equal_var=False`).
 3. **"The data must be normal."** It's the *sampling distribution of the
@@ -756,7 +756,7 @@ assert verdict == expected`,
 4. **Significance = importance.** A tiny, meaningless difference becomes
    "significant" with enough data. Report an effect size and an interval.
 5. **A non-significant result proves "no difference."** It means you
-   couldn't detect one — the effect may be real but small. (The
+   couldn't detect one, the effect may be real but small. (The
    not-guilty verdict from *Hypothesis Testing*.)
 </Callout>
 
@@ -795,11 +795,11 @@ Welch's is the safe default precisely because it drops a fragile assumption at a
 <MultipleChoice
   markdown={`Your raw measurements are clearly right-skewed (a long tail), but you have n = 500 observations. Can you still use a t-test on the mean?
 
-- No — the t-test requires the raw data itself to be normally distributed
+- No, the t-test requires the raw data itself to be normally distributed
   > The t-test does not require the raw data to be normal. This is the most common misconception about its assumptions.
-- [o] Yes — with a large sample the central limit theorem makes the sampling distribution of the mean approximately normal, which is what the test actually needs
+- [o] Yes, with a large sample the central limit theorem makes the sampling distribution of the mean approximately normal, which is what the test actually needs
   > The relevant quantity is the sampling distribution of the *mean*, not the raw values, and the CLT makes that approximately normal for large n even when the data is skewed.
-- No — skewed data always requires a nonparametric test regardless of sample size
+- No, skewed data always requires a nonparametric test regardless of sample size
   > Skew matters mainly for *small* samples; with large n the CLT rescues the mean, so a nonparametric test is not mandatory here.
 - Only if you first delete the long tail as outliers
   > Deleting the tail would distort the very quantity you're estimating. Legitimate skew is not the same as bad data points to remove.
@@ -846,7 +846,7 @@ A p-value tells you whether a difference is distinguishable from zero, never whe
 - Match the **design**: one group vs a target → `ttest_1samp`; two
   independent groups → `ttest_ind(..., equal_var=False)` (Welch's); same
   units measured twice → `ttest_rel` (paired).
-- **Default to Welch's** for two independent samples — it drops the
+- **Default to Welch's** for two independent samples, it drops the
   fragile equal-variance assumption at almost no cost.
 - **Pair when the data is paired.** Pairing removes between-unit
   variation and buys power; mismatching the design wastes it or invalidates
@@ -855,5 +855,5 @@ A p-value tells you whether a difference is distinguishable from zero, never whe
   roughly normal (the CLT helps), *not* the raw data. Small + skewed →
   go nonparametric (*Correlation and Nonparametric Tests*).
 - Always pair the verdict with a **confidence interval** and an **effect
-  size** — significance is not importance.
+  size**, significance is not importance.
 </Callout>

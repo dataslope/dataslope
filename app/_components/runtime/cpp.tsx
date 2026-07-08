@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import { getClangFormat } from "./clangFormat";
 
-// C++ runs inside a dedicated Web Worker via browsercc — see browsercc-worker.ts.
+// C++ runs inside a dedicated Web Worker via browsercc, see browsercc-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -250,7 +250,7 @@ function hasCppMain(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the C++ standard library — always available, no
+  // Highlights from the C++ standard library, always available, no
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
   {
@@ -509,7 +509,7 @@ class CppWorkerRuntime implements LanguageRuntime {
 
     constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook —
+  /** Free the runtime by terminating its worker. Registry-eviction hook,
    *  the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
@@ -559,7 +559,7 @@ class CppWorkerRuntime implements LanguageRuntime {
     // files so the compiler can resolve #include "..." directives and
     // compile additional translation units. Only forward staged files
     // when the caller explicitly opted into multi-file mode by passing
-    // an entry filename — otherwise stale staged files from a prior
+    // an entry filename, otherwise stale staged files from a prior
     // ChallengeCard/Playground run on the same shared runtime could
     // pollute the build.
     const files: Array<[string, string]> = [];
@@ -581,7 +581,7 @@ class CppWorkerRuntime implements LanguageRuntime {
         if (msg.id !== id) return;
         if (msg.kind === "run-status") {
           // Mid-run wait (the first C++ run awaiting the precompiled
-          // header) — surface the boot notice for the duration.
+          // header), surface the boot notice for the duration.
           options?.onStatus?.(msg.message, msg.preparing);
           return;
         }
@@ -611,7 +611,7 @@ export const cppAdapter: LanguageAdapter = {
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C++ is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim — no server roundtrip. Code is built at -O2 with -fno-exceptions, which lets the playground reuse browsercc's prebuilt libc++ precompiled header so iostream- and STL-heavy snippets compile quickly.",
+      "C++ is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server roundtrip. Code is built at -O2 with -fno-exceptions, which lets the playground reuse browsercc's prebuilt libc++ precompiled header so iostream- and STL-heavy snippets compile quickly.",
   },
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
@@ -621,7 +621,7 @@ export const cppAdapter: LanguageAdapter = {
   coldDownloadMB: 45,
   // Compiles (clang) on every run, so later runs are faster, not instant.
   compiled: true,
-  // clang-format LLVM style (see formatCode) — keep in sync.
+  // clang-format LLVM style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -655,7 +655,7 @@ export const cppAdapter: LanguageAdapter = {
       >
         C++ standard library
       </a>{" "}
-      and ship with browsercc&apos;s WASI sysroot — no install step needed.
+      and ship with browsercc&apos;s WASI sysroot, no install step needed.
     </>
   ),
   importSnippet: (name) => `#include <${name}>`,
@@ -678,7 +678,7 @@ export const cppAdapter: LanguageAdapter = {
         const msg = ev.data;
         if (msg.kind === "loading") {
           // The worker's single loading stage covers the clang/lld
-          // toolchain download — the bulk of the boot.
+          // toolchain download, the bulk of the boot.
           setLoadingMessage(msg.message, 0.1);
         } else if (msg.kind === "ready") {
           worker.removeEventListener("message", onMessage);

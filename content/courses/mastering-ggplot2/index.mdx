@@ -5,14 +5,14 @@ description: A deep, intuition-first tour of ggplot2 and the Grammar of Graphics
 
 <Figure
   slug="data-visualization"
-  alt="An assortment of charts — the data visualizations you'll build with the Grammar of Graphics"
+  alt="An assortment of charts, the data visualizations you'll build with the Grammar of Graphics"
   priority
 />
 
 Welcome to **Mastering ggplot2: The Grammar of Graphics in R**.
 
 Before a single word of theory, let us make a chart. The block below is
-**live** — it is running R in your browser right now, through a
+**live**, it is running R in your browser right now, through a
 WebAssembly build called WebR. Click **Run** and a plot appears.
 
 <CodeBlock adapter="r"
@@ -23,7 +23,7 @@ WebAssembly build called WebR. Click **Run** and a plot appears.
   geom_point()` }]} />
 
 Three species of Antarctic penguin, each a different color, heavier
-birds toward the top, longer-flippered birds toward the right — and the
+birds toward the top, longer-flippered birds toward the right, and the
 legend appeared on its own. **Now make it yours.** Change `color = species`
 to `color = island`, or `color = sex`, and re-run. One word changes, and
 the whole chart re-poses to answer a new question. That single edit is
@@ -31,7 +31,7 @@ the entire idea of this course in miniature.
 
 <Callout type="info" title="This whole course runs in your browser">
 Every R code block on these pages executes through
-[WebR](https://docs.r-wasm.org/webr/latest/) — a full build of R
+[WebR](https://docs.r-wasm.org/webr/latest/), a full build of R
 compiled to WebAssembly. `ggplot2` is already loaded; there is nothing
 to install and nothing to download but the page itself. Edit any
 snippet, click **Run**, and the plot (or table) renders inline. Break
@@ -40,7 +40,7 @@ things on purpose. It is the fastest way to learn.
 
 ## Why a whole course on one R package?
 
-You have almost certainly made a chart before — in Excel or Google
+You have almost certainly made a chart before, in Excel or Google
 Sheets, in Tableau or Power BI, with `matplotlib`, `seaborn`, Plotly,
 or base R's `plot()`. You know a scatter plot from a bar chart. You are
 *not* a beginner at visualization.
@@ -48,7 +48,7 @@ or base R's `plot()`. You know a scatter plot from a bar chart. You are
 So why study one package in depth?
 
 Because `ggplot2` is not "another charting library." It is the
-practical embodiment of a **theory** — the *Grammar of Graphics* — that
+practical embodiment of a **theory**, the *Grammar of Graphics*, that
 quietly reorganizes how you think about every chart you will ever make.
 Once it clicks, you stop asking *"which function draws the chart I
 want?"* and start asking *"which **components** does my chart need?"*
@@ -57,7 +57,7 @@ That shift is the entire point of this course.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three tilted acetate sheets — blue point marks, green bars, and a yellow title layer — stack diagonally and pass along a thin gray arrow into one finished chart card — plots built layer by layer"
+  aria-label="Three tilted acetate sheets, blue point marks, green bars, and a yellow title layer, stack diagonally and pass along a thin gray arrow into one finished chart card, plots built layer by layer"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -113,7 +113,7 @@ That shift is the entire point of this course.
 
 Most tutorials teach ggplot2 as a pile of recipes: *"to make a
 boxplot, type `geom_boxplot()`."* That works until you hit a chart no
-recipe covers — and then you are stuck.
+recipe covers, and then you are stuck.
 
 This course teaches the **grammar**. Every ggplot, from a one-line
 scatter plot to a publication figure with faceting, custom scales, and
@@ -123,9 +123,9 @@ components:
 **Data → Aesthetic mappings → Geometries → Statistics → Scales → Coordinates → Facets → Theme → Rendered plot**
 
 Learn the components once, and every chart becomes a *combination* you
-can reason about — including charts you have never seen before.
+can reason about, including charts you have never seen before.
 
-## What we focus on — and what we skip
+## What we focus on, and what we skip
 
 This is a **ggplot2** course, not a general data-visualization course.
 
@@ -154,9 +154,9 @@ You will work with three kinds of interactive element:
 
 1. **Executable R code blocks** like the one above. Change them, run
    them, break them, fix them.
-2. **Challenge cards** — short tasks that check your code against
+2. **Challenge cards**, short tasks that check your code against
    hidden tests, so you know when you have it right.
-3. **Multiple-choice questions** — quick conceptual checks. The harder
+3. **Multiple-choice questions**, quick conceptual checks. The harder
    or more foundational a page is, the more of these you will find;
    getting the mental model right early saves hours later.
 
@@ -170,7 +170,7 @@ workspace, open the [R Playground](/playground/r) in a new tab.
 ## A taste of where we are going
 
 Here is a complete, layered ggplot. It will look like a lot right now.
-By the end of this course every line will feel *inevitable* — you will
+By the end of this course every line will feel *inevitable*, you will
 be able to name the component each line belongs to.
 
 <CodeBlock
@@ -200,5 +200,5 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
 
 Do not worry about understanding it yet. Notice only this: the plot is
 *added together*, one component at a time, with `+`. That is the
-grammar at work — and by the final chapter you will dissect this exact
+grammar at work, and by the final chapter you will dissect this exact
 figure line by line.

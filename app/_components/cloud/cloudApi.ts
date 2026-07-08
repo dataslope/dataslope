@@ -119,7 +119,7 @@ async function throwResponseError(res: Response): Promise<never> {
     const body = (await res.json()) as { error?: string };
     if (body?.error) message = body.error;
   } catch {
-    /* non-JSON error body — keep the generic message */
+    /* non-JSON error body, keep the generic message */
   }
   throw new CloudApiError(message, res.status);
 }

@@ -1,10 +1,10 @@
 ---
 title: Interpreting Plots
-description: A chart you can build is useful. A chart you can *read* is twice as valuable. A short field guide to seeing what a plot is actually saying — and what it isn't.
+description: A chart you can build is useful. A chart you can *read* is twice as valuable. A short field guide to seeing what a plot is actually saying, and what it isn't.
 ---
 
 It is one thing to *make* a chart. It is a more advanced skill to
-*read* one carefully — to extract everything it is telling you,
+*read* one carefully, to extract everything it is telling you,
 and to notice everything it is *not* telling you.
 
 This page is a tour of how to look at a chart. Every analyst
@@ -13,7 +13,7 @@ needs this, and almost nobody teaches it explicitly.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Blue dots climb along a thin green trend line inside a plot card while one yellow point far above the rest sits circled in a bold yellow ring — reading a plot means seeing the trend and noticing what breaks it"
+  aria-label="Blue dots climb along a thin green trend line inside a plot card while one yellow point far above the rest sits circled in a bold yellow ring, reading a plot means seeing the trend and noticing what breaks it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -103,15 +103,15 @@ For a **line chart**, ask:
 The most important interpretation question is *what's missing
 from the picture*. Some examples:
 
-- A scatterplot of price vs square footage — but what about
+- A scatterplot of price vs square footage, but what about
   **neighborhood**? Bigger houses might cluster in better
   neighborhoods.
-- A line chart of sales over time — but what about **inflation**?
+- A line chart of sales over time, but what about **inflation**?
   A nominal rise may be a real decline.
-- A bar chart of complaints by store — but what about **traffic
+- A bar chart of complaints by store, but what about **traffic
   per store**? More complaints might just mean more customers.
 
-A chart is a *projection* — a few dimensions of a higher-dimensional
+A chart is a *projection*, a few dimensions of a higher-dimensional
 truth. The skilled reader always asks what *other* dimensions
 might explain the picture.
 
@@ -119,7 +119,7 @@ So whenever you see a chart, work through it in order:
 
 1. Read the axes and legend.
 2. Identify the encoding.
-3. See the shape — direction, strength, outliers.
+3. See the shape, direction, strength, outliers.
 4. Ask what's *not* shown that could explain this.
 5. Form an interpretation, *with appropriate uncertainty*.
 
@@ -193,11 +193,11 @@ ggplot(airquality, aes(x = Temp, y = Ozone)) +
 How might you read it?
 
 1. **Axes**: temperature in °F (x), ozone concentration in parts
-   per billion (y). Both start near the minimum value — not at
+   per billion (y). Both start near the minimum value, not at
    zero, but that's fine for a scatterplot.
-2. **Encoding**: each dot is one day. No color or facet — just
+2. **Encoding**: each dot is one day. No color or facet, just
    two variables.
-3. **Shape**: clear *positive* relationship — hotter days have
+3. **Shape**: clear *positive* relationship, hotter days have
    higher ozone. The relationship looks *curved*: ozone rises
    slowly at low temps and shoots up at high temps. There's a
    single far outlier around 90°F.
@@ -205,7 +205,7 @@ How might you read it?
    season, pollution sources. Maybe what we're really seeing is
    that hot days are usually *still* days, and ozone accumulates
    when there's no wind to disperse it. The chart can't tell us
-   that — but we know to ask.
+   that, but we know to ask.
 
 Notice we did not say "high temperature *causes* high ozone." We
 said *associated with*. That's the discipline.
@@ -229,7 +229,7 @@ shows us *associations*; causation requires more.
 
 - The legend
   > The legend identifies encodings for color, shape, or size, but it only makes sense after you know what the axes represent.
-- [o] The axes — their labels, units, scale, and starting values
+- [o] The axes, their labels, units, scale, and starting values
   > Without knowing what the axes are showing, the picture itself is uninterpretable. A y-axis starting at 85 vs. 0 can completely change the story.
 - The colors
   > Colors encode a variable, but their meaning depends on knowing what the axes already say.
@@ -245,7 +245,7 @@ shows us *associations*; causation requires more.
   > R's plotting functions are accurate; the lesson of Anscombe's quartet is about the inadequacy of summary statistics alone, not about software errors.
 - Correlation is always meaningless.
   > Correlation is a useful measure of linear association; the quartet shows that identical correlations can hide very different structures, not that correlation has no value.
-- [o] Datasets with nearly identical summary statistics can have completely different shapes — so you must visualize, not just summarize.
+- [o] Datasets with nearly identical summary statistics can have completely different shapes, so you must visualize, not just summarize.
   > It is the canonical demonstration of why "plot first" is non-negotiable in EDA.
 - Linear regression is always wrong.
   > Linear regression is appropriate for some of the quartet's datasets; the point is that you cannot know which without looking at the data.

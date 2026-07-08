@@ -18,7 +18,7 @@ Now let's write our own.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Coins queue up and drop through a slot into a blue machine, which dispenses a green block down a short chute — call a function, get a value back"
+  aria-label="Coins queue up and drop through a slot into a blue machine, which dispenses a green block down a short chute, call a function, get a value back"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -127,10 +127,10 @@ int main(void) {
 
 `n` in `main` is unchanged because `try_to_increment` got its own
 copy of the value. To actually modify a caller's variable, you would
-pass a **pointer** to it — which is exactly what pointers are for,
+pass a **pointer** to it, which is exactly what pointers are for,
 and what we'll explore in a few chapters.
 
-## `void` — when a function returns nothing
+## `void`, when a function returns nothing
 
 If a function does its work via side effects (like printing) and
 has nothing meaningful to return, use `void` as the return type.
@@ -157,7 +157,7 @@ int main(void) {
 
 `void name(void)` means "this function takes no arguments and
 returns nothing". The empty `()` (without `void`) in an old-style
-declaration means something subtly different — use `(void)` to be
+declaration means something subtly different, use `(void)` to be
 unambiguous.
 
 ## Multiple parameters
@@ -235,7 +235,7 @@ flowchart TD
 
 ## The call stack
 
-Every function call is recorded on the **call stack** — a stack of
+Every function call is recorded on the **call stack**, a stack of
 "frames", one per active call. A frame holds the function's
 parameters, its local variables, and the address to return to in the
 caller.
@@ -261,7 +261,7 @@ returned value is delivered to `main`, and execution resumes in
 its variables**, neatly tucked into its own frame, with no
 interference between them.
 
-We will see this picture again — many times — in the chapter on
+We will see this picture again, many times, in the chapter on
 pointers and memory.
 
 ## Forward declarations
@@ -330,12 +330,12 @@ int main(void) {
 
 Recursion always needs:
 
-- A **base case** — a value of the parameter for which the function
+- A **base case**, a value of the parameter for which the function
   returns directly without calling itself.
-- A **recursive case** — the function calls itself on a *smaller*
+- A **recursive case**, the function calls itself on a *smaller*
   problem.
 
-Forget the base case and the program will recurse forever — until it
+Forget the base case and the program will recurse forever, until it
 runs out of stack space and crashes with a *stack overflow*. Recursion
 is powerful but also restrained: prefer a loop unless the problem is
 naturally recursive (trees, divide-and-conquer, parsing).
@@ -435,7 +435,7 @@ int main(void) {
 - A compile-time error.
   > The code is syntactically valid; passing \`n\` by value and ignoring the side effect inside the function is not an error.
 
-To modify a caller's variable, the function would need to receive a *pointer* to it — \`void increment(int *x) { (*x)++; }\` — and the caller would pass \`&n\`. We'll meet pointers soon.`}
+To modify a caller's variable, the function would need to receive a *pointer* to it, \`void increment(int *x) { (*x)++; }\`, and the caller would pass \`&n\`. We'll meet pointers soon.`}
 />
 
 <MultipleChoice

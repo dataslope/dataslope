@@ -1,9 +1,9 @@
 ---
-title: Challenge Cards — DuckDB
+title: "Challenge Cards: DuckDB"
 description: Sandbox for `<SqlChallengeCard dialect="duckdb">` variations.
 ---
 
-DuckDB challenges run via **@duckdb/duckdb-wasm** — a full DuckDB
+DuckDB challenges run via **@duckdb/duckdb-wasm**, a full DuckDB
 engine compiled to WebAssembly, served from jsDelivr at first use.
 
 ## 1. Generate and filter
@@ -347,7 +347,7 @@ ORDER BY
 ## 4. Large result sets (infinite scroll)
 
 The result pane virtualises its rows so a `SELECT *` against a 10k-row
-table stays responsive — only the rows actually inside the viewport
+table stays responsive, only the rows actually inside the viewport
 are rendered. The **Tables** viewer above the editor pages its rows
 in on scroll (infinite scroll) rather than loading all 10,000 up front.
 

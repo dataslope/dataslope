@@ -1,9 +1,9 @@
 ---
 title: Resource Management
-description: Memory, file handles, and other resources — what the runtime cleans up for you, and what you must clean up yourself
+description: Memory, file handles, and other resources, what the runtime cleans up for you, and what you must clean up yourself
 ---
 
-Every program uses **resources** — memory, file handles, network
+Every program uses **resources**, memory, file handles, network
 sockets, database connections, locks. Most of them are *finite*:
 the operating system gives you a budget, and if you don't return
 what you've borrowed, eventually the program (or the whole
@@ -13,7 +13,7 @@ C# splits resources into two camps:
 
 1. **Memory**, which is reclaimed automatically by the **garbage
    collector** (GC).
-2. **Everything else** — usually called **unmanaged resources** —
+2. **Everything else**, usually called **unmanaged resources**,
    which the runtime can *help* you release but can't fully manage
    on its own.
 
@@ -103,16 +103,16 @@ second category.
 ## Unmanaged resources: not the GC's job
 
 Consider opening a file. Behind the scenes, the OS gives you a
-**file handle** — a small numeric ticket the kernel tracks. The
+**file handle**, a small numeric ticket the kernel tracks. The
 OS only allows a limited number per process.
 
 If you open a file, never close it, and let the variable go out of
-scope, the GC will *eventually* reclaim the .NET object — but it
+scope, the GC will *eventually* reclaim the .NET object, but it
 might be seconds or minutes later. Meanwhile, the file handle is
 still held by the OS. Do this in a loop and you'll hit "too many
 open files" long before memory becomes a concern.
 
-So C# offers a way to say "I'm done with this resource — release
+So C# offers a way to say "I'm done with this resource, release
 it *now*, deterministically": the **`IDisposable`** pattern.
 
 ## `IDisposable` and `using`
@@ -159,7 +159,7 @@ public class Connection : IDisposable
   ]}
 />
 
-Run that. You'll see "closed A" *before* "done" — proof that
+Run that. You'll see "closed A" *before* "done", proof that
 `Dispose()` ran deterministically at the end of the block.
 
 ## The shorter "using declaration"
@@ -246,18 +246,18 @@ impossible to forget. Reach for it every time.
 ```mermaid
 flowchart TD
     R["resource"] --> M{"managed by GC?"}
-    M -- "memory" --> GC["yes — just let the<br/>object become unreachable"]
-    M -- "file / socket / handle / lock" --> D["no — wrap usage in 'using'<br/>so Dispose() runs deterministically"]
+    M -- "memory" --> GC["yes, just let the<br/>object become unreachable"]
+    M -- "file / socket / handle / lock" --> D["no, wrap usage in 'using'<br/>so Dispose() runs deterministically"]
 ```
 
 Beginners often misremember this and think the GC handles
-*everything*. It doesn't. It handles memory. The rest is your job —
+*everything*. It doesn't. It handles memory. The rest is your job,
 made easy by `IDisposable` and `using`.
 
 ## Finalizers (briefly)
 
 A class can also have a **finalizer** (`~ClassName()`) that the GC
-calls before reclaiming the object — a *last-ditch* chance to
+calls before reclaiming the object, a *last-ditch* chance to
 release unmanaged resources if the user forgot to call `Dispose()`.
 
 You will almost never write a finalizer in everyday code. They run
@@ -317,7 +317,7 @@ threw. That's the whole game.
 ## A guideline that pays for itself forever
 
 > If a class implements `IDisposable`, treat every instance as
-> requiring `using` — unless the documentation explicitly says
+> requiring `using`, unless the documentation explicitly says
 > otherwise.
 
 It's a one-line rule that prevents an enormous category of
@@ -330,7 +330,7 @@ production bugs.
 
 - Memory, file handles, and network sockets
   > Just memory.
-- [o] Memory only — other resources still need to be released explicitly, typically via \`IDisposable\` / \`using\`
+- [o] Memory only, other resources still need to be released explicitly, typically via \`IDisposable\` / \`using\`
   > The GC reclaims managed heap memory; file handles, sockets, and locks are not its job.
 - Only unmanaged memory
   > It collects managed objects on the .NET heap.
@@ -344,8 +344,8 @@ production bugs.
 - It's faster
   > Performance is essentially the same.
 - It doesn't actually call \`Dispose()\`
-  > It does — that's the whole point.
-- [o] It guarantees \`Dispose()\` runs at the end of the block, even if an exception is thrown — so you can't forget cleanup
+  > It does, that's the whole point.
+- [o] It guarantees \`Dispose()\` runs at the end of the block, even if an exception is thrown, so you can't forget cleanup
   > \`using\` expands to a try/finally that calls \`Dispose()\` for you, so cleanup can't be skipped.
 - It hides what's happening
   > It makes the intent *clearer*, not more hidden.`}

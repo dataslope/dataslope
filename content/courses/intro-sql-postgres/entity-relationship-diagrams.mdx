@@ -1,18 +1,18 @@
 ---
 title: Entity Relationship Diagrams
-description: Reading and drawing ER diagrams — the standard picture of a database's tables, keys, and the relationships between them.
+description: Reading and drawing ER diagrams, the standard picture of a database's tables, keys, and the relationships between them.
 ---
 
 Once you can spot entities, you need a way to **draw** them so the
 whole design is visible at a glance. The standard picture is the
 **entity relationship diagram** (ERD). It shows each entity as a
-box, its attributes inside, and lines for the relationships — the
+box, its attributes inside, and lines for the relationships, the
 blueprint of a database.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A miniature Chen-style diagram: two entity boxes joined through a yellow relationship diamond by thin lines, with attribute circles hanging off each entity — the blueprint of a database"
+  aria-label="A miniature Chen-style diagram: two entity boxes joined through a yellow relationship diamond by thin lines, with attribute circles hanging off each entity, the blueprint of a database"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -73,7 +73,7 @@ erDiagram
 - **Boxes** are entities (which become tables): `customers`,
   `orders`.
 - **Rows inside a box** are attributes (columns), with their type
-  and any key marker — `PK` for primary key, `FK` for foreign key.
+  and any key marker, `PK` for primary key, `FK` for foreign key.
 - **The line between boxes** is a relationship, labelled with a verb
   ("places").
 
@@ -92,12 +92,12 @@ erDiagram
 
 Read each end separately:
 
-- `||` — **exactly one** (a straight bar).
-- `o{` — **zero or many** (a circle plus the crow's foot).
-- `|{` — **one or many**.
+- `||`, **exactly one** (a straight bar).
+- `o{`, **zero or many** (a circle plus the crow's foot).
+- `|{`, **one or many**.
 
 So `customers ||--o{ orders` reads: "**one** customer relates to
-**zero or many** orders" — one-to-many, the most common kind.
+**zero or many** orders", one-to-many, the most common kind.
 
 <Callout type="info" title="Read the line from both ends">
 Always read a relationship in both directions. `customers ||--o{
@@ -120,9 +120,9 @@ flowchart TB
 
 - **One-to-one:** each row pairs with at most one row on the other
   side. Rare; often the two could be a single table.
-- **One-to-many:** the workhorse. One parent, many children — handled
+- **One-to-many:** the workhorse. One parent, many children, handled
   by a foreign key on the "many" side.
-- **Many-to-many:** both sides can have many — handled by a junction
+- **Many-to-many:** both sides can have many, handled by a junction
   table, which an ERD shows as two one-to-many lines into a middle
   box.
 
@@ -172,7 +172,7 @@ side. The diagram and the schema are two views of the same design.
 ## A fuller model
 
 Bringing several entities together, a small shop might look like
-this — products, customers, orders, and a junction table linking
+this, products, customers, orders, and a junction table linking
 orders to products:
 
 ```mermaid
@@ -204,7 +204,7 @@ erDiagram
 Trace the lines: a customer places many orders; each order contains
 many `order_items`; each product appears in many `order_items`. The
 many-to-many between orders and products is resolved by the
-`order_items` junction in the middle — exactly the pattern from the
+`order_items` junction in the middle, exactly the pattern from the
 relationships pages, now drawn formally.
 
 ## Check your understanding

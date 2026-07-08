@@ -524,7 +524,7 @@ function DuckDbTypeSelector({
 
   // When the field is empty or still holds the column's committed type (i.e.
   // the user opened the list via the chevron rather than typing a search
-  // fragment), show every group so all types stay discoverable — including
+  // fragment), show every group so all types stay discoverable, including
   // committed types absent from the built-in list such as `DECIMAL(10,2)`.
   // Only filter once they type a partial that is not itself a known type.
   const visibleGroups = useMemo(
@@ -822,7 +822,7 @@ function DuckDbStructureColumnRow({
 
 /** Row for a generated column inside the DuckDB structure drawer.
  *  DuckDB only supports STORED generated columns, so there is no
- *  storage-type selector — only the expression is editable. */
+ *  storage-type selector, only the expression is editable. */
 function PgGeneratedColumnRow({
   col,
   onExpressionChange,
@@ -904,7 +904,7 @@ function quoteIdent(name: string): string {
 type ImportFlavor = "csv" | "json" | "parquet";
 
 function DuckDbPlaygroundInner() {
-  // Coalesced localStorage writer for settings — install the
+  // Coalesced localStorage writer for settings, install the
   // pagehide/visibilitychange flush listener once per playground mount.
   useEffect(() => {
     ensurePersistUnloadFlush();
@@ -1278,7 +1278,7 @@ function DuckDbPlaygroundInner() {
   // DuckDB runs one statement batch at a time. Rather than drop a run that
   // arrives while the engine is busy (which would silently lose, e.g., the
   // re-fetch after a second edit), we coalesce the latest such request here and
-  // run it the moment the in-flight one settles — see `drainPendingRun`, called
+  // run it the moment the in-flight one settles, see `drainPendingRun`, called
   // from every engine-busy path's `finally`.
   const runSqlForTabRef = useRef<
     | ((
@@ -1310,7 +1310,7 @@ function DuckDbPlaygroundInner() {
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const openSettingsTab = useCallback(() => {
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
-      // Settings tab is active — close it and return to a query tab.
+      // Settings tab is active, close it and return to a query tab.
       setSettingsOpen(false);
       const fallback = tabsRef.current[0]?.id;
       if (fallback) {
@@ -1318,11 +1318,11 @@ function DuckDbPlaygroundInner() {
         setActiveTabId(fallback);
       }
     } else if (settingsOpenRef.current) {
-      // Settings tab is in the tab bar but not active — activate it.
+      // Settings tab is in the tab bar but not active, activate it.
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
     } else {
-      // Settings tab is not open — add it and make it active.
+      // Settings tab is not open, add it and make it active.
       setSettingsOpen(true);
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
@@ -1347,14 +1347,14 @@ function DuckDbPlaygroundInner() {
       : activeSample.filename;
   // Tab reordering is delegated to the generic TabBar; no externalised
   // drag state or sensors are needed for the tab strip. `setDraggingTabId`
-  // remains in the hook signature for legacy compatibility — passed a
+  // remains in the hook signature for legacy compatibility, passed a
   // no-op below.
   const setDraggingTabId = useCallback(() => {}, []);
 
   // Trailing-edge debounce of `saveTabs` so a fast typist doesn't pay a
   // synchronous JSON.stringify + localStorage.setItem on every keystroke.
   // We still update `tabsRef.current` + React state immediately so the rest
-  // of the component sees fresh tab text right away — only the persist
+  // of the component sees fresh tab text right away, only the persist
   // is deferred. Pending writes are flushed on tab/db switch and unmount.
   const pendingSaveRef = useRef<{ dbId: string; tabs: QueryTab[] } | null>(
     null,
@@ -1491,7 +1491,7 @@ function DuckDbPlaygroundInner() {
     if (!view || !engine) return;
     const sql = activeSqlForEditor(view).trim();
     if (!sql) {
-      showToast("Nothing to explain — the query is empty.", "warn");
+      showToast("Nothing to explain, the query is empty.", "warn");
       return;
     }
     void (async () => {
@@ -1556,7 +1556,7 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       if (runningRef.current) {
-        // Engine busy — queue the latest request (coalescing a burst) instead
+        // Engine busy, queue the latest request (coalescing a burst) instead
         // of dropping it; it runs when the in-flight one settles.
         pendingRunRef.current = () =>
           runSqlForTabRef.current?.(
@@ -1572,7 +1572,7 @@ function DuckDbPlaygroundInner() {
       }
       const trimmed = sql.trim();
       if (!trimmed) {
-        showToast("Nothing to run — the query is empty.", "warn");
+        showToast("Nothing to run, the query is empty.", "warn");
         return;
       }
       runningRef.current = true;
@@ -1583,7 +1583,7 @@ function DuckDbPlaygroundInner() {
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
-      // editable, just like opening the table from the sidebar — but only
+      // editable, just like opening the table from the sidebar, but only
       // for an actual table (not a view), so edits never fail on commit.
       const isTable = (name: string) => tablesRef.current.includes(name);
       if (!sourceTable) {
@@ -1649,7 +1649,7 @@ function DuckDbPlaygroundInner() {
           elapsedMs,
           success: true,
         });
-        // Refresh the schema sidebar in the background — don't hold the run
+        // Refresh the schema sidebar in the background, don't hold the run
         // lock (which blocks the next re-page: filter / sort / page) on schema
         // introspection, since a re-page doesn't change the schema.
         void refreshSchema().catch(() => undefined);
@@ -1725,7 +1725,7 @@ function DuckDbPlaygroundInner() {
   }, [runSqlForTab]);
 
   // Run just the statement under the editor cursor (the toolbar "Run statement"
-  // affordance — mirrors the Ctrl/⌘+Enter keymap).
+  // affordance, mirrors the Ctrl/⌘+Enter keymap).
   const runStatementAtCursor = useCallback(() => {
     const view = editorRef.current;
     const tab = tabsRef.current.find(
@@ -1869,8 +1869,8 @@ function DuckDbPlaygroundInner() {
   useEffect(() => {
     let cancelled = false;
     // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount — e.g. a browser
-    // back-then-forward return to the playground — can re-acquire it instead
+    // client-side navigation away) so a later remount, e.g. a browser
+    // back-then-forward return to the playground, can re-acquire it instead
     // of colliding with this document's own stale lock.
     const lockController = new AbortController();
     if (editorHostRef.current && !editorRef.current) {
@@ -1932,13 +1932,13 @@ function DuckDbPlaygroundInner() {
               if (!cancelled && !hasLock) {
                 window.sessionStorage.setItem(noticeKey, "1");
                 showToast(
-                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                  "This workspace is already open in another tab. Edits here may conflict, switch workspaces via the badge in the header.",
                   "warn",
                 );
               }
             }
           } catch {
-            /* sessionStorage / Locks unavailable — ignore. */
+            /* sessionStorage / Locks unavailable, ignore. */
           }
         } catch {
           /* proceed in-memory */
@@ -1951,7 +1951,7 @@ function DuckDbPlaygroundInner() {
         if (cancelled) {
           // The component already unmounted while bootstrap was in flight.
           // The engine never reaches engineRef, so the unmount cleanup
-          // can't destroy it — do it here instead so its connection
+          // can't destroy it, do it here instead so its connection
           // doesn't outlive this mount and interfere with the next one.
           void engine.destroy();
           return;
@@ -1978,7 +1978,7 @@ function DuckDbPlaygroundInner() {
               try {
                 await engine.registerFileBuffer(entry.path, bytes);
               } catch {
-                /* skip unreadable entry — UI still shows it as available */
+                /* skip unreadable entry, UI still shows it as available */
               }
             }
             if (!cancelled && persisted.length > 0) {
@@ -2107,7 +2107,7 @@ function DuckDbPlaygroundInner() {
   }, [showSystemSchemas, refreshSchemas]);
 
   // Keep autocomplete schema in sync with current tables/views. Skip the
-  // dispatch when nothing actually changed — refreshSchema() always
+  // dispatch when nothing actually changed, refreshSchema() always
   // creates fresh `columnsByEntity` / `foreignKeysByEntity` objects, so
   // reference equality would fire this effect (and re-parse the entire
   // editor doc) on every query / CSV import even when the visible schema
@@ -2168,7 +2168,7 @@ function DuckDbPlaygroundInner() {
     // checks below guard against stale dispatches if the user typed,
     // imported, or destroyed the editor before the chunk resolved.
     // We only mark `lastReconfigureKeyRef` as up-to-date once the lang
-    // dispatch actually fires — that way a StrictMode-cancelled effect
+    // dispatch actually fires, that way a StrictMode-cancelled effect
     // won't make the next run incorrectly skip the lang reconfigure.
     let cancelled = false;
     void makeSqlLangExtension("duckdb", schema).then((langExt) => {
@@ -2242,7 +2242,7 @@ function DuckDbPlaygroundInner() {
       setForeignKeysByEntity({});
       setRowCountByTable({});
       setExpandedEntities(new Set());
-      // Reset the in-memory file tree — switching databases reinitialises
+      // Reset the in-memory file tree, switching databases reinitialises
       // DuckDB's virtual filesystem too, so any previously registered
       // user files (CSV/JSON/Parquet) are no longer queryable anyway.
       setVirtualFiles([]);
@@ -2332,7 +2332,7 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       // Capture size before transferring the buffer to the DuckDB-WASM
-      // worker — the worker takes ownership of the underlying ArrayBuffer
+      // worker, the worker takes ownership of the underlying ArrayBuffer
       // via postMessage transfer, which detaches it in the main thread and
       // makes bytes.length → 0 after the await.
       const size = bytes.length;
@@ -2367,7 +2367,7 @@ function DuckDbPlaygroundInner() {
             const bytes = new Uint8Array(buf);
             const path = parentPath ? `${parentPath}/${file.name}` : file.name;
             // Persist a copy to OPFS *before* handing the buffer to the
-            // DuckDB-WASM worker — the worker detaches the underlying
+            // DuckDB-WASM worker, the worker detaches the underlying
             // ArrayBuffer via postMessage transfer, so we can't rely on
             // the bytes still being readable after `registerFileBuffer`.
             const wsId = workspaceIdRef.current;
@@ -2553,7 +2553,7 @@ function DuckDbPlaygroundInner() {
         const leaf = sourcePath.split("/").pop() ?? sourcePath;
         const newPath = destFolderPath ? `${destFolderPath}/${leaf}` : leaf;
         if (newPath === sourcePath) return;
-        // Reuse the rename helper — same mechanics: drop+re-register
+        // Reuse the rename helper, same mechanics: drop+re-register
         // each file, update the in-memory list. Auto-expand the dest
         // folder so the moved entry is visible after the drop.
         const oldPrefix = `${sourcePath}/`;
@@ -2824,13 +2824,13 @@ function DuckDbPlaygroundInner() {
     setIsFormatting(true);
     try {
       const { format: sqlFormat } = await import("sql-formatter");
-      // Use the native DuckDB dialect — the same one SqlCodeBlock /
+      // Use the native DuckDB dialect, the same one SqlCodeBlock /
       // SqlChallengeCard format duckdb snippets with (via
-      // `sqlFormatterLanguage`) — so the identical query formats the same
+      // `sqlFormatterLanguage`), so the identical query formats the same
       // way here as it does in lesson code blocks.
       const formatted = sqlFormat(code, { language: "duckdb" });
       if (formatted === code) {
-        showToast("Already formatted — nothing to change.");
+        showToast("Already formatted, nothing to change.");
         return;
       }
       view.dispatch({
@@ -3062,7 +3062,7 @@ function DuckDbPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
-      // Strip generated columns — DuckDB rejects INSERTs that target them.
+      // Strip generated columns, DuckDB rejects INSERTs that target them.
       const generatedCols = new Set(
         (columnsByEntity[tableName] ?? [])
           .filter((col) => col.generated !== null)
@@ -3191,7 +3191,7 @@ function DuckDbPlaygroundInner() {
   const openEntityStructure = useCallback(
     async (name: string) => {
       const engine = engineRef.current;
-      // Display SQL is for the editor tab only — actual execution uses
+      // Display SQL is for the editor tab only, actual execution uses
       // parameterized execParams below to prevent injection.
       const schema = selectedSchemaRef.current;
       const safeSch = schema.replace(/'/g, "''");
@@ -3735,7 +3735,7 @@ function DuckDbPlaygroundInner() {
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
   // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs — the database binary itself never leaves the browser.
+  // the query tabs, the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
@@ -4074,7 +4074,7 @@ function DuckDbPlaygroundInner() {
   );
 
   // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment — the sidebar copy may be retired).
+  // menu (the latter is an experiment, the sidebar copy may be retired).
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}
@@ -5424,7 +5424,7 @@ function DuckDbPlaygroundInner() {
                     ))}
                   </SchemaSection>
                   {/*
-                DuckDB has no triggers — the entire TRIGGERS sidebar
+                DuckDB has no triggers, the entire TRIGGERS sidebar
                 section from the Postgres playground is intentionally
                 omitted to avoid confusing users with a perpetually
                 empty group. `engine.listTriggers()` always resolves
@@ -5828,7 +5828,7 @@ function ImportDialog<
           "Parse a CSV file and import its rows into a new or existing table.",
         accept: ".csv,text/csv",
         dropLabel: "Drop a CSV file here",
-        dropHint: "or click to browse — .csv",
+        dropHint: "or click to browse, .csv",
         Icon: FileText,
       };
     }
@@ -5839,7 +5839,7 @@ function ImportDialog<
           "Parse a JSON array of objects and import its rows into a new or existing table.",
         accept: ".json,application/json",
         dropLabel: "Drop a JSON file here",
-        dropHint: "or click to browse — .json (array of objects)",
+        dropHint: "or click to browse, .json (array of objects)",
         Icon: FileJson,
       };
     }
@@ -5849,7 +5849,7 @@ function ImportDialog<
         "Read a Parquet file and add its rows into a new or existing table.",
       accept: ".parquet,application/octet-stream",
       dropLabel: "Drop a Parquet file here",
-      dropHint: "or click to browse — .parquet",
+      dropHint: "or click to browse, .parquet",
       Icon: Database,
     };
   }, [flavor]);
@@ -5967,7 +5967,7 @@ function ImportDialog<
               aria-hidden="true"
             />
             <span>
-              This is a playground — your data is only held in browser memory
+              This is a playground, your data is only held in browser memory
               and will not be persisted on reload.
             </span>
           </div>

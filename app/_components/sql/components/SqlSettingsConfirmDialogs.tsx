@@ -77,7 +77,7 @@ export function SqlSettingsConfirmDialogs({
                 {" "}<strong>workspace</strong>, persisted{" "}
                 <strong>database</strong>, and uploaded{" "}
                 <strong>data file</strong> across{" "}
-                <strong>all Dataslope playgrounds</strong> — including
+                <strong>all Dataslope playgrounds</strong>, including
                 localStorage, OPFS, IndexedDB, and any cached assets. The
                 page will reload immediately. This cannot be undone.
               </AlertDialog.Description>
@@ -110,7 +110,7 @@ export function SqlSettingsConfirmDialogs({
             <AlertDialog.Description className="confirm-desc">
               Settings, saved queries, and per-database state for every
               Dataslope playground will be erased. This action cannot be undone
-              — the page will reload immediately afterwards.
+, the page will reload immediately afterwards.
             </AlertDialog.Description>
             <div className="confirm-actions">
               <AlertDialog.Close className="confirm-btn confirm-btn-secondary">

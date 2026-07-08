@@ -1,6 +1,6 @@
 ---
 title: Declarative Thinking
-description: Saying *what* you want, not *how* to compute it — the mental shift that makes functional code small and readable.
+description: Saying *what* you want, not *how* to compute it, the mental shift that makes functional code small and readable.
 ---
 
 The most important shift you'll make in this course is not learning
@@ -16,7 +16,7 @@ smaller, easier to read, and easier to change.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A card of numbered step bars next to a card holding one finished flower of circles — imperative code lists the steps, declarative code states the result"
+  aria-label="A card of numbered step bars next to a card holding one finished flower of circles, imperative code lists the steps, declarative code states the result"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -161,8 +161,8 @@ Declarative code:
 2. **Uses named transformations** (`filter`, `map`, `reduce`,
    `groupBy`) instead of generic control flow (`for`, `while`,
    `if`).
-3. **Composes** — each step is a value that flows into the next.
-4. **Avoids intermediate mutable state** — no `let acc = ...; acc =
+3. **Composes**, each step is a value that flows into the next.
+4. **Avoids intermediate mutable state**, no `let acc = ...; acc =
    acc + 1`.
 
 You can think of it as moving up one level of abstraction: instead of
@@ -208,7 +208,7 @@ them.
 ## Building a pipeline, one stage at a time
 
 Pipelines work best when each stage does *one thing*. Here is a
-realistic example — computing per-customer paid totals.
+realistic example, computing per-customer paid totals.
 
 <CodeBlock
   adapter="typescript"
@@ -378,7 +378,7 @@ for (const line of lines) console.log(line);
       filename: "stats.ts",
       starterCode: `export type Sale = { readonly category: string; readonly amount: number };
 
-// Reimplement this declaratively — no \`for\`, no \`let\`, no mutation.
+// Reimplement this declaratively, no \`for\`, no \`let\`, no mutation.
 export function avgPerCategory(
   sales: readonly Sale[],
 ): ReadonlyMap<string, number> {

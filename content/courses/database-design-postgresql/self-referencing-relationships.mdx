@@ -13,7 +13,7 @@ back to the table's own primary key.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A thin arc leaves the right side of a table and loops back into its own top, while inside a manager dot links down to two report dots — a table pointing at itself"
+  aria-label="A thin arc leaves the right side of a table and loops back into its own top, while inside a manager dot links down to two report dots, a table pointing at itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -167,8 +167,8 @@ same parent, which creates a tree.
 
 ## A self-reference in the wild
 
-This pattern is not a textbook curiosity. The Chinook sample database
-— a model of a digital music store — stores its staff in a single
+This pattern is not a textbook curiosity. The Chinook sample database,
+a model of a digital music store, stores its staff in a single
 `employee` table with a `reports_to` column pointing back at
 `employee_id`. The whole org chart lives in one table. Run the query
 and read the result from the top down: the general manager has no
@@ -190,7 +190,7 @@ ORDER BY
   e.employee_id;`}
 />
 
-Notice it is the same query shape you wrote above — two aliases, one
+Notice it is the same query shape you wrote above, two aliases, one
 table, a `LEFT JOIN` to keep the root row. Once you can read this
 pattern, you will spot it everywhere: ticketing systems, folder
 trees, category hierarchies, comment threads.

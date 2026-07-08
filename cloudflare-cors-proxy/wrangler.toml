@@ -8,8 +8,8 @@ compatibility_flags = ["nodejs_compat"]
 # Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
 # for production secrets, or set them here for non-sensitive defaults.
 #
-# A "*" in an entry is a wildcard that matches one hostname label — one or more
-# characters that are not a "." or "/" — so it stays scoped to a single host. The
+# A "*" in an entry is a wildcard that matches one hostname label, one or more
+# characters that are not a "." or "/", so it stays scoped to a single host. The
 # app's non-production deployments use version/alias preview URLs, which Cloudflare
 # formats as `<version-or-alias>-<worker-name>.<subdomain>.workers.dev` (the
 # variable part is a PREFIX). The `*-dataslope.subwaymatch.workers.dev` entry

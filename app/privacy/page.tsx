@@ -2,7 +2,7 @@ import "@/app/tailwind.css";
 import { LegalShell } from "../_components/legal/LegalShell";
 
 export const metadata = {
-  title: "Privacy Policy — Dataslope",
+  title: "Privacy Policy, Dataslope",
   description:
     "How Dataslope handles your data: no accounts, no tracking, and code that runs entirely in your browser.",
 };
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         To make the product usable, your browser&apos;s <strong>local
         storage</strong> keeps things like your theme preference and the code,
         queries, and progress in your playgrounds and lessons. This stays on
-        your device and in your browser — it is not transmitted to or stored on
+        your device and in your browser, it is not transmitted to or stored on
         our servers, and clearing your browser&apos;s site data removes it.
       </p>
 
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
       <h2>Cookies and tracking</h2>
       <p>
         We do not use advertising or cross-site tracking cookies, and we do not
-        sell or share personal data — we don&apos;t have any to sell.
+        sell or share personal data, we don&apos;t have any to sell.
       </p>
 
       <h2>Children&apos;s privacy</h2>

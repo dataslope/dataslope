@@ -6,13 +6,13 @@ description: What a variable really is, where it lives, and how to think about i
 A **variable** in C is a name attached to a piece of memory. Behind
 the friendly name is a fixed-size box of bytes at a specific address.
 
-That mental model — *variable = labelled box in memory* — will guide
+That mental model, *variable = labelled box in memory*, will guide
 every chapter from now on.
 
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="A long strip of memory cells with a few occupied by colored values, one holding a half-faded dot — a variable never initialized — and address ticks underneath"
+  aria-label="A long strip of memory cells with a few occupied by colored values, one holding a half-faded dot, a variable never initialized, and address ticks underneath"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -125,7 +125,7 @@ Address      Variable          Value (decimal)
 ```
 
 Each box is 4 bytes. The actual addresses are not predictable across
-runs — they depend on the OS, the architecture, and security
+runs, they depend on the OS, the architecture, and security
 features like ASLR. But the **shape** is reliable.
 
 ## Assignment versus declaration
@@ -180,7 +180,7 @@ Variable names in C:
 
 - May contain letters, digits, and underscores `_`.
 - Must **not** start with a digit.
-- Are **case-sensitive** — `Score`, `score`, and `SCORE` are three
+- Are **case-sensitive**, `Score`, `score`, and `SCORE` are three
   different variables.
 - Cannot collide with C **keywords** (`int`, `if`, `return`, ...).
 - Should be **descriptive**. `n` is fine for a loop counter; `score`
@@ -189,7 +189,7 @@ Variable names in C:
 ```c
 int score;            // good
 int playerScore;      // also fine (camelCase)
-int player_score;     // fine (snake_case — more common in C)
+int player_score;     // fine (snake_case, more common in C)
 int 1st_score;        // ERROR: starts with a digit
 int return;           // ERROR: keyword
 ```
@@ -212,7 +212,7 @@ printf("%d\n", x);   // prints whatever happened to be in memory
 
 …the compiler reserves the memory but does not zero it. The contents
 are whatever was left there by the previous use of those bytes. The
-value you read is **undefined behavior** — the program may print
+value you read is **undefined behavior**, the program may print
 anything, including different values on different runs. **Always
 initialize**.
 
@@ -292,13 +292,13 @@ This is the classic **swap** idiom. Trace it with a table:
 
 | step | a | b | tmp |
 |-----:|--:|--:|----:|
-| start | 1 | 2 | — |
+| start | 1 | 2 |, |
 | `int tmp = a;` | 1 | 2 | 1 |
 | `a = b;` | 2 | 2 | 1 |
 | `b = tmp;` | 2 | 1 | 1 |
 
 A common rookie mistake is to try `a = b; b = a;` *without* a
-temporary — but by the time the second line runs, `a` already holds
+temporary, but by the time the second line runs, `a` already holds
 the new value, so you copy it back into `b` and lose the original.
 Always think *what's in each box, right now?*
 
@@ -306,7 +306,7 @@ Always think *what's in each box, right now?*
 
 A `int` on most systems is 4 bytes. That means it can hold values
 roughly between `-2,147,483,648` and `+2,147,483,647`. Go above that
-and the value **wraps around** — a phenomenon called **integer
+and the value **wraps around**, a phenomenon called **integer
 overflow**.
 
 <CodeBlock
@@ -400,7 +400,7 @@ int y = x + 1;
 printf("%d\\n", y);
 \`\`\`
 
-- Nothing — \`y\` will always be \`1\`.
+- Nothing, \`y\` will always be \`1\`.
   > \`x\` is uninitialized, so its value is indeterminate; \`x + 1\` could produce any number, not reliably \`1\`.
 - The compiler will refuse to build it.
   > Most compilers will issue a warning about an uninitialized read but will still compile the code; the resulting program has undefined behavior at runtime.
@@ -409,5 +409,5 @@ printf("%d\\n", y);
 - \`y\` cannot be initialized from another variable.
   > C allows initializing a variable from any expression, including another variable. The bug here is that \`x\` is uninitialized, not that \`y\` is initialized from \`x\`.
 
-Always initialize your variables. Modern compilers will often emit a warning for uninitialized reads — turn warnings on and pay attention to them.`}
+Always initialize your variables. Modern compilers will often emit a warning for uninitialized reads, turn warnings on and pay attention to them.`}
 />

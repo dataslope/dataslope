@@ -1,6 +1,6 @@
 ---
 title: "Deeper History: The Rise of Statistical Computing"
-description: How the arrival of mainframes and the invention of dedicated statistical languages — SPSS, SAS, and especially the S language at Bell Labs — transformed how data analysis was done.
+description: How the arrival of mainframes and the invention of dedicated statistical languages, SPSS, SAS, and especially the S language at Bell Labs, transformed how data analysis was done.
 ---
 
 When electronic computers became available in the 1950s and 1960s,
@@ -9,13 +9,13 @@ statisticians were among the first people to want them.
 The reason was obvious. If a t-test took half a day by hand, and a
 computer could do the same arithmetic in milliseconds, then a
 statistician's *productivity* could jump by factors of *thousands*.
-But there was a catch — and that catch is the whole story of this
+But there was a catch, and that catch is the whole story of this
 chapter.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A yellow punched card rides a solid gray arrow into a blue mainframe cabinet with two tape reels and status lights, and a green card of rising bars comes out the other side — statistical computing turning hand-work into milliseconds"
+  aria-label="A yellow punched card rides a solid gray arrow into a blue mainframe cabinet with two tape reels and status lights, and a green card of rising bars comes out the other side, statistical computing turning hand-work into milliseconds"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -137,7 +137,7 @@ ambitious.
 <IllustrationPrompt subject="John Chambers" photo />
 
 That group included **John Chambers**, **Rick Becker**, **Allan
-Wilks**, and others. They were interactive thinkers — they wanted
+Wilks**, and others. They were interactive thinkers, they wanted
 to *play with data*, not write batch jobs and wait for output. They
 wanted to fit a model, look at the residuals, fit another one, plot
 something, change a parameter, and try again.
@@ -154,7 +154,7 @@ timeline
     1976 : SAS at NC State University
     1976 : John Chambers begins work on S at Bell Labs
     1980 : S released externally
-    1988 : "New S" — the version most modern R users would recognize
+    1988 : "New S", the version most modern R users would recognize
     1991 : Ross Ihaka & Robert Gentleman start a tiny project in Auckland called "R"
     1993 : Mathsoft acquires the commercial license for S, branding it S-PLUS
     1996 : R announced publicly in the "Ihaka and Gentleman" paper
@@ -163,8 +163,8 @@ timeline
 
 ## What was different about S
 
-The system they built — and called, with characteristic Bell-Labs
-brevity, **"S"** — had three radical ideas baked in from the start.
+The system they built, and called, with characteristic Bell-Labs
+brevity, **"S"**, had three radical ideas baked in from the start.
 
 **Idea 1: An interactive prompt.** You typed a command, you saw an
 answer, you typed another command. No batch jobs. No waiting.
@@ -173,7 +173,7 @@ revolutionary for serious statistical computing.
 
 **Idea 2: Treat data as a first-class object.** In SAS, data lived
 in special "datasets" you manipulated with `PROC` steps. In S, data
-was just a variable in your workspace — you could pass it around,
+was just a variable in your workspace, you could pass it around,
 look at it, modify it, save it, like any other object. This sounds
 mundane today, but it changed the *mental model* of analysis.
 
@@ -207,7 +207,7 @@ aggregate(mpg ~ cyl, data = mtcars, FUN = mean)
 />
 
 In SAS (circa 1980), the same analysis would look something like
-this (not runnable here — for illustration only):
+this (not runnable here, for illustration only):
 
 ```sas
 PROC MEANS DATA=mtcars NWAY;
@@ -231,7 +231,7 @@ different vision of what statistical computing should feel like.
 ## The legacy of S
 
 By the late 1980s, S was being used inside Bell Labs for serious
-work, and a commercial version — **S-PLUS** — had been licensed and
+work, and a commercial version, **S-PLUS**, had been licensed and
 sold to companies that needed it for statistical work.
 
 S-PLUS was expensive. A single-seat license could cost several
@@ -239,8 +239,8 @@ thousand dollars. For corporate users this was reasonable; for
 graduate students, university departments, and independent
 researchers, it was prohibitive.
 
-In 1991, two statisticians at the University of Auckland — Ross
-Ihaka and Robert Gentleman — quietly began a side project. Their
+In 1991, two statisticians at the University of Auckland, Ross
+Ihaka and Robert Gentleman, quietly began a side project. Their
 goal was modest: they wanted a *free* implementation of an
 S-like language for their teaching. They called it **R**.
 
@@ -280,7 +280,7 @@ What happened next surprised everyone, including them.
 - Sitting at a terminal, typing one expression at a time and seeing immediate output.
   > That interactive style was the innovation of S, not the typical SAS workflow; SAS analysts in 1985 wrote and submitted complete batch jobs.
 - [o] Writing a batch script of \`DATA\` and \`PROC\` steps, submitting it, and reading the printed output later.
-  > SAS was — and historically still is — primarily a batch language, in which an analyst writes a complete program of steps and submits it as a job.
+  > SAS was, and historically still is, primarily a batch language, in which an analyst writes a complete program of steps and submits it as a job.
 - Writing FORTRAN code that called SAS subroutines.
   > SAS provided its own high-level \`DATA\`/\`PROC\` language precisely to free analysts from writing FORTRAN; they did not call SAS from FORTRAN.
 - Editing data interactively in a spreadsheet-like grid.
@@ -289,8 +289,8 @@ What happened next surprised everyone, including them.
 
 ## A quick code exercise
 
-Most modern R code uses **vectorized operations** — single
-expressions that operate on a whole column of data — because that
+Most modern R code uses **vectorized operations**, single
+expressions that operate on a whole column of data, because that
 is what S was designed for. As a warm-up, let us compute a column
 of "is this car efficient?" labels (TRUE if mpg ≥ 25, FALSE
 otherwise) without writing a loop.
@@ -298,7 +298,7 @@ otherwise) without writing a loop.
 <ChallengeCard
   adapter="r"
   title="Vectorized labeling"
-  instructions={`Create a logical vector \`efficient\` the same length as \`mpg\`, where each element is \`TRUE\` if the corresponding mpg is at least 25, and \`FALSE\` otherwise. No loops — use a single comparison.`}
+  instructions={`Create a logical vector \`efficient\` the same length as \`mpg\`, where each element is \`TRUE\` if the corresponding mpg is at least 25, and \`FALSE\` otherwise. No loops, use a single comparison.`}
   files={[
     {
       filename: "main.r",
@@ -335,11 +335,11 @@ print(efficient)
   ]}
 />
 
-This one-line operation — "compare a whole vector to a number,
-get a whole vector back" — was already idiomatic in S in the
+This one-line operation, "compare a whole vector to a number,
+get a whole vector back", was already idiomatic in S in the
 1980s. It is one of the most important habits to learn in R, and
 we will return to it many times.
 
 In the next chapter we will tell the story of how R itself came
-about — and why a humble university teaching project ended up
+about, and why a humble university teaching project ended up
 displacing its million-dollar commercial parent.

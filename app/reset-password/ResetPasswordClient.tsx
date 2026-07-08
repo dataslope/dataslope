@@ -7,7 +7,7 @@ import { resetPassword } from "@/lib/auth/client";
 import { EyeIcon } from "../_components/auth/authIcons";
 import styles from "../_components/auth/authCard.module.css";
 
-/** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
+/** Minimum password length, mirrors Better Auth's default (`minPasswordLength`). */
 const MIN_PASSWORD = 8;
 
 /** Read `window.location.search` without a setState-in-effect: the server
@@ -35,7 +35,7 @@ export function ResetPasswordClient() {
   const params = new URLSearchParams(ready ? search : "");
   const token = params.get("token");
   // An expired/invalid token redirects here with `?error=…`, and a bare visit
-  // has no token at all — both are dead links.
+  // has no token at all, both are dead links.
   const linkError = ready && (!token || Boolean(params.get("error")));
 
   const [password, setPassword] = useState("");
@@ -47,7 +47,7 @@ export function ResetPasswordClient() {
   const [done, setDone] = useState(false);
 
   const pwOk = password.length >= MIN_PASSWORD;
-  // Lazy mismatch check — only after the confirm field has been touched.
+  // Lazy mismatch check, only after the confirm field has been touched.
   const mismatch =
     confirmTouched && confirm.length > 0 && confirm !== password;
 
@@ -61,7 +61,7 @@ export function ResetPasswordClient() {
     }
     if (!token) return;
     setSubmitting(true);
-    // Server-side failures resolve with {error}; a network failure rejects —
+    // Server-side failures resolve with {error}; a network failure rejects,
     // catch it so the form doesn't stay disabled at "Updating…".
     try {
       const { error } = await resetPassword({ newPassword: password, token });
@@ -98,7 +98,7 @@ export function ResetPasswordClient() {
         <button
           type="button"
           onClick={() => {
-            // Deep-link straight into the "Reset your password" form —
+            // Deep-link straight into the "Reset your password" form,
             // landing on the sign-in tab would make the user rediscover
             // "Forgot password?" themselves.
             router.push("/sign-in?mode=forgot");
@@ -175,7 +175,7 @@ export function ResetPasswordClient() {
               id="reset-password-hint"
               className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
             >
-              {pwOk ? "Strong enough — looks good." : "At least 8 characters."}
+              {pwOk ? "Strong enough, looks good." : "At least 8 characters."}
             </span>
           </div>
         </div>

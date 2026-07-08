@@ -7,7 +7,7 @@ So far each of our classes has stood alone. But many real-world
 modeling problems involve **families** of related things: shapes,
 employees, accounts, vehicles, events. Java lets one class *extend*
 another, inheriting its fields and methods. This is **inheritance**,
-and it's one of the most powerful — and most over-used — features of
+and it's one of the most powerful, and most over-used, features of
 OOP.
 
 <svg
@@ -146,7 +146,7 @@ The arrow with the open triangle means "extends." `Circle` and
 
 Run it. The single `for` loop prints information about three
 different concrete shapes, even though the loop never says the words
-`Circle` or `Rectangle`. That is **polymorphism** — the same call
+`Circle` or `Rectangle`. That is **polymorphism**, the same call
 (`s.describe()`) does different things depending on the *actual*
 object behind the reference.
 
@@ -163,12 +163,12 @@ sequenceDiagram
     participant JVM
     participant C as Circle area
     participant R as Rectangle area
-    Iter->>JVM: s.area() — s is a Circle
+    Iter->>JVM: s.area(), s is a Circle
     JVM->>C: invoke Circle.area
     C-->>JVM: 12.566
     JVM-->>Iter: 12.566
 
-    Iter->>JVM: s.area() — s is a Rectangle
+    Iter->>JVM: s.area(), s is a Rectangle
     JVM->>R: invoke Rectangle.area
     R-->>JVM: 12.0
     JVM-->>Iter: 12.0
@@ -176,9 +176,9 @@ sequenceDiagram
 
 This is the mechanism that lets *new* shape classes be added later
 *without changing any of the code in `Main`*. As long as a new class
-`extends Shape` and overrides `area`, the loop works. That property
-— "code written today keeps working as new types are added
-tomorrow" — is the chief reason polymorphism exists.
+`extends Shape` and overrides `area`, the loop works. That property,
+"code written today keeps working as new types are added
+tomorrow", is the chief reason polymorphism exists.
 
 ## `abstract` classes and `abstract` methods
 
@@ -269,7 +269,7 @@ later.
 A good rule: **prefer composition over inheritance**. If `Car`
 *has-a* `Engine`, that is composition (a field of type `Engine`), not
 inheritance. Inherit only when the "is-a" relationship is genuine,
-permanent, and substitutive — meaning anywhere a `Shape` is expected,
+permanent, and substitutive, meaning anywhere a `Shape` is expected,
 a `Circle` works correctly.
 
 Common red flags that you should *not* be using inheritance:
@@ -303,7 +303,7 @@ Common red flags that you should *not* be using inheritance:
 - [o] Every instance of the child class genuinely *is a* legitimate instance of the parent and can be used wherever the parent is expected
   > This is the Liskov substitution intuition.
 - The child wants to reuse one helper method from the parent
-  > Reuse alone is not enough — use composition instead.`}
+  > Reuse alone is not enough, use composition instead.`}
 />
 
 <MultipleChoice
@@ -409,5 +409,5 @@ Hello, I say Meow.
 />
 
 Inheritance lets us reuse code along *is-a* lines. But Java has
-another tool — **interfaces** — that captures *can-do* relationships
+another tool, **interfaces**, that captures *can-do* relationships
 without the heavy coupling of `extends`. That is the next page.

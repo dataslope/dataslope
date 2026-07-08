@@ -10,7 +10,7 @@ shrinks with function calls, how the heap supports data structures
 the size of which you don't know in advance, and why "undefined
 behavior" is a phrase to take seriously.
 
-That's a real foundation. So — what's next?
+That's a real foundation. So, what's next?
 
 <svg
   viewBox="0 0 640 235"
@@ -62,16 +62,16 @@ and finishing none.
 You've met `<stdio.h>`, `<stdlib.h>`, `<string.h>`. There's more.
 Worth exploring next:
 
-- `<ctype.h>` — character classification (`isspace`, `isdigit`,
+- `<ctype.h>`, character classification (`isspace`, `isdigit`,
   `tolower`).
-- `<math.h>` — `sqrt`, `sin`, `pow`, `floor`. Often needs `-lm` at
+- `<math.h>`, `sqrt`, `sin`, `pow`, `floor`. Often needs `-lm` at
   link time outside browser playgrounds.
-- `<time.h>` — clocks, timers, formatting dates.
-- `<assert.h>` — `assert(x)` aborts the program if `x` is false; a
+- `<time.h>`, clocks, timers, formatting dates.
+- `<assert.h>`, `assert(x)` aborts the program if `x` is false; a
   useful sanity check during development.
-- `<stdint.h>` and `<stdbool.h>` — exact-width integer types
+- `<stdint.h>` and `<stdbool.h>`, exact-width integer types
   (`int32_t`, `uint8_t`) and `bool`.
-- `<errno.h>` — how system calls report errors.
+- `<errno.h>`, how system calls report errors.
 
 Browse the [cppreference C library](https://en.cppreference.com/w/c)
 section. You don't need to memorize anything; just know what's
@@ -120,12 +120,12 @@ available to a C programmer.
 
 ## Recommended books
 
-A small, opinionated list — none of these are mandatory, but each is
+A small, opinionated list, none of these are mandatory, but each is
 worth its weight.
 
 - **"The C Programming Language"** by Brian W. Kernighan and Dennis
   M. Ritchie ("K&R"). The original book by C's creator. Slim, clear,
-  still essentially correct. Read it cover to cover — it's short.
+  still essentially correct. Read it cover to cover, it's short.
 - **"C Programming: A Modern Approach"** by K. N. King. A thorough
   modern textbook with great exercises. Good as a reference too.
 - **"Computer Systems: A Programmer's Perspective"** by Bryant and
@@ -167,8 +167,8 @@ tools. You'll feel productive in a weekend.
 
 For everyday scripting, data work, and web development, a
 high-level language pays off quickly. You'll appreciate the
-conveniences — strings without manual memory management, hash maps
-as a built-in type — much more than someone who'd never used C.
+conveniences, strings without manual memory management, hash maps
+as a built-in type, much more than someone who'd never used C.
 
 ### Assembly
 
@@ -182,7 +182,7 @@ under the hood your C will improve.
 
 It is tempting at this stage to chase "the next language". Resist
 that for a few months. The single best thing you can do for your
-programming life — in any language — is to **write more programs
+programming life, in any language, is to **write more programs
 end-to-end**, debug them, finish them, and read other people's
 finished programs.
 
@@ -197,7 +197,7 @@ Welcome to the craft. There is a lot of code waiting for you.
 
 <Callout type="info" title="One last challenge">
   Pick **one** of the project ideas above and start it this week.
-  Don't plan, don't shop for the perfect language — open an editor,
+  Don't plan, don't shop for the perfect language, open an editor,
   create `main.c`, and write `printf("starting...\n");`. Everything
   else follows.
 </Callout>
@@ -229,5 +229,5 @@ A close runner-up is the debugger (\`gdb\` / \`lldb\`), but sanitizers tend to w
 - Memorize the entire C standard library.
   > The standard library is large and best treated as a reference to look up when needed; memorizing it is neither practical nor the bottleneck for improvement.
 
-There is nothing wrong with learning a new language soon — but the foundation you've built is the part that's hardest to acquire, and the most valuable to deepen first.`}
+There is nothing wrong with learning a new language soon, but the foundation you've built is the part that's hardest to acquire, and the most valuable to deepen first.`}
 />

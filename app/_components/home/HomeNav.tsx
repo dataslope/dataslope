@@ -51,7 +51,7 @@ function LangIcon({
 }
 
 /** Desktop primary-menu link. The item for the section being viewed renders
- *  in the brand accent (matching the courses-page mockup) — derived from the
+ *  in the brand accent (matching the courses-page mockup), derived from the
  *  current pathname, so `/courses/python-basics` still lights up "Courses". */
 function NavLink({
   href,
@@ -113,7 +113,7 @@ function GitHubLink() {
   );
 }
 
-/** Desktop "Playground" dropdown — a Base UI Menu styled to echo the
+/** Desktop "Playground" dropdown, a Base UI Menu styled to echo the
  *  playground switcher: a bordered, shadowed popup of language rows. */
 function PlaygroundMenu() {
   return (
@@ -361,7 +361,7 @@ export function HomeNav() {
   // Two thresholds (hysteresis) with a gap wider than the header's shrink
   // delta (≤16px). A single threshold caused an infinite bounce near the top:
   // toggling the header height changes the in-flow document height, and the
-  // browser's scroll-anchoring nudges scrollY to compensate — which flips the
+  // browser's scroll-anchoring nudges scrollY to compensate, which flips the
   // threshold back, resizing the header again, ad infinitum. The gap keeps that
   // compensation from ever crossing the opposite threshold.
   const [scrolled, setScrolled] = useState(false);
@@ -394,7 +394,7 @@ export function HomeNav() {
           <BrandLogo />
         </div>
 
-        {/* Center: primary menu (desktop only — visibility handled by the
+        {/* Center: primary menu (desktop only, visibility handled by the
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-1">

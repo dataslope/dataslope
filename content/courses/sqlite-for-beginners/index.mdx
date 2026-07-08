@@ -1,24 +1,24 @@
 ---
 title: Welcome
-description: A friendly, visual, zero-prerequisite introduction to databases, SQL, and relational thinking using SQLite — for people who have never written a query before.
+description: A friendly, visual, zero-prerequisite introduction to databases, SQL, and relational thinking using SQLite, for people who have never written a query before.
 ---
 
 Welcome to **SQLite for Beginners**. If the words *database*,
-*query*, and *table* feel vague — or if the only place you have
-ever organized information is a spreadsheet — you are in exactly
+*query*, and *table* feel vague, or if the only place you have
+ever organized information is a spreadsheet, you are in exactly
 the right place. This course assumes **no programming experience,
 no database experience, and no SQL experience.**
 
 Before any theory, here is the most important thing about this
 course: **it runs.** Every example on every page executes inside
-your browser on a real SQLite engine — no installation, no signup,
+your browser on a real SQLite engine, no installation, no signup,
 no server. The box below is not a screenshot. It is a live database
 with a small table of pets already loaded. Click **Run** and watch
 it answer.
 
 <SqlCodeBlock
   dialect="sqlite"
-  title="Your very first query — click Run"
+  title="Your very first query, click Run"
   initSql={`CREATE TABLE pets (
   name    TEXT,
   species TEXT,
@@ -43,19 +43,19 @@ ORDER BY
 
 That query says, in almost plain English: *"Show me the name,
 species, and age from the pets table, but only the cats, sorted
-from oldest to youngest."* You just ran real SQL — the same
+from oldest to youngest."* You just ran real SQL, the same
 language used by banks, airlines, and the phone in your pocket.
 
 Now change something. In the editor above, replace `'cat'` with
 `'dog'` and click **Run** again. The answer changes instantly:
 same question, different filter. That edit–run–observe loop is how
-this entire course works, and it is how you will actually learn —
+this entire course works, and it is how you will actually learn,
 not by reading about queries, but by running and breaking them.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Loose tilted paper scraps flow along a solid gray arrow into one big friendly yellow file with a folded corner, where they settle into tidy blue and green tables — a whole little database living inside a single SQLite file"
+  aria-label="Loose tilted paper scraps flow along a solid gray arrow into one big friendly yellow file with a folded corner, where they settle into tidy blue and green tables, a whole little database living inside a single SQLite file"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-300)">
@@ -93,7 +93,7 @@ not by reading about queries, but by running and breaking them.
 
 <Callout type="info" title="How the magic works">
 Every SQL block runs on the official `@sqlite.org/sqlite-wasm`
-build — SQLite itself, compiled to WebAssembly, executing entirely
+build, SQLite itself, compiled to WebAssembly, executing entirely
 in your browser tab. There is no server behind it. The engine you
 are practicing on is the genuine article, not a simulation.
 </Callout>
@@ -106,7 +106,7 @@ You will feel at home here if any of these sound like you:
   query" and quietly wondered what they actually mean.
 - You keep information in spreadsheets, but they have started to
   feel slow, fragile, or hard to keep consistent.
-- You are curious about data roles — analyst, engineer, scientist —
+- You are curious about data roles, analyst, engineer, scientist,
   and you want to understand the foundation everyone builds on.
 - You tried a SQL tutorial once and bounced off a wall of syntax
   with no explanation of *why* any of it exists.
@@ -129,24 +129,24 @@ By the end of the course you will be able to:
 - Walk into an unfamiliar database and figure out what it holds.
 
 This is a **foundations** course. It deliberately skips database
-administration topics — deployment, replication, tuning, security
-hardening — because those make far more sense *after* the ideas
+administration topics, deployment, replication, tuning, security
+hardening, because those make far more sense *after* the ideas
 taught here are solid.
 
 ## How to study
 
-The course starts with two short pages of ideas — what a database
-really is, and why this course uses SQLite — and then you are
+The course starts with two short pages of ideas, what a database
+really is, and why this course uses SQLite, and then you are
 writing queries for the rest of the journey. Along the way you
 will meet three kinds of interactive elements:
 
 1. **Runnable SQL blocks**, like the one above. Most pre-load
    sample tables for you; edit the query, click *Run*, inspect the
    result.
-2. **Challenge cards** — small problems with tests. Write a query,
+2. **Challenge cards**, small problems with tests. Write a query,
    run the tests, see which pass. They are designed as quick wins,
    not exams.
-3. **Multiple-choice questions** — quick checks that an idea has
+3. **Multiple-choice questions**, quick checks that an idea has
    landed, with an explanation for every choice.
 
 The single best study habit: **never just read a code block.** Run
@@ -155,12 +155,12 @@ if you were right. Being wrong is the productive part.
 
 <Callout type="info" title="Each SQL block is independent">
 Tables you create in one runnable block are **not** visible to the
-next block, even on the same page — every block that needs data
+next block, even on the same page, every block that needs data
 sets it up itself. If you want a single long-lived workspace to
 experiment in, open the
 [SQLite Playground](/playground/sqlite) in a new tab.
 </Callout>
 
 Ready? The next page answers the question every tutorial should
-start with: what *is* a database, really — and why did the world
+start with: what *is* a database, really, and why did the world
 decide it needed such a thing?

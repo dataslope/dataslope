@@ -283,7 +283,7 @@ export interface HomeWebBlock {
   tailwind?: boolean;
 }
 
-// A tiny, self-contained interactive page — the HTML/CSS/JS runs on native
+// A tiny, self-contained interactive page, the HTML/CSS/JS runs on native
 // browser primitives, so it renders instantly with no runtime download.
 const WEB_INDEX_HTML = `<!doctype html>
 <html>
@@ -336,7 +336,7 @@ const WEB_INDEX_HTML = `<!doctype html>
 </html>
 `;
 
-// A React counter — esbuild-wasm bundles the TSX in a worker and the result
+// A React counter, esbuild-wasm bundles the TSX in a worker and the result
 // renders in the same sandboxed preview iframe the web block uses.
 const REACT_MAIN_TSX = `import { useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -390,7 +390,7 @@ export const WEB_CODE_BLOCKS: HomeWebBlock[] = [
  * data analysis, machine learning, web development, and NLP.
  */
 export const CONCEPT_QUESTIONS: string[] = [
-  // SQL — WHERE vs HAVING
+  // SQL, WHERE vs HAVING
   `In SQL, which clause filters rows **after** aggregation, so it can use the result of a function like \`COUNT()\` or \`SUM()\`?
 
 - The \`WHERE\` clause
@@ -404,7 +404,7 @@ export const CONCEPT_QUESTIONS: string[] = [
 
 \`WHERE\` filters raw rows before grouping, while \`HAVING\` filters the grouped results afterward. That ordering is why an aggregate condition like \`COUNT(*) > 5\` has to live in \`HAVING\`, not \`WHERE\`.`,
 
-  // Python / pandas — column selection returns a Series
+  // Python / pandas, column selection returns a Series
   `In pandas, what does selecting a single column with \`df["age"]\` return?
 
 - [o] A \`Series\`
@@ -418,7 +418,7 @@ export const CONCEPT_QUESTIONS: string[] = [
 
 Indexing a DataFrame with a single column name gives a \`Series\`; indexing with a list of names gives a \`DataFrame\`. Keeping that distinction straight avoids a lot of shape-related bugs.`,
 
-  // Machine learning — purpose of a train/test split
+  // Machine learning, purpose of a train/test split
   `Why split a dataset into separate **training** and **test** sets before fitting a model?
 
 - To give the model more data to memorize
@@ -432,7 +432,7 @@ Indexing a DataFrame with a single column name gives a \`Series\`; indexing with
 
 A held-out test set stands in for future, unseen inputs, so its score estimates real-world performance and exposes overfitting when training accuracy is high but test accuracy is low.`,
 
-  // Web development — the CSS box model
+  // Web development, the CSS box model
   `In the CSS box model, which property adds space **inside** an element, between its content and its border?
 
 - \`margin\`
@@ -446,7 +446,7 @@ A held-out test set stands in for future, unseen inputs, so its score estimates 
 
 Padding sits inside the border; margin sits outside it. A quick mnemonic: padding pads the content within the box, while margin marks the distance to everything else.`,
 
-  // NLP — tokenization
+  // NLP, tokenization
   `In natural language processing, what does **tokenization** do?
 
 - [o] Splits text into smaller units such as words or subwords

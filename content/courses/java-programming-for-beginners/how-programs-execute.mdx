@@ -1,6 +1,6 @@
 ---
 title: How Programs Execute
-description: From source code to a running program — compilation, classloading, and the run cycle in Java
+description: From source code to a running program, compilation, classloading, and the run cycle in Java
 ---
 
 So far we have written `.java` files and watched them produce
@@ -11,7 +11,7 @@ output."
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three steps of a staircase joined by thin gray elbow lines: a blue source card, a solid blue machine marked with a white run chevron, and a green output card where result bars appear — from typed code to running program"
+  aria-label="Three steps of a staircase joined by thin gray elbow lines: a blue source card, a solid blue machine marked with a white run chevron, and a green output card where result bars appear, from typed code to running program"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -50,13 +50,13 @@ flowchart TD
 
 Every Java program goes through these four stages:
 
-1. **Source code.** You write `Main.java` — text that humans can read.
+1. **Source code.** You write `Main.java`, text that humans can read.
 2. **Compilation.** A program called `javac` reads your source and
-   produces a `Main.class` file containing **bytecode** — a compact,
+   produces a `Main.class` file containing **bytecode**, a compact,
    abstract instruction set the JVM understands.
 3. **Bytecode.** This is *not* machine code for your CPU. It's an
    intermediate format. The same `.class` file works on Windows,
-   macOS, Linux, ARM, x86 — anywhere a JVM is installed.
+   macOS, Linux, ARM, x86, anywhere a JVM is installed.
 4. **Execution.** The JVM (started by the `java` command) loads
    the bytecode, verifies it, translates it (lazily) into actual
    CPU instructions, and runs them.
@@ -71,8 +71,8 @@ each platform, does that part.
 `javac` is a program written in Java itself. It:
 
 - Reads the source text.
-- Parses it into an internal tree (an AST — abstract syntax tree).
-- Checks types, scopes, access modifiers — "does `x.foo()` make
+- Parses it into an internal tree (an AST, abstract syntax tree).
+- Checks types, scopes, access modifiers, "does `x.foo()` make
   sense given the type of `x`?"
 - Reports errors if anything is wrong (and produces **no** `.class`
   if there are errors).
@@ -108,7 +108,7 @@ Three pieces are worth understanding even at a beginner level:
 
 1. **Classloader.** Finds `.class` files on disk (or in JAR
    archives), reads them into memory, links them together. Loads
-   only what is actually used — `Cat.class` may never load if your
+   only what is actually used, `Cat.class` may never load if your
    program never mentions `Cat`.
 2. **Verifier.** Checks that the bytecode is internally consistent
    ("does this method really claim to leave one `int` on the stack?
@@ -178,8 +178,8 @@ cheaper than run-time crashes.
 
 Modern IDEs (and online runners like this one) often *appear* to
 "just run" your code. They are quietly performing the compile step
-behind the scenes. There is no shortcut around `.java → .class → run`
-— you just don't have to type it.
+behind the scenes. There is no shortcut around `.java → .class → run`,
+you just don't have to type it.
 
 ```mermaid
 flowchart TD
@@ -205,13 +205,13 @@ flowchart TD
   markdown={`Why does Java use bytecode and a JVM instead of compiling directly to native code?
 
 - Because native code is illegal
-  > It's not — it's just less portable.
+  > It's not, it's just less portable.
 - Because the JVM is faster than native execution
   > Generally the opposite, though the JIT closes much of the gap.
-- [o] Because bytecode is portable — the same \`.class\` files can run on any platform that has a JVM, fulfilling Java's "write once, run anywhere" promise
+- [o] Because bytecode is portable, the same \`.class\` files can run on any platform that has a JVM, fulfilling Java's "write once, run anywhere" promise
   > One compiled artifact runs everywhere a JVM exists, instead of one build per platform.
 - Because Java cannot be compiled directly
-  > It could be, in principle — the design choice was portability.`}
+  > It could be, in principle, the design choice was portability.`}
 />
 
 <MultipleChoice

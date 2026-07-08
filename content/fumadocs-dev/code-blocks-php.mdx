@@ -1,9 +1,9 @@
 ---
-title: Code Blocks — PHP
+title: "Code Blocks: PHP"
 description: Run PHP in the browser via php-wasm.
 ---
 
-PHP runs through **php-wasm** — a WebAssembly build of the PHP
+PHP runs through **php-wasm**, a WebAssembly build of the PHP
 interpreter. Each block executes in a fresh process, so superglobals
 and class definitions don't carry over.
 
@@ -163,7 +163,7 @@ function bye(string $name): string
 
 ## Initialization code
 
-`initCode` is read-only setup prepended to your snippet on every Run — handy
+`initCode` is read-only setup prepended to your snippet on every Run, handy
 for imports or sample data without cluttering the part you edit. Init of 3
 lines or fewer shows a compact read-only header; 4 lines or more collapses
 behind a "Click to expand" toggle.

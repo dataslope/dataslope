@@ -2,9 +2,9 @@
 title: Basic Sorting Algorithms
 description: Learn bubble sort, selection sort, insertion sort, stability, and loop invariants in C++
 ---
-Sorting is the gateway drug of algorithm design. Binary search demands sorted input; duplicate detection, range queries, and median-finding all get easier on sorted data — which is why so much computing has always gone into ordering things. In the opening of his volume on sorting, Donald Knuth reports that computer manufacturers of the 1960s estimated more than a quarter of all running time on their machines was spent sorting.
+Sorting is the gateway drug of algorithm design. Binary search demands sorted input; duplicate detection, range queries, and median-finding all get easier on sorted data, which is why so much computing has always gone into ordering things. In the opening of his volume on sorting, Donald Knuth reports that computer manufacturers of the 1960s estimated more than a quarter of all running time on their machines was spent sorting.
 
-This page covers the three classic "slow" sorts: bubble, selection, and insertion. None is the right tool for a million elements — all are O(n²) in the worst case — so why learn them? Three honest reasons. They are small enough to *fully* understand, which makes them ideal for learning loop invariants, the reasoning tool behind every correct algorithm. One of them (insertion sort) is genuinely the fastest known method for tiny or nearly-sorted inputs, and lives on inside the hybrid sorts of every standard library. And they give the efficient sorts of the next page something to be measured against.
+This page covers the three classic "slow" sorts: bubble, selection, and insertion. None is the right tool for a million elements, all are O(n²) in the worst case, so why learn them? Three honest reasons. They are small enough to *fully* understand, which makes them ideal for learning loop invariants, the reasoning tool behind every correct algorithm. One of them (insertion sort) is genuinely the fastest known method for tiny or nearly-sorted inputs, and lives on inside the hybrid sorts of every standard library. And they give the efficient sorts of the next page something to be measured against.
 
 <Figure
   slug="a-risograph-of-sorting"
@@ -14,7 +14,7 @@ This page covers the three classic "slow" sorts: bubble, selection, and insertio
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A row of bars mid bubble sort — two adjacent yellow bars are being swapped while the tallest bars already sit settled and green at the right end"
+  aria-label="A row of bars mid bubble sort, two adjacent yellow bars are being swapped while the tallest bars already sit settled and green at the right end"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -38,7 +38,7 @@ This page covers the three classic "slow" sorts: bubble, selection, and insertio
 
 Bubble sort repeatedly compares adjacent elements and swaps them if they are out of order. After one full pass, the largest value has bubbled to the end; after two passes, the two largest are settled, and so on.
 
-It is also computing's favorite punching bag. Knuth's verdict in *The Art of Computer Programming* is that bubble sort "seems to have nothing to recommend it, except a catchy name" — and the name really is most of its legacy. In a 2007 Google town hall, Eric Schmidt jokingly asked candidate Barack Obama the most efficient way to sort a million 32-bit integers; Obama's deadpan "I think the bubble sort would be the wrong way to go" brought down the house. He was right. But the catchy name marks a genuinely useful teaching specimen: it is the simplest sort to verify, and its early-exit trick below introduces an idea — *detect that you are already done* — that better algorithms reuse.
+It is also computing's favorite punching bag. Knuth's verdict in *The Art of Computer Programming* is that bubble sort "seems to have nothing to recommend it, except a catchy name", and the name really is most of its legacy. In a 2007 Google town hall, Eric Schmidt jokingly asked candidate Barack Obama the most efficient way to sort a million 32-bit integers; Obama's deadpan "I think the bubble sort would be the wrong way to go" brought down the house. He was right. But the catchy name marks a genuinely useful teaching specimen: it is the simplest sort to verify, and its early-exit trick below introduces an idea, *detect that you are already done*, that better algorithms reuse.
 ```mermaid
 flowchart TD
     A["5 1 4 2"] --> B["1 5 4 2"]
@@ -118,11 +118,11 @@ int main() {
   ]}
 />
 
-Selection sort always does O(n²) comparisons, even if the input is already sorted — it never notices, because it must scan the whole suffix to *prove* it found the minimum. Its one virtue is doing at most n−1 swaps, the fewest of any of these sorts, which once mattered when writes were expensive.
+Selection sort always does O(n²) comparisons, even if the input is already sorted, it never notices, because it must scan the whole suffix to *prove* it found the minimum. Its one virtue is doing at most n−1 swaps, the fewest of any of these sorts, which once mattered when writes were expensive.
 
 ## Insertion sort
 
-Insertion sort is the other card-player's algorithm — the one people use *while being dealt* cards: keep your hand sorted, and slot each new card into its place by sliding bigger cards over. In code, the sorted prefix grows one element at a time; each new value shifts larger elements right until its position opens.
+Insertion sort is the other card-player's algorithm, the one people use *while being dealt* cards: keep your hand sorted, and slot each new card into its place by sliding bigger cards over. In code, the sorted prefix grows one element at a time; each new value shifts larger elements right until its position opens.
 
 <CodeBlock
   adapter="cpp"
@@ -154,10 +154,10 @@ int main() {
   ]}
 />
 
-Insertion sort is O(n²) in the worst case (input sorted backward — every element shifts all the way), but O(n) on already-sorted or nearly-sorted data, because the inner `while` loop exits immediately when nothing needs shifting. That adaptiveness is why it is not a museum piece: `std::sort` and most production sorts hand small sub-ranges to insertion sort, where its tiny constant factor beats the clever algorithms.
+Insertion sort is O(n²) in the worst case (input sorted backward, every element shifts all the way), but O(n) on already-sorted or nearly-sorted data, because the inner `while` loop exits immediately when nothing needs shifting. That adaptiveness is why it is not a museum piece: `std::sort` and most production sorts hand small sub-ranges to insertion sort, where its tiny constant factor beats the clever algorithms.
 
 <Callout type="success" title="Stability">
-A stable sort keeps equal elements in their original relative order. Why care? Suppose you sort emails by date, then by sender: with a stable sort, each sender's messages stay date-ordered — the second sort preserves the first one's work on ties. Insertion sort is stable because it shifts only values *strictly greater* than the key. Selection sort is not stable in its typical swap-based form: the long-range swap can leapfrog one equal element over another.
+A stable sort keeps equal elements in their original relative order. Why care? Suppose you sort emails by date, then by sender: with a stable sort, each sender's messages stay date-ordered, the second sort preserves the first one's work on ties. Insertion sort is stable because it shifts only values *strictly greater* than the key. Selection sort is not stable in its typical swap-based form: the long-range swap can leapfrog one equal element over another.
 </Callout>
 
 ## Comparing basic sorts
@@ -168,7 +168,7 @@ A stable sort keeps equal elements in their original relative order. Why care? S
 | Selection sort | O(n^2) | O(n^2) | O(n^2) | O(1) | No |
 | Insertion sort | O(n) | O(n^2) | O(n^2) | O(1) | Yes |
 
-The deeper lesson of this page is the **loop invariant** — a statement that is true before every iteration of a loop, which together with the loop's exit condition proves the algorithm correct. Each sort has one. Bubble sort: "after pass k, the last k elements are the largest k, in final position." Selection sort: "the first i elements are the smallest i, sorted." Insertion sort: "the elements before index i are sorted (though not necessarily final)." When you write any loop-based algorithm, asking *what is my invariant?* is the fastest route to both correctness and understanding — and it is exactly the reasoning you will need to trust quicksort's partition on the next page.
+The deeper lesson of this page is the **loop invariant**, a statement that is true before every iteration of a loop, which together with the loop's exit condition proves the algorithm correct. Each sort has one. Bubble sort: "after pass k, the last k elements are the largest k, in final position." Selection sort: "the first i elements are the smallest i, sorted." Insertion sort: "the elements before index i are sorted (though not necessarily final)." When you write any loop-based algorithm, asking *what is my invariant?* is the fastest route to both correctness and understanding, and it is exactly the reasoning you will need to trust quicksort's partition on the next page.
 
 ## Practice: bubble sort with early exit
 

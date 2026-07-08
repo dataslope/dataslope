@@ -15,7 +15,7 @@ import {
   decodeWorkspaceTextFiles,
 } from "./tsLanguageService";
 
-// JavaScript runs in a dedicated Web Worker backed by almostnode — a
+// JavaScript runs in a dedicated Web Worker backed by almostnode, a
 // browser-native Node.js runtime. The worker stages every open file
 // (code tabs + uploaded data) into almostnode's VirtualFS, then
 // executes the entry file with CommonJS semantics. `require()` works,
@@ -112,7 +112,7 @@ const url =
   "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv";
 const text = await (await fetch(url)).text();
 
-// Minimal CSV parse — this dataset has no quoted/embedded commas.
+// Minimal CSV parse, this dataset has no quoted/embedded commas.
 const [header, ...rows] = text.trim().split(/\\r?\\n/);
 const cols = header.split(",");
 const data = rows.map((line) => {
@@ -129,7 +129,7 @@ console.log("first 5 rows:", data.slice(0, 5));
     key: "node_modules",
     title: "Node.js Modules",
     desc: "require('path'), require('crypto'), require('os')",
-    code: `// almostnode shims Node.js core modules — require() them just
+    code: `// almostnode shims Node.js core modules, require() them just
 // like in a Node script.
 const path = require("node:path");
 const crypto = require("node:crypto");
@@ -149,7 +149,7 @@ console.log("EOL bytes =>", JSON.stringify(os.EOL));
     key: "multi_file",
     title: "Multi-File Modules",
     desc: "Split logic across files with require()",
-    code: `// utils.js sits alongside this file in the workspace — \`require\`
+    code: `// utils.js sits alongside this file in the workspace, \`require\`
 // resolves it from the VFS. Edit either tab and re-run.
 const utils = require("./utils");
 
@@ -241,7 +241,7 @@ module.exports = { hello, bye };
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // No installable packages are surfaced yet — npm package install in
+  // No installable packages are surfaced yet, npm package install in
   // the packages drawer is a future feature (see the integration plan
   // in agent-outputs/). almostnode's bundled Node.js shims (`fs`,
   // `path`, `crypto`, …) are always available via require() without
@@ -258,21 +258,21 @@ type WorkerOutMessage =
 
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
-  // Text files from the last `prepareFileSystem` snapshot — cross-file
+  // Text files from the last `prepareFileSystem` snapshot, cross-file
   // context for the language-service completions (imports of sibling
   // workspace files resolve against these).
   private stagedText = new Map<string, string>();
 
   constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook —
+  /** Free the runtime by terminating its worker. Registry-eviction hook,
    *  the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
   }
 
   /** Intellisense via the shared TS language service worker (allowJs
-   *  inference) — separate from the execution worker so analysis never
+   *  inference), separate from the execution worker so analysis never
    *  queues behind a long-running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
     return completeWithTsService(
@@ -351,10 +351,10 @@ export const javascriptAdapter: LanguageAdapter = {
     engine: "almostnode (browser-native Node.js)",
     engineUrl: "https://almostnode.dev/",
     notes:
-      "Runs in a Web Worker on top of almostnode — multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
+      "Runs in a Web Worker on top of almostnode, multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
   },
   codeMirrorMode: "javascript",
-  // web_fmt configured for 2-space indentation (see formatCode) — keep in sync.
+  // web_fmt configured for 2-space indentation (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -398,7 +398,7 @@ export const javascriptAdapter: LanguageAdapter = {
     // .mjs` to `public/_workers/javascript-worker.js`. We point the
     // Worker constructor at the resulting static URL (not at
     // `new URL("./javascript-worker.ts", import.meta.url)`) so
-    // Turbopack never sees the import — Turbopack's worker bundler
+    // Turbopack never sees the import, Turbopack's worker bundler
     // splits almostnode's ~16 MB tree across many chunks loaded via
     // `importScripts`, where colliding minified top-level identifiers
     // throw `Identifier 'e1' has already been declared` at startup.

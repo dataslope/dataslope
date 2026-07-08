@@ -1,31 +1,31 @@
 ---
 title: Effect Sizes
-description: Why a p-value tells you whether an effect exists but never how big it is — and how Cohen's d, correlation r, and risk ratios measure the size that actually drives decisions, always paired with a confidence interval.
+description: Why a p-value tells you whether an effect exists but never how big it is, and how Cohen's d, correlation r, and risk ratios measure the size that actually drives decisions, always paired with a confidence interval.
 ---
 
 You ran the test, the p-value came back `0.001`, and the dashboard lit
 up green. The new onboarding flow is "statistically significant." Time
-to ship — right?
+to ship, right?
 
 Not so fast. A p-value answers exactly one question: *is there an
 effect at all?* It says nothing about the question your boss actually
 cares about: *how **big** is the effect?* Those are different
 questions, and conflating them is one of the most expensive mistakes in
 applied data science. A medication can lower blood pressure by a
-"highly significant" 0.2 mmHg — real, repeatable, and utterly useless.
+"highly significant" 0.2 mmHg, real, repeatable, and utterly useless.
 A redesign can lift revenue by a thumping 8% with a p-value that only
 squeaks under 0.05. Significance and importance are not the same axis.
 
 **Effect size** is the missing axis. It's a number that says *how much*,
 on a scale you can reason about, independent of how many rows you
-collected. This page is about measuring magnitude — and about why, with
+collected. This page is about measuring magnitude, and about why, with
 a big enough sample, *everything* becomes significant whether it matters
 or not.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A tiny blue speck ringed by loud yellow broadcast circles stands on a long sample bar, while a massive green boulder with barely a whisper of a ring stands on a short one — a huge sample can make a microscopic effect scream with significance while a big effect on little data hardly registers"
+  aria-label="A tiny blue speck ringed by loud yellow broadcast circles stands on a long sample bar, while a massive green boulder with barely a whisper of a ring stands on a short one, a huge sample can make a microscopic effect scream with significance while a big effect on little data hardly registers"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="none" stroke="var(--ds-yellow-500)">
@@ -52,7 +52,7 @@ is, and how much data you have. Crank up the sample size and the
 p-value shrinks toward zero *even if the underlying effect is
 microscopic*. With ten million users, a difference of one-hundredth of
 a percent in conversion will be "significant." Significance, past a
-certain sample size, is almost guaranteed — so it stops carrying
+certain sample size, is almost guaranteed, so it stops carrying
 information about whether you should care.
 
 ```mermaid
@@ -78,7 +78,7 @@ p-value. Always ask *how big*, not just *is it real*.
 
 Two studies can land on the *identical* p-value while describing effects
 that are worlds apart in magnitude. The p-value alone cannot tell them
-apart — only an effect size can.
+apart, only an effect size can.
 
 ```mermaid
 flowchart TD
@@ -108,7 +108,7 @@ across contexts: a `d` of 0.5 means the same "amount of separation"
 whether you're measuring dollars, milliseconds, or test scores.
 
 <Callout type="info" title="Why divide by the standard deviation?">
-A raw difference of "5" is meaningless on its own — 5 what, relative to
+A raw difference of "5" is meaningless on its own, 5 what, relative to
 how much things naturally vary? If salaries range over tens of
 thousands, a \\$5 gap is nothing; if they vary by \\$3, a \\$5 gap is
 enormous. Cohen's d puts the difference on the ruler of the data's own
@@ -201,14 +201,14 @@ print(f"Raw difference : {gentoo.mean() - adelie.mean():+.1f} mm")
 print(f"Cohen's d      : {cohens_d(gentoo, adelie):.2f}")
 print()
 print("d > 4: the two species barely overlap on flipper length.")
-print("This is what a genuinely huge real-world effect looks like —")
+print("This is what a genuinely huge real-world effect looks like,")
 print("far beyond the '0.8 = large' guidepost.")
 `,
     },
   ]}
 />
 
-A Cohen's d above 4 is off the end of the usual table — the distributions
+A Cohen's d above 4 is off the end of the usual table, the distributions
 are almost completely separated. Biology hands you effects this clean;
 product experiments almost never do, which is the whole reason the next
 section matters.
@@ -216,7 +216,7 @@ section matters.
 ## Demonstrating significance ≠ importance
 
 Time to prove the central claim with code. We'll take a difference so
-tiny it's practically nothing — and then collect a giant sample. Watch
+tiny it's practically nothing, and then collect a giant sample. Watch
 the p-value collapse to "highly significant" while Cohen's d stays
 negligible.
 
@@ -255,7 +255,7 @@ print("Both are correct. Only one of them should drive a decision.")
   ]}
 />
 
-The p-value is microscopic — the difference is "real" in the sense that
+The p-value is microscopic, the difference is "real" in the sense that
 it isn't pure chance. But the effect size is near zero, so the finding
 is real and *irrelevant at the same time*. That is the whole lesson of
 this page in one code block. We first met this tension in *P-values* and
@@ -263,7 +263,7 @@ this page in one code block. We first met this tension in *P-values* and
 
 <Callout type="tip" title="The flip side: tiny samples hide real effects">
 The same tangle works in reverse. A genuinely large effect can come back
-*non*-significant if your sample is small — there simply wasn't enough
+*non*-significant if your sample is small, there simply wasn't enough
 data to rule out chance. That's a power problem (see *Errors and Power*).
 The effect size, computed on the same small sample, will still report a
 large magnitude. This is exactly why you report the effect size *and* a
@@ -276,9 +276,9 @@ This is the property that makes effect sizes so valuable, and it's worth
 stating plainly because it's a common misconception. As you collect more
 data:
 
-- The **p-value** marches toward 0 for any nonzero effect — it depends
+- The **p-value** marches toward 0 for any nonzero effect, it depends
   heavily on `n`.
-- The **effect size** converges to the true magnitude — adding data
+- The **effect size** converges to the true magnitude, adding data
   makes it *more precise*, not bigger or smaller.
 
 ```mermaid
@@ -295,7 +295,7 @@ to the p-value versus the estimated `d` as `n` grows.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three panels with ever taller stacks of blue data dots: the green effect-size bar stays exactly the same height in every panel while the red p-value bar collapses to a sliver — more data sharpens the magnitude but makes significance nearly automatic"
+  aria-label="Three panels with ever taller stacks of blue data dots: the green effect-size bar stays exactly the same height in every panel while the red p-value bar collapses to a sliver, more data sharpens the magnitude but makes significance nearly automatic"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -382,8 +382,8 @@ so no extra scaling is needed.
 | ~0.5+ | strong |
 
 A handy companion is r², the **proportion of variance explained**:
-an `r` of 0.3 means the relationship accounts for only `0.09` — about 9%
-— of the variation. That reframing often deflates an impressive-sounding
+an `r` of 0.3 means the relationship accounts for only `0.09`, about 9%,
+of the variation. That reframing often deflates an impressive-sounding
 correlation.
 
 <CodeBlock
@@ -417,13 +417,13 @@ print("r itself tells you the STRENGTH; the p-value only tells you it's not zero
 Because `r` is a standardized effect size, it's the natural way to
 report "how strongly are X and Y related?" without dragging in the units
 of X or Y. The p-value next to it only answers "is the correlation
-distinguishable from zero?" — once again, existence versus magnitude.
+distinguishable from zero?", once again, existence versus magnitude.
 </Callout>
 
 ## Effect sizes for proportions: risk difference and relative risk
 
-When your outcome is a yes/no event — converted or not, churned or not,
-recovered or not — the natural effect sizes compare two proportions.
+When your outcome is a yes/no event, converted or not, churned or not,
+recovered or not, the natural effect sizes compare two proportions.
 There are two complementary ways to do it, and they tell genuinely
 different stories.
 
@@ -465,7 +465,7 @@ print(f"Relative uplift      : {relative_uplift * 100:+.1f}%")
 
 <Callout type="warn" title="Relative numbers can mislead">
 "40% more likely!" sounds huge, but if the baseline is 0.001%, the
-*absolute* gain is 0.0004% — practically nothing. Headlines love
+*absolute* gain is 0.0004%, practically nothing. Headlines love
 relative risk because it sounds dramatic; honest analysis reports
 **both** the absolute risk difference and the relative risk so the
 reader can judge magnitude in context.
@@ -473,7 +473,7 @@ reader can judge magnitude in context.
 
 ## Always pair an effect size with a confidence interval
 
-An effect size is still a single number estimated from a noisy sample —
+An effect size is still a single number estimated from a noisy sample,
 so it has its own uncertainty. Reporting `d = 0.42` alone repeats the
 exact sin of reporting a bare point estimate that *Confidence Intervals*
 warned against. The grown-up move is to report the effect size **with a
@@ -614,8 +614,8 @@ assert abs(d - expected) < 1e-9`,
 
 Demonstrate the gap between significance and importance by computing **both**:
 
-- \`p\`: the p-value from \`scipy.stats.ttest_ind(a, b)\` — store it as a float.
-- \`d\`: Cohen's d for \`b - a\` (pooled sd, \`ddof=1\`) — store it as a float.
+- \`p\`: the p-value from \`scipy.stats.ttest_ind(a, b)\`, store it as a float.
+- \`d\`: Cohen's d for \`b - a\` (pooled sd, \`ddof=1\`), store it as a float.
 
 For this data, \`p\` should be **below 0.05** (significant) while \`abs(d)\` should be **below 0.1** (negligible). Your job is to show both can be true at once.`}
   files={[
@@ -681,13 +681,13 @@ print(f"p = {p:.2e},  d = {d:.4f}")
   markdown={`A study with 2 million users finds that a new font color increases time-on-page by 0.3 seconds, with a p-value of 0.000001. What is the most reasonable conclusion?
 
 - The effect is large and important because the p-value is extremely small
-  > A tiny p-value reflects strong evidence the effect is nonzero, plus a very large sample — it says nothing about magnitude. 0.3 seconds may be trivial.
+  > A tiny p-value reflects strong evidence the effect is nonzero, plus a very large sample, it says nothing about magnitude. 0.3 seconds may be trivial.
 - [o] The effect is almost certainly real but probably too small to matter; you should check the effect size before acting
   > A huge sample makes even microscopic effects significant, so the next question is how big 0.3 seconds is relative to what matters for the business.
 - The result is invalid because the p-value is suspiciously small
   > Extremely small p-values are exactly what you expect from a large sample combined with a genuine (if tiny) effect; there is nothing invalid about it.
 - There is no effect because 0.3 seconds is small
-  > The data does show an effect; it is just small. "Small" is not the same as "zero" — the right move is to weigh whether small is worth acting on.
+  > The data does show an effect; it is just small. "Small" is not the same as "zero", the right move is to weigh whether small is worth acting on.
 
 The lesson: significance confirms existence; effect size judges importance.`}
 />
@@ -712,7 +712,7 @@ This independence from n is what makes effect sizes worth reporting.`}
 
 - What was the p-value of the comparison?
   > The p-value addresses whether the increase is distinguishable from chance, not whether a 50% relative increase is practically large.
-- [o] What is the absolute risk difference — 50% more likely than what baseline rate?
+- [o] What is the absolute risk difference, 50% more likely than what baseline rate?
   > A relative increase is meaningless without the baseline: 50% more than 0.001% is negligible in absolute terms, while 50% more than 10% is substantial.
 - How large was the sample?
   > Sample size affects precision and significance, but the practical importance hinges on the absolute change, not on n.
@@ -754,8 +754,8 @@ A bare effect size repeats the mistake of reporting a point estimate with no mea
 
 <Callout type="success" title="Key takeaways">
 - A **p-value answers "is there an effect?"**; an **effect size answers "how big?"** They are different axes.
-- With a large enough sample, **trivial effects become significant** — so significance alone never justifies acting.
+- With a large enough sample, **trivial effects become significant**, so significance alone never justifies acting.
 - **Cohen's d** standardizes a mean difference; **r** (and r²) measures relationship strength; **risk difference and relative risk** compare proportions. Report relative *and* absolute for rates.
-- Unlike the p-value, an **effect size does not grow with sample size** — more data just makes it more precise.
+- Unlike the p-value, an **effect size does not grow with sample size**, more data just makes it more precise.
 - Always pair an effect size with a **confidence interval**. We put this whole toolkit to work in *A/B Testing*.
 </Callout>

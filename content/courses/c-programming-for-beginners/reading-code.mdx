@@ -4,7 +4,7 @@ description: How to make sense of C code you didn't write
 ---
 
 So far this course has mostly been about *writing* C. In real life,
-programmers spend much more time *reading* code than writing it —
+programmers spend much more time *reading* code than writing it,
 their own code from last week, library code, code from teammates,
 code from strangers on the internet whose only common language with
 you is C itself.
@@ -199,25 +199,25 @@ That matches our guess.
 
 - The doubling loop is a "growable buffer" pattern, same as our
   `DynArr` from the dynamic memory chapter.
-- `(c = fgetc(f)) != EOF && c != '\n'` — both ends are
+- `(c = fgetc(f)) != EOF && c != '\n'`, both ends are
   short-circuited; we stop on either EOF or `\n`, and we *don't*
   store the `\n`.
 - The `if (len == 0 && c == EOF)` block handles the "nothing to
   read" case at the end of the file: return `NULL` so the caller
   knows we're done. Otherwise an empty-but-valid line returns `""`.
-- The error path on `realloc` failure carefully `free`s `buf` —
+- The error path on `realloc` failure carefully `free`s `buf`,
   important because `realloc` returning `NULL` does *not* free the
   original.
 - Ownership: the caller must `free` the returned string.
 
-Notice we read three times — once for purpose, once for shape, once
+Notice we read three times, once for purpose, once for shape, once
 for detail. We never tried to understand every line on the first
 pass.
 
 ## Make the code obvious *to yourself*
 
 When you read unfamiliar code, give yourself permission to rewrite
-it on paper or in comments — to *make* it readable, even if the
+it on paper or in comments, to *make* it readable, even if the
 author didn't.
 
 - Add explanatory comments as you read. (Remove or keep them
@@ -235,13 +235,13 @@ audience that matters right now.
 When reading unknown C, be alert for:
 
 - **Functions without bounds checking on input** (`strcpy`,
-  `gets`, `scanf("%s", ...)`) — frequent sources of bugs.
-- **`malloc` without a matching `free`** — possible leak.
-- **`free` of something that wasn't `malloc`'d** — crash waiting
+  `gets`, `scanf("%s", ...)`), frequent sources of bugs.
+- **`malloc` without a matching `free`**, possible leak.
+- **`free` of something that wasn't `malloc`'d**, crash waiting
   to happen.
-- **Comparisons between signed and unsigned types** — often wrong
+- **Comparisons between signed and unsigned types**, often wrong
   in subtle ways.
-- **Comments that contradict the code** — believe the code; the
+- **Comments that contradict the code**, believe the code; the
   comment is probably out of date.
 
 Train your eye to flag these in passing. They are the C equivalent
@@ -307,12 +307,12 @@ like a C programmer.
   > Reading strictly top-to-bottom forces you to hold every detail in your head simultaneously; a high-level pass first gives context that makes the details make sense.
 - The longest function in the file.
   > Length does not indicate importance; the longest function may be a complex detail, not the best entry point for understanding the file's purpose.
-- [o] The header file (\`.h\`) for the file, plus the names of all functions defined in the \`.c\` — to learn what the file does and exposes before diving in.
+- [o] The header file (\`.h\`) for the file, plus the names of all functions defined in the \`.c\`, to learn what the file does and exposes before diving in.
   > Building a high-level mental model first means every subsequent detail has a place to live. Diving straight into line-by-line reading is the slowest way to understand a file.
 - The bottom of the file (most files put \`main\` at the bottom).
   > Many files have no \`main\` at all, and even when they do, reading \`main\` before understanding the supporting functions often leaves the reader without the context needed to follow it.
 
-This isn't a hard rule — sometimes \`main\` is the right place to start, sometimes a key data structure is. The principle is "build the big picture first, fill in details on demand".`}
+This isn't a hard rule, sometimes \`main\` is the right place to start, sometimes a key data structure is. The principle is "build the big picture first, fill in details on demand".`}
 />
 
 <MultipleChoice
@@ -329,7 +329,7 @@ What should you immediately suspect?
   > 64 bytes is a modest, common buffer size; there is no reason to treat it as wasteful. The danger is the opposite: that it is too small for unbounded input.
 - That \`scanf\` will read multiple words by mistake.
   > Actually, \`%s\` stops at whitespace; reading multiple words is the opposite of what it does.
-- [o] That an input longer than 63 characters will overflow \`buf\` — \`scanf("%s", ...)\` has no length limit.
+- [o] That an input longer than 63 characters will overflow \`buf\`, \`scanf("%s", ...)\` has no length limit.
   > This is a classic buffer overflow. The fix is \`scanf("%63s", buf)\` (note the explicit length) or, better, \`fgets(buf, sizeof buf, stdin)\`.
 - That \`buf\` should have been declared \`const\`.
   > \`const\` would make \`buf\` read-only, preventing \`scanf\` from writing into it at all. The real concern is the lack of a length limit.

@@ -3,8 +3,8 @@
  *
  * Renders an on-brand SVG (the DataSlope logo + a descending "data slope"
  * motif + headline) to PNG with @resvg/resvg-js using system fonts. The PNG is
- * a committed static asset — referenced as the default OpenGraph/Twitter image
- * in lib/site.ts — so it costs nothing at request time (no runtime next/og).
+ * a committed static asset, referenced as the default OpenGraph/Twitter image
+ * in lib/site.ts, so it costs nothing at request time (no runtime next/og).
  *
  * Regenerate after editing the copy/design:  npm run build:og-image
  *

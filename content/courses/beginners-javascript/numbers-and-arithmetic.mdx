@@ -63,7 +63,7 @@ same type, stored the same way. There is no distinction between
       starterCode: `console.log(typeof 7); // "number"
 console.log(typeof 7.0); // "number"
 console.log(typeof -3.14); // "number"
-console.log(7 === 7.0); // true — they are the same value.
+console.log(7 === 7.0); // true, they are the same value.
 `,
     },
   ]}
@@ -88,20 +88,20 @@ The familiar operators all work as expected:
 
 Unary operators:
 
-- `-x` — negate.
-- `+x` — coerce to number (mostly useful when `x` is a string).
+- `-x`, negate.
+- `+x`, coerce to number (mostly useful when `x` is a string).
 
 <CodeBlock
   adapter="javascript"
   files={[
     {
       filename: "main.js",
-      starterCode: `console.log(7 / 2); // 3.5  — NOT 3, because there is no integer division.
+      starterCode: `console.log(7 / 2); // 3.5, NOT 3, because there is no integer division.
 console.log(7 % 2); // 1
 console.log(2 ** 10); // 1024
 console.log(-5 + 8); // 3
-console.log(+"42"); // 42  — string coerced to number
-console.log(+"hello"); // NaN — cannot be coerced
+console.log(+"42"); // 42, string coerced to number
+console.log(+"hello"); // NaN, cannot be coerced
 `,
     },
   ]}
@@ -179,10 +179,10 @@ console.log(i); // 3
 JavaScript has three special numeric values you will eventually
 encounter:
 
-- **`Infinity`** — what you get when you divide a positive number
+- **`Infinity`**, what you get when you divide a positive number
   by zero, or when a number gets too large to represent.
-- **`-Infinity`** — same, the negative side.
-- **`NaN`** — "Not a Number". The result of mathematically
+- **`-Infinity`**, same, the negative side.
+- **`NaN`**, "Not a Number". The result of mathematically
   undefined operations like `0 / 0` or `Math.sqrt(-1)`, or of
   trying to convert a non-numeric string to a number.
 
@@ -199,7 +199,7 @@ console.log(Number("hello")); // NaN
 
 // NaN is famously NOT equal to itself:
 console.log(NaN === NaN); // false  (!)
-console.log(Number.isNaN(NaN)); // true — the right way to test for NaN
+console.log(Number.isNaN(NaN)); // true, the right way to test for NaN
 `,
     },
   ]}
@@ -222,13 +222,13 @@ errors. The classic example:
       filename: "main.js",
       starterCode: `console.log(0.1 + 0.2); // 0.30000000000000004
 console.log(0.1 + 0.2 === 0.3); // false  (!)
-console.log(Math.abs(0.1 + 0.2 - 0.3) < 1e-9); // true  — the safe way to compare
+console.log(Math.abs(0.1 + 0.2 - 0.3) < 1e-9); // true, the safe way to compare
 `,
     },
   ]}
 />
 
-This is not a JavaScript bug — it is how floating-point arithmetic
+This is not a JavaScript bug, it is how floating-point arithmetic
 works in essentially every language (C, Java, Python, Rust, …).
 The number `0.1` cannot be represented exactly in binary, any more
 than `1/3` can be represented exactly in decimal.
@@ -241,7 +241,7 @@ Scud missile, which struck a barracks and killed 28 soldiers. The
 official investigation found the cause in arithmetic: the system's
 clock counted time in tenths of a second, and `0.1` cannot be
 represented exactly in binary. Stored in a 24-bit register, the
-truncation error was about 0.000000095 seconds per tick —
+truncation error was about 0.000000095 seconds per tick,
 harmless, except the battery had been running continuously for
 about 100 hours. The accumulated drift was roughly a third of a
 second, and a Scud travels over half a kilometre in that time. The
@@ -286,7 +286,7 @@ console.log(Math.abs(-42)); // 42
 
 // Powers, roots, logs
 console.log(Math.sqrt(16)); // 4
-console.log(Math.pow(2, 10)); // 1024 — same as 2 ** 10
+console.log(Math.pow(2, 10)); // 1024, same as 2 ** 10
 console.log(Math.log2(1024)); // 10
 
 // Random in [0, 1)
@@ -299,14 +299,14 @@ console.log("d6 roll:", randInt(1, 6));
 
 // Parsing strings
 console.log(parseInt("42")); // 42
-console.log(parseInt("42 things")); // 42  — stops at the first non-digit
+console.log(parseInt("42 things")); // 42, stops at the first non-digit
 console.log(parseFloat("3.14")); // 3.14
-console.log(Number("3.14")); // 3.14 — stricter than parseFloat
-console.log(Number("3.14 things")); // NaN  — strict, the whole string must parse
+console.log(Number("3.14")); // 3.14, stricter than parseFloat
+console.log(Number("3.14 things")); // NaN, strict, the whole string must parse
 
 // Formatting
 const x = 1234.5678;
-console.log(x.toFixed(2)); // "1234.57"  — note: returns a string!
+console.log(x.toFixed(2)); // "1234.57", note: returns a string!
 console.log(x.toString()); // "1234.5678"
 console.log(x.toLocaleString()); // e.g. "1,234.568"  (locale-dependent)
 `,
@@ -394,8 +394,8 @@ console.log("  Gain: ", format(gain));
   title="Temperature conversion"
   instructions={`Write two functions:
 
-- \`toCelsius(f)\` — converts Fahrenheit to Celsius using \`(f - 32) * 5 / 9\`.
-- \`toFahrenheit(c)\` — converts Celsius to Fahrenheit using \`c * 9 / 5 + 32\`.
+- \`toCelsius(f)\`, converts Fahrenheit to Celsius using \`(f - 32) * 5 / 9\`.
+- \`toFahrenheit(c)\`, converts Celsius to Fahrenheit using \`c * 9 / 5 + 32\`.
 
 Both should return a *number*, not a string. The tests use a small tolerance to allow for floating-point rounding.`}
   files={[
@@ -473,12 +473,12 @@ if (typeof toFahrenheit(50) !== "number") throw new Error("toFahrenheit must ret
 
 - Because JavaScript has a bug in its addition operator
   > The addition operator works correctly; the unexpected result comes from the IEEE 754 floating-point representation, which is the same standard used by virtually every other programming language.
-- [o] Because JavaScript numbers are 64-bit floating-point, and decimals like 0.1 cannot be represented exactly in binary — tiny rounding errors are unavoidable
+- [o] Because JavaScript numbers are 64-bit floating-point, and decimals like 0.1 cannot be represented exactly in binary, tiny rounding errors are unavoidable
   > This behaviour is built into the IEEE 754 floating-point standard used by almost every modern language. When you need to compare decimals, compare with a small tolerance (\`Math.abs(a - b) < 1e-9\`), or for money, work in integer cents and only format for display.
 - Because \`0.3\` is actually \`null\` under the hood
   > \`0.3\` is a perfectly valid number literal, not \`null\`; the issue is that its binary floating-point representation differs very slightly from the result of adding \`0.1\` and \`0.2\`.
 - Because \`===\` always returns false for decimals
   > \`===\` compares floating-point values correctly and returns \`true\` for equal ones (e.g. \`0.5 + 0.5 === 1\` is \`true\`); the problem is specific to values that cannot be represented exactly in binary.
 
-This is one of the most surprising things in early programming, and it's universal — Python, Java, C, and Rust all produce essentially the same result. It's a property of floating-point arithmetic, not of any specific language.`}
+This is one of the most surprising things in early programming, and it's universal, Python, Java, C, and Rust all produce essentially the same result. It's a property of floating-point arithmetic, not of any specific language.`}
 />

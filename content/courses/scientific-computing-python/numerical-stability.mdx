@@ -1,6 +1,6 @@
 ---
 title: Numerical Stability and Conditioning
-description: The difference between a hard problem and a fragile algorithm — and why both can ruin your answer
+description: The difference between a hard problem and a fragile algorithm, and why both can ruin your answer
 ---
 
 The previous chapter showed that every floating-point operation
@@ -99,7 +99,7 @@ for x in [0.5, 1.0, 1.5, 3.1, 3.14, 3.1415]:
 
 Near $x = \pi$, $\sin(x)$ is nearly zero, so the relative output
 change for a tiny input change is enormous. Evaluating $\sin$ near
-a root is *intrinsically* ill-conditioned — there is no clever
+a root is *intrinsically* ill-conditioned, there is no clever
 algorithm that fixes this.
 
 ## Stability, intuitively
@@ -170,7 +170,7 @@ $$ I_n = \int_0^1 \frac{x^n}{x + 10} \, dx $$
 
 These satisfy a tidy recurrence $I_n = \frac{1}{n} - 10 \, I_{n-1}$
 with $I_0 = \ln(1.1)$. The forward recurrence is *numerically
-unstable* — every step multiplies the error by $-10$ — even though
+unstable*, every step multiplies the error by $-10$, even though
 the integrals themselves are perfectly well-defined small positive
 numbers.
 
@@ -192,14 +192,14 @@ for n in range(1, 20):
   ]}
 />
 
-The recursion produces *negative* values, then enormous oscillations
-— all wrong. The integrand is positive and the integral has to be
+The recursion produces *negative* values, then enormous oscillations,
+all wrong. The integrand is positive and the integral has to be
 less than $1/(10n)$. The error introduced at step 1 is multiplied
 by 10 at every later step.
 
 The cure: run the recurrence *backwards*, where the multiplier is
-$1/10$ instead of $10$. Start from a guess at large $n$ — even a
-wildly wrong guess — and iterate downward. The error *shrinks* by
+$1/10$ instead of $10$. Start from a guess at large $n$, even a
+wildly wrong guess, and iterate downward. The error *shrinks* by
 $10$ per step.
 
 <CodeBlock
@@ -249,7 +249,7 @@ $$
 $$
 
 A condition number of $10^{14}$ and a perturbation of $10^{-16}$
-gives a relative output error of $10^{-2}$ — two correct digits.
+gives a relative output error of $10^{-2}$, two correct digits.
 That number is your **truth ceiling**, set by the *problem*, not
 the *algorithm*.
 
@@ -301,7 +301,7 @@ A handful of rules turn most numerical code from fragile to robust.
    SciPy, Eigen, and PETSc routines all come with these. Custom
    code usually does not.
 
-Here is a beautiful illustration of point 2 — Kahan summation
+Here is a beautiful illustration of point 2, Kahan summation
 recovers most of the digits a naive sum throws away.
 
 <CodeBlock
@@ -356,7 +356,7 @@ when you really need it.
   > Twelve correct digits would remain if only 4 digits were lost, but the condition number $\\kappa \\approx 10^{12}$ consumes 12 of the 16 available digits, leaving about 4.
 - [o] About 4
   > The truth ceiling is roughly $\\kappa \\cdot \\epsilon \\approx 10^\{12\} \\cdot 10^\{-16\} = 10^\{-4\}$, i.e. $\\sim 4$ correct digits. A *stable* algorithm achieves this; an *unstable* one would get fewer.
-- Zero — the problem is unsolvable
+- Zero, the problem is unsolvable
   > With $\\kappa \\approx 10^{12}$ the problem still has roughly 4 correct digits available; only when $\\kappa \\gtrsim 10^{16}$ does the problem become hopeless at double precision.
 
 The condition number tells you the **best** an algorithm can hope to achieve.`}

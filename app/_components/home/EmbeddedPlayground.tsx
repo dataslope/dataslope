@@ -25,7 +25,7 @@ import {
  * playground route.
  *
  * The playground boots a full WASM engine (PGlite, Pyodide, …) the moment its
- * route mounts, which costs hundreds of MB of memory — far too much to spend
+ * route mounts, which costs hundreds of MB of memory, far too much to spend
  * on every visitor who merely scrolls past. So the iframe is a *click-to-
  * activate facade*: a mock of the playground window with a Launch button
  * (animated with CSS only, so it still costs ~nothing to keep on screen),
@@ -55,7 +55,7 @@ function FacadeGlyph({ id }: { id: string }) {
 
 /** Mock of the playground window shown before launch: window chrome, a fake
  *  gutter/code skeleton (CSS-animated so the window reads as live, not a dead
- *  image), and the centered Launch CTA. The whole region launches on click —
+ *  image), and the centered Launch CTA. The whole region launches on click,
  *  the outer div carries the click handler and a subtle full-surface hover
  *  tint, while the ShimmerButton inside is the real, keyboard-focusable
  *  <button> (its activation click bubbles up; nesting it inside a <button>
@@ -131,8 +131,8 @@ function PlaygroundFacade({
           </ShimmerButton>
           <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-green-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-green-400)]">
             {suspended
-              ? "Paused to free memory — relaunch to pick up where you left off."
-              : "Runs entirely in your browser — nothing downloads until you launch it."}
+              ? "Paused to free memory, relaunch to pick up where you left off."
+              : "Runs entirely in your browser, nothing downloads until you launch it."}
           </span>
         </div>
       </div>
@@ -155,7 +155,7 @@ export function EmbeddedPlayground({
   const [suspended, setSuspended] = useState(false);
 
   // While the playground is live, unload it once it has been far offscreen
-  // for a while — the engine's WASM heap is the page's single biggest memory
+  // for a while, the engine's WASM heap is the page's single biggest memory
   // consumer, and a visitor who scrolled on has stopped using it. Tabs and
   // workspace persist (localStorage/OPFS), so relaunching restores them.
   useEffect(() => {

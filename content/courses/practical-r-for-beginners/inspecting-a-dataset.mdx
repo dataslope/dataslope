@@ -4,8 +4,8 @@ description: Before you analyze a dataset, you have to *meet* it. The five-minut
 ---
 
 When a new dataset arrives, the temptation is to dive straight into
-the interesting question — *"do customers in region X spend more
-than customers in region Y?"* — and start running analyses.
+the interesting question, *"do customers in region X spend more
+than customers in region Y?"*, and start running analyses.
 
 That is almost always a mistake. The very first thing every
 experienced analyst does is something more modest: **find out what
@@ -18,7 +18,7 @@ This page is the ritual. Memorize it.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A flashlight beam sweeps across a dark faint table and lights up a band of cells, one of them a suspicious yellow — the first job with any new dataset is finding out what you actually have"
+  aria-label="A flashlight beam sweeps across a dark faint table and lights up a band of cells, one of them a suspicious yellow, the first job with any new dataset is finding out what you actually have"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -67,18 +67,18 @@ This page is the ritual. Memorize it.
 The moment a dataset arrives, run these five steps before anything
 else:
 
-1. **Shape** — `dim()`, `nrow()`, `ncol()`.
-2. **Peek** — `head()`, `tail()`.
-3. **Types and structure** — `str()`.
-4. **Summaries** — `summary()`.
-5. **Missingness** — `colSums(is.na(...))`.
+1. **Shape**, `dim()`, `nrow()`, `ncol()`.
+2. **Peek**, `head()`, `tail()`.
+3. **Types and structure**, `str()`.
+4. **Summaries**, `summary()`.
+5. **Missingness**, `colSums(is.na(...))`.
 
 Only then are you ready to start asking real questions. Each step
 takes seconds and gives you orientation. Skip any of them and you
 risk asking a meaningless question of a misunderstood dataset.
 
-We'll use `airquality` — a built-in dataset of daily air quality
-measurements in New York, May–September 1973 — as our example.
+We'll use `airquality`, a built-in dataset of daily air quality
+measurements in New York, May–September 1973, as our example.
 
 ## Step 1: shape
 
@@ -98,7 +98,7 @@ ncol(airquality)
 />
 
 The shape tells you what kind of analysis is even feasible.
-153 rows × 6 columns is small — every operation will be instant.
+153 rows × 6 columns is small, every operation will be instant.
 A million rows × 200 columns is a different problem entirely.
 
 ## Step 2: peek
@@ -181,7 +181,7 @@ You're scanning for:
 - **Lots of NAs.**
 
 In `airquality`, look at the `Ozone` column. The max is 168 but
-the median is around 30 — a heavy right tail. That's a real
+the median is around 30, a heavy right tail. That's a real
 finding, not a glitch, but worth noting.
 
 ## Step 5: missingness
@@ -216,20 +216,20 @@ upfront lets you choose your strategy.
 ## The ritual at a glance
 
 That is the entire ritual. Before applying it to a fresh dataset below, here
-it is as a walkthrough — the question each step answers about the data in
+it is as a walkthrough, the question each step answers about the data in
 front of you:
 
 <Steps>
 <Step>
 
-**Shape — how big is it?**
+**Shape, how big is it?**
 
 `dim()`, `nrow()`, `ncol()`. The size decides what analysis is even feasible.
 
 </Step>
 <Step>
 
-**Peek — does it look right?**
+**Peek, does it look right?**
 
 `head()`, `tail()`. A ten-second glance catches mangled headers and parsing
 errors before they cost you an hour.
@@ -237,7 +237,7 @@ errors before they cost you an hour.
 </Step>
 <Step>
 
-**Structure — are the types right?**
+**Structure, are the types right?**
 
 `str()`. Confirm numbers are numeric, dates are dates, and categories are not
 hiding as strings.
@@ -245,14 +245,14 @@ hiding as strings.
 </Step>
 <Step>
 
-**Summaries — are the values plausible?**
+**Summaries, are the values plausible?**
 
 `summary()`. Scan for impossible values, suspicious means, and telltale skew.
 
 </Step>
 <Step>
 
-**Missingness — what is missing, and how much?**
+**Missingness, what is missing, and how much?**
 
 `colSums(is.na(...))`. Knowing the gaps upfront shapes how you average, plot,
 and join.
@@ -262,8 +262,8 @@ and join.
 
 ## A multi-file walkthrough: meet the penguins
 
-Let's apply the ritual to a fresh dataset — the **Palmer penguins**,
-staged as `penguins.csv` and loaded for you — with the inspection
+Let's apply the ritual to a fresh dataset, the **Palmer penguins**,
+staged as `penguins.csv` and loaded for you, with the inspection
 split across files so you can see each step clearly:
 
 <ChallengeCard
@@ -330,7 +330,7 @@ report("NAs per column", colSums(is.na(penguins)))
 - \`head()\`
   > \`head()\` shows the first few rows, but not a one-line report of types and dimensions.
 - [o] \`str()\`
-  > \`str()\` is the structural summary — types and a sample, in one screen.
+  > \`str()\` is the structural summary, types and a sample, in one screen.
 - \`dim()\`
   > \`dim()\` returns just the row and column counts, with no type or value information.`}
 />
@@ -339,7 +339,7 @@ report("NAs per column", colSums(is.na(penguins)))
   markdown={`Why is it a bad idea to skip the "inspect the dataset" ritual?
 
 - It's required by R; the language won't compute without it.
-  > Not true — R will happily compute on a dataset you've never looked at.
+  > Not true, R will happily compute on a dataset you've never looked at.
 - [o] Because real datasets contain surprises (missing values, wrong types, implausible values) that can silently corrupt every downstream analysis.
   > Five minutes of inspection saves hours of debugging later.
 - Because \`summary()\` is the only way to compute means.

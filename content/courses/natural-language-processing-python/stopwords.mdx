@@ -1,13 +1,13 @@
 ---
 title: Identifying and Removing Stopwords
-description: What stopwords are, why removing them can sharpen a topic analysis — and why removing them can quietly destroy a sentiment analysis. The negation trap, domain-specific stoplists, and how to decide whether to filter at all.
+description: What stopwords are, why removing them can sharpen a topic analysis, and why removing them can quietly destroy a sentiment analysis. The negation trap, domain-specific stoplists, and how to decide whether to filter at all.
 ---
 
 Some words are everywhere. In almost any English text, "the", "is", "of",
-"and", and "to" are among the most frequent words — and they are also among
+"and", and "to" are among the most frequent words, and they are also among
 the *least* informative about what the text is *about*. These ultra-common,
 low-content words are called **stopwords**, and deciding whether to remove
-them is one of the most consequential — and most frequently botched — choices
+them is one of the most consequential, and most frequently botched, choices
 in a text pipeline.
 
 This page has a split personality on purpose. The first half shows you why
@@ -90,7 +90,7 @@ print("Is 'python' a stopword?", "python" in stop)
   ]}
 />
 
-The list is short — under 200 words — but those words make up a huge fraction
+The list is short, under 200 words, but those words make up a huge fraction
 of any text. Removing them has two appealing effects: it shrinks your data,
 and it concentrates attention on **content words** (nouns, verbs, adjectives)
 that actually signal the topic.
@@ -150,8 +150,8 @@ print(f"Removed {len(tokens) - len(content)} of {len(tokens)} tokens.")
   ]}
 />
 
-The content words — "quick", "brown", "fox", "jumps", "lazy", "dog", "park" —
-tell you what the sentence is *about*. The stopwords — "the", "over", "in" —
+The content words, "quick", "brown", "fox", "jumps", "lazy", "dog", "park",
+tell you what the sentence is *about*. The stopwords, "the", "over", "in",
 mostly just hold the grammar together. For a task like topic detection or
 building a search index, dropping them is a clear win.
 
@@ -205,7 +205,7 @@ for word in ["not", "no", "nor", "never", "but", "against", "don't", "won't"]:
   ]}
 />
 
-The negation words — "not", "no", "nor" — are stopwords. So are many negated
+The negation words, "not", "no", "nor", are stopwords. So are many negated
 contractions. These are the words that *reverse meaning*, and the standard
 stoplist deletes them. Watch what that does to a negative product review.
 
@@ -264,7 +264,7 @@ print("The negative review has been turned positive.")
 />
 
 The review "not good" became simply "good". A sentiment system reading the
-filtered tokens would conclude the reviewer *liked* the movie — the exact
+filtered tokens would conclude the reviewer *liked* the movie, the exact
 opposite of the truth. This is not a contrived edge case; negation is
 everywhere in opinionated text, and blindly removing stopwords before
 sentiment analysis is a classic, costly mistake.
@@ -272,7 +272,7 @@ sentiment analysis is a classic, costly mistake.
 <Callout type="warn" title="Do not remove stopwords before sentiment analysis (at least not naively)">
 The standard stopword list contains the very words that carry sentiment
 structure: negations ("not", "no", "nor"), contrasts ("but"), and
-intensity ("very" — also a stopword). Strip them and you can flip a review's
+intensity ("very", also a stopword). Strip them and you can flip a review's
 meaning. For sentiment, either **keep stopwords**, or use a **custom list
 that preserves negation and contrast words**. The same caution applies to any
 task where small function words change meaning.
@@ -281,21 +281,21 @@ task where small function words change meaning.
 ## More tasks where stopwords are precious
 
 Sentiment is not the only place the default list hurts. Stopwords are
-essential — sometimes they are the *entire signal* — in several tasks:
+essential, sometimes they are the *entire signal*, in several tasks:
 
 - **Phrases and idioms.** "To be or not to be" is *all* stopwords. Remove
   them and the most famous line in English vanishes into nothing.
 - **Machine translation.** Function words encode tense, number, and
   relationships. You cannot translate by throwing them away.
-- **Question answering.** "Who" vs "whom", "can" vs "cannot" — the small
+- **Question answering.** "Who" vs "whom", "can" vs "cannot", the small
   words often *are* the question.
 - **Authorship attribution.** Remarkably, *how* an author uses stopwords
   (their unconscious rate of "the", "of", "that") is a fingerprint used to
   identify who wrote a text. Here the stopwords are the data and the content
-  words are the noise — the exact inverse of topic analysis.
+  words are the noise, the exact inverse of topic analysis.
 
 <Callout type="warn" title="Two more misconceptions to retire">
-**"Always remove stopwords."** No — it is a task-dependent choice, and for a
+**"Always remove stopwords."** No, it is a task-dependent choice, and for a
 large class of tasks it is harmful. **"The stopword list is universal."**
 Also no. There is no single official list; NLTK's differs from spaCy's and
 from scikit-learn's, and the right list for *your* domain often needs
@@ -307,7 +307,7 @@ practitioners curate the list for the job.
 ## Customizing the stoplist
 
 Because the list is just a Python collection, you can add domain-specific
-noise words and — crucially — remove words you must keep.
+noise words and, crucially, remove words you must keep.
 
 <CodeBlock
   adapter="python"
@@ -355,8 +355,8 @@ print("'the' still a stopword?  ", "the" in custom)
   ]}
 />
 
-This three-line recipe — start from the base list, *subtract* the words you
-must protect, *add* the words specific to your domain — is how stopword
+This three-line recipe, start from the base list, *subtract* the words you
+must protect, *add* the words specific to your domain, is how stopword
 removal is done responsibly in practice.
 
 <MultipleChoice
@@ -365,7 +365,7 @@ scoring reviews. Reviews like "this is not good" keep getting classified as
 positive. What is the root cause?
 
 - The reviews are too short to classify
-  > Length is not the issue; even a short phrase like "not good" is sufficient for classification — the problem is that stopword removal strips the negation and inverts the meaning.
+  > Length is not the issue; even a short phrase like "not good" is sufficient for classification, the problem is that stopword removal strips the negation and inverts the meaning.
 - [o] "not" is on the stopword list, so removing stopwords deletes the negation and "not good" collapses to "good", flipping the sentiment
   > NLTK's stopword list includes negation words. Stripping them throws away the words that reverse meaning, so negative statements look positive. For sentiment, preserve negation (or keep stopwords entirely).
 - Sentiment analysis is impossible in Python
@@ -373,7 +373,7 @@ positive. What is the root cause?
 - The pipeline forgot to lowercase the text
   > Case folding does not affect whether "not" survives; both "not" and "Not" are on the stopword list (after lowercasing), so the negation would still be removed.
 
-Negation lives in the stoplist, and sentiment lives in negation — a dangerous combination.`}
+Negation lives in the stoplist, and sentiment lives in negation, a dangerous combination.`}
 />
 
 ## Your turn: filter stopwords without losing negation
@@ -392,7 +392,7 @@ Build a custom stop set by starting from \`stopwords.words("english")\` and
 subtracting those five words, then keep only tokens not in that custom set.
 
 For example, given \`["this", "is", "not", "good"]\`, the function should
-return \`["not", "good"]\` — ordinary stopwords gone, the negation kept.`}
+return \`["not", "good"]\`, ordinary stopwords gone, the negation kept.`}
   files={[
     {
       filename: "main.py",
@@ -484,7 +484,7 @@ assert set(out) == {"not", "no", "nor", "never", "but"}, "Got: " + repr(out)`,
 - A word that signals the end of a sentence
   > Sentence-ending signals are punctuation marks like periods and question marks; stopwords are high-frequency function words like "the" and "is" that appear throughout a sentence, not just at its end.
 - [o] A very common, low-content word (like "the", "is", "of") that appears across nearly all texts and carries little topical meaning on its own
-  > Stopwords are high-frequency function words. They are everywhere, so they say little about what a *particular* document is about — which is why topic-focused tasks often remove them.
+  > Stopwords are high-frequency function words. They are everywhere, so they say little about what a *particular* document is about, which is why topic-focused tasks often remove them.
 - A misspelled word that should be corrected
   > Spelling correction is a separate preprocessing step; stopwords are correctly spelled, extremely common function words, not errors.
 - A word that must always be removed from any text
@@ -513,12 +513,12 @@ Topic-oriented matching is the sweet spot; the other three are cases where stopw
 
 - Because stopword lists change every day
   > Stopword lists in libraries like NLTK are stable and rarely updated; the misconception is not about frequency of change but about the false belief that any one list is universal.
-- [o] Because there is no single canonical list — different libraries ship different lists, and the right list depends on your domain (a movie corpus might treat "movie" as a stopword)
+- [o] Because there is no single canonical list, different libraries ship different lists, and the right list depends on your domain (a movie corpus might treat "movie" as a stopword)
   > Stoplists are conventions, not standards. NLTK, spaCy, and scikit-learn all differ, and effective practitioners customize the list for their domain rather than treating any one list as authoritative.
 - Because stopwords do not exist in English
-  > Stopwords clearly exist in English — "the", "is", "of", and hundreds more are universally recognized as high-frequency, low-content words; the misconception is that one fixed list covers all use cases.
+  > Stopwords clearly exist in English, "the", "is", "of", and hundreds more are universally recognized as high-frequency, low-content words; the misconception is that one fixed list covers all use cases.
 - Because only nouns can be stopwords
-  > Most stopwords are function words: prepositions, articles, conjunctions, and pronouns — almost never nouns; the claim that only nouns qualify inverts the typical pattern.
+  > Most stopwords are function words: prepositions, articles, conjunctions, and pronouns, almost never nouns; the claim that only nouns qualify inverts the typical pattern.
 
 Treat any stoplist as a starting point to curate, not a fixed law.`}
 />
@@ -532,11 +532,11 @@ sentiment survives. Which approach is correct?
 - [o] Start from the base stoplist, subtract the negation/contrast words you must keep, and filter tokens against that customized set
   > Subtracting protected words from the base set (then filtering) cleanly removes ordinary stopwords while leaving negation intact. It is the standard responsible recipe for sentiment-safe filtering.
 - Skip tokenization so stopwords never appear
-  > Without tokenization there are no individual tokens to filter at all; and skipping it does not protect negation — it simply makes the text unprocessable.
+  > Without tokenization there are no individual tokens to filter at all; and skipping it does not protect negation, it simply makes the text unprocessable.
 - Convert the reviews to uppercase first
   > Changing case does not affect which tokens appear in the text or solve the negation-preservation problem; the standard stopword list uses lowercase, so uppercasing would actually prevent the filter from matching anything.
 
-Customizing the set — subtract what you must keep, add domain noise — is how this is done in practice.`}
+Customizing the set, subtract what you must keep, add domain noise, is how this is done in practice.`}
 />
 
 <MultipleChoice
@@ -546,13 +546,13 @@ improves:
 - The accuracy of the filtering
   > A set and a list with the same elements produce identical filtering results; converting to a set changes only the speed of each membership test, not which tokens are kept or removed.
 - [o] The speed, because membership tests (\`token in stop\`) are roughly constant-time in a set versus a linear scan in a list
-  > A set gives near-constant-time lookups, so checking each token against it is far faster than scanning a list — important when filtering large corpora. It does not change *which* tokens are removed, only how fast.
+  > A set gives near-constant-time lookups, so checking each token against it is far faster than scanning a list, important when filtering large corpora. It does not change *which* tokens are removed, only how fast.
 - The number of stopwords in the list
-  > Converting to a set does not add or remove any words from the list; the number of stopwords remains the same — only the data structure and lookup speed change.
+  > Converting to a set does not add or remove any words from the list; the number of stopwords remains the same, only the data structure and lookup speed change.
 - The language of the text
   > The data structure (set vs. list) has no effect on the language of the text being filtered; the language is determined by which stopword list you load, not how you store it.
 
-Same result, faster execution — a cheap and worthwhile habit.`}
+Same result, faster execution, a cheap and worthwhile habit.`}
 />
 
 Stopword removal trims the *common* words. The next page tackles a different

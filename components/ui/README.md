@@ -36,10 +36,10 @@ Two equivalent options:
    `components.json` is already configured (components → `@/components/ui`,
    `cn` → `@/lib/utils`, css → `app/tailwind.css`).
 
-2. **Magic UI MCP server** — configured in `.mcp.json` at the repo root. It is
+2. **Magic UI MCP server**, configured in `.mcp.json` at the repo root. It is
    picked up by Claude Code at the start of a **new** session (MCP servers load
    at startup, so it won't appear mid-session). In Claude Code on the web, only
-   project-scoped servers committed to `.mcp.json` are available — `claude mcp
+   project-scoped servers committed to `.mcp.json` are available, `claude mcp
    add` / local user config is not.
 
 After adding a component, check `app/tailwind.css`: components that ship custom

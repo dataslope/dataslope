@@ -1,24 +1,24 @@
 ---
 title: Light Touches with Matplotlib
-description: Seaborn returns matplotlib objects — add titles, labels, and limits with a few lines, without leaving Seaborn behind.
+description: Seaborn returns matplotlib objects, add titles, labels, and limits with a few lines, without leaving Seaborn behind.
 ---
 
-Seaborn does not replace matplotlib — it is built **on top** of it. Every
+Seaborn does not replace matplotlib, it is built **on top** of it. Every
 Seaborn function ultimately draws with matplotlib and hands you back a
 matplotlib object when it is done. That is great news: it means you can do
 all the hard statistical work in Seaborn's concise vocabulary, and then
-reach for a *little* matplotlib only for the final **polish** — a real
+reach for a *little* matplotlib only for the final **polish**, a real
 title, human-readable axis labels, a sensible axis range.
 
 This is not a matplotlib course, so we keep it light. The goal is to learn
 the handful of one-liners that turn a good exploratory chart into a
-presentable one, and — just as important — to learn which object you got
+presentable one, and, just as important, to learn which object you got
 back so you call the *right* one-liner.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A light blue chart panel with a thin rising blue data line and gray axes, finished with yellow matplotlib touches — a title bar above, a rotated y-axis label at the left, and an x-axis label below"
+  aria-label="A light blue chart panel with a thin rising blue data line and gray axes, finished with yellow matplotlib touches, a title bar above, a rotated y-axis label at the left, and an x-axis label below"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,8 +60,8 @@ common source of "why did my title land on the wrong panel?" confusion.
 
 ## Polishing an axes-level plot
 
-Axes-level functions return a matplotlib `Axes`. Capture it in a variable —
-conventionally `ax` — and then call its setter methods:
+Axes-level functions return a matplotlib `Axes`. Capture it in a variable,
+conventionally `ax`, and then call its setter methods:
 
 <CodeBlock
   adapter="python"
@@ -124,12 +124,12 @@ ax.set_title("Tips rise with the bill")
 Because you made the `Axes`, you control its size and placement, and you can
 even put several Seaborn plots onto different axes of the same figure. This
 `plt.subplots(...)` + `ax=ax` pattern only works with **axes-level**
-functions — figure-level functions insist on making their own figure.
+functions, figure-level functions insist on making their own figure.
 
 <Callout type="warn" title="Never wrap a figure-level plot in plt.subplots">
 A figure-level function (`relplot`, `displot`, `catplot`, ...) creates its
 own figure and ignores any `ax=` you pass. If you make a `fig, ax` and then
-call `relplot`, you'll get *two* figures — your empty one and Seaborn's. Use
+call `relplot`, you'll get *two* figures, your empty one and Seaborn's. Use
 `plt.subplots` only with axes-level functions.
 </Callout>
 
@@ -176,7 +176,7 @@ g.figure.subplots_adjust(top=0.9)
 A few things to notice:
 
 - **`g.set_axis_labels("X", "Y")`** labels the shared x and y across all
-  panels — you do not label each one separately.
+  panels, you do not label each one separately.
 - **`g.set_titles("{col_name}")`** sets each panel's title from the value of
   the faceting column (here, each `sex`). The `{col_name}` is a template
   Seaborn fills in per panel.
@@ -188,15 +188,15 @@ A few things to notice:
 When the grid has a legend (from `hue`), you can rename it with
 `g.legend.set_title("...")`. To set a shared axis range across all panels,
 use `g.set(xlim=(...), ylim=(...))`. And if you need a *single* underlying
-`Axes` — say, to draw one more thing on it — reach it with `g.ax` (for a
+`Axes`, say, to draw one more thing on it, reach it with `g.ax` (for a
 single-panel grid) or `g.axes` (the array of all panels).
 
 <Callout type="warn" title="Do not use plt.title() on a figure-level grid">
-`plt.title(...)` sets the title of matplotlib's *current* axes — which, on a
+`plt.title(...)` sets the title of matplotlib's *current* axes, which, on a
 multi-panel grid, is whichever panel was drawn last. Your title lands on the
 wrong panel. For a one big title use `g.figure.suptitle(...)`; for per-panel
 titles use `g.set_titles(...)`. The same caution applies to `plt.xlabel` /
-`plt.ylabel` — prefer `g.set_axis_labels(...)`.
+`plt.ylabel`, prefer `g.set_axis_labels(...)`.
 </Callout>
 
 <MultipleChoice
@@ -205,7 +205,7 @@ and want **one** overall title centered above both panels. Which call is
 right?
 
 - \`plt.title("Tips by service time")\`
-  > \`plt.title\` titles matplotlib's current axes — the last panel drawn — so the text lands on one panel instead of above the whole figure.
+  > \`plt.title\` titles matplotlib's current axes, the last panel drawn, so the text lands on one panel instead of above the whole figure.
 - [o] \`g.figure.suptitle("Tips by service time")\`
   > \`suptitle\` places a single title over the entire figure; pairing it with \`g.figure.subplots_adjust(top=0.9)\` leaves room so it doesn't overlap the panels.
 - \`g.set_xlabel("Tips by service time")\`
@@ -281,9 +281,9 @@ sns.despine()
   ]}
 />
 
-The statistics — the grouping by `origin`, the color mapping, the legend —
-were all Seaborn. The polish — the title, the unit-bearing labels, the
-y-range, the lighter frame — was a handful of matplotlib lines on the `Axes`
+The statistics, the grouping by `origin`, the color mapping, the legend,
+were all Seaborn. The polish, the title, the unit-bearing labels, the
+y-range, the lighter frame, was a handful of matplotlib lines on the `Axes`
 Seaborn handed back. That division of labor is the whole idea: **Seaborn for
 the substance, a light touch of matplotlib for the finish.**
 
@@ -386,7 +386,7 @@ figure-level functions size themselves with \`height\` and \`aspect\`.`}
 kind="box")\`, how do you label the shared x and y axes across both panels?
 
 - \`plt.xlabel("Day"); plt.ylabel("Tip")\`
-  > \`plt.xlabel\`/\`plt.ylabel\` target the current axes — the last panel — so only one panel gets labeled.
+  > \`plt.xlabel\`/\`plt.ylabel\` target the current axes, the last panel, so only one panel gets labeled.
 - [o] \`g.set_axis_labels("Day", "Tip")\`
   > \`set_axis_labels\` sets the shared x and y labels for every panel of the grid in one call.
 - \`g.set_title("Day", "Tip")\`
@@ -400,6 +400,6 @@ rather than the per-axes \`plt\` functions.`}
 
 You now have the light-touch matplotlib you need: capture the `Axes` from an
 axes-level call (or the grid from a figure-level one), then add a title,
-labels, and limits in a few lines. Next we put it all together — themes,
-color, and these finishing touches — into the craft of **telling a clear
+labels, and limits in a few lines. Next we put it all together, themes,
+color, and these finishing touches, into the craft of **telling a clear
 story with data**.

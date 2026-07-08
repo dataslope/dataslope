@@ -4,14 +4,14 @@ description: Reading a result set like an analyst, not an application. SELECT, W
 ---
 
 You know `SELECT`, `WHERE`, and `ORDER BY` already. This page is not about
-new syntax — it is about *re-seeing* those familiar tools through an
+new syntax, it is about *re-seeing* those familiar tools through an
 analyst's eyes. The same `SELECT` that fetches a record in an app becomes,
 with a shift in intent, the first move of an exploration.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three cards in a pipeline joined by solid arrows: a grid where only some blue cells stay solid, a set of green bars sorted tallest to shortest, and a final card keeping just the top two bars with dashed outlines where the rest were dropped — WHERE slices, ORDER BY sorts, LIMIT peeks"
+  aria-label="Three cards in a pipeline joined by solid arrows: a grid where only some blue cells stay solid, a set of green bars sorted tallest to shortest, and a final card keeping just the top two bars with dashed outlines where the rest were dropped, WHERE slices, ORDER BY sorts, LIMIT peeks"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ with a shift in intent, the first move of an exploration.
 
 Before summarizing anything, an analyst usually takes a quick look at a
 few rows just to learn the columns and their flavor. `LIMIT` makes this
-cheap even on a huge table — you peek, you do not pull everything.
+cheap even on a huge table, you peek, you do not pull everything.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -90,12 +90,12 @@ LIMIT
 />
 
 That single `SELECT *` answers "what columns exist and what do typical
-values look like?" — the very first question of any exploration.
+values look like?", the very first question of any exploration.
 
 ## `WHERE` as a slice, not a search
 
 In an application, `WHERE id = 4` finds one specific row. In analysis,
-`WHERE` usually carves out a **slice** of the data you want to study —
+`WHERE` usually carves out a **slice** of the data you want to study,
 *Seattle trips*, *long trips*, *this month*. You are not hunting a needle;
 you are choosing a subset to summarize.
 
@@ -139,7 +139,7 @@ look."* `WHERE` is how an analyst zooms in.
 
 ## `ORDER BY` to surface the interesting rows
 
-Sorting is not cosmetic in analysis — it is how you bring the **extremes**
+Sorting is not cosmetic in analysis, it is how you bring the **extremes**
 to the top. "Longest trips", "biggest spenders", "slowest pages": every
 one is an `ORDER BY` followed by a glance at the head of the result.
 
@@ -150,7 +150,7 @@ flowchart TD
     O --> L["<code>LIMIT</code><br/>(look at the top)"]
 ```
 
-This three-step rhythm — **slice, sort, peek** — is the analyst's
+This three-step rhythm, **slice, sort, peek**, is the analyst's
 equivalent of a first glance. It answers "what stands out?" before you
 commit to heavier summarizing.
 
@@ -191,7 +191,7 @@ LIMIT
 ## Computed columns: asking a new question of each row
 
 Analysts constantly invent columns that are not stored. "Fare per
-minute", "price with tax", "is this a long trip?" — all computed on the
+minute", "price with tax", "is this a long trip?", all computed on the
 fly. This is where `SELECT` stops *retrieving* and starts *deriving*.
 
 <SqlCodeBlock
@@ -227,14 +227,14 @@ ORDER BY
   fare_per_min DESC;`}
 />
 
-The column `fare_per_min` exists only inside this query — it is a
+The column `fare_per_min` exists only inside this query, it is a
 *question*, not stored data. Inventing measures like this is most of what
 analytical `SELECT` lists are for.
 
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="A blue stored bar over a green stored bar joined by a fraction line, then a geometric equals sign, produce one solid yellow chip resting above a dashed shelf — a derived measure that exists only inside the query, never in the table"
+  aria-label="A blue stored bar over a green stored bar joined by a fraction line, then a geometric equals sign, produce one solid yellow chip resting above a dashed shelf, a derived measure that exists only inside the query, never in the table"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -263,7 +263,7 @@ analytical `SELECT` lists are for.
 | `ORDER BY` | Present rows in a tidy order | Surface the extremes worth noticing |
 | `LIMIT` | Paginate results for a UI | Peek cheaply without pulling everything |
 
-Nothing here is new SQL. What is new is the *intent* — and intent is what
+Nothing here is new SQL. What is new is the *intent*, and intent is what
 separates analytical queries from application ones.
 
 ## Check your understanding
@@ -273,7 +273,7 @@ separates analytical queries from application ones.
 
 - To find one specific row by its primary key for display.
   > That is the application use of \`WHERE\`. Analysts more often use it to choose a subset to study.
-- [o] To carve out a slice of the data — a subset to explore or summarize.
+- [o] To carve out a slice of the data, a subset to explore or summarize.
   > Analysts use \`WHERE\` to zoom into "Seattle trips" or "last month" before summarizing.
 - To permanently delete rows that do not match.
   > \`WHERE\` in a \`SELECT\` filters the result; it does not delete anything.
@@ -303,7 +303,7 @@ For an analyst, \`WHERE\` chooses which slice of the data to look at.`}
 
 - A column physically stored in the \`trips\` table.
   > It is computed in the query; nothing about it is stored in the table.
-- [o] A derived column that exists only in this query's result — a measure the analyst invented.
+- [o] A derived column that exists only in this query's result, a measure the analyst invented.
   > Analysts routinely compute new measures on the fly; \`fare_per_min\` lives only in the result set.
 - A new permanent table.
   > It is a single column in a result, not a table.
@@ -314,5 +314,5 @@ Derived columns let analysts ask new questions of each row without
 changing the stored data.`}
 />
 
-You can now *look* like an analyst. Next: how to get data *into* DuckDB —
+You can now *look* like an analyst. Next: how to get data *into* DuckDB,
 and how to conjure test data out of thin air with `range()`.

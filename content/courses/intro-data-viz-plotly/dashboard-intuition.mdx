@@ -9,13 +9,13 @@ quickly. The word originally came from cars: an instrument panel
 of dials and gauges meant to be readable at speed.
 
 Dashboards are *everywhere* in modern business. Most are bad.
-This page is about what makes a dashboard work — and what makes
+This page is about what makes a dashboard work, and what makes
 it fail.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="An instrument panel of three tiles — a gauge with a needle, a big number, and a sparkline — with traffic-light status dots, made to be read at a glance"
+  aria-label="An instrument panel of three tiles, a gauge with a needle, a big number, and a sparkline, with traffic-light status dots, made to be read at a glance"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="35" width="480" height="190" rx="14" fill="currentColor" opacity="0.06" />
@@ -76,7 +76,7 @@ Examples of good dashboard questions:
 - "Which servers are unhealthy right now?"
 - "Are any KPIs trending in the wrong direction?"
 
-Each is a *recurring* question — something the user looks at again
+Each is a *recurring* question, something the user looks at again
 and again, expecting to see something *change*.
 
 Dashboards are **not** good for:
@@ -207,15 +207,15 @@ fig2.show()
 
 That's the rough rhythm of a dashboard: **headline numbers →
 trend chart → breakdown**. Real dashboards (Plotly Dash, Tableau,
-Power BI, Streamlit) add layout, filtering controls, and live data
-— but the *information architecture* is the same.
+Power BI, Streamlit) add layout, filtering controls, and live data,
+but the *information architecture* is the same.
 
 ## Real dashboards: Dash and Streamlit
 
 Plotly has a sister project, **Dash**, that lets you turn Plotly
 charts into a multi-chart web dashboard with dropdowns and
 sliders. **Streamlit** is a similar tool that's even simpler. Both
-go beyond what we'll cover in this course — they're full
+go beyond what we'll cover in this course, they're full
 frameworks.
 
 The good news: every chart you've learned to build in Plotly
@@ -229,7 +229,7 @@ When you're tempted to add a chart to a dashboard, ask:
 > *"If the value on this chart changes, will someone do something
 > different?"*
 
-If yes — add it. If no — delete it. That single question prevents
+If yes, add it. If no, delete it. That single question prevents
 ~80% of dashboard bloat.
 
 ## Check your understanding
@@ -242,9 +242,9 @@ If yes — add it. If no — delete it. That single question prevents
 - Exploring data in depth.
   > Deep exploration is the job of a notebook or an interactive analytical tool; dashboards surface recurring high-level metrics quickly, not detailed drill-down analysis.
 - [o] Quickly answering a small number of **recurring** questions about an ongoing situation.
-  > Dashboards are meant to be glanced at — repeatedly — and absorbed in seconds. They are not the right tool for one-off analysis or for deep exploration. Those tasks deserve a notebook or an interactive tool.
+  > Dashboards are meant to be glanced at, repeatedly, and absorbed in seconds. They are not the right tool for one-off analysis or for deep exploration. Those tasks deserve a notebook or an interactive tool.
 - Running statistical tests.
-  > Statistical tests require hypothesis formulation, underlying data, and interpretation — none of which a dashboard is designed to facilitate; the right tool is a notebook or statistical software.
+  > Statistical tests require hypothesis formulation, underlying data, and interpretation, none of which a dashboard is designed to facilitate; the right tool is a notebook or statistical software.
 
 Dashboards = "what is happening right now / this week, and is anything alarming?" Anything else is a different tool.`}
 />
@@ -253,10 +253,10 @@ Dashboards = "what is happening right now / this week, and is anything alarming?
   markdown={`Which is a typical **failure mode** of real-world dashboards?
 
 - Showing too few charts.
-  > Dashboards rarely fail from having too few charts; the chronic problem is accumulation over time — stakeholders keep adding panels until the dashboard is unreadable.
+  > Dashboards rarely fail from having too few charts; the chronic problem is accumulation over time, stakeholders keep adding panels until the dashboard is unreadable.
 - Loading too quickly.
   > Load speed is a performance metric, not a failure mode of dashboard *design*; a dashboard that loads quickly but shows 40 confusing charts is still a bad dashboard.
-- [o] A "wall of charts" — many small panels with no visual priority, no clear question per chart, and no story to read.
+- [o] A "wall of charts", many small panels with no visual priority, no clear question per chart, and no story to read.
   > Dashboards are cheap to add to and expensive to delete from. Over years they accumulate every stakeholder's pet chart until nobody knows what to look at. The cure is a *regular* deletion pass: any chart that hasn't driven a decision in N months goes.
 
 A single number in big text often communicates more than a chart of the same number.`}
@@ -272,7 +272,7 @@ A single number in big text often communicates more than a chart of the same num
 - [o] "If the value on this chart changes, will someone do something different?"
   > The point of a dashboard is to *drive action*. A chart whose changes never trigger any decision is just decoration. Delete it. This question alone prevents most dashboard bloat.
 - "Does it have a legend?"
-  > A legend is a labeling element; whether a chart has one is unrelated to whether it earns its place on a dashboard — what matters is whether it drives decisions.
+  > A legend is a labeling element; whether a chart has one is unrelated to whether it earns its place on a dashboard, what matters is whether it drives decisions.
 
 Make the action-orientation explicit and your dashboards stay focused.`}
 />

@@ -1,20 +1,20 @@
 ---
 title: Debugging and Reasoning About Programs
-description: Finding bugs by thinking clearly — stack traces, mental tracing, hypotheses, and invariants
+description: Finding bugs by thinking clearly, stack traces, mental tracing, hypotheses, and invariants
 ---
 
 Every program you write will have bugs. That's not a personal
 failing; it's the human condition. What separates beginners from
-experienced developers isn't fewer bugs — it's how quickly and
+experienced developers isn't fewer bugs, it's how quickly and
 calmly they *find* them.
 
 This chapter is less about syntax and more about the *method* of
-debugging — a mental discipline you can practice on every program.
+debugging, a mental discipline you can practice on every program.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two dotted storylines run as one until a yellow-ringed point where they split — the expected story climbing to a green circle, the actual story drifting down to a red square; the bug lives in the gap"
+  aria-label="Two dotted storylines run as one until a yellow-ringed point where they split, the expected story climbing to a green circle, the actual story drifting down to a red square; the bug lives in the gap"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -55,7 +55,7 @@ Whenever a program misbehaves, you really have two stories:
 
 A bug is the place where those two diverge. Debugging is the work
 of figuring out which step in your mental story doesn't match
-reality — and then fixing one or the other.
+reality, and then fixing one or the other.
 
 ```mermaid
 flowchart TD
@@ -70,12 +70,12 @@ flowchart TD
 
 Every productive debugging session looks like this:
 
-1. **Observe.** Read the actual symptom — error message, wrong
+1. **Observe.** Read the actual symptom, error message, wrong
    output, hang. Don't guess; *look*.
 2. **Hypothesize.** Form one specific theory: "I think `total` is
    wrong before line 27 because the loop never runs."
-3. **Test.** Make ONE change — a print, a breakpoint, an extra
-   assertion — that would *prove or disprove* your hypothesis.
+3. **Test.** Make ONE change, a print, a breakpoint, an extra
+   assertion, that would *prove or disprove* your hypothesis.
 4. **Compare** the result to what you expected.
 5. **Refine.** Either narrow the suspect zone or update the
    hypothesis.
@@ -88,17 +88,17 @@ The method works even on bugs that sound impossible. A famous
 example from sysadmin lore: in the 1990s, Trey Harris, then a
 university systems administrator, got a complaint from a statistics
 department chairman that his team **couldn't send email farther
-than about 500 miles** — they had mapped it, and emails to anywhere
+than about 500 miles**, they had mapped it, and emails to anywhere
 closer worked. It sounds like a prank. Harris took the observation
 seriously anyway: he confirmed the symptom, examined the mail
 server, and found that an OS upgrade had quietly downgraded the
 mail software's configuration, leaving the connection timeout
-effectively near zero — a few milliseconds. And how far can a
+effectively near zero, a few milliseconds. And how far can a
 signal travel through the network in a few milliseconds before the
 timeout kills the connection? Roughly... 500 miles. The "impossible"
 geography was the timeout, measured in the speed of light. The
 lesson is not about email. It's that *observing carefully and
-trusting the evidence* beats dismissing a weird symptom — the
+trusting the evidence* beats dismissing a weird symptom, the
 weirder the bug, the more precisely its cause is hiding in plain
 sight.
 
@@ -123,7 +123,7 @@ This is gold:
 The vast majority of "I can't figure this out" cases evaporate
 when you stop and actually read the trace top to bottom.
 
-## Print debugging — undervalued but powerful
+## Print debugging, undervalued but powerful
 
 You don't need a debugger to find most bugs. A handful of
 well-placed `Console.WriteLine`s often gets you there faster.
@@ -153,7 +153,7 @@ Console.WriteLine($"Sum(5) = {Sum(5)}");
   ]}
 />
 
-Run it. The trace makes the bug obvious — the loop stops at
+Run it. The trace makes the bug obvious, the loop stops at
 `i = 4` when we expected it to include `5`. The fix is `i <= n`.
 
 After fixing, **delete the prints**. Leftover diagnostic prints
@@ -162,7 +162,7 @@ become noise that hides the next bug.
 ## Mental tracing: pretending to be the CPU
 
 Pick a small input and walk through the code line by line on
-paper, tracking each variable's value. It's tedious — and it
+paper, tracking each variable's value. It's tedious, and it
 *works*. Most off-by-one bugs and most logic bugs surface within
 five lines of mental tracing.
 
@@ -231,7 +231,7 @@ Assertions document your assumptions and catch them being violated
 as soon as something goes wrong, instead of much later when the
 damage is harder to trace.
 
-## Common bug categories — what to look for first
+## Common bug categories, what to look for first
 
 | Symptom                          | Suspect                                      |
 |----------------------------------|----------------------------------------------|
@@ -245,7 +245,7 @@ damage is harder to trace.
 Knowing the *shape* of common bugs lets you skip straight to the
 likely cause.
 
-## Practice — a tiny bug hunt
+## Practice, a tiny bug hunt
 
 The function below is *supposed* to return the largest value in
 the array. It has a bug. Run it, observe the wrong answer, fix it,
@@ -276,7 +276,7 @@ Console.WriteLine(Largest(new[] { 3, 1, 4, 1, 5 }));  // expected: 5
   ]}
 />
 
-The first call prints `0` — clearly wrong. The bug is the
+The first call prints `0`, clearly wrong. The bug is the
 initial value of `max`. Initialize it to `xs[0]` and try again.
 
 ## Test your understanding
@@ -288,7 +288,7 @@ initial value of `max`. Initialize it to `xs[0]` and try again.
   > That hides the bug, not solves it.
 - Run it a few times to see if the problem repeats
   > Sometimes useful, but secondary.
-- [o] Read the stack trace from the top — the exception type and the file/line tell you what went wrong and where
+- [o] Read the stack trace from the top, the exception type and the file/line tell you what went wrong and where
   > Most bugs are visible right there.
 - Reinstall the .NET SDK
   > Extremely unlikely to be the cause.`}

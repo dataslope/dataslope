@@ -1,6 +1,6 @@
 ---
 title: Sampling and Distributions
-description: Almost every dataset is a sample drawn from some bigger population. Understanding sampling — and the surprisingly orderly behavior of sample averages — turns raw data into evidence.
+description: Almost every dataset is a sample drawn from some bigger population. Understanding sampling, and the surprisingly orderly behavior of sample averages, turns raw data into evidence.
 ---
 
 When pollsters say "we surveyed 1,000 voters," they're not
@@ -13,13 +13,13 @@ This page explains:
 
 1. The population/sample distinction and why it matters.
 2. How sample statistics behave (the **sampling distribution**).
-3. The **Central Limit Theorem** — the deep reason why "mean ±
+3. The **Central Limit Theorem**, the deep reason why "mean ±
    error" works even when individual data points are weird.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A large light blue card filled with pale dots sends a solid gray arrow to a small green card holding just four solid dots — every dataset is a sample lifted out of a much larger population"
+  aria-label="A large light blue card filled with pale dots sends a solid gray arrow to a small green card holding just four solid dots, every dataset is a sample lifted out of a much larger population"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -115,10 +115,10 @@ everyone.
 
 Two things can go wrong with a sample:
 
-- **Bias** — your sampling method systematically misses certain
+- **Bias**, your sampling method systematically misses certain
   cases. (Surveying only people who answer landlines biases
   toward older respondents.)
-- **Variability** — even an unbiased method produces sample
+- **Variability**, even an unbiased method produces sample
   statistics that wiggle from one sample to the next.
 
 Big sample sizes shrink **variability** but not **bias**. A
@@ -128,7 +128,7 @@ biased survey of 10 million people is still biased. This is why
 | Sampling method | Where the estimates land |
 | --- | --- |
 | Unbiased + low variance ✅ | Cluster near the truth |
-| Biased ❌ | Cluster tightly — but not near the truth |
+| Biased ❌ | Cluster tightly, but not near the truth |
 | Unbiased + high variance | Centered on the truth, but scattered |
 
 ## The sampling distribution of the mean
@@ -168,13 +168,13 @@ Three things to notice:
 1. The histogram is **bell-shaped**, centered on the population
    mean (~170 cm).
 2. The spread of the sampling distribution (the SD of
-   `many_means`) matches `sd(population) / sqrt(n)` — that's the
+   `many_means`) matches `sd(population) / sqrt(n)`, that's the
    **standard error of the mean**.
 3. Although *one* sample bounces around, the *distribution of
    possible sample means* is highly predictable.
 
-This regularity — the sampling distribution of x̄ being
-bell-shaped and narrower than the population — is what makes
+This regularity, the sampling distribution of x̄ being
+bell-shaped and narrower than the population, is what makes
 quantitative inference possible.
 
 ## The Central Limit Theorem (in plain English)
@@ -182,7 +182,7 @@ quantitative inference possible.
 Here's the magic: *even if the underlying population is not
 bell-shaped*, the distribution of sample means becomes
 bell-shaped as n grows. Let's see this with a *very* non-normal
-population — an exponential distribution (lots of small values,
+population, an exponential distribution (lots of small values,
 a long right tail):
 
 <CodeBlock
@@ -279,7 +279,7 @@ cat(sprintf(
 />
 
 The "approximate 95% interval" `x̄ ± 2·SE` is a quick rule of
-thumb — about 95% of the time, an interval built like this
+thumb, about 95% of the time, an interval built like this
 covers the true population mean. (We'll polish that idea on the
 next page.)
 
@@ -291,7 +291,7 @@ next page.)
 *Hint: the standard error should get smaller as the sample size n grows.*
 
 - σ
-  > This is the spread of individual values, which does not depend on n at all — the standard error must shrink as n grows.
+  > This is the spread of individual values, which does not depend on n at all, the standard error must shrink as n grows.
 - [o] σ / √n
   > Doubling sample size shrinks SE by √2, quadrupling shrinks it by 2, etc.
 - σ × n
@@ -317,13 +317,13 @@ next page.)
   markdown={`Why is "sampling 10 million biased people" still a problem?
 
 - It's never a problem if n is huge.
-  > A large biased sample converges very precisely to the wrong answer — large n reduces variability, but cannot remove a systematic offset in the sampling process.
-- [o] Bias is a systematic offset that big sample size does **not** fix — you'll just be very precisely wrong.
+  > A large biased sample converges very precisely to the wrong answer, large n reduces variability, but cannot remove a systematic offset in the sampling process.
+- [o] Bias is a systematic offset that big sample size does **not** fix, you'll just be very precisely wrong.
   > Sample size shrinks variance, but only sound sampling design eliminates bias.
 - p-values become unreliable.
   > p-values and confidence intervals address variability, not bias; a biased sample will produce p-values that are too small or confidence intervals that miss the true parameter, regardless of n.
 - The CLT stops applying.
-  > The CLT still applies to biased samples — sample means still become approximately normal — but they converge to a biased value rather than the true population mean.`}
+  > The CLT still applies to biased samples, sample means still become approximately normal, but they converge to a biased value rather than the true population mean.`}
 />
 
 ## Mini challenge: estimate the mean with uncertainty
@@ -379,11 +379,11 @@ ci <- c(x_bar - 2 * se, x_bar + 2 * se)
     {
       id: "covers",
       name: "Interval is reasonable",
-      code: `if (50 < ci[1] || 50 > ci[2]) warning("CI did not cover the true mean — that's possible ~5% of the time, try a different seed")`,
+      code: `if (50 < ci[1] || 50 > ci[2]) warning("CI did not cover the true mean, that's possible ~5% of the time, try a different seed")`,
     },
   ]}
 />
 
-Next, we'll unpack what that interval really *means* — and
+Next, we'll unpack what that interval really *means*, and
 explore p-values, confidence intervals, and how to keep your
 intuition honest when reading statistical claims.

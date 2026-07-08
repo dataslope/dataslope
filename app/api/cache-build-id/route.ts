@@ -3,7 +3,7 @@
  *
  * The R2 incremental cache keys every object as
  * `incremental-cache/<OPEN_NEXT_BUILD_ID>/<hash>.cache` (see
- * open-next.config.ts). Each deploy — production *and* every preview — writes a
+ * open-next.config.ts). Each deploy, production *and* every preview, writes a
  * fresh ~0.6 GB folder under a new build ID and nothing is pruned automatically
  * (the key includes the build ID and OpenNext never deletes old ones).
  *
@@ -18,7 +18,7 @@
  * `WORKERS_CI_COMMIT_SHA`), which is also how the cleanup job maps every other
  * folder to the branch/PR it belongs to.
  *
- * The build ID is not sensitive — Next.js already exposes it in page payloads and
+ * The build ID is not sensitive, Next.js already exposes it in page payloads and
  * `/_next/static/<buildId>/…` asset URLs. `/api/` is disallowed in robots.ts.
  */
 

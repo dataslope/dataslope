@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import { getClangFormat } from "./clangFormat";
 
-// C runs inside a dedicated Web Worker via browsercc — see browsercc-worker.ts.
+// C runs inside a dedicated Web Worker via browsercc, see browsercc-worker.ts.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -238,7 +238,7 @@ function hasCMain(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the C standard library — always available, no
+  // Highlights from the C standard library, always available, no
   // install step. Clicking inserts the corresponding `#include` at the
   // top of the editor.
   {
@@ -444,7 +444,7 @@ type WorkerOutMessage =
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
   // C never triggers the PCH wait (C++-only), but the shared browsercc
-  // worker's message union includes it — keep the type accurate.
+  // worker's message union includes it, keep the type accurate.
   | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
@@ -459,7 +459,7 @@ class CWorkerRuntime implements LanguageRuntime {
 
     constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook —
+  /** Free the runtime by terminating its worker. Registry-eviction hook,
    *  the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
@@ -502,7 +502,7 @@ class CWorkerRuntime implements LanguageRuntime {
     // files so the compiler can resolve #include "..." directives and
     // compile additional translation units. Only forward staged files
     // when the caller explicitly opted into multi-file mode by passing
-    // an entry filename — otherwise stale staged files from a prior
+    // an entry filename, otherwise stale staged files from a prior
     // ChallengeCard/Playground run on the same shared runtime could
     // pollute the build.
     const files: Array<[string, string]> = [];
@@ -543,7 +543,7 @@ export const cAdapter: LanguageAdapter = {
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim — no server roundtrip.",
+      "C is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server roundtrip.",
   },
   // CodeMirror's clike mode handles C syntax. `text/x-csrc` is the
   // standard MIME alias for C inside that mode.
@@ -552,7 +552,7 @@ export const cAdapter: LanguageAdapter = {
   coldDownloadMB: 35,
   // Compiles (clang) on every run, so later runs are faster, not instant.
   compiled: true,
-  // clang-format LLVM style (see formatCode) — keep in sync.
+  // clang-format LLVM style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -580,7 +580,7 @@ export const cAdapter: LanguageAdapter = {
       >
         C standard library
       </a>{" "}
-      and ship with browsercc&apos;s WASI sysroot — no install step needed.
+      and ship with browsercc&apos;s WASI sysroot, no install step needed.
     </>
   ),
   importSnippet: (name) => `#include <${name}>`,
@@ -603,7 +603,7 @@ export const cAdapter: LanguageAdapter = {
         const msg = ev.data;
         if (msg.kind === "loading") {
           // The worker's single loading stage covers the clang/lld
-          // toolchain download — the bulk of the boot.
+          // toolchain download, the bulk of the boot.
           setLoadingMessage(msg.message, 0.1);
         } else if (msg.kind === "ready") {
           worker.removeEventListener("message", onMessage);

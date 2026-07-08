@@ -9,13 +9,13 @@ So far, every field and every method we've written has belonged to
 instances.
 
 But sometimes a piece of data or a piece of behavior doesn't belong
-to any one instance — it belongs to the *class itself*. Java models
+to any one instance, it belongs to the *class itself*. Java models
 that with the keyword **`static`**.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three blue object cells each hold their own state dot beneath a single shared light green plaque holding one green dot and one green method bar — static members live once, on the class itself"
+  aria-label="Three blue object cells each hold their own state dot beneath a single shared light green plaque holding one green dot and one green method bar, static members live once, on the class itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -74,10 +74,10 @@ flowchart TB
 }
 
 class Widget {
-  // Belongs to the CLASS — shared by all instances:
+  // Belongs to the CLASS, shared by all instances:
   private static int created = 0;
 
-  // Belongs to each INSTANCE — each Widget has its own:
+  // Belongs to each INSTANCE, each Widget has its own:
   private final int id;
 
   public Widget() {
@@ -143,7 +143,7 @@ to change.
 
 ## Utility classes
 
-A **utility class** is a class that holds *only* `static` members —
+A **utility class** is a class that holds *only* `static` members,
 no instance state, no constructor anyone calls. It is a namespace for
 related helper functions. Java's own `Math` class is the canonical
 example.
@@ -204,7 +204,7 @@ nobody can mistakenly write `new StringTools()`.
   ]}
 />
 
-The class is also marked `final` (no class can extend it) — another
+The class is also marked `final` (no class can extend it), another
 convention for utility classes.
 
 ## When *not* to use a utility class
@@ -257,7 +257,7 @@ class Color {
     this.b = b;
   }
 
-  // Factory methods — the *named* construction paths
+  // Factory methods, the *named* construction paths
   public static Color rgb(int r, int g, int b) { return new Color(r, g, b); }
   public static Color named(String name) {
     switch (name) {
@@ -386,7 +386,7 @@ sum=15
 - \`@Constant\` annotation
   > No such annotation.
 - [o] \`public static final\` field, written in \`UPPER_SNAKE_CASE\`
-  > This is the standard idiom — class-wide, immutable, and easy to spot.
+  > This is the standard idiom, class-wide, immutable, and easy to spot.
 - \`private\` field with a getter
   > That makes a constant-ish *instance* value, but the canonical Java idiom is \`public static final\`.`}
 />
@@ -398,7 +398,7 @@ sum=15
   > Avoidance isn't a design reason.
 - [o] When the methods are genuinely stateless and don't naturally belong to any particular object
   > Pure functions on a shared theme (like \`Math\`) fit this nicely.
-- For all classes — it makes them easier to test
+- For all classes, it makes them easier to test
   > Heavy static use *hurts* testability and reuse. It also negates most OOP benefits.
 - For any class that has more than ten methods
   > Method count is not a criterion.`}

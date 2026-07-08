@@ -1,9 +1,9 @@
 ---
 title: Your First Queries
-description: Run real SQL right now — compute values, name results, and understand the anatomy of a basic SELECT before we touch tables.
+description: Run real SQL right now, compute values, name results, and understand the anatomy of a basic SELECT before we touch tables.
 ---
 
-Enough concepts — let us *write SQL*. The wonderful thing about
+Enough concepts, let us *write SQL*. The wonderful thing about
 PostgreSQL is that you can run a query without any tables at all,
 which makes it a perfect, friendly calculator for learning the
 shape of the language.
@@ -11,7 +11,7 @@ shape of the language.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A terminal window where a tiny query of one plus one returns a green chip holding the number two — SQL as a friendly calculator"
+  aria-label="A terminal window where a tiny query of one plus one returns a green chip holding the number two, SQL as a friendly calculator"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -77,7 +77,7 @@ Notice three things that will recur all course long:
 - Text values go in **single quotes**: `'PostgreSQL'`. Double quotes
   mean something different in SQL (they refer to names), so stick to
   single quotes for text.
-- `AS name` labels each result column. The label is for *you* — it
+- `AS name` labels each result column. The label is for *you*, it
   does not change any stored data.
 
 ## The anatomy of a query
@@ -92,15 +92,15 @@ flowchart TD
     F --> T["which table<br/>to read from"]
 ```
 
-- **`SELECT`** — *what* you want back (columns or computed values).
-- **`FROM`** — *where* to get it (which table).
+- **`SELECT`**, *what* you want back (columns or computed values).
+- **`FROM`**, *where* to get it (which table).
 
 When you are just computing values, like `SELECT 2 + 2`, you can
 skip `FROM` entirely. The moment you want stored data, you add
 `FROM table_name`.
 
 <Callout type="info" title="SQL keywords and your style">
-SQL keywords like \`SELECT\` and \`FROM\` are not case-sensitive —
+SQL keywords like \`SELECT\` and \`FROM\` are not case-sensitive,
 \`select\`, \`Select\`, and \`SELECT\` all work. By strong
 convention, this course writes keywords in UPPERCASE and names in
 lowercase, because it makes queries far easier to read at a glance.
@@ -110,7 +110,7 @@ lowercase, because it makes queries far easier to read at a glance.
 
 Each SQL statement ends with a semicolon `;`. It marks where one
 instruction stops. With a single statement it is often optional, but
-it becomes essential when you run several statements together — so we
+it becomes essential when you run several statements together, so we
 will always include it as a good habit.
 
 ```mermaid
@@ -144,7 +144,7 @@ FROM
 
 Try editing it: replace `name, population` with `*` to get every
 column, or with just `country` to get one. You are already steering
-a query — choosing exactly what comes back. The whole **Querying
+a query, choosing exactly what comes back. The whole **Querying
 Data** section expands on this.
 
 ## Check your understanding

@@ -64,13 +64,13 @@ export function Highlighter({
 
     // rough-notation draws the annotation to fit the element's current
     // document-space box. It does NOT follow the element when later reflows
-    // (font loads, wrapping changes, window resizes) move or resize it — the
+    // (font loads, wrapping changes, window resizes) move or resize it, the
     // drawing is left stranded in its old spot. So we re-draw whenever the
     // element's own geometry actually changes.
     //
     // Geometry is measured in DOCUMENT space (rect + scroll offset), which
-    // means: (a) scrolling alone never triggers a re-draw — rough-notation is
-    // already positioned in document space, so it tracks scroll for free — and
+    // means: (a) scrolling alone never triggers a re-draw, rough-notation is
+    // already positioned in document space, so it tracks scroll for free, and
     // (b) unrelated layout changes that don't move this element (e.g. an FAQ
     // accordion opening further down the page) are correctly ignored.
     const geometry = () => {

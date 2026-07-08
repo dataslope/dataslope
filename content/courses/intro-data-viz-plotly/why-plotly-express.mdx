@@ -5,13 +5,13 @@ description: How a general-purpose language and a one-line charting library beca
 
 The last page ended with a teaser: an interactive chart written in a
 handful of lines of Python. This page explains *why this course uses
-Python and Plotly Express at all* — and gives you the shape of the
+Python and Plotly Express at all*, and gives you the shape of the
 tool before we slow down and learn it properly.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three nested translucent containers: a large company, a library inside it, and at the core a bright capsule with rising dots — Plotly Express inside Plotly inside Plotly"
+  aria-label="Three nested translucent containers: a large company, a library inside it, and at the core a bright capsule with rising dots, Plotly Express inside Plotly inside Plotly"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -43,10 +43,10 @@ and the most common answer, by a wide margin, is **Python**. This was
 not obvious twenty years ago. In 2005, serious analysts used SAS,
 SPSS, Stata, R, or MATLAB; Python was a "scripting language" with no
 good numerical library, no DataFrame, and no notebook. Three
-libraries — and a notebook — changed that between 2005 and 2014:
+libraries, and a notebook, changed that between 2005 and 2014:
 
 - **NumPy** (2005) gave Python fast numerical arrays.
-- **pandas** (2008, by Wes McKinney) added the **DataFrame** — a
+- **pandas** (2008, by Wes McKinney) added the **DataFrame**, a
   labeled, in-memory table that behaves like a spreadsheet but scales
   to millions of rows. The DataFrame is the **central object** of the
   rest of this course; every chart starts with one.
@@ -55,7 +55,7 @@ libraries — and a notebook — changed that between 2005 and 2014:
   by side with charts appearing inline.
 
 Python "won" not because it was the *best* at any one thing, but
-because it was *good enough at everything* — pipelines, machine
+because it was *good enough at everything*, pipelines, machine
 learning, web apps, and visualization in one language. Once every
 tool had a Python interface, *not* using Python became the costly
 choice. (The fuller version of this story lives in the
@@ -67,14 +67,14 @@ appendix.)
 The name "Plotly" gets used for three different things. Let's be
 precise:
 
-- **Plotly** — a company founded in **Montréal in 2013**. Its
+- **Plotly**, a company founded in **Montréal in 2013**. Its
   original product was a web app for making charts collaboratively.
-- **Plotly.js** — an open-source JavaScript charting library the
+- **Plotly.js**, an open-source JavaScript charting library the
   company released in **2015**, built on top of **D3.js** and
   **stack.gl**. It is what actually *renders* every Plotly chart you
   see.
-- **plotly.py** — the Python wrapper around Plotly.js.
-- **Plotly Express** — a much simpler, higher-level API on top of
+- **plotly.py**, the Python wrapper around Plotly.js.
+- **Plotly Express**, a much simpler, higher-level API on top of
   plotly.py, released in **2019** by Nicolas Kruchten.
 
 ```mermaid
@@ -87,8 +87,8 @@ flowchart TB
 
 For most of this course, "Plotly" means **Plotly Express**. It is
 the gateway. Almost every chart you need is one line of it. When you
-outgrow it, you drop down to `plotly.graph_objects` for full control
-— but that day is months away.
+outgrow it, you drop down to `plotly.graph_objects` for full control,
+but that day is months away.
 
 ## One line, one chart
 
@@ -112,7 +112,7 @@ fig = px.bar(
 fig.show()
 ```
 
-Try it — and notice how the code reads almost like a *sentence about
+Try it, and notice how the code reads almost like a *sentence about
 the data*:
 
 <CodeBlock
@@ -140,8 +140,8 @@ fig.show()
   ]}
 />
 
-The chart that came out is *fully interactive* — hover, zoom,
-download — for free. There is no trade-off for the brevity. (For
+The chart that came out is *fully interactive*, hover, zoom,
+download, for free. There is no trade-off for the brevity. (For
 comparison, the equivalent chart in the older `graph_objects` API
 took about nine lines; that history is in the appendix.)
 
@@ -158,7 +158,7 @@ That third point is the heart of why interactivity matters for
 *analysis*, not just for showing off. A static chart can only answer
 the questions the author anticipated. An interactive chart lets the
 *reader* hover, filter, and zoom to ask questions the author never
-thought of — and lets *you*, while writing the analysis, catch a bug
+thought of, and lets *you*, while writing the analysis, catch a bug
 or an outlier in seconds. **Treat interactivity as your default
 analytical surface**, hovering and clicking every chart while you
 build it. That single habit will make you faster.
@@ -167,14 +167,14 @@ build it. That single habit will make you faster.
 
 You'll hear about other Python chart libraries. A fair summary:
 
-- **Matplotlib** — foundational, static, total control, verbose.
+- **Matplotlib**, foundational, static, total control, verbose.
   Great for publication figures.
-- **Seaborn** — statistical charts with beautiful defaults; built on
+- **Seaborn**, statistical charts with beautiful defaults; built on
   Matplotlib; not interactive.
-- **Altair** — declarative grammar-of-graphics, interactive web
+- **Altair**, declarative grammar-of-graphics, interactive web
   output.
-- **Bokeh** — another interactive web library.
-- **Plotly Express** — the easiest path from DataFrame to
+- **Bokeh**, another interactive web library.
+- **Plotly Express**, the easiest path from DataFrame to
   *interactive* chart. This course's choice.
 
 There is no single "best" library. Plotly Express is the right
@@ -184,7 +184,7 @@ branch out.
 
 ## A peek at the range
 
-Here is a denser chart to show what one Plotly Express call can do —
+Here is a denser chart to show what one Plotly Express call can do,
 the famous Gapminder bubble chart, mapping four variables at once.
 We'll build up to this; for now, just hover the big bubbles.
 
@@ -219,14 +219,14 @@ fig.show()
   ]}
 />
 
-That density of meaning per line of code — four variables, a log
-scale, labeled axes, full interactivity — is exactly why Plotly
+That density of meaning per line of code, four variables, a log
+scale, labeled axes, full interactivity, is exactly why Plotly
 Express is the right tool to start with.
 
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Which Python library introduced the **DataFrame** — a labeled, spreadsheet-like table that has become the central object of Python data analysis?
+  markdown={`Which Python library introduced the **DataFrame**, a labeled, spreadsheet-like table that has become the central object of Python data analysis?
 
 - NumPy
   > NumPy (2005) introduced efficient numerical arrays, but its primary structure is a homogeneous multidimensional array, not a labeled table with named columns. The DataFrame came later, with pandas.
@@ -248,7 +248,7 @@ Almost every page of this course starts by loading data into a pandas DataFrame.
 - Plotly Express is a different programming language.
   > Plotly Express is a Python library; it builds objects that are serialized and passed to Plotly.js for rendering in the browser.
 - [o] Plotly Express is a high-level Python API on top of plotly.py, which wraps the Plotly.js JavaScript library.
-  > When you call **px.bar(...)**, Plotly Express builds a configuration object, plotly.py serializes it, and Plotly.js renders the interactive chart in the browser. You write Python; the browser executes JavaScript — invisibly.
+  > When you call **px.bar(...)**, Plotly Express builds a configuration object, plotly.py serializes it, and Plotly.js renders the interactive chart in the browser. You write Python; the browser executes JavaScript, invisibly.
 - Plotly.js is a fork of Plotly Express.
   > The dependency runs the other way: Plotly Express (2019) was built on top of plotly.py and Plotly.js (2015). Plotly.js is not derived from Plotly Express.
 
@@ -262,8 +262,8 @@ This three-layer stack is invisible most of the time. You'll only notice it when
   > Professionalism is a side effect; a static chart can look just as polished but cannot support the interactive exploration loop that changes how analysis is done.
 - It allows charts to animate.
   > Animation is one specific form of interactivity, not the core benefit. The fundamental value is that the viewer can explore the data themselves rather than being limited to what the author anticipated.
-- [o] It lets the *viewer* ask follow-up questions — hover for detail, filter to subsets, zoom into regions — without re-running code.
-  > Interactivity changes the *cognitive workload* of analysis. A static chart answers only the questions the author anticipated; an interactive chart answers questions the viewer discovers on the spot — and helps you catch bugs and outliers as you build.
+- [o] It lets the *viewer* ask follow-up questions, hover for detail, filter to subsets, zoom into regions, without re-running code.
+  > Interactivity changes the *cognitive workload* of analysis. A static chart answers only the questions the author anticipated; an interactive chart answers questions the viewer discovers on the spot, and helps you catch bugs and outliers as you build.
 - It is required by web browsers.
   > Browsers have no such requirement; static images display perfectly. Interactivity is a deliberate enhancement, not a prerequisite.
 
@@ -276,7 +276,7 @@ The exploratory loop "overview → zoom → filter → detail" is dramatically f
 - It is faster than plotly.graph_objects.
   > Both APIs produce the same Plotly.js output; rendering speed is identical. Plotly Express trades fine-grained control for brevity, not performance.
 - It produces static images.
-  > Plotly Express charts are fully interactive by default — pannable, zoomable, hoverable — just like charts made with \`graph_objects\`.
+  > Plotly Express charts are fully interactive by default, pannable, zoomable, hoverable, just like charts made with \`graph_objects\`.
 - [o] It is a high-level wrapper that takes a DataFrame and column names, producing a complete chart in essentially one function call.
   > One line of **px.bar(df, x=..., y=...)** replaces about nine lines of **graph_objects** code, and the chart is just as interactive. When you outgrow Plotly Express, you can drop down to **graph_objects** for fine control.
 - It requires a paid Plotly subscription.

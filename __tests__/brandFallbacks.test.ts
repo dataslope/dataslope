@@ -11,7 +11,7 @@ import BRAND_FALLBACKS from "../lib/generated/brand-fallbacks.js";
  * variable can't be read from the DOM.
  *
  * The generator guarantees the values can't drift from brand.css, but it
- * can't know which tokens Mermaid depends on — deleting a ramp step from
+ * can't know which tokens Mermaid depends on, deleting a ramp step from
  * brand.css (say, the blue half-steps the mindmap shades use) would silently
  * produce `undefined` colors at render time. This test pins that contract:
  * every token mermaid.tsx references must exist, as a concrete hex color.

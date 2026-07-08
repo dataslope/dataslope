@@ -54,7 +54,7 @@ export function unscaledDecimalToString(unscaled: bigint, scale: number): string
 }
 
 /** Coerce the unscaled integer out of whatever Arrow handed back for a DECIMAL
- *  cell — a `BigInt`, or an object/number whose `String()` is a plain integer.
+ *  cell, a `BigInt`, or an object/number whose `String()` is a plain integer.
  *  Returns `null` when the value already looks like a formatted decimal (has a
  *  `.`) or isn't an integer, so the caller leaves it untouched (guards against
  *  double-scaling on Arrow builds that pre-scale). */

@@ -7,8 +7,8 @@
  *   - sessionStorage (per-session toast suppression flags, etc.)
  *   - OPFS (workspaces/, including code files, uploaded data files, and
  *     persisted SQLite / PGlite / DuckDB databases)
- *   - IndexedDB (best-effort — used by some pyodide / DuckDB-WASM caches)
- *   - Cache Storage (best-effort — service worker caches if present)
+ *   - IndexedDB (best-effort, used by some pyodide / DuckDB-WASM caches)
+ *   - Cache Storage (best-effort, service worker caches if present)
  *
  * Each step is independently best-effort: a failure in one surface (e.g.
  * private mode disables OPFS) does not abort the others. After all surfaces
@@ -23,7 +23,7 @@ async function clearOpfs(): Promise<void> {
   try {
     const root = await navigator.storage.getDirectory();
     // Walk the top level and remove every entry recursively. We can't
-    // delete the root itself — only its children — so this is the
+    // delete the root itself, only its children, so this is the
     // closest we get to "wipe OPFS".
     const entries = root as unknown as {
       entries(): AsyncIterable<[string, FileSystemHandle]>;
@@ -37,7 +37,7 @@ async function clearOpfs(): Promise<void> {
       }
     }
   } catch {
-    /* OPFS access denied or unavailable — nothing more to do. */
+    /* OPFS access denied or unavailable, nothing more to do. */
   }
 }
 
@@ -79,13 +79,13 @@ async function clearCacheStorage(): Promise<void> {
 }
 
 /** Clears every local storage surface used by the app. Returns when
- *  every best-effort pass has run — does NOT reload the page itself
+ *  every best-effort pass has run, does NOT reload the page itself
  *  (the caller decides whether to reload). */
 export async function clearAllLocalData(): Promise<void> {
   try {
     localStorage.clear();
   } catch {
-    /* private mode — ignore */
+    /* private mode, ignore */
   }
   try {
     sessionStorage.clear();

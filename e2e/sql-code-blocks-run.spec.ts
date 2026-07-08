@@ -4,7 +4,7 @@ import { discoverPages } from "./_discoverPages";
 // Runs every <SqlCodeBlock> on each /fumadocs-dev/sql-code-blocks-<dialect> demo
 // page and asserts the query executes without the block entering its
 // "error" status. SQL blocks render via @sqlite.org/sqlite-wasm (in
-// process), DuckDB-WASM and PGlite — all client-side.
+// process), DuckDB-WASM and PGlite, all client-side.
 //
 // Each <SqlCodeBlock> exposes:
 //   - root:   [data-testid="sql-code-block"] with [data-run-status]
@@ -49,7 +49,7 @@ async function runBlock(
 
 test.describe("SQL code blocks run cleanly", () => {
   for (const { path: pagePath, label } of SQL_PAGES) {
-    test(`${label} — every SQL code block runs without error`, async ({
+    test(`${label}, every SQL code block runs without error`, async ({
       page,
     }) => {
       const pageErrors: string[] = [];

@@ -1,9 +1,9 @@
 /* ============================================================================
- * home.css — hardening for the home route ("/").
+ * home.css, hardening for the home route ("/").
  * ----------------------------------------------------------------------------
  * The /learn route's stylesheet (app/docs.css) defines GLOBAL element
- * typography — `body { font-family: Inter }` and `h1..h6 { font-family: Inter }`
- * with tightened display tracking — and imports Tailwind's preflight, whose
+ * typography, `body { font-family: Inter }` and `h1..h6 { font-family: Inter }`
+ * with tightened display tracking, and imports Tailwind's preflight, whose
  * `.hidden` utility competes with our responsive `md:*` display utilities.
  * Next.js can leave that stylesheet applied after a *client-side*
  * back-navigation from /learn, so its rules bleed onto this page: headings pick
@@ -17,14 +17,14 @@
  *
  * NOTE: the utility-vs-utility half of this bug class (`.hidden` vs
  * `md:flex`, …) is now fixed at the root by the shared @source list in
- * app/tailwind.shared.css — both Tailwind roots emit identical utility
+ * app/tailwind.shared.css, both Tailwind roots emit identical utility
  * layers, so stylesheet order can't flip those pairs anymore (enforced by
  * __tests__/cssCascadeParity.test.ts). The rules below remain as
  * belt-and-suspenders, and the element-selector half (learn.css's global
  * `body`/`h1..h6` typography) still relies on them.
  * ========================================================================== */
 
-/* Keep the whole page — and every heading in it — on the home page's own
+/* Keep the whole page, and every heading in it, on the home page's own
  * Inter styling, immune to learn.css's global `h1..h6` heading rule. */
 .ds-home,
 .ds-home h1,
@@ -40,21 +40,15 @@
 /* The embedded challenge cards, code blocks, and MCQ are authored for the
  * /learn route: in dark mode their surface background reads
  * `var(--color-fd-background, <fallback>)`. That Fumadocs token doesn't exist
- * outside /learn, so they fall back to hardcoded values — some of which are
+ * outside /learn, so they fall back to hardcoded values, some of which are
  * blue-slate (#111827, --ch-slate-900). Define the token here (white in light,
  * Fumadocs's neutral near-black #121212 in dark) so those surfaces stay neutral
  * and match the rest of the page. */
 .ds-home {
   --color-fd-background: #ffffff;
-  /* Solid, filled surface for the hero preview controls (the language /
-   * dialect / flavor pickers and the MCQ number button group) so they read as
-   * tangible buttons against the page rather than blending into it. A subtle
-   * gray in light; a slightly raised near-black in dark. */
-  --ds-control-surface: #f3f4f6;
 }
 html.dark .ds-home {
   --color-fd-background: #121212;
-  --ds-control-surface: #1e1e1e;
 }
 
 /* Center nav menu: hidden below md, flex from md up. Replaces `hidden md:flex`
@@ -103,7 +97,7 @@ html.dark .ds-home {
   }
 }
 
-/* Decorative CSS animations pause while their section is offscreen — see
+/* Decorative CSS animations pause while their section is offscreen, see
  * AnimationPauseGate.tsx, which toggles the data attribute from an
  * IntersectionObserver. Scoped under .ds-home so the rule can't leak into
  * other routes; `!important` outranks the animation shorthand set by the

@@ -5,7 +5,7 @@ description: Using TypeScript's discriminated unions and exhaustiveness checking
 
 In a language like Haskell, ML, Rust, or Scala, pattern matching
 is a first-class syntactic construct. TypeScript doesn't have a
-`match` keyword — but it has something close enough: **discriminated
+`match` keyword, but it has something close enough: **discriminated
 unions** + **exhaustiveness checking** via the `never` type.
 
 Used well, this pair gives you the central guarantee of pattern
@@ -14,7 +14,7 @@ matching: *the compiler refuses to build code that forgets a case*.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A queue of circles, triangles, and squares meets a diamond marked with a question mark and is routed along dotted paths into three bins that each hold only one shape — every case goes to its own handler"
+  aria-label="A queue of circles, triangles, and squares meets a diamond marked with a question mark and is routed along dotted paths into three bins that each hold only one shape, every case goes to its own handler"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -104,13 +104,13 @@ console.log(show(s2));
 />
 
 Inside `case "circle":`, the compiler **narrows** `s` to the circle
-variant — `s.radius` works; `s.side` doesn't. That narrowing is the
+variant, `s.radius` works; `s.side` doesn't. That narrowing is the
 heart of pattern matching in TypeScript.
 
 ## The exhaustiveness trick: `never`
 
 Now we add the safety net. Inside the `default:` branch of a
-`switch`, the value's type should be `never` — because we've
+`switch`, the value's type should be `never`, because we've
 covered every case. If a future change adds a new variant and we
 forget to handle it, the type stops being `never` and the compiler
 catches it.
@@ -149,7 +149,7 @@ console.log(area({ kind: "rectangle", w: 3, h: 4 }));
 
 Try adding `| { kind: "triangle"; base: number; height: number }`
 to `Shape` (locally on your machine) and re-running the type
-checker — the `default` branch starts erroring, because `s` is no
+checker, the `default` branch starts erroring, because `s` is no
 longer `never`. The compiler has told you, *before* you ship, that
 you forgot a case.
 
@@ -160,7 +160,7 @@ engineer to do in code review.
 ## A `match` helper for expressions
 
 `switch` is a *statement*. Sometimes you want pattern matching as
-an *expression* — for instance, when assigning a result. You can
+an *expression*, for instance, when assigning a result. You can
 build a tiny helper that achieves both exhaustiveness and a nice
 calling syntax:
 
@@ -204,7 +204,7 @@ console.log(describe({ kind: "rectangle", w: 3, h: 4 }));
 />
 
 The `Handlers<T, R>` mapped type forces you to provide a handler
-for **every** variant of `T`. Forget one — the compiler complains
+for **every** variant of `T`. Forget one, the compiler complains
 the moment you call `match`.
 
 This is much closer to what pattern matching feels like in
@@ -327,7 +327,7 @@ flowchart TD
 ```
 
 The dotted line is the safety: the *moment* somebody adds a new
-shape, the diagram literally cannot be drawn anymore — the compiler
+shape, the diagram literally cannot be drawn anymore, the compiler
 fails, and the developer is forced to extend every match.
 
 ## A small challenge
@@ -441,5 +441,5 @@ export function apply(balance: number, e: Event): number {
 - It improves runtime performance of the \`switch\`
   > No measurable effect.
 
-This trick — *exhaustiveness via \`never\`* — is the closest TypeScript gets to ML/Haskell-style pattern matching, and it's astonishingly powerful when combined with discriminated unions.`}
+This trick, *exhaustiveness via \`never\`*, is the closest TypeScript gets to ML/Haskell-style pattern matching, and it's astonishingly powerful when combined with discriminated unions.`}
 />

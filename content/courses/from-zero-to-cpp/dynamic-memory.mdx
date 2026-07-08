@@ -1,6 +1,6 @@
 ---
 title: Dynamic Memory
-description: Asking the operating system for memory at runtime with new and delete — and why we want to avoid doing it by hand.
+description: Asking the operating system for memory at runtime with new and delete, and why we want to avoid doing it by hand.
 ---
 
 So far every variable we created lived on the **stack**: created at
@@ -15,7 +15,7 @@ control: the **heap**.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Two balloons on strings: a green one held by a solid stack-frame box below, and a red one whose string was cut drifting away from a faded frame — heap objects outlive their scope, and forgotten ones float off as leaks"
+  aria-label="Two balloons on strings: a green one held by a solid stack-frame box below, and a red one whose string was cut drifting away from a faded frame, heap objects outlive their scope, and forgotten ones float off as leaks"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -109,7 +109,7 @@ flowchart TD
 ```
 
 After `delete p`, the heap slot is gone but `p` still holds the old
-address — it has become a **dangling pointer**. That is why we set
+address, it has become a **dangling pointer**. That is why we set
 `p = nullptr;` immediately after.
 
 ## Arrays on the heap
@@ -176,7 +176,7 @@ You used the pointer *after* deleting it.
 ```cpp
 int* p = new int(1);
 delete p;
-std::cout << *p;   // UNDEFINED BEHAVIOR — anything can happen
+std::cout << *p;   // UNDEFINED BEHAVIOR, anything can happen
 ```
 
 ### 3. Double-delete
@@ -232,7 +232,7 @@ A preview of the safer version of dynamic memory, using
 int main() {
   auto p = std::make_unique<int>(42); // allocates and owns
   std::cout << *p << "\\n";
-  // no delete needed — the unique_ptr's destructor frees it on scope exit
+  // no delete needed, the unique_ptr's destructor frees it on scope exit
   return 0;
 }
 `,
@@ -242,8 +242,8 @@ int main() {
 
 We'll devote a whole chapter to smart pointers. For now, just know
 that **raw `new`/`delete` are advanced tools you should rarely need
-in modern application code.** When you do need them — implementing
-your own container, or interfacing with a C library — you'll know
+in modern application code.** When you do need them, implementing
+your own container, or interfacing with a C library, you'll know
 why.
 
 ## Sizing intuition
@@ -411,6 +411,6 @@ int main() {
   > \`new\` does not allocate on the stack.`}
 />
 
-Next: aggregates and strings — how to bundle data, and the tools
+Next: aggregates and strings, how to bundle data, and the tools
 the standard library gives you so you almost never need raw arrays
 again.

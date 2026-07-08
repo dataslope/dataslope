@@ -1,10 +1,10 @@
 ---
 title: Lists
-description: ArrayList, LinkedList, the List interface, and how to choose between them — with the memory pictures that make the choice obvious
+description: ArrayList, LinkedList, the List interface, and how to choose between them, with the memory pictures that make the choice obvious
 ---
 
 A **list** is an ordered, indexed sequence of elements. It is the
-most-used container in almost any program — the JCF interface
+most-used container in almost any program, the JCF interface
 `List<E>` is your default when you need to remember things in the
 order they arrived.
 
@@ -16,7 +16,7 @@ you'll ever ask.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A full row of four cells has no room for the waiting yellow dot, so a thin gray arrow leads down to a doubled row of eight — old cells copied, the newcomer in green, three faint ghost cells in reserve"
+  aria-label="A full row of four cells has no room for the waiting yellow dot, so a thin gray arrow leads down to a doubled row of eight, old cells copied, the newcomer in green, three faint ghost cells in reserve"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -163,9 +163,9 @@ scattered all over the heap, costing a cache miss on every step.
 The cases where `LinkedList` still wins:
 
 - You are doing many `addFirst` / `removeFirst` and need an *equal*
-  guarantee — but `ArrayDeque` is almost always better for this.
+  guarantee, but `ArrayDeque` is almost always better for this.
 - You have an explicit reference to a node and need `O(1)`
-  removal — but Java's `LinkedList` API doesn't expose nodes.
+  removal, but Java's `LinkedList` API doesn't expose nodes.
 
 In modern Java code, `LinkedList` shows up much less often than you
 might guess from textbooks. Reach for `ArrayList` by default;
@@ -240,7 +240,7 @@ public class Main {
 ## Sublist: a *view*, not a copy
 
 `subList(from, to)` returns a *live view* of the underlying list.
-Changes to the sublist affect the original — and structural changes
+Changes to the sublist affect the original, and structural changes
 to the original *invalidate* the sublist.
 
 <CodeBlock
@@ -272,7 +272,7 @@ public class Main {
   ]}
 />
 
-This is enormously useful for slicing — and a frequent source of
+This is enormously useful for slicing, and a frequent source of
 surprise for people who expect a copy.
 
 ## Immutable list literals: List.of(...)
@@ -294,7 +294,7 @@ public class Main {
     System.out.println(primary);
 
     try {
-      primary.add("yellow"); // throws — immutable
+      primary.add("yellow"); // throws, immutable
     } catch (UnsupportedOperationException e) {
       System.out.println("threw: " + e.getClass().getSimpleName());
     }
@@ -425,7 +425,7 @@ public class RecentHistory<E> {
 - [o] \`get(i)\` for arbitrary \`i\`
   > An \`ArrayList\` indexes by arithmetic; a \`LinkedList\` must walk.
 - \`contains(x)\`
-  > Both are \`O(n)\` — they scan.
+  > Both are \`O(n)\`, they scan.
 - Removing the first element
   > That's actually faster on \`LinkedList\` (\`O(1)\`) than \`ArrayList\` (\`O(n)\`).`}
 />

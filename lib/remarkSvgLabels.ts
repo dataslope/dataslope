@@ -4,14 +4,14 @@
  *
  * Why a remark plugin (not an MDX component override):
  * In MDX v3 with fumadocs-mdx dynamic compilation, the `svg` key in the
- * MDX components map does not reliably intercept inline <svg> elements —
+ * MDX components map does not reliably intercept inline <svg> elements,
  * the compiled output may call React.createElement("svg", …) directly
  * rather than going through `_components.svg`. A remark plugin runs during
  * compilation and injects a new MDAST node, the same approach
  * fumadocs-core/remarkMdxMermaid uses to turn ```mermaid fences into
  * <Mermaid /> elements. This plugin runs AFTER remarkMdxMermaid (see the
  * plugin order in source.config.ts), so those <Mermaid> nodes already
- * exist in the tree and get labelled here too — keeping a single,
+ * exist in the tree and get labelled here too, keeping a single,
  * consistent ID scheme for every graphic on the page.
  *
  * Globally-unique, stable IDs:
@@ -20,7 +20,7 @@
  * and `<hash>` is a 6-char hex digest derived deterministically from the
  * graphic's own content (the authored <svg> source, or a Mermaid chart's
  * text). Because the page slug includes the course folder, IDs are unique
- * across ALL courses, and any ID decodes back to its source file — so a
+ * across ALL courses, and any ID decodes back to its source file, so a
  * graphic can be referenced by its ID alone, without also naming the course
  * or page.
  *
@@ -92,8 +92,8 @@ function isGraphic(node: AnyNode): boolean {
 // A stable text signature of the graphic's content, used to derive its hash.
 // For Mermaid the chart text lives in the `chart` attribute (the original code
 // fence was already replaced by remarkMdxMermaid). For an inline <svg> we slice
-// the authored source via the node's position offsets — the most faithful
-// representation — falling back to a structural serialization if positions are
+// the authored source via the node's position offsets, the most faithful
+// representation, falling back to a structural serialization if positions are
 // missing. Whitespace is collapsed so reindenting a graphic doesn't change its
 // ID.
 export function graphicSignature(node: AnyNode, source: string): string {

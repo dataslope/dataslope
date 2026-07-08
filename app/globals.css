@@ -12,11 +12,11 @@ html, body {
 /* Pre-paint document background, keyed off the explicit `.dark` class that
    every route applies to <html> before first paint (the per-route
    THEME_BOOTSTRAP scripts, the /playground bootstrap in app/layout.tsx, and
-   next-themes on the Fumadocs routes — /courses, /interview-prep,
+   next-themes on the Fumadocs routes, /courses, /interview-prep,
    /fumadocs-dev). A fixed dark value here painted a dark first frame
-   for light-mode users — most visibly as a dark blink when the home page's
+   for light-mode users, most visibly as a dark blink when the home page's
    embedded playground iframe loaded. The values mirror the canonical page
-   surfaces (#ffffff light / #121212 dark — see app/home.css and
+   surfaces (#ffffff light / #121212 dark, see app/home.css and
    THEME_PALETTES in playgroundTheme.ts). */
 html {
   background: #ffffff;
@@ -26,7 +26,7 @@ html.dark {
 }
 
 /* Skip-to-content link: the first tabbable element on every page (mounted in
-   the root layout). Visually hidden until keyboard focus reaches it — the
+   the root layout). Visually hidden until keyboard focus reaches it, the
    playground headers alone have ~10 tab stops before the editor. */
 .skip-to-content {
   position: fixed;

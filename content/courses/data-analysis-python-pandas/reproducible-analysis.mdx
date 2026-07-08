@@ -1,6 +1,6 @@
 ---
 title: Reproducible Analysis
-description: Why analysts increasingly write code instead of clicking through spreadsheets — and the habits that make analyses re-runnable.
+description: Why analysts increasingly write code instead of clicking through spreadsheets, and the habits that make analyses re-runnable.
 ---
 
 A "one-off" spreadsheet analysis becomes a "rerun-this-every-
@@ -11,7 +11,7 @@ can re-run your work and get the same result.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A blue script produces three perfectly identical green results — rerunning a reproducible analysis gives the same answer every time"
+  aria-label="A blue script produces three perfectly identical green results, rerunning a reproducible analysis gives the same answer every time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -46,7 +46,7 @@ flowchart TB
 ```
 
 Most teams hover around L1–L2. The higher you go, the easier
-it is to trust — and reuse — the analysis later.
+it is to trust, and reuse, the analysis later.
 
 ## Why this matters
 
@@ -108,8 +108,8 @@ print(sample)
   ]}
 />
 
-Any operation involving randomness — train/test splits,
-samples, model initializations — should set a seed. Otherwise
+Any operation involving randomness, train/test splits,
+samples, model initializations, should set a seed. Otherwise
 your "reproducible" notebook gives slightly different numbers
 each run.
 
@@ -161,7 +161,7 @@ variable so you can pick up at any step.
 
 ```python
 assert orders["amount"].min() >= 0, "Negative amounts shouldn't exist"
-assert len(orders) > 0, "Empty result — check filters"
+assert len(orders) > 0, "Empty result, check filters"
 ```
 
 `assert` statements throughout a pipeline catch regressions
@@ -213,7 +213,7 @@ Without reproducibility, automation is impossible.
 - Using emoji in chart titles
   > Chart formatting is a presentation concern; it has no bearing on whether the analysis can be re-run and verified by someone else.
 - Writing many comments
-  > Comments improve readability but do not make an analysis reproducible on their own — the code still needs to produce the same output from a clean start.
+  > Comments improve readability but do not make an analysis reproducible on their own, the code still needs to produce the same output from a clean start.
 - [o] Treating the raw data as immutable and capturing every transformation in code that can be re-run from scratch
   > If raw data is untouched and all steps are in code, the analysis can always be regenerated.
 - Saving to xlsx instead of csv
@@ -229,7 +229,7 @@ Immutability of inputs is the bedrock.`}
   > Restarting the kernel does clear variables from memory, but that is a side effect; the purpose of the practice is to verify that the notebook runs correctly from a clean state.
 - It triggers garbage collection
   > Python's garbage collector runs automatically; restarting the kernel is not the mechanism for triggering it, and memory management is not why analysts do this.
-- [o] It guarantees the notebook actually produces its results from a clean state — otherwise hidden side effects from out-of-order cells can give false confidence
+- [o] It guarantees the notebook actually produces its results from a clean state, otherwise hidden side effects from out-of-order cells can give false confidence
   > The only test that matters is whether the notebook works from scratch.
 - It speeds up Pandas
   > Pandas performance depends on data size and code, not on whether the kernel was recently restarted.
@@ -241,11 +241,11 @@ Restart-and-run-all is the cheapest reproducibility test you can run.`}
   markdown={`You're tweaking an analysis that uses random sampling. Each run gives slightly different numbers. What's the fix?
 
 - Increase the sample size
-  > A larger sample reduces variance but does not eliminate run-to-run differences — without a fixed seed, the random selections still change each execution.
+  > A larger sample reduces variance but does not eliminate run-to-run differences, without a fixed seed, the random selections still change each execution.
 - Decrease the sample size
   > A smaller sample has higher variance, making run-to-run differences worse, not better.
 - [o] Set a random seed (e.g. \`np.random.RandomState(42)\`) so the "random" choices are deterministic across runs
-  > Set a seed and the same input always gives the same output — even when randomness is involved.
+  > Set a seed and the same input always gives the same output, even when randomness is involved.
 - Disable random sampling
   > Removing randomness entirely may change the analysis's statistical validity; fixing the seed preserves the sampling approach while making it reproducible.
 
@@ -259,7 +259,7 @@ Seeded randomness is one of the simplest reproducibility wins.`}
   > Pinning specific versions does not reduce the number of packages installed; it only ensures the versions are consistent across machines and over time.
 - Required by Python
   > Python itself has no requirement for a \`requirements.txt\`; it is a convention for package management tools like pip.
-- [o] Pandas (and other libraries) evolve — methods get renamed or removed. Pinning protects your notebook from breaking when versions change.
+- [o] Pandas (and other libraries) evolve, methods get renamed or removed. Pinning protects your notebook from breaking when versions change.
   > Pinning trades fresh-features for *stability*. For analyses, stability usually wins.
 - Faster execution
   > Pinning package versions does not affect how fast the code runs; execution speed depends on the code and data, not which specific version is installed.

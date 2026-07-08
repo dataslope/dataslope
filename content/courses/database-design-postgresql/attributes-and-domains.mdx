@@ -7,13 +7,13 @@ Once you have an entity like `customer`, the next question is: *what
 facts do we need to remember about each customer?* Those facts are
 **attributes**.
 
-Attributes become columns. But good columns are not just names — they
+Attributes become columns. But good columns are not just names, they
 also have **domains**, the set of values that are allowed to appear.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="An entity container lists three attribute rows, each beside a fenced set of allowed values on the right — attributes and their domains"
+  aria-label="An entity container lists three attribute rows, each beside a fenced set of allowed values on the right, attributes and their domains"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.09">
@@ -122,9 +122,9 @@ for someone, somewhere.
 
 There is a whole genre of programming essays about this, started by
 Patrick McKenzie's widely shared 2010 post "Falsehoods Programmers
-Believe About Names." Its list of wrong assumptions — that everyone
+Believe About Names." Its list of wrong assumptions, that everyone
 has exactly one full name, that names have a first and last part in
-that order, that names do not change, that names fit in ASCII — has
+that order, that names do not change, that names fit in ASCII, has
 since been joined by similar lists for addresses, phone numbers, time
 zones, and calendars. Each list is really a catalog of schema designs
 that hurt real users: the mononymous person who cannot pass a form
@@ -138,13 +138,13 @@ person has one. `VARCHAR(20)` claims no name is longer. A `CHECK`
 that statuses come from a fixed list claims the business will warn
 you before inventing a new status. Some of those claims are solid;
 others quietly exclude real people and real cases. The strongest
-designers are not the ones with the strictest constraints — they are
+designers are not the ones with the strictest constraints, they are
 the ones who know *which* facts the system genuinely guarantees.
 
 <Callout type="info" title="When in doubt, constrain what you control">
-Values your own system generates — statuses, roles, internal codes —
+Values your own system generates, statuses, roles, internal codes,
 deserve tight domains, because you control the full list. Values that
-come from the outside world — names, addresses — deserve more
+come from the outside world, names, addresses, deserve more
 humility and looser domains. Required versus optional is still worth
 deciding; pretending to know the format often is not.
 </Callout>
@@ -211,7 +211,7 @@ flowchart TD
 <Callout type="warn" title="Do not model everything as a separate table">
 A table has a cost: keys, relationships, joins, and rules. Make a new
 entity when the thing has independent meaning, repeated instances, or
-relationships of its own — not just because it is a noun.
+relationships of its own, not just because it is a noun.
 </Callout>
 
 ## Attributes should be named for meaning

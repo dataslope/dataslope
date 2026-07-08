@@ -1,6 +1,6 @@
 ---
 title: Where to Go Next
-description: A roadmap of the systems-programming topics that follow this course — processes, threads, I/O, sockets, kernels, sanitizers, and modern alternatives
+description: A roadmap of the systems-programming topics that follow this course, processes, threads, I/O, sockets, kernels, sanitizers, and modern alternatives
 ---
 
 You now have the foundation: types, pointers, arrays, strings, the
@@ -8,9 +8,9 @@ stack, the heap, structs, and the bug classes that haunt manual
 memory management. That is enough to read most of the C source code
 in the world and write small to medium programs of your own.
 
-What's left is the *systems* part of systems programming — the
+What's left is the *systems* part of systems programming, the
 APIs that connect C programs to the operating system, the network,
-and other processes — plus the modern tooling and language
+and other processes, plus the modern tooling and language
 alternatives that build on what C taught you.
 
 This page is a roadmap, not a tutorial. Each topic deserves its own
@@ -19,7 +19,7 @@ course, and there are many great ones out there.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A transit map: from a blue you-are-here hub, three thin lines branch through solid stations to ring-shaped termini — processes, networking, tooling — and a faint gray line continues off the map's edge, because the journey keeps going"
+  aria-label="A transit map: from a blue you-are-here hub, three thin lines branch through solid stations to ring-shaped termini, processes, networking, tooling, and a faint gray line continues off the map's edge, because the journey keeps going"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -84,12 +84,12 @@ course, and there are many great ones out there.
 A *process* is a running program: its address space, open files,
 credentials, and one or more threads of execution.
 
-- `fork()` — duplicate the current process
-- `execve()` family — replace the current process image with a new program
-- `wait()` / `waitpid()` — reap children
-- `exit()` / `_exit()` — terminate a process
-- `getpid()`, `getppid()`, `getuid()` — identity
-- `signal()` / `sigaction()` — asynchronous notifications (`SIGINT`, `SIGTERM`, `SIGSEGV`, `SIGCHLD`, …)
+- `fork()`, duplicate the current process
+- `execve()` family, replace the current process image with a new program
+- `wait()` / `waitpid()`, reap children
+- `exit()` / `_exit()`, terminate a process
+- `getpid()`, `getppid()`, `getuid()`, identity
+- `signal()` / `sigaction()`, asynchronous notifications (`SIGINT`, `SIGTERM`, `SIGSEGV`, `SIGCHLD`, …)
 
 Together these are how shells run commands, how `init` supervises
 services, and how Unix's "do one thing well" philosophy becomes
@@ -106,10 +106,10 @@ That makes communication cheap and corruption easy.
 - POSIX threads: `pthread_create`, `pthread_join`, `pthread_mutex_t`,
   `pthread_cond_t`
 - C11 threads: `<threads.h>` provides a portable subset
-- Atomics: `<stdatomic.h>` — lock-free counters, flags, sequence
+- Atomics: `<stdatomic.h>`, lock-free counters, flags, sequence
   numbers
 - The memory model: acquire / release, sequential consistency,
-  happens-before — what does "thread A wrote 5 to `x`" actually
+  happens-before, what does "thread A wrote 5 to `x`" actually
   guarantee for thread B?
 
 Threads are how you keep all the cores busy in compute-heavy work;
@@ -124,11 +124,11 @@ Action* (the C and C++ memory models are very similar).
 Above `stdio.h` lives the standard library's buffered I/O (`fopen`,
 `fread`, `fwrite`, `fprintf`). Below it lives the raw POSIX layer:
 
-- `open` / `close` / `read` / `write` — the four core syscalls
-- `lseek`, `dup`, `dup2`, `pipe` — file-descriptor plumbing
-- `stat` / `fstat` — file metadata
-- `mmap` — map a file (or anonymous memory) into the address space
-- `fcntl`, `ioctl` — the "everything else" syscalls
+- `open` / `close` / `read` / `write`, the four core syscalls
+- `lseek`, `dup`, `dup2`, `pipe`, file-descriptor plumbing
+- `stat` / `fstat`, file metadata
+- `mmap`, map a file (or anonymous memory) into the address space
+- `fcntl`, `ioctl`, the "everything else" syscalls
 
 Understanding the difference between *file descriptors* (small ints
 in the kernel's per-process table) and `FILE *` (a libc buffer
@@ -140,9 +140,9 @@ The Berkeley sockets API is C through and through:
 
 - `socket`, `bind`, `listen`, `accept`, `connect`
 - `send` / `recv`, `sendto` / `recvfrom`
-- `getaddrinfo`, `freeaddrinfo` — DNS and address handling
+- `getaddrinfo`, `freeaddrinfo`, DNS and address handling
 - TCP vs UDP, blocking vs non-blocking, `select` / `poll` /
-  `epoll` (Linux) / `kqueue` (BSD/macOS) / `IOCP` (Windows) — the
+  `epoll` (Linux) / `kqueue` (BSD/macOS) / `IOCP` (Windows), the
   many shapes of "wait for many descriptors at once"
 
 Once you can write an echo server, you can read most of nginx.
@@ -166,14 +166,14 @@ space.
 ## 6. The kernel boundary and syscalls
 
 Every interaction with the outside world ultimately becomes a
-*syscall* — a controlled transition from user mode to kernel mode.
+*syscall*, a controlled transition from user mode to kernel mode.
 Learn what is on each side of that line:
 
-- `strace` (Linux), `dtruss` (macOS), `truss` (Solaris) — observe
+- `strace` (Linux), `dtruss` (macOS), `truss` (Solaris), observe
   which syscalls a program makes
-- `/proc/<pid>/` on Linux — a window into kernel-side state
+- `/proc/<pid>/` on Linux, a window into kernel-side state
 - vDSO and how `gettimeofday` avoids a real syscall
-- `seccomp` and Linux namespaces — the building blocks of containers
+- `seccomp` and Linux namespaces, the building blocks of containers
 
 If this excites you, the next step is reading the Linux kernel source
 or a teaching OS like xv6.
@@ -186,7 +186,7 @@ These are the tools that turn C from "trust the programmer" into
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue program block passes through a yellow scanner gate and comes out the other side with its two red defects exposed — sanitizers making invisible memory bugs visible at run time"
+  aria-label="A blue program block passes through a yellow scanner gate and comes out the other side with its two red defects exposed, sanitizers making invisible memory bugs visible at run time"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -224,18 +224,18 @@ your CI from day one of any new C project.
 Real C projects rarely use one giant `clang *.c -o out`. Common
 options:
 
-- **Make** — the classic, still excellent for small projects
-- **CMake** — the most widely used cross-platform meta-build system
-- **Meson + Ninja** — modern, fast, declarative
-- **Bazel / Buck** — for huge monorepos
-- **Autotools** — older but you will meet it in GNU packages
+- **Make**, the classic, still excellent for small projects
+- **CMake**, the most widely used cross-platform meta-build system
+- **Meson + Ninja**, modern, fast, declarative
+- **Bazel / Buck**, for huge monorepos
+- **Autotools**, older but you will meet it in GNU packages
 
 For dependencies: `pkg-config`, vcpkg, Conan, system package
 managers (`apt`, `pacman`, `brew`).
 
 ## 9. Embedded and freestanding C
 
-C without an OS underneath you — for microcontrollers, bootloaders,
+C without an OS underneath you, for microcontrollers, bootloaders,
 and kernels themselves.
 
 - Cross-compilation: `arm-none-eabi-gcc`, `xtensa-esp32-elf-gcc`
@@ -252,15 +252,15 @@ directly; you just lose the comforts of a hosted environment.
 Once you understand C, several modern languages will feel like "C
 with some of the foot-guns removed":
 
-- **C++** — superset that adds RAII, generics (templates), and a huge
+- **C++**, superset that adds RAII, generics (templates), and a huge
   standard library. The natural step up when you need
   classes/containers but cannot leave the C ABI.
-- **Rust** — the most successful "memory-safe systems language" yet.
+- **Rust**, the most successful "memory-safe systems language" yet.
   The borrow checker enforces at compile time the ownership
   discipline you have been writing by hand in C.
-- **Zig** — explicit allocators, compile-time code execution,
+- **Zig**, explicit allocators, compile-time code execution,
   excellent C interop. A "better C" that does not try to be C++.
-- **Go** — garbage-collected but still systems-oriented (good
+- **Go**, garbage-collected but still systems-oriented (good
   concurrency primitives, fast static binaries, dead-simple build).
 
 Any of them will be much easier to learn now that you understand
@@ -270,53 +270,53 @@ Any of them will be much easier to learn now that you understand
 
 A short, opinionated list:
 
-- **K&R** — *The C Programming Language* by Kernighan & Ritchie.
+- **K&R**, *The C Programming Language* by Kernighan & Ritchie.
   Still the gold-standard tour of the language itself.
-- **APUE** — *Advanced Programming in the Unix Environment* by
+- **APUE**, *Advanced Programming in the Unix Environment* by
   Stevens. The reference for syscalls on Unix-like systems.
-- **CSAPP** — *Computer Systems: A Programmer's Perspective* by
-  Bryant & O'Hallaron. Ties C to the machine — assembly, caches,
+- **CSAPP**, *Computer Systems: A Programmer's Perspective* by
+  Bryant & O'Hallaron. Ties C to the machine, assembly, caches,
   linking, virtual memory, concurrency.
-- **TLPI** — *The Linux Programming Interface* by Michael Kerrisk.
+- **TLPI**, *The Linux Programming Interface* by Michael Kerrisk.
   The exhaustive Linux complement to APUE.
-- **C: A Modern Approach** by K. N. King — gentler introduction with
+- **C: A Modern Approach** by K. N. King, gentler introduction with
   many exercises.
-- **Modern C** by Jens Gustedt — focused on C99/C11/C17 idioms.
+- **Modern C** by Jens Gustedt, focused on C99/C11/C17 idioms.
 
 For tools:
 
 - The man pages: `man 3 malloc`, `man 2 read`, `man 7 epoll`, …
-- Compiler Explorer ([godbolt.org](https://godbolt.org)) — see exactly
+- Compiler Explorer ([godbolt.org](https://godbolt.org)), see exactly
   what the compiler turns your C into.
-- *Hacker's Delight* by Henry Warren — bit-twiddling and low-level
+- *Hacker's Delight* by Henry Warren, bit-twiddling and low-level
   tricks.
 
 ## 12. Practice projects
 
 The fastest way to consolidate everything you've learned:
 
-1. **A tiny shell** — `fork` + `execve` + a parser. ~500 lines.
+1. **A tiny shell**, `fork` + `execve` + a parser. ~500 lines.
 2. **A `cat` / `wc` / `grep` reimplementation.** Teaches you file I/O.
 3. **A toy `malloc`.** Implement `mmalloc`/`mfree` on top of `mmap`
    with a free-list. You will never look at the heap the same way.
 4. **A TCP echo server.** First blocking, then with `select`, then
    with `epoll`.
-5. **A static-site generator or a JSON parser.** Pure parsing — great
+5. **A static-site generator or a JSON parser.** Pure parsing, great
    for practicing struct + heap discipline.
-6. **A linked allocator in an embedded RTOS** — if you have a board.
+6. **A linked allocator in an embedded RTOS**, if you have a board.
 
 ## A final note
 
 C is old. It has rough edges. Modern languages do many things better.
 But every operating system, every database, every browser, every
 language runtime has C (or near-C) at its core. Understanding C is
-understanding the layer of abstraction directly above the silicon —
+understanding the layer of abstraction directly above the silicon,
 and that understanding pays dividends for the rest of your career,
 no matter which language you spend your days in.
 
 <Callout type="success" title="Thank you">
 Thanks for working through *Systems Programming &amp; Memory
-Management in C*. If something in the course stuck — or didn't —
+Management in C*. If something in the course stuck, or didn't,
 please file an issue on the [Dataslope
 repository](https://github.com/dataslope/dataslope). Happy hacking.
 </Callout>

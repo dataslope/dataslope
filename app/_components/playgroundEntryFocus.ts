@@ -6,7 +6,7 @@
  * On the FIRST focus after a playground mounts ("entering" the playground):
  * - Desktop viewports focus the editor with the cursor at the END of the
  *   restored code, ready to continue typing where the work left off.
- * - Mobile viewports skip the focus entirely — focusing CodeMirror pops the
+ * - Mobile viewports skip the focus entirely, focusing CodeMirror pops the
  *   on-screen keyboard, which covers a large share of the screen before the
  *   user has asked to type.
  *

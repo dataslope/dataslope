@@ -6,7 +6,7 @@
  * `content/interview/` via `interviewSource`.
  *
  * Reuses the shared Tailwind/Fumadocs stylesheet (`../docs.css`) rather than
- * duplicating it — the docs routes all render the same Fumadocs UI, so the
+ * duplicating it, the docs routes all render the same Fumadocs UI, so the
  * scoped styles are identical. Importing it here scopes it to the
  * /interview-prep bundle too, keeping it out of the plain-CSS /playground
  * pages.

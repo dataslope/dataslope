@@ -1,10 +1,10 @@
 ---
 title: Data Structures & Algorithms
-description: Backend interview questions on Big-O, hashing, and stacks — with answers, concept checks, and three runnable coding challenges (Two Sum, Valid Anagram, Valid Parentheses).
+description: Backend interview questions on Big-O, hashing, and stacks, with answers, concept checks, and three runnable coding challenges (Two Sum, Valid Anagram, Valid Parentheses).
 ---
 
 The core of a coding interview. Review the Q&A, take the concept checks,
-then solve the three challenges — they run against a test suite in your
+then solve the three challenges, they run against a test suite in your
 browser.
 
 ## Q&A
@@ -12,7 +12,7 @@ browser.
 ### What is Big-O notation, and why do interviewers care?
 
 Big-O describes how an algorithm's time or space grows with input size
-**n**, ignoring constants — $O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$,
+**n**, ignoring constants, $O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$,
 $O(n^2)$, … Interviewers care because it predicts whether a solution
 scales: an $O(n^2)$ double loop that's fine for 100 items melts at
 1,000,000. The usual game is "make this brute-force $O(n^2)$ into $O(n)$
@@ -20,12 +20,12 @@ with the right data structure."
 
 ### When do you reach for a hash map?
 
-When you need **$O(1)$ average lookup/insert by key** — membership tests,
+When you need **$O(1)$ average lookup/insert by key**, membership tests,
 counting frequencies, grouping, or "have I seen this before?" It's what
 turns many $O(n^2)$ "compare all pairs" problems into a single $O(n)$ pass
 (see Two Sum below).
 
-### Array vs linked list — trade-offs?
+### Array vs linked list, trade-offs?
 
 **Arrays**: $O(1)$ random access by index, cache-friendly, but $O(n)$
 insert/delete in the middle. **Linked lists**: $O(1)$ insert/delete given
@@ -35,7 +35,7 @@ or as building blocks (queues, least-recently-used (LRU) caches).
 
 ### When is a stack the right structure?
 
-When the problem is about the **most recently seen** item — matching/
+When the problem is about the **most recently seen** item, matching/
 nesting (parentheses), undo, backtracking, or depth-first search (DFS).
 Its last-in-first-out (LIFO) order encodes "close the thing you opened
 last," which a counter can't (see Valid Parentheses).
@@ -43,7 +43,7 @@ last," which a counter can't (see Valid Parentheses).
 ### Recursion vs iteration?
 
 Recursion expresses naturally-recursive structure (trees, divide and
-conquer) clearly, but each call uses stack frames — deep recursion can
+conquer) clearly, but each call uses stack frames, deep recursion can
 overflow (Python's default limit is ~1000). Iteration (often with an
 explicit stack/queue) avoids that and is usually faster by a constant
 factor. Convert recursion to iteration when depth can be large.
@@ -61,8 +61,8 @@ amortized $O(1)$ per insert.
 
 A binary heap supports `insert` in $O(\log n)$ (bubble up), `extract-min`
 or `extract-max` in $O(\log n)$ (sift down), and `peek` in $O(1)$.
-Building a heap from n elements is $O(n)$ via heapify — not
-$O(n \log n)$ — because most nodes are near the leaves and travel very
+Building a heap from n elements is $O(n)$ via heapify, not
+$O(n \log n)$, because most nodes are near the leaves and travel very
 little. Python's `heapq` module is a min-heap. The snippet below uses
 `heapify` to build the heap in place, then `heappush` and `heappop` to
 add and remove the smallest element.
@@ -76,14 +76,14 @@ add and remove the smallest element.
 h = [5, 3, 8, 1]
 heapq.heapify(h)       # O(n) in-place
 heapq.heappush(h, 2)   # O(log n)
-print(heapq.heappop(h))  # 1  — O(log n)`,
+print(heapq.heappop(h))  # 1, O(log n)`,
     },
   ]}
 />
 
 ### How does a priority queue differ from a regular queue?
 
-A queue is first-in-first-out (FIFO) — elements leave in insertion order.
+A queue is first-in-first-out (FIFO), elements leave in insertion order.
 A priority queue always removes the element with the highest (or lowest)
 priority, regardless of insertion order. It is commonly implemented with a
 heap, giving $O(\log n)$ push and pop. Use it for Dijkstra's algorithm,
@@ -98,11 +98,11 @@ breadth-first search (BFS) queue, or any "add to one end, remove from
 other end" pattern. `list.pop(0)` is $O(n)$ and should be replaced with
 `deque.popleft()`.
 
-### Walk me through BFS vs DFS — when do you choose each?
+### Walk me through BFS vs DFS, when do you choose each?
 
 BFS uses a queue and explores level by level, guaranteeing the
 **shortest path** in an unweighted graph. DFS uses a stack (or recursion)
-and dives deep first — natural for cycle detection, topological sort,
+and dives deep first, natural for cycle detection, topological sort,
 connected components, and backtracking. BFS memory usage can be $O(n)$ at
 the widest level; DFS memory is proportional to depth.
 
@@ -148,8 +148,8 @@ print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D']`,
 ### How do you detect a cycle in a directed graph?
 
 Use DFS with a **three-color** (or two-set) approach: track nodes as
-unvisited, in the current recursion stack, or fully visited. A back edge —
-an edge to a node already on the current stack — means a cycle exists.
+unvisited, in the current recursion stack, or fully visited. A back edge,
+an edge to a node already on the current stack, means a cycle exists.
 Alternatively, run Kahn's topological-sort algorithm; if the output
 contains fewer than n nodes, there is a cycle.
 
@@ -229,7 +229,7 @@ Dijkstra finds the shortest path from a source to all other nodes in a
 graph with **non-negative** edge weights. It uses a min-heap of
 `(distance, node)` pairs. Each node is processed once; each edge
 relaxation costs $O(\log V)$ for the heap update. Total:
-$O((V + E)\log V)$. It fails with negative weights — use Bellman-Ford
+$O((V + E)\log V)$. It fails with negative weights, use Bellman-Ford
 there. In the `dijkstra` function below, the `dist` dict holds the best
 known distance and the stale-entry check (`if d > dist.get(u, ...)`) skips
 heap entries that have already been improved.
@@ -318,7 +318,7 @@ In-order (left → root → right) visits BST nodes in **sorted** order.
 Pre-order (root → left → right) is useful for serializing a tree.
 Post-order (left → right → root) is useful for deletion or evaluating
 expression trees. All three are $O(n)$. The `inorder` function below
-recurses left, prints the current node, then recurses right — yielding the
+recurses left, prints the current node, then recurses right, yielding the
 keys in ascending order.
 
 <CodeBlock
@@ -358,11 +358,11 @@ inorder(root)  # prints 1 3 4 5 7 in sorted order`,
 
 A trie (prefix tree) stores strings character by character in a tree.
 Lookup, insert, and prefix search are all $O(L)$ where L is the key
-length — independent of how many keys are stored. It excels at
+length, independent of how many keys are stored. It excels at
 autocomplete, spell-check, and IP routing tables. The trade-off is higher
 memory than a hash map for sparse key sets.
 
-### Binary search — prerequisites and common mistakes?
+### Binary search, prerequisites and common mistakes?
 
 Binary search requires a **sorted, random-access** collection. The classic
 mistake is the off-by-one error in the loop bounds (`lo < hi` vs `lo <= hi`)
@@ -435,7 +435,7 @@ A sliding window maintains a contiguous subarray (or substring) of
 variable or fixed size, expanding and shrinking it rather than recomputing
 from scratch. It reduces many $O(n^2)$ substring problems to $O(n)$. For
 example, "longest substring without repeating characters" expands the
-right pointer and shrinks the left when a duplicate enters the window —
+right pointer and shrinks the left when a duplicate enters the window,
 exactly what `length_of_longest_substring` does below using the `seen`
 map of last-seen indices.
 
@@ -530,7 +530,7 @@ print(quicksort([3, 6, 8, 10, 1, 2, 1]))  # [1, 1, 2, 3, 6, 8, 10]`,
 
 ### When is heapsort preferable?
 
-Heapsort is $O(n \log n)$ worst-case and $O(1)$ extra space — no
+Heapsort is $O(n \log n)$ worst-case and $O(1)$ extra space, no
 recursion, no merge buffer. It is less cache-friendly than quicksort in
 practice, so real libraries rarely use it alone. Its main advantage is the
 guaranteed $O(n \log n)$ with constant space, useful for embedded or
@@ -539,7 +539,7 @@ memory-constrained systems.
 ### What makes a sort "stable," and why does it matter?
 
 A stable sort preserves the relative order of elements that compare as
-equal. It matters when sorting by multiple keys sequentially — e.g., sort
+equal. It matters when sorting by multiple keys sequentially, e.g., sort
 by last name first, then by first name: a stable sort on first name
 preserves the last-name ordering among ties. Python's built-in sort
 (Timsort) is stable; heapsort is not.
@@ -560,7 +560,7 @@ bottom-up with no recursion.
   files={[
     {
       filename: "main.py",
-      starterCode: `# Memoization — Fibonacci
+      starterCode: `# Memoization, Fibonacci
 from functools import lru_cache
 
 @lru_cache(maxsize=None)
@@ -569,7 +569,7 @@ def fib(n):
         return n
     return fib(n - 1) + fib(n - 2)
 
-# Tabulation — Fibonacci
+# Tabulation, Fibonacci
 def fib_tab(n):
     a, b = 0, 1
     for _ in range(n):
@@ -707,7 +707,7 @@ structures proportional to input size. Quicksort is in-place; merge sort
 is out-of-place. The trade-off is memory overhead vs simplicity and
 sometimes performance (cache effects).
 
-### What graph representation should you use — adjacency list vs matrix?
+### What graph representation should you use, adjacency list vs matrix?
 
 An adjacency **list** uses $O(V + E)$ space and is efficient for sparse
 graphs; iterating over neighbors is $O(\text{degree})$. An adjacency
@@ -723,7 +723,7 @@ final order contains fewer than V nodes, at least one cycle exists and a
 full topological sort is impossible. It is an alternative to DFS-based
 topological sort and naturally detects cycles. The `kahns` function below
 takes an edge list, computes each node's `in_deg`, and drains the
-zero-in-degree queue — comparing `len(order)` against `num_nodes` to
+zero-in-degree queue, comparing `len(order)` against `num_nodes` to
 report a cycle.
 
 <CodeBlock
@@ -762,14 +762,14 @@ print("cycle?" , len(order) < 4)     # False`,
 ## Concept checks
 
 <MultipleChoice
-  markdown={`Your first Two Sum solution uses two nested loops — O(n²). How does a single pass with a hash map bring it to O(n)?
+  markdown={`Your first Two Sum solution uses two nested loops, O(n²). How does a single pass with a hash map bring it to O(n)?
 
 - It can't; comparing all pairs is fundamentally O(n²).
   > A hash map avoids comparing all pairs by checking each number once against what you've already seen.
 - [o] As you scan, store each value's index in a dict and check whether \`target - num\` is already in it.
-  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space) — the standard optimal Two Sum.
+  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space), the standard optimal Two Sum.
 - Sort the array first, then binary search for each complement.
-  > Sorting is O(n log n) and loses the original indices the question asks for — slower and more bookkeeping.
+  > Sorting is O(n log n) and loses the original indices the question asks for, slower and more bookkeeping.
 - Use recursion to divide the array in half.
   > Divide-and-conquer doesn't apply cleanly and wouldn't beat the O(n) hash-map scan.`}
 />
@@ -779,10 +779,10 @@ print("cycle?" , len(order) < 4)     # False`,
 
 - Counting is fine; the bracket counts just have to be equal.
   > Equal counts aren't enough: \`"([)]"\` has matching counts but is invalid because the nesting order is wrong.
-- [o] A stack enforces ordering — each closer must match the **most recently opened** bracket (LIFO).
+- [o] A stack enforces ordering, each closer must match the **most recently opened** bracket (LIFO).
   > LIFO matching catches interleaved brackets like \`"([)]"\` that a counter would wrongly accept.
 - A queue (FIFO) would work just as well.
-  > FIFO matches the *oldest* open bracket — the opposite of nesting; \`"([)]"\` would be accepted incorrectly.
+  > FIFO matches the *oldest* open bracket, the opposite of nesting; \`"([)]"\` would be accepted incorrectly.
 - You need a hash map, not a stack.
   > A map helps look up the matching pair, but the stack enforces correct nesting order.`}
 />

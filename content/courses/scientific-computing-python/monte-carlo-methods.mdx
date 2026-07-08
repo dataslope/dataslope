@@ -1,6 +1,6 @@
 ---
 title: Monte Carlo Methods
-description: Compute with random numbers — integration, simulation, and uncertainty quantification
+description: Compute with random numbers, integration, simulation, and uncertainty quantification
 ---
 
 When a problem has too many dimensions, too much geometric
@@ -14,14 +14,14 @@ Three things make Monte Carlo special:
 - The error scales as $1/\sqrt{N}$ **regardless of dimension**.
   This is bad for low-dimensional smooth integrals (deterministic
   quadrature crushes it) and *unbeatable* in high dimensions.
-- It needs almost no problem structure — you only have to be
+- It needs almost no problem structure, you only have to be
   able to *sample* and *evaluate*.
 - It produces an error estimate as a byproduct.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Random dots scattered over a square: those landing inside the translucent quarter circle are blue, the rest faded — estimating pi by counting where the darts fall"
+  aria-label="Random dots scattered over a square: those landing inside the translucent quarter circle are blue, the rest faded, estimating pi by counting where the darts fall"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -76,7 +76,7 @@ print(f"standard error ≈ 4·√(p(1-p)/N) = {4 * np.sqrt(inside * (1 - inside)
 
 A million samples buy you about three correct digits. To get one
 more digit you would need 100× as many samples. This **$1/\sqrt
-N$ scaling** is the central law of Monte Carlo — slow, but
+N$ scaling** is the central law of Monte Carlo, slow, but
 unaffected by the dimensionality of the problem.
 
 ## Monte Carlo integration
@@ -148,11 +148,11 @@ $$
 rng = np.random.default_rng(0)
 N = 100_000
 
-# Uniform sampling on [0, 50] — most samples in the tail are wasted
+# Uniform sampling on [0, 50], most samples in the tail are wasted
 xu = rng.uniform(0, 50, N)
 mc_uniform = 50 * np.mean(xu * np.exp(-xu))
 
-# Importance sampling from exponential(1) — perfectly matched
+# Importance sampling from exponential(1), perfectly matched
 xe = rng.exponential(scale=1.0, size=N)
 mc_importance = np.mean(xe * np.exp(-xe) / np.exp(-xe))  # = mean(xe)
 
@@ -210,7 +210,7 @@ plt.show()
   ]}
 />
 
-The mean-squared displacement grows linearly with time — the
+The mean-squared displacement grows linearly with time, the
 diffusion law. This same simulation underlies Brownian motion,
 neutron transport, and option pricing.
 
@@ -262,7 +262,7 @@ plt.show()
 />
 
 After enough time, every walker's marginal distribution converges
-to the same Gaussian — the *stationary distribution*. Monte Carlo
+to the same Gaussian, the *stationary distribution*. Monte Carlo
 lets you see analytical results emerge from raw randomness.
 
 ## Uncertainty quantification by bootstrap
@@ -295,7 +295,7 @@ print(f"bootstrap std error : {boot_means.std(ddof=1):.4f}")
   ]}
 />
 
-The bootstrap works for *any* statistic — median, regression
+The bootstrap works for *any* statistic, median, regression
 coefficient, correlation, anything you can compute on a sample.
 It is one of the most powerful applications of Monte Carlo to
 statistics.
@@ -349,7 +349,7 @@ def estimate_with_se(f, low, high, N, seed=0):
   ]}
 />
 
-Notice how the error bars shrink as $1/\sqrt N$ — every 100×
+Notice how the error bars shrink as $1/\sqrt N$, every 100×
 increase in samples buys you one extra digit. This is both the
 power and the limitation of Monte Carlo.
 
@@ -407,7 +407,7 @@ def mc_area(predicate, bounds, n_samples, seed=0):
 
 - Deterministic quadrature always wins because it is higher order
   > High order only helps in low dimensions; in 12 dimensions a fixed budget of evaluations forces $n = 2$ nodes per axis (a $2^{12}$ grid), which gives far less accuracy than Monte Carlo on the same budget.
-- [o] Monte Carlo usually wins because deterministic quadrature costs $n^\{12\}$ evaluations — only $n = 2$ fits in any reasonable budget — while MC's $1/\\sqrt\{N\}$ error is independent of dimension
+- [o] Monte Carlo usually wins because deterministic quadrature costs $n^\{12\}$ evaluations, only $n = 2$ fits in any reasonable budget, while MC's $1/\\sqrt\{N\}$ error is independent of dimension
   > In high dimensions deterministic quadrature suffers from the curse of dimensionality: doubling accuracy multiplies cost by $2^d$. Monte Carlo's dimension-free error scaling is what makes it the standard tool for integrals beyond ~5 dimensions.
 - They are always equivalent
   > They are equivalent only in very low dimensions; the curse of dimensionality makes deterministic quadrature impractical beyond about 4–5 dimensions while Monte Carlo is unaffected.

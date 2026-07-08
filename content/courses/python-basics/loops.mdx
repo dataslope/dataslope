@@ -3,14 +3,14 @@ title: Loops
 description: for, while, range, break, continue, and the for-else surprise
 ---
 
-Iteration is the engine of automation. Every batch job, every data pipeline, every web scraper, every game loop, every file processor — they all loop. Python has two looping constructs: `for` iterates over any iterable; `while` repeats while a condition holds true. Mastering loops means writing efficient, readable code that processes data at scale.
+Iteration is the engine of automation. Every batch job, every data pipeline, every web scraper, every game loop, every file processor, they all loop. Python has two looping constructs: `for` iterates over any iterable; `while` repeats while a condition holds true. Mastering loops means writing efficient, readable code that processes data at scale.
 
-Every snippet on this page runs in your browser — no setup required.
+Every snippet on this page runs in your browser, no setup required.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three green squares already filled, a blue square under the marker being handled now, and a dashed slot still waiting, while a thin gray loop line sweeps from the end of the row back to the start — a loop repeats until every item is done"
+  aria-label="Three green squares already filled, a blue square under the marker being handled now, and a dashed slot still waiting, while a thin gray loop line sweeps from the end of the row back to the start, a loop repeats until every item is done"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -29,7 +29,7 @@ Every snippet on this page runs in your browser — no setup required.
 
 ## Real-world impact
 
-Loops are everywhere in real code. A web server loops over incoming requests. A machine learning library loops over training batches. A file processor loops over lines. A game engine loops 60 times per second. Understanding loops deeply — including when to `break`, when to `continue`, and how to avoid common pitfalls — is essential.
+Loops are everywhere in real code. A web server loops over incoming requests. A machine learning library loops over training batches. A file processor loops over lines. A game engine loops 60 times per second. Understanding loops deeply, including when to `break`, when to `continue`, and how to avoid common pitfalls, is essential.
 
 ```mermaid
 flowchart TD
@@ -148,7 +148,7 @@ print()
 />
 
 <Callout type="warn">
-The `stop` parameter is **exclusive**. `range(5)` yields `0, 1, 2, 3, 4` — not 5. This is Python's universal convention for ranges and slices, and it prevents off-by-one errors most of the time. But you still need to watch for them when converting between 0-indexed and 1-indexed logic.
+The `stop` parameter is **exclusive**. `range(5)` yields `0, 1, 2, 3, 4`, not 5. This is Python's universal convention for ranges and slices, and it prevents off-by-one errors most of the time. But you still need to watch for them when converting between 0-indexed and 1-indexed logic.
 </Callout>
 
 ## `enumerate`
@@ -625,13 +625,13 @@ for i in range(3):
   markdown={`When does a \`for ... else\` clause execute?
 
 - Always, after the loop body finishes
-  > No — it only runs if the loop **completes** without a break.
+  > No, it only runs if the loop **completes** without a break.
 - When the loop body raises an exception
-  > No — exceptions skip the else clause.
+  > No, exceptions skip the else clause.
 - [o] Only when the loop finishes without hitting \`break\`
   > That is what makes it useful for search loops.
 - Only when the iterable is empty
-  > No — it runs after a **successful** completion, not an empty iterable.`}
+  > No, it runs after a **successful** completion, not an empty iterable.`}
 />
 
 <MultipleChoice

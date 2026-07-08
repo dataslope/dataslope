@@ -1,20 +1,20 @@
 ---
 title: Discrete Distributions
-description: Bernoulli, Binomial, Poisson, and Geometric — the count models for yes/no outcomes and rare events, when each one arises in real data, and how to answer probability questions with scipy.stats.
+description: Bernoulli, Binomial, Poisson, and Geometric, the count models for yes/no outcomes and rare events, when each one arises in real data, and how to answer probability questions with scipy.stats.
 ---
 
 A huge share of data-science questions boil down to **counting things
 that either happen or don't**. Did this visitor convert? How many of
 the 10,000 emails bounced? How many support tickets will land in the
 next hour? You can't write down the exact future, but you *can* write
-down a model for how those counts behave — and once you have the model,
+down a model for how those counts behave, and once you have the model,
 questions like "what's the chance we get 8 or more tickets this hour?"
 become one line of code.
 
 That's what a **discrete distribution** is: a rulebook assigning a
 probability to each whole-number outcome a count can take. This page
-covers the four you'll reach for constantly — **Bernoulli**,
-**Binomial**, **Poisson**, and (briefly) **Geometric** — and, just as
+covers the four you'll reach for constantly, **Bernoulli**,
+**Binomial**, **Poisson**, and (briefly) **Geometric**, and, just as
 important, *which one fits which situation*. Picking the wrong model is
 the most common way these tools go wrong, so we'll spend real time on
 when each one applies and when it doesn't.
@@ -22,7 +22,7 @@ when each one applies and when it doesn't.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A single yes-or-no Bernoulli pair at the top branches down three thin lines into its children — a lollipop hill of success counts, a row of event ticks, and a run of gray misses ending in the first green hit — binomial, Poisson, and geometric all grown from one tiny atom"
+  aria-label="A single yes-or-no Bernoulli pair at the top branches down three thin lines into its children, a lollipop hill of success counts, a row of event ticks, and a run of gray misses ending in the first green hit, binomial, Poisson, and geometric all grown from one tiny atom"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -71,7 +71,7 @@ when each one applies and when it doesn't.
 
 <Callout type="info" title="Discrete means countable">
 A distribution is **discrete** when the outcomes are separate, countable
-values — 0, 1, 2, 3 tickets; never 2.7 tickets. The function that gives
+values, 0, 1, 2, 3 tickets; never 2.7 tickets. The function that gives
 the probability of each exact value is the **probability mass function
 (PMF)**. Contrast this with continuous quantities like wait times or
 heights, which we handle in *Continuous Distributions*.
@@ -84,8 +84,8 @@ single trial with two outcomes, "success" (1) with probability `p` and
 "failure" (0) with probability `1 − p`. One coin flip. One visitor who
 either converts or doesn't. One email that either bounces or doesn't.
 
-There's almost nothing to it — the mean is just `p` and the variance is
-`p(1 − p)` — but it's the building block. Every other distribution on this
+There's almost nothing to it, the mean is just `p` and the variance is
+`p(1 − p)`, but it's the building block. Every other distribution on this
 page is what happens when you start combining Bernoulli trials.
 
 <CodeBlock
@@ -113,7 +113,7 @@ print("\\n10 simulated visitors:", sample)
 />
 
 <Callout type="tip" title="The frozen-distribution pattern you'll reuse everywhere">
-`stats.bernoulli(p)` returns a **frozen distribution** — an object with
+`stats.bernoulli(p)` returns a **frozen distribution**, an object with
 the parameters baked in. You then call methods on it: `.pmf(k)`,
 `.cdf(k)`, `.mean()`, `.var()`, `.rvs(size=...)`. Every distribution in
 `scipy.stats` follows this same pattern, so once you learn it for one,
@@ -229,8 +229,8 @@ your probabilities can be badly wrong:
 
 <Callout type="danger" title="Misconception: 'it's yes/no, so it must be binomial'">
 Yes/no outcomes are necessary but **not sufficient**. If conversions are
-*correlated* — say a TV ad drives a burst of visitors who all behave
-alike — trials aren't independent and the binomial **understates** the
+*correlated*, say a TV ad drives a burst of visitors who all behave
+alike, trials aren't independent and the binomial **understates** the
 real variability. If `p` drifts over the day (mobile users convert less
 than desktop), the constant-`p` assumption breaks. Real funnels often
 violate these; the binomial is a *model*, and you should ask whether its
@@ -244,8 +244,8 @@ assumptions actually fit before trusting its numbers.
 
 Using \`scipy.stats.binom\`, compute:
 
-- **\`expected\`** — the expected number of sign-ups (a plain Python \`float\`).
-- **\`p_at_least_25\`** — the probability of getting **25 or more** sign-ups, \`P(X >= 25)\`, as a \`float\`.
+- **\`expected\`**, the expected number of sign-ups (a plain Python \`float\`).
+- **\`p_at_least_25\`**, the probability of getting **25 or more** sign-ups, \`P(X >= 25)\`, as a \`float\`.
 
 Hints:
 
@@ -317,7 +317,7 @@ assert abs(p_at_least_25 - wrong) > 1e-12`,
 The **Poisson** distribution counts how many times a rare-ish event
 happens in a fixed window of time or space, when events occur
 independently at a constant average **rate** λ (lambda). There's
-no fixed `n` and no per-trial `p` — just an average rate and an
+no fixed `n` and no per-trial `p`, just an average rate and an
 interval. Classic uses:
 
 - **Arrivals**: customers per minute, requests per second, calls per hour.
@@ -328,7 +328,7 @@ interval. Classic uses:
 The Poisson has one beautiful property: its mean **and** its variance
 both equal λ. If your event counts have a variance much larger
 than their mean, that's a red flag the Poisson doesn't fit
-(over-dispersion — often from events clumping together).
+(over-dispersion, often from events clumping together).
 
 ```mermaid
 flowchart TD
@@ -341,12 +341,12 @@ flowchart TD
 
 Suppose your queue gets about **3 support tickets per hour** on average,
 arriving independently. What's the chance a single hour brings **8 or
-more** — a spike worth staffing for?
+more**, a spike worth staffing for?
 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="One long timeline of irregularly arriving yellow event ticks sliced into three equal translucent windows, each topped by blue count dots for the two, five, and one events it captured — a fixed interval, a constant average rate, and a count that varies window to window is exactly the Poisson setting"
+  aria-label="One long timeline of irregularly arriving yellow event ticks sliced into three equal translucent windows, each topped by blue count dots for the two, five, and one events it captured, a fixed interval, a constant average rate, and a count that varies window to window is exactly the Poisson setting"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="110" width="520" height="3" rx="1.5" fill="var(--ds-gray-400)" />
@@ -434,8 +434,8 @@ The Poisson assumes events are **independent** and occur at a
 
 Using \`scipy.stats.poisson\`, compute:
 
-- **\`mean_errors\`** — the expected errors per minute (a \`float\`; it should equal the rate).
-- **\`p_more_than_9\`** — the probability of **more than 9** errors in a minute, \`P(X > 9)\`, as a \`float\`.
+- **\`mean_errors\`**, the expected errors per minute (a \`float\`; it should equal the rate).
+- **\`p_more_than_9\`**, the probability of **more than 9** errors in a minute, \`P(X > 9)\`, as a \`float\`.
 
 Hints:
 
@@ -527,7 +527,7 @@ print(f"P(more than 10 calls needed)          = {d.sf(10):.4f}")
 `scipy.stats.geom` counts the **trial number of the first success**, so
 its support is 1, 2, 3, ... and its mean is `1/p`. Some textbooks define
 the geometric as the number of *failures before* the first success
-(support 0, 1, 2, ... with mean `(1 − p)/p`). Same idea, shifted by one —
+(support 0, 1, 2, ... with mean `(1 − p)/p`). Same idea, shifted by one,
 always check which convention a tool uses before trusting the numbers.
 </Callout>
 
@@ -548,7 +548,7 @@ flowchart TD
 ```
 
 <Callout type="warn" title="The biggest modeling trap: a discrete model for continuous data">
-All four distributions here are for **counts** — whole numbers. They are
+All four distributions here are for **counts**, whole numbers. They are
 the wrong tool for inherently continuous measurements like wait times,
 revenue, temperatures, or response latencies. "Seconds until the page
 loads" is continuous; reach for the **Exponential** or **Normal** in
@@ -561,7 +561,7 @@ doesn't apply.
 
 When you're unsure whether a formula is right, simulate. Draw many
 samples with `.rvs`, count how often the event happens, and compare to
-the analytic probability. They should match closely — that agreement is
+the analytic probability. They should match closely, that agreement is
 your confidence the model is set up correctly.
 
 <CodeBlock
@@ -598,7 +598,7 @@ print("\\nClose agreement = the model is set up correctly.")
 - Bernoulli, because each customer either arrives or doesn't
   > Bernoulli models a single yes/no trial, not a count of many arrivals over an interval.
 - Binomial, because you're counting arrivals
-  > A binomial needs a fixed number of trials \`n\` and a per-trial probability \`p\`; here there is no fixed \`n\` — just a rate over time.
+  > A binomial needs a fixed number of trials \`n\` and a per-trial probability \`p\`; here there is no fixed \`n\`, just a rate over time.
 - [o] Poisson, because it counts independent events occurring at a constant rate over a fixed interval
   > Counting independent events arriving at a steady average rate in a fixed window is exactly the situation the Poisson is built for, with mean equal to the rate.
 - Geometric, because you're waiting for customers
@@ -611,7 +611,7 @@ No fixed \`n\`, just a rate over an interval, points squarely at the Poisson.`}
   markdown={`For \`stats.binom(n=100, p=0.2)\`, which expression gives \`P(X >= 30)\` (30 or more successes)?
 
 - \`d.cdf(30)\`
-  > \`cdf(30)\` is \`P(X <= 30)\`, the lower tail — the opposite of what's asked.
+  > \`cdf(30)\` is \`P(X <= 30)\`, the lower tail, the opposite of what's asked.
 - \`d.sf(30)\`
   > \`sf(30)\` is \`P(X > 30)\` = \`P(X >= 31)\`, which excludes the value 30 and is off by one.
 - [o] \`d.sf(29)\`
@@ -656,9 +656,9 @@ Variance far exceeding the mean is the classic fingerprint of clustered, non-ind
   markdown={`Which quantity is **not** appropriate to model with any of the discrete distributions on this page?
 
 - The number of defective items in a shipment of 500
-  > A fixed number of items each pass/fail independently — a textbook binomial.
+  > A fixed number of items each pass/fail independently, a textbook binomial.
 - The number of fraud alerts triggered per day
-  > A count of events over a fixed interval at some average rate — a Poisson fits.
+  > A count of events over a fixed interval at some average rate, a Poisson fits.
 - The number of login attempts until the first success
   > Counting trials until the first success is exactly the geometric.
 - [o] The exact time in seconds a page takes to load
@@ -668,14 +668,14 @@ Counts are whole numbers; continuous measurements like time belong to the next c
 />
 
 <Callout type="success" title="Key takeaways">
-- **Bernoulli(p)** — one yes/no trial; the atom for the rest.
-- **Binomial(n, p)** — count of successes in a **fixed** number of
+- **Bernoulli(p)**, one yes/no trial; the atom for the rest.
+- **Binomial(n, p)**, count of successes in a **fixed** number of
   independent trials with **constant** p (conversions, defects,
   yes/no survey counts). Mean `np`, variance `np(1 − p)`.
-- **Poisson(λ)** — count of independent events at a **constant rate**
+- **Poisson(λ)**, count of independent events at a **constant rate**
   over a fixed interval (arrivals, errors/hour, typos/page).
   Mean = variance = λ; rates scale linearly with the interval.
-- **Geometric(p)** — number of trials until the **first** success;
+- **Geometric(p)**, number of trials until the **first** success;
   watch the start-at-1 convention in scipy.
 - Match the **assumptions** to reality (fixed n, independence,
   constant p / constant rate), and never use a discrete count model

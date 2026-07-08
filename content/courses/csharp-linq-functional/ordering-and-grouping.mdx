@@ -1,6 +1,6 @@
 ---
 title: Ordering and Grouping
-description: OrderBy, ThenBy, GroupBy — the operators that bring shape to a flat sequence
+description: OrderBy, ThenBy, GroupBy, the operators that bring shape to a flat sequence
 ---
 
 So far our operators preserved the order of the input (`Where`,
@@ -94,13 +94,13 @@ record Person(string Name, int Age, string City);
 
 A few important details:
 
-- `OrderBy` returns `IOrderedEnumerable<T>` — a special kind of
+- `OrderBy` returns `IOrderedEnumerable<T>`, a special kind of
   enumerable that *remembers* the sort key, so you can layer more
   sorting on top with `ThenBy`.
 - It's a **stable sort**: elements with equal keys keep their input
   order.
 - It allocates an internal buffer and sorts. It is **not** lazy in
-  the same way `Where` is — it has to see all the elements before it
+  the same way `Where` is, it has to see all the elements before it
   can produce the first one in sorted order.
 
 ### Multiple sort keys with `ThenBy`
@@ -133,7 +133,7 @@ record Person(string Name, int Age, string City);
   ]}
 />
 
-`ThenBy` is *only* available on `IOrderedEnumerable<T>` — that is,
+`ThenBy` is *only* available on `IOrderedEnumerable<T>`, that is,
 *after* an `OrderBy`. The compiler will stop you from writing
 `xs.ThenBy(...)` without an `OrderBy` first.
 
@@ -141,7 +141,7 @@ record Person(string Name, int Age, string City);
 
 If you write `xs.OrderBy(a).OrderBy(b)`, the second `OrderBy`
 **discards** the first one. The result is sorted by `b`, then by `a`
-only within tied `b` values — almost always the opposite of what you
+only within tied `b` values, almost always the opposite of what you
 wanted. Use `ThenBy` instead.
 
 ## Grouping: `GroupBy`
@@ -192,7 +192,7 @@ flowchart LR
 
 ### `GroupBy` with an aggregate
 
-In practice, most of the time you don't iterate the groups — you
+In practice, most of the time you don't iterate the groups, you
 project them into summaries.
 
 <CodeBlock
@@ -226,7 +226,7 @@ This is one of the most common shapes you'll write in your career:
 
 ### Grouping by composite keys
 
-The key can be anything — including a tuple or anonymous type.
+The key can be anything, including a tuple or anonymous type.
 
 <CodeBlock
   adapter="csharp"
@@ -256,7 +256,7 @@ record Sale(string Region, string Product, decimal Amount);
 />
 
 Anonymous types implement structural equality, so two anonymous
-keys with the same field values are treated as equal — exactly what
+keys with the same field values are treated as equal, exactly what
 `GroupBy` needs.
 
 ### `GroupBy` vs `ToLookup`
@@ -279,7 +279,7 @@ var sales = new[] {
 
 var lookup = sales.ToLookup(s => s.Region);
 
-// Indexer returns an empty sequence for missing keys — no exception.
+// Indexer returns an empty sequence for missing keys, no exception.
 Console.WriteLine($"EU count    = {lookup["EU"].Count()}");
 Console.WriteLine($"AFRICA count = {lookup["AFRICA"].Count()}");
 
@@ -365,7 +365,7 @@ public static class SalesReport
 - [o] A sequence sorted by B, with ties in B broken by A.
   > The *second* \`OrderBy\` re-sorts everything by B; the first \`OrderBy\`'s ordering survives only within tied B values (because the sort is stable).
 - A compile error, because you can't apply \`OrderBy\` twice.
-  > It compiles fine — every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
+  > It compiles fine, every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
 - A sequence in undefined order.
   > The order is well-defined: by B primarily, then by A within equal B's.
 

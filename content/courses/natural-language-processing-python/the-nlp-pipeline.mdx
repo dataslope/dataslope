@@ -1,6 +1,6 @@
 ---
 title: The Anatomy of an NLP Pipeline
-description: The standard sequence of preprocessing steps text flows through — tokenize, normalize, filter, reduce, analyze — seen as one picture. Why it is a pipeline of transformations, why most steps are optional, and why order matters.
+description: The standard sequence of preprocessing steps text flows through, tokenize, normalize, filter, reduce, analyze, seen as one picture. Why it is a pipeline of transformations, why most steps are optional, and why order matters.
 ---
 
 On the last page we said NLP adds structure to text in *layers*. Those layers
@@ -12,7 +12,7 @@ once, because the shape will repeat on nearly every page that follows.
 <svg
   viewBox="0 0 640 310"
   role="img"
-  aria-label="A raw text capsule descends through small gray arrows: split into blue token chips, then filtered — two slots left as dashed outlines — into green normalized chips, and finally counted into a small green bar chart"
+  aria-label="A raw text capsule descends through small gray arrows: split into blue token chips, then filtered, two slots left as dashed outlines, into green normalized chips, and finally counted into a small green bar chart"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -81,14 +81,14 @@ comes out, ready to be counted or fed into a model. Three things about this
 sequence matter more than the steps themselves.
 
 **First, it is a pipeline of transformations.** At each step you are holding
-a value — first a string, then a list of tokens — and you apply one
+a value, first a string, then a list of tokens, and you apply one
 transformation to get the next value. This is exactly the list-comprehension
 style of Python you already know: `tokens = [t.lower() for t in tokens]` *is*
 the case-folding step.
 
 **Second, most steps are optional.** Only tokenization is nearly always
 present. Whether you lowercase, whether you remove stopwords, whether you
-stem or lemmatize — those are *choices*, and making them well is the single
+stem or lemmatize, those are *choices*, and making them well is the single
 most important skill in classic NLP. We give that skill its own page later
 ([Designing the Right Pipeline](./choosing-your-pipeline)).
 
@@ -96,18 +96,18 @@ most important skill in classic NLP. We give that skill its own page later
 information a tokenizer needs (those periods help it find sentence ends).
 Lowercasing before part-of-speech tagging can confuse a tagger that uses
 capitalization as a clue. The same steps in a different order can give
-different — sometimes worse — results.
+different, sometimes worse, results.
 
 The table above is the quick reference. Here is the same flow as a
 walkthrough, so you can watch the value in your hands change shape at each
-stage — a single string going in, a clean list of units coming out:
+stage, a single string going in, a clean list of units coming out:
 
 <Steps>
 <Step>
 
 **Raw text in**
 
-You start with a single string — one document, message, or sentence.
+You start with a single string, one document, message, or sentence.
 
 </Step>
 <Step>
@@ -123,7 +123,7 @@ sentence boundaries.
 **Word tokenization**
 
 Break the text into words and punctuation. You are now holding a *list of
-tokens* — and almost everything that follows is a transformation of that list.
+tokens*, and almost everything that follows is a transformation of that list.
 
 </Step>
 <Step>
@@ -144,7 +144,7 @@ Drop punctuation and other non-word tokens you do not need.
 
 **Stopword removal** *(optional)*
 
-Remove ultra-common words like *the*, *is*, and *of* — when the task benefits
+Remove ultra-common words like *the*, *is*, and *of*, when the task benefits
 from it.
 
 </Step>
@@ -170,7 +170,7 @@ After tokenization, your text is just a Python list of strings, and every
 later step is a transformation of that list into another list: filter out
 some items, lowercase the rest, replace each with its root. If you are
 comfortable with list comprehensions, you already understand the *mechanics*
-of an NLP pipeline. The hard part is never the code — it is deciding which
+of an NLP pipeline. The hard part is never the code, it is deciding which
 transformations to apply.
 </Callout>
 
@@ -219,24 +219,24 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer`,
       starterCode: `text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
 
-# Step 1 — word tokenization
+# Step 1, word tokenization
 tokens = word_tokenize(text)
 print("1. tokenized: ", tokens)
 
-# Step 2 — case folding (lowercase)
+# Step 2, case folding (lowercase)
 tokens = [t.lower() for t in tokens]
 print("2. lowercased:", tokens)
 
-# Step 3 — cleaning (keep only alphabetic tokens)
+# Step 3, cleaning (keep only alphabetic tokens)
 tokens = [t for t in tokens if t.isalpha()]
 print("3. cleaned:   ", tokens)
 
-# Step 4 — stopword removal
+# Step 4, stopword removal
 stop = set(stopwords.words("english"))
 tokens = [t for t in tokens if t not in stop]
 print("4. no stops:  ", tokens)
 
-# Step 5 — lemmatization (reduce to dictionary form)
+# Step 5, lemmatization (reduce to dictionary form)
 lemmatizer = WordNetLemmatizer()
 tokens = [lemmatizer.lemmatize(t) for t in tokens]
 print("5. lemmatized:", tokens)
@@ -247,7 +247,7 @@ print("5. lemmatized:", tokens)
 
 Each `print` is one row of the pipeline table. The list started as thirteen
 tokens including punctuation and shrank to a handful of meaningful roots. Try
-commenting out step 4 (stopword removal) and re-running — notice how much
+commenting out step 4 (stopword removal) and re-running, notice how much
 longer the final list becomes, and ask yourself whether those extra words
 would help or hurt whatever you planned to do next. That question has no
 universal answer, which is exactly why these steps are choices.
@@ -256,20 +256,20 @@ universal answer, which is exactly why these steps are choices.
 Move the lowercasing step (step 2) to *after* stopword removal and re-run.
 The stopword list is all lowercase, so comparing un-lowercased tokens like
 `"The"` against it silently fails to remove them. This is a tiny taste of why
-*order matters* — a theme we will keep returning to.
+*order matters*, a theme we will keep returning to.
 </Callout>
 
 ## The two families of steps: cleaning vs. analysis
 
 It helps to mentally split the pipeline into two halves.
 
-**Preprocessing (cleaning)** — a fixed sequence:
+**Preprocessing (cleaning)**, a fixed sequence:
 
 1. Tokenize
 2. Normalize
 3. Filter / reduce
 
-**Analysis (extracting value)** — pick what your goal needs:
+**Analysis (extracting value)**, pick what your goal needs:
 
 - Count frequencies
 - Tag parts of speech
@@ -281,7 +281,7 @@ mostly mechanical and mostly the same from project to project. The
 **analysis** half is where you actually extract value, and it depends on your
 goal: a search engine counts and indexes, an autocomplete builds n-grams, a
 classifier builds features. Crucially, *the analysis you intend to do should
-drive the preprocessing choices you make* — not the other way around. We will
+drive the preprocessing choices you make*, not the other way around. We will
 see this dependency again and again.
 
 <MultipleChoice
@@ -289,8 +289,8 @@ see this dependency again and again.
 tokenization usually is not"?
 
 - Tokenization is the only step that is fast enough to run
-  > Speed is not what makes tokenization special; it is that every subsequent step — lowercasing, filtering, counting — operates on the list of tokens that tokenization produces, making it a prerequisite rather than a choice.
-- [o] Almost every later step operates on *tokens*, so you need tokens before you can lowercase, filter, count, or tag them — whereas lowercasing, stopword removal, and stemming are choices that depend on the task
+  > Speed is not what makes tokenization special; it is that every subsequent step, lowercasing, filtering, counting, operates on the list of tokens that tokenization produces, making it a prerequisite rather than a choice.
+- [o] Almost every later step operates on *tokens*, so you need tokens before you can lowercase, filter, count, or tag them, whereas lowercasing, stopword removal, and stemming are choices that depend on the task
   > Tokenization produces the list of units everything else transforms. Without it there is nothing to lowercase or count. The later steps add or remove information and are applied (or skipped) based on what you are trying to achieve.
 - Tokenization is the last thing you do, after counting
   > Tokenization must come first, not last, because counting and every other step require a list of tokens to operate on; you cannot count words in a raw string directly.
@@ -303,7 +303,7 @@ You cannot transform a list of tokens you have not produced yet.`}
 ## Order matters: a concrete example
 
 We just hinted at it; let us prove it. The block below runs the *same three
-operations* — lowercase, remove stopwords, keep alphabetic — but in two
+operations*, lowercase, remove stopwords, keep alphabetic, but in two
 different orders, and compares the results.
 
 <CodeBlock
@@ -360,7 +360,7 @@ Order A correctly removes all three "the"s, because by the time we compare
 against the lowercase stopword list, every token is lowercase. Order B leaves
 `"The"` and `"THE"` behind, because they did not match the lowercase `"the"`
 in the stoplist at the moment we filtered. Same operations, different order,
-different — and in this case wrong — result.
+different, and in this case wrong, result.
 
 <Callout type="warn" title="Order bugs are silent">
 Notice that Order B did not crash. It produced a perfectly reasonable-looking
@@ -426,7 +426,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 stop = set(stopwords.words("english"))`,
       starterCode: `def preprocess(text):
-    # your code here — return a list of clean tokens
+    # your code here, return a list of clean tokens
     tokens = word_tokenize(text)
     # ... lowercase, keep alphabetic, drop stopwords ...
     return tokens
@@ -488,7 +488,7 @@ assert all(w.isalpha() for w in out), "Found a non-alphabetic token: " + repr(ou
 
 <Callout type="success" title="Notice what the second test taught you">
 `preprocess("It is NOT a good day.")` returned `['good', 'day']`. The word
-**"not"** vanished — it is on NLTK's stopword list — and with it, the entire
+**"not"** vanished, it is on NLTK's stopword list, and with it, the entire
 meaning of the sentence flipped from negative to positive. That is a preview
 of one of the most important cautionary tales in this course, which we will
 tell in full on the [stopwords page](./stopwords). Removing stopwords is not
@@ -501,32 +501,32 @@ free; sometimes it throws away the very words that matter.
   markdown={`Why can applying the *same* preprocessing steps in a *different* order
 produce different results?
 
-- It cannot — order never affects the outcome of preprocessing
+- It cannot, order never affects the outcome of preprocessing
   > Order consistently affects outcomes, as the concrete code example in this page demonstrates: filtering stopwords before lowercasing leaves capitalized variants like "The" and "THE" in the output.
 - [o] Each step transforms the data the next step sees, so (for example) filtering before lowercasing compares differently-cased tokens against a lowercase stopword list and misses some
   > Steps are not independent; each one changes the input to the next. Lowercasing after filtering means the filter saw the original casing, so case-mismatched stopwords slip through. Order changes what each step actually operates on.
 - Reordering steps changes which version of Python runs
   > The Python version is a runtime property of the environment and is completely unaffected by the order of preprocessing operations in your code.
 - Only the first step has any effect; the rest are ignored
-  > Every step in the pipeline transforms the token list it receives; later steps are not ignored — they each change the data that flows into the following step.
+  > Every step in the pipeline transforms the token list it receives; later steps are not ignored, they each change the data that flows into the following step.
 
 Pipelines are sequential transformations, so the order of those transformations is part of the logic.`}
 />
 
 <MultipleChoice
   markdown={`A colleague says, "I always remove stopwords and stem every text, no matter
-the project — it's just good hygiene." What is the best response?
+the project, it's just good hygiene." What is the best response?
 
 - They are right; more preprocessing is always better
   > More preprocessing means more information destroyed; for sentiment analysis, removing stopwords deletes negations like "not", silently flipping a negative review to look positive.
 - [o] Preprocessing steps are choices that should be driven by the downstream task; some steps that help one task (like topic counting) actively hurt another (like sentiment analysis)
-  > There is no universally correct pipeline. Stopword removal helps when you want content words for topic analysis but can destroy sentiment or phrase meaning. The right steps depend on what you are trying to do — which is why "choosing the pipeline" gets its own page.
+  > There is no universally correct pipeline. Stopword removal helps when you want content words for topic analysis but can destroy sentiment or phrase meaning. The right steps depend on what you are trying to do, which is why "choosing the pipeline" gets its own page.
 - They are right, because stemming and stopword removal are required by NLTK
   > NLTK provides these tools but does not require you to use them; they are optional steps in a pipeline that should be applied only when the task benefits from them.
 - They are wrong because preprocessing should never be done at all
   > Preprocessing is essential for most NLP tasks; the issue is not whether to preprocess but which steps to apply, because each step is a deliberate choice rather than an automatic requirement.
 
-"It depends on the task" is the honest, correct answer — and the core skill this course builds.`}
+"It depends on the task" is the honest, correct answer, and the core skill this course builds.`}
 />
 
 <MultipleChoice
@@ -535,10 +535,10 @@ tokens" is useful mainly because:
 
 - It proves that NLP requires no programming
   > NLP does require programming; the list-transformation model clarifies that the coding is straightforward list comprehensions, but choosing which transformations to apply still demands judgment.
-- [o] Once text is tokenized, each later step is just a filter or map over a list — a pattern you already know — so the difficulty shifts from *coding* the steps to *choosing* them
+- [o] Once text is tokenized, each later step is just a filter or map over a list, a pattern you already know, so the difficulty shifts from *coding* the steps to *choosing* them
   > After tokenization you are holding a Python list of strings, and lowercasing, filtering stopwords, and stemming are ordinary list comprehensions. The mechanics are familiar; the judgment about which transformations to apply is the real work.
 - It means the order of operations is irrelevant
-  > Order still matters even when steps are list operations; the order determines what input each transformation receives, and applying them in the wrong sequence produces different — often incorrect — results.
+  > Order still matters even when steps are list operations; the order determines what input each transformation receives, and applying them in the wrong sequence produces different, often incorrect, results.
 - It guarantees every pipeline gives the same output
   > Different pipelines applying different transformations produce different outputs; the list model explains how pipelines work mechanically, not that all pipelines converge to the same result.
 
@@ -546,5 +546,5 @@ The mental model reframes NLP preprocessing as list-wrangling plus good judgment
 />
 
 With the whole assembly line in view, we can now study each station properly.
-We start where the pipeline starts: **tokenization** — and why breaking text
+We start where the pipeline starts: **tokenization**, and why breaking text
 into words and sentences is far subtler than it looks.

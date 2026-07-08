@@ -5,14 +5,14 @@ description: How to declare your own generic types and methods, and the small-bu
 
 We have used the standard generic types (`List<E>`, `Map<K,V>`,
 `Set<E>`). It is time to *write our own*. Designing a generic class
-is one of the most underrated skills in Java — it is what separates
+is one of the most underrated skills in Java, it is what separates
 a library you can use anywhere from one you have to copy-paste and
 edit.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A template card with an empty dashed diamond socket branches into three instance cards, each snapping a different shape into the socket — and every item inside matches that shape exactly"
+  aria-label="A template card with an empty dashed diamond socket branches into three instance cards, each snapping a different shape into the socket, and every item inside matches that shape exactly"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -47,7 +47,7 @@ edit.
 
 ## A first generic class: a typed box
 
-The traditional "hello world" of generics is a `Box<T>` — a container
+The traditional "hello world" of generics is a `Box<T>`, a container
 of exactly one element of some type `T`. Compare the untyped and
 typed versions.
 
@@ -58,13 +58,13 @@ typed versions.
       filename: "main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
-    // Without generics — Object, cast everywhere
+    // Without generics, Object, cast everywhere
     UntypedBox a = new UntypedBox();
     a.put("hello");
     String s = (String)a.get(); // cast required
     System.out.println(s.toUpperCase());
 
-    // With generics — no cast, type checked
+    // With generics, no cast, type checked
     Box<String> b = new Box<>();
     b.put("world");
     System.out.println(b.get().toUpperCase()); // no cast
@@ -90,7 +90,7 @@ class Box<T> {
 Three things to notice in the typed `Box`:
 
 - The type parameter `<T>` appears immediately after the class name.
-  From inside the class, `T` is just a *placeholder type* — wherever
+  From inside the class, `T` is just a *placeholder type*, wherever
   you would write `String` or `Customer`, you can write `T`.
 - `put` and `get` use `T`. The compiler now enforces that whatever
   `put` accepts is whatever `get` returns.
@@ -104,14 +104,14 @@ By convention, single uppercase letters name type parameters:
 | Letter | Meaning |
 | --- | --- |
 | `E` | An *element* of a collection |
-| `T` | A general *type* — the only or main type parameter |
+| `T` | A general *type*, the only or main type parameter |
 | `K`, `V` | A *key* and a *value* in a map |
 | `R` | A *return* type, especially in functional interfaces |
 | `N` | A *numeric* type |
 | `S`, `U` | Secondary type parameters when more than one is needed |
 
-These are conventions, not rules — the compiler will accept any
-identifier — but every Java reader is wired to expect them, so
+These are conventions, not rules, the compiler will accept any
+identifier, but every Java reader is wired to expect them, so
 straying is gratuitous noise.
 
 ## Multiple type parameters
@@ -129,7 +129,7 @@ example is `Pair<A, B>`:
     Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
     System.out.println(nameAge.first() + " is " + nameAge.second());
 
-    // The two parameters are independent — they can be the same type:
+    // The two parameters are independent, they can be the same type:
     Pair<String, String> fullName = new Pair<>("Ada", "Lovelace");
     System.out.println(fullName.first() + " " + fullName.second());
   }
@@ -150,7 +150,7 @@ class Pair<A, B> {
   ]}
 />
 
-Each occurrence is checked independently — putting a `String` where
+Each occurrence is checked independently, putting a `String` where
 a `B` is expected only works if `B = String` for that particular
 instance.
 
@@ -173,12 +173,12 @@ public static <T> T identity(T x) { return x; }
 import java.util.List;
 
 public class Main {
-  // Generic method — works on any element type T
+  // Generic method, works on any element type T
   public static <T> T firstOf(List<T> list) {
     return list.isEmpty() ? null : list.get(0);
   }
 
-  // Another generic method — uses two parameters
+  // Another generic method, uses two parameters
   public static <K, V> boolean keyMatchesValue(K k, V v) {
     return k.toString().equals(v.toString());
   }
@@ -206,13 +206,13 @@ public class Main {
 
 Generic methods are how the standard library writes things like
 `Collections.emptyList()` or `Map.of(k, v)`. You usually do not have
-to specify the type parameter at the call site — the compiler infers
+to specify the type parameter at the call site, the compiler infers
 it.
 
 ## A multi-file generic class: a stack
 
 This is the classic generic class to write next. `Stack<E>` is a
-typed LIFO container — `push`, `pop`, `peek`, `size`.
+typed LIFO container, `push`, `pop`, `peek`, `size`.
 
 <CodeBlock
   adapter="java"
@@ -233,7 +233,7 @@ typed LIFO container — `push`, `pop`, `peek`, `size`.
     System.out.println("pop  = " + s.pop());
     System.out.println("size = " + s.size());
 
-    // A different element type — entirely independent:
+    // A different element type, entirely independent:
     Stack<Integer> ns = new Stack<>();
     ns.push(1);
     ns.push(2);
@@ -294,7 +294,7 @@ is what **bounded type parameters** are for, in their simplest form:
 import java.util.List;
 
 public class Main {
-  // T must extend Number — we may call doubleValue() on it.
+  // T must extend Number, we may call doubleValue() on it.
   public static <T extends Number> double average(List<T> xs) {
     double total = 0;
     for (T x : xs)
@@ -316,7 +316,7 @@ public class Main {
     System.out.println("avg ints = " + average(ints));
     System.out.println("avg dbls = " + average(dbls));
 
-    // List<String> would not compile — String is not a Number.
+    // List<String> would not compile, String is not a Number.
   }
 }
 `,
@@ -363,7 +363,7 @@ public class Main {
     ws.add("alpha");
     ws.add("zeta");
     ws.add("kappa");
-    System.out.println("max str = " + maxOf(ws)); // "zeta" — lex order
+    System.out.println("max str = " + maxOf(ws)); // "zeta", lex order
   }
 }
 `,
@@ -454,7 +454,7 @@ ada / 36
   markdown={`What does the bound \`<T extends Number>\` allow the method body to do that \`<T>\` would not?
 
 - Call any method of \`Object\` on \`T\`
-  > Both forms allow that — every type is an \`Object\`.
+  > Both forms allow that, every type is an \`Object\`.
 - [o] Call methods defined on \`Number\` (such as \`intValue()\`, \`doubleValue()\`) on any value of type \`T\`
   > The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.
 - Compare \`T\` values with \`<\` and \`>\`
@@ -468,7 +468,7 @@ ada / 36
 
 - It uses less memory
   > Memory use is similar.
-- [o] It composes a \`List\` instead of extending \`Vector\`, so its public API contains only the stack operations — not random list methods
+- [o] It composes a \`List\` instead of extending \`Vector\`, so its public API contains only the stack operations, not random list methods
   > Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.
 - It is faster on every operation
   > Performance is comparable; the win is API hygiene.

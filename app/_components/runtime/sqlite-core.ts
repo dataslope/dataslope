@@ -2,12 +2,12 @@
 // `@sqlite.org/sqlite-wasm` (the official SQLite WASM build) and
 // exposes the small surface that `SqlPlayground.tsx` actually needs:
 //
-//   - `init()`                  — load the wasm + create a Database
-//   - `loadSampleDatabase(id)`  — tear down and rebuild against a sample
-//   - `exec(sql)`               — run user-authored SQL, returning the
+//   - `init()`, load the wasm + create a Database
+//   - `loadSampleDatabase(id)`, tear down and rebuild against a sample
+//   - `exec(sql)`, run user-authored SQL, returning the
 //                                  raw `QueryExecResult[]` shape that
 //                                  the UI renders directly
-//   - `listTables()` / `listViews()` / `previewTable(name, limit)` —
+//   - `listTables()` / `listViews()` / `previewTable(name, limit)`,
 //                                  used to populate the sidebar tree
 //                                  and the table-preview pane
 //
@@ -33,7 +33,7 @@ export type { QueryExecResult } from "./sqlite-wasm";
 /** Result of a SELECT-like statement with the per-column declared types
  *  attached.  `columnTypes` may contain empty strings for computed /
  *  expression columns that don't map back to a single declared SQLite
- *  column type — the UI falls back to value-based inference for those. */
+ *  column type, the UI falls back to value-based inference for those. */
 export type QueryExecResultWithTypes = QueryExecResult & {
   columnTypes?: string[];
 };
@@ -74,7 +74,7 @@ export interface ColumnConstraintInfo {
   name: string;
   /** True when this column is part of the primary key. */
   isPrimaryKey: boolean;
-  /** True when this column is an INTEGER PRIMARY KEY AUTOINCREMENT —
+  /** True when this column is an INTEGER PRIMARY KEY AUTOINCREMENT,
    *  its value is assigned automatically by SQLite so it can be
    *  omitted from an INSERT when duplicating a row. */
   isAutoIncrement: boolean;
@@ -168,7 +168,7 @@ export interface SqliteEngine {
   listViews: () => Promise<string[]>;
   /** Names of every user-defined index in the active database. Built-in
    *  auto-indexes (created implicitly by `PRIMARY KEY` / `UNIQUE`) are
-   *  excluded — they have no `CREATE INDEX` statement and aren't
+   *  excluded, they have no `CREATE INDEX` statement and aren't
    *  meaningful to the user. */
   listIndexes: () => Promise<string[]>;
   /** Names of every trigger in the active database. */
@@ -178,14 +178,14 @@ export interface SqliteEngine {
    *  collide with reserved words; sqlite-wasm does not expose a parameter
    *  binding for identifiers, so quoting is the only viable option. */
   previewTable: (name: string, limit?: number) => Promise<QueryExecResult[]>;
-  /** `PRAGMA table_info(<name>)` — used by the sidebar context-menu
+  /** `PRAGMA table_info(<name>)`, used by the sidebar context-menu
    *  "View Structure" action to render the column list of a table or
    *  view in the results pane. */
   describeTable: (name: string) => Promise<QueryExecResult[]>;
-  /** `SELECT COUNT(*) FROM <name>` — used by the sidebar context-menu
+  /** `SELECT COUNT(*) FROM <name>`, used by the sidebar context-menu
    *  "Count Rows" action. */
   countRows: (name: string) => Promise<QueryExecResult[]>;
-  /** `DROP TABLE`/`DROP VIEW`/`DROP INDEX`/`DROP TRIGGER` — used by
+  /** `DROP TABLE`/`DROP VIEW`/`DROP INDEX`/`DROP TRIGGER`, used by
    *  the sidebar context-menu "Drop" action. The kind is restricted to
    *  a fixed allowlist so the resulting statement can never be coerced
    *  into something else. */
@@ -193,7 +193,7 @@ export interface SqliteEngine {
     name: string,
     kind: "table" | "view" | "index" | "trigger",
   ) => Promise<void>;
-  /** `DELETE FROM <name>` — clears every row of a table without
+  /** `DELETE FROM <name>`, clears every row of a table without
    *  dropping the schema. SQLite has no `TRUNCATE` keyword; an
    *  unqualified DELETE is the standard equivalent. */
   truncateTable: (name: string) => Promise<void>;
@@ -245,7 +245,7 @@ export interface SqliteEngine {
       column: string;
       value: unknown;
       /** When present, identifies the target row by primary-key value(s)
-       *  instead of the rowid offset — robust to display reordering. */
+       *  instead of the rowid offset, robust to display reordering. */
       pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
   ) => Promise<number>;
@@ -299,7 +299,7 @@ export interface SqliteEngine {
   ) => Promise<{ result: QueryExecResultWithTypes[]; totalCount: number }>;
 }
 
-/** Options for opening the engine's database — used by Phase 3 to
+/** Options for opening the engine's database, used by Phase 3 to
  *  switch from in-memory storage to OPFS persistence. When `vfs` is
  *  provided (e.g. `"opfs-sahpool"`), the database is opened against
  *  that VFS and `filename` becomes the OPFS-relative path. */
@@ -320,7 +320,7 @@ export interface SqliteEngineOpenOptions {
 /** Treat any identifier whose value isn't a safe `[A-Za-z_][A-Za-z0-9_]*`
  *  as untrusted and escape embedded double-quotes per the SQL standard.
  *  The names we feed in come straight out of `sqlite_master`, so this
- *  is mostly defensive — but defensive is what we want when building
+ *  is mostly defensive, but defensive is what we want when building
  *  SQL by string concatenation. */
 function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
@@ -330,7 +330,7 @@ const SAFE_TYPE = /^[A-Za-z_][A-Za-z0-9_ ()]*$/;
 
 /** Render one `ColumnSpec` into a column definition for use inside
  *  `CREATE TABLE (...)`. Inline foreign keys are emitted via
- *  `REFERENCES`. The output never trusts free-form identifiers — table
+ *  `REFERENCES`. The output never trusts free-form identifiers, table
  *  / column names are quoted, and the `type` keyword is checked
  *  against a conservative allowlist before being inlined. */
 function renderColumnDef(col: ColumnSpec): string {
@@ -434,7 +434,7 @@ function parseGeneratedFromDDL(
  *  the column names up in the database's schema.
  *
  *  sqlite-wasm does NOT export `sqlite3_column_decltype` (verified against
- *  the published 1.13.0 wasm — the export table only includes
+ *  the published 1.13.0 wasm, the export table only includes
  *  `column_blob/bytes/count/double/name/text/type`), so we can't read
  *  declared types directly from the prepared statement.  Instead we
  *  parse FROM/JOIN clauses out of the SQL and consult
@@ -479,7 +479,7 @@ function resolveDeclaredColumnTypes(
  *  string.  Strips string literals and SQL comments first so identifiers
  *  inside them aren't misread as table references.  Quoted identifiers
  *  (`"users"`, `[users]`, `` `users` ``) are unquoted before being
- *  returned.  Not a full SQL parser — designed to be good enough for
+ *  returned.  Not a full SQL parser, designed to be good enough for
  *  the common single-statement SELECTs the playground actually runs. */
 function extractReferencedTables(sql: string): string[] {
   // Remove block comments, line comments, and string/identifier literals
@@ -628,8 +628,8 @@ function copyDatabaseContents(src: Database, dst: Database): void {
   }
 }
 
-/** The `SqliteEngine` surface with every promise unwrapped — the
- *  in-process engine executes synchronously — except for
+/** The `SqliteEngine` surface with every promise unwrapped, the
+ *  in-process engine executes synchronously, except for
  *  `loadSampleDatabase`, which stays async because samples backed by
  *  `remoteSql` download their seed script before the rebuild. */
 export type InProcessSqliteEngine = Omit<
@@ -710,7 +710,7 @@ export async function createSqliteEngineInProcess(
 
   /** Replace the active database's contents with the database encoded
    *  in `bytes` (a binary `.sqlite` file). Persistent (OPFS) mode
-   *  copies object-by-object into the on-disk file — we can't
+   *  copies object-by-object into the on-disk file, we can't
    *  sqlite3_deserialize into an OPFS-backed DB because the OPFS VFS
    *  requires the file backing to remain in place. In-memory mode
    *  deserialises directly. */
@@ -785,7 +785,7 @@ export async function createSqliteEngineInProcess(
         try {
           db.close();
         } catch {
-          // Ignore — closing a half-broken db shouldn't block the rebuild.
+          // Ignore, closing a half-broken db shouldn't block the rebuild.
         }
       }
       db = openFresh();
@@ -796,7 +796,7 @@ export async function createSqliteEngineInProcess(
     // toggles it off/on around its own work.
     db.exec("PRAGMA foreign_keys = ON;");
     // First-open detection: if we just opened a persistent (OPFS) DB
-    // file that already contains user objects, do NOT reseed — the
+    // file that already contains user objects, do NOT reseed, the
     // user is re-attaching to a saved workspace. This is the core of
     // Phase 3's persistence behaviour.
     const shouldSkipSeed =
@@ -828,7 +828,7 @@ export async function createSqliteEngineInProcess(
     type: "table" | "view" | "index" | "trigger",
   ): string[] {
     // Defensive allowlist even though the TS signature narrows the
-    // input — keeps the implementation robust if the function is ever
+    // input, keeps the implementation robust if the function is ever
     // re-exported or called from looser-typed code.
     const kind =
       type === "view"
@@ -839,7 +839,7 @@ export async function createSqliteEngineInProcess(
             ? "trigger"
             : "table";
     // Indexes carry an extra filter: skip auto-indexes (those whose
-    // `sql` is NULL — they were created implicitly by PRIMARY KEY /
+    // `sql` is NULL, they were created implicitly by PRIMARY KEY /
     // UNIQUE constraints and have no user-visible DDL).
     const extra = kind === "index" ? " AND sql IS NOT NULL" : "";
     const res = execAll(require(), 
@@ -874,7 +874,7 @@ export async function createSqliteEngineInProcess(
             results.push(null);
           } else {
             const columns = stmt.getColumnNames();
-            // SELECT-like statement — collect rows (may be zero). Resolve
+            // SELECT-like statement, collect rows (may be zero). Resolve
             // declared column types from PRAGMA table_info so the
             // ResultView shows real types even when no rows are returned
             // (otherwise value-based inference falls through to "NULL"
@@ -948,7 +948,7 @@ export async function createSqliteEngineInProcess(
       return names;
     },
     previewTable(name: string, limit = 200) {
-      // The table name is a SQLite identifier — sqlite-wasm does not allow
+      // The table name is a SQLite identifier, sqlite-wasm does not allow
       // parameter binding for identifiers, so we quote it instead. The
       // `limit` is coerced into a finite integer in [1, 10_000] before
       // being interpolated, which makes the value safe to embed: any
@@ -976,7 +976,7 @@ export async function createSqliteEngineInProcess(
     },
     dropEntity(name: string, kind: "table" | "view" | "index" | "trigger") {
       // Restrict `kind` to the fixed allowlist defensively even though
-      // the TS signature narrows the input — callers may forward
+      // the TS signature narrows the input, callers may forward
       // looser-typed values from UI events.
       const k =
         kind === "view"
@@ -1162,7 +1162,7 @@ export async function createSqliteEngineInProcess(
       // table being rebuilt (even if it is ON a different table) will
       // fail validation the moment that table is temporarily absent
       // between DROP TABLE and ALTER TABLE … RENAME TO. Dropping all
-      // triggers up front — just like we do with views — avoids this.
+      // triggers up front, just like we do with views, avoids this.
       const triggerSqls: string[] = [];
       const triggerNames: string[] = [];
       {
@@ -1197,7 +1197,7 @@ export async function createSqliteEngineInProcess(
             spec.newName,
           );
         }
-        // Patch renamed columns (best-effort — simple word-boundary replacement).
+        // Patch renamed columns (best-effort, simple word-boundary replacement).
         for (const [oldCol, newCol] of renameMap) {
           const escaped = oldCol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           patched = patched.replace(
@@ -1263,12 +1263,12 @@ export async function createSqliteEngineInProcess(
         );
         // Recreate indexes with potentially patched DDL. If an index
         // references a column that was deleted in this rebuild it will
-        // fail — skip it rather than aborting the whole save.
+        // fail, skip it rather than aborting the whole save.
         for (const sql of indexSqls) {
           try {
             d.exec(patchDdl(sql));
           } catch {
-            // Index references a deleted column — drop it silently.
+            // Index references a deleted column, drop it silently.
           }
         }
         // Recreate all triggers with potentially patched DDL (handles
@@ -1278,7 +1278,7 @@ export async function createSqliteEngineInProcess(
           try {
             d.exec(patchDdl(sql));
           } catch {
-            // Trigger references a deleted column — drop it silently.
+            // Trigger references a deleted column, drop it silently.
           }
         }
         // Recreate all views with patched DDL (handles table/column renames).
@@ -1287,7 +1287,7 @@ export async function createSqliteEngineInProcess(
           try {
             d.exec(patchDdl(sql));
           } catch {
-            // View references a deleted column — drop it silently.
+            // View references a deleted column, drop it silently.
           }
         }
         d.exec("COMMIT");
@@ -1306,7 +1306,7 @@ export async function createSqliteEngineInProcess(
       // `sqlite_master.sql` already stores the original CREATE
       // statement verbatim (minus a trailing semicolon). We use a
       // bound parameter for the entity name so this path is safe
-      // against arbitrary identifier strings — sqlite-wasm *does* allow
+      // against arbitrary identifier strings, sqlite-wasm *does* allow
       // value parameters, only identifier interpolation has to be
       // done by hand.
       const stmt = require().prepare(
@@ -1651,7 +1651,7 @@ export async function createSqliteEngineInProcess(
           `${stripped} LIMIT ${safeSize} OFFSET ${safeOffset}`,
         );
         if (stmt.columnCount === 0) {
-          // Non-SELECT statement that somehow reached the lazy path —
+          // Non-SELECT statement that somehow reached the lazy path,
           // drain and return an empty result so the UI shows success.
           while (stmt.step()) { /* drain */ }
           return { result: [], totalCount: totalCount ?? safeOffset };

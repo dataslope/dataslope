@@ -83,7 +83,7 @@ function topKeywords(result: CompletionResult | null, n = 8): string[] {
 // Replicates @codemirror/autocomplete's sortOptions for an empty typed
 // pattern: every option's fuzzy score is equal, so ordering is boost plus
 // the dynamic-section offset (sections sort by their best-scoring option).
-// This is the order users actually see in the dropdown — assertions on raw
+// This is the order users actually see in the dropdown, assertions on raw
 // `options` order or plain boosts can't catch section-level inversions.
 function renderedLabels(result: CompletionResult | null): string[] {
   const options = result?.options ?? [];
@@ -149,7 +149,7 @@ describe("SQLite SQL completion source", () => {
     expect(labelSet.has("WHERE")).toBe(true);
     expect(labelSet.has("JOIN")).toBe(true);
     // Tables can still appear as low-priority extras, but the top-ranked
-    // suggestions must be keywords — tables should never crowd out the
+    // suggestions must be keywords, tables should never crowd out the
     // expected next-clause keywords here.
     const top = result?.options
       .slice()
@@ -220,7 +220,7 @@ describe("SQLite SQL completion source", () => {
     const result = complete(
       "SELECT * FROM customers JOIN orders USING (",
     );
-    // USING takes bare names that exist on both sides — `id` here. The
+    // USING takes bare names that exist on both sides, `id` here. The
     // shared column ranks above single-side columns; dotted names would
     // be invalid in this slot and must not appear.
     const idOption = findOption(result, "id");
@@ -410,7 +410,7 @@ describe("SQLite SQL completion source", () => {
       const result = complete("SELECT * FROM customers ORDER ", true);
       const labelSet = new Set(labels(result));
       expect(labelSet.has("BY")).toBe(true);
-      // Restricted slot — other keywords should not appear at all.
+      // Restricted slot, other keywords should not appear at all.
       expect(labelSet.has("SELECT")).toBe(false);
       expect(labelSet.has("WHERE")).toBe(false);
     });
@@ -447,7 +447,7 @@ describe("SQLite SQL completion source", () => {
 
     it("inserts uppercase keywords for uppercase prefixes", () => {
       const result = complete("SEL");
-      // No apply override — the uppercase label itself is inserted.
+      // No apply override, the uppercase label itself is inserted.
       expect(findOption(result, "SELECT")?.apply).toBeUndefined();
     });
 
@@ -606,7 +606,7 @@ describe("SQLite SQL completion source", () => {
       expect(labelSet.has("PRAGMA")).toBe(true);
       expect(labelSet.has("GLOB")).toBe(true);
       expect(labelSet.has("REGEXP")).toBe(true);
-      // ILIKE and SIMILAR are Postgres/DuckDB-only — should not appear here.
+      // ILIKE and SIMILAR are Postgres/DuckDB-only, should not appear here.
       expect(labelSet.has("ILIKE")).toBe(false);
       expect(labelSet.has("QUALIFY")).toBe(false);
     });

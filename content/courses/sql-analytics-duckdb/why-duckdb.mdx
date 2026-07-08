@@ -4,7 +4,7 @@ description: How a research lab in Amsterdam built a fast, zero-setup analytical
 ---
 
 The last page explained *why* analytical SQL rewards a column-oriented,
-vectorized engine. **DuckDB** is exactly that engine — purpose-built for
+vectorized engine. **DuckDB** is exactly that engine, purpose-built for
 analysis, and the one this whole course runs on. This page is the short
 version of *where it came from* and *why it became so popular*, so the
 tool you are about to use stops feeling like a black box.
@@ -13,7 +13,7 @@ tool you are about to use stops feeling like a black box.
 
 <Callout type="info" title="A database named after a duck">
 DuckDB was created by **Mark Raasveldt** and **Hannes Mühleisen** at the
-**CWI** research institute in Amsterdam — the same lab that produced the
+**CWI** research institute in Amsterdam, the same lab that produced the
 column-store database **MonetDB**, and where Guido van Rossum created
 Python. First released around **2019**, it is named after Hannes's pet
 duck, **Wilbur**: ducks are hardy and live everywhere, which is exactly
@@ -23,7 +23,7 @@ what the authors wanted in a database.
 <svg
   viewBox="0 0 640 225"
   role="img"
-  aria-label="A faraway gray server is cut off by a connector broken at a red diamond, while inside the laptop screen on the right a green engine in concentric rings sits beside the small yellow file it queries in place — DuckDB runs where you already are"
+  aria-label="A faraway gray server is cut off by a connector broken at a red diamond, while inside the laptop screen on the right a green engine in concentric rings sits beside the small yellow file it queries in place, DuckDB runs where you already are"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="48" width="64" height="130" rx="10" fill="currentColor" opacity="0.1" />
@@ -59,7 +59,7 @@ what the authors wanted in a database.
 ## The problem DuckDB solves
 
 Organizations now generate **enormous** amounts of data almost by
-accident — every click, order, sensor reading, and log line is recorded.
+accident, every click, order, sensor reading, and log line is recorded.
 Analysts want to explore that data, but their two traditional options
 each hurt:
 
@@ -92,10 +92,10 @@ exploratory loop you learned about.
   inside your browser tab). There is no server to start, no port, no
   login. You open it and query.
 - **Single-file or in-memory.** A whole database can be one file you copy
-  around like a spreadsheet — or live entirely in memory for a quick
+  around like a spreadsheet, or live entirely in memory for a quick
   analysis.
 - **Reads files directly.** DuckDB can query CSV and Parquet files *in
-  place* — even straight from a URL — without a separate "load" step,
+  place*, even straight from a URL, without a separate "load" step,
   which suits ad-hoc analysis.
 - **Analyst-friendly SQL.** Conveniences like `GROUP BY ALL`,
   `SELECT * EXCLUDE (...)`, `SUMMARIZE`, and friendly list/struct types
@@ -118,7 +118,7 @@ flowchart TB
 People sometimes call DuckDB *"SQLite for analytics."* SQLite gave
 everyone a tiny, embedded **transactional** database with no server;
 DuckDB does the same for **analytical** work. It is the OLAP counterpart
-to SQLite's OLTP niche — same spirit, opposite workload.
+to SQLite's OLTP niche, same spirit, opposite workload.
 
 ## Where it fits in a modern workflow
 
@@ -141,13 +141,13 @@ flowchart TD
 
 The important point for this course: DuckDB lets you practice *real
 analytical SQL* with **zero friction**. The same engine runs right here
-in your browser, so every example is live — and to prove the "reads files
+in your browser, so every example is live, and to prove the "reads files
 directly" point, this one queries a **CSV on the web** with `read_csv_auto`
 and never downloads it as a step you can see.
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="A taste of analyst-friendly DuckDB SQL — over a remote CSV"
+  title="A taste of analyst-friendly DuckDB SQL, over a remote CSV"
   starterCode={`-- read_csv_auto opens the file and infers its columns.
 -- GROUP BY ALL groups by every non-aggregated column automatically.
 SELECT
@@ -177,7 +177,7 @@ DuckDB pleasant for the rapid question-query-look loop.
 
 - DuckDB is a fork of SQLite that adds a web server.
   > DuckDB is not a SQLite fork, and it adds no server; the analogy is about *style*, not lineage.
-- [o] Like SQLite, it is a tiny, embedded, zero-setup database — but tuned for analytical (OLAP) work instead of transactions.
+- [o] Like SQLite, it is a tiny, embedded, zero-setup database, but tuned for analytical (OLAP) work instead of transactions.
   > Both run in-process with no server; SQLite targets transactional use, DuckDB targets analytical scans.
 - It can only store the same amount of data as SQLite.
   > The analogy is about embedding and ease of use, not a storage-size limit.
@@ -221,9 +221,9 @@ and prototyping.`}
 />
 
 You now understand *why* analytical SQL, *why* the OLAP workload, and
-*why* DuckDB. Time to stop talking about analysis and start doing it — let
+*why* DuckDB. Time to stop talking about analysis and start doing it, let
 us write your first analytical query. (If you want the analyst's
 *exploratory mindset* spelled out first, the
 [Thinking in Datasets](/courses/sql-analytics-duckdb/thinking-in-datasets)
-deep dive in the *Interesting discussions* section near the end covers it
-— but you can pick it up as you go.)
+deep dive in the *Interesting discussions* section near the end covers it,
+but you can pick it up as you go.)

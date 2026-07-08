@@ -4,7 +4,7 @@
  * Fetch three suggested questions from `/api/ai/suggest` whenever a new
  * "conversation point" is reached: panel opened on an empty conversation, an
  * answer finished streaming, or the conversation was reset. Suggestions are a
- * nicety — any failure resolves to an empty list and the UI hides the section.
+ * nicety, any failure resolves to an empty list and the UI hides the section.
  *
  * `turnKey` (the caller passes `messages.length`) identifies the conversation
  * point; a fetch happens at most once per key. Context/history are read
@@ -21,7 +21,7 @@ import type {
 interface Args {
   /** Fetch only while this is true (panel open, signed in, not streaming). */
   active: boolean;
-  /** Conversation point id — one fetch per distinct value. */
+  /** Conversation point id, one fetch per distinct value. */
   turnKey: number;
   buildContext: () => AskAiClientContext;
   history: AskAiTurn[];

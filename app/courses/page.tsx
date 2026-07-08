@@ -11,9 +11,9 @@ import { getCourseCatalog } from "@/lib/courseCatalog";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { CoursesCatalog } from "./_components/CoursesCatalog";
 
-const PAGE_TITLE = "Courses — Dataslope";
+const PAGE_TITLE = "Courses, Dataslope";
 const PAGE_DESCRIPTION =
-  "Hands-on, browser-based tracks across data and engineering. Every lesson runs live — no setup, no sign-up.";
+  "Hands-on, browser-based tracks across data and engineering. Every lesson runs live, no setup, no sign-up.";
 
 export const metadata: Metadata = {
   // A bare string here lets the root layout's "%s · DataSlope" template render
@@ -60,7 +60,7 @@ export default async function CoursesPage() {
             </h1>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Hands-on, browser-based tracks across data and engineering. Every
-              lesson runs live — no setup, no sign-up.
+              lesson runs live, no setup, no sign-up.
             </p>
           </div>
 

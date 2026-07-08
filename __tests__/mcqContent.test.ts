@@ -7,7 +7,7 @@ import { findMcqFiles, lintFiles } from "../scripts/check-mcq.mjs";
 // learn-courses UX audit found: unwinnable questions (no correct answer),
 // contradictory duplicate options, too-few choices, and affirmative-opening
 // explanations (which render as false praise for learners who answered
-// wrong — see AGENTS.md). Runs as part of `npm test`.
+// wrong, see AGENTS.md). Runs as part of `npm test`.
 describe("content/courses + content/fumadocs-dev <MultipleChoice> corpus", () => {
   const files = [
     ...findMcqFiles(path.join(process.cwd(), "content", "courses")),

@@ -1,18 +1,18 @@
 ---
 title: Grouping Data with GROUP BY
-description: The leap from one grand total to one summary per category — how GROUP BY splits rows into buckets and aggregates each one separately.
+description: The leap from one grand total to one summary per category, how GROUP BY splits rows into buckets and aggregates each one separately.
 ---
 
 Aggregates gave us *one* number for a whole table. But real
 questions are usually *per category*: revenue **per product**,
 headcount **per department**, orders **per customer**. `GROUP BY` is
 the tool for exactly this, and it is one of the most powerful ideas
-in SQL. Take your time — there are extra checks at the end.
+in SQL. Take your time, there are extra checks at the end.
 
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Mixed rows cluster into three color stacks — one per category — and each stack collapses into a single summary dot carrying its count"
+  aria-label="Mixed rows cluster into three color stacks, one per category, and each stack collapses into a single summary dot carrying its count"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -103,7 +103,7 @@ flowchart TB
 ```
 
 Instead of one average salary, you get one average salary *per
-department* — a far more useful answer.
+department*, a far more useful answer.
 
 ## Your first GROUP BY
 
@@ -135,14 +135,14 @@ describes.
 
 ## The golden rule of GROUP BY
 
-Here is the rule that, once understood, makes `GROUP BY` click — and
+Here is the rule that, once understood, makes `GROUP BY` click, and
 whose violation causes the most common error beginners hit:
 
 > Every column in your `SELECT` must either be **in the `GROUP BY`**
 > or be wrapped in an **aggregate function.**
 
 Why? Because each output row represents a *whole group*. A column
-like `dept` is safe — it is the same for everyone in the group. But
+like `dept` is safe, it is the same for everyone in the group. But
 a column like `name` differs *within* the group, so the database
 cannot pick a single value for the group's row. It refuses, rather
 than guess.
@@ -157,7 +157,7 @@ flowchart TB
 
 <Callout type="warn" title="The classic error">
 `SELECT dept, name, COUNT(*) ... GROUP BY dept` fails, because
-`name` is neither grouped nor aggregated — there are many names in
+`name` is neither grouped nor aggregated, there are many names in
 one department, so which would the single Engineering row show? If
 you want names, either group by name too, or aggregate it (e.g.
 `STRING_AGG(name, ', ')` to list them).
@@ -197,7 +197,7 @@ columns is how you build cross-tabulated summaries.
 
 ## Where GROUP BY sits in the query
 
-Filtering with `WHERE` happens **before** grouping — so you can
+Filtering with `WHERE` happens **before** grouping, so you can
 restrict which rows enter the groups:
 
 <SqlCodeBlock
@@ -229,7 +229,7 @@ flowchart TD
 
 `WHERE` thins the rows first; *then* the survivors are grouped and
 averaged. Filtering on the *aggregated* results (e.g. "only groups
-with more than 5 people") needs a different clause — `HAVING` — which
+with more than 5 people") needs a different clause, `HAVING`, which
 is the next page.
 
 ## Check your understanding

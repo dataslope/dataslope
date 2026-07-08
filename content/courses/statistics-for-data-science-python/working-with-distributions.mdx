@@ -1,10 +1,10 @@
 ---
 title: Working with Distributions
-description: The practical scipy.stats toolkit — the four-questions-to-four-methods map, the loc/scale convention and frozen distributions, fitting a distribution to data with .fit, and sanity-checking the fit with histogram overlays and Q-Q plot intuition.
+description: The practical scipy.stats toolkit, the four-questions-to-four-methods map, the loc/scale convention and frozen distributions, fitting a distribution to data with .fit, and sanity-checking the fit with histogram overlays and Q-Q plot intuition.
 ---
 
 You've now met the main distributions individually. This page is about
-the **workflow** — the small, reusable set of moves that turns *any*
+the **workflow**, the small, reusable set of moves that turns *any*
 distribution in `scipy.stats` into concrete answers, and the discipline
 of **fitting** a distribution to real data and then *checking whether it
 actually fits* before you trust it. Master this and a new distribution
@@ -14,14 +14,14 @@ different parameters.
 The mindset is a two-step loop you'll use constantly as a data
 scientist: **model the data** (pick a distribution and estimate its
 parameters), then **use the model to answer questions** (probabilities,
-thresholds, simulations). The catch — and the part people skip — is the
+thresholds, simulations). The catch, and the part people skip, is the
 sanity check in between. A model that doesn't fit gives precise,
 authoritative, *wrong* answers.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A frozen distribution sits inside a translucent ice cube at the center while four small tool tiles hang off it on thin solid spokes — a density hump, a rising accumulation ribbon, a yellow quantile cut post, and a spray of random draws — every scipy distribution answers the same four questions"
+  aria-label="A frozen distribution sits inside a translucent ice cube at the center while four small tool tiles hang off it on thin solid spokes, a density hump, a rising accumulation ribbon, a yellow quantile cut post, and a spray of random draws, every scipy distribution answers the same four questions"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -78,13 +78,13 @@ This table is the whole API in a nutshell:
 
 | You want to know... | Method | Returns |
 | --- | --- | --- |
-| **Density / mass** at a value — how concentrated is the distribution here? | `.pdf(x)` (continuous), `.pmf(k)` (discrete) | height / point probability |
-| **Accumulation** — what fraction is below (or above) a value? | `.cdf(x)` = P(X ≤ x); `.sf(x)` = P(X > x) | a probability |
-| **Quantile** — what value sits at a given percentile? | `.ppf(p)`; `.isf(p)` (upper tail) | a value |
-| **Simulation** — draw random samples | `.rvs(size=...)` | random data |
+| **Density / mass** at a value, how concentrated is the distribution here? | `.pdf(x)` (continuous), `.pmf(k)` (discrete) | height / point probability |
+| **Accumulation**, what fraction is below (or above) a value? | `.cdf(x)` = P(X ≤ x); `.sf(x)` = P(X > x) | a probability |
+| **Quantile**, what value sits at a given percentile? | `.ppf(p)`; `.isf(p)` (upper tail) | a value |
+| **Simulation**, draw random samples | `.rvs(size=...)` | random data |
 
 Plus the summaries `.mean()`, `.var()`, `.std()`, and `.median()`. That's
-it — learn these once and every distribution behaves the same way.
+it, learn these once and every distribution behaves the same way.
 
 ```mermaid
 flowchart TD
@@ -98,8 +98,8 @@ flowchart TD
 <Callout type="info" title="cdf and ppf are inverses; sf and isf are their upper-tail twins">
 `cdf` (value → left-tail probability) and `ppf` (probability → value)
 undo each other. For the *upper* tail, `sf(x) = 1 - cdf(x)` gives
-P(X > x), and `isf(p)` returns the value with upper-tail probability `p`
-— handy for "what threshold leaves only 5% above it?" (`isf(0.05)`).
+P(X > x), and `isf(p)` returns the value with upper-tail probability `p`,
+handy for "what threshold leaves only 5% above it?" (`isf(0.05)`).
 Using `sf`/`isf` instead of `1 - cdf` is also more numerically accurate
 deep in the tail.
 </Callout>
@@ -163,14 +163,14 @@ call. It's cleaner and prevents parameter-mismatch bugs.
 d = stats.norm(loc=30, scale=6)
 print("frozen:", round(float(d.cdf(36)), 4), round(float(d.ppf(0.9)), 2))
 
-# Unfrozen (equivalent, but you repeat parameters every call — error-prone).
+# Unfrozen (equivalent, but you repeat parameters every call, error-prone).
 print(
     "unfrozen:",
     round(float(stats.norm.cdf(36, loc=30, scale=6)), 4),
     round(float(stats.norm.ppf(0.9, loc=30, scale=6)), 2),
 )
 
-# Same numbers — the frozen form is just tidier and safer.
+# Same numbers, the frozen form is just tidier and safer.
 `,
     },
   ]}
@@ -181,7 +181,7 @@ print(
 So far we've *assumed* the parameters. With real data you usually
 **estimate** them: hand the data to `.fit()` and scipy returns the
 parameters that best match it (by maximum likelihood). For the normal,
-`.fit()` returns `(loc, scale)` — essentially the sample mean and
+`.fit()` returns `(loc, scale)`, essentially the sample mean and
 standard deviation.
 
 <CodeBlock
@@ -222,12 +222,12 @@ fits the sample's minimum but makes the parameters hard to interpret.
 
 ## Sanity-checking the fit
 
-Fitting *always* returns parameters — even for a distribution that's
+Fitting *always* returns parameters, even for a distribution that's
 completely wrong for your data. The numbers don't tell you the fit is
 good; **you** have to check. Two standard checks:
 
 1. **Histogram overlay**: plot the data's histogram (as a density) and
-   draw the fitted PDF on top. Do they have the same shape — same center,
+   draw the fitted PDF on top. Do they have the same shape, same center,
    spread, skew, and tails?
 2. **Q–Q plot**: plot the data's quantiles against the fitted
    distribution's quantiles. If the fit is good, the points fall on a
@@ -261,7 +261,7 @@ fig.add_trace(
 )
 fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines", name="fitted normal"))
 fig.update_layout(
-    title="Histogram with fitted normal overlay — shapes match well",
+    title="Histogram with fitted normal overlay, shapes match well",
     xaxis_title="score",
     yaxis_title="density",
 )
@@ -275,9 +275,9 @@ fig.show()
 
 A **Q–Q (quantile–quantile) plot** is the sharper check. The idea:
 
-- Sort the data — these are the **sample quantiles**.
+- Sort the data, these are the **sample quantiles**.
 - For each, compute where the **fitted distribution** says that quantile
-  should fall — the **theoretical quantiles**.
+  should fall, the **theoretical quantiles**.
 - Plot sample-vs-theoretical. A good fit makes the points hug the
   diagonal line `y = x`. Curvature, or tails that peel off the line,
   means the model misses the data's shape there.
@@ -332,7 +332,7 @@ fig = px.scatter(
     x=theo,
     y=samp,
     labels={"x": "theoretical quantiles (fitted normal)", "y": "sample quantiles"},
-    title="Q-Q plot: skewed data vs a fitted normal — note the curve",
+    title="Q-Q plot: skewed data vs a fitted normal, note the curve",
 )
 lo, hi = min(theo.min(), samp.min()), max(theo.max(), samp.max())
 fig.add_shape(type="line", x0=lo, y0=lo, x1=hi, y1=hi, line=dict(dash="dash"))
@@ -344,10 +344,10 @@ fig.show()
 
 <Callout type="warn" title="A high Q-Q correlation is suggestive, not proof">
 Points hugging the line is *evidence* the chosen distribution is
-plausible — not a guarantee the data "follows" it. Real data is never
+plausible, not a guarantee the data "follows" it. Real data is never
 *exactly* any textbook distribution. Treat the Q–Q plot as a diagnostic
 for spotting *how* a model fails (heavy tails, skew), and as a check that
-the model is *good enough* for the decision at hand — not as a proof of
+the model is *good enough* for the decision at hand, not as a proof of
 the true data-generating process.
 </Callout>
 
@@ -357,7 +357,7 @@ the true data-generating process.
   instructions={`You're given a sample of measured values in \`data\` (a NumPy array). Assume a **Normal** model.
 
 1. Fit a normal with \`stats.norm.fit(data)\`, which returns \`(loc, scale)\`. Store them in **\`loc\`** and **\`scale\`** (both \`float\`).
-2. Build the fitted distribution and compute **\`p_above_100\`** — the probability the value **exceeds 100**, \`P(X > 100)\`, as a \`float\`.
+2. Build the fitted distribution and compute **\`p_above_100\`**, the probability the value **exceeds 100**, \`P(X > 100)\`, as a \`float\`.
 
 Hints:
 
@@ -429,7 +429,7 @@ assert abs(p_above_100 - expected) < 1e-9`,
   title="Set a threshold from a fitted model"
   instructions={`Using the same sample in \`data\`, fit a **Normal** model and use it to set a capacity threshold.
 
-Compute **\`cutoff_95\`** — the **95th-percentile** value of the fitted distribution (the value with 95% of outcomes at or below it), as a \`float\`.
+Compute **\`cutoff_95\`**, the **95th-percentile** value of the fitted distribution (the value with 95% of outcomes at or below it), as a \`float\`.
 
 Hints:
 
@@ -485,7 +485,7 @@ assert abs(d.sf(cutoff_95) - 0.05) < 1e-6`,
 ## Don't extrapolate a fitted model past your data
 
 A fitted model is only trustworthy in the **range where you have data**.
-The tails of a fitted distribution are an *extrapolation* — they're
+The tails of a fitted distribution are an *extrapolation*, they're
 governed by the assumed shape, not by observations you actually made. If
 your data tops out around 120, asking the fitted normal for P(X > 300) is
 answering a question the data never spoke to.
@@ -493,7 +493,7 @@ answering a question the data never spoke to.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="A green fitted band runs solidly through the region where data dots actually live, then dissolves into fading ghost dots beyond the last observation, where a red diamond waits — past the data's edge a model is pure assumption, not evidence"
+  aria-label="A green fitted band runs solidly through the region where data dots actually live, then dissolves into fading ghost dots beyond the last observation, where a red diamond waits, past the data's edge a model is pure assumption, not evidence"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="141" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -549,7 +549,7 @@ print("not from anything the data actually observed. Treat it with caution.")
 
 <Callout type="danger" title="Two misconceptions to retire">
 **(1) Fitting proves the data follows the distribution.** It doesn't.
-`.fit()` returns parameters for *any* distribution you ask, fit or not —
+`.fit()` returns parameters for *any* distribution you ask, fit or not,
 you must verify with an overlay or Q–Q plot, and even a good fit only
 means "plausible and good enough," never "this is the true law."
 **(2) A fitted model is valid everywhere.** It's only credible within the
@@ -569,7 +569,7 @@ heavy-tailed model).
 - \`.ppf(0.05)\`
   > \`ppf(0.05)\` returns the value with 5% *below* it (lower tail), the opposite end from what's asked.
 - [o] \`.isf(0.05)\`
-  > The inverse-survival function returns the value whose upper-tail probability equals 0.05 — exactly the threshold with 5% of the distribution above it (equivalently \`ppf(0.95)\`).
+  > The inverse-survival function returns the value whose upper-tail probability equals 0.05, exactly the threshold with 5% of the distribution above it (equivalently \`ppf(0.95)\`).
 - \`.sf(0.05)\`
   > \`sf\` takes a value and returns its upper-tail probability, not a value at a given tail level.
 
@@ -582,8 +582,8 @@ heavy-tailed model).
 - The data follows a normal distribution, since the fit succeeded
   > \`.fit\` always returns parameters regardless of fit quality; a successful call says nothing about whether the model is appropriate.
 - The fit failed because the data is skewed
-  > The fit doesn't "fail" on skewed data — it silently returns the best-matching normal, which simply won't describe the data well.
-- [o] You have the best-fitting *normal* parameters, but you must still check (overlay/Q-Q) whether a normal is appropriate — and for skewed data it likely isn't
+  > The fit doesn't "fail" on skewed data, it silently returns the best-matching normal, which simply won't describe the data well.
+- [o] You have the best-fitting *normal* parameters, but you must still check (overlay/Q-Q) whether a normal is appropriate, and for skewed data it likely isn't
   > Fitting only estimates parameters for the distribution you chose; verifying the shape actually matches is a separate, required step, and skew is a sign a normal is the wrong family.
 - The skew will be automatically corrected by the fit
   > Fitting a normal cannot remove skew; it just centers and scales a symmetric bell that ignores the data's asymmetry.
@@ -596,14 +596,14 @@ Fitting estimates parameters; it never validates the choice of distribution.`}
 
 - The fit is perfect
   > A perfect fit keeps points on the line throughout; a systematic departure at one end signals a specific mismatch.
-- [o] The data has a heavier right tail than the fitted distribution — extreme high values occur more often than the model predicts
+- [o] The data has a heavier right tail than the fitted distribution, extreme high values occur more often than the model predicts
   > Points peeling above the line at the upper end mean the sample's large quantiles exceed what the model expects, the signature of a heavier-than-modeled right tail.
 - The data has fewer values than the model assumes
   > A Q–Q plot compares quantile *positions*, not counts; sample size isn't what the bend reveals.
 - The loc parameter was estimated incorrectly
   > A wrong center would shift the whole line, not bend only the upper tail; tail curvature is about shape, not location.
 
-Where and how the points leave the line tells you exactly how the model misfits — here, an under-modeled right tail.`}
+Where and how the points leave the line tells you exactly how the model misfits, here, an under-modeled right tail.`}
 />
 
 <MultipleChoice
@@ -624,16 +624,16 @@ A fitted model is trustworthy within the data's range; its far tails are assumpt
 <Callout type="success" title="Key takeaways">
 - Every distribution answers the same **four questions**: density
   (`pdf`/`pmf`), accumulation (`cdf`/`sf`), quantile (`ppf`/`isf`), and
-  simulation (`rvs`) — plus `.mean`/`.var`/`.std`.
+  simulation (`rvs`), plus `.mean`/`.var`/`.std`.
 - The **`loc`/`scale`** convention and **frozen distributions** give one
   consistent, tidy interface across all of `scipy.stats`.
 - **`.fit()`** estimates parameters from data; for bounded data, fix the
   location with **`floc=0`**.
 - *Always* **sanity-check the fit** with a **histogram overlay** and a
-  **Q–Q plot** — points on a line means a plausible fit, curvature shows
+  **Q–Q plot**, points on a line means a plausible fit, curvature shows
   how it fails.
 - Fitting **does not prove** the data follows the distribution, and a
-  fitted model is only trustworthy **within the observed range** — its
+  fitted model is only trustworthy **within the observed range**, its
   far tails are extrapolation.
 - This model-then-question loop underpins the inference ahead: we'll lean
   on these methods in *The Normal Distribution* recap and throughout

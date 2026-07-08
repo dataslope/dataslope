@@ -1,6 +1,6 @@
 ---
 title: The Birth of Reusable Containers
-description: From hand-rolled arrays to Java 1.0's first container classes — Vector, Stack, Hashtable, Enumeration — and the lessons learned
+description: From hand-rolled arrays to Java 1.0's first container classes, Vector, Stack, Hashtable, Enumeration, and the lessons learned
 ---
 
 The history of *every* mainstream language goes through the same arc:
@@ -10,21 +10,21 @@ library from the start. Python had `list` and `dict` baked into the
 language. Java, when it first shipped in 1996, had **four** container
 classes and one helper interface in `java.util`:
 
-- `Vector` — a growable array of `Object`
-- `Stack` — a `Vector` with `push` / `pop`
-- `Hashtable` — a key-to-value map of `Object`
-- `Properties` — a `Hashtable` for `String` pairs
-- `Enumeration` — an interface for walking through them
+- `Vector`, a growable array of `Object`
+- `Stack`, a `Vector` with `push` / `pop`
+- `Hashtable`, a key-to-value map of `Object`
+- `Properties`, a `Hashtable` for `String` pairs
+- `Enumeration`, an interface for walking through them
 
 That was it. For three years (Java 1.0, 1.1) those were the entire
 collection story. The story is worth telling because the *next*
-generation of containers — the Collections Framework — was designed
+generation of containers, the Collections Framework, was designed
 specifically to fix what these classes got wrong.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue circle, green square, and yellow triangle all funnel through a thin gray arrow into one container box where they become identical gray dots; the dot taken back out wears a dashed yellow ring — its original type forgotten"
+  aria-label="A blue circle, green square, and yellow triangle all funnel through a thin gray arrow into one container box where they become identical gray dots; the dot taken back out wears a dashed yellow ring, its original type forgotten"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="90" cy="60" r="9" fill="var(--ds-blue-500)" />
@@ -88,7 +88,7 @@ public class Main {
     Vector v = new Vector();
     v.addElement("Ada");
     v.addElement("Linus");
-    v.addElement(42); // also legal — it's a Vector of Object
+    v.addElement(42); // also legal, it's a Vector of Object
 
     // Walk it the 1996 way, with Enumeration.
     Enumeration e = v.elements();
@@ -138,7 +138,7 @@ were eventually invented to kill.
 `Stack` is a small subclass of `Vector` that adds `push`, `pop`,
 `peek`, and `empty`. It is the textbook example of how the early
 library used inheritance where it should have used composition (we'll
-return to this — modern code prefers `ArrayDeque` for stack behavior).
+return to this, modern code prefers `ArrayDeque` for stack behavior).
 
 <CodeBlock
   adapter="java"
@@ -166,7 +166,7 @@ public class Main {
 
 Because `Stack extends Vector`, you can *also* call `elementAt(0)` on
 it and reach the bottom of the stack, breaking the abstraction. That
-is a famous wart — and a great example of why "is-a" inheritance is
+is a famous wart, and a great example of why "is-a" inheritance is
 a dangerous design tool to reach for first.
 
 ## Hashtable: the first map
@@ -207,7 +207,7 @@ public class Main {
 />
 
 Same problems as `Vector`: untyped, and *also* synchronized on every
-method. Every `put` and every `get` took a lock — useful in 1996
+method. Every `put` and every `get` took a lock, useful in 1996
 when threading was new, expensive every day after.
 
 ## Enumeration: the original iterator
@@ -245,7 +245,7 @@ public class Main {
 
 It worked. It was uniform-*ish*. But it could not be used in the
 for-each loop, it could not be removed during iteration, and there
-was nothing standard above it — every container exposed its own
+was nothing standard above it, every container exposed its own
 "walking" method (`elements()` for `Vector`, `keys()` and
 `elements()` for `Hashtable`, etc.).
 
@@ -262,13 +262,13 @@ By 1997 the cracks were obvious:
 | `Enumeration` rather than something more capable | No `remove()` during walks, no integration with future for-each |
 
 Every one of those bullets becomes a *design goal* in the Java 1.2
-Collections Framework — and a *language-level fix* in Java 5 generics.
+Collections Framework, and a *language-level fix* in Java 5 generics.
 
 ## The same idea, rewritten with a hand-rolled container
 
 Just to feel what reusable containers *look* like, here is a tiny
 generic-free generic-style container that mimics `Vector`. Notice
-that even building one such thing is non-trivial — and now imagine
+that even building one such thing is non-trivial, and now imagine
 needing one for "list", "set", "map", "queue", "stack",
 "linked list", "tree map", and so on.
 
@@ -286,7 +286,7 @@ needing one for "list", "set", "map", "queue", "stack",
     bag.add("Grace");
 
     for (int i = 0; i < bag.size(); i++) {
-      // Downcast required — the bag is untyped.
+      // Downcast required, the bag is untyped.
       String s = (String)bag.get(i);
       System.out.println(s);
     }
@@ -330,7 +330,7 @@ Collections Framework.
 
 - Because \`Object\` is faster than other types
   > Speed is unrelated.
-- [o] Because \`Vector\` had no element-type parameter — the same class held any kind of element
+- [o] Because \`Vector\` had no element-type parameter, the same class held any kind of element
   > Without generics, a container had to be defined in terms of \`Object\`, and the cast was the price of mixing types.
 - Because \`Vector\` is an interface, not a class
   > \`Vector\` is a class.

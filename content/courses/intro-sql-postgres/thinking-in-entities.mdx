@@ -1,6 +1,6 @@
 ---
 title: Thinking in Entities
-description: The first step of data modeling — spotting the "things" in a problem, their attributes, and the relationships between them.
+description: The first step of data modeling, spotting the "things" in a problem, their attributes, and the relationships between them.
 ---
 
 Before writing a single `CREATE TABLE`, good database design starts
@@ -11,7 +11,7 @@ system is about, and how do they relate?* This habit is called
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three crisp entity cards stamped out of an amorphous blob of real-world detail — spotting the distinct things a system is about"
+  aria-label="Three crisp entity cards stamped out of an amorphous blob of real-world detail, spotting the distinct things a system is about"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -41,7 +41,7 @@ system is about, and how do they relate?* This habit is called
 
 ## What is an entity?
 
-An **entity** is a distinct "thing" your data is about — something
+An **entity** is a distinct "thing" your data is about, something
 you would naturally talk about in the real world: a *customer*, a
 *product*, an *order*, a *student*, a *course*. Each entity usually
 becomes a **table**, and each real instance of it becomes a **row**.
@@ -72,7 +72,7 @@ their **attributes**. Read this sentence:
 > "A **bookstore** sells **books** to **customers**, who place
 > **orders**."
 
-The nouns — bookstore, book, customer, order — are candidate
+The nouns, bookstore, book, customer, order, are candidate
 entities. Now ask of each: *what do we need to know about it?* Those
 become attributes (columns):
 
@@ -91,9 +91,9 @@ values (a customer's many orders), that is a sign of a
 
 Telling these two apart is the heart of modeling:
 
-- An **attribute** is a single value owned by one row — a book's
+- An **attribute** is a single value owned by one row, a book's
   `price`, a customer's `email`.
-- A **relationship** is a connection to another entity — a customer
+- A **relationship** is a connection to another entity, a customer
   *places* orders, an order *contains* books.
 
 ```mermaid
@@ -110,7 +110,7 @@ erDiagram
     }
 ```
 
-The verbs in the description — *sells*, *places*, *contains* — point
+The verbs in the description, *sells*, *places*, *contains*, point
 to relationships. The "many" symbols on the diagram (`o{`) capture
 how many of each side participate, just as you saw with foreign keys
 and junction tables.
@@ -124,12 +124,12 @@ Let's turn a short description into a model. Imagine a library:
 
 Working through it:
 
-1. **Entities (nouns):** `books`, `members`, and `loans` — a loan is
+1. **Entities (nouns):** `books`, `members`, and `loans`, a loan is
    a real thing we track, so it is its own entity.
 2. **Attributes:** books have a `title`; members have a `name`;
    loans have a `borrowed_on` and `due_on`.
 3. **Relationships:** a member *has* many loans; a book *appears in*
-   many loans. `loans` connects the two — it is a junction-like
+   many loans. `loans` connects the two, it is a junction-like
    entity that also carries its own dates.
 
 <SqlCodeBlock

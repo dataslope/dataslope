@@ -1,10 +1,10 @@
 ---
 title: Vectors Everywhere
-description: The single most important fact about R — there are no "scalars," only vectors. Once this clicks, the entire language makes sense.
+description: The single most important fact about R, there are no "scalars," only vectors. Once this clicks, the entire language makes sense.
 ---
 
 If R has a "secret," this is it: **everything is a vector.** When
-you write `x <- 5`, R does *not* store a single number — it stores
+you write `x <- 5`, R does *not* store a single number, it stores
 a vector of length one that happens to contain the number 5. There
 are no scalars hiding under the surface. The vector *is* the
 fundamental unit of data in R.
@@ -16,7 +16,7 @@ around that operation from day one.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="The number five written alone points along a thin gray arrow to what R actually stores — a capsule holding a single element — stacked above longer capsules of three and six elements: in R every value is already a vector"
+  aria-label="The number five written alone points along a thin gray arrow to what R actually stores, a capsule holding a single element, stacked above longer capsules of three and six elements: in R every value is already a vector"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -68,7 +68,7 @@ length(temperatures)
 The output starts with `[1]`. That `[1]` is the *index of the first
 element shown on this line*. If the vector were long enough to
 wrap across lines, you would see `[1]`, then `[8]`, then `[15]`,
-and so on — R is helpfully telling you where you are in the
+and so on, R is helpfully telling you where you are in the
 vector.
 
 ## Length-one vectors
@@ -85,7 +85,7 @@ length 1:
 print(x) # [1] 42
 length(x) # [1] 1
 is.vector(x) # [1] TRUE
-x[1] # [1] 42 — yes, you can index it
+x[1] # [1] 42, yes, you can index it
 `,
     },
   ]}
@@ -109,7 +109,7 @@ flowchart LR
   style R fill:#dcfce7
 ```
 
-This is not a curiosity — it's the foundation of everything that
+This is not a curiosity, it's the foundation of everything that
 follows. When you learn `mean(x)`, it works on length 1, length
 100, or length 10 million. The same word, the same idea, every
 time.
@@ -144,7 +144,7 @@ rep(c("yes", "no"), times = 3)
   ]}
 />
 
-`:` builds an integer sequence. `seq()` is the general tool — you
+`:` builds an integer sequence. `seq()` is the general tool, you
 either specify a step (`by =`) or a number of values
 (`length.out =`). `rep()` repeats. Between these three you can
 build almost any pattern you need.
@@ -180,7 +180,7 @@ c(1, "two", TRUE)
 />
 
 The coercion order is: logical → integer → numeric → character.
-This is sometimes surprising — `c(1, "two")` gives you the
+This is sometimes surprising, `c(1, "two")` gives you the
 *string* `"1"`, not the number 1. It is one of R's well-known
 gotchas. The fix is to be intentional: keep one type per vector,
 and use a list (`list()`) when you genuinely need mixed types.
@@ -199,7 +199,7 @@ You access elements with `[ ]`. The first element is `[1]`, not
 
 days[1] # first element
 days[3] # third
-days[c(1, 5, 7)] # several at once — pass a vector of indices!
+days[c(1, 5, 7)] # several at once, pass a vector of indices!
 days[-1] # everything except the first (negative index = exclude)
 days[-c(1, 7)] # everything except first and last
 days[2:4] # a contiguous slice
@@ -214,7 +214,7 @@ Two things to notice:
 1. R uses **1-based indexing**. The first element is 1. (This
    matches how mathematicians and statisticians have always
    counted things. Most "data people" find it natural.)
-2. A *negative* index doesn't mean "from the end" — it means
+2. A *negative* index doesn't mean "from the end", it means
    *exclude this position*. To get the last element, use
    `days[length(days)]` or `tail(days, 1)`.
 
@@ -281,7 +281,7 @@ flowchart TB
   style ops fill:#fde68a
 ```
 
-The next page is about *operating* on vectors — and that is where R
+The next page is about *operating* on vectors, and that is where R
 really starts to shine.
 
 ## Test your understanding
@@ -307,7 +307,7 @@ really starts to shine.
 - An error
   > R does not error on mixed-type \`c()\` calls; it silently coerces all elements to the most general type present.
 - [o] A character vector: \`"1" "two" "TRUE"\`
-  > Mixing types with \`c()\` coerces everything to the most general type — in this case, character.
+  > Mixing types with \`c()\` coerces everything to the most general type, in this case, character.
 - A numeric vector: \`1 2 1\`
   > The presence of the character \`"two"\` forces coercion all the way to character, not just numeric; \`TRUE\` becomes \`"TRUE"\` and 1 becomes \`"1"\`.`}
 />
@@ -315,7 +315,7 @@ really starts to shine.
 <MultipleChoice
   markdown={`Given \`x <- c(10, 20, 30, 40, 50)\`, what does \`x[-2]\` return?
 
-*Hint: in R a negative index does not count from the end (as in some languages) — it drops that position.*
+*Hint: in R a negative index does not count from the end (as in some languages), it drops that position.*
 
 - \`20\`
   > That is \`x[2]\`. A negative index does not select the second element; it removes it.

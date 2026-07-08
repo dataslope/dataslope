@@ -1,6 +1,6 @@
 // A self-contained, flat auth page (design option "2a"). Unlike /pricing and
 // friends, it does NOT pull in the home route's Tailwind bundle (tailwind.css)
-// or the HomeNav/HomeFooter chrome — the whole screen is a single centered
+// or the HomeNav/HomeFooter chrome, the whole screen is a single centered
 // card plus a top-left brand lockup, styled with a local CSS module. Global
 // resets come from app/globals.css (imported in the root layout).
 import type { Metadata } from "next";

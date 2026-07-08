@@ -1,6 +1,6 @@
 /* Theme tokens mirror /svg-gallery: light is the default; `.dark` (toggled on
    the root) swaps in the dark palette. Page background is pure white (#ffffff)
-   in light and #121212 in dark — the two backgrounds the illustrations must
+   in light and #121212 in dark, the two backgrounds the illustrations must
    read well on, and the ones named in every prompt. */
 .page {
   --bg: #ffffff;

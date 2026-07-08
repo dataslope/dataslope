@@ -1,14 +1,14 @@
 ---
 title: When Computers Were People
-description: How human calculators hit a wall shaped exactly like the problems scientific computing now solves — and how the first machines turned simulation into a third pillar of science
+description: How human calculators hit a wall shaped exactly like the problems scientific computing now solves, and how the first machines turned simulation into a third pillar of science
 ---
 
-Before there were computers, there were **computers** — and they were
+Before there were computers, there were **computers**, and they were
 people. From the seventeenth century through the Second World War, a
 "computer" was someone whose job was to grind through long arithmetic
 by hand, for astronomy, navigation, ballistics, or engineering.
-Teams of them — the women of the Harvard Observatory, the human
-computers of the Army's Aberdeen Proving Ground — produced the
+Teams of them, the women of the Harvard Observatory, the human
+computers of the Army's Aberdeen Proving Ground, produced the
 numerical infrastructure on which modern science was built.
 
 This page is about the wall those human computers hit, and how, in a
@@ -19,7 +19,7 @@ run numerical code before the page is over.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A small hand abacus dwarfed by a vast wall of faint dots stretching away to the right — the scale of calculation that outgrew human computers"
+  aria-label="A small hand abacus dwarfed by a vast wall of faint dots stretching away to the right, the scale of calculation that outgrew human computers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -82,7 +82,7 @@ run numerical code before the page is over.
 
 Consider one of the oldest problems in physics: predicting where the
 planets will be a thousand years from now. Newton's laws describe one
-planet orbiting the sun perfectly — but add a *third* gravitating
+planet orbiting the sun perfectly, but add a *third* gravitating
 body and the equations no longer have a closed-form solution. The
 only way forward is to *march* the system in tiny time steps:
 evaluate the forces, update the velocities, update the positions,
@@ -121,8 +121,8 @@ print(f"Human-years required:        {human_years:,.1f}")
 />
 
 Nearly six human-years of nonstop arithmetic for a problem your
-laptop solves in a fraction of a second. This gap — between what is
-*mathematically defined* and what is *humanly computable* — is the
+laptop solves in a fraction of a second. This gap, between what is
+*mathematically defined* and what is *humanly computable*, is the
 gap scientific computing exists to close.
 
 ## The three walls
@@ -154,7 +154,7 @@ graph TB
   noise. We will see that even 16-digit machines can lose every
   digit to a poorly written formula.
 - **Dimensionality.** Many problems are not just long but
-  *high-dimensional* — optimizing a function of two thousand
+  *high-dimensional*, optimizing a function of two thousand
   variables needs an entirely different toolbox than optimizing one
   of two.
 
@@ -183,8 +183,8 @@ for k in range(1, 12):
 
 The "naive" column drifts and then collapses to zero; the "rewritten"
 column stays accurate. The math has not changed, only the *numerical
-method*. This single phenomenon — **catastrophic cancellation**,
-where subtracting two nearly equal numbers destroys precision — is
+method*. This single phenomenon, **catastrophic cancellation**,
+where subtracting two nearly equal numbers destroys precision, is
 the reason numerical analysis is a discipline rather than a footnote.
 We will name it properly in the foundations chapters.
 
@@ -193,7 +193,7 @@ We will name it properly in the foundations chapters.
 When the first electronic computers came online in the 1940s, they
 did not merely speed up existing science. They invented a new way of
 doing it. Theory and experiment had been the two pillars of science
-since Galileo; a third pillar now appeared — **simulation**.
+since Galileo; a third pillar now appeared, **simulation**.
 
 ```mermaid
 flowchart LR
@@ -204,13 +204,13 @@ flowchart LR
 
 The machine that opened the door was **ENIAC**, unveiled at the
 University of Pennsylvania in 1946. It performed about 5,000
-additions per second — roughly a month of human-computer work every
+additions per second, roughly a month of human-computer work every
 second. Built to compute ballistics tables for the U.S. Army, its
 first major job was instead a thermonuclear-weapons calculation for
 Los Alamos, run by Stanley Frankel, Nicholas Metropolis, and Anthony
 Turkevich. That run took weeks and produced a million numerical
-results, and the vocabulary it forced into existence — *time
-stepping*, *discretization*, *iteration* — is the vocabulary of this
+results, and the vocabulary it forced into existence, *time
+stepping*, *discretization*, *iteration*, is the vocabulary of this
 entire course.
 
 ## Monte Carlo: the first great idea
@@ -248,7 +248,7 @@ print(f"True value:                      {np.pi:.6f}")
   ]}
 />
 
-Increase `n` and the estimate sharpens — but only as $1/\sqrt{n}$, so
+Increase `n` and the estimate sharpens, but only as $1/\sqrt{n}$, so
 a hundredfold more samples buys you just one more digit. That slow,
 relentless convergence is *the* central law of Monte Carlo, and it is
 the same whether the problem has two dimensions or two thousand. We
@@ -259,25 +259,25 @@ devote a whole chapter to it later.
 The first decade of computational science handed down a remarkably
 durable toolkit, and every item appears in this course:
 
-- **Time stepping** — march a system forward in small increments.
-- **Discretization** — replace continuous fields with grids.
-- **Iteration** — solve hard problems by repeatedly applying easier
+- **Time stepping**, march a system forward in small increments.
+- **Discretization**, replace continuous fields with grids.
+- **Iteration**, solve hard problems by repeatedly applying easier
   ones.
-- **Monte Carlo** — use random sampling to estimate integrals and
+- **Monte Carlo**, use random sampling to estimate integrals and
   rare events.
-- **Stability analysis** — understand when a method amplifies error
+- **Stability analysis**, understand when a method amplifies error
   and when it doesn't.
 
 None of these requires a supercomputer to learn. They all run
 beautifully in the browser kernel powering this page. The next
-chapter follows the *languages* that grew up around this toolkit —
-FORTRAN, MATLAB, and finally Python — and why scientific Python won.
+chapter follows the *languages* that grew up around this toolkit,
+FORTRAN, MATLAB, and finally Python, and why scientific Python won.
 
 <Callout type="info" title="Want the longer history?">
 We have kept this opener lean so we can start computing. The fuller
-stories — the first computer weather forecast, the hardware ladder
+stories, the first computer weather forecast, the hardware ladder
 from ENIAC to exascale, and the Nobel Prize awarded for *simulation
-methods* — live in [Interesting
+methods*, live in [Interesting
 discussions](/courses/scientific-computing-python/interesting-discussions)
 near the end of the course.
 </Callout>
@@ -287,16 +287,16 @@ near the end of the course.
 <MultipleChoice
   markdown={`Which of the following was **not** a category of "wall" that human computers ran into and that modern scientific computing was created to overcome?
 
-- Volume — sheer number of arithmetic operations required
+- Volume, sheer number of arithmetic operations required
   > Volume is explicitly identified as the first wall: planetary simulation alone requires billions of operations a human computer could never complete.
-- Precision — accumulated round-off in long calculations
+- Precision, accumulated round-off in long calculations
   > Precision is explicitly the second wall: carrying only seven decimal digits through thousands of operations leaves only noise in the later digits.
-- Dimensionality — problems with thousands of variables
+- Dimensionality, problems with thousands of variables
   > Dimensionality is explicitly the third wall: optimizing a function of two thousand variables requires an entirely different toolbox.
-- [o] Syntax — the absence of structured programming constructs
+- [o] Syntax, the absence of structured programming constructs
   > "Syntax" is a software-engineering concern, not a fundamental obstacle to scientific calculation. Human computers worked with mathematical notation, not programming languages. Volume, precision, and dimensionality are the three classical walls.
 
-The three walls — volume, precision, and dimensionality — map directly onto the three pillars of numerical analysis: efficient algorithms, stable methods, and tractable high-dimensional optimization.`}
+The three walls, volume, precision, and dimensionality, map directly onto the three pillars of numerical analysis: efficient algorithms, stable methods, and tractable high-dimensional optimization.`}
 />
 
 <MultipleChoice
@@ -306,7 +306,7 @@ The three walls — volume, precision, and dimensionality — map directly onto 
   > \`math.cos\` is correctly implemented and accurate for small arguments; the problem is the subtraction \`1 - cos(x)\`, not \`cos\` itself.
 - The CPU is rounding $x^2$ to zero
   > For tiny but nonzero $x$ (e.g. $10^{-6}$), $x^2 = 10^{-12}$ is well within double precision and is not rounded to zero; the issue is cancellation in $1 - \\cos(x)$, not underflow of $x^2$.
-- [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits — *catastrophic cancellation*
+- [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits, *catastrophic cancellation*
   > For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floats that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction.
 - The random number generator introduced noise
   > No random numbers appear in this example; the collapse is a deterministic floating-point cancellation effect.

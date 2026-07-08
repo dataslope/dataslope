@@ -80,7 +80,7 @@ display(df.head(10))
     code: `import pandas as pd
 
 # raw.githubusercontent.com sends permissive CORS headers, so pandas can
-# read the CSV straight from the URL — no download or proxy needed.
+# read the CSV straight from the URL, no download or proxy needed.
 url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
 penguins = pd.read_csv(url)
 
@@ -295,7 +295,7 @@ model = LinearRegression()
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
-print("Linear Regression — Housing Price Model")
+print("Linear Regression, Housing Price Model")
 print("─" * 42)
 print(f"  R²  score : {r2_score(y_test, y_pred):.4f}")
 print(f"  RMSE      : \${mean_squared_error(y_test, y_pred)**0.5:,.0f}")
@@ -361,7 +361,7 @@ print(f"min at x={minimum.x:.4f}, f={minimum.fun:.4f}")
   },
   {
     cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.13",
-    desc: "Symbolic mathematics — algebra, calculus, equation solving",
+    desc: "Symbolic mathematics, algebra, calculus, equation solving",
     example: `from sympy import symbols, expand, diff, integrate
 
 x = symbols("x")
@@ -418,7 +418,7 @@ print("schema:", table.schema)
   // Visualization
   {
     cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.8",
-    desc: "2D plotting — line, bar, scatter, histogram, heatmap, etc.",
+    desc: "2D plotting, line, bar, scatter, histogram, heatmap, etc.",
     example: `import matplotlib.pyplot as plt
 import numpy as np
 
@@ -432,7 +432,7 @@ plt.show()
   },
   {
     cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.24",
-    desc: "Interactive charts — line, bar, scatter, 3D, maps",
+    desc: "Interactive charts, line, bar, scatter, 3D, maps",
     example: `import plotly.express as px
 
 fig = px.bar(
@@ -477,7 +477,7 @@ print(chart.to_json(indent=2))
   },
   {
     cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "11.3",
-    desc: "Image processing — open, transform, save images",
+    desc: "Image processing, open, transform, save images",
     example: `from PIL import Image, ImageDraw
 
 img = Image.new("RGB", (200, 80), "white")
@@ -503,7 +503,7 @@ print(f"accuracy: {clf.score(Xte, yte):.3f}")
   },
   {
     cat: "Machine Learning", icon: "🌲", color: "#a78bfa", name: "xgboost", ver: "2.1",
-    desc: "Gradient boosting — fast and accurate tree models",
+    desc: "Gradient boosting, fast and accurate tree models",
     example: `import xgboost as xgb
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -588,7 +588,7 @@ print("unpacked:", msgpack.unpackb(packed))
   // Networking & Utilities
   {
     cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.32",
-    desc: "HTTP requests (via micropip — pure Python)",
+    desc: "HTTP requests (via micropip, pure Python)",
     example: `# Note: real network calls are blocked in the browser sandbox; this
 # example shows the request-construction API instead of executing it.
 import requests
@@ -613,7 +613,7 @@ print("decrypted:", f.decrypt(token))
   },
   {
     cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "25.2",
-    desc: "Classes without boilerplate — define clean data classes",
+    desc: "Classes without boilerplate, define clean data classes",
     example: `import attrs
 
 @attrs.define
@@ -640,7 +640,7 @@ print(f"{v} satisfies {spec}? {v in spec}")
   },
   {
     cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.3",
-    desc: "Testing framework — run via micropip install",
+    desc: "Testing framework, run via micropip install",
     example: `# A minimal pytest-style sanity check. In a real project these would
 # live in a test_*.py file and be discovered by 'pytest'.
 import pytest
@@ -659,7 +659,7 @@ print("test_add passed")
   },
 ];
 
-// ─── Worker protocol — must stay in sync with `pyodide-worker.ts`. ─────
+// ─── Worker protocol, must stay in sync with `pyodide-worker.ts`. ─────
 type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
 interface OutputCellMessage {
   type: OutputCellType;
@@ -702,14 +702,14 @@ class PyodideWorkerRuntime implements LanguageRuntime {
   constructor(private worker: Worker) {}
 
   /** Free the Pyodide heap by terminating the worker. Registry-eviction
-   *  hook — the instance must not be used after this. */
+   *  hook, the instance must not be used after this. */
   dispose(): void {
     this.worker.terminate();
   }
 
   /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages): asks
-   *  the worker to pre-install the heavy package set — and any micropip
-   *  drawer packages the sources import — when the authored code (or an
+   *  the worker to pre-install the heavy package set, and any micropip
+   *  drawer packages the sources import, when the authored code (or an
    *  explicit `packages` list) actually needs it. Explicit module names
    *  are turned into synthetic `import x` lines so the worker's gate and
    *  micropip mapping treat them exactly like authored imports. */
@@ -750,7 +750,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         if (msg.id !== id) return;
         if (msg.kind === "run-status") {
           // Mid-run wait notices (e.g. the deferred package set still
-          // installing on the first data-stack run) — see RunOptions.
+          // installing on the first data-stack run), see RunOptions.
           // `preparing` lets the UI show the boot notice during the wait
           // and drop it once execution actually starts.
           options?.onStatus?.(msg.message, msg.preparing);
@@ -793,7 +793,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const id = ++this.nextId;
-    // Filter to plain files Python is likely to consume — staging
+    // Filter to plain files Python is likely to consume, staging
     // archives, hidden dotfiles, etc. is fine but we always send the
     // workspace's exact filenames so the user's mental model matches
     // what shows up in `os.listdir()`.
@@ -833,11 +833,11 @@ export const pythonAdapter: LanguageAdapter = {
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "python",
-  // Phase A of the two-phase boot (interpreter + stdlib — what the boot
+  // Phase A of the two-phase boot (interpreter + stdlib, what the boot
   // notice actually waits for); the ~32 MB package set follows in the
   // background and surfaces via run-status if a run needs it earlier.
   coldDownloadMB: 6,
-  // ruff_fmt (PEP 8) (see formatCode) — keep in sync.
+  // ruff_fmt (PEP 8) (see formatCode), keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -863,7 +863,7 @@ export const pythonAdapter: LanguageAdapter = {
   importSnippet: (name) => `import ${name}`,
   hasImport(code, name) {
     // Match `import name`, `import name as alias`, `import a, name`,
-    // and `from name import ...` — anchored at the start of a line so
+    // and `from name import ...`, anchored at the start of a line so
     // imports that appear in strings or comments mid-line are ignored.
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const re = new RegExp(
@@ -881,7 +881,7 @@ export const pythonAdapter: LanguageAdapter = {
     // Standard Web Worker construction pattern that Next.js / Turbopack
     // recognises: it bundles the worker as a separate chunk. The worker
     // itself avoids the bundler's dynamic-import handling by loading
-    // Pyodide via `importScripts` from the CDN — this requires a classic
+    // Pyodide via `importScripts` from the CDN, this requires a classic
     // (non-module) worker, so we deliberately omit `{ type: "module" }`.
     const worker = new Worker(
       new URL("./pyodide-worker.ts", import.meta.url),

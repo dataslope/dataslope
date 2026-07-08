@@ -5,7 +5,7 @@ description: Differentiation and integration when symbols stop working
 
 Real scientific problems rarely have closed-form integrals or
 analytic derivatives. The temperature profile in a reactor, the
-drag on an airfoil, the cumulative dose of a drug — all are defined
+drag on an airfoil, the cumulative dose of a drug, all are defined
 by *data* or by integrals nobody has solved on paper. **Numerical
 calculus** turns those problems into arithmetic.
 
@@ -16,7 +16,7 @@ think about their accuracy.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Translucent green columns stand packed under a smooth pale green curve — integration as areas summed strip by strip"
+  aria-label="Translucent green columns stand packed under a smooth pale green curve, integration as areas summed strip by strip"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -43,14 +43,14 @@ flowchart LR
     F --> D[Differentiation]
     F --> I[Integration]
     D --> D1["finite differences<br/>(forward / centered)"]
-    D --> D2["automatic differentiation<br/>(JAX, PyTorch — beyond scipy)"]
+    D --> D2["automatic differentiation<br/>(JAX, PyTorch, beyond scipy)"]
     I --> I1["fixed-node rules<br/>(trapezoid, Simpson)"]
     I --> I2["adaptive quadrature<br/>(quad)"]
     I --> I3["Monte Carlo<br/>(high dimensions)"]
 ```
 
-Differentiation in finite precision is *ill-conditioned* — you are
-subtracting nearby numbers. Integration is *well-conditioned* —
+Differentiation in finite precision is *ill-conditioned*, you are
+subtracting nearby numbers. Integration is *well-conditioned*,
 errors average out. This asymmetry shapes every algorithm below.
 
 ## Finite differences
@@ -136,7 +136,7 @@ right tool when all you have is a *table* of values.
 ## Quadrature: integration as a weighted sum
 
 Every integration rule has the form
-$\int_a^b f(x)\,dx \approx \sum_i w_i\, f(x_i)$ — pick nodes $x_i$
+$\int_a^b f(x)\,dx \approx \sum_i w_i\, f(x_i)$, pick nodes $x_i$
 and weights $w_i$, multiply, add. The art is in choosing them.
 
 | Rule | Nodes | Error on smooth $f$ |
@@ -398,5 +398,5 @@ This V-shaped error curve is the single most important plot to remember about nu
 - The error is the variance of the integrand
   > The variance of the integrand is related to Monte Carlo error, not quadrature error; the error bound returned by \`quad\` is an estimate of the absolute integration error, not a statistical variance.
 
-Always check the reported error — it costs nothing extra and tells you whether to tighten tolerances.`}
+Always check the reported error, it costs nothing extra and tells you whether to tighten tolerances.`}
 />

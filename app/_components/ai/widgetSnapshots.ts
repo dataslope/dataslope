@@ -56,7 +56,7 @@ export function describeChallenge(args: {
     const passed = tests.filter((t) => t.state === "pass").length;
     const lines = tests.map((t) => {
       const detail =
-        t.state === "fail" && t.detail?.trim() ? ` — ${t.detail.trim()}` : "";
+        t.state === "fail" && t.detail?.trim() ? `, ${t.detail.trim()}` : "";
       return `- [${t.state}] ${t.name}${detail}`;
     });
     parts.push(
@@ -113,7 +113,7 @@ export function describeMcq(args: {
       parts.push(`Author's explanation:\n${args.explanation.trim()}`);
     }
   } else {
-    parts.push("The user has not answered yet — nudge, don't reveal the answer.");
+    parts.push("The user has not answered yet, nudge, don't reveal the answer.");
   }
   return parts.join("\n\n");
 }
@@ -147,7 +147,7 @@ export function describeSqlSurface(args: {
     const passed = tests.filter((t) => t.state === "pass").length;
     const lines = tests.map((t) => {
       const detail =
-        t.state === "fail" && t.detail?.trim() ? ` — ${t.detail.trim()}` : "";
+        t.state === "fail" && t.detail?.trim() ? `, ${t.detail.trim()}` : "";
       return `- [${t.state}] ${t.name}${detail}`;
     });
     parts.push(

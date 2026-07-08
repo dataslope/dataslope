@@ -9,13 +9,13 @@ stage, in plain language. Understanding this picture is the
 difference between feeling like programming is magic and feeling
 like you know what's going on.
 
-We'll keep it conceptual — you don't need to memorize bytecodes or
+We'll keep it conceptual, you don't need to memorize bytecodes or
 CPU instructions, just build the mental model.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three stacked translation layers — blue source bars, yellow bytecode squares, green machine ticks — threaded top to bottom by one thin line that ends at a play triangle — code translated stage by stage"
+  aria-label="Three stacked translation layers, blue source bars, yellow bytecode squares, green machine ticks, threaded top to bottom by one thin line that ends at a play triangle, code translated stage by stage"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -63,7 +63,7 @@ the whole journey at a glance, before we open up each piece:
 
 **Source code**
 
-You write human-readable C# in `.cs` files — meaningless to the CPU until
+You write human-readable C# in `.cs` files, meaningless to the CPU until
 something translates it.
 
 </Step>
@@ -72,7 +72,7 @@ something translates it.
 **Compile to IL**
 
 Roslyn turns your source into **Intermediate Language** (CIL), packaged in a
-`.dll` — portable, but not yet machine code.
+`.dll`, portable, but not yet machine code.
 
 </Step>
 <Step>
@@ -95,8 +95,8 @@ first time each method runs.
 
 **Execute on the CPU**
 
-The CPU runs that native code — the stack tracks calls, the heap holds objects
-— until the program exits and the OS frees its memory.
+The CPU runs that native code, the stack tracks calls, the heap holds objects,
+until the program exits and the OS frees its memory.
 
 </Step>
 </Steps>
@@ -149,12 +149,12 @@ it's not tied to one CPU.
 
 ## 3. The runtime loads and verifies your program
 
-When you run your program, the .NET **runtime** (the CLR — Common
+When you run your program, the .NET **runtime** (the CLR, Common
 Language Runtime) loads the `.dll` and does a number of things
 before any of your code executes:
 
 - **Type checks.** The runtime verifies that your program's types
-  are consistent — for example, you're not trying to use a number
+  are consistent, for example, you're not trying to use a number
   as a method.
 - **Security checks.** Make sure the program isn't trying to do
   something it isn't allowed to.
@@ -212,8 +212,8 @@ flowchart TB
   `Person`, a `Library`) lives on the heap.
 
 You usually don't think about which region a value lives in. But
-when something surprising happens — "why did changing one variable
-also change another?" — the answer almost always traces back to
+when something surprising happens, "why did changing one variable
+also change another?", the answer almost always traces back to
 this picture. We'll come back to it when we talk about value vs
 reference types.
 
@@ -266,7 +266,7 @@ Two things to notice:
   caller picks up where it left off.
 
 This is why a variable named `x` inside `Square` and a variable
-named `x` somewhere else don't interfere — they're in different
+named `x` somewhere else don't interfere, they're in different
 frames.
 
 ## 7. Garbage collection: who frees memory
@@ -351,7 +351,7 @@ picture.
   markdown={`What does the Roslyn compiler produce when it compiles a C# program?
 
 - Machine code for your CPU
-  > Not directly — that happens later, at runtime, via the JIT.
+  > Not directly, that happens later, at runtime, via the JIT.
 - A Word document
   > No.
 - [o] An assembly (a \`.dll\` or \`.exe\`) containing Intermediate Language (IL)
@@ -370,7 +370,7 @@ picture.
 - [o] The stack holds short-lived bookkeeping for method calls (parameters, locals, return addresses). The heap holds longer-lived objects created with \`new\` and managed by the garbage collector.
   > Stack memory is reclaimed automatically the moment a method returns, while heap objects persist until the garbage collector frees them.
 - The heap is faster than the stack
-  > It's usually the other way around — stack access is extremely fast.`}
+  > It's usually the other way around, stack access is extremely fast.`}
 />
 
 <MultipleChoice

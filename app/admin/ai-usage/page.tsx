@@ -1,4 +1,4 @@
-// /admin/ai-usage — per-user and site-wide AI spend (Ask AI chat + inline
+// /admin/ai-usage, per-user and site-wide AI spend (Ask AI chat + inline
 // completions), backed by the admin-only /api/admin/ai-usage endpoint.
 import type { Metadata } from "next";
 import { AiUsageClient } from "./AiUsageClient";

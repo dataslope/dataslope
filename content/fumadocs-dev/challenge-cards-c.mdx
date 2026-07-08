@@ -1,5 +1,5 @@
 ---
-title: Challenge Cards — C
+title: "Challenge Cards: C"
 description: Sandbox for `<ChallengeCard>` C variations.
 ---
 
@@ -7,7 +7,7 @@ C challenges compile your source to WebAssembly via **browsercc**
 (clang + lld) and run the resulting WASI binary in your browser.
 
 Because each run produces a fresh process, C challenges use the
-**stdout-based** test mode (`expect: { ... }`) — there's no
+**stdout-based** test mode (`expect: { ... }`), there's no
 interpreter context to inject per-test assertions into.
 
 ## 1. Hello, World
@@ -290,7 +290,7 @@ filesystem before each run, so the entry translation unit can
 <ChallengeCard
   adapter="c"
   title="Implement greet() in utils.c"
-  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided — it calls \`greet()\` once.`}
+  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided, it calls \`greet()\` once.`}
   entryFilename="main.c"
   files={[
     {
@@ -337,7 +337,7 @@ void greet(void) { printf("Hello, World!\\n"); }
 <ChallengeCard
   adapter="c"
   title="Implement greet() in utils.c"
-  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided — it calls \`greet()\` once.`}
+  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided, it calls \`greet()\` once.`}
   entryFilename="main.c"
   files={[
     {

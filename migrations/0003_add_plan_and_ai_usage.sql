@@ -7,7 +7,7 @@
 -- quotas for Ask AI (free members → a cheaper OpenRouter model; paid members →
 -- an OpenAI model). See lib/ai/tier.ts and lib/ai/models.ts. Values: 'free' |
 -- 'pro'. New users default to 'free'. A `PRO_USER_EMAILS` allowlist and admins
--- are also treated as pro at request time without this column being set — the
+-- are also treated as pro at request time without this column being set, the
 -- bootstrap path (mirrors how ADMIN_EMAILS grants admin before a billing system
 -- exists). The column follows the same kysely-adapter sqlite encoding as 0002
 -- (plain TEXT). It is exposed on the Better Auth session via the user

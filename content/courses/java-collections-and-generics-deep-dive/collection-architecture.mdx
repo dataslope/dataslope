@@ -1,6 +1,6 @@
 ---
 title: Collection-Oriented Architecture
-description: Programming to interfaces at the boundary — keeping APIs flexible, safe, and reusable when collections cross modules
+description: Programming to interfaces at the boundary, keeping APIs flexible, safe, and reusable when collections cross modules
 ---
 
 A class is small. An *architecture* is large. The decisions you make
@@ -14,7 +14,7 @@ boundaries with collections.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="An architecture tree: a blue outlined interface card at the top branches over thin gray lines into three solid cards — blue, green, yellow — each backed by two lighter implementation chips below"
+  aria-label="An architecture tree: a blue outlined interface card at the top branches over thin gray lines into three solid cards, blue, green, yellow, each backed by two lighter implementation chips below"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -71,7 +71,7 @@ int countNonNull(Collection<String> items) { ... }
 
 If we take `ArrayList`, callers with a `LinkedHashSet` must copy
 their data first. If we take `Collection`, every caller is happy and
-nothing is given up — we only need `size()` and iteration anyway.
+nothing is given up, we only need `size()` and iteration anyway.
 
 The same idea on the return side, in reverse:
 
@@ -105,10 +105,10 @@ public List<Order> orders() { return this.orders; }
 Two safe forms:
 
 ```java
-// "Live, read-only view" — caller cannot mutate; you still can
+// "Live, read-only view", caller cannot mutate; you still can
 public List<Order> orders() { return Collections.unmodifiableList(orders); }
 
-// "Immutable snapshot" — caller sees a copy that never changes
+// "Immutable snapshot", caller sees a copy that never changes
 public List<Order> orders() { return List.copyOf(orders); }
 ```
 
@@ -153,7 +153,7 @@ A few useful conventions:
   mutable internal collections. Just don't leak them.
 - **Controllers / APIs adapt.** Convert to DTOs or response objects
   that you fully control. Don't serialize internal domain
-  collections directly — they couple your storage shape to your wire
+  collections directly, they couple your storage shape to your wire
   format.
 
 ## A worked example: an in-memory `BookRepo`
@@ -240,7 +240,7 @@ Notice three things:
 ## When you really need a "stream API"
 
 For repositories of *huge* data, returning a list of everything is
-the wrong shape — even if it's immutable. Then you have two clean
+the wrong shape, even if it's immutable. Then you have two clean
 options:
 
 - Return a **`Stream<T>`** so the caller can compose filters before
@@ -248,7 +248,7 @@ options:
   it wraps I/O.
 - Return a **paged result** type with `items()`, `nextCursor()`, etc.
 
-Avoid returning iterators directly — they expose mutation and have
+Avoid returning iterators directly, they expose mutation and have
 no useful documentation surface.
 
 ## Practice
@@ -379,11 +379,11 @@ public class Inbox {
 <MultipleChoice
   markdown={`A repository for a 50-million-row table is asked "give me all items as a \`List\`." What is the *architecturally* better return type?
 
-- \`List<Item>\` — load them all into memory
+- \`List<Item>\`, load them all into memory
   > That guarantees an \`OutOfMemoryError\`.
 - \`Iterator<Item>\` exposed directly
   > Iterators are poor public API; they support \`remove\` and have no good way to be closed.
-- [o] \`Stream<Item>\` (or a paged result type), so the caller composes filters before materializing — and the repository can lazily fetch in batches
+- [o] \`Stream<Item>\` (or a paged result type), so the caller composes filters before materializing, and the repository can lazily fetch in batches
   > Lazy, composable, and never materializes the whole set if the caller filters first.
 - \`Set<Item>\` for "uniqueness"
   > Same memory problem and the wrong shape.`}

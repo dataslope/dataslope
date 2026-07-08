@@ -1,11 +1,11 @@
 ---
 title: Welcome
-description: A computer science course on the Java Collections Framework, generic type systems, and collection-oriented software design — taught with Java
+description: A computer science course on the Java Collections Framework, generic type systems, and collection-oriented software design, taught with Java
 ---
 
 <Figure
   slug="stack"
-  alt="A stack of elements, last-in first-out — one of the collections this course explores in depth"
+  alt="A stack of elements, last-in first-out, one of the collections this course explores in depth"
   priority
 />
 
@@ -18,7 +18,7 @@ real program leans on: the **Java Collections Framework** and the
 
 This is a computer-science course, not a framework or interview
 bootcamp. We use Java because its collections are mature, explicit,
-and well-documented — and because Java's generics force you to be
+and well-documented, and because Java's generics force you to be
 honest about what your data *is*. By the end you should be able to
 look at a problem ("the system needs to track all active orders by
 customer, in arrival order, with fast lookup by id") and reach for
@@ -29,10 +29,10 @@ and explain *why* one collection wins over another.
 
 Everything in this course runs live in your browser. Here is the very
 first idea of the course in code: a `List<String>` is a typed,
-resizable sequence — and the *type parameter* `<String>` is what
+resizable sequence, and the *type parameter* `<String>` is what
 stops you from accidentally putting an `Integer` next to a name.
 Press **Run** (the first run takes a moment while the JVM boots),
-then add a fourth name — or try un-commenting the `names.add(42)`
+then add a fourth name, or try un-commenting the `names.add(42)`
 line and watch the compiler protect you.
 
 <CodeBlock
@@ -50,7 +50,7 @@ public class Main {
     names.add("Linus");
     names.add("Grace");
 
-    // names.add(42);   // compile error — the list is List<String>
+    // names.add(42);   // compile error, the list is List<String>
 
     for (String name : names) {
       System.out.println("Hello, " + name);
@@ -64,7 +64,7 @@ public class Main {
   ]}
 />
 
-Three things to notice — they will reappear on almost every page:
+Three things to notice, they will reappear on almost every page:
 
 - `List<String>` is a **generic type**. The `<String>` is the
   *type parameter*. Without it, the list would hold `Object`s and
@@ -72,14 +72,14 @@ Three things to notice — they will reappear on almost every page:
 - We program to the **interface** `List`, not the concrete
   implementation `ArrayList`. Swapping in `new LinkedList<>()`
   would not change a single other line.
-- `for (String name : names)` is **iteration through `Iterable`** —
+- `for (String name : names)` is **iteration through `Iterable`**,
   the for-each loop only works because `List` extends `Iterable`,
   which is the single most important interface in the framework.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="One solid blue rail spans three container cards hanging from thin gray lines — an ordered row of blue squares, a loose cluster of green dots, and yellow key-to-value rows — the collections framework at a glance"
+  aria-label="One solid blue rail spans three container cards hanging from thin gray lines, an ordered row of blue squares, a loose cluster of green dots, and yellow key-to-value rows, the collections framework at a glance"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -152,21 +152,21 @@ mindmap
 
 You will spend most of your time on:
 
-- **Why collections exist** — the structural problems with raw arrays
+- **Why collections exist**, the structural problems with raw arrays
   and procedural data handling that made reusable containers
   inevitable
-- **The shape of the framework** — `Iterable`, `Collection`, `List`,
+- **The shape of the framework**, `Iterable`, `Collection`, `List`,
   `Set`, `Map`, `Queue`, `Deque`, and how their interfaces compose
-- **Generic type systems** — declaring generic classes and methods,
+- **Generic type systems**, declaring generic classes and methods,
   bounded type parameters, wildcards (`? extends T`, `? super T`),
   type erasure, and why PECS exists
-- **Tradeoffs** — when `ArrayList` beats `LinkedList`, when
+- **Tradeoffs**, when `ArrayList` beats `LinkedList`, when
   `HashMap` beats `TreeMap`, what `LinkedHashSet` really costs, and
   how to reason about Big-O and memory in practice
-- **Equality, hashing, and ordering** — the `equals`/`hashCode`
+- **Equality, hashing, and ordering**, the `equals`/`hashCode`
   contract, `Comparable`, `Comparator`, and the bugs that lurk when
   you get them wrong
-- **Collection-oriented design** — modeling real systems as
+- **Collection-oriented design**, modeling real systems as
   collections of values, layering abstractions through interfaces,
   and writing APIs that read like English
 
@@ -184,7 +184,7 @@ Every page mixes prose with three kinds of interactive widget:
    run in a session is slow because the JVM has to boot; subsequent
    runs are fast.
 2. **Multi-file challenge cards.** Real collection code lives across
-   many files — interface, implementation, value type, driver. You
+   many files, interface, implementation, value type, driver. You
    will see workspaces with several `.java` files side by side and
    fill in the missing parts.
 3. **Multiple-choice questions.** Short single-answer checks at the
@@ -200,7 +200,7 @@ persistent multi-file workspace, open the
 
 ## What you'll be able to do by the end
 
-Take a vague requirement — *track unique users by login order* — and
+Take a vague requirement, *track unique users by login order*, and
 carry it all the way down:
 
 1. **Recognize** the right container (here, a `LinkedHashSet`).

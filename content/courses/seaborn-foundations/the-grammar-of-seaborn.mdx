@@ -1,6 +1,6 @@
 ---
 title: "How Seaborn Thinks"
-description: "Seaborn's declarative, dataset-oriented mental model — and how it sits on top of matplotlib."
+description: "Seaborn's declarative, dataset-oriented mental model, and how it sits on top of matplotlib."
 ---
 
 There are two ways to ask a computer to draw a chart, and the difference
@@ -17,15 +17,15 @@ the library figure out the steps. *Put this column on x, that column on y,
 and color by this third column.* You describe the chart in the vocabulary of
 your data, and the plumbing disappears.
 
-Seaborn is built around the declarative idea, and matplotlib — the library
-Seaborn draws on — is the imperative one underneath. Understanding that
+Seaborn is built around the declarative idea, and matplotlib, the library
+Seaborn draws on, is the imperative one underneath. Understanding that
 relationship is the mental model that makes everything else in this course
 click.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A fussy zigzag of small step-by-step instruction blocks reaches a little chart, while below one green capsule sends a single straight arrow to the same chart — imperative recipe versus declarative description"
+  aria-label="A fussy zigzag of small step-by-step instruction blocks reaches a little chart, while below one green capsule sends a single straight arrow to the same chart, imperative recipe versus declarative description"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.3">
@@ -157,7 +157,7 @@ sns.relplot(
 />
 
 That is the whole thing. No loop, no color list, no manual legend, no axis
-labels — Seaborn inferred all of it from the data and the roles you assigned.
+labels, Seaborn inferred all of it from the data and the roles you assigned.
 Change `hue="species"` to `hue="island"` and it recolors, re-groups, and
 rebuilds the legend automatically. Add `col="sex"` and it lays out a panel
 per sex with shared axes. The code stays the size of the *question*, not the
@@ -165,8 +165,8 @@ size of the drawing instructions.
 
 <Callout type="tip" title="The core shift">
 Stop thinking *"loop, draw, label, legend."* Start thinking *"which column
-plays which **role**?"* That single reframing — from drawing steps to
-column-to-role assignments — is what "thinking in Seaborn" means.
+plays which **role**?"* That single reframing, from drawing steps to
+column-to-role assignments, is what "thinking in Seaborn" means.
 </Callout>
 
 <MultipleChoice
@@ -177,7 +177,7 @@ matplotlib?
 - It computed more accurate point positions.
   > Both versions plot the same points at the same positions; accuracy is identical. The difference is who manages the grouping and legend.
 - [o] It split the data into species groups, assigned colors, and built the legend automatically from the \`hue\` column.
-  > Mapping a column to \`hue\` told Seaborn to group, color, and legend by that column — replacing the manual loop, color list, and \`ax.legend\` call.
+  > Mapping a column to \`hue\` told Seaborn to group, color, and legend by that column, replacing the manual loop, color list, and \`ax.legend\` call.
 - It made the figure render faster.
   > Speed is not the point and is roughly the same. The win is that declarative role-assignment removes the manual bookkeeping.
 - It used a completely different drawing engine instead of matplotlib.
@@ -194,29 +194,29 @@ start from one **tidy DataFrame** (`data=`) and then assign its columns to
 **roles**. Learn these roles once and they transfer to every chart type in
 the course.
 
-**Positional channels** place a point in space — the encodings the eye reads
+**Positional channels** place a point in space, the encodings the eye reads
 most precisely:
 
-* `x` — the column on the horizontal axis.
-* `y` — the column on the vertical axis.
+* `x`, the column on the horizontal axis.
+* `y`, the column on the vertical axis.
 
 **Semantic channels** add extra variables by varying an appearance:
 
-* `hue` — color. A categorical column gets distinct colors and a legend; a
+* `hue`, color. A categorical column gets distinct colors and a legend; a
   numeric column gets a continuous color gradient and a colorbar.
-* `size` — marker (or line) size, for a roughly-read numeric or categorical
+* `size`, marker (or line) size, for a roughly-read numeric or categorical
   variable.
-* `style` — marker shape and/or dash pattern, for a categorical variable.
+* `style`, marker shape and/or dash pattern, for a categorical variable.
 
-**Facet channels** split one plot into a grid of small panels — sometimes
+**Facet channels** split one plot into a grid of small panels, sometimes
 called *small multiples*:
 
-* `col` — one column of panels per category.
-* `row` — one row of panels per category.
+* `col`, one column of panels per category.
+* `row`, one row of panels per category.
 
 And one more selector that picks *which kind* of chart to draw:
 
-* `kind` — e.g. `relplot(kind="scatter")` vs `relplot(kind="line")`, or
+* `kind`, e.g. `relplot(kind="scatter")` vs `relplot(kind="line")`, or
   `displot(kind="hist")` vs `displot(kind="kde")`.
 
 | Role | Visual property | Typical column type |
@@ -238,13 +238,13 @@ the same as more insight.
 ## Seaborn computes statistics for you
 
 Here is the part that earns the word *statistical* in "statistical
-visualization." Seaborn does not just place dots — for many chart types it
+visualization." Seaborn does not just place dots, for many chart types it
 **computes a statistical transform** from your raw rows and plots the result.
 You hand it observations; it hands you back a summary, drawn.
 
 * `countplot` **counts** how many rows fall in each category.
 * `barplot` and `pointplot` compute a **mean** per group and draw an error
-  bar — a **confidence interval** — around it by default.
+  bar, a **confidence interval**, around it by default.
 * `histplot` / `displot` **bin** values to estimate a distribution; add
   `kde=True` for a smooth **density** curve.
 * `lineplot` aggregates repeated y-values at each x into a **mean with a
@@ -259,12 +259,12 @@ arithmetic and shows you the answer.
 
 <Callout type="warn" title="Modern argument: errorbar, not ci">
 When you reach the chart types that draw uncertainty, control it with
-`errorbar` — for example `errorbar=("ci", 95)` for a 95% confidence interval,
+`errorbar`, for example `errorbar=("ci", 95)` for a 95% confidence interval,
 or `errorbar=None` to switch it off. Older tutorials use a `ci=` argument that
 newer Seaborn has replaced; prefer `errorbar`.
 </Callout>
 
-## It still returns matplotlib — so you can fine-tune
+## It still returns matplotlib, so you can fine-tune
 
 Declarative does not mean a locked black box. Because Seaborn draws *on top
 of* matplotlib, every call hands back real matplotlib objects you can keep
@@ -315,8 +315,8 @@ matplotlib for the last 10% of polish. We give that polish its own page later;
 for now, just know the escape hatch is always there.
 
 <Callout type="tip" title="Figure-level vs. axes-level (a coming chapter)">
-That split — functions that build a whole *figure* and return a grid, versus
-functions that draw on one *Axes* and return it — is one of the most useful
+That split, functions that build a whole *figure* and return a grid, versus
+functions that draw on one *Axes* and return it, is one of the most useful
 distinctions in Seaborn, and it has its own dedicated page later. The quick
 rule for now: reach for a **figure-level** function (like `relplot`) when you
 might want multiple panels via `col`/`row`, and an **axes-level** function
@@ -326,7 +326,7 @@ might want multiple panels via `col`/`row`, and an **axes-level** function
 ## A common mistake: titling a figure-level grid
 
 Because figure-level functions return a *grid* rather than a single Axes,
-reaching for the usual `plt.title("...")` does not do what you expect — it
+reaching for the usual `plt.title("...")` does not do what you expect, it
 acts on matplotlib's notion of the "current axes," which on a multi-panel grid
 is just the last panel. The result is a title stuck on one sub-panel instead
 of the whole figure.
@@ -346,10 +346,10 @@ single \`sns.relplot\` call, draw a scatter plot of:
 
 - \`total_bill\` on the x-axis,
 - \`tip\` on the y-axis,
-- colored by \`time\` (lunch vs. dinner) — assign it to the \`hue\` role.
+- colored by \`time\` (lunch vs. dinner), assign it to the \`hue\` role.
 
 Assign the returned grid object to a variable named \`g\`. You should not need
-a loop, a color list, or any manual legend code — that is the whole point.`}
+a loop, a color list, or any manual legend code, that is the whole point.`}
   files={[
     {
       filename: "main.py",
@@ -399,7 +399,7 @@ g = sns.relplot(
   ]}
 />
 
-Notice the test simply checks that a legend *exists* — you never wrote a line
+Notice the test simply checks that a legend *exists*, you never wrote a line
 of legend code. Mapping a column to `hue` is what produced it. That is
 declarative plotting in miniature.
 
@@ -436,8 +436,8 @@ does that tell you about the column?
 - Seaborn could not find the column and fell back to a default.
   > If the column were missing you would get an error, not a colorbar. The colorbar is a deliberate choice for numeric data.
 
-The *same* \`hue\` parameter behaves two ways — discrete for categorical
-columns, continuous for numeric ones — chosen automatically from the column's
+The *same* \`hue\` parameter behaves two ways, discrete for categorical
+columns, continuous for numeric ones, chosen automatically from the column's
 type.`}
 />
 
@@ -454,7 +454,7 @@ practical consequence of that relationship?
 - Seaborn replaces matplotlib entirely and shares no objects with it.
   > Seaborn does not replace matplotlib; it builds on it and hands matplotlib objects back to you.
 
-Declarative convenience on top, full imperative control underneath — you get
+Declarative convenience on top, full imperative control underneath, you get
 both.`}
 />
 
@@ -469,7 +469,7 @@ more memorable.
 scientist's tool for his own work. John D. Hunter created matplotlib in 2003
 while doing epilepsy research, to visualize the brain's electrical activity
 (EEG) in Python rather than the proprietary software his lab was using. He
-modeled its plotting commands on MATLAB so colleagues could switch easily —
+modeled its plotting commands on MATLAB so colleagues could switch easily,
 which is why so many matplotlib calls still look the way they do. Seaborn is a
 higher-level statistical layer built on top of that foundation, two decades
 later.
@@ -477,11 +477,11 @@ later.
 **Where the name (and `sns`) came from.** You have typed `import seaborn as
 sns` in every example, and the alias has a backstory. By its author Michael
 Waskom's own account, "seaborn" is named after **Samuel "Sam" Seaborn**, a
-character from the television series *The West Wing* — and the otherwise
+character from the television series *The West Wing*, and the otherwise
 puzzling `sns` alias nods to that character's initials. It is the kind of
 detail that makes a library feel made by a person, not a committee.
 
 You now have the mental model the rest of the course rests on: **a tidy table,
 columns assigned to roles, statistics computed for you, and matplotlib
-underneath for polish.** Next we put it to work in a repeatable habit — the
+underneath for polish.** Next we put it to work in a repeatable habit, the
 **exploratory data analysis** loop for getting to know a brand-new dataset.

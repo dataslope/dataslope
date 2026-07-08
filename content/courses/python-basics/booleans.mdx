@@ -3,9 +3,9 @@ title: Booleans
 description: True and False, truthiness, comparison, and the and / or / not operators
 ---
 
-`bool` has exactly two values: `True` and `False`. Both are written capitalized, and both are singleton objects. Understanding how Python evaluates truthiness—what counts as true or false in a boolean context—is key to writing idiomatic code.
+`bool` has exactly two values: `True` and `False`. Both are written capitalized, and both are singleton objects. Understanding how Python evaluates truthiness-what counts as true or false in a boolean context-is key to writing idiomatic code.
 
-Every snippet on this page runs in your browser—no setup required.
+Every snippet on this page runs in your browser-no setup required.
 
 <Figure
   slug="a-risograph-of-the-boolean-data-type"
@@ -15,7 +15,7 @@ Every snippet on this page runs in your browser—no setup required.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue value dot splits along two thin lines toward a green card holding a bold checkmark and a red card holding a cross — every Python value resolves to exactly one of True or False"
+  aria-label="A blue value dot splits along two thin lines toward a green card holding a bold checkmark and a red card holding a cross, every Python value resolves to exactly one of True or False"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -61,7 +61,7 @@ print(type(False))
 />
 
 <Callout type="info" title="The origin of 'boolean'">
-The term "boolean" comes from **George Boole** (1815–1864), an English mathematician who developed Boolean algebra—a system of logic with just two values: true and false. His work laid the foundation for digital circuit design and all of computer science.
+The term "boolean" comes from **George Boole** (1815–1864), an English mathematician who developed Boolean algebra-a system of logic with just two values: true and false. His work laid the foundation for digital circuit design and all of computer science.
 </Callout>
 
 ### bool is a subclass of int
@@ -93,7 +93,7 @@ print(False * 100)  # 0
 />
 
 <Callout type="warn" title="The 'is True' antipattern">
-**Never write `if x is True:`**—it checks whether `x` is the exact `True` object, not whether `x` is truthy. This breaks with values like `1`, `"hello"`, or `[1, 2, 3]` that are truthy but not `True`.
+**Never write `if x is True:`**, it checks whether `x` is the exact `True` object, not whether `x` is truthy. This breaks with values like `1`, `"hello"`, or `[1, 2, 3]` that are truthy but not `True`.
 
 **Bad:**
 ```python
@@ -426,7 +426,7 @@ print(abs_x)
 <ChallengeCard
   adapter="python"
   title="XOR without ^"
-  instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator—use \`and\`, \`or\`, and \`not\`.`}
+  instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator-use \`and\`, \`or\`, and \`not\`.`}
   files={[
     {
       filename: "main.py",
@@ -476,7 +476,7 @@ print(xor(False, False))
 <ChallengeCard
   adapter="python"
   title="All-truthy detector"
-  instructions={`Write a function \`all_truthy(items)\` that returns \`True\` if **all** items in the list are truthy, and \`False\` otherwise. Do not use the built-in \`all()\`—implement it yourself with a loop or comprehension.`}
+  instructions={`Write a function \`all_truthy(items)\` that returns \`True\` if **all** items in the list are truthy, and \`False\` otherwise. Do not use the built-in \`all()\`, implement it yourself with a loop or comprehension.`}
   files={[
     {
       filename: "main.py",
@@ -574,7 +574,7 @@ assert all_truthy(["a", "", "c"]) is False`,
 - \`if len(items) > 0:\`
   > This is functionally correct but verbose; Pythonic code uses truthiness.
 - [o] \`if items:\`
-  > This is the idiomatic Pythonic way—concise and readable.
+  > This is the idiomatic Pythonic way-concise and readable.
 - \`if items is not None:\`
   > This checks whether \`items\` is \`None\`, not whether it's empty. An empty list \`[]\` would pass this check.
 - \`if items == True:\`

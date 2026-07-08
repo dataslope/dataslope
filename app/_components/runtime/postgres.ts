@@ -285,7 +285,7 @@ async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlit
   // election lock and BroadcastChannel. Without a unique id every instance
   // with the same worker URL shares the same lock, meaning an unclosed
   // PGliteWorker from a previous page visit stays leader while the new one
-  // becomes a follower — so SQL is silently proxied to the old (already-
+  // becomes a follower, so SQL is silently proxied to the old (already-
   // populated) database, causing "relation already exists" errors.
   //
   // When `dataDir` is provided (Phase 4 OPFS persistence), it is forwarded
@@ -306,7 +306,7 @@ async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlit
  *  run inside PGlite. Dumps and distribution scripts (e.g. the Chinook
  *  release scripts) open with psql meta-commands and CREATE/DROP
  *  DATABASE statements; PGlite is a single-database embedded build, so
- *  those lines can never succeed and are dropped. Works line-by-line —
+ *  those lines can never succeed and are dropped. Works line-by-line,
  *  both constructs are single-line statements in practice. */
 export function preparePostgresScriptForPglite(sql: string): string {
   return sql
@@ -320,8 +320,8 @@ export function preparePostgresScriptForPglite(sql: string): string {
     .join("\n");
 }
 
-/** Resolve the SQL that seeds `sample`: its inline `sql`, or — for
- *  remote samples — the script fetched from the datasets repo, prepared
+/** Resolve the SQL that seeds `sample`: its inline `sql`, or, for
+ *  remote samples, the script fetched from the datasets repo, prepared
  *  for PGlite. Resolve *before* tearing anything down so a failed
  *  download leaves the current database intact. */
 async function resolveSampleSql(sample: PostgresSampleDatabase): Promise<string> {
@@ -332,7 +332,7 @@ async function resolveSampleSql(sample: PostgresSampleDatabase): Promise<string>
 }
 
 /** True when the connected PGlite cluster already has at least one
- *  user table in the `public` schema — i.e. it is an existing OPFS
+ *  user table in the `public` schema, i.e. it is an existing OPFS
  *  workspace we should *not* re-seed. */
 async function pgHasUserTables(db: PGlite): Promise<boolean> {
   try {
@@ -780,7 +780,7 @@ export async function createPostgresEngine(
       const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
-      // Columns whose CREATE TABLE used SERIAL/BIGSERIAL/SMALLSERIAL —
+      // Columns whose CREATE TABLE used SERIAL/BIGSERIAL/SMALLSERIAL,
       // Postgres auto-creates sequences for those, named
       // `<tableName>_<columnName>_seq`. After we rename the table from
       // tmpName to finalName, the sequences keep the tmpName prefix and
@@ -811,7 +811,7 @@ export async function createPostgresEngine(
         }
         // Like the sequences above, constraints auto-named by CREATE TABLE
         // (`<tmpName>_pkey`, `<tmpName>_<col>_key`, `<tmpName>_<col>_fkey`,
-        // …) keep the temp prefix after RENAME TO — which would surface in
+        // …) keep the temp prefix after RENAME TO, which would surface in
         // the sidebar as e.g. `books__tmp_rebuild_1_pkey`. Rename every
         // constraint that carries the temp prefix; renaming a constraint
         // also renames its backing index.
@@ -998,7 +998,7 @@ export async function createPostgresEngine(
       try {
         // Dumps taken from a full Postgres server often open with
         // `\connect` / CREATE DATABASE lines that can never run in
-        // PGlite — strip them instead of failing the whole import.
+        // PGlite, strip them instead of failing the whole import.
         await next.exec(preparePostgresScriptForPglite(sql));
       } catch (err) {
         try {

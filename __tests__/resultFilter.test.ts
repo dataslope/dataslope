@@ -60,7 +60,7 @@ describe("parseResultFilter", () => {
 
   it("treats a value containing a colon (e.g. a time) as a whole term", () => {
     // The token before the colon ("12") isn't a valid identifier start, so the
-    // whole thing is a term — the user can search for "12:30".
+    // whole thing is a term, the user can search for "12:30".
     expect(parseResultFilter("12:30", COLS)).toEqual({
       column: null,
       term: "12:30",
@@ -198,7 +198,7 @@ describe("canClientFilterResult", () => {
   });
 
   it("is false for a lazy result paged past the first page", () => {
-    // A later page is loaded — filtering it would only see that window.
+    // A later page is loaded, filtering it would only see that window.
     expect(
       canClientFilterResult({
         isLazy: true,

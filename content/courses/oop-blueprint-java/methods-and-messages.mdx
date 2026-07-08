@@ -5,14 +5,14 @@ description: How objects communicate, what method overloading means, and why we 
 
 We have used the word **message** loosely so far. This page nails it
 down. In an object-oriented program, calling `dog.bark()` is more
-than just "running a function" — it is *asking the dog to bark, and
+than just "running a function", it is *asking the dog to bark, and
 letting the dog decide how*. That framing changes how you design
 software.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A yellow envelope rides a solid gray arrow from a blue caller card to a green receiver card, and a small green chip travels back along a thinner arrow below — a method call as a message sent and a value returned"
+  aria-label="A yellow envelope rides a solid gray arrow from a blue caller card to a green receiver card, and a small green chip travels back along a thinner arrow below, a method call as a message sent and a value returned"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -54,7 +54,7 @@ receiver . message ( arguments )
   to do its job.
 
 The receiver decides *how* to respond. The caller doesn't need to
-know — and shouldn't care — what the receiver does internally to
+know, and shouldn't care, what the receiver does internally to
 fulfill the request.
 
 ```mermaid
@@ -71,7 +71,7 @@ sequenceDiagram
 
 This is not just terminology. *Thinking* of method calls as messages
 between objects is what lets you design systems whose pieces can be
-swapped, refactored, or replaced — because each receiver is free to
+swapped, refactored, or replaced, because each receiver is free to
 implement the message in its own way.
 
 <CodeBlock
@@ -86,7 +86,7 @@ implement the message in its own way.
     desk.setBrightness(0.8);
     System.out.println(desk.describe());
 
-    desk.setBrightness(2.0); // out of range — lamp clamps
+    desk.setBrightness(2.0); // out of range, lamp clamps
     System.out.println(desk.describe());
   }
 }
@@ -134,7 +134,7 @@ its parameters. The return type is *not* part of the signature.
 | `String describe()` | `describe()` |
 
 Two methods in the same class may share a name **only** if their
-signatures differ — different number of parameters, different
+signatures differ, different number of parameters, different
 parameter types, or different parameter order. This is **method
 overloading**.
 
@@ -185,8 +185,8 @@ flowchart TD
     Q -->|No| Y["Query<br/>(returns a value)"]
 ```
 
-A method that does *both* — modifies state *and* returns a meaningful
-value — is sometimes useful (think `boolean spend(int)` from the
+A method that does *both*, modifies state *and* returns a meaningful
+value, is sometimes useful (think `boolean spend(int)` from the
 Wallet exercise) but is the most error-prone shape. Keep it rare and
 keep the name honest (`tryWithdraw`, `popOrNull`).
 
@@ -240,7 +240,7 @@ class Stopwatch {
   ]}
 />
 
-`summary()` doesn't recompute the elapsed time itself — it sends the
+`summary()` doesn't recompute the elapsed time itself, it sends the
 message `elapsedNs()` to `this`. If the formula ever changes, you
 change it in one place.
 
@@ -248,7 +248,7 @@ change it in one place.
 
 This is where OOP really comes alive: an object's method can fulfill
 its responsibility by *sending messages to other objects*. The
-example below — three classes, one diagram — is the pattern you will
+example below, three classes, one diagram, is the pattern you will
 use thousands of times.
 
 ```mermaid
@@ -457,7 +457,7 @@ Hello, Eve!
 - \`public void run()\` and \`private void run()\`
   > Access modifiers don't differentiate overloads either.
 - \`void log(String s)\` and \`void log(String s)\`
-  > Identical signatures — duplicate method, won't compile.`}
+  > Identical signatures, duplicate method, won't compile.`}
 />
 
 <MultipleChoice

@@ -1,6 +1,6 @@
 ---
 title: Abstract Classes
-description: Partial blueprints — classes that capture shared behavior but leave specific details to their subclasses
+description: Partial blueprints, classes that capture shared behavior but leave specific details to their subclasses
 ---
 
 Sometimes the class you want to write is *almost* complete, but one
@@ -13,7 +13,7 @@ Java models this with the keyword **`abstract`**. An *abstract
 class* is a class that may have:
 
 - Normal fields and concrete methods (just like any class).
-- *Abstract methods* — methods declared without a body, leaving
+- *Abstract methods*, methods declared without a body, leaving
   subclasses to provide the implementation.
 
 You cannot construct an abstract class directly with `new`. You can
@@ -22,7 +22,7 @@ only construct concrete subclasses of it.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A translucent disc missing one wedge beside two solid discs where the wedge is filled in — a darker blue in one and a lighter blue in the other — an abstract class completed differently by each subclass"
+  aria-label="A translucent disc missing one wedge beside two solid discs where the wedge is filled in, a darker blue in one and a lighter blue in the other, an abstract class completed differently by each subclass"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -119,7 +119,7 @@ abstract. Concrete subclasses must implement `area()`.
 />
 
 The `describe` method in `Shape` calls `area()`. At the time `Shape`
-is written, *nobody knows* what `area()` will return — that depends
+is written, *nobody knows* what `area()` will return, that depends
 entirely on which concrete subclass is plugged in. This is exactly
 what makes abstract classes powerful: the parent provides the
 *skeleton*, the child fills in the *steps*.
@@ -127,7 +127,7 @@ what makes abstract classes powerful: the parent provides the
 <Callout type="info" title={`Why "abstract"?`}>
 The class is "abstract" in the same sense that "vehicle" is abstract
 in everyday language. You can't point at a vehicle that is just *a
-vehicle* — every vehicle you encounter is some concrete kind:
+vehicle*, every vehicle you encounter is some concrete kind:
 a bicycle, a car, a tram. "Vehicle" is a useful category, but it has
 no realisation of its own.
 </Callout>
@@ -174,7 +174,7 @@ sequenceDiagram
 
   protected TaxReturn(double income) { this.income = income; }
 
-  // The template method — defines the overall shape:
+  // The template method, defines the overall shape:
   public final String file() {
     gatherIncome();
     double tax = computeTax();
@@ -231,7 +231,7 @@ sequenceDiagram
   ]}
 />
 
-Notice the `final` on `file()` — subclasses cannot override the
+Notice the `final` on `file()`, subclasses cannot override the
 *shape* of the algorithm. They can only fill in the marked
 extension points. That is the spirit of Template Method: a tightly
 controlled invitation to vary.
@@ -374,7 +374,7 @@ To +1-555-0100: Your code is 1234
 - It is the same as an interface
   > Interfaces and abstract classes are related but different (next page).
 - [o] It can have both concrete and abstract methods, and cannot be instantiated with \`new\` directly
-  > Abstract classes are partial blueprints — useful when you want to share both code and a contract.
+  > Abstract classes are partial blueprints, useful when you want to share both code and a contract.
 - It can only have static methods
   > That would be a utility class.`}
 />
@@ -387,7 +387,7 @@ To +1-555-0100: Your code is 1234
 - [o] To prevent subclasses from changing the overall shape of the algorithm; they may only fill in the marked steps
   > The base class controls the *order* of work; subclasses choose only what each step does.
 - Because the JVM forbids overriding abstract methods
-  > It doesn't — that's exactly what you *must* do.
+  > It doesn't, that's exactly what you *must* do.
 - To make the class implicitly abstract
   > \`final\` and \`abstract\` are essentially opposite intents.`}
 />

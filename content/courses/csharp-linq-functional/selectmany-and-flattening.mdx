@@ -1,6 +1,6 @@
 ---
 title: SelectMany and Flattening
-description: How to deal with sequences of sequences — and why SelectMany is the single most useful operator after Where and Select
+description: How to deal with sequences of sequences, and why SelectMany is the single most useful operator after Where and Select
 ---
 
 `Select` projects each element to *one* thing. `SelectMany` projects
@@ -11,14 +11,14 @@ constantly in real data:
 > *"I have a list of things, each of which has a list inside it.
 > How do I get one flat list out?"*
 
-That question is everywhere — orders with line items, blog posts
+That question is everywhere, orders with line items, blog posts
 with tags, departments with employees, files with lines, paragraphs
 with words. `SelectMany` is the right tool every single time.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three translucent bags holding dots empty downward into one flat row that keeps every dot in order — sequences of sequences flattened into one"
+  aria-label="Three translucent bags holding dots empty downward into one flat row that keeps every dot in order, sequences of sequences flattened into one"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -68,7 +68,7 @@ var company = new[] {
     new Department("Finance", new List<Employee> { new("Farah") }),
 };
 
-// Wrong: with Select we get IEnumerable<List<Employee>> — a sequence of sequences.
+// Wrong: with Select we get IEnumerable<List<Employee>>, a sequence of sequences.
 var nested = company.Select(d => d.Employees);
 Console.WriteLine($"nested type: {nested.GetType().Name}");
 Console.WriteLine($"nested has {nested.Count()} elements (not 6!)");
@@ -116,7 +116,7 @@ record Department(string Name, List<Employee> Employees);
   ]}
 />
 
-The output is six lines — one employee per line. `SelectMany`
+The output is six lines, one employee per line. `SelectMany`
 visited each department, asked for its `Employees` list, and merged
 them all into a single sequence.
 
@@ -305,7 +305,7 @@ public static class Reports
 {
     public static IEnumerable<string> FlattenOrders(IEnumerable<Customer> customers)
     {
-        // your code here — use SelectMany with a result selector
+        // your code here, use SelectMany with a result selector
         return new string[0];
     }
 }
@@ -325,7 +325,7 @@ public static class Reports
     {
       id: "flatten",
       name: "Flattens 6 customer:order pairs",
-      description: "Ada has 2, Bilal 1, Chiara 3 — total 6 lines",
+      description: "Ada has 2, Bilal 1, Chiara 3, total 6 lines",
       expect: { stdoutEquals: "Ada:1\nAda:2\nBilal:3\nChiara:4\nChiara:5\nChiara:6" },
     },
   ]}
@@ -339,7 +339,7 @@ public static class Reports
 - [o] Producing a flat list of every tag across every blog post in a list of posts.
   > Each post has *many* tags, and you want one flat sequence. That's exactly the flattening that \`SelectMany\` performs.
 - Filtering a list of orders to only those with \`Total > 100\`.
-  > That's a filter, not a flattening — \`Where\` is the right operator.
+  > That's a filter, not a flattening, \`Where\` is the right operator.
 - Counting how many items are in a list.
   > That's an aggregation; \`Count()\` or \`Length\` is the right tool.
 

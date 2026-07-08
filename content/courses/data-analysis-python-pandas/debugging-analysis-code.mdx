@@ -1,17 +1,17 @@
 ---
 title: Debugging Analysis Code
-description: Why analysts spend half their time debugging — and the systematic habits that make it less painful.
+description: Why analysts spend half their time debugging, and the systematic habits that make it less painful.
 ---
 
 Most analysis bugs are not crashes. They're **silent
-mistakes** — numbers that look fine but are subtly wrong. Real
+mistakes**, numbers that look fine but are subtly wrong. Real
 analysts are not "people who never write bugs". They're "people
 who catch their own bugs early."
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Five look-alike bars stand over green check dots, but a yellow inspection beam shining on one of them reveals a hidden red core and a red dot below — silent bugs are found only by checking"
+  aria-label="Five look-alike bars stand over green check dots, but a yellow inspection beam shining on one of them reveals a hidden red core and a red dot below, silent bugs are found only by checking"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -51,10 +51,10 @@ flowchart TB
   B2 --> B2d["Wrong aggregation<br/>(mean of strings)"]
 ```
 
-Loud bugs are *easy* — you see the traceback. The quiet ones
+Loud bugs are *easy*, you see the traceback. The quiet ones
 are what bite you.
 
-## Habit 1 — Look at the data after every step
+## Habit 1, Look at the data after every step
 
 After any non-trivial line, print and check.
 
@@ -85,7 +85,7 @@ print(filtered)
 Knowing the row count *before and after* every transformation
 is the cheapest bug-detector in Pandas.
 
-## Habit 2 — Trust nothing about dtypes
+## Habit 2, Trust nothing about dtypes
 
 <CodeBlock
   adapter="python"
@@ -107,7 +107,7 @@ print(df["price"].sum())
 Always check `df.dtypes` after loading. Strings that look like
 numbers are one of the most common silent failures.
 
-## Habit 3 — Read the assumption, not just the code
+## Habit 3, Read the assumption, not just the code
 
 When you write:
 
@@ -131,7 +131,7 @@ assert len(result) == before, f"Row count changed: {before} -> {len(result)}"
 If reality contradicts the assumption, you find out *now*, not
 after the chart is in your boss's deck.
 
-## Habit 4 — Use `.shape` and `.info()` as constants
+## Habit 4, Use `.shape` and `.info()` as constants
 
 <CodeBlock
   adapter="python"
@@ -154,7 +154,7 @@ that column is the wrong type" bug. Here it also quietly reveals
 the missing data: the measurement columns report fewer non-null
 values than the 344 total rows.
 
-## Habit 5 — Pin down weird rows
+## Habit 5, Pin down weird rows
 
 When something looks off, **find the actual rows** rather than
 guessing.
@@ -179,10 +179,10 @@ print(df[df["age"] < 0])
   ]}
 />
 
-Don't reason abstractly — pull up the actual problem rows. Often
+Don't reason abstractly, pull up the actual problem rows. Often
 they reveal the root cause immediately.
 
-## Habit 6 — Bisect the pipeline
+## Habit 6, Bisect the pipeline
 
 When a 30-step pipeline produces the wrong answer, *don't*
 re-read all 30 steps. Print the intermediate output halfway.
@@ -198,7 +198,7 @@ flowchart LR
 
 This O(log n) approach beats O(n) re-reading every time.
 
-## Habit 7 — Reproduce in a minimal example
+## Habit 7, Reproduce in a minimal example
 
 When stuck, recreate the problem with a tiny DataFrame.
 
@@ -209,7 +209,7 @@ When stuck, recreate the problem with a tiny DataFrame.
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# Real data has 1M rows — too big to inspect.
+# Real data has 1M rows, too big to inspect.
 # Construct a 4-row mini that triggers the same bug:
 mini = pd.DataFrame(
     {
@@ -229,7 +229,7 @@ If you can reproduce the bug in a 4-row example, you can
 *solve* it in a 4-row example. And when you ask a colleague
 for help, the 4-row example is what they need.
 
-## Habit 8 — Suspect chained indexing warnings
+## Habit 8, Suspect chained indexing warnings
 
 `SettingWithCopyWarning` is a real warning, not noise.
 
@@ -244,7 +244,7 @@ df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
 
 # This MIGHT modify a copy, not df. Don't do this.
 sub = df[df["x"] > 1]
-sub["y"] = 0  # Risky — may warn or fail silently
+sub["y"] = 0  # Risky, may warn or fail silently
 
 # Safer:
 df.loc[df["x"] > 1, "y"] = 0
@@ -257,16 +257,16 @@ print(df)
 Use `.loc[..., col] = value` when you really mean to modify the
 original.
 
-## Habit 9 — Confirm with a different method
+## Habit 9, Confirm with a different method
 
 If your aggregation says revenue is $1.2M, double-check with a
-crude calculation — `df["revenue"].sum()` — to ensure the
+crude calculation, `df["revenue"].sum()`, to ensure the
 groupby didn't drop or duplicate rows.
 
 The act of computing the same number two ways catches an
 astonishing number of bugs.
 
-## Habit 10 — Slow down
+## Habit 10, Slow down
 
 When the result looks wrong:
 
@@ -299,7 +299,7 @@ Before you change any code, run through:
   > Floating-point errors produce tiny rounding discrepancies, not a result six digits long from a handful of rows.
 - The data is corrupt
   > Corrupt data would more likely cause an error or NaN, not a suspiciously long but coherent string-like result.
-- [o] The column is a string, and \`.sum()\` concatenated the values instead of adding them — check \`df.dtypes\`
+- [o] The column is a string, and \`.sum()\` concatenated the values instead of adding them, check \`df.dtypes\`
   > String-vs-number is the most common silent bug in Pandas.
 - Pandas needs an upgrade
   > A Pandas version issue would not selectively cause string concatenation on a single column; the bug is in the data type, not the library.
@@ -311,7 +311,7 @@ Always check dtypes after loading.`}
   markdown={`A merge unexpectedly multiplied your row count by 3. Best diagnostic step?
 
 - Add more print statements throughout
-  > Scattering prints everywhere is unfocused; the chapter recommends diagnosing the specific cause — key duplication — rather than adding noise.
+  > Scattering prints everywhere is unfocused; the chapter recommends diagnosing the specific cause, key duplication, rather than adding noise.
 - Re-run with a different package version
   > A cardinality blow-up is almost never a Pandas bug; it is a data problem that any version would reproduce.
 - [o] Check whether the join key is duplicated on the right-hand table (\`df.duplicated(subset=...).sum()\`), and/or re-run the merge with \`validate="one_to_many"\` or similar
@@ -329,7 +329,7 @@ Encode assumptions; let Pandas tell you when reality breaks them.`}
   > Re-reading all 30 steps is O(n) search; bisection reduces the problem to O(log n) by splitting the problem in half each time.
 - Rewrite the pipeline
   > Rewriting discards working code and adds new bugs; the problem needs to be located first, not replaced.
-- [o] Bisect — check the intermediate output halfway through; whichever half is wrong, bisect again
+- [o] Bisect, check the intermediate output halfway through; whichever half is wrong, bisect again
   > Logarithmic search through your pipeline beats linear search.
 - Add more comments
   > Comments explain intent but do not execute or reveal the intermediate state that would expose where the wrong answer originates.
@@ -344,7 +344,7 @@ Bisection is one of the most powerful debugging habits, period.`}
   > Speed is a benefit of a mini DataFrame, but the chapter emphasises a deeper advantage: the act of constructing the minimal example often makes the bug obvious.
 - It avoids print spam
   > Reducing output noise is a side effect, not the primary value; the main payoff is forced understanding and a shareable reproduction case.
-- [o] Both of those, AND a mini-example forces you to truly understand the bug — and is the perfect format to ask someone for help
+- [o] Both of those, AND a mini-example forces you to truly understand the bug, and is the perfect format to ask someone for help
   > "Can you reproduce it minimally?" is a question that often answers itself in the act of trying.
 - It uses less memory
   > Memory savings are trivial for a 5-row DataFrame; the real value is conceptual clarity and shareability of the reproduction.

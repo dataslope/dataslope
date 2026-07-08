@@ -1,8 +1,8 @@
 /**
- * AI inline completion — client-side suggestion state machine.
+ * AI inline completion, client-side suggestion state machine.
  *
  * The ghost-text rendering and the fetch plugin need a browser, but the
- * subtle part — how an active suggestion reacts to further editing — is pure
+ * subtle part, how an active suggestion reacts to further editing, is pure
  * `EditorState` logic and runs in Node: type-through consumption, and
  * clearing on any edit or cursor move that invalidates the suggestion.
  */

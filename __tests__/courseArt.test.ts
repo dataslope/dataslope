@@ -28,7 +28,7 @@ async function rootCourseSlugs(): Promise<string[]> {
         slugs.push(entry.name);
       }
     } catch {
-      // no meta.json — not a course root
+      // no meta.json, not a course root
     }
   }
   return slugs;

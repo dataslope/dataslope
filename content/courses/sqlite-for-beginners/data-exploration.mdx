@@ -1,12 +1,12 @@
 ---
 title: Exploring Data
-description: How to walk into an unfamiliar SQLite database and quickly understand what it holds — its tables, columns, sizes, ranges, and quirks.
+description: How to walk into an unfamiliar SQLite database and quickly understand what it holds, its tables, columns, sizes, ranges, and quirks.
 ---
 
 Most of this course has built tables from scratch. But often you are
 handed a database someone *else* made and asked, *"what's in here?"*
 **Data exploration** is the skill of answering that question quickly
-and methodically — before you write a single "real" query.
+and methodically, before you write a single "real" query.
 
 This page gives you a repeatable routine. Think of it as the
 questions a careful analyst always asks first.
@@ -14,7 +14,7 @@ questions a careful analyst always asks first.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A yellow compass star beside a blue magnifying glass whose lens holds four crisp green value dots — exploring an unfamiliar database"
+  aria-label="A yellow compass star beside a blue magnifying glass whose lens holds four crisp green value dots, exploring an unfamiliar database"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -64,7 +64,7 @@ List the tables in the database so you know what you are working with.
 
 **What columns does each have?**
 
-Inspect a table's schema — the column names and types tell you what questions
+Inspect a table's schema, the column names and types tell you what questions
 are even askable.
 
 </Step>
@@ -87,12 +87,12 @@ spread.
 
 **Any gaps, NULLs, or surprises?**
 
-Hunt for missing values and anomalies — then loop back with sharper questions.
+Hunt for missing values and anomalies, then loop back with sharper questions.
 
 </Step>
 </Steps>
 
-## Step 1 — What tables exist?
+## Step 1, What tables exist?
 
 In SQLite, the database keeps a built-in catalog of itself in a
 special table called `sqlite_master` (also available as
@@ -125,7 +125,7 @@ the editor, so you can often see the table list without querying
 SQLite database, anywhere.
 </Callout>
 
-## Step 2 — What columns does a table have?
+## Step 2, What columns does a table have?
 
 To see a table's columns and their declared types, SQLite gives you a
 special command called `PRAGMA table_info`. It returns one row per
@@ -141,9 +141,9 @@ INSERT INTO orders (customer_id, amount, placed_on) VALUES (1,42.0,'2024-01-03')
 
 Each row tells you the column's name, its declared type, whether it
 is `NOT NULL`, its default, and whether it is part of the primary key.
-That is the table's **schema** — its shape — at a glance.
+That is the table's **schema**, its shape, at a glance.
 
-## Step 3 — Peek at a few rows
+## Step 3, Peek at a few rows
 
 Numbers and types only tell you so much. Always look at real rows.
 `LIMIT` keeps the peek small even if the table is huge.
@@ -166,7 +166,7 @@ A five-row peek instantly answers questions a schema cannot: Are
 names capitalized consistently? Is `city` sometimes blank? Do the
 values match what the column *names* promised?
 
-## Step 4 — How big, and what's in the columns?
+## Step 4, How big, and what's in the columns?
 
 Now ask quantitative questions. Three are almost always useful:
 
@@ -192,7 +192,7 @@ FROM
   orders;`}
 />
 
-To see how a column's values are distributed, group by it and count —
+To see how a column's values are distributed, group by it and count,
 a quick **frequency table** that often reveals typos, unexpected
 categories, or skew:
 
@@ -214,7 +214,7 @@ ORDER BY
   how_many DESC;`}
 />
 
-## Step 5 — Hunt for gaps and surprises
+## Step 5, Hunt for gaps and surprises
 
 Real data is messy. Before trusting a column, check whether it has
 missing values. A single query can count the holes:
@@ -235,7 +235,7 @@ FROM
 
 Remember from **Working with NULL** that `COUNT(city)` skips `NULL`s,
 while `COUNT(*)` counts every row. The difference is exactly how many
-values are missing — a fast, reliable data-quality check.
+values are missing, a fast, reliable data-quality check.
 
 <Callout type="success" title="A routine you can reuse forever">
 List the tables → inspect each table's columns → peek at rows → count
@@ -247,7 +247,7 @@ better than someone who jumped straight to writing queries.
 ## Your turn: a database you have never seen
 
 Everything above used tables this course built for you. Now do it
-for real. The block below loads **Northwind** — a classic sample
+for real. The block below loads **Northwind**, a classic sample
 database modeling a food-trading company, with customers, orders,
 products, suppliers, and more. Nobody is going to tell you what is
 inside. Run the starter query to list its tables, then work the
@@ -269,13 +269,13 @@ ORDER BY
 
 Some prompts to keep you honest, one loop step at a time:
 
-- `PRAGMA table_info (Products);` — what columns does the products
+- `PRAGMA table_info (Products);`, what columns does the products
   table have?
-- `SELECT * FROM Products LIMIT 5;` — what do real rows look like?
-- `SELECT COUNT(*), MIN(Price), MAX(Price) FROM Products;` — how
+- `SELECT * FROM Products LIMIT 5;`, what do real rows look like?
+- `SELECT COUNT(*), MIN(Price), MAX(Price) FROM Products;`, how
   big, and what is the price range?
 - `SELECT CategoryID, COUNT(*) FROM Products GROUP BY CategoryID
-  ORDER BY COUNT(*) DESC;` — how are products distributed across
+  ORDER BY COUNT(*) DESC;`, how are products distributed across
   categories?
 
 If you can answer those four questions about a database you opened
@@ -320,7 +320,7 @@ A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
 
 - The table has 388 rows.
   > These are two counts of the same 200 rows, not two separate tables to add together.
-- Nothing — the two counts should always match.
+- Nothing, the two counts should always match.
   > They differ precisely because \`COUNT(amount)\` ignores \`NULL\`s while \`COUNT(*)\` does not.
 - [o] 12 rows have a \`NULL\` (missing) \`amount\`.
   > \`COUNT(*)\` counts all rows; \`COUNT(amount)\` skips \`NULL\`s, so the gap of 12 is the missing values.
@@ -334,7 +334,7 @@ A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
   markdown={`Which query best reveals how a category column \`status\` is distributed?
 
 - \`SELECT * FROM tickets;\`
-  > Dumping every row makes you eyeball distribution by hand — slow and error-prone.
+  > Dumping every row makes you eyeball distribution by hand, slow and error-prone.
 - [o] \`SELECT status, COUNT(*) FROM tickets GROUP BY status ORDER BY COUNT(*) DESC;\`
   > Grouping and counting builds a frequency table that shows each value and how often it occurs.
 - \`SELECT MAX(status) FROM tickets;\`

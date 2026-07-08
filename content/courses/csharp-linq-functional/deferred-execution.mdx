@@ -1,6 +1,6 @@
 ---
 title: Deferred Execution
-description: "When LINQ actually runs (spoiler: not when you think) — and how to avoid the bugs and performance traps that follow"
+description: "When LINQ actually runs (spoiler: not when you think), and how to avoid the bugs and performance traps that follow"
 ---
 
 LINQ is **lazy**. That single fact explains 90% of the "weird"
@@ -15,7 +15,7 @@ goes wrong when you forget.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A pipeline of unlit gray circles waiting dormant; a lightning bolt at the far end has just lit up the nearest stages in blue — nothing runs until something asks for results"
+  aria-label="A pipeline of unlit gray circles waiting dormant; a lightning bolt at the far end has just lit up the nearest stages in blue, nothing runs until something asks for results"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -96,7 +96,7 @@ Console.WriteLine("Pipeline built. Now iterating:");
 foreach (var n in pipeline)
     Console.WriteLine($"  got {n}");
 
-Console.WriteLine("Iterating a SECOND time — source runs again:");
+Console.WriteLine("Iterating a SECOND time, source runs again:");
 foreach (var n in pipeline)
     Console.WriteLine($"  got {n}");
 `,
@@ -172,7 +172,7 @@ static IEnumerable<int> Counting()
     }
 }
 
-// Even though Counting is infinite, this terminates — Any stops as soon as it sees the first match.
+// Even though Counting is infinite, this terminates, Any stops as soon as it sees the first match.
 bool hasBig = Counting().Any(n => n > 3);
 Console.WriteLine($"hasBig = {hasBig}");
 `,
@@ -232,7 +232,7 @@ Console.WriteLine($"With threshold=1: {string.Join(",", pipeline)}");
   ]}
 />
 
-Same pipeline, two enumerations, two different results — because
+Same pipeline, two enumerations, two different results, because
 `threshold` was captured *by reference*.
 
 This is often desirable (you can build a query that responds to
@@ -241,11 +241,11 @@ behavior to change). Either way, knowing it is the difference.
 
 ### Pitfall 3: side effects in lambdas
 
-Because lambdas may run zero, one, or many times — and at unexpected
-moments — putting side effects in them is a recipe for confusion.
+Because lambdas may run zero, one, or many times, and at unexpected
+moments, putting side effects in them is a recipe for confusion.
 
 ```csharp
-// BAD — when does this print? With Count(), no. With Sum(), yes. With ToList(), yes.
+// BAD, when does this print? With Count(), no. With Sum(), yes. With ToList(), yes.
 nums.Select(n => { Console.WriteLine(n); return n * 2; });
 ```
 
@@ -322,12 +322,12 @@ foreach (var x in q) { ... }
 
 …and assuming \`numbers\` is the result of an expensive method call like \`LoadFromDatabase()\`, what is the consequence?
 
-- Nothing notable — \`q\` is cached after the first iteration.
+- Nothing notable, \`q\` is cached after the first iteration.
   > LINQ operators do not cache results; \`q\` is a re-runnable recipe, not a memoized value.
 - A compile error, because you can't iterate a deferred sequence twice.
   > It compiles and runs fine, but it re-executes the pipeline on each iteration.
 - [o] The pipeline (and the underlying \`LoadFromDatabase\` call) runs *twice*, once per \`foreach\`.
-  > Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again — re-running any side-effectful or expensive source method.
+  > Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again, re-running any side-effectful or expensive source method.
 - The second \`foreach\` produces no output, because the enumerator is already at the end.
   > Each \`foreach\` calls \`GetEnumerator\` again, so it starts from the beginning each time.
 

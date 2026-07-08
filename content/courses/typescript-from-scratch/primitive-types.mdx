@@ -3,7 +3,7 @@ title: Primitive Types
 description: Numbers, strings, booleans, and other atomic types that form the foundation of TypeScript's type system
 ---
 
-TypeScript's type system begins with **primitives** — the atomic,
+TypeScript's type system begins with **primitives**, the atomic,
 indivisible types that represent single values. If you already know
 JavaScript, you've used these types hundreds of times: numbers, strings,
 booleans, `null`, `undefined`. TypeScript gives you a way to *name* these
@@ -16,7 +16,7 @@ This chapter answers three questions: **What are the primitive types?**
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Seven primitive tiles laid out like a tiny periodic table: solid blue, green, yellow, and pale blue tiles on the top row, with a gray tile, a dashed empty outline, and a one-of-a-kind red tile with a sparkle below — the indivisible atoms of the type system"
+  aria-label="Seven primitive tiles laid out like a tiny periodic table: solid blue, green, yellow, and pale blue tiles on the top row, with a gray tile, a dashed empty outline, and a one-of-a-kind red tile with a sparkle below, the indivisible atoms of the type system"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,13 +60,13 @@ This chapter answers three questions: **What are the primitive types?**
 JavaScript has seven primitive types. TypeScript provides a corresponding
 type annotation for each:
 
-1. **`number`** — all numeric values, integers and floats alike
-2. **`string`** — text values
-3. **`boolean`** — `true` or `false`
-4. **`null`** — the intentional absence of a value
-5. **`undefined`** — uninitialized or missing values
-6. **`bigint`** — arbitrarily large integers (ES2020+)
-7. **`symbol`** — unique, immutable identifiers
+1. **`number`**, all numeric values, integers and floats alike
+2. **`string`**, text values
+3. **`boolean`**, `true` or `false`
+4. **`null`**, the intentional absence of a value
+5. **`undefined`**, uninitialized or missing values
+6. **`bigint`**, arbitrarily large integers (ES2020+)
+7. **`symbol`**, unique, immutable identifiers
 
 Here's a simple demonstration of each:
 
@@ -97,7 +97,7 @@ console.log("symbol:", typeof id);
 
 **What the compiler now knows:** Every one of these variables has a fixed
 type. If you later try to assign `greeting = 99`, TypeScript raises a
-compile-time error — it knows `greeting` is a `string`, and `99` is a
+compile-time error, it knows `greeting` is a `string`, and `99` is a
 `number`.
 
 ## Type inference vs explicit annotation
@@ -213,7 +213,7 @@ expect.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Two kinds of nothing: on the left a solid blue bowl stands on its pedestal, deliberately empty under a green ring marker, while on the right only a dashed outline shows where a bowl would stand — null is emptiness on purpose, undefined is a value that never arrived"
+  aria-label="Two kinds of nothing: on the left a solid blue bowl stands on its pedestal, deliberately empty under a green ring marker, while on the right only a dashed outline shows where a bowl would stand, null is emptiness on purpose, undefined is a value that never arrived"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -242,14 +242,14 @@ expect.
 **Strict null checks:** By default (in `strict` mode), TypeScript does
 *not* allow `null` or `undefined` to inhabit other types. A variable of
 type `number` cannot hold `null` unless you explicitly declare it as
-`number | null`. This is a major source of TypeScript's safety — the
+`number | null`. This is a major source of TypeScript's safety, the
 billion-dollar mistake (null pointer errors) becomes a compile-time issue,
 not a runtime crash.
 
 ## Literal types: a preview
 
 Every primitive value is also a *literal type*. The number `42` is not
-just a `number` — it's *specifically* the number `42`. TypeScript can
+just a `number`, it's *specifically* the number `42`. TypeScript can
 track this:
 
 <CodeBlock
@@ -279,7 +279,7 @@ type. When you use `let`, it infers the broader primitive type (because
 `let` allows reassignment). We'll explore literal types in depth in
 [Type Aliases and Literals](./type-aliases-and-literals), but the key
 insight is this: **TypeScript's type system is more precise than "just a
-number" — it can track the exact value when the code makes that
+number", it can track the exact value when the code makes that
 guarantee.**
 
 ## BigInt and Symbol
@@ -383,7 +383,7 @@ function area(width, height) {
 }
 ```
 
-Nothing stops you from calling `area("10", 5)` — JavaScript will coerce
+Nothing stops you from calling `area("10", 5)`, JavaScript will coerce
 the string `"10"` to a number, and you'll get `50`. But what if the string
 were `"10px"`? You'd get `NaN`. The bug hides until runtime.
 
@@ -504,5 +504,5 @@ and function call, catching category errors before they become runtime
 bugs.
 
 In the next chapter, [Arrays and Tuples](./arrays-and-tuples), we'll see
-how to build compound types from these primitives — collections of values
+how to build compound types from these primitives, collections of values
 whose shape and length the compiler can verify.

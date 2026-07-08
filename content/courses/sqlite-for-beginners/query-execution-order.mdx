@@ -1,18 +1,18 @@
 ---
 title: Query Execution Order
-description: The hidden order in which SQL clauses really run in SQLite — and why understanding it explains many puzzling errors and results.
+description: The hidden order in which SQL clauses really run in SQLite, and why understanding it explains many puzzling errors and results.
 ---
 
 You **write** a query as `SELECT ... FROM ... WHERE ... GROUP BY ...`,
 but SQLite does **not** run it in that order. SQL has a hidden
 **logical execution order**, and learning it explains a whole class
-of confusing errors — like *"why can't I use an alias in `WHERE`?"*
+of confusing errors, like *"why can't I use an alias in `WHERE`?"*
 This is one of the most clarifying ideas in all of SQL.
 
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Five blue stations ride one line in fixed order, each marked with one to five white pips and an arrowhead at the end — a query runs as an ordered assembly line, not in the order it is written"
+  aria-label="Five blue stations ride one line in fixed order, each marked with one to five white pips and an arrowhead at the end, a query runs as an ordered assembly line, not in the order it is written"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="70" y1="80" x2="576" y2="80" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
@@ -48,14 +48,14 @@ This is one of the most clarifying ideas in all of SQL.
 The order you type is for human readability. The order the database
 *reasons* about the query is different:
 
-1. **`FROM` / `JOIN`** — gather and combine tables.
-2. **`WHERE`** — filter individual rows.
-3. **`GROUP BY`** — form groups.
-4. **`HAVING`** — filter groups.
-5. **`SELECT`** — choose columns, compute aliases.
-6. **`DISTINCT`** — remove duplicates.
-7. **`ORDER BY`** — sort.
-8. **`LIMIT`** — keep the first N.
+1. **`FROM` / `JOIN`**, gather and combine tables.
+2. **`WHERE`**, filter individual rows.
+3. **`GROUP BY`**, form groups.
+4. **`HAVING`**, filter groups.
+5. **`SELECT`**, choose columns, compute aliases.
+6. **`DISTINCT`**, remove duplicates.
+7. **`ORDER BY`**, sort.
+8. **`LIMIT`**, keep the first N.
 
 Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
@@ -136,19 +136,19 @@ LIMIT
 
 Trace it in execution order:
 
-1. **FROM** `orders` — start with all rows.
-2. **WHERE** `amount > 10` — drop the small individual orders.
-3. **GROUP BY** `customer_id` — bundle rows into one group per
+1. **FROM** `orders`, start with all rows.
+2. **WHERE** `amount > 10`, drop the small individual orders.
+3. **GROUP BY** `customer_id`, bundle rows into one group per
    customer.
-4. **HAVING** `SUM(amount) > 50` — drop groups whose total is too
+4. **HAVING** `SUM(amount) > 50`, drop groups whose total is too
    small.
-5. **SELECT** `customer_id, SUM(amount) AS total` — compute the
+5. **SELECT** `customer_id, SUM(amount) AS total`, compute the
    output, naming the sum `total`.
-6. **ORDER BY** `total DESC` — sort the surviving groups.
-7. **LIMIT 2** — keep the top two.
+6. **ORDER BY** `total DESC`, sort the surviving groups.
+7. **LIMIT 2**, keep the top two.
 
 This is the **query transformation pipeline**: each stage reshapes a
-table and passes it on. Every query you write — however complex —
+table and passes it on. Every query you write, however complex,
 flows through these same steps:
 
 **`orders` (all rows) → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY` → `LIMIT` → final result**
@@ -168,7 +168,7 @@ flowchart TD
 ```
 
 You cannot filter on `SUM(amount)` in `WHERE`, because the sum does
-not exist until grouping happens — which is step 3, *after* `WHERE`.
+not exist until grouping happens, which is step 3, *after* `WHERE`.
 You must use `HAVING`. Once again, the order is the reason.
 
 ## Check your understanding
@@ -215,7 +215,7 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 - [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
   > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
 - Because \`HAVING\` is just a faster version of \`WHERE\`.
-  > They filter at different stages — rows vs. groups — not at different speeds.
+  > They filter at different stages, rows vs. groups, not at different speeds.
 - Because \`SUM\` cannot be used anywhere except \`HAVING\`.
   > \`SUM\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
 

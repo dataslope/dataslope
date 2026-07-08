@@ -40,7 +40,7 @@ describe("writeDatabase + readDatabase", () => {
     expect(await readDatabase("ws_missing", "sqlite.db")).toBeNull();
   });
 
-  it("coalesces multiple writes — only the last is persisted", async () => {
+  it("coalesces multiple writes, only the last is persisted", async () => {
     const { writeDatabase, readDatabase, flushDatabaseWrites } = await import(
       "../app/_components/opfs/databaseStorage"
     );

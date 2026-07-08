@@ -13,7 +13,7 @@ This chapter builds that picture.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="Three colored circles riding a single thin ring — the endless fetch, decode, execute cycle — fed by a queue of instruction squares from the left"
+  aria-label="Three colored circles riding a single thin ring, the endless fetch, decode, execute cycle, fed by a queue of instruction squares from the left"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -67,11 +67,11 @@ flowchart TD
   whether to jump to a different instruction.
 - **Memory** (RAM) is a giant array of numbered storage cells. Each
   cell holds 8 bits (one byte). Each cell has an **address**, which is
-  itself just a number — like a house number on an infinitely long
+  itself just a number, like a house number on an infinitely long
   street.
 
-That's it. Everything else — variables, functions, files, web
-browsers, video games — is built on top of these two ideas.
+That's it. Everything else, variables, functions, files, web
+browsers, video games, is built on top of these two ideas.
 
 ## Memory as a row of mailboxes
 
@@ -84,7 +84,7 @@ Contents:   42   00    00    00    'H'   'i'   '!'   00    ...
 
 Each mailbox holds one byte (a number between 0 and 255, or a
 character). Larger values like a 32-bit integer occupy several
-consecutive mailboxes — typically 4 bytes for an `int`.
+consecutive mailboxes, typically 4 bytes for an `int`.
 
 When your C program declares a variable `int score = 42;`, the
 compiler arranges for four mailboxes somewhere in RAM to hold the
@@ -115,13 +115,13 @@ flowchart TD
    reads the instruction at that address from memory.
 2. **Decode.** It looks at the bits of the instruction and figures out
    what kind it is: add, jump, load, store, etc.
-3. **Execute.** It actually performs the operation — perhaps updating
+3. **Execute.** It actually performs the operation, perhaps updating
    a register, perhaps writing to memory, perhaps changing the PC to
    jump elsewhere.
 
 Then it goes back to step 1. That tiny loop is **the entire job of a
-CPU**. Everything your computer does — running your operating system,
-streaming a movie, rendering a 3D game — is some combination of those
+CPU**. Everything your computer does, running your operating system,
+streaming a movie, rendering a 3D game, is some combination of those
 three steps repeated trillions of times.
 
 ## What "running a program" actually means
@@ -129,7 +129,7 @@ three steps repeated trillions of times.
 When you double-click a program, here is the (simplified) sequence:
 
 1. The **operating system** finds the executable file on disk.
-2. It allocates a chunk of memory for the program — the **process**.
+2. It allocates a chunk of memory for the program, the **process**.
 3. It copies the program's machine instructions into the
    **code segment** of that memory.
 4. It sets up a place for the program's variables: the **data
@@ -155,7 +155,7 @@ flowchart TB
     CPU -->|read/write| S
 ```
 
-Don't worry about memorizing these regions yet — we'll come back to
+Don't worry about memorizing these regions yet, we'll come back to
 the stack and the heap several times in this course. The important
 thing is the **mental picture**: your program is a chunk of
 instructions and data, sitting in memory, being chewed through by the
@@ -209,7 +209,7 @@ Programming is the art of **arranging a sequence of small operations
 in memory** such that, when the CPU walks through them, something
 useful happens at the end.
 
-Every language we use — Python, JavaScript, Rust, C — ultimately
+Every language we use, Python, JavaScript, Rust, C, ultimately
 exists to make it easier for humans to describe such arrangements.
 Some hide the machine almost entirely (Python). Some keep it just out
 of sight (Java). C keeps it **right at your fingertips**, which is
@@ -223,7 +223,7 @@ exactly why it's such a great teacher.
 - [o] It holds the address of the next instruction the CPU will fetch.
   > The PC is just a special register that points into memory at the next instruction. Jumps, function calls, and \`if\` statements all work by changing the PC.
 - It records how many instructions a program has executed in total.
-  > Some CPUs have performance counters for profiling, but the program counter is not a cumulative instruction count — it is an address, reset when the PC jumps.
+  > Some CPUs have performance counters for profiling, but the program counter is not a cumulative instruction count, it is an address, reset when the PC jumps.
 - It stores the result of the most recent arithmetic operation.
   > That is the role of an accumulator or general-purpose register, not the program counter.
 

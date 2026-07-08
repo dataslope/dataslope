@@ -4,7 +4,7 @@ description: Turning a chart into an argument that lands
 ---
 
 By now you can produce technically correct charts. This page is
-about producing *charts that change minds* — the difference
+about producing *charts that change minds*, the difference
 between *displaying* data and *communicating* with it.
 
 The discipline is sometimes called **data storytelling**. It's not
@@ -14,7 +14,7 @@ visualization in service of an argument.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A three-panel strip follows one blue dot: lost in the crowd, then falling, then rising to a green burst — context, conflict, resolution"
+  aria-label="A three-panel strip follows one blue dot: lost in the crowd, then falling, then rising to a green burst, context, conflict, resolution"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -78,7 +78,7 @@ chart → the reader → who then acts or believes.**
 
 ### 1. A clear *claim*
 
-Before you build the chart, write down — in *one sentence* — the
+Before you build the chart, write down, in *one sentence*, the
 claim you want to make. "Mobile traffic surpassed desktop in Q2."
 That's a claim. "Here is some data on traffic" is not.
 
@@ -88,16 +88,16 @@ to choose, what to highlight, what to leave out.
 ### 2. A focused *encoding*
 
 Once the claim is clear, pick the encoding that makes the claim
-*visually obvious*. If the claim is "X surpassed Y" — a line chart
+*visually obvious*. If the claim is "X surpassed Y", a line chart
 with X and Y both visible, plus an annotation at the crossover, is
 the right shape.
 
-If the claim is "X dwarfs everything else" — a sorted bar chart
+If the claim is "X dwarfs everything else", a sorted bar chart
 with X colored prominently and everyone else gray.
 
 ### 3. A clear *title and annotation*
 
-The title should *state the claim*. Not "Sales by quarter" — say
+The title should *state the claim*. Not "Sales by quarter", say
 "Mobile sales overtook desktop in Q2 2024." The annotation should
 *point at* the moment that proves the claim.
 
@@ -138,7 +138,7 @@ fig1.add_annotation(
 )
 fig1.show()
 
-# Story 2: "Total sales are flat" — same data, summed
+# Story 2: "Total sales are flat", same data, summed
 total = df.groupby("year", as_index=False)["sales"].sum()
 fig2 = px.line(
     total,
@@ -156,7 +156,7 @@ fig2.show()
 />
 
 Both charts are *true*. The first emphasizes the channel mix shift;
-the second emphasizes the total. **Neither is wrong — but they
+the second emphasizes the total. **Neither is wrong, but they
 make different arguments.** Choose the one that matches the
 honest argument you're trying to make.
 
@@ -164,9 +164,9 @@ honest argument you're trying to make.
 
 A multi-chart presentation often follows a small arc:
 
-1. **Hook** — one big chart that establishes the headline.
-2. **Detail** — a few charts that drill into the *why*.
-3. **Conclusion** — a chart or table that anchors the *what next*.
+1. **Hook**, one big chart that establishes the headline.
+2. **Detail**, a few charts that drill into the *why*.
+3. **Conclusion**, a chart or table that anchors the *what next*.
 
 This is the same structure as a news article. Three to five charts
 told as a sequence beat fifteen charts dumped on a slide.
@@ -181,7 +181,7 @@ The most-shared newspaper graphics in the world (NYT, WSJ,
 Bloomberg) lean *heavily* on annotations. They almost never let a
 chart speak for itself.
 
-## Don't lie — but do focus
+## Don't lie, but do focus
 
 There is a difference between *focusing* an argument and *misleading*
 the reader.
@@ -195,7 +195,7 @@ the reader.
 The line is sometimes fuzzy, but the test is clear: **could a
 careful reader, given your chart plus your caption, come to a
 different reasonable conclusion than yours?** If yes, you're
-focusing. If no — and the conclusion contradicts the full data —
+focusing. If no, and the conclusion contradicts the full data,
 you're misleading.
 
 The next chapter dives into ethics in more detail.
@@ -206,7 +206,7 @@ The next chapter dives into ethics in more detail.
   markdown={`What is the **first step** in data storytelling, before you ever open a chart library?
 
 - Pick a color palette.
-  > Color selection is a late-stage styling decision, not a starting point. Choosing colors before knowing what you're arguing produces decoration rather than communication — the palette should serve the claim, not precede it.
+  > Color selection is a late-stage styling decision, not a starting point. Choosing colors before knowing what you're arguing produces decoration rather than communication, the palette should serve the claim, not precede it.
 - Choose between Plotly and Matplotlib.
   > Tool selection is a technical decision that can wait until after the story is defined. The claim, the audience, and the encoding should drive the chart, regardless of which library ends up rendering it.
 - [o] State the **claim** you want to make in one clear sentence.
@@ -227,9 +227,9 @@ Claim first; chart second. This is the discipline that separates "displaying dat
 - [o] "Q4 sales grew 23%, the steepest jump since 2019."
   > A descriptive title tells the reader *what the chart is*. A narrative title tells them *what it means*. For presentations and dashboards, narrative titles do much of the cognitive work for the reader and dramatically increase the chance the takeaway lands.
 - "Untitled."
-  > An untitled chart gives the viewer no context whatsoever — they must infer the topic, the time period, and the units entirely from the axes. Leaving a presentation chart untitled is a communication failure.
+  > An untitled chart gives the viewer no context whatsoever, they must infer the topic, the time period, and the units entirely from the axes. Leaving a presentation chart untitled is a communication failure.
 
-Narrative titles are not "spin" — they're a respectful summary of what the data actually says.`}
+Narrative titles are not "spin", they're a respectful summary of what the data actually says.`}
 />
 
 <MultipleChoice
@@ -244,5 +244,5 @@ Narrative titles are not "spin" — they're a respectful summary of what the dat
 - Focusing requires a license.
   > Focusing is a design and communication choice available to anyone making a chart. There is no licensing or legal concept associated with choosing which subset of data to highlight in a visualization.
 
-Every chart leaves something out — that's not the problem. The problem is leaving out things that would change the conclusion.`}
+Every chart leaves something out, that's not the problem. The problem is leaving out things that would change the conclusion.`}
 />

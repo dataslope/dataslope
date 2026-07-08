@@ -1,6 +1,6 @@
 ---
 title: Control Flow
-description: How to make decisions, repeat work, and choose between alternatives — the basic shapes of program logic in C#
+description: How to make decisions, repeat work, and choose between alternatives, the basic shapes of program logic in C#
 ---
 
 So far our programs have been straight-line: do this, then this,
@@ -12,7 +12,7 @@ in the cart, add up the price"). These ideas together are called
 <svg
   viewBox="0 0 640 212"
   role="img"
-  aria-label="A thin track runs from a start dot to a yellow decision diamond; one branch curves up to a green result while the other drops to a blue work block whose loop line sweeps back to run again — branching and repetition in one picture"
+  aria-label="A thin track runs from a start dot to a yellow decision diamond; one branch curves up to a green result while the other drops to a blue work block whose loop line sweeps back to run again, branching and repetition in one picture"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -143,7 +143,7 @@ else
   ]}
 />
 
-`&&` and `||` are **short-circuit** — they stop as soon as the
+`&&` and `||` are **short-circuit**, they stop as soon as the
 answer is known. That can matter when one side might be expensive
 or unsafe to evaluate.
 
@@ -184,7 +184,7 @@ The `_` (underscore) is the catch-all "anything else" pattern.
 A **loop** is a block of code that runs repeatedly. C# has four
 loop forms; you'll mostly use two (`foreach` and `for`).
 
-### `while` — "as long as this is true"
+### `while`, "as long as this is true"
 
 <CodeBlock
   adapter="csharp"
@@ -216,7 +216,7 @@ flowchart TB
     B --> C
 ```
 
-### `do-while` — "run, then check"
+### `do-while`, "run, then check"
 
 The body runs at least once, and the condition is checked **after**
 each iteration.
@@ -242,7 +242,7 @@ do
 You'll use this less often than `while`. Mostly when you want a
 "prompt-and-validate" loop and the first prompt always happens.
 
-### `for` — "counter loop"
+### `for`, "counter loop"
 
 Used when you know up front how many iterations you want, or you
 need a counter variable.
@@ -279,7 +279,7 @@ flowchart TB
     Inc --> Cond
 ```
 
-### `foreach` — "do this to every item"
+### `foreach`, "do this to every item"
 
 Almost always your best choice when iterating a collection.
 
@@ -436,7 +436,7 @@ Console.WriteLine($"vowels = {count}");
   markdown={`In a chain of \`if\` / \`else if\` / \`else\`:
 
 - All matching branches run, in order
-  > No — only the first matching branch runs.
+  > No, only the first matching branch runs.
 - All branches always run
   > Definitely not.
 - [o] Only the *first* matching branch runs; the rest are skipped

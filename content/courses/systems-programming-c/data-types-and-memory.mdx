@@ -12,7 +12,7 @@ reason about *what is actually in memory*.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A tube of fixed height is packed full of blue value blocks; the next red block cannot fit and tips over the rim, while a thin arrow loops from the top of the tube around to its bottom — a fixed-size integer overflowing and wrapping to the minimum"
+  aria-label="A tube of fixed height is packed full of blue value blocks; the next red block cannot fit and tips over the rim, while a thin arrow loops from the top of the tube around to its bottom, a fixed-size integer overflowing and wrapping to the minimum"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -116,7 +116,7 @@ int main(void) {
 />
 
 <Callout type="warn" title="Signed overflow is UB, unsigned overflow is not">
-For *signed* integers, overflow is undefined behavior — the compiler
+For *signed* integers, overflow is undefined behavior, the compiler
 is allowed to assume it never happens. For *unsigned*, overflow is
 well-defined modular arithmetic (it wraps). When you actually *want*
 wrap-around (e.g. a hash function), use unsigned.
@@ -206,9 +206,9 @@ A 32-bit integer like `0x12345678` is four bytes: `12`, `34`, `56`,
 memory:
 
 - **Little-endian** (x86, ARM in normal mode, RISC-V, WASI): the *least*
-  significant byte first — `78 56 34 12` at increasing addresses.
+  significant byte first, `78 56 34 12` at increasing addresses.
 - **Big-endian** (older PowerPC, network byte order): the *most*
-  significant byte first — `12 34 56 78`.
+  significant byte first, `12 34 56 78`.
 
 Laid out byte by byte at increasing addresses:
 
@@ -221,7 +221,7 @@ Big-endian:      0x12     0x34     0x56     0x78
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="The same four byte blocks, graded tall to short, appear in opposite orders on two shelves: big-endian leads with the tallest byte while little-endian leads with the shortest one, marked by a yellow underline in both rows — opposite layouts, identical value"
+  aria-label="The same four byte blocks, graded tall to short, appear in opposite orders on two shelves: big-endian leads with the tallest byte while little-endian leads with the shortest one, marked by a yellow underline in both rows, opposite layouts, identical value"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -270,7 +270,7 @@ int main(void) {
   ]}
 />
 
-On the little-endian WASI target you should see `78 56 34 12` — the
+On the little-endian WASI target you should see `78 56 34 12`, the
 "low" byte first. That order matters when you serialize integers to
 disk or send them over a network; protocols like TCP/IP standardize
 on big-endian ("network byte order") and provide `htonl` / `ntohl` to
@@ -279,14 +279,14 @@ convert.
 <Callout type="info" title="Why &quot;endian&quot;? Blame Jonathan Swift">
 The names come from *Gulliver's Travels* (1726), in which the empire
 of Lilliput fights a bitter civil war over which end of a boiled egg
-to crack first — the Big-Endians versus the Little-Endians. In 1980,
+to crack first, the Big-Endians versus the Little-Endians. In 1980,
 network engineer Danny Cohen borrowed the names for a satirical
 memo, *"On Holy Wars and a Plea for Peace"* (IEN 137, dated April
 1), pointing out that the byte-order argument raging between
 computer architectures was exactly as theological as Swift's egg
 war: both orders work fine, and the only real sin is failing to
 agree. The names stuck; the holy war, as you can see from the table
-above, was never fully resolved — we just learned to convert at the
+above, was never fully resolved, we just learned to convert at the
 border.
 </Callout>
 
@@ -305,7 +305,7 @@ structs.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Cars parked neatly inside evenly spaced parking bays, except one red car slewed across two bays' dividing line — values must start at addresses that are multiples of their size, and the red one is misaligned"
+  aria-label="Cars parked neatly inside evenly spaced parking bays, except one red car slewed across two bays' dividing line, values must start at addresses that are multiples of their size, and the red one is misaligned"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -356,7 +356,7 @@ int main(void) {
 <ChallengeCard
   adapter="c"
   title="Count the number of 1 bits in a uint32_t"
-  instructions={`Implement \`int popcount(uint32_t x)\` that returns how many bits of \`x\` are set to 1. Do not call any library popcount intrinsic — write the loop yourself. The provided \`main\` calls it for several values and prints the results, one per line.`}
+  instructions={`Implement \`int popcount(uint32_t x)\` that returns how many bits of \`x\` are set to 1. Do not call any library popcount intrinsic, write the loop yourself. The provided \`main\` calls it for several values and prints the results, one per line.`}
   files={[
     {
       filename: "main.c",
@@ -473,7 +473,7 @@ int main(void) {
 - \`int\`
   > \`int\` may be 16 or 64 bits on some targets.
 - \`unsigned int\`
-  > Same problem — not guaranteed to be exactly 32 bits.
+  > Same problem, not guaranteed to be exactly 32 bits.
 - \`size_t\`
   > \`size_t\` is pointer-sized (32 or 64 bits depending on the platform).
 - [o] \`uint32_t\` (from \`<stdint.h>\`)

@@ -1,6 +1,6 @@
 ---
 title: Layering Multiple Geoms
-description: How to combine several geoms into one figure, share or override mappings per layer, and control inheritance — the craft of multi-layer plots.
+description: How to combine several geoms into one figure, share or override mappings per layer, and control inheritance, the craft of multi-layer plots.
 ---
 
 We have seen that a plot is a stack of layers. Now we make that
@@ -11,7 +11,7 @@ uses.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three small layer cards — blue points, a green line, a yellow band — feed along thin gray lines into one chart panel where all three geoms sit stacked together as a single figure"
+  aria-label="Three small layer cards, blue points, a green line, a yellow band, feed along thin gray lines into one chart panel where all three geoms sit stacked together as a single figure"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -70,7 +70,7 @@ ggplot(mpg, aes(displ, hwy)) +
 
 Both layers inherit `x = displ, y = hwy` from `ggplot()`. The points
 show the raw data; the smoother summarizes the trend. Together they say
-more than either alone — *here are the data, and here is the pattern in
+more than either alone, *here are the data, and here is the pattern in
 them.*
 
 ## Inheritance: layers borrow from the base by default
@@ -78,7 +78,7 @@ them.*
 A key rule: **layers inherit the data and mappings declared in
 `ggplot()`** unless you override them. So from a base of
 `ggplot(data = mpg, aes(displ, hwy, color = drv))`, both `geom_point()`
-and `geom_smooth()` inherit all three — and `geom_smooth()` draws one
+and `geom_smooth()` inherit all three, and `geom_smooth()` draws one
 line per `drv`.
 
 So a `color = drv` mapping in `ggplot()` reaches *every* layer:
@@ -122,8 +122,8 @@ ggplot(mpg, aes(displ, hwy)) +
   ]}
 />
 
-The points are colored by drivetrain; the smoother — which never saw
-`color = drv` — fits one black line to all the data. **Where you place
+The points are colored by drivetrain; the smoother, which never saw
+`color = drv`, fits one black line to all the data. **Where you place
 a mapping decides which layers it affects.** This is the lever behind
 most sophisticated ggplot figures.
 
@@ -154,7 +154,7 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 Three layers: all cars in grey, the standout cars re-emphasized in red,
-and text labels — the red layer and the text layer both override the
+and text labels, the red layer and the text layer both override the
 base data with `best`, while still inheriting the `x`/`y` mappings.
 
 <Callout type="info" title="inherit.aes = FALSE">
@@ -176,7 +176,7 @@ ones.
 
 - One line, because \`geom_smooth\` ignores color.
   > \`geom_smooth\` does respect an inherited \`color\` grouping.
-- [o] Three lines — one per drivetrain — because \`color = drv\` is declared in \`ggplot()\` and therefore inherited by the smoother, which groups by it.
+- [o] Three lines, one per drivetrain, because \`color = drv\` is declared in \`ggplot()\` and therefore inherited by the smoother, which groups by it.
   > Mappings in \`ggplot()\` reach every layer, so the smoother fits one line per \`drv\` group.
 - No lines, because \`geom_smooth\` needs its own \`aes()\`.
   > \`geom_smooth\` inherits the base \`aes()\`; no separate \`aes()\` is required.
@@ -184,7 +184,7 @@ ones.
   > The number of smoother lines equals the number of \`drv\` groups, which is three.
 
 A \`color\` mapping in \`ggplot()\` groups *every* layer that understands
-it — including the smoother.`}
+it, including the smoother.`}
 />
 
 <MultipleChoice
@@ -200,7 +200,7 @@ it — including the smoother.`}
   > That would strip the points of x/y too; the fix is *where* the color mapping lives.
 
 The placement of a mapping (base vs. layer) controls which layers it
-affects — the core skill of multi-layer plotting.`}
+affects, the core skill of multi-layer plotting.`}
 />
 
 ## Key takeaways

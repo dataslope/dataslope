@@ -1,23 +1,23 @@
 ---
 title: "A Rule-Based Sentiment Classifier"
-description: The capstone — assemble tokenization, normalization, deliberate stopword choices, and negation handling into a working lexicon-based sentiment classifier. Watch why keeping negation matters, see how text flows through the whole pipeline, and learn the limits of rule-based methods.
+description: The capstone, assemble tokenization, normalization, deliberate stopword choices, and negation handling into a working lexicon-based sentiment classifier. Watch why keeping negation matters, see how text flows through the whole pipeline, and learn the limits of rule-based methods.
 ---
 
 Time to put it all together. In this final build we will write a **rule-based
-sentiment classifier** — a program that reads a sentence and decides whether it
-is positive, negative, or neutral — using nothing but the classic techniques
+sentiment classifier**, a program that reads a sentence and decides whether it
+is positive, negative, or neutral, using nothing but the classic techniques
 from this course and a hand-made word list. No machine learning, no training
 data, no black box. Every decision it makes, you will be able to explain.
 
 This capstone matters for two reasons. First, lexicon-based sentiment is
 genuinely used in the real world (it is transparent, needs no training data,
 and is easy to audit). Second, building it forces every earlier lesson to pay
-off at once — especially the warning about negation and stopwords.
+off at once, especially the warning about negation and stopwords.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A sentence of word chips — two green positives, one red negative, grays neutral — drops signed bars above and below a thin zero line, and past a divider the bars sum to one net green sentiment score"
+  aria-label="A sentence of word chips, two green positives, one red negative, grays neutral, drops signed bars above and below a thin zero line, and past a divider the bars sum to one net green sentiment score"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="86" y="36" width="54" height="24" rx="10" fill="currentColor" opacity="0.18" />
@@ -42,7 +42,7 @@ A **sentiment lexicon** is just two sets of words: ones that signal positive
 feeling ("good", "love", "excellent") and ones that signal negative feeling
 ("bad", "hate", "terrible"). To score a sentence, tokenize it, look up each
 word, add up the polarities, and read off the sign of the total. Here is the
-full flow — trace it top to bottom, because it is the entire course in one
+full flow, trace it top to bottom, because it is the entire course in one
 diagram.
 
 ```mermaid
@@ -61,7 +61,7 @@ flowchart TD
 ```
 
 Notice step B already encodes a decision you learned to make: we **keep**
-stopwords and negation, because — as the stopwords page warned — stripping
+stopwords and negation, because, as the stopwords page warned, stripping
 "not" would flip a review's meaning. The pipeline you are building is a direct
 application of the judgment from the "choosing your pipeline" page.
 
@@ -121,7 +121,7 @@ for review in ["I love this movie", "This film is terrible", "It is not good"]:
   ]}
 />
 
-The first two are right. The third — "It is not good" — is scored
+The first two are right. The third, "It is not good", is scored
 **positive**, because the naive counter sees the word "good" and is blind to
 the "not" sitting right in front of it. This is the exact negation failure we
 have been warning about since the stopwords page, now caught red-handed.
@@ -139,7 +139,7 @@ token) has to be part of the logic.
 The fix is to track whether the previous token was a negation and, if so, flip
 the polarity of the next sentiment word. We also reset the negation at
 punctuation, so it does not bleed across clauses. This is a tiny amount of
-"local order" awareness — the same insight behind n-grams.
+"local order" awareness, the same insight behind n-grams.
 
 <CodeBlock
   adapter="python"
@@ -210,7 +210,7 @@ for review in tests:
   ]}
 />
 
-Now "It is not good" is correctly **negative**, and — satisfyingly — "This is
+Now "It is not good" is correctly **negative**, and, satisfyingly, "This is
 not bad at all" comes out **positive**, because the negation flipped the
 negative word "bad" into a positive contribution. You just taught a program the
 difference between "good" and "not good" using only tokenization and a single
@@ -224,7 +224,7 @@ feature extraction), and **local-order awareness** (the n-gram insight, as a
 negation flag). The whole course converged on one small, explainable program.
 </Callout>
 
-## The limits of rules — and when to graduate to learning
+## The limits of rules, and when to graduate to learning
 
 Rule-based sentiment is transparent and needs no training data, but it has real
 ceilings you should respect:
@@ -241,7 +241,7 @@ ceilings you should respect:
 These limits are *why* machine-learning approaches exist: instead of a
 hand-written lexicon, they **learn** word sentiment (and more) from thousands of
 labeled examples, picking up sarcasm cues, domain meanings, and intensity that
-no hand-built list captures. But notice — those models still tokenize,
+no hand-built list captures. But notice, those models still tokenize,
 normalize, and make the very preprocessing choices you practiced here. You have
 built the foundation they stand on.
 
@@ -249,7 +249,7 @@ built the foundation they stand on.
 Even when you eventually reach for machine learning, a rule-based baseline is
 worth building first: it is fast, transparent, needs no labeled data, and gives
 you a score to beat. If a simple lexicon already solves your problem, you may not
-need anything more complicated — recall the very first page's advice that a
+need anything more complicated, recall the very first page's advice that a
 clear rule often beats a model.
 </Callout>
 
@@ -259,7 +259,7 @@ earlier lesson explains this failure most directly?
 
 - Stemming should have been applied first
   > Stemming normalizes word forms but has no effect on word order; "not good" would still be read as positive after stemming.
-- [o] Counting positive/negative words independently ignores word order, so "not good" looks positive because of "good" — the same order-blindness as bag-of-words, fixable with negation/local-order handling
+- [o] Counting positive/negative words independently ignores word order, so "not good" looks positive because of "good", the same order-blindness as bag-of-words, fixable with negation/local-order handling
   > Independent word counting is a bag-of-words model and shares its blindness to order. "not good" must be read as a unit (or via a negation flag) for the negative meaning to register.
 - The text was not lowercased
   > The code already lowercases tokens before lookup, so casing is not the issue here.
@@ -424,7 +424,7 @@ classifier?
 - It learns word sentiment from thousands of labeled training examples
   > Learning from labeled examples describes machine learning, not the lexicon-based approach, which requires no training data at all.
 - [o] It scores text by looking each word up in hand-made lists of positive and negative words and summing the polarities
-  > Lexicon-based sentiment uses curated word lists rather than learned parameters. It is transparent and needs no training data — you can read exactly why it produced a given score.
+  > Lexicon-based sentiment uses curated word lists rather than learned parameters. It is transparent and needs no training data, you can read exactly why it produced a given score.
 - It translates the text and counts the characters
   > Character counting has nothing to do with sentiment analysis; this describes neither the lexicon-based nor any other real sentiment approach.
 - It uses a neural network to predict sentiment
@@ -446,7 +446,7 @@ removing them?
 - Because NLTK forbids removing stopwords
   > NLTK places no such restriction; removing stopwords is a common operation and is entirely up to the programmer.
 
-Keeping negation is a deliberate, task-driven choice — exactly the judgment this course builds.`}
+Keeping negation is a deliberate, task-driven choice, exactly the judgment this course builds.`}
 />
 
 <MultipleChoice
@@ -456,7 +456,7 @@ machine-learning approaches?
 - It is unable to lowercase text
   > Lowercasing is trivial with Python's \`.lower()\` and has nothing to do with the conceptual limits of rule-based sentiment.
 - [o] It cannot detect sarcasm ("Oh great, another delay"), handle domain-specific meanings, or score words missing from its lexicon
-  > Fixed word lists miss sarcasm, context-dependent meaning, and any vocabulary they do not contain. Learning-based models infer these from labeled data — though they still rely on the same preprocessing you practiced.
+  > Fixed word lists miss sarcasm, context-dependent meaning, and any vocabulary they do not contain. Learning-based models infer these from labeled data, though they still rely on the same preprocessing you practiced.
 - It runs only on Tuesdays
   > There is no such restriction; this is a fictional claim.
 - It cannot process more than one sentence
@@ -487,7 +487,7 @@ rule-based baseline first a good idea?
 
 - It is required before any model can be trained
   > Machine-learning models can be trained without any rule-based baseline; starting with one is good practice, not a requirement.
-- [o] It is fast, transparent, needs no labeled data, and gives a concrete score to beat — and sometimes it already solves the problem well enough
+- [o] It is fast, transparent, needs no labeled data, and gives a concrete score to beat, and sometimes it already solves the problem well enough
   > A simple, explainable baseline sets a bar and may suffice on its own. It also sanity-checks your data and preprocessing. Reaching for a heavier model makes sense only once the baseline proves inadequate.
 - It guarantees higher accuracy than any model
   > A rule-based baseline is a starting point, not an upper bound; machine-learning models routinely surpass it on complex tasks.
@@ -498,7 +498,7 @@ Start simple and transparent; add complexity only when it earns its place.`}
 />
 
 You have built a complete, explainable NLP program from raw text to a labeled
-verdict — using only the classic toolkit. That is a real accomplishment. Before
+verdict, using only the classic toolkit. That is a real accomplishment. Before
 the closing map of where to go next, the following page steps back from the code
-for a few **stories** — the people and moments that shaped the field you have
+for a few **stories**, the people and moments that shaped the field you have
 just learned the foundations of.

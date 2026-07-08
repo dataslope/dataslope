@@ -1,6 +1,6 @@
 ---
 title: P-values
-description: The single most misunderstood number in statistics — what a p-value actually measures, built visually as a tail area under the null, and the long list of things it is not.
+description: The single most misunderstood number in statistics, what a p-value actually measures, built visually as a tail area under the null, and the long list of things it is not.
 ---
 
 The p-value is the most quoted and most misunderstood number in all of
@@ -10,7 +10,7 @@ of those are wrong, and believing them leads to bad decisions worth real
 money and, in medicine, real lives.
 
 This page does two things. First, it builds the p-value *from scratch*, by
-simulation, so you can literally see what it measures — an area under a
+simulation, so you can literally see what it measures, an area under a
 curve. Second, it relentlessly clears away every classic misreading,
 because knowing what a p-value is *not* is just as important as knowing
 what it is.
@@ -18,7 +18,7 @@ what it is.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A bell-shaped blue histogram records every gap pure noise produced in a no-effect world; a solid red post marks the gap actually observed, and the small yellow tail bar at or beyond it is the p-value — the fraction of the boring world at least as extreme as you"
+  aria-label="A bell-shaped blue histogram records every gap pure noise produced in a no-effect world; a solid red post marks the gap actually observed, and the small yellow tail bar at or beyond it is the p-value, the fraction of the boring world at least as extreme as you"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.35">
@@ -49,13 +49,13 @@ what it is.
 
 Read it slowly. Three pieces carry all the meaning:
 
-- **"assuming H₀ is true"** — the whole calculation lives in a
+- **"assuming H₀ is true"**, the whole calculation lives in a
   hypothetical world where there is no effect. The p-value never asks
   whether that world is the real one.
-- **"at least as extreme"** — not the probability of *your exact* result
+- **"at least as extreme"**, not the probability of *your exact* result
   (which is usually near zero for continuous data), but the probability of
   your result *or anything more surprising*.
-- **"data"** — summarized by a test statistic. We measure extremeness on
+- **"data"**, summarized by a test statistic. We measure extremeness on
   that one number.
 
 Everything else on this page is a consequence of, or a contrast with,
@@ -63,7 +63,7 @@ that sentence.
 
 <Callout type="info" title="It's a conditional probability, and the condition matters">
 In symbols, a p-value is `P(data this extreme or more | H₀)`.
-The thing to the right of the bar — "given H₀" — is *assumed*, not
+The thing to the right of the bar, "given H₀", is *assumed*, not
 concluded. This is exactly why a p-value can never be the probability that
 H₀ is true: you cannot end up with a probability *about* the thing you
 *assumed* at the start.
@@ -73,9 +73,9 @@ H₀ is true: you cannot end up with a probability *about* the thing you
 
 Here is the idea that makes p-values click. Suppose H₀ is true. Then
 there is a whole *distribution* of test-statistic values you might get,
-just from random sampling — the **null distribution**. Your observed
+just from random sampling, the **null distribution**. Your observed
 statistic is one point on that distribution. The p-value is simply **how
-much of the null distribution is at least as extreme as your point** — the
+much of the null distribution is at least as extreme as your point**, the
 shaded tail.
 
 ```mermaid
@@ -133,12 +133,12 @@ print("landed as far from 50 as your 62 did. It is an AREA, not a verdict.")
 The p-value you get is the *proportion* of fair-coin simulations that were
 as far from 50 as your real result. That's all it is: a tail area under
 the null distribution. Nothing in that calculation knows or claims whether
-the coin is *actually* fair — we *assumed* it was fair to draw the
+the coin is *actually* fair, we *assumed* it was fair to draw the
 distribution in the first place.
 
 <Callout type="tip" title="Why 'two-sided' counts both tails here">
 Because the claim was just "the coin is biased" (either way), a result of
-38 heads would be exactly as surprising as 62 heads — both sit 12 away
+38 heads would be exactly as surprising as 62 heads, both sit 12 away
 from 50. So "at least as extreme" includes both tails. If the claim had
 been specifically "biased toward heads," you'd count only the upper tail
 and the p-value would be about half as large. This is the one-sided vs
@@ -174,7 +174,7 @@ p_exact = stats.binomtest(observed_heads, n_flips, 0.5, alternative="two-sided")
 print(f"Simulated p-value : {p_sim:.4f}")
 print(f"scipy exact p     : {p_exact:.4f}")
 print()
-print("They agree. The p-value was never mysterious — it is just the")
+print("They agree. The p-value was never mysterious, it is just the")
 print("tail area, which we can get by simulation OR by a formula.")
 `,
     },
@@ -234,7 +234,7 @@ print("The p-value is the share of the histogram beyond the red lines.")
   ]}
 />
 
-Look at the histogram. It is centered on **zero** — because under H₀
+Look at the histogram. It is centered on **zero**, because under H₀
 the two groups are identical, so most random gaps are near nothing. Your
 observed difference sits out in the tail. The further out it sits, the
 thinner the tail beyond it, and the smaller the p-value. *A small p-value
@@ -260,7 +260,7 @@ The null distribution shows what "pure noise" looks like, and pure noise average
 This is the heart of the page. Every item below is a misreading you will
 hear from smart people. Burn the corrections in.
 
-A p-value is `P(data this extreme or more | H0 true)` — and nothing else.
+A p-value is `P(data this extreme or more | H0 true)`, and nothing else.
 Each misreading below, with why it fails:
 
 | A p-value is NOT… | Why |
@@ -327,7 +327,7 @@ print("P(data | H0) is NOT P(H0 | data).")
 The false-positive rate is 5%, yet most positives are false alarms,
 because the disease is rare. In exactly the same way, a p-value of 0.05 is
 **not** a 5% chance that H₀ is true. To get `P(H₀ | data)`
-you'd also need the prior plausibility of H₀ — which the p-value never
+you'd also need the prior plausibility of H₀, which the p-value never
 uses.
 
 <Callout type="danger" title="The prosecutor's fallacy, in one line">
@@ -340,7 +340,7 @@ in applied statistics.
 ### It is NOT "the probability the result happened by chance"
 
 This one sounds reasonable and is subtly circular. The p-value is computed
-in a world where the result *did* happen purely by chance — that's the
+in a world where the result *did* happen purely by chance, that's the
 assumption. So it can't also be the probability that chance was at work;
 that's baked in. What the p-value measures is: *given* chance is the only
 thing operating, how often does chance reach this far?
@@ -385,13 +385,13 @@ The effect never changed, yet the p-value swung from "not significant" to
 "astronomically significant" purely by collecting more data. If a number
 can do that while the underlying truth is fixed, it cannot be telling you
 *how big* the effect is. For size, you need an **effect size** and a
-**confidence interval** — the subjects of *Effect Sizes* and *Confidence
+**confidence interval**, the subjects of *Effect Sizes* and *Confidence
 Intervals*.
 
 ### A non-significant p does NOT prove "no effect"
 
 The mirror image of the above. A large p-value (say 0.40) means your data
-was unremarkable under H₀ — but as the example just showed, a real
+was unremarkable under H₀, but as the example just showed, a real
 effect can easily produce a large p-value when `n` is small. "Not
 significant" means *undetected*, not *absent*. This is the same
 not-guilty-is-not-innocent point from *Hypothesis Testing*, and we'll
@@ -400,16 +400,16 @@ quantify exactly when real effects go undetected in *Errors and Power*.
 <MultipleChoice
   markdown={`A study reports p = 0.03. A colleague says: "So there's a 97% chance the effect is real." What is wrong with that?
 
-- Nothing — that is a fine way to read a p-value
+- Nothing, that is a fine way to read a p-value
   > That reading is the prosecutor's fallacy. A p-value is not the probability that an effect is real.
 - The percentage should be 3%, not 97%
   > Neither 3% nor 97% is the probability the effect is real; the p-value is not a probability about the hypothesis in either direction.
-- [o] A p-value is $P(\text{data} \mid H_0)$, not $P(\text{effect is real} \mid \text{data})$ — the two require different information and are not interchangeable
+- [o] A p-value is $P(\text{data} \mid H_0)$, not $P(\text{effect is real} \mid \text{data})$, the two require different information and are not interchangeable
   > Getting the probability that the effect is real would require the prior plausibility of the hypotheses, which the p-value never uses; the p-value only describes how extreme the data is under the null.
 - The colleague forgot to multiply by the sample size
   > Sample size does not convert a p-value into a probability that the effect is real; the objection is conceptual, not a missing arithmetic step.
 
-$P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are different quantities — never swap them.`}
+$P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are different quantities, never swap them.`}
 />
 
 ## How to read a p-value, in practice
@@ -436,14 +436,14 @@ does not close it.
 <IllustrationPrompt subject="Ronald Fisher" photo />
 
 <Callout type="info" title="Where did 0.05 come from? (a true story)">
-The famous 0.05 threshold is not a law of nature — it's a convention that
+The famous 0.05 threshold is not a law of nature, it's a convention that
 hardened into a rule. **R.A. Fisher** suggested it in the 1920s as a
 convenient cutoff, calling it a reasonable line for deciding a result
 "deserves a second look," and openly noting the choice was somewhat
 arbitrary. The field then ossified it into a pass/fail gate, with
 enormous downstream consequences for what gets published and believed. In
 2016 the **American Statistical Association** took the rare step of
-issuing a formal statement warning against exactly this misuse —
+issuing a formal statement warning against exactly this misuse,
 treating `p < 0.05` as a bright line for truth, ignoring effect sizes,
 and the p-hacking we're about to cover. Treat 0.05 as a default worth
 questioning, not a verdict.
@@ -454,7 +454,7 @@ questioning, not a verdict.
 Here is the practical reason all of this matters. If H₀ is true, a
 p-value is essentially a uniform random number between 0 and 1. So if you
 test **20 independent things** that are all truly null, you *expect* one
-of them to come up "significant" at α = 0.05 — by pure luck. Hunt
+of them to come up "significant" at α = 0.05, by pure luck. Hunt
 through enough comparisons and you will always find a "discovery."
 
 <IllustrationPrompt subject="a jar of green jelly beans (the xkcd #882 significance comic)" />
@@ -465,7 +465,7 @@ The canonical illustration of this is the webcomic *xkcd* #882,
 nothing (p > 0.05). A bystander insists it must be a *specific color*, so
 they test all 20 colors one by one. Nineteen come back null; the green
 ones hit p < 0.05. The next panel is a newspaper headline: "GREEN JELLY
-BEANS LINKED TO ACNE!" — with the "only 5% chance of coincidence!"
+BEANS LINKED TO ACNE!", with the "only 5% chance of coincidence!"
 caption that ignores the 19 other tests. One significant result out of 20
 null tests is exactly what chance predicts. This is the multiple-comparisons
 problem in a single comic, and you will see real analyses make the same
@@ -475,7 +475,7 @@ mistake without the punchline.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A wall of identical test tiles, every one of them pure noise, with exactly one glowing green — scan enough comparisons and luck alone will hand you a discovery to misreport"
+  aria-label="A wall of identical test tiles, every one of them pure noise, with exactly one glowing green, scan enough comparisons and luck alone will hand you a discovery to misreport"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -549,7 +549,7 @@ print("Report only the winners and you have manufactured a fake discovery.")
 />
 
 Run it and you'll typically see one or two "significant" results out of
-twenty — all of them false, by construction. This is **p-hacking** (also
+twenty, all of them false, by construction. This is **p-hacking** (also
 called the multiple-comparisons problem): test enough things, or peek
 repeatedly as data trickles in, and false positives are guaranteed. The
 fix is to plan your comparisons in advance and adjust for how many you
@@ -563,12 +563,12 @@ is only trustworthy when the number of looks and tests was fixed in
 advance.
 </Callout>
 
-## Challenge 1 — Compute a p-value from a null distribution
+## Challenge 1, Compute a p-value from a null distribution
 
 <ChallengeCard
   adapter="python"
   title="Right-tailed p-value by simulation"
-  instructions={`You ran a one-sided test. The setup gives you \`null_stats\` — an array of test-statistic values simulated under $H_0$ — and a single \`observed_stat\`. Your alternative is "the statistic is **larger** than the null predicts," so *more extreme* means *larger*.
+  instructions={`You ran a one-sided test. The setup gives you \`null_stats\`, an array of test-statistic values simulated under $H_0$, and a single \`observed_stat\`. Your alternative is "the statistic is **larger** than the null predicts," so *more extreme* means *larger*.
 
 - Compute the **right-tailed** p-value as the **proportion** of \`null_stats\` that are **greater than or equal to** \`observed_stat\`.
 - Store it as a float called **\`p_value\`**.
@@ -620,7 +620,7 @@ assert abs(p_value - expected) < 1e-12`,
   ]}
 />
 
-## Challenge 2 — A two-sided p-value
+## Challenge 2, A two-sided p-value
 
 <ChallengeCard
   adapter="python"
@@ -726,7 +726,7 @@ This is the prosecutor's fallacy: $P(\text{data} \mid H_0) \neq P(H_0 \mid \text
   > The true effect was held constant; only the sample size changed. The data did not alter the underlying effect.
 - The p-value is unreliable and should be ignored
   > The behavior is exactly what theory predicts, not a malfunction; the lesson is about what the p-value measures, not that it is broken.
-- [o] The p-value reflects evidence against $H_0$, which grows with sample size even for a fixed small effect — so a p-value is not a measure of effect size
+- [o] The p-value reflects evidence against $H_0$, which grows with sample size even for a fixed small effect, so a p-value is not a measure of effect size
   > Larger samples make even a tiny true effect easier to distinguish from zero, shrinking the p-value while the effect itself is unchanged; magnitude must be judged separately.
 - Larger samples always make effects more important
   > Detectability is not importance; a larger sample can make a trivial effect highly significant without making it matter.
@@ -761,7 +761,7 @@ To learn how big an effect is, use an effect size and a confidence interval, not
 - Exactly 1, because only one result can be significant at a time
   > Multiple comparisons can each independently reach significance; there is no rule limiting it to one, and the expected count here is about two.
 
-Testing many true nulls guarantees occasional false positives — the multiple-comparisons problem.`}
+Testing many true nulls guarantees occasional false positives, the multiple-comparisons problem.`}
 />
 
 <MultipleChoice
@@ -782,7 +782,7 @@ Every extra look or extra test is another chance for chance to fool you.`}
 ## Key takeaways
 
 <Callout type="success" title="What to carry forward">
-- A p-value is `P(data this extreme or more | H₀)` — a **tail
+- A p-value is `P(data this extreme or more | H₀)`, a **tail
   area** under the null distribution, which you can get by simulation or
   by formula.
 - It is **not** the probability H₀ is true, **not** the probability the
@@ -790,9 +790,9 @@ Every extra look or extra test is another chance for chance to fool you.`}
   `1 − P(H₁)`, **not** the effect size, and **not** the probability of
   replication.
 - A small p-value says the data is surprising under H₀; it says nothing
-  about *how big* the effect is — for that, see *Effect Sizes* and
+  about *how big* the effect is, for that, see *Effect Sizes* and
   *Confidence Intervals*.
-- A large p-value means *undetected*, not *absent* — a question of power,
+- A large p-value means *undetected*, not *absent*, a question of power,
   covered in *Errors and Power*.
 - Testing many things or peeking repeatedly manufactures false positives
   (**p-hacking**); plan and adjust comparisons in advance, as in

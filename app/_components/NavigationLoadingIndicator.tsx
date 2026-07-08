@@ -5,8 +5,8 @@
  *
  * App Router navigations to heavy routes (playgrounds, course pages) can
  * take a few seconds before the new page commits, during which the old page
- * just sits there and the site feels unresponsive. This component — mounted
- * once in the root layout — shows the brand "diamond assemble + quarter-turn"
+ * just sits there and the site feels unresponsive. This component, mounted
+ * once in the root layout, shows the brand "diamond assemble + quarter-turn"
  * loader in a small corner badge while a navigation is in flight.
  *
  * There is no global "navigation started" event in the App Router, so start
@@ -14,9 +14,9 @@
  * listener on `document` that recognises left-clicks on same-origin,
  * same-tab, non-download links whose path/query differ from the current URL
  * (capture phase, because next/link calls preventDefault before the bubble
- * phase — `defaultPrevented` can't distinguish an SPA navigation from an
+ * phase, `defaultPrevented` can't distinguish an SPA navigation from an
  * app-handled click). Back/forward is covered by `popstate`. Programmatic
- * `router.push` calls are not detected — link clicks are how users reach
+ * `router.push` calls are not detected, link clicks are how users reach
  * playgrounds and courses.
  *
  * "Navigation finished" is the router state actually changing:
@@ -36,7 +36,7 @@ import styles from "./NavigationLoadingIndicator.module.css";
  *  fast (prefetched / cached) navigations never flash it. */
 const SHOW_DELAY_MS = 250;
 
-/** Failsafe: hide the badge if no route change commits — the click never
+/** Failsafe: hide the badge if no route change commits, the click never
  *  actually navigated (app code intercepted it) or the navigation failed. */
 const SAFETY_TIMEOUT_MS = 12_000;
 
@@ -95,7 +95,7 @@ function IndicatorImpl() {
    *  percent-encoding differences. */
   const committedUrl = useRef("");
 
-  // The route committed — the navigation is done.
+  // The route committed, the navigation is done.
   useEffect(() => {
     committedUrl.current = `${pathname}?${searchParams.toString()}`;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the route commit IS the "navigation finished" signal; hiding the badge here is the point
@@ -135,7 +135,7 @@ function IndicatorImpl() {
 
   return (
     <>
-      {/* Always mounted so the live region exists before its text changes —
+      {/* Always mounted so the live region exists before its text changes,
           screen readers only announce content that appears in an existing
           aria-live container. */}
       <span role="status" aria-live="polite" className={styles.srStatus}>

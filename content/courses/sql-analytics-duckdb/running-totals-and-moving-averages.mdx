@@ -1,11 +1,11 @@
 ---
 title: Running Totals and Moving Averages
-description: Ordered windows that accumulate and smooth — running totals, moving averages, and row-to-row comparisons with LAG and LEAD. The window frame, finally made clear.
+description: Ordered windows that accumulate and smooth, running totals, moving averages, and row-to-row comparisons with LAG and LEAD. The window frame, finally made clear.
 ---
 
 Time-series questions dominate business analytics: "cumulative revenue to
 date", "7-day moving average", "growth versus last month." All of them use
-**ordered windows** — windows where `ORDER BY` inside `OVER` makes the
+**ordered windows**, windows where `ORDER BY` inside `OVER` makes the
 calculation accumulate or slide as it moves through the rows. This page
 covers running totals, moving averages, and the row-comparison functions
 `LAG`/`LEAD`, and finally explains the **window frame**.
@@ -13,7 +13,7 @@ covers running totals, moving averages, and the row-comparison functions
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A staircase of stacked bars climbs left to right, each step carrying the previous blue total with today's green slice added on top, while a yellow dot walks the rising edge — a running total accumulating row by row"
+  aria-label="A staircase of stacked bars climbs left to right, each step carrying the previous blue total with today's green slice added on top, while a yellow dot walks the rising edge, a running total accumulating row by row"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -88,7 +88,7 @@ ORDER BY
 Day 1 shows 100, day 2 shows 240, day 3 shows 330, ... each row carries
 the total *so far*. Remove the `ORDER BY` and `SUM(revenue) OVER ()` would
 instead put the grand total `650` on every row. **Ordering an aggregate
-window turns it from a total into a running total** — that is the single
+window turns it from a total into a running total**, that is the single
 most important idea on this page.
 
 | Day | Revenue | Running total |
@@ -102,7 +102,7 @@ most important idea on this page.
 ## Running totals per group
 
 Combine `PARTITION BY` with the ordered window to get a running total that
-**resets for each group** — cumulative revenue per region, say.
+**resets for each group**, cumulative revenue per region, say.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -174,14 +174,14 @@ ORDER BY
   day;`}
 />
 
-The first row's `prev_day` is `NULL` — there is no earlier row to look
+The first row's `prev_day` is `NULL`, there is no earlier row to look
 back to. That is expected, and it is why the first `change` is also
 `NULL`.
 
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A blue row reaches back along a solid green arc to its predecessor and forward along a solid yellow arc to its successor, while the first row's backward arc finds only a hollow red ring — LAG and LEAD read neighboring rows, and the first row has nothing behind it"
+  aria-label="A blue row reaches back along a solid green arc to its predecessor and forward along a solid yellow arc to its successor, while the first row's backward arc finds only a hollow red ring, LAG and LEAD read neighboring rows, and the first row has nothing behind it"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="56" cy="100" r="8" fill="none" stroke="var(--ds-red-500)" strokeWidth="3.5" />
@@ -208,18 +208,18 @@ back to. That is expected, and it is why the first `change` is also
   </g>
 </svg>
 
-## The window frame — moving averages
+## The window frame, moving averages
 
 So far an ordered `SUM` summed *everything up to the current row*. That
 default is called the frame `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT
-ROW`. You can change the frame to a **sliding window** — say, the current
-row plus the two before it — to compute a **moving average** that smooths
+ROW`. You can change the frame to a **sliding window**, say, the current
+row plus the two before it, to compute a **moving average** that smooths
 out noise.
 
 <svg
   viewBox="0 0 640 185"
   role="img"
-  aria-label="A translucent yellow frame slides along a row of jagged bars three at a time, leaving behind its ghost from the previous step — a moving window smoothing the series"
+  aria-label="A translucent yellow frame slides along a row of jagged bars three at a time, leaving behind its ghost from the previous step, a moving window smoothing the series"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.22">
@@ -276,7 +276,7 @@ ORDER BY
 
 The frame `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` means "average this
 row and the two before it." As the window slides down the table, the
-average follows — a classic noise-smoothing technique.
+average follows, a classic noise-smoothing technique.
 
 ```mermaid
 flowchart TB
@@ -290,9 +290,9 @@ flowchart TB
 
 The full mental model of an ordered window has three dials:
 
-- **`PARTITION BY`** — which rows share a window (optional).
-- **`ORDER BY`** — the order the window walks through.
-- **Frame** (`ROWS BETWEEN ...`) — *how much* of the ordered window each
+- **`PARTITION BY`**, which rows share a window (optional).
+- **`ORDER BY`**, the order the window walks through.
+- **Frame** (`ROWS BETWEEN ...`), *how much* of the ordered window each
   row sees: everything-so-far (running total) or a sliding band (moving
   average).
 
@@ -313,7 +313,7 @@ combination of them.
 - Adding \`GROUP BY\`.
   > \`GROUP BY\` collapses rows; the running total needs an ordered window that preserves rows.
 
-Ordering an aggregate window makes it accumulate — that is a running
+Ordering an aggregate window makes it accumulate, that is a running
 total.`}
 />
 
@@ -364,6 +364,6 @@ before it.`}
 it within each.`}
 />
 
-You now command the window-function toolkit — ranking, running totals,
+You now command the window-function toolkit, ranking, running totals,
 moving averages, and row comparisons. Next we shift from *summarizing*
 data to *transforming* it: conditional logic, dates, and reshaping.

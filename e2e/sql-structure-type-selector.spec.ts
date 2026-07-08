@@ -2,8 +2,8 @@ import { test, expect, type Page } from "@playwright/test";
 
 // ─────────────────────────────────────────────────────────────────────
 // Update 2: A column whose committed type isn't one of the built-in presets
-// — e.g. Postgres `character varying(15)` (how PGlite reports `varchar(15)`),
-// or any parameterized type — must NOT make the View/Edit Structure type
+//, e.g. Postgres `character varying(15)` (how PGlite reports `varchar(15)`),
+// or any parameterized type, must NOT make the View/Edit Structure type
 // picker show "No matching built-in types." Opening the list should reveal
 // the full set of built-in types while preserving the column's real type.
 // The PgTypeSelector / DuckDb equivalents share `computeVisibleTypeGroups`
@@ -23,7 +23,7 @@ async function runSql(page: Page, sql: string) {
     .click();
 }
 
-test("postgres structure editor — a `character varying(n)` column lists all built-in types", async ({
+test("postgres structure editor, a `character varying(n)` column lists all built-in types", async ({
   page,
 }) => {
   test.setTimeout(180_000);
@@ -65,7 +65,7 @@ test("postgres structure editor — a `character varying(n)` column lists all bu
     "character varying(15)",
   );
 
-  // Opening its type list shows the built-in types — NOT "No matching
+  // Opening its type list shows the built-in types, NOT "No matching
   // built-in types" (the bug).
   await cnameGroup.locator('[aria-label="Open type list"]').click();
   const popup = page.locator(".playground-type-popup");

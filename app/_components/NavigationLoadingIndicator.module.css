@@ -1,4 +1,4 @@
-/* Global navigation loading badge — a small fixed card in the BOTTOM-LEFT
+/* Global navigation loading badge, a small fixed card in the BOTTOM-LEFT
    corner (bottom-right belongs to the AskAi launcher, z-index 60) that hosts
    the brand "diamond assemble + quarter-turn" loader while an App Router
    navigation is in flight. Explicit light/dark values (following the site's
@@ -53,7 +53,7 @@
 }
 
 /* Visually-hidden live region announcing navigation progress to screen
-   readers — they can't fall back on the corner badge's subtle visuals. */
+   readers, they can't fall back on the corner badge's subtle visuals. */
 .srStatus {
   position: fixed;
   width: 1px;

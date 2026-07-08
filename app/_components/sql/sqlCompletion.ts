@@ -65,17 +65,17 @@ interface SqlCompletionContextInfo {
   mode: SqlCompletionMode;
   from: number;
   qualifier?: string;
-  /** Qualified mode entered via a literal `alias.` — adds the `*`
+  /** Qualified mode entered via a literal `alias.`, adds the `*`
    *  suggestion (`t.*`) the way SQL IDEs do. INSERT column lists and
    *  `REFERENCES t(…)` reuse qualified mode but must not offer `*`. */
   viaDot?: boolean;
-  /** `JOIN … ON |` slot — prepend ready-made join conditions derived
+  /** `JOIN … ON |` slot, prepend ready-made join conditions derived
    *  from foreign keys / matching column names. */
   joinConditionSlot?: boolean;
-  /** `JOIN |` slot — tables related (via FKs) to tables already in the
+  /** `JOIN |` slot, tables related (via FKs) to tables already in the
    *  statement are ranked above the rest. */
   joinTableSlot?: boolean;
-  /** `USING (…|` slot — suggest bare column names shared between the
+  /** `USING (…|` slot, suggest bare column names shared between the
    *  joined tables instead of qualified ones. */
   usingSlot?: boolean;
   /** Sub-slot inside a `CREATE TABLE (…)` body. */
@@ -107,7 +107,7 @@ const qualifiedIdentifierPattern = new RegExp(
   `(${sqlIdentifierPattern})\\.\\s*([A-Za-z_][A-Za-z0-9_$]*)?$`,
 );
 // Words that look like identifiers but introduce a new clause and so must
-// never be captured as a table alias — without this guard the alias group
+// never be captured as a table alias, without this guard the alias group
 // would greedily eat the next clause keyword (e.g. "FROM t JOIN" → alias=JOIN)
 // and we'd lose the second table from the reference set.
 const aliasBlockListSource =
@@ -130,12 +130,12 @@ const insertColumnListPattern = new RegExp(
   String.raw`\bINSERT\s+INTO\s+(?:${sqlIdentifierPattern}\s*\.\s*)?(${sqlIdentifierPattern})\s*\(([^()]*)$`,
   "i",
 );
-// FOREIGN KEY (…) REFERENCES parent(col1, …| — complete the parent's columns.
+// FOREIGN KEY (…) REFERENCES parent(col1, …|, complete the parent's columns.
 const referencesColumnListPattern = new RegExp(
   String.raw`\bREFERENCES\s+(?:${sqlIdentifierPattern}\s*\.\s*)?(${sqlIdentifierPattern})\s*\(([^()]*)$`,
   "i",
 );
-// CREATE INDEX idx ON tbl(col1, …| — complete the indexed table's columns.
+// CREATE INDEX idx ON tbl(col1, …|, complete the indexed table's columns.
 const indexColumnListPattern = new RegExp(
   String.raw`\bON\s+(?:${sqlIdentifierPattern}\s*\.\s*)?(${sqlIdentifierPattern})\s*\(([^()]*)$`,
   "i",
@@ -146,7 +146,7 @@ const createNewObjectPattern = new RegExp(
   String.raw`\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMP(?:ORARY)?\s+)?(?:UNIQUE\s+)?(?:MATERIALIZED\s+)?(TABLE|VIEW|INDEX|TRIGGER|SCHEMA|SEQUENCE)\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:[A-Za-z_][A-Za-z0-9_$]*)?$`,
   "i",
 );
-// Head of a CREATE TABLE body — everything between this `(` and its
+// Head of a CREATE TABLE body, everything between this `(` and its
 // matching `)` is column-definition territory with its own slots.
 const createTableBodyPattern = new RegExp(
   String.raw`\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMP(?:ORARY)?\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:${sqlIdentifierPattern}\s*\.\s*)?${sqlIdentifierPattern}\s*\(`,
@@ -155,9 +155,9 @@ const createTableBodyPattern = new RegExp(
 
 // All sections use `rank: "dynamic"` so the group containing the
 // best-scoring suggestion renders first. With static ranks the section
-// order would *override* every per-option boost — the Tables section
+// order would *override* every per-option boost, the Tables section
 // would sit above Columns even inside a WHERE clause where columns carry
-// the high boost — which is backwards from how SQL IDEs order results.
+// the high boost, which is backwards from how SQL IDEs order results.
 const tableSection = { name: "Tables", rank: "dynamic" } as const;
 const viewSection = { name: "Views", rank: "dynamic" } as const;
 const cteSection = { name: "CTEs", rank: "dynamic" } as const;
@@ -170,7 +170,7 @@ const BOOST = {
   cteInTableContext: 85,
   // Tables connected by a foreign key to tables already referenced in the
   // statement (e.g. after `FROM customers JOIN |`) outrank everything else
-  // in the table list — the DataGrip-style "related tables first" ordering.
+  // in the table list, the DataGrip-style "related tables first" ordering.
   relatedTableBump: 15,
   keywordInTableContext: 5,
   columnInColumnContext: 90,
@@ -601,7 +601,7 @@ const ALL_TYPE_NAMES = new Set<string>([
 ]);
 
 // Schema (namespace) qualifiers recognized when the host doesn't supply
-// an explicit list — `main.` in SQLite/DuckDB, `public.` in Postgres.
+// an explicit list, `main.` in SQLite/DuckDB, `public.` in Postgres.
 const DEFAULT_SCHEMA_NAMES: Record<SqlDialect, readonly string[]> = {
   sqlite: ["main", "temp"],
   postgres: ["public"],
@@ -694,7 +694,7 @@ const columnTargetKeywords = new Set([
   "ORDER",
   "GROUP",
   "RETURNING",
-  // DuckDB: `QUALIFY <expr>` filters on window functions — same shape as
+  // DuckDB: `QUALIFY <expr>` filters on window functions, same shape as
   // HAVING, so completion-wise it wants column names + boolean operators.
   "QUALIFY",
   // CASE expressions: WHEN/THEN/ELSE all introduce sub-expressions that
@@ -822,7 +822,7 @@ function maskCommentsAndStrings(sql: string): string {
 /** The statement that contains `pos`, split at the cursor. `before` is
  *  what precedes the cursor (drives slot detection); `full` also covers
  *  the text after the cursor up to the next `;` so tables referenced
- *  *later* in the statement still feed column/alias scope — the
+ *  *later* in the statement still feed column/alias scope, the
  *  "SELECT | FROM customers" case every SQL IDE handles. */
 function statementAround(
   sql: string,
@@ -934,7 +934,7 @@ function isIdentifierToken(token: string | undefined): boolean {
 /** True when `token` reads as a *complete operand*: an identifier, a
  *  numeric literal (incl. the `0` marker masked strings leave behind), a
  *  closing paren, or END finishing a CASE. After an operand the user
- *  wants connectors (AND/OR), clause keywords, or an alias — not the
+ *  wants connectors (AND/OR), clause keywords, or an alias, not the
  *  start of a fresh expression. */
 function isOperandToken(token: string | undefined): boolean {
   if (!token) return false;
@@ -979,7 +979,7 @@ function resolveKeywordContext(
       return { primary: [], secondary: ["UNION"], restrict: true };
   }
 
-  // `SELECT * |` — the select list is complete, FROM is next. Without this
+  // `SELECT * |`, the select list is complete, FROM is next. Without this
   // the `*` would be read as a dangling multiplication operator.
   if (
     lastToken === "*" &&
@@ -988,7 +988,7 @@ function resolveKeywordContext(
     return { primary: ["FROM"] };
   }
 
-  // `OVER (|` — window definition slot.
+  // `OVER (|`, window definition slot.
   if (lastToken === "(" && tokens.at(-2) === "OVER") {
     return {
       primary: ["PARTITION", "ORDER"],
@@ -996,7 +996,7 @@ function resolveKeywordContext(
     };
   }
 
-  // `WITH name AS (|` / `CREATE VIEW v AS (|` — a subquery body starts.
+  // `WITH name AS (|` / `CREATE VIEW v AS (|`, a subquery body starts.
   if (lastToken === "(" && tokens.at(-2) === "AS") {
     return { primary: ["SELECT"], secondary: ["WITH", "VALUES"] };
   }
@@ -1153,7 +1153,7 @@ function resolveKeywordContext(
   }
 
   // Open CASE expression: after a complete operand the next step is
-  // THEN (in the WHEN branch) or WHEN/ELSE/END — ahead of clause keywords.
+  // THEN (in the WHEN branch) or WHEN/ELSE/END, ahead of clause keywords.
   if (inOpenCaseExpression(tokens) && isOperandToken(lastToken)) {
     return {
       primary: ["THEN", "WHEN", "ELSE", "END", "AND", "OR"],
@@ -1296,7 +1296,7 @@ function resolveKeywordContext(
     case "GROUP":
     case "ORDER": {
       // Once BY has been typed, the slot wants sort modifiers and the
-      // next clause — re-suggesting BY would be noise.
+      // next clause, re-suggesting BY would be noise.
       const clauseIndex = Math.max(
         tokens.lastIndexOf("GROUP"),
         tokens.lastIndexOf("ORDER"),
@@ -1435,7 +1435,7 @@ function isInsideUnclosedParen(prefix: string): boolean {
   return depth > 0;
 }
 
-/** Signed paren balance — unlike `isInsideUnclosedParen` this may go
+/** Signed paren balance, unlike `isInsideUnclosedParen` this may go
  *  negative, which is how we know a `CREATE TABLE (…)` body has already
  *  been closed before the cursor. */
 function signedParenBalance(masked: string): number {
@@ -1467,7 +1467,7 @@ function resolveCreateTableBody(
   const depth = 1 + signedParenBalance(body);
   if (depth <= 0) return null; // body already closed
   if (depth > 1) {
-    // Nested paren — CHECK(...), DECIMAL(10,…), etc. Suggestions here are
+    // Nested paren, CHECK(...), DECIMAL(10,…), etc. Suggestions here are
     // more likely to mislead than help (the columns being defined aren't
     // in the schema yet), so stay quiet.
     return {
@@ -1481,7 +1481,7 @@ function resolveCreateTableBody(
   const last = bodyTokens.at(-1);
   const prev = bodyTokens.at(-2);
 
-  // Fresh column-name slot — the user is inventing a name, so stay quiet
+  // Fresh column-name slot, the user is inventing a name, so stay quiet
   // unless they explicitly ask, in which case offer the table-constraint
   // starters that are also legal here.
   if (last === undefined || last === "(" || last === ",") {
@@ -1587,7 +1587,7 @@ function inferCompletionContext(
     ? statement.slice(0, Math.max(0, statement.length - currentWord.length))
     : statement;
 
-  // INSERT INTO <table> (col1, col2, |) — suggest columns of <table>.
+  // INSERT INTO <table> (col1, col2, |), suggest columns of <table>.
   const insertMatch = insertColumnListPattern.exec(prefixWithoutWord);
   if (insertMatch) {
     return {
@@ -1597,7 +1597,7 @@ function inferCompletionContext(
     };
   }
 
-  // … REFERENCES parent (col1, |) — suggest the parent table's columns.
+  // … REFERENCES parent (col1, |), suggest the parent table's columns.
   const referencesMatch = referencesColumnListPattern.exec(prefixWithoutWord);
   if (referencesMatch) {
     return {
@@ -1607,7 +1607,7 @@ function inferCompletionContext(
     };
   }
 
-  // CREATE INDEX … ON <table> (col1, |) — suggest the table's columns.
+  // CREATE INDEX … ON <table> (col1, |), suggest the table's columns.
   if (createIndexStatementPattern.test(prefixWithoutWord)) {
     const indexMatch = indexColumnListPattern.exec(prefixWithoutWord);
     if (indexMatch) {
@@ -1619,7 +1619,7 @@ function inferCompletionContext(
     }
   }
 
-  // JOIN ... USING (col1, |) — suggest columns shared by the joined tables.
+  // JOIN ... USING (col1, |), suggest columns shared by the joined tables.
   if (
     usingClausePattern.test(prefixWithoutWord) &&
     isInsideUnclosedParen(prefixWithoutWord)
@@ -1628,7 +1628,7 @@ function inferCompletionContext(
   }
 
   // CREATE [TEMP] [UNIQUE] TABLE|VIEW|INDEX|TRIGGER [IF NOT EXISTS] <newName>
-  // — user is naming a new object, so suppress existing-table suggestions
+  //, user is naming a new object, so suppress existing-table suggestions
   // and only surface the few keywords that legally appear in this slot.
   const namingMatch = createNewObjectPattern.exec(prefixWithoutWord);
   if (namingMatch) {
@@ -1661,7 +1661,7 @@ function inferCompletionContext(
     resolveKeywordContext(tokens, lastToken, lastClauseKeyword, dialect) ??
     undefined;
 
-  // CREATE INDEX idx ON | — ON names a table here, not a join condition.
+  // CREATE INDEX idx ON |, ON names a table here, not a join condition.
   if (
     lastToken === "ON" &&
     tokens.includes("CREATE") &&
@@ -1670,7 +1670,7 @@ function inferCompletionContext(
     return { mode: "tables", from, keywordContext };
   }
 
-  // ALTER TABLE t DROP/RENAME COLUMN | — complete t's existing columns.
+  // ALTER TABLE t DROP/RENAME COLUMN |, complete t's existing columns.
   // (ADD COLUMN names a new column, so that slot stays quiet.)
   if (lastToken === "COLUMN" && tokens.includes("ALTER")) {
     if (tokens.at(-2) === "ADD") {
@@ -1843,7 +1843,7 @@ function extractCtes(sql: string): SqlCompletionEntity[] {
     addCte(match[1], match[2]);
   }
 
-  // Continuation `, name AS (...)` — only honor those that fall outside any
+  // Continuation `, name AS (...)`, only honor those that fall outside any
   // open CTE body, otherwise we'd pick up commas from inside subqueries.
   cteContinuationPattern.lastIndex = 0;
   while ((match = cteContinuationPattern.exec(masked))) {
@@ -1919,7 +1919,7 @@ function entityInfo(entity: SqlCompletionEntity): string | undefined {
 }
 
 /** Table names (lowercased) reachable via a foreign key from/to any of
- *  the already-referenced tables — used to float likely JOIN partners. */
+ *  the already-referenced tables, used to float likely JOIN partners. */
 function fkRelatedTables(
   schema: SqlCompletionSchema,
   refs: TableReference[],
@@ -1972,8 +1972,8 @@ const KEYWORD_PRIMARY_BUMP = 30;
 const KEYWORD_SECONDARY_BUMP = 5;
 const KEYWORD_OFF_CONTEXT_PENALTY = 25;
 
-/** Keyword/function casing follows what the user is typing — a
- *  lowercase prefix completes to `select`, anything else to `SELECT` —
+/** Keyword/function casing follows what the user is typing, a
+ *  lowercase prefix completes to `select`, anything else to `SELECT`,
  *  the "match typed case" insertion mode of desktop SQL IDEs. Labels
  *  always render uppercase; only the inserted text changes. */
 type KeywordCasing = "upper" | "lower";
@@ -2002,8 +2002,8 @@ function keywordOptions(
 
   // Primary/secondary entries from the context may reference keywords
   // outside the active dialect (e.g. PRAGMA in Postgres). We keep them in
-  // the suggestion list anyway — the context resolver is already dialect-
-  // aware — but fall back to the dialect catalog for the unranked tail.
+  // the suggestion list anyway, the context resolver is already dialect-
+  // aware, but fall back to the dialect catalog for the unranked tail.
   const orderedKeywords = primary
     ? [
         ...keywordContext!.primary,
@@ -2027,7 +2027,7 @@ function keywordOptions(
     if (!restrict && !isPrimary && !isSecondary && !dialectKeywordSet.has(keyword))
       continue;
     // A handful of DuckDB identifiers (LIST, MAP, STRUCT, RANGE) exist as
-    // both keyword and function. Showing both is duplicate noise — keep
+    // both keyword and function. Showing both is duplicate noise, keep
     // the callable form unless the context explicitly pinned the keyword.
     if (functionLabels?.has(keyword) && !isPrimary && !isSecondary) continue;
     let kwBoost = boost;
@@ -2212,7 +2212,7 @@ function qualifiedColumnOptions(
   return options;
 }
 
-/** Display name for a table reference inside a join condition — the
+/** Display name for a table reference inside a join condition, the
  *  alias when one was declared, the table name otherwise. */
 function refDisplay(ref: TableReference): string {
   return ref.alias ?? ref.table;
@@ -2291,7 +2291,7 @@ function joinConditionOptions(
       for (const column of targetColumns) {
         const lower = column.toLowerCase();
         // A column named exactly the same on both sides is the classic
-        // join key — except bare `id`, which is both tables' own pk.
+        // join key, except bare `id`, which is both tables' own pk.
         if (lower !== "id" && otherColumns.has(lower)) {
           add(joinConditionCompletion(target, column, other, column));
         }
@@ -2385,7 +2385,7 @@ export function createSqlCompletionSource(
             ? joinConditionOptions(localSchema, before)
             : [];
           if (cols.length === 0 && joins.length === 0) {
-            // No FROM/JOIN/UPDATE/INTO target in scope yet — column suggestions
+            // No FROM/JOIN/UPDATE/INTO target in scope yet, column suggestions
             // would be misleading, so offer keywords + tables instead.
             return [
               ...keywordOptions(dialect, BOOST.keywordInColumnContext, kw, {
@@ -2412,7 +2412,7 @@ export function createSqlCompletionSource(
             info.viaDot ?? false,
           );
           if (qualified.length > 0) return qualified;
-          // `public.|` / `main.|` — a schema qualifier completes to its
+          // `public.|` / `main.|`, a schema qualifier completes to its
           // tables rather than columns.
           if (
             info.qualifier &&

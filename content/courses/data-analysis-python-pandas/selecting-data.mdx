@@ -1,6 +1,6 @@
 ---
 title: Selecting Data
-description: The many ways to grab the rows and columns you want — and why Pandas has so many of them.
+description: The many ways to grab the rows and columns you want, and why Pandas has so many of them.
 ---
 
 There are at least five distinct syntaxes in Pandas for "give me
@@ -13,7 +13,7 @@ zooms in on the two most important.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A faint grid of cells with one highlighted block in the middle — many selection syntaxes, one goal"
+  aria-label="A faint grid of cells with one highlighted block in the middle, many selection syntaxes, one goal"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -123,7 +123,7 @@ print("Type:", type(sub).__name__)
   ]}
 />
 
-## 3. `loc` — by label
+## 3. `loc`, by label
 
 <CodeBlock
   adapter="python"
@@ -155,7 +155,7 @@ print(df.loc["Aiko":"Chen"])
 Important: `loc` slices are **inclusive** of both endpoints,
 unlike Python lists.
 
-## 4. `iloc` — by position
+## 4. `iloc`, by position
 
 <CodeBlock
   adapter="python"
@@ -243,10 +243,10 @@ df.loc[df["status"] == "active", ["customer_id", "revenue"]]
 
 Parse it from outside in:
 
-1. **Outer `loc[...]`** — label-based selection.
-2. **Row selector** (`df["status"] == "active"`) — a boolean
+1. **Outer `loc[...]`**, label-based selection.
+2. **Row selector** (`df["status"] == "active"`), a boolean
    mask.
-3. **Column selector** (`["customer_id", "revenue"]`) — list of
+3. **Column selector** (`["customer_id", "revenue"]`), list of
    column labels.
 
 The whole expression reads as: *"From df, the rows where status
@@ -261,9 +261,9 @@ This is the canonical shape of an analyst's daily code.
   title="Practice selecting on the penguins data"
   instructions={`The penguins file is staged as \`penguins.csv\` and loaded into \`penguins\` for you. Produce three results:
 
-1. \`mass_series\` — the \`body_mass_g\` column as a Series.
-2. \`species_mass\` — a DataFrame with just the \`species\` and \`body_mass_g\` columns, in that order.
-3. \`first_ten\` — the first 10 rows of the full DataFrame, selected with \`iloc\`.`}
+1. \`mass_series\`, the \`body_mass_g\` column as a Series.
+2. \`species_mass\`, a DataFrame with just the \`species\` and \`body_mass_g\` columns, in that order.
+3. \`first_ten\`, the first 10 rows of the full DataFrame, selected with \`iloc\`.`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
@@ -319,25 +319,25 @@ assert first_ten.shape == (10, 8)`,
 <MultipleChoice
   markdown={`Which of these selects the *single column* \`age\` from \`df\`?
 
-- \`df.age\` (attribute access — works but discouraged)
+- \`df.age\` (attribute access, works but discouraged)
   > Attribute access returns a Series but breaks for column names containing spaces, dots, or names that clash with DataFrame methods like \`count\` or \`sum\`.
 - \`df[["age"]]\` (returns a DataFrame)
-  > Double brackets select one or more columns and always return a DataFrame, not a Series — even when only one column name is given.
+  > Double brackets select one or more columns and always return a DataFrame, not a Series, even when only one column name is given.
 - [o] \`df["age"]\` (returns a Series)
   > Single bracket → single column → Series.
 - \`df.loc[:, "age":"age"]\` (a label slice)
   > A label-slice from \`"age"\` to \`"age"\` returns a one-column DataFrame (not a Series), and the syntax is more verbose than a simple single-bracket selection.
 
-The first option *works* but breaks for columns with spaces, dots, or names matching methods — prefer brackets.`}
+The first option *works* but breaks for columns with spaces, dots, or names matching methods, prefer brackets.`}
 />
 
 <MultipleChoice
-  markdown={`In Pandas, \`df.loc["Aiko":"Chen"]\` versus \`df.iloc[0:3]\` — what is the key difference?
+  markdown={`In Pandas, \`df.loc["Aiko":"Chen"]\` versus \`df.iloc[0:3]\`, what is the key difference?
 
 - \`loc\` is faster
   > The performance difference between the two is negligible for typical analytical use; the meaningful distinction is inclusive vs exclusive endpoint behavior.
 - They are identical
-  > \`df.loc["Aiko":"Chen"]\` includes Chen (inclusive end), while \`df.iloc[0:3]\` excludes the row at position 3 (exclusive end) — the same rows only if the label order and positions happen to coincide.
+  > \`df.loc["Aiko":"Chen"]\` includes Chen (inclusive end), while \`df.iloc[0:3]\` excludes the row at position 3 (exclusive end), the same rows only if the label order and positions happen to coincide.
 - [o] \`loc\` slicing is *inclusive* of both endpoints, while \`iloc\` (like normal Python) is *exclusive* of the end
   > This often-surprising difference is one of the most common bugs in label-based slicing.
 - \`iloc\` accepts strings
@@ -352,7 +352,7 @@ Memorize: label-slice is inclusive; position-slice is exclusive.`}
 - An error
   > This is valid Pandas syntax; passing a boolean mask as the row selector and a list of column names as the column selector is exactly how \`loc\` is designed to be used.
 - All rows of df
-  > The boolean mask \`df["status"] == "active"\` selects only rows where the condition is True — not all rows.
+  > The boolean mask \`df["status"] == "active"\` selects only rows where the condition is True, not all rows.
 - [o] The rows of df where status equals "active", keeping only the columns id and rev
   > This is the canonical "filter rows AND project columns" pattern.
 - The first row

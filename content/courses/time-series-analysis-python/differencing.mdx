@@ -1,11 +1,11 @@
 ---
 title: "Detrending Data: Mastering Differencing to Make a Series Stationary"
-description: How subtracting consecutive values removes a trend, why the difference of a line is a constant, seasonal differencing to kill a yearly cycle, the over-differencing trap, and integration as the inverse — the 'I' in ARIMA.
+description: How subtracting consecutive values removes a trend, why the difference of a line is a constant, seasonal differencing to kill a yearly cycle, the over-differencing trap, and integration as the inverse, the 'I' in ARIMA.
 ---
 
 The Augmented Dickey-Fuller test kept handing us the same prescription:
 *difference the series*. **Differencing** is the workhorse transformation
-that turns a trending, non-stationary series into a stationary one — and it's
+that turns a trending, non-stationary series into a stationary one, and it's
 the operation hiding behind the `d` in **ARIMA**. This page is about *why*
 it works, how far to take it, and the classic mistake of taking it one step
 too far.
@@ -13,7 +13,7 @@ too far.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue line climbs in steps on the left; past a small arrow, the green differenced line runs perfectly flat above its baseline — differencing turns a rising level into a constant step, and the trend vanishes"
+  aria-label="A blue line climbs in steps on the left; past a small arrow, the green differenced line runs perfectly flat above its baseline, differencing turns a rising level into a constant step, and the trend vanishes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -61,7 +61,7 @@ value**:
 
 You stop modeling the *level* of the series and start modeling its
 *step-to-step change*. That single shift in perspective is what removes a
-trend — because a series can wander far from its starting level while its
+trend, because a series can wander far from its starting level while its
 *changes* stay small and well-behaved.
 
 <CodeBlock
@@ -109,14 +109,14 @@ print("The first value is NaN -- there's no earlier month to subtract.")
 />
 
 `y.diff()` is exactly `y - y.shift(1)`. The first entry is `NaN` because the
-very first observation has no predecessor — differencing always costs you
+very first observation has no predecessor, differencing always costs you
 one row per difference.
 
 ## Why differencing kills a trend
 
 Here's the intuition made exact: **the difference of a straight line is a
 constant.** If a series climbs by the same amount every step, then its
-*changes* are all identical — a flat, stationary series. Differencing
+*changes* are all identical, a flat, stationary series. Differencing
 converts "a steadily rising level" into "a steady rate," and a steady rate
 has no trend.
 
@@ -148,7 +148,7 @@ print("each difference peels off one degree of polynomial trend.")
 
 A linear trend vanishes after **one** difference; a curved (quadratic) trend
 needs **two**. In practice almost every real series is stationary after
-`d = 1` or `d = 2` differences — you rarely need more.
+`d = 1` or `d = 2` differences, you rarely need more.
 
 <CodeBlock
   adapter="python"
@@ -201,13 +201,13 @@ print("hump survived. First differencing removed the trend, not the season.")
 
 The trend is gone after one difference, and the ADF p-value collapses. But
 look closely: a *seasonal* wobble remains. First differencing removes the
-**trend**, not the **seasonality** — those need a different cut.
+**trend**, not the **seasonality**, those need a different cut.
 
 ## Seasonal differencing: subtract one season ago
 
 To remove a seasonal cycle of period `m`, subtract the value from one full
 season earlier: `y(t) - y(t-m)`. For monthly data with a yearly cycle that's
-`y.diff(12)` — each month minus the same month last year. The repeating
+`y.diff(12)`, each month minus the same month last year. The repeating
 pattern cancels against its own copy.
 
 ```mermaid
@@ -280,14 +280,14 @@ The recipe "log, then a regular difference, then a seasonal difference" is
 what a *seasonal* ARIMA (SARIMA) encodes in its orders. We'll keep our hands
 on the wheel with plain ARIMA and pre-difference manually, but know that the
 `d` (regular differences) and `D` (seasonal differences) parameters are just
-this page, parameterized. Differencing isn't a side-trick — it's half of
+this page, parameterized. Differencing isn't a side-trick, it's half of
 what ARIMA *is*.
 </Callout>
 
 ## The over-differencing trap
 
 If one difference is good, are two always better? **No.** Differencing a
-series that's *already* stationary doesn't help — it *injects* artificial
+series that's *already* stationary doesn't help, it *injects* artificial
 structure and inflates the variance. The fingerprint of over-differencing is
 a strong **negative lag-1 autocorrelation** (around `-0.5`) and a variance
 that went *up* instead of down.
@@ -295,7 +295,7 @@ that went *up* instead of down.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A calm blue line with gentle jitter passes one needless extra difference and becomes a violent red sawtooth with twice the spread — over-differencing manufactures negative correlation instead of removing anything"
+  aria-label="A calm blue line with gentle jitter passes one needless extra difference and becomes a violent red sawtooth with twice the spread, over-differencing manufactures negative correlation instead of removing anything"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -363,7 +363,7 @@ print("and doubled the variance. Use the SMALLEST d that achieves stationarity."
 More differencing is not safer. Each unnecessary difference adds noise,
 raises the variance, and stamps a spurious `-0.5` lag-1 autocorrelation onto
 the series that your model will then waste effort "explaining." The goal is
-the **smallest `d`** that makes the series stationary (usually 0, 1, or 2) —
+the **smallest `d`** that makes the series stationary (usually 0, 1, or 2),
 not the `d` that gives the tiniest ADF p-value. If a series is already
 stationary, the correct `d` is **0**.
 </Callout>
@@ -373,7 +373,7 @@ stationary, the correct `d` is **0**.
 
 - The series became more stationary; this is ideal
   > A jump in variance and a strong negative lag-1 autocorrelation are *warning signs*, not signs of success. A well-differenced series has lower or similar variance and near-zero short-lag autocorrelation.
-- [o] It was over-differenced — differencing an already-stationary series injected a spurious negative autocorrelation and inflated the variance
+- [o] It was over-differenced, differencing an already-stationary series injected a spurious negative autocorrelation and inflated the variance
   > Those two symptoms together are the classic over-differencing fingerprint. The fix is to step back to fewer differences (use the minimum \`d\` that reaches stationarity).
 - The seasonal period is wrong
   > A wrong seasonal period shows up as leftover seasonal spikes, not as a uniform +variance and -0.5 lag-1 autocorrelation. This pattern points specifically to over-differencing.
@@ -387,7 +387,7 @@ Inflated variance plus a ~-0.5 lag-1 autocorrelation is the textbook signature o
 
 If you difference a series to model it, you must eventually **undo** the
 difference to get a forecast back on the original scale. The inverse of
-differencing is a **cumulative sum** plus the starting value — a process
+differencing is a **cumulative sum** plus the starting value, a process
 called **integration**. That's literally what the "I" in AR**I**MA stands
 for: *Integrated*, meaning the model works on a differenced series and
 integrates its forecasts back up.
@@ -395,7 +395,7 @@ integrates its forecasts back up.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="From a yellow starting dot, flat green change-tiles are stacked one atop another, column by column, rebuilding the staircase on the right — integration, the cumulative sum plus the starting value, undoes differencing and is the I in ARIMA"
+  aria-label="From a yellow starting dot, flat green change-tiles are stacked one atop another, column by column, rebuilding the staircase on the right, integration, the cumulative sum plus the starting value, undoes differencing and is the I in ARIMA"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -543,9 +543,9 @@ assert manual_sdiff.loc[pd.Timestamp("1950-01-01")] == 3`,
 <ChallengeCard
   adapter="python"
   title="Pick the minimum d (don't over-difference)"
-  instructions={`A series \`s\` is loaded that is stationary after exactly **one** difference. For \`d\` in 0, 1, 2, 3, compute the ADF p-value of the \`d\`-times-differenced series and the lag-1 autocorrelation. Choose \`best_d\`: the **smallest** \`d\` whose ADF p-value is below 0.05 (the minimum differences that achieve stationarity — do NOT just pick the smallest p-value).
+  instructions={`A series \`s\` is loaded that is stationary after exactly **one** difference. For \`d\` in 0, 1, 2, 3, compute the ADF p-value of the \`d\`-times-differenced series and the lag-1 autocorrelation. Choose \`best_d\`: the **smallest** \`d\` whose ADF p-value is below 0.05 (the minimum differences that achieve stationarity, do NOT just pick the smallest p-value).
 
-Also set \`over_diff_ac\` to the lag-1 autocorrelation at \`d = 2\` (one difference too many), which should be clearly negative — the over-differencing signature.`}
+Also set \`over_diff_ac\` to the lag-1 autocorrelation at \`d = 2\` (one difference too many), which should be clearly negative, the over-differencing signature.`}
   files={[
     {
       filename: "main.py",
@@ -596,13 +596,13 @@ print("best_d:", best_d, " over-diff lag-1 ac:", round(over_diff_ac, 3))
 <ChallengeCard
   adapter="python"
   title="One difference makes the Keeling Curve stationary"
-  instructions={`The monthly CO₂ series \`co2\` is non-stationary — its trend dominates everything. Show that a single ordinary difference fixes it.
+  instructions={`The monthly CO₂ series \`co2\` is non-stationary, its trend dominates everything. Show that a single ordinary difference fixes it.
 
 Compute:
 
-- \`co2_diff\` — the first difference \`co2.diff()\` (the month-to-month *change* in CO₂)
-- \`p_raw\` — the ADF p-value of the raw \`co2\` (a float)
-- \`p_diff\` — the ADF p-value of \`co2_diff\` after dropping NaNs (a float)
+- \`co2_diff\`, the first difference \`co2.diff()\` (the month-to-month *change* in CO₂)
+- \`p_raw\`, the ADF p-value of the raw \`co2\` (a float)
+- \`p_diff\`, the ADF p-value of \`co2_diff\` after dropping NaNs (a float)
 
 The raw series should be non-stationary (\`p_raw\` is very high, near 1.0) and the differenced series should be stationary (\`p_diff\` < 0.05). The first value of \`co2_diff\` must be \`NaN\` (there's no earlier month to subtract).`}
   files={[
@@ -675,7 +675,7 @@ The difference of a line is a constant, so first differencing turns a rising lev
 - Difference again with \`diff()\` (a second regular difference)
   > A second *regular* difference targets curvature in the trend, not seasonality. The yearly wobble would survive, and you'd risk over-differencing.
 - [o] Apply a *seasonal* difference, \`diff(12)\`, to subtract each month from the same month a year earlier
-  > Seasonal differencing at the cycle length cancels the repeating yearly pattern against its own prior-year copy — exactly the leftover structure here.
+  > Seasonal differencing at the cycle length cancels the repeating yearly pattern against its own prior-year copy, exactly the leftover structure here.
 - Increase the rolling-window size
   > A larger rolling window smooths for *visualization* but doesn't remove seasonality from the series you'll model. Seasonal differencing is the targeted fix.
 - Re-run the ADF test until it passes
@@ -687,10 +687,10 @@ Leftover seasonality after a regular difference calls for a *seasonal* differenc
 <MultipleChoice
   markdown={`A series tests stationary (ADF p = 0.01) with **no** differencing. What is the appropriate \`d\`?
 
-- [o] d = 0 — it's already stationary, so differencing would only add noise
+- [o] d = 0, it's already stationary, so differencing would only add noise
   > A low ADF p-value with the raw series means stationarity is already satisfied. The correct number of differences is zero; differencing further would over-difference.
 - d = 1, because every series needs at least one difference
-  > Not every series needs differencing — only non-stationary ones. An already-stationary series should be left at d = 0.
+  > Not every series needs differencing, only non-stationary ones. An already-stationary series should be left at d = 0.
 - d = 2, to be safe
   > "To be safe" is exactly the over-differencing mindset. Extra differences inject a spurious negative autocorrelation and inflate variance.
 - Whatever gives the smallest p-value
@@ -703,7 +703,7 @@ If the raw series is already stationary, the right choice is d = 0; more differe
 - **Differencing** (`y.diff()` = `y - y.shift(1)`) models the *change* rather
   than the *level*, which removes a trend because the difference of a line is
   a constant.
-- A **linear** trend needs one difference; a **curved** trend needs two —
+- A **linear** trend needs one difference; a **curved** trend needs two,
   rarely more.
 - **Seasonal differencing** (`y.diff(m)`) removes a cycle of period `m`
   (`diff(12)` for monthly-yearly). The airline recipe is **log → diff(1) →
@@ -712,11 +712,11 @@ If the raw series is already stationary, the right choice is d = 0; more differe
 - **Over-differencing** is real: it inflates variance and stamps a `-0.5`
   lag-1 autocorrelation. Use the **minimum `d`** that reaches stationarity;
   if already stationary, `d = 0`.
-- **Integration** (cumulative sum + starting value) inverts differencing —
+- **Integration** (cumulative sum + starting value) inverts differencing,
   the **"I"** in ARIMA, used to put forecasts back on the original scale.
 </Callout>
 
 We now have a stationary series. But "stationary" only means the *rules* are
-fixed — it doesn't tell us *what* those rules are. To choose a model we need
+fixed, it doesn't tell us *what* those rules are. To choose a model we need
 to read the series' internal echoes: how strongly each value relates to the
 ones before it. That's the job of the ACF and PACF plots.

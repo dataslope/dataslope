@@ -5,16 +5,16 @@ description: Why "pure functions", "immutability", and "data in, data out" lead 
 
 Now that you've met `map`, `filter`, and `reduce`, you've actually
 been doing a kind of programming called **functional
-programming** (FP) — even if no one used the phrase. This chapter
+programming** (FP), even if no one used the phrase. This chapter
 makes the underlying ideas explicit. You don't need to become a
 strict functional programmer to benefit from them; you just need
 the *intuition*.
 
 Three ideas do most of the work:
 
-1. **Pure functions** — same input, same output, no surprises.
-2. **Immutability** — prefer creating new values to mutating old ones.
-3. **Data in, data out** — programs as pipelines of transformations.
+1. **Pure functions**, same input, same output, no surprises.
+2. **Immutability**, prefer creating new values to mutating old ones.
+3. **Data in, data out**, programs as pipelines of transformations.
 
 <svg
   viewBox="0 0 640 200"
@@ -103,16 +103,16 @@ Pure functions are easy to reason about because you only need to
 look at their arguments to predict their output. No hidden state,
 no surprises.
 
-> "Same input, same output" sounds boring. That's the point —
+> "Same input, same output" sounds boring. That's the point,
 > *boring* is exactly the property you want when debugging.
 
 ### Side effects are not evil
 
-Real programs *must* eventually do I/O — print things, save files,
+Real programs *must* eventually do I/O, print things, save files,
 send network requests, update the screen. A program of only pure
 functions would never affect the outside world.
 
-The functional advice is not "never have side effects" — it's
+The functional advice is not "never have side effects", it's
 **push them to the edges of your program** and keep the core
 logic pure.
 
@@ -130,7 +130,7 @@ shape, whether or not the author names it.
 
 A value is **immutable** when, once created, it cannot change.
 JavaScript's primitives (numbers, strings, booleans) *are* already
-immutable — `"hello".toUpperCase()` returns a new string,
+immutable, `"hello".toUpperCase()` returns a new string,
 "hello" itself never changes.
 
 Objects and arrays are *mutable* by default. Functional code
@@ -143,7 +143,7 @@ treats them as if they weren't.
       filename: "main.js",
       starterCode: `// MUTATING style: change the array in place.
 const nums = [1, 2, 3];
-nums.push(4); // nums is now [1,2,3,4] — the SAME array
+nums.push(4); // nums is now [1,2,3,4], the SAME array
 console.log(nums);
 
 // IMMUTABLE style: produce a new array, leave the old one alone.
@@ -155,7 +155,7 @@ console.log(b);
 // Same idea for objects:
 const user = { name: "Ada", age: 28 };
 const olderUser = { ...user, age: user.age + 1 };
-console.log(user); // { name: 'Ada', age: 28 }   — unchanged
+console.log(user); // { name: 'Ada', age: 28 }, unchanged
 console.log(olderUser); // { name: 'Ada', age: 29 }
 `,
     },
@@ -295,7 +295,7 @@ algorithms or performance-critical inner loops.
 ## A practical refactor
 
 Let's take some imperative code and *gradually* make it more
-functional. None of these versions is "wrong" — they're trade-offs.
+functional. None of these versions is "wrong", they're trade-offs.
 
 <CodeBlock
   adapter="javascript"
@@ -309,7 +309,7 @@ functional. None of these versions is "wrong" — they're trade-offs.
   { id: 4, amount: 200, status: "paid" },
 ];
 
-// Version 1 — imperative. Works, but verbose.
+// Version 1, imperative. Works, but verbose.
 function totalPaidV1(orders) {
   let total = 0;
   for (let i = 0; i < orders.length; i++) {
@@ -320,7 +320,7 @@ function totalPaidV1(orders) {
   return total;
 }
 
-// Version 2 — for...of. Cleaner.
+// Version 2, for...of. Cleaner.
 function totalPaidV2(orders) {
   let total = 0;
   for (const order of orders) {
@@ -329,7 +329,7 @@ function totalPaidV2(orders) {
   return total;
 }
 
-// Version 3 — functional. Pipeline of transformations.
+// Version 3, functional. Pipeline of transformations.
 function totalPaidV3(orders) {
   return orders
     .filter((o) => o.status === "paid")
@@ -416,7 +416,7 @@ module.exports = { totalPaid, byCustomer, topCustomer, summarise };
 
 The `summary.js` module is entirely pure. You could test it
 without ever printing anything: feed it orders, inspect the
-returned object. The `index.js` module does the impure part —
+returned object. The `index.js` module does the impure part,
 prints to the terminal.
 
 ## Challenge
@@ -436,7 +436,7 @@ This is a classic immutable update.`}
     {
       filename: "main.js",
       starterCode: `function incrementScores(students, name) {
-  // your code here — no mutation!
+  // your code here, no mutation!
   return students;
 }
 
@@ -511,7 +511,7 @@ if (r[0].score !== 90) throw new Error("should not change unrelated entries");`,
   markdown={`A function is called "pure" when it...
 
 - always returns the same type
-  > Consistent return types are good practice, but purity is about consistent *values* for the same inputs and the absence of side effects — not about type consistency.
+  > Consistent return types are good practice, but purity is about consistent *values* for the same inputs and the absence of side effects, not about type consistency.
 - uses arrow-function syntax
   > Arrow functions are just a syntax shorthand; purity is a behavioural property that applies equally to regular \`function\` declarations and arrow functions.
 - [o] returns the same output for the same input and has no side effects

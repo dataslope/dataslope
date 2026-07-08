@@ -1,9 +1,9 @@
-/* Tailwind entrypoint — shared, opt-in stylesheet.
+/* Tailwind entrypoint, shared, opt-in stylesheet.
  *
  * (Formerly `magicui.css`. Renamed because its job is Tailwind, not Magic UI:
  * it happens to also carry the shadcn/Magic UI design tokens that the
  * components under components/ui reference, but any route importing it does so
- * for the Tailwind utility classes — the header nav, for one, is pure Tailwind
+ * for the Tailwind utility classes, the header nav, for one, is pure Tailwind
  * with no Magic UI component at all.)
  *
  * Why this file exists (and how it relates to app/docs.css):
@@ -11,7 +11,7 @@
  *   The /learn route loads Tailwind because Fumadocs UI depends on it. The
  *   rest of the app is authored with CSS modules + plain CSS and doesn't use
  *   Tailwind. This stylesheet lets ANY route opt into Tailwind (plus the Magic
- *   UI components under components/ui) — import it from that route's layout (or
+ *   UI components under components/ui), import it from that route's layout (or
  *   page):
  *
  *       import "@/app/tailwind.css";
@@ -19,13 +19,13 @@
  *   Next.js scopes a stylesheet to the bundle of the route that imports it, so
  *   routes that don't import it stay Tailwind-free and pay nothing.
  *
- * Heads-up — this includes Tailwind's Preflight (the global base reset), so on
+ * Heads-up, this includes Tailwind's Preflight (the global base reset), so on
  * a route that imports it, Preflight WILL normalize margins/padding/borders/
  * typography for that route's markup. That's intentional (it's what Magic UI
  * components are designed against) and was an accepted trade-off.
  *
- * Everything this root compiles from — the @source list, the dark variant,
- * the design tokens, and the Magic UI keyframes — lives in
+ * Everything this root compiles from, the @source list, the dark variant,
+ * the design tokens, and the Magic UI keyframes, lives in
  * app/tailwind.shared.css, which app/docs.css imports too. That is
  * deliberate and load-bearing: both Tailwind roots must generate the SAME
  * utility layer so that the App Router's unpredictable stylesheet ordering

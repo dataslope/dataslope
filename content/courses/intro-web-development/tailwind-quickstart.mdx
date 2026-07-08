@@ -1,11 +1,11 @@
 ---
-title: Tailwind CSS — Quickstart
-description: Utility-first styling — composing designs from small single-purpose classes instead of writing custom CSS.
+title: "Tailwind CSS: Quickstart"
+description: Utility-first styling, composing designs from small single-purpose classes instead of writing custom CSS.
 ---
 
 You've written CSS by inventing class names (`.card`, `.tier`) and
 styling them in a stylesheet. **Tailwind CSS** flips that around: it
-ships thousands of tiny, single-purpose classes — *utilities* — and
+ships thousands of tiny, single-purpose classes, *utilities*, and
 you compose designs by stacking them directly in your HTML:
 
 ```html
@@ -17,7 +17,7 @@ you compose designs by stacking them directly in your HTML:
 Every class does exactly one thing you already know from the CSS
 lessons: `rounded-lg` sets a border-radius, `bg-blue-600` a
 background color, `px-4` horizontal padding, `py-2` vertical padding.
-Tailwind isn't a replacement for knowing CSS — it's a *shorthand* for
+Tailwind isn't a replacement for knowing CSS, it's a *shorthand* for
 it, and it's everywhere in industry.
 
 The blocks in this lesson have the Tailwind compiler enabled, so
@@ -58,13 +58,13 @@ Some utilities to try in the block above:
 - Layout: `flex`, `grid`, `items-center`, `justify-between`
 - Effects: `shadow-lg`, `rounded-2xl`, `hover:bg-blue-700`
 
-That last one shows a Tailwind superpower — **variants**. Prefixing a
+That last one shows a Tailwind superpower, **variants**. Prefixing a
 utility with `hover:`, `focus:`, or a breakpoint like `md:` applies
 it conditionally. Responsive design becomes `class="text-sm md:text-lg"`.
 
 <Callout type="info" title="How it runs here (and in real projects)">
 These lessons load Tailwind's official in-browser compiler, which
-scans your markup and generates CSS on the fly — perfect for learning
+scans your markup and generates CSS on the fly, perfect for learning
 and prototypes. Production projects run the same scan **at build
 time** instead, shipping only the handful of kilobytes of CSS the
 pages actually use.
@@ -110,7 +110,7 @@ pages actually use.
       id: "flex_row",
       name: "<main> is a centered flex row",
       code: `// Tailwind's in-browser compiler generates its stylesheet just after
-// the page loads — poll briefly so the check never races it.
+// the page loads, poll briefly so the check never races it.
 const main = document.querySelector("main");
 let s = getComputedStyle(main);
 const deadline = Date.now() + 3000;
@@ -119,10 +119,10 @@ while (s.display !== "flex" && Date.now() < deadline) {
   s = getComputedStyle(main);
 }
 if (s.display !== "flex") {
-  throw new Error("Add the 'flex' utility to <main> — computed display is " + s.display + ".");
+  throw new Error("Add the 'flex' utility to <main>, computed display is " + s.display + ".");
 }
 if (s.alignItems !== "center") {
-  throw new Error("Add 'items-center' to <main> — computed align-items is " + s.alignItems + ".");
+  throw new Error("Add 'items-center' to <main>, computed align-items is " + s.alignItems + ".");
 }`,
     },
     {
@@ -130,11 +130,11 @@ if (s.alignItems !== "center") {
       name: "The button is blue with white text",
       code: `const s = getComputedStyle(document.querySelector("button"));
 if (s.color !== "rgb(255, 255, 255)") {
-  throw new Error("Add 'text-white' to the button — computed color is " + s.color + ".");
+  throw new Error("Add 'text-white' to the button, computed color is " + s.color + ".");
 }
 const bg = s.backgroundColor;
 if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") {
-  throw new Error("Add 'bg-blue-600' to the button — it has no background yet.");
+  throw new Error("Add 'bg-blue-600' to the button, it has no background yet.");
 }`,
     },
     {
@@ -143,7 +143,7 @@ if (bg === "rgba(0, 0, 0, 0)" || bg === "transparent") {
       code: `const s = getComputedStyle(document.querySelector("button"));
 const radius = parseFloat(s.borderTopLeftRadius);
 if (!radius || radius < 2) {
-  throw new Error("Add a rounded-* utility to the button — computed radius is " + s.borderTopLeftRadius + ".");
+  throw new Error("Add a rounded-* utility to the button, computed radius is " + s.borderTopLeftRadius + ".");
 }`,
     },
   ]}

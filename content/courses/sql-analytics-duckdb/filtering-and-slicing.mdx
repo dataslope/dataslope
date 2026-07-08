@@ -1,19 +1,19 @@
 ---
 title: Filtering and Slicing
-description: Using WHERE, BETWEEN, IN, and pattern matching to carve a dataset into the exact slice a question needs — and why filtering early is the analyst's habit.
+description: Using WHERE, BETWEEN, IN, and pattern matching to carve a dataset into the exact slice a question needs, and why filtering early is the analyst's habit.
 ---
 
 Profiling tells you what the whole dataset looks like. Most questions,
 though, are about a **part** of it: this region, this month, these
 categories. Carving out that part is **slicing**, and the tool is the
-`WHERE` clause you already know — used with an analyst's intent. This page
+`WHERE` clause you already know, used with an analyst's intent. This page
 sharpens your filtering vocabulary and explains *why* analysts filter as
 early as possible.
 
 <svg
   viewBox="0 0 640 225"
   role="img"
-  aria-label="A yellow cut mark runs across the top of a faint blue isometric cube of data, and past a solid gray arrow the carved slice stands alone as a solid blue slab — WHERE lifts out exactly the part the question asks about"
+  aria-label="A yellow cut mark runs across the top of a faint blue isometric cube of data, and past a solid gray arrow the carved slice stands alone as a solid blue slab, WHERE lifts out exactly the part the question asks about"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -50,7 +50,7 @@ flowchart TD
 
 ## Ranges with `BETWEEN`
 
-Numeric ranges come up constantly — a price band, a carat bracket, an age
+Numeric ranges come up constantly, a price band, a carat bracket, an age
 window. `BETWEEN` reads naturally and is **inclusive** on both ends. Here
 we slice the real diamonds file down to a specific shopping bracket:
 one-carat stones priced between \$4,000 and \$5,000.
@@ -152,7 +152,7 @@ WHERE
 -- email ends in .gov`}
 />
 
-## Combining conditions — and the danger of `AND`/`OR`
+## Combining conditions, and the danger of `AND`/`OR`
 
 Real slices combine conditions. Be careful mixing `AND` and `OR`: `AND`
 binds tighter than `OR`, so without parentheses the query may not mean
@@ -190,13 +190,13 @@ ORDER BY
 />
 
 Without the parentheses, `amount > 100 AND region = 'West' OR region =
-'East'` would also return *every* East order regardless of amount — a
+'East'` would also return *every* East order regardless of amount, a
 classic, silent analytical bug.
 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Gray rows flow along a lane toward a yellow filter gate and come out green, but a solid red bypass arc jumps one row up and over the gate straight into the output — an ungrouped OR quietly lets rows skip the filter"
+  aria-label="Gray rows flow along a lane toward a yellow filter gate and come out green, but a solid red bypass arc jumps one row up and over the gate straight into the output, an ungrouped OR quietly lets rows skip the filter"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -231,7 +231,7 @@ Filtering early is both a performance habit and a clarity habit:
   a table of 10 million. On a column store, a tight `WHERE` lets the engine
   skip whole chunks.
 - **Clearer reasoning.** Once the data is reduced to "the rows this
-  question is about," every later step — grouping, joining, averaging — is
+  question is about," every later step, grouping, joining, averaging, is
   easier to think about.
 
 ```mermaid
@@ -289,8 +289,8 @@ you can.**
   > \`OR\` is perfectly valid; the issue is operator precedence without parentheses.
 
 Because \`AND\` binds tighter than \`OR\`, mixing them without parentheses
-silently changes the meaning — always group explicitly.`}
+silently changes the meaning, always group explicitly.`}
 />
 
 You can now carve any slice you need. Often the next move is to **sort** a
-slice and look at its top or bottom — the subject of the next page.
+slice and look at its top or bottom, the subject of the next page.

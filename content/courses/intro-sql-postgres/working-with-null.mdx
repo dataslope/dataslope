@@ -1,9 +1,9 @@
 ---
 title: Working with NULL
-description: The special value that means "unknown," why it behaves so strangely, and how to test for it correctly — a concept that trips up nearly every beginner.
+description: The special value that means "unknown," why it behaves so strangely, and how to test for it correctly, a concept that trips up nearly every beginner.
 ---
 
-`NULL` is one of the most important — and most misunderstood — ideas
+`NULL` is one of the most important, and most misunderstood, ideas
 in SQL. It is the source of countless beginner bugs. Slow down here:
 a clear understanding of `NULL` will save you real confusion later,
 which is why this page has extra checks at the end.
@@ -62,7 +62,7 @@ which is why this page has extra checks at the end.
 
 ## NULL means "unknown," not "zero" or "empty"
 
-A cell can be **`NULL`**, which means *there is no value here — it is
+A cell can be **`NULL`**, which means *there is no value here, it is
 unknown or missing.* This is **not** the same as zero, and not the
 same as an empty string `''`:
 
@@ -79,12 +79,12 @@ flowchart TB
 
 Imagine a `phone` column. A customer with `phone = ''` told us their
 phone is blank; a customer with `phone = NULL` never told us their
-phone at all. Different meanings — and databases keep them distinct.
+phone at all. Different meanings, and databases keep them distinct.
 
 ## The surprising part: NULL is "contagious"
 
 Because `NULL` means "unknown," any calculation involving it usually
-produces `NULL` — because the answer is genuinely unknown. If you do
+produces `NULL`, because the answer is genuinely unknown. If you do
 not know someone's age, you also do not know "their age plus one."
 
 <SqlCodeBlock
@@ -96,14 +96,14 @@ not know someone's age, you also do not know "their age plus one."
   NULL = NULL AS is_null_equal_null;`}
 />
 
-Look closely at the third column. Even `NULL = NULL` is **not true**
-— it comes back as `NULL` (shown as blank), because "is one unknown
+Look closely at the third column. Even `NULL = NULL` is **not true**,
+it comes back as `NULL` (shown as blank), because "is one unknown
 equal to another unknown?" cannot be answered. This is the trap that
 catches everyone.
 
 There is a name for what you just witnessed: **three-valued
 logic**. In most programming, a comparison is either true or false.
-In SQL there is a third outcome — *unknown* — and it matters
+In SQL there is a third outcome, *unknown*, and it matters
 enormously for filtering, because `WHERE` keeps only the rows where
 the condition is **true**. Not false, and *not unknown*. A
 comparison against `NULL` is always unknown, so the row is dropped.
@@ -113,8 +113,8 @@ That is why the next section's rule exists.
 
 Since `= NULL` does not work, SQL gives you special tests:
 
-- `IS NULL` — true when the value is missing.
-- `IS NOT NULL` — true when the value is present.
+- `IS NULL`, true when the value is missing.
+- `IS NOT NULL`, true when the value is present.
 
 <SqlCodeBlock
   dialect="postgres"
@@ -139,7 +139,7 @@ WHERE
 />
 
 <Callout type="warn" title="WHERE phone = NULL returns nothing">
-A very common bug: writing `WHERE phone = NULL`. It does not error —
+A very common bug: writing `WHERE phone = NULL`. It does not error,
 it just silently matches **no rows**, because the comparison is never
 true. Always use `IS NULL` / `IS NOT NULL` to test for missing
 values.
@@ -147,14 +147,14 @@ values.
 
 ## When NULL escapes into the real world
 
-Mishandled NULLs are not just a beginner's stumble — they cause
+Mishandled NULLs are not just a beginner's stumble, they cause
 real, expensive, occasionally hilarious bugs in production systems.
 The most famous example: in 2016, security researcher **Joseph
 Tartaro** registered a California vanity license plate reading
 `NULL`. He thought of it as a nerdy joke. The joke reversed itself:
 systems that processed traffic citations apparently associated
 tickets that had a *missing* plate value with the literal string
-"NULL" — and Tartaro started receiving **thousands of dollars'
+"NULL", and Tartaro started receiving **thousands of dollars'
 worth of other drivers' tickets**, eventually totaling over
 \$12,000. He told the story at the DEF CON security conference in
 2019, by which point clearing his record had become a recurring
@@ -197,7 +197,7 @@ If `NULL` is so tricky, why have it? Because **"unknown" is a real
 and honest state.** When a customer has not given a phone number,
 forcing in a fake `0` or `''` would *lie* about the data. `NULL`
 lets the database tell the truth: "we do not know." The strange
-behavior is the price of that honesty — and `IS NULL` plus
+behavior is the price of that honesty, and `IS NULL` plus
 `COALESCE` make it manageable.
 
 ```mermaid
@@ -216,7 +216,7 @@ flowchart TD
   > Zero is a known value; \`NULL\` means there is no known value at all.
 - An empty string of text.
   > An empty string \`''\` is a known (if blank) text value; \`NULL\` is the absence of any value.
-- [o] That the value is unknown or missing — there is no value present.
+- [o] That the value is unknown or missing, there is no value present.
   > \`NULL\` represents "we don't know," which is distinct from zero or an empty string.
 - A syntax error in the query.
   > \`NULL\` is a valid, intentional marker for missing data, not an error.
@@ -245,7 +245,7 @@ Comparing \`NULL\` with \`=\` yields \`NULL\`, which is exactly why \`= NULL\` n
 - \`WHERE phone = NULL\`
   > This silently matches no rows, because a comparison with \`NULL\` is never true.
 - \`WHERE phone = ''\`
-  > That matches an empty string, which is a *known* value — not the same as a missing \`NULL\`.
+  > That matches an empty string, which is a *known* value, not the same as a missing \`NULL\`.
 - [o] \`WHERE phone IS NULL\`
   > \`IS NULL\` is the dedicated, correct test for missing values.
 - \`WHERE phone = 'NULL'\`
@@ -324,7 +324,7 @@ ORDER BY
     {
       id: "row_count",
       name: "Returns all four customers",
-      description: "Nobody is filtered out — missing emails get a fallback instead.",
+      description: "Nobody is filtered out, missing emails get a fallback instead.",
       expectedRowCount: 4,
     },
     {

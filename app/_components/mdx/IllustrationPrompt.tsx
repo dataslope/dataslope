@@ -28,7 +28,7 @@ interface IllustrationPromptProps {
   /** What to illustrate, phrased to read naturally after "illustration of"
    *  (e.g. "Brendan Eich", "a person punching holes in a paper punch card"). */
   subject: string;
-  /** Set for a specific real person — appends "(photo attached)" so the prompt
+  /** Set for a specific real person, appends "(photo attached)" so the prompt
    *  signals that a reference photo accompanies the request. Omit for generic
    *  objects/scenes that need no reference image. */
   photo?: boolean;

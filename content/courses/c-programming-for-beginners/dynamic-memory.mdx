@@ -15,7 +15,7 @@ controls are `malloc` and `free`.
 <svg
   viewBox="0 0 640 245"
   role="img"
-  aria-label="A translucent memory pool holding allocated green chunks, one chunk fading as it is freed, and a red chunk drifting outside the pool along a thin trail — a leak"
+  aria-label="A translucent memory pool holding allocated green chunks, one chunk fading as it is freed, and a red chunk drifting outside the pool along a thin trail, a leak"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -44,15 +44,15 @@ controls are `malloc` and `free`.
 
 A running program's memory is split into a few regions:
 
-- **Code** — your compiled instructions.
-- **Globals & constants** — values that live for the whole program.
-- **Heap** — a large pool you grab from with `malloc` and return with
+- **Code**, your compiled instructions.
+- **Globals & constants**, values that live for the whole program.
+- **Heap**, a large pool you grab from with `malloc` and return with
   `free`.
-- **Stack** — where function locals live, one frame per call.
+- **Stack**, where function locals live, one frame per call.
 
 | Stack                                | Heap                              |
 |--------------------------------------|-----------------------------------|
-| Automatic — frame per function call  | Manual — `malloc` / `free`        |
+| Automatic, frame per function call  | Manual, `malloc` / `free`        |
 | Size fixed at compile time           | Size decided at runtime           |
 | Very fast                            | Fast, but slower than stack       |
 | Freed automatically on return        | Lives until **you** free it       |
@@ -71,7 +71,7 @@ returns a pointer to it (or `NULL` if it failed). Always include
 ```c
 int *nums = malloc(10 * sizeof(int));
 if (nums == NULL) {
-    // out of memory — handle it
+    // out of memory, handle it
 }
 // use nums[0]..nums[9]
 free(nums);
@@ -90,7 +90,7 @@ The shape `malloc(N * sizeof(T))` is the canonical form. Read it as
 #include <stdlib.h>
 
 int main(void) {
-  /* In a real program this would come from the user or a file —
+  /* In a real program this would come from the user or a file,
      the point is that it is only known at runtime. Try changing it. */
   int n = 7;
 
@@ -123,13 +123,13 @@ you can ask for exactly as much as you need.
 `free(p)` returns the chunk `p` points at to the heap, so other
 parts of the program can reuse it. It does **not**:
 
-- Set `p` to `NULL` — the variable `p` still holds the same address.
-- Erase the memory — the bytes are still there until something
+- Set `p` to `NULL`, the variable `p` still holds the same address.
+- Erase the memory, the bytes are still there until something
   overwrites them.
 - Tell you whether you'd already freed the chunk.
 
-That's why dangling pointers — pointers to memory that has already
-been freed — are one of the most dangerous bug types in C. A
+That's why dangling pointers, pointers to memory that has already
+been freed, are one of the most dangerous bug types in C. A
 self-discipline that helps: after `free(p)`, immediately do
 `p = NULL;`.
 
@@ -137,10 +137,10 @@ self-discipline that helps: after `free(p)`, immediately do
 
 Two close cousins of `malloc` are worth knowing:
 
-- `calloc(count, size)` — like `malloc(count * size)` but
+- `calloc(count, size)`, like `malloc(count * size)` but
   **zero-initializes** the memory. Useful when you want a clean
   slate.
-- `realloc(p, new_size)` — resize an existing allocation. May move
+- `realloc(p, new_size)`, resize an existing allocation. May move
   it; always reassign:
   `p = realloc(p, new_size);` and check the result before using.
 
@@ -190,7 +190,7 @@ You freed memory, then used the pointer anyway:
 
 ```c
 free(p);
-p[0] = 5;       // UB — that memory is no longer yours
+p[0] = 5;       // UB, that memory is no longer yours
 ```
 
 ### 3. Double-free
@@ -199,7 +199,7 @@ You freed the same pointer twice:
 
 ```c
 free(p);
-free(p);        // UB — corruption of the heap's bookkeeping
+free(p);        // UB, corruption of the heap's bookkeeping
 ```
 
 Tools like Valgrind and AddressSanitizer can catch all three
@@ -415,7 +415,7 @@ The cure is to either not access the memory after \`free\`, or to set \`p = NULL
 - [o] \`calloc(n, sizeof(int))\`
   > \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
 - \`realloc(NULL, n * sizeof(int))\`
-  > Passing \`NULL\` as the first argument to \`realloc\` is equivalent to \`malloc\`—it allocates but does not zero-initialize the new memory.
+  > Passing \`NULL\` as the first argument to \`realloc\` is equivalent to \`malloc\`, it allocates but does not zero-initialize the new memory.
 - \`alloca(n * sizeof(int))\`
   > \`alloca\` allocates on the stack rather than the heap, and it never zero-initializes the memory it returns.
 

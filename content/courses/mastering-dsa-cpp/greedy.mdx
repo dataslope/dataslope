@@ -3,14 +3,14 @@ title: Greedy Algorithms
 description: Learn local-choice algorithms, exchange arguments, and classic greedy problems in C++
 ---
 
-Dynamic programming wins by considering *every* option at every decision point. Greedy algorithms make the opposite bet: at each step, take the choice that looks best **right now**, commit to it forever, and never look back. When the bet is sound, greedy is glorious — no table, no recursion, usually just a sort and a single pass. When the bet is unsound, greedy fails silently, returning a confident wrong answer.
+Dynamic programming wins by considering *every* option at every decision point. Greedy algorithms make the opposite bet: at each step, take the choice that looks best **right now**, commit to it forever, and never look back. When the bet is sound, greedy is glorious, no table, no recursion, usually just a sort and a single pass. When the bet is unsound, greedy fails silently, returning a confident wrong answer.
 
 So this page teaches two skills, and the second matters more: how to write greedy algorithms, and how to know whether you are *allowed* to.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="From the same blue start, a bold yellow line grabs the biggest coin at every step while a thin gray route through smaller coins reaches the green goal too — the locally best choice is not always globally best"
+  aria-label="From the same blue start, a bold yellow line grabs the biggest coin at every step while a thin gray route through smaller coins reaches the green goal too, the locally best choice is not always globally best"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M66 118 C 110 140, 130 148, 150 150 C 210 156, 240 132, 270 130 C 320 128, 360 156, 390 160 C 450 158, 520 130, 556 116" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" />
@@ -48,10 +48,10 @@ flowchart TD
 Greedy works when local choices are provably safe. Advanced theory connects this to matroids; most working proofs use an **exchange argument**, which we will see in action below.
 
 <Callout type="warn" title="Greedy needs proof">
-A local rule that feels right can still fail — and greedy failures don't crash, they just quietly return suboptimal answers.
+A local rule that feels right can still fail, and greedy failures don't crash, they just quietly return suboptimal answers.
 </Callout>
 
-Here is the canonical failure, promised on the DP page. With coins `{1, 3, 4}` and amount `6`, the "obvious" rule — always grab the biggest coin that fits — takes `4+1+1`: three coins. The optimum is `3+3`: two. The greedy rule cannot see that taking the 4 *now* poisons the remainder. (With US denominations `{1, 5, 10, 25}` the same rule happens to be optimal — coin systems with that property are called *canonical* — which makes coin change the perfect cautionary tale: the identical algorithm is correct or incorrect depending on the input universe.)
+Here is the canonical failure, promised on the DP page. With coins `{1, 3, 4}` and amount `6`, the "obvious" rule, always grab the biggest coin that fits, takes `4+1+1`: three coins. The optimum is `3+3`: two. The greedy rule cannot see that taking the 4 *now* poisons the remainder. (With US denominations `{1, 5, 10, 25}` the same rule happens to be optimal, coin systems with that property are called *canonical*, which makes coin change the perfect cautionary tale: the identical algorithm is correct or incorrect depending on the input universe.)
 
 <CodeBlock
   adapter="cpp"
@@ -81,7 +81,7 @@ int main() {
 
 ## Activity selection
 
-Now a greedy that *works*, with the proof technique that shows it. You have one lecture hall and a pile of requested time slots; schedule as many non-overlapping activities as possible. Plausible-sounding rules abound — shortest first? fewest conflicts first? earliest start? All beatable. The winning rule: **always take the activity that ends earliest** among those compatible with what you've chosen, because finishing early preserves the most room for everything after. Sort by end time and scan:
+Now a greedy that *works*, with the proof technique that shows it. You have one lecture hall and a pile of requested time slots; schedule as many non-overlapping activities as possible. Plausible-sounding rules abound, shortest first? fewest conflicts first? earliest start? All beatable. The winning rule: **always take the activity that ends earliest** among those compatible with what you've chosen, because finishing early preserves the most room for everything after. Sort by end time and scan:
 
 ```mermaid
 gantt
@@ -124,7 +124,7 @@ int main() {
   ]}
 />
 
-Why is "earliest end" provably safe? The **exchange argument** goes like this. Take any optimal schedule `O`. Look at its first activity; the greedy choice `g` ends no later than it (greedy picked the earliest ender of all). So swap `g` in for `O`'s first activity: nothing that followed is disturbed — they all started after the old first activity ended, hence after `g` ends too — and the schedule is exactly as large. Therefore *some* optimal schedule starts with the greedy choice; repeat the argument on the rest, and greedy's whole output is optimal. Every greedy proof you will ever write has this shape: "take an optimal solution, exchange one piece for the greedy piece, show it got no worse."
+Why is "earliest end" provably safe? The **exchange argument** goes like this. Take any optimal schedule `O`. Look at its first activity; the greedy choice `g` ends no later than it (greedy picked the earliest ender of all). So swap `g` in for `O`'s first activity: nothing that followed is disturbed, they all started after the old first activity ended, hence after `g` ends too, and the schedule is exactly as large. Therefore *some* optimal schedule starts with the greedy choice; repeat the argument on the rest, and greedy's whole output is optimal. Every greedy proof you will ever write has this shape: "take an optimal solution, exchange one piece for the greedy piece, show it got no worse."
 
 ```mermaid
 flowchart TD
@@ -135,7 +135,7 @@ flowchart TD
 
 ## Fractional knapsack
 
-A pleasing contrast with the DP chapter: 0/1 knapsack *requires* dynamic programming, but allow items to be split — you can take half the sack of flour — and greedy suddenly becomes correct. Sort by value-per-kilogram and take the densest item until it runs out or the bag fills, topping off with a fraction of the next. Divisibility is what saves the local rule: there is never a "this dense item doesn't quite fit, should I have skipped it?" regret, because you take exactly the part that fits. A tiny change in the problem's rules flips which paradigm applies — worth remembering in interviews.
+A pleasing contrast with the DP chapter: 0/1 knapsack *requires* dynamic programming, but allow items to be split, you can take half the sack of flour, and greedy suddenly becomes correct. Sort by value-per-kilogram and take the densest item until it runs out or the bag fills, topping off with a fraction of the next. Divisibility is what saves the local rule: there is never a "this dense item doesn't quite fit, should I have skipped it?" regret, because you take exactly the part that fits. A tiny change in the problem's rules flips which paradigm applies, worth remembering in interviews.
 
 <CodeBlock
   adapter="cpp"
@@ -175,7 +175,7 @@ int main() {
 
 ## Jump game
 
-Some greedy solutions need no sort at all — just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route — track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, O(1) space.
+Some greedy solutions need no sort at all, just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route, track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, O(1) space.
 
 <CodeBlock
   adapter="cpp"
@@ -206,9 +206,9 @@ int main() {
 
 ## Huffman coding
 
-The most consequential greedy algorithm ever devised was a homework dodge. In 1951, David Huffman was a graduate student in Robert Fano's information theory course at MIT, where students could either take the final exam or solve a term-paper problem: construct the most efficient binary code for a set of symbols with known frequencies. What Huffman didn't know was that Fano himself — with Claude Shannon — had attacked the problem and settled for a suboptimal method. Huffman struggled for months and was about to give up and study for the exam when the insight arrived: build the code tree *bottom-up*, greedily merging the two least frequent symbols, again and again. The result was provably optimal, outdoing his professor, and Huffman coding still runs inside ZIP, JPEG, and MP3 files today.
+The most consequential greedy algorithm ever devised was a homework dodge. In 1951, David Huffman was a graduate student in Robert Fano's information theory course at MIT, where students could either take the final exam or solve a term-paper problem: construct the most efficient binary code for a set of symbols with known frequencies. What Huffman didn't know was that Fano himself, with Claude Shannon, had attacked the problem and settled for a suboptimal method. Huffman struggled for months and was about to give up and study for the exam when the insight arrived: build the code tree *bottom-up*, greedily merging the two least frequent symbols, again and again. The result was provably optimal, outdoing his professor, and Huffman coding still runs inside ZIP, JPEG, and MP3 files today.
 
-The implementation is a priority-queue loop: repeatedly extract the two smallest frequencies, merge them, and push the sum back. (The full algorithm builds tree nodes; the version below computes just the total encoding cost — each merge's sum is the number of bits that merge contributes.)
+The implementation is a priority-queue loop: repeatedly extract the two smallest frequencies, merge them, and push the sum back. (The full algorithm builds tree nodes; the version below computes just the total encoding cost, each merge's sum is the number of bits that merge contributes.)
 
 ```mermaid
 graph TD
@@ -252,7 +252,7 @@ int main() {
 
 ## Minimum platforms
 
-A final greedy flavor: the **sweep**. Given train arrival and departure times, how many platforms must the station have? Imagine time flowing forward: each arrival is +1 platform in use, each departure is −1, and the answer is the highest the counter ever reaches. Sort arrivals and departures separately and merge-walk them with two pointers — at each step, whichever event happens first adjusts the counter.
+A final greedy flavor: the **sweep**. Given train arrival and departure times, how many platforms must the station have? Imagine time flowing forward: each arrival is +1 platform in use, each departure is −1, and the answer is the highest the counter ever reaches. Sort arrivals and departures separately and merge-walk them with two pointers, at each step, whichever event happens first adjusts the counter.
 
 <CodeBlock
   adapter="cpp"
@@ -339,7 +339,7 @@ int main() {
 
 <ChallengeCard
   adapter="cpp"
-  title="Jump game — can reach end"
+  title="Jump game, can reach end"
   instructions={`Implement \`bool canJump(const std::vector<int>& nums)\`.`}
   files={[
     {

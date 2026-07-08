@@ -1,9 +1,9 @@
 ---
-title: Challenge Cards — SQLite
+title: "Challenge Cards: SQLite"
 description: Sandbox for `<SqlChallengeCard dialect="sqlite">` variations.
 ---
 
-SQLite challenges run via **@sqlite.org/sqlite-wasm** — the official
+SQLite challenges run via **@sqlite.org/sqlite-wasm**, the official
 WebAssembly build, in-process, in your browser.
 
 ## 1. Basic SELECT
@@ -245,7 +245,7 @@ ORDER BY
 <SqlChallengeCard
   dialect="sqlite"
   title="Insert a new user"
-  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
+  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\`, it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,
   name  TEXT NOT NULL,
@@ -278,7 +278,7 @@ INSERT INTO users (name, email) VALUES
 <SqlChallengeCard
   dialect="sqlite"
   title="Insert a new user"
-  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\` — it auto-increments.`}
+  instructions={`Insert a single new row into \`users\` with \`name = 'Carol'\` and \`email = 'carol@example.com'\`. You do not need to specify the \`id\`, it auto-increments.`}
   initSql={`CREATE TABLE users (
   id    INTEGER PRIMARY KEY AUTOINCREMENT,
   name  TEXT NOT NULL,
@@ -312,7 +312,7 @@ INSERT INTO users (name, email) VALUES
 ## 4. Large result sets (infinite scroll)
 
 The result pane virtualises its rows so a `SELECT *` against a 10k-row
-table stays responsive — only the rows actually inside the viewport
+table stays responsive, only the rows actually inside the viewport
 are rendered. The **Tables** viewer above the editor pages its rows
 in on scroll (infinite scroll) rather than loading all 10,000 up front.
 
@@ -406,11 +406,11 @@ ORDER BY
 />
 ```
 
-## 5. Remote dataset — Northwind from GitHub
+## 5. Remote dataset, Northwind from GitHub
 
 `remoteInitSql` clones a complete sample database from the
 [dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
-before the first run — here the classic **Northwind** store. The script
+before the first run, here the classic **Northwind** store. The script
 is fetched from raw.githubusercontent.com, so the card embeds no seed
 SQL at all; `initSql` (when present) still runs afterwards for
 challenge-specific extras.
@@ -418,7 +418,7 @@ challenge-specific extras.
 <SqlChallengeCard
   dialect="sqlite"
   title="Five most expensive products"
-  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products — columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products, columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
   remoteInitSql="sqlite/northwind_sqlite.sql"
   tables={["Products", "Categories", "Suppliers"]}
   starterCode={`-- Your query here:
@@ -462,7 +462,7 @@ LIMIT
 <SqlChallengeCard
   dialect="sqlite"
   title="Five most expensive products"
-  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products — columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products, columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
   remoteInitSql="sqlite/northwind_sqlite.sql"
   tables={["Products", "Categories", "Suppliers"]}
   starterCode={`-- Your query here:

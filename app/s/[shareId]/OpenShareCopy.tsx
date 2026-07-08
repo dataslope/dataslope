@@ -82,7 +82,7 @@ export function OpenShareCopy({
         </p>
       )}
       <p className="mt-3 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-        Opening creates your own private copy — nothing you do affects the
+        Opening creates your own private copy, nothing you do affects the
         shared original.
       </p>
     </div>

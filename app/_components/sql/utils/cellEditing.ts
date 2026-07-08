@@ -9,7 +9,7 @@
  *  pure *enhancement* over the existing free-text inline editor. To guarantee
  *  an edit is at least as safe as typing the ISO text by hand, the picker
  *  reconstructs the committed string by substituting only the date and time
- *  substrings of the *original* value — preserving its separator (`T` vs a
+ *  substrings of the *original* value, preserving its separator (`T` vs a
  *  space), fractional seconds, and timezone suffix (`Z` / `+05:30`). The
  *  engine produced that format, so it always parses it back. No JS `Date`
  *  timezone arithmetic is performed, which is the usual source of off-by-an-
@@ -77,7 +77,7 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
 
 /** Normalize an array cell's stored value to JSON text for editing. Array
  *  values reach the grid as JSON strings (both adapters JSON-stringify them),
- *  but a value may also be a live JS array — handle both. */
+ *  but a value may also be a live JS array, handle both. */
 export function arrayEditorText(value: unknown): string {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
@@ -103,7 +103,7 @@ export function parseArrayEditValue(text: string): {
     const parsed: unknown = JSON.parse(text);
     if (Array.isArray(parsed)) return { ok: true, value: parsed };
   } catch {
-    // not valid JSON — fall through
+    // not valid JSON, fall through
   }
   return { ok: false, value: [] };
 }
@@ -113,7 +113,7 @@ export type TemporalEditorKind = "date" | "datetime" | "time";
 
 /** Does a stored temporal value carry a real (non-midnight) time-of-day?
  *
- *  A column may be declared `date` yet hold a value with a meaningful time —
+ *  A column may be declared `date` yet hold a value with a meaningful time,
  *  this is common with flexibly-typed engines (SQLite stores whatever string
  *  you give it) and also happens when a value like `2024-03-15 14:30:00` lands
  *  in a date-ish column. In those cases a date-only `<input type="date">`
@@ -169,7 +169,7 @@ function timePart(s: string): string | null {
 /** Convert a stored cell value into the string a native date/time input
  *  expects, or `null` if the value isn't a recognizable temporal string (in
  *  which case the caller should fall back to the plain text editor, so odd
- *  representations — e.g. a SQLite date stored as a Unix integer — are never
+ *  representations, e.g. a SQLite date stored as a Unix integer, are never
  *  silently mangled). */
 export function toDateEditorValue(
   stored: unknown,

@@ -1,6 +1,6 @@
 ---
 title: Inserting, Updating, and Deleting Data
-description: How rows get into a table and how they change — INSERT, UPDATE, and DELETE — and why WHERE is the most important word on this page.
+description: How rows get into a table and how they change, INSERT, UPDATE, and DELETE, and why WHERE is the most important word on this page.
 ---
 
 A table is only useful once it holds data. This page covers the
@@ -116,7 +116,7 @@ A few things to absorb:
 ## UPDATE: changing existing rows
 
 `UPDATE` changes values in rows that already exist. You set new
-values with `SET`, and — crucially — you say *which* rows with
+values with `SET`, and, crucially, you say *which* rows with
 `WHERE`:
 
 <SqlCodeBlock
@@ -240,11 +240,11 @@ painful mistakes for the rest of your data career.
 - It does nothing because a \`WHERE\` is required.
   > A \`WHERE\` is *not* required, which is exactly why this is dangerous; the statement runs and affects everything.
 - [o] It deletes every row in the \`tasks\` table.
-  > With no \`WHERE\` to limit it, the deletion applies to all rows — a common and costly beginner mistake.
+  > With no \`WHERE\` to limit it, the deletion applies to all rows, a common and costly beginner mistake.
 - It deletes the table's structure as well as its rows.
   > Removing the table itself is \`DROP TABLE\`; \`DELETE\` removes rows but leaves the (now empty) table.
 
-Without \`WHERE\`, \`DELETE\` and \`UPDATE\` apply to every row — always scope them deliberately.`}
+Without \`WHERE\`, \`DELETE\` and \`UPDATE\` apply to every row, always scope them deliberately.`}
 />
 
 <MultipleChoice

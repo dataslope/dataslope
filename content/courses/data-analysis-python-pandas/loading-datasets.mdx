@@ -1,6 +1,6 @@
 ---
 title: Loading Datasets
-description: Reading real CSV, Excel, JSON, and Parquet data into Pandas — including from URLs — and the most common pitfalls that hit you in the first five seconds.
+description: Reading real CSV, Excel, JSON, and Parquet data into Pandas, including from URLs, and the most common pitfalls that hit you in the first five seconds.
 ---
 
 This is where the hands-on work begins. Almost every analysis
@@ -11,7 +11,7 @@ unhappy paths.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A flat text file of value bars separated by comma dots flows along an arrow into a tidy grid with a blue header row and colored values — read_csv turning text into a DataFrame"
+  aria-label="A flat text file of value bars separated by comma dots flows along an arrow into a tidy grid with a blue header row and colored values, read_csv turning text into a DataFrame"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="40" width="170" height="150" rx="10" fill="currentColor" opacity="0.08" />
@@ -77,15 +77,15 @@ unhappy paths.
 
 ## The two functions you will use most
 
-- `pd.read_csv(path_or_url)` — the workhorse. CSV is the
+- `pd.read_csv(path_or_url)`, the workhorse. CSV is the
   universal data format.
-- `pd.read_excel(path_or_url)` — for `.xlsx` files.
+- `pd.read_excel(path_or_url)`, for `.xlsx` files.
 
 Honorable mentions:
 
-- `pd.read_json` — JSON, often after some flattening.
-- `pd.read_parquet` — Parquet files (a fast columnar format).
-- `pd.read_sql` — query results from a SQL database.
+- `pd.read_json`, JSON, often after some flattening.
+- `pd.read_parquet`, Parquet files (a fast columnar format).
+- `pd.read_sql`, query results from a SQL database.
 
 For the rest of the course we will lean on `read_csv` because the
 data we will use lives on the public internet as CSVs.
@@ -97,8 +97,8 @@ Our main companion dataset for the course is **Palmer Penguins**:
 collected by Dr. Kristen Gorman at the Palmer Station Long-Term
 Ecological Research site, and packaged by Allison Horst and
 colleagues as a friendly, ethically-uncomplicated alternative to
-the famous old iris flower dataset. It is small, it is real, and —
-crucially for a course that takes data cleaning seriously — it has a
+the famous old iris flower dataset. It is small, it is real, and,
+crucially for a course that takes data cleaning seriously, it has a
 few genuinely missing values. We will get to know it well.
 
 ## Reading from a URL
@@ -115,7 +115,7 @@ can see how it works:
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# Direct URL — works because raw.githubusercontent.com supports CORS
+# Direct URL, works because raw.githubusercontent.com supports CORS
 penguins = pd.read_csv(
     "https://raw.githubusercontent.com/dataslope/datasets/main/palmer-penguins.csv"
 )
@@ -131,7 +131,7 @@ penguins.head(3)
 Two notes:
 
 1. **Use the raw URL.** Browsers show GitHub *HTML pages* at
-   `github.com/.../file.csv` — that is not the file itself. The raw
+   `github.com/.../file.csv`, that is not the file itself. The raw
    version starts with `raw.githubusercontent.com` and returns the
    actual bytes.
 2. **Some hosts don't allow direct browser fetches.** For those you
@@ -140,7 +140,7 @@ Two notes:
 For the rest of the course, instead of hardcoding URLs we will
 *stage* the file as a local `penguins.csv` (you will see it loaded
 with `pd.read_csv("penguins.csv")`). That keeps the lesson code
-clean and is closer to how you will work on your own machine —
+clean and is closer to how you will work on your own machine,
 where the data is a file on disk, not a URL.
 
 ## Common `read_csv` options
@@ -190,7 +190,7 @@ Two things to notice:
 
 - `usecols` saves memory by skipping columns we do not need.
 - `dtype` with `"category"` for repeated string columns (`species`,
-  `island`, `sex`) saves memory and speeds up later groupings —
+  `island`, `sex`) saves memory and speeds up later groupings,
   there are only a handful of distinct values across hundreds of
   rows.
 
@@ -207,34 +207,34 @@ Whenever you load a new dataset, run these three commands
       filename: "main.py",
       initCode: `import pandas as pd
 penguins = pd.read_csv("penguins.csv")`,
-      starterCode: `# 1. Shape — do you have the rows you expected?
+      starterCode: `# 1. Shape, do you have the rows you expected?
 print("Shape:", penguins.shape)
 print()
 
-# 2. Head — does each column look sensible?
+# 2. Head, does each column look sensible?
 print(penguins.head())
 print()
 
-# 3. Dtypes — are the types right?
+# 3. Dtypes, are the types right?
 print(penguins.dtypes)
 `,
     },
   ]}
 />
 
-If any of those three looks wrong — surprising row count,
-garbled values, wrong types — fix it now. The cost of fixing a
+If any of those three looks wrong, surprising row count,
+garbled values, wrong types, fix it now. The cost of fixing a
 loading bug is much lower at this moment than three steps later.
 
 ## When a URL won't load directly
 
 Reading from a URL only works when the host returns the right
-permission headers (the technical name is **CORS** — cross-origin
+permission headers (the technical name is **CORS**, cross-origin
 resource sharing). `raw.githubusercontent.com` does;
 `github.com/.../file.csv` (the HTML page) does not, and neither do
 many private servers. When a browser-side fetch is blocked, the
-usual fix is to route the request through a small **CORS proxy** — a
-relay that adds the missing headers — by URL-encoding the real
+usual fix is to route the request through a small **CORS proxy**, a
+relay that adds the missing headers, by URL-encoding the real
 address into a `?url=...` parameter:
 
 ```python
@@ -249,7 +249,7 @@ df = pd.read_csv(proxy + real)
 When you have a choice, **prefer the direct
 `raw.githubusercontent.com` URL** (or, as in this course, a staged
 local file). A proxy is a workaround for the cases where you do
-not. On your own laptop the problem usually disappears entirely —
+not. On your own laptop the problem usually disappears entirely,
 local Python is not a browser and is not bound by CORS at all.
 
 ## Reading Excel files
@@ -302,7 +302,7 @@ print(df.dtypes)
   ]}
 />
 
-For deeply nested JSON, use `pd.json_normalize(...)` — it
+For deeply nested JSON, use `pd.json_normalize(...)`, it
 recursively flattens nested objects into columns with
 dot-separated names.
 
@@ -425,7 +425,7 @@ assert isinstance(df["island"].dtype, pd.CategoricalDtype)`,
 - They are identical
   > The two URLs serve different content: the first is a GitHub webpage with HTML, JavaScript, and navigation; the second is the raw file bytes.
 - The first is faster
-  > The first URL typically returns more data (a full HTML page) than the second (the raw file), so it is not faster — and passing HTML to \`pd.read_csv\` causes a parse error.
+  > The first URL typically returns more data (a full HTML page) than the second (the raw file), so it is not faster, and passing HTML to \`pd.read_csv\` causes a parse error.
 - [o] The first returns the GitHub HTML page that *displays* the file; the second returns the file's raw bytes
   > Always use the raw URL for \`pd.read_csv\` so you get the data and not the HTML.
 - The second requires authentication
@@ -442,7 +442,7 @@ You will hit this distinction the very first time you try to load data from a Gi
 - [o] Repeated string values are stored once with integer codes, which saves memory and speeds up grouping
   > \`category\` is essentially an interned-string column, ideal for low-cardinality repeated values.
 - It allows the column to hold any type
-  > The \`category\` dtype is more restrictive, not more permissive — it represents a fixed set of values (the categories), not arbitrary types.
+  > The \`category\` dtype is more restrictive, not more permissive, it represents a fixed set of values (the categories), not arbitrary types.
 - It is required by Pandas
   > \`category\` is an optional optimization; Pandas defaults to \`object\` dtype for string columns and works fine without it.
 
@@ -459,7 +459,7 @@ For columns with millions of rows and only a handful of distinct values, the sav
 - [o] Pass \`dtype={"phone": "string"}\` to \`pd.read_csv\` so the values are read as strings from the start
   > Once a leading-zero phone or ZIP code has been parsed as int, the leading zeros are gone. Force the string type at read time.
 - Use \`.astype("int64")\` afterwards
-  > Converting to \`int64\` after the fact moves in the wrong direction — phone numbers should be strings, and the column is already an integer at this point.
+  > Converting to \`int64\` after the fact moves in the wrong direction, phone numbers should be strings, and the column is already an integer at this point.
 
 Specifying \`dtype\` at read time is much safer than trying to recover later.`}
 />
@@ -470,7 +470,7 @@ Specifying \`dtype\` at read time is much safer than trying to recover later.`}
 - Load the whole thing and wait
   > Loading 5 GB into memory without first understanding the file's structure risks out-of-memory errors and wastes time before you even know what columns you need.
 - Open it in Excel
-  > Excel cannot open a 5 GB CSV — it would hit its row limit or run out of memory long before loading the full file.
+  > Excel cannot open a 5 GB CSV, it would hit its row limit or run out of memory long before loading the full file.
 - [o] Use \`pd.read_csv(path, nrows=1000)\` to load a preview, then plan the real load (dtypes, usecols) based on what you see
   > A small preview is the cheapest way to design a defensible full load.
 - Convert it to JSON first

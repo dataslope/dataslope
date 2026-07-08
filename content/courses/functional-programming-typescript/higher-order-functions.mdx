@@ -1,6 +1,6 @@
 ---
 title: Higher-Order Functions
-description: Functions that take functions, return functions, or both — the universal mechanism for abstraction in FP.
+description: Functions that take functions, return functions, or both, the universal mechanism for abstraction in FP.
 ---
 
 A **higher-order function** is a function that does at least one of
@@ -17,7 +17,7 @@ replace whole categories of boilerplate with one-line calls.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Interchangeable chips marked lambda, f, and plus hover over a slot in a machine that turns an input dot into an output dot — higher-order functions accept behavior as a pluggable value"
+  aria-label="Interchangeable chips marked lambda, f, and plus hover over a slot in a machine that turns an input dot into an output dot, higher-order functions accept behavior as a pluggable value"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -53,7 +53,7 @@ replace whole categories of boilerplate with one-line calls.
 ## Functions as values: the prerequisite
 
 For higher-order functions to make sense, the language has to treat
-functions as **first-class values** — things you can store in
+functions as **first-class values**, things you can store in
 variables, pass to other functions, return, and put in data
 structures. TypeScript inherited this from JavaScript, which
 inherited it from Scheme.
@@ -85,7 +85,7 @@ console.log(dispatch["square"](6));
 />
 
 The fact that `(x: number) => number` is a *type* you can use
-anywhere — as an array element, a record value, a parameter — is
+anywhere, as an array element, a record value, a parameter, is
 what makes everything else in this chapter possible.
 
 ## Functions that take functions: the classic combinators
@@ -249,7 +249,7 @@ console.log(v2("hi@there")); // null
   ]}
 />
 
-These returned functions are **closures** — they capture variables
+These returned functions are **closures**, they capture variables
 from the enclosing scope (`amount`, `n`, `re`, `message`). Closures
 are the technical mechanism that makes "function-returning-function"
 useful.
@@ -258,8 +258,8 @@ useful.
 
 Returning a function that wraps another function is called a
 **decorator** (the FP sense, unrelated to TypeScript's `@decorator`
-syntax). It lets you add cross-cutting concerns — logging, timing,
-retries, memoization, throttling — without modifying the inner
+syntax). It lets you add cross-cutting concerns, logging, timing,
+retries, memoization, throttling, without modifying the inner
 function.
 
 <CodeBlock
@@ -402,9 +402,9 @@ both flexibility *and* safety: behavior is a parameter, but it's a
   title="Build a tiny validator library"
   instructions={`In \`validators.ts\`, implement three higher-order helpers:
 
-- \`every(...vs)\` — combine validators; returns the first error or \`null\`.
-- \`when(pred, v)\` — run validator \`v\` only when \`pred(value)\` is true.
-- \`mapInput(f, v)\` — adapt a validator from one type to another (e.g. validate \`s.length\` with a number validator).
+- \`every(...vs)\`, combine validators; returns the first error or \`null\`.
+- \`when(pred, v)\`, run validator \`v\` only when \`pred(value)\` is true.
+- \`mapInput(f, v)\`, adapt a validator from one type to another (e.g. validate \`s.length\` with a number validator).
 
 Then validate the sample data in \`main.ts\`.
 
@@ -513,5 +513,5 @@ export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
 - A function annotated with TypeScript generics
   > Generic and higher-order are different concepts. A function can be one without the other (though they often appear together).
 
-The defining feature is that *functions themselves flow through the function* — as inputs, outputs, or both.`}
+The defining feature is that *functions themselves flow through the function*, as inputs, outputs, or both.`}
 />

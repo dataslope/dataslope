@@ -11,18 +11,18 @@ import { loadCheerpJ, TOOLS_JAR_VFS_PATH, type CheerpJApi } from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
 
 // Run Java in the browser via CheerpJ
-// (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
+// (https://cheerpj.com/), a full OpenJDK runtime + JIT compiled to
 // WebAssembly. CheerpJ does not ship `tools.jar`, so we fetch a Java 8
 // `tools.jar` from a CDN and mount it in CheerpJ's /str/ filesystem at
 // runtime (see cheerpj.ts); we then drive `javac`
 // (`com.sun.tools.javac.Main`) on user source and run the compiled main
-// class with `cheerpjRunMain` — the JavaFiddle approach
+// class with `cheerpjRunMain`, the JavaFiddle approach
 // (https://github.com/leaningtech/javafiddle).
 //
 // This adapter targets Java 8 because that is what the bundled
 // `tools.jar` compiles against. Java 8 is the lingua franca of
 // online Java tutorials (lambdas, streams, Optional, java.time are
-// all there) — so the playground covers what most learners need
+// all there), so the playground covers what most learners need
 // without pulling in newer-language features (records, var, text
 // blocks) that would fail to compile.
 
@@ -234,7 +234,7 @@ function hasJavaMain(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the Java 8 standard library — always available, no
+  // Highlights from the Java 8 standard library, always available, no
   // install step. Clicking inserts the corresponding `import` at the
   // top of the editor.
   {
@@ -265,7 +265,7 @@ public class Main {
     color: "#34d399",
     name: "java.util.stream",
     ver: "Java 8",
-    desc: "Stream, Collectors, IntStream — functional pipelines.",
+    desc: "Stream, Collectors, IntStream, functional pipelines.",
     example: `import java.util.*;
 import java.util.stream.*;
 
@@ -445,8 +445,8 @@ public class Main {
 ];
 
 // CheerpJ's classpath: tools.jar is fetched from the CDN and mounted in
-// CheerpJ's /str/ FS at TOOLS_JAR_VFS_PATH (see cheerpj.ts) — it contains
-// com.sun.tools.javac.Main — and we compile user code into /files/. Both
+// CheerpJ's /str/ FS at TOOLS_JAR_VFS_PATH (see cheerpj.ts), it contains
+// com.sun.tools.javac.Main, and we compile user code into /files/. Both
 // must be on the classpath when running both javac and the user's main
 // class.
 const CLASSPATH = `${TOOLS_JAR_VFS_PATH}:/files/`;
@@ -471,7 +471,7 @@ function findMainClassName(source: string): string {
     /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
   const classes: { name: string; start: number; isPublic: boolean }[] = [];
   for (let m; (m = classRegex.exec(cleaned)) !== null; ) {
-    // Skip nested classes — count unmatched `{` before this match to get
+    // Skip nested classes, count unmatched `{` before this match to get
     // brace depth; depth > 0 means we are inside another class body.
     // String/char literals and comments have already been stripped from
     // `cleaned`, so stray braces from those sources are not a concern.
@@ -524,10 +524,10 @@ class JavaRuntime implements LanguageRuntime {
   // Capture javac's diagnostics + a program's output by intercepting
   // console.log / console.error for the duration of one cheerpjRunMain
   // invocation. CheerpJ writes Java's System.out/System.err to those
-  // globals (verified in cj3.js — there's no other println sink to
+  // globals (verified in cj3.js, there's no other println sink to
   // hook); it forwards each underlying `write` as one console.log call
   // and includes the chunk's own newline bytes (so `println("x")`
-  // arrives as "x\n"). We therefore concatenate the args verbatim —
+  // arrives as "x\n"). We therefore concatenate the args verbatim,
   // adding our own "\n" per call would produce a blank line between
   // every chunk. The wrap+restore is in a try/finally so a thrown error
   // during `await` can't leave the page's console permanently patched.
@@ -558,7 +558,7 @@ class JavaRuntime implements LanguageRuntime {
    *  on the learner's first Run.
    *
    *  `cheerpjInit` (in `loadCheerpJ`) only bootstraps the CheerpJ
-   *  runtime — it does NOT load `tools.jar`, `javac`, or the core
+   *  runtime, it does NOT load `tools.jar`, `javac`, or the core
    *  OpenJDK classes. Those are pulled in (and JIT-compiled) lazily on
    *  the *first* `cheerpjRunMain` call, which without this warm-up is
    *  the user's first Run: that one execution paid the whole
@@ -596,7 +596,7 @@ class JavaRuntime implements LanguageRuntime {
         );
       }
     } catch {
-      // Warm-up is best-effort — never let it block real runs.
+      // Warm-up is best-effort, never let it block real runs.
     }
   }
 
@@ -605,7 +605,7 @@ class JavaRuntime implements LanguageRuntime {
     for (const [path, bytes] of files) {
       // Only stage .java files; skip binary data files.
       if (!path.endsWith(".java")) continue;
-      // Use only the basename (no subdirectory) — CheerpJ's /str/
+      // Use only the basename (no subdirectory), CheerpJ's /str/
       // is a flat virtual filesystem, and javac is invoked with
       // individual file paths rather than a source root.
       const filename = path.includes("/") ? path.split("/").pop()! : path;
@@ -657,7 +657,7 @@ class JavaRuntime implements LanguageRuntime {
 
     // 3) Capture javac's diagnostics + the program's output via the
     //    shared `runWithCapture` helper (which intercepts console.log /
-    //    console.error — CheerpJ's only println sink). `printf("%a
+    //    console.error, CheerpJ's only println sink). `printf("%a
     //    %b%n", …)` triggers several writes per logical line, so the
     //    helper concatenates chunks verbatim rather than adding newlines.
 
@@ -682,7 +682,7 @@ class JavaRuntime implements LanguageRuntime {
     if (diag) emit({ type: "stderr", content: diag });
 
     if (javacResult.exitCode !== 0) {
-      // Compilation failed — `diag` already explains why; nothing to
+      // Compilation failed, `diag` already explains why; nothing to
       // run.
       return;
     }
@@ -717,7 +717,7 @@ export const javaAdapter: LanguageAdapter = {
     engine: "CheerpJ (OpenJDK + javac, WebAssembly)",
     engineUrl: "https://cheerpj.com/",
     notes:
-      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ — a full OpenJDK runtime in WebAssembly. No server roundtrip. Pure-AOT alternatives like TeaVM aren't a fit for an in-browser playground because they require a JVM at compile time.",
+      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ, a full OpenJDK runtime in WebAssembly. No server roundtrip. Pure-AOT alternatives like TeaVM aren't a fit for an in-browser playground because they require a JVM at compile time.",
   },
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.
@@ -727,7 +727,7 @@ export const javaAdapter: LanguageAdapter = {
   coldDownloadMB: 30,
   // Compiles (javac) on every run, so later runs are faster, not instant.
   compiled: true,
-  // clang-format LLVM style (see formatCode) — keep in sync.
+  // clang-format LLVM style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -758,7 +758,7 @@ export const javaAdapter: LanguageAdapter = {
       >
         Java SE 8 standard library
       </a>{" "}
-      and ship with CheerpJ&apos;s OpenJDK runtime — no install step needed.
+      and ship with CheerpJ&apos;s OpenJDK runtime, no install step needed.
     </>
   ),
   importSnippet: (name) => `import ${name}.*;`,
@@ -784,8 +784,8 @@ export const javaAdapter: LanguageAdapter = {
     // Compile + run a throwaway program now so the first user Run
     // doesn't pay the one-time tools.jar + javac + runtime class-load +
     // JIT cost (see `JavaRuntime.warmUp`). Done before resolving init so
-    // the boot notice stays up — and `isRuntimeReady` only reports ready
-    // — once the JVM can actually run code without a multi-second stall.
+    // the boot notice stays up, and `isRuntimeReady` only reports ready
+    //, once the JVM can actually run code without a multi-second stall.
     await runtime.warmUp(setLoadingMessage);
     return runtime;
   },

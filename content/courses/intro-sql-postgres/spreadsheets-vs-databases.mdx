@@ -1,6 +1,6 @@
 ---
 title: Spreadsheets vs. Databases
-description: Why spreadsheets are wonderful — until they aren't — and the specific moments when a relational database becomes the right tool.
+description: Why spreadsheets are wonderful, until they aren't, and the specific moments when a relational database becomes the right tool.
 ---
 
 Spreadsheets are one of the most successful tools ever made. They
@@ -63,7 +63,7 @@ strain. This page is about recognizing those moments.
 
 - You can **see everything** at once and click any cell.
 - Formulas update instantly as you type.
-- There is nothing to set up — open it and go.
+- There is nothing to set up, open it and go.
 - They are perfect for quick calculations, small lists, and
   drafts.
 
@@ -82,7 +82,7 @@ flowchart TB
     S --> A["Grows to<br/>millions of rows"]
     S --> B["Many people<br/>edit at once"]
     S --> C["Same info copied<br/>across many sheets"]
-    S --> D["No rules — a price<br/>cell can say 'banana'"]
+    S --> D["No rules, a price<br/>cell can say 'banana'"]
     A --> Pain["It becomes slow,<br/>fragile, and untrustworthy"]
     B --> Pain
     C --> Pain
@@ -93,7 +93,7 @@ Let us name each crack precisely.
 
 ### 1. Scale
 
-Spreadsheets slow to a crawl — or refuse to open — somewhere in the
+Spreadsheets slow to a crawl, or refuse to open, somewhere in the
 hundreds of thousands to a few million rows. Databases routinely
 handle billions.
 
@@ -123,9 +123,9 @@ moment they happen.
 
 This is the big one. Real data is full of **connections**:
 customers *have* orders, orders *contain* products. Spreadsheets
-have no real notion of a relationship — you end up copying data
+have no real notion of a relationship, you end up copying data
 between sheets and praying it stays in sync. Relational databases
-are *designed* around relationships — primary keys, foreign keys,
+are *designed* around relationships, primary keys, foreign keys,
 and joins, the machinery this course has spent whole sections on.
 
 ## A side-by-side summary
@@ -182,7 +182,7 @@ ORDER BY
   o.id;`}
 />
 
-You can read that `JOIN` fluently now — which is itself a nice
+You can read that `JOIN` fluently now, which is itself a nice
 measure of how far you have come. The point to absorb: "Ada"
 appears **once** in storage, and the database stitches the two
 tables together on demand. That single idea is why relational
@@ -203,7 +203,7 @@ spreadsheet fundamentally cannot give you.
 - You need to color-code ten cells for a presentation.
   > Visual formatting of a tiny amount of data is a spreadsheet strength, not a reason to adopt a database.
 
-Databases earn their value with large, shared, connected, long-lived data — not tiny personal tasks.`}
+Databases earn their value with large, shared, connected, long-lived data, not tiny personal tasks.`}
 />
 
 <MultipleChoice

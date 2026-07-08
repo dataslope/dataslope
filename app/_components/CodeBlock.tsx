@@ -73,7 +73,7 @@ import {
   savePersistedCode,
 } from "./codePersistence";
 // Global keyframes for the run overlay (shared with ChallengeCard and the
-// playgrounds) — the module CSS references them by their global names.
+// playgrounds), the module CSS references them by their global names.
 import "./runOverlayAnimations.css";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
@@ -82,20 +82,20 @@ type Status = "idle" | "loading" | "ready" | "running" | "error";
 
 /** One file in a multi-file `<CodeBlock>` workspace. Mirrors the
  *  `ChallengeFile` shape from `ChallengeCard` so authors can use the
- *  same mental model — the layout / styles are identical too. */
+ *  same mental model, the layout / styles are identical too. */
 export interface CodeBlockFile {
   /** Workspace-relative filename, e.g. `"greeter.hpp"`. */
   filename: string;
   /** Optional read-only initialization code for THIS file, prepended
    *  verbatim to the file's code on every Run. Rendered in a
    *  collapsed-by-default read-only panel above the editor when this file
-   *  is the active tab — handy for imports or sample data without
+   *  is the active tab, handy for imports or sample data without
    *  cluttering the snippet the learner edits.
    *
    *  Caveat: the prepend is purely textual, so init must be valid at the
    *  *top level* of the target language (e.g. `import` / `using` /
-   *  `#include` directives, top-level statements, or — for languages
-   *  without top-level statements like Java — a complete declaration the
+   *  `#include` directives, top-level statements, or, for languages
+   *  without top-level statements like Java, a complete declaration the
    *  user code can reference). */
   initCode?: string;
   /** Starter content shown in the editor for this file. Reset restores
@@ -107,13 +107,13 @@ interface CodeBlockProps {
   /** Language adapter that describes the runtime to use. The same
    *  adapter instance can be passed to multiple `CodeBlock`s on the
    *  same page; they share one underlying runtime, but each block
-   *  always executes against a freshly-reset state — variables defined
+   *  always executes against a freshly-reset state, variables defined
    *  in one block are never visible to another. */
   adapter: LanguageAdapter;
   /** Workspace files. Every block supplies at least one file; each file
    *  carries its own `initCode` (read-only setup prepended on Run) and
-   *  `starterCode` (the editable starter). With more than one file — or
-   *  with `showFileTabBar` — a non-sortable, non-closeable tab bar
+   *  `starterCode` (the editable starter). With more than one file, or
+   *  with `showFileTabBar`, a non-sortable, non-closeable tab bar
    *  appears above the editor so the learner can switch between files.
    *  Code runs against `entryFilename` (or the first file when omitted);
    *  every other file is staged into the runtime's virtual file system
@@ -127,8 +127,8 @@ interface CodeBlockProps {
    *  before every Run, so init/starter code reads them like local files
    *  (e.g. `pd.read_csv("penguins.csv")`). Each entry names a path in
    *  the dataslope/datasets repo (or a full URL); the bytes are fetched
-   *  through the globally cached dataset path — memoised in-session and
-   *  persisted via the browser's Cache API — so every block, page, and
+   *  through the globally cached dataset path, memoised in-session and
+   *  persisted via the browser's Cache API, so every block, page, and
    *  visit that references the same file shares one download. Blocks
    *  with different init code share the same staged bytes. Requires an
    *  adapter whose runtime implements `prepareFileSystem` (Python, R,
@@ -143,7 +143,7 @@ interface CodeBlockProps {
   /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
    *  pre-install when the block's runtime warms, merged with the modules
    *  found by scanning the block's own code (init + starter). Escape
-   *  hatch for imports the scan can't see — e.g. dynamic imports. Only
+   *  hatch for imports the scan can't see, e.g. dynamic imports. Only
    *  meaningful for runtimes with optional package sets (Python). */
   packages?: string[];
   /** Inject the pinned Tailwind in-browser compiler into the preview
@@ -329,7 +329,7 @@ function ToastList() {
 // blink the wave animation in and back out within a single frame.
 const MIN_RUN_OVERLAY_MS = 300;
 
-// Sine-wave running overlay — anchored to the bottom of the code block
+// Sine-wave running overlay, anchored to the bottom of the code block
 // and shorter (28 px) than the full playground variant (44 px).
 function RunOverlay({ active }: { active: boolean }) {
   return (
@@ -359,7 +359,7 @@ function RunOverlay({ active }: { active: boolean }) {
   );
 }
 
-// Public export — wraps the inner component with a Toast.Provider so
+// Public export, wraps the inner component with a Toast.Provider so
 // that Toast.useToastManager() works inside CodeBlockInner.
 export default function CodeBlock(props: CodeBlockProps) {
   return (
@@ -394,10 +394,10 @@ function CodeBlockInner({
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
-  // Line-number compartment — reconfigured when the active file changes
+  // Line-number compartment, reconfigured when the active file changes
   // so the gutter offset tracks that file's init line count.
   const lineNumberCompRef = useRef<Compartment | null>(null);
-  // Language compartment — reconfigured per active file for adapters
+  // Language compartment, reconfigured per active file for adapters
   // whose workspaces mix languages (web: .html/.css/.js).
   const languageCompRef = useRef<Compartment | null>(null);
   // Slot the preview adapters (web / react) mount their sandboxed
@@ -409,7 +409,7 @@ function CodeBlockInner({
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
-  // Outer card element — observed so the shared runtime can be warmed when
+  // Outer card element, observed so the shared runtime can be warmed when
   // the block first scrolls into view (so the learner's first Run isn't a
   // cold download). `warmedRef` guards against re-warming on re-intersect.
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -433,7 +433,7 @@ function CodeBlockInner({
   // until the adapter reports one); smoothed for display below.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
   // Mid-run blocking waits (e.g. Python's on-first-run package install)
-  // — surfaces the boot notice during the wait. Callbacks are stable.
+  //, surfaces the boot notice during the wait. Callbacks are stable.
   const {
     preparing: midRunPreparing,
     message: midRunMessage,
@@ -474,7 +474,7 @@ function CodeBlockInner({
     datasetsRef.current = blockDatasets;
   }, [blockDatasets]);
 
-  // Everything this block could ask the runtime to execute — per-file
+  // Everything this block could ask the runtime to execute, per-file
   // init + starter code. Passed to `runtime.warmPackages` as the
   // needs-analysis input so heavy optional packages (Python's data
   // stack) only download for blocks whose code actually imports them.
@@ -640,7 +640,7 @@ function CodeBlockInner({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
         noActiveLine,
-        // AI ghost-text completion (pro members only — the extension gates
+        // AI ghost-text completion (pro members only, the extension gates
         // itself and stays inert for guests/free members). The active file's
         // read-only init code travels as extra prompt prefix so suggestions
         // can use the names it defines.
@@ -651,8 +651,8 @@ function CodeBlockInner({
         }),
         // Debounce-persist the *active* file's buffer so reloads /
         // navigation restore in-progress code. We always look up the
-        // active filename through the ref so the listener — registered
-        // once at mount — stays correct after tab switches.
+        // active filename through the ref so the listener, registered
+        // once at mount, stays correct after tab switches.
         EditorView.updateListener.of((update) => {
           if (!update.docChanged) return;
           const current = update.state.doc.toString();
@@ -889,7 +889,7 @@ function CodeBlockInner({
   const run = useCallback(async () => {
     const filesSnapshot = snapshotAllFiles();
     const entrySource = filesSnapshot.get(resolvedEntryFilename) ?? "";
-    // Each file's init code is prepended verbatim to its buffer — every
+    // Each file's init code is prepended verbatim to its buffer, every
     // adapter resets state at the start of run(), so init effectively
     // executes inside the same fresh scope as the user code. Authors are
     // responsible for providing syntactically-compatible init (e.g.
@@ -925,7 +925,7 @@ function CodeBlockInner({
       if (!runtimeRef.current) {
         // The registry subscribes this callback to the in-flight boot
         // even when a silent warm-up started it, replaying the current
-        // stage — so a Run click mid-boot shows live progress.
+        // stage, so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
@@ -942,7 +942,7 @@ function CodeBlockInner({
       if (datasetsPromise) {
         if (!runtimeRef.current.prepareFileSystem) {
           throw new Error(
-            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system) — remove the block's \`datasets\` prop.`,
+            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system), remove the block's \`datasets\` prop.`,
           );
         }
         setStatusMessage("Downloading dataset files…");
@@ -954,8 +954,8 @@ function CodeBlockInner({
       setStatusMessage("Running…");
 
       // Stage files into the runtime VFS: the block's remote datasets
-      // (so init/starter code can read them like local files) and — for
-      // multi-file workspaces — every workspace file, so imports /
+      // (so init/starter code can read them like local files) and, for
+      // multi-file workspaces, every workspace file, so imports /
       // #includes / cross-class references resolve. The entry file's
       // bytes mirror what we pass to `run()` below. Single-file blocks
       // without datasets skip the call entirely (see ChallengeCard's
@@ -1102,7 +1102,7 @@ function CodeBlockInner({
 
   // Pin this block's runtime in the registry while the block is mounted,
   // so eviction (the per-scope LRU cap) never tears a runtime down under
-  // a block that could still Run against it — including the `runtimeRef`
+  // a block that could still Run against it, including the `runtimeRef`
   // cached above.
   useEffect(
     () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
@@ -1110,7 +1110,7 @@ function CodeBlockInner({
   );
 
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
-  // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
+  // Save-Data-guarded, one boot at a time, see runtime/warmup.ts), so
   // the time a reader spends on the page's prose pays for the runtime
   // download instead of the first Run click.
   useEffect(() => {
@@ -1138,7 +1138,7 @@ function CodeBlockInner({
             if (!runtimeRef.current) runtimeRef.current = rt;
             // Pre-install heavy optional packages only if this block's
             // authored code (or its explicit `packages` prop) needs
-            // them — see LanguageRuntime.warmPackages. Fire-and-forget:
+            // them, see LanguageRuntime.warmPackages. Fire-and-forget:
             // a Run installs on demand regardless.
             const hint = warmHintRef.current;
             rt.warmPackages?.(hint.sources, { packages: hint.packages });
@@ -1186,7 +1186,7 @@ function CodeBlockInner({
       persistSaveTimerRef.current = null;
     }
     setOutputs([]);
-    // Reset also tears down the live preview — removing the iframe
+    // Reset also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
     previewHostRef.current?.replaceChildren();
     setStatus("idle");
@@ -1206,7 +1206,7 @@ function CodeBlockInner({
     const view = editorRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
-    // Skip the spinner / round-trip entirely on empty buffers — same
+    // Skip the spinner / round-trip entirely on empty buffers, same
     // short-circuit ChallengeCard's Format uses.
     if (!code.trim()) return;
     setIsFormatting(true);
@@ -1222,7 +1222,7 @@ function CodeBlockInner({
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
         startTransition(() => {
-          toastManager.add({ title: "Already formatted — nothing to change." });
+          toastManager.add({ title: "Already formatted, nothing to change." });
         });
       } else {
         view.dispatch({
@@ -1237,7 +1237,7 @@ function CodeBlockInner({
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       startTransition(() => {
         toastManager.add({
-          title: "Couldn't format — code may have a syntax error.",
+          title: "Couldn't format, code may have a syntax error.",
         });
       });
     } finally {
@@ -1269,7 +1269,7 @@ function CodeBlockInner({
         toastManager.add({ title: "Code copied to clipboard." });
       });
     } catch {
-      // Clipboard failures are non-fatal — silently ignore so a missing
+      // Clipboard failures are non-fatal, silently ignore so a missing
       // permission doesn't surface as a runtime error in the page.
     }
   }, [toastManager]);
@@ -1285,12 +1285,12 @@ function CodeBlockInner({
   // Show the boot notice during a cold boot (status "loading") and during
   // a mid-run blocking wait (e.g. installing packages mid-run, while
   // status is "running"). The mid-run case has no runtime download and no
-  // determinate fraction — just the loader + the wait message.
+  // determinate fraction, just the loader + the wait message.
   const showBootNotice =
     status === "loading" || (status === "running" && midRunPreparing);
 
   // Header readouts for the merged output panel. Cells stream in during
-  // the run, each stamped with the elapsed time at its arrival — the last
+  // the run, each stamped with the elapsed time at its arrival, the last
   // one is the closest to the run's total. Only text is sensibly
   // copyable: skipping image/plot content avoids dumping a raw base64
   // PNG / Plotly JSON blob behind a misleading "Copy" affordance.
@@ -1617,7 +1617,7 @@ function CodeBlockInner({
           aria-live="polite"
         >
           {/* The "Output" header is hidden while the boot notice (loading
-              animation) is showing — there's no output yet, just setup.
+              animation) is showing, there's no output yet, just setup.
               It returns the moment user code actually runs. */}
           {!showBootNotice && (
             <div className={challengeStyles.outputHeader}>
@@ -1674,7 +1674,7 @@ function CodeBlockInner({
               ))}
             </div>
           )}
-          {/* No "Running…" placeholder while output is empty — the blue
+          {/* No "Running…" placeholder while output is empty, the blue
               wave overlay already signals the run is in progress. */}
           <RunOverlay active={isBusy} />
         </div>
@@ -1702,7 +1702,7 @@ async function copyToClipboard(text: string): Promise<void> {
       document.body.removeChild(ta);
     }
   } catch {
-    // Non-fatal — see CodeBlock.copyEditor for rationale.
+    // Non-fatal, see CodeBlock.copyEditor for rationale.
   }
 }
 
@@ -1783,7 +1783,7 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
     let cancelled = false;
     void (async () => {
       // Plotly is heavy and only needed when a chart actually renders, so we
-      // lazy-load it from jsDelivr on demand — keeping it out of the client
+      // lazy-load it from jsDelivr on demand, keeping it out of the client
       // bundle and the OpenNext Worker bundle (see PLOTLY_CDN in runtime/cdn).
       const mod = await import(
         /* webpackIgnore: true */ /* turbopackIgnore: true */ PLOTLY_CDN

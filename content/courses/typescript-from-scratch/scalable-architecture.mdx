@@ -5,12 +5,12 @@ description: Structure large TypeScript systems with layered architecture and de
 
 As codebases grow, they become harder to navigate, test, and change. Functions depend on other functions, modules import from everywhere, and changes ripple unpredictably. Without structure, you end up with a tangled mess where every change risks breaking something distant.
 
-This chapter introduces **layered architecture** — a pattern for organizing code into distinct layers (domain, application, infrastructure) with clear boundaries and dependencies flowing in one direction. You'll learn how to use **TypeScript's type system** to enforce these boundaries, prevent circular dependencies, and make large systems understandable and maintainable.
+This chapter introduces **layered architecture**, a pattern for organizing code into distinct layers (domain, application, infrastructure) with clear boundaries and dependencies flowing in one direction. You'll learn how to use **TypeScript's type system** to enforce these boundaries, prevent circular dependencies, and make large systems understandable and maintainable.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A temple in cross-section: the yellow roof of infrastructure rests on blue application columns standing on a deep green domain foundation; one column is only a dashed outline — a port — with its solid green implementation sliding in from the side along a thin arrow — layers depend downward and the foundation knows nothing above it"
+  aria-label="A temple in cross-section: the yellow roof of infrastructure rests on blue application columns standing on a deep green domain foundation; one column is only a dashed outline, a port, with its solid green implementation sliding in from the side along a thin arrow, layers depend downward and the foundation knows nothing above it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -204,8 +204,8 @@ export class InMemoryUserRepository implements UserRepository {
 />
 
 Here:
-- `application.ts` defines `UserRepository` (a **port** — an interface).
-- `infrastructure.ts` provides `InMemoryUserRepository` (an **adapter** — a concrete implementation).
+- `application.ts` defines `UserRepository` (a **port**, an interface).
+- `infrastructure.ts` provides `InMemoryUserRepository` (an **adapter**, a concrete implementation).
 - `main.ts` wires them together.
 
 This is **dependency inversion**: the application depends on an abstraction (the interface), not a concrete implementation. You can swap `InMemoryUserRepository` for `PostgresUserRepository` without changing `application.ts`.
@@ -367,7 +367,7 @@ A **barrel file** (`index.ts`) re-exports only the public API of a module, hidin
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Three thin blue lines pour from separate export dots into one gray barrel with a single tap, and one solid green line with an arrowhead flows out — a barrel file gathers a module's public surface into one import path and keeps internals inside"
+  aria-label="Three thin blue lines pour from separate export dots into one gray barrel with a single tap, and one solid green line with an arrowhead flows out, a barrel file gathers a module's public surface into one import path and keeps internals inside"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -709,4 +709,4 @@ Layered architecture makes large systems comprehensible. Each layer has a single
 
 ---
 
-**Next**: [Static Analysis in Action](./static-analysis-in-action) — exploring what the TypeScript compiler actually proves for you.
+**Next**: [Static Analysis in Action](./static-analysis-in-action), exploring what the TypeScript compiler actually proves for you.

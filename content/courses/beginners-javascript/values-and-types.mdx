@@ -1,6 +1,6 @@
 ---
 title: Values and Types
-description: The atoms of every JavaScript program — what values are, what types they have, and why this distinction matters.
+description: The atoms of every JavaScript program, what values are, what types they have, and why this distinction matters.
 ---
 
 Before you can write meaningful programs, you have to know what
@@ -14,7 +14,7 @@ time with it.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Round number blobs, long string bars, a green and red boolean pair, and faint ghost shapes lined up on a shelf — the different kinds of values"
+  aria-label="Round number blobs, long string bars, a green and red boolean pair, and faint ghost shapes lined up on a shelf, the different kinds of values"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="150" width="500" height="4" rx="2" fill="currentColor" opacity="0.12" />
@@ -79,7 +79,7 @@ in a sensible way for its kind.
 
 ## A type is "the kind of value"
 
-Every value has a **type** — the *kind* of value it is. JavaScript
+Every value has a **type**, the *kind* of value it is. JavaScript
 has a small set of built-in types, and you can ask the runtime
 what type any value has with the `typeof` operator:
 
@@ -93,7 +93,7 @@ console.log(typeof 3.14); // "number"
 console.log(typeof "hello"); // "string"
 console.log(typeof true); // "boolean"
 console.log(typeof undefined); // "undefined"
-console.log(typeof null); // "object" (a famous historical bug — see below)
+console.log(typeof null); // "object" (a famous historical bug, see below)
 console.log(typeof [1, 2, 3]); // "object"
 console.log(typeof { x: 1 }); // "object"
 console.log(typeof function () {}); // "function"
@@ -124,7 +124,7 @@ This is one of JavaScript's oldest, most famous bugs. In the very
 first implementation in 1995, the way `null` was represented under
 the hood happened to look like an object, and `typeof` reported
 `"object"`. By the time anyone wanted to fix it, fixing it would
-have broken too many web pages. So it stays — forever.
+have broken too many web pages. So it stays, forever.
 
 If you ever need to check for `null` specifically, write
 `value === null`.
@@ -190,16 +190,16 @@ parts of the language for beginners.
   files={[
     {
       filename: "main.js",
-      starterCode: `console.log("5" + 3); // "53"  — number 3 was converted to the string "3", then strings were joined.
-console.log("5" - 3); // 2     — string "5" was converted to the number 5, then subtracted.
-console.log(5 + null); // 5     — null became 0.
-console.log(5 + undefined); // NaN — "Not a Number". undefined cannot meaningfully become a number.
-console.log("hello" * 2); // NaN — string "hello" cannot become a number.
+      starterCode: `console.log("5" + 3); // "53", number 3 was converted to the string "3", then strings were joined.
+console.log("5" - 3); // 2, string "5" was converted to the number 5, then subtracted.
+console.log(5 + null); // 5, null became 0.
+console.log(5 + undefined); // NaN, "Not a Number". undefined cannot meaningfully become a number.
+console.log("hello" * 2); // NaN, string "hello" cannot become a number.
 
-console.log(Boolean(0)); // false  — 0 is "falsy"
-console.log(Boolean("")); // false  — empty string is falsy
-console.log(Boolean(" ")); // true   — non-empty string is truthy
-console.log(Boolean("0")); // true   — the *string* "0" is truthy!
+console.log(Boolean(0)); // false, 0 is "falsy"
+console.log(Boolean("")); // false, empty string is falsy
+console.log(Boolean(" ")); // true, non-empty string is truthy
+console.log(Boolean("0")); // true, the *string* "0" is truthy!
 `,
     },
   ]}
@@ -223,9 +223,9 @@ and don't have to ask "why does this work?".
 
 JavaScript has two equality operators:
 
-- `===` (strict equality) — compares values *and* requires the
+- `===` (strict equality), compares values *and* requires the
   same type. `5 === "5"` is `false`.
-- `==`  (loose equality) — converts as needed before comparing.
+- `==`  (loose equality), converts as needed before comparing.
   `5 == "5"` is `true`.
 
 **Always use `===`** (and its partner `!==`). Loose equality is
@@ -239,12 +239,12 @@ equality is predictable.
     {
       filename: "main.js",
       starterCode: `console.log(5 === 5); // true
-console.log(5 === "5"); // false  (different types — good!)
+console.log(5 === "5"); // false  (different types, good!)
 console.log("a" === "a"); // true
-console.log(true === 1); // false  (boolean vs number — good!)
+console.log(true === 1); // false  (boolean vs number, good!)
 
 // Compare with the loose ==, which is full of footguns:
-console.log(5 == "5"); // true   (silent conversion — confusing)
+console.log(5 == "5"); // true   (silent conversion, confusing)
 console.log(null == undefined); // true
 console.log("" == 0); // true
 console.log("0" == 0); // true
@@ -280,12 +280,12 @@ console.log(x); // undefined
 console.log(typeof x); // "undefined"
 
 const user = { name: "Ada" };
-console.log(user.email); // undefined — property doesn't exist
+console.log(user.email); // undefined, property doesn't exist
 
 function greet(name) {
   console.log("Hello,", name);
 }
-greet(); // logs "Hello, undefined" — no argument given
+greet(); // logs "Hello, undefined", no argument given
 
 const middleName = null; // deliberately: this user has no middle name
 console.log(middleName); // null
@@ -302,7 +302,7 @@ value can be treated as if it were a boolean*. The values that
 behave like `false` in conditions are called **falsy**; the rest are
 **truthy**.
 
-The falsy values are exactly these (memorise this list — it's
+The falsy values are exactly these (memorise this list, it's
 short):
 
 - `false`
@@ -348,7 +348,7 @@ describe({}); // truthy (an object)
   ]}
 />
 
-This is incredibly useful in practice — `if (name) { ... }` is a
+This is incredibly useful in practice, `if (name) { ... }` is a
 common idiom for "if name is set to something non-empty". It can
 also bite you (an empty array `[]` is truthy even though it
 "feels" empty). We will see it constantly.
@@ -414,12 +414,12 @@ core mental model of programming.**
   markdown={`Which equality operator should you almost always use in JavaScript, and why?
 
 - \`==\` because it is more forgiving and converts types automatically
-  > The automatic type conversion done by \`==\` follows a long set of non-obvious rules — for example, \`0 == "0"\` is \`true\`, \`"" == false\` is \`true\`, and \`null == undefined\` is \`true\` — which makes code that uses \`==\` harder to reason about.
+  > The automatic type conversion done by \`==\` follows a long set of non-obvious rules, for example, \`0 == "0"\` is \`true\`, \`"" == false\` is \`true\`, and \`null == undefined\` is \`true\`, which makes code that uses \`==\` harder to reason about.
 - [o] \`===\` because it compares values *and* types, giving predictable behaviour without surprising conversions
   > \`===\` (and \`!==\`) avoid the long list of historic, surprising rules built into \`==\`. They give you exactly what most programmers actually want: "true if these two values are the same kind of thing and equal in value".
 - \`=\` because it is the assignment operator and works for everything
   > \`=\` is used to *assign* a value to a variable, not to compare two values; using it in a conditional like \`if (x = 5)\` assigns \`5\` to \`x\` rather than checking equality.
-- It doesn't matter — they behave identically
+- It doesn't matter, they behave identically
   > \`==\` and \`===\` produce different results whenever the operands are of different types; for example \`1 == "1"\` is \`true\` but \`1 === "1"\` is \`false\`.
 
 In modern JavaScript, \`===\` is the standard. Reserve \`==\` for the very specific case of "I want to treat \`null\` and \`undefined\` as the same thing", and even then, prefer \`value == null\` deliberately.`}

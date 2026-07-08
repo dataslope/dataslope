@@ -83,7 +83,7 @@ describe("deleteFile", () => {
     const { writeFile, readFile, deleteFile, flushFileWrites } = await import(
       "../app/_components/opfs/fileStorage"
     );
-    // Queue a write then immediately delete — the write should be cancelled.
+    // Queue a write then immediately delete, the write should be cancelled.
     writeFile("ws_1", "cancel_me", "should not appear");
     await deleteFile("ws_1", "cancel_me");
     await flushFileWrites();

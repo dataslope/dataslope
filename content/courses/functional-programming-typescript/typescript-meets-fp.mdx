@@ -4,7 +4,7 @@ description: How TypeScript's type system turns functional intuitions into compi
 ---
 
 JavaScript can *imitate* functional programming. TypeScript can
-*enforce* it. The difference is not cosmetic — it changes which
+*enforce* it. The difference is not cosmetic, it changes which
 kinds of mistakes the compiler catches and, therefore, which patterns
 are actually safe to rely on in a large codebase.
 
@@ -15,7 +15,7 @@ shape of the rest of the course.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A ball wobbles along an unrailed track and a faint red one has fallen off; where guardrails begin, the ball runs straight to a green flag — TypeScript adds the rails that keep functional patterns on course"
+  aria-label="A ball wobbles along an unrailed track and a faint red one has fallen off; where guardrails begin, the ball runs straight to a green flag, TypeScript adds the rails that keep functional patterns on course"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="118" width="520" height="10" rx="5" fill="currentColor" opacity="0.12" />
@@ -49,18 +49,18 @@ designed to add types to JavaScript without breaking the JavaScript
 mental model. And yet, almost by accident, it ended up with a set of
 features that map *unusually well* onto the functional toolbox:
 
-- **Structural typing** — two types are compatible if their shapes
+- **Structural typing**, two types are compatible if their shapes
   match. No mandatory class hierarchies, no nominal ceremony.
-- **Discriminated unions** — first-class algebraic data types.
-- **Exhaustiveness checking via `never`** — the compiler can prove
+- **Discriminated unions**, first-class algebraic data types.
+- **Exhaustiveness checking via `never`**, the compiler can prove
   a `switch` covers every case.
-- **Generics with constraints** — parametric polymorphism, the
+- **Generics with constraints**, parametric polymorphism, the
   backbone of generic FP abstractions.
-- **Literal types and template-literal types** — values can appear
+- **Literal types and template-literal types**, values can appear
   *in* types, enabling precise modeling.
-- **Type narrowing** — control-flow analysis that refines a type as
+- **Type narrowing**, control-flow analysis that refines a type as
   you check it.
-- **Readonly markers** — you can express "this value cannot be
+- **Readonly markers**, you can express "this value cannot be
   mutated" right in the type.
 
 What TypeScript *doesn't* have natively:
@@ -114,8 +114,8 @@ is what makes higher-order functions possible.
 ## Immutability through `readonly` and `as const`
 
 TypeScript lets you mark values as unable to be mutated *through this
-binding*. This is not a deep guarantee — the underlying object is
-the same as a mutable one at runtime — but it is enough to catch a
+binding*. This is not a deep guarantee, the underlying object is
+the same as a mutable one at runtime, but it is enough to catch a
 huge category of bugs at compile time.
 
 <CodeBlock
@@ -230,7 +230,7 @@ console.log(describe("blue"));
   ]}
 />
 
-This pattern — `const _exhaustive: never = x` in the default case —
+This pattern, `const _exhaustive: never = x` in the default case,
 is how you turn "I think this `switch` is complete" into "the
 compiler will *prove* this `switch` is complete".
 
@@ -266,13 +266,13 @@ console.log(y);
 
 Generics let us write each FP combinator (`map`, `flatMap`,
 `compose`, `pipe`, `chain`) once, in a way that works for every
-shape — and the compiler still tracks the types end-to-end.
+shape, and the compiler still tracks the types end-to-end.
 
 ## A type-driven "Option" preview
 
 We'll spend a whole chapter on this later, but here is a tiny preview
-of what type-driven design feels like when all three pieces — sum
-types, generics, exhaustiveness — come together.
+of what type-driven design feels like when all three pieces, sum
+types, generics, exhaustiveness, come together.
 
 <CodeBlock
   adapter="typescript"
@@ -346,7 +346,7 @@ them. Here is a tiny taste of that shape, spread across three files.
 
 const names = ["Ada", "Linus", "Grace"];
 
-// "shell" — does the I/O
+// "shell", does the I/O
 for (const g of greetings(names)) {
   console.log(makeMessage(g));
 }
@@ -418,13 +418,13 @@ that has a `Foo.map` method".
   markdown={`Which TypeScript feature is the most direct enabler of "make illegal states unrepresentable"?
 
 - The \`any\` type
-  > \`any\` is the *opposite* — it disables the type system. It allows illegal states everywhere.
+  > \`any\` is the *opposite*, it disables the type system. It allows illegal states everywhere.
 - The \`strict\` compiler flag
   > Strict mode enables many useful checks, but it doesn't itself model your domain. It's a *prerequisite*, not the mechanism.
 - [o] Discriminated unions with exhaustiveness checking
   > By modeling "this is one of N possibilities" as a discriminated union and then handling every variant in a \`switch\`, you make impossible combinations *unrepresentable* in the types. The compiler enforces it.
 - Interfaces
-  > Interfaces model *product types* — a record with these fields. They cannot express "one of several alternatives", which is what we need to rule out illegal combinations.
+  > Interfaces model *product types*, a record with these fields. They cannot express "one of several alternatives", which is what we need to rule out illegal combinations.
 
 Sums + products + exhaustive case analysis are the trio that lets the *compiler* prove your data model has no impossible states.`}
 />

@@ -1,16 +1,16 @@
 ---
-title: Code Blocks — Python
+title: "Code Blocks: Python"
 description: Run Python in the browser via Pyodide. NumPy, Pandas, Matplotlib, and Plotly are all available.
 ---
 
 The Python runtime is **Pyodide 3.13** running inside a Web Worker so
 your code doesn't block the UI. Each block below runs against a fresh
-global scope — variables you define in one block won't leak into the
+global scope, variables you define in one block won't leak into the
 next.
 
 ## Variables and printing
 
-Python doesn't need type declarations — assigning with `=` creates the
+Python doesn't need type declarations, assigning with `=` creates the
 binding. Try editing the multiplier and re-running.
 
 <CodeBlock
@@ -49,7 +49,7 @@ Anything passed to `display()` (or returned as the last expression of a
 block) is rendered with its rich representation. For a Pandas
 `DataFrame` that means an HTML table.
 
-The block below has *initialization code* — click "▸ Initialization
+The block below has *initialization code*, click "▸ Initialization
 code (Python)" to see what's running before your snippet.
 
 <CodeBlock
@@ -132,7 +132,7 @@ plt.show()
 
 ## Interactive Plotly charts
 
-Plotly figures render as fully interactive charts — the same rendering
+Plotly figures render as fully interactive charts, the same rendering
 path the [Python Playground](/playground/python) uses.
 
 <CodeBlock
@@ -235,7 +235,7 @@ def bye(name: str) -> str:
 
 ## Initialization code
 
-`initCode` is read-only setup prepended to your snippet on every Run — handy
+`initCode` is read-only setup prepended to your snippet on every Run, handy
 for imports or sample data without cluttering the part you edit. Init of 3
 lines or fewer shows a compact read-only header; 4 lines or more collapses
 behind a "Click to expand" toggle.

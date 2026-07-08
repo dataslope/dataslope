@@ -15,7 +15,7 @@ async function waitForRuntimeReady(page: Page) {
   // The Run button is disabled until `setLoaded(true)` fires, which
   // only happens after `adapter.init()` resolves successfully. If
   // initialization throws, the loading banner shows the error message
-  // — surface that instead of waiting out the timeout.
+  //, surface that instead of waiting out the timeout.
   await page.waitForFunction(
     () => {
       const banner = document.querySelector(".loading-banner, .pg-status");
@@ -33,7 +33,7 @@ async function waitForRuntimeReady(page: Page) {
 
 async function runAndCollectOutput(page: Page) {
   await page.locator(".run-btn").first().click();
-  // Wait for at least one output cell that finished — the elapsed
+  // Wait for at least one output cell that finished, the elapsed
   // timestamp ("Done in N.NNs") only renders after the run completes.
   await page.waitForFunction(
     () => {
@@ -66,7 +66,7 @@ test.describe("Playgrounds (fast)", () => {
     // splits the worker into multiple chunks. A classic Worker would load
     // them via importScripts() and throw "Identifier 'e1' has already been
     // declared" before our adapter ever wires up. The fix is `type:
-    // "module"` in the Worker constructor — catch any regression here.
+    // "module"` in the Worker constructor, catch any regression here.
     const initErrors: string[] = [];
     page.on("pageerror", (err) => initErrors.push(err.message));
     page.on("console", (msg) => {
@@ -119,7 +119,7 @@ test.describe("Playgrounds (fast)", () => {
       timeout: 30_000,
     });
 
-    // The Files rail/pane is hidden for the web playground — the panes
+    // The Files rail/pane is hidden for the web playground, the panes
     // themselves are the file surface.
     await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
     await expect(
@@ -128,7 +128,7 @@ test.describe("Playgrounds (fast)", () => {
 
     await page.locator(".run-btn").first().click();
 
-    // The default trio renders inside the sandboxed preview iframe —
+    // The default trio renders inside the sandboxed preview iframe,
     // the CSS and JS panes apply implicitly (no <link>/<script src>).
     const preview = page.frameLocator(".web-preview-slot iframe");
     await expect(preview.locator("h1")).toContainText(
@@ -136,7 +136,7 @@ test.describe("Playgrounds (fast)", () => {
       { timeout: 60_000 },
     );
 
-    // script.js wired a click handler — the preview stays interactive.
+    // script.js wired a click handler, the preview stays interactive.
     await preview.locator("#greet").click();
     await expect(preview.locator("#greet")).toContainText("Clicked 1 time");
 
@@ -171,7 +171,7 @@ test.describe("Playgrounds (fast)", () => {
       timeout: 120_000,
     });
 
-    // The preview stays live after the run — clicking drives real
+    // The preview stays live after the run, clicking drives real
     // React state updates inside the sandboxed document.
     await preview.locator("button").click();
     await expect(preview.locator("h1")).toContainText("You clicked 1 times");
@@ -194,7 +194,7 @@ test.describe("Playgrounds (fast)", () => {
     // The default Hello World example prints "Hello, C Playground!".
     // Anything else (in particular a clang error or runtime crash)
     // means the browsercc toolchain or WASI shim failed to initialize
-    // — exactly the regression this test exists to catch.
+    //, exactly the regression this test exists to catch.
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, C Playground!");

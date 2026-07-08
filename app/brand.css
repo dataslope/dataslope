@@ -1,5 +1,5 @@
 /* ============================================================================
- * brand.css — DataSlope brand color system (single source of truth)
+ * brand.css, DataSlope brand color system (single source of truth)
  * ----------------------------------------------------------------------------
  * Imported once in app/layout.tsx so every route (/, /learn, /playground) can
  * read these tokens. Defines:
@@ -22,8 +22,8 @@
 :root {
   /* ── Blue (primary) ───────────────────────────────────────────────────
    * The dark half of the ramp (500→950) is stepped at 50-unit increments so
-   * elements that need several *distinct, white-text-legible* blues — most
-   * notably the Mermaid mindmaps (app/_components/mdx/mermaid.tsx) — can pick
+   * elements that need several *distinct, white-text-legible* blues, most
+   * notably the Mermaid mindmaps (app/_components/mdx/mermaid.tsx), can pick
    * neighbouring shades that stay clearly apart. The half-steps were
    * interpolated from the 100-step anchors in OKLCH (constant hue, L/C lerped,
    * gamut-mapped); 950 continues the slope one half-step past 900. White text
@@ -83,7 +83,7 @@
   /* ── Decorative / categorical hues (NON-SEMANTIC) ──────────────────────
    * Extend the four brand hues to give charts, diagrams (Mermaid mindmaps,
    * pie/quadrant) and illustrations categorical variety. Unlike green/red/
-   * yellow — which are LOCKED to success/error/warning (see brand report §5) —
+   * yellow, which are LOCKED to success/error/warning (see brand report §5),
    * these carry no meaning; use them purely to tell series/branches apart.
    * Same OKLCH method as the brand ramps (constant hue, interpolated L/C,
    * gamut-mapped to sRGB; 500 = the base hue). Together with blue they form a
@@ -164,9 +164,9 @@
   /* ── Semantic roles ───────────────────────────────────────────────────
    * Only the focus ring survives as a semantic token; the rest of the old
    * role layer (--ds-primary/--ds-link/--ds-success/--ds-danger/--ds-warning
-   * and their -fill/dark variants) was never consumed anywhere — the
+   * and their -fill/dark variants) was never consumed anywhere, the
    * playgrounds define their own roles from the raw hues (playground.css)
-   * and /learn maps hues onto Fumadocs tokens (learn.css) — so it was
+   * and /learn maps hues onto Fumadocs tokens (learn.css), so it was
    * removed. Reintroduce a role token here only together with its first
    * consumer. */
   --ds-focus: var(--ds-blue); /* focus ring (UI, 3:1 is enough) */

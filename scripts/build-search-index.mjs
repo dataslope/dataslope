@@ -6,22 +6,22 @@
  *
  * Fumadocs's default `createFromSource(source)` builds an Orama "advanced"
  * index at request time by reading each lesson's MDX from disk (the docs
- * collections run in `dynamic` mode — see `source.config.ts`). On Cloudflare
+ * collections run in `dynamic` mode, see `source.config.ts`). On Cloudflare
  * Workers there is no filesystem at request time, so that route 500s. Even
  * setting that aside, the advanced index is ~54 MB (≈35k heading/section
- * documents) — far past the 25 MB Workers-asset limit and too large to hold
+ * documents), far past the 25 MB Workers-asset limit and too large to hold
  * in a Worker's 128 MB memory.
  *
  * Instead we precompute, at build time, a compact per-page input array and
  * bundle it into the Worker. The route builds a lightweight Orama "simple"
  * index (one document per page) from it on cold start and answers queries
- * server-side — the index is never shipped to the browser. The bundled input
+ * server-side, the index is never shipped to the browser. The bundled input
  * is ~3.7 MB (~1.35 MB gzipped); the built simple index lives only in Worker
  * memory.
  *
  * What gets indexed: prose only. We extract structured data with Fumadocs's
  * `remark-structure`, restricted to `heading`/`paragraph`/`blockquote`/
- * `tableCell` nodes. That deliberately EXCLUDES the heavy, non-prose pieces —
+ * `tableCell` nodes. That deliberately EXCLUDES the heavy, non-prose pieces,
  * fenced code blocks, inline `<svg>` graphics, ```mermaid``` charts, and the
  * self-closing MDX components (`<ChallengeCard>`, `<CodeBlock>`,
  * `<SqlChallengeCard>`, `<SqlCodeBlock>`, `<MultipleChoice>`, `<Mermaid>`,
@@ -104,7 +104,7 @@ function courseTitle(sectionDir, slug) {
     const meta = JSON.parse(readFileSync(join(sectionDir, slug, "meta.json"), "utf8"));
     if (typeof meta.title === "string" && meta.title) title = meta.title;
   } catch {
-    // No meta.json — leave breadcrumbs empty.
+    // No meta.json, leave breadcrumbs empty.
   }
   metaTitleCache.set(key, title);
   return title;
@@ -169,6 +169,6 @@ const json = JSON.stringify(docs);
 writeFileSync(OUT_FILE, `export default ${json};\n`);
 
 console.log(
-  `[search-index] wrote lib/generated/search-index.js — ${docs.length} pages ` +
+  `[search-index] wrote lib/generated/search-index.js, ${docs.length} pages ` +
     `(${Math.round(json.length / 1024)} kB${fellBack ? `, ${fellBack} via text fallback` : ""})`,
 );

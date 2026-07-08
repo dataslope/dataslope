@@ -31,10 +31,10 @@ import {
 } from "./challenges";
 
 // The editor/runtime-backed cards are heavy (CodeMirror + a WASM runtime), so
-// they're code-split and rendered client-only — only the active tab mounts.
+// they're code-split and rendered client-only, only the active tab mounts.
 // The fallback renders inside the RippleFrame, on top of the ripple halo, so
 // its fill must be fully opaque (the page-surface token, not a translucent
-// tint) — otherwise the rings show through while a tab's card loads.
+// tint), otherwise the rings show through while a tab's card loads.
 const CardLoading = () => (
   <div className="flex min-h-[26rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm text-[var(--ds-gray-500)] dark:border-white/10">
     <Loader2
@@ -108,7 +108,7 @@ function PickerSelect({
       >
         {/* Magic UI ShimmerButton as the select trigger. The background tracks
             the page surface (--color-fd-background: white in light, #121212 in
-            dark — see app/home.css) so the trigger reads as part of the page
+            dark, see app/home.css) so the trigger reads as part of the page
             rather than a floating dark pill; text/border/chevron flip per theme
             so they stay legible on either surface, with the blue shimmer as the
             accent edge. */}
@@ -116,14 +116,14 @@ function PickerSelect({
           render={(triggerProps) => (
             <ShimmerButton
               {...triggerProps}
-              background="var(--ds-control-surface)"
+              background="var(--color-fd-background)"
               shimmerColor="#148CFF"
               shimmerSize="0.15em"
               borderRadius="0.625rem"
               className="min-w-40 justify-between gap-2 border-[color:var(--ds-gray-200)] px-3.5 py-1.5 text-sm font-medium text-[color:var(--ds-gray-900)] focus-visible:outline-none dark:border-white/10 dark:text-white"
             >
               {active && <OptionIcon id={active.iconId} />}
-              {/* Render the label explicitly — a bare <Select.Value/> shows the
+              {/* Render the label explicitly, a bare <Select.Value/> shows the
                   raw (lowercased) value instead of the option's label. */}
               <Select.Value className="flex-1 truncate text-left">
                 {active?.label ?? value}
@@ -159,15 +159,17 @@ function PickerSelect({
   );
 }
 
-/** Centered row wrapper for a panel's picker / control strip. */
+/** Centered row wrapper for a panel's picker / control strip. `z-20` lifts
+ *  it above the RippleFrame's ripple (a later sibling that would otherwise
+ *  paint its rings over these opaque controls). */
 function ControlRow({ children }: { children: React.ReactNode }) {
-  return <div className="flex justify-center">{children}</div>;
+  return <div className="relative z-20 flex justify-center">{children}</div>;
 }
 
 /**
  * Wraps a preview card with a Magic UI Ripple that is centered on the card
  * (both axes) and sized from the card's shorter edge, so its largest circle
- * reaches a bit beyond that edge — a soft halo rather than a ring
+ * reaches a bit beyond that edge, a soft halo rather than a ring
  * spanning the whole card. The card renders on top (opaque), so the rings read
  * as a halo around it. The ripple re-sizes itself as the card's measured box
  * changes (e.g. when the runtime loads or the viewport resizes).
@@ -186,7 +188,7 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect();
   }, []);
 
-  // Size the ripple from the card's SHORTER edge so it stays subtle — the
+  // Size the ripple from the card's SHORTER edge so it stays subtle, the
   // largest circle reaches a bit beyond that edge for a soft halo without
   // spreading the full width of the card. Fall back to a sensible size
   // until the card is measured.
@@ -199,14 +201,14 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
   return (
     <div ref={ref} className="relative">
       {/* Box is the size of the largest circle, centered on the card. No
-          overflow clip — the rings are meant to spill slightly past the card;
+          overflow clip, the rings are meant to spill slightly past the card;
           the page itself is kept from widening by <main>'s overflow-x-clip. */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
         style={{ width: maxCircle, height: maxCircle }}
       >
         {/* No mask: the Ripple ships a built-in solid→transparent fade that
-            would hide the rings — drop it so the ripple stays fully visible.
+            would hide the rings, drop it so the ripple stays fully visible.
             The rings fade naturally via their own decreasing opacity. */}
         <Ripple
           className="[mask-image:none]"
@@ -339,7 +341,7 @@ function McqPanel() {
                 className={
                   active
                     ? "relative z-10 inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-blue-500)] bg-[var(--ds-blue-500)] text-sm font-semibold text-white"
-                    : "inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--ds-control-surface)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-200)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                    : "inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
                 }
               >
                 {i + 1}

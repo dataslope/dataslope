@@ -1,6 +1,6 @@
 ---
 title: Lambdas and Delegates
-description: How C# represents functions as values — and the subtle but important differences between lambdas, delegates, methods, and expression trees
+description: How C# represents functions as values, and the subtle but important differences between lambdas, delegates, methods, and expression trees
 ---
 
 We've been writing lambdas like `n => n * 2` for several pages
@@ -11,13 +11,13 @@ lambda compiles to, what a closure captures, and why
 `Func<T,bool>`.
 
 This is the most "language mechanics" page in the course. It is
-worth the patience — every page after this assumes you can read a
+worth the patience, every page after this assumes you can read a
 lambda and know what it's doing.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three tiny mappings, each an input dot, a thin arrow, and an output — change of shape, change of size, one into two — with a captured red dot tethered to the last row by a thin line"
+  aria-label="Three tiny mappings, each an input dot, a thin arrow, and an output, change of shape, change of size, one into two, with a captured red dot tethered to the last row by a thin line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -109,7 +109,7 @@ The built-in delegate types you'll use 99% of the time:
 
 `Action` is for void-returning functions (side effects). `Func` is
 for value-returning functions. `Predicate<T>` is a niche older alias
-for `Func<T, bool>` — LINQ uses `Func<T, bool>`, not `Predicate<T>`.
+for `Func<T, bool>`, LINQ uses `Func<T, bool>`, not `Predicate<T>`.
 
 ## Lambda syntax
 
@@ -145,9 +145,9 @@ f("Ada");
 
 Two forms of body are allowed:
 
-- **Expression body** — `x => expr` — implicitly returns the value
+- **Expression body**, `x => expr`, implicitly returns the value
   of `expr`.
-- **Statement body** — `x => { ... }` — needs an explicit `return`
+- **Statement body**, `x => { ... }`, needs an explicit `return`
   if it has a return type.
 
 Almost everywhere in LINQ you'll see the expression form.
@@ -155,7 +155,7 @@ Almost everywhere in LINQ you'll see the expression form.
 ## Method references
 
 If a function you want already exists as a named method, you can
-pass the method directly — no need to wrap it in a lambda.
+pass the method directly, no need to wrap it in a lambda.
 
 <CodeBlock
   adapter="csharp"
@@ -177,7 +177,7 @@ Console.WriteLine(string.Join(",", nums.Select(Double)));
   ]}
 />
 
-Prefer the method reference — `nums.Select(Double)` — when the
+Prefer the method reference, `nums.Select(Double)`, when the
 lambda would just call the method. It reads better.
 
 ## Closures: capturing variables
@@ -247,7 +247,7 @@ but the lesson stands: **prefer capturing immutable data**.
 ## When a lambda becomes data: expression trees
 
 This is the deepest idea on this page. Most of the time a lambda
-compiles to *executable code* — a regular method the runtime can
+compiles to *executable code*, a regular method the runtime can
 call. But there is a second form: a lambda can compile to a *data
 structure* describing itself.
 
@@ -258,11 +258,11 @@ is `Expression<Func<...>>`.
 using System;
 using System.Linq.Expressions;
 
-// Compiled to executable code — you can call it.
+// Compiled to executable code, you can call it.
 Func<int, int> doubleFunc = x => x * 2;
 Console.WriteLine(doubleFunc(7)); // 14
 
-// Compiled to a data structure — you can inspect it.
+// Compiled to a data structure, you can inspect it.
 Expression<Func<int, int>> doubleExpr = x => x * 2;
 
 Console.WriteLine($"Type:        {doubleExpr.GetType().Name}");
@@ -275,8 +275,8 @@ var compiled = doubleExpr.Compile();
 Console.WriteLine(compiled(7)); // 14
 ```
 
-Why does this matter? Because LINQ providers — EF Core, MongoDB
-LINQ, etc. — accept `Expression<Func<T,bool>>`. They don't *call*
+Why does this matter? Because LINQ providers, EF Core, MongoDB
+LINQ, etc., accept `Expression<Func<T,bool>>`. They don't *call*
 your lambda; they walk its tree and *translate* it into another
 language (SQL, BSON, an HTTP query).
 
@@ -291,11 +291,11 @@ flowchart TD
 We're not going to write a LINQ provider in this course, but it is
 useful to know the difference exists. When you start using EF Core
 in real work, you'll occasionally hit "the LINQ provider could not
-translate this expression" errors — and now you'll know why.
+translate this expression" errors, and now you'll know why.
 
 ## Functions as values: a practical example
 
-Putting lambdas and HOFs together — a small "rule engine" defined
+Putting lambdas and HOFs together, a small "rule engine" defined
 entirely as data.
 
 <CodeBlock
@@ -333,7 +333,7 @@ record Person(string Name, int Age, string City);
 />
 
 The rules are *data*. You could load them from a config file,
-combine them dynamically, or build a UI to toggle them — all without
+combine them dynamically, or build a UI to toggle them, all without
 recompiling. That power comes from treating functions as values.
 
 <MultipleChoice

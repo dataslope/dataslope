@@ -4,7 +4,7 @@
 // language tab the user visits first.
 //
 // The version is pinned to match the installed npm package so the JS
-// and WASM builds always stay in sync — update both together.
+// and WASM builds always stay in sync, update both together.
 export const CLANG_FORMAT_VERSION = "22.1.4";
 
 let clangFormatInitPromise: Promise<{

@@ -1,11 +1,11 @@
 ---
 title: Aggregation Basics
-description: Sum, mean, median, min, max — the simple reductions that turn many rows into one number, and the subtle choices that change what they mean.
+description: Sum, mean, median, min, max, the simple reductions that turn many rows into one number, and the subtle choices that change what they mean.
 ---
 
 An **aggregation** turns many values into one. The mean of a
-column, the count of rows, the maximum price, the sum of revenue
-— these are all aggregations.
+column, the count of rows, the maximum price, the sum of revenue,
+these are all aggregations.
 
 This chapter covers single-Series aggregations. The next chapter
 introduces `groupby`, which is aggregations *per group*.
@@ -13,7 +13,7 @@ introduces `groupby`, which is aggregations *per group*.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Six value rows converge along thin lines into a single large green circle marked with a sigma — an aggregation collapsing many numbers into one"
+  aria-label="Six value rows converge along thin lines into a single large green circle marked with a sigma, an aggregation collapsing many numbers into one"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -107,7 +107,7 @@ import numpy as np
 
 s = pd.Series([10, 20, np.nan, 40, np.nan])
 
-print(f"mean:           {s.mean()}")  # 23.33 — only the 3 non-null values
+print(f"mean:           {s.mean()}")  # 23.33, only the 3 non-null values
 print(f"count:          {s.count()}")  # 3 (NaNs not counted)
 print(f"sum:            {s.sum()}")  # 70
 print(f"mean(skipna=False): {s.mean(skipna=False)}")  # NaN
@@ -119,14 +119,14 @@ print(f"mean(skipna=False): {s.mean(skipna=False)}")  # NaN
 Compare with what you might naively expect: dividing by 5 (the
 length) would give 14.0. Pandas divides by 3 (the count of
 non-null values) and gives 23.33. This is *almost always* what
-you want — but be aware.
+you want, but be aware.
 
 ## Mean vs median
 
 The two most-cited "averages" mean different things.
 
-- **Mean** — sum / count. Sensitive to outliers.
-- **Median** — middle value when sorted. Robust to outliers.
+- **Mean**, sum / count. Sensitive to outliers.
+- **Median**, middle value when sorted. Robust to outliers.
 
 <CodeBlock
   adapter="python"
@@ -146,7 +146,7 @@ print(f"median: {salaries.median()}")
 A single outlier moved the mean from ~63 (where the typical
 person sits) to over 100. The median is unaffected. When
 reporting "typical" values to a non-technical audience, the
-median is often a better choice — and you should usually report
+median is often a better choice, and you should usually report
 both.
 
 <Callout type="info" title="A useful habit">
@@ -156,7 +156,7 @@ diverge, dig in: outliers or skew may be hiding important
 information.
 </Callout>
 
-## `.describe()` — the multi-statistic summary
+## `.describe()`, the multi-statistic summary
 
 Get all the common statistics in one call:
 
@@ -177,7 +177,7 @@ print(s.describe())
 On a DataFrame, `describe` does the same per numeric column.
 On a non-numeric column, it returns count / unique / top / freq.
 
-## `.agg()` — multiple aggregations at once
+## `.agg()`, multiple aggregations at once
 
 `.agg` lets you compute several aggregations in one go, getting
 back a Series or DataFrame of results.
@@ -256,9 +256,9 @@ print("Average engineer salary:", eng_mean.round(1))
 />
 
 This works, but if you find yourself doing it for every
-department, you want `groupby` — coming up next chapter.
+department, you want `groupby`, coming up next chapter.
 
-## `value_counts` — a one-shot category breakdown
+## `value_counts`, a one-shot category breakdown
 
 For a categorical column, `.value_counts()` gives you both the
 distinct values *and* their counts.
@@ -281,7 +281,7 @@ print(penguins["species"].value_counts(normalize=True).round(3))
   ]}
 />
 
-`normalize=True` converts counts to proportions — the fastest way
+`normalize=True` converts counts to proportions, the fastest way
 to compute category shares.
 
 ## Counting nulls and uniques
@@ -319,7 +319,7 @@ print(penguins.isna().sum())
 - 70.0
   > 70.0 is the sum, not the mean; \`.mean()\` divides by the count, not returns the total.
 
-This default is almost always what you want — but it can hide that some values are missing.`}
+This default is almost always what you want, but it can hide that some values are missing.`}
 />
 
 <MultipleChoice
@@ -330,7 +330,7 @@ This default is almost always what you want — but it can hide that some values
 - The sum
   > The sum is directly inflated by the 500 outlier and changes significantly whenever an outlier is added or removed.
 - [o] The median
-  > Medians are computed by position, not magnitude — they barely move when an extreme value is added.
+  > Medians are computed by position, not magnitude, they barely move when an extreme value is added.
 - The max
   > The max is, by definition, the outlier itself (500), so it is maximally affected.
 
@@ -345,9 +345,9 @@ Pair-report mean and median whenever distributions might be skewed.`}
 - A list of unique values
   > \`s.unique()\` returns a list of distinct values; \`value_counts(normalize=True)\` returns a Series of proportions indexed by those values.
 - [o] The *proportions* (fractions of total) of each unique value
-  > \`normalize=True\` divides each count by the total, giving share-of-total — perfect for "what fraction of customers are in each tier" questions.
+  > \`normalize=True\` divides each count by the total, giving share-of-total, perfect for "what fraction of customers are in each tier" questions.
 - A sorted Series
-  > \`value_counts()\` does sort by frequency by default, but \`normalize=True\` specifically changes the *values* from counts to proportions — the sorting behavior is unchanged.
+  > \`value_counts()\` does sort by frequency by default, but \`normalize=True\` specifically changes the *values* from counts to proportions, the sorting behavior is unchanged.
 
-A small flag that saves a division — well worth knowing.`}
+A small flag that saves a division, well worth knowing.`}
 />

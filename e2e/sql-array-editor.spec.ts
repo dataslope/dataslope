@@ -88,7 +88,7 @@ for (const { id, route, insert } of ENGINES) {
     ).toBeVisible({ timeout: 40_000 });
 
     // The re-fetched array reflects the edit (written as a real array, then
-    // read back as JSON) — and the old elements are gone. The last cell of
+    // read back as JSON), and the old elements are gone. The last cell of
     // each row is the width-absorbing filler, so skip it.
     const numsCell = page
       .locator(".sql-result-table tbody tr")

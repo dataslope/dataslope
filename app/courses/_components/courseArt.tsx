@@ -1,12 +1,12 @@
 /**
  * Course-row artwork for the course cards (the `/courses` catalog and the
- * home page's Courses section) — the "mono" glyph variant from the
- * courses-page mockup (option 2a — Refined sidebar): a single-shade line
+ * home page's Courses section), the "mono" glyph variant from the
+ * courses-page mockup (option 2a, Refined sidebar): a single-shade line
  * motif, unique per course.
  *
  * Every course gets its OWN motif via `COURSE_MOTIFS` (slug → kind); no two
  * courses share one (__tests__/courseArt.test.ts enforces it). A course
- * missing from that map falls back to its domain tag's motif — add a bespoke
+ * missing from that map falls back to its domain tag's motif, add a bespoke
  * entry when a new course lands.
  *
  * Everything draws in `currentColor`; the glyph inherits the row's text
@@ -217,7 +217,7 @@ export function motifShapes(kind: string): React.ReactNode {
         </>
       );
     // ── Bespoke per-course motifs (COURSE_MOTIFS) ───────────────────────
-    // Curly braces — JavaScript.
+    // Curly braces, JavaScript.
     case "braces":
       return (
         <>
@@ -231,7 +231,7 @@ export function motifShapes(kind: string): React.ReactNode {
           />
         </>
       );
-    // A table: header row + one body row split into columns — SQLite.
+    // A table: header row + one body row split into columns, SQLite.
     case "table":
       return (
         <>
@@ -239,7 +239,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M13 24h30M13 33h30M28 24v17" {...S} strokeWidth={2} />
         </>
       );
-    // Coffee mug with steam — Java.
+    // Coffee mug with steam, Java.
     case "mug":
       return (
         <>
@@ -255,7 +255,7 @@ export function motifShapes(kind: string): React.ReactNode {
           />
         </>
       );
-    // A coiled snake, head up and tongue out — Python.
+    // A coiled snake, head up and tongue out, Python.
     case "snake":
       return (
         <>
@@ -267,7 +267,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M39.4 27h3l2.2-2m-2.2 2l2.2 2" {...S} strokeWidth={2} />
         </>
       );
-    // Lift-off — C++ "from zero to…".
+    // Lift-off, C++ "from zero to…".
     case "rocket":
       return (
         <>
@@ -280,7 +280,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M28 36v8" {...S} strokeWidth={2} />
         </>
       );
-    // Shield with a check — TypeScript's compile-time safety.
+    // Shield with a check, TypeScript's compile-time safety.
     case "shield":
       return (
         <>
@@ -291,7 +291,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M22 27l4.5 4.5L35 23" {...S} />
         </>
       );
-    // CPU with pins — C, close to the metal.
+    // CPU with pins, C, close to the metal.
     case "chip":
       return (
         <>
@@ -304,12 +304,12 @@ export function motifShapes(kind: string): React.ReactNode {
           />
         </>
       );
-    // Analytics funnel — DuckDB SQL analytics.
+    // Analytics funnel, DuckDB SQL analytics.
     case "funnel":
       return (
         <path d="M13 14h30L32 27v12l-8 5V27z" {...S} />
       );
-    // Box-and-whisker plot — R's statistical roots.
+    // Box-and-whisker plot, R's statistical roots.
     case "boxplot":
       return (
         <>
@@ -318,7 +318,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M19 25.5h18" {...S} strokeWidth={2} />
         </>
       );
-    // Musical sharp sign — C#.
+    // Musical sharp sign, C#.
     case "sharp":
       return (
         <path
@@ -326,7 +326,7 @@ export function motifShapes(kind: string): React.ReactNode {
           {...S}
         />
       );
-    // Two entities joined by an elbow — database schema design.
+    // Two entities joined by an elbow, database schema design.
     case "schema":
       return (
         <>
@@ -335,7 +335,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M25 19h10v13" {...S} strokeWidth={2} />
         </>
       );
-    // Ridgeline of small distributions — seaborn.
+    // Ridgeline of small distributions, seaborn.
     case "ridge":
       return (
         <path
@@ -344,7 +344,7 @@ export function motifShapes(kind: string): React.ReactNode {
           strokeWidth={2}
         />
       );
-    // Speech bubble with text lines — natural language processing.
+    // Speech bubble with text lines, natural language processing.
     case "chat":
       return (
         <>
@@ -356,7 +356,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M20 21h16M20 26h9" {...S} strokeWidth={2} />
         </>
       );
-    // Three crates, one stacked — collections.
+    // Three crates, one stacked, collections.
     case "crates":
       return (
         <>
@@ -365,7 +365,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <rect x={29.5} y={29} width={12} height={12} rx={2} {...S} strokeWidth={2} />
         </>
       );
-    // Stacked layers — ggplot2's grammar-of-graphics.
+    // Stacked layers, ggplot2's grammar-of-graphics.
     case "layers":
       return (
         <>
@@ -373,7 +373,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M14 27l14 7 14-7M14 34l14 7 14-7" {...S} strokeWidth={2} />
         </>
       );
-    // A browser window with angle brackets on the canvas — web development.
+    // A browser window with angle brackets on the canvas, web development.
     case "browser":
       return (
         <>
@@ -384,7 +384,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M23 28l-4.5 4 4.5 4M33 28l4.5 4-4.5 4" {...S} strokeWidth={2} />
         </>
       );
-    // Values flowing through a chain of stages — LINQ pipelines.
+    // Values flowing through a chain of stages, LINQ pipelines.
     case "pipeline":
       return (
         <>
@@ -394,7 +394,7 @@ export function motifShapes(kind: string): React.ReactNode {
           <path d="M17.5 28h6M32.5 28h6" {...S} strokeWidth={2} />
         </>
       );
-    // Not in the mockup's shape set (an oversight there — its only user,
+    // Not in the mockup's shape set (an oversight there, its only user,
     // oop-blueprint-java, rendered blank): a floor-plan sketch in the same
     // stroke language as the other motifs.
     case "blueprint":

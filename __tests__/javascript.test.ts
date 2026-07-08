@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 
-// Pull out just the runtime class — we instantiate it manually to avoid
+// Pull out just the runtime class, we instantiate it manually to avoid
 // pulling in React (which is only needed for the adapter object).
 // The class isn't exported, so we re-implement the minimal runtime logic
 // that mirrors JavaScriptRuntime.run() to verify the execution model.
@@ -141,7 +141,7 @@ console.log(sum);
   });
 
   // Each `<CodeBlock>` is supposed to be independent of every other
-  // block on the same page — variables defined in block A must not be
+  // block on the same page, variables defined in block A must not be
   // visible in block B even when both blocks share the same runtime
   // instance via `runtimeRegistry`. The JS adapter achieves this by
   // running every snippet inside its own `AsyncFunction` scope, which

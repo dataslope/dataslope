@@ -8,7 +8,7 @@
  * actual widget (which pulls
  * in react-markdown) is dynamically imported so those bytes never load on
  * the home page, pricing, etc. Off-surface this is a bare `usePathname()`
- * check — no session fetch, no widget code.
+ * check, no session fetch, no widget code.
  *
  * `collectContext` is called at send time (not render), so it reads the live
  * playground store / current slug each time the user asks.
@@ -53,7 +53,7 @@ function collectPlayground(segment: string): AskAiClientContext {
 export default function AskAi() {
   const pathname = usePathname() ?? "";
   // Lesson surfaces: course lessons, interview-prep pages, and the dev
-  // component gallery. The bare `/courses` URL is the catalog page — no
+  // component gallery. The bare `/courses` URL is the catalog page, no
   // lesson to ask about there. Interview-prep has no raw-Markdown mirror,
   // so its context comes entirely from the widget registry (the questions
   // on screen), which is what matters there anyway.
@@ -72,7 +72,7 @@ export default function AskAi() {
       pathname.startsWith("/interview-prep") ||
       pathname.startsWith("/fumadocs-dev")
     ) {
-      // Send the FULL path segments (base included) — the server allowlists
+      // Send the FULL path segments (base included), the server allowlists
       // the base segment and fetches `/<segments>.md` (see lib/ai/context.ts).
       // Bases without a `.md` mirror (interview-prep) resolve to null there.
       return { surface: "learn", slug: segments };
@@ -85,7 +85,7 @@ export default function AskAi() {
   return (
     <AskAiWidget
       surface={onLesson ? "learn" : "playground"}
-      // Interview-prep mounts as the "learn" surface but isn't a lesson —
+      // Interview-prep mounts as the "learn" surface but isn't a lesson,
       // keep the widget's copy honest about what it's looking at.
       subjectNoun={
         onInterviewPrep ? "question set" : onLesson ? "lesson" : "playground"

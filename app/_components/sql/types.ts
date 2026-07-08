@@ -21,7 +21,7 @@ export interface QueryRunResult {
   elapsedMs: number;
   /** Optional error message if the run failed mid-way. */
   error?: string;
-  /** Optional source label shown above the result panel — either the
+  /** Optional source label shown above the result panel, either the
    *  active tab's title or, for sidebar previews, the table name. */
   source: string;
   /** When the result came from a sidebar preview, the underlying
@@ -51,8 +51,8 @@ export interface QueryRunResult {
    *  virtualized "All" result view. */
   lazyInfinite?: boolean;
   /** The exact (semicolon-stripped) SQL that produced this result. Used to
-   *  re-run the *same* query after an inline edit — preserving any `LIMIT`/
-   *  shape — for materialized results that have no `lazyBaseSql` to re-page. */
+   *  re-run the *same* query after an inline edit, preserving any `LIMIT`/
+   *  shape, for materialized results that have no `lazyBaseSql` to re-page. */
   querySql?: string;
 }
 

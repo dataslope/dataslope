@@ -23,13 +23,13 @@ const nextConfig: NextConfig = {
   // Cloudflare Workers Builds. The R2 incremental cache keys every object as
   // `incremental-cache/<buildId>/…` (see open-next.config.ts), so this makes a
   // cache folder's name equal to the commit it was built from. That's what lets
-  // the scheduled cleanup workflow map each folder back to a commit — and via
-  // the GitHub API to the open pull request (branch) it belongs to — so it can
+  // the scheduled cleanup workflow map each folder back to a commit, and via
+  // the GitHub API to the open pull request (branch) it belongs to, so it can
   // keep only the latest commit per active branch and drop merged/closed ones
   // (.github/workflows/r2-cache-cleanup.yml). `WORKERS_CI_COMMIT_SHA` is the
   // full commit SHA injected by Workers Builds; off-CI (local `next build` /
   // `next dev`) it's unset, so we return null and Next falls back to its default
-  // random build ID — no behavior change outside CI.
+  // random build ID, no behavior change outside CI.
   generateBuildId: async () => process.env.WORKERS_CI_COMMIT_SHA || null,
   // Tell Next.js to rewrite barrel imports from these icon packages
   // into deep specifier-level imports so we don't pull whole index
@@ -38,7 +38,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "react-icons"],
     // NOTE: this option is a NO-OP for this project's builds. It is only
     // wired into Next's webpack/rspack pipeline (CssChunkingPlugin), and Next
-    // 16 builds with Turbopack by default — which `next dev`/`next build`
+    // 16 builds with Turbopack by default, which `next dev`/`next build`
     // use here. It's kept solely so a `next build --webpack` fallback keeps
     // deterministic CSS chunk ordering; do NOT rely on it for the
     // segment-CSS reorder bugs (#528/#541). The real, bundler-independent
@@ -66,8 +66,8 @@ const nextConfig: NextConfig = {
   // point at these URLs. Using `beforeFiles` guarantees the `.md` suffix is
   // intercepted before the catch-all page routes get a chance to match it.
   // The bare `/fumadocs-dev.md` entry covers that section's index page
-  // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page — its
-  // index is the course-catalog page — so there is no bare `/courses.md`.
+  // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page, its
+  // index is the course-catalog page, so there is no bare `/courses.md`.
   rewrites: async () => ({
     beforeFiles: [
       { source: "/courses/:path*.md", destination: "/llms/courses/:path*" },

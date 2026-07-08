@@ -97,28 +97,28 @@ Each stage uses LINQ. Each stage is independently testable.
 ## The data model
 
 We'll model rows as records and the per-product summary as another
-record. *Data first, behavior second* — the functional move.
+record. *Data first, behavior second*, the functional move.
 
 ## Your turn
 
 <ChallengeCard
   adapter="csharp"
   title="Build the full data pipeline"
-  instructions={`Assemble a pure, LINQ-driven batch pipeline across four files. \`Program.cs\` is already wired to call \`Pipeline.BuildReport\` — implement the three classes below.
+  instructions={`Assemble a pure, LINQ-driven batch pipeline across four files. \`Program.cs\` is already wired to call \`Pipeline.BuildReport\`, implement the three classes below.
 
 **\`Parsing.cs\`**
-- \`ParseLine\` — parse one \`"yyyy-MM-dd,product,quantity,unitPrice,status"\` line into a \`Txn\`, returning \`null\` on any failure.
-- \`ParseAll\` — parse every line and drop the nulls.
+- \`ParseLine\`, parse one \`"yyyy-MM-dd,product,quantity,unitPrice,status"\` line into a \`Txn\`, returning \`null\` on any failure.
+- \`ParseAll\`, parse every line and drop the nulls.
 
 **\`Summarize.cs\`**
-- \`ByProduct\` — group transactions by product and, for each group, compute:
+- \`ByProduct\`, group transactions by product and, for each group, compute:
   - \`UnitsSold\` = sum of \`Quantity\` over **paid** transactions only,
   - \`Gross\` = sum of \`Quantity * UnitPrice\` over **paid** transactions only,
   - \`Net\` = paid total minus refund total (the refund total also uses \`Quantity * UnitPrice\`).
   - Return the summaries ordered by \`Product\` ascending.
 
 **\`Pipeline.cs\`**
-- \`BuildReport\` — compose the stages and produce the report string in **exactly** this format (amounts formatted as \`0.00\`), with one block per product followed by a \`TOTAL\` block:
+- \`BuildReport\`, compose the stages and produce the report string in **exactly** this format (amounts formatted as \`0.00\`), with one block per product followed by a \`TOTAL\` block:
 
 \`\`\`
 === Product {key} ===
@@ -340,7 +340,7 @@ If you completed the challenge, look back over your code and notice:
 
 3. **Pure stages.** `Parsing`, `Summarize`, and `Pipeline` are all
    testable in isolation. Feed them an `IEnumerable<string>`,
-   `IEnumerable<Txn>`, etc. — get deterministic output. The "world"
+   `IEnumerable<Txn>`, etc., get deterministic output. The "world"
    never appears.
 
 4. **One pure function per file.** Each file is small. Each function
@@ -353,8 +353,8 @@ If you completed the challenge, look back over your code and notice:
 
 **Raw input → Parse → Validate → Transform → Summarize → Render**
 
-Almost every batch data program — analytics, ETL, report
-generation, log processing, billing, search indexing — fits this
+Almost every batch data program, analytics, ETL, report
+generation, log processing, billing, search indexing, fits this
 shape. The same pure-functional, LINQ-driven pattern scales from
 six lines of CSV to gigabytes of input (with `IEnumerable` streaming
 all the way through). What changes is the *source* and the *sink*;
@@ -372,18 +372,18 @@ Tick the boxes for yourself:
 - [ ] I felt the *whole program* fit in my head at once
 
 If most of those are ticks, you've internalized the course. If
-not — re-read the relevant chapter and rebuild the broken stage.
+not, re-read the relevant chapter and rebuild the broken stage.
 This is the kind of muscle that needs reps.
 
 <MultipleChoice
   markdown={`In the capstone solution, what makes \`Summarize.ByProduct\` so easy to test?
 
 - It uses \`async\` so the test runner can await it.
-  > \`Summarize.ByProduct\` is fully synchronous — there's nothing to await.
+  > \`Summarize.ByProduct\` is fully synchronous, there's nothing to await.
 - It writes test logs internally that the test framework reads.
   > It has no logging or IO. That's the *point*.
 - [o] It is a pure function: it takes an \`IEnumerable<Txn>\` and returns \`IEnumerable<ProductSummary>\` with no IO or hidden state.
-  > Pure functions are trivially testable: hand-craft a few \`Txn\` records, call the function, assert on the returned values. No mocks, no fakes, no setup, no teardown — and the same input always produces the same output.
+  > Pure functions are trivially testable: hand-craft a few \`Txn\` records, call the function, assert on the returned values. No mocks, no fakes, no setup, no teardown, and the same input always produces the same output.
 - It uses inheritance to be mocked.
   > It is a plain \`static\` method. No mocking required *because* it is pure.
 

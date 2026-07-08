@@ -18,7 +18,7 @@
      and is only used for CodeMirror token coloring. */
   --text-muted: #b4b9c0;
   --text-dim: #83878e;
-  /* Complementary accent drawn from the theme's function-highlight color —
+  /* Complementary accent drawn from the theme's function-highlight color,
      a vibrant hue populated per-theme by `applyThemePalette`. */
   --text-complementary: oklch(75% 0.2 85);
   /* Semantic aliases for the active theme's primary/complementary colors.
@@ -27,7 +27,7 @@
      `--text-complementary`. */
   --accent1: oklch(68% 0.18 250);
   --accent2: oklch(75% 0.2 85);
-  /* Brand-signal tokens — sourced from brand.css so the Run button, error
+  /* Brand-signal tokens, sourced from brand.css so the Run button, error
      states, and selection tints match the rest of the site. The editor-theme
      palettes (applyThemePalette / THEME_PALETTES) intentionally stay separate;
      they recolor the chrome to the user's chosen code theme, not the brand. */
@@ -47,7 +47,7 @@
   --ok-accent: var(--ds-green);
   --err-accent: var(--ds-red);
   /* Very subtle hover tint shared by dropdown / drawer / dialog menu items
-     across the playgrounds — a faint lift that reads consistently on any
+     across the playgrounds, a faint lift that reads consistently on any
      surface (--bg, --bg2, popups) rather than the heavier --bg3 step. */
   --menu-item-hover: color-mix(in srgb, var(--text) 6%, transparent);
   /* --font-mono (JetBrains Mono) is published on <html> by next/font in
@@ -55,29 +55,29 @@
      --font-ui is the playground-local alias every rule below consumes. */
   --font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
   --radius: 8px;
-  /* Editor font size — overridable inline by the font-size slider.
+  /* Editor font size, overridable inline by the font-size slider.
      Defining it as a variable lets the slider take effect even though
      the `.cm-editor` rule below uses `!important` (which would otherwise
      prevent inline font-size styles from applying). */
   --cm-font-size: 14px;
-  /* Output cell font size — defaults to the editor font size unless the
+  /* Output cell font size, defaults to the editor font size unless the
      "Use Different Font Size for Outputs" toggle is enabled. */
   --output-font-size: 13px;
 }
 
-/* ─── Light mode — only non-variable overrides remain ─── */
+/* ─── Light mode, only non-variable overrides remain ─── */
 html[data-playground-theme="light"] .pyodide-loading {
   background: var(--bg);
 }
 
 /* (box-sizing: border-box is set globally on every element by
-   app/globals.css, which the root layout imports on every route — no
+   app/globals.css, which the root layout imports on every route, no
    playground-scoped re-declaration is needed.) */
 
 /* ─── Consistent scrollbar styling ───────────────────────────────────────
    Apply across every playground (Python, R, SQL, Java, C#, …) so any
-   scrollable surface — output cells, sidebars, dialog/drawer bodies,
-   tab strips, dataframes, etc. — uses the same thin, low-contrast
+   scrollable surface, output cells, sidebars, dialog/drawer bodies,
+   tab strips, dataframes, etc., uses the same thin, low-contrast
    scrollbar that blends with the dark UI chrome instead of the
    bright OS default.
 
@@ -106,7 +106,7 @@ html[data-playground-theme="light"] .pyodide-loading {
   background: var(--border);
   border-radius: 4px;
   /* Slightly inset so the thumb doesn't run flush against the gutter
-     edges — gives the same airy look as the bespoke styles already
+     edges, gives the same airy look as the bespoke styles already
      used for the output / package list scrollbars. */
   background-clip: padding-box;
   border: 1px solid transparent;
@@ -308,13 +308,13 @@ body.playground-active {
   color: var(--primary);
 }
 
-/* Status pill removed — runtime state is now communicated by the Run
+/* Status pill removed, runtime state is now communicated by the Run
    button (idle / running / loading) plus the loading overlay. */
 
 /* ─── Header action group ─────────────────────────────────────────────── */
 /* Examples / Export / Packages / Info / Settings live in a single segmented
    group on the right so they read as a related cluster of actions.
-   `overflow: visible` is important — the header dropdowns/popovers are
+   `overflow: visible` is important, the header dropdowns/popovers are
    portalled by Base UI so this isn't strictly needed for them, but the
    border-radius is still respected via `clip-path` so segments look
    joined. */
@@ -322,7 +322,7 @@ body.playground-active {
   display: flex;
   align-items: stretch;
   background: transparent;
-  /* No outer border — buttons are separated by subtle vertical
+  /* No outer border, buttons are separated by subtle vertical
      dividers between siblings instead. */
 }
 
@@ -350,7 +350,7 @@ body.playground-active {
 /* Re-assert border-left after the .header-btn { border:none } reset. Using
    a two-class selector gives specificity (0,2,0), which beats .header-btn's
    (0,1,0) and therefore survives the border:none override. The universal `*`
-   before `+` means this fires regardless of what the preceding sibling is —
+   before `+` means this fires regardless of what the preceding sibling is,
    including the visually-hidden FocusGuard <span>s that Base UI injects next
    to Menu/Popover triggers when a popup is open, which previously broke the
    more specific `.header-btn + .header-btn` sibling selector. */
@@ -383,9 +383,9 @@ body.playground-active {
    blank out filled glyphs like react-icons' FaInfo.) */
 
 /* No outer border on the action group, so first/last buttons don't
-   need rounded corners — they remain flush with the header. */
+   need rounded corners, they remain flush with the header. */
 
-/* Visibility helpers — desktop / mobile. */
+/* Visibility helpers, desktop / mobile. */
 .mobile-only {
   display: none;
 }
@@ -436,7 +436,7 @@ body.playground-active {
   color: var(--text-dim);
 }
 
-/* ─── Icon sidebar wrapper — wraps icon sidebar + panes on desktop ─── */
+/* ─── Icon sidebar wrapper, wraps icon sidebar + panes on desktop ─── */
 .playground-body {
   display: flex;
   flex-direction: row;
@@ -781,7 +781,7 @@ body.playground-active {
   display: grid;
   grid-template-columns: 1fr 1fr;
   /* Pin the single grid row to the container height. Without this the
-     implicit `auto` row tracks its tallest item's content — so a tall
+     implicit `auto` row tracks its tallest item's content, so a tall
      Settings pane (e.g. the Themes grid) silently stretched the editor
      past the viewport, and a short one didn't fill it. */
   grid-template-rows: minmax(0, 1fr);
@@ -794,7 +794,7 @@ body.playground-active {
 /* While the Settings tab is active, pin the output pane to the cell the
    settings panel overlays (row 1, column 2). Without this, the settings
    pane's explicit placement claims that cell first and grid
-   auto-placement spills the output pane into an implicit second row —
+   auto-placement spills the output pane into an implicit second row,
    which both shrank row 1 (the editor) and let the settings panel's
    content height drive the editor's height. */
 .panes[data-settings-active] .output-pane {
@@ -809,7 +809,7 @@ body.playground-active {
    underneath it there. */
 @media (max-width: 768px) {
   /* The mobile panes area is a single tab-switched column and the
-     settings panel covers it absolutely, so undo the desktop pinning —
+     settings panel covers it absolutely, so undo the desktop pinning,
      an explicit column 2 would otherwise open an implicit track. */
   .panes[data-settings-active] .output-pane {
     grid-row: auto;
@@ -898,7 +898,7 @@ body.playground-active {
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  /* Slightly tighter radius than the rest of the chrome — the Run
+  /* Slightly tighter radius than the rest of the chrome, the Run
      button is the primary action and reads as more "button-like" with
      a small-but-deliberate corner. */
   border-radius: 4px;
@@ -1042,7 +1042,7 @@ body.playground-active {
 
 /* ─── Multi-entry-point split run button (non-SQL playgrounds) ─────
  *
- * Visual style copied from `.run-btn-split-main` above (per spec —
+ * Visual style copied from `.run-btn-split-main` above (per spec,
  * deliberately not reusing the class name) so the C / C++ / Java /
  * C# / Python / R / JS / TS / PHP playgrounds get the same primary
  * button + chevron + divider treatment as the SQL playground's
@@ -1078,7 +1078,7 @@ body.playground-active {
   filter: none;
 }
 .playground-run-multi-main.has-chevron {
-  /* Visual divider between primary action and the chevron — same
+  /* Visual divider between primary action and the chevron, same
    * 1px translucent-white treatment as `.run-btn-split-divider`. */
   box-shadow: inset -1px 0 0 0 rgba(255, 255, 255, 0.3);
 }
@@ -1152,7 +1152,7 @@ body.playground-active {
   flex: 1 1 auto;
 }
 /* Right-aligned, muted keyboard-shortcut hint inside a Run dropdown
-   row — mirrors the SQL playground's `.run-split-item-kbd`. */
+   row, mirrors the SQL playground's `.run-split-item-kbd`. */
 .playground-run-multi-item-kbd {
   color: var(--text-dim);
   font-size: 11px;
@@ -1233,7 +1233,7 @@ body.playground-active {
   background: color-mix(in srgb, var(--primary) 30%, transparent) !important;
 }
 
-/* ─── Tomorrow Night Eighties — selection override ─── */
+/* ─── Tomorrow Night Eighties, selection override ─── */
 /* The theme sets selection to #2D2D2D which is identical to the editor
    background after the playground palette override, making selected text
    invisible. The global subtle rule above already fixes this, but we keep
@@ -1274,7 +1274,7 @@ body.playground-active {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  /* Modest bottom padding — the auto-scroll places the most recent output
+  /* Modest bottom padding, the auto-scroll places the most recent output
      near the top of the viewport, so users no longer need huge slack
      below the last cell. */
   padding: 16px 16px 32px 16px;
@@ -1309,7 +1309,7 @@ body.playground-active {
   /* Pin the empty-state text to Inter. Without this the heading/body simply
      inherit the document font, which is fine on the standalone playground but
      lets a host's typography leak in wherever the playground is mounted inside
-     another styled context (the heading especially — see `.welcome h3`). */
+     another styled context (the heading especially, see `.welcome h3`). */
   font-family: var(--font-ui);
   text-align: center;
   padding: 32px;
@@ -1326,7 +1326,7 @@ body.playground-active {
 .welcome h3 {
   /* "Run a query to see results" is an <h3>. A bare `h3` selector (e.g. the
      /learn docs' `h1–h6 { font-family: var(--font-sans) }`) would otherwise
-     win over the inherited value above, so pin Inter directly here — the
+     win over the inherited value above, so pin Inter directly here, the
      `.welcome h3` selector outranks a lone element selector. */
   font-family: var(--font-ui);
   font-size: 16px;
@@ -1341,7 +1341,7 @@ body.playground-active {
   margin-top: 8px;
 }
 
-/* Output cells — minimal chrome. A single colored left accent identifies the
+/* Output cells, minimal chrome. A single colored left accent identifies the
    cell type; the header's darker background separates it from the body. No
    outer box border so cells don't look nested. */
 .out-cell {
@@ -1417,7 +1417,7 @@ body.playground-active {
 
 /* ─── Output segments ───
    One run renders as a single OUTPUT cell whose body stacks segments in
-   chronological order: text, dataframes, figures, charts — notebook
+   chronological order: text, dataframes, figures, charts, notebook
    style. Visually heavy segments are height-capped so a giant figure /
    frame stays in the page flow but remains reachable via its own
    scrollbar. */
@@ -1444,7 +1444,7 @@ body.playground-active {
   height: 380px;
 }
 
-/* DataFrame tables — kept in lockstep with `.outCellHtml table` in
+/* DataFrame tables, kept in lockstep with `.outCellHtml table` in
    ChallengeCard.module.css (same declarations, --ch-* tokens instead):
    the Jupyter-notebook default look (600-weight header row and index
    column, very subtle row striping, right-aligned cells, no cell
@@ -1455,7 +1455,7 @@ body.playground-active {
   overflow: auto;
   max-height: 480px;
   padding: 6px 0;
-  /* The merged output body renders text with pre-wrap — the newlines
+  /* The merged output body renders text with pre-wrap, the newlines
      between the tags of pandas' HTML must not become blank lines. */
   white-space: normal;
 }
@@ -1505,7 +1505,7 @@ body.playground-active {
 .dataframe-wrap tbody tr:hover th {
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
-/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+/* Middle-truncation marker cells/columns (R runtime), pandas renders
    its own "..." cells which inherit the same muted colour. */
 .dataframe-wrap .dataframe-ellipsis-row td,
 .dataframe-wrap .dataframe-ellipsis-col {
@@ -1529,7 +1529,7 @@ body.playground-active {
   color: var(--text-dim);
 }
 
-/* Clear button — uses a subtle border that blends with the pane bar
+/* Clear button, uses a subtle border that blends with the pane bar
    while keeping the label readable across editor themes. The label
    colour matches the "Editor"/"Output" pane heading so the two
    captions read as part of the same row. */
@@ -1746,7 +1746,7 @@ body.playground-active {
   flex-shrink: 0;
 }
 
-/* ✕ button pinned to the far right of the settings tab bar — closes the
+/* ✕ button pinned to the far right of the settings tab bar, closes the
    Settings tab and returns to the previously-active surface. */
 .settings-tabs-close {
   display: inline-flex;
@@ -1807,8 +1807,8 @@ body.playground-active {
 /* Restore-defaults / clear-localStorage actions. Sit at the bottom of
    the General tab, separated from the rest by a divider so they don't
    read as just-another-toggle. The buttons are grouped into rounded
-   cards — neutral maintenance actions in one, destructive actions in a
-   red-tinted "danger" one — with each row carrying a soft tinted icon
+   cards, neutral maintenance actions in one, destructive actions in a
+   red-tinted "danger" one, with each row carrying a soft tinted icon
    chip, so the section reads as deliberate UI rather than a raw button
    stack. */
 .settings-actions {
@@ -1854,7 +1854,7 @@ body.playground-active {
   outline: none;
   box-shadow: inset 0 0 0 2px var(--primary);
 }
-/* Soft tinted chip behind each row's icon — brand blue for neutral
+/* Soft tinted chip behind each row's icon, brand blue for neutral
    actions, red for destructive ones. */
 .settings-action-icon {
   display: inline-flex;
@@ -1916,13 +1916,13 @@ body.playground-active {
     height: 18px;
   }
   .settings-tab[data-active] {
-    /* No border around the active pill on mobile — the filled background
+    /* No border around the active pill on mobile, the filled background
        and primary text colour already mark it as selected. */
     background: var(--bg3);
     color: var(--primary);
   }
   .settings-tab-label {
-    /* Visually hidden — keep available to assistive tech via aria. */
+    /* Visually hidden, keep available to assistive tech via aria. */
     position: absolute;
     width: 1px;
     height: 1px;
@@ -2205,7 +2205,7 @@ input[type="range"].fs-slider:disabled {
   flex-shrink: 0;
 }
 .pkg-drawer-title {
-  /* Same heading-leak guard as .mobile-menu-drawer-title — this Drawer.Title
+  /* Same heading-leak guard as .mobile-menu-drawer-title, this Drawer.Title
      heading is portalled to body and would otherwise pick up the /learn
      docs' `h1–h6` rule (Inter with tightened display tracking). */
   font-family: var(--font-ui);
@@ -2424,7 +2424,7 @@ input[type="range"].fs-slider:disabled {
 /* ─── Toast ─── */
 /* Toast styles live further down (near the toast-viewport rule). */
 
-/* Loading overlay — full-screen splash shown until the runtime finishes
+/* Loading overlay, full-screen splash shown until the runtime finishes
    booting. Layout: huge horizontally-scrolling title text fills the
    middle of the viewport (faded out at the left/right edges via a CSS
    mask), and a witty status line + full-width indeterminate progress
@@ -2533,7 +2533,7 @@ input[type="range"].fs-slider:disabled {
   font-size: 13px;
   opacity: 0.85;
 }
-/* Workspace-conflict overlay — reuses the boot-overlay chrome but offers
+/* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
    open in another browser tab). */
 .playground-conflict-actions {
@@ -2607,7 +2607,7 @@ input[type="range"].fs-slider:disabled {
   color: var(--red, #e57373);
 }
 
-/* Resizer — draggable divider between editor and output panes. A persistent
+/* Resizer, draggable divider between editor and output panes. A persistent
    grip indicator makes it discoverable without requiring the user to hover to
    find the hit area. */
 .resizer {
@@ -2668,7 +2668,7 @@ input[type="range"].fs-slider:disabled {
   margin-top: 4px;
 }
 
-/* Section heading inside the Import dropdown — separates "Database" from
+/* Section heading inside the Import dropdown, separates "Database" from
    "Tables" import options. Matches .sql-result-export-group-label style. */
 .import-section-label {
   margin-top: 6px;
@@ -2703,7 +2703,7 @@ input[type="range"].fs-slider:disabled {
   margin-left: 8px;
 }
 
-/* File-extension badge — compact inline badge rendered beside the item title. */
+/* File-extension badge, compact inline badge rendered beside the item title. */
 .ext-badge {
   flex-shrink: 0;
   display: inline-flex;
@@ -2758,7 +2758,7 @@ input[type="range"].fs-slider:disabled {
     grid-template-rows: 48px 1fr;
   }
 
-  /* Header on mobile is compact — the playground switcher stays on the
+  /* Header on mobile is compact, the playground switcher stays on the
      left and a single hamburger menu replaces all individual action
      buttons. */
   .playground-header {
@@ -2773,7 +2773,7 @@ input[type="range"].fs-slider:disabled {
     border-bottom: 1px solid var(--border);
   }
   /* The Settings tab fills the whole pane, so its own Editor/Output pane
-     switcher is meaningless while it's open — hide it. */
+     switcher is meaningless while it's open, hide it. */
   .mobile-tabs[data-settings-active] {
     display: none;
   }
@@ -2811,7 +2811,7 @@ input[type="range"].fs-slider:disabled {
 
   /* Let the editor/output column shrink to the viewport. The flex chain
      defaults to min-width:auto, so it was held open at the editor pane
-     bar's min-content width — which forced a ~96px horizontal overflow
+     bar's min-content width, which forced a ~96px horizontal overflow
      at 390px. Relax min-width down the chain and drop the keyboard-only
      run hint (no Ctrl/Cmd+Enter on touch) so the pane bar fits; the Run
      label already truncates with an ellipsis. */
@@ -2852,7 +2852,7 @@ input[type="range"].fs-slider:disabled {
 /* ─── Base UI popups (shared positioner -> popup styling) ──────────────
    Base UI sets `data-starting-style` and `data-ending-style` on popups
    during enter/exit, and `data-side` / `--transform-origin` on the
-   positioner — we use these to drive natural enter/exit animations. */
+   positioner, we use these to drive natural enter/exit animations. */
 .bui-popup {
   outline: none;
   background: var(--bg);
@@ -3026,7 +3026,7 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* The Files bottom-sheet hosts the full FilesPanel (toolbar + tree),
-   which expects to fill its container — so give it a definite, usable
+   which expects to fill its container, so give it a definite, usable
    height and let the panel scroll internally instead of the menu body. */
 .mobile-files-drawer-body {
   padding: 0;
@@ -3186,7 +3186,7 @@ input[type="range"].fs-slider:disabled {
   transform: translateY(0);
 }
 
-/* Smooth sine-wave SVG layer — replaces the previous diagonal stripe
+/* Smooth sine-wave SVG layer, replaces the previous diagonal stripe
    pattern so the motion reads as a flowing curve rather than a stack
    of hard "spikes". The path is wider than the viewBox so a simple
    translateX loop produces a seamless scroll. */
@@ -3226,7 +3226,7 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* A bright, narrow data-flow line that streaks across the band.
-   This is the "data" half of the metaphor — a packet flying through. */
+   This is the "data" half of the metaphor, a packet flying through. */
 .dataslope-stream {
   position: absolute;
   left: 0;
@@ -3449,7 +3449,7 @@ input[type="range"].fs-slider:disabled {
   color: color-mix(in srgb, var(--text-dim) 60%, transparent);
 }
 
-/* ─── Toast viewport (Base UI Toast — stacked / hover-to-expand) ───
+/* ─── Toast viewport (Base UI Toast, stacked / hover-to-expand) ───
    Modeled on Base UI's docs hero demo so multiple toasts stack into
    a single card with the older ones peeking from behind, and expand
    into a vertical column when the viewport is hovered or focused. */
@@ -3643,7 +3643,7 @@ html[data-playground-theme="light"] .toast {
   background: var(--bg3);
 }
 
-/* ─── Dark editor themes — force white text on top-bar controls and
+/* ─── Dark editor themes, force white text on top-bar controls and
    the empty-output welcome heading so they remain legible against the
    editor-themed background (which can use a colored "muted" hue that
    doesn't read as a UI label). Light themes keep the existing palette. */
@@ -3902,7 +3902,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 12px;
   cursor: pointer;
   position: relative;
-  /* Don't shrink — keep each tab readable and let the strip scroll. */
+  /* Don't shrink, keep each tab readable and let the strip scroll. */
   flex: 0 0 auto;
   min-width: 60px;
   max-width: 240px;
@@ -4057,7 +4057,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   background: var(--green);
 }
 
-/* Save menu trigger — sits next to the badge on every playground. Accent-
+/* Save menu trigger, sits next to the badge on every playground. Accent-
    filled while the active workspace is an unsaved draft with changes (the
    call to action: it isn't in the saved list yet); otherwise the `quiet`
    variant matches the badge pill. */
@@ -4229,7 +4229,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text-dim);
 }
 
-/* Section label separating cloud-only rows ("Cloud — not on this device")
+/* Section label separating cloud-only rows ("Cloud, not on this device")
    from the local recents above them. */
 .workspace-popover-subheader {
   margin-top: 4px;
@@ -4394,7 +4394,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-weight: 500;
   cursor: pointer;
   /* Share the row evenly instead of content-sizing with a ragged right
-     edge. No `margin-bottom` — the parent's flex `gap` owns the spacing
+     edge. No `margin-bottom`, the parent's flex `gap` owns the spacing
      (the stray margin compounded with the gap and the column gap). */
   flex: 1 1 auto;
 }
@@ -4725,7 +4725,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 /* ─── Editors top: CodePen-style columns over the preview ────────────────
    With the editor pane spanning the full width above the output, the
-   stacked panes waste vertical space — lay them out side by side
+   stacked panes waste vertical space, lay them out side by side
    instead, one column per file. */
 .panes[data-editor-position="top"]:not([data-settings-active])
   .split-editor-panes {

@@ -1,6 +1,6 @@
 ---
 title: Grouping Data
-description: GROUP BY turns one grand total into one summary per category — the single most-used analytical construct. How grouping works mentally, and how to read a grouped result.
+description: GROUP BY turns one grand total into one summary per category, the single most-used analytical construct. How grouping works mentally, and how to read a grouped result.
 ---
 
 A grand total answers "how much, overall?" But analysts almost always
@@ -12,7 +12,7 @@ builds a solid mental model of what grouping really does.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="A mixed row of blue, green, and yellow dots fans along thin lines into three tinted cards sorted by color, and each card condenses into one solid bar sized to its contents — GROUP BY bins the rows, then summarizes every bin once"
+  aria-label="A mixed row of blue, green, and yellow dots fans along thin lines into three tinted cards sorted by color, and each card condenses into one solid bar sized to its contents, GROUP BY bins the rows, then summarizes every bin once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -92,7 +92,7 @@ ORDER BY
 />
 
 Read the result as a small report: each line is one cut, summarized. Look
-closely and the order may surprise you — average price does *not* simply
+closely and the order may surprise you, average price does *not* simply
 track cut quality, because the cuts differ in their typical `carat`, and
 size drives price hard. Noticing that mismatch, then asking *why*, is
 exactly the kind of thread an analyst pulls on next.
@@ -104,7 +104,7 @@ Every column in the `SELECT` list must be either **in the `GROUP BY`** or
 is worth understanding *why*, not just memorizing it.
 
 When you group by `region`, each result row stands for a *whole group* of
-orders. Asking for a bare `id` makes no sense — *which* order's id, when
+orders. Asking for a bare `id` makes no sense, *which* order's id, when
 the row represents twenty orders? There is no single answer, so SQL
 refuses. The column must either *define* the group (`region`) or be
 *summarized* across it (`SUM(amount)`).
@@ -117,7 +117,7 @@ flowchart TD
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="The rule in action — every column is grouped or aggregated"
+  title="The rule in action, every column is grouped or aggregated"
   initSql={`CREATE TABLE sales (region TEXT, product TEXT, amount DECIMAL(8, 2));
 
 INSERT INTO
@@ -147,14 +147,14 @@ ORDER BY
 ## Grouping by multiple columns
 
 Grouping by two columns creates one row per **combination** that actually
-appears. Above, you get one row per `(region, product)` pair — a small
+appears. Above, you get one row per `(region, product)` pair, a small
 matrix of the business. Adding a grouping column is exactly the
 **drill-down** move from earlier: more dimensions, finer detail.
 
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Six tinted pill tiles form a small grid: three region colors run down the rows, and a gray square or triangle product mark alternates across the columns — grouping by two columns yields one summary row per combination that appears"
+  aria-label="Six tinted pill tiles form a small grid: three region colors run down the rows, and a gray square or triangle product mark alternates across the columns, grouping by two columns yields one summary row per combination that appears"
   style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -187,7 +187,7 @@ matrix of the business. Adding a grouping column is exactly the
 
 ## Grouping by an expression
 
-You can group by something computed, not just a stored column — by month
+You can group by something computed, not just a stored column, by month
 extracted from a date, by a price bucket, by the first letter of a name.
 This is where grouping becomes genuinely creative.
 
@@ -240,7 +240,7 @@ flowchart TD
     A --> O["<code>ORDER BY</code><br/>(sort the summary)"]
 ```
 
-`WHERE` filters *individual rows* before grouping — it cannot see group
+`WHERE` filters *individual rows* before grouping, it cannot see group
 totals. Filtering on a group total needs `HAVING`, which is two pages
 away.
 
@@ -266,7 +266,7 @@ away.
 
 - \`id\` is a reserved word.
   > \`id\` is a normal column name; the issue is grouping semantics, not reserved words.
-- [o] Each result row represents a whole group of orders, so a single \`id\` is ambiguous — it is neither grouped nor aggregated.
+- [o] Each result row represents a whole group of orders, so a single \`id\` is ambiguous, it is neither grouped nor aggregated.
   > Every selected column must be in the \`GROUP BY\` or inside an aggregate; a bare \`id\` has no single value per group.
 - \`SUM(amount)\` is invalid when other columns are present.
   > \`SUM(amount)\` is fine; the problem is specifically the unaggregated, ungrouped \`id\`.
@@ -347,5 +347,5 @@ ORDER BY
 />
 
 `GROUP BY` is so central that DuckDB adds conveniences to make it terser
-and more powerful — `GROUP BY ALL` and grouping sets. That is the next
+and more powerful, `GROUP BY ALL` and grouping sets. That is the next
 page.

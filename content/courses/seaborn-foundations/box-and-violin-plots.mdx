@@ -1,10 +1,10 @@
 ---
 title: Box and Violin Plots
-description: Summarizing a distribution with quartiles — the anatomy of a box plot, the shape a violin adds, and the one thing a box plot dangerously hides.
+description: Summarizing a distribution with quartiles, the anatomy of a box plot, the shape a violin adds, and the one thing a box plot dangerously hides.
 ---
 
 When you have a numeric variable split across several categories, you often
-don't want every raw point *or* a single bar — you want a compact **summary
+don't want every raw point *or* a single bar, you want a compact **summary
 of each group's distribution** so you can compare them at a glance. That's
 what box plots and violin plots are for.
 
@@ -14,7 +14,7 @@ hide can genuinely mislead you, so we'll go carefully.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A box plot's tidy rectangle, median bar, and whiskers beside a violin whose mirrored outline swells twice around its inner quartile capsule — the two humps the box quietly flattened away"
+  aria-label="A box plot's tidy rectangle, median bar, and whiskers beside a violin whose mirrored outline swells twice around its inner quartile capsule, the two humps the box quietly flattened away"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -42,14 +42,14 @@ hide can genuinely mislead you, so we'll go carefully.
 ## Anatomy of a box plot
 
 A **box plot** (or box-and-whisker plot) compresses a distribution into a
-handful of robust summary numbers based on **quartiles** — the values that
+handful of robust summary numbers based on **quartiles**, the values that
 cut the sorted data into four equal parts.
 
 Reading the parts:
 
 - **The box** spans the first quartile (**Q1**, 25th percentile) to the
   third quartile (**Q3**, 75th percentile). Its height is the
-  **interquartile range (IQR)** — the middle 50% of the data.
+  **interquartile range (IQR)**, the middle 50% of the data.
 - **The line inside the box** is the **median** (Q2, 50th percentile).
 - **The whiskers** extend to the most extreme points still within **1.5 ×
   IQR** of the box edges.
@@ -130,7 +130,7 @@ a **numeric** variable to summarize.
 ## The dangerous thing a box plot hides
 
 A box plot only knows about quartiles. It is completely blind to the
-**shape** of the data *between* those landmarks — most importantly, it can't
+**shape** of the data *between* those landmarks, most importantly, it can't
 show whether a group is **bimodal** (has two peaks). Two wildly different
 distributions can produce the *same* box plot.
 
@@ -162,7 +162,7 @@ sns.catplot(data=df, x="group", y="value", kind="box", height=4, aspect=1.1)
   ]}
 />
 
-The two boxes look nearly identical — yet group B is strongly bimodal and
+The two boxes look nearly identical, yet group B is strongly bimodal and
 group A is not. The box plot erased that completely. Now swap to a violin:
 
 <CodeBlock
@@ -202,13 +202,13 @@ conclude?
 - The two groups have the same distribution.
   > Box plots only match on quartiles; the groups can still differ dramatically in shape (for example, one bimodal and one not).
 - [o] They have similar quartiles, but could still have very different *shapes* (e.g. one bimodal).
-  > A box plot summarizes only the five-number summary, so matching boxes guarantee similar quartiles — nothing about modality or the shape between them.
+  > A box plot summarizes only the five-number summary, so matching boxes guarantee similar quartiles, nothing about modality or the shape between them.
 - One group must contain outliers and the other must not.
   > Outliers are shown separately and aren't implied by matching boxes; both or neither could have them.
 - The medians are different.
   > Identical-looking boxes would have *similar* medians, not different ones.
 
-Matching boxes mean matching quartiles, not matching distributions — switch
+Matching boxes mean matching quartiles, not matching distributions, switch
 to a violin (or a strip/swarm) when shape matters.`}
 />
 
@@ -363,7 +363,7 @@ g = sns.catplot(
 
 A box plot is only useful if you can *read* the numbers it draws. The line
 inside each box is the **median**, and the box spans the middle 50% of the
-data (the 25th to the 75th percentile — the **interquartile range, or IQR**).
+data (the 25th to the 75th percentile, the **interquartile range, or IQR**).
 Let's compute those directly so the picture and the numbers line up.
 
 <ChallengeCard
@@ -374,9 +374,9 @@ Let's compute those directly so the picture and the numbers line up.
 penguins specifically, compute the two values a box's *core* shows and store
 each as a plain Python \`float\`:
 
-1. \`adelie_median\` — the **median** \`body_mass_g\` of Adelie penguins (the
+1. \`adelie_median\`, the **median** \`body_mass_g\` of Adelie penguins (the
    line inside the box).
-2. \`adelie_iqr\` — the **interquartile range** of their \`body_mass_g\`: the
+2. \`adelie_iqr\`, the **interquartile range** of their \`body_mass_g\`: the
    75th percentile minus the 25th percentile (the box's height).
 
 Hint: filter to \`species == "Adelie"\`, then use \`.median()\` and
@@ -429,7 +429,7 @@ other) represent?
 
 - The full range from the minimum to the maximum value.
   > That's closer to what the whiskers-plus-outliers cover; the box is narrower.
-- [o] The interquartile range — from Q1 (25th percentile) to Q3 (75th percentile), i.e. the middle 50% of the data.
+- [o] The interquartile range, from Q1 (25th percentile) to Q3 (75th percentile), i.e. the middle 50% of the data.
   > The box spans Q1 to Q3, so its length is the IQR and it contains the central half of the observations.
 - One standard deviation on either side of the mean.
   > Box plots are built from quartiles (a median-based summary), not from the mean and standard deviation.
@@ -490,6 +490,6 @@ Boxen plots extend the box idea to expose tail quantiles, which is most
 useful when you have lots of data.`}
 />
 
-Box plots summarize, violins reveal shape, boxen plots expose tails — but all
+Box plots summarize, violins reveal shape, boxen plots expose tails, but all
 three still *summarize*. Next we go the other direction and plot **every
 single observation** with strip and swarm plots.

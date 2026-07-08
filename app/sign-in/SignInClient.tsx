@@ -15,14 +15,14 @@ import styles from "../_components/auth/authCard.module.css";
 
 /** Where to land after a successful sign-in when we don't know where
  *  the visitor came from (direct /sign-in loads, private mode). The
- *  usual case resolves to the page they were on instead — see
+ *  usual case resolves to the page they were on instead, see
  *  `resolveCallbackUrl` below and _components/auth/returnTo.ts. */
 const FALLBACK_CALLBACK_URL = "/account";
 
 /**
  * The post-sign-in destination: an explicit, validated `?next=` param
  * wins, then the tracked "page the user came from" (recorded per-tab by
- * ReturnToTracker in the root layout — it sees client-side navigations,
+ * ReturnToTracker in the root layout, it sees client-side navigations,
  * which document.referrer misses), then /account. Read via
  * window.location (not useSearchParams) so the page keeps prerendering
  * statically without a Suspense boundary.
@@ -41,12 +41,12 @@ function resolveCallbackUrl(): string {
  *   - The one-time `state` cookie didn't make it back to the callback host.
  *     This used to fail *every* sign-in started on www.dataslope.com (the
  *     host-only cookie stayed on www while Google returned to the apex);
- *     fixed by domain-scoping the cookie — see `oauthStateCookieDomain` in
+ *     fixed by domain-scoping the cookie, see `oauthStateCookieDomain` in
  *     lib/auth/server.ts. It still happens on hosts no cookie can bridge,
  *     e.g. a workers.dev preview, where retrying (now from the apex this
  *     error page landed on) is genuinely the fix.
  *   - A *duplicate* callback request whose state was already consumed by the
- *     request that signed the user in — a session exists, and the signed-in
+ *     request that signed the user in, a session exists, and the signed-in
  *     redirect below whisks the visitor to /account before any copy renders.
  */
 const STALE_ATTEMPT_COPY =
@@ -60,10 +60,10 @@ const AUTH_ERROR_COPY: Record<string, string> = {
 const AUTH_ERROR_FALLBACK =
   "Something went wrong during sign-in. Please try again.";
 
-/** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
+/** Minimum password length, mirrors Better Auth's default (`minPasswordLength`). */
 const MIN_PASSWORD = 8;
 
-/** Lazy email check — matches the design's validation regex exactly. */
+/** Lazy email check, matches the design's validation regex exactly. */
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 type Mode = "signin" | "signup" | "forgot";
@@ -114,8 +114,8 @@ function GoogleGlyph() {
 }
 
 /**
- * Auth card spanning three modes — sign in, create account, and request a
- * password reset — as a single flat, borderless component (design option "2a").
+ * Auth card spanning three modes, sign in, create account, and request a
+ * password reset, as a single flat, borderless component (design option "2a").
  *
  * Success paths (destination = resolveCallbackUrl(): the page the user
  * came from, else /account):
@@ -146,7 +146,7 @@ export function SignInClient() {
   const [socialPending, setSocialPending] = useState<string | null>(null);
 
   // A signed-in visitor has no reason to be on the sign-in/registration screen
-  // — send them back where they came from (or to their account).
+  //, send them back where they came from (or to their account).
   useEffect(() => {
     if (!isPending && session) router.replace(resolveCallbackUrl());
   }, [isPending, session, router]);
@@ -154,7 +154,7 @@ export function SignInClient() {
   // Surface a forwarded OAuth-callback failure (`/sign-in?error=<code>`) and
   // scrub the code from the address bar so it doesn't linger through reloads,
   // bookmarks, or copied links. Read via window.location (not useSearchParams)
-  // so the page keeps prerendering statically without a Suspense boundary —
+  // so the page keeps prerendering statically without a Suspense boundary,
   // same pattern as the checkout return in app/account/AccountClient.tsx.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -173,7 +173,7 @@ export function SignInClient() {
   }, []);
 
   // Deep-link support: /sign-in?mode=forgot (or signup) opens that form
-  // directly — the expired-reset-link page points here so users don't have
+  // directly, the expired-reset-link page points here so users don't have
   // to land on the sign-in tab and rediscover "Forgot password?". Same
   // window.location pattern as the error effect above, for the same
   // static-prerender reason.
@@ -187,7 +187,7 @@ export function SignInClient() {
 
   // A browser Back from the OAuth provider can restore this page from the
   // bfcache with `socialPending`/`submitting` still set from before the
-  // navigation — which would leave every control disabled with no request in
+  // navigation, which would leave every control disabled with no request in
   // flight. `pageshow` with `persisted` fires exactly on that restore.
   useEffect(() => {
     function onPageShow(e: PageTransitionEvent) {
@@ -201,7 +201,7 @@ export function SignInClient() {
 
   if (!isPending && session) {
     return (
-      <p className={styles.redirecting}>You&apos;re signed in — redirecting…</p>
+      <p className={styles.redirecting}>You&apos;re signed in, redirecting…</p>
     );
   }
 
@@ -226,8 +226,8 @@ export function SignInClient() {
     // Full-page redirect to the provider, returning to the resolved
     // callback URL. On success the client's redirect plugin navigates
     // away, so the button staying "pending" is right. Server-side
-    // failures resolve with {error} (they do NOT reject) — e.g. the
-    // provider isn't configured in this environment — and must
+    // failures resolve with {error} (they do NOT reject), e.g. the
+    // provider isn't configured in this environment, and must
     // re-enable the card; a rejection is a network failure and must too.
     try {
       const { error } = await signIn.social({
@@ -259,7 +259,7 @@ export function SignInClient() {
         // The server already answers 200 with a neutral body for unknown
         // emails, so the form can't probe which addresses are registered.
         // A returned error is therefore always a genuine failure (sender not
-        // configured, Resend outage) — surfacing it leaks nothing, and
+        // configured, Resend outage), surfacing it leaks nothing, and
         // pretending the link was sent would leave the user waiting forever.
         const { error } = await requestPasswordReset({
           email,
@@ -290,7 +290,7 @@ export function SignInClient() {
     const derivedName = email.split("@")[0]?.trim() || email;
 
     // Server-side failures resolve with {error}; only a network-level failure
-    // rejects — catch it so the form doesn't stay disabled at "Signing in…".
+    // rejects, catch it so the form doesn't stay disabled at "Signing in…".
     const callbackUrl = resolveCallbackUrl();
     try {
       const { data, error } = isSignup
@@ -304,7 +304,7 @@ export function SignInClient() {
 
       if (error) {
         // When verification is required, an unverified sign-in is rejected and a
-        // fresh verification email is sent — tell the user to check their inbox.
+        // fresh verification email is sent, tell the user to check their inbox.
         if (error.code === "EMAIL_NOT_VERIFIED") {
           setNotice(
             "Please verify your email first. We've sent you a new verification link.",
@@ -316,7 +316,7 @@ export function SignInClient() {
         return;
       }
 
-      // Sign-up with verification required returns no active session — prompt to
+      // Sign-up with verification required returns no active session, prompt to
       // verify rather than redirecting into a gated page.
       if (isSignup && data && !("token" in data && data.token)) {
         setPassword("");
@@ -429,7 +429,7 @@ export function SignInClient() {
                   id="auth-password-hint"
                   className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
                 >
-                  {pwOk ? "Strong enough — looks good." : "At least 8 characters."}
+                  {pwOk ? "Strong enough, looks good." : "At least 8 characters."}
                 </span>
               ) : (
                 <button

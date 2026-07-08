@@ -1,6 +1,6 @@
 {
     "title": "Intro to Web Development",
-    "description": "Build real web pages in your browser — HTML structure, CSS styling and layout, JavaScript interactivity, a taste of Tailwind and React. Every lesson has a live, editable page preview.",
+    "description": "Build real web pages in your browser, HTML structure, CSS styling and layout, JavaScript interactivity, a taste of Tailwind and React. Every lesson has a live, editable page preview.",
     "root": true,
     "tags": {
         "language": [

@@ -3,9 +3,9 @@ title: Strings
 description: Literals, indexing, slicing, methods, and f-strings
 ---
 
-A `str` in Python 3 is an immutable sequence of Unicode code points. Strings are one of the most-used types in the language—text is everywhere—and Python gives you a rich toolkit for working with them.
+A `str` in Python 3 is an immutable sequence of Unicode code points. Strings are one of the most-used types in the language-text is everywhere-and Python gives you a rich toolkit for working with them.
 
-Every snippet on this page runs in your browser—no setup required.
+Every snippet on this page runs in your browser-no setup required.
 
 <Figure
   slug="a-risograph-of-a-string-data-structure"
@@ -15,7 +15,7 @@ Every snippet on this page runs in your browser—no setup required.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two thin yellow cut lines drop at positions two and six along a loaf of character cells and the span between them lifts out as a fresh green copy — slicing reads from the first cut up to, not including, the second"
+  aria-label="Two thin yellow cut lines drop at positions two and six along a loaf of character cells and the span between them lifts out as a fresh green copy, slicing reads from the first cut up to, not including, the second"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -51,11 +51,11 @@ Strings show up in almost every program:
 - **Automation scripts:** command output, configuration files, environment variables.
 - **Games:** dialogue, item names, save files.
 
-Understanding strings—indexing, slicing, formatting, and the immutability gotcha—is essential to productive Python programming.
+Understanding strings-indexing, slicing, formatting, and the immutability gotcha-is essential to productive Python programming.
 
 ## String literals
 
-There are four ways to write a string literal. They're all equivalent at the value level—pick whichever avoids backslash escapes.
+There are four ways to write a string literal. They're all equivalent at the value level-pick whichever avoids backslash escapes.
 
 <CodeBlock
   adapter="python"
@@ -267,7 +267,7 @@ print(s)
 />
 
 <Callout type="warn" title="Immutability gotcha">
-Because strings are immutable, repeatedly concatenating with `+=` in a loop is O(n²)—each operation creates a new string and copies everything.
+Because strings are immutable, repeatedly concatenating with `+=` in a loop is O(n²), each operation creates a new string and copies everything.
 
 **Bad:**
 ```python
@@ -422,13 +422,13 @@ print(f"double = {score * 2:.2f}")
 <Callout type="info" title="f-string format mini-language">
 The part after `:` in `{value:format}` is a powerful mini-language:
 
-- `.Nf` — N decimal places for floats
-- `>width` — right-align in width
-- `<width` — left-align
-- `^width` — center
-- `,` — thousands separator
-- `0Nf` — zero-pad
-- `%` — multiply by 100 and add percent sign
+- `.Nf`, N decimal places for floats
+- `>width`, right-align in width
+- `<width`, left-align
+- `^width`, center
+- `,`, thousands separator
+- `0Nf`, zero-pad
+- `%`, multiply by 100 and add percent sign
 
 Full spec: [Format Specification Mini-Language](https://docs.python.org/3/library/string.html#formatspec).
 </Callout>
@@ -654,7 +654,7 @@ print(slugify("Python 3.12 Released"))
 - \`"ace"\`
   > That would be \`"abcdef"[0:5:2]\`.
 - An \`IndexError\`
-  > Slicing never raises \`IndexError\`—it returns whatever overlaps.`}
+  > Slicing never raises \`IndexError\`, it returns whatever overlaps.`}
 />
 
 <MultipleChoice

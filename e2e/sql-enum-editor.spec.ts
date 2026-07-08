@@ -52,7 +52,7 @@ for (const { id, route } of ENGINES) {
     );
     await waitIdle(page);
 
-    // Wait for `feels` to land in the sidebar — the same schema refresh
+    // Wait for `feels` to land in the sidebar, the same schema refresh
     // populates its columns (incl. the enum labels), so the dropdown is ready.
     await page
       .locator(".sql-tree-item-name", { hasText: /^feels$/ })
@@ -71,7 +71,7 @@ for (const { id, route } of ENGINES) {
       .first();
     await okCell.dblclick();
 
-    // It's a dropdown of the enum's labels — not a free-text input.
+    // It's a dropdown of the enum's labels, not a free-text input.
     const select = page.locator("select.sql-cell-select");
     await expect(select).toBeVisible();
     await expect(select.locator("option")).toHaveText(["sad", "ok", "happy"]);
@@ -87,7 +87,7 @@ for (const { id, route } of ENGINES) {
       page.locator(".toast-title", { hasText: "Updated 1 cell" }),
     ).toBeVisible({ timeout: 40_000 });
 
-    // The new label persisted (row may move under MVCC — assert presence).
+    // The new label persisted (row may move under MVCC, assert presence).
     await expect(page.locator(".sql-result-table")).toContainText("happy", {
       timeout: 40_000,
     });

@@ -1,6 +1,6 @@
 ---
 title: Regression and Trend Lines
-description: lmplot and regplot — fitting a line or curve through a scatter to summarize a relationship, without fooling yourself.
+description: lmplot and regplot, fitting a line or curve through a scatter to summarize a relationship, without fooling yourself.
 ---
 
 A scatter plot shows you *every* point. Often you want one more thing: a
@@ -8,7 +8,7 @@ single line drawn through the cloud that says "on average, as x goes up, y
 does *this*." That line is a **regression fit**, and Seaborn can add it on
 top of the scatter for you.
 
-A fitted line is a powerful summary — and a powerful way to mislead
+A fitted line is a powerful summary, and a powerful way to mislead
 yourself. It can imply a relationship is simpler, stronger, or more
 trustworthy than the data really supports. So this page teaches the tools
 *and* the discipline: how to draw a trend line, and how to keep it honest.
@@ -16,7 +16,7 @@ trustworthy than the data really supports. So this page teaches the tools
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A translucent confidence band pinched narrow at its middle and flaring wide at both ends wraps a dotted fit line through a faint scatter, with one red point the line quietly ignores — trust the trend most at its center"
+  aria-label="A translucent confidence band pinched narrow at its middle and flaring wide at both ends wraps a dotted fit line through a faint scatter, with one red point the line quietly ignores, trust the trend most at its center"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="206" width="480" height="3" rx="1.5" fill="currentColor" opacity="0.25" />
@@ -51,16 +51,16 @@ trustworthy than the data really supports. So this page teaches the tools
 
 Seaborn has two functions that draw a scatter **plus** a fitted line:
 
-- **`sns.regplot`** — axes-level. Draws onto a single Axes and returns it.
-- **`sns.lmplot`** — figure-level. Makes its own figure and, crucially,
+- **`sns.regplot`**, axes-level. Draws onto a single Axes and returns it.
+- **`sns.lmplot`**, figure-level. Makes its own figure and, crucially,
   supports `hue`, `col`, and `row` to fit lines per group or per panel.
 
 Both draw the same two things: the **points**, and a line that estimates
-the *central tendency of y for each value of x* — your best single guess
+the *central tendency of y for each value of x*, your best single guess
 for y given x. Around that line is a translucent band.
 
 <Callout type="info" title="What the shaded band means">
-The band is a **95% confidence interval for the fitted line itself** — a
+The band is a **95% confidence interval for the fitted line itself**, a
 measure of how well-pinned-down the *line* is, given this sample. It is
 **not** a range that contains 95% of the data points, and it is not a
 prediction interval for a new observation. A narrow band means "we're
@@ -89,8 +89,8 @@ sns.lmplot(data=tips, x="total_bill", y="tip", height=4)
 />
 
 The line slopes up: larger bills tend to come with larger tips. The band is
-narrow in the middle — where most bills sit, so the average is well
-estimated — and flares at the extremes, where there are fewer points to
+narrow in the middle, where most bills sit, so the average is well
+estimated, and flares at the extremes, where there are fewer points to
 pin it down. Notice the points are still there: the line is a *summary
 laid over the evidence*, never a replacement for it.
 
@@ -120,13 +120,13 @@ sns.lmplot(data=tips, x="total_bill", y="tip", hue="smoker", height=4, aspect=1.
 Now you can compare slopes directly. If two lines are nearly parallel, the
 groups respond to `total_bill` similarly; if they fan apart, the
 relationship itself depends on the group. (Want them side by side instead
-of overlaid? Use `col="smoker"` for one panel each — the same faceting idea
+of overlaid? Use `col="smoker"` for one panel each, the same faceting idea
 from the relational plots.)
 
 ## The key lesson: a straight line on a curve lies
 
 A straight fit assumes the relationship *is* a straight line. When it
-isn't, the line is not just imprecise — it is **wrong**, and it will lie to
+isn't, the line is not just imprecise, it is **wrong**, and it will lie to
 you confidently. The `mpg` dataset shows this beautifully: fuel efficiency
 versus engine horsepower.
 
@@ -148,7 +148,7 @@ sns.lmplot(data=mpg, x="horsepower", y="mpg", height=4, aspect=1.3)
 />
 
 Look closely at how the line sits against the points. The relationship
-bends — mpg falls steeply at low horsepower and then flattens — but the
+bends, mpg falls steeply at low horsepower and then flattens, but the
 straight line splits the difference. It runs *above* the data at both ends
 and *below* it in the middle. Read off any prediction and it is off. The
 line is precise-looking and simply incorrect.
@@ -195,9 +195,9 @@ line clearly sits *above* the points at both ends and *below* them in the
 middle. What is the right conclusion?
 
 - Horsepower and mpg are unrelated, so the line is flat noise.
-  > The points show a strong, clear relationship — it is just *curved*. "Unrelated" would look like a shapeless cloud with a roughly flat fit.
+  > The points show a strong, clear relationship, it is just *curved*. "Unrelated" would look like a shapeless cloud with a roughly flat fit.
 - [o] The relationship is curved, so a straight-line fit is the wrong model; use \`order=2\` or \`lowess=True\`.
-  > A systematic over/under/over pattern is the signature of fitting a line to a curve. Letting the fit bend — a polynomial or a LOWESS smoother — matches the data's actual shape.
+  > A systematic over/under/over pattern is the signature of fitting a line to a curve. Letting the fit bend, a polynomial or a LOWESS smoother, matches the data's actual shape.
 - The confidence band is too narrow and should be widened.
   > The band describes uncertainty in the fitted line; it cannot rescue a fit whose *shape* is wrong. The fix is a better curve, not a wider band.
 - You should remove the points and keep only the line for clarity.
@@ -218,7 +218,7 @@ re-weights iteratively).
 sns.lmplot(data=tips, x="total_bill", y="tip", robust=True)
 ```
 
-**`logistic=True`** is for a **binary** outcome — a y that is only 0 or 1.
+**`logistic=True`** is for a **binary** outcome, a y that is only 0 or 1.
 Instead of a straight line, it fits an S-shaped logistic curve estimating
 the *probability* that y = 1 as x changes. The `titanic` dataset has a 0/1
 `survived` column:
@@ -234,8 +234,8 @@ A straight line here would happily predict probabilities above 1 or below
 ## Diagnosing a fit with `residplot`
 
 How do you *check* whether a straight line was appropriate, rather than
-just eyeballing it? Plot the **residuals** — the leftover gap between each
-point and the line — against x. `sns.residplot` does this. The rule is
+just eyeballing it? Plot the **residuals**, the leftover gap between each
+point and the line, against x. `sns.residplot` does this. The rule is
 simple:
 
 - **Patternless cloud around zero** → the straight-line model captured the
@@ -260,7 +260,7 @@ sns.residplot(data=mpg, x="horsepower", y="mpg")
   ]}
 />
 
-The residuals smile (a U-shape) rather than scattering flatly around zero —
+The residuals smile (a U-shape) rather than scattering flatly around zero,
 a clear signal that the relationship bent and a straight line could not
 follow it.
 
@@ -272,7 +272,7 @@ honest.
 <Callout type="danger" title="Association is not causation">
 A sloping line means x and y *move together* in this data. It says nothing
 about whether changing x would *cause* y to change. Larger bills come with
-larger tips — but that does not prove that inflating a bill *causes* a
+larger tips, but that does not prove that inflating a bill *causes* a
 bigger tip; party size, service, and occasion all lurk behind both. A
 regression line describes an association; only careful study design earns
 the word "causes."
@@ -281,13 +281,13 @@ the word "causes."
 <Callout type="warn" title="Never extrapolate past the data">
 The fit is only evidence *within* the range of x you actually observed.
 Extending the line to horsepower values you have no data for is guesswork
-dressed up as a measurement — and if the true relationship curves (as
+dressed up as a measurement, and if the true relationship curves (as
 `mpg` does), the extrapolation is not just uncertain, it is wrong. Trust
 the line only over the x-range the points cover.
 </Callout>
 
 <Callout type="tip" title="Always show the points">
-The band is *not* the data, and the line is *not* the data — the points
+The band is *not* the data, and the line is *not* the data, the points
 are. Showing them is what let you catch the curved-fit problem above. A
 lonely line with a shaded band hides whether the fit is any good. Keep the
 scatter visible so the summary stays accountable to the evidence.
@@ -362,11 +362,11 @@ g = sns.lmplot(
 - The path connecting every data point in order.
   > That describes a line *plot* of ordered data. A regression line is a single fitted summary, not a connect-the-dots path.
 - [o] An estimate of the average value of y for each value of x.
-  > The fit summarizes the central tendency of y given x — your best single guess for y at a given x — drawn over the scatter of individual points.
+  > The fit summarizes the central tendency of y given x, your best single guess for y at a given x, drawn over the scatter of individual points.
 - The boundary that separates outliers from normal points.
   > Regression does not classify points as in/out; it summarizes the overall trend, and outliers still influence (and appear on) the plot.
 - The 95% range that contains most of the data.
-  > That confuses the line with its band — and even the band is a CI for the *line*, not a range covering most points.
+  > That confuses the line with its band, and even the band is a CI for the *line*, not a range covering most points.
 
 The fitted line estimates the conditional average of y as x varies.`}
 />
@@ -379,7 +379,7 @@ The fitted line estimates the conditional average of y as x varies.`}
 - The range of a future single prediction.
   > That is a prediction interval, which is wider. The default band is about the fitted line, not individual new points.
 - [o] A 95% confidence interval for the fitted line itself.
-  > It expresses how well the sample pins down the line's position — narrow where data is dense, wider where it is sparse.
+  > It expresses how well the sample pins down the line's position, narrow where data is dense, wider where it is sparse.
 - The standard deviation of x.
   > The band concerns uncertainty in the y-direction fit; it is unrelated to the spread of x.
 
@@ -394,13 +394,13 @@ gives an honest trend?
 - Keep the straight fit but widen the confidence band.
   > A wider band cannot fix a fit whose *shape* is wrong; it would still run above the data at the ends and below it in the middle.
 - Drop the points so only the straight line shows.
-  > Hiding the points conceals the mismatch instead of addressing it — the opposite of honest.
+  > Hiding the points conceals the mismatch instead of addressing it, the opposite of honest.
 - [o] Use \`order=2\` for a polynomial fit, or \`lowess=True\` to follow the local trend.
   > Both let the fit *bend* to match the data's real shape rather than forcing a straight line through a curve.
 - Swap to \`regplot\`; it automatically detects curvature.
   > \`regplot\` fits a straight line by default just like \`lmplot\`; you must explicitly ask for \`order=\` or \`lowess=\`.
 
-When the relationship bends, the fix is to let the fit bend too — via a
+When the relationship bends, the fix is to let the fit bend too, via a
 polynomial order or a LOWESS smoother.`}
 />
 
@@ -411,16 +411,16 @@ line. What can you correctly conclude?
 - Buying ice cream causes drownings.
   > A line shows association, not causation. Inventing a causal arrow from a slope is precisely the mistake to avoid.
 - Drownings cause people to buy ice cream.
-  > Reversing the causal arrow is no more justified — the fit is symmetric about which variable "causes" the other.
+  > Reversing the causal arrow is no more justified, the fit is symmetric about which variable "causes" the other.
 - [o] The two variables are associated in this data; a lurking factor (like hot weather) may drive both.
   > A slope establishes that the variables move together; an unmeasured common cause such as summer heat can produce that association with no direct link between them.
-- Nothing — a positive slope carries no information at all.
+- Nothing, a positive slope carries no information at all.
   > It does carry information: the variables co-vary. The error is leaping from co-variation to causation, not the existence of the association.
 
 A trend line measures association; attributing cause requires reasoning and
 design beyond the plot itself.`}
 />
 
-You can now lay an honest trend over a scatter — and spot when that trend is
+You can now lay an honest trend over a scatter, and spot when that trend is
 lying. Next we widen the lens from one pair of variables to *all* of them
 at once, with the **correlation heatmap**.

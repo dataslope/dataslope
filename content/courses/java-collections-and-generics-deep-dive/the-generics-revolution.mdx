@@ -15,7 +15,7 @@ feature whose effect was enormous: **parameterized types**.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Before generics, a box of mixed shapes hands back a piece inside a red burst at runtime; after, a solid green gate line in front of the typed box checks arrivals — the circle sails through, the triangle is crossed out before it ever gets in"
+  aria-label="Before generics, a box of mixed shapes hands back a piece inside a red burst at runtime; after, a solid green gate line in front of the typed box checks arrivals, the circle sails through, the triangle is crossed out before it ever gets in"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -75,7 +75,7 @@ public class Main {
     List names = new ArrayList();
     names.add("Ada");
     names.add("Linus");
-    names.add(42); // legal — there is no element type
+    names.add(42); // legal, there is no element type
 
     for (int i = 0; i < names.size(); i++) {
       String s = (String)names.get(i); // cast every time
@@ -91,7 +91,7 @@ public class Main {
 Run that and the third element crashes with `ClassCastException`. The
 mistake (`names.add(42)`) was made on line 6; the explosion happens
 on line 11. The further apart "the mistake" and "the symptom" are, the
-worse a bug class is, and the JCF — through no fault of its own —
+worse a bug class is, and the JCF, through no fault of its own,
 made that distance large.
 
 ## The two ideas of generics
@@ -105,17 +105,17 @@ a new *language* feature with two distinct ideas:
 2. **The compiler checks the parameter, and inserts the casts for
    you.** You write `String s = names.get(0)` and the compiler emits
    the cast under the hood. If you try to put an `Integer` into a
-   `List<String>`, the *compile* fails — before the program even
+   `List<String>`, the *compile* fails, before the program even
    runs.
 
 |  | Pre-generics (Java 1.4) | Generics (Java 5+) |
 | --- | --- | --- |
 | **Declaration** | `List names = new ArrayList()` | `List<String> names = new ArrayList<>()` |
 | **Compile time** | holds `Object`; no type checks | element type checked |
-| **Runtime** | manual cast, risking `ClassCastException` | no cast in source — the compiler inserts one and proves it safe |
+| **Runtime** | manual cast, risking `ClassCastException` | no cast in source, the compiler inserts one and proves it safe |
 
 That is the entire story. The JCF you already know does not change
-shape — the *types* on every method now carry the element type, so
+shape, the *types* on every method now carry the element type, so
 the compiler can prove that the cast cannot fail.
 
 ## The same example after generics
@@ -133,9 +133,9 @@ public class Main {
     List<String> names = new ArrayList<>();
     names.add("Ada");
     names.add("Linus");
-    // names.add(42);            // compile error — won't even start
+    // names.add(42);            // compile error, won't even start
 
-    for (String s : names) { // no cast — the compiler knows
+    for (String s : names) { // no cast, the compiler knows
       System.out.println(s.toUpperCase());
     }
   }
@@ -147,7 +147,7 @@ public class Main {
 
 Notice three changes:
 
-- `List<String>` everywhere — the element type *is* part of the
+- `List<String>` everywhere, the element type *is* part of the
   type now.
 - The diamond `<>` on construction (Java 7 added this) lets the
   compiler infer the type argument from the variable's type.
@@ -190,7 +190,7 @@ public class Main {
     wordCount.put("beta", 1);
     wordCount.put("gamma", 7);
 
-    // Look — Integer comes out of get(), and we can do arithmetic.
+    // Look, Integer comes out of get(), and we can do arithmetic.
     int total = 0;
     for (Integer n : wordCount.values())
       total += n;
@@ -216,13 +216,13 @@ prevents whole categories of mistake.
 <IllustrationPrompt subject="the GJ team: Philip Wadler, Martin Odersky, Gilad Bracha, and Dave Stoutamire" photo />
 
 Generics took six years to arrive after the JCF, and the gap was not
-procrastination — it was research. In 1998, programming-language
+procrastination, it was research. In 1998, programming-language
 researchers **Philip Wadler**, **Martin Odersky**, **Gilad Bracha**,
 and **Dave Stoutamire** published **GJ** ("Generic Java"), an
 extension of Java with parameterized types designed around one brutal
 constraint: the millions of lines of existing Java code, and every
-existing `.class` file, had to keep working unchanged. GJ's solution
-— check the types at compile time, then *erase* them — is exactly
+existing `.class` file, had to keep working unchanged. GJ's solution,
+check the types at compile time, then *erase* them, is exactly
 what shipped in Java 5, and Odersky's GJ compiler was so solid that
 Sun adopted it as the basis of the standard `javac` itself. (Odersky
 took what he learned about bolting a sophisticated type system onto
@@ -233,7 +233,7 @@ erasure decision has consequences we'll meet two pages from now.
 ## Why generic *types* and not just generic *methods*?
 
 Other languages (notably Smalltalk and pre-2.0 Python) made the bet
-that you don't need parameterized types — that you can just trust
+that you don't need parameterized types, that you can just trust
 runtime checks. The Java team made the opposite bet: programs grow
 large enough that you need a *machine* to verify the data shapes you
 intend, and the cost of writing `<String>` is small compared to the
@@ -262,7 +262,7 @@ the right type*, with no cast.
     book.add("Grace", "555-0102");
     book.add("Linus", "555-0103");
 
-    // No cast — generic types flow all the way through.
+    // No cast, generic types flow all the way through.
     String n = book.lookup("Grace");
     System.out.println("Grace -> " + n.toUpperCase());
     System.out.println("Bob   -> " + book.lookup("Bob"));
@@ -329,7 +329,7 @@ public class Registry<K, V> {
   ]}
 />
 
-One `Registry` class. Two distinct usages — `Registry<String, Integer>`
+One `Registry` class. Two distinct usages, `Registry<String, Integer>`
 and `Registry<Integer, String>`. The compiler checks them
 independently, and neither use can leak into the other. That is the
 power generics give you: **reusable code that doesn't pay for that
@@ -351,7 +351,7 @@ here on takes the typed framework as given.
 
 ## A quick warning: pre-generics code still exists
 
-You will sometimes meet code or APIs that use **raw types** —
+You will sometimes meet code or APIs that use **raw types**,
 `List` instead of `List<String>`. They compile (Java keeps them for
 backwards compatibility), but the compiler will emit an *unchecked
 warning*, and you lose all the type safety we just gained.
@@ -367,7 +367,7 @@ import java.util.List;
 public class Main {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public static void main(String[] args) {
-    List raw = new ArrayList(); // raw type — bad
+    List raw = new ArrayList(); // raw type, bad
     raw.add("Ada");
     raw.add(42); // legal at compile time
 

@@ -9,7 +9,7 @@ import SkipToContent from "@/app/_components/SkipToContent";
 import { ReturnToTracker } from "@/app/_components/auth/returnTo";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
-// variables on <html> so every route (and every portal — portals stay inside
+// variables on <html> so every route (and every portal, portals stay inside
 // <html>) can consume them. This is the ONLY place the webfonts are loaded;
 // stylesheets reference var(--font-sans) / var(--font-mono) and must not
 // re-import the faces (the old per-stylesheet Google Fonts @imports
@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const SITE_DESCRIPTION =
-  "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.";
+  "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 
 // `metadataBase` makes every relative OpenGraph/canonical URL resolve to an
 // absolute production URL. The `title.template` appends "· DataSlope" to each
@@ -39,7 +39,7 @@ const SITE_DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "DataSlope — Learn Python, SQL, C++ in your browser",
+    default: "DataSlope, Learn Python, SQL, C++ in your browser",
     template: "%s · DataSlope",
   },
   description: SITE_DESCRIPTION,
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "DataSlope",
     url: SITE_URL,
-    title: "DataSlope — Learn Python, SQL, C++ in your browser",
+    title: "DataSlope, Learn Python, SQL, C++ in your browser",
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DataSlope — Learn Python, SQL, C++ in your browser",
+    title: "DataSlope, Learn Python, SQL, C++ in your browser",
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
@@ -92,7 +92,7 @@ const themeBootstrapScript = `
     r.style.setProperty("--accent1", p.a1);
     r.style.setProperty("--accent2", p.a2);
     r.setAttribute("data-playground-theme", dark ? "dark" : "light");
-  } catch (e) { /* localStorage unavailable — fall back to default theme */ }
+  } catch (e) { /* localStorage unavailable, fall back to default theme */ }
 })();
 `;
 
@@ -125,7 +125,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>
-        {/* First tab stop on every page — playground headers alone have ~10
+        {/* First tab stop on every page, playground headers alone have ~10
             stops before the editor. Visually hidden until focused. */}
         <SkipToContent />
         {children}

@@ -10,7 +10,7 @@ get ten subtly different answers. Let us pin it down.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Four stations arranged in a circle of dotted steps — a teal question leads to blue data, data to a green insight, and the insight to a decision diamond that raises new questions"
+  aria-label="Four stations arranged in a circle of dotted steps, a teal question leads to blue data, data to a green insight, and the insight to a decision diamond that raises new questions"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.3">
@@ -58,7 +58,7 @@ Three words in that sentence are doing all the work:
 - **Disciplined.** It is not "looking at numbers until something
   feels right." It is a structured workflow with checkpoints,
   validation, and (often) peer review.
-- **Useful.** The output is supposed to influence a decision —
+- **Useful.** The output is supposed to influence a decision,
   buy or sell, hire or fire, launch or kill, treat or wait.
 - **Defensible.** If someone challenges your number, you can
   walk them through every step that produced it. Reproducibility
@@ -71,7 +71,7 @@ before any of those tools did.
 
 ## The four kinds of analysis
 
-A common framework — adapted from the consulting world — divides
+A common framework, adapted from the consulting world, divides
 analytical work into four kinds, in order of increasing
 ambition.
 
@@ -86,7 +86,7 @@ flowchart TD
     style Pr fill:#dcfce7
 ```
 
-### Descriptive — *What happened?*
+### Descriptive, *What happened?*
 
 You count, you sum, you average, you slice. "Revenue last
 quarter was $12.4M, up 6% year over year." "We onboarded 312
@@ -94,22 +94,22 @@ new users in March." "The median time to resolve a support
 ticket is 4 hours." This is the bread and butter of every
 analyst's day and the focus of most of this course.
 
-### Diagnostic — *Why did it happen?*
+### Diagnostic, *Why did it happen?*
 
 You drill in. "Revenue grew because the West region grew 18%,
 while every other region was flat." "Support tickets are slower
 because two senior engineers left." Diagnostic analysis is
-still mostly Pandas — slicing, grouping, comparing — but it
+still mostly Pandas, slicing, grouping, comparing, but it
 demands more domain knowledge and skepticism.
 
-### Predictive — *What will happen?*
+### Predictive, *What will happen?*
 
 You build a model. "If marketing spend stays flat, we expect
 4,200 new users next month." This is where statistics and
 machine learning come in. We touch this lightly in the *Hypothesis
 Intuition* chapter; it is the subject of its own course.
 
-### Prescriptive — *What should we do?*
+### Prescriptive, *What should we do?*
 
 You recommend an action and quantify its expected impact. "We
 should reduce churn by improving onboarding; based on a 3% lift
@@ -125,17 +125,17 @@ data work and the foundation for everything above them.
 Strip away the buzzwords and a working analyst spends their day
 doing some mix of:
 
-1. **Asking** — translating a vague business question into a
+1. **Asking**, translating a vague business question into a
    specific, answerable analytical question.
-2. **Acquiring** — getting the right data into a tool you can
+2. **Acquiring**, getting the right data into a tool you can
    work with.
-3. **Cleaning** — fixing types, missing values, inconsistencies,
+3. **Cleaning**, fixing types, missing values, inconsistencies,
    bad rows.
-4. **Exploring** — summary statistics, group breakdowns,
+4. **Exploring**, summary statistics, group breakdowns,
    visualizations.
-5. **Interpreting** — what does the pattern mean? Could it be a
+5. **Interpreting**, what does the pattern mean? Could it be a
    data artifact? Could it be noise?
-6. **Communicating** — distilling the result for a decision
+6. **Communicating**, distilling the result for a decision
    maker, in words, charts, and (sometimes) a recommendation.
 
 ```mermaid
@@ -175,8 +175,8 @@ The first does not.
 <Callout type="info" title="A practical tip">
 Before writing any code, write the question down in one sentence
 and circle the words that have to be defined precisely. *"Users
-who saw"* — saw the page or the ad? *"Within 7 days"* — 7 days
-of what? *"Compare with"* — on what metric? Every imprecise word
+who saw"*, saw the page or the ad? *"Within 7 days"*, 7 days
+of what? *"Compare with"*, on what metric? Every imprecise word
 is a fork in the road that you (not the data) will have to pick.
 </Callout>
 
@@ -188,7 +188,7 @@ you met on the welcome page. Question:
 > Among our Antarctic penguins, does **body mass** differ between
 > **Adelie** and **Gentoo** penguins?
 
-Here is the full process explicitly — the same six-step loop you will repeat
+Here is the full process explicitly, the same six-step loop you will repeat
 on almost every question:
 
 <Steps>
@@ -218,7 +218,7 @@ numbers.
 
 **Explore**
 
-Summarize the groups — medians and quartiles — to surface the pattern.
+Summarize the groups, medians and quartiles, to surface the pattern.
 
 </Step>
 <Step>
@@ -289,7 +289,7 @@ print("Species present:", penguins["species"].unique())
   ]}
 />
 
-There are two penguins with no body-mass measurement at all — a
+There are two penguins with no body-mass measurement at all, a
 real reminder that even a tidy teaching dataset has gaps. Pandas
 will skip those automatically when it computes the medians below.
 
@@ -320,7 +320,7 @@ You can read the quartiles for each species at a glance.
 ### Step 5: Interpret
 
 You will notice that Gentoo penguins are *substantially* heavier
-than Adelie penguins — their median body mass is well over a
+than Adelie penguins, their median body mass is well over a
 kilogram greater (about 5,000 g versus 3,700 g). The difference is
 large and consistent, so it is unlikely to be noise. But "Gentoos are heavier" is a *description*, not an
 explanation. A careful analyst immediately asks follow-ups:
@@ -355,7 +355,7 @@ what their numbers can and cannot prove.
 - It is not the same as machine learning (training models).
 - It is not the same as business intelligence (building
   dashboards), though there is heavy overlap.
-- It is not a substitute for domain expertise — it *amplifies* it.
+- It is not a substitute for domain expertise, it *amplifies* it.
 
 ## A short pause for skepticism
 
@@ -372,7 +372,7 @@ coming back to it.
   markdown={`Which of the following best matches the chapter's working definition of data analysis?
 
 - Producing as many charts as possible
-  > Chart volume is not the goal; the definition emphasizes useful, defensible answers — charts are one communication tool among several.
+  > Chart volume is not the goal; the definition emphasizes useful, defensible answers, charts are one communication tool among several.
 - Memorizing Pandas function names
   > Knowing library syntax is a means to an end; the chapter's definition is tool-independent and centers on the analytical process.
 - [o] A disciplined process of turning raw recorded observations into useful, defensible answers to questions humans care about
@@ -387,13 +387,13 @@ A useful definition is tool-independent.`}
   markdown={`Which of these is a **descriptive** analytical question (as opposed to diagnostic, predictive, or prescriptive)?
 
 - Why did revenue drop last quarter?
-  > "Why did revenue drop" is a diagnostic question — it seeks a cause, not just a description of what happened.
+  > "Why did revenue drop" is a diagnostic question, it seeks a cause, not just a description of what happened.
 - What should we do to reduce churn?
   > Recommending an action is prescriptive analysis, the highest level of analytical ambition in the chapter's framework.
 - What will revenue be next quarter?
   > Forecasting a future value is predictive analysis, not descriptive.
 - [o] What was our revenue last quarter?
-  > Descriptive analysis answers "what happened" — counts, sums, averages, breakdowns. It is the foundation everything else is built on.
+  > Descriptive analysis answers "what happened", counts, sums, averages, breakdowns. It is the foundation everything else is built on.
 
 Most analyst work falls in the descriptive and diagnostic layers, which is exactly what this course focuses on.`}
 />

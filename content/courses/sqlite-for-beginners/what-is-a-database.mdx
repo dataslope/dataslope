@@ -9,20 +9,20 @@ who the customers are, which orders have been placed, and whether
 each order has shipped. None of that can live in anyone's head,
 and none of it can vanish when the computer restarts.
 
-Every piece of software you use — a banking app, a chat app, a
-game with saved progress — faces this same problem. The answer,
+Every piece of software you use, a banking app, a chat app, a
+game with saved progress, faces this same problem. The answer,
 almost always, is a **database**: an organized place to store
 facts so software can find them, change them, and trust them
 later.
 
 That definition sounds modest. This page is about why it is
-actually one of the biggest ideas in computing — and why it has a
+actually one of the biggest ideas in computing, and why it has a
 surprisingly good origin story.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue catalog box holds a row of neat gray cards with colored tabs, and one green-tabbed card is lifted straight up on a thin line — a database is an organized place where facts are stored, found again, and trusted"
+  aria-label="A blue catalog box holds a row of neat gray cards with colored tabs, and one green-tabbed card is lifted straight up on a thin line, a database is an organized place where facts are stored, found again, and trusted"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="457" y1="110" x2="457" y2="86" stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round" />
@@ -71,19 +71,19 @@ accept an order with no customer, do not lose today's sales if
 the power flickers.
 
 The first three jobs sound easy. The fourth is where things get
-interesting — and it is the real reason databases exist.
+interesting, and it is the real reason databases exist.
 
 ## Why not just save a file?
 
 A reasonable first instinct: skip the database, write everything
-into a file. Sometimes that genuinely is the right answer — a
+into a file. Sometimes that genuinely is the right answer, a
 photo, a PDF, a configuration file. But for *facts that change
 and matter*, plain files hide three hard problems.
 
 **Problem one: memory disappears and files corrupt.** A program's
 memory vanishes the instant it exits, so the data must reach disk.
-But writing to disk can be interrupted halfway — a crash, a power
-cut — leaving the file scrambled. A database promises
+But writing to disk can be interrupted halfway, a crash, a power
+cut, leaving the file scrambled. A database promises
 **durability**: once it says a change is saved, the change
 survives, even across a crash mid-write.
 
@@ -109,7 +109,7 @@ sequenceDiagram
 means creating the order, adding its items, reducing inventory,
 and recording the payment. If a crash happens after step two, the
 data lies: an order exists with no payment and wrong stock counts.
-Databases solve this with **transactions** — a group of changes
+Databases solve this with **transactions**, a group of changes
 that either *all* happen or *none* do.
 
 Every application that used plain files had to reinvent solutions
@@ -170,7 +170,7 @@ you what a value means (`92` in a `quiz_score` column is a score;
 in a `temperature` column it would mean something else entirely),
 and every row has the same shape, so one question can be tested
 against all of them. Even *missing* information gets an honest
-place — that `NULL` for Riley means "no known value," an idea with
+place, that `NULL` for Riley means "no known value," an idea with
 its own page later in this course.
 
 This is **structured data**, and the structure is the point: it is
@@ -193,13 +193,13 @@ for Large Shared Data Banks."* Its proposal was radical in its
 simplicity: store everything in plain **tables** of rows and
 columns, hide the physical layout entirely, and let people ask
 for data by *describing* what they want rather than navigating to
-it. Connections between facts would be made by **values** — a
-customer number appearing in an orders table — not by fragile
+it. Connections between facts would be made by **values**, a
+customer number appearing in an orders table, not by fragile
 pointers.
 
 That idea won so completely that today it is hard to see how
-radical it was. SQLite, PostgreSQL, MySQL, Oracle, SQL Server —
-the databases running most of the world — are all **relational**
+radical it was. SQLite, PostgreSQL, MySQL, Oracle, SQL Server,
+the databases running most of the world, are all **relational**
 databases, direct descendants of that 1970 paper. This course
 teaches the relational model throughout: tables, keys, and the
 relationships between them.
@@ -208,8 +208,8 @@ relationships between them.
 
 Codd's model needed a language people could write. In the early
 1970s, two of his IBM colleagues, **Donald Chamberlin** and
-**Raymond Boyce**, designed one and called it **SEQUEL** —
-*Structured English Query Language* — because its queries read
+**Raymond Boyce**, designed one and called it **SEQUEL**,
+*Structured English Query Language*, because its queries read
 almost like English sentences. The name was later shortened to
 **SQL** after "SEQUEL" turned out to be someone else's trademark.
 The original pronunciation stuck, which is why you will hear both
@@ -217,7 +217,7 @@ The original pronunciation stuck, which is why you will hear both
 
 What made SQL different is that it is **declarative**: you
 describe the result you want, and the database works out the
-steps. Try it — this is real SQL against a real table:
+steps. Try it, this is real SQL against a real table:
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -243,7 +243,7 @@ WHERE
 You did not say *"open the file, scan each record, compare byte
 offsets."* You said *"names and prices of products cheaper than
 20"* and SQLite figured out the rest. Change `20` to `2` and run
-it again — the question changes, the method stays invisible.
+it again, the question changes, the method stays invisible.
 
 Nearly everything an application does with stored data fits four
 SQL verbs:
@@ -256,7 +256,7 @@ DELETE  remove rows
 ```
 
 You will spend most of this course on `SELECT`, because asking
-good questions is most of the work — but you will meet all four.
+good questions is most of the work, but you will meet all four.
 
 <MultipleChoice
   markdown={`What does it mean that SQL is declarative?
@@ -278,7 +278,7 @@ word "database" for two related things:
 
 - The **database** is the stored information itself.
 - The **database management system** (DBMS) is the software that
-  manages it — accepting SQL, storing rows, enforcing rules,
+  manages it, accepting SQL, storing rows, enforcing rules,
   surviving crashes.
 
 ```mermaid
@@ -288,7 +288,7 @@ flowchart TD
 ```
 
 SQLite is a DBMS. The databases it manages are, charmingly,
-ordinary files on disk — a design choice with a story of its own,
+ordinary files on disk, a design choice with a story of its own,
 which is exactly where the next page picks up.
 
 <Callout type="info" title="Want to go deeper?">
@@ -298,7 +298,7 @@ section: [Spreadsheets vs. Databases](/courses/sqlite-for-beginners/spreadsheets
 (when each tool is the right one) and
 [How Applications Store Information](/courses/sqlite-for-beginners/how-applications-store-information)
 (the full loop from a button click to a saved row). Read them now
-or save them for later — the main path continues without them.
+or save them for later, the main path continues without them.
 </Callout>
 
 ## Check your understanding

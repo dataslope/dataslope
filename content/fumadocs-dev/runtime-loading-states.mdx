@@ -1,19 +1,19 @@
 ---
 title: Runtime Loading States
-description: The first-execution loading UI for code blocks and challenge cards — the brand boot notice shown in the real code-block layout, with the JSX that renders each.
+description: The first-execution loading UI for code blocks and challenge cards, the brand boot notice shown in the real code-block layout, with the JSX that renders each.
 ---
 
 ## Overview
 
-The first time a learner runs code on a page, the language runtime (Pyodide, WebR, CheerpJ, .NET, the clang toolchain…) has to download and instantiate — a multi-second wait on a cold cache. The **runtime boot notice** turns that wait into something legible: the brand **assemble-and-quarter-turn** mark, the current setup stage, a one-time size hint, and a determinate progress bar.
+The first time a learner runs code on a page, the language runtime (Pyodide, WebR, CheerpJ, .NET, the clang toolchain…) has to download and instantiate, a multi-second wait on a cold cache. The **runtime boot notice** turns that wait into something legible: the brand **assemble-and-quarter-turn** mark, the current setup stage, a one-time size hint, and a determinate progress bar.
 
-It is one shared component, [`<RuntimeBootNotice>`](https://github.com/dataslope/dataslope/blob/main/app/_components/RuntimeBootNotice.tsx), rendered by both `<CodeBlock>` and `<ChallengeCard>` in their output panel while the runtime is `loading`. The bar is driven by coarse **stage fractions** each adapter reports through the runtime registry; between stages a smoothing hook eases it forward so it never looks frozen, and it deliberately never reaches 100% — the notice unmounts the instant the runtime is ready.
+It is one shared component, [`<RuntimeBootNotice>`](https://github.com/dataslope/dataslope/blob/main/app/_components/RuntimeBootNotice.tsx), rendered by both `<CodeBlock>` and `<ChallengeCard>` in their output panel while the runtime is `loading`. The bar is driven by coarse **stage fractions** each adapter reports through the runtime registry; between stages a smoothing hook eases it forward so it never looks frozen, and it deliberately never reaches 100%, the notice unmounts the instant the runtime is ready.
 
 > **Why you rarely see this on a real lesson:** every block warms its runtime in the background as soon as the page lands (idle-scheduled, one boot at a time, skipped on Save-Data). By the time you finish reading and click **Run**, the runtime is usually already warm, so the boot is instant. The previews below are static (no runtime) so the loading display can be reviewed on demand.
 
 ## In a code block
 
-The loading display in context — the real code-block card chrome (header, editor, action bar, output panel) frozen in its loading state. The first example animates through a simulated boot.
+The loading display in context, the real code-block card chrome (header, editor, action bar, output panel) frozen in its loading state. The first example animates through a simulated boot.
 
 <RuntimeLoadingStates section="code-block" />
 
@@ -64,4 +64,4 @@ import {
 
 `<CodeBlockLoadingPreview>` adds `version`, `langId` (for the header glyph), and `code` (the faux editor contents) on top of those.
 
-The brand loader itself is [`<DiamondAssembleTurnLoader>`](/fumadocs-dev/loading-animations) — see the Loading Animations page for the full set of brand spinners and the wave.
+The brand loader itself is [`<DiamondAssembleTurnLoader>`](/fumadocs-dev/loading-animations), see the Loading Animations page for the full set of brand spinners and the wave.

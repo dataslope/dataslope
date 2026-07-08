@@ -4,15 +4,15 @@ description: Addresses, dereferencing, pointer types, NULL, and pass-by-pointer 
 ---
 
 A pointer is just a variable whose value is the address of another
-piece of memory. That one sentence is the whole concept — and also
+piece of memory. That one sentence is the whole concept, and also
 the source of half the things that make C feel hard.
 
 If the sentence feels slippery, try the postal version. Every house
 on a street has an address. A pointer is a slip of paper with an
 address written on it. The slip is not the house: you can copy the
 slip, lose the slip, or write a different address on it, all without
-touching the house. But if you *walk to* the address on the slip —
-that's dereferencing — you arrive at the actual house and can look
+touching the house. But if you *walk to* the address on the slip,
+that's dereferencing, you arrive at the actual house and can look
 inside or repaint the door. Everything on this page is a precise
 version of that picture: `&` writes a house's address onto a slip,
 `*` walks to whatever address a slip currently holds.
@@ -20,7 +20,7 @@ version of that picture: `&` writes a house's address onto a slip,
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three parcels sit on a shelf; a yellow tag's thin thread leads to exactly one of them, while a second gray tag's thread ends at a red cross — a pointer holds an address, and NULL points at nothing"
+  aria-label="Three parcels sit on a shelf; a yellow tag's thin thread leads to exactly one of them, while a second gray tag's thread ends at a red cross, a pointer holds an address, and NULL points at nothing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -146,11 +146,11 @@ int main(void) {
 
 A pointer that does not point anywhere meaningful should be `NULL`
 (defined in `<stddef.h>`, usually as `((void*)0)`). Dereferencing a
-`NULL` pointer is undefined behavior — usually a crash.
+`NULL` pointer is undefined behavior, usually a crash.
 
 The idea of a special "points at nothing" value is older than C, and
 its inventor regrets it. Tony Hoare added the null reference to the
-ALGOL W language in 1965 — in his words, "simply because it was so
+ALGOL W language in 1965, in his words, "simply because it was so
 easy to implement." At a conference in 2009 he formally apologized,
 calling it his **billion-dollar mistake**: his estimate of what null
 dereferences have cost the industry in crashes, vulnerabilities, and
@@ -187,7 +187,7 @@ int main(void) {
 />
 
 <Callout type="warn" title="Always initialize pointers">
-An uninitialized pointer holds *garbage* — whatever bytes happened to
+An uninitialized pointer holds *garbage*, whatever bytes happened to
 be in that memory before. Dereferencing it is undefined behavior.
 Either give it a real address or set it to `NULL`.
 </Callout>
@@ -200,7 +200,7 @@ gets a copy. Modifying that copy does nothing to the caller.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Left: the function gets a copy of the box, and the yellow edit lands only on the faded copy below the original; right: it gets an arrow back to the one real box, so the same yellow edit lands on the original — pass by value versus pass by pointer"
+  aria-label="Left: the function gets a copy of the box, and the yellow edit lands only on the faded copy below the original; right: it gets an arrow back to the one real box, so the same yellow edit lands on the original, pass by value versus pass by pointer"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -284,7 +284,7 @@ int main(void) {
   ]}
 />
 
-This is also how functions can "return" multiple values — give them
+This is also how functions can "return" multiple values, give them
 output pointers.
 
 <CodeBlock
@@ -339,7 +339,7 @@ read-only data, and helps the compiler optimize.
 ## `void *`: the type-erased pointer
 
 A `void *` is a pointer with no element type. It can hold the address
-of *anything*, but you cannot dereference it directly — the compiler
+of *anything*, but you cannot dereference it directly, the compiler
 does not know how many bytes to read or how to interpret them.
 
 `malloc` returns `void *`. So do many generic library functions like
@@ -357,7 +357,7 @@ int main(void) {
   int a = 0xDEADBEEF;
   int b = 0;
 
-  // memcpy takes void * — works with any types.
+  // memcpy takes void *, works with any types.
   memcpy(&b, &a, sizeof(int));
   printf("b = 0x%X\\n", b);
   return 0;
@@ -377,7 +377,7 @@ variables.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A small blue card points along a thin arrow to a second blue card, which points along another arrow to the green value box — pointer to pointer to value, two dereferences from the data"
+  aria-label="A small blue card points along a thin arrow to a second blue card, which points along another arrow to the green value box, pointer to pointer to value, two dereferences from the data"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -561,7 +561,7 @@ int main(void) {
   > C absolutely supports swapping; you just need pointers.
 - Because the compiler optimizes the swap away.
   > Even with optimization disabled, the function still cannot affect the caller's variables.
-- [o] Because C passes arguments **by value** — the function gets copies of the caller's ints, and modifying the copies leaves the originals untouched.
+- [o] Because C passes arguments **by value**, the function gets copies of the caller's ints, and modifying the copies leaves the originals untouched.
   > To modify the caller's variables you must pass *pointers* to them.
 - Because \`int\` is not large enough to be swapped on this machine.
   > Size has nothing to do with it.`}

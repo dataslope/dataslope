@@ -7,7 +7,7 @@ import tailwindPostcss from "@tailwindcss/postcss";
 /**
  * Cross-stylesheet cascade-parity regression test.
  *
- * The app has two Tailwind roots — app/tailwind.css (home, /pricing,
+ * The app has two Tailwind roots, app/tailwind.css (home, /pricing,
  * /account, /admin, legal) and app/docs.css (/courses lessons, /fumadocs-dev, /interview-prep).
  * After a client-side navigation BOTH stylesheets can be applied to the
  * document at once, and the App Router does not guarantee which <link> ends
@@ -25,8 +25,8 @@ import tailwindPostcss from "@tailwindcss/postcss";
  * @custom-variant to one root only).
  *
  * Historical bugs in this class: #528 (intermittent black borders on /learn),
- * #541 (mobile navbar leaking onto desktop, slicing the top of /learn), and —
- * before the shared list existed — /admin's desktop tables vanishing after
+ * #541 (mobile navbar leaking onto desktop, slicing the top of /learn), and,
+ * before the shared list existed, /admin's desktop tables vanishing after
  * /admin → /learn → back (the learn sheet's later `hidden` copy beat the
  * admin sheet's `md:block`).
  *

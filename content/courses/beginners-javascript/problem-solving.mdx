@@ -1,6 +1,6 @@
 ---
 title: Problem Solving with Code
-description: A repeatable process for turning real-world problems into working programs — without panicking.
+description: A repeatable process for turning real-world problems into working programs, without panicking.
 ---
 
 In the previous page we met four mental moves: decomposition,
@@ -16,7 +16,7 @@ the answer in one shot. There is a better way.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A dotted trail winding through five numbered colored milestones — the five steps of solving a problem"
+  aria-label="A dotted trail winding through five numbered colored milestones, the five steps of solving a problem"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.28">
@@ -67,14 +67,14 @@ flowchart TD
     E --> C
 ```
 
-1. **Understand** — re-state the problem in your own words. List the
+1. **Understand**, re-state the problem in your own words. List the
    inputs, outputs, and edge cases.
-2. **Plan** — sketch the algorithm in plain language or
+2. **Plan**, sketch the algorithm in plain language or
    pseudo-code, *before* you touch the keyboard.
-3. **Implement** — write code in small increments. Run after each.
-4. **Test** — check the easy cases, the edge cases, the weird
+3. **Implement**, write code in small increments. Run after each.
+4. **Test**, check the easy cases, the edge cases, the weird
    cases.
-5. **Refine** — clean up names, extract helpers, remove duplication.
+5. **Refine**, clean up names, extract helpers, remove duplication.
 
 Cycle through them. When a test fails, you go back to plan or
 implement. When the program works, you go to refine. Refine often
@@ -97,7 +97,7 @@ Re-state the problem to yourself:
 
 - **Input:** a list of `{ price, quantity }` items, and a string
   (the discount code, possibly empty).
-- **Output:** a single number — the final total, in dollars.
+- **Output:** a single number, the final total, in dollars.
 
 What are the **edge cases**?
 
@@ -105,7 +105,7 @@ What are the **edge cases**?
 - A quantity is zero (or negative? probably not allowed, but worth
   noticing).
 - The discount code is not recognised.
-- `FLAT5` is applied to a tiny cart whose subtotal is below $5 —
+- `FLAT5` is applied to a tiny cart whose subtotal is below $5,
   the total should be `0`, not negative.
 
 Already, before writing any code, we have learned a lot about the
@@ -273,7 +273,7 @@ function finalTotal(items, code) {
   return clampZero(s - d);
 }
 
-// Same tests as before — behaviour is unchanged.
+// Same tests as before, behaviour is unchanged.
 const cart = [
   { price: 10.0, quantity: 2 },
   { price: 4.5, quantity: 1 },
@@ -303,7 +303,7 @@ big reasons:
 - **Refining makes future bugs visible.** Clean code is easier to
   trace. When something breaks next month, you will silently thank
   past-you.
-- **Refining is how you learn.** The very act of "this looks ugly —
+- **Refining is how you learn.** The very act of "this looks ugly,
   let me make it nicer" trains your taste. Over time, you will
   write the cleaner version on the first try.
 
@@ -315,7 +315,7 @@ order:
 1. **Re-read the question.** Slowly. Underline every concrete
    noun and verb. Beginners often solve the wrong problem.
 2. **Solve a smaller version first.** Don't tackle "tax for any
-   country and any product" — tackle "tax for one country and one
+   country and any product", tackle "tax for one country and one
    product".
 3. **Solve it by hand for one example.** Take a single input and
    work out, on paper, exactly what the answer should be. Now your
@@ -340,7 +340,7 @@ to fill in the missing function.
 <ChallengeCard
   adapter="javascript"
   title="Cart total across multiple files"
-  instructions={`The file \`cart.js\` defines \`finalTotal(items, code)\` partially — the discount logic is missing. Fill it in so the totals match what the tests expect.
+  instructions={`The file \`cart.js\` defines \`finalTotal(items, code)\` partially, the discount logic is missing. Fill it in so the totals match what the tests expect.
 
 The rules:
 - \`SAVE10\` → 10% off the subtotal.
@@ -455,7 +455,7 @@ if (finalTotal([{ price: 2, quantity: 1 }], "FLAT5") !== 0) throw new Error("exp
 - They use the wrong text editor
   > The choice of text editor has essentially no bearing on learning to solve programming problems; the most common mistake is about *process*, not tooling.
 - [o] They sit down and try to write the complete answer in one shot, instead of working in small understand → plan → implement → test → refine cycles
-  > Trying to write the answer in one go almost always leads to confusion and frustration. Taking small, deliberate steps — and *running* after each one — is dramatically more productive.
+  > Trying to write the answer in one go almost always leads to confusion and frustration. Taking small, deliberate steps, and *running* after each one, is dramatically more productive.
 - They use too many functions
   > Breaking problems into small, well-named functions is encouraged, not a mistake; the page specifically advocates for decomposition as a problem-solving strategy.
 - They write too many tests

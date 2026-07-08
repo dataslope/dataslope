@@ -1,6 +1,6 @@
 ---
 title: Statistical Summaries
-description: describe, mean, median, std, quantiles, value_counts, and correlations — the everyday vocabulary of summary statistics.
+description: describe, mean, median, std, quantiles, value_counts, and correlations, the everyday vocabulary of summary statistics.
 ---
 
 Summary statistics compress a big, messy distribution into a
@@ -10,7 +10,7 @@ analyst needs.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A solid blue histogram on a light panel flows through a gray arrow into a card of four small stat rows, each a colored square beside a gray bar — a whole distribution compressed into a few summary numbers"
+  aria-label="A solid blue histogram on a light panel flows through a gray arrow into a card of four small stat rows, each a colored square beside a gray bar, a whole distribution compressed into a few summary numbers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -55,13 +55,13 @@ analyst needs.
 | **count**  | How many non-missing values |
 | **mean**   | Arithmetic average |
 | **median** | Middle value (50th percentile) |
-| **std**    | Standard deviation — how spread out |
+| **std**    | Standard deviation, how spread out |
 | **min / max** | Smallest / largest value |
 | **25% / 50% / 75%** | Quartiles |
 | **mode**   | Most common value |
 | **nunique** | How many distinct values |
 
-## describe — the one-shot summary
+## describe, the one-shot summary
 
 <CodeBlock
   adapter="python"
@@ -78,7 +78,7 @@ df = pd.read_csv("diamonds.csv")`,
 />
 
 `describe()` shows everything at once for numeric columns. Use
-`.T` (transpose) to put columns as rows — much easier to read
+`.T` (transpose) to put columns as rows, much easier to read
 when you have many columns.
 
 For non-numeric columns:
@@ -99,7 +99,7 @@ df = pd.read_csv("diamonds.csv")`,
 
 You get `count`, `unique`, `top` (most common), and `freq`.
 
-## Mean vs Median — the classic trap
+## Mean vs Median, the classic trap
 
 <CodeBlock
   adapter="python"
@@ -118,8 +118,8 @@ print(f"Median: $ {salaries.median():>10,.0f}")
   ]}
 />
 
-The mean salary is \$165K — almost nobody earns that. The median
-is \$52K — much more representative. **For skewed
+The mean salary is \$165K, almost nobody earns that. The median
+is \$52K, much more representative. **For skewed
 distributions, prefer median.** Income, prices, durations, and
 file sizes are almost always skewed.
 
@@ -129,7 +129,7 @@ file sizes are almost always skewed.
 | Right-skewed (e.g. income) | Mean ≫ median | **Median** |
 | Outliers present | Mean is misleading | **Median** |
 
-## Quantiles — beyond the median
+## Quantiles, beyond the median
 
 <CodeBlock
   adapter="python"
@@ -153,7 +153,7 @@ print("99%:", s.quantile(0.99))
 Quantiles are great for things like SLAs ("95% of our requests
 finish in under X ms") or pay-band analyses.
 
-## Spread — std and IQR
+## Spread, std and IQR
 
 <CodeBlock
   adapter="python"
@@ -178,7 +178,7 @@ for name, s in [("a", a), ("b", b), ("c", c)]:
 mean. **IQR** (interquartile range = Q3 − Q1) is the middle 50%
 spread. IQR is more robust to outliers; std is more sensitive.
 
-## value_counts — the categorical describe
+## value_counts, the categorical describe
 
 <CodeBlock
   adapter="python"
@@ -197,7 +197,7 @@ print((df["cut"].value_counts(normalize=True) * 100).round(1))
   ]}
 />
 
-`normalize=True` gives proportions instead of counts — perfect
+`normalize=True` gives proportions instead of counts, perfect
 for "what share of our customers are in each tier?".
 
 ## Correlation
@@ -222,10 +222,10 @@ The correlation between two columns ranges from -1 to +1:
 
 | Value | Meaning |
 | --- | --- |
-| +1.0 | Perfect positive — they move identically |
-| +0.7 | Strong positive — they often move together |
+| +1.0 | Perfect positive, they move identically |
+| +0.7 | Strong positive, they often move together |
 | 0    | No linear relationship |
-| -0.7 | Strong negative — one goes up, the other goes down |
+| -0.7 | Strong negative, one goes up, the other goes down |
 | -1.0 | Perfect negative |
 
 <Callout type="warn" title="Correlation ≠ causation">
@@ -237,7 +237,7 @@ investigate further before claiming a cause.
 The diamond columns are mostly about *size*, so they tend to move
 together. Correlation gets more revealing on a dataset whose columns
 measure genuinely different things. **California Housing** is all
-numeric — median income, house age, average rooms, location — so
+numeric, median income, house age, average rooms, location, so
 `.corr()` summarizes every pairing at once.
 
 <CodeBlock
@@ -255,17 +255,17 @@ housing = pd.read_csv("housing.csv")`,
 />
 
 Two numbers stand out. `AveRooms` and `AveBedrms` correlate at
-**0.85** — no surprise, since bigger homes have more of both. But
+**0.85**, no surprise, since bigger homes have more of both. But
 `Latitude` and `Longitude` correlate at **-0.92**, and that one is a
 trap: latitude does not *cause* longitude. They move together only
-because California is a long diagonal strip — head north and you tend
+because California is a long diagonal strip, head north and you tend
 to head west too. It is exactly the third-variable illusion the
 callout just warned about, hiding in plain sight in a dataset about
 houses.
 
 ## Grouped summaries
 
-The natural extension — `describe` per group:
+The natural extension, `describe` per group:
 
 <CodeBlock
   adapter="python"
@@ -307,7 +307,7 @@ print("Outliers:", s[(s < lo) | (s > hi)].tolist())
   ]}
 />
 
-This is a **heuristic**, not a verdict — you still have to
+This is a **heuristic**, not a verdict, you still have to
 decide whether the outlier is wrong data, a real edge case, or
 the most important customer on the list.
 
@@ -397,8 +397,8 @@ print(summary)
   markdown={`Reporting income data for a country, which is usually the more representative single number?
 
 - mean
-  > The mean is pulled upward by very high earners, making it higher than what most people actually earn — a misleading summary for a right-skewed distribution.
-- [o] median — incomes are right-skewed and median is robust to the few very high earners
+  > The mean is pulled upward by very high earners, making it higher than what most people actually earn, a misleading summary for a right-skewed distribution.
+- [o] median, incomes are right-skewed and median is robust to the few very high earners
   > Mean income is dragged upward by a small number of very large values.
 - mode
   > The mode reports the most frequent value, which for continuous income data may not even be near the typical earner and is not the summary the question asks for.
@@ -412,10 +412,10 @@ This is among the most common real-world stats mistakes.`}
   markdown={`What does \`value_counts(normalize=True)\` return?
 
 - Sorted values
-  > \`value_counts()\` does return values sorted by count by default, but \`normalize=True\` specifically changes counts to proportions — sorting is orthogonal to normalization.
+  > \`value_counts()\` does return values sorted by count by default, but \`normalize=True\` specifically changes counts to proportions, sorting is orthogonal to normalization.
 - Z-scores
   > Z-scores standardize values relative to the mean and standard deviation; \`normalize=True\` divides counts by the total to get relative frequencies.
-- [o] Proportions (relative frequencies) instead of raw counts — perfect for "what share of rows fall into each category"
+- [o] Proportions (relative frequencies) instead of raw counts, perfect for "what share of rows fall into each category"
   > Multiply by 100 for percentages.
 - A heatmap
   > A heatmap is a 2-D visualization of a matrix; \`value_counts(normalize=True)\` returns a 1-D Series of proportions, not a chart.
@@ -429,9 +429,9 @@ A small but frequently used flag.`}
 - One causes the other
   > Correlation measures the strength of linear co-movement; it provides no information about which variable, if either, causes changes in the other.
 - They are unrelated
-  > A correlation of -0.95 is near the maximum magnitude of -1.0, indicating a very strong relationship — the opposite of unrelated.
-- [o] They have a very strong **inverse** linear relationship — when one goes up, the other tends to go down. (No claim about cause.)
-  > Strong correlation, negative direction — but causation is a separate investigation.
+  > A correlation of -0.95 is near the maximum magnitude of -1.0, indicating a very strong relationship, the opposite of unrelated.
+- [o] They have a very strong **inverse** linear relationship, when one goes up, the other tends to go down. (No claim about cause.)
+  > Strong correlation, negative direction, but causation is a separate investigation.
 - It is a bug
   > A correlation of -0.95 is a valid, meaningful result from Pandas; it is not an error.
 
@@ -442,10 +442,10 @@ Sign matters as much as magnitude.`}
   markdown={`The 1.5×IQR rule flags a few "outliers" in your data. What is the correct next step?
 
 - Delete them immediately
-  > Deleting without investigation risks removing real, important data points — the 1.5×IQR rule is a heuristic that flags candidates, not a verdict.
+  > Deleting without investigation risks removing real, important data points, the 1.5×IQR rule is a heuristic that flags candidates, not a verdict.
 - Ignore them
   > Ignoring flagged values is as risky as deleting them; an outlier could be a data-entry error that would corrupt every downstream calculation.
-- [o] Investigate — they might be data errors, sentinel values, or genuinely important edge cases. The decision to drop, cap, or keep depends on context.
+- [o] Investigate, they might be data errors, sentinel values, or genuinely important edge cases. The decision to drop, cap, or keep depends on context.
   > The rule highlights candidates; you make the judgement.
 - Replace them with the mean
   > Mean imputation is one possible strategy, but applying it before investigating can mask real errors or distort the distribution.

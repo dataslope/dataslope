@@ -1,6 +1,6 @@
 ---
 title: Intuition for Inference
-description: Confidence intervals and p-values are the lingua franca of applied statistics — and the most misinterpreted ideas in all of science. Let's build correct intuition for what they really mean.
+description: Confidence intervals and p-values are the lingua franca of applied statistics, and the most misinterpreted ideas in all of science. Let's build correct intuition for what they really mean.
 ---
 
 You've now seen that any statistic computed from a sample
@@ -9,11 +9,11 @@ population *despite* that wiggling.
 
 We'll cover three workhorse ideas:
 
-1. **Confidence intervals** — a range of plausible values for an
+1. **Confidence intervals**, a range of plausible values for an
    unknown parameter.
-2. **p-values** — how surprising your data would be under a
+2. **p-values**, how surprising your data would be under a
    skeptical "no effect" assumption.
-3. **Effect size** — *how big* a difference is, separate from
+3. **Effect size**, *how big* a difference is, separate from
    *how confident* we are that it exists.
 
 We'll do all of them in R using built-in functions like
@@ -22,7 +22,7 @@ We'll do all of them in R using built-in functions like
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Six interval bars with center dots stack beside a thin green line marking the unknown true value — five capture it and one red interval misses — what a confidence procedure really promises"
+  aria-label="Six interval bars with center dots stack beside a thin green line marking the unknown true value, five capture it and one red interval misses, what a confidence procedure really promises"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -89,7 +89,7 @@ mean(contains)
 
 Run it a few times. You'll see the fraction of CIs containing
 the truth hovers around 0.95. That's what "95% confidence"
-means. Each individual CI either covers the truth or doesn't —
+means. Each individual CI either covers the truth or doesn't,
 we just don't know which.
 
 Visualize it:
@@ -117,7 +117,7 @@ plot(NA,
   xlim = range(results[, c("lo", "hi")]),
   ylim = c(1, n_studies),
   xlab = "Estimated mean (with 95% CI)", ylab = "Study #",
-  main = "30 simulated studies — vertical line is the truth"
+  main = "30 simulated studies, vertical line is the truth"
 )
 abline(v = true_mean, col = "red", lwd = 2)
 
@@ -138,7 +138,7 @@ sampling variability made visible.
 ## A p-value, plainly
 
 A **p-value** is the probability, *if there were no real
-effect*, of seeing a result as extreme as the one you got — or
+effect*, of seeing a result as extreme as the one you got, or
 more extreme.
 
 Small p-value → your observed result is surprising under "no
@@ -146,7 +146,7 @@ effect" → you have evidence of *some* effect.
 
 Large p-value → your observed result is unsurprising under "no
 effect" → you have no strong evidence of an effect (but also no
-strong evidence *against* one — absence of evidence is not
+strong evidence *against* one, absence of evidence is not
 evidence of absence).
 
 Let's run a quick test:
@@ -179,7 +179,7 @@ The output gives you:
   *true* difference in means.
 
 If `p < 0.05`, by convention we say the result is "statistically
-significant." That convention is useful — but also widely
+significant." That convention is useful, but also widely
 abused.
 
 ## Three things p-values do NOT mean
@@ -226,8 +226,8 @@ cat(
 
 A and B might both look "highly significant" by p-value, but the
 *effect sizes* differ by ~100×. A is a real but trivial
-difference; B is a real and large one. Always report — and
-think about — the *effect*, not just the p.
+difference; B is a real and large one. Always report, and
+think about, the *effect*, not just the p.
 
 ```mermaid
 flowchart TB
@@ -235,8 +235,8 @@ flowchart TB
   q2{Practically meaningful effect size?}
   q1 -- no --> nope[Insufficient evidence]
   q1 -- yes --> q2
-  q2 -- no --> meh[Real but tiny — probably not actionable]
-  q2 -- yes --> act[Real AND meaningful — act on it]
+  q2 -- no --> meh[Real but tiny, probably not actionable]
+  q2 -- yes --> act[Real AND meaningful, act on it]
   style act fill:#dcfce7
   style meh fill:#fef3c7
   style nope fill:#fee2e2
@@ -276,10 +276,10 @@ A grounded reading of that output:
 1. The boxplot suggests group 2 trends higher on average.
 2. The estimated difference is reported, with a CI.
 3. If `p < 0.05`, we have decent evidence the two drugs differ in
-   their effect — but always re-check the CI to see *by how
+   their effect, but always re-check the CI to see *by how
    much*.
 
-That last step — looking at the CI, not only the p-value — is
+That last step, looking at the CI, not only the p-value, is
 the single best habit you can develop. The CI tells you both
 *direction* and *magnitude* of the difference and how much it
 could plausibly be larger or smaller.
@@ -290,7 +290,7 @@ could plausibly be larger or smaller.
   "significant" ones. With 20 random tests under no-effect, you
   expect about 1 to land below p=0.05 by chance.
 - **Overinterpreting non-significance.** "p = 0.07" is not
-  "no effect" — it's "we couldn't reliably distinguish it from
+  "no effect", it's "we couldn't reliably distinguish it from
   zero with this sample size."
 - **Ignoring sample size.** With huge n, *any* tiny gap becomes
   significant. With small n, even large real effects can be
@@ -306,11 +306,11 @@ could plausibly be larger or smaller.
 *Hint: the true mean is a fixed (if unknown) number; what changes from study to study is the interval you compute.*
 
 - There is a 95% chance the true mean is between 45 and 55.
-  > A common misreading. The true mean is fixed, so it is either in this interval or not — the "95%" describes the long-run behavior of the procedure, not this one interval.
+  > A common misreading. The true mean is fixed, so it is either in this interval or not, the "95%" describes the long-run behavior of the procedure, not this one interval.
 - 95% of the data falls between 45 and 55.
   > This describes the spread of individual data points, not the uncertainty about the mean. A CI is about the parameter, not the raw values.
 - [o] If we repeated the study many times and built CIs the same way each time, about 95% of those intervals would contain the true mean.
-  > The interval is what varies across hypothetical repetitions — the true value is fixed.
+  > The interval is what varies across hypothetical repetitions, the true value is fixed.
 - The mean is exactly 50.
   > A CI gives a range of plausible values; it does not pin the mean to the midpoint.`}
 />
@@ -318,7 +318,7 @@ could plausibly be larger or smaller.
 <MultipleChoice
   markdown={`A study reports p = 0.001 for a difference in means. Which is correct?
 
-*Hint: a p-value assumes the null hypothesis is true and asks how surprising the data would be under it — not how likely the null itself is.*
+*Hint: a p-value assumes the null hypothesis is true and asks how surprising the data would be under it, not how likely the null itself is.*
 
 - The probability the null hypothesis is true is 0.001.
   > A p-value is computed *assuming* the null is true; it cannot also be the probability that the null is true.
@@ -327,7 +327,7 @@ could plausibly be larger or smaller.
 - [o] If there were no real difference between the groups, the chance of seeing a difference at least this extreme would be about 0.001.
   > That's the actual definition of a p-value.
 - The difference is definitely large.
-  > A small p-value speaks to evidence against the null, not to the size of the effect — that's what effect size measures.`}
+  > A small p-value speaks to evidence against the null, not to the size of the effect, that's what effect size measures.`}
 />
 
 <MultipleChoice
@@ -337,7 +337,7 @@ could plausibly be larger or smaller.
   > p-values are well-defined and consistent when used correctly; the issue is not unreliability but that they measure *evidence against the null*, not the size or importance of an effect.
 - Effect size determines the p-value entirely.
   > The p-value depends on both the effect size and the sample size; two studies can show different p-values for the same true effect if their sample sizes differ.
-- [o] A result can be statistically significant (especially with large n) yet practically meaningless — effect size tells you whether it matters in the real world.
+- [o] A result can be statistically significant (especially with large n) yet practically meaningless, effect size tells you whether it matters in the real world.
   > Significance and importance are different questions.
 - Confidence intervals are not used in practice.
   > Confidence intervals are widely used in applied research, clinical trials, and reporting precisely because they convey both direction and magnitude of an effect.`}
@@ -350,9 +350,9 @@ automatic transmission (`am == 0`) and manual transmission
 (`am == 1`) have different mean miles-per-gallon. Save the
 output of `t.test()` to a variable `tt`, and pull out:
 
-- `est_diff` — the *difference of sample means* (manual − auto)
-- `ci`       — the 95% confidence interval for that difference (length-2 numeric)
-- `p`        — the p-value
+- `est_diff`, the *difference of sample means* (manual − auto)
+- `ci`, the 95% confidence interval for that difference (length-2 numeric)
+- `p`, the p-value
 
 <ChallengeCard
   adapter="r"
@@ -395,7 +395,7 @@ p <- tt$p.value
     {
       id: "diffsign",
       name: "Manual cars have higher mpg",
-      code: `if (est_diff <= 0) stop("expected manual mpg > automatic mpg — check sign")`,
+      code: `if (est_diff <= 0) stop("expected manual mpg > automatic mpg, check sign")`,
     },
     {
       id: "cilen",

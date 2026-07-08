@@ -2,7 +2,7 @@
  * "Ask AI" quota read: how many chat prompts the signed-in member has left
  * today, so the panel can render a "N prompts left" counter for free members.
  *
- * Read-only (no same-origin gate needed) and cheap — one D1 row lookup. The
+ * Read-only (no same-origin gate needed) and cheap, one D1 row lookup. The
  * chat endpoint remains the enforcement point; this is display-only, so the
  * limits come from `limitsForTier` (they don't depend on provider config
  * being present). `force-dynamic` for the same reason as the chat route: it

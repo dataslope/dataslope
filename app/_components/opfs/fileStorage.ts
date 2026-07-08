@@ -10,7 +10,7 @@
  *  2. Eagerly on `pagehide` / `visibilitychange` so no edits are lost when
  *     the user closes the tab.
  *
- * `readFile` always reads directly from OPFS (no caching here — callers
+ * `readFile` always reads directly from OPFS (no caching here, callers
  * maintain their own in-memory dirty buffers in Zustand).
  *
  * No UI changes are made in Phase 1; this file is infrastructure only.
@@ -32,7 +32,7 @@ interface PendingFileWrite {
 // Async write queue (module-level singleton)
 // ---------------------------------------------------------------------------
 
-/** Map key: `${workspaceId}/${fileId}` — newer writes overwrite older ones. */
+/** Map key: `${workspaceId}/${fileId}`, newer writes overwrite older ones. */
 const pending = new Map<string, PendingFileWrite>();
 let scheduled = false;
 
@@ -110,7 +110,7 @@ if (typeof window !== "undefined") {
  * by `(workspaceId, fileId)`. Returns immediately; the actual I/O happens on
  * the next idle callback (or `pagehide`).
  *
- * Falls back gracefully when OPFS is unavailable — the write is silently
+ * Falls back gracefully when OPFS is unavailable, the write is silently
  * dropped (callers must maintain their own in-memory dirty buffer).
  */
 export function writeFile(
@@ -234,7 +234,7 @@ async function sumDirectory(dir: FileSystemDirectoryHandle): Promise<number> {
         const file = await (handle as FileSystemFileHandle).getFile();
         total += file.size;
       } catch {
-        // Unreadable file — skip.
+        // Unreadable file, skip.
       }
     }
   }

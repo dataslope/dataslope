@@ -10,7 +10,7 @@ several pages exploring.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A data grid showing the classic messes at once — a missing cell haloed in yellow, a glaring red wrong value, and two suspiciously identical rows of green dots"
+  aria-label="A data grid showing the classic messes at once, a missing cell haloed in yellow, a glaring red wrong value, and two suspiciously identical rows of green dots"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -105,7 +105,7 @@ You usually have four choices:
 
 - **Drop** rows with missing values.
 - **Drop** the whole column if it is mostly missing.
-- **Impute** — fill in a plausible value (mean, median, 0, a
+- **Impute**, fill in a plausible value (mean, median, 0, a
   flag, or a predicted value).
 - **Keep as NaN** and ensure downstream code handles it.
 
@@ -206,7 +206,7 @@ What did you spot?
 - **Country inconsistency** (USA / U.S.A. / United States / U.S.).
 - **Date format chaos** (ISO, slash, MM/DD).
 - **A date worth double-checking** (`2024-02-29` looks like a typo
-  but is real — 2024 is a leap year; a value like Feb 30 would be
+  but is real, 2024 is a leap year; a value like Feb 30 would be
   the kind that *looks* fine but breaks).
 - **`spend` as strings** (because `"abc"` and `""` poison the
   type inference).
@@ -221,7 +221,7 @@ dozen problems.
 
 ## Walking through a small clean
 
-A taste — we will not fix everything here, just demonstrate the
+A taste, we will not fix everything here, just demonstrate the
 pattern.
 
 <CodeBlock
@@ -253,13 +253,13 @@ messy = pd.DataFrame({
             .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
         )
     )
-    # 4. Parse dates — bad values become NaT
+    # 4. Parse dates, bad values become NaT
     .assign(
         signup_date=lambda x: pd.to_datetime(
             x["signup_date"], errors="coerce", format="mixed"
         )
     )
-    # 5. Coerce spend to numeric — bad values become NaN
+    # 5. Coerce spend to numeric, bad values become NaN
     .assign(spend=lambda x: pd.to_numeric(x["spend"], errors="coerce"))
     # 6. Flag suspicious spend values
     .assign(spend_suspicious=lambda x: (x["spend"] < 0) | (x["spend"] > 1_000_000))
@@ -274,7 +274,7 @@ print(clean.dtypes)
 />
 
 The remaining mess (missing names, suspicious spends) is now
-*flagged* and *typed* — we can decide what to do with each in
+*flagged* and *typed*, we can decide what to do with each in
 later analysis steps.
 
 ## The cleaning manifesto
@@ -284,7 +284,7 @@ Three principles to internalize:
 1. **Preserve the raw.** Never overwrite the source file. Your
    raw → clean pipeline should be a function of the raw input.
 2. **Document every decision.** Each cleaning step should have a
-   comment explaining *why*. Not for show — for the next
+   comment explaining *why*. Not for show, for the next
    analyst, who is often you in three months.
 3. **Make every step a small testable transformation.** Avoid
    one giant cleaning blob; break it into named steps so you can
@@ -298,7 +298,7 @@ Three principles to internalize:
 - It is a Pandas requirement
   > Pandas imposes no constraint on whether you overwrite files; the recommendation is an analytical best practice, not a library rule.
 - Raw files are bigger
-  > File size is not the reason; the issue is reversibility — you cannot re-derive the raw data from the cleaned version.
+  > File size is not the reason; the issue is reversibility, you cannot re-derive the raw data from the cleaned version.
 - [o] If your cleaning is wrong, you can re-run from the untouched raw input; if you overwrote it, you cannot recover the original
   > Raw input is sacred; cleaning is code; the clean version is derived. This is the foundation of reproducible analysis.
 - Raw files are encrypted
@@ -308,10 +308,10 @@ This is among the most important professional habits in data work.`}
 />
 
 <MultipleChoice
-  markdown={`A column contains \`"USA"\`, \`"U.S.A."\`, \`"United States"\`, and \`"U.S."\` — all meaning the same country. What is the best one-word description?
+  markdown={`A column contains \`"USA"\`, \`"U.S.A."\`, \`"United States"\`, and \`"U.S."\`, all meaning the same country. What is the best one-word description?
 
 - Duplicate values
-  > Duplicate values are repeated rows; here the values are not repeated — each variant appears in a different row and means the same thing under different spellings.
+  > Duplicate values are repeated rows; here the values are not repeated, each variant appears in a different row and means the same thing under different spellings.
 - Missing values
   > No values are absent; every row has a country entry. The problem is that the same country is spelled four different ways.
 - [o] Inconsistent categories
@@ -330,7 +330,7 @@ A canonical mapping (\`"U.S."\` → \`"USA"\`, etc.) is the typical fix.`}
 - Replacing the values with NaN
   > Replacing with NaN loses the original value permanently; flagging preserves it while marking the suspicion.
 - [o] Keeping the original values but adding a boolean column that marks them as suspicious, so reviewers can see your judgment without losing information
-  > Flagging is the least-destructive option — perfect when you are not 100% sure whether a value is wrong.
+  > Flagging is the least-destructive option, perfect when you are not 100% sure whether a value is wrong.
 - Coloring the cells
   > Cell color is a visual formatting trick that does not persist in a CSV or DataFrame and cannot be queried programmatically.
 

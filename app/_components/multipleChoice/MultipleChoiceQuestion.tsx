@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * `<MultipleChoiceQuestion>` — a self-contained quiz card authored in
+ * `<MultipleChoiceQuestion>`, a self-contained quiz card authored in
  * Markdown. Parses the raw question source on mount via
  * `parseQuestion()` and renders the result with the same paper/badge
  * chrome as `<ChallengeCard>`.
@@ -13,8 +13,8 @@
  *   - A "Try Again" button then resets the selection so learners can
  *     iterate as many times as they like (mirrors the "unlimited
  *     attempts" UX of the existing `<ChallengeCard>` Check-Answer flow).
- *   - All learner-visible Markdown — body, choice labels, per-choice
- *     explanations, overall explanation — is rendered through
+ *   - All learner-visible Markdown, body, choice labels, per-choice
+ *     explanations, overall explanation, is rendered through
  *     react-markdown with GFM + KaTeX + rehype-highlight so authors
  *     can mix prose, lists, code (with syntax colouring), tables, and
  *     math equations.
@@ -56,7 +56,7 @@ type Verdict =
 export interface MultipleChoiceQuestionProps {
   /** Raw Markdown source for the question. See `parseQuestion.ts` for
    *  the syntax. The component is intentionally markdown-in,
-   *  React-out — authors should never need to construct the parsed
+   *  React-out, authors should never need to construct the parsed
    *  shape by hand. */
   markdown: string;
   /** Optional label shown in the top-left badge. Defaults to
@@ -105,7 +105,7 @@ export default function MultipleChoiceQuestion({
   const [submitted, setSubmitted] = useState(false);
 
   const select = (id: string) => {
-    // Picking a choice locks the card and reveals feedback immediately —
+    // Picking a choice locks the card and reveals feedback immediately,
     // a single-answer question has no separate Submit step.
     if (submitted) return;
     setSelectedId(id);
@@ -259,7 +259,7 @@ export default function MultipleChoiceQuestion({
             )}
           </span>
           <span>
-            {result === "pass" ? "Correct!" : "Not quite — try again"}
+            {result === "pass" ? "Correct!" : "Not quite, try again"}
           </span>
         </div>
       ) : null}

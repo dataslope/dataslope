@@ -1,6 +1,6 @@
 ---
 title: Missing Values (NA)
-description: Real data is full of holes. R has a first-class concept — `NA` — for representing "I don't know," and a small set of rules for working with it correctly.
+description: Real data is full of holes. R has a first-class concept, `NA`, for representing "I don't know," and a small set of rules for working with it correctly.
 ---
 
 In real datasets, things go missing. A survey respondent skips a
@@ -14,7 +14,7 @@ string. It is R's way of saying: *we don't have a value here.*
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A column of solid blue value chips has one dashed empty slot, and the solid gray arrow to the yellow result panel ends in another dashed empty chip — one NA in the input leaves a hole in the answer"
+  aria-label="A column of solid blue value chips has one dashed empty slot, and the solid gray arrow to the yellow result panel ends in another dashed empty chip, one NA in the input leaves a hole in the answer"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -38,7 +38,7 @@ string. It is R's way of saying: *we don't have a value here.*
 ## How `NA` propagates
 
 The single most important rule about `NA`: **most computations
-involving `NA` return `NA`**. R is being careful — if you don't
+involving `NA` return `NA`**. R is being careful, if you don't
 know one of the inputs, you don't know the answer either.
 
 <CodeBlock
@@ -80,7 +80,7 @@ which(is.na(x)) # positions of NAs
 />
 
 `is.na()` is **the** way to test for missing values. Never use `==
-NA` — it will silently give you all `NA`s.
+NA`, it will silently give you all `NA`s.
 
 ## Summary functions and the `na.rm` argument
 
@@ -95,7 +95,7 @@ quietly removes `NA`s before computing.
       filename: "main.r",
       starterCode: `temps <- c(68, 70, NA, 72, 75, NA, 69)
 
-mean(temps) # NA — there are missings
+mean(temps) # NA, there are missings
 mean(temps, na.rm = TRUE) # works: average of the non-NA values
 sum(temps, na.rm = TRUE)
 max(temps, na.rm = TRUE)
@@ -167,7 +167,7 @@ the most under-appreciated idea in beginner data work: **the fact
 that a value is missing is itself information.**
 
 If 30% of survey respondents skipped the "income" question, that
-is not noise — that's a signal. Maybe people in certain income
+is not noise, that's a signal. Maybe people in certain income
 brackets are more likely to skip. Maybe the question was poorly
 worded. Maybe there's a UI bug. Either way, you cannot find out
 unless you *look at the missingness* before deciding what to do.
@@ -201,7 +201,7 @@ confuse with `NA`:
   is technically of numeric type. `is.na(NaN)` returns `TRUE`.
 - **`Inf`** and **`-Inf`** = positive and negative infinity. Come
   from operations like `1/0`. Not the same as missing.
-- **`NULL`** = "nothing at all" — an empty object, length 0. Not
+- **`NULL`** = "nothing at all", an empty object, length 0. Not
   the same as `NA`. Used most often to mean "there is no value
   here, not even a missing one."
 
@@ -214,9 +214,9 @@ confuse with `NA`:
 1 / 0 # Inf
 -1 / 0 # -Inf
 
-is.na(NaN) # TRUE — NaN counts as missing
+is.na(NaN) # TRUE, NaN counts as missing
 is.nan(NA) # FALSE
-is.null(NA) # FALSE — NA is not NULL
+is.null(NA) # FALSE, NA is not NULL
 
 length(NULL) # 0
 length(NA) # 1
@@ -248,7 +248,7 @@ work with them constantly.
   markdown={`Which of these is the **correct** way to test whether \`x\` is missing?
 
 - \`x == NA\`
-  > This returns \`NA\`, not \`TRUE\` or \`FALSE\` — comparing to \`NA\` is always \`NA\`.
+  > This returns \`NA\`, not \`TRUE\` or \`FALSE\`, comparing to \`NA\` is always \`NA\`.
 - \`x = NA\`
   > That's *assignment*, not a test.
 - [o] \`is.na(x)\`

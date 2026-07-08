@@ -14,7 +14,7 @@ const PORT = Number(process.env.E2E_PORT ?? 3457);
 export default defineConfig({
   testDir: "./e2e",
   // Per-playground initialization (browsercc fetching the clang/lld
-  // toolchain, Pyodide, WebR) is the slow part — give each test enough
+  // toolchain, Pyodide, WebR) is the slow part, give each test enough
   // headroom to finish even on a cold cache.
   timeout: 180_000,
   expect: { timeout: 30_000 },

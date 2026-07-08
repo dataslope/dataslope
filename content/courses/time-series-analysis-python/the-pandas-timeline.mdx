@@ -1,12 +1,12 @@
 ---
 title: "Mastering the Pandas Timeline: DatetimeIndex, Frequency, and Alignment"
-description: How pandas turns dates into a first-class index — parsing with to_datetime, the DatetimeIndex, Timestamp vs Period, frequency strings, partial-string slicing, the .dt accessor, and the automatic alignment that makes time series arithmetic safe.
+description: How pandas turns dates into a first-class index, parsing with to_datetime, the DatetimeIndex, Timestamp vs Period, frequency strings, partial-string slicing, the .dt accessor, and the automatic alignment that makes time series arithmetic safe.
 ---
 
 A time series only becomes *easy* in pandas once the timestamps live in the
 **index**, not in an ordinary column. Promote your dates to a
 `DatetimeIndex` and a whole toolbox unlocks: slice by `"1955"`, resample to
-weekly, roll a 7-day average, and — the quiet hero of this page —
+weekly, roll a 7-day average, and, the quiet hero of this page,
 **automatically align** two series by date so you never make an
 off-by-one error again. This page is about getting your data onto that
 timeline correctly.
@@ -14,7 +14,7 @@ timeline correctly.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Tilted scraps of date text drift above an evenly spaced timeline and rain down into clean blue dots, but one red scrap that will not parse leaves only a hollow ring on the spine — to_datetime turns messy strings into a DatetimeIndex, marking the unparseable as NaT"
+  aria-label="Tilted scraps of date text drift above an evenly spaced timeline and rain down into clean blue dots, but one red scrap that will not parse leaves only a hollow ring on the spine, to_datetime turns messy strings into a DatetimeIndex, marking the unparseable as NaT"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
@@ -76,10 +76,10 @@ print("  is 2014 a leap year? Feb has", ts[1].days_in_month, "days")
 
 Two new types just appeared, and they matter:
 
-- **`Timestamp`** — pandas's version of a single moment in time (one
+- **`Timestamp`**, pandas's version of a single moment in time (one
   observation's "when"). It's calendar-aware: it knows weekdays, month
   lengths, leap years.
-- **`DatetimeIndex`** — an *array* of `Timestamp`s, purpose-built to be a
+- **`DatetimeIndex`**, an *array* of `Timestamp`s, purpose-built to be a
   DataFrame or Series index.
 
 <Callout type="tip" title="Parse early, parse once">
@@ -114,7 +114,7 @@ print("count of valid dates:", parsed.notna().sum())
 
 `NaT` ("Not a Time") is to timestamps what `NaN` is to numbers. Using
 `errors="coerce"` keeps the column correctly typed while flagging the bad
-rows — far better than letting one typo turn the whole column back into
+rows, far better than letting one typo turn the whole column back into
 text.
 
 ## Setting a `DatetimeIndex`
@@ -150,8 +150,8 @@ print("Now the timeline tools are available.")
 />
 
 <Callout type="info" title="Why the index, not a column?">
-pandas reserves its time-series superpowers — partial-string slicing,
-`resample`, `rolling`, automatic alignment — for data indexed by a
+pandas reserves its time-series superpowers, partial-string slicing,
+`resample`, `rolling`, automatic alignment, for data indexed by a
 `DatetimeIndex`. A date sitting in a normal column is just data; a date in
 the *index* is a coordinate the library can navigate. When in doubt with
 time series, **put time in the index**.
@@ -159,8 +159,8 @@ time series, **put time in the index**.
 
 ## Building a timeline from scratch: `date_range`
 
-When you need a regular grid of timestamps — for simulated data, for a
-forecast horizon, or to reindex onto a clean calendar — `pd.date_range`
+When you need a regular grid of timestamps, for simulated data, for a
+forecast horizon, or to reindex onto a clean calendar, `pd.date_range`
 generates one. The `freq` argument sets the spacing.
 
 <CodeBlock
@@ -208,7 +208,7 @@ online), monthly frequency was just `"M"` (month end) and `"A"`/`"Y"` was
 year end. Modern pandas (2.2+) **renamed** these to `"ME"`, `"YE"`,
 `"QE"`, and lowercased hourly to `"h"`. The old codes still *work* for now
 but emit a noisy `FutureWarning`. This course uses the modern codes
-(`"ME"`, `"YE"`, `"h"`) so output stays clean — but when you paste code
+(`"ME"`, `"YE"`, `"h"`) so output stays clean, but when you paste code
 from the internet and see "M is deprecated," now you know the one-line
 fix: append an `E`.
 </Callout>
@@ -260,7 +260,7 @@ print("Peak month across the whole series:", air.idxmax().date(), "=", air.max()
   ]}
 />
 
-Notice that `air.loc["1955-06":"1955-09"]` is **inclusive of the end** —
+Notice that `air.loc["1955-06":"1955-09"]` is **inclusive of the end**,
 unlike normal Python slicing, which excludes the stop. That's deliberate:
 you asked for "through September," so you get September. This partial-string
 slicing is the single most convenient thing about a `DatetimeIndex`.
@@ -268,7 +268,7 @@ slicing is the single most convenient thing about a `DatetimeIndex`.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A yellow selection frame with corner handles encloses a run of solid blue squares on the timeline while the squares outside it stay gray — partial-string slicing selects the whole span you name, inclusive of both ends"
+  aria-label="A yellow selection frame with corner handles encloses a run of solid blue squares on the timeline while the squares outside it stay gray, partial-string slicing selects the whole span you name, inclusive of both ends"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -315,7 +315,7 @@ slicing is the single most convenient thing about a `DatetimeIndex`.
 - The single value at 1955-06 only
   > A colon makes it a *range*, not a single lookup. This selects every month in the span, not one point.
 - [o] Every monthly value from June 1955 through September 1955, inclusive of September
-  > Partial-string slicing on a DatetimeIndex expands each endpoint to the period it names and includes the end — so June, July, August, and September 1955 all come back.
+  > Partial-string slicing on a DatetimeIndex expands each endpoint to the period it names and includes the end, so June, July, August, and September 1955 all come back.
 - June through August 1955, excluding September (like normal Python slicing)
   > Label-based datetime slicing is *inclusive* of the stop, unlike positional Python slicing. September is included.
 - An error, because those strings are not exact timestamps in the index
@@ -377,7 +377,7 @@ print("Peak travel months are the summer (Jul/Aug) - that's the seasonality.")
   ]}
 />
 
-Grouping by `date.dt.month` already reveals the yearly seasonal shape —
+Grouping by `date.dt.month` already reveals the yearly seasonal shape,
 summer months tower over winter ones. We'll formalize that into a proper
 *seasonal component* later; for now, notice how `.dt` turns timestamps into
 ordinary grouping keys.
@@ -385,7 +385,7 @@ ordinary grouping keys.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="One solid blue timestamp capsule fans out along three thin arrows into green, blue, and yellow tiles — the dt accessor splits a single datetime into calendar parts like year, month, and weekday"
+  aria-label="One solid blue timestamp capsule fans out along three thin arrows into green, blue, and yellow tiles, the dt accessor splits a single datetime into calendar parts like year, month, and weekday"
   style={{ display: "block", width: "100%", maxWidth: "540px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -428,13 +428,13 @@ flowchart TB
     PD -. "a span of the line" .-> LINE["the timeline"]
 ```
 
-- A **`Timestamp`** is an *instant* — "the reading taken at 14:32:05."
-- A **`Period`** is a *span* — "the month of March," "the year 1955," "Q3."
+- A **`Timestamp`** is an *instant*, "the reading taken at 14:32:05."
+- A **`Period`** is a *span*, "the month of March," "the year 1955," "Q3."
 
 Monthly sales aren't really a value *at* March 1st; they're the total *over
 all of March*. That's conceptually a `Period`. Most of the time we still
 use a `Timestamp` index (it plays nicer with plotting and resampling) and
-just remember the value summarizes a span — but knowing the distinction
+just remember the value summarizes a span, but knowing the distinction
 keeps you from nonsense like "the sales at exactly midnight on the 1st."
 
 <CodeBlock
@@ -469,13 +469,13 @@ print(
 - A \`Timestamp\`, because every value needs an exact moment
   > A monthly total isn't measured *at* one instant; it accumulates across the whole month. Forcing it to a single instant ("midnight on the 1st") misrepresents what the number means.
 - [o] A \`Period\`, because the value summarizes consumption over an entire month-long span, not at one instant
-  > Totals and averages over a calendar month are spans by nature — exactly what a \`Period\` represents. (In practice we often still index by a \`Timestamp\` for convenience, while remembering it stands for the whole month.)
-- Neither — monthly data can't be represented in pandas
+  > Totals and averages over a calendar month are spans by nature, exactly what a \`Period\` represents. (In practice we often still index by a \`Timestamp\` for convenience, while remembering it stands for the whole month.)
+- Neither, monthly data can't be represented in pandas
   > pandas represents monthly data comfortably with either type; the question is which one matches the *meaning*. A span-valued total maps most naturally to a \`Period\`.
 - It must be a \`Timestamp\` or resampling won't work
   > Resampling works on a \`DatetimeIndex\` regardless of this conceptual point. The distinction here is about correctly interpreting what the value represents.
 
-A total accumulated over a month is a span — conceptually a \`Period\` — even if we often store it under a \`Timestamp\` for tooling convenience.`}
+A total accumulated over a month is a span, conceptually a \`Period\`, even if we often store it under a \`Timestamp\` for tooling convenience.`}
 />
 
 ## The quiet hero: automatic alignment
@@ -483,7 +483,7 @@ A total accumulated over a month is a span — conceptually a \`Period\` — eve
 Here is the feature that prevents a whole category of silent bugs. When you
 combine two pandas objects, the operation aligns them **by index label**,
 not by position. Add two series and pandas matches March-to-March,
-April-to-April — even if they're in different orders or have different
+April-to-April, even if they're in different orders or have different
 lengths. Where a label is missing on one side, the result is `NaN`.
 
 ```mermaid
@@ -525,7 +525,7 @@ hand you a confidently wrong answer. pandas's label alignment is the
 guardrail.
 
 <Callout type="warn" title="Alignment is a feature, but watch for the NaNs">
-Label alignment saves you from off-by-one disasters — but it *introduces*
+Label alignment saves you from off-by-one disasters, but it *introduces*
 `NaN`s wherever the two indices don't overlap. After combining series with
 different date ranges, always check for new missing values. The fix is
 usually `.dropna()`, an explicit `.reindex(...)`, or `fill_value=0` on the
@@ -684,12 +684,12 @@ assert total.loc[pd.Timestamp("2014-03-04")] == 8`,
 
 - It saves memory
   > Memory is not the motivation, and the savings are negligible. The point is unlocking behavior, not shrinking storage.
-- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample\`, \`rolling\`, and automatic alignment — features that don't work on a plain column
+- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample\`, \`rolling\`, and automatic alignment, features that don't work on a plain column
   > pandas attaches its time-series machinery to the index. With dates in the index you can write \`df.loc["1955"]\`, \`df.resample("ME")\`, and rely on label alignment; with dates in a column you can't.
 - It automatically removes duplicate dates
   > Setting an index does not deduplicate; you can have repeated index labels. Deduplication is a separate, explicit step.
 - It converts the data to a NumPy array
-  > Indexing has nothing to do with converting to NumPy, and you wouldn't want that — you'd lose the very label-awareness that makes the index useful.
+  > Indexing has nothing to do with converting to NumPy, and you wouldn't want that, you'd lose the very label-awareness that makes the index useful.
 
 The index is where pandas keeps its time-series powers; a date in a column is inert by comparison.`}
 />
@@ -699,12 +699,12 @@ The index is where pandas keeps its time-series powers; a date in a column is in
 
 - \`"Month"\`
   > Frequency codes are short aliases, not English words. \`"Month"\` is not a valid alias.
-- [o] \`"ME"\` (month end) — modern pandas renamed \`"M"\` to \`"ME"\` and \`"Y"\`/\`"A"\` to \`"YE"\`
+- [o] \`"ME"\` (month end), modern pandas renamed \`"M"\` to \`"ME"\` and \`"Y"\`/\`"A"\` to \`"YE"\`
   > The deprecation is purely a rename: append \`E\` for the "end" anchored aliases. \`"M"\` becomes \`"ME"\`, \`"Q"\` becomes \`"QE"\`, \`"Y"\` becomes \`"YE"\`.
 - \`"MS"\`, which is identical to the old \`"M"\`
-  > \`"MS"\` is month *start* (labels on the 1st); the old \`"M"\` was month *end* (labels on the last day). They are not identical — the direct replacement for \`"M"\` is \`"ME"\`.
+  > \`"MS"\` is month *start* (labels on the 1st); the old \`"M"\` was month *end* (labels on the last day). They are not identical, the direct replacement for \`"M"\` is \`"ME"\`.
 - There is no replacement; monthly frequency was removed
-  > Monthly frequency is alive and well — only its spelling changed. \`"ME"\` is the current month-end alias.
+  > Monthly frequency is alive and well, only its spelling changed. \`"ME"\` is the current month-end alias.
 
 The \`'M'\` -> \`'ME'\` rename (and \`'Y'\` -> \`'YE'\`, \`'Q'\` -> \`'QE'\`) is a spelling change; the behavior is unchanged.`}
 />
@@ -713,13 +713,13 @@ The \`'M'\` -> \`'ME'\` rename (and \`'Y'\` -> \`'YE'\`, \`'Q'\` -> \`'QE'\`) is
   markdown={`Two Series indexed by date are added with \`a + b\`. \`a\` covers Jan 1-3 and \`b\` covers Jan 2-4. What happens on Jan 1 and Jan 4 in the result?
 
 - They're dropped from the output entirely
-  > Alignment uses the *union* of indices, so both dates appear in the result — they aren't silently dropped.
+  > Alignment uses the *union* of indices, so both dates appear in the result, they aren't silently dropped.
 - They're added to the nearest available date
   > pandas never guesses by proximity. It matches labels exactly and refuses to invent a partner for an unmatched date.
 - [o] Both become \`NaN\`, because each date exists in only one of the two Series and there's nothing to add it to
   > Label alignment pairs identical dates; Jan 1 (only in \`a\`) and Jan 4 (only in \`b\`) have no counterpart, so the sum is undefined and pandas marks it \`NaN\`.
 - They use 0 for the missing side automatically
-  > Plain \`+\` does not assume 0 for missing labels — that would be a silent guess. You'd get \`NaN\`. To treat missing as 0 you must opt in with \`a.add(b, fill_value=0)\`.
+  > Plain \`+\` does not assume 0 for missing labels, that would be a silent guess. You'd get \`NaN\`. To treat missing as 0 you must opt in with \`a.add(b, fill_value=0)\`.
 
 Arithmetic aligns on the union of labels and yields \`NaN\` where a label is missing on one side, unless you explicitly supply a \`fill_value\`.`}
 />
@@ -730,17 +730,17 @@ Arithmetic aligns on the union of labels and yields \`NaN\` where a label is mis
 - Put time in the **index** (a **`DatetimeIndex`**) to unlock slicing,
   resampling, rolling, and alignment.
 - **`pd.date_range(..., freq=...)`** builds a regular timeline. Modern freq
-  codes: `D`, `W`, **`ME`**/`MS`, `QE`, **`YE`**, `h`, `min` — and remember
+  codes: `D`, `W`, **`ME`**/`MS`, `QE`, **`YE`**, `h`, `min`, and remember
   the old **`M`** is now **`ME`**.
 - **Partial-string slicing** (`air.loc["1955"]`, `air.loc["1955-06":"1955-09"]`)
   is inclusive of the end and is the most convenient `DatetimeIndex` trick.
 - **`Timestamp`** is an instant; **`Period`** is a span. Monthly totals are
   conceptually spans.
-- **Automatic alignment** matches operations by index label, not position —
-  a guardrail against off-by-one bugs — but it creates `NaN`s where indices
+- **Automatic alignment** matches operations by index label, not position,
+  a guardrail against off-by-one bugs, but it creates `NaN`s where indices
   don't overlap.
 </Callout>
 
 You can now get any dataset onto a clean timeline. Next we change the
-*resolution* of that timeline — squeezing daily data up to monthly, or
-stretching monthly data down to daily — with `resample`.
+*resolution* of that timeline, squeezing daily data up to monthly, or
+stretching monthly data down to daily, with `resample`.

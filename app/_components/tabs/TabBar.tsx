@@ -44,7 +44,7 @@ export interface TabBarProps {
 
 /**
  * Generic, content-agnostic tab strip. The bar renders only the strip
- * and "+" button — the surrounding component is responsible for
+ * and "+" button, the surrounding component is responsible for
  * rendering the active tab's content.
  */
 export function TabBar({
@@ -61,7 +61,7 @@ export function TabBar({
   const sortable = !!onReorderTabs;
 
   // Keep the active tab visible in the now horizontally-scrollable strip
-  // — e.g. after opening a new tab (the "+" button) or switching tabs
+  //, e.g. after opening a new tab (the "+" button) or switching tabs
   // from elsewhere (mobile pane bar, programmatic activation).
   const stripRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -288,7 +288,7 @@ const TabItem = memo(function TabItem({
   // Focus the rename input when the dialog opens, and select either the
   // full label or just the stem (the bit before the last `.`) so the
   // user can immediately start typing. The Dialog mounts asynchronously
-  // — wait one frame so the input is in the DOM before we touch it.
+  //, wait one frame so the input is in the DOM before we touch it.
   useEffect(() => {
     if (!renameOpen) return;
     const id = window.requestAnimationFrame(() => {
@@ -480,7 +480,7 @@ const TabItem = memo(function TabItem({
 });
 
 /** Lightweight clone rendered inside `DragOverlay` while a tab is
- *  being dragged. No interactive affordances — DnD-kit handles the
+ *  being dragged. No interactive affordances, DnD-kit handles the
  *  drop animation. */
 function TabOverlay({
   tab,

@@ -1,20 +1,20 @@
 ---
 title: Welcome
-description: An intuition-first course on statistical data visualization with Seaborn — understand why each chart choice is made, not just how to call a function.
+description: An intuition-first course on statistical data visualization with Seaborn, understand why each chart choice is made, not just how to call a function.
 ---
 
 <Figure
   slug="penguins"
-  alt="A family of penguins — echoing the Palmer Penguins dataset used throughout this course"
+  alt="A family of penguins, echoing the Palmer Penguins dataset used throughout this course"
   priority
 />
 
 Welcome to **Seaborn Foundations: Visualizing Statistical Data**.
 
-You already know some Python. You can wrangle a `DataFrame` with pandas —
+You already know some Python. You can wrangle a `DataFrame` with pandas,
 filter rows, group by a column, compute a mean. You know what an x-axis
 and a y-axis are. What you want now is to turn columns of numbers into
-**pictures that reveal what the data is actually doing** — and to know
+**pictures that reveal what the data is actually doing**, and to know
 *which* picture to reach for, and *why*.
 
 That is exactly what this course is about.
@@ -22,7 +22,7 @@ That is exactly what this course is about.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Faint blue dots melt upward into one smooth translucent density hump — many observations becoming a single readable shape"
+  aria-label="Faint blue dots melt upward into one smooth translucent density hump, many observations becoming a single readable shape"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -39,8 +39,8 @@ That is exactly what this course is about.
 ## Why Seaborn?
 
 You could draw every chart in this course with raw matplotlib. But you
-would spend most of your energy on plumbing — looping over groups,
-positioning bars, building legends by hand — instead of on *seeing*.
+would spend most of your energy on plumbing, looping over groups,
+positioning bars, building legends by hand, instead of on *seeing*.
 
 Seaborn flips that around. You hand it a **tidy table** and describe your
 chart in the vocabulary of statistics:
@@ -49,7 +49,7 @@ chart in the vocabulary of statistics:
 > panel per `day`."
 
 Seaborn does the grouping, the aggregation, the color mapping, the legend,
-and sensible defaults — so the code you write looks like the *question you
+and sensible defaults, so the code you write looks like the *question you
 are asking*.
 
 The flow is always the same: **a tidy DataFrame → describe the chart (`x`,
@@ -65,7 +65,7 @@ This is the mental shift the course is built around: **you describe
   pandas** (DataFrames, Series, filtering, `groupby`) and **basic stats**
   (mean, median, standard deviation).
 - People who can already make *a* chart but freeze when deciding *which*
-  chart — or why their chart looks misleading.
+  chart, or why their chart looks misleading.
 - Anyone who wants visualization to feel like **reasoning about data**,
   not memorizing function signatures.
 </Callout>
@@ -79,14 +79,14 @@ This course **is** about:
 
 - The principles of statistical data visualization and **exploratory data
   analysis (EDA)**
-- **Tidy data** — the table shape Seaborn is built for
+- **Tidy data**, the table shape Seaborn is built for
 - **Relational** plots (scatter, line), **distribution** plots (histogram,
   KDE, ECDF, rug), and **categorical** plots (bar, count, box, violin,
   boxen, strip, swarm)
 - **Regression and trend** visualization, **correlation heatmaps**, and
   **multi-panel grids** (facets, pair plots, joint plots)
-- **Aesthetics that aid communication** — themes, contexts, and color
-  palettes — and the judgment to tell a clear visual story
+- **Aesthetics that aid communication**, themes, contexts, and color
+  palettes, and the judgment to tell a clear visual story
 
 This course is **not** about:
 
@@ -101,24 +101,24 @@ about Seaborn.
 
 ## How the interactive pages work
 
-Every code block on these pages **runs right here in your browser** —
+Every code block on these pages **runs right here in your browser**,
 there is nothing to install, and Seaborn, pandas, and the example
 datasets are already available. Edit any snippet, run it, break it, and
 fix it. That is how the intuition sticks.
 
 You will meet three kinds of widgets:
 
-1. **Executable code blocks.** Change a parameter — `hue`, `bins`,
-   `kind` — and watch the chart respond.
+1. **Executable code blocks.** Change a parameter, `hue`, `bins`,
+   `kind`, and watch the chart respond.
 2. **Challenge cards.** Small, checked tasks where *you* write the code.
    Tests tell you the moment you have it right.
 3. **Multiple-choice questions.** Quick concept checks. The more
-   foundational a page is, the more of these you will find — getting the
+   foundational a page is, the more of these you will find, getting the
    mental model right early saves hours later.
 
 <Callout type="info" title="Each block starts fresh">
 Variables defined in one code block are **not** visible in the next, even
-on the same page. So every example is self-contained — it imports Seaborn
+on the same page. So every example is self-contained, it imports Seaborn
 and loads its data at the top. That repetition is intentional: you can run
 any block in isolation. For a longer-lived workspace, open the
 [Python Playground](/playground/python) in a new tab.
@@ -126,13 +126,13 @@ any block in isolation. For a longer-lived workspace, open the
 
 ## Try it right now
 
-Enough preamble — here is a real Seaborn figure you can run this second.
+Enough preamble, here is a real Seaborn figure you can run this second.
 **This whole course runs in your browser:** there is nothing to install,
 and pandas, Seaborn, and the example data are already loaded. Press
 **Run** and watch a few hundred penguins sort themselves into three
 species.
 
-Do not worry about the details yet — by the end of this course every line
+Do not worry about the details yet, by the end of this course every line
 will feel *obvious*, and you will be able to say what each one is *for*.
 
 <CodeBlock
@@ -163,7 +163,7 @@ sns.relplot(
 
 Notice what you did *not* have to do: no loop over species, no manual
 color assignment, no legend code. You named the columns and the *roles*
-they should play — `x`, `y`, `hue` — and Seaborn did the rest. That is the
+they should play, `x`, `y`, `hue`, and Seaborn did the rest. That is the
 whole game.
 
 <Callout type="tip" title="Now change one thing">
@@ -175,14 +175,14 @@ The fastest way to build intuition is to *poke*. In the block above, try
 - split it into panels: add `col="sex"` on its own line inside the call.
 
 Each tiny change asks Seaborn a different question, and the picture answers
-instantly. That loop — tweak, run, look — is the whole rhythm of this
+instantly. That loop, tweak, run, look, is the whole rhythm of this
 course.
 </Callout>
 
 <Callout type="tip" title="The one habit to build">
 As you go, keep asking three questions of every chart: **What does it
 reveal? What does it hide? When would it break?** A great analyst is not
-the one who knows the most chart types — it is the one who knows which
+the one who knows the most chart types, it is the one who knows which
 chart *fits the data and the question*.
 </Callout>
 

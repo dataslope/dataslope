@@ -1,17 +1,17 @@
 ---
 title: Thinking in Datasets
-description: How analysts reason about large datasets they cannot see all at once — the mental moves of exploratory data analysis, and how SQL turns questions into answers.
+description: How analysts reason about large datasets they cannot see all at once, the mental moves of exploratory data analysis, and how SQL turns questions into answers.
 ---
 
 An application developer usually knows exactly which row they want before
 they write a query. An analyst almost never does. Faced with a table of a
-million rows, you cannot eyeball it — you have to **reason about its
+million rows, you cannot eyeball it, you have to **reason about its
 shape** through summaries. This page is about that mindset: how to think
 when the data is too big to see, and how SQL becomes your instrument for
 "looking."
 
 <Callout type="info" title="An optional deep dive">
-This is one of the course's *Interesting discussions* — the mental
+This is one of the course's *Interesting discussions*, the mental
 toolkit behind exploratory analysis. Nothing later strictly depends on it,
 so read it whenever you like. Many readers enjoy it most after they have
 run a few queries and felt the exploratory loop firsthand.
@@ -20,7 +20,7 @@ run a few queries and felt the exploratory loop firsthand.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A wide field of faint blue rows runs past both edges of the frame with one red dot hiding inside, while a small card above holds four crisp colored summary chips — a dataset too big to see, held in mind as a handful of numbers"
+  aria-label="A wide field of faint blue rows runs past both edges of the frame with one red dot hiding inside, while a small card above holds four crisp colored summary chips, a dataset too big to see, held in mind as a handful of numbers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,7 +60,7 @@ run a few queries and felt the exploratory loop firsthand.
   </g>
 </svg>
 
-## You cannot see a million rows — so you summarize
+## You cannot see a million rows, so you summarize
 
 Imagine someone hands you a spreadsheet with 2 million sales. Scrolling
 is hopeless. Instead, an analyst asks *summarizing* questions that shrink
@@ -69,7 +69,7 @@ the data to something a human can hold in mind:
 - *How many rows are there?* (the size)
 - *What date range does it cover?* (the span)
 - *How many distinct products / regions / customers?* (the cardinality)
-- *What does a typical value look like — and the extremes?* (the
+- *What does a typical value look like, and the extremes?* (the
   distribution)
 
 Each answer is a single number or a short list. Stacked together, they
@@ -102,7 +102,7 @@ flowchart TD
 Say you compute revenue per region and notice one region is oddly low.
 That *surprise* drives the next query: is it fewer orders, or smaller
 ones? Then the next: which products? Each step narrows the mystery. SQL
-is fast enough that this loop can spin many times per minute — which is
+is fast enough that this loop can spin many times per minute, which is
 why analysts prefer it to hand-editing spreadsheets.
 
 ## Drilling down: from coarse to fine
@@ -117,7 +117,7 @@ flowchart TB
     L3 --> L4["The one region-month<br/>that looks wrong"]
 ```
 
-You do **not** dump all the detail at once — that just recreates the
+You do **not** dump all the detail at once, that just recreates the
 unreadable million-row spreadsheet. You add a dimension at a time, follow
 the surprises, and stop when the picture is clear.
 
@@ -127,7 +127,7 @@ through. First, *how big is it, and what does price span?*
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Building a mental picture — size and span"
+  title="Building a mental picture, size and span"
   starterCode={`-- Question 1: how big, and what does it span?
 SELECT
   COUNT(*) AS rows,
@@ -140,7 +140,7 @@ FROM
   );`}
 />
 
-Now sharpen the question — *what cuts exist, and how common is each?*
+Now sharpen the question, *what cuts exist, and how common is each?*
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -159,7 +159,7 @@ ORDER BY
   n DESC;`}
 />
 
-You just turned 53,940 invisible rows into a few lines of story — without
+You just turned 53,940 invisible rows into a few lines of story, without
 ever reading a single individual diamond. That is thinking in datasets.
 
 ## Three habits worth keeping
@@ -185,7 +185,7 @@ ever reading a single individual diamond. That is thinking in datasets.
 - Because individual rows are always inaccurate.
   > Individual rows are not inherently inaccurate; they are simply too many to inspect one by one.
 
-You summarize because you cannot see a million rows at once — the summary
+You summarize because you cannot see a million rows at once, the summary
 *is* how you "see" the data.`}
 />
 

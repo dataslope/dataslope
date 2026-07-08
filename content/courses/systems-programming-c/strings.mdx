@@ -8,8 +8,8 @@ sequence of `char` ending in a zero byte (`'\0'`). Every function in
 `<string.h>` relies on that single byte to know where the string
 stops.
 
-It did not have to be this way. The other classic design —
-used by Pascal, and by many languages since — stores the *length*
+It did not have to be this way. The other classic design,
+used by Pascal, and by many languages since, stores the *length*
 in front of the characters, so the runtime always knows where a
 string ends without scanning it. Thompson, Ritchie, and Kernighan
 chose the terminator instead, probably because it made strings of
@@ -21,7 +21,7 @@ overflows, `strlen` scans, and security advisories, all downstream
 of one byte saved per string in 1970. Whether or not you accept his
 accounting, the lesson of this page is that the terminator is a
 **convention enforced by nothing**. The language will not stop you
-from losing it — and the moment a string loses its `'\0'`, every
+from losing it, and the moment a string loses its `'\0'`, every
 function in `<string.h>` becomes a loaded gun.
 
 ## Null-terminated character arrays
@@ -113,18 +113,18 @@ will happily keep walking into unrelated memory.
 
 ## String literals
 
-`"hello"` in C is a string literal — an *anonymous array* of `char`
+`"hello"` in C is a string literal, an *anonymous array* of `char`
 with an automatically appended `'\0'`. The compiler usually places
 literals in read-only memory.
 
 | Form | What it is | Mutable? |
 | --- | --- | --- |
 | `char s[] = "hi";` | A *copy* of the literal in a local array | yes |
-| `char *s = "hi";` | A pointer to the literal in read-only memory | **no** — writing through it is UB |
+| `char *s = "hi";` | A pointer to the literal in read-only memory | **no**, writing through it is UB |
 | `const char *s = "hi";` | The right way to spell the second form | n/a |
 
 <Callout type="warn" title="Do not write through a string literal pointer">
-`char *s = "hi"; s[0] = 'H';` compiles but is undefined behavior — on
+`char *s = "hi"; s[0] = 'H';` compiles but is undefined behavior, on
 many platforms it crashes because the literal lives in read-only
 memory. Use `const char *` for literal pointers, or `char s[] = "hi";`
 when you need to modify the contents.
@@ -158,9 +158,9 @@ int main(void) {
 | Function | Purpose | Notes |
 | --- | --- | --- |
 | `strlen(s)` | Number of bytes before `'\0'` | O(n) |
-| `strcpy(dst, src)` | Copy null-terminated `src` to `dst` | No length check — unsafe |
+| `strcpy(dst, src)` | Copy null-terminated `src` to `dst` | No length check, unsafe |
 | `strncpy(dst, src, n)` | Copy at most `n` bytes | May *not* null-terminate; see below |
-| `strcat(dst, src)` | Append `src` to `dst` | No length check — unsafe |
+| `strcat(dst, src)` | Append `src` to `dst` | No length check, unsafe |
 | `strcmp(a, b)` | Compare two strings | negative / 0 / positive |
 | `strncmp(a, b, n)` | Compare first `n` bytes | |
 | `strchr(s, c)` | First occurrence of `c` | Returns pointer or `NULL` |
@@ -259,7 +259,7 @@ int main(void) {
   // Pretend buf has trash so we can see if strncpy terminates.
   memset(buf, 'X', sizeof buf);
   strncpy(buf, "hello!", 5); // 6 chars + '\\0' would not fit
-  // buf now contains 'h','e','l','l','o' — no '\\0'!
+  // buf now contains 'h','e','l','l','o', no '\\0'!
 
   // The safer pattern: force termination.
   char safe[5];
@@ -380,7 +380,7 @@ plain `char` is signed on some platforms.
 <ChallengeCard
   adapter="c"
   title="Implement your own strcmp"
-  instructions={`Implement \`int my_strcmp(const char *a, const char *b)\` that returns a negative value if \`a < b\`, zero if equal, and positive if \`a > b\` — using byte-wise comparison. The provided \`main\` prints \`<\`, \`=\`, or \`>\` for a few pairs.`}
+  instructions={`Implement \`int my_strcmp(const char *a, const char *b)\` that returns a negative value if \`a < b\`, zero if equal, and positive if \`a > b\`, using byte-wise comparison. The provided \`main\` prints \`<\`, \`=\`, or \`>\` for a few pairs.`}
   files={[
     {
       filename: "main.c",
@@ -508,7 +508,7 @@ int main(void) {
   markdown={`What is the *length* of the C string literal \`"hello"\` in memory (in bytes)?
 
 - 4 bytes
-  > Too few — even the visible characters are 5.
+  > Too few, even the visible characters are 5.
 - 5 bytes
   > Close, but it forgets the terminator.
 - [o] 6 bytes (5 characters + the trailing \`'\\0'\`)
@@ -534,7 +534,7 @@ int main(void) {
   markdown={`Which is the safest way to copy a string into a fixed-size buffer?
 
 - \`strcpy(dst, src);\`
-  > No length check — overflows silently if \`src\` is longer than \`dst\`.
+  > No length check, overflows silently if \`src\` is longer than \`dst\`.
 - \`strncpy(dst, src, sizeof dst);\`
   > Subtle bug: if \`src\` is too long, \`dst\` will not be null-terminated.
 - [o] \`snprintf(dst, sizeof dst, "%s", src);\`

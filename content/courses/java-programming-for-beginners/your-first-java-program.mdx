@@ -11,7 +11,7 @@ larger.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A code card with one solid green line among faint gray ones sends a thin arrow to a console card, where past the blue prompt chevron that same line appears as green output — your first program prints its first words"
+  aria-label="A code card with one solid green line among faint gray ones sends a thin arrow to a console card, where past the blue prompt chevron that same line appears as green output, your first program prints its first words"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="30" width="220" height="150" rx="14" fill="currentColor" opacity="0.05" />
@@ -55,7 +55,7 @@ Kernighan at Bell Labs, who used a "hello, world" example in his
 early-1970s tutorial for the B language and then canonized it in
 *The C Programming Language* (1978), the most influential
 programming book ever written. Practically every programmer alive
-began exactly where you are now — making a machine say hello.
+began exactly where you are now, making a machine say hello.
 
 Now, let us pull this program apart.
 
@@ -64,16 +64,16 @@ Now, let us pull this program apart.
 ### `public class Main {`
 
 Every Java program lives inside a **class**. A class is a kind of
-"file" — a named container for code. We will spend an entire chapter
+"file", a named container for code. We will spend an entire chapter
 on classes soon. For now, all you need to know is that **there is no
 such thing as a "free-standing" function in Java**. Every method
 belongs to some class.
 
-- `public` — this class is visible to any other code.
-- `class` — the keyword that declares a class.
-- `Main` — the *name* of the class. By convention class names use
+- `public`, this class is visible to any other code.
+- `class`, the keyword that declares a class.
+- `Main`, the *name* of the class. By convention class names use
   PascalCase (capital letter for every word).
-- `{` — opens the body of the class.
+- `{`, opens the body of the class.
 
 > By convention, the file is named exactly `Main.java`. Java is
 > picky about this: a `public class Main` *must* live in a file
@@ -82,19 +82,19 @@ belongs to some class.
 
 ### `public static void main(String[] args) {`
 
-This is the **entry point** of the program — the very first method
+This is the **entry point** of the program, the very first method
 the JVM calls when you run your program. Every Java program needs
 exactly one method that looks (almost) exactly like this.
 
 Break it down:
 
-- `public` — callable from anywhere (including by the JVM).
-- `static` — belongs to the class itself, not to an instance. This
+- `public`, callable from anywhere (including by the JVM).
+- `static`, belongs to the class itself, not to an instance. This
   matters because the JVM needs to call `main` *before* it has
   built any objects. (More on this in the classes chapter.)
-- `void` — returns nothing. When the method ends, the program ends.
-- `main` — the special name the JVM looks for.
-- `(String[] args)` — accepts an array of strings; the command-line
+- `void`, returns nothing. When the method ends, the program ends.
+- `main`, the special name the JVM looks for.
+- `(String[] args)`, accepts an array of strings; the command-line
   arguments. In our browser environment this is empty, but on a real
   computer running `java Main hello world`, `args` would be
   `["hello", "world"]`.
@@ -103,14 +103,14 @@ Break it down:
 
 This is the only line that *does* anything. It prints text.
 
-- `System` — a class from the Java standard library. It exposes
+- `System`, a class from the Java standard library. It exposes
   things related to the running program.
-- `out` — a field of `System` that is the standard output (the
+- `out`, a field of `System` that is the standard output (the
   console).
-- `println` — a method on `out` that prints its argument followed by
+- `println`, a method on `out` that prints its argument followed by
   a newline.
-- `"Hello, Java!"` — a **string literal** — a value of type `String`.
-- `;` — the semicolon that ends every statement in Java.
+- `"Hello, Java!"`, a **string literal**, a value of type `String`.
+- `;`, the semicolon that ends every statement in Java.
 
 ### The closing braces
 
@@ -143,7 +143,7 @@ happen *before* you click Run.
 
 1. Change `println` to `print` (no `ln`). The newline disappears.
 2. Add a second `println` line. Both lines print.
-3. Add `System.out.println(5 + 3);` — Java prints `8`. You can
+3. Add `System.out.println(5 + 3);`, Java prints `8`. You can
    print numbers, not just strings.
 4. Delete the semicolon at the end of any statement. Java will
    refuse to compile and tell you what is wrong.
@@ -162,7 +162,7 @@ the error message**. Java's compiler is wordy but rarely cryptic.
   > \`main\` is the agreed-upon entry point.
 - It is required to be called \`Main\` like the class
   > It must be called \`main\` (lowercase), regardless of the class name.
-- It is optional — Java programs without a \`main\` method still run
+- It is optional, Java programs without a \`main\` method still run
   > A program with no \`main\` cannot start.`}
 />
 
@@ -181,7 +181,7 @@ the error message**. Java's compiler is wordy but rarely cryptic.
 
 ## Multi-file Java: a sneak peek
 
-Every "real" Java program is spread across many files — usually one
+Every "real" Java program is spread across many files, usually one
 class per file. The code block component supports this. Here is the
 same greeting, split across two files:
 
@@ -269,4 +269,4 @@ Role: First programmer
 
 You now own the basic structure of every Java program you will ever
 write. The next page is about what happens when you write `int x =
-5;` — the heart of how a program holds onto data.
+5;`, the heart of how a program holds onto data.

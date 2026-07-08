@@ -3,7 +3,7 @@
 // only once per page load.
 //
 // The version is pinned to match the installed npm package so the JS
-// and WASM builds always stay in sync — update both together.
+// and WASM builds always stay in sync, update both together.
 const RUFF_FMT_VERSION = "0.15.12";
 
 let ruffFmtInitPromise: Promise<{

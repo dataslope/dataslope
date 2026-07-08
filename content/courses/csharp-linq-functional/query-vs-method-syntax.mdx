@@ -1,20 +1,20 @@
 ---
 title: Query vs Method Syntax
-description: The two faces of LINQ — when SQL-like query syntax shines, when fluent method chains win, and how the compiler bridges them
+description: The two faces of LINQ, when SQL-like query syntax shines, when fluent method chains win, and how the compiler bridges them
 ---
 
 C# offers **two syntactic styles** for writing LINQ. They look very
 different, but they compile to the same code and have identical
 semantics. Choosing between them is a matter of *readability*.
 
-This page builds an intuition for when each style serves you best —
+This page builds an intuition for when each style serves you best,
 and shows you what the compiler does behind the scenes so the two
 never feel like separate languages.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two parallel rails — one of rounded bars, one of chained circles — converge along thin lines on the same yellow diamond station: two syntaxes, one meaning"
+  aria-label="Two parallel rails, one of rounded bars, one of chained circles, converge along thin lines on the same yellow diamond station: two syntaxes, one meaning"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -173,7 +173,7 @@ var labeled =
 ```
 
 `Join` in method form requires four lambdas and a key selector
-dance. Query syntax keeps it visually flat — much closer to SQL.
+dance. Query syntax keeps it visually flat, much closer to SQL.
 
 ## When method syntax reads better
 
@@ -186,7 +186,7 @@ var topRevenue = orders
     .Where(o => o.Status == "completed")
     .Sum(o => o.Total);
 
-// query equivalent is awkward — query syntax cannot end with Sum
+// query equivalent is awkward, query syntax cannot end with Sum
 var topRevenue2 = (
     from o in orders
     where o.Status == "completed"
@@ -240,7 +240,7 @@ ergonomics layer on top.
 
 Each should return, one per line, the authors whose books total **more than 1500 pages**, **ordered by author name**, formatted as \`"Name: totalPages"\`.
 
-Write \`QueryStyle\` using **query syntax** (the SQL-like \`from … where … select\` form) and \`MethodStyle\` using **method syntax** (the fluent \`.GroupBy().Where()…\` chain). Edit \`QueryStyle.cs\` and \`MethodStyle.cs\` — \`Program.cs\` is already wired up.`}
+Write \`QueryStyle\` using **query syntax** (the SQL-like \`from … where … select\` form) and \`MethodStyle\` using **method syntax** (the fluent \`.GroupBy().Where()…\` chain). Edit \`QueryStyle.cs\` and \`MethodStyle.cs\`, \`Program.cs\` is already wired up.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -348,7 +348,7 @@ public static class MethodStyle
   ]}
 />
 
-Both pipelines should now produce the same single line — `Knuth: 2150` —
+Both pipelines should now produce the same single line, `Knuth: 2150`,
 because Knuth's three volumes (650 + 700 + 800 = 2150) are the only
 author group whose total page count exceeds the `1500` threshold.
 

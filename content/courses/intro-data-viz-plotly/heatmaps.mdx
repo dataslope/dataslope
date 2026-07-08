@@ -5,18 +5,18 @@ description: Encoding a two-dimensional table with color to reveal patterns that
 
 A **heatmap** is a grid of colored cells, where each cell's color
 encodes a numeric value. It's the natural chart for any data that
-sits in a *two-dimensional table* — categories on rows and columns,
+sits in a *two-dimensional table*, categories on rows and columns,
 numbers in the cells.
 
 You will see heatmaps used for correlation matrices, schedule
 calendars, hourly traffic, missing-data maps, and confusion
-matrices in ML — all the same chart, applied to different data
+matrices in ML, all the same chart, applied to different data
 shapes.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A grid of blue cells whose opacity rises toward a single hot solid cell — a heatmap revealing a hotspot in a table of numbers"
+  aria-label="A grid of blue cells whose opacity rises toward a single hot solid cell, a heatmap revealing a hotspot in a table of numbers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -68,7 +68,7 @@ Use a heatmap when:
 - You have a **2-D table** of values: rows × columns of numbers.
 - You want to spot **patterns**, **clusters**, or **anomalies**
   across both axes simultaneously.
-- The number of rows and columns isn't huge — a 20×20 grid is
+- The number of rows and columns isn't huge, a 20×20 grid is
   comfortable, a 1000×1000 grid is a different kind of chart.
 
 ## A simple heatmap
@@ -77,7 +77,7 @@ Plotly Express offers `px.imshow` (for image-like 2-D matrices) and
 `px.density_heatmap` (which bins two continuous variables on the fly).
 
 This is exactly the tool for big, overplotted data. The **diamonds**
-dataset has 53,940 rows — far too many for a scatter — so we bin them
+dataset has 53,940 rows, far too many for a scatter, so we bin them
 into a grid and color by count instead.
 
 <CodeBlock
@@ -109,11 +109,11 @@ fig.show()
 
 Where a scatter plot would show *every dot* (and collapse into a
 blob), this shows *cell counts*. The hot cells are where most
-diamonds fall — small carat, low price.
+diamonds fall, small carat, low price.
 
 ## A correlation matrix heatmap
 
-A classic use is a **correlation matrix** — every numeric column
+A classic use is a **correlation matrix**, every numeric column
 correlated against every other.
 
 <CodeBlock
@@ -200,7 +200,7 @@ This is the single most important decision when making a heatmap.
 - **Diverging** (color → white → other color): `"RdBu"`,
   `"RdBu_r"` (reversed), `"PiYG"`. Use for values with a
   *meaningful zero* (correlations, deviations, gain/loss).
-- **Avoid `Jet` / rainbow.** It is *perceptually non-uniform* —
+- **Avoid `Jet` / rainbow.** It is *perceptually non-uniform*,
   bright cyan and yellow bands look like ridges in the data even
   where there aren't any. `Viridis` is its modern replacement.
 
@@ -209,7 +209,7 @@ This is the single most important decision when making a heatmap.
 - **Too many cells** (1000×1000) make individual cells invisible.
   Either aggregate or switch to a density-based representation.
 - **Wrong palette** (rainbow / Jet) introduces false structure.
-- **Forgetting the colorbar legend** — without it, the chart's
+- **Forgetting the colorbar legend**, without it, the chart's
   colors mean nothing to the reader. Always show the legend.
 - **Truncating the color range** can mask outliers, similar to a
   truncated y-axis on a bar chart.
@@ -223,7 +223,7 @@ This is the single most important decision when making a heatmap.
   > A single variable's distribution is best shown with a histogram or box plot; a heatmap requires values at the intersection of two categorical or binned axes.
 - A trend over time.
   > Trends over time are best shown with a line chart; a heatmap has no inherent x-axis ordering and is not designed to reveal directional change.
-- [o] A 2-D table of numeric values — rows × columns — where you want to spot patterns or hotspots.
+- [o] A 2-D table of numeric values, rows × columns, where you want to spot patterns or hotspots.
   > Each cell's color encodes the numeric value at that row/column intersection. The eye perceives the dense, hot, or cold regions instantly, which makes heatmaps excellent for correlation matrices, calendar data, and any cross-tabulation.
 - A part-of-a-whole composition.
   > Part-of-a-whole compositions are shown with pie charts or stacked bar charts; a heatmap's cells encode values at row-column intersections, not shares of a total.
@@ -235,7 +235,7 @@ For distributions use a histogram; for trends use a line chart; for compositions
   markdown={`For a **correlation matrix** heatmap (values from -1 to +1), which color palette is most appropriate?
 
 - A sequential palette like **Viridis**.
-  > A sequential palette goes from low to high without a midpoint, so a correlation of -0.9 and one of 0.0 would look equally "different" from +0.9 — the negative side's meaning would be obscured.
+  > A sequential palette goes from low to high without a midpoint, so a correlation of -0.9 and one of 0.0 would look equally "different" from +0.9, the negative side's meaning would be obscured.
 - A categorical palette like **Plotly**.
   > Categorical palettes use distinct hues for unordered groups; they have no intensity gradient and cannot encode the magnitude or sign of a numeric value like a correlation coefficient.
 - [o] A **diverging** palette like **RdBu** or **RdBu_r**, centered at zero.
@@ -250,10 +250,10 @@ Diverging data deserves a diverging palette. Mixing it up is a common mistake.`}
   markdown={`Why should you **avoid** the **Jet** (rainbow) colormap for heatmaps?
 
 - It is copyrighted.
-  > Jet/rainbow colormaps are freely available and widely distributed; copyright is not a reason to avoid them — perceptual distortion is.
+  > Jet/rainbow colormaps are freely available and widely distributed; copyright is not a reason to avoid them, perceptual distortion is.
 - It is only available on Windows.
   > Jet is available in matplotlib, Plotly, and virtually every other visualization library on all platforms; platform availability is not the issue.
-- [o] It is **perceptually non-uniform** — bright cyan and yellow bands appear as visual "ridges" even where data is flat, leading viewers to see structure that isn't there.
+- [o] It is **perceptually non-uniform**, bright cyan and yellow bands appear as visual "ridges" even where data is flat, leading viewers to see structure that isn't there.
   > Jet was popular in the 1990s but is now known to introduce false features. Modern perceptually uniform palettes (Viridis, Cividis, Magma) increase smoothly in luminance and reveal the actual structure of the data without visual artifacts.
 - It uses too many colors.
   > The number of distinct colors in a palette is not inherently a problem; the actual issue with Jet is that its color transitions are perceptually non-uniform, creating false visual structure.

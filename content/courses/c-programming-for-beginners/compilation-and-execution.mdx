@@ -83,10 +83,10 @@ Recognizing which stage is angry at you is half the debugging battle.
 The preprocessor is a **text-only** tool. It does not understand C
 syntax. It only knows three things:
 
-1. **`#include`** — paste the contents of a header file here.
-2. **`#define`** — perform text substitution (`#define MAX 100`
+1. **`#include`**, paste the contents of a header file here.
+2. **`#define`**, perform text substitution (`#define MAX 100`
    replaces every later `MAX` with `100`).
-3. **`#if` / `#ifdef` / `#endif`** — conditionally include or omit
+3. **`#if` / `#ifdef` / `#endif`**, conditionally include or omit
    chunks of code.
 
 It also strips comments.
@@ -126,7 +126,7 @@ int main(void) {
 }
 ```
 
-`GREETING` and `TIMES` are simply gone — they were replaced.
+`GREETING` and `TIMES` are simply gone, they were replaced.
 
 <Callout type="warn" title="Macros are textual">
 \`#define DOUBLE(x) x * 2\` looks fine, but \`DOUBLE(1 + 1)\` expands
@@ -153,7 +153,7 @@ hello.c:5:9: error: use of undeclared identifier 'printff'
 ```
 
 The compiler points at the column and explains what went wrong. Read
-the *first* error first — later errors are often cascading
+the *first* error first, later errors are often cascading
 consequences of the first.
 
 ## Stage 3: the assembler
@@ -206,7 +206,7 @@ The header is the *interface*. The source file is the
 *implementation*.
 
 The browser sandbox supports multi-file builds. Edit any tab below
-and click *Run* — both files are compiled and linked together.
+and click *Run*, both files are compiled and linked together.
 
 <CodeBlock
   adapter="c"
@@ -266,7 +266,7 @@ This distinction trips up beginners constantly:
   **exactly once** across the whole program.
 
 The compiler is happy with just declarations. The linker demands at
-least one definition per used symbol — no more, no less.
+least one definition per used symbol, no more, no less.
 
 ```mermaid
 flowchart TD

@@ -12,7 +12,7 @@ conceptual unlock for Pandas.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A grid of faint cells with one full row highlighted green and one full column highlighted blue, meeting at a single yellow cell — every value lives where a record crosses an attribute"
+  aria-label="A grid of faint cells with one full row highlighted green and one full column highlighted blue, meeting at a single yellow cell, every value lives where a record crosses an attribute"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -110,7 +110,7 @@ Columns share three properties that you will rely on constantly:
 1. **A column has a name.** That name is the human-facing label
    for the attribute.
 2. **A column has a type.** All its values are (in principle)
-   the same kind of thing — integers, strings, dates.
+   the same kind of thing, integers, strings, dates.
 3. **A column is the unit of most Pandas operations.** You
    filter rows *based on a column*. You group rows *by a
    column*. You sum, average, or count *a column*.
@@ -228,8 +228,8 @@ is: keep your working copy long, pivot to wide only for display.
 
 When you select a column, you get back a **Series** (a labeled
 1-D array). When you select a row, you also get a Series, but
-indexed by the column names. This duality — same underlying
-type, different axis — is a recurring theme.
+indexed by the column names. This duality, same underlying
+type, different axis, is a recurring theme.
 
 ```mermaid
 flowchart LR
@@ -251,10 +251,10 @@ columns-as-attributes idea.
   title="Build a typed DataFrame by hand"
   instructions={`Construct a DataFrame called \`students\` with exactly 5 rows and 4 columns. Each row should represent one student. The columns should be:
 
-- \`name\` — a string
-- \`grade\` — an integer between 1 and 12
-- \`gpa\` — a float between 0.0 and 4.0
-- \`passed_math\` — a boolean
+- \`name\`, a string
+- \`grade\`, an integer between 1 and 12
+- \`gpa\`, a float between 0.0 and 4.0
+- \`passed_math\`, a boolean
 
 You can pick any names, grades, GPAs, and pass/fail values.`}
   files={[
@@ -346,7 +346,7 @@ A column is an attribute that applies to every row of the dataset.`}
   > Font is a display property of a UI, not a concept in tabular data semantics.
 - The total size of the dataset in bytes
   > Dataset size in bytes is a storage metric; grain is a semantic concept about what each row represents.
-- [o] The level of detail each row represents — for example "one row per customer" versus "one row per customer-month"
+- [o] The level of detail each row represents, for example "one row per customer" versus "one row per customer-month"
   > Grain is one of the most under-discussed concepts in data work; getting it wrong leads to double-counting in joins and aggregations.
 - The color scheme of the table
   > Color scheme is a display concern; grain refers to the conceptual unit of each row in the data.

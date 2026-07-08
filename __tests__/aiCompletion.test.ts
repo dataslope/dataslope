@@ -1,7 +1,7 @@
 /**
  * AI inline completion: prompt assembly + response cleanup.
  *
- * Pure functions (no D1, no network), so they run in Node — same posture as
+ * Pure functions (no D1, no network), so they run in Node, same posture as
  * aiModels.test.ts. The endpoint's auth/tier/budget gates are exercised by
  * their own modules; here we pin the prompt contract and the defensive
  * post-processing of model replies.

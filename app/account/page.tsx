@@ -10,7 +10,7 @@ import { AccountClient } from "./AccountClient";
 export const metadata: Metadata = {
   title: "Account",
   description: "Manage your Dataslope account.",
-  // Personalized, behind sign-in — keep it out of search results.
+  // Personalized, behind sign-in, keep it out of search results.
   robots: { index: false, follow: false },
 };
 

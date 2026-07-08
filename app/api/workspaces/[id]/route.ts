@@ -1,11 +1,11 @@
 /**
  * One cloud-saved workspace.
  *
- * PUT    /api/workspaces/:id — create or replace the save ("push"). Multipart:
+ * PUT    /api/workspaces/:id, create or replace the save ("push"). Multipart:
  *                              `meta` JSON ({ name, playground, manifest }) +
  *                              `bundle` (gzipped JSON, lib/workspaces/types.ts).
- * GET    /api/workspaces/:id — metadata row.
- * DELETE /api/workspaces/:id — remove the save (R2 object first, then row).
+ * GET    /api/workspaces/:id, metadata row.
+ * DELETE /api/workspaces/:id, remove the save (R2 object first, then row).
  *
  * The row key is (user id, workspace id): the id is the client-generated
  * ws_… id, so the same workspace pairs with its cloud copy by id equality on
@@ -120,7 +120,7 @@ export async function PUT(
 
   // Quota check against the *live* footprint (expired rows purge here too, so
   // freeing space is as simple as letting old drafts age out). The workspace
-  // being written is excluded from the purge — its background delete targets
+  // being written is excluded from the purge, its background delete targets
   // the same R2 key this PUT is about to write.
   const nowMs = Date.now();
   const state = await loadLiveUserState(

@@ -8,7 +8,7 @@
  * rendered page (e.g. `svg-intro-sql-postgres-filtering-rows-f4f4db`) plus a
  * deep link back to the lesson that contains it.
  *
- * Mermaid charts are excluded — they're authored as ```mermaid fences, never
+ * Mermaid charts are excluded, they're authored as ```mermaid fences, never
  * `<svg>` elements, so the `<svg>`-only collection skips them by construction.
  *
  * Deliberately free of any Fumadocs `source` dependency: lesson URLs are
@@ -18,7 +18,7 @@
  * falling back to the index page's frontmatter title, then the slug. That
  * keeps the module importable from `scripts/build-svg-gallery-data.mjs`,
  * which runs it ahead of `next build`/`next dev` to emit the gallery data as
- * a plain static asset (`public/svg-gallery/data.json`) — served straight
+ * a plain static asset (`public/svg-gallery/data.json`), served straight
  * from the CDN with no ISR involvement.
  */
 import { readdirSync, readFileSync } from "node:fs";
@@ -35,7 +35,7 @@ const SECTIONS = [
 ];
 
 export interface GalleryGraphic {
-  /** Globally-unique, content-hashed ID — identical to the on-page label. */
+  /** Globally-unique, content-hashed ID, identical to the on-page label. */
   id: string;
   /** Render-ready SVG markup (JSX-isms rewritten to valid HTML). */
   html: string;

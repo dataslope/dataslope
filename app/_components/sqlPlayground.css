@@ -1,4 +1,4 @@
-/* ─── SQLite playground — layout-specific overrides ───────────────────
+/* ─── SQLite playground, layout-specific overrides ───────────────────
  * Only adds the layout primitives unique to the SQL playground (sidebar
  * + horizontally-resized panes + result table). Every color is sourced
  * from the same CSS custom properties (--bg, --bg2, --bg3, --border,
@@ -96,7 +96,7 @@
 
 /* Transparent full-screen backdrop behind the open database dropdown.
    The SQL playground is a fixed `overflow:hidden` layout whose scrolling
-   lives in inner panes (schema tree, results), not on `body` — so Base
+   lives in inner panes (schema tree, results), not on `body`, so Base
    UI's modal body-scroll-lock has nothing to lock and the panes behind
    the dropdown stay touch-scrollable on mobile. Sitting above those panes
    and one step below the popup, this backdrop swallows touch gestures
@@ -240,7 +240,7 @@
   color: var(--text);
 }
 
-/* Expand / collapse all button in a section header — semantically
+/* Expand / collapse all button in a section header, semantically
    distinct from the "add" button that creates a new entity. */
 .sql-tree-section-expand-toggle {
   display: inline-flex;
@@ -281,7 +281,7 @@
 
 /* Wrapper that hosts both the row's button and (when expanded) its
    column list. Used as the ContextMenu trigger so right-clicking
-   anywhere — including on a column row — pops the table/view's
+   anywhere, including on a column row, pops the table/view's
    context menu. */
 .sql-tree-entity-trigger {
   display: flex;
@@ -545,7 +545,7 @@
   flex-shrink: 0;
 }
 
-/* Trigger wrapper for result-table PK/FK icons — no button styling */
+/* Trigger wrapper for result-table PK/FK icons, no button styling */
 .sql-result-th-key-trigger {
   display: inline-flex;
   align-items: center;
@@ -611,7 +611,7 @@
   color: var(--text);
 }
 
-/* ─── Sidebar body — flex-row container below the db selector ─── */
+/* ─── Sidebar body, flex-row container below the db selector ─── */
 .sql-sidebar-body {
   display: flex;
   flex-direction: row;
@@ -620,7 +620,7 @@
   overflow: hidden;
 }
 
-/* ─── Sidebar content — schema selector + tree next to the icon bar ─── */
+/* ─── Sidebar content, schema selector + tree next to the icon bar ─── */
 .sql-sidebar-content {
   display: flex;
   flex-direction: column;
@@ -639,7 +639,7 @@
      handle overflow correctly. */
   grid-template-rows: auto minmax(0, 0.55fr) 6px minmax(0, 1.45fr);
   min-height: 0;
-  /* Same rationale as `.sql-editor-pane min-width: 0` below — keep this
+  /* Same rationale as `.sql-editor-pane min-width: 0` below, keep this
      grid track inside its parent so children become the scroll
      containers instead of pushing the pane wider than the viewport. */
   min-width: 0;
@@ -692,7 +692,7 @@
 .sql-results-body {
   flex: 1;
   min-height: 0;
-  /* The body itself does not scroll — the inner result-sets container
+  /* The body itself does not scroll, the inner result-sets container
      does, so we have a single pair of scrollbars (horizontal +
      vertical) that wrap the entire tabular content. The pager and
      status footer live as siblings of the scroll container so they
@@ -791,7 +791,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* Single shared scroll container — both axes — so the result table
+  /* Single shared scroll container, both axes, so the result table
      fills the whole results box. */
   overflow: auto;
 }
@@ -949,7 +949,7 @@
 }
 
 /* The grid renders in two phases. Measure pass (no explicit widths yet):
-   the browser's auto table layout sizes every column to its content —
+   the browser's auto table layout sizes every column to its content,
    `width: auto` so columns are NOT stretched across the pane. The
    component then freezes those widths and adds `.sql-result-table-sized`:
    fixed layout + explicit <col> widths + a trailing filler column that
@@ -1165,7 +1165,7 @@
 
 /* In-grid filter ("find in results"): a compact search field in the result
    footer that narrows the displayed/paginated rows to those whose visible text
-   matches. View-only — it never re-queries the database, so it behaves the
+   matches. View-only, it never re-queries the database, so it behaves the
    same for every engine, and export stays based on the full result. */
 .sql-result-filter {
   display: inline-flex;
@@ -1785,7 +1785,7 @@
    still drives focus trapping / overlay; we just swap the popup
    positioning + animation. */
 .sql-modify-backdrop {
-  /* Lighter scrim than the centered confirm dialogs — the drawer
+  /* Lighter scrim than the centered confirm dialogs, the drawer
      covers a smaller portion of the screen so a heavy backdrop
      would feel disproportionate. */
   background: #0008;
@@ -2207,7 +2207,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   View/Edit Structure drawer — redesign
+   View/Edit Structure drawer, redesign
    Drawer-local tokens (available to the shared column table wherever it
    renders, i.e. both the structure drawer and the Add Table drawer).
    ══════════════════════════════════════════════════════════════════════ */
@@ -2760,7 +2760,7 @@
   cursor: not-allowed;
 }
 
-/* Disabled-Export "create a table" popover — add comfortable padding. */
+/* Disabled-Export "create a table" popover, add comfortable padding. */
 .sql-export-disabled-popup {
   padding: 10px 12px;
   font-size: 13px;
@@ -2979,7 +2979,7 @@
   box-sizing: border-box;
   width: 100%;
   /* min-width:0 (with size={1} on the <input>) so the editor never inflates
-     the auto-laid-out column's intrinsic width — entering edit mode must not
+     the auto-laid-out column's intrinsic width, entering edit mode must not
      widen the column (it did when the table had no horizontal scroll). */
   min-width: 0;
   /* The cell's <td> keeps its 5px 10px padding while editing; the input fills
@@ -3004,7 +3004,7 @@
     0 0 0 3px var(--primary-glow, rgba(240, 180, 0, 0.25));
 }
 
-/* Enum dropdown inline editor — inherits .sql-cell-input's edit ring; keeps
+/* Enum dropdown inline editor, inherits .sql-cell-input's edit ring; keeps
    the native select appearance so the arrow shows, re-themed to the cell. */
 .sql-cell-select {
   cursor: pointer;
@@ -3028,7 +3028,7 @@
   cursor: default;
 }
 
-/* Per-cell "discard this edit" affordance — a small ✕ that reverts just this
+/* Per-cell "discard this edit" affordance, a small ✕ that reverts just this
    cell's pending edit (revealed on hover/focus of the edited cell). */
 .sql-cell-discard {
   border: none;
@@ -3189,7 +3189,7 @@
   gap: 6px;
 }
 
-/* Secondary "Cancel" button next to Update — discards pending edits (also Esc). */
+/* Secondary "Cancel" button next to Update, discards pending edits (also Esc). */
 .sql-edit-cancel-btn {
   display: inline-flex;
   align-items: center;
@@ -3241,7 +3241,7 @@
   pointer-events: none;
 }
 
-/* Rename-column dialog — slightly narrower than the edit-cell modal. */
+/* Rename-column dialog, slightly narrower than the edit-cell modal. */
 .sql-rename-col-popup {
   width: min(400px, calc(100vw - 48px));
 }
@@ -3408,7 +3408,7 @@
   line-height: 1.5;
 }
 
-/* ─── Placeholder text — theme-matched ─── */
+/* ─── Placeholder text, theme-matched ─── */
 /* Update 5: Make placeholder text use the current theme's dim color at
    a reduced opacity so it remains a weak, non-distracting hint while
    still adapting to light/dark themes. Applies globally in the playground
@@ -3571,7 +3571,7 @@
   color: var(--text);
 }
 
-/* Clickable index/trigger items — togglable layout */
+/* Clickable index/trigger items, togglable layout */
 .sql-struct-list-item.sql-struct-list-item-toggle {
   flex-direction: column;
   align-items: stretch;
@@ -4753,7 +4753,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* "New schema…" entry inside the schema selector dropdown — visually
+/* "New schema…" entry inside the schema selector dropdown, visually
    distinguished from regular schema items so it reads as an action
    rather than a selectable schema. */
 .sql-db-item-action {
@@ -4845,12 +4845,12 @@
    untouched. None of these rules fire on desktop.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* Bottom tab bar — rendered always, shown only on mobile (below). */
+/* Bottom tab bar, rendered always, shown only on mobile (below). */
 .sql-mobile-tabs {
   display: none;
 }
 /* The full-screen Settings tab replaces the editor/results split, so its
-   bottom Schema / Editor / Results pane switcher doesn't apply — hide it
+   bottom Schema / Editor / Results pane switcher doesn't apply, hide it
    while Settings is open. Higher specificity than the mobile rule below,
    so it wins inside the media query too. */
 .playground-root[data-settings-active] .sql-mobile-tabs {
@@ -4872,7 +4872,7 @@
   }
   .playground-header .workspace-badge,
   .playground-header .workspace-save-btn {
-    /* Hidden on mobile — the workspace lives in the hamburger drawer.
+    /* Hidden on mobile, the workspace lives in the hamburger drawer.
        Higher specificity than playground.css's `.workspace-badge` hide,
        so this is what actually drops it on the SQL playgrounds. */
     display: none;
@@ -4914,7 +4914,7 @@
   /* Editor / Results: a single full-height pane for a *normal* query tab.
      Special tabs (view-data / er-diagram / settings / query-history) carry a
      `sql-panes--…` modifier and keep their existing desktop takeover layout
-     — the `:not([class*="--"])` guard leaves those untouched. The query-tab
+, the `:not([class*="--"])` guard leaves those untouched. The query-tab
      strip (grid row 1) stays visible in both modes for context. ── */
   .sql-panes:not([class*="--"]) {
     grid-template-rows: auto minmax(0, 1fr);

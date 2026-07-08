@@ -5,7 +5,7 @@ description: Why ggplot2 expects tidy data frames, how the shape of your data de
 
 Every ggplot starts with **data**. It is the first argument to
 `ggplot()` and the foundation every other component builds on. Getting
-the data into the right *shape* is half the battle of plotting — and
+the data into the right *shape* is half the battle of plotting, and
 the half beginners most often skip.
 
 <svg
@@ -92,7 +92,7 @@ a column you can map to x.
 
 ### A concrete reshaping example
 
-Suppose sales are stored with one **column per year** — convenient for
+Suppose sales are stored with one **column per year**, convenient for
 a spreadsheet, useless for ggplot2, because "year" is not a column,
 it is spread across column *names*.
 
@@ -154,8 +154,8 @@ ggplot(long, aes(x = year, y = sales, color = region)) +
 <Callout type="info" title="The rule of thumb">
 If a variable you want to put on an axis or in a legend is *not a
 single column*, reshape the data first. In real projects you would use
-`tidyr::pivot_longer()`; the idea is identical to the `reshape()` above
-— move information out of column **names** and into column **values**.
+`tidyr::pivot_longer()`; the idea is identical to the `reshape()` above,
+move information out of column **names** and into column **values**.
 </Callout>
 
 ## Continuous vs. categorical columns
@@ -204,7 +204,7 @@ ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
 />
 
 Same column, same mapping target (color), but a completely different
-legend and palette — because the *type* changed from continuous to
+legend and palette, because the *type* changed from continuous to
 discrete. Keep this in mind; it explains a surprising number of "why
 does my plot look wrong?" moments.
 
@@ -237,14 +237,14 @@ mapped. This is the most common data-prep step before plotting.`}
   > Gradients apply to any continuous aesthetic, including color.
 
 Whether a column is continuous or discrete drives the scale, the
-legend, and the palette — a core reason \`factor()\` appears so often.`}
+legend, and the palette, a core reason \`factor()\` appears so often.`}
 />
 
 ## Quick challenge: make it tidy
 
 The wide table below hides `year` in its column *names*. Reshape it into
-a **long** data frame called `tidy` with three columns — `region`,
-`year`, and `sales` — so that `year` becomes something you could map.
+a **long** data frame called `tidy` with three columns, `region`,
+`year`, and `sales`, so that `year` becomes something you could map.
 Six rows in total (two regions × three years).
 
 <ChallengeCard
@@ -307,7 +307,7 @@ print(tidy)
 
 - ggplot2 plots **data frames**: rows are observations, columns are
   variables, and **mappings refer to columns by name**.
-- Prefer **tidy/long** data — if a variable is hiding in column
+- Prefer **tidy/long** data, if a variable is hiding in column
   *names*, reshape it into a column before plotting.
 - A column's **type** matters: numeric → continuous scales, factor /
   character → discrete scales. Use `factor()` to switch a number to

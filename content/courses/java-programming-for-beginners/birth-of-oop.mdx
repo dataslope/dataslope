@@ -1,19 +1,19 @@
 ---
 title: From Punched Cards to Objects
-description: How programming hit a wall in the 1960s — and how a strange new idea from a Norwegian simulation lab rescued it
+description: How programming hit a wall in the 1960s, and how a strange new idea from a Norwegian simulation lab rescued it
 ---
 
 Before there was Java, a "program" was not a file. It was a physical
 object: a deck of **punched cards**, or a roll of paper tape, or a
 patch panel with wires plugged from socket to socket. A programmer
-in the 1950s would write a program on paper, punch it onto cards —
-one card per line — carry the deck to an operator in a cardboard
+in the 1950s would write a program on paper, punch it onto cards,
+one card per line, carry the deck to an operator in a cardboard
 box, and come back the next day to learn whether it had worked.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Six gray sockets on a board tangled together by crossing blue, green, and yellow cables — before objects, every part of a program wired directly to every other"
+  aria-label="Six gray sockets on a board tangled together by crossing blue, green, and yellow cables, before objects, every part of a program wired directly to every other"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="100" y="32" width="440" height="160" rx="16" fill="currentColor" opacity="0.06" />
@@ -49,8 +49,8 @@ single instruction to cardboard. That instinct is worth keeping even
 now that our tools answer in milliseconds: a program is a plan you
 are handing to a machine, and bad planning is expensive.
 
-The languages themselves improved quickly. **Machine code** — raw
-`0`s and `1`s — gave way to **assembly language**, where you could
+The languages themselves improved quickly. **Machine code**, raw
+`0`s and `1`s, gave way to **assembly language**, where you could
 write readable mnemonics like `ADD R1, R2` instead of binary. Then,
 in the late 1950s and 1960s, languages like **FORTRAN**, **COBOL**,
 and later **C** and **Pascal** let programmers write something that
@@ -59,12 +59,12 @@ into machine code. These languages were **procedural**: a program
 was a sequence of *procedures* (also called functions) that
 manipulated data, calling one another until a result emerged.
 
-## A program is a recipe — see for yourself
+## A program is a recipe, see for yourself
 
 The mental model of that whole era was simple: a program is a
 **recipe**. Write down the steps, in order. Run the recipe. Get a
 result. Sixty years later, that model still holds inside every
-method you will ever write — including in Java. Here is a recipe,
+method you will ever write, including in Java. Here is a recipe,
 as a real Java program. Run it, and read the output top to bottom:
 
 <CodeBlock
@@ -90,7 +90,7 @@ as a real Java program. Run it, and read the output top to bottom:
 />
 
 The machine executed your instructions exactly, in order, top to
-bottom. Change the numbers and run it again — the recipe obediently
+bottom. Change the numbers and run it again, the recipe obediently
 recomputes. This "do this, then that" style is the foundation under
 everything in this course. The question of the 1960s was: what
 happens when the recipe grows to a million lines?
@@ -102,10 +102,10 @@ The answer arrived fast, and it was ugly.
 Through the 1960s, hardware roughly doubled in power every couple of
 years, and ambition grew even faster: payroll for entire
 corporations, airline reservations, banking networks, the flight
-software for the Apollo missions. And those programs were *failing* —
+software for the Apollo missions. And those programs were *failing*,
 not occasionally, but chronically. Projects shipped years late and
-far over budget, full of bugs, and so tangled that nobody — including
-the original authors — could safely change them.
+far over budget, full of bugs, and so tangled that nobody, including
+the original authors, could safely change them.
 
 <IllustrationPrompt subject="Fred Brooks, author of The Mythical Man-Month" photo />
 
@@ -115,12 +115,12 @@ programmer-years and shipped late anyway. Its manager, **Fred
 Brooks**, distilled the experience into the 1975 classic *The
 Mythical Man-Month*, including the observation now known as
 **Brooks's law**: *adding manpower to a late software project makes
-it later* — because every new person multiplies the communication
+it later*, because every new person multiplies the communication
 overhead among everyone else.
 
 In October 1968, NATO sponsored a conference in Garmisch, Germany,
-to confront the problem head-on. The attendees put a name to it —
-the **software crisis** — and proposed, half as aspiration, a new
+to confront the problem head-on. The attendees put a name to it,
+the **software crisis**, and proposed, half as aspiration, a new
 discipline to fix it: *software engineering*. The profession you are
 now entering was invented, in real time, in response to a disaster.
 
@@ -138,7 +138,7 @@ What exactly went wrong when recipes grew huge? Two patterns of pain
 showed up over and over.
 
 **Global state.** Many procedural programs kept their data in
-**global variables** — variables that any procedure anywhere could
+**global variables**, variables that any procedure anywhere could
 read or write. In a tiny program this is fine. In a 200,000-line
 program it is a nightmare: a bug in one corner could silently corrupt
 data, and hours later, on the far side of the codebase, a completely
@@ -160,7 +160,7 @@ corrupted it?* `A`? `B`? `D`? Any of them, at any time. The search
 space is the entire program.
 
 **No grouping of data and behavior.** The data for a "bank account"
-might live in one place — an array of numbers — while the procedures
+might live in one place, an array of numbers, while the procedures
 that operate on accounts lived somewhere else entirely. Nothing
 *forced* the rule "only account code may touch account data." Any
 programmer in a hurry could bypass the official procedures and poke
@@ -198,7 +198,7 @@ what a program *is*.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Four tidy objects — a blue circle, a green square, a yellow hexagon, and a pale capsule — linked by a few thin gray routes, with small colored message chips traveling between them: a program as a society of objects"
+  aria-label="Four tidy objects, a blue circle, a green square, a yellow hexagon, and a pale capsule, linked by a few thin gray routes, with small colored message chips traveling between them: a program as a society of objects"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -224,8 +224,8 @@ what a program *is*.
 
 <IllustrationPrompt subject="Ole-Johan Dahl and Kristen Nygaard, the creators of Simula" photo />
 
-In 1960s Oslo, two Norwegian researchers — **Ole-Johan Dahl** and
-**Kristen Nygaard** — were building software to *simulate* physical
+In 1960s Oslo, two Norwegian researchers, **Ole-Johan Dahl** and
+**Kristen Nygaard**, were building software to *simulate* physical
 systems: ships moving through a harbor, customers queuing at a bank.
 They noticed something. The most natural way to write a simulation
 is to model each *thing in the world* as a *thing in the program*: a
@@ -235,9 +235,9 @@ position and speed, and offering its own behaviors.
 They built this insight into a language, **Simula 67**, which
 introduced two words we still use every single day:
 
-- **Class** — the description, the template, the blueprint of a kind
+- **Class**, the description, the template, the blueprint of a kind
   of thing.
-- **Object** — an actual *instance* of that thing, with its own data.
+- **Object**, an actual *instance* of that thing, with its own data.
 
 ```mermaid
 flowchart LR
@@ -247,7 +247,7 @@ flowchart LR
     C -->|new| O3["Ship 'Endurance'"]
 ```
 
-This was a quiet revolution — quiet enough that it took the field
+This was a quiet revolution, quiet enough that it took the field
 decades to absorb, and significant enough that Dahl and Nygaard
 eventually received the 2001 Turing Award, computing's highest
 honor, for it. A program was no longer just "code that manipulates
@@ -258,13 +258,13 @@ its own data and offering its own behavior.
 
 In the 1970s, at Xerox PARC in California, **Alan Kay** and his team
 pushed the idea to its limit in a language called **Smalltalk**:
-*everything* is an object — even numbers, even `true` and `false` —
+*everything* is an object, even numbers, even `true` and `false`,
 and objects interact only by sending each other messages. Kay coined
 the very phrase "object-oriented programming." (He later quipped, at
 the 1997 OOPSLA conference, "I made up the term 'object-oriented',
 and I can tell you I did not have C++ in mind.") The same PARC group
 invented overlapping windows, the bitmapped graphical interface, and
-much of what a young Steve Jobs saw on his famous 1979 visit — the
+much of what a young Steve Jobs saw on his famous 1979 visit, the
 visit that shaped the Lisa and the Macintosh. A staggering amount of
 modern computing traces back to that one research lab.
 
@@ -276,7 +276,7 @@ procedure could change. The object idea dissolves it with one rule:
 > **Each object owns its own data, and only its own methods may
 > touch that data.**
 
-That rule — later named **encapsulation** — means that when a piece
+That rule, later named **encapsulation**, means that when a piece
 of data is wrong, you only have to look at *one* object's methods to
 find the culprit. It scopes the search. It puts the data behind a
 door, and the door has a label saying who may open it.
@@ -302,7 +302,7 @@ cannot reach in and rewrite the balance. The rules of the account
 live *with* the account.
 
 As the idea matured through the 1970s and 80s, it stabilized into
-four pillars. Do not memorize them now — we will spend whole
+four pillars. Do not memorize them now, we will spend whole
 chapters on each. Just notice the shape of the list:
 
 | Idea | One-sentence summary |
@@ -350,7 +350,7 @@ language had to run on every kind of computer, not just one research
 workstation; and the industry had to be in enough pain to try
 something new.
 
-In the early 1990s, all three conditions were met at once — by a
+In the early 1990s, all three conditions were met at once, by a
 secret project at Sun Microsystems whose actual goal was to program
 *television set-top boxes and smart appliances*. That gloriously
 sideways origin story is the next page.

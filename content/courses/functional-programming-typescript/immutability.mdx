@@ -1,6 +1,6 @@
 ---
 title: Immutability
-description: Building programs out of values that never change — and why this makes large systems easier, not harder.
+description: Building programs out of values that never change, and why this makes large systems easier, not harder.
 ---
 
 A value is **immutable** if, once created, it cannot be changed.
@@ -13,7 +13,7 @@ Immutability is not about asceticism. It is about *reasoning*.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A filmstrip of three frames: each new frame repeats the previous dots and adds one green dot, and every earlier frame remains intact — updates create new versions instead of editing old ones"
+  aria-label="A filmstrip of three frames: each new frame repeats the previous dots and adds one green dot, and every earlier frame remains intact, updates create new versions instead of editing old ones"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -77,7 +77,7 @@ console.log("after:", alice);
 />
 
 Reading the function `birthday`, you might assume it returns a new
-user. It doesn't — it mutates the one you gave it. Every caller
+user. It doesn't, it mutates the one you gave it. Every caller
 who held a reference to `alice` is now silently affected.
 
 This is the entire problem with mutation: **it leaks across
@@ -128,7 +128,7 @@ liberally.
       starterCode: `// readonly on a single field
 type Point = { readonly x: number; readonly y: number };
 
-// readonly on an array — disables push/pop/splice etc.
+// readonly on an array, disables push/pop/splice etc.
 type Path = readonly Point[];
 
 // readonly tuple
@@ -213,7 +213,7 @@ const alice: User = {
   address: { city: "Berlin", country: "DE" },
 };
 
-// Update the city — explicit re-spread of nested object
+// Update the city, explicit re-spread of nested object
 const moved: User = {
   ...alice,
   address: { ...alice.address, city: "Munich" },
@@ -250,15 +250,15 @@ const todos: readonly Todo[] = [
   { id: 3, text: "Sleep", done: false },
 ];
 
-// Mark id=2 as done — returns a NEW array
+// Mark id=2 as done, returns a NEW array
 const updated: readonly Todo[] = todos.map((t) =>
   t.id === 2 ? { ...t, done: true } : t,
 );
 
-// Remove id=1 — returns a NEW array
+// Remove id=1, returns a NEW array
 const remaining: readonly Todo[] = updated.filter((t) => t.id !== 1);
 
-// Add a new one — returns a NEW array
+// Add a new one, returns a NEW array
 const withNew: readonly Todo[] = [
   ...remaining,
   { id: 4, text: "Refactor", done: false },
@@ -286,7 +286,7 @@ for two reasons.
    For a 20-field record, an update copies 20 pointers, not 20
    payloads.
 2. **The bottleneck is usually elsewhere.** Most programs spend their
-   time on I/O, rendering, JSON parsing, or framework overhead — not
+   time on I/O, rendering, JSON parsing, or framework overhead, not
    on object allocation. The allocations from immutability are
    typically rounding error compared to a network call or a React
    render.
@@ -367,7 +367,7 @@ console.log("after 2 undos: ", history[history.length - 1]);
 This implementation is ~20 lines and *correct*. In an imperative
 world, undo means snapshotting state, deep-cloning it, tracking
 diffs, or wiring elaborate command-pattern machinery. With
-immutability, the "snapshot" is the old value itself — you couldn't
+immutability, the "snapshot" is the old value itself, you couldn't
 have changed it if you tried.
 
 ## Mutation, hidden in plain sight
@@ -420,10 +420,10 @@ console.log("tomorrow2: ", tomorrow2.toISOString());
 The standard library is full of these traps. As a rule:
 
 - `Array#sort`, `Array#reverse`, `Array#splice`, `Array#push`,
-  `Array#pop`, `Array#shift`, `Array#unshift` — **mutate**
+  `Array#pop`, `Array#shift`, `Array#unshift`, **mutate**
 - `Array#map`, `Array#filter`, `Array#slice`, `Array#concat`,
   `Array#flatMap`, `Array#toSorted`, `Array#toReversed`,
-  `Array#toSpliced`, `Array#with` — **return new**
+  `Array#toSpliced`, `Array#with`, **return new**
 
 When in doubt, prefer the new immutable variants (`toSorted`,
 `toReversed`, etc.) introduced in ES2023.
@@ -436,9 +436,9 @@ When in doubt, prefer the new immutable variants (`toSorted`,
   instructions={`Implement three **pure** functions in \`cart.ts\` that all
 return *new* carts and never mutate the input.
 
-- \`add(cart, item)\` — append \`item\`.
-- \`remove(cart, itemId)\` — remove the entry whose \`id\` matches.
-- \`setQty(cart, itemId, qty)\` — update the matching entry's
+- \`add(cart, item)\`, append \`item\`.
+- \`remove(cart, itemId)\`, remove the entry whose \`id\` matches.
+- \`setQty(cart, itemId, qty)\`, update the matching entry's
   quantity.
 
 If \`itemId\` is not found in \`remove\` or \`setQty\`, return the cart

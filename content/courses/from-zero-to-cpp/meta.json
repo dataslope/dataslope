@@ -1,6 +1,6 @@
 {
     "title": "From Zero to C++ Programming",
-    "description": "A beginner-first course that teaches programming, computational thinking, and modern C++ — assuming no prior experience.",
+    "description": "A beginner-first course that teaches programming, computational thinking, and modern C++, assuming no prior experience.",
     "root": true,
     "tags": {
         "language": [

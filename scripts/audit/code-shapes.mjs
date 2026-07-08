@@ -13,7 +13,7 @@
 // strong, unambiguous code signal. The first group of rules covers identifiers
 // and calls (scope `::`, a call `f(…)`, a template `<T>`, a member call `a.b()`,
 // snake_case); a second continuation group (below `escHtml`) covers the *other*
-// shapes of code that read as prose to those rules — expressions (lambdas,
+// shapes of code that read as prose to those rules, expressions (lambdas,
 // comparisons, assignments, returns), SQL clauses and keyword stage-boxes, and
 // literals (shell commands, LINQ queries, numeric arrays). Bare words, proper
 // nouns (JavaScript), math notation (AR(p), y(t), a < X < b) and prose-with-a-
@@ -53,7 +53,7 @@ const SHAPES = [
 ];
 
 // Scan from `start` to the first closer (one of `closers`) lying OUTSIDE a
-// double-quoted region — so a quoted label can contain the bracket char, e.g.
+// double-quoted region, so a quoted label can contain the bracket char, e.g.
 // `["unit_prices: [9.99, …]"]`. Returns { start, end } of the closer, or null.
 function scanClose(line, start, closers) {
   const N = line.length;
@@ -83,7 +83,7 @@ function findNodes(line) {
   const word = (ch) => /[A-Za-z0-9_]/.test(ch);
   let i = 0;
   while (i < N) {
-    // Skip quoted regions that aren't a node label — e.g. edge labels
+    // Skip quoted regions that aren't a node label, e.g. edge labels
     // (`-->|"fit(x)"|`), where `fit(x)` must NOT be mistaken for a node.
     if (line[i] === '"') {
       i++;
@@ -161,7 +161,7 @@ function isProseName(s) {
 }
 
 // A function name that reads as a code identifier rather than math notation.
-// Excludes single letters and short all-caps tokens — so `fib(5)`, `resample()`
+// Excludes single letters and short all-caps tokens, so `fib(5)`, `resample()`
 // and `value_counts()` pass, but `y(t)`, `AR(p)`, `I(d)`, `O(n)` and
 // `Poisson(lambda)` (a capitalized distribution) do not.
 function isCodeName(n) {
@@ -194,7 +194,7 @@ function isWholeCode(rawLabel) {
     /[A-Za-z_][\w.]*\s*=\s*(?:'[^']*'|"[^"]*"|0x[0-9a-fA-F_]+|-?\d[\w.]*|[A-Za-z_][\w.]*\([^()]*\))/g,
   );
   // Member paths (df.head()), dotted file/module names (hello.c, users.js), and
-  // camelCase names (DataFrame) — but skip proper nouns (Plotly.js, JavaScript)
+  // camelCase names (DataFrame), but skip proper nouns (Plotly.js, JavaScript)
   // so a label that is *only* a product name isn't treated as code.
   const removeGuarded = (re) => {
     s = s.replace(re, (m) => {
@@ -263,16 +263,16 @@ function escHtml(t) {
 // The patterns above catch identifiers, calls and templates. This second group
 // catches the *other* shapes of code that read as prose to those rules but are
 // still things you'd type into an editor, a SQL console or a shell:
-//   • expressions — lambdas (x => x.Age > 30), comparisons/conditions
+//   • expressions, lambdas (x => x.Age > 30), comparisons/conditions
 //     (score >= 90?), assignments (i = i + 1), method chains (.Select(p => p.B)),
 //     return statements, pointer arrows (a -> Widget);
-//   • SQL — clauses and statements (SELECT name, salary; WHERE price < 20), down
+//   • SQL, clauses and statements (SELECT name, salary; WHERE price < 20), down
 //     to bare keyword stage-boxes (SELECT, FROM, WHERE), with any trailing prose
 //     description left in the sans body font;
-//   • literals — shell commands (git push), LINQ query syntax, numeric arrays.
+//   • literals, shell commands (git push), LINQ query syntax, numeric arrays.
 
 // SQL keywords that open a clause (longest first so "GROUP BY" beats "GROUP").
-// Matched only when UPPERCASE, the convention these courses write SQL in — so a
+// Matched only when UPPERCASE, the convention these courses write SQL in, so a
 // prose "join the tables" or "select a row" is never mistaken for code.
 const SQL_OPENERS = [
   "FULL OUTER JOIN", "CREATE TABLE AS", "DELETE FROM", "INSERT INTO", "GROUP BY",
@@ -313,7 +313,7 @@ function sqlTokenize(s) {
   return toks;
 }
 
-// Keyword enumerations — UPPERCASE SQL keywords joined by "/" or "," (SELECT /
+// Keyword enumerations, UPPERCASE SQL keywords joined by "/" or "," (SELECT /
 // WHERE, INSERT / UPDATE / DELETE). Wrap each keyword, leaving the separators.
 const SQL_KW_ALT = SQL_OPENERS.join("|"); // longest-first, so "GROUP BY" wins
 function wrapSqlKeywordLists(seg, tags) {
@@ -329,10 +329,10 @@ function wrapSqlKeywordLists(seg, tags) {
 
 // Wrap maximal SQL clauses in a segment. A clause starts at an UPPERCASE SQL
 // keyword that leads the segment or follows a separator (: / | , (), then runs
-// through SQL tokens — identifiers, numbers, strings, operators, commas,
-// function calls — until a prose word, a separator, a colon, or an arrow. The
+// through SQL tokens, identifiers, numbers, strings, operators, commas,
+// function calls, until a prose word, a separator, a colon, or an arrow. The
 // clause is wrapped only if it extends past the keyword (e.g. WHERE price < 20)
-// or *is* the whole label (a bare SELECT / FROM stage-box) — so a lone keyword
+// or *is* the whole label (a bare SELECT / FROM stage-box), so a lone keyword
 // trailed by prose ("UPDATE: move each center…", "WHERE filter rows") is left be.
 function wrapSqlClause(seg, tags) {
   if (!/[A-Z]/.test(seg)) return seg;
@@ -488,15 +488,15 @@ function wrapExprSpans(chunk, tags) {
     const before = chunk.slice(0, offset);
     if (/[A-Za-z_]\w*<[A-Za-z_]/.test(m) && !/\s<\s/.test(m)) return m; // generic, not a comparison
     if (!isStrongExpr(m)) return m;
-    // For an assignment, the strength must be on the RIGHT of "=" — so "b =
+    // For an assignment, the strength must be on the RIGHT of "=", so "b =
     // nullptr" and "i = i + 1" wrap, but a prose gloss like "null = no effect"
     // (strong only because of the keyword on the left) does not.
     const asg = m.match(/^[A-Za-z_][\w.]*\s*=(?!=)\s*([\s\S]+)$/);
     if (asg) {
       if (!isStrongExpr(asg[1])) return m;
     } else if (/[<>]=?|[=!]==?/.test(m) && !/=>|⇒/.test(m)) {
-      // Math / probability notation over single-letter operands — a chained
-      // inequality (a < X < b) or one inside a function call P(X <= x) — reads as
+      // Math / probability notation over single-letter operands, a chained
+      // inequality (a < X < b) or one inside a function call P(X <= x), reads as
       // math, not code; same call the first pass made for y(t) and AR(p). A real
       // condition (i < N, score >= 90, ADF p >= 0.05, width <= 0.8) still wraps.
       const ops = (m.match(/[<>]=?|[=!]==?/g) || []).length;
@@ -517,7 +517,7 @@ function wrapNewSpans(seg, tags) {
 }
 
 // Is the whole label a single SQL statement (possibly wrapped over <br/> lines)?
-// Starts with a clause keyword and every token is SQL — a keyword, a column/table
+// Starts with a clause keyword and every token is SQL, a keyword, a column/table
 // name (lowercase, not a prose word), a number, string, function call, operator
 // or comma. Lets a multi-line statement wrap as ONE span instead of per line.
 const SQL_OPEN_RE = new RegExp(`^(?:${SQL_OPENERS.join("|")})\\b`);
@@ -592,7 +592,7 @@ function rewriteLabel(rawLabel) {
   return { label: `"${out.replace(/"/g, "&quot;")}"`, tags };
 }
 
-// Find edge labels — the text inside the `|…|` of `A -->|"INSERT, UPDATE"| B`.
+// Find edge labels, the text inside the `|…|` of `A -->|"INSERT, UPDATE"| B`.
 // Tracks shape-bracket depth and quotes so a pipe *inside* a node label (e.g.
 // the linked-list cell `["a | next"]`) is never mistaken for an edge label.
 function findEdgeLabels(line) {

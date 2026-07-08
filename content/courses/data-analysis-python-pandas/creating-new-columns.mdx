@@ -10,7 +10,7 @@ fits a different situation.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A blue column divided by a green column yields a new yellow column, which then drifts along dotted steps to dock at the edge of a faint table — new columns computed from old ones"
+  aria-label="A blue column divided by a green column yields a new yellow column, which then drifts along dotted steps to dock at the edge of a faint table, new columns computed from old ones"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ fits a different situation.
   </g>
 </svg>
 
-## The simplest case — arithmetic
+## The simplest case, arithmetic
 
 <CodeBlock
   adapter="python"
@@ -85,7 +85,7 @@ print(df)
 The whole column appears on both sides of `=`. That is the
 *vectorized* style: no for-loop, just whole-column arithmetic.
 
-## `.assign()` — chainable column creation
+## `.assign()`, chainable column creation
 
 `.assign()` produces a *new* DataFrame with the added columns,
 which makes it perfect for method chains.
@@ -122,16 +122,16 @@ matters when you want one new column to reference another.
 The same logical operation can be expressed two ways:
 
 ```python
-# In place — modifies df
+# In place, modifies df
 df["total_comp"] = df["salary"] + df["bonus"]
 
-# Functional — returns a new DataFrame
+# Functional, returns a new DataFrame
 df2 = df.assign(total_comp=df["salary"] + df["bonus"])
 ```
 
 Both are widely used. A modern convention: use `.assign()` inside
 long method chains; use direct assignment for one-off tweaks.
-Either way, **immutability is the analyst's friend** — keeping
+Either way, **immutability is the analyst's friend**, keeping
 the original `df` untouched makes it easier to reason about
 later cells.
 
@@ -223,7 +223,7 @@ print(df)
 `.map(dict)` is the quintessential dictionary-as-lookup pattern.
 Values not in the dict become NaN.
 
-## `.apply` — when you really need a function
+## `.apply`, when you really need a function
 
 When a column's value depends on more complex logic, fall back
 to `.apply`. It is slower than vectorized operations, but
@@ -305,7 +305,7 @@ print(df)
 
 ## A composite example
 
-Put several techniques together — the penguins dataset with four
+Put several techniques together, the penguins dataset with four
 derived fields, one per technique from this chapter.
 
 <CodeBlock

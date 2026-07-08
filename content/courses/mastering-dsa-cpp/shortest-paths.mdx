@@ -3,16 +3,16 @@ title: "Shortest Paths: Dijkstra"
 description: Learn source-to-all shortest paths in non-negative weighted graphs with Dijkstra's algorithm in C++
 ---
 
-BFS told us the path with the fewest *edges*. But real edges have costs — kilometers, milliseconds, tolls — and the route with the fewest hops is frequently not the cheapest one. The shortest path problem asks for the minimum total edge *weight* from a source vertex to others, and it is one of the most-run computations on Earth: every map query, every network packet's route, every game character pathing around an obstacle.
+BFS told us the path with the fewest *edges*. But real edges have costs, kilometers, milliseconds, tolls, and the route with the fewest hops is frequently not the cheapest one. The shortest path problem asks for the minimum total edge *weight* from a source vertex to others, and it is one of the most-run computations on Earth: every map query, every network packet's route, every game character pathing around an obstacle.
 
 <IllustrationPrompt subject="Edsger Dijkstra" photo />
 
-The algorithm at the heart of it has the best origin story in computer science. One morning in 1956, the 26-year-old Edsger Dijkstra was shopping in Amsterdam with his fiancée; tired, they sat down on a café terrace for coffee, and he worked out the shortest-path algorithm in about twenty minutes, in his head. He later credited part of the design's elegance to having no pencil and paper — "you are almost forced to avoid all avoidable complexities." He had been hunting for a problem the public could understand, to demonstrate the new ARMAC computer; the demo found shortest routes between Dutch cities. The algorithm was published in 1959, three pages long, and it still runs the world's routing. This page focuses on that algorithm: **single-source shortest paths** in weighted graphs with **non-negative** edge weights.
+The algorithm at the heart of it has the best origin story in computer science. One morning in 1956, the 26-year-old Edsger Dijkstra was shopping in Amsterdam with his fiancée; tired, they sat down on a café terrace for coffee, and he worked out the shortest-path algorithm in about twenty minutes, in his head. He later credited part of the design's elegance to having no pencil and paper, "you are almost forced to avoid all avoidable complexities." He had been hunting for a problem the public could understand, to demonstrate the new ARMAC computer; the demo found shortest routes between Dutch cities. The algorithm was published in 1959, three pages long, and it still runs the world's routing. This page focuses on that algorithm: **single-source shortest paths** in weighted graphs with **non-negative** edge weights.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two routes between the same endpoints — a thin direct edge crowned by one huge red weight, and a bold green three-hop path whose small weights add up to less — why shortest paths weigh edges instead of counting them"
+  aria-label="Two routes between the same endpoints, a thin direct edge crowned by one huge red weight, and a bold green three-hop path whose small weights add up to less, why shortest paths weigh edges instead of counting them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M120 92 C 200 50, 440 50, 520 92" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
@@ -60,7 +60,7 @@ BFS would happily report the one-edge path `0 -> 1` at cost 100, never noticing 
 
 ## Dijkstra's idea
 
-Imagine pouring water into the source vertex and letting it flow along every edge at one unit of cost per second. The flood reaches each vertex at a time equal to its shortest distance — the wavefront cannot cheat. Dijkstra's algorithm is that flood, discretized: it repeatedly picks the unprocessed vertex with the smallest known distance (the next place the water arrives), locks it in as final, and **relaxes** its outgoing edges — checking whether going *through* this vertex improves any neighbor's best-known distance.
+Imagine pouring water into the source vertex and letting it flow along every edge at one unit of cost per second. The flood reaches each vertex at a time equal to its shortest distance, the wavefront cannot cheat. Dijkstra's algorithm is that flood, discretized: it repeatedly picks the unprocessed vertex with the smallest known distance (the next place the water arrives), locks it in as final, and **relaxes** its outgoing edges, checking whether going *through* this vertex improves any neighbor's best-known distance.
 
 Why is it safe to lock a vertex in? Because when `u` has the smallest tentative distance of all unprocessed vertices, any other route to `u` would have to pass through some vertex that is *farther away already*, and with non-negative edges, going farther first can never come back cheaper. That is the greedy bet, and non-negativity is what makes it a sure thing.
 
@@ -162,7 +162,7 @@ With a binary heap, the time complexity is **O((V + E) log V)**. The adjacency l
 
 ## Relaxation in isolation
 
-The word **relaxation** sounds grander than it is. It is one `if` statement: if reaching `v` through `u` beats `v`'s current best — `dist[u] + w < dist[v]` — record the improvement. Here it is alone, with no algorithm wrapped around it:
+The word **relaxation** sounds grander than it is. It is one `if` statement: if reaching `v` through `u` beats `v`'s current best, `dist[u] + w < dist[v]`, record the improvement. Here it is alone, with no algorithm wrapped around it:
 
 <CodeBlock
   adapter="cpp"
@@ -253,7 +253,7 @@ int main() {
 
 ## When Dijkstra fails
 
-Every guarantee above leaned on edges being non-negative. Introduce a negative edge and the flood metaphor breaks — water that "arrived" at a vertex might later find a route that runs backward in time. A vertex Dijkstra confidently finalized can become cheaper through a negative edge discovered afterward, and the algorithm never reopens finalized vertices, so it simply returns the wrong answer (no error, no warning).
+Every guarantee above leaned on edges being non-negative. Introduce a negative edge and the flood metaphor breaks, water that "arrived" at a vertex might later find a route that runs backward in time. A vertex Dijkstra confidently finalized can become cheaper through a negative edge discovered afterward, and the algorithm never reopens finalized vertices, so it simply returns the wrong answer (no error, no warning).
 
 <Callout type="warn" title="Negative weights need a different algorithm">
 If negative weights are possible, use Bellman-Ford for single-source shortest paths. If a negative cycle is reachable from the source, no finite shortest path exists for affected vertices.
@@ -272,7 +272,7 @@ BellmanFord(edges, n, src):
     one more pass can detect negative cycles
 ```
 
-Bellman-Ford gives up Dijkstra's greedy shortcut and pays for it with O(V·E) time — but it is immune to negative edges, and that extra detection pass is how systems flag negative cycles (in currency-exchange graphs, a negative cycle is literally an arbitrage loop).
+Bellman-Ford gives up Dijkstra's greedy shortcut and pays for it with O(V·E) time, but it is immune to negative edges, and that extra detection pass is how systems flag negative cycles (in currency-exchange graphs, a negative cycle is literally an arbitrage loop).
 
 ## Floyd-Warshall for all pairs
 

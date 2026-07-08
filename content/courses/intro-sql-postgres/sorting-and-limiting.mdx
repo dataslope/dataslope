@@ -1,12 +1,12 @@
 ---
 title: Sorting and Limiting
-description: Putting results in a deliberate order with ORDER BY, and grabbing just the top rows with LIMIT — the tools behind every "top 10" list.
+description: Putting results in a deliberate order with ORDER BY, and grabbing just the top rows with LIMIT, the tools behind every "top 10" list.
 ---
 
 Recall that a table is an **unordered** bag of rows. If you want
 your results in a particular order, you must say so. That is what
 `ORDER BY` is for. And once results are ordered, `LIMIT` lets you
-keep just the first few — together they power every "top sellers"
+keep just the first few, together they power every "top sellers"
 and "most recent" list you have ever seen.
 
 <svg
@@ -70,7 +70,7 @@ ORDER BY
 />
 
 Swap `DESC` for `ASC` (or remove it) to flip to lowest-first.
-Sorting works on text too — text sorts alphabetically.
+Sorting works on text too, text sorts alphabetically.
 
 ## Sorting by more than one column
 
@@ -134,7 +134,7 @@ LIMIT
 
 <Callout type="warn" title="LIMIT without ORDER BY is meaningless">
 Because rows have no inherent order, `LIMIT 3` *without* an
-`ORDER BY` gives you "some three rows" — and which three is
+`ORDER BY` gives you "some three rows", and which three is
 unpredictable. Always pair `LIMIT` with `ORDER BY` when you mean
 "the top three." If you genuinely just want a quick peek at any few
 rows, that is the one acceptable exception.
@@ -143,7 +143,7 @@ rows, that is the one acceptable exception.
 ## Skipping rows with OFFSET
 
 `OFFSET n` skips the first `n` rows before returning. `OFFSET`
-together with `LIMIT` is how applications show "pages" of results —
+together with `LIMIT` is how applications show "pages" of results,
 page 1 is `LIMIT 10 OFFSET 0`, page 2 is `LIMIT 10 OFFSET 10`, and
 so on:
 
@@ -169,7 +169,7 @@ OFFSET
   2;`}
 />
 
-The query orders everyone, skips the top 2, and returns the next 2 —
+The query orders everyone, skips the top 2, and returns the next 2,
 Carol and Dave. This is the engine behind "Next page" buttons across
 the web.
 
@@ -187,7 +187,7 @@ flowchart TD
 
 You can leave out the middle ones, but whichever you include must
 follow this sequence. *Select* from a table, *filter*, *sort*, then
-*trim* — a pipeline that reads almost like a sentence.
+*trim*, a pipeline that reads almost like a sentence.
 
 ## Check your understanding
 
@@ -233,7 +233,7 @@ Without an \`ORDER BY\`, \`LIMIT\` returns an arbitrary subset, not a meaningful
 - \`WHERE row = 2\`
   > There is no inherent row-number column to filter on; pagination uses \`LIMIT\` and \`OFFSET\`.
 
-\`OFFSET\` skips earlier rows and \`LIMIT\` caps how many follow — together they implement pagination.`}
+\`OFFSET\` skips earlier rows and \`LIMIT\` caps how many follow, together they implement pagination.`}
 />
 
 <MultipleChoice

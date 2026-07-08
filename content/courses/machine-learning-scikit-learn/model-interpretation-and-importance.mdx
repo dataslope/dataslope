@@ -1,10 +1,10 @@
 ---
 title: Model Interpretation and Feature Importance
-description: A model that works is not enough — you usually need to know why it works. How to ask a model which features drove its predictions, and the traps in every answer it gives.
+description: A model that works is not enough, you usually need to know why it works. How to ask a model which features drove its predictions, and the traps in every answer it gives.
 ---
 
 Suppose you have built a model that predicts, with 96% accuracy, which
-species a penguin belongs to. Wonderful — but a field biologist about to
+species a penguin belongs to. Wonderful, but a field biologist about to
 act on that prediction will immediately ask a question your accuracy score
 cannot answer: **why?** Which measurements made the model say "Gentoo"?
 Would it have said the same thing if one value were a little different? A
@@ -12,7 +12,7 @@ number on a held-out set tells you *that* the model is good. It does not
 tell you *how* the model thinks, and for most real decisions, that second
 question matters just as much.
 
-This page is about **interpretation** — opening the box and asking a
+This page is about **interpretation**, opening the box and asking a
 trained model which features it leaned on, and how much. You will learn the
 three most common ways to do this in scikit-learn, and, just as important,
 the ways each one can quietly mislead you.
@@ -20,7 +20,7 @@ the ways each one can quietly mislead you.
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="A translucent model box pours out horizontal bars of sharply decreasing length, the longest glowing green — feature importance asks a trained model which inputs it actually leaned on"
+  aria-label="A translucent model box pours out horizontal bars of sharply decreasing length, the longest glowing green, feature importance asks a trained model which inputs it actually leaned on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -44,12 +44,12 @@ A perfectly accurate model you cannot explain is, in many settings, nearly
 useless. Interpretability is not a nicety bolted on at the end; it is often
 the difference between a model that ships and one that sits in a notebook.
 
-- **Trust.** A clinician, a loan officer, or a judge will not — and often
-  legally *cannot* — act on a prediction they cannot scrutinize. "The model
+- **Trust.** A clinician, a loan officer, or a judge will not, and often
+  legally *cannot*, act on a prediction they cannot scrutinize. "The model
   said so" is not a reason anyone can stand behind.
 - **Debugging.** When a model behaves strangely, importance scores are your
   flashlight. If a customer-churn model leans almost entirely on a
-  `customer_id` column, you have found a bug — that column should carry no
+  `customer_id` column, you have found a bug, that column should carry no
   real signal, and the model has latched onto an artifact.
 - **Fairness.** If a model's decisions hinge heavily on a feature that is a
   proxy for a protected attribute (a zip code standing in for race, say),
@@ -69,11 +69,11 @@ well and still be uninterpretable, or be perfectly interpretable and score
 poorly. You usually need both kinds of answer.
 </Callout>
 
-## Coefficients as importance — for linear and logistic models
+## Coefficients as importance, for linear and logistic models
 
 The most directly interpretable models are the linear ones. A
 `LinearRegression` or `LogisticRegression` assigns each feature a single
-number — a **coefficient** — and the prediction is built by multiplying
+number, a **coefficient**, and the prediction is built by multiplying
 each feature by its coefficient and adding them up. A coefficient's *sign*
 tells you the direction of the relationship; its *magnitude* hints at how
 strongly that feature pushes the prediction.
@@ -81,7 +81,7 @@ strongly that feature pushes the prediction.
 This is the appeal of linear models: their parameters *are* an explanation,
 for free. Let us read the coefficients of a logistic regression on the
 penguins data, whose four body measurements have plain, interpretable
-names. We narrow to the two most separable species — Adelie and Gentoo —
+names. We narrow to the two most separable species, Adelie and Gentoo,
 so a single set of coefficients carries a clean sign: positive raises the
 probability of "Gentoo," negative lowers it.
 
@@ -129,7 +129,7 @@ But there is a catch, and it is a big one.
 <Callout type="danger" title="Coefficients depend on feature SCALE">
 A coefficient's size depends on the *units* of its feature. A feature
 measured in millimeters will get a coefficient a thousand times larger than
-the same feature in meters — yet nothing about the model's behavior changed.
+the same feature in meters, yet nothing about the model's behavior changed.
 **You cannot compare raw coefficients across features on different scales.**
 Either standardize the features first (as above), so a one-unit change means
 "one standard deviation" for every feature, or do not rank features by raw
@@ -138,8 +138,8 @@ coefficient magnitude at all.
 
 There is a second, subtler trap. When two features are **correlated**,
 linear models can split their shared influence between them almost
-arbitrarily — giving one a large coefficient and the other a tiny one, or
-even flipping a sign — without changing predictions at all. The model is
+arbitrarily, giving one a large coefficient and the other a tiny one, or
+even flipping a sign, without changing predictions at all. The model is
 indifferent to how it divides credit between redundant features, so reading
 a single coefficient as "this feature's importance" can badly mislead you.
 
@@ -149,11 +149,11 @@ the weight onto one and starve the other, even reversing a coefficient's
 sign. The pair *together* matters, but neither coefficient alone tells you
 that. With correlated features, treat individual coefficients with
 suspicion. In the penguins data, for instance, `flipper_length_mm` and
-`body_mass_g` move together closely — bigger penguins have longer
-flippers — so the model can shuffle credit between them.
+`body_mass_g` move together closely, bigger penguins have longer
+flippers, so the model can shuffle credit between them.
 </Callout>
 
-## Tree and forest importances — `feature_importances_`
+## Tree and forest importances, `feature_importances_`
 
 Tree-based models offer a different, built-in notion of importance. As a
 decision tree grows, every split on a feature reduces **impurity** (it makes
@@ -198,15 +198,15 @@ print(f"\\nThey sum to {importances.sum():.2f} (always 1.0).")
 Two conveniences jump out. Tree importances are always **non-negative** and
 **sum to 1**, so you can read them as "share of the model's decision-making
 attributed to this feature." And unlike coefficients, they are **scale
-invariant** — a tree splits on thresholds, so the units of a feature do not
+invariant**, a tree splits on thresholds, so the units of a feature do not
 matter. That alone makes them friendlier than raw coefficients.
 
 But impurity-based importance has well-known biases you must know about.
 
 <Callout type="warn" title="Impurity importance is biased toward high-cardinality features">
 Impurity-based `feature_importances_` tends to **inflate** features with
-many distinct values (high cardinality) — continuous numbers, or an ID-like
-column — because such features offer more places to split and can reduce
+many distinct values (high cardinality), continuous numbers, or an ID-like
+column, because such features offer more places to split and can reduce
 impurity *on the training data* almost by accident. The notorious symptom:
 add a column of pure random noise with many unique values, and a forest may
 assign it a non-trivial importance. Treat impurity importance as a useful
@@ -218,15 +218,15 @@ A second limitation: impurity importance is computed from how the tree was
 necessarily what helps on new data. For an importance measure tied to actual
 predictive performance, we need a different idea.
 
-## Permutation importance — model-agnostic and harder to fool
+## Permutation importance, model-agnostic and harder to fool
 
 **Permutation importance** asks the most direct question imaginable: *if I
 destroy the information in this feature, how much worse does the model get?*
 
 The procedure is beautifully simple. Take a trained model and a held-out
-set. Measure its score. Now randomly **shuffle** one feature's column —
+set. Measure its score. Now randomly **shuffle** one feature's column,
 scrambling the link between that feature and the target while keeping its
-distribution identical — and measure the score again. If the score
+distribution identical, and measure the score again. If the score
 collapses, that feature was important; if the score barely moves, the model
 was not really relying on it. Repeat for every feature.
 
@@ -239,7 +239,7 @@ flowchart TD
     D --> E["Repeat for every feature,<br/>rank by drop"]
 ```
 
-This has three big advantages. It is **model-agnostic** — it works on *any*
+This has three big advantages. It is **model-agnostic**, it works on *any*
 fitted estimator, from a linear model to a forest to a pipeline, because it
 only needs `.predict()`. It measures importance against **real predictive
 performance** (the score you care about), not training-set impurity. And by
@@ -285,11 +285,11 @@ for i in order:
 />
 
 Run both blocks and the rankings line up: the forest's top features and
-permutation importance agree on which measurements carry the model — a
+permutation importance agree on which measurements carry the model, a
 reassuring sign that the two lenses are seeing the same structure.
 
 Because the shuffle is random, permutation importance is itself a *random*
-quantity — that is why we repeat it (`n_repeats=20`) and get a mean and a
+quantity, that is why we repeat it (`n_repeats=20`) and get a mean and a
 standard deviation. A feature whose importance is well above its own noise
 band is genuinely being used; one whose importance is a hair from zero
 (within its standard deviation) probably is not.
@@ -298,13 +298,13 @@ band is genuinely being used; one whose importance is a hair from zero
 Run permutation importance on **held-out** data whenever you can. On the
 training set, an overfit model may look like it depends heavily on features
 it merely memorized. On held-out data, you measure what actually helps the
-model generalize — which is almost always the question you care about.
+model generalize, which is almost always the question you care about.
 </Callout>
 
 Permutation importance is not flawless either. With strongly **correlated**
 features it can *understate* importance: if two columns carry the same
 information, shuffling just one leaves the other intact, so the model barely
-suffers and *both* look unimportant — even though the information they share
+suffers and *both* look unimportant, even though the information they share
 is crucial. No single importance method is immune to correlated features;
 this is a recurring theme, not a quirk of one technique.
 
@@ -329,7 +329,7 @@ itself a clue worth investigating.
 
 Importance scores are far easier to read as a bar chart than as a column of
 numbers. Here we fit a forest and draw its top impurity importances with
-matplotlib — the kind of plot you will make constantly.
+matplotlib, the kind of plot you will make constantly.
 
 <CodeBlock
   adapter="python"
@@ -379,7 +379,7 @@ There is a second flavor: **local** explanations, which explain *one
 specific prediction*. "For *this particular* penguin, the long flipper is
 what pushed the model toward 'Gentoo'" is a local statement.
 Global tells you how the model behaves on average; local tells you why it
-made the call it made for a single case — which is often exactly what a
+made the call it made for a single case, which is often exactly what a
 person affected by the decision wants to know.
 
 <Callout type="info" title="Global and local answer different questions">
@@ -402,11 +402,11 @@ A model can lean heavily on a feature for reasons that have nothing to do
 with cause and effect:
 
 - The feature may be a **proxy** for the true cause. Ice-cream sales might
-  be a top predictor of drownings — not because ice cream causes drowning,
+  be a top predictor of drownings, not because ice cream causes drowning,
   but because hot weather drives both. A model happily uses the proxy.
 - The feature may leak the answer. If "number of reminder letters sent" is a
   top predictor of loan default, it may be that the bank sends letters
-  *because* it already suspects default — the feature is a *consequence*, not
+  *because* it already suspects default, the feature is a *consequence*, not
   a cause.
 - Causation may run the *other way*, or both features may share a hidden
   common cause, as with the ice cream above.
@@ -423,7 +423,7 @@ This is the same lesson as the old statistics adage *correlation is not
 causation*, wearing machine-learning clothes. A high importance score means
 "the model found this feature useful for prediction given the data it saw."
 Whether intervening on that feature in the real world would change the
-outcome is a **causal** question that importance scores cannot answer — it
+outcome is a **causal** question that importance scores cannot answer, it
 takes an experiment, or careful causal reasoning, to know.
 
 <Callout type="danger" title="Do not read importance as a to-do list">
@@ -439,7 +439,7 @@ importance ranking.
 ## When NOT to over-trust importance
 
 - **When features are strongly correlated.** As we saw, every method
-  distorts under correlation — splitting credit, hiding it, or shuffling it
+  distorts under correlation, splitting credit, hiding it, or shuffling it
   ineffectively. Inspect your correlations before reading too much into any
   single feature's rank.
 - **When you have not scaled, for coefficients.** Ranking raw coefficients
@@ -455,7 +455,7 @@ importance ranking.
 
 Interpretation runs alongside prediction across every serious domain. A
 credit team must, often by law, tell a rejected applicant which factors
-drove the decision — straight from model coefficients or importances. A
+drove the decision, straight from model coefficients or importances. A
 hospital validating a diagnostic model checks that it leans on clinically
 sensible measurements, not on an artifact like which scanner produced the
 image. A churn team uses importance to brief the business on *why* customers
@@ -636,10 +636,10 @@ The held-out measurement answers the question you usually care about: what helps
   > Which importance method was used is beside the point; the flaw is interpreting any importance score as causal.
 - Because the feature should have been scaled first
   > Scaling concerns comparing coefficients, not the logic error of reading importance as causation.
-- [o] Because high importance means the feature predicts churn, not that it causes churn — tickets may be a symptom of an underlying problem, and suppressing them would not fix the cause
+- [o] Because high importance means the feature predicts churn, not that it causes churn, tickets may be a symptom of an underlying problem, and suppressing them would not fix the cause
   > Importance describes prediction given the data, not intervention; the tickets likely signal a deeper dissatisfaction, so hiding the symptom would not address the actual driver of churn.
 - Because random forests cannot be used for churn prediction
   > Random forests are perfectly suitable for churn prediction; the error is in the causal interpretation of importance.
 
-Importance answers "what predicts the outcome," never "what to change to alter the outcome" — that needs causal evidence.`}
+Importance answers "what predicts the outcome," never "what to change to alter the outcome", that needs causal evidence.`}
 />

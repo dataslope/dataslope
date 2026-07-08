@@ -1,11 +1,11 @@
 ---
 title: A/B Testing
-description: The capstone — design a real experiment with a clear hypothesis, one primary metric, randomization, and power up front; then analyze it fully with a test, a lift, a confidence interval, and an effect size; and decide to ship or not by weighing significance against practical importance.
+description: The capstone, design a real experiment with a clear hypothesis, one primary metric, randomization, and power up front; then analyze it fully with a test, a lift, a confidence interval, and an effect size; and decide to ship or not by weighing significance against practical importance.
 ---
 
 This is where the whole course comes together. An **A/B test** (a
 randomized controlled experiment) is the single most powerful tool a data
-scientist has for answering "*does this change actually work?*" — and it
+scientist has for answering "*does this change actually work?*", and it
 runs on every concept you've built: populations and samples,
 randomization, sampling distributions, confidence intervals, hypothesis
 tests, p-values, power, and effect sizes. If you can design and read an
@@ -13,7 +13,7 @@ A/B test correctly, you can be trusted with real decisions.
 
 We'll go in the order a real experiment does: **design** it before you
 collect a single row, **analyze** it once it's done, and **decide**
-whether to ship — then catalog the **pitfalls** that quietly invalidate
+whether to ship, then catalog the **pitfalls** that quietly invalidate
 otherwise-fine tests.
 
 The full arc, start to finish:
@@ -23,7 +23,7 @@ The full arc, start to finish:
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A stream of yellow user dots reaches a yellow coin-flip diamond and splits along two thin lines — a blue control panel and a green variant panel of identical crowds, the variant lighting up more converted dots and growing a longer result pill — randomize the split, and the only difference left to credit is the change itself"
+  aria-label="A stream of yellow user dots reaches a yellow coin-flip diamond and splits along two thin lines, a blue control panel and a green variant panel of identical crowds, the variant lighting up more converted dots and growing a longer result pill, randomize the split, and the only difference left to credit is the change itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -78,10 +78,10 @@ made **before** data collection:
 
 **1. A single, falsifiable hypothesis.** "The new checkout button
 increases the purchase-conversion rate." Not "the new button is better"
-(better at what?) — name the exact change and the exact outcome.
+(better at what?), name the exact change and the exact outcome.
 
 **2. One primary metric, chosen in advance.** Pick *the* number the
-decision hinges on — say, conversion rate — and commit to it. Tracking
+decision hinges on, say, conversion rate, and commit to it. Tracking
 ten metrics and celebrating whichever one moves is the multiple-comparisons
 trap from *Statistical Fallacies* wearing a business suit.
 
@@ -105,7 +105,7 @@ secondary/guardrail metric you look at for context, not for the verdict.
 Here is the deep reason A/B tests can say "X *caused* Y" when ordinary
 observational data (from *Statistical Fallacies*) cannot. Randomly
 assigning who gets the treatment makes the two groups **statistically
-identical on everything** — measured and unmeasured — *except* the change
+identical on everything**, measured and unmeasured, *except* the change
 you're testing. Age, device, loyalty, the weather, mood, and every
 confounder you never thought of are, on average, balanced across the two
 arms. So if B outperforms A by more than chance allows, the *only*
@@ -131,7 +131,7 @@ correlation into a credible cause.
 
 You met **statistical power** in *Errors and Power*: the probability your
 test *detects* a real effect of a given size. Run a test on too few
-users and even a genuine, worthwhile lift can come back non-significant —
+users and even a genuine, worthwhile lift can come back non-significant,
 you "found nothing" only because you lacked the data to find it. So you
 size the experiment up front, around the *smallest effect worth
 detecting* (the minimum detectable effect, MDE).
@@ -186,7 +186,7 @@ print("so you don't stop early or chase an effect too small to see.")
 
 <Callout type="tip" title="Why size up front, not after">
 If you decide the sample size *after* peeking at results, you've turned a
-clean test into a fishing expedition — you'll be tempted to stop the
+clean test into a fishing expedition, you'll be tempted to stop the
 moment the numbers look good. Committing to `n` in advance is what keeps
 the false-positive rate at the α you intended.
 </Callout>
@@ -201,7 +201,7 @@ the **p-value**, and an **effect size**.
 
 For a conversion (yes/no) metric, the natural test compares two
 proportions. We'll use a **two-proportion z-test** computed directly, and
-cross-check it against a chi-square test on the 2×2 table — they answer
+cross-check it against a chi-square test on the 2×2 table, they answer
 the same question.
 
 <CodeBlock
@@ -316,8 +316,8 @@ print("real, useful effect. Overlapping intervals -> stay cautious.")
 />
 
 <Callout type="info" title="Continuous metric? Use a t-test instead">
-If your primary metric is *continuous* — revenue per user, session
-length, time-to-checkout — swap the two-proportion test for an
+If your primary metric is *continuous*, revenue per user, session
+length, time-to-checkout, swap the two-proportion test for an
 independent **t-test** (`scipy.stats.ttest_ind`), report the difference
 in means with its CI, and use **Cohen's d** as the effect size. The
 design, randomization, power, and decision logic are identical; only the
@@ -327,7 +327,7 @@ test and effect-size formula change.
 ## Decide: ship or don't ship
 
 A significant p-value is *permission to look at the effect size*, not an
-order to ship. The decision weighs **two** axes together — exactly the
+order to ship. The decision weighs **two** axes together, exactly the
 significance-vs-importance distinction from *Effect Sizes*.
 
 ```mermaid
@@ -341,13 +341,13 @@ flowchart TD
 
 Walk the branches:
 
-- **Not significant.** No green light. But check power first — a null
+- **Not significant.** No green light. But check power first, a null
   result on a tiny sample means "we couldn't tell," not "no effect."
 - **Significant but tiny.** The classic trap. With enough traffic a
   0.05pp lift is "significant" and worthless. Look at the effect size and
   whether the *whole* confidence interval clears the threshold you'd care
   about.
-- **Significant and meaningful.** Ship — and ideally confirm the CI's
+- **Significant and meaningful.** Ship, and ideally confirm the CI's
   lower bound is still above the level that justifies the rollout cost.
 
 <Callout type="danger" title="The most expensive A/B testing mistake">
@@ -375,11 +375,11 @@ Each one inflates false positives or biases the estimate.
   bump fades. Run long enough to see whether the lift persists past the
   novelty window.
 - **Simpson's paradox across segments.** An overall win can hide a loss in
-  every segment (or vice versa) if your traffic mix shifted — straight
+  every segment (or vice versa) if your traffic mix shifted, straight
   from *Statistical Fallacies*. Sanity-check key segments.
 - **Unequal / broken groups (assignment bias).** If the arms differ in
-  size or composition more than randomization predicts — a "sample ratio
-  mismatch" — your randomization is broken and the comparison is suspect.
+  size or composition more than randomization predicts, a "sample ratio
+  mismatch", your randomization is broken and the comparison is suspect.
 
 ```mermaid
 flowchart LR
@@ -401,7 +401,7 @@ method designed for continuous monitoring.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A thin blue p-value line wanders and dips below the red significance line exactly once, where a yellow stop flag is eagerly planted, while its fainter future climbs right back up — peek long enough and noise alone will hand you a lucky dip to stop on"
+  aria-label="A thin blue p-value line wanders and dips below the red significance line exactly once, where a yellow stop flag is eagerly planted, while its fainter future climbs right back up, peek long enough and noise alone will hand you a lucky dip to stop on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="130" width="500" height="4" rx="2" fill="var(--ds-red-500)" />
@@ -595,7 +595,7 @@ assert excludes_zero == (ci[0] > 0)`,
 
 - Because randomization guarantees the two groups have identical sample sizes
   > Equal sizes are not the point, and randomization only balances sizes on average. The benefit is balancing *characteristics*, not counts.
-- [o] Because randomization balances confounders — known and unknown — across the two groups, so the treatment is the only systematic difference
+- [o] Because randomization balances confounders, known and unknown, across the two groups, so the treatment is the only systematic difference
   > With confounders evenly split between arms, any difference beyond chance can be attributed to the treatment rather than a lurking variable.
 - Because randomization increases the sample size
   > Randomization is about *how* users are assigned, not how many there are; it does not change the sample size.
@@ -608,7 +608,7 @@ Randomization is the mechanism that turns a correlation into a credible cause.`}
 <MultipleChoice
   markdown={`A test reaches p = 0.04 after 3 days. Your teammate wants to stop and ship immediately. What's the statistical problem with stopping the moment it crosses 0.05?
 
-- Nothing — once p < 0.05 the result is locked in and valid
+- Nothing, once p < 0.05 the result is locked in and valid
   > The p-value fluctuates as data accrues; a single crossing is not a permanent verdict, and stopping on it inflates the false-positive rate.
 - [o] Peeking and stopping at the first significant moment inflates the false-positive rate well above the stated alpha
   > Because the p-value wanders over time, repeatedly checking and stopping on the first dip below 0.05 makes spurious "wins" far more likely than 5%.
@@ -623,16 +623,16 @@ Pre-commit to a sample size or use a method designed for continuous monitoring.`
 <MultipleChoice
   markdown={`With 5 million users, a new layout shows a statistically significant lift in conversion of 0.02 percentage points (from 8.00% to 8.02%). The 95% CI is [0.005pp, 0.035pp]. Should you ship?
 
-- Yes — it's statistically significant, and significance means ship
+- Yes, it's statistically significant, and significance means ship
   > Significance only certifies the effect is distinguishable from zero. The magnitude here is tiny, and significance alone is not a shipping criterion.
-- [o] Probably not on this alone — the effect is real but so small it likely isn't worth the cost; weigh the tiny effect size against the rollout cost
+- [o] Probably not on this alone, the effect is real but so small it likely isn't worth the cost; weigh the tiny effect size against the rollout cost
   > A huge sample makes microscopic effects significant; the CI confirms the lift is real but trivially small, so practical importance should drive the decision.
 - Yes, because the confidence interval excludes zero
   > Excluding zero confirms significance, but the entire interval sits at a trivially small magnitude, so it does not justify shipping by itself.
 - No, because the result must be a false positive
   > With 5 million users a 0.02pp effect can be entirely real; it is just too small to matter, which is different from being a false positive.
 
-Significant is not the same as worth shipping — read the effect size and CI.`}
+Significant is not the same as worth shipping, read the effect size and CI.`}
 />
 
 <MultipleChoice
@@ -657,7 +657,7 @@ Pre-commit to one primary metric, or correct for the number of comparisons.`}
   > When every segment disagrees with the aggregate, the aggregate is suspect; this is a textbook Simpson's-paradox warning sign, not something to ignore.
 - The test had too few users
   > Sample size does not produce a sign reversal between aggregate and every subgroup; an uneven mix across segments does.
-- [o] Simpson's paradox — the traffic mix differs between arms, so the pooled result reverses what happens within each device
+- [o] Simpson's paradox, the traffic mix differs between arms, so the pooled result reverses what happens within each device
   > A difference in how device traffic is distributed across arms can flip the aggregate relative to the within-segment results, even with a correct calculation.
 - The metric was continuous instead of binary
   > The metric's type is irrelevant to a sign reversal across segments; the cause is the segment-mix imbalance between the two arms.
@@ -666,9 +666,9 @@ When the aggregate and every segment disagree, suspect a shift in segment mix (a
 />
 
 <Callout type="success" title="Key takeaways">
-- **Design before you collect:** one falsifiable hypothesis, one primary metric, randomization, and a power-based sample size — all up front.
+- **Design before you collect:** one falsifiable hypothesis, one primary metric, randomization, and a power-based sample size, all up front.
 - **Randomization** balances confounders across arms, which is what licenses a *causal* conclusion.
-- **Analyze fully:** report the lift, a **confidence interval on the difference**, an **effect size**, *and* the p-value — never the p-value alone.
+- **Analyze fully:** report the lift, a **confidence interval on the difference**, an **effect size**, *and* the p-value, never the p-value alone.
 - **Decide on two axes:** ship only when the result is significant **and** the effect is practically large enough (CI comfortably past your threshold).
 - **Beware the pitfalls:** peeking/early stopping, multiple metrics, novelty effects, Simpson's paradox across segments, and broken (unequal) groups.
 </Callout>

@@ -1,19 +1,19 @@
 ---
 title: Profiling a Dataset
-description: The analyst's first ten minutes with new data — counting rows, checking ranges, measuring distinctness, and finding missing values. DuckDB's SUMMARIZE makes it nearly automatic.
+description: The analyst's first ten minutes with new data, counting rows, checking ranges, measuring distinctness, and finding missing values. DuckDB's SUMMARIZE makes it nearly automatic.
 ---
 
 When an analyst opens an unfamiliar dataset, they do not start with the
 interesting business question. They start by **profiling** it: a few quick
 queries that reveal the data's size, range, distinctness, and gaps.
-Skipping this step is how analysts get fooled — by duplicates, missing
+Skipping this step is how analysts get fooled, by duplicates, missing
 values, or a date column that secretly stops in March. This page is the
 profiling checklist, expressed in SQL.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue table card with one missing cell outlined in dashed red flows through a solid gray arrow into a profile card of quick stats — a range bar, distinct-value dots, and a red ring beside the missing value — profiling a dataset before trusting it"
+  aria-label="A blue table card with one missing cell outlined in dashed red flows through a solid gray arrow into a profile card of quick stats, a range bar, distinct-value dots, and a red ring beside the missing value, profiling a dataset before trusting it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ A dataset can lie to you in quiet ways:
 - A column has **far fewer distinct values** than expected (or far more).
 - Some values are **missing** (`NULL`), silently dropping rows from
   averages.
-- The **range** is wrong — dates that stop early, amounts that go
+- The **range** is wrong, dates that stop early, amounts that go
   negative.
 
 Profiling surfaces these before they corrupt a conclusion. Think of it as
@@ -98,7 +98,7 @@ FROM
   signups;`}
 />
 
-In seconds you learn the table's size and the window of time it covers —
+In seconds you learn the table's size and the window of time it covers,
 without scrolling a single row.
 
 ## Distinctness: `COUNT(DISTINCT ...)`
@@ -127,13 +127,13 @@ FROM
   signups;`}
 />
 
-If `distinct_ids` were less than `rows`, you would have duplicate ids — a
+If `distinct_ids` were less than `rows`, you would have duplicate ids, a
 red flag worth investigating before trusting any per-id summary.
 
 ## Missing values: counting `NULL`s
 
 `COUNT(column)` ignores `NULL`s, while `COUNT(*)` counts every row. The
-difference is exactly the number of missing values — a one-line null
+difference is exactly the number of missing values, a one-line null
 check.
 
 <SqlCodeBlock
@@ -165,7 +165,7 @@ trustworthy or needs cleaning before analysis.
 <svg
   viewBox="0 0 640 130"
   role="img"
-  aria-label="Two left-aligned measuring bars — every row in blue above, only the non-null values in green below — leave a red overhang where they differ: the exact count of missing values"
+  aria-label="Two left-aligned measuring bars, every row in blue above, only the non-null values in green below, leave a red overhang where they differ: the exact count of missing values"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -205,7 +205,7 @@ FROM
 
 One line of intent, a complete profile of ten columns. Scan the `min` and
 `max` of `price` and `carat`, the distinct counts of `cut` / `color` /
-`clarity`, and the null percentages — in seconds you know more about this
+`clarity`, and the null percentages, in seconds you know more about this
 file than scrolling it for an hour would tell you. `SUMMARIZE` is the
 first thing many DuckDB analysts type when they meet a new dataset.
 
@@ -233,7 +233,7 @@ Or just run `SUMMARIZE` and read the lot at a glance.
 
 - The \`id\` column has 20 NULL values.
   > \`COUNT(DISTINCT id)\` already ignores NULLs; the gap here points to repeated id *values*, i.e. duplicates.
-- [o] There are duplicate \`id\` values — 1000 rows but only 980 unique ids.
+- [o] There are duplicate \`id\` values, 1000 rows but only 980 unique ids.
   > When distinct ids are fewer than total rows, some ids repeat, which usually signals duplicate rows worth investigating.
 - The query is invalid.
   > Both counts are valid; their difference is meaningful information.
@@ -264,7 +264,7 @@ difference is the number of missing values.`}
 
 - It deletes summary rows from a table.
   > \`SUMMARIZE\` produces a report; it changes nothing in the table.
-- [o] It returns a per-column profile — count, distinct values, null percentage, min, max, average, and quantiles — for a table or query.
+- [o] It returns a per-column profile, count, distinct values, null percentage, min, max, average, and quantiles, for a table or query.
   > \`SUMMARIZE\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
 - It permanently sorts the table by every column.
   > It neither sorts nor modifies the table; it only reports statistics.
@@ -275,4 +275,4 @@ difference is the number of missing values.`}
 />
 
 With a trustworthy mental model in hand, you can start carving the data
-into the slices you care about — which is exactly the next page.
+into the slices you care about, which is exactly the next page.

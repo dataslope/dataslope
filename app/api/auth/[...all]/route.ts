@@ -1,5 +1,5 @@
 /**
- * Better Auth catch-all handler — serves every `/api/auth/*` endpoint
+ * Better Auth catch-all handler, serves every `/api/auth/*` endpoint
  * (sign-in, OAuth callbacks, session, sign-out, …).
  *
  * The Better Auth instance is built per request (`createAuth(env, request)`)
@@ -9,7 +9,7 @@
  * against D1 only on its own endpoints. `getCloudflareContext()` surfaces the
  * binding inside the handler.
  *
- * `force-dynamic` keeps these endpoints off the incremental cache — they set
+ * `force-dynamic` keeps these endpoints off the incremental cache, they set
  * cookies and read D1, so they must run on every request, never be prerendered.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";

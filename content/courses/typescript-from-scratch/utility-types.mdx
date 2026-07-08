@@ -3,14 +3,14 @@ title: Utility Types
 description: Master TypeScript's built-in utility types and learn how they're implemented.
 ---
 
-TypeScript ships with a rich set of **utility types** — pre-built generic types that perform common transformations. You've already glimpsed a few (like `Partial` and `Pick`). Now that you understand [mapped and conditional types](./mapped-and-conditional-types), we'll tour the full lineup and demystify how each is implemented.
+TypeScript ships with a rich set of **utility types**, pre-built generic types that perform common transformations. You've already glimpsed a few (like `Partial` and `Pick`). Now that you understand [mapped and conditional types](./mapped-and-conditional-types), we'll tour the full lineup and demystify how each is implemented.
 
-These utilities aren't magic. They're all built from the primitives you've learned: mapped types, conditional types, `keyof`, indexed access, and `infer`. By the end of this chapter, you'll see that you could write them yourself — and you'll know when to reach for them in real code.
+These utilities aren't magic. They're all built from the primitives you've learned: mapped types, conditional types, `keyof`, indexed access, and `infer`. By the end of this chapter, you'll see that you could write them yourself, and you'll know when to reach for them in real code.
 
 <svg
   viewBox="0 0 640 260"
   role="img"
-  aria-label="One solid blue type card with three field bars fans out along four thin arrows into four transformed copies — a dashed optional outline, a narrow single-field pick, a copy sealed with a green ring, and a copy whose last field is an empty dashed slot — utility types mint new types from a single original"
+  aria-label="One solid blue type card with three field bars fans out along four thin arrows into four transformed copies, a dashed optional outline, a narrow single-field pick, a copy sealed with a green ring, and a copy whose last field is an empty dashed slot, utility types mint new types from a single original"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -283,7 +283,7 @@ These types filter or extract members from unions.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A line of mixed shapes reaches a junction where a branch rail drops the yellow triangles into a tray below while the blue circles and green squares continue along the main line — Extract collects the matching members of a union and Exclude keeps the ones that remain"
+  aria-label="A line of mixed shapes reaches a junction where a branch rail drops the yellow triangles into a tray below while the blue circles and green squares continue along the main line, Extract collects the matching members of a union and Exclude keeps the ones that remain"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -799,4 +799,4 @@ None of these are magic. They're all built from mapped types, conditional types,
 
 ---
 
-**Next**: [keyof, typeof & Template Literals](./keyof-typeof-template-literals) — lifting values into types and building string-based type systems.
+**Next**: [keyof, typeof & Template Literals](./keyof-typeof-template-literals), lifting values into types and building string-based type systems.

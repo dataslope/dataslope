@@ -15,7 +15,7 @@ becomes easier.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A long row of dots whose three-color motif repeats four times, each repetition softly grouped — and below, the single abstracted motif that generates them all"
+  aria-label="A long row of dots whose three-color motif repeats four times, each repetition softly grouped, and below, the single abstracted motif that generates them all"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -56,12 +56,12 @@ becomes easier.
 Researchers usually break computational thinking into four
 overlapping habits:
 
-1. **Decomposition** — break a big problem into smaller problems.
-2. **Pattern recognition** — notice when two small problems are
+1. **Decomposition**, break a big problem into smaller problems.
+2. **Pattern recognition**, notice when two small problems are
    really the same problem.
-3. **Abstraction** — strip away unnecessary detail; describe the
+3. **Abstraction**, strip away unnecessary detail; describe the
    problem in terms a computer can handle.
-4. **Algorithm design** — write down a precise, step-by-step recipe
+4. **Algorithm design**, write down a precise, step-by-step recipe
    for solving the problem.
 
 Put together, these habits carry you from a problem to a program:
@@ -122,7 +122,7 @@ That's it. That short recipe will work for 3 numbers, or 3 million,
 in any programming language. **The hard work was the thinking, not
 the typing.**
 
-## A first taste of C — but read it like a recipe
+## A first taste of C, but read it like a recipe
 
 Here is the same algorithm in C. **Don't worry about the syntax**.
 Just read it and check that it matches the pseudocode line by line.
@@ -194,7 +194,7 @@ into three cases: *tie*, *player wins*, *computer wins*.
 We can encode each move as a number: `0 = rock`, `1 = paper`,
 `2 = scissors`. Then "X beats Y" becomes a pure arithmetic statement.
 With the encoding above, X beats Y exactly when `(X - Y + 3) % 3 == 1`.
-(Don't worry, we'll explain the `%` operator later — for now,
+(Don't worry, we'll explain the `%` operator later, for now,
 appreciate that *thinking* about the problem turned a tangle of `if`s
 into a clean formula.)
 
@@ -236,7 +236,7 @@ understand them faster when they happen.
 
 ## Practice: trace the algorithm by hand
 
-Take a small list of numbers — for example `[7, 2, 9, 4, 9, 6]` —
+Take a small list of numbers, for example `[7, 2, 9, 4, 9, 6]`,
 and run the "find the maximum" pseudocode by hand. After each step,
 write down what `best` holds:
 
@@ -251,7 +251,7 @@ n = 6:  6 > 9?  no, best stays 9
 print 9
 ```
 
-That tiny table — sometimes called a **trace table** — is one of the
+That tiny table, sometimes called a **trace table**, is one of the
 most powerful tools in a programmer's arsenal. We will use it many
 times in this course. When a program confuses you, build a trace
 table. The bug usually exposes itself by row three.

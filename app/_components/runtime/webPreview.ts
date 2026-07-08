@@ -3,7 +3,7 @@
 // The execution model (per the §4.1 architecture in
 // agent-outputs/20260706-0224-web-dev-playgrounds-browser-wasm-research.md):
 // user code becomes a self-contained HTML document that runs inside a
-// sandboxed `<iframe srcdoc>` with a *bare opaque origin* — `sandbox`
+// sandboxed `<iframe srcdoc>` with a *bare opaque origin*, `sandbox`
 // grants `allow-scripts allow-modals allow-forms` and **never**
 // `allow-same-origin` (the HTML spec warns that combination would let
 // embedded script reach up and remove its own sandbox). A tiny bridge
@@ -18,12 +18,12 @@
 // bridge (an opaque-origin frame can't be targeted by origin, so
 // `targetOrigin` is necessarily `"*"`); frames that don't know the
 // token are ignored. The learner's own code could of course post forged
-// messages — but it already controls its own console output, so this is
+// messages, but it already controls its own console output, so this is
 // the same trust level as every other adapter (a learner can "cheat" a
 // challenge by printing the sentinel lines in any language).
 //
 // Teardown story: each run replaces the host's children with a fresh
-// iframe, killing the previous document's scripts — an infinite loop
+// iframe, killing the previous document's scripts, an infinite loop
 // freezes only its own (old) frame, never the app.
 
 import type { EmitOutput } from "../types";
@@ -39,7 +39,7 @@ export const PREVIEW_MESSAGE_KEY = "__dsWebPreview__";
 export const PREVIEW_IFRAME_CLASS = "ds-web-preview-frame";
 
 /** Sandbox grants for the preview iframe. `allow-same-origin` is
- *  deliberately absent — see the module docs. */
+ *  deliberately absent, see the module docs. */
 export const PREVIEW_SANDBOX = "allow-scripts allow-modals allow-forms";
 
 /** How long after the document's `load` event we keep forwarding
@@ -65,7 +65,7 @@ export function newPreviewToken(): string {
 }
 
 /** True when `source` contains a challenge harness appended by
- *  `buildHarness` — every builder starts by printing this sentinel, so
+ *  `buildHarness`, every builder starts by printing this sentinel, so
  *  its presence tells the preview runner to wait for the harness-done
  *  signal instead of resolving at document load. */
 export function hasHarnessMarker(source: string): boolean {
@@ -86,7 +86,7 @@ export function escapeInlineStyleContent(css: string): string {
 /**
  * The bridge script injected at the very top of every preview document
  * (before any user code can run). Serializes console arguments inside
- * the iframe — the messages that cross the boundary are final strings,
+ * the iframe, the messages that cross the boundary are final strings,
  * so nothing structured-clone-unfriendly ever hits postMessage.
  */
 export function buildPreviewBridge(token: string): string {
@@ -248,7 +248,7 @@ function bytesToBase64(bytes: Uint8Array): string {
 
 /** Insert `snippet` as early as possible in the document: right after
  *  `<head>` when present, after `<html>` otherwise, else prepended.
- *  "As early as possible" matters — the console bridge must install
+ *  "As early as possible" matters, the console bridge must install
  *  before any user script can log. */
 export function injectAtDocumentStart(html: string, snippet: string): string {
   const headMatch = html.match(/<head\b[^>]*>/i);
@@ -265,18 +265,18 @@ export function injectAtDocumentStart(html: string, snippet: string): string {
 }
 
 export interface WebComposeInput {
-  /** The entry document's HTML (a full document or a fragment — the
+  /** The entry document's HTML (a full document or a fragment, the
    *  browser's fragment parsing rules handle both inside srcdoc). May
    *  already carry a challenge harness `<script>` appended by
    *  `ChallengeCard`. */
   entryHtml: string;
   /** Per-run bridge token (see `newPreviewToken`). */
   token: string;
-  /** Text files from the workspace, keyed by workspace-relative path —
+  /** Text files from the workspace, keyed by workspace-relative path,
    *  `<link rel="stylesheet" href>` / `<script src>` references to
    *  these are inlined so the sandboxed document is self-contained. */
   textFiles?: Map<string, string>;
-  /** Binary files (uploads) — `<img src>` references become data URIs. */
+  /** Binary files (uploads), `<img src>` references become data URIs. */
   binaryFiles?: Map<string, Uint8Array>;
   /** Inject the pinned Tailwind browser compiler before user code. */
   tailwind?: boolean;
@@ -285,14 +285,14 @@ export interface WebComposeInput {
 /**
  * Compose the final srcdoc for an HTML/CSS/JS run. Workspace-relative
  * `<link>`/`<script src>`/`<img src>` references are inlined (a srcdoc
- * document has no base URL to resolve them against — Tier 2's
+ * document has no base URL to resolve them against, Tier 2's
  * Service-Worker virtual server is the "real URLs" upgrade path), and
  * the console bridge (+ optional Tailwind compiler) is injected at the
  * top of the document.
  *
  * CodePen-style implicit composition: root-level `.css` / `.js`
  * workspace files that the entry document does NOT reference get
- * appended automatically — styles as `<style>`, scripts as `<script>`
+ * appended automatically, styles as `<style>`, scripts as `<script>`
  * after the user's markup (so scripts see the parsed DOM, exactly like
  * CodePen's JS pane). Explicitly referenced files inline at their tag
  * as before, so documents that link their assets keep full control of
@@ -304,7 +304,7 @@ export function composeWebDocument(input: WebComposeInput): string {
   const textFiles = input.textFiles ?? new Map<string, string>();
   const binaryFiles = input.binaryFiles ?? new Map<string, Uint8Array>();
   let html = input.entryHtml;
-  // Workspace files the entry references explicitly — excluded from the
+  // Workspace files the entry references explicitly, excluded from the
   // implicit CodePen-style injection below.
   const referenced = new Set<string>();
 
@@ -316,7 +316,7 @@ export function composeWebDocument(input: WebComposeInput): string {
     if (!href) return tag;
     const path = normalizeAssetPath(href);
     const css = textFiles.get(path);
-    if (css === undefined) return tag; // external URL — leave it alone
+    if (css === undefined) return tag; // external URL, leave it alone
     referenced.add(path);
     return `<style data-inlined-from="${path}">\n${escapeInlineStyleContent(css)}\n</style>`;
   });
@@ -329,7 +329,7 @@ export function composeWebDocument(input: WebComposeInput): string {
       if (!src) return tag;
       const path = normalizeAssetPath(src);
       const js = textFiles.get(path);
-      if (js === undefined) return tag; // external URL — leave it alone
+      if (js === undefined) return tag; // external URL, leave it alone
       referenced.add(path);
       const type = getAttr(tag, "type");
       const isModule = type?.toLowerCase() === "module";
@@ -341,7 +341,7 @@ export function composeWebDocument(input: WebComposeInput): string {
       }
       if (hasBareAttr(attrs, "defer")) {
         // Classic `defer` scripts run after parsing. Approximate that
-        // for the inlined copy with a DOMContentLoaded wrapper — the
+        // for the inlined copy with a DOMContentLoaded wrapper, the
         // one observable difference is that top-level declarations
         // become listener-local, so course content prefers body-end
         // script tags where plain inlining is exact.
@@ -364,7 +364,7 @@ export function composeWebDocument(input: WebComposeInput): string {
     const b64 = bytes !== undefined
       ? bytesToBase64(bytes)
       : bytesToBase64(new TextEncoder().encode(text));
-    // Rewrite the src ATTRIBUTE specifically — a bare string replace
+    // Rewrite the src ATTRIBUTE specifically, a bare string replace
     // could clobber an alt/title that happens to contain the same text.
     const escaped = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return tag.replace(
@@ -375,7 +375,7 @@ export function composeWebDocument(input: WebComposeInput): string {
 
   // Implicit CodePen-style composition of unreferenced root-level
   // files. Styles append after the markup (they still apply page-wide,
-  // and appending keeps them the "last word" in the cascade — the
+  // and appending keeps them the "last word" in the cascade, the
   // pane-CSS mental model); scripts append last so they run against
   // the fully parsed DOM, like CodePen's JS pane. Sorted for
   // deterministic ordering across runs.
@@ -478,7 +478,7 @@ export interface PreviewRunRequest {
  *     signal, so every test sentinel is captured first (postMessage is
  *     FIFO per source);
  *   - a document that never signals (infinite loop) trips a deadline
- *     that surfaces a hint and resolves — the next run replaces the
+ *     that surfaces a hint and resolves, the next run replaces the
  *     frozen frame.
  *
  * Never rejects: failures surface as stderr cells, matching the
@@ -532,7 +532,7 @@ export function runPreviewDocument(req: PreviewRunRequest): Promise<void> {
         req.emit({
           type: "stderr",
           content:
-            "The preview didn't finish within the time limit — a script may be stuck in a loop. " +
+            "The preview didn't finish within the time limit, a script may be stuck in a loop. " +
             "The preview stays live above; run again to replace it.",
         });
         finish();

@@ -9,7 +9,7 @@
 //   - Runtime  : CommonJS executor with 40+ shimmed Node.js modules
 //
 // We use almostnode directly (not `createRuntime`) because we're already
-// inside a same-origin Web Worker — the existing security model — so
+// inside a same-origin Web Worker, the existing security model, so
 // adding another layer of isolation (worker-inside-worker or a cross-
 // origin sandbox) buys nothing here.
 
@@ -18,7 +18,7 @@ import { VirtualFS, Runtime } from "almostnode";
 // ─── Console arg formatting ─────────────────────────────────────────
 //
 // Mirrors the formatter from the legacy javascript-worker.ts so output
-// in the playground UI is byte-compatible with the previous runtime —
+// in the playground UI is byte-compatible with the previous runtime,
 // no migration surprises for existing snippets.
 
 function jsonReplacer(_key: string, value: unknown): unknown {
@@ -60,7 +60,7 @@ export function normalizeVfsPath(p: string): string {
 
 /** Stage the given files into a freshly-created VirtualFS, returning the
  *  new VFS. Recreating per `prepare-fs` cleanly mirrors deletions and
- *  renames that happened in the UI — no stale entries linger. */
+ *  renames that happened in the UI, no stale entries linger. */
 export function stageFiles(
   files: Array<[string, Uint8Array]>,
   transformFile?: (
@@ -93,7 +93,7 @@ export function stageFiles(
 // We solve this by rewriting the *entry* file so its body executes
 // inside an async IIFE assigned to `module.exports`. The runtime then
 // returns the promise via `result.exports`, which the caller awaits
-// before reporting `done` — guaranteeing console writes flush in order.
+// before reporting `done`, guaranteeing console writes flush in order.
 
 const WRAP_PROLOGUE = "module.exports = (async () => {\n";
 const WRAP_EPILOGUE = "\n})();";
@@ -157,7 +157,7 @@ export async function runEntry(
 // `<CodeBlock>` and `<ChallengeCard>` on a /learn page (and every run in
 // a `<Playground>`) shares ONE worker instance per language via the
 // runtime registry. That means the worker's VirtualFS would, if reused,
-// persist files — including the entry file — from one block's run into
+// persist files, including the entry file, from one block's run into
 // the next. A single-file block that doesn't stage its own files would
 // then execute whatever entry the *previous* block left behind, so
 // running block B right after block A printed block A's output. (See the
@@ -193,7 +193,7 @@ export class AlmostNodeRunner {
   }
 
   /** Execute the entry file against a VirtualFS holding only this run's
-   *  files — the freshly-staged snapshot if `stage()` was called since
+   *  files, the freshly-staged snapshot if `stage()` was called since
    *  the last run, otherwise a brand-new empty FS.
    *
    *  `resolveEntrySource` is handed that VFS and returns the entry's

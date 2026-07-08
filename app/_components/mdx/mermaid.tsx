@@ -56,7 +56,7 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 // element reads as part of the DataSlope palette:
 //
 //   • Shapes use saturated brand fills (the 500 shade by default), and those
-//     fills are IDENTICAL in light and dark mode — no translucent or pastel
+//     fills are IDENTICAL in light and dark mode, no translucent or pastel
 //     variants. Only the *page-level* structure (connectors, free-floating
 //     titles, edge-label backdrops, the subtle subgraph surface) follows the
 //     surrounding light/dark page.
@@ -75,13 +75,13 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 //
 // Mermaid runs color math (khroma) over theme values and needs concrete colors,
 // so we resolve the brand tokens to hex at render time (brand.css stays the
-// source of truth) with literal fallbacks — BRAND_FALLBACKS, generated from
+// source of truth) with literal fallbacks, BRAND_FALLBACKS, generated from
 // brand.css at build time by scripts/build-brand-fallbacks.mjs.
 
 // Inter for regular text; JetBrains Mono for diagrams that are entirely code.
 // Inline <code> spans in flowchart labels are styled via mermaid.module.css; whole
-// class/ER diagrams (see isCodeDiagram) render in mono so Mermaid measures — and
-// therefore sizes the boxes — in the mono face. The CSS vars resolve in the DOM
+// class/ER diagrams (see isCodeDiagram) render in mono so Mermaid measures, and
+// therefore sizes the boxes, in the mono face. The CSS vars resolve in the DOM
 // (published on <html> by next/font in app/layout.tsx); the literal fallbacks
 // keep text measurement correct if a var is ever missing.
 const SANS =
@@ -91,7 +91,7 @@ const MONO =
 
 // Class diagrams (class names, fields, method signatures) and ER diagrams (tables,
 // typed columns, keys) are entirely code, so they render wholesale in mono. Other
-// types stay sans — flowcharts tag individual code spans with <code> instead, and
+// types stay sans, flowcharts tag individual code spans with <code> instead, and
 // state/sequence/mindmap/timeline labels are prose. Detected from the first line.
 function isCodeDiagram(chart: string): boolean {
   const first = chart
@@ -128,7 +128,7 @@ const WHEEL: ReadonlyArray<{ name: string; dark: boolean }> = [
 // brand blue; branches cycle a set of distinct blue shades so sibling sections
 // stay tellable apart. Every branch uses a *dark* shade (the 50-step ramp's
 // 650–850, which all clear WCAG AA body text against white) so the label can
-// always be white — no light fills with hard-to-read dark text. The shades
+// always be white, no light fills with hard-to-read dark text. The shades
 // alternate light/dark around the wheel to keep neighbouring sections distinct.
 const MINDMAP_ROOT = "--ds-blue-500";
 const MINDMAP_BRANCHES = [
@@ -155,7 +155,7 @@ function readBrand(): (token: string) => string {
 function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
   const c = readBrand();
 
-  // ── Shapes — brand fills, identical in light & dark, no borders ──────────
+  // ── Shapes, brand fills, identical in light & dark, no borders ──────────
   // The default node is brand blue. Every *BorderColor below is set equal to
   // its fill so borders never paint (adaptNodes also forces stroke-width:0).
   // `nodeText` is the theme default white; adaptNodes refines it per fill.
@@ -164,19 +164,19 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
   const dark = c("--ds-gray-900");
   const light = c("--ds-gray-50");
 
-  // ── Page-level structure — the only thing that follows light/dark ────────
+  // ── Page-level structure, the only thing that follows light/dark ────────
   // Connectors, free-floating titles/signals, edge-label backdrops, and the
   // subtle subgraph/cluster surface sit ON the page, so they track it.
   const pageText = isDark ? light : dark;
   const surface = isDark ? dark : c("--ds-white");
-  const line = c("--ds-gray-400"); // connectors — visible on light and dark
+  const line = c("--ds-gray-400"); // connectors, visible on light and dark
   const clusterFill = isDark ? c("--ds-gray-800") : c("--ds-gray-100");
   const lifeline = isDark ? c("--ds-gray-600") : c("--ds-gray-300");
 
-  // ── Notes — brand yellow (attention), dark text, both modes ──────────────
+  // ── Notes, brand yellow (attention), dark text, both modes ──────────────
   const noteFill = c("--ds-yellow-500");
 
-  // ── Categorical wheel (mindmaps / pie) — brand 500s, same in both modes ──
+  // ── Categorical wheel (mindmaps / pie), brand 500s, same in both modes ──
   // Mindmap sections aren't `.node`, so adaptNodes leaves them alone; set the
   // label color per hue here instead (white on the darker hues, dark on the
   // lighter ones).
@@ -197,13 +197,13 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
     // config which only governs text measurement.
     fontSize: "15px",
 
-    // Nodes (flowchart / class / state / ER) + sequence actors — border = fill
+    // Nodes (flowchart / class / state / ER) + sequence actors, border = fill
     primaryColor: nodeFill,
     primaryBorderColor: nodeFill,
     primaryTextColor: nodeText,
     nodeTextColor: nodeText,
 
-    // Secondary / tertiary — keep nodes brand blue; clusters get the surface
+    // Secondary / tertiary, keep nodes brand blue; clusters get the surface
     secondaryColor: nodeFill,
     secondaryBorderColor: nodeFill,
     secondaryTextColor: nodeText,
@@ -247,7 +247,7 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
     compositeTitleBackground: clusterFill,
     compositeBorder: clusterFill,
 
-    // ER diagrams — alternating attribute rows
+    // ER diagrams, alternating attribute rows
     attributeBackgroundColorOdd: clusterFill,
     attributeBackgroundColorEven: surface,
 
@@ -342,13 +342,13 @@ function snapToBrand(
 
 // After the SVG is in the DOM, make every flowchart node consistent with the
 // brand system:
-//   1. fill — snap to the nearest brand 500 by hue (so author pastels go bold);
+//   1. fill, snap to the nearest brand 500 by hue (so author pastels go bold);
 //      mindmap nodes instead get an all-blue shade keyed to their section.
-//   2. borders — removed from simple shapes (rect/circle/polygon/stadium); kept
+//   2. borders, removed from simple shapes (rect/circle/polygon/stadium); kept
 //      as a subtle 600 stroke only where it conveys structure: the cylinder lip
 //      (`outer-path`), inner bars (`line`), and class/state compartment
 //      `divider`s (which Mermaid draws in the fill color, i.e. invisible).
-//   3. label color — white, except near-black on yellow (and the two lightest
+//   3. label color, white, except near-black on yellow (and the two lightest
 //      mindmap blues) where white is unreadable.
 //   4. for labels containing an inline <code> span, grow the box so the mono
 //      face (styled via CSS) isn't clipped past Mermaid's measured size.
@@ -363,7 +363,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
   const pageBg = isDark ? c("--ds-gray-900") : c("--ds-white");
 
   // Edge labels sit on the page. Mermaid colors their text from the (white)
-  // node-text variable and gives them a translucent white backdrop — invisible
+  // node-text variable and gives them a translucent white backdrop, invisible
   // on a light page and against our "no translucent fills" rule. Recolor the
   // text to the page foreground and make the backdrop the opaque page surface
   // (so it just masks the connector behind the text).
@@ -414,7 +414,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
       if (fillHex) shape.style.setProperty("fill", fillHex, "important");
       // Keep a subtle 600 stroke only on shapes whose structure lives in the
       // outline (the cylinder lip / other `outer-path` shapes). Simple shapes
-      // get no border — their fill already shows the silhouette.
+      // get no border, their fill already shows the silhouette.
       if (shape.classList.contains("outer-path")) {
         shape.style.setProperty("stroke", stroke600, "important");
         shape.style.setProperty("stroke-width", "1.5px", "important");
@@ -425,8 +425,8 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     });
 
     // Inner `<line>` bars vary by diagram. Mindmap's default node appends a
-    // full-width `node-line-` rule under the label — an underline that fights
-    // the clean filled-pill look — so hide it. Elsewhere (e.g. subroutine side
+    // full-width `node-line-` rule under the label, an underline that fights
+    // the clean filled-pill look, so hide it. Elsewhere (e.g. subroutine side
     // rules) the line conveys structure, so keep it as a subtle 600 stroke.
     node.querySelectorAll<SVGElement>("line").forEach((ln) => {
       if (isMindmap) {
@@ -629,7 +629,7 @@ function MermaidFullscreen({
   // (rather than via `dangerouslySetInnerHTML`) and adapt it in the same pass.
   // Why not dangerouslySetInnerHTML: React owns that subtree, and under
   // StrictMode's double commit it re-asserts the *raw* multi-hue SVG over our
-  // adapted nodes after this ref has run — without re-firing the ref — so the
+  // adapted nodes after this ref has run, without re-firing the ref, so the
   // fullscreen copy reverts to Mermaid's default palette. Setting innerHTML
   // ourselves keeps the subtree outside React's reconciler, so the brand
   // snapping/borderless/white-label treatment sticks. `useCallback` keyed on
@@ -717,7 +717,7 @@ function MermaidFullscreen({
   // zoom level. The transform is left to pure translation for panning.
   //
   // Runs after every commit (not just on scale change) and via a layout
-  // effect so the size is reasserted before paint — pan re-renders must
+  // effect so the size is reasserted before paint, pan re-renders must
   // never leave the SVG at its natural size while `scale` says otherwise.
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -775,7 +775,7 @@ function MermaidFullscreen({
   );
 
   // Wheel zoom. Attach via ref + addEventListener so we can pass
-  // `passive: false` — React's onWheel is passive by default in newer
+  // `passive: false`, React's onWheel is passive by default in newer
   // versions and would warn on preventDefault.
   useEffect(() => {
     const viewport = viewportRef.current;

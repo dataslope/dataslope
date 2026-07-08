@@ -6,13 +6,13 @@ description: Where scientific Python goes when NumPy and SciPy aren't enough
 You now have the core scientific Python toolkit: NumPy, SciPy,
 matplotlib, and the numerical thinking to use them well. This
 final chapter is a map of where to go when those tools start to
-strain — when you need to be faster, work on bigger data, target
+strain, when you need to be faster, work on bigger data, target
 GPUs, or differentiate through your simulation.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="An abstract composition — three tilted bars in blue, green, and yellow sweep across a pale green disc, with a blue dot and a yellow dot floating at opposite corners — a bright send-off for the course"
+  aria-label="An abstract composition, three tilted bars in blue, green, and yellow sweep across a pale green disc, with a blue dot and a yellow dot floating at opposite corners, a bright send-off for the course"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -112,12 +112,12 @@ Numba shines when you have:
 - A function called millions of times
 - A willingness to stay in the *typed numeric* subset of Python
 
-For everything else, profile first — `cProfile` plus a flame graph
+For everything else, profile first, `cProfile` plus a flame graph
 will tell you whether you actually need a JIT.
 
 ## When you need a GPU: CuPy and JAX
 
-**CuPy** is "NumPy with a `.cu` underneath" — almost the same API
+**CuPy** is "NumPy with a `.cu` underneath", almost the same API
 running on NVIDIA GPUs. Drop-in replacement for many workflows:
 
 ```python
@@ -169,13 +169,13 @@ Jacobians, and Hessians for free.
 
 Applications go far beyond machine learning:
 
-- **Inverse problems** — fit physics models to data by gradient
+- **Inverse problems**, fit physics models to data by gradient
   descent on the simulator
-- **Optimal control** — differentiate through an ODE rollout to
+- **Optimal control**, differentiate through an ODE rollout to
   find the best control inputs
-- **Sensitivity analysis** — quantify how outputs change with
+- **Sensitivity analysis**, quantify how outputs change with
   inputs in high dimensions
-- **Variational inference** — gradient-based probabilistic
+- **Variational inference**, gradient-based probabilistic
   programming (`numpyro`, `pyro`, `blackjax`)
 
 ## When data is bigger than RAM: Dask and friends
@@ -191,7 +191,7 @@ you already know, so adopting it incrementally is realistic.
 ```
 
 **Xarray** adds *labeled* dimensions (time, latitude, etc.) to
-N-D arrays — the natural way to handle climate, geospatial, or
+N-D arrays, the natural way to handle climate, geospatial, or
 medical-imaging data without losing the axis semantics. It plays
 beautifully with Dask for out-of-core workflows.
 
@@ -238,14 +238,14 @@ hot numerical loop.
 Sometimes the right answer is "use a different language for the
 hot kernel". Three high-quality options:
 
-- **Julia** — designed from the ground up for scientific
+- **Julia**, designed from the ground up for scientific
   computing; JIT compiled, multiple dispatch, very strong ODE and
   optimization ecosystems (`DifferentialEquations.jl`,
   `JuMP.jl`).
-- **C++ via `pybind11`** — when you need ultimate control,
+- **C++ via `pybind11`**, when you need ultimate control,
   zero-cost abstractions, and access to mature libraries (Eigen,
   Boost).
-- **Rust via PyO3** — increasingly popular for fast,
+- **Rust via PyO3**, increasingly popular for fast,
   memory-safe extensions and for projects where parallelism and
   safety both matter.
 
@@ -310,7 +310,7 @@ Profile first, then apply the cheapest tool that fixes the actual bottleneck.`}
 
 - Pure NumPy with finite-difference gradients
   > Finite-difference gradients require $O(n)$ extra simulator evaluations per gradient step and introduce truncation error; automatic differentiation gives exact gradients at a fraction of the cost.
-- [o] JAX, which provides automatic differentiation, JIT compilation, and a NumPy-compatible API — so gradients of arbitrary simulations come "for free"
+- [o] JAX, which provides automatic differentiation, JIT compilation, and a NumPy-compatible API, so gradients of arbitrary simulations come "for free"
   > The whole point of JAX (and frameworks like PyTorch) is to remove the need to derive gradients manually or approximate them with finite differences. You write the forward simulator in \`jax.numpy\`, wrap with \`grad\`, and you have exact, fast derivatives suitable for high-dimensional optimization or inference.
 - SymPy, which symbolically integrates the ODE
   > SymPy can solve simple ODEs symbolically, but a physics simulator with complex dynamics generally has no closed-form solution; SymPy cannot differentiate through a numerical simulator.

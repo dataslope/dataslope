@@ -1,6 +1,6 @@
 ---
-title: HTML — Structure of a Page
-description: Elements, tags, nesting, and the skeleton every page shares — doctype, head, and body.
+title: "HTML: Structure of a Page"
+description: Elements, tags, nesting, and the skeleton every page shares, doctype, head, and body.
 ---
 
 HTML (*HyperText Markup Language*) describes what the parts of a page
@@ -23,7 +23,7 @@ An element is usually a pair of tags wrapped around some content:
   job is describing structure.
 
 Elements **nest**: a list contains list items, a paragraph can contain
-emphasized text. Nesting must be properly contained — close inner
+emphasized text. Nesting must be properly contained, close inner
 elements before outer ones.
 
 A few elements have no content and no closing tag, like `<img>` (an
@@ -59,7 +59,7 @@ Reading top to bottom:
 - `<!doctype html>` tells the browser "this is modern HTML". Every
   page starts with it.
 - `<html>` wraps the entire document.
-- `<head>` holds information *about* the page — its `<title>` (shown
+- `<head>` holds information *about* the page, its `<title>` (shown
   in the browser tab), stylesheets, and metadata. Nothing in the head
   is rendered on the page itself.
 - `<body>` holds everything you actually see.
@@ -67,7 +67,7 @@ Reading top to bottom:
 Notice the heading levels: one `<h1>` for the page's main title, then
 `<h2>` for its sections (there are also `<h3>`–`<h6>` for deeper
 levels). Heading structure is how screen readers and search engines
-understand your page's outline — use levels for *hierarchy*, never
+understand your page's outline, use levels for *hierarchy*, never
 for font size.
 
 ## Whitespace mostly doesn't matter
@@ -125,7 +125,7 @@ Keep the \`<!doctype html>\`, \`<head>\`, and \`<body>\` skeleton that's already
       name: "There is exactly one <h1>, titled Pancakes",
       code: `const h1s = document.querySelectorAll("h1");
 if (h1s.length !== 1) {
-  throw new Error("Use exactly one <h1> on the page — found " + h1s.length + ".");
+  throw new Error("Use exactly one <h1> on the page, found " + h1s.length + ".");
 }
 if (!/pancakes/i.test(h1s[0].textContent || "")) {
   throw new Error("The <h1> should contain the word 'Pancakes'.");

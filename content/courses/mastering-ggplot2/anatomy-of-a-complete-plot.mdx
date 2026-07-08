@@ -3,14 +3,14 @@ title: Anatomy of a Complete Plot
 description: Revisit the intimidating plot from the welcome page and decompose it, component by component, now that you know the whole grammar.
 ---
 
-Remember the plot on the welcome page — the one we said would feel
+Remember the plot on the welcome page, the one we said would feel
 "inevitable" by the end? It is time. You now know every component it
 uses. Let us dissect it and prove the grammar has become second nature.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A finished plot pulled apart at the seams — yellow title, thin axes with ticks, a panel of blue points crossed by a solid green trend, and a floating legend card — every component of a complete plot"
+  aria-label="A finished plot pulled apart at the seams, yellow title, thin axes with ticks, a panel of blue points crossed by a solid green trend, and a floating legend card, every component of a complete plot"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -98,7 +98,7 @@ doing one job.
 ## Predicting behavior from the grammar
 
 Because you understand the components, you can *predict* what edits
-would do — without running them. Test yourself, then run to confirm.
+would do, without running them. Test yourself, then run to confirm.
 
 <CodeBlock
   adapter="r"
@@ -121,8 +121,8 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
 
 If you predicted **one** smoother per panel (instead of one per
 drivetrain), you have internalized layer-scoped mappings. The points
-are still colored by `drv`, but the smoother — no longer seeing
-`color` — fits a single line to each panel's data.
+are still colored by `drv`, but the smoother, no longer seeing
+`color`, fits a single line to each panel's data.
 
 ## Building it up, not writing it whole
 
@@ -161,7 +161,7 @@ p + facet_wrap(~class)
   ]}
 />
 
-This incremental rhythm — *add a component, look, add another* — is the
+This incremental rhythm, *add a component, look, add another*, is the
 natural way to work in a grammar where plots are built by addition. It
 also makes debugging trivial: if something breaks, it is almost always
 the component you just added.
@@ -209,8 +209,8 @@ component by component and check as you go.`}
 ## Key takeaways
 
 - Any complete ggplot decomposes cleanly into **data, mappings, geoms,
-  stats, scales, facets, labels, and theme** — you can now name each.
+  stats, scales, facets, labels, and theme**, you can now name each.
 - Understanding components lets you **predict** the effect of an edit
   (e.g. moving a mapping into one layer) before running it.
-- Build complex plots **incrementally** — add a component, view, repeat
-  — which mirrors the grammar and makes debugging easy.
+- Build complex plots **incrementally**, add a component, view, repeat,
+which mirrors the grammar and makes debugging easy.

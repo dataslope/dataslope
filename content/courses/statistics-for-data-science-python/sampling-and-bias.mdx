@@ -1,11 +1,11 @@
 ---
 title: Sampling and Bias
-description: How we choose samples and how sampling goes wrong — random, stratified, cluster, systematic, and convenience sampling, the classic biases that ruin inference, and the all-important distinction between bias and variance.
+description: How we choose samples and how sampling goes wrong, random, stratified, cluster, systematic, and convenience sampling, the classic biases that ruin inference, and the all-important distinction between bias and variance.
 ---
 
 In *Populations and Samples* we drew samples with `rng.normal(...)` and
 quietly assumed each one *represented* the population. This page is about
-that assumption — the one that licenses everything else in the course.
+that assumption, the one that licenses everything else in the course.
 **How you pick the sample decides whether your estimate is honest.** Pick
 it well and a few thousand observations can speak for millions. Pick it
 badly and a *million* observations can still point you confidently in the
@@ -14,13 +14,13 @@ wrong direction.
 That last sentence is the whole point, and it surprises people: more data
 does not rescue a badly chosen sample. A flawed sampling method bakes in
 an error that *no amount of extra rows removes*. Learning to see that
-error — and to choose samples that avoid it — is one of the highest-value
+error, and to choose samples that avoid it, is one of the highest-value
 skills in applied statistics.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A well-mixed field of blue and green dots is sampled by a yellow scoop that covers only one green-heavy corner, filling the tray with an unbalanced handful whose red estimate lands away from the yellow truth mark — a biased scoop stays wrong no matter how much it scoops"
+  aria-label="A well-mixed field of blue and green dots is sampled by a yellow scoop that covers only one green-heavy corner, filling the tray with an unbalanced handful whose red estimate lands away from the yellow truth mark, a biased scoop stays wrong no matter how much it scoops"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="40" y="24" width="400" height="176" rx="16" fill="var(--ds-blue-500)" fillOpacity="0.06" />
@@ -93,7 +93,7 @@ skills in applied statistics.
 
 Almost every method in this course assumes your sample is a *fair draw*
 from the population. Confidence intervals, p-values, the central limit
-theorem — all of them are statements about what happens when you sample
+theorem, all of them are statements about what happens when you sample
 **randomly**. Randomness is not a nicety here; it is the mathematical
 contract that connects the sample you have to the population you care
 about.
@@ -109,8 +109,8 @@ flowchart TD
 
 When the sampling mechanism is random, the laws of probability take over
 and let you say *how close* your estimate is to the truth. When it isn't
-random — when the sample is chosen by convenience, by who volunteered, or
-by who survived — those laws no longer apply, and your tidy confidence
+random, when the sample is chosen by convenience, by who volunteered, or
+by who survived, those laws no longer apply, and your tidy confidence
 interval is quietly measuring the wrong thing.
 
 <Callout type="info" title="The word that does all the work: representative">
@@ -141,20 +141,20 @@ flowchart TD
   the math assumes. In code it's `rng.choice(population, size=n,
   replace=False)`.
 - **Stratified sampling.** Split the population into non-overlapping
-  groups (*strata*) — say age bands or regions — then sample *within
+  groups (*strata*), say age bands or regions, then sample *within
   each* stratum, usually in proportion to its size. Because you guarantee
   every group is represented, stratification removes the risk of a random
   draw accidentally missing a subgroup, and it usually gives a *more
   precise* estimate than SRS.
 - **Cluster sampling.** Split the population into many small groups
-  (*clusters*) — city blocks, schools, stores — then randomly pick whole
+  (*clusters*), city blocks, schools, stores, then randomly pick whole
   clusters and measure *everyone* in the chosen ones. It's cheaper when
   units are geographically scattered, at the cost of some precision.
 - **Systematic sampling.** Order the population, pick a random starting
-  point, then take every `k`-th unit. Simple and often fine — but
+  point, then take every `k`-th unit. Simple and often fine, but
   dangerous if the ordering has a hidden cycle that lines up with `k`.
 
-<Callout type="tip" title="Stratified vs cluster — don't mix them up">
+<Callout type="tip" title="Stratified vs cluster, don't mix them up">
 Both split the population into groups, but they do opposite things.
 **Stratified**: sample *within every* group (you want all groups
 represented) → more precise. **Cluster**: randomly choose *some* whole
@@ -167,7 +167,7 @@ Stratified divides to include; cluster divides to economize.
 **Convenience sampling** means taking whoever is easiest to reach: the
 users who happened to be online, the customers who answered the phone,
 the friends you texted. There's no random mechanism, so the chance of
-being selected is unknown and unequal — and almost always *correlated
+being selected is unknown and unequal, and almost always *correlated
 with the thing you're measuring*. That correlation is what turns "easy"
 into "wrong."
 
@@ -211,7 +211,7 @@ print("The convenience sample is systematically too optimistic.")
   ]}
 />
 
-The random sample misses the truth by a little — that's ordinary sampling
+The random sample misses the truth by a little, that's ordinary sampling
 *noise*, and it shrinks if you collect more. The convenience sample
 misses by a lot *in a consistent direction*: it overstates satisfaction
 because happy customers were overrepresented. That consistent,
@@ -276,14 +276,14 @@ print("Convenience estimate converges to a WRONG value and stays there.")
 />
 
 Watch the two lines. The random estimate homes in on the dashed truth
-line as `n` grows. The convenience estimate also *stabilizes* — but on the
+line as `n` grows. The convenience estimate also *stabilizes*, but on the
 wrong value. At `n = 100,000` the biased estimate is rock-steady and
 badly wrong. It looks precise; it is precisely misleading.
 
 <Callout type="danger" title="Misconception: 'we have tons of data, so it must be accurate'">
 Sample **size** controls *noise* (variance); sampling **method** controls
 *bias*. A huge sample with a biased method is a high-confidence wrong
-answer — arguably worse than a small honest one, because its size *feels*
+answer, arguably worse than a small honest one, because its size *feels*
 authoritative. The famous 1936 *Literary Digest* poll mailed **2.4
 million** responses and still called the U.S. presidential election
 wrong, because its list (car and telephone owners during the Depression)
@@ -295,11 +295,11 @@ oversampled the wealthy. Size did not save it. Method sinks it.
 Every estimate misses the truth in two fundamentally different ways, and
 keeping them separate is one of the most important habits in statistics.
 
-- **Bias** is a *systematic* miss — the estimate is centered on the wrong
+- **Bias** is a *systematic* miss, the estimate is centered on the wrong
   value. Averaging many biased samples does **not** converge to the truth.
   Bias comes from *how you sample* (or how you measure). **You cannot fix
   it with more data.**
-- **Variance** is a *random* miss — the estimate scatters around its
+- **Variance** is a *random* miss, the estimate scatters around its
   center from sample to sample. Variance comes from *finite sample size*.
   **You fix it with more data** (it shrinks like `1/√n`).
 
@@ -327,7 +327,7 @@ instinct for bias.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two dartboards: on the left a loose blue cluster centered on the yellow bullseye, on the right a tight red cluster parked stubbornly away from it — noisy but honest beats consistent but wrong, because more darts tighten a cluster yet never move its center"
+  aria-label="Two dartboards: on the left a loose blue cluster centered on the yellow bullseye, on the right a tight red cluster parked stubbornly away from it, noisy but honest beats consistent but wrong, because more darts tighten a cluster yet never move its center"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5">
@@ -408,7 +408,7 @@ print("As n grows: SPREAD shrinks for both, but the convenience BIAS stays.")
 />
 
 Run it and compare the rows. Going from `n=200` to `n=5000` shrinks the
-*spread* of both methods dramatically — that's variance falling. But the
+*spread* of both methods dramatically, that's variance falling. But the
 convenience method's *bias* (its center minus the truth) barely budges.
 Variance is a sample-size problem; bias is a method problem. They do not
 trade off, and one will not fix the other.
@@ -423,7 +423,7 @@ trade off, and one will not fix the other.
 - The estimate is both unbiased and precise, since a full year covers all customer types
   > Running longer collects more *opt-in* responses, not a representative cross-section. Duration doesn't convert a self-selected sample into a random one.
 - The extra data makes the estimate worse than a small sample would be in every respect
-  > The extra data genuinely reduces variance, so it's not worse in *every* respect — it's just that the dominant error (bias) is untouched, so the precision is misleading.
+  > The extra data genuinely reduces variance, so it's not worse in *every* respect, it's just that the dominant error (bias) is untouched, so the precision is misleading.
 
 The fix for self-selection bias is a better sampling mechanism, not a bigger self-selected sample.`}
 />
@@ -456,15 +456,15 @@ flowchart TD
   silently dropping the ones that failed. This one is so important and so
   sneaky it gets its own section.
 - **Undercoverage.** Part of the population has *no chance* of being
-  sampled at all — e.g., a web-only survey excludes everyone offline.
+  sampled at all, e.g., a web-only survey excludes everyone offline.
 
 <Callout type="warn" title="Misconception: 'random' means 'haphazard' or 'whatever's handy'">
-In everyday speech "random" means casual or arbitrary — *"I grabbed a
+In everyday speech "random" means casual or arbitrary, *"I grabbed a
 random sample of reviews."* In statistics, **random sampling is the
 opposite of haphazard**: it requires a deliberate chance mechanism (a
 random number generator, a lottery, `rng.choice`) where each unit's
 probability of selection is *known and controlled*. Grabbing whatever's
-convenient is precisely *not* random — it's a convenience sample, the
+convenient is precisely *not* random, it's a convenience sample, the
 thing that produces bias.
 </Callout>
 
@@ -472,13 +472,13 @@ thing that produces bias.
 
 In World War II, the statistician Abraham Wald was asked where to add
 armor to bombers. The military had data on returning planes and mapped
-where they were riddled with bullet holes — concentrated on the wings and
+where they were riddled with bullet holes, concentrated on the wings and
 fuselage. The obvious move: armor the spots with the most holes.
 
 Wald saw the trap. The data came *only from planes that returned*. The
-planes hit in the engines and cockpit weren't in the dataset — they
+planes hit in the engines and cockpit weren't in the dataset, they
 **didn't come back**. The holes showed where a plane could be hit and
-*survive*. The armor belonged on the *undamaged* areas — the places that,
+*survive*. The armor belonged on the *undamaged* areas, the places that,
 when hit, were fatal.
 
 ```mermaid
@@ -491,7 +491,7 @@ flowchart TD
 
 Survivorship bias is everywhere in business data. Mutual-fund
 performance tables look fantastic partly because funds that did badly get
-*closed and removed* from the database — you're seeing only the
+*closed and removed* from the database, you're seeing only the
 survivors. "Successful founders dropped out of college" ignores the vast
 graveyard of dropouts whose startups failed and who were never
 interviewed. Any time your dataset is "the ones still here," ask what the
@@ -500,7 +500,7 @@ interviewed. Any time your dataset is "the ones still here," ask what the
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A top-view bomber silhouette speckled with red bullet holes along its wings and tail while a yellow ring marks the untouched nose — the holes only show where planes survived being hit, and the clean spot is where the lost planes were struck"
+  aria-label="A top-view bomber silhouette speckled with red bullet holes along its wings and tail while a yellow ring marks the untouched nose, the holes only show where planes survived being hit, and the clean spot is where the lost planes were struck"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M 320 28 C 332 40 330 60 330 80 L 330 102 L 424 132 L 424 154 L 332 134 L 332 168 L 364 184 L 364 200 L 322 192 L 280 200 L 280 184 L 312 168 L 312 134 L 220 154 L 220 132 L 314 102 L 314 80 C 314 60 312 40 320 28 Z" fill="currentColor" opacity="0.15" />
@@ -554,21 +554,21 @@ print("The database looks better than reality because the losers are gone.")
 
 The survivors' average is inflated not because the funds got better, but
 because the bad ones were *deleted from the dataset*. No statistical test
-on the surviving funds can recover the truth — the missing data is missing
+on the surviving funds can recover the truth, the missing data is missing
 in a *systematic*, outcome-dependent way. Survivorship bias is a missing
 data problem disguised as a sampling problem.
 
 <MultipleChoice
   markdown={`A fitness app reports that users who've been active for **2+ years** lost an average of 18 pounds. The marketing team wants to claim "our app helps people lose 18 pounds." What's the core problem?
 
-- Nothing — long-term users are the most reliable evidence of effectiveness
+- Nothing, long-term users are the most reliable evidence of effectiveness
   > Long-term users are exactly the ones for whom the app *worked*; people who saw no results tend to quit. Looking only at them is survivorship bias.
 - The sample is too small to generalize
   > The issue isn't size. Even with millions of 2-year users, conditioning on "still active" filters out everyone the app didn't help.
 - [o] It's survivorship bias: people for whom the app didn't work mostly quit, so the surviving long-term users overstate the typical effect
   > Restricting to people who *stuck around* selects for success and silently drops the dropouts, inflating the apparent benefit relative to a typical new user.
 - The 18-pound figure must be a measurement error
-  > The number can be perfectly measured among survivors and still mislead, because the survivors are a non-representative slice — the bias is in *who's counted*, not in the measurement.
+  > The number can be perfectly measured among survivors and still mislead, because the survivors are a non-representative slice, the bias is in *who's counted*, not in the measurement.
 
 To estimate the app's typical effect, you'd need everyone who started, including the people who left.`}
 />
@@ -589,8 +589,8 @@ implements stratified sampling and checks that it estimates the true mean.
 
 To separate *bias* from *noise*, draw **each** method **300 times** at sample size \`n = 800\`, recording the mean of every sample. Then compute a dict named \`result\` with:
 
-- \`"random_bias"\` — (mean of the 300 random-sample means) minus \`true_mean\` (a float)
-- \`"conv_bias"\` — (mean of the 300 convenience-sample means) minus \`true_mean\` (a float)
+- \`"random_bias"\`, (mean of the 300 random-sample means) minus \`true_mean\` (a float)
+- \`"conv_bias"\`, (mean of the 300 convenience-sample means) minus \`true_mean\` (a float)
 
 Use the provided \`rng\` for all draws. Both values must be plain Python floats. The convenience bias should be clearly positive (the method systematically overestimates); the random bias should be near zero.`}
   files={[
@@ -682,8 +682,8 @@ Implement **proportional stratified sampling** to estimate the overall mean with
 
 Produce:
 
-- \`strat_estimate\` — the pooled mean spend of your stratified sample (a float).
-- \`abs_error\` — \`abs(strat_estimate - true_mean)\` (a float).
+- \`strat_estimate\`, the pooled mean spend of your stratified sample (a float).
+- \`abs_error\`, \`abs(strat_estimate - true_mean)\` (a float).
 
 The estimate should land close to \`true_mean\` (within about 30).`}
   files={[
@@ -766,7 +766,7 @@ The three regions have very different mean spend (120 vs 200 vs 320). A
 *simple* random sample could, by bad luck, grab too few high-spending West
 customers and skew low. Proportional stratification **guarantees** each
 region appears in its correct proportion, eliminating that source of
-variability. Same honesty as SRS, usually better precision — which is why
+variability. Same honesty as SRS, usually better precision, which is why
 pollsters and survey teams stratify by design.
 </Callout>
 
@@ -776,19 +776,19 @@ pollsters and survey teams stratify by design.
   enrollment, and any time your data is collected by *who shows up*. These
   are exactly the situations where self-selection and nonresponse creep
   in.
-- **It's subtler but still critical** for "found" data — server logs, CRM
+- **It's subtler but still critical** for "found" data, server logs, CRM
   exports, scraped data. Ask: *who or what is missing from this table, and
   is their absence related to what I'm measuring?* (That question catches
   survivorship and undercoverage.)
 - **It matters less** when you genuinely observe the whole population (a
-  true census) — but then ask whether your "population" is really the one
+  true census), but then ask whether your "population" is really the one
   you care about, or just the slice your systems happen to log.
 
 <Callout type="danger" title="The two-sentence summary of this page">
 **Variance is a sample-size problem you fix with more data. Bias is a
 sampling-method problem you cannot fix with any amount of data.** When an
 estimate feels off, your first question shouldn't be "do I have enough
-rows?" — it should be "*how was this sample selected, and who's missing?*"
+rows?", it should be "*how was this sample selected, and who's missing?*"
 </Callout>
 
 ## Check your understanding
@@ -797,7 +797,7 @@ rows?" — it should be "*how was this sample selected, and who's missing?*"
   markdown={`Which scenario describes **bias** rather than **variance**?
 
 - A poll of 50 random voters gives a wide margin of error
-  > A wide margin from a small *random* sample is variance — it shrinks as you add more randomly chosen voters. The estimate is still centered on the truth.
+  > A wide margin from a small *random* sample is variance, it shrinks as you add more randomly chosen voters. The estimate is still centered on the truth.
 - Two random samples from the same population give slightly different means
   > Sample-to-sample fluctuation around the true value is the definition of variance, not bias. Neither estimate is systematically off.
 - [o] An opt-in web survey consistently overestimates customer satisfaction no matter how many responses come in
@@ -812,7 +812,7 @@ Bias is a *systematic, directional* error tied to method; variance is *random sc
   markdown={`A data scientist says: "Our sample of 5 million log events is so large that it's basically the whole population, so there's no sampling concern." When is this reasoning **most dangerous**?
 
 - When the 5 million events are a true random draw from all events
-  > A genuine random draw of 5 million is both large *and* unbiased — exactly the safe case. The reasoning isn't dangerous here.
+  > A genuine random draw of 5 million is both large *and* unbiased, exactly the safe case. The reasoning isn't dangerous here.
 - When all events are identical
   > If events were identical there'd be no variability to worry about at all, so the reasoning, while odd, wouldn't mislead.
 - [o] When the 5 million events come only from a non-representative subgroup (e.g., only logged-in power users)
@@ -820,14 +820,14 @@ Bias is a *systematic, directional* error tied to method; variance is *random sc
 - When the events were collected over a full calendar year
   > A full year is generally a *plus* for coverage. The danger is non-representativeness of *who/what* generates the events, not the time span.
 
-"Big data" removes variance, not bias — a non-representative billion is still non-representative.`}
+"Big data" removes variance, not bias, a non-representative billion is still non-representative.`}
 />
 
 <MultipleChoice
   markdown={`You want to estimate average household income in a country with distinct regions of differing wealth, and you want to *guarantee* every region is represented in proportion to its population. Which method fits best?
 
 - Convenience sampling at the busiest train station
-  > A single location oversamples commuters from nearby (likely wealthier) areas and guarantees no representation — the opposite of what's wanted.
+  > A single location oversamples commuters from nearby (likely wealthier) areas and guarantees no representation, the opposite of what's wanted.
 - [o] Stratified sampling with regions as strata, sampling each in proportion to its size
   > Defining regions as strata and sampling each proportionally guarantees representation and typically improves precision over a simple random sample.
 - Systematic sampling from an alphabetical list of surnames
@@ -844,20 +844,20 @@ When you must ensure subgroups appear in their true proportions, stratify on tho
 - Nonresponse bias, fixable by following up with fund managers
   > Funds aren't *declining to respond*; the poor performers were closed and removed. That's survivorship, not nonresponse, and following up can't resurrect delisted funds.
 - Selection bias, fixable by sampling more current funds
-  > More *current* funds repeats the same filter — they're all survivors. Adding survivors can't represent the funds that already vanished.
+  > More *current* funds repeats the same filter, they're all survivors. Adding survivors can't represent the funds that already vanished.
 - [o] Survivorship bias, and a larger database of surviving funds cannot fix it because the failed funds are systematically absent
   > The database only contains funds that lasted; the underperformers were delisted, so the missing data is outcome-dependent and no quantity of survivors recovers it.
 - Pure variance, fixable by averaging over more years
   > This is a systematic, directional inflation from missing failures, not random scatter. Averaging more years of *survivor* data won't remove it.
 
-Survivorship bias is missing data tied to the outcome — more of the same survivors won't undo it.`}
+Survivorship bias is missing data tied to the outcome, more of the same survivors won't undo it.`}
 />
 
 <MultipleChoice
   markdown={`Why does **random** sampling (a deliberate chance mechanism) license statistical inference, while **haphazard** convenience sampling does not?
 
 - Because random samples are always larger than convenience samples
-  > Size isn't the distinction — a convenience sample can be huge and a random sample small. The difference is the *mechanism* of selection, not its size.
+  > Size isn't the distinction, a convenience sample can be huge and a random sample small. The difference is the *mechanism* of selection, not its size.
 - [o] Because a known random mechanism gives every unit a known selection probability, which is what the math of inference (margins of error, p-values) is built on
   > Inference theory assumes selection probabilities are known and unrelated to the measured outcome; a random mechanism provides exactly that, so the resulting error formulas are valid.
 - Because convenience samples always contain measurement errors
@@ -865,18 +865,18 @@ Survivorship bias is missing data tied to the outcome — more of the same survi
 - Because random samples never contain bias of any kind
   > Random sampling controls *selection* bias, but other biases (e.g., a badly worded question, or nonresponse) can still intrude. Its key virtue is the known selection probability.
 
-The chance mechanism — not effort or size — is what connects the sample to the population mathematically.`}
+The chance mechanism, not effort or size, is what connects the sample to the population mathematically.`}
 />
 
 <Callout type="success" title="Key takeaways">
 - **How you sample** decides whether inference is honest; the math assumes a random mechanism.
 - **Probability methods** (simple random, stratified, cluster, systematic) give every unit a known selection chance. **Convenience sampling** does not, and usually introduces bias.
-- **Bias** is a systematic, directional miss from *method* — it does **not** shrink with more data. **Variance** is random scatter from *sample size* — it **does** shrink (like `1/√n`).
+- **Bias** is a systematic, directional miss from *method*, it does **not** shrink with more data. **Variance** is random scatter from *sample size*, it **does** shrink (like `1/√n`).
 - Classic biases: **selection**, **self-selection**, **nonresponse**, **survivorship**, **undercoverage**. Always ask *who is missing*.
 - A bigger biased sample is a *more confident wrong answer*. "Random" means a deliberate chance mechanism, never "haphazard."
 </Callout>
 
 With an honest sample in hand, we can finally study how a *statistic*
-behaves across many such samples. That's *Sampling Distributions* — the
+behaves across many such samples. That's *Sampling Distributions*, the
 single most important idea in the course, and the bridge to the *Central
 Limit Theorem*, *Standard Error*, and *Confidence Intervals*.

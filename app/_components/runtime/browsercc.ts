@@ -20,7 +20,7 @@
 // We load both libraries from a CDN at runtime:
 //   * browsercc pulls its own siblings (`clang.wasm`, `lld.wasm`,
 //     `sysroot.tar`, ...) relative to `import.meta.url`, so importing
-//     `index.js` from jsDelivr is enough — every other artefact is
+//     `index.js` from jsDelivr is enough, every other artefact is
 //     resolved against the same jsDelivr path automatically.
 //   * `@bjorn3/browser_wasi_shim` is pure JavaScript with no extra
 //     assets, so we just import its ESM bundle from esm.sh.

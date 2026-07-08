@@ -16,7 +16,7 @@ were actually building.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Raw numbers enter a mapping machine through a slot and come out as visual marks — a dot, a bar, and a wedge — visualization as a systematic encoding of data"
+  aria-label="Raw numbers enter a mapping machine through a slot and come out as visual marks, a dot, a bar, and a wedge, visualization as a systematic encoding of data"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -81,7 +81,7 @@ about how to translate columns of data into ink (or pixels).
 
 ### Visual
 
-Visualization is specifically about the **visual** system — the
+Visualization is specifically about the **visual** system, the
 parts of the brain that process light, edges, motion, color, and
 shape. We are using this *biological hardware* because it is
 extraordinarily fast and parallel. A human can detect that one bar
@@ -113,7 +113,7 @@ Sharpening the definition helps. Here are some things that look
 like visualization but aren't, or aren't quite:
 
 - **A photograph** is not a data visualization. It is a visual
-  *recording*, but it doesn't encode abstract data — it captures
+  *recording*, but it doesn't encode abstract data, it captures
   what was there.
 - **A logo or an icon** is not a data visualization. It is a
   pictogram or branding element.
@@ -122,7 +122,7 @@ like visualization but aren't, or aren't quite:
   structure is still rows of numbers, not a visual representation.
   It's a useful borderline case.
 - **A diagram explaining a process** (like a flowchart or a
-  network diagram) is a visualization, but a different kind —
+  network diagram) is a visualization, but a different kind,
   it visualizes *relationships*, not *data values*. We sometimes
   call these "diagrammatic" or "schematic" visualizations.
 - **A 3-D rendering of a building** is a visualization of the
@@ -136,7 +136,7 @@ encoding *measurements* into *visual properties* of a 2-D picture.
 ## A live example: same data, different visualizations
 
 Watch what changes when the same five numbers are shown in three
-different ways. Each is a legitimate visualization — and each
+different ways. Each is a legitimate visualization, and each
 answers slightly different questions.
 
 <CodeBlock
@@ -160,7 +160,7 @@ fig1 = px.bar(
     x="fruit",
     y="sales",
     template="simple_white",
-    title="Bar — compare exact values",
+    title="Bar, compare exact values",
 )
 fig1.show()
 
@@ -170,7 +170,7 @@ fig2 = px.pie(
     names="fruit",
     values="sales",
     template="simple_white",
-    title="Pie — show parts of total",
+    title="Pie, show parts of total",
 )
 fig2.show()
 
@@ -180,7 +180,7 @@ fig3 = px.scatter(
     x="fruit",
     y="sales",
     template="simple_white",
-    title="Dot — minimalist comparison",
+    title="Dot, minimalist comparison",
 )
 fig3.update_traces(marker_size=15)
 fig3.show()
@@ -196,7 +196,7 @@ The data is identical in all three charts. But:
 - The **pie chart** invites you to compare *shares of the whole*.
   Apple is "about a third" of total sales.
 - The **dot chart** is the same idea as the bar but with less
-  visual weight per data point — useful when you have many
+  visual weight per data point, useful when you have many
   categories.
 
 The data does not change. The *encoding* changes, and so the
@@ -210,7 +210,7 @@ If you take only one thing from this page, take this:
 > into a visual representation, made to answer a specific question
 > for a specific audience.**
 
-That sentence — boring as it is — will protect you from most of the
+That sentence, boring as it is, will protect you from most of the
 mistakes beginners make. Whenever you find yourself making a chart,
 stop and ask:
 
@@ -228,13 +228,13 @@ When all four are clear, the chart almost makes itself.
   markdown={`According to the definition used in this course, which of these is the **clearest example of a data visualization**?
 
 - A photograph of a sunset.
-  > A photograph is a visual recording of light at a moment in time. It does not encode abstract data into visual properties to answer a question — it captures what was physically present.
+  > A photograph is a visual recording of light at a moment in time. It does not encode abstract data into visual properties to answer a question, it captures what was physically present.
 - A company logo.
   > A logo is a branding element that conveys identity, not an encoding of numerical or categorical data. There is no data→visual mapping and no analytical question being answered.
 - [o] A bar chart of monthly revenue for a small business.
-  > The bar chart **encodes** numerical data (revenue) into a visual property (bar height) to help a viewer **answer questions** ("which month was best?", "is there a trend?"). All three pieces of the definition — encoding, visual representation, answering a question — are present.
+  > The bar chart **encodes** numerical data (revenue) into a visual property (bar height) to help a viewer **answer questions** ("which month was best?", "is there a trend?"). All three pieces of the definition, encoding, visual representation, answering a question, are present.
 - A 3-D rendering of a planned building.
-  > A 3-D architectural rendering visualizes the building itself — its physical form and appearance — rather than encoding abstract measurements about the building. It represents a physical thing, not a dataset.
+  > A 3-D architectural rendering visualizes the building itself, its physical form and appearance, rather than encoding abstract measurements about the building. It represents a physical thing, not a dataset.
 
 The bar chart is a textbook statistical visualization. The other three are visual artifacts, but not visualizations of *data* in the analytic sense.`}
 />
@@ -245,7 +245,7 @@ The bar chart is a textbook statistical visualization. The other three are visua
 - It applies a password to the chart file.
   > Encryption is a data-security concept that has nothing to do with how charts represent information. "Encoding" in visualization means mapping data values to visual properties so the eye can perceive them.
 - It uses statistical formulas internally.
-  > Some chart types do involve statistical computation (e.g., a box plot computes quartiles, a histogram computes bin counts), but "encoding" specifically refers to the mapping from data values to visual properties — position, length, color, and so on.
+  > Some chart types do involve statistical computation (e.g., a box plot computes quartiles, a histogram computes bin counts), but "encoding" specifically refers to the mapping from data values to visual properties, position, length, color, and so on.
 - [o] It maps columns of data to visual properties such as position, length, color, size, or shape.
   > "Encoding" is the term for the *rules* of the map between data and image. **x="year"** is an encoding: it maps the **year** column to horizontal position. Every choice you make in **px.bar(...)** or **px.scatter(...)** is an encoding decision.
 - It compresses the data.
@@ -260,9 +260,9 @@ Encoding is the central design act of visualization. We'll devote a whole chapte
 - The chart is technically broken.
   > A technically correct chart can still fail as a visualization if it was built without a clear question. Rendering without errors does not mean the chart communicates anything useful.
 - The data is wrong.
-  > Wrong data would produce a chart that makes incorrect claims, not one that makes no claim at all. A chart without a takeaway suggests the underlying problem is conceptual — no question was defined — not that the data is erroneous.
-- [o] The chart was created without a clear question in mind — so even if it's pretty, it isn't really *doing* anything as a visualization.
-  > A chart without a question is decoration. Beauty is not enough — the chart has to *help someone reason*. This is one of the most common mistakes in business dashboards, where chart count goes up but information goes down.
+  > Wrong data would produce a chart that makes incorrect claims, not one that makes no claim at all. A chart without a takeaway suggests the underlying problem is conceptual, no question was defined, not that the data is erroneous.
+- [o] The chart was created without a clear question in mind, so even if it's pretty, it isn't really *doing* anything as a visualization.
+  > A chart without a question is decoration. Beauty is not enough, the chart has to *help someone reason*. This is one of the most common mistakes in business dashboards, where chart count goes up but information goes down.
 - The chart needs more colors.
   > Adding more colors increases visual complexity without adding analytical value if there is no clear question to answer. More colors cannot compensate for a missing purpose.
 
@@ -273,13 +273,13 @@ Encoding is the central design act of visualization. We'll devote a whole chapte
   markdown={`Why is it important that data visualization works *with* the human visual system?
 
 - Because computers can't draw without humans.
-  > Computers can generate charts automatically without human input — the visual system's capabilities are independent of who or what produces the image. The reason visualization works with human perception is biological, not computational.
+  > Computers can generate charts automatically without human input, the visual system's capabilities are independent of who or what produces the image. The reason visualization works with human perception is biological, not computational.
 - Because charts are required to be pretty.
   > Aesthetic appeal is a secondary goal of visualization, not its fundamental purpose. Charts are designed around the visual system because that system can process spatial patterns and relative differences far faster than sequential reading can.
-- [o] Because the visual system can recognize patterns (relative size, position, color) in milliseconds — much faster than reading raw numbers.
+- [o] Because the visual system can recognize patterns (relative size, position, color) in milliseconds, much faster than reading raw numbers.
   > Vision is built-in, parallel, pre-conscious hardware. A chart that aligns with how the visual system works (e.g., uses length for quantity) lets the reader perceive structure almost instantly. A chart that fights it (e.g., uses 3-D angles) forces slow, conscious effort.
 - Because eyes are the only sensors humans have.
-  > Humans perceive the world through multiple senses. The reason we use the visual channel for data is specifically that the visual system is very fast and parallel at detecting patterns — not because it is the only option.
+  > Humans perceive the world through multiple senses. The reason we use the visual channel for data is specifically that the visual system is very fast and parallel at detecting patterns, not because it is the only option.
 
 We will go deep into this in the next chapter, "How Humans Perceive Visuals."`}
 />

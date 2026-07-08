@@ -33,7 +33,7 @@ const STORAGE_KEY = "theme";
 const CHANGE_EVENT = "ds-theme-change";
 
 /** Read the persisted theme, treating anything other than "dark" (unset,
- *  "system", "light") as light — matching the home route's light default. */
+ *  "system", "light") as light, matching the home route's light default. */
 function readStoredTheme(): Theme {
   if (typeof window === "undefined") return "light";
   try {
@@ -50,7 +50,7 @@ function applyTheme(theme: Theme) {
   // Set an EXPLICIT class for the active theme (both `dark` and `light`),
   // mirroring next-themes. Components that detect the scheme (e.g. the
   // challenge card's CodeMirror theme picker) treat a missing class as "ask
-  // the OS" — so without an explicit `light` class, a light page on a
+  // the OS", so without an explicit `light` class, a light page on a
   // dark-OS device would render its editors dark.
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
@@ -81,7 +81,7 @@ export function useTheme() {
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      /* private mode / quota — the class + snapshot still update below */
+      /* private mode / quota, the class + snapshot still update below */
     }
     applyTheme(next);
     window.dispatchEvent(new Event(CHANGE_EVENT));

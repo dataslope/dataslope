@@ -3,18 +3,18 @@ title: keyof, typeof & Template Literals
 description: Lift values into types and build string-based type systems with keyof, typeof, and template literals.
 ---
 
-You've learned how to transform and filter types with [mapped and conditional types](./mapped-and-conditional-types). But where do types come from in the first place? Often, they come from *values* — runtime constants, configuration objects, or string literals. TypeScript gives you three powerful operators to bridge the gap between values and types:
+You've learned how to transform and filter types with [mapped and conditional types](./mapped-and-conditional-types). But where do types come from in the first place? Often, they come from *values*, runtime constants, configuration objects, or string literals. TypeScript gives you three powerful operators to bridge the gap between values and types:
 
-1. **`keyof T`** — produces a union of an object type's keys.
-2. **`typeof value`** — lifts a runtime value into the type world.
-3. **Template literal types** — builds new string literal types from existing ones, with full string manipulation.
+1. **`keyof T`**, produces a union of an object type's keys.
+2. **`typeof value`**, lifts a runtime value into the type world.
+3. **Template literal types**, builds new string literal types from existing ones, with full string manipulation.
 
 Together, these tools let you derive types from your code's structure, ensuring that types and values stay in sync automatically. You'll build event systems, configuration validators, and API contracts where the types are generated from your data, not manually duplicated.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="An object card lists three colored property keys, and past a thin arrow a tray holds exactly three matching chips — keyof lifts an object's true keys into a union type, no more and no fewer"
+  aria-label="An object card lists three colored property keys, and past a thin arrow a tray holds exactly three matching chips, keyof lifts an object's true keys into a union type, no more and no fewer"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -142,7 +142,7 @@ console.log(newConfig);
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A solid green square on the ground is lifted along a thin arrow across the dashed boundary into the type world above, where its hollow outlined twin appears — typeof lifts a runtime value into the world of types"
+  aria-label="A solid green square on the ground is lifted along a thin arrow across the dashed boundary into the type world above, where its hollow outlined twin appears, typeof lifts a runtime value into the world of types"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -264,7 +264,7 @@ When you interpolate a union, TypeScript distributes over it, producing all comb
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two blue prefix chips cross three yellow suffix chips in a small multiplication table, minting six two-tone combination chips — a template literal type generates every pairing automatically"
+  aria-label="Two blue prefix chips cross three yellow suffix chips in a small multiplication table, minting six two-tone combination chips, a template literal type generates every pairing automatically"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -323,10 +323,10 @@ console.log(handler1, handler2);
 
 TypeScript provides four built-in utility types for manipulating string literals:
 
-- **`Uppercase<S>`** — converts `S` to uppercase.
-- **`Lowercase<S>`** — converts `S` to lowercase.
-- **`Capitalize<S>`** — capitalizes the first character.
-- **`Uncapitalize<S>`** — lowercases the first character.
+- **`Uppercase<S>`**, converts `S` to uppercase.
+- **`Lowercase<S>`**, converts `S` to lowercase.
+- **`Capitalize<S>`**, capitalizes the first character.
+- **`Uncapitalize<S>`**, lowercases the first character.
 
 <CodeBlock
   adapter="typescript"
@@ -588,8 +588,8 @@ You've learned how to:
 - Manipulate strings with **`Uppercase`, `Lowercase`, `Capitalize`, `Uncapitalize`**.
 - Create type-safe mappings between related string-based concepts (events → handlers).
 
-These tools let you write types that are *computed* from your code's structure, rather than manually maintained in parallel. When you change a configuration object or add a new event, the types update automatically — the compiler becomes your co-maintainer.
+These tools let you write types that are *computed* from your code's structure, rather than manually maintained in parallel. When you change a configuration object or add a new event, the types update automatically, the compiler becomes your co-maintainer.
 
 ---
 
-**Next**: [Branded Types](./branded-types) — adding nominal typing to TypeScript's structural system to prevent mixing semantically distinct values.
+**Next**: [Branded Types](./branded-types), adding nominal typing to TypeScript's structural system to prevent mixing semantically distinct values.

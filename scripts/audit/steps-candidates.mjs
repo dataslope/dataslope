@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // One-off audit: find mermaid blocks that are really an ORDERED SEQUENCE OF
-// STEPS drawn as boxes — the case the Fumadocs <Steps> component renders better
+// STEPS drawn as boxes, the case the Fumadocs <Steps> component renders better
 // than a diagram. The signal is a *linear* flowchart (a simple A→B→C path, no
 // branches/merges/cycles) whose node labels are *numbered* ("1.", "Step 2",
 // "Phase 3", …). Spatial/structural diagrams (memory layouts, call stacks, JOIN
@@ -69,7 +69,7 @@ function analyze(chart) {
   const first = lines[0] || "";
   if (!/^(flowchart|graph)\b/i.test(first)) return null;
 
-  // No subgraphs — those are almost always spatial groupings, not step lists.
+  // No subgraphs, those are almost always spatial groupings, not step lists.
   if (/^\s*subgraph\b/im.test(norm)) return { numbered: false, hasSubgraph: true, labels: [] };
 
   const labels = [];
@@ -80,11 +80,11 @@ function analyze(chart) {
   if (labels.length === 0) return { numbered: false, hasSubgraph: false, labels: [] };
 
   // A label counts as "numbered" if it starts with 1./2)/Step 3/Phase 4 etc.
-  // (but NOT "0:50" index:value pairs — require the separator to be . ) : - and
+  // (but NOT "0:50" index:value pairs, require the separator to be . ) : - and
   // be followed by a letter/space, not another digit run that looks like data).
   const numRe = /^(?:(?:step|phase|stage|part)\s*)?\d+\s*[\.\)\-–]\s*\D/i;
   const numbered = labels.filter((t) => numRe.test(t));
-  // Require at least 3 numbered labels and that they dominate (≥ half) — a real
+  // Require at least 3 numbered labels and that they dominate (≥ half), a real
   // ordered list, tolerant of a leading "You are here" / trailing node.
   const isSeq = numbered.length >= 3 && numbered.length * 2 >= labels.length;
 

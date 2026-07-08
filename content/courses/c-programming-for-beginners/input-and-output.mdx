@@ -4,7 +4,7 @@ description: printf, scanf, format specifiers, and reading data the program didn
 ---
 
 Up to this point our programs have always known their inputs in
-advance — they were hard-coded into the source. A real program needs
+advance, they were hard-coded into the source. A real program needs
 to talk to the outside world: read from the keyboard, write to the
 terminal, read from files. This is **I/O**, short for *input/output*.
 
@@ -117,7 +117,7 @@ int main(void) {
 
 ### Field width and padding
 
-You can ask for a minimum field width — useful for tables:
+You can ask for a minimum field width, useful for tables:
 
 <CodeBlock
   adapter="c"
@@ -138,8 +138,8 @@ int main(void) {
   ]}
 />
 
-- `%-10s` — string in a 10-wide field, left-justified (the `-`).
-- `%5d`   — integer in a 5-wide field, right-justified (the default).
+- `%-10s`, string in a 10-wide field, left-justified (the `-`).
+- `%5d`, integer in a 5-wide field, right-justified (the default).
 
 Tiny formatting tricks like these are how plain-text reports stay
 readable.
@@ -233,7 +233,7 @@ Always specify the maximum width when reading strings with `scanf`,
 or your program is one long input away from a buffer overflow. We'll
 return to strings and buffers in upcoming chapters.
 
-## `getchar` and `putchar` — one character at a time
+## `getchar` and `putchar`, one character at a time
 
 For character-by-character I/O, the standard library offers
 `getchar()` and `putchar()`.
@@ -261,7 +261,7 @@ int main(void) {
 This is a tiny, classic loop. Why is `c` an `int` rather than a
 `char`? Because `getchar` returns `EOF` (typically `-1`) to signal
 "no more input", and `EOF` must be distinguishable from every valid
-character — including `0xFF`. Storing the result in a `char` would
+character, including `0xFF`. Storing the result in a `char` would
 make that distinction impossible.
 
 ## Standard streams
@@ -280,7 +280,7 @@ errors lets a user redirect them differently from normal output.
 
 ## Formatted vs unformatted I/O
 
-`printf` and `scanf` are **formatted** I/O — they understand types
+`printf` and `scanf` are **formatted** I/O, they understand types
 and format specifications. There are also **unformatted** I/O
 functions like `fgets` (read a line into a buffer) and `fputs`
 (write a string) that operate on raw bytes. For real input handling
@@ -373,7 +373,7 @@ int main(void) {
 - Because \`&\` converts \`n\` to a string suitable for parsing.
   > \`&\` produces a pointer (a memory address), not a string. Parsing is handled by \`scanf\` itself using the \`%d\` specifier.
 - Because \`%d\` requires a special pointer type.
-  > \`%d\` expects a plain \`int *\` — a pointer to an \`int\` — which is exactly what \`&n\` produces. There is no special pointer type involved.
+  > \`%d\` expects a plain \`int *\`, a pointer to an \`int\`, which is exactly what \`&n\` produces. There is no special pointer type involved.
 
-When you write \`&n\`, you're saying "here is the address of the box called \`n\` — please put the answer in it". This is one of the most common uses of the \`&\` (address-of) operator in C.`}
+When you write \`&n\`, you're saying "here is the address of the box called \`n\`, please put the answer in it". This is one of the most common uses of the \`&\` (address-of) operator in C.`}
 />

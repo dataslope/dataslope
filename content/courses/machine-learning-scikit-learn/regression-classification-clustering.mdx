@@ -1,6 +1,6 @@
 ---
 title: Regression, Classification, and Clustering
-description: The three core task types of classical machine learning, told apart by one thing — what comes out. A number means regression, a category means classification, and groups with no labels mean clustering. We see all three in code and pictures.
+description: The three core task types of classical machine learning, told apart by one thing, what comes out. A number means regression, a category means classification, and groups with no labels mean clustering. We see all three in code and pictures.
 ---
 
 By now you can ask the two questions that frame any machine learning
@@ -9,21 +9,21 @@ my target?* (number vs. category). Combine those two questions and you land
 on one of three task types that cover the overwhelming majority of classical
 machine learning:
 
-- **Regression** — predict a *number*.
-- **Classification** — predict a *category*.
-- **Clustering** — discover *groups*, with no labels at all.
+- **Regression**, predict a *number*.
+- **Classification**, predict a *category*.
+- **Clustering**, discover *groups*, with no labels at all.
 
 The fastest way to tell them apart is also the most reliable: **look at what
 the model outputs.** Out comes a number on a continuous scale? Regression.
 Out comes a label from a fixed set of classes? Classification. Out come group
 assignments invented from unlabeled data? Clustering. This page makes each
-one concrete — in code, and in a picture — so the three become instantly
+one concrete, in code, and in a picture, so the three become instantly
 recognizable.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three panels: dots climbing along a fitted line, dots colored into two known groups, and unlabeled dots gathered in two loose groups — regression predicts numbers, classification predicts labels, clustering discovers groups"
+  aria-label="Three panels: dots climbing along a fitted line, dots colored into two known groups, and unlabeled dots gathered in two loose groups, regression predicts numbers, classification predicts labels, clustering discovers groups"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -78,7 +78,7 @@ shape of the output is the surest classifier of the task.
 
 ## Regression: predicting a number
 
-Regression predicts a **continuous quantity** — a value on a scale where
+Regression predicts a **continuous quantity**, a value on a scale where
 in-between answers make sense. House prices, temperatures, a patient's blood
 pressure, tomorrow's demand: all numbers that could land anywhere in a range,
 not just on a few fixed options.
@@ -86,8 +86,8 @@ not just on a few fixed options.
 The mental image is a **line (or curve) through a cloud of points.** The
 model learns the trend relating the input to the output, and to predict, it
 reads the height of that trend at a new input. Let us train the simplest
-regressor, `LinearRegression`, on real diamond data — predicting a diamond's
-price from its carat weight — and draw the line it learns.
+regressor, `LinearRegression`, on real diamond data, predicting a diamond's
+price from its carat weight, and draw the line it learns.
 
 <CodeBlock
   adapter="python"
@@ -131,7 +131,7 @@ plt.show()
 />
 
 The output is a *number*, and it is continuous: nudge the carat weight and the
-predicted price slides smoothly. There is no notion of "categories" here — the
+predicted price slides smoothly. There is no notion of "categories" here, the
 model is estimating a quantity. That is the unmistakable signature of
 regression. We will measure how good such predictions are (with metrics like
 mean absolute error and R²) in the *regression metrics* chapter; here, focus
@@ -140,14 +140,14 @@ on the *shape* of the task: number in, number out.
 <Callout type="tip" title="Is it really continuous?">
 A quick test for regression: could the true answer reasonably be a value
 *between* two of your observed answers? Between a price of 4,300 and 4,310
-sits 4,305, a perfectly sensible price — so price is continuous, and
+sits 4,305, a perfectly sensible price, so price is continuous, and
 predicting it is regression. If "in-between" answers are nonsensical
 (half-way between "cat" and "dog"?), you are not looking at regression.
 </Callout>
 
 ## Classification: predicting a category
 
-Classification predicts a **category** — one label from a fixed, finite set.
+Classification predicts a **category**, one label from a fixed, finite set.
 Spam or not spam (two classes); the species of a penguin (three classes);
 which of five products a customer will buy (five classes). The output is not a
 quantity but a *choice among options*, and "in-between" answers do not exist:
@@ -198,24 +198,24 @@ plt.show()
 />
 
 The output is a *label*, drawn from a fixed set of three species. There is no
-"2.5th species." That discreteness — a choice among named classes — is what
+"2.5th species." That discreteness, a choice among named classes, is what
 makes this classification rather than regression, even though the *inputs*
 (the measurements) are themselves continuous numbers. Remember: the task
 type is defined by the **output**, not the inputs.
 
 <Callout type="warn" title="Numbers used as class labels are still categories">
-A frequent confusion: penguin species are often stored as 0, 1, 2 — numbers! —
+A frequent confusion: penguin species are often stored as 0, 1, 2, numbers!,
 so people assume the task is regression. It is not. Those integers are just
 *names* for categories; class 2 is not "twice" class 1, and there is no
-class 1.5. Whenever the target is a fixed set of labels — whatever symbols
-encode them — the task is classification. The math underneath treats them as
+class 1.5. Whenever the target is a fixed set of labels, whatever symbols
+encode them, the task is classification. The math underneath treats them as
 distinct categories, not as quantities on a scale.
 </Callout>
 
 ## A quick check
 
 <MultipleChoice
-  markdown={`A model outputs a person's predicted annual income in dollars — any value on a continuous scale. What task type is this?
+  markdown={`A model outputs a person's predicted annual income in dollars, any value on a continuous scale. What task type is this?
 
 - Classification, because income comes in brackets
   > Income "brackets" are a way humans organize it, not what the model outputs. A continuous dollar amount as output means regression, not classification.
@@ -226,20 +226,20 @@ distinct categories, not as quantities on a scale.
 - It cannot be determined from the output alone
   > The output alone is exactly what settles the task type. A continuous number as output means regression, regardless of the inputs.
 
-Continuous number out means regression — the output type settles it.`}
+Continuous number out means regression, the output type settles it.`}
 />
 
 ## Clustering: discovering groups with no labels
 
 Clustering is the odd one out: it is **unsupervised**, so there are no labels
-at all. Instead of predicting a known answer, it *discovers* groups — sets of
+at all. Instead of predicting a known answer, it *discovers* groups, sets of
 examples that are similar to each other and different from the rest. Nobody
 tells the algorithm what the groups are or even what they mean; it finds them
 from the structure of the features alone.
 
 The mental image is **points falling into natural clumps**, with the
 algorithm drawing a circle around each clump. We will run `KMeans` on synthetic
-blobs — a deliberate choice, since making the data ourselves means we *know*
+blobs, a deliberate choice, since making the data ourselves means we *know*
 there are three real groups and can see whether the algorithm recovers them.
 We ask it to find three groups and color the points by the group it assigns.
 Notice we never pass any labels.
@@ -277,18 +277,18 @@ plt.show()
   ]}
 />
 
-The colors here did not come from any answer key — they are *invented* by the
+The colors here did not come from any answer key, they are *invented* by the
 algorithm. Re-run with a different seed and the same three clumps might get
 numbered differently; the grouping is what matters, not the labels 0/1/2.
 Because there is no ground truth, you cannot compute "accuracy"; clustering is
 judged by how tight and separated the groups are, and by whether they are
-*useful* — the subject of the *evaluating clusters* chapter.
+*useful*, the subject of the *evaluating clusters* chapter.
 
 <Callout type="danger" title="Clustering does not know what the groups mean">
 A clustering algorithm finds *that* points group together, never *why* or
 *what the groups represent*. If you cluster customers and get three groups,
 the algorithm cannot tell you "these are bargain hunters, these are loyalists,
-these are one-time buyers" — interpreting the clusters is a human job
+these are one-time buyers", interpreting the clusters is a human job
 requiring domain knowledge. The algorithm supplies structure; you supply
 meaning.
 </Callout>
@@ -322,7 +322,7 @@ category is classification. Two questions, three tasks, every time.
 
 The claim that "the task is set by the question, not the data" sounds
 abstract, so let us prove it on a single dataset. We will take the diamonds
-dataset — 53,940 real diamonds whose target is a continuous price — and
+dataset, 53,940 real diamonds whose target is a continuous price, and
 frame *the same data* as all three task types, just by changing the question
 we ask. This is the most direct way to see that the task type lives in your
 intent, not in the rows.
@@ -365,7 +365,7 @@ Nothing about the underlying measurements changed between the three blocks.
 What changed was the *question*: "what is the exact price?" (regression),
 "is the diamond expensive or cheap?" (classification, after bucketing the
 target), and "which diamonds resemble each other?" (clustering, ignoring the
-target entirely). Same rows, three tasks — because the task type is a property
+target entirely). Same rows, three tasks, because the task type is a property
 of what you are trying to learn, not of the data sitting on disk.
 
 <Callout type="info" title="Bucketing trades precision for simplicity">
@@ -375,19 +375,19 @@ a coarse "premium / mid / budget" decision is all the business needs, or
 because classes are easier to act on. The cost is thrown-away precision: you
 no longer distinguish a price of 3,500 from 15,000 if both land in "expensive."
 Whether that trade is worth it depends entirely on how the prediction will be
-used — a recurring theme in framing problems well.
+used, a recurring theme in framing problems well.
 </Callout>
 
 ## Common misconceptions
 
-- **"The inputs decide the task."** They do not — the *output* does. A model
+- **"The inputs decide the task."** They do not, the *output* does. A model
   with continuous numeric inputs can be a classifier (penguin measurements →
   species); a model with categorical inputs can be a regressor (neighborhood →
   price). Look at what comes *out*.
 - **"Integer labels mean regression."** No. Class labels are often stored as
   integers (0, 1, 2) for convenience, but they are categories, not
   quantities. If there is no meaningful "in-between," it is classification.
-- **"Clustering is just classification without training the labels."** No —
+- **"Clustering is just classification without training the labels."** No,
   there are no labels at all, and there is no ground truth to be right or
   wrong against. The goal is discovery, not prediction of a known answer.
 - **"You must pick exactly one task per dataset."** A single dataset can
@@ -419,7 +419,7 @@ clustering.
 ## Your turn
 
 The challenge gives you several described scenarios. For each, name the task
-type — regression, classification, or clustering — using the output-based
+type, regression, classification, or clustering, using the output-based
 test from this page. This is exactly the judgment you make at the start of
 every project.
 
@@ -436,15 +436,15 @@ discovering groups from UNLABELED data -> clustering.
 Fill in the dictionary \`tasks\` so each scenario key maps to exactly one of
 the strings \`"regression"\`, \`"classification"\`, or \`"clustering"\`:
 
-1. \`"predict_tomorrows_temperature"\` — predict tomorrow's high temperature
+1. \`"predict_tomorrows_temperature"\`, predict tomorrow's high temperature
    in degrees, from past weather.
-2. \`"is_email_spam"\` — label each incoming email as spam or not spam.
-3. \`"segment_shoppers"\` — group shoppers into natural segments when you have
+2. \`"is_email_spam"\`, label each incoming email as spam or not spam.
+3. \`"segment_shoppers"\`, group shoppers into natural segments when you have
    NO predefined segments, only their behavior.
-4. \`"predict_house_price"\` — predict a house's sale price in dollars.
-5. \`"identify_flower_species"\` — predict which of three species a flower is,
+4. \`"predict_house_price"\`, predict a house's sale price in dollars.
+5. \`"identify_flower_species"\`, predict which of three species a flower is,
    from its measurements.
-6. \`"group_songs_by_audio"\` — organize an unlabeled music library into groups
+6. \`"group_songs_by_audio"\`, organize an unlabeled music library into groups
    of similar-sounding songs.
 
 The tests check each individual answer.`}
@@ -526,7 +526,7 @@ print(tasks)
 - By which scikit-learn module the algorithm lives in
   > Module location is an organizational choice in scikit-learn, not the definition of the task. The task is determined by the output, not by where the class is imported from.
 - [o] By the output: a continuous number means regression, a category from a fixed set means classification, and discovered groups from unlabeled data means clustering
-  > The task type is defined by what a single prediction looks like. Number, category, or discovered group — the output settles which of the three you have.
+  > The task type is defined by what a single prediction looks like. Number, category, or discovered group, the output settles which of the three you have.
 - By the number of features in \`X\`
   > The number of input features is irrelevant to the task type. A single-feature problem can be regression or classification depending on what is predicted.
 
@@ -540,10 +540,10 @@ Look at what comes out of the model; the output type names the task.`}
   > The storage format of labels (integers) does not determine the task. These integers name three distinct species; there is no meaningful "species 1.5," so the task is classification.
 - Regression, because the model outputs values between 0 and 2
   > Regression outputs a continuous quantity anywhere on a scale. Predicting one of three fixed codes (0, 1, 2) is predicting a category, not a continuous value.
-- [o] Classification, because those integers are just names for three distinct categories — there is no meaningful "species 1.5"
+- [o] Classification, because those integers are just names for three distinct categories, there is no meaningful "species 1.5"
   > Integer labels are a convenient encoding of categories, not quantities. With no sensible in-between value, the task is classification regardless of how the labels are stored.
 - Clustering, because there are multiple species
-  > Clustering discovers groups in unlabeled data. Here the species labels are given and we are predicting one of them — that is supervised classification, not clustering.
+  > Clustering discovers groups in unlabeled data. Here the species labels are given and we are predicting one of them, that is supervised classification, not clustering.
 
 Numeric-looking labels can still be categories; with no meaningful in-between, it is classification.`}
 />
@@ -555,10 +555,10 @@ Numeric-looking labels can still be categories; with no meaningful in-between, i
   > Regression is supervised: it requires a continuous labeled target \`y\` to train from.
 - Classification
   > Classification is supervised: it requires a categorical labeled target \`y\` to train from.
-- [o] Clustering — it discovers groups from the features alone, with no target \`y\`
+- [o] Clustering, it discovers groups from the features alone, with no target \`y\`
   > Clustering is the unsupervised task of the three. It finds structure in \`X\` without any answer key, whereas regression and classification both need a labeled target.
 - All three are unsupervised
-  > Regression and classification are supervised — both require a labeled target \`y\`. Only clustering operates with no labels.
+  > Regression and classification are supervised, both require a labeled target \`y\`. Only clustering operates with no labels.
 
 Clustering needs no labels; regression and classification both require a target.`}
 />
@@ -571,7 +571,7 @@ Clustering needs no labels; regression and classification both require a target.
 - Clustering, because applicants form groups
   > Clustering discovers groups in unlabeled data. Here each applicant is given a labeled decision (approve/deny), which is supervised classification.
 - [o] Classification, because the output is a category (approve or deny) chosen from a fixed set
-  > The deliverable is a class label — approve or deny — so this is classification. (Such models can also output a probability, but the task is still predicting a category.)
+  > The deliverable is a class label, approve or deny, so this is classification. (Such models can also output a probability, but the task is still predicting a category.)
 - It is not a machine learning task
   > Predicting one of two outcomes (approve/deny) from applicant features is a well-defined binary classification problem.
 
@@ -582,13 +582,13 @@ The final output is a category from a fixed set, which makes it classification.`
   markdown={`Why can't you compute "accuracy" on a clustering result the way you do for a classifier?
 
 - Because clustering is always perfectly accurate
-  > Clustering is not "perfectly accurate" — it has no labels to be accurate against. Its quality is judged by tightness and separation, not by a correctness score.
+  > Clustering is not "perfectly accurate", it has no labels to be accurate against. Its quality is judged by tightness and separation, not by a correctness score.
 - Because accuracy is only defined for regression
   > Accuracy is defined for classification (fraction of correct class labels), not for regression. Regression uses error metrics such as MAE and R². Neither applies to clustering.
-- [o] Because clustering has no ground-truth labels to compare against — the group ids are invented by the algorithm, so there is no "correct" answer to score
+- [o] Because clustering has no ground-truth labels to compare against, the group ids are invented by the algorithm, so there is no "correct" answer to score
   > Accuracy needs known answers. Clustering produces groups with no answer key, so accuracy is undefined; clusters are judged by tightness, separation, and usefulness instead.
 - Because clusters change every run, so accuracy is meaningless by chance
-  > While cluster numbering can vary across runs, the real reason accuracy is undefined is the absence of any ground-truth labels — not just run-to-run instability.
+  > While cluster numbering can vary across runs, the real reason accuracy is undefined is the absence of any ground-truth labels, not just run-to-run instability.
 
 Without ground-truth labels there is nothing to compare predictions to, so accuracy does not apply.`}
 />
@@ -600,7 +600,7 @@ Without ground-truth labels there is nothing to compare predictions to, so accur
   > A single dataset can be framed as regression, classification, or clustering depending on the question asked. The data alone does not fix the task.
 - The inputs (features) determine whether it is regression or classification
   > The same input features can feed a regression, a classification, or a clustering. The task is determined by the output you want, not by what goes in.
-- [o] A single dataset can support several tasks — the task is set by the question you ask (predict a number, predict a class, or find groups), not by the data alone
+- [o] A single dataset can support several tasks, the task is set by the question you ask (predict a number, predict a class, or find groups), not by the data alone
   > Customer data, for instance, could drive a regression (spend), a classification (churn), and a clustering (segments). What you ask determines the task; the inputs do not.
 - Clustering and regression are interchangeable for any dataset
   > Clustering and regression serve different purposes. Regression predicts a labeled continuous target; clustering discovers structure in unlabeled data. They are not interchangeable.

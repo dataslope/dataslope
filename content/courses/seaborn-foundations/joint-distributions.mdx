@@ -1,23 +1,23 @@
 ---
 title: "Joint Plots"
-description: "sns.jointplot — a pair of variables shown as a center plot plus each variable's marginal distribution."
+description: "sns.jointplot, a pair of variables shown as a center plot plus each variable's marginal distribution."
 ---
 
-A plain scatter plot answers "how do these two variables relate?" — but it
+A plain scatter plot answers "how do these two variables relate?", but it
 stays silent on a second question that often matters just as much: *"how is
 each variable distributed on its own?"* A **joint plot** answers both at
 once.
 
 **`sns.jointplot`** draws two numeric variables as a central **bivariate**
 plot, and tucks each variable's **univariate** distribution into the
-**margins** — one along the top, one down the right side. The center shows
+**margins**, one along the top, one down the right side. The center shows
 the *joint* relationship; the margins show the two *marginals*. You get the
 relationship and both distributions in one compact figure.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A central cloud of rising dots flanked by two smooth marginal humps — one lying along the top edge, one standing down the right side — the joint relationship and both individual distributions in a single frame"
+  aria-label="A central cloud of rising dots flanked by two smooth marginal humps, one lying along the top edge, one standing down the right side, the joint relationship and both individual distributions in a single frame"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -61,11 +61,11 @@ sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm")
   ]}
 />
 
-Read it in two directions. The **center** is the familiar scatter — bill
+Read it in two directions. The **center** is the familiar scatter, bill
 length against bill depth. The **top margin** is the distribution of
 `bill_length_mm` alone; the **right margin** is the distribution of
 `bill_depth_mm` alone. Notice the top histogram looks distinctly
-two-humped — a clue there are subgroups hiding in this data that a bare
+two-humped, a clue there are subgroups hiding in this data that a bare
 scatter wouldn't have surfaced as clearly.
 
 <Callout type="info" title="Why the margins earn their space">
@@ -81,7 +81,7 @@ variable become obvious without leaving the figure. Reach for a joint plot
 
 - Zoomed-in copies of the central scatter plot.
   > The margins aren't copies of the center; they summarize each variable separately.
-- [o] The univariate distribution of each variable — \`x\` along the top, \`y\` down the right.
+- [o] The univariate distribution of each variable, \`x\` along the top, \`y\` down the right.
   > The center shows the joint relationship, while each margin shows one variable's own distribution, so you read the relationship and both marginals together.
 - The x-axis and y-axis labels, enlarged.
   > Those are just labels; the margins hold actual distribution plots (histograms or densities), not text.
@@ -97,17 +97,17 @@ view with each variable's marginal distribution.`}
 The `kind` parameter swaps out what the central plot is, while the margins
 adapt to match. The options:
 
-- `kind="scatter"` — the default; one dot per observation.
-- `kind="kde"` — smooth density **contours**, like a topographic map of
+- `kind="scatter"`, the default; one dot per observation.
+- `kind="kde"`, smooth density **contours**, like a topographic map of
   where points concentrate.
-- `kind="hist"` — a **2-D histogram**, binning the plane into colored
+- `kind="hist"`, a **2-D histogram**, binning the plane into colored
   rectangles.
-- `kind="hex"` — **hexagonal bins**; the go-to fix for overplotting in dense
+- `kind="hex"`, **hexagonal bins**; the go-to fix for overplotting in dense
   data (more on this below).
-- `kind="reg"` — a scatter with a **regression line** (and confidence band)
+- `kind="reg"`, a scatter with a **regression line** (and confidence band)
   drawn through it.
 
-Here is `kind="kde"`, which trades individual points for density contours —
+Here is `kind="kde"`, which trades individual points for density contours,
 useful when you care about *where the mass is* rather than each observation:
 
 <CodeBlock
@@ -133,7 +133,7 @@ sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", kind="kde")
 A scatter's weakness is **overplotting**: with thousands of points the dots
 pile into a solid blob and you lose the very structure you came to see. A
 **hexbin** plot fixes this by dividing the plane into hexagonal bins and
-**coloring each bin by how many points fall in it** — darker means denser.
+**coloring each bin by how many points fall in it**, darker means denser.
 No dot is ever hidden behind another, because you're counting, not stacking.
 
 To show real density we need more points than the small built-ins offer, so
@@ -162,8 +162,8 @@ sns.jointplot(data=diamonds, x="carat", y="price", kind="hex")
 
 A plain scatter of carat against price would be a dark smear in the
 bottom-left corner. The hexbin instead *shows* where diamonds actually
-concentrate — most are small and cheap, with a thinning tail toward larger,
-pricier stones — and the marginal histograms confirm both variables are
+concentrate, most are small and cheap, with a thinning tail toward larger,
+pricier stones, and the marginal histograms confirm both variables are
 heavily right-skewed.
 
 <Callout type="tip" title="Dense data? Stop scattering, start binning">
@@ -193,7 +193,7 @@ When points overlap into a blob, counting them (hexbin) or smoothing them
 ## Splitting groups with `hue`
 
 Just like a scatter plot, a joint plot accepts a **`hue`** column. The
-center colors points by group, and — neatly — the margins split into one
+center colors points by group, and, neatly, the margins split into one
 distribution per group, so you see how the categories differ on each axis:
 
 <CodeBlock
@@ -221,7 +221,7 @@ sns.jointplot(
 
 That two-humped top margin from the very first plot now explains itself: the
 humps are different **species**. With `hue` the center resolves into clean
-clusters, and each margin shows three separate distributions — the same
+clusters, and each margin shows three separate distributions, the same
 group-revealing payoff you saw with pair plots, focused on a single pair.
 
 <Callout type="info" title="Under the hood: JointGrid">
@@ -233,17 +233,17 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
 `jointplot` and its `kind=` options are all you need.
 </Callout>
 
-## What a joint plot shows — and when to skip it
+## What a joint plot shows, and when to skip it
 
 - **Data it needs:** two **numeric** columns, plus an optional
   **categorical** column for `hue`.
 - **What it highlights best:** a single pair's relationship *together with*
-  each variable's marginal distribution — skew, peaks, and outliers you'd
+  each variable's marginal distribution, skew, peaks, and outliers you'd
   miss in a bare scatter.
 - **When to prefer a plain scatter:** when you only care about the
   relationship and the marginals are noise, a `relplot`/`scatterplot` is
   simpler and composes more flexibly (facets, custom Axes).
-- **When it breaks:** large `n` with `kind="scatter"` overplots the center —
+- **When it breaks:** large `n` with `kind="scatter"` overplots the center,
   switch to `kind="hex"` or `kind="kde"`.
 
 ## Your turn
@@ -256,7 +256,7 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
 
 - \`bill_length_mm\` on the x-axis,
 - \`bill_depth_mm\` on the y-axis,
-- with a scatter center (\`kind="scatter"\`, the default — or try \`"hex"\`).
+- with a scatter center (\`kind="scatter"\`, the default, or try \`"hex"\`).
 
 Assign the result to a variable named \`g\`. The marginal distributions
 should appear automatically along the top and right.`}
@@ -328,7 +328,7 @@ plot from an ordinary scatter.`}
 - \`kind="hist"\`
   > That produces a 2-D histogram of binned rectangles, not smooth contours.
 - \`kind="hex"\`
-  > Hexbin colors hexagonal bins by point count — discrete bins, not continuous contours.
+  > Hexbin colors hexagonal bins by point count, discrete bins, not continuous contours.
 - [o] \`kind="kde"\`
   > A kernel density estimate draws smooth contour lines showing where point density is highest, like a topographic map of the data.
 - \`kind="reg"\`
@@ -341,10 +341,10 @@ data concentrates.`}
 <MultipleChoice
   markdown={`When is a joint plot a better choice than a plain \`scatterplot\`?
 
-- Always — a joint plot is strictly superior and should replace every scatter.
+- Always, a joint plot is strictly superior and should replace every scatter.
   > It's not free: the margins add space and complexity, and a plain scatter composes more flexibly (facets, shared Axes). Use the joint plot when the marginals actually earn their keep.
 - When you need to place the chart on a specific matplotlib Axes alongside other plots.
-  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control — that favors \`scatterplot\`.
+  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control, that favors \`scatterplot\`.
 - [o] When the marginal distributions of each variable matter, or you want a quick density view of a single pair.
   > The joint plot's whole value-add is showing each variable's distribution alongside the relationship, so it shines exactly when those marginals (or a density center like hex/kde) are worth seeing.
 - When you want one panel per category.
@@ -354,7 +354,7 @@ Choose a joint plot when a single pair's marginals or density add real
 insight; otherwise a plain scatter is simpler and more composable.`}
 />
 
-You've now zoomed all the way in — from the whole-dataset pair-plot grid to
+You've now zoomed all the way in, from the whole-dataset pair-plot grid to
 a single, richly annotated pair of variables with its marginals. With
 relational and pairwise views in hand, the next chapters turn to the
 distribution plots (histograms, KDEs, ECDFs) that power those margins.

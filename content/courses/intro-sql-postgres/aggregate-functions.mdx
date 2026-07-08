@@ -1,6 +1,6 @@
 ---
 title: Aggregate Functions
-description: Collapsing many rows into a single summary number — counts, sums, averages, minimums, and maximums — the foundation of every report.
+description: Collapsing many rows into a single summary number, counts, sums, averages, minimums, and maximums, the foundation of every report.
 ---
 
 So far every query returned roughly one result row per table row.
@@ -12,7 +12,7 @@ are aggregate questions, and they are the heart of reporting.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Many rows of dots pour into a funnel and come out as one large summary dot — an aggregate boils a whole column down to a single value"
+  aria-label="Many rows of dots pour into a funnel and come out as one large summary dot, an aggregate boils a whole column down to a single value"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -77,7 +77,7 @@ The five core aggregates cover most needs:
 ## Counting rows
 
 `COUNT(*)` counts rows. Run it and notice the result is a single row
-with a single number — the whole table collapsed to a count:
+with a single number, the whole table collapsed to a count:
 
 <SqlCodeBlock
   dialect="postgres"
@@ -118,7 +118,7 @@ FROM
   employees;`}
 />
 
-One row, five numbers — a complete summary of the whole table. This
+One row, five numbers, a complete summary of the whole table. This
 single query would be a whole afternoon of manual spreadsheet work
 on a large dataset.
 
@@ -126,8 +126,8 @@ on a large dataset.
 
 Five rows is a toy. To feel what aggregates are *for*, run them on
 something real. The block below clones the **Chinook** sample
-database — a fictional digital music store with thousands of actual
-tracks — straight into your browser, then summarizes the entire
+database, a fictional digital music store with thousands of actual
+tracks, straight into your browser, then summarizes the entire
 `track` table in one row:
 
 <SqlCodeBlock
@@ -144,7 +144,7 @@ FROM
 />
 
 Thousands of rows collapse into three honest numbers. The average
-track runs about four minutes — but look at that maximum. Chinook's
+track runs about four minutes, but look at that maximum. Chinook's
 catalog includes whole TV episodes sold as "tracks," which is
 exactly the kind of surprise a quick aggregate sweep is good at
 surfacing. Try swapping `MAX` for `MIN` to find the shortest track,
@@ -186,7 +186,7 @@ flowchart TD
 **1. Aggregates ignore NULLs (except `COUNT(*)`).** `AVG`, `SUM`,
 `MIN`, `MAX`, and `COUNT(column)` skip rows where that column is
 `NULL`. Only `COUNT(*)` counts every row regardless. This is usually
-what you want — an unknown salary should not drag an average toward
+what you want, an unknown salary should not drag an average toward
 zero.
 
 **2. `COUNT(*)` vs `COUNT(column)`.** `COUNT(*)` counts rows;
@@ -208,7 +208,7 @@ FROM
   customers;`}
 />
 
-Four rows, but only two phones on file — the difference reveals the
+Four rows, but only two phones on file, the difference reveals the
 two missing values at a glance.
 
 ## Check your understanding

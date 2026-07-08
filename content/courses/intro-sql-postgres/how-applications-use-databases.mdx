@@ -6,14 +6,14 @@ description: Where the database sits in a real app, what a "query" is, and why a
 Now that you can write SQL yourself, it is worth taking a longer
 look at where it actually runs in the software you use every day.
 This optional discussion page traces a single tap on an app screen
-all the way down to the queries you now know how to write — because
+all the way down to the queries you now know how to write, because
 once you can picture that, your new skill stops being abstract and
 starts being obviously useful.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A phone and a database card exchange dotted arcs — a query tag travels one way and a green row of results comes back"
+  aria-label="A phone and a database card exchange dotted arcs, a query tag travels one way and a green row of results comes back"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -76,7 +76,7 @@ starts being obviously useful.
 
 ## The app is not the data
 
-When you use an app — a store, a chat, a banking site — there are
+When you use an app, a store, a chat, a banking site, there are
 really **two separate things** working together:
 
 1. The **application**: the screens, buttons, and logic you
@@ -112,7 +112,7 @@ the requested rows or a confirmation that the change happened.
 
 <Callout type="info" title="Queries do more than ask questions">
 Although "query" sounds like *asking*, in practice SQL queries also
-*change* data — inserting, updating, and deleting rows. We will
+*change* data, inserting, updating, and deleting rows. We will
 learn the asking kind (`SELECT`) most deeply, because reading data
 well is the foundation for everything else.
 </Callout>
@@ -150,7 +150,7 @@ this course. When you wrote `SELECT ... WHERE`, you were writing
 exactly what an app runs to fetch "this user's unread messages."
 When you wrote a `JOIN`, you were writing how an app shows "your
 orders, with each restaurant's name attached." You did not learn
-trivia — you learned the language that powers the software world.
+trivia, you learned the language that powers the software world.
 
 ```mermaid
 flowchart TB
@@ -176,7 +176,7 @@ flowchart TB
   > The application is a face on top of the data; the database is the system that durably remembers everything.
 - Only in the user's memory.
   > People forget; the whole point of a database is durable, reliable storage independent of any person.
-- Nowhere — apps recalculate everything each time.
+- Nowhere, apps recalculate everything each time.
   > Apps must remember orders, messages, and accounts between sessions, which is exactly why they rely on a database.
 
 The application handles interaction; the database handles durable storage, and the two communicate through queries.`}
@@ -189,7 +189,7 @@ The application handles interaction; the database handles durable storage, and t
   > Buttons are part of the application's interface; a query is the request the app sends to the database when a button is used.
 - A backup copy of the database.
   > A backup is a safety copy of data; a query is an instruction or question sent to the database.
-- [o] A precise request — a question or an instruction — sent to the database, written in SQL.
+- [o] A precise request, a question or an instruction, sent to the database, written in SQL.
   > Whether it reads data or changes it, a query is the message that tells the database exactly what to do.
 - The physical disk where data is stored.
   > Storage hardware holds the data; a query is the request that asks the database to read or change that data.

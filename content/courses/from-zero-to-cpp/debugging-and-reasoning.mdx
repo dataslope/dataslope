@@ -1,22 +1,22 @@
 ---
 title: Debugging and Reasoning
-description: How to find bugs methodically — print statements, assertions, debuggers, sanitizers, and the right mindset.
+description: How to find bugs methodically, print statements, assertions, debuggers, sanitizers, and the right mindset.
 ---
 
-Every program is buggy at some point in its life. Debugging — the
-craft of figuring out *why* a program does what it does — is at
+Every program is buggy at some point in its life. Debugging, the
+craft of figuring out *why* a program does what it does, is at
 least half of professional programming. The good news is that it's a
 learnable skill, not a talent.
 
 <IllustrationPrompt subject="the 1947 Harvard Mark II logbook page with the first computer bug, an actual moth, taped onto it" />
 
 The word itself comes with a story. On September 9, 1947, operators
-of the Harvard Mark II — an electromechanical computer built of
-relays — traced a malfunction to an actual moth crushed between the
+of the Harvard Mark II, an electromechanical computer built of
+relays, traced a malfunction to an actual moth crushed between the
 contacts of relay #70. Grace Hopper's team taped the moth into the
 machine's logbook with the note *"First actual case of bug being
 found."* The joke, of course, was that engineers had been calling
-faults "bugs" since Edison's day — but the moth made it literal,
+faults "bugs" since Edison's day, but the moth made it literal,
 and the logbook page (moth included) is now preserved at the
 Smithsonian. Most of the bugs you will hunt are less photogenic.
 The method for finding them, though, hasn't changed: observe,
@@ -25,7 +25,7 @@ hypothesize, test, repeat.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Translucent boxes nest tighter and tighter around a single red dot — debugging as systematically shrinking where the bug can hide"
+  aria-label="Translucent boxes nest tighter and tighter around a single red dot, debugging as systematically shrinking where the bug can hide"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -52,7 +52,7 @@ and what it *actually* does. Every step of debugging chips away at
 that gap.
 
 The instinct to fix is loud and unhelpful. The instinct to
-*understand* — to slow down, form a hypothesis, and test it — is
+*understand*, to slow down, form a hypothesis, and test it, is
 how bugs actually get fixed.
 
 ```mermaid
@@ -144,11 +144,11 @@ quickly.
 Modern compilers (Clang, GCC) ship runtime *sanitizers* that
 instrument your code to catch entire classes of bug:
 
-- **AddressSanitizer (ASan)** — detects out-of-bounds access,
+- **AddressSanitizer (ASan)**, detects out-of-bounds access,
   use-after-free, double-free, leaks.
-- **UndefinedBehaviorSanitizer (UBSan)** — catches signed overflow,
+- **UndefinedBehaviorSanitizer (UBSan)**, catches signed overflow,
   null dereference, misaligned loads, and more.
-- **ThreadSanitizer (TSan)** — finds data races in multithreaded
+- **ThreadSanitizer (TSan)**, finds data races in multithreaded
   code.
 
 A typical command line:
@@ -183,7 +183,7 @@ Some techniques that help:
 
 A bug you can reliably reproduce is half-solved. Spend serious
 effort getting a small input that triggers it on demand before doing
-anything else. Tests, sample inputs, even hand-crafted commands —
+anything else. Tests, sample inputs, even hand-crafted commands,
 whatever it takes.
 
 ## When you're stuck
@@ -228,5 +228,5 @@ A few standard tricks:
   > The standard says nothing about debugging methodology.`}
 />
 
-Next: stepping back from individual bugs to entire *codebases* —
+Next: stepping back from individual bugs to entire *codebases*,
 how to build software that stays maintainable.

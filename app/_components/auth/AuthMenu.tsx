@@ -5,7 +5,7 @@
  * (account / sign out) when signed in.
  *
  * The session is read client-side via `useSession()` so the header can sit on
- * statically prerendered pages without making them dynamic — the server ships
+ * statically prerendered pages without making them dynamic, the server ships
  * the same anonymous HTML to everyone and this swaps in after hydration. While
  * the first session fetch is in flight we render a neutral skeleton (not the
  * "Sign in" button), so the markup is stable on first paint (no hydration
@@ -96,7 +96,7 @@ export function AuthMenu() {
       // Re-render anything reading the session; the menu collapses to "Sign in".
       router.refresh();
     } catch {
-      // Network failure — leave the session as-is; the item re-enables.
+      // Network failure, leave the session as-is; the item re-enables.
     }
     setSigningOut(false);
   }

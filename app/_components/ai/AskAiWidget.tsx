@@ -2,7 +2,7 @@
 
 /**
  * Floating "Ask AI" launcher + chat panel. Shared by the /learn and /playground
- * surfaces — they differ only in the `collectContext` they pass in. Signed-in
+ * surfaces, they differ only in the `collectContext` they pass in. Signed-in
  * only: signed-out users get a sign-in CTA (auth gates the *action*, never the
  * page, so the host page stays statically prerendered).
  */
@@ -66,7 +66,7 @@ import styles from "./AskAiPanel.module.css";
 
 interface Props {
   surface: AskAiSurface;
-  /** What the user is looking at, for display copy only — "lesson" on course
+  /** What the user is looking at, for display copy only, "lesson" on course
    *  pages, "question set" on interview-prep (which mounts as surface
    *  "learn" but isn't a lesson), "playground" elsewhere. */
   subjectNoun?: string;
@@ -82,7 +82,7 @@ const KIND_ICONS: Record<AskAiSourceKind, typeof Code2> = {
 };
 
 // Selection caps: ignore accidental micro-selections, and keep the request
-// body small — the server re-clips against the token budget anyway.
+// body small, the server re-clips against the token budget anyway.
 const MIN_SELECTION_CHARS = 3;
 const MAX_SELECTION_CHARS = 2000;
 
@@ -93,7 +93,7 @@ interface CapturedSelection {
 }
 
 // Lesson bases that have a raw-Markdown mirror the server can fetch (mirrors
-// LESSON_BASES in lib/ai/context.ts) — used only to describe the context
+// LESSON_BASES in lib/ai/context.ts), used only to describe the context
 // honestly in the "What AI can see" panel.
 const LESSON_MD_BASES = new Set(["courses", "fumadocs-dev"]);
 
@@ -242,7 +242,7 @@ export default function AskAiWidget({
   // ── Daily prompt quota ─────────────────────────────────────────────
   // Fetched when the panel opens; decremented locally per send. Usage is
   // recorded server-side AFTER each answer streams (via waitUntil), so an
-  // immediate refetch would race the write — the local decrement stays
+  // immediate refetch would race the write, the local decrement stays
   // accurate until the next open. Display-only: the chat endpoint is the
   // enforcement point.
   const [usage, setUsage] = useState<AskAiUsageResponse | null>(null);
@@ -260,7 +260,7 @@ export default function AskAiWidget({
           setSentSinceUsageFetch(0);
         }
       } catch {
-        // display-only — the counter just doesn't render
+        // display-only, the counter just doesn't render
       }
     })();
     return () => {
@@ -279,7 +279,7 @@ export default function AskAiWidget({
       const res = requestAiEdit(collectContext().adapterId, s);
       if (res.ok) {
         setEditStatus(
-          `Review the ${s.filename} diff in the editor — accept or reject the changes there.`,
+          `Review the ${s.filename} diff in the editor, accept or reject the changes there.`,
         );
       } else if (res.reason === "unchanged") {
         setEditStatus(`${s.filename} already matches this suggestion.`);
@@ -294,7 +294,7 @@ export default function AskAiWidget({
   // Whether a playground editor that can host the diff review is mounted.
   // SQL playgrounds (and lesson pages) share this surface but register no
   // handler, so their answers never grow the review buttons. Evaluated only
-  // once a completed answer exists — the handler registry is module state,
+  // once a completed answer exists, the handler registry is module state,
   // and any completed answer implies the playground has long since mounted.
   const canApplyEdits =
     surface === "playground" &&
@@ -335,7 +335,7 @@ export default function AskAiWidget({
   }, [draft, sendQuestion]);
 
   // ── "What AI can see" panel ────────────────────────────────────────
-  // Expanded view of the exact payload the next question would carry —
+  // Expanded view of the exact payload the next question would carry,
   // computed from buildContext() itself so it can't drift from reality.
   const [contextOpen, setContextOpen] = useState(false);
   const contextPreview = useMemo(
@@ -345,7 +345,7 @@ export default function AskAiWidget({
     [contextOpen, buildContext, sources],
   );
   // Whether the server can actually fetch this page's markdown (mirrors the
-  // LESSON_BASES allowlist) — interview-prep has no mirror, so don't claim it.
+  // LESSON_BASES allowlist), interview-prep has no mirror, so don't claim it.
   const hasLessonText =
     contextPreview?.surface === "learn" &&
     LESSON_MD_BASES.has(contextPreview.slug?.[0] ?? "");
@@ -432,7 +432,7 @@ export default function AskAiWidget({
                 : surface === "learn"
                   ? "lesson, a code block, or a question"
                   : "code, an error, or the language"}{" "}
-              — I can see what&apos;s on your screen. Highlight text on the
+, I can see what&apos;s on your screen. Highlight text on the
               page to ask about it, or pin a card below to reference it
               directly.
             </div>
@@ -454,7 +454,7 @@ export default function AskAiWidget({
               }
               const isLast = i === messages.length - 1;
               // Only a COMPLETED answer that actually contains `file=`-tagged
-              // code blocks gets the "review in editor" actions — a plain
+              // code blocks gets the "review in editor" actions, a plain
               // Q&A answer renders exactly as before (see editSuggestions.ts).
               const editSuggestions =
                 canApplyEdits && m.content && !(streaming && isLast)
@@ -629,8 +629,8 @@ export default function AskAiWidget({
                   aria-pressed={pinned}
                   title={
                     pinned
-                      ? "Pinned — always sent with your question. Click to unpin."
-                      : "On screen — sent with your question. Click to pin it as the thing you're asking about."
+                      ? "Pinned, always sent with your question. Click to unpin."
+                      : "On screen, sent with your question. Click to pin it as the thing you're asking about."
                   }
                 >
                   <Icon size={12} aria-hidden />
@@ -690,7 +690,7 @@ export default function AskAiWidget({
                       className={`${styles.quota} ${
                         promptsLeft <= 5 ? styles.quotaLow : ""
                       }`}
-                      aria-label={`${promptsLeft} Ask AI prompts left today — details`}
+                      aria-label={`${promptsLeft} Ask AI prompts left today, details`}
                     >
                       <Info size={12} aria-hidden />
                       {promptsLeft} prompt{promptsLeft === 1 ? "" : "s"} left
