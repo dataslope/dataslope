@@ -6,6 +6,7 @@ import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import AskAi from "@/app/_components/ai/AskAi";
 import NavigationLoadingIndicator from "@/app/_components/NavigationLoadingIndicator";
 import SkipToContent from "@/app/_components/SkipToContent";
+import { ReturnToTracker } from "@/app/_components/auth/returnTo";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
 // variables on <html> so every route (and every portal — portals stay inside
@@ -135,6 +136,9 @@ export default function RootLayout({
         {/* Corner badge with the brand diamond loader, shown while a slow
             client-side navigation (playgrounds, course pages) is pending. */}
         <NavigationLoadingIndicator />
+        {/* Records the last non-auth page per tab so /sign-in can send
+            the user back where they came from after authenticating. */}
+        <ReturnToTracker />
       </body>
     </html>
   );

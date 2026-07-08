@@ -239,9 +239,11 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
     if (!session) {
       // Remember the chosen billing period across the sign-in detour — the
       // buyer lands on /account afterwards, whose Upgrade button honors it
-      // (otherwise an annual purchase silently becomes monthly).
+      // (otherwise an annual purchase silently becomes monthly). The explicit
+      // ?next= pins that destination: sign-in otherwise returns the user to
+      // the page they came from (see app/_components/auth/returnTo.ts).
       stashCheckoutPeriod(annual ? "annual" : "monthly");
-      router.push("/sign-in");
+      router.push("/sign-in?next=/account");
       return;
     }
     if (isPro) {

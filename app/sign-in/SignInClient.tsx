@@ -10,10 +10,28 @@ import {
   useSession,
 } from "@/lib/auth/client";
 import { EyeIcon } from "../_components/auth/authIcons";
+import { isSafeReturnPath, readReturnTo } from "../_components/auth/returnTo";
 import styles from "../_components/auth/authCard.module.css";
 
-/** Where to land after a successful sign-in. */
-const CALLBACK_URL = "/account";
+/** Where to land after a successful sign-in when we don't know where
+ *  the visitor came from (direct /sign-in loads, private mode). The
+ *  usual case resolves to the page they were on instead — see
+ *  `resolveCallbackUrl` below and _components/auth/returnTo.ts. */
+const FALLBACK_CALLBACK_URL = "/account";
+
+/**
+ * The post-sign-in destination: an explicit, validated `?next=` param
+ * wins, then the tracked "page the user came from" (recorded per-tab by
+ * ReturnToTracker in the root layout — it sees client-side navigations,
+ * which document.referrer misses), then /account. Read via
+ * window.location (not useSearchParams) so the page keeps prerendering
+ * statically without a Suspense boundary.
+ */
+function resolveCallbackUrl(): string {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (isSafeReturnPath(next)) return next;
+  return readReturnTo() ?? FALLBACK_CALLBACK_URL;
+}
 
 /**
  * Friendly copy for the `?error=<code>` a failed OAuth callback forwards here
@@ -99,10 +117,11 @@ function GoogleGlyph() {
  * Auth card spanning three modes — sign in, create account, and request a
  * password reset — as a single flat, borderless component (design option "2a").
  *
- * Success paths:
- *   - sign in → session set, redirect to /account
+ * Success paths (destination = resolveCallbackUrl(): the page the user
+ * came from, else /account):
+ *   - sign in → session set, redirect to the destination
  *   - sign up → if verification is required, show a "check your email" notice
- *               and switch to sign-in; otherwise redirect to /account
+ *               and switch to sign-in; otherwise redirect to the destination
  *   - forgot  → always show a neutral "if an account exists…" notice
  *
  * Verification + reset only do anything once RESEND_API_KEY is configured
@@ -127,9 +146,9 @@ export function SignInClient() {
   const [socialPending, setSocialPending] = useState<string | null>(null);
 
   // A signed-in visitor has no reason to be on the sign-in/registration screen
-  // — send them straight to their account.
+  // — send them back where they came from (or to their account).
   useEffect(() => {
-    if (!isPending && session) router.replace(CALLBACK_URL);
+    if (!isPending && session) router.replace(resolveCallbackUrl());
   }, [isPending, session, router]);
 
   // Surface a forwarded OAuth-callback failure (`/sign-in?error=<code>`) and
@@ -181,7 +200,9 @@ export function SignInClient() {
   }, []);
 
   if (!isPending && session) {
-    return <p className={styles.redirecting}>Redirecting to your account…</p>;
+    return (
+      <p className={styles.redirecting}>You&apos;re signed in — redirecting…</p>
+    );
   }
 
   const isSignin = mode === "signin";
@@ -202,16 +223,16 @@ export function SignInClient() {
   async function startSocial(provider: string) {
     setSocialPending(provider);
     setError(null);
-    // Full-page redirect to the provider, returning to CALLBACK_URL. On
-    // success the client's redirect plugin navigates away, so the button
-    // staying "pending" is right. Server-side failures resolve with {error}
-    // (they do NOT reject) — e.g. the provider isn't configured in this
-    // environment — and must re-enable the card; a rejection is a network
-    // failure and must too.
+    // Full-page redirect to the provider, returning to the resolved
+    // callback URL. On success the client's redirect plugin navigates
+    // away, so the button staying "pending" is right. Server-side
+    // failures resolve with {error} (they do NOT reject) — e.g. the
+    // provider isn't configured in this environment — and must
+    // re-enable the card; a rejection is a network failure and must too.
     try {
       const { error } = await signIn.social({
         provider,
-        callbackURL: CALLBACK_URL,
+        callbackURL: resolveCallbackUrl(),
       });
       if (error) {
         setError(
@@ -270,15 +291,16 @@ export function SignInClient() {
 
     // Server-side failures resolve with {error}; only a network-level failure
     // rejects — catch it so the form doesn't stay disabled at "Signing in…".
+    const callbackUrl = resolveCallbackUrl();
     try {
       const { data, error } = isSignup
         ? await signUp.email({
             name: derivedName,
             email,
             password,
-            callbackURL: CALLBACK_URL,
+            callbackURL: callbackUrl,
           })
-        : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
+        : await signIn.email({ email, password, callbackURL: callbackUrl });
 
       if (error) {
         // When verification is required, an unverified sign-in is rejected and a
@@ -313,8 +335,9 @@ export function SignInClient() {
       return;
     }
 
-    // Session is set; surface it on /account (and re-render the header).
-    router.push(CALLBACK_URL);
+    // Session is set; return to the originating page (and re-render the
+    // header so it shows the signed-in state).
+    router.push(callbackUrl);
     router.refresh();
   }
 
