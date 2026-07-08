@@ -46,9 +46,15 @@
  * and match the rest of the page. */
 .ds-home {
   --color-fd-background: #ffffff;
+  /* Solid, filled surface for the hero preview controls (the language /
+   * dialect / flavor pickers and the MCQ number button group) so they read as
+   * tangible buttons against the page rather than blending into it. A subtle
+   * gray in light; a slightly raised near-black in dark. */
+  --ds-control-surface: #f3f4f6;
 }
 html.dark .ds-home {
   --color-fd-background: #121212;
+  --ds-control-surface: #1e1e1e;
 }
 
 /* Center nav menu: hidden below md, flex from md up. Replaces `hidden md:flex`

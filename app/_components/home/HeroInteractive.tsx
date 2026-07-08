@@ -3,9 +3,18 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
-import { ChevronDown, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  Code2,
+  Database,
+  Globe,
+  ListChecks,
+  Loader2,
+  type LucideIcon,
+} from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
@@ -13,10 +22,12 @@ import {
 } from "../languageIcons";
 import {
   CODE_CHALLENGES,
-  CONCEPT_QUESTION,
+  CONCEPT_QUESTIONS,
   SQL_CHALLENGES,
+  WEB_CODE_BLOCKS,
   type HomeCodeChallenge,
   type HomeSqlChallenge,
+  type HomeWebBlock,
 } from "./challenges";
 
 // The editor/runtime-backed cards are heavy (CodeMirror + a WASM runtime), so
@@ -42,17 +53,22 @@ const SqlChallengeCard = dynamic(() => import("../SqlChallengeCard"), {
   ssr: false,
   loading: CardLoading,
 });
+const MdxCodeBlock = dynamic(() => import("../MdxCodeBlock"), {
+  ssr: false,
+  loading: CardLoading,
+});
 const MultipleChoiceQuestion = dynamic(
   () => import("../multipleChoice/MultipleChoiceQuestion"),
   { ssr: false, loading: CardLoading },
 );
 
-type TabId = "code" | "sql" | "mcq";
+type TabId = "code" | "sql" | "web" | "mcq";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "code", label: "Code Challenge" },
-  { id: "sql", label: "SQL Challenge" },
-  { id: "mcq", label: "Multiple Choice Questions" },
+const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
+  { id: "code", label: "Programming", icon: Code2 },
+  { id: "sql", label: "SQL", icon: Database },
+  { id: "web", label: "Web", icon: Globe },
+  { id: "mcq", label: "Multiple Choice", icon: ListChecks },
 ];
 
 function OptionIcon({ id }: { id: string }) {
@@ -100,7 +116,7 @@ function PickerSelect({
           render={(triggerProps) => (
             <ShimmerButton
               {...triggerProps}
-              background="var(--color-fd-background)"
+              background="var(--ds-control-surface)"
               shimmerColor="#148CFF"
               shimmerSize="0.15em"
               borderRadius="0.625rem"
@@ -141,6 +157,11 @@ function PickerSelect({
       </Select.Root>
     </div>
   );
+}
+
+/** Centered row wrapper for a panel's picker / control strip. */
+function ControlRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex justify-center">{children}</div>;
 }
 
 /**
@@ -205,17 +226,19 @@ function CodeChallengePanel() {
   const challenge =
     CODE_CHALLENGES.find((c) => c.adapter === adapterId) ?? CODE_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-2">
-      <PickerSelect
-        label="Language"
-        value={adapterId}
-        onValueChange={setAdapterId}
-        options={CODE_CHALLENGES.map((c: HomeCodeChallenge) => ({
-          value: c.adapter,
-          label: c.label,
-          iconId: c.adapter,
-        }))}
-      />
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Language"
+          value={adapterId}
+          onValueChange={setAdapterId}
+          options={CODE_CHALLENGES.map((c: HomeCodeChallenge) => ({
+            value: c.adapter,
+            label: c.label,
+            iconId: c.adapter,
+          }))}
+        />
+      </ControlRow>
       <RippleFrame>
         <MdxChallengeCard
           key={challenge.adapter}
@@ -236,17 +259,19 @@ function SqlChallengePanel() {
   const challenge =
     SQL_CHALLENGES.find((c) => c.dialect === dialect) ?? SQL_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-2">
-      <PickerSelect
-        label="Dialect"
-        value={dialect}
-        onValueChange={setDialect}
-        options={SQL_CHALLENGES.map((c: HomeSqlChallenge) => ({
-          value: c.dialect,
-          label: c.label,
-          iconId: c.dialect,
-        }))}
-      />
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Dialect"
+          value={dialect}
+          onValueChange={setDialect}
+          options={SQL_CHALLENGES.map((c: HomeSqlChallenge) => ({
+            value: c.dialect,
+            label: c.label,
+            iconId: c.dialect,
+          }))}
+        />
+      </ControlRow>
       <RippleFrame>
         <SqlChallengeCard
           key={challenge.dialect}
@@ -264,6 +289,76 @@ function SqlChallengePanel() {
   );
 }
 
+function WebPanel() {
+  const [flavor, setFlavor] = useState<string>("web");
+  const block =
+    WEB_CODE_BLOCKS.find((b) => b.flavor === flavor) ?? WEB_CODE_BLOCKS[0];
+  return (
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Flavor"
+          value={flavor}
+          onValueChange={setFlavor}
+          options={WEB_CODE_BLOCKS.map((b: HomeWebBlock) => ({
+            value: b.flavor,
+            label: b.label,
+            iconId: b.adapter,
+          }))}
+        />
+      </ControlRow>
+      <RippleFrame>
+        <MdxCodeBlock
+          key={block.flavor}
+          adapter={block.adapter}
+          files={block.files}
+          entryFilename={block.entryFilename}
+          tailwind={block.tailwind}
+        />
+      </RippleFrame>
+    </div>
+  );
+}
+
+function McqPanel() {
+  const [index, setIndex] = useState(0);
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Numbered button group (shadcn) to pick which question to try. */}
+      <ControlRow>
+        <ButtonGroup aria-label="Choose a question">
+          {CONCEPT_QUESTIONS.map((_, i) => {
+            const active = i === index;
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Question ${i + 1}`}
+                aria-pressed={active}
+                onClick={() => setIndex(i)}
+                className={
+                  active
+                    ? "relative z-10 inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-blue-500)] bg-[var(--ds-blue-500)] text-sm font-semibold text-white"
+                    : "inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--ds-control-surface)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-200)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                }
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+        </ButtonGroup>
+      </ControlRow>
+      <RippleFrame>
+        <MultipleChoiceQuestion
+          key={index}
+          markdown={CONCEPT_QUESTIONS[index]}
+          badge="Concept Check"
+        />
+      </RippleFrame>
+    </div>
+  );
+}
+
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
 
@@ -273,6 +368,7 @@ export function HeroInteractive() {
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
           const active = t.id === tab;
+          const Icon = t.icon;
           return (
             <button
               key={t.id}
@@ -280,10 +376,11 @@ export function HeroInteractive() {
               onClick={() => setTab(t.id)}
               className={
                 active
-                  ? "relative text-base font-semibold text-[var(--ds-gray-900)] dark:text-white"
-                  : "relative text-base font-medium text-[var(--ds-gray-500)] transition-colors hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
+                  ? "relative inline-flex items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] dark:text-white"
+                  : "relative inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-colors hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
               }
             >
+              <Icon size={16} aria-hidden="true" />
               {t.label}
               {active && (
                 <span className="absolute -bottom-2 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-[var(--ds-blue-500)]" />
@@ -299,14 +396,8 @@ export function HeroInteractive() {
       <div>
         {tab === "code" && <CodeChallengePanel />}
         {tab === "sql" && <SqlChallengePanel />}
-        {tab === "mcq" && (
-          <RippleFrame>
-            <MultipleChoiceQuestion
-              markdown={CONCEPT_QUESTION}
-              badge="Concept Check"
-            />
-          </RippleFrame>
-        )}
+        {tab === "web" && <WebPanel />}
+        {tab === "mcq" && <McqPanel />}
       </div>
     </div>
   );

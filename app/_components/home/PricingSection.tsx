@@ -83,11 +83,7 @@ const PLANS: Plan[] = [
         text: "Share playgrounds",
         note: "Share links expire 30 days after creation",
       },
-      {
-        icon: Sparkles,
-        text: "3 “Ask AI” messages every 24 hours",
-        note: "Across playgrounds, challenges, code blocks & lessons",
-      },
+      { text: "No “Ask AI” messages", included: false },
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
@@ -180,13 +176,36 @@ const PLANS: Plan[] = [
 // all of the subgrid's rows.
 const COL_START = ["lg:col-start-1", "lg:col-start-2", "lg:col-start-3"];
 
-function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
+/** Two features are "the same" (so the row can be collapsed on mobile) when
+ *  their text, note, and availability all match. */
+function sameFeature(a: Feature, b: Feature): boolean {
+  return (
+    a.text === b.text &&
+    (a.note ?? "") === (b.note ?? "") &&
+    a.included !== false === (b.included !== false)
+  );
+}
+
+function FeatureRow({
+  feature,
+  last,
+  mobileHidden = false,
+}: {
+  feature: Feature;
+  last: boolean;
+  /** Hide on mobile (shown only in the desktop comparison grid) because the
+   *  feature is identical to the Guest plan's — the mobile layout replaces
+   *  these repeats with an "Everything in Guest, plus" line. */
+  mobileHidden?: boolean;
+}) {
   const included = feature.included !== false;
   // Supported → the feature's own icon; missing → an ✕. Both sit in a filled
   // circle (green / red) with a white glyph.
   const Icon = included ? (feature.icon ?? Check) : X;
   return (
-    <div className={`flex gap-3 ${last ? "lg:pb-8" : ""}`}>
+    <div
+      className={`${mobileHidden ? "hidden lg:flex" : "flex"} gap-3 ${last ? "lg:pb-8" : ""}`}
+    >
       <span
         className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
           included ? "bg-[var(--ds-green-500)]" : "bg-[var(--ds-red-500)]"
@@ -280,10 +299,15 @@ function PlanColumn({
   plan,
   annual,
   colClass,
+  guestFeatures,
+  isGuest,
 }: {
   plan: Plan;
   annual: boolean;
   colClass: string;
+  /** The Guest plan's features, used to collapse repeated rows on mobile. */
+  guestFeatures: Feature[];
+  isGuest: boolean;
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
@@ -337,11 +361,34 @@ function PlanColumn({
         </Link>
       )}
 
+      {/* Mobile only: the free/pro columns stack below Guest, so repeating
+          every shared line is noise. Lead with an "Everything in Guest, plus"
+          note and show only the rows that differ. The desktop comparison grid
+          (lg+) still renders every row so the three columns line up. */}
+      {!isGuest && (
+        <div className="flex items-center gap-3 lg:hidden">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ds-green-500)]"
+            aria-hidden="true"
+          >
+            <Check size={12} strokeWidth={2.5} className="text-white" />
+          </span>
+          <span className="text-[15px] font-semibold leading-snug text-[var(--ds-gray-900)] dark:text-white">
+            Everything in Guest, plus:
+          </span>
+        </div>
+      )}
+
       {plan.features.map((feature, i) => (
         <FeatureRow
           key={feature.text}
           feature={feature}
           last={i === FEATURE_COUNT - 1}
+          mobileHidden={
+            !isGuest &&
+            guestFeatures[i] !== undefined &&
+            sameFeature(feature, guestFeatures[i])
+          }
         />
       ))}
     </div>
@@ -419,6 +466,8 @@ export function PricingSection({
               plan={plan}
               annual={annual}
               colClass={COL_START[i]}
+              guestFeatures={PLANS[0].features}
+              isGuest={i === 0}
             />
           ))}
         </div>
