@@ -11,7 +11,8 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
-import { EditorState, Compartment } from "@codemirror/state";
+import { EditorState, Compartment, StateEffect } from "@codemirror/state";
+import { unifiedMergeView } from "@codemirror/merge";
 import {
   EditorView,
   keymap,
@@ -41,6 +42,10 @@ import {
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
+import {
+  registerAiEditHandler,
+  type AiEditSuggestion,
+} from "./ai/editSuggestions";
 import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
@@ -96,6 +101,7 @@ import {
 import { usePlaygroundThemeSync } from "./playgroundThemeSync";
 import { useIsFramed } from "./useIsFramed";
 import {
+  CopyIcon,
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
   LOADING_QUIPS,
@@ -149,6 +155,7 @@ import {
   Rows3,
   Settings,
   Zap,
+  ZapOff,
 } from "lucide-react";
 import PlaygroundSplitEditors from "./PlaygroundSplitEditors";
 import { FilesPanel, type VirtualFile } from "./files/FilesPanel";
@@ -583,30 +590,6 @@ function mergeConsecutiveStdout<T extends { type: string; content: string }>(
   return result;
 }
 
-// Small clipboard / "copy to clipboard" glyph reused by the editor and
-// output cell headers. Stroked rather than filled so it visually matches
-// the existing pane-bar icons.
-function CopyIcon() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      width="13"
-      height="13"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="5" y="5" width="9" height="9" rx="1.5" />
-      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H5" />
-    </svg>
-  );
-}
-
-
-
 export interface PlaygroundProps {
   adapter: LanguageAdapter;
 }
@@ -917,9 +900,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const suppressPersistRef = useRef(false);
 
   const [workspaceReady, setWorkspaceReady] = useState(false);
+  // Mirrored into a ref for callbacks registered outside the render cycle
+  // (e.g. the Ask AI edit handler in ai/editSuggestions.ts).
+  const workspaceReadyRef = useRef(false);
+  useEffect(() => {
+    workspaceReadyRef.current = workspaceReady;
+  }, [workspaceReady]);
 
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatPopoverOpen, setFormatPopoverOpen] = useState(false);
+  // Split view: the id of the file whose pane-header Format button is
+  // currently running, so only that pane shows the spinner.
+  const [formattingSplitId, setFormattingSplitId] = useState<string | null>(
+    null,
+  );
   const outputCounter = useRef(0);
   // Monotonic per-run id stamped on every cell a run appends, so the
   // output pane can render one merged frame per run (see outputGroups).
@@ -987,6 +981,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setSplitView = useCallback(
     (on: boolean) => {
       setSplitViewState(on);
+      // Switching views can change the editor arrangement (tabbed pins
+      // the editor left) — drop the resizer's inline grid template so
+      // the new arrangement's CSS takes over at default proportions.
+      panesRef.current?.style.removeProperty("grid-template-columns");
       try {
         window.localStorage.setItem(
           `playground_${adapter.id}_splitview`,
@@ -1093,6 +1091,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [adapter.id],
   );
+  // On split-capable adapters the tabbed (manage files) view always
+  // pins the editor to the left; the stored arrangement only applies
+  // while the split panes are showing. Non-split preview adapters keep
+  // their arrangement in both views.
+  const editorPinnedLeft = splitAvailable && !splitActive;
+  const effectiveEditorPosition = editorPinnedLeft ? "left" : editorPosition;
 
   // Latest run handler in a ref so the editor's keymap can call into it
   // without being re-bound on every render. `auto` marks debounced
@@ -3132,6 +3136,258 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
   }, [adapter, showToast]);
 
+  // Per-pane Copy/Format for the split view — each pane header carries
+  // its own buttons so it's unambiguous which file they act on.
+  const copySplitFile = useCallback(
+    (fileId: string) => {
+      const code =
+        dirtyBuffersRef.current.get(fileId) ??
+        splitViewsRef.current.get(fileId)?.state.doc.toString() ??
+        "";
+      if (!code) {
+        showToast("Editor is empty.", "warn");
+        return;
+      }
+      void copyToClipboard(code, "Code");
+    },
+    [copyToClipboard, showToast],
+  );
+
+  const formatSplitFile = useCallback(
+    async (fileId: string) => {
+      if (!adapter.formatCode) return;
+      const view = splitViewsRef.current.get(fileId);
+      if (!view) return;
+      const code = view.state.doc.toString();
+      setFormattingSplitId(fileId);
+      try {
+        // Pass the pane's filename so mixed-language workspaces (web:
+        // .html/.css/.js) format with the right dialect.
+        const filename = filesRef.current.find(
+          (f) => f.id === fileId,
+        )?.filename;
+        const formatted = await adapter.formatCode(code, filename);
+        if (formatted === code) {
+          showToast("Already formatted — nothing to change.");
+          return;
+        }
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        });
+        showToast("Code formatted.", "info");
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        showToast(
+          reason ? `Formatting failed: ${reason}` : "Formatting failed.",
+          "warn",
+        );
+      } finally {
+        setFormattingSplitId(null);
+      }
+    },
+    [adapter, showToast],
+  );
+
+  // ─── AI-suggested edit review (Ask AI panel → in-editor diff) ──────────
+  // The Ask AI widget can propose complete new contents for a workspace
+  // file (see ai/editSuggestions.ts). We open a CodeMirror unified merge
+  // view over the target file's editor: the doc becomes the proposal, the
+  // previous contents are the diff baseline, and the built-in per-chunk
+  // Accept/Reject controls let the user pick changes. A banner above the
+  // editor finishes the review ("Keep result") or reverts everything.
+  interface AiReviewState {
+    fileId: string;
+    filename: string;
+    /** The file's contents when the review opened — "Revert all" target. */
+    original: string;
+    /** Compartment holding the merge extension in the target view. */
+    comp: Compartment;
+    /** Which editor family hosted the review (split pane vs tabbed). */
+    split: boolean;
+  }
+  const [aiReview, setAiReview] = useState<AiReviewState | null>(null);
+  const aiReviewRef = useRef<AiReviewState | null>(null);
+  useEffect(() => {
+    aiReviewRef.current = aiReview;
+  }, [aiReview]);
+  // A suggestion accepted by the handler but not yet materialized in an
+  // editor — applied by the effect below AFTER the tab-switch doc sync.
+  const [pendingAiEdit, setPendingAiEdit] = useState<{
+    fileId: string;
+    filename: string;
+    content: string;
+  } | null>(null);
+
+  /** The live EditorView showing `fileId`, if any. */
+  const viewForFile = useCallback((fileId: string): EditorView | null => {
+    if (splitActiveRef.current) {
+      return splitViewsRef.current.get(fileId) ?? null;
+    }
+    return activeFileIdRef.current === fileId ? editorRef.current : null;
+  }, []);
+
+  const endAiReview = useCallback(
+    (keep: boolean) => {
+      const review = aiReviewRef.current;
+      if (!review) return;
+      const view = viewForFile(review.fileId);
+      if (view) {
+        if (!keep) {
+          view.dispatch({
+            changes: {
+              from: 0,
+              to: view.state.doc.length,
+              insert: review.original,
+            },
+          });
+        }
+        view.dispatch({ effects: review.comp.reconfigure([]) });
+        view.focus();
+      } else if (!keep) {
+        // The review's editor is gone (tab switched / view remounted) —
+        // restore the file's buffer directly.
+        updateDirtyBuffer(review.fileId, review.original);
+        const wsId = workspaceIdRef.current;
+        if (wsId) opfsWriteFile(wsId, review.fileId, review.original);
+      }
+      setAiReview(null);
+    },
+    [updateDirtyBuffer, viewForFile],
+  );
+
+  // Materialize a pending suggestion once the target editor is showing the
+  // file (the tab-switch doc sync above runs first — effect order matters).
+  useEffect(() => {
+    if (!pendingAiEdit) return;
+    const view = viewForFile(pendingAiEdit.fileId);
+    if (!view) return; // wait for the view to mount / tab to activate
+    const original = view.state.doc.toString();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- consume-once queue: the pending suggestion is cleared the moment it materializes
+    setPendingAiEdit(null);
+    if (original === pendingAiEdit.content) {
+      showToast("The file already matches the AI suggestion.");
+      return;
+    }
+    const comp = new Compartment();
+    // Baseline first, then swap the doc to the proposal — the merge view
+    // recomputes the diff on doc changes, and the write-through persist
+    // listeners treat the proposal like any edit (so Run previews it).
+    view.dispatch({
+      effects: StateEffect.appendConfig.of(
+        comp.of(unifiedMergeView({ original, mergeControls: true })),
+      ),
+    });
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: pendingAiEdit.content },
+    });
+    setAiReview({
+      fileId: pendingAiEdit.fileId,
+      filename: pendingAiEdit.filename,
+      original,
+      comp,
+      split: splitActiveRef.current,
+    });
+  }, [pendingAiEdit, activeFileId, splitActive, showToast, viewForFile]);
+
+  // A review can't survive its editor: switching tabs away (tabbed mode)
+  // or toggling the split/tabbed layout replaces or remounts the view, so
+  // treat either as "revert the suggestion".
+  useEffect(() => {
+    const review = aiReviewRef.current;
+    if (!review) return;
+    const detached =
+      review.split !== splitActive ||
+      (!review.split && activeFileId !== review.fileId) ||
+      !files.some((f) => f.id === review.fileId);
+    if (!detached) return;
+    // The tabbed editor may now show ANOTHER file with the merge extension
+    // still attached — strip it before restoring the reviewed file's buffer.
+    if (!review.split && editorRef.current) {
+      editorRef.current.dispatch({ effects: review.comp.reconfigure([]) });
+    }
+    updateDirtyBuffer(review.fileId, review.original);
+    const wsId = workspaceIdRef.current;
+    if (wsId && files.some((f) => f.id === review.fileId)) {
+      opfsWriteFile(wsId, review.fileId, review.original);
+    }
+    setAiReview(null);
+  }, [activeFileId, splitActive, files, updateDirtyBuffer]);
+
+  // Filenames the model may create when the user asked for a new file.
+  const SAFE_NEW_FILENAME = /^[A-Za-z0-9_][A-Za-z0-9._/-]{0,99}$/;
+
+  useEffect(() => {
+    return registerAiEditHandler(adapter.id, (suggestion: AiEditSuggestion) => {
+      if (!workspaceReadyRef.current) {
+        return { ok: false, reason: "unavailable" };
+      }
+      if (aiReviewRef.current) return { ok: false, reason: "busy" };
+      const existing =
+        filesRef.current.find((f) => f.filename === suggestion.filename) ??
+        filesRef.current.find(
+          (f) => f.filename.split("/").pop() === suggestion.filename,
+        );
+      flushActiveFileToBuffer();
+      if (!existing) {
+        // A brand-new file: no baseline to diff against — create it with
+        // the proposed contents and open it.
+        if (
+          !SAFE_NEW_FILENAME.test(suggestion.filename) ||
+          suggestion.filename.includes("..") ||
+          filesRef.current.length >= 50
+        ) {
+          return { ok: false, reason: "unavailable" };
+        }
+        const wsId = workspaceIdRef.current;
+        const id = newFileId();
+        const file: PlaygroundFile = {
+          id,
+          filename: suggestion.filename,
+          pristineFilename: suggestion.filename,
+        };
+        const next = [...filesRef.current, file];
+        filesRef.current = next;
+        setFiles(next);
+        updateDirtyBuffer(id, suggestion.content);
+        if (wsId) opfsWriteFile(wsId, id, suggestion.content);
+        markDirty();
+        activeFileIdRef.current = id;
+        setActiveFileId(id);
+        setActiveTabId(id);
+        showToast(`Created ${suggestion.filename} from the AI suggestion.`, "info");
+        return { ok: true };
+      }
+      const current = dirtyBuffersRef.current.get(existing.id) ?? "";
+      if (current === suggestion.content) {
+        return { ok: false, reason: "unchanged" };
+      }
+      if (splitActiveRef.current) {
+        focusSplitFile(existing.id);
+      } else {
+        activeFileIdRef.current = existing.id;
+        setActiveFileId(existing.id);
+        setActiveTabId(existing.id);
+      }
+      setPendingAiEdit({
+        fileId: existing.id,
+        filename: existing.filename,
+        content: suggestion.content,
+      });
+      return { ok: true };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    adapter.id,
+    flushActiveFileToBuffer,
+    focusSplitFile,
+    markDirty,
+    setActiveFileId,
+    setActiveTabId,
+    setFiles,
+    showToast,
+    updateDirtyBuffer,
+  ]);
+
   // Auto-scroll output on new cells.
   useEffect(() => {
     scrollToLatestOutput();
@@ -4208,7 +4464,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           className="panes"
           data-mobile-tab={mobileTab}
           data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
-          data-editor-position={hasPreview ? editorPosition : undefined}
+          data-editor-position={hasPreview ? effectiveEditorPosition : undefined}
           ref={panesRef}
         >
           <div className="editor-pane" ref={editorPaneRef}>
@@ -4219,40 +4475,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </span>
               <div className="pane-bar-sep" />
               <div className="pane-editor-btn-group">
-                {splitAvailable && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className={`icon-btn${splitActive ? " active" : ""}`}
-                          aria-label={
-                            splitActive
-                              ? "Switch to tabbed editor"
-                              : "Switch to split editors"
-                          }
-                          aria-pressed={splitActive}
-                          onClick={() => setSplitView(!splitActive)}
-                        >
-                          <Rows3 size={14} aria-hidden="true" />
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          {splitActive
-                            ? "Tabbed editor (manage files)"
-                            : "Split editors (CodePen-style)"}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
                 {hasPreview && (
                   <Popover.Root>
                     <Popover.Trigger
@@ -4272,7 +4494,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           aria-pressed={autoRun}
                           onClick={() => setAutoRun(!autoRun)}
                         >
-                          <Zap size={14} aria-hidden="true" />
+                          {autoRun ? (
+                            <Zap size={14} aria-hidden="true" />
+                          ) : (
+                            <ZapOff size={14} aria-hidden="true" />
+                          )}
                         </button>
                       )}
                     />
@@ -4285,20 +4511,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </Popover.Portal>
                   </Popover.Root>
                 )}
-                {hasPreview && (
-                  <Menu.Root>
-                    <Menu.Trigger
+                {(hasPreview || splitAvailable) && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
                       render={(triggerProps) => (
                         <button
                           {...triggerProps}
                           type="button"
                           className="icon-btn"
-                          aria-label="Change view (editor position)"
-                          title="Change view"
+                          aria-label="Change view"
                         >
-                          {editorPosition === "right" ? (
+                          {effectiveEditorPosition === "right" ? (
                             <PanelRight size={14} aria-hidden="true" />
-                          ) : editorPosition === "top" ? (
+                          ) : effectiveEditorPosition === "top" ? (
                             <PanelTop size={14} aria-hidden="true" />
                           ) : (
                             <PanelLeft size={14} aria-hidden="true" />
@@ -4306,59 +4534,96 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </button>
                       )}
                     />
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={6} align="start" side="bottom">
-                        <Menu.Popup className="bui-popup change-view-menu">
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="start" side="bottom">
+                        <Popover.Popup className="bui-popup change-view-menu">
                           <div className="change-view-title">Change View</div>
-                          {(
-                            [
-                              { pos: "left", label: "Editors left", Icon: PanelLeft },
-                              { pos: "top", label: "Editors top", Icon: PanelTop },
-                              { pos: "right", label: "Editors right", Icon: PanelRight },
-                            ] as const
-                          ).map(({ pos, label, Icon }) => (
-                            <Menu.Item
-                              key={pos}
-                              className={`change-view-item${
-                                editorPosition === pos ? " selected" : ""
-                              }`}
-                              onClick={() => setEditorPosition(pos)}
-                            >
-                              <Icon size={14} aria-hidden="true" />
-                              <span>{label}</span>
-                            </Menu.Item>
-                          ))}
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.Root>
+                          {hasPreview &&
+                            (
+                              [
+                                { pos: "left", label: "Editors left", Icon: PanelLeft },
+                                { pos: "top", label: "Editors top", Icon: PanelTop },
+                                { pos: "right", label: "Editors right", Icon: PanelRight },
+                              ] as const
+                            ).map(({ pos, label, Icon }) => (
+                              <button
+                                key={pos}
+                                type="button"
+                                className={`change-view-item${
+                                  effectiveEditorPosition === pos ? " selected" : ""
+                                }`}
+                                disabled={editorPinnedLeft}
+                                // eslint-disable-next-line react-hooks/refs -- click handler; setEditorPosition touches panesRef only on invocation
+                                onClick={() => setEditorPosition(pos)}
+                              >
+                                <Icon size={14} aria-hidden="true" />
+                                <span>{label}</span>
+                              </button>
+                            ))}
+                          {hasPreview && editorPinnedLeft && (
+                            <div className="change-view-hint">
+                              The tabbed editor keeps the editor on the left.
+                            </div>
+                          )}
+                          {splitAvailable && (
+                            <>
+                              <div className="change-view-sep" role="separator" />
+                              <div className="change-view-title">Editor Layout</div>
+                              <button
+                                type="button"
+                                className={`change-view-item${splitActive ? " selected" : ""}`}
+                                aria-pressed={splitActive}
+                                onClick={() => setSplitView(true)}
+                              >
+                                <Rows3 size={14} aria-hidden="true" />
+                                <span>Split editors (CodePen-style)</span>
+                              </button>
+                              <button
+                                type="button"
+                                className={`change-view-item${!splitActive ? " selected" : ""}`}
+                                aria-pressed={!splitActive}
+                                onClick={() => setSplitView(false)}
+                              >
+                                <FileCode size={14} aria-hidden="true" />
+                                <span>Tabbed editor (manage files)</span>
+                              </button>
+                            </>
+                          )}
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
                 )}
-                <Popover.Root>
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="icon-btn"
-                        aria-label="Copy code to clipboard"
-                        onClick={copyEditor}
-                      >
-                        <CopyIcon />
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                      <Popover.Popup className="bui-popup pane-btn-popover">
-                        Copy code
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-                {adapter.formatCode && (
+                {/* Split view: Copy/Format live in each pane's header
+                    instead, so it's unambiguous which file they act on. */}
+                {!splitActive && (
+                  <Popover.Root>
+                    <Popover.Trigger
+                      openOnHover
+                      delay={150}
+                      closeDelay={100}
+                      render={(triggerProps) => (
+                        <button
+                          {...triggerProps}
+                          type="button"
+                          className="icon-btn"
+                          aria-label="Copy code to clipboard"
+                          onClick={copyEditor}
+                        >
+                          <CopyIcon />
+                        </button>
+                      )}
+                    />
+                    <Popover.Portal>
+                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
+                        <Popover.Popup className="bui-popup pane-btn-popover">
+                          Copy code
+                        </Popover.Popup>
+                      </Popover.Positioner>
+                    </Popover.Portal>
+                  </Popover.Root>
+                )}
+                {!splitActive && adapter.formatCode && (
                   <Popover.Root
                     open={isFormatting ? false : formatPopoverOpen}
                     onOpenChange={setFormatPopoverOpen}
@@ -4503,6 +4768,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 )}
               </div>
             </div>
+            {aiReview && (
+              <div className="ai-review-bar" role="region" aria-label="AI suggested changes">
+                <Wand2 size={13} aria-hidden="true" />
+                <span className="ai-review-text">
+                  AI suggested changes to{" "}
+                  <code>{aiReview.filename}</code> — accept or reject each
+                  chunk in the editor.
+                </span>
+                <div className="ai-review-actions">
+                  <button
+                    type="button"
+                    className="ai-review-btn ai-review-keep"
+                    onClick={() => endAiReview(true)}
+                    title="Finish the review, keeping the changes as shown in the editor"
+                  >
+                    Keep result
+                  </button>
+                  <button
+                    type="button"
+                    className="ai-review-btn ai-review-revert"
+                    onClick={() => endAiReview(false)}
+                    title="Restore the file to how it was before the suggestion"
+                  >
+                    Revert all
+                  </button>
+                </div>
+              </div>
+            )}
             {splitActive ? (
               // CodePen-style split: one always-visible editor per
               // file, stacked HTML → CSS → JS. Panes write straight
@@ -4527,6 +4820,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onAddFile={addNewFile}
                 registerView={registerSplitEditorView}
                 getRuntime={() => runtimeRef.current}
+                onCopyFile={copySplitFile}
+                onFormatFile={
+                  adapter.formatCode
+                    ? (fileId) => void formatSplitFile(fileId)
+                    : undefined
+                }
+                formattingFileId={formattingSplitId}
               />
             ) : (
               <div

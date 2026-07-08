@@ -155,12 +155,14 @@ test.describe("Playgrounds (fast)", () => {
     // First readiness wait covers the esbuild-wasm toolchain download.
     await waitForRuntimeReady(page);
 
-    // The react playground opens as the main/App/styles trio with one
-    // always-visible pane per file, and no Files rail.
-    await expect(page.locator(".split-editor-section")).toHaveCount(3, {
+    // The react playground opens as the main/App/styles trio in the
+    // regular tabbed editor (one tab per file), with the Files rail
+    // available like the JS/TS playgrounds.
+    await expect(page.locator(".playground-tab")).toHaveCount(3, {
       timeout: 30_000,
     });
-    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(0);
+    await expect(page.locator(".split-editor-section")).toHaveCount(0);
+    await expect(page.locator(".playground-icon-sidebar")).toHaveCount(1);
 
     await page.locator(".run-btn").first().click();
 

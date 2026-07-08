@@ -18,6 +18,7 @@ import {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Popover } from "@base-ui-components/react/popover";
 import {
   Sparkles,
   X,
@@ -35,12 +36,23 @@ import {
   Eye,
   BookOpen,
   FileCode,
+  FileDiff,
+  Info,
 } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
-import type { AskAiClientContext, AskAiSurface } from "@/lib/ai/types";
+import type {
+  AskAiClientContext,
+  AskAiSurface,
+  AskAiUsageResponse,
+} from "@/lib/ai/types";
 import { useAskAi } from "./useAskAi";
 import { useSuggestedQuestions } from "./useSuggestedQuestions";
 import { countSchemaEntities } from "./sqlSchemaText";
+import {
+  parseAiEditSuggestions,
+  requestAiEdit,
+  type AiEditSuggestion,
+} from "./editSuggestions";
 import {
   collectAskAiWidgets,
   findAskAiSourceLabelFor,
@@ -226,6 +238,59 @@ export default function AskAiWidget({
 
   const signedIn = Boolean(session) && !isPending && !needsSignIn;
 
+  // ── Daily prompt quota ─────────────────────────────────────────────
+  // Fetched when the panel opens; decremented locally per send. Usage is
+  // recorded server-side AFTER each answer streams (via waitUntil), so an
+  // immediate refetch would race the write — the local decrement stays
+  // accurate until the next open. Display-only: the chat endpoint is the
+  // enforcement point.
+  const [usage, setUsage] = useState<AskAiUsageResponse | null>(null);
+  const [sentSinceUsageFetch, setSentSinceUsageFetch] = useState(0);
+  useEffect(() => {
+    if (!open || !signedIn) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/ai/usage");
+        if (!res.ok) return;
+        const body = (await res.json()) as AskAiUsageResponse;
+        if (!cancelled) {
+          setUsage(body);
+          setSentSinceUsageFetch(0);
+        }
+      } catch {
+        // display-only — the counter just doesn't render
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, signedIn]);
+  const promptsLeft = usage
+    ? Math.max(0, usage.requestsRemaining - sentSinceUsageFetch)
+    : null;
+
+  // ── AI edit suggestions → the playground editor ────────────────────
+  // Feedback line under a suggestion's action buttons after clicking one.
+  const [editStatus, setEditStatus] = useState<string | null>(null);
+  const handleReviewEdit = useCallback(
+    (s: AiEditSuggestion) => {
+      const res = requestAiEdit(collectContext().adapterId, s);
+      if (res.ok) {
+        setEditStatus(
+          `Review the ${s.filename} diff in the editor — accept or reject the changes there.`,
+        );
+      } else if (res.reason === "unchanged") {
+        setEditStatus(`${s.filename} already matches this suggestion.`);
+      } else if (res.reason === "busy") {
+        setEditStatus("Finish the diff review already open in the editor first.");
+      } else {
+        setEditStatus("The editor isn't available to apply changes right now.");
+      }
+    },
+    [collectContext],
+  );
+
   // ── Suggested questions ────────────────────────────────────────────
   // Three context-grounded questions on the empty panel and after each
   // answer. Free for the member (tracked on suggestion-specific counters
@@ -242,6 +307,8 @@ export default function AskAiWidget({
     (q: string) => {
       send(q);
       clearSuggestions();
+      setSentSinceUsageFetch((n) => n + 1);
+      setEditStatus(null);
       // The highlighted text answered this question; don't let it leak into
       // unrelated follow-ups. Re-selecting re-captures it.
       setSelection(null);
@@ -375,6 +442,15 @@ export default function AskAiWidget({
                 );
               }
               const isLast = i === messages.length - 1;
+              // Only a COMPLETED answer that actually contains `file=`-tagged
+              // code blocks gets the "review in editor" actions — a plain
+              // Q&A answer renders exactly as before (see editSuggestions.ts).
+              const editSuggestions =
+                surface === "playground" &&
+                m.content &&
+                !(streaming && isLast)
+                  ? parseAiEditSuggestions(m.content)
+                  : [];
               return (
                 <div key={i} className={`${styles.msg} ${styles.assistant}`}>
                   {m.content ? (
@@ -384,6 +460,26 @@ export default function AskAiWidget({
                   ) : streaming && isLast ? (
                     <span className={styles.caret} />
                   ) : null}
+                  {editSuggestions.length > 0 && (
+                    <div className={styles.editActions}>
+                      {editSuggestions.map((s) => (
+                        <button
+                          key={s.filename}
+                          type="button"
+                          className={styles.editActionButton}
+                          onClick={() => handleReviewEdit(s)}
+                        >
+                          <FileDiff size={13} aria-hidden />
+                          Review changes to <code>{s.filename}</code>
+                        </button>
+                      ))}
+                      {isLast && editStatus && (
+                        <span className={styles.editStatus} role="status">
+                          {editStatus}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -568,9 +664,44 @@ export default function AskAiWidget({
               </button>
             )}
           </div>
-          <p className={styles.hint}>
-            AI can make mistakes. Verify important answers.
-          </p>
+          <div className={styles.hintRow}>
+            <p className={styles.hint}>
+              AI can make mistakes. Verify important answers.
+            </p>
+            {usage && usage.tier !== "pro" && promptsLeft !== null && (
+              <Popover.Root>
+                <Popover.Trigger
+                  openOnHover
+                  delay={100}
+                  closeDelay={150}
+                  render={(triggerProps) => (
+                    <button
+                      {...triggerProps}
+                      type="button"
+                      className={`${styles.quota} ${
+                        promptsLeft <= 5 ? styles.quotaLow : ""
+                      }`}
+                      aria-label={`${promptsLeft} Ask AI prompts left today — details`}
+                    >
+                      <Info size={12} aria-hidden />
+                      {promptsLeft} prompt{promptsLeft === 1 ? "" : "s"} left
+                      today
+                    </button>
+                  )}
+                />
+                <Popover.Portal>
+                  <Popover.Positioner side="top" align="end" sideOffset={8}>
+                    <Popover.Popup className={styles.quotaPopover}>
+                      Free accounts include {usage.requestsLimit} Ask AI
+                      prompts per day, resetting at midnight UTC.{" "}
+                      <strong>Pro</strong> members get unlimited prompts, a
+                      smarter model, and AI autocomplete.
+                    </Popover.Popup>
+                  </Popover.Positioner>
+                </Popover.Portal>
+              </Popover.Root>
+            )}
+          </div>
         </div>
       )}
     </div>

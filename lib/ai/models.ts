@@ -29,7 +29,7 @@ export interface ResolvedModel {
   contextBudget: number;
 }
 
-type TierLimits = Pick<
+export type TierLimits = Pick<
   ResolvedModel,
   "maxTokens" | "dailyTokenBudget" | "dailyRequestBudget" | "contextBudget"
 >;
@@ -49,6 +49,13 @@ const LIMITS: Record<MemberTier, TierLimits> = {
     contextBudget: 12_000,
   },
 };
+
+/** A tier's non-secret limits, independent of provider configuration —
+ *  used by the usage endpoint to report "prompts left today" even in
+ *  environments where the provider vars aren't set. */
+export function limitsForTier(tier: MemberTier): TierLimits {
+  return LIMITS[tier];
+}
 
 /** Build a tier's provider config from env, or null if key/base URL/model isn't all set. */
 function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null {

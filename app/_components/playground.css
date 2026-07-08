@@ -1586,6 +1586,18 @@ body.playground-active {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
+/* Toggled-on state for pane-bar icon toggles (e.g. auto-run): accent
+   tint so on/off reads at a glance, on top of the paired on/off icons
+   (Zap vs ZapOff). */
+.icon-btn.active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+.icon-btn.active:hover {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
 .icon-btn svg {
   display: block;
 }
@@ -4730,6 +4742,18 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-family: var(--font-mono, ui-monospace, monospace);
   color: var(--text-dim);
 }
+/* Per-pane Copy/Format buttons at the right end of each header, so
+   it's unambiguous which file the action targets. */
+.split-editor-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.split-editor-actions .icon-btn {
+  width: 21px;
+  height: 21px;
+}
 .split-editor-section-active .split-editor-filename {
   color: var(--text);
 }
@@ -4799,9 +4823,14 @@ html[data-playground-theme="dark"] .welcome h3 {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   padding: 6px 8px;
+  border: none;
   border-radius: 6px;
+  background: transparent;
+  font: inherit;
   font-size: 12.5px;
+  text-align: left;
   color: var(--text);
   cursor: pointer;
 }
@@ -4812,6 +4841,86 @@ html[data-playground-theme="dark"] .welcome h3 {
 .change-view-item.selected {
   color: var(--primary);
   font-weight: 600;
+}
+.change-view-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.change-view-item:disabled:hover {
+  background: transparent;
+}
+.change-view-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 4px;
+}
+.change-view-hint {
+  font-size: 10.5px;
+  color: var(--text-dim);
+  padding: 2px 8px 4px;
+  max-width: 190px;
+}
+
+/* ─── AI-suggested edit review ────────────────────────────────────────────
+   Banner shown above the editor while a CodeMirror unified merge view
+   presents an Ask AI suggestion. The per-chunk Accept/Reject buttons come
+   from @codemirror/merge; the banner finishes or reverts the review. */
+.ai-review-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg2));
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ai-review-bar > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.ai-review-text code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11.5px;
+}
+.ai-review-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-review-btn {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.ai-review-keep {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.ai-review-keep:hover {
+  filter: brightness(1.08);
+}
+.ai-review-revert:hover {
+  background: var(--bg3);
+}
+/* The merge view's accept/reject chunk buttons, restyled to match the
+   playground chrome (the package default is a bare monospace label). */
+.cm-chunkButtons button {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 1px 7px;
+  margin-left: 4px;
+  cursor: pointer;
 }
 
 /* Split-stack footer: add-file affordance + file-management hint. */
