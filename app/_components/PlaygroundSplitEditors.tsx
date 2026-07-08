@@ -417,7 +417,7 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
           ＋ New file
         </button>
         <span className="split-editor-footer-hint">
-          rename or close files in the tabbed view
+          rename or close files in the tabbed editor (Change View)
         </span>
       </div>
     </div>

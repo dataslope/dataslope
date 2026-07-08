@@ -49,6 +49,7 @@ import { useAskAi } from "./useAskAi";
 import { useSuggestedQuestions } from "./useSuggestedQuestions";
 import { countSchemaEntities } from "./sqlSchemaText";
 import {
+  hasAiEditHandler,
   parseAiEditSuggestions,
   requestAiEdit,
   type AiEditSuggestion,
@@ -290,6 +291,16 @@ export default function AskAiWidget({
     },
     [collectContext],
   );
+  // Whether a playground editor that can host the diff review is mounted.
+  // SQL playgrounds (and lesson pages) share this surface but register no
+  // handler, so their answers never grow the review buttons. Evaluated only
+  // once a completed answer exists — the handler registry is module state,
+  // and any completed answer implies the playground has long since mounted.
+  const canApplyEdits =
+    surface === "playground" &&
+    !streaming &&
+    messages.some((m) => m.role === "assistant" && m.content) &&
+    hasAiEditHandler(collectContext().adapterId);
 
   // ── Suggested questions ────────────────────────────────────────────
   // Three context-grounded questions on the empty panel and after each
@@ -446,9 +457,7 @@ export default function AskAiWidget({
               // code blocks gets the "review in editor" actions — a plain
               // Q&A answer renders exactly as before (see editSuggestions.ts).
               const editSuggestions =
-                surface === "playground" &&
-                m.content &&
-                !(streaming && isLast)
+                canApplyEdits && m.content && !(streaming && isLast)
                   ? parseAiEditSuggestions(m.content)
                   : [];
               return (
