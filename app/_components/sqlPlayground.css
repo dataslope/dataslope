@@ -2416,6 +2416,13 @@
   cursor: not-allowed;
 }
 
+/* Disabled On delete / On update selects dim like the other disabled fields
+   (e.g. the FK column combobox) instead of showing a diagonal strike-through. */
+.sql-modify-table
+  .sql-modify-cell-field:has(.sql-modify-fk-cascade:disabled)::after {
+  content: none;
+}
+
 /* Keep each column from collapsing below a legible width; the table's own
    min-width lets any overflow scroll inside the bordered container. */
 .sql-modify-table .sql-modify-col-name {
