@@ -3365,10 +3365,6 @@ function SqlPlaygroundInner() {
                   <Dialog.Title className="sql-modify-drawer-title">
                     View/Edit Structure
                   </Dialog.Title>
-                  <Dialog.Description className="sql-modify-drawer-subtitle">
-                    <Table size={12} className="sql-modify-drawer-entity-icon" aria-hidden="true" />
-                    {modifyDialog?.originalName ?? ""}
-                  </Dialog.Description>
                 </div>
                 <Dialog.Close
                   className="sql-modify-drawer-close"

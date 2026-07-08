@@ -241,9 +241,7 @@ export function ModifyColumnRow({
           onChange={(fkTable) => onChange({ fkTable, fkColumn: "" })}
           options={knownTables}
           placeholder="(none)"
-          ariaLabel="Foreign key target table"
-          noneLabel="— none"
-        />
+          ariaLabel="Foreign key target table"        />
       </td>
       <td>
         <FkCombobox
@@ -251,9 +249,7 @@ export function ModifyColumnRow({
           onChange={(fkColumn) => onChange({ fkColumn })}
           options={fkTargetColumns.map((c) => c.name)}
           placeholder="(column)"
-          ariaLabel="Foreign key target column"
-          noneLabel="— none"
-          disabled={!col.fkTable}
+          ariaLabel="Foreign key target column"          disabled={!col.fkTable}
         />
       </td>
       <td>
@@ -556,19 +552,19 @@ export function ModifyStructureForm({
   return (
     <div className="sql-modify-body" ref={formBodyRef}>
       <label className="sql-modify-field">
-        <span className="sql-modify-field-label">
+        <span className="sql-modify-field-label">Table name</span>
+        <div className="sql-modify-table-name-wrap">
           <Table
-            size={13}
-            className="sql-modify-field-icon"
+            size={14}
+            className="sql-modify-table-name-icon"
             aria-hidden="true"
           />
-          Table name
-        </span>
-        <input
-          className="sql-rename-input sql-modify-table-name-input"
-          value={state.newName}
-          onChange={(e) => onChange({ ...state, newName: e.target.value })}
-        />
+          <input
+            className="sql-rename-input sql-modify-table-name-input"
+            value={state.newName}
+            onChange={(e) => onChange({ ...state, newName: e.target.value })}
+          />
+        </div>
       </label>
 
       {/* Tab strip */}

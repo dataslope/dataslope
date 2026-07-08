@@ -760,9 +760,7 @@ function DuckDbStructureColumnRow({
           onChange={(fkTable) => onChange({ fkTable, fkColumn: "" })}
           options={knownTables}
           placeholder="(none)"
-          ariaLabel="Foreign key target table"
-          noneLabel="— none"
-        />
+          ariaLabel="Foreign key target table"        />
       </td>
       <td>
         <FkCombobox
@@ -770,9 +768,7 @@ function DuckDbStructureColumnRow({
           onChange={(fkColumn) => onChange({ fkColumn })}
           options={fkTargetColumns.map((target) => target.name)}
           placeholder="(column)"
-          ariaLabel="Foreign key target column"
-          noneLabel="— none"
-          disabled={!col.fkTable}
+          ariaLabel="Foreign key target column"          disabled={!col.fkTable}
         />
       </td>
       <td>
@@ -4626,10 +4622,6 @@ function DuckDbPlaygroundInner() {
                   <Dialog.Title className="sql-modify-drawer-title">
                     View/Edit Structure
                   </Dialog.Title>
-                  <Dialog.Description className="sql-modify-drawer-subtitle">
-                    <Table size={12} className="sql-modify-drawer-entity-icon" aria-hidden="true" />
-                    {viewStructureDialog?.tableName ?? ""}
-                  </Dialog.Description>
                 </div>
                 <Dialog.Close
                   className="sql-modify-drawer-close"
@@ -4641,25 +4633,25 @@ function DuckDbPlaygroundInner() {
               {viewStructureDialog && (
                 <div className="sql-modify-body" ref={viewStructureBodyRef}>
                   <label className="sql-modify-field">
-                    <span className="sql-modify-field-label">
+                    <span className="sql-modify-field-label">Table name</span>
+                    <div className="sql-modify-table-name-wrap">
                       <Table
-                        size={13}
-                        className="sql-modify-field-icon"
+                        size={14}
+                        className="sql-modify-table-name-icon"
                         aria-hidden="true"
                       />
-                      Table name
-                    </span>
-                    <input
-                      className={`sql-rename-input sql-modify-table-name-input${duckdbStructureValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
-                      value={viewStructureDialog.newTableName}
-                      onChange={(e) =>
-                        setViewStructureDialog((prev) =>
-                          prev
-                            ? { ...prev, newTableName: e.target.value }
-                            : null,
-                        )
-                      }
-                    />
+                      <input
+                        className={`sql-rename-input sql-modify-table-name-input${duckdbStructureValidation.hasTableNameError ? " sql-modify-col-name-error" : ""}`}
+                        value={viewStructureDialog.newTableName}
+                        onChange={(e) =>
+                          setViewStructureDialog((prev) =>
+                            prev
+                              ? { ...prev, newTableName: e.target.value }
+                              : null,
+                          )
+                        }
+                      />
+                    </div>
                   </label>
                   {(() => {
                     const regularCols = viewStructureDialog.columns.filter(
