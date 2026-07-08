@@ -55,8 +55,10 @@ export interface SplitEditorsProps {
   onRun: () => void;
   onRunSecondary: () => void;
   /** Create a new workspace file (same handler as the tab bar's "+");
-   *  the new file appears as an additional pane. */
-  onAddFile: () => void;
+   *  the new file appears as an additional pane. Omitted when the
+   *  adapter disables adding files (e.g. the fixed HTML/CSS/JS trio), in
+   *  which case the "+ New file" footer button is hidden. */
+  onAddFile?: () => void;
   /** Expose each pane's EditorView so Format/Copy can target the
    *  active pane. Called with `null` on teardown. */
   registerView: (fileId: string, view: EditorView | null) => void;
@@ -414,14 +416,16 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
         ))}
       </div>
       <div className="split-editor-footer">
-        <button
-          type="button"
-          className="split-editor-add"
-          onClick={onAddFile}
-          aria-label="Add a new file"
-        >
-          ＋ New file
-        </button>
+        {onAddFile && (
+          <button
+            type="button"
+            className="split-editor-add"
+            onClick={onAddFile}
+            aria-label="Add a new file"
+          >
+            ＋ New file
+          </button>
+        )}
         <span className="split-editor-footer-hint">
           rename or close files in the tabbed editor (Change View)
         </span>

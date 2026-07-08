@@ -306,6 +306,12 @@ export interface LanguageAdapter {
    *  split view already shows every file as a pane, so a separate
    *  file-tree that can't "open" files anywhere would only confuse. */
   hideFilesPane?: boolean;
+  /** Optional: disable adding new files to the workspace for this
+   *  adapter. The HTML/CSS/JS playground sets this — it's a fixed
+   *  index.html / styles.css / script.js trio, so the "+ New file"
+   *  affordances (the tab strip's "+" and the split view's footer
+   *  button) are hidden. Existing files can still be renamed or closed. */
+  disableAddFile?: boolean;
   /** Optional: classify which workspace files contain entry points
    *  (i.e. `main()` / `Main()` / top-level statements). Used by the
    *  Run button to populate a split-button dropdown when multiple

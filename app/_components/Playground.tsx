@@ -4514,7 +4514,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             activeTabId={activeTabId || activeFileId}
             onSelectTab={selectTab}
             onCloseTab={closeFileTab}
-            onAddTab={addNewFile}
+            onAddTab={adapter.disableAddFile ? undefined : addNewFile}
             onRenameTab={renameFileTab}
             onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
             className="playground-file-tabbar"
@@ -4903,7 +4903,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onFocusFile={focusSplitFile}
                 onRun={() => runRef.current()}
                 onRunSecondary={() => runSecondaryRef.current()}
-                onAddFile={addNewFile}
+                onAddFile={adapter.disableAddFile ? undefined : addNewFile}
                 registerView={registerSplitEditorView}
                 getRuntime={() => runtimeRef.current}
                 onCopyFile={copySplitFile}

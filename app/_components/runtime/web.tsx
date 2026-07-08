@@ -495,6 +495,10 @@ export const webAdapter: LanguageAdapter = {
   // The split panes already show every file; a separate file tree with
   // nowhere to "open" files into would only confuse.
   hideFilesPane: true,
+  // The HTML/CSS/JS playground is a fixed index.html / styles.css /
+  // script.js trio — hide the "+ New file" affordances so the workspace
+  // stays the CodePen-style three-pane shape.
+  disableAddFile: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (
     <>
