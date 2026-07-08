@@ -4702,6 +4702,15 @@ html[data-playground-theme="dark"] .welcome h3 {
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+/* Panes wrapper: vertical stack by default; the editors-top arrangement
+   flips it to CodePen-style side-by-side columns (see below). Scrolling
+   lives here so the add-file footer stays pinned. */
+.split-editor-panes {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
 }
 .split-editor-section {
@@ -4713,6 +4722,28 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 .split-editor-section:last-child {
   border-bottom: none;
+}
+/* ─── Editors top: CodePen-style columns over the preview ────────────────
+   With the editor pane spanning the full width above the output, the
+   stacked panes waste vertical space — lay them out side by side
+   instead, one column per file. */
+.panes[data-editor-position="top"]:not([data-settings-active])
+  .split-editor-panes {
+  flex-direction: row;
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.panes[data-editor-position="top"]:not([data-settings-active])
+  .split-editor-section {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 200px;
+  border-bottom: none;
+  border-right: 1px solid var(--border);
+}
+.panes[data-editor-position="top"]:not([data-settings-active])
+  .split-editor-section:last-child {
+  border-right: none;
 }
 .split-editor-header {
   display: flex;
@@ -4741,6 +4772,11 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 11.5px;
   font-family: var(--font-mono, ui-monospace, monospace);
   color: var(--text-dim);
+  /* Narrow columns (editors-top side-by-side) truncate gracefully. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* Per-pane Copy/Format buttons at the right end of each header, so
    it's unambiguous which file the action targets. */

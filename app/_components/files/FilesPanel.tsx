@@ -14,6 +14,7 @@ import {
   Folder,
   FolderOpen,
   FolderSymlink,
+  FileCode,
   FileText,
   ChevronRight,
   ChevronDown,
@@ -53,6 +54,14 @@ interface FilesPanelProps {
   onCreateFolder: (parentPath: string, name: string) => void;
   onCreateFile?: (parentPath: string, name: string) => void;
   onMove: (sourcePath: string, destFolderPath: string) => void;
+  /** Called when the user opens a file into the editor (double-click or
+   *  the "Open in Editor" context item). Only rendered when provided —
+   *  playgrounds use it to (re)open a workspace code file's tab. */
+  onOpenFile?: (path: string) => void;
+  /** Predicate gating the open-file affordance per file (e.g. only
+   *  workspace code files, not uploaded data files). When omitted, every
+   *  file offers it as long as `onOpenFile` is provided. */
+  canOpenFile?: (path: string) => boolean;
   /** Called when the user chooses to open/query a file. Only rendered when
    *  provided — use to surface a runtime-specific "open" action. */
   onOpenQuery?: (path: string) => void;
@@ -156,6 +165,8 @@ interface TreeRowProps {
   onDownload: (path: string) => void;
   onRequestDelete: (node: TreeNode) => void;
   onRequestInfo: (node: TreeNode) => void;
+  onOpenFile?: (path: string) => void;
+  canOpenFile?: (path: string) => boolean;
   onOpenQuery?: (path: string) => void;
   openQueryLabel?: string;
   onCreateTable?: (path: string) => void;
@@ -187,6 +198,8 @@ function TreeRow({
   onDownload,
   onRequestDelete,
   onRequestInfo,
+  onOpenFile,
+  canOpenFile,
   onOpenQuery,
   openQueryLabel = "Query with SELECT",
   onCreateTable,
@@ -201,6 +214,10 @@ function TreeRow({
   onDropOnFolder,
 }: TreeRowProps) {
   const isExpanded = expandedFolders.has(node.fullPath);
+  const openable =
+    !node.isFolder &&
+    Boolean(onOpenFile) &&
+    (!canOpenFile || canOpenFile(node.fullPath));
   const isSelected = selectedPath === node.fullPath;
   const isRenaming = renamingPath === node.fullPath;
   const isDropTarget = dropTargetPath === node.fullPath;
@@ -246,6 +263,9 @@ function TreeRow({
               onClick={() => {
                 if (node.isFolder) onToggleFolder(node.fullPath);
                 onSelect(node.fullPath);
+              }}
+              onDoubleClick={() => {
+                if (openable) onOpenFile!(node.fullPath);
               }}
             >
               {node.isFolder ? (
@@ -317,6 +337,15 @@ function TreeRow({
         <ContextMenu.Portal>
           <ContextMenu.Positioner sideOffset={4}>
             <ContextMenu.Popup className="bui-popup examples-dropdown playground-files-ctx-menu">
+              {openable && (
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => onOpenFile!(node.fullPath)}
+                >
+                  <FileCode size={12} aria-hidden="true" />
+                  <div className="ex-title">Open in Editor</div>
+                </ContextMenu.Item>
+              )}
               {!node.isFolder && onOpenQuery && (
                 <ContextMenu.Item
                   className="example-item"
@@ -412,6 +441,8 @@ function TreeRow({
             onDownload={onDownload}
             onRequestDelete={onRequestDelete}
             onRequestInfo={onRequestInfo}
+            onOpenFile={onOpenFile}
+            canOpenFile={canOpenFile}
             onOpenQuery={onOpenQuery}
             openQueryLabel={openQueryLabel}
             onCreateTable={onCreateTable}
@@ -441,6 +472,8 @@ export function FilesPanel({
   onCreateFolder,
   onCreateFile,
   onMove,
+  onOpenFile,
+  canOpenFile,
   onOpenQuery,
   openQueryLabel,
   onCreateTable,
@@ -800,6 +833,8 @@ export function FilesPanel({
                     onDownload={onDownload}
                     onRequestDelete={handleRequestDelete}
                     onRequestInfo={handleRequestInfo}
+                    onOpenFile={onOpenFile}
+                    canOpenFile={canOpenFile}
                     onOpenQuery={onOpenQuery}
                     openQueryLabel={openQueryLabel}
                     onCreateTable={onCreateTable}

@@ -11,10 +11,10 @@
  *   - User edits here write through synchronously (`onChange` mirrors
  *     the main editor's persist listener: buffer + OPFS + dirty mark),
  *     so Run / snapshot paths that read buffers are always current.
- *   - External writes (loading an example, Close All) flow back in via
- *     the `buffers` prop: each editor replaces its doc when the buffer
- *     diverges, with a suppress flag so the replacement isn't echoed
- *     back out as a user edit.
+ *   - External writes (loading an example, an AI-suggestion revert)
+ *     flow back in via the `buffers` prop: each editor replaces its doc
+ *     when the buffer diverges, with a suppress flag so the replacement
+ *     isn't echoed back out as a user edit.
  *
  * Focusing an editor reports the file as "active" so the Run button
  * label, Format target, and completion filename all track the pane the
@@ -306,9 +306,10 @@ function SplitEditor({
     }
   }, [wordWrap]);
 
-  // External buffer changes (example load, Close All, workspace
-  // hydration) → replace the doc. User edits round-trip through the
-  // store and compare equal here, so this never fights the cursor.
+  // External buffer changes (example load, workspace hydration, an
+  // AI-suggestion revert) → replace the doc. User edits round-trip
+  // through the store and compare equal here, so this never fights the
+  // cursor.
   const bufferValue = buffers.get(file.id);
   useEffect(() => {
     const view = viewRef.current;
@@ -404,9 +405,14 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
 
   return (
     <div className="split-editor-stack" role="group" aria-label="Editors">
-      {ordered.map((file) => (
-        <SplitEditor key={file.id} {...props} file={file} />
-      ))}
+      {/* The panes wrapper stacks editors vertically beside the preview;
+          the editors-top arrangement flips it to CodePen-style columns
+          via CSS keyed off .panes[data-editor-position="top"]. */}
+      <div className="split-editor-panes">
+        {ordered.map((file) => (
+          <SplitEditor key={file.id} {...props} file={file} />
+        ))}
+      </div>
       <div className="split-editor-footer">
         <button
           type="button"
