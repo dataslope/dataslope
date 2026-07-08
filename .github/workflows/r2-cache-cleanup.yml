@@ -147,7 +147,11 @@ jobs:
             [[ -z "$sha" ]] && continue
             pr_branch["$sha"]="$branch (PR #$num)"
           done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
-          echo "Open PRs (active branches): ${#pr_branch[@]}"
+          # `${#assoc[@]}` on an EMPTY associative array trips `set -u`
+          # ("unbound variable") — bash treats a zero-element associative array
+          # as unset. Expanding its keys is safe when empty, so count those.
+          pr_shas=("${!pr_branch[@]}")
+          echo "Open PRs (active branches): ${#pr_shas[@]}"
 
           # 3) Enumerate the build folders in the bucket.
           mapfile -t folders < <(
