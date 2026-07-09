@@ -11,7 +11,17 @@
  * catalog (not the filtered list), matching the mockup.
  */
 import { useMemo, useState } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { Select } from "@base-ui-components/react/select";
+import {
+  ArrowDownAZ,
+  BarChart3,
+  ChevronDown,
+  Code2,
+  GraduationCap,
+  Search,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseCard, LangIcon, LevelBars } from "./CourseCard";
@@ -39,6 +49,12 @@ const LEVEL_RANK: Record<string, number> = {
 };
 
 type Sort = "popular" | "az" | "level";
+
+const SORT_OPTIONS: { value: Sort; label: string; icon: LucideIcon }[] = [
+  { value: "popular", label: "Recommended", icon: Sparkles },
+  { value: "az", label: "A to Z", icon: ArrowDownAZ },
+  { value: "level", label: "By level", icon: BarChart3 },
+];
 
 // Theme-follower shorthands (the mockup's CSS variables → brand tokens).
 const HAIRLINE = "border-[var(--ds-gray-100)] dark:border-white/[0.07]";
@@ -119,6 +135,61 @@ function MobileFilterSelect({
         className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 ${FAINT}`}
       />
     </div>
+  );
+}
+
+/** Sort dropdown, a Base UI Select styled as a borderless chip (subtle
+ *  filled background, body-coloured text) with a lucide icon per option. */
+function SortSelect({
+  value,
+  onChange,
+}: {
+  value: Sort;
+  onChange: (value: Sort) => void;
+}) {
+  const active = SORT_OPTIONS.find((o) => o.value === value) ?? SORT_OPTIONS[0];
+  const ActiveIcon = active.icon;
+  return (
+    <Select.Root
+      value={value}
+      onValueChange={(next) => {
+        if (next != null) onChange(next as Sort);
+      }}
+    >
+      <Select.Trigger
+        aria-label="Sort courses"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[var(--ds-gray-100)] px-3 py-1.5 text-[13px] font-medium text-[#121212] outline-none transition-colors hover:bg-[var(--ds-gray-200)] focus-visible:outline-none dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/10"
+      >
+        <ActiveIcon size={14} aria-hidden="true" />
+        <Select.Value className="text-left">{active.label}</Select.Value>
+        <Select.Icon className={FAINT}>
+          <ChevronDown size={14} />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner
+          sideOffset={6}
+          alignItemWithTrigger={false}
+          className="z-50"
+        >
+          <Select.Popup className="min-w-44 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+            {SORT_OPTIONS.map((o) => {
+              const Icon = o.icon;
+              return (
+                <Select.Item
+                  key={o.value}
+                  value={o.value}
+                  className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white dark:data-[selected]:text-[var(--ds-blue-400)]"
+                >
+                  <Icon size={14} aria-hidden="true" />
+                  <Select.ItemText>{o.label}</Select.ItemText>
+                </Select.Item>
+              );
+            })}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 }
 
@@ -268,8 +339,9 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 text-[11.5px] font-semibold uppercase tracking-[0.06em] ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
           >
+            <Code2 size={13} aria-hidden="true" />
             Language
           </h3>
           {languages.map((l) => (
@@ -286,8 +358,9 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 text-[11.5px] font-semibold uppercase tracking-[0.06em] ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
           >
+            <BarChart3 size={13} aria-hidden="true" />
             Level
           </h3>
           {LEVELS.map((l) => (
@@ -319,18 +392,16 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
         <div
           className={`flex items-center gap-2.5 border-b px-0.5 pb-3.5 ${HAIRLINE}`}
         >
-          <span className={`text-[13.5px] ${SOFT}`}>{countText}</span>
+          <span className={`inline-flex items-center gap-1.5 text-[13.5px] ${SOFT}`}>
+            <GraduationCap
+              size={15}
+              aria-hidden="true"
+              className="text-[#121212] dark:text-white"
+            />
+            {countText}
+          </span>
           <span className="flex-1" />
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            aria-label="Sort courses"
-            className={`cursor-pointer border-none bg-transparent px-0.5 py-1 text-[13px] font-medium ${SOFT}`}
-          >
-            <option value="popular">Recommended</option>
-            <option value="az">A to Z</option>
-            <option value="level">By level</option>
-          </select>
+          <SortSelect value={sort} onChange={setSort} />
         </div>
 
         {list.map((course) => (

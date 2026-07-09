@@ -19,9 +19,13 @@ import { CourseGlyph } from "./courseArt";
 
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 // Hover affordance: no background fill, just a subtle shift of the glyph +
-// title toward the brand blue (the description stays put).
+// title toward the brand blue, and a gentle darkening of the description.
 const HOVER_TEXT =
   "transition-colors group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
+// The description shifts a shade darker on hover, subtle enough to read as a
+// whole-card affordance without competing with the title's blue.
+const HOVER_DESC =
+  "transition-colors group-hover:text-[var(--ds-gray-600)] dark:group-hover:text-[var(--ds-gray-300)]";
 
 /** Neutral database glyph for "sql", the shared language-icon registry only
  *  has per-engine marks (SQLite/PostgreSQL/DuckDB); path from the mockup. */
@@ -107,7 +111,9 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
         >
           {course.title}
         </span>
-        <span className="line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)]">
+        <span
+          className={`line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)] ${HOVER_DESC}`}
+        >
           {course.description}
         </span>
         {/* Difficulty + language, below the description and aligned with it.
