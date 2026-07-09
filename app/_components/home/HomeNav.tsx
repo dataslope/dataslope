@@ -8,8 +8,6 @@ import {
   ChevronDown,
   LogOut,
   Menu as Hamburger,
-  Moon,
-  Sun,
   User as UserIcon,
   X,
 } from "lucide-react";
@@ -23,7 +21,7 @@ import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
-import { useTheme } from "./theme";
+import { ThemePillToggle } from "../ThemePillToggle";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
@@ -77,24 +75,6 @@ function NavLink({
     >
       {children}
     </Link>
-  );
-}
-
-/** Light/dark toggle. The displayed glyph is driven purely by the `.dark`
- *  class on <html> (set pre-hydration) so it never mismatches on hydration. */
-function ThemeToggle() {
-  const { toggle } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
-    >
-      <Sun size={18} className="hidden dark:block" />
-      <Moon size={18} className="block dark:hidden" />
-    </button>
   );
 }
 
@@ -229,41 +209,6 @@ function MobileAuthSection() {
   );
 }
 
-/** Pill toggle switch (sun ↔ moon) for the drawer footer. The knob position and
- *  glyph are driven purely by the `.dark` class on <html> (set pre-hydration),
- *  so they never mismatch on hydration. */
-function ThemeSwitch() {
-  const { theme, toggle } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      role="switch"
-      aria-checked={theme === "dark"}
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
-      className="relative inline-flex h-7 w-[3.25rem] shrink-0 items-center rounded-full bg-[var(--ds-gray-100)] px-1 transition-colors dark:bg-white/10"
-    >
-      {/* Faint end markers so the control reads as sun ↔ moon. */}
-      <Sun
-        size={13}
-        className="pointer-events-none absolute left-1.5 text-[var(--ds-gray-400)]"
-        aria-hidden="true"
-      />
-      <Moon
-        size={13}
-        className="pointer-events-none absolute right-1.5 text-[var(--ds-gray-400)]"
-        aria-hidden="true"
-      />
-      {/* Knob: sits left in light mode, slides right in dark mode. */}
-      <span className="z-10 inline-flex size-5 items-center justify-center rounded-full bg-white text-[var(--ds-gray-700)] shadow-sm transition-transform duration-200 dark:translate-x-[1.5rem] dark:bg-[#2a2a2a] dark:text-white">
-        <Sun size={12} className="block dark:hidden" aria-hidden="true" />
-        <Moon size={12} className="hidden dark:block" aria-hidden="true" />
-      </span>
-    </button>
-  );
-}
-
 /** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
  *  drawer) holding the same navigation the desktop bar exposes inline. */
 function MobileDrawer() {
@@ -336,7 +281,7 @@ function MobileDrawer() {
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
-            <ThemeSwitch />
+            <ThemePillToggle />
             <a
               href={GITHUB_URL}
               target="_blank"
@@ -410,8 +355,8 @@ export function HomeNav() {
         <div className="flex items-center justify-end gap-1">
           {/* Theme + GitHub are desktop-only; on mobile the drawer carries a
               theme switch and a GitHub link instead. */}
-          <span className="ds-nav-icons items-center gap-1">
-            <ThemeToggle />
+          <span className="ds-nav-icons items-center gap-2">
+            <ThemePillToggle />
             <GitHubLink />
           </span>
           {/* Desktop-only: the mobile drawer carries its own auth control so

@@ -49,6 +49,10 @@
  * Tailwind classes, never in just one of the two roots. */
 @source "../components/**/*.{ts,tsx}";
 @source "./_components/home/**/*.{ts,tsx}";
+/* The site-wide light/dark pill toggle lives at the _components root (not
+   under home/) because the playground and Fumadocs surfaces render it too;
+   scan it explicitly so its utilities generate for BOTH Tailwind roots. */
+@source "./_components/ThemePillToggle.tsx";
 /* The header's account control lives here; without this glob its Tailwind
    classes (e.g. the avatar's `size-*`) are never generated, so the avatar
    image falls back to its intrinsic ~96px size. */

@@ -16,6 +16,7 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { interviewSource } from "@/lib/source";
+import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 
 export default function InterviewLayout({ children }: { children: ReactNode }) {
   return (
@@ -23,6 +24,10 @@ export default function InterviewLayout({ children }: { children: ReactNode }) {
       <DocsLayout
         tree={interviewSource.pageTree}
         tabs={false}
+        // Use the site's shared light/dark pill toggle in place of Fumadocs's
+        // default segmented theme switch, so the docs chrome matches the home
+        // header, mobile drawer, and playground settings.
+        slots={{ themeSwitch: ThemePillToggleSlot }}
         // Match /learn: don't viewport-prefetch sidebar links (these pages are
         // static; navigation fetches on click).
         sidebar={{ prefetch: false }}

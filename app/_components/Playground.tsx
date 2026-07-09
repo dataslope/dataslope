@@ -1182,8 +1182,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
+    // Default to D.clearBeforeRun when unset (only an explicit stored value
+    // overrides it), so the shared default drives first-run behaviour.
+    const storedClearBeforeRun = localStorage.getItem(
+      storageKey("clearbeforerun"),
+    );
     const savedClearBeforeRun =
-      localStorage.getItem(storageKey("clearbeforerun")) === "true";
+      storedClearBeforeRun === null
+        ? D.clearBeforeRun
+        : storedClearBeforeRun === "true";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch

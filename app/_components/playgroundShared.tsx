@@ -13,15 +13,14 @@ import { Tabs } from "@base-ui-components/react/tabs";
 import {
   ALargeSmall,
   Eraser,
-  Moon,
   RotateCcw,
   Sliders,
-  Sun,
+  SunMoon,
   Trash2,
   WrapText,
   X,
 } from "lucide-react";
-import { setSiteTheme } from "./siteTheme";
+import { ThemePillToggle } from "./ThemePillToggle";
 import type { RuntimeInfo } from "./types";
 
 /** Small clipboard / "copy to clipboard" glyph shared by the editor
@@ -57,7 +56,7 @@ export const DEFAULT_PLAYGROUND_SETTINGS = {
   outputFontSizeEnabled: false,
   editorTheme: "github-light",
   wordWrap: true,
-  clearBeforeRun: false,
+  clearBeforeRun: true,
 } as const;
 
 /** Cheeky one-liners cycled below the loading hero while the runtime
@@ -283,7 +282,6 @@ export function SettingsPanelContent({
   setOutputFontSizeEnabled,
   outputFontSize,
   setOutputFontSize,
-  editorTheme,
   wordWrap,
   setWordWrap,
   clearBeforeRun,
@@ -317,8 +315,6 @@ export function SettingsPanelContent({
       // ignore
     }
   }, []);
-
-  const isDark = editorTheme === "github-dark";
 
   return (
     <Tabs.Root
@@ -448,30 +444,11 @@ export function SettingsPanelContent({
 
           <div className="setting-row">
             <label className="setting-switch-row">
-              <span className="setting-switch-label is-iconless">
+              <span className="setting-switch-label">
+                <SunMoon size={14} aria-hidden="true" />
                 <span>Appearance</span>
               </span>
-              <span className="theme-switch">
-                <Sun
-                  size={14}
-                  aria-hidden="true"
-                  className={`theme-switch-icon${isDark ? "" : " is-active"}`}
-                />
-                <Switch.Root
-                  checked={isDark}
-                  onCheckedChange={(checked) =>
-                    setSiteTheme(checked ? "dark" : "light")
-                  }
-                  className="bui-switch"
-                >
-                  <Switch.Thumb className="bui-switch-thumb" />
-                </Switch.Root>
-                <Moon
-                  size={14}
-                  aria-hidden="true"
-                  className={`theme-switch-icon${isDark ? " is-active" : ""}`}
-                />
-              </span>
+              <ThemePillToggle />
             </label>
           </div>
 
