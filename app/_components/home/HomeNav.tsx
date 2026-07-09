@@ -149,10 +149,10 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[15deg]"
+        className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[8deg]"
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-1 dark:text-white">
+      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white">
         Dataslope
       </span>
     </Link>
