@@ -366,8 +366,11 @@ export function HeroInteractive() {
 
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Tab bar */}
-      <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      {/* Tab bar. Extra bottom margin gives the active-item dot room; a
+          roomier row gap keeps the tabs from crowding when they wrap onto
+          multiple lines on narrow screens; and desktop gets wider horizontal
+          spacing between items. */}
+      <div className="relative z-10 mb-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-5 sm:gap-x-12">
         {TABS.map((t) => {
           const active = t.id === tab;
           const Icon = t.icon;
@@ -384,8 +387,10 @@ export function HeroInteractive() {
             >
               <Icon size={16} aria-hidden="true" />
               {t.label}
+              {/* Active-item dot, desktop only (on mobile the bold, darker
+                  label already marks the active tab). */}
               {active && (
-                <span className="absolute -bottom-2 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-[var(--ds-blue-500)]" />
+                <span className="absolute -bottom-2.5 left-1/2 hidden size-1.5 -translate-x-1/2 rounded-full bg-current sm:block" />
               )}
             </button>
           );

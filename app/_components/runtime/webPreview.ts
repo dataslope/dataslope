@@ -42,8 +42,10 @@ export const PREVIEW_IFRAME_CLASS = "ds-web-preview-frame";
  *  deliberately absent, see the module docs. */
 export const PREVIEW_SANDBOX = "allow-scripts allow-modals allow-forms";
 
-/** How long after the document's `load` event we keep forwarding
- *  console output before resolving a non-harness run. */
+/** How long after the document's `load` event a non-harness run waits
+ *  before RESOLVING (so the "running" indicator clears). Console output
+ *  keeps forwarding to the output panel after this, for as long as the
+ *  live preview is on screen, see the live-listener registry below. */
 const LOADED_SETTLE_MS = 150;
 /** Deadline for a run whose document never signals `load` (infinite
  *  loop in a script, endless resource). */
@@ -442,6 +444,14 @@ function cellTypeFor(level: PreviewConsoleLevel): "stdout" | "stderr" {
   return level === "warn" || level === "error" ? "stderr" : "stdout";
 }
 
+// The live preview stays interactive after a run resolves (its iframe is
+// left mounted), so its console output must keep flowing to the output panel
+// too, e.g. a `console.log` inside a button's click handler. We therefore
+// leave the `message` listener attached past the run's resolution and retire
+// it only when the NEXT run on the same host replaces the iframe. This map
+// holds the pending "retire the previous run's listener" callback per host.
+const liveConsoleCleanup = new WeakMap<HTMLElement, () => void>();
+
 // Off-DOM fallback host so a run without a surface slot (tests, future
 // headless callers) still executes and reports console output.
 let fallbackHost: HTMLElement | null = null;
@@ -487,6 +497,13 @@ export interface PreviewRunRequest {
 export function runPreviewDocument(req: PreviewRunRequest): Promise<void> {
   return new Promise<void>((resolve) => {
     const host = req.previewHost ?? getFallbackHost();
+
+    // Retire the previous run's still-attached console listener for this
+    // host, its iframe is about to be replaced below, so it can't post any
+    // more messages anyway.
+    liveConsoleCleanup.get(host)?.();
+    liveConsoleCleanup.delete(host);
+
     const iframe = document.createElement("iframe");
     iframe.className = PREVIEW_IFRAME_CLASS;
     iframe.setAttribute("sandbox", PREVIEW_SANDBOX);
@@ -497,13 +514,23 @@ export function runPreviewDocument(req: PreviewRunRequest): Promise<void> {
     let settleTimer: number | null = null;
     let deadlineTimer: number | null = null;
 
+    const removeListener = () => {
+      window.removeEventListener("message", onMessage);
+      if (liveConsoleCleanup.get(host) === removeListener) {
+        liveConsoleCleanup.delete(host);
+      }
+    };
+
     const finish = () => {
       if (settled) return;
       settled = true;
-      window.removeEventListener("message", onMessage);
       if (settleTimer !== null) window.clearTimeout(settleTimer);
       if (deadlineTimer !== null) window.clearTimeout(deadlineTimer);
       resolve();
+      // Do NOT detach the listener here: the preview is still live and
+      // interactive, so keep forwarding its console output to the output
+      // panel until the next run replaces this iframe (see the registry).
+      liveConsoleCleanup.set(host, removeListener);
     };
 
     const onMessage = (ev: MessageEvent) => {

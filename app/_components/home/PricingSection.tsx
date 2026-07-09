@@ -20,6 +20,7 @@ import {
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
+import { Highlighter } from "@/components/ui/highlighter";
 import {
   stashCheckoutPeriod,
   startProCheckout,
@@ -34,6 +35,9 @@ type Feature = {
   icon?: LucideIcon;
   note?: string;
   included?: boolean;
+  /** Optional substring of `text` to wrap in a Magic UI underline
+   *  highlight (used to draw the eye to the headline Pro perks). */
+  highlight?: string;
 };
 
 interface Plan {
@@ -147,6 +151,7 @@ const PLANS: Plan[] = [
         icon: Database,
         text: "10 GB of cloud storage",
         note: "Total across all playgrounds",
+        highlight: "10 GB",
       },
       {
         icon: Share2,
@@ -157,11 +162,13 @@ const PLANS: Plan[] = [
         icon: Sparkles,
         text: "Unlimited “Ask AI” messages",
         note: "Fair use policy applies",
+        highlight: "Unlimited",
       },
       {
         icon: WandSparkles,
         text: "Unlimited AI-suggested autocomplete",
         note: "Inline, context-aware code completions in every playground",
+        highlight: "Unlimited",
       },
     ],
     cta: "Go Pro",
@@ -186,6 +193,22 @@ function sameFeature(a: Feature, b: Feature): boolean {
   );
 }
 
+/** Render the feature text, wrapping `feature.highlight` (if present) in a
+ *  Magic UI underline highlight. */
+function FeatureText({ feature }: { feature: Feature }) {
+  const at = feature.highlight ? feature.text.indexOf(feature.highlight) : -1;
+  if (!feature.highlight || at === -1) return <>{feature.text}</>;
+  return (
+    <>
+      {feature.text.slice(0, at)}
+      <Highlighter action="underline" color="#148CFF" isView>
+        {feature.highlight}
+      </Highlighter>
+      {feature.text.slice(at + feature.highlight.length)}
+    </>
+  );
+}
+
 function FeatureRow({
   feature,
   last,
@@ -194,8 +217,8 @@ function FeatureRow({
   feature: Feature;
   last: boolean;
   /** Hide on mobile (shown only in the desktop comparison grid) because the
-   *  feature is identical to the Guest plan's, the mobile layout replaces
-   *  these repeats with an "Everything in Guest, plus" line. */
+   *  feature is identical to the previous plan's, the mobile layout replaces
+   *  these repeats with an "Everything in <plan>, plus" line. */
   mobileHidden?: boolean;
 }) {
   const included = feature.included !== false;
@@ -215,7 +238,7 @@ function FeatureRow({
         <Icon size={12} strokeWidth={2.5} className="text-white" />
       </span>
       <span className="text-[15px] leading-snug text-[var(--ds-gray-900)] dark:text-white">
-        {feature.text}
+        <FeatureText feature={feature} />
         {feature.note && (
           <span className="mt-0.5 block text-[13px] text-[var(--ds-gray-400)]">
             {feature.note}
@@ -299,15 +322,14 @@ function PlanColumn({
   plan,
   annual,
   colClass,
-  guestFeatures,
-  isGuest,
+  prevPlan,
 }: {
   plan: Plan;
   annual: boolean;
   colClass: string;
-  /** The Guest plan's features, used to collapse repeated rows on mobile. */
-  guestFeatures: Feature[];
-  isGuest: boolean;
+  /** The plan one tier down (undefined for Guest). Its features collapse the
+   *  repeated rows on mobile behind an "Everything in <plan>, plus" line. */
+  prevPlan?: Plan;
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
@@ -361,11 +383,12 @@ function PlanColumn({
         </Link>
       )}
 
-      {/* Mobile only: the free/pro columns stack below Guest, so repeating
-          every shared line is noise. Lead with an "Everything in Guest, plus"
-          note and show only the rows that differ. The desktop comparison grid
-          (lg+) still renders every row so the three columns line up. */}
-      {!isGuest && (
+      {/* Mobile only: each paid column stacks below the one before it, so
+          repeating every shared line is noise. Lead with an "Everything in
+          <previous plan>, plus" note and show only the rows that differ. The
+          desktop comparison grid (lg+) still renders every row so the three
+          columns line up. */}
+      {prevPlan && (
         <div className="flex items-center gap-3 lg:hidden">
           <span
             className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ds-green-500)]"
@@ -374,7 +397,7 @@ function PlanColumn({
             <Check size={12} strokeWidth={2.5} className="text-white" />
           </span>
           <span className="text-[15px] font-semibold leading-snug text-[var(--ds-gray-900)] dark:text-white">
-            Everything in Guest, plus:
+            Everything in {prevPlan.name}, plus:
           </span>
         </div>
       )}
@@ -385,9 +408,9 @@ function PlanColumn({
           feature={feature}
           last={i === FEATURE_COUNT - 1}
           mobileHidden={
-            !isGuest &&
-            guestFeatures[i] !== undefined &&
-            sameFeature(feature, guestFeatures[i])
+            prevPlan !== undefined &&
+            prevPlan.features[i] !== undefined &&
+            sameFeature(feature, prevPlan.features[i])
           }
         />
       ))}
@@ -471,8 +494,7 @@ export function PricingSection({
                 plan={plan}
                 annual={annual}
                 colClass={COL_START[i]}
-                guestFeatures={PLANS[0].features}
-                isGuest={i === 0}
+                prevPlan={i > 0 ? PLANS[i - 1] : undefined}
               />
             ))}
           </div>
