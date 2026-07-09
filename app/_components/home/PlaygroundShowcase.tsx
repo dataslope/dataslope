@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
 import { Highlighter } from "@/components/ui/highlighter";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -12,7 +12,6 @@ import {
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 import { EmbeddedPlayground } from "./EmbeddedPlayground";
-import { useTheme } from "./theme";
 
 const SQL_IDS = new Set(["postgres", "sqlite", "duckdb"]);
 
@@ -101,12 +100,8 @@ function PlaygroundSwitcher({
  *  a link to the full page. */
 export function PlaygroundShowcase() {
   const [playgroundId, setPlaygroundId] = useState("postgres");
-  const { theme } = useTheme();
   const name = languageName(playgroundId);
   const isSql = SQL_IDS.has(playgroundId);
-  // Yellow reads well behind dark text in light mode but washes out behind
-  // the light link text in dark mode, so use brand blue there.
-  const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
 
   const subtitle = isSql
     ? `A full in-browser SQL workbench, query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
@@ -138,9 +133,10 @@ export function PlaygroundShowcase() {
           href={playgroundHref(playgroundId)}
           className="group inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
+          <SquareTerminal size={16} aria-hidden="true" />
           <span>
             Open the{" "}
-            <Highlighter action="highlight" color={highlightColor} isView>
+            <Highlighter action="circle" color="#20C621" isView>
               {name}
             </Highlighter>{" "}
             playground

@@ -58,7 +58,6 @@ const SORT_OPTIONS: { value: Sort; label: string; icon: LucideIcon }[] = [
 
 // Theme-follower shorthands (the mockup's CSS variables → brand tokens).
 const HAIRLINE = "border-[var(--ds-gray-100)] dark:border-white/[0.07]";
-const SOFT = "text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]";
 const FAINT = "text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]";
 const MUTED = "text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]";
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
@@ -392,12 +391,8 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
         <div
           className={`flex items-center gap-2.5 border-b px-0.5 pb-3.5 ${HAIRLINE}`}
         >
-          <span className={`inline-flex items-center gap-1.5 text-[13.5px] ${SOFT}`}>
-            <GraduationCap
-              size={15}
-              aria-hidden="true"
-              className="text-[#121212] dark:text-white"
-            />
+          <span className="inline-flex items-center gap-1.5 text-[13.5px] text-[#121212] dark:text-white">
+            <GraduationCap size={15} aria-hidden="true" />
             {countText}
           </span>
           <span className="flex-1" />

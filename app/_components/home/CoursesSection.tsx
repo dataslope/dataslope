@@ -9,7 +9,7 @@
  */
 import { useMemo, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown, GraduationCap } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import Link from "../Link";
 import { formatTagLabel } from "@/lib/tagLabels";
@@ -147,6 +147,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
           href="/courses"
           className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
         >
+          <GraduationCap size={16} aria-hidden="true" />
           Browse all {courses.length} courses
           <ArrowRight
             size={16}

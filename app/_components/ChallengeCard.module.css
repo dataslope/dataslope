@@ -491,6 +491,30 @@
   color: var(--ds-gray-900);
 }
 
+/* Fenced code blocks in instructions (e.g. an "expected output" sample) are a
+   real multi-line block, NOT the inline-code pill above. The ambient prose /
+   code styling the card inherits collapses their newlines by forcing
+   `white-space: nowrap` on <code>, so re-assert `pre` here (the parent <pre>
+   already preserves newlines; the inline <code> child was overriding it). */
+.instructionsBody pre {
+  margin: 8px 0 10px;
+  padding: 10px 12px;
+  background: var(--ds-gray-100);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.instructionsBody pre code {
+  display: block;
+  white-space: pre;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-gray-900);
+}
+
 .instructionsBody ul,
 .instructionsBody ol {
   padding-left: 18px;
@@ -2231,6 +2255,15 @@
 
 :global(html:is(.dark, [data-theme="dark"])) .instructionsBody code {
   background: #252525;
+  color: var(--ch-text);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .instructionsBody pre {
+  background: #252525;
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .instructionsBody pre code {
+  background: none;
   color: var(--ch-text);
 }
 

@@ -134,6 +134,15 @@ function BrandLogo() {
       href="/"
       aria-label="Dataslope home"
       className="flex items-center gap-2"
+      // This nav only renders on "/", so a Link to "/" is a same-route no-op
+      // and nothing appears to happen. Scroll back to the top instead, the
+      // expected behaviour of clicking a site logo.
+      onClick={() => {
+        const reduce = window.matchMedia?.(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

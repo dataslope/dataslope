@@ -85,7 +85,7 @@ function PlaygroundFacade({
           <span className="size-2.5 rounded-full bg-[#FFDD6C]" />
           <span className="size-2.5 rounded-full bg-[var(--ds-green-500)]/70" />
         </span>
-        <span className="ml-2 inline-flex items-center gap-2 text-xs font-medium text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <span className="ml-2 inline-flex items-center gap-2 text-xs font-medium text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-green-600)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-green-400)]">
           <FacadeGlyph id={playgroundId} />
           {label} playground
         </span>
@@ -127,7 +127,7 @@ function PlaygroundFacade({
             className="gap-2.5 border-[color:var(--ds-gray-300)] px-6 py-3 text-sm font-semibold text-[var(--ds-gray-900)] shadow-sm transition-colors group-hover:border-[var(--ds-green-600)] group-hover:text-[var(--ds-green-700)] dark:border-white/15 dark:text-white dark:group-hover:border-[var(--ds-green-400)] dark:group-hover:text-[var(--ds-green-400)]"
           >
             <Play size={16} aria-hidden="true" />
-            Launch the {label} playground
+            Preview the {label} playground
           </ShimmerButton>
           <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-green-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-green-400)]">
             {suspended
