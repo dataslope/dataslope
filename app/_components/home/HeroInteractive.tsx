@@ -370,7 +370,7 @@ export function HeroInteractive() {
           keeping the pickers close below; a roomier row gap keeps the tabs
           from crowding when they wrap onto multiple lines on narrow screens;
           and desktop gets wider horizontal spacing between items. */}
-      <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-5 sm:gap-x-12">
+      <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-1 gap-y-3 sm:gap-x-6">
         {TABS.map((t) => {
           const active = t.id === tab;
           const Icon = t.icon;
@@ -381,8 +381,8 @@ export function HeroInteractive() {
               onClick={() => setTab(t.id)}
               className={
                 active
-                  ? "relative inline-flex cursor-pointer items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] transition-[translate] hover:-translate-y-0.5 dark:text-white"
-                  : "relative inline-flex cursor-pointer items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-[color,translate] hover:-translate-y-0.5 hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
+                  ? "relative inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-base font-semibold text-[var(--ds-gray-900)] transition-[translate] hover:-translate-y-0.5 dark:text-white"
+                  : "relative inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-base font-medium text-[var(--ds-gray-500)] transition-[color,translate] hover:-translate-y-0.5 hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
               }
             >
               <Icon size={16} aria-hidden="true" />
@@ -391,7 +391,7 @@ export function HeroInteractive() {
                   colour), desktop only (on mobile the bold, darker label
                   already marks the active tab). */}
               {active && (
-                <span className="absolute -bottom-2 left-1/2 hidden h-0.5 w-5 -translate-x-1/2 rounded-full bg-current sm:block" />
+                <span className="absolute bottom-0 left-1/2 hidden h-0.5 w-5 -translate-x-1/2 rounded-full bg-current sm:block" />
               )}
             </button>
           );

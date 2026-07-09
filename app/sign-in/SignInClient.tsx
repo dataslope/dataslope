@@ -92,6 +92,15 @@ const COPY: Record<
   },
 };
 
+/** Browser-tab title per mode, mirroring the dedicated routes' metadata
+ *  (the root layout appends "· DataSlope"). Kept in step client-side because
+ *  switching modes doesn't navigate, so Next never re-runs the route metadata. */
+const DOC_TITLE: Record<Mode, string> = {
+  signin: "Sign in",
+  signup: "Create your account",
+  forgot: "Reset your password",
+};
+
 function GoogleGlyph() {
   // Google "G" mark, inline so it needs no extra icon dependency.
   return (
@@ -195,6 +204,13 @@ export function SignInClient({
     window.addEventListener("pageshow", onPageShow);
     return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
+
+  // Keep the browser-tab title tracking the visible form. `go()` swaps the
+  // URL with replaceState (no navigation), so Next doesn't re-apply the
+  // route's metadata title, do it here.
+  useEffect(() => {
+    document.title = `${DOC_TITLE[mode]} · DataSlope`;
+  }, [mode]);
 
   if (!isPending && session) {
     return (
