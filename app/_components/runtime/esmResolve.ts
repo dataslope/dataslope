@@ -4,12 +4,12 @@
 // modules; the esbuild worker rewrites every bare specifier in learner
 // code to one of these URLs and marks it external, so the browser
 // fetches the module directly inside the sandboxed preview iframe (the
-// "import-map passthrough" variant from §5/§9 of the research report —
+// "import-map passthrough" variant from §5/§9 of the research report,
 // no fetch-and-bundle step, each module cached by the browser).
 //
 // React itself is version-pinned for reproducible course content, and
 // every OTHER package gets `?deps=react@<pin>` so esm.sh resolves any
-// transitive react peer-dependency to the exact same module instance —
+// transitive react peer-dependency to the exact same module instance,
 // two copies of react would break hooks with the infamous "Invalid hook
 // call" error. Keep REACT_VERSION in step with the react major the repo
 // itself uses (package.json), bumping deliberately alongside course
@@ -28,7 +28,7 @@ const PINNED_VERSIONS: Record<string, string> = {
   "react-dom": REACT_VERSION,
 };
 
-/** True for the module specifiers that need CDN resolution — anything
+/** True for the module specifiers that need CDN resolution, anything
  *  that isn't a relative/absolute path or a full URL. */
 export function isBareSpecifier(specifier: string): boolean {
   if (specifier.startsWith(".") || specifier.startsWith("/")) return false;
@@ -54,7 +54,7 @@ export function esmShUrlFor(specifier: string): string {
   const pin = PINNED_VERSIONS[packageName];
   const version = pin ? `@${pin}` : "";
   // Pin the shared react instance for everything except react itself
-  // (react's own subpaths — jsx-runtime etc. — already resolve within
+  // (react's own subpaths, jsx-runtime etc., already resolve within
   // the pinned package).
   const deps = packageName === "react" ? "" : `?deps=react@${REACT_VERSION}`;
   return `${ESM_SH_ORIGIN}/${packageName}${version}${subpath}${deps}`;

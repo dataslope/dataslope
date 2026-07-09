@@ -5,12 +5,12 @@ description: Splitting code across files with import, packages, and __main__
 
 A **module** is just a `.py` file. A **package** is a directory of modules (usually marked by an `__init__.py`). `import` is how you pull them in.
 
-Modules are the backbone of Python's ecosystem: every library you `pip install` — **requests**, **numpy**, **pandas** — is a package made of modules.
+Modules are the backbone of Python's ecosystem: every library you `pip install`, **requests**, **numpy**, **pandas**, is a package made of modules.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three module cards sit above a program card, and thin lines carry down only the blue circle and the yellow triangle while the green square stays put — import brings in just the pieces your program asks for"
+  aria-label="Three module cards sit above a program card, and thin lines carry down only the blue circle and the yellow triangle while the green square stays put, import brings in just the pieces your program asks for"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -42,10 +42,10 @@ Modules are the backbone of Python's ecosystem: every library you `pip install` 
 
 Python's module system is the foundation of its success:
 
-- **Code reuse** — Write once, import everywhere.
-- **PyPI ecosystem** — Over 500,000 packages available. `pip install requests` gives you a production-grade HTTP client in one line.
-- **Testability** — Each module can be tested in isolation.
-- **Namespace isolation** — `foo.bar` and `baz.bar` don't collide.
+- **Code reuse**, Write once, import everywhere.
+- **PyPI ecosystem**, Over 500,000 packages available. `pip install requests` gives you a production-grade HTTP client in one line.
+- **Testability**, Each module can be tested in isolation.
+- **Namespace isolation**, `foo.bar` and `baz.bar` don't collide.
 
 When you do `import pandas as pd`, you're pulling in hundreds of modules, all organized into a single namespace. Understanding how `import` works is critical for debugging import errors, managing dependencies, and organizing your own code.
 
@@ -76,9 +76,9 @@ print(m.cos(0))
 />
 
 <Callout type="tip" title="When to use each import style">
-- `import math` — Use when you call multiple functions (`math.sqrt`, `math.cos`, ...). Keeps the namespace clean.
-- `from math import sqrt` — Use when you call one or two functions repeatedly. But don't overdo it; `sqrt(x)` is less clear than `math.sqrt(x)` to a reader who doesn't know where `sqrt` comes from.
-- `import numpy as np` — Use for libraries with established conventions. Everyone knows `np`, `pd`, `plt`.
+- `import math`, Use when you call multiple functions (`math.sqrt`, `math.cos`, ...). Keeps the namespace clean.
+- `from math import sqrt`, Use when you call one or two functions repeatedly. But don't overdo it; `sqrt(x)` is less clear than `math.sqrt(x)` to a reader who doesn't know where `sqrt` comes from.
+- `import numpy as np`, Use for libraries with established conventions. Everyone knows `np`, `pd`, `plt`.
 </Callout>
 
 ## The standard library
@@ -114,12 +114,12 @@ The standard library has modules for **everything**: file I/O, networking, threa
 
 When you write `import foo`:
 
-1. **Check the cache** — Python looks for `foo` in `sys.modules` (a dict of already-imported modules). If it's there, done.
-2. **Search the path** — If not, Python searches every directory in `sys.path` for:
+1. **Check the cache**, Python looks for `foo` in `sys.modules` (a dict of already-imported modules). If it's there, done.
+2. **Search the path**, If not, Python searches every directory in `sys.path` for:
    - A `foo.py` file
    - A `foo/` directory with an `__init__.py` (package)
    - A built-in module (written in C, like `sys` or `math`)
-3. **Execute** — The module is executed top to bottom, and its namespace is bound to the name `foo`.
+3. **Execute**, The module is executed top to bottom, and its namespace is bound to the name `foo`.
 
 `sys.path` includes the directory of the running script, the `PYTHONPATH` environment variable, and the install's `site-packages`. You can inspect it:
 
@@ -260,7 +260,7 @@ Use **relative imports** inside a package when modules import from each other. T
 
 Each of these is a **package** made of **modules**. When you `pip install`, you're downloading a package from PyPI and putting it in your `site-packages/` directory (which is in `sys.path`).
 
-The ability to share and reuse code at this scale — hundreds of thousands of packages, billions of downloads — is only possible because Python's module system is simple and consistent.
+The ability to share and reuse code at this scale, hundreds of thousands of packages, billions of downloads, is only possible because Python's module system is simple and consistent.
 
 ## Multi-file challenge
 

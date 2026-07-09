@@ -51,37 +51,40 @@ export function Highlighter({
     const element = elementRef.current;
     if (!shouldShow || !element) return;
 
-    const annotation = annotate(element, {
+    const opts = {
       type: action,
       color,
       strokeWidth,
-      animationDuration,
       iterations,
       padding,
       multiline,
-    });
+    } as const;
+
+    // Only the FIRST draw animates; later repositions are instant (see below).
+    const annotation = annotate(element, { ...opts, animationDuration });
     annotation.show();
 
     // rough-notation draws the annotation to fit the element's current
     // document-space box. It does NOT follow the element when later reflows
-    // (font loads, wrapping changes, window resizes) move or resize it — the
+    // (font loads, wrapping changes, window resizes) move or resize it, the
     // drawing is left stranded in its old spot. So we re-draw whenever the
     // element's own geometry actually changes.
     //
-    // Geometry is measured in DOCUMENT space (rect + scroll offset), which
-    // means: (a) scrolling alone never triggers a re-draw — rough-notation is
-    // already positioned in document space, so it tracks scroll for free — and
-    // (b) unrelated layout changes that don't move this element (e.g. an FAQ
-    // accordion opening further down the page) are correctly ignored.
-    const geometry = () => {
+    // Geometry is measured in DOCUMENT space (rect + scroll offset), so
+    // scrolling alone never moves it and unrelated layout changes elsewhere on
+    // the page are ignored. The measurements are kept fractional (no rounding)
+    // and compared with a 1px tolerance, because getBoundingClientRect() and
+    // window.scrollY drift by sub-pixel amounts during a scroll, and rounding
+    // that drift would otherwise flip the value by ±1 and trigger a needless
+    // re-draw on almost every scroll frame.
+    const geometry = (): [number, number, number, number] => {
       const r = element.getBoundingClientRect();
-      return [
-        Math.round(r.left + window.scrollX),
-        Math.round(r.top + window.scrollY),
-        Math.round(r.width),
-        Math.round(r.height),
-      ].join(",");
+      return [r.left + window.scrollX, r.top + window.scrollY, r.width, r.height];
     };
+    const moved = (
+      a: [number, number, number, number],
+      b: [number, number, number, number],
+    ) => a.some((v, i) => Math.abs(v - b[i]) > 1);
 
     let cancelled = false;
     let frame = 0;
@@ -92,9 +95,16 @@ export function Highlighter({
       frame = requestAnimationFrame(() => {
         if (cancelled) return;
         const next = geometry();
-        if (next === last) return;
+        if (!moved(last, next)) return;
         last = next;
-        annotation.hide();
+        // Reposition by re-rendering the SAME annotation instance: calling
+        // show() on a mark that's already showing clears and redraws it,
+        // without animation, reusing rough-notation's per-instance random
+        // seed. So the hand-drawn shape is IDENTICAL and simply snaps to the
+        // element's new box. (Creating a fresh annotation, as we used to,
+        // rolls a NEW seed and visibly re-sketches the mark, which read as a
+        // flicker on every scroll once the sticky header's shrink-on-scroll
+        // started moving the text.)
         annotation.show();
       });
     };

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AI usage section — how much Ask AI chat, inline completion, and suggested
+ * AI usage section, how much Ask AI chat, inline completion, and suggested
  * questions the site served over a chosen date window, per user and in total.
  * This is the page to watch while testing the AI features with test users:
  * counters move as completions/chats land (usage is recorded post-response via
@@ -68,7 +68,7 @@ const full = new Intl.NumberFormat("en");
 type Range = "day" | "week" | "month" | "total";
 
 /** The toggle options, with the trailing span each covers (in days). Total has
- *  no fixed span — it drops the lower bound entirely. */
+ *  no fixed span, it drops the lower bound entirely. */
 const RANGES: { key: Range; label: string; span: number }[] = [
   { key: "day", label: "Day", span: 1 },
   { key: "week", label: "Week", span: 7 },
@@ -76,7 +76,7 @@ const RANGES: { key: Range; label: string; span: number }[] = [
   { key: "total", label: "Total", span: 0 },
 ];
 
-/** Today as a UTC 'YYYY-MM-DD' — matches how the server buckets usage. */
+/** Today as a UTC 'YYYY-MM-DD', matches how the server buckets usage. */
 function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -325,7 +325,7 @@ export function AiUsageClient() {
               disabled={range === "total"}
               title={
                 range === "total"
-                  ? "Total covers all time — pick another range to filter by date"
+                  ? "Total covers all time, pick another range to filter by date"
                   : "The last day the window includes"
               }
               onChange={(e) => selectAnchor(e.target.value)}

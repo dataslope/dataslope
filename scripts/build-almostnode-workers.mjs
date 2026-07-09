@@ -6,12 +6,12 @@
  * Why this exists:
  *
  * Turbopack's worker bundler emits a bootstrap script that loads its
- * dependency chunks with `importScripts.apply(self, chunks)` — and
+ * dependency chunks with `importScripts.apply(self, chunks)`, and
  * explicitly strips the `type` option from the Worker constructor
  * (see `new e(u, i ? {...i, type: void 0} : void 0)` in Turbopack's
  * runtime). Two consequences for the almostnode worker:
  *
- *   1. `{ type: "module" }` on `new Worker(...)` is ignored — the
+ *   1. `{ type: "module" }` on `new Worker(...)` is ignored, the
  *      worker is always classic.
  *   2. almostnode's ~16 MB bundle is split into many chunks, all
  *      concatenated via `importScripts`. Two chunks happen to declare
@@ -69,7 +69,7 @@ const stubNodeBuiltins = {
     buildContext.onLoad({ filter: /.*/, namespace: "node-stub" }, () => ({
       // CommonJS loader so any `import { foo } from "node:zlib"`
       // resolves at runtime through property access on the stub
-      // object — esbuild interops ESM↔CJS by reading properties
+      // object, esbuild interops ESM↔CJS by reading properties
       // dynamically. just-bash's browser bundle imports things like
       // `{ gunzipSync, gzipSync, constants }` from `node:zlib` in dead
       // code paths; this stub returns `undefined` for any name so the
@@ -91,7 +91,7 @@ const common = {
   target: "es2022",
   platform: "browser",
   // Workers don't have a DOM and we don't ship sourcemaps for them to
-  // browsers — keeping the file small matters more than debuggability
+  // browsers, keeping the file small matters more than debuggability
   // here (the original .ts source is still in /app/_components/runtime).
   minify: true,
   legalComments: "none",
@@ -100,7 +100,7 @@ const common = {
   conditions: ["worker", "browser", "import", "default"],
   plugins: [stubNodeBuiltins],
   // almostnode's bundle pulls in `comlink` which references
-  // `MessageChannel` etc. — all worker-safe globals.
+  // `MessageChannel` etc., all worker-safe globals.
 };
 
 const targets = [

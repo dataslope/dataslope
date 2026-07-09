@@ -5,13 +5,13 @@ description: Hiding internal details so objects protect their own state and expo
 
 A class isn't truly useful just because it bundles data and methods.
 Its real value comes from the fact that *outside code can't mess
-with the data directly* — only the methods of the class itself can.
+with the data directly*, only the methods of the class itself can.
 
 That discipline goes by two related names:
 
-- **Encapsulation** — keep the data and the rules that govern it in
+- **Encapsulation**, keep the data and the rules that govern it in
   one place; let no one else touch the data directly.
-- **Abstraction** — expose only what callers need to know; hide the
+- **Abstraction**, expose only what callers need to know; hide the
   rest.
 
 They are two angles on the same idea: *separating "what" from "how."*
@@ -19,7 +19,7 @@ They are two angles on the same idea: *separating "what" from "how."*
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A caller's thin line passes through the single green port in a solid blue wall to reach the core, while a red line aimed at the wall itself is stopped with a cross — methods exposed, state hidden"
+  aria-label="A caller's thin line passes through the single green port in a solid blue wall to reach the core, while a red line aimed at the wall itself is stopped with a cross, methods exposed, state hidden"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="330" y="35" width="240" height="140" rx="18" fill="currentColor" opacity="0.07" />
@@ -98,7 +98,7 @@ public class BankAccount
 
 Nothing about the class prevents an outside caller from setting the
 balance to nonsense. The "rules of being a bank account" don't live
-*inside the class* — they're scattered across every place that
+*inside the class*, they're scattered across every place that
 touches `Balance`. That's the problem encapsulation solves.
 
 ## Access modifiers: the basic tools
@@ -130,7 +130,7 @@ a.Deposit(50);
 a.Withdraw(30);
 Console.WriteLine($"{a.Owner}: {a.Balance}");
 
-// a.Balance = -9999;   // won't compile — Balance has a private setter
+// a.Balance = -9999;   // won't compile, Balance has a private setter
 
 public class BankAccount
 {
@@ -185,7 +185,7 @@ locked behind it.
 ## Abstraction: hide the *how*
 
 Where encapsulation is about access, abstraction is about
-*ignorance* — a *good* kind of ignorance. Callers should be able to
+*ignorance*, a *good* kind of ignorance. Callers should be able to
 use your class without knowing how it works.
 
 Consider a `TemperatureSensor`:
@@ -216,7 +216,7 @@ public class TemperatureSensor
 
 Callers never need to know there's a voltage involved, or that the
 calibration formula could change. If we later swap the sensor model,
-the `Celsius` and `Fahrenheit` properties keep working — the API is
+the `Celsius` and `Fahrenheit` properties keep working, the API is
 stable even when the internals shift.
 
 That stability is the practical payoff of abstraction.
@@ -299,7 +299,7 @@ catch (Exception ex)
 
 Notice the **invariants** the class guarantees:
 
-1. `Cash >= 0` always — it's impossible to construct or transition
+1. `Cash >= 0` always, it's impossible to construct or transition
    into a negative balance.
 2. `Add` and `Spend` only accept positive amounts.
 

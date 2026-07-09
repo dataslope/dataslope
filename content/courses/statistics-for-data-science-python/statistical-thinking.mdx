@@ -1,12 +1,12 @@
 ---
 title: Statistical Thinking
-description: The core mindset of the course — treating data as one noisy realization of an underlying process, thinking in distributions instead of point values, and separating signal from noise without fooling yourself.
+description: The core mindset of the course, treating data as one noisy realization of an underlying process, thinking in distributions instead of point values, and separating signal from noise without fooling yourself.
 ---
 
 There's a quiet but enormous difference between two ways of looking at
 a number. In the first, a number is *the answer*: the spreadsheet says
 average order value is \$48.20, so average order value **is** \$48.20.
-In the second, that \$48.20 is just *one thing that happened* — one
+In the second, that \$48.20 is just *one thing that happened*, one
 noisy draw from a process that could easily have handed you \$47.10 or
 \$49.60 instead. This page is about deliberately switching from the
 first way of thinking to the second, because that switch is what the
@@ -16,14 +16,14 @@ We'll call the first one **deterministic thinking** (the mindset of
 accounting, of inventory counts, of "the number is the number") and
 the second **statistical thinking** (the mindset of "the number is a
 draw from a noisy process, and I care about the process"). Both are
-useful. The mistake — the expensive, career-defining mistake — is
+useful. The mistake, the expensive, career-defining mistake, is
 using deterministic thinking on a question that needs statistical
 thinking.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A soft green process emits a string of draws that wobble around its yellow true level; the one draw you actually observed is ringed in blue and sits clearly off the line — a number is one noisy output of a process, not the truth itself"
+  aria-label="A soft green process emits a string of draws that wobble around its yellow true level; the one draw you actually observed is ringed in blue and sits clearly off the line, a number is one noisy output of a process, not the truth itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -61,9 +61,9 @@ thinking.
 
 <Callout type="info" title="What this page is and isn't">
 This is a *mindset* page, not a techniques page. There are no formulas
-to memorize. The goal is to install a handful of reflexes — variation
+to memorize. The goal is to install a handful of reflexes, variation
 is everywhere, separate signal from noise, think in distributions, and
-don't fool yourself — that every later page will lean on.
+don't fool yourself, that every later page will lean on.
 </Callout>
 
 ## Deterministic thinking vs. statistical thinking
@@ -72,8 +72,8 @@ When you count yesterday's shipped orders, deterministic thinking is
 exactly right. The count is a fact about a fixed set of rows; run it
 again and you get the same answer. Nothing is uncertain.
 
-But the moment your question reaches beyond the rows you have — *is
-this group better, is this metric trending, will this change help* —
+But the moment your question reaches beyond the rows you have, *is
+this group better, is this metric trending, will this change help*,
 the number in front of you stops being "the answer" and becomes
 *evidence*. Same number, completely different epistemic status.
 
@@ -91,12 +91,12 @@ The rest of this page sharpens the right-hand branch into four habits.
 
 The foundational fact of statistical thinking is that **the same
 process, run again, gives a different number**. Not because anything
-changed — because the process has natural spread baked in. Customers
+changed, because the process has natural spread baked in. Customers
 differ, sensors jitter, people round their answers, demand wobbles.
 
 The trap is that a *single* run of a process hides this completely. You
 see one number and it looks solid, authoritative, final. Re-running the
-process — which in real life you usually can't do — would show you how
+process, which in real life you usually can't do, would show you how
 much that number was free to move.
 
 <CodeBlock
@@ -125,7 +125,7 @@ print("hiding how much it was free to move.")
   ]}
 />
 
-Notice the means aren't wildly different — they cluster around 200 —
+Notice the means aren't wildly different, they cluster around 200,
 but they're never identical. That clustering-with-wobble *is* the
 process showing through the noise. Statistical thinking means always
 asking, about any summary number, "how much would this wobble if I
@@ -134,7 +134,7 @@ could re-run it?" The wobble has a name we'll formalize later: the
 
 <Callout type="warn" title="The point summary illusion">
 A single mean, rate, or percentage printed to two decimals *looks*
-precise. The decimals are real, but the stability is an illusion — most
+precise. The decimals are real, but the stability is an illusion, most
 of those digits would change on a fresh sample. Precision of display is
 not precision of knowledge.
 </Callout>
@@ -143,8 +143,8 @@ not precision of knowledge.
 
 Here's where variation stops being a curiosity and starts being
 dangerous. Because numbers wobble, **pure randomness can manufacture
-patterns that look exactly like real findings** — trends, gaps,
-"effects" — out of nothing at all.
+patterns that look exactly like real findings**, trends, gaps,
+"effects", out of nothing at all.
 
 Watch a fake trend appear from data where, by construction, there is no
 trend whatsoever.
@@ -152,7 +152,7 @@ trend whatsoever.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Scattered blue dots jitter evenly around a flat yellow truth line while a red arrow sweeps upward through one lucky run of them — the rising trend is a story the noise told, not a thing the process did"
+  aria-label="Scattered blue dots jitter evenly around a flat yellow truth line while a red arrow sweeps upward through one lucky run of them, the rising trend is a story the noise told, not a thing the process did"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -266,15 +266,15 @@ print(
   ]}
 />
 
-That little pattern — *simulate a world with no effect, see how big
-chance differences get, compare yours to it* — is the seed of
+That little pattern, *simulate a world with no effect, see how big
+chance differences get, compare yours to it*, is the seed of
 hypothesis testing. We'll grow it into a full method in *Hypothesis
 Testing*. For now, just internalize the move: **noise has a size, and
 you can estimate it.**
 
 <Callout type="tip" title="The one question that prevents most blunders">
 Before you act on any difference, trend, or spike, ask: *"Could this be
-chance?"* If you can't rule chance out, you don't yet have a finding —
+chance?"* If you can't rule chance out, you don't yet have a finding,
 you have a hypothesis.
 </Callout>
 
@@ -282,7 +282,7 @@ you have a hypothesis.
   markdown={`A dashboard shows a metric rising for the last 4 weeks. Before celebrating, what's the most statistically sound first move?
 
 - Extrapolate the 4-week trend forward to forecast next quarter
-  > Extrapolating assumes the pattern is real and will continue — but that's the very thing you haven't checked yet. A short rising stretch appears routinely in pure noise.
+  > Extrapolating assumes the pattern is real and will continue, but that's the very thing you haven't checked yet. A short rising stretch appears routinely in pure noise.
 - [o] Estimate how often a 4-week rise of this size shows up when nothing is actually changing, and compare
   > This pins the observed movement against the size of movement that randomness alone produces, which is exactly how you separate signal from noise.
 - Declare the increase real because four weeks in a row is unlikely to be coincidence
@@ -296,7 +296,7 @@ The habit is to compare any pattern against a model of what pure chance produces
 ## The data-generating process
 
 Step back and name the thing all of this is circling. Behind your
-dataset is a **data-generating process (DGP)** — the real-world
+dataset is a **data-generating process (DGP)**, the real-world
 mechanism (customers deciding, machines running, biology happening)
 that produces numbers. You almost never see the process directly. You
 see a *sample*: a finite, noisy slice of its output.
@@ -308,7 +308,7 @@ A useful mental model:
 The **signal** is the stable, real structure of the process (the true
 average, the true effect, the true relationship). The **noise** is the
 run-to-run variation that smears it. Your job as a data scientist is to
-peer through the noise and estimate the signal — while being honest
+peer through the noise and estimate the signal, while being honest
 that you can never fully separate them from a single sample.
 
 ```mermaid
@@ -322,7 +322,7 @@ flowchart TD
 Read that pipeline left to right: the process emits a sample, you boil
 the sample down to a statistic, and then you reason *backward* from the
 statistic to a claim about the process. That backward arrow is the
-entire game. It's also why uncertainty is unavoidable — you're
+entire game. It's also why uncertainty is unavoidable, you're
 inferring a hidden cause from one of its many possible effects.
 
 <Callout type="info" title="Why 'the population' is often imaginary">
@@ -335,7 +335,7 @@ list. We make this precise in *Populations and Samples*.
 </Callout>
 
 This reframing changes how you read every result. A 3% lift in an A/B
-test isn't "the lift" — it's *this sample's estimate* of the process's
+test isn't "the lift", it's *this sample's estimate* of the process's
 true lift, wrapped in noise. A churn rate of 6.2% is the process's true
 churn rate, plus or minus whatever this month's randomness added.
 
@@ -348,13 +348,13 @@ distributions of plausible numbers.**
 Deterministic thinking says: "average handle time is 200 ms."
 Statistical thinking says: "average handle time is *somewhere around*
 200, and here's the range of values that are consistent with what I
-saw." The second is not vaguer — it's *more honest and more useful*,
+saw." The second is not vaguer, it's *more honest and more useful*,
 because it carries its own error bars.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A single yellow point estimate caps a bell-shaped pile of translucent blue dots, each dot a value the same process could just as easily have produced — the reported number is one member of a distribution, not the distribution itself"
+  aria-label="A single yellow point estimate caps a bell-shaped pile of translucent blue dots, each dot a value the same process could just as easily have produced, the reported number is one member of a distribution, not the distribution itself"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="210" y="170" width="228" height="4" rx="2" fill="currentColor" opacity="0.2" />
@@ -420,7 +420,7 @@ fig = px.histogram(
     many_means,
     nbins=40,
     labels={"value": "Sample mean (ms)"},
-    title="The mean is not a point — it's a distribution",
+    title="The mean is not a point, it's a distribution",
 )
 fig.add_vline(
     x=point_estimate, line_dash="dash", annotation_text="your one sample's mean"
@@ -446,7 +446,7 @@ are all just disciplined ways of describing that distribution from a
 single sample you actually have.
 
 <Callout type="success" title="The mental upgrade">
-A statistic is not a fact — it's a **random variable** with its own
+A statistic is not a fact, it's a **random variable** with its own
 distribution. "What's the mean?" becomes "what's the distribution of
 the mean?" Once you think this way, error bars stop being decoration
 and become the actual answer.
@@ -470,7 +470,7 @@ Carrying uncertainty alongside an estimate is the practical payoff of thinking i
 ## Not fooling yourself
 
 The physicist Richard Feynman put the whole discipline in one line:
-*"The first principle is that you must not fool yourself — and you are
+*"The first principle is that you must not fool yourself, and you are
 the easiest person to fool."* Statistical thinking is, more than
 anything, a set of habits for not fooling yourself.
 
@@ -486,7 +486,7 @@ this turns noise into narrative every time. A few concrete defenses:
   quietly redefine success.)
 - **Beware testing many things and reporting the lucky one.** Check 20
   segments and one will look "significant" by chance alone. The more
-  comparisons you make, the more noise dresses up as signal — we'll
+  comparisons you make, the more noise dresses up as signal, we'll
   return to this in *Statistical Fallacies*.
 - **Always ask "could this be chance?" first**, and only promote a
   pattern to a finding once chance is a poor explanation.
@@ -507,7 +507,7 @@ flowchart TD
 ```
 
 <Callout type="danger" title="The most seductive trap: HARKing">
-*Hypothesizing After the Results are Known* — looking at the data,
+*Hypothesizing After the Results are Known*, looking at the data,
 spotting the bump, and then presenting it as the thing you set out to
 test. It feels rigorous because there's a "result," but the result was
 hand-picked from noise. If the hypothesis was born from the same data
@@ -515,7 +515,7 @@ that "confirms" it, you've fooled yourself. Find the pattern in one
 dataset, then confirm it in fresh data.
 </Callout>
 
-These habits can feel like they slow you down. They do — on purpose.
+These habits can feel like they slow you down. They do, on purpose.
 The cost of a few minutes of skepticism is trivial next to the cost of
 shipping a decision built on a random wiggle.
 
@@ -532,7 +532,7 @@ You're given \`draw_sample()\`, which returns a fresh sample of 150 values from 
 - Collect those 2000 means into a NumPy array named \`means\`.
 - Compute the standard deviation of \`means\` into a float named \`wobble\`.
 
-\`wobble\` measures how much the sample mean wanders run-to-run — a first taste of the standard error.`}
+\`wobble\` measures how much the sample mean wanders run-to-run, a first taste of the standard error.`}
   files={[
     {
       filename: "main.py",
@@ -608,7 +608,7 @@ rng = np.random.default_rng(2024)
 
 # Two groups. Are they really different, or is this gap just luck?
 control = rng.normal(50, 10, size=80)
-treatment = rng.normal(50, 10, size=80)  # SAME process — no real effect
+treatment = rng.normal(50, 10, size=80)  # SAME process, no real effect
 
 _pooled = np.concatenate([control, treatment])
 
@@ -682,11 +682,11 @@ this course is a faster, sharper version of exactly that move.
   markdown={`Which scenario genuinely calls for **statistical** thinking rather than plain deterministic counting?
 
 - Reporting exactly how many invoices were issued last month
-  > This is a fact about a fixed set of rows. You count it once and it's settled — no uncertainty, no generalization, so no statistics needed.
+  > This is a fact about a fixed set of rows. You count it once and it's settled, no uncertainty, no generalization, so no statistics needed.
 - Summing today's completed transactions for an end-of-day total
   > A sum over the exact rows you have is deterministic. Re-running it gives the same answer; there's nothing to infer.
 - [o] Deciding whether a new onboarding flow improves 30-day retention for future users
-  > This generalizes from a noisy sample to a process that produces *future* users, where any observed difference could partly be chance — the defining situation for statistical reasoning.
+  > This generalizes from a noisy sample to a process that produces *future* users, where any observed difference could partly be chance, the defining situation for statistical reasoning.
 - Looking up a specific customer's lifetime spend in the database
   > Retrieving a stored value for one known entity is a lookup, not an inference about an unseen process.
 
@@ -714,7 +714,7 @@ The decomposition is why a single statistic is evidence about the process, not t
 - It proves that two real groups are always identical
   > The two halves are identical *by construction* in this simulation; it says nothing about whether two real-world groups are identical. That's the question you're trying to answer, not an assumption.
 - It tells you the exact true effect in your real experiment
-  > It contains no information about any real effect — every split has zero true effect on purpose. It calibrates chance, not the effect.
+  > It contains no information about any real effect, every split has zero true effect on purpose. It calibrates chance, not the effect.
 - [o] It shows how large a gap pure chance can produce, giving you a yardstick to judge whether a real observed gap is surprising
   > Generating the spread of gaps under no effect provides the reference scale against which a real difference is measured, which is how you separate signal from noise.
 - It removes randomness from your real data
@@ -727,7 +727,7 @@ A model of "what chance alone does" is the benchmark every significance test com
   markdown={`A colleague scans 25 customer segments, finds that one shows a "statistically surprising" jump, and writes it up as the headline result. What's the core problem?
 
 - Twenty-five segments is too few to find anything real
-  > The issue isn't too few comparisons — it's too *many*. Checking many segments makes a lucky-looking one almost guaranteed even when nothing is going on.
+  > The issue isn't too few comparisons, it's too *many*. Checking many segments makes a lucky-looking one almost guaranteed even when nothing is going on.
 - Segments should never be analyzed separately
   > Segment analysis is perfectly legitimate. The problem is cherry-picking the most extreme result from many and presenting it as if it were the only thing tested.
 - [o] Testing many segments and reporting only the most extreme one lets random noise masquerade as a finding (a multiple-comparisons trap)
@@ -735,7 +735,7 @@ A model of "what chance alone does" is the benchmark every significance test com
 - The jump can't be real because it was found by scanning
   > Scanning doesn't make a real effect impossible; it makes a *spurious* one likely. The right move is to confirm the candidate on fresh data, not to dismiss it outright.
 
-The more things you check, the more noise dresses up as signal — adjust your skepticism accordingly.`}
+The more things you check, the more noise dresses up as signal, adjust your skepticism accordingly.`}
 />
 
 <MultipleChoice
@@ -754,11 +754,11 @@ Deciding what counts as a result up front is the cleanest defense against foolin
 />
 
 <Callout type="success" title="Key takeaways">
-- A number from a process is **one noisy draw**, not the final answer — re-running would move it.
+- A number from a process is **one noisy draw**, not the final answer, re-running would move it.
 - **Variation is everywhere**; a single point summary hides how much it could have differed.
 - **Signal vs. noise**: pure randomness manufactures patterns, so always ask *"could this be chance?"* and compare against a model of no effect.
 - Your data is **signal + noise** emitted by a **data-generating process** you can't see directly; you reason backward from sample to process.
-- **Think in distributions, not points** — a statistic is a random variable with its own spread.
+- **Think in distributions, not points**, a statistic is a random variable with its own spread.
 - **Don't fool yourself**: decide the question first, watch for multiple comparisons, and prefer honest ranges over false precision.
 </Callout>
 

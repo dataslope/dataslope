@@ -1,6 +1,6 @@
 ---
 title: The Collections Framework
-description: Why Java 1.2 introduced a unified hierarchy of interfaces and implementations — and the shape of the framework you'll use for the rest of the course
+description: Why Java 1.2 introduced a unified hierarchy of interfaces and implementations, and the shape of the framework you'll use for the rest of the course
 ---
 
 In December 1998, Java 1.2 shipped a redesign of `java.util` that
@@ -22,7 +22,7 @@ the decisions you are about to study.)
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A stroked blue frame holds three tinted compartments — an ordered row of blue squares, scattered green dots, and a yellow flow strip with a tiny arrow — while the key-value map card sits just outside, tied on by a thin dashed gray line"
+  aria-label="A stroked blue frame holds three tinted compartments, an ordered row of blue squares, scattered green dots, and a yellow flow strip with a tiny arrow, while the key-value map card sits just outside, tied on by a thin dashed gray line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="480" y1="116" x2="516" y2="116" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="5 4" />
@@ -78,7 +78,7 @@ methods all over the JDK are declared in terms of `List`, `Set`,
 
 ## The interface hierarchy
 
-Here is the **shape** of the framework. Memorize this diagram — every
+Here is the **shape** of the framework. Memorize this diagram, every
 remaining page in the course refers to some corner of it.
 
 ```mermaid
@@ -127,7 +127,7 @@ classDiagram
     }
 ```
 
-`Map` is *not* a subtype of `Collection` — it is its own hierarchy:
+`Map` is *not* a subtype of `Collection`, it is its own hierarchy:
 
 ```mermaid
 classDiagram
@@ -187,7 +187,7 @@ course:
 | `SortedMap<K,V>` | `TreeMap<K,V>` | A red-black tree |
 
 Each implementation has its own performance and memory profile. We
-will earn that table over many pages — for now, it's a road map.
+will earn that table over many pages, for now, it's a road map.
 
 ## Programming to the interface
 
@@ -206,7 +206,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-  // The method talks about List<String> — it does NOT care
+  // The method talks about List<String>, it does NOT care
   // whether the underlying storage is an array or a linked list.
   static int totalLength(List<String> words) {
     int total = 0;
@@ -242,8 +242,8 @@ implementation for free.
 
 A second hallmark of the framework is that **algorithms live
 separately from data structures**. The class `java.util.Collections`
-holds static helpers — `sort`, `shuffle`, `reverse`,
-`unmodifiableList`, `frequency`, `min`, `max` — that work on any
+holds static helpers, `sort`, `shuffle`, `reverse`,
+`unmodifiableList`, `frequency`, `min`, `max`, that work on any
 matching collection.
 
 <CodeBlock
@@ -283,7 +283,7 @@ public class Main {
 
 Notice you did not write a sort. You did not write a min. You did not
 write a frequency-counter. They work on `ArrayList`, on `LinkedList`,
-on user-written `List` implementations — anything that says "I am a
+on user-written `List` implementations, anything that says "I am a
 `List`."
 
 ## Iterator: a real walking protocol
@@ -333,7 +333,7 @@ will return to iterators in their own chapter.
 ## A first multi-file example: programming to interfaces
 
 This shows the JCF style end-to-end. A `Library` *consumes* a
-`List<Book>` and a `Set<String>` — it does not care which
+`List<Book>` and a `Set<String>`, it does not care which
 implementation you hand it.
 
 <CodeBlock
@@ -418,10 +418,10 @@ public class Library {
   title="A roster that programs to interfaces"
   instructions={`Write a class \`Roster\` that holds a \`List<String>\` of student names and exposes:
 
-- \`void addStudent(String name)\` — appends the name
-- \`int size()\` — the number of students
-- \`boolean has(String name)\` — whether the roster contains that name
-- \`List<String> all()\` — the underlying list
+- \`void addStudent(String name)\`, appends the name
+- \`int size()\`, the number of students
+- \`boolean has(String name)\`, whether the roster contains that name
+- \`List<String> all()\`, the underlying list
 
 The constructor must take a \`List<String>\` as its only argument, so callers can pass any implementation they like (\`ArrayList\`, \`LinkedList\`, ...). The provided \`Main\` will exercise it. Expected output:
 

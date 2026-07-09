@@ -3,7 +3,7 @@ title: Graphical Encodings
 description: The handful of visual channels that every chart in the world is built from
 ---
 
-You have now met *encoding* twice — first as the formal definition
+You have now met *encoding* twice, first as the formal definition
 of what a visualization is, and then through the Cleveland-McGill
 ranking of how *accurately* different encodings convey magnitude.
 This page consolidates everything into a single working vocabulary.
@@ -17,7 +17,7 @@ call.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three data-column chips flow along dotted paths into a chart: one to the vertical axis, one to a colored dot, one to the horizontal axis — columns mapped to visual channels"
+  aria-label="Three data-column chips flow along dotted paths into a chart: one to the vertical axis, one to a colored dot, one to the horizontal axis, columns mapped to visual channels"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.13">
@@ -150,7 +150,7 @@ A bit more formally, four common data types:
 - **Nominal** (unordered categories): country, color, sport. Use
   **color hue**, **shape**, or **facets**.
 - **Temporal** (time): dates and times. Use the **x-axis**, almost
-  always. Time is sacred — keep it on x.
+  always. Time is sacred, keep it on x.
 
 ## Encodings tell a story about importance
 
@@ -185,7 +185,7 @@ prominent third variable. Same data; three different stories.
   ●  ■  ▲  ▼  ◆  ★  ✦  ✚  apart in a crowded plot.
 - **Doubling up two channels redundantly when one would do.** If
   you `color="continent"` AND `facet_col="continent"`, you've used
-  two channels for one variable — wasteful and busy.
+  two channels for one variable, wasteful and busy.
 - **Using `size` for a *negative* meaning** (bigger dot = worse).
   The eye reads "bigger" as "more important" by default; flipping
   this confuses readers.
@@ -204,7 +204,7 @@ which column is mapped to which channel.
       initCode: `import pandas as pd
 import plotly.express as px
 
-# Palmer Penguins — the friendly stand-in for the old iris dataset.
+# Palmer Penguins, the friendly stand-in for the old iris dataset.
 penguins = pd.read_csv("penguins.csv").dropna(
     subset=["bill_depth_mm", "bill_length_mm", "flipper_length_mm"]
 )`,
@@ -245,7 +245,7 @@ ink. Tradeoffs.
 - **facet_col="..."**
   > **facet_col="column_name"** splits the chart into multiple side-by-side panels, one per unique value of that column. It controls panel layout, not the horizontal position of data within a panel.
 
-Position along x and y are the two most powerful encodings — use them for what matters most.`}
+Position along x and y are the two most powerful encodings, use them for what matters most.`}
 />
 
 <MultipleChoice
@@ -269,7 +269,7 @@ A general rule: the two most important *quantitative* variables go on x and y.
 - Continuous prices (e.g., \\$0 – \\$1,000,000).
   > Continuous quantities need an encoding that conveys gradual change, such as position on an axis or a sequential color intensity scale (light→dark). Categorical hue can only distinguish a handful of discrete groups, not represent a numeric continuum.
 - An ordered scale of customer satisfaction (1-5).
-  > An ordered scale is ordinal data, which is best encoded with a sequential or diverging color intensity scale — or position along an axis — so the viewer can perceive the ordering. Categorical hue treats each level as equally distinct, losing the rank information.
+  > An ordered scale is ordinal data, which is best encoded with a sequential or diverging color intensity scale, or position along an axis, so the viewer can perceive the ordering. Categorical hue treats each level as equally distinct, losing the rank information.
 - [o] A small number (~3-7) of distinct, unordered categories such as continents or product lines.
   > Hue is excellent at saying "these dots belong together" for a handful of categories, and the eye distinguishes the colors instantly. For continuous or ordered data, prefer a sequential or diverging *intensity* scale instead of a categorical hue palette.
 - Time stamps over a 100-year span.
@@ -284,11 +284,11 @@ Color hue = categories. Color intensity (light → dark) = quantity. Mixing them
 - The chart will fail to render.
   > Using the same column for both **facet_col** and **color** is perfectly valid syntax and will render without errors. The issue is not technical correctness but wasted visual channels.
 - Plotly will crash.
-  > Plotly handles redundant encodings gracefully — it does not crash or produce an error. The result is a valid chart that happens to use two channels for the same variable instead of reserving one for a different variable.
-- [o] The chart will work, but you've spent two visual channels on a single variable — a missed opportunity that often adds clutter without adding information.
-  > Redundant encoding is sometimes deliberate (e.g., for colorblind accessibility), but it's frequently a wasted channel. Each facet panel will be a single color anyway, so the color encoding adds nothing new — and you've used up a channel you could have given to a different variable.
+  > Plotly handles redundant encodings gracefully, it does not crash or produce an error. The result is a valid chart that happens to use two channels for the same variable instead of reserving one for a different variable.
+- [o] The chart will work, but you've spent two visual channels on a single variable, a missed opportunity that often adds clutter without adding information.
+  > Redundant encoding is sometimes deliberate (e.g., for colorblind accessibility), but it's frequently a wasted channel. Each facet panel will be a single color anyway, so the color encoding adds nothing new, and you've used up a channel you could have given to a different variable.
 - Plotly will use a random color per facet.
-  > Plotly assigns colors consistently according to the color scale and the unique values of the **color=** column. It does not use random colors — each value maps to the same color every time.
+  > Plotly assigns colors consistently according to the color scale and the unique values of the **color=** column. It does not use random colors, each value maps to the same color every time.
 
 Use each channel intentionally. If you have five variables, try to give each its own channel before doubling up.`}
 />

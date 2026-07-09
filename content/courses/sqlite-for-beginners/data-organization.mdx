@@ -1,18 +1,18 @@
 ---
 title: Organizing Data
-description: Why we split information across multiple related tables — giving every fact a single home so data stays consistent and easy to change.
+description: Why we split information across multiple related tables, giving every fact a single home so data stays consistent and easy to change.
 ---
 
 When beginners first meet databases, the instinct is to put
 *everything in one big table*. **Organizing data well** means doing
 the opposite: splitting that big table into smaller, related ones so
 each fact is stored **once**. This page builds the intuition behind
-why that matters — the idea professionals call *normalization*.
+why that matters, the idea professionals call *normalization*.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A crammed reddish table holds the same yellow fact three times with one copy drifted red, while across from it three tidy cards each hold one solid fact and hang together by thin lines — organizing data gives every fact exactly one home"
+  aria-label="A crammed reddish table holds the same yellow fact three times with one copy drifted red, while across from it three tidy cards each hold one solid fact and hang together by thin lines, organizing data gives every fact exactly one home"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
@@ -74,10 +74,10 @@ flowchart LR
 ```
 
 - **Update problem:** Ada changes her email. You must update *every*
-  row that mentions her — miss one and the data now disagrees with
+  row that mentions her, miss one and the data now disagrees with
   itself.
 - **Insertion problem:** You want to record a new product's price,
-  but the table is about orders — you cannot add the product until
+  but the table is about orders, you cannot add the product until
   someone buys it.
 - **Deletion problem:** Delete Ada's only order and you also erase
   the only record of who Ada is.
@@ -114,7 +114,7 @@ erDiagram
 
 Now Ada's email lives in **one** row of `customers`; the book's
 price lives in **one** row of `products`. An order just *points* to
-them. Change the email once and every order instantly reflects it —
+them. Change the email once and every order instantly reflects it,
 the problems vanish.
 
 <SqlCodeBlock
@@ -156,7 +156,7 @@ ORDER BY
   o.id;`}
 />
 
-The "flat" view people liked is not lost — a join reproduces it any
+The "flat" view people liked is not lost, a join reproduces it any
 time. The difference is that it is now *computed* from
 single-source-of-truth tables instead of *stored* with duplication.
 
@@ -173,7 +173,7 @@ flowchart TD
 
 Ask of every column: *"Is this a fact about this row's key, and
 nothing else?"* A customer's email is a fact about the **customer**,
-so it belongs in `customers` — not repeated on every order. If a
+so it belongs in `customers`, not repeated on every order. If a
 column really describes some *other* thing, that other thing probably
 deserves its own table.
 
@@ -181,7 +181,7 @@ deserves its own table.
 More tables mean more joins. Most application databases aim for a
 clean split that avoids duplication while staying practical to query.
 Deliberately keeping *some* duplication for speed is a real technique
-too — but learn the clean form first. You can only break the rules
+too, but learn the clean form first. You can only break the rules
 well once you understand them.
 </Callout>
 

@@ -5,7 +5,7 @@ description: Markdown-authored quiz cards that learners can submit, retry, and l
 
 The `<MultipleChoice>` component lets MDX authors embed quiz-style
 questions directly inside a Learn page. Each question is a single
-Markdown document — there are no JSON arrays of choices to keep in sync
+Markdown document, there are no JSON arrays of choices to keep in sync
 with the prose.
 
 ## Syntax
@@ -24,9 +24,9 @@ with the prose.
 
 - Mark the correct choice with `[o]`. Each question has exactly one
   correct answer.
-- Use `*` or `1.` for lists inside the question body — `-` is reserved
+- Use `*` or `1.` for lists inside the question body, `-` is reserved
   for choices.
-- Math works anywhere — `$x^2$` for inline and `$$\int_0^\infty$$` for
+- Math works anywhere, `$x^2$` for inline and `$$\int_0^\infty$$` for
   display equations.
 - Learners pick an answer, see per-choice feedback, and can click **Try
   again** to keep iterating.
@@ -97,7 +97,7 @@ The power rule states that $\frac{d}{dx}[x^n] = nx^{n-1}$.
 
 ## 3. Rich question body
 
-The question body is full Markdown — lists, inline code, **bold**, and
+The question body is full Markdown, lists, inline code, **bold**, and
 fenced code blocks all work. Remember to use `*` or `1.` for any lists
 inside the body so the parser doesn't mistake them for choices. Code
 blocks in the body are syntax-highlighted automatically.
@@ -113,11 +113,11 @@ def total(prices, tax_rate=0.07):
 What does \`total([10, 20, 30])\` return?
 
 - 60
-  > That's the pre-tax total — the function also applies a 7% tax.
+  > That's the pre-tax total, the function also applies a 7% tax.
 - [o] 64.2
   > \`60 * 1.07 = 64.2\`.
 - 70.0
-- An error — \`tax_rate\` must be supplied.
+- An error, \`tax_rate\` must be supplied.
   > \`tax_rate\` has a default value of \`0.07\`, so it's optional.
 
 The function multiplies the sum of \`prices\` by \`1 + tax_rate\`. With the default
@@ -135,11 +135,11 @@ def total(prices, tax_rate=0.07):
 What does `total([10, 20, 30])` return?
 
 - 60
-  > That's the pre-tax total — the function also applies a 7% tax.
+  > That's the pre-tax total, the function also applies a 7% tax.
 - [o] 64.2
   > `60 * 1.07 = 64.2`.
 - 70.0
-- An error — `tax_rate` must be supplied.
+- An error, `tax_rate` must be supplied.
   > `tax_rate` has a default value of `0.07`, so it's optional.
 
 The function multiplies the sum of `prices` by `1 + tax_rate`. With the default
@@ -148,7 +148,7 @@ tax rate of 7 %, the result is `60 × 1.07 = 64.2`.
 
 ## 4. Code blocks as choices
 
-Choices can be fenced code blocks — ideal for questions that ask learners
+Choices can be fenced code blocks, ideal for questions that ask learners
 to identify the correct snippet. Open the fence right after `- ` (or
 `- [o] `), then indent all code lines and the closing fence by 2 spaces.
 Blank lines inside the block are preserved exactly as authored.
@@ -161,7 +161,7 @@ Blank lines inside the block are preserved exactly as authored.
 
   pd = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
   \`\`\`
-  > \`pd\` is reassigned here, shadowing the pandas module — any subsequent use of \`pd\` as a module (e.g. \`pd.Series(...)\`) would raise a \`TypeError\`.
+  > \`pd\` is reassigned here, shadowing the pandas module, any subsequent use of \`pd\` as a module (e.g. \`pd.Series(...)\`) would raise a \`TypeError\`.
 - \`\`\`python
   import numpy as np
 
@@ -188,7 +188,7 @@ Which snippet correctly creates a pandas DataFrame with columns A and B?
 
   pd = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
   ```
-  > `pd` is reassigned here, shadowing the pandas module — any subsequent use of `pd` as a module (e.g. `pd.Series(...)`) would raise a `TypeError`.
+  > `pd` is reassigned here, shadowing the pandas module, any subsequent use of `pd` as a module (e.g. `pd.Series(...)`) would raise a `TypeError`.
 - ```python
   import numpy as np
 

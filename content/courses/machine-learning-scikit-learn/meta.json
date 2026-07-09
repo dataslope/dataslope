@@ -1,6 +1,6 @@
 {
     "title": "Machine Learning with scikit-learn",
-    "description": "A foundations-first machine learning course built on scikit-learn — heavy on intuition, model evaluation, and the reasoning behind every algorithm. For learners who already know Python, Pandas, and basic statistics.",
+    "description": "A foundations-first machine learning course built on scikit-learn, heavy on intuition, model evaluation, and the reasoning behind every algorithm. For learners who already know Python, Pandas, and basic statistics.",
     "root": true,
     "tags": {
         "language": [

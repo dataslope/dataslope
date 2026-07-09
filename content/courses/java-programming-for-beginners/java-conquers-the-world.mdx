@@ -1,11 +1,11 @@
 ---
 title: How Java Conquered the World
-description: Free tools, university curricula, enterprise adoption, Android, and a decade-long lawsuit — the full story of Java's rise, era by era
+description: Free tools, university curricula, enterprise adoption, Android, and a decade-long lawsuit, the full story of Java's rise, era by era
 ---
 
 The origin story earlier in this course ended in 1995, with a
 toaster language unexpectedly riding the web into public view. Being
-technically impressive, however, has never been enough — the
+technically impressive, however, has never been enough, the
 graveyard of programming languages is full of brilliant designs. By
 2007, Java was *everywhere*. This page is the story of how that
 happened: part engineering, part timing, part marketing, and part
@@ -14,7 +14,7 @@ self-reinforcing luck.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A solid blue core radiates two thin rings dotted with green, yellow, and blue satellites — adoption spreading outward ring by ring until Java is everywhere"
+  aria-label="A solid blue core radiates two thin rings dotted with green, yellow, and blue satellites, adoption spreading outward ring by ring until Java is everywhere"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -48,8 +48,8 @@ that, say, Perl or Tcl did not.
 
 ## The education flywheel
 
-Java's deliberately restrained design — no pointer arithmetic, no
-manual memory management, mandatory classes, strict typing — also
+Java's deliberately restrained design, no pointer arithmetic, no
+manual memory management, mandatory classes, strict typing, also
 made it an ideal first language for university courses. There were
 fewer footguns to explain, and the same `Hello World` behaved
 identically on a student's laptop and the professor's office
@@ -58,7 +58,7 @@ switched their introductory computer science course to Java, and the
 College Board moved the **AP Computer Science** exam to Java
 starting with the 2003–04 school year.
 
-The result was a self-reinforcing loop — and that loop, more than
+The result was a self-reinforcing loop, and that loop, more than
 any single technical feature, is why Java remained one of the
 most-taught languages on the planet for two decades:
 
@@ -77,9 +77,9 @@ up almost line-for-line with the pains of the 1990s:
 
 | Enterprise pain | Java answer |
 | --- | --- |
-| "Our developers crash production with bad memory management." | Garbage collection — no `delete` to forget. |
-| "Code we write today must run on hardware we have not bought yet." | Bytecode + JVM — no recompile required. |
-| "Our codebase will outlive any single developer." | Strict typing and mandatory class structure — readable by newcomers. |
+| "Our developers crash production with bad memory management." | Garbage collection, no `delete` to forget. |
+| "Code we write today must run on hardware we have not bought yet." | Bytecode + JVM, no recompile required. |
+| "Our codebase will outlive any single developer." | Strict typing and mandatory class structure, readable by newcomers. |
 | "We need one language across desktop, server, and embedded." | Java ran on all three. |
 | "We can't keep writing string functions from scratch." | A huge standard library shipped with every JVM. |
 
@@ -87,15 +87,15 @@ up almost line-for-line with the pains of the 1990s:
 
 The first thing the world saw Java do was animate things inside web
 pages. An **applet** was a small program the browser downloaded and
-ran in a sandbox — calculators, plots, simple games, proofs of
+ran in a sandbox, calculators, plots, simple games, proofs of
 concept. For a brief window in the late 1990s, applets looked like
 the future of interactive content.
 
 They never lived up to it. Applets were slow to start (the JVM had
 to boot inside the browser), awkward to secure, and steadily
-out-competed by JavaScript — which, despite the confusing name, is
+out-competed by JavaScript, which, despite the confusing name, is
 an *unrelated* language that Netscape named partly to ride Java's
-hype — and later by Flash. Browsers eventually removed plug-in
+hype, and later by Flash. Browsers eventually removed plug-in
 support entirely, and applets went extinct. But they had done their
 job: they were Java's debut on the world stage, and the reason
 millions of people first heard the word.
@@ -104,7 +104,7 @@ millions of people first heard the word.
 
 While applets faded in the browser, Java quietly conquered the
 server. **Servlets** (1997) let Java respond to web requests, and on
-top of them grew a bewildering ecosystem of enterprise standards —
+top of them grew a bewildering ecosystem of enterprise standards,
 J2EE, EJB, JMS, and a parade of other acronyms. Banks, insurers,
 airlines, and government departments built entire platforms on these
 foundations. Some of the standards aged well; others became
@@ -112,7 +112,7 @@ notorious case studies in over-engineering. The backlash against the
 heavyweight parts produced **Spring** (2003), a lighter framework
 that remains the dominant way to build Java backends today.
 
-You do not need any of these frameworks to learn Java — they are all
+You do not need any of these frameworks to learn Java, they are all
 downstream of the language itself. But when a job posting says "Java
 developer," this server-side world is usually what it means.
 
@@ -122,30 +122,30 @@ In 2008 something happened that nobody at Sun had predicted. Google
 launched **Android** and chose Java as its application language.
 Suddenly every Android app on Earth was a Java program, and hundreds
 of thousands of developers learned Java specifically to write mobile
-apps — a population that had nothing to do with banking backends.
+apps, a population that had nothing to do with banking backends.
 
 Android never used Sun's JVM: it shipped its own runtime (first
 **Dalvik**, later **ART**) executing a different bytecode, with the
 Java *language* on top. That technical distinction turned out to
-matter enormously, because in 2010 **Oracle** — which had just
-acquired Sun, and Java with it — sued Google over Android's use of
+matter enormously, because in 2010 **Oracle**, which had just
+acquired Sun, and Java with it, sued Google over Android's use of
 Java's APIs. *Oracle v. Google* ran for over a decade, swung both
 ways through trials and appeals, and put a genuinely nerdy question
 in front of the United States Supreme Court: can you copyright the
-*shape* of an API — the method names and signatures that programmers
+*shape* of an API, the method names and signatures that programmers
 build against? In April 2021 the Court ruled 6–2 for Google, finding
 its reimplementation of the Java API to be fair use. Programmers
 everywhere exhaled: the freedom to reimplement an interface is load
 bearing for the entire industry.
 
-Today, Google recommends **Kotlin** for new Android code — but
+Today, Google recommends **Kotlin** for new Android code, but
 Kotlin is itself a JVM-family language, interoperable with Java, so
 the platform's Java DNA remains.
 
 ## Era 4: big data and the JVM as a platform (2010–)
 
-By 2010, "big data" was the headline, and the dominant tools —
-**Hadoop**, **Spark**, **Kafka**, **Elasticsearch**, **Cassandra** —
+By 2010, "big data" was the headline, and the dominant tools,
+**Hadoop**, **Spark**, **Kafka**, **Elasticsearch**, **Cassandra**,
 were all built on the JVM, written in Java or Scala. Data
 engineering became another massive Java domain. This era cemented an
 idea bigger than the language: the JVM as a *platform* hosting many
@@ -155,7 +155,7 @@ libraries.
 
 ## Era 5: modern Java (2017–today)
 
-For its first two decades Java evolved slowly — a major release
+For its first two decades Java evolved slowly, a major release
 every two or three years. Since 2017, new versions ship on a strict
 **six-month cadence**, and the language has been catching up on a
 generation of ideas:
@@ -172,7 +172,7 @@ generation of ideas:
 Honesty requires listing what was *given up* along the way: applets
 are gone, Java Web Start is gone, the Java EE enterprise standards
 were handed to the Eclipse Foundation (as **Jakarta EE**), and Sun
-itself is gone — absorbed into Oracle in 2010. What survived and
+itself is gone, absorbed into Oracle in 2010. What survived and
 grew is exactly the core of the original proposition: a portable,
 statically typed, garbage-collected, object-oriented language
 running on a superb virtual machine.
@@ -220,12 +220,12 @@ Very few technology investments age that well.
   > Naming was a side issue at most.
 - Whether Android phones infringed Sun's hardware patents
   > The decisive question was about software interfaces, not hardware.
-- [o] Whether reimplementing the Java API — its method names and signatures — in Android was copyright infringement or fair use
+- [o] Whether reimplementing the Java API, its method names and signatures, in Android was copyright infringement or fair use
   > The Supreme Court ruled in 2021 that Google's reuse of the API's structure was fair use.
 - Whether the JVM could legally run on mobile devices
   > Running a JVM was never the issue; Android didn't even use Sun's JVM.`}
 />
 
 The next discussion zooms out one more step: never mind Java's
-products — how did Java change *programming itself*? The fingerprints
+products, how did Java change *programming itself*? The fingerprints
 are on nearly every language you will ever use.

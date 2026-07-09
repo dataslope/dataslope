@@ -1,18 +1,18 @@
 ---
 title: Normalization
-description: Why we split data into multiple tables — removing duplication step by step so updates stay correct and simple.
+description: Why we split data into multiple tables, removing duplication step by step so updates stay correct and simple.
 ---
 
 When beginners first meet databases, the instinct is to put
 *everything in one big table*. **Normalization** is the disciplined
 process of splitting that big table into smaller, related ones so
 each fact is stored **once**. This page builds the intuition behind
-why that matters — and walks through it step by step.
+why that matters, and walks through it step by step.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="One wide table divides into two smaller ones — a fact repeated as three identical green dots collapses into a single green dot stored once"
+  aria-label="One wide table divides into two smaller ones, a fact repeated as three identical green dots collapses into a single green dot stored once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -86,10 +86,10 @@ flowchart LR
 ```
 
 - **Update anomaly:** Ada changes her email. You must update *every*
-  row that mentions her — miss one and the data now disagrees with
+  row that mentions her, miss one and the data now disagrees with
   itself.
 - **Insertion anomaly:** You want to record a new product's price,
-  but the table is about orders — you cannot add the product until
+  but the table is about orders, you cannot add the product until
   someone buys it.
 - **Deletion anomaly:** Delete Ada's only order and you also erase
   the only record of who Ada is.
@@ -126,7 +126,7 @@ erDiagram
 
 Now Ada's email lives in **one** row of `customers`; the book's
 price lives in **one** row of `products`. An order just *points* to
-them. Change the email once and every order instantly reflects it —
+them. Change the email once and every order instantly reflects it,
 the anomalies vanish.
 
 <SqlCodeBlock
@@ -168,14 +168,14 @@ ORDER BY
   o.id;`}
 />
 
-The "flat" view people liked is not lost — a join reproduces it any
+The "flat" view people liked is not lost, a join reproduces it any
 time. The difference is that it is now *computed* from
 single-source-of-truth tables instead of *stored* with duplication.
 
 ## The normal forms, in plain words
 
 Normalization is traditionally described in stages called **normal
-forms**. You do not need the formal definitions yet — the intuition
+forms**. You do not need the formal definitions yet, the intuition
 is what counts:
 
 ```mermaid
@@ -185,24 +185,24 @@ flowchart TD
     NF2 --> NF3["3NF:<br/>non-key columns depend<br/>on nothing but the key"]
 ```
 
-- **First normal form (1NF):** each cell holds a single value — no
+- **First normal form (1NF):** each cell holds a single value, no
   comma-separated lists, no "product1, product2" in one column.
 - **Second normal form (2NF):** every non-key column depends on the
   *entire* primary key, not just part of it.
 - **Third normal form (3NF):** non-key columns depend *only* on the
-  key — a customer's email depends on the customer, so it belongs in
+  key, a customer's email depends on the customer, so it belongs in
   `customers`, not `orders`.
 
 A handy summary of 3NF: every column should describe **"the key, the
 whole key, and nothing but the key."** That phrasing comes from a
 1983 paper by William Kent that translated the normal forms into
-plain English — and database folk traditionally complete it with a
+plain English, and database folk traditionally complete it with a
 wink: *"…so help me Codd,"* in honor of Edgar Codd, who defined the
 normal forms in the first place.
 
 <Callout type="warn" title="Normalization is a balance">
 More tables mean more joins. Most application databases aim for
-third normal form — clean enough to avoid anomalies, practical
+third normal form, clean enough to avoid anomalies, practical
 enough to query. Deliberately *de*-normalizing for speed is a real
 technique too, but learn the clean form first: you can only break
 the rules well once you understand them.
@@ -262,7 +262,7 @@ A join rebuilds the combined view from the normalized tables without storing dup
   > Tables can have many columns; the phrase is about what those columns depend on.
 - That primary keys must be numbers.
   > Keys need not be numbers; the phrase concerns dependency, not data type.
-- [o] That every non-key column should depend on the table's key — the essence of reaching third normal form.
+- [o] That every non-key column should depend on the table's key, the essence of reaching third normal form.
   > Each non-key column should be a fact about the key itself, which is what 3NF requires.
 - That foreign keys are unnecessary.
   > Foreign keys remain essential for linking normalized tables.

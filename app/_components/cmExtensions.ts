@@ -2,7 +2,7 @@
 
 // Shared CodeMirror v6 helpers used by every editor mount in the app
 // (CodeBlock, Playground, SqlPlayground.DdlViewer). Keeps the per-call-
-// site setup small while leaving v6's compositional API exposed —
+// site setup small while leaving v6's compositional API exposed,
 // consumers still hold their own EditorView, manage their own
 // Compartments, and dispatch their own transactions, so adding custom
 // extensions / decorations / annotations later is just appending to the
@@ -46,7 +46,7 @@ export const redoKeymap: readonly KeyBinding[] = [
 // `@codemirror/legacy-modes`, which re-runs the v5 stream parser inside
 // v6's framework.
 //
-// Returns `null` for unknown modes — callers should treat that as
+// Returns `null` for unknown modes, callers should treat that as
 // "render plain text", which is how v5 behaved when a mode wasn't loaded.
 // A failed chunk load (flaky network on a deployed site) resolves `null`
 // too, so callers never see an unhandled rejection for a cosmetic feature.
@@ -98,7 +98,7 @@ async function loadLanguageModule(mode: string): Promise<Extension | null> {
       const { r } = await import("@codemirror/legacy-modes/mode/r");
       return StreamLanguage.define(r);
     }
-    // SQL is intentionally not handled here — SqlPlayground builds the
+    // SQL is intentionally not handled here, SqlPlayground builds the
     // language extension itself so it can pass a live `schema` for
     // schema-aware autocompletion.
     case "xml": {
@@ -260,7 +260,7 @@ const themeCache = new Map<string, Extension>();
 /** An extension that suppresses active-line background highlighting.
  *  Add to any editor where the current-line glow is distracting (e.g.
  *  challenge-card read-only init editors, user code editors, and the
- *  GitHub themes — see `themeFor`). */
+ *  GitHub themes, see `themeFor`). */
 export const noActiveLine: Extension = EditorView.theme({
   ".cm-activeLine": { backgroundColor: "transparent !important" },
   ".cm-activeLineGutter": { backgroundColor: "transparent !important" },
@@ -294,7 +294,7 @@ const githubDarkCustom: Extension = [
 const githubLightCustom: Extension = [githubLight, noActiveLine];
 
 export function themeFor(name: string): Extension {
-  // GitHub themes come directly from the @uiw package — bypass the
+  // GitHub themes come directly from the @uiw package, bypass the
   // palette-based buildTheme so they use the package's own token
   // colors instead of our synthetic approximation.
   if (name === "github-dark") return githubDarkCustom;

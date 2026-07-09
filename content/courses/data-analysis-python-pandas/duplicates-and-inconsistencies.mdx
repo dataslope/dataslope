@@ -3,15 +3,15 @@ title: Duplicates and Inconsistencies
 description: Detecting and resolving the same logical thing recorded twice, three times, or under inconsistent names.
 ---
 
-After missing values, the next universal mess is **duplication**
-— the same logical record appearing more than once. Closely
+After missing values, the next universal mess is **duplication**,
+the same logical record appearing more than once. Closely
 related: **inconsistency**, where the same thing wears different
 labels.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="In a stack of records one row is an exact twin slid out toward a red cross, while on the right two pills of the same shape but different shades sit around an approximately-equals sign — duplicates and inconsistent labels"
+  aria-label="In a stack of records one row is an exact twin slid out toward a red cross, while on the right two pills of the same shape but different shades sit around an approximately-equals sign, duplicates and inconsistent labels"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -67,7 +67,7 @@ labels.
 It depends on the **grain**. In a customers table, the same
 customer ID appearing twice is a duplicate. In an orders table,
 the same customer ID appearing twice is just a returning
-customer — not a duplicate.
+customer, not a duplicate.
 
 So the question is always: *what columns, taken together, should
 uniquely identify a row?*
@@ -130,7 +130,7 @@ df = pd.DataFrame({
 print(df.drop_duplicates())
 print()
 
-# Drop duplicates based on customer_id only — keeps the first
+# Drop duplicates based on customer_id only, keeps the first
 print(df.drop_duplicates(subset=["customer_id"]))
 `,
     },
@@ -169,7 +169,7 @@ df = pd.DataFrame(
     }
 )
 
-# Naive count — every variant is its own group
+# Naive count, every variant is its own group
 print("Before cleanup:")
 print(df["country"].value_counts())
 `,
@@ -207,7 +207,7 @@ print(df["country_clean"].value_counts())
   ]}
 />
 
-The pattern — strip → case-normalize → map known variants —
+The pattern, strip → case-normalize → map known variants,
 covers most categorical cleanup.
 
 ## Useful string helpers
@@ -228,7 +228,7 @@ them in detail in the next chapter):
 ## Fuzzy duplicates (a peek)
 
 Sometimes records are *almost* duplicates with subtle
-differences — `"John Smith"` vs `"Jon Smith"`. Fully solving
+differences, `"John Smith"` vs `"Jon Smith"`. Fully solving
 this needs string-similarity tools (Levenshtein distance, the
 `rapidfuzz` library, record-linkage techniques). For most
 beginner work, exact-match deduplication is enough; just be
@@ -311,7 +311,7 @@ than a baffling alignment bug forty cells later.
   markdown={`In a table where each row should represent one customer, two rows have the same \`customer_id\` but slightly different \`name\` and \`spend\`. What is the most defensible response?
 
 - Always drop the second copy
-  > Dropping the second copy assumes it is less authoritative, which may not be true — it could be more recent or more accurate.
+  > Dropping the second copy assumes it is less authoritative, which may not be true, it could be more recent or more accurate.
 - Always sum the spend
   > Summing blindly could double-count a customer's spend if both rows represent the same purchase event.
 - [o] Decide based on the business rules (keep first? keep latest? aggregate?) and document the choice; do not blindly drop or sum

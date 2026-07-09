@@ -1,6 +1,6 @@
 ---
 title: Tables, Rows, and Columns
-description: The three words that make up every relational database — table, row, column — and the mental model that turns SQL from cryptic to obvious.
+description: The three words that make up every relational database, table, row, column, and the mental model that turns SQL from cryptic to obvious.
 ---
 
 We touched these words earlier. Now we make them rock-solid,
@@ -79,14 +79,14 @@ The `students` table:
 | 2 | Ben | 10 | 3.4 |
 | 3 | Cara | 11 | 2.9 |
 
-- **Table** — a named grid that holds data about one kind of thing.
+- **Table**, a named grid that holds data about one kind of thing.
   This one holds *students*.
-- **Column** — one attribute, running top to bottom. `name` is a
+- **Column**, one attribute, running top to bottom. `name` is a
   column; `gpa` is a column. Every column has a name and a type.
-- **Row** — one specific thing, running left to right. The second
+- **Row**, one specific thing, running left to right. The second
   row is *Ben, grade 10, gpa 3.4*. A row is also called a
   **record**.
-- **Cell** — the value where a row and column meet. The cell at
+- **Cell**, the value where a row and column meet. The cell at
   Cara's row and the `gpa` column is `2.9`.
 
 <Callout type="info" title="Read it as a sentence">
@@ -101,9 +101,9 @@ table is well-shaped.
 This is worth slowing down on, because it is the source of good
 data instincts:
 
-- A **row** answers *"which one?"* — which student, which order,
+- A **row** answers *"which one?"*, which student, which order,
   which product.
-- A **column** answers *"what about it?"* — what name, what price,
+- A **column** answers *"what about it?"*, what name, what price,
   what date.
 
 | Table | Each row is one… | Typical columns (attributes) |
@@ -122,7 +122,7 @@ probably confused about what it holds.
 A subtle but important point: in a relational table, **rows have no
 inherent order.** The database is free to store and return them in
 any order unless you explicitly ask for a sort. Ana being "first"
-in the picture is not a property of the data — it is just how we
+in the picture is not a property of the data, it is just how we
 happened to print it.
 
 ```mermaid
@@ -137,7 +137,7 @@ do not ask, you must not assume.
 
 Notice that `grade` holds whole numbers and `name` holds text. Each
 column has a declared **type**, and the database enforces it. We
-devote the next pages to keys and types — for now, just register
+devote the next pages to keys and types, for now, just register
 that a column is not a free-for-all: it is a named slot of a
 specific kind of value.
 
@@ -168,7 +168,7 @@ FROM
 />
 
 Try changing `SELECT *` to `SELECT name, gpa` and run again. You
-just asked for *two columns instead of all of them* — your first
+just asked for *two columns instead of all of them*, your first
 deliberate slice of a table.
 
 ## Check your understanding
@@ -179,7 +179,7 @@ deliberate slice of a table.
 - The word "amount" that labels one of the columns.
   > A column label like "amount" names an attribute; a row is a full record, not a single heading.
 - [o] One specific order, with a value in each of the table's columns.
-  > A row gathers all the attributes of one entity — here, one order — into a single record.
+  > A row gathers all the attributes of one entity, here, one order, into a single record.
 - The list of types each column can hold.
   > That describes the table's schema, not a row.
 - The total number of orders in the table.
@@ -200,14 +200,14 @@ A row is one record: a single order described across every column.`}
 - Row order is fixed forever once the table is created.
   > Nothing fixes a permanent order; the database may return rows in any order unless you specify one.
 
-Never assume an order you did not request — use \`ORDER BY\` when it matters.`}
+Never assume an order you did not request, use \`ORDER BY\` when it matters.`}
 />
 
 <MultipleChoice
   markdown={`A **column** in a relational table corresponds to which concept?
 
 - One specific thing, such as one customer.
-  > That is a row — one specific entity. A column is different.
+  > That is a row, one specific entity. A column is different.
 - [o] One attribute shared by every row, such as "name" or "price."
   > A column is a single attribute running down the table, with a name and a type, present for every row.
 - The grid as a whole.

@@ -5,12 +5,12 @@ description: Restrict type parameters to enable richer operations
 
 In [Generics Basics](./generics-basics), we saw how unconstrained type parameters like `<T>` let you write functions that work with *any* type. But sometimes "any type" is too permissive. What if you need to call a method on `T`, or access a property, or ensure `T` is a subtype of something?
 
-This is where **generic constraints** come in. You can restrict a type parameter to types that satisfy certain conditions using the `extends` keyword. This unlocks richer operations: accessing properties, calling methods, indexing into objects, and more — all while keeping the code generic and type-safe.
+This is where **generic constraints** come in. You can restrict a type parameter to types that satisfy certain conditions using the `extends` keyword. This unlocks richer operations: accessing properties, calling methods, indexing into objects, and more, all while keeping the code generic and type-safe.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three very different shapes all connect to the same rail through an identical small plug, while a red shape with no plug sits apart beneath a red cross — a constraint admits any type as long as it brings the required part"
+  aria-label="Three very different shapes all connect to the same rail through an identical small plug, while a red shape with no plug sits apart beneath a red cross, a constraint admits any type as long as it brings the required part"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -128,7 +128,7 @@ Here's what's happening:
 
 - `K extends keyof T` means "`K` must be one of the keys of `T`."
 - For `person`, `keyof T` is `"name" | "age" | "city"`.
-- So `K` can only be `"name"`, `"age"`, or `"city"` — anything else is a compile error.
+- So `K` can only be `"name"`, `"age"`, or `"city"`, anything else is a compile error.
 - The return type `T[K]` is the type of the property at key `K`. For `"name"`, it's `string`. For `"age"`, it's `number`.
 
 This is **type-safe property access**: the compiler guarantees the key exists and gives you the correct property type.
@@ -166,7 +166,7 @@ console.log(\`Name: \${nameValue}, Age: \${ageValue}\`);
   ]}
 />
 
-The compiler infers `K = "name"`, so `T[K]` becomes `Person["name"]`, which is `string`. This is how libraries like Lodash's `get` or `pick` functions are typed — they use `keyof` and indexed access types to preserve precise property types.
+The compiler infers `K = "name"`, so `T[K]` becomes `Person["name"]`, which is `string`. This is how libraries like Lodash's `get` or `pick` functions are typed, they use `keyof` and indexed access types to preserve precise property types.
 
 ## Default type parameters
 
@@ -236,7 +236,7 @@ console.log(\`First number: \${firstNum}\`);
   ]}
 />
 
-By constraining `T extends readonly unknown[]`, we accept both mutable and readonly arrays, and the return type `T[0]` preserves the element type — including literal types like `"red"`.
+By constraining `T extends readonly unknown[]`, we accept both mutable and readonly arrays, and the return type `T[0]` preserves the element type, including literal types like `"red"`.
 
 <Callout type="success" title="Precise types unlock better inference">
 When you preserve precise input types (readonly, literals, exact shapes), the compiler can give you more accurate autocomplete and catch more bugs. This is especially important in library code, where you don't control the input types.
@@ -284,7 +284,7 @@ The `pluck` function is generic over both the object type (`T`) and the key type
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three record cards each carry the same three slots; a translucent band lifts the middle slot out of every card into one tidy green column — pluck extracts a single keyed property from every object, and the constraint guarantees the key exists"
+  aria-label="Three record cards each carry the same three slots; a translucent band lifts the middle slot out of every card into one tidy green column, pluck extracts a single keyed property from every object, and the constraint guarantees the key exists"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -371,15 +371,15 @@ When you have generic types, you might wonder: is `Box<Dog>` assignable to `Box<
 - **Contravariant:** If `A extends B`, then `Handler<B>` extends `Handler<A>`. (Function parameters are contravariant.)
 - **Invariant:** No subtyping relationship. (Mutable containers are often invariant.)
 
-Why does anyone care about these rules? Because getting them wrong is a famous, expensive mistake. Java (1995) made its arrays **covariant**: a `String[]` may be used wherever an `Object[]` is expected. That sounds harmless — every string *is* an object — until someone writes through the wider type:
+Why does anyone care about these rules? Because getting them wrong is a famous, expensive mistake. Java (1995) made its arrays **covariant**: a `String[]` may be used wherever an `Object[]` is expected. That sounds harmless, every string *is* an object, until someone writes through the wider type:
 
 ```java
-// Java — compiles without complaint
+// Java, compiles without complaint
 Object[] objects = new String[3];
 objects[0] = Integer.valueOf(42); // runtime ArrayStoreException!
 ```
 
-A *mutable* container can't safely be covariant, because the wider alias lets you put a wrong-typed value in. Java's designers knew this and accepted the runtime check as the price of making early APIs like `sort(Object[])` usable before the language had generics; every Java programmer since has met `ArrayStoreException`, the type error that escaped to runtime. The covariance-of-mutable-arrays decision is now a standard cautionary tale in language design. (Full disclosure: TypeScript knowingly makes the same bet — its mutable arrays are covariant too, trading a sliver of soundness for ergonomics, with no runtime check to catch you. Pragmatism is a theme with this language.) Here are the safe rules, which TypeScript otherwise applies for you:
+A *mutable* container can't safely be covariant, because the wider alias lets you put a wrong-typed value in. Java's designers knew this and accepted the runtime check as the price of making early APIs like `sort(Object[])` usable before the language had generics; every Java programmer since has met `ArrayStoreException`, the type error that escaped to runtime. The covariance-of-mutable-arrays decision is now a standard cautionary tale in language design. (Full disclosure: TypeScript knowingly makes the same bet, its mutable arrays are covariant too, trading a sliver of soundness for ergonomics, with no runtime check to catch you. Pragmatism is a theme with this language.) Here are the safe rules, which TypeScript otherwise applies for you:
 
 TypeScript infers variance automatically based on how the type parameter is used. You don't usually need to think about it, but it's good to know the terms:
 
@@ -553,7 +553,7 @@ If you call \`getValue({ x: 10, y: "hello" }, "y")\`, what is the return type?
 - [o] \`string\`
   > \`K\` is inferred as \`"y"\`, and \`T["y"]\` is \`string\`, so the return type is \`string\`.
 - \`T[K]\`
-  > Partially correct — the return type *is* \`T[K]\`, but the compiler simplifies it to \`string\` based on the specific call. The concrete return type is \`string\`.
+  > Partially correct, the return type *is* \`T[K]\`, but the compiler simplifies it to \`string\` based on the specific call. The concrete return type is \`string\`.
 
 The power of \`keyof\` and indexed access types is that the compiler tracks the specific key you passed and gives you the exact property type, not a union of all possible property types.`}
 />
@@ -574,7 +574,7 @@ Only add constraints when you need them. If your function truly works with any t
 
 ## Recap
 
-Generic constraints let you write generic code that's more expressive and type-safe. Instead of accepting *any* type, you can restrict type parameters to types that satisfy certain conditions — like having a `length` property, being a key of another type, or extending a base type.
+Generic constraints let you write generic code that's more expressive and type-safe. Instead of accepting *any* type, you can restrict type parameters to types that satisfy certain conditions, like having a `length` property, being a key of another type, or extending a base type.
 
 **Key takeaways:**
 
@@ -587,4 +587,4 @@ Generic constraints let you write generic code that's more expressive and type-s
 
 Generic constraints are the key to building rich, reusable abstractions like `pluck`, `pick`, `groupBy`, and the entire ecosystem of TypeScript utility types. Once you master them, you'll write libraries and helpers that feel as polished and type-safe as the standard library itself.
 
-You've now completed the **Type-Driven Design** and **Generics** chapters. You've learned how to use type inference, structural typing, discriminated unions, domain modeling, and generic abstractions to write code that's both flexible and safe. The next step is to explore **advanced types** — conditional types, mapped types, template literal types, and more — but you already have the foundation to write world-class TypeScript.
+You've now completed the **Type-Driven Design** and **Generics** chapters. You've learned how to use type inference, structural typing, discriminated unions, domain modeling, and generic abstractions to write code that's both flexible and safe. The next step is to explore **advanced types**, conditional types, mapped types, template literal types, and more, but you already have the foundation to write world-class TypeScript.

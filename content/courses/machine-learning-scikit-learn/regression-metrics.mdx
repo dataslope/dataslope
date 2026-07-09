@@ -1,19 +1,19 @@
 ---
-title: Regression Metrics — MAE, MSE, RMSE, R²
-description: A model predicts numbers — but how wrong is it, and does "wrong" mean a few big misses or many small ones? Choosing and reading the right error metric is a skill in itself.
+title: "Regression Metrics: MAE, MSE, RMSE, R²"
+description: A model predicts numbers, but how wrong is it, and does "wrong" mean a few big misses or many small ones? Choosing and reading the right error metric is a skill in itself.
 ---
 
 A regression model outputs numbers, so evaluating it means measuring the
 gap between predicted numbers and true numbers. That sounds simple, but
 "how wrong is the model?" has several different honest answers, and they can
 disagree about which of two models is better. This chapter is about
-understanding each metric deeply enough to choose the right one — and to
+understanding each metric deeply enough to choose the right one, and to
 know what it is quietly *not* telling you.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Around a thin fitted line, one small green residual carries a tiny square while one far-off red miss carries a huge one — squared-error metrics punish big misses far more than small ones"
+  aria-label="Around a thin fitted line, one small green residual carries a tiny square while one far-off red miss carries a huge one, squared-error metrics punish big misses far more than small ones"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="80" y1="170" x2="560" y2="60" stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round" />
@@ -39,7 +39,7 @@ know what it is quietly *not* telling you.
 
 ## Residuals: the raw material
 
-Every regression metric is built from **residuals** — the differences
+Every regression metric is built from **residuals**, the differences
 between actual and predicted values, one per example.
 
 ```mermaid
@@ -52,7 +52,7 @@ flowchart TD
 A residual of `+3` means the model undershot by 3; `-3` means it overshot by
 3. A perfect model has all residuals equal to zero. The metrics below are
 just different ways to boil a whole vector of residuals down to a single
-score — and the *way* you summarize them encodes what you care about.
+score, and the *way* you summarize them encodes what you care about.
 
 <CodeBlock
   adapter="python"
@@ -83,7 +83,7 @@ print("First five residuals: ", np.round(residuals[:5], 1))
   ]}
 />
 
-## MAE — Mean Absolute Error
+## MAE, Mean Absolute Error
 
 **What it measures.** The average size of the errors, ignoring their
 direction: take the absolute value of each residual and average them.
@@ -94,14 +94,14 @@ $$
 
 - **Units:** the same as the target. If you are predicting house prices in
   dollars, MAE is in dollars. "On average we are off by about 4,300
-  dollars" — that is an MAE, and it is wonderfully interpretable.
+  dollars", that is an MAE, and it is wonderfully interpretable.
 - **What it does *not* measure:** it does not care whether your errors are a
   few huge misses or many small ones. A model that is off by 10 on every
   one of 10 houses and a model that is perfect on 9 and off by 100 on one
   both have the same total absolute error.
 - **Robust to outliers:** because errors are not squared, one giant miss
   does not dominate. MAE treats a 100-dollar error as exactly ten times a
-  10-dollar error — no more, no less.
+  10-dollar error, no more, no less.
 
 <CodeBlock
   adapter="python"
@@ -131,7 +131,7 @@ print(
   ]}
 />
 
-## MSE — Mean Squared Error
+## MSE, Mean Squared Error
 
 **What it measures.** The average of the *squared* residuals.
 
@@ -142,7 +142,7 @@ $$
 Squaring has two big consequences:
 
 - **Large errors are punished disproportionately.** An error of 10
-  contributes 100; an error of 20 contributes 400 — four times as much for
+  contributes 100; an error of 20 contributes 400, four times as much for
   twice the miss. MSE *hates* big misses. If a single catastrophic
   prediction is much worse for you than several mediocre ones, MSE encodes
   that preference.
@@ -152,16 +152,16 @@ Squaring has two big consequences:
   great for *optimizing* and *comparing* but poor for *reporting*.
 
 <Callout type="info" title="Why squared error is everywhere under the hood">
-`LinearRegression` literally minimizes MSE — it finds the line with the
+`LinearRegression` literally minimizes MSE, it finds the line with the
 smallest sum of squared residuals. Squaring is also mathematically
 convenient (smooth, differentiable). So MSE is the quantity many models
 optimize, even when you report something more readable.
 </Callout>
 
-## RMSE — Root Mean Squared Error
+## RMSE, Root Mean Squared Error
 
 **What it measures.** The square root of MSE. Taking the root undoes the
-squaring of the *units*, so RMSE is back in the target's units — but it
+squaring of the *units*, so RMSE is back in the target's units, but it
 keeps MSE's heavy penalty on large errors.
 
 $$
@@ -245,7 +245,7 @@ wrong medical dose, a hugely mispriced trade), prefer RMSE because it
 screams about them. If all errors hurt in proportion to their size and you
 do not want a few outliers to dominate the score, prefer MAE.
 
-## R² — the coefficient of determination
+## R², the coefficient of determination
 
 MAE, MSE, and RMSE tell you the error in the target's units, but they cannot
 tell you whether that error is *good*. Is an RMSE of 50 impressive? It
@@ -260,9 +260,9 @@ $$
 The numerator is your model's squared error; the denominator is the squared
 error of a dumb baseline that always predicts the mean. So:
 
-- **R² = 1.0** — perfect predictions, zero error.
-- **R² = 0.0** — your model is no better than always guessing the mean.
-- **R² < 0** — your model is *worse* than guessing the mean. Yes, R² can be
+- **R² = 1.0**, perfect predictions, zero error.
+- **R² = 0.0**, your model is no better than always guessing the mean.
+- **R² < 0**, your model is *worse* than guessing the mean. Yes, R² can be
   negative, and on a bad model with a held-out test set it sometimes is.
 
 <CodeBlock
@@ -322,7 +322,7 @@ business-critical amount on every single prediction.
 
 ### Residual plots: the picture every R² hides
 
-A residual plot — residuals versus predictions — reveals problems that no
+A residual plot, residuals versus predictions, reveals problems that no
 single number can. For a good linear model, residuals should scatter
 randomly around zero with no pattern.
 
@@ -377,7 +377,7 @@ the context**, and to glance at a residual plot before trusting any of them.
 <Callout type="tip" title="A practical reporting recipe">
 "Our model predicts charges with an RMSE of about 4,300 dollars (MAE 3,100),
 explaining roughly 78% of the variance (R² = 0.78)." That one sentence gives
-the error size, the outlier sensitivity, and the context — far more honest
+the error size, the outlier sensitivity, and the context, far more honest
 than any single number.
 </Callout>
 
@@ -386,10 +386,10 @@ than any single number.
 - **"Lower MSE is always a better model."** Only on the *same* data. MSE
   drops as you overfit the training set; compare on held-out data, and
   remember its units are not interpretable.
-- **"R² of 0.9 means 90% correct."** No — see the callout above. R² is
+- **"R² of 0.9 means 90% correct."** No, see the callout above. R² is
   explained variance, not accuracy.
 - **"A negative R² is a bug."** It is a legitimate signal that your model is
-  worse than predicting the mean — usually a sign of severe overfitting or a
+  worse than predicting the mean, usually a sign of severe overfitting or a
   mismatched model.
 - **"RMSE and MAE rank models the same way."** Usually, but not when
   outliers are involved. RMSE can prefer a model that avoids big misses
@@ -402,7 +402,7 @@ A delivery-time predictor might optimize MAE because every minute of error
 annoys a customer equally. A power-grid load forecaster cares enormously
 about rare large misses (blackouts) and so leans on RMSE. A scientist
 reporting how well a variable is explained reaches for R². The metric is not
-a formality — it is a statement about which mistakes you are willing to
+a formality, it is a statement about which mistakes you are willing to
 tolerate.
 
 ## Your turn
@@ -417,10 +417,10 @@ set (predicting \`price\` from the numeric features), and \`y_test\` /
 \`y_pred\` are available.
 
 Compute and store:
-1. \`mae\` — the mean absolute error,
-2. \`rmse\` — the root mean squared error (use \`root_mean_squared_error\`
+1. \`mae\`, the mean absolute error,
+2. \`rmse\`, the root mean squared error (use \`root_mean_squared_error\`
    or \`mean_squared_error(...) ** 0.5\`),
-3. \`r2\` — the R² score,
+3. \`r2\`, the R² score,
 
 all comparing \`y_test\` to \`y_pred\`.
 
@@ -510,11 +510,11 @@ Both react the same way to errors; RMSE just restores interpretable units.`}
 - Model B is better because RMSE is higher
   > A higher RMSE indicates larger errors, not better performance. Since RMSE heavily penalizes large misses (through squaring), a much higher RMSE means Model B has worse outlier predictions.
 - The models are identical
-  > The identical MAE means their typical error size is the same, but the dramatically different RMSE values reveal that Model B has much larger individual errors — the models are not equivalent.
+  > The identical MAE means their typical error size is the same, but the dramatically different RMSE values reveal that Model B has much larger individual errors, the models are not equivalent.
 - [o] Model B has a few large outlier errors; its typical error is the same, but big misses inflate its RMSE far above its MAE
   > A large RMSE-to-MAE gap signals that a handful of big errors dominate the squared term. If large misses are costly, prefer Model A.
 - Model B has lower variance
-  > A much larger RMSE relative to MAE is the signature of high variance in the errors — a few very large misses — not lower variance. Model B has more unevenly distributed errors.
+  > A much larger RMSE relative to MAE is the signature of high variance in the errors, a few very large misses, not lower variance. Model B has more unevenly distributed errors.
 
 Equal MAE but much larger RMSE points straight at outlier predictions.`}
 />
@@ -527,7 +527,7 @@ Equal MAE but much larger RMSE points straight at outlier predictions.`}
 - Predictions are within 85% of the true values
   > R² does not describe how close individual predictions are to the true values in percentage terms. It is a scale-free ratio of explained variance to total variance.
 - [o] The model explains about 85% of the variance in the target, relative to a baseline that always predicts the mean
-  > R² is explained variance versus a mean baseline — not an accuracy rate and not a percentage error on individual predictions.
+  > R² is explained variance versus a mean baseline, not an accuracy rate and not a percentage error on individual predictions.
 - The model has 85% precision
   > Precision is a classification metric (TP / (TP + FP)); it does not apply to regression. R² is a regression metric measuring explained variance relative to a mean baseline.
 
@@ -538,10 +538,10 @@ R² is a scale-free measure of variance explained, not a count of correct answer
   markdown={`On a held-out test set, a model produces R² = -0.20. What does this mean?
 
 - The calculation is invalid; R² cannot be negative
-  > R² can be negative. When a model's squared error on the test set exceeds that of the constant-mean baseline, R² is negative — a legitimate and informative result, not a calculation error.
+  > R² can be negative. When a model's squared error on the test set exceeds that of the constant-mean baseline, R² is negative, a legitimate and informative result, not a calculation error.
 - The model is 20% accurate
   > R² is not an accuracy percentage and a value of -0.20 does not mean 20% accuracy. It means the model's squared error is 20% worse than just always predicting the mean.
-- [o] The model performs worse than simply predicting the mean of the target — a red flag, often from overfitting or a mismatched model
+- [o] The model performs worse than simply predicting the mean of the target, a red flag, often from overfitting or a mismatched model
   > R² below 0 means the model's squared error exceeds that of the mean baseline. It is a legitimate, informative warning, not a bug.
 - The model explains 20% of the variance
   > A negative R² does not mean the model explains 20% of the variance; it means the model's errors are worse than the trivial mean-prediction baseline. Explaining 20% of variance would give R² = 0.20, not -0.20.
@@ -553,7 +553,7 @@ A negative R² is a meaningful signal that the model is actively unhelpful.`}
   markdown={`Why should you report an absolute metric (MAE or RMSE) **alongside** R² rather than R² alone?
 
 - Because R² is always wrong
-  > R² is a valid and useful metric — it is not always wrong. The reason to pair it with an absolute metric is that R² is scale-free and hides the actual magnitude of errors.
+  > R² is a valid and useful metric, it is not always wrong. The reason to pair it with an absolute metric is that R² is scale-free and hides the actual magnitude of errors.
 - [o] Because R² is scale-free and says nothing about the actual size of the errors; the same R² can correspond to tiny or huge errors depending on the target's spread
   > R² gives context relative to a baseline but hides the magnitude of mistakes. Pairing it with MAE or RMSE reports both "how good relative to baseline" and "how large in real units."
 - Because MAE and R² are identical
@@ -561,7 +561,7 @@ A negative R² is a meaningful signal that the model is actively unhelpful.`}
 - Because R² cannot be computed without RMSE
   > R² is computed directly from the actual and predicted values using their squared differences; it does not require RMSE as an intermediate step.
 
-R² answers "better than baseline?" while MAE/RMSE answer "how big are the errors?" — you usually want both.`}
+R² answers "better than baseline?" while MAE/RMSE answer "how big are the errors?", you usually want both.`}
 />
 
 <MultipleChoice

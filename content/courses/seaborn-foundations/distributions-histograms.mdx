@@ -1,12 +1,12 @@
 ---
 title: Histograms
-description: displot with kind='hist' — turning a column of numbers into a shape, and why bin width changes the story.
+description: displot with kind='hist', turning a column of numbers into a shape, and why bin width changes the story.
 ---
 
 A scatter plot asks how *two* variables relate. A **histogram** asks a
 simpler, more fundamental question about *one*: where do its values pile up?
 Hand Seaborn a single numeric column and a histogram turns it into a
-**shape** — a silhouette you can read for peaks, spread, and stragglers in
+**shape**, a silhouette you can read for peaks, spread, and stragglers in
 about a second.
 
 The idea is humble. Chop the number line into equal-width **bins**, then
@@ -17,7 +17,7 @@ there; short bar, few. That count-by-bin picture is the most common way to
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A histogram silhouette of solid blue bars rising to a single peak and tapering away on a light blue panel — one numeric column turned into a readable shape"
+  aria-label="A histogram silhouette of solid blue bars rising to a single peak and tapering away on a light blue panel, one numeric column turned into a readable shape"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -37,13 +37,13 @@ there; short bar, few. That count-by-bin picture is the most common way to
 
 - **Data it needs:** one **numeric (continuous)** variable. Optionally a
   **categorical** column for `hue` to compare groups.
-- **What it highlights best:** the *shape* of a distribution — where it
+- **What it highlights best:** the *shape* of a distribution, where it
   peaks (**modality**), whether it leans left or right (**skew**), how wide
   it is (**spread**), and whether stray values sit far out (**outliers**).
 - **What it hides or distorts:** the bars depend entirely on where the bin
   edges fall. A different bin width can *manufacture* a bump or *erase* one,
   so a single histogram is one opinion about the data, not the truth.
-- **When it breaks:** comparing many groups at once — overlapping colored
+- **When it breaks:** comparing many groups at once, overlapping colored
   histograms occlude each other into mud. We'll handle that with `multiple=`
   and faceting below.
 
@@ -72,8 +72,8 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", height=4)
 />
 
 That silhouette already says something: flipper lengths are not a single
-tidy hump. There is a tall group on the left and a second rise on the right
-— a hint that *more than one kind of penguin* is hiding in this column. Hold
+tidy hump. There is a tall group on the left and a second rise on the right,
+a hint that *more than one kind of penguin* is hiding in this column. Hold
 onto that observation; it is about to be the whole lesson.
 
 <Callout type="info" title="Figure-level and axes-level, same chart">
@@ -89,7 +89,7 @@ an Axes of your own.
 
 Here is the single most important thing to understand about histograms: the
 **number of bins** (or equivalently their **width**) is a decision *you*
-make, and it changes the story the chart tells. Same data, same column —
+make, and it changes the story the chart tells. Same data, same column,
 different number of bars, different conclusion.
 
 Watch the same flipper lengths drawn three ways. First, far too few bins:
@@ -114,7 +114,7 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", bins=5, height=4)
 />
 
 With only five fat bins the two groups blur together into one vague mound.
-The structure we glimpsed earlier — two populations — has been **erased** by
+The structure we glimpsed earlier, two populations, has been **erased** by
 coarse binning. Now swing to the other extreme:
 
 <CodeBlock
@@ -129,7 +129,7 @@ import seaborn as sns
 sns.set_theme(style="whitegrid")
 penguins = pd.read_csv("penguins.csv")
 
-# Too many bins: every wobble becomes its own spike — noise, not signal.
+# Too many bins: every wobble becomes its own spike, noise, not signal.
 sns.displot(penguins, x="flipper_length_mm", kind="hist", bins=50, height=4)
 `,
     },
@@ -137,7 +137,7 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", bins=50, height=4)
 />
 
 Now there are so many skinny bars that each holds only a handful of penguins.
-The picture is **jagged and noisy** — random gaps and spikes that say more
+The picture is **jagged and noisy**, random gaps and spikes that say more
 about sampling luck than about the real distribution. Somewhere in between
 sits a width that shows the genuine structure:
 
@@ -160,7 +160,7 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", bins=20, height=4)
   ]}
 />
 
-With about twenty bins the **two peaks** stand out clearly — the flipper
+With about twenty bins the **two peaks** stand out clearly, the flipper
 lengths are **bimodal**, exactly the signature of two kinds of penguin mixed
 together. Too few bins hid it; too many buried it in noise; a sensible
 width let it speak.
@@ -171,7 +171,7 @@ hump. A colleague redraws it with \`bins=20\` and now sees **two** clear
 peaks. What is the most reasonable conclusion?
 
 - The \`bins=20\` version invented peaks that aren't really in the data.
-  > More bins can add *noise*, but two well-separated peaks that appear at a moderate bin count usually reflect real structure — here, two penguin groups. Five bins were too coarse to resolve them.
+  > More bins can add *noise*, but two well-separated peaks that appear at a moderate bin count usually reflect real structure, here, two penguin groups. Five bins were too coarse to resolve them.
 - [o] Five bins were too coarse and merged real structure; the finer view reveals genuine bimodality.
   > Wide bins average nearby values together, which can smear two close peaks into one. A moderate bin count resolved a real two-group pattern that the coarse view hid.
 - Histograms are unreliable, so neither picture means anything.
@@ -192,8 +192,8 @@ questions:
 - `bins=20` fixes the **number** of bars; their width is computed from the
   data range. Handy when you want a quick "more or fewer."
 - `binwidth=2` fixes the **width** of each bar in the variable's own units
-  (here, 2&nbsp;mm). Handy when the width is *meaningful* — "group ages into
-  5-year bands," "bill lengths every 2&nbsp;mm" — and when you want two
+  (here, 2&nbsp;mm). Handy when the width is *meaningful*, "group ages into
+  5-year bands," "bill lengths every 2&nbsp;mm", and when you want two
   charts to share an identical scale.
 
 <CodeBlock
@@ -216,20 +216,20 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", binwidth=2, height=4)
 />
 
 If you set neither, Seaborn picks a reasonable width for you. That default
-is a fine *starting* point — but now you know to nudge it and see whether
+is a fine *starting* point, but now you know to nudge it and see whether
 the shape holds.
 
 <Callout type="tip" title="The honest habit">
 Never trust a single histogram. Redraw it at two or three bin widths. The
-features that *persist* across them — a second peak, a long right tail — are
+features that *persist* across them, a second peak, a long right tail, are
 real. The ones that flicker in and out are noise from the bin edges.
 </Callout>
 
 ## A smooth overlay with `kde=True`
 
 Because bin edges are arbitrary, you may want a smoother summary of the same
-shape. Adding `kde=True` overlays a **kernel density estimate** — a smooth
-curve fitted to the data — on top of the bars:
+shape. Adding `kde=True` overlays a **kernel density estimate**, a smooth
+curve fitted to the data, on top of the bars:
 
 <CodeBlock
   adapter="python"
@@ -252,7 +252,7 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", kde=True, height=4)
 
 The curve traces the same two-humped shape without committing to hard bin
 edges. It has its *own* tuning knob (a smoothing bandwidth) and its own ways
-of misleading — so the KDE gets a full treatment on the next page. For now,
+of misleading, so the KDE gets a full treatment on the next page. For now,
 just know it as a quick way to sketch the distribution's outline over the
 bars.
 
@@ -281,7 +281,7 @@ sns.displot(penguins, x="flipper_length_mm", hue="species", kind="hist", height=
 
 The mystery is solved in color: the left peak is mostly **Adelie** and
 **Chinstrap**, the right peak is **Gentoo**. The bimodality was a mix of
-species all along — the same reveal a `hue` gave us on the scatter page,
+species all along, the same reveal a `hue` gave us on the scatter page,
 now for a single variable.
 
 ### Choosing how the groups stack: `multiple=`
@@ -290,16 +290,16 @@ When colored histograms share an x-axis they have to coexist somehow, and
 the `multiple=` argument decides the arrangement. The four options suit
 different goals:
 
-- `"layer"` *(default)* — bars are drawn semi-transparently on top of each
+- `"layer"` *(default)*, bars are drawn semi-transparently on top of each
   other. Good for **2–3 groups** that don't overlap much; beyond that the
   colors muddy together.
-- `"dodge"` — bars for each group sit **side by side** within each bin. Makes
+- `"dodge"`, bars for each group sit **side by side** within each bin. Makes
   per-bin comparison exact, but gets cramped fast with many groups or many
   bins.
-- `"stack"` — groups are **piled vertically**. The total height shows the
+- `"stack"`, groups are **piled vertically**. The total height shows the
   combined count, but only the bottom group sits on a flat baseline, so the
   upper ones are harder to compare.
-- `"fill"` — like `stack` but every bar is normalized to the **same full
+- `"fill"`, like `stack` but every bar is normalized to the **same full
   height**, so you read each group's *proportion* within a bin rather than
   its count.
 
@@ -331,7 +331,7 @@ sns.displot(
 />
 
 Another readable choice for overlapping groups is `element="step"`, which
-draws each distribution as an **outline** instead of filled bars — the lines
+draws each distribution as an **outline** instead of filled bars, the lines
 cross cleanly without hiding one another:
 
 <CodeBlock
@@ -371,13 +371,13 @@ that point switch to `element="step"`, or give each group its own panel with
 
 By default each bar's height is a raw **count** of observations
 (`stat="count"`). That is intuitive, but it makes groups of unequal size
-hard to compare — a bigger group has taller bars everywhere simply because
+hard to compare, a bigger group has taller bars everywhere simply because
 it has more penguins. Switching `stat` rescales the y-axis:
 
-- `stat="count"` *(default)* — number of observations per bin.
-- `stat="density"` — bars scaled so the **total area is 1**, which is what
+- `stat="count"` *(default)*, number of observations per bin.
+- `stat="density"`, bars scaled so the **total area is 1**, which is what
   lets a histogram sit on the same scale as a KDE.
-- `stat="probability"` — bar **heights** sum to 1, i.e. each bar is the
+- `stat="probability"`, bar **heights** sum to 1, i.e. each bar is the
   fraction of observations in that bin.
 
 <CodeBlock
@@ -414,7 +414,7 @@ When you compare groups of different sizes, `stat="density"` (or
 ## A common mistake
 
 The classic histogram error is reading one bin width as gospel. A report
-that shows a single smooth hump — drawn, unknowingly, with too few bins —
+that shows a single smooth hump, drawn, unknowingly, with too few bins,
 can hide a second population entirely, and a decision gets made on a shape
 that was never really there. The fix is cheap: vary the width, and trust
 only the features that survive.
@@ -482,7 +482,7 @@ g = sns.displot(tips, x="total_bill", kind="hist", bins=20)
 - The proportion of a whole made up by each category.
   > Part-to-whole composition is a pie or stacked-bar idea; a histogram describes how one numeric variable is spread out.
 
-A histogram answers "how is this one column of numbers distributed?" — its
+A histogram answers "how is this one column of numbers distributed?", its
 peaks, spread, skew, and outliers.`}
 />
 
@@ -509,11 +509,11 @@ penguin-like groups on one axis. A layered (overlapping) histogram is
 unreadable. What is the better move?
 
 - Keep layering but pick brighter colors.
-  > Brighter colors don't fix occlusion — five translucent fills still cover one another. The problem is the overlap itself.
+  > Brighter colors don't fix occlusion, five translucent fills still cover one another. The problem is the overlap itself.
 - Map all five groups to \`size\` instead of \`hue\`.
   > \`size\` is not a channel histograms use to separate groups, and size is read imprecisely anyway. It would not make the comparison clearer.
 - [o] Use \`element="step"\` outlines, or give each group its own panel with \`col=\`.
-  > Step outlines let the curves cross without hiding one another, and faceting with \`col\` gives each group its own space — both stay readable with many groups.
+  > Step outlines let the curves cross without hiding one another, and faceting with \`col\` gives each group its own space, both stay readable with many groups.
 - Reduce the number of bins to 2.
   > Two bins would destroy the very shape you want to compare; it sacrifices the distribution to avoid overlap.
 

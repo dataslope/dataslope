@@ -1,6 +1,6 @@
 ---
 title: Missing Values
-description: NaN, NaT, None — what they are, where they come from, how Pandas treats them, and the four strategies for dealing with them.
+description: NaN, NaT, None, what they are, where they come from, how Pandas treats them, and the four strategies for dealing with them.
 ---
 
 Missing data is the single most universal property of real-world
@@ -9,7 +9,7 @@ datasets. This chapter is the playbook for handling it.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A row of cells with one ghostly gap marked by a teal question badge, and two remedies fanning out along thin lines below — dropping leaves a shorter row, filling drops a green value into the hole"
+  aria-label="A row of cells with one ghostly gap marked by a teal question badge, and two remedies fanning out along thin lines below, dropping leaves a shorter row, filling drops a green value into the hole"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,15 +58,15 @@ datasets. This chapter is the playbook for handling it.
 
 Pandas uses two sentinel values:
 
-- **`NaN`** (Not a Number) — for missing floats and, by
+- **`NaN`** (Not a Number), for missing floats and, by
   extension, most "missing" cells.
-- **`NaT`** (Not a Time) — for missing datetimes.
+- **`NaT`** (Not a Time), for missing datetimes.
 
 Plus Python's **`None`** which Pandas often converts to NaN.
 
 Newer Pandas (1.x+) also offers **nullable integer**, **nullable
 boolean**, and **nullable string** dtypes (with capital-letter
-names — `Int64`, `boolean`, `string`) that use a richer sentinel
+names, `Int64`, `boolean`, `string`) that use a richer sentinel
 called `pd.NA`. For this course we stick with the classic
 NaN/NaT.
 
@@ -131,7 +131,7 @@ worst-first.
 ## A real audit: the penguins
 
 Toy DataFrames make the mechanics clear, but real missingness has
-*texture* — it clusters, and the clustering tells a story. The
+*texture*, it clusters, and the clustering tells a story. The
 penguins dataset has 19 missing cells, and they are not scattered
 at random. Run the audit and look at *which rows* are affected:
 
@@ -158,14 +158,14 @@ print(incomplete[["species", "island", "body_mass_g", "sex"]])
 
 The pattern is exactly the kind of thing the *First Look* chapter
 told you to watch for. **Two** penguins are missing *every*
-measurement — the observer clearly never got a full reading on
+measurement, the observer clearly never got a full reading on
 those birds, so those rows are nearly worthless and are good
 candidates to **drop**. The other **nine** are missing only `sex`
 (harder to determine in the field) but have perfectly good
-measurements — dropping them would needlessly throw away real data,
+measurements, dropping them would needlessly throw away real data,
 so for a body-mass analysis you would **keep** them. Same dataset,
 two different remedies, decided by *where* the holes are. That
-judgment — not the syntax — is the actual skill.
+judgment, not the syntax, is the actual skill.
 
 ## Where do NaNs come from?
 
@@ -184,7 +184,7 @@ Knowing the source guides the fix:
 
 The remediation differs for each.
 
-## Strategy 1 — drop rows
+## Strategy 1, drop rows
 
 `dropna()` removes rows with any missing value:
 
@@ -223,9 +223,9 @@ random, and the columns are central to your analysis.
 
 **When *not* to:** when missingness is high or correlated with
 something interesting (e.g., income is missing more often for
-unemployed respondents — dropping them changes the population).
+unemployed respondents, dropping them changes the population).
 
-## Strategy 2 — drop columns
+## Strategy 2, drop columns
 
 If a column is mostly NaN, it usually does not help your
 analysis and may be noise.
@@ -255,7 +255,7 @@ print(df[keep])
   ]}
 />
 
-## Strategy 3 — impute
+## Strategy 3, impute
 
 Fill in a plausible value. The simplest options:
 
@@ -297,7 +297,7 @@ For numeric columns:
 
 - The mean (sensitive to outliers).
 - The median (robust).
-- 0 — only if 0 is a meaningful "no contribution" value.
+- 0, only if 0 is a meaningful "no contribution" value.
 - A group-based mean (e.g. department's average) for sophisticated
   cases.
 
@@ -309,7 +309,7 @@ matters), it is bad. Always ask whether the missingness itself
 is meaningful before imputing it away.
 </Callout>
 
-## Strategy 4 — keep it explicit
+## Strategy 4, keep it explicit
 
 Sometimes the right move is to leave the NaNs and design
 downstream code to handle them.
@@ -413,7 +413,7 @@ df["age"] = df["age"].replace([-1, 999], np.nan)
 - [o] Replace the sentinels with NaN (\`df["age"].replace([-1, 999], np.nan)\`) so downstream operations treat them as missing
   > Convert sentinels to NaN as early as possible so the rest of your code does not have to remember the sentinel codes.
 - Round them to zero
-  > Rounding sentinel codes to zero turns a "refused to answer" into an age of zero, which is worse than missing — it is wrong.
+  > Rounding sentinel codes to zero turns a "refused to answer" into an age of zero, which is worse than missing, it is wrong.
 
 Documenting the conversion is just as important as performing it.`}
 />
@@ -453,8 +453,8 @@ almost always a missed column or a sentinel you forgot about.
   title="Clean the penguins, deliberately"
   instructions={`The penguins file is staged as \`penguins.csv\` and loaded into \`penguins\` for you. Apply the two-remedy logic from this chapter:
 
-1. Build \`measured\` — the penguins that have a \`body_mass_g\` value (i.e. drop only the rows where \`body_mass_g\` is missing). This removes the two rows with no measurements at all.
-2. From \`measured\`, compute \`mean_mass\` — the mean of \`body_mass_g\`, rounded to 1 decimal place.
+1. Build \`measured\`, the penguins that have a \`body_mass_g\` value (i.e. drop only the rows where \`body_mass_g\` is missing). This removes the two rows with no measurements at all.
+2. From \`measured\`, compute \`mean_mass\`, the mean of \`body_mass_g\`, rounded to 1 decimal place.
 
 Keep every penguin that has a body mass, even if its \`sex\` is missing.`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -511,7 +511,7 @@ assert len(measured) == 342, f"Expected 342 rows, got {len(measured)}"`,
   markdown={`When is **dropping rows with NaN** a poor strategy?
 
 - When the dataset is small
-  > Small datasets make the problem worse, not better — dropping rows from a small dataset reduces power significantly, but the strategy is still fine when missingness is rare and random.
+  > Small datasets make the problem worse, not better, dropping rows from a small dataset reduces power significantly, but the strategy is still fine when missingness is rare and random.
 - Always
   > Dropping is sometimes the right choice, such as when NaNs are rare, random, and not in key columns.
 - [o] When missingness is high or correlated with something interesting (e.g., income is missing more often for certain groups), because dropping changes the effective population
@@ -528,11 +528,11 @@ Understanding *why* values are missing is essential before deciding how to handl
 - Replaces NaNs with 0
   > \`fillna(0)\` fills with a literal zero; \`fillna(s.median())\` fills with the computed median of the non-null values.
 - Removes NaNs from \`s\`
-  > \`dropna()\` removes rows with NaN; \`fillna\` substitutes a value in their place — the Series retains the same length.
+  > \`dropna()\` removes rows with NaN; \`fillna\` substitutes a value in their place, the Series retains the same length.
 - [o] Replaces NaNs with the median of the non-null values in \`s\`
-  > Median imputation is a robust default — it does not get pulled by outliers like the mean does.
+  > Median imputation is a robust default, it does not get pulled by outliers like the mean does.
 - Computes the median while ignoring NaNs
-  > \`s.median()\` does compute the median, but the outer \`fillna(...)\` call uses that value to replace NaNs — the result is the filled Series, not just the median.
+  > \`s.median()\` does compute the median, but the outer \`fillna(...)\` call uses that value to replace NaNs, the result is the filled Series, not just the median.
 
 For numeric columns where missingness is moderate and random, median imputation is a sensible default.`}
 />
@@ -541,7 +541,7 @@ For numeric columns where missingness is moderate and random, median imputation 
   markdown={`A categorical column \`payment_method\` has 8% missing values. You decide to fill them in. Which is **most appropriate**?
 
 - Fill with 0
-  > Zero is a numeric value with no meaning in a categorical column like \`payment_method\` — it would create a spurious category.
+  > Zero is a numeric value with no meaning in a categorical column like \`payment_method\`, it would create a spurious category.
 - Fill with the column's mean
   > A categorical column of payment method strings has no numeric mean; computing one would raise an error or produce nonsense.
 - [o] Fill with the mode (most common value) or with a literal label like \`"unknown"\`
@@ -556,10 +556,10 @@ Pick the option that matches what you want downstream code to *do* with these ro
   markdown={`Why might you add a column like \`score_missing\` instead of (or in addition to) filling \`score\`?
 
 - It looks fancy
-  > Aesthetic appeal is not the reason; the flag serves an analytical purpose — encoding the missingness as a feature.
+  > Aesthetic appeal is not the reason; the flag serves an analytical purpose, encoding the missingness as a feature.
 - Pandas requires it
   > Pandas does not require a missingness indicator column; it is an optional design choice that captures information which imputation would erase.
-- [o] Because the *fact* that a value was missing can itself be informative — sometimes more informative than any imputed value
+- [o] Because the *fact* that a value was missing can itself be informative, sometimes more informative than any imputed value
   > In churn analysis, "users who did not answer this question" can behave very differently from users who answered. The flag preserves that information.
 - It saves memory
   > Adding a boolean column increases memory use slightly; the motivation is analytical, not technical efficiency.

@@ -9,7 +9,7 @@ import type { SqlDialectId } from "./ddl";
  *  - SQLite: plain `EXPLAIN` returns VM bytecode, so we use the
  *    human-readable `EXPLAIN QUERY PLAN`.
  *  - Postgres / DuckDB: plain `EXPLAIN` (no `ANALYZE`), which *plans* the
- *    statement without executing it — so it's safe even for DML.
+ *    statement without executing it, so it's safe even for DML.
  *
  *  A trailing `;` is tolerated, and an already-`EXPLAIN`-prefixed statement is
  *  passed through unchanged so the user can't double-wrap it. */
@@ -27,7 +27,7 @@ export function buildExplainSql(dialect: SqlDialectId, sql: string): string {
  *  column (one plan line per row); SQLite `EXPLAIN QUERY PLAN` returns
  *  `(id, parent, notused, detail)`; DuckDB returns the plan (an ASCII tree) in
  *  its column(s). When a `detail` column is present (SQLite) we show just that;
- *  otherwise each row's non-null cells are joined, then rows by newlines —
+ *  otherwise each row's non-null cells are joined, then rows by newlines,
  *  which renders all three readably (DuckDB's embedded newlines included). */
 export function formatExplainResult(
   columns: readonly string[],

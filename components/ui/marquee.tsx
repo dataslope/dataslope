@@ -59,7 +59,7 @@ export function Marquee({
         .map((_, i) => (
           <div
             key={i}
-            // The repeats exist only to fill the scroll loop visually —
+            // The repeats exist only to fill the scroll loop visually,
             // screen readers should hear the content once, not `repeat` times.
             aria-hidden={i > 0 || undefined}
             className={cn("flex shrink-0 justify-around gap-(--gap)", {

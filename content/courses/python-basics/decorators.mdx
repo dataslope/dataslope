@@ -8,7 +8,7 @@ A **decorator** is just a function that takes another function and returns a new
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A solid blue square rides a thin gray arrow and reappears unchanged inside a bold green frame — a decorator wraps a function in new behavior without touching the function itself"
+  aria-label="A solid blue square rides a thin gray arrow and reappears unchanged inside a bold green frame, a decorator wraps a function in new behavior without touching the function itself"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -410,11 +410,11 @@ Applying \`@staticmethod\` first (closest to the function) can cause errors beca
 
 ## Built-in decorators worth knowing
 
-- `@functools.wraps` — use inside your own decorators to preserve metadata.
-- `@functools.cache` (3.9+) — memoize function results indefinitely.
-- `@functools.lru_cache(maxsize=128)` — least-recently-used cache with a size limit.
-- `@staticmethod`, `@classmethod`, `@property` — for classes (covered in the Classes page).
-- `@dataclass` (from `dataclasses`) — auto-generates `__init__`, `__repr__`, etc.
+- `@functools.wraps`, use inside your own decorators to preserve metadata.
+- `@functools.cache` (3.9+), memoize function results indefinitely.
+- `@functools.lru_cache(maxsize=128)`, least-recently-used cache with a size limit.
+- `@staticmethod`, `@classmethod`, `@property`, for classes (covered in the Classes page).
+- `@dataclass` (from `dataclasses`), auto-generates `__init__`, `__repr__`, etc.
 
 <CodeBlock
   adapter="python"
@@ -740,7 +740,7 @@ assert foo.__name__ == "foo"`,
 - [o] It copies metadata (name, docstring, signature) from \`fn\` onto the wrapper.
   > Without it, tools and tracebacks see the wrapper's name instead of the real function's.
 - It prevents the wrapper from accepting \`*args\` and \`**kwargs\`.
-  > \`wraps\` does not change the wrapper's signature — you still need \`*args, **kwargs\`.
+  > \`wraps\` does not change the wrapper's signature, you still need \`*args, **kwargs\`.
 - It is required syntax for the \`@\` decorator notation to work.
   > The \`@\` syntax works fine without \`wraps\`, but metadata is lost.`}
 />
@@ -785,7 +785,7 @@ Which is equivalent?
 - To make the wrapper run faster.
   > \`*args, **kwargs\` has no performance impact.
 - [o] To accept any arguments the wrapped function expects, without knowing them in advance.
-  > Decorators are generic — they should work on any function signature.
+  > Decorators are generic, they should work on any function signature.
 - It is required syntax for decorators to work.
   > You can write a decorator without \`*args, **kwargs\`, but it will only work on functions with a specific signature.
 - To prevent the function from being called with keyword arguments.

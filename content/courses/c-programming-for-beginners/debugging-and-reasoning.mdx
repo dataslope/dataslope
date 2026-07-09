@@ -5,7 +5,7 @@ description: How to think clearly when your program doesn't do what you expected
 
 Every working program was, at some point, a broken one. The
 difference between a beginner and an experienced programmer is not
-that the experienced one writes fewer bugs — it's that they find
+that the experienced one writes fewer bugs, it's that they find
 and fix them faster.
 
 That speed comes from a few habits. None of them are magic. All of
@@ -14,7 +14,7 @@ them can be practiced.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Nested translucent brackets halving a row of dots again and again until they close in on a single red dot — finding a bug by bisection"
+  aria-label="Nested translucent brackets halving a row of dots again and again until they close in on a single red dot, finding a bug by bisection"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -76,7 +76,7 @@ make sense at the indicated line, look at the line **above**.
 
 Compile with `-Wall -Wextra` (or whatever the equivalent is in your
 toolchain) and **fix every warning**. Warnings almost always
-identify a real bug — uninitialized variables, comparisons that are
+identify a real bug, uninitialized variables, comparisons that are
 always true, format-string mismatches. Treat a warning-free build as
 the standard.
 
@@ -125,7 +125,7 @@ Trace `fact(4)`:
 
 Two bugs are now obvious from the table:
 
-1. `r` should start at `1`, not `0` — multiplying by zero makes the
+1. `r` should start at `1`, not `0`, multiplying by zero makes the
    answer zero forever.
 2. The loop should go up to `i <= n`, not `i < n`, or we never
    include `n` itself in the product.
@@ -150,7 +150,7 @@ A few tips:
 - **Use a recognizable prefix** like `[DBG]` so you can `grep` for
   them and remove them later.
 - **Flush** if your program might crash:
-  `fflush(stdout);` — without a flush, your print might never
+  `fflush(stdout);`, without a flush, your print might never
   appear if the program dies just after.
 
 Print debugging is sometimes derided as primitive, but it has a huge
@@ -163,7 +163,7 @@ If the bug only appears with a 10,000-line input file, you cannot
 debug it. Cut the input in half. Does the bug still happen? Cut it
 in half again. Keep going.
 
-This binary-search technique — *minimization* — turns "my program
+This binary-search technique, *minimization*, turns "my program
 crashes mysteriously on this giant input" into "my program crashes
 on the four characters `\n\n\n\0`", at which point the bug usually
 diagnoses itself.
@@ -177,13 +177,13 @@ persists.
 Out loud (or in writing), explain the code to an inanimate object,
 line by line, as if it had never seen the program before. Most of
 the time, you'll hear yourself say something that doesn't make
-sense — "and here we increment `i`, then we add it to `total`, then
-we... wait, why did I subtract `1` here?" — and the bug is found
+sense, "and here we increment `i`, then we add it to `total`, then
+we... wait, why did I subtract `1` here?", and the bug is found
 without anyone else needing to look.
 
 ## Memory bugs: the special category
 
-Memory bugs — use-after-free, double-free, buffer overflow, leak —
+Memory bugs, use-after-free, double-free, buffer overflow, leak,
 are particularly nasty in C because they often *don't crash
 immediately*. They corrupt some data, and the program crashes a
 million instructions later, in some innocent code that had nothing
@@ -227,7 +227,7 @@ each piece of code, ask:
 - **Post-condition**: what is guaranteed to be true when it
   finishes?
 
-For loops in particular, write down the **loop invariant** —
+For loops in particular, write down the **loop invariant**,
 something that's true before the loop starts, remains true after
 each iteration, and tells you the answer when the loop exits:
 
@@ -319,7 +319,7 @@ The first instinct on a segfault should be: "I'm dereferencing a pointer that do
   > Rewriting transfers the same bug into a new file unless you first understand what the bug is; it also destroys the original for comparison.
 - Add \`printf\` statements throughout the code, then re-run with the full input.
   > Printing debug output during a 50MB run generates an overwhelming flood of lines; it only becomes useful once you have a small, focused reproducer.
-- [o] Try to reproduce the bug on a much smaller input — half the file, then half of that, etc.
+- [o] Try to reproduce the bug on a much smaller input, half the file, then half of that, etc.
   > Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
 
 Once you have a tiny failing input, *then* it's worth reading the code carefully or adding prints. Trying to debug with the full input is like trying to find a needle in 50MB of hay.`}

@@ -1,11 +1,11 @@
 /**
- * `/illustration-prompts` — a build-time review page for the custom line-art
+ * `/illustration-prompts`, a build-time review page for the custom line-art
  * illustration placeholders (`<IllustrationPrompt>`) authored across the
  * `/courses`, `/fumadocs-dev`, and `/interview-prep` pages.
  *
  * Each distinct illustration gets one card with its semantic target file name
  * (e.g. `leland-wilkinson-portrait.svg`), the exact generation prompt and a
- * copy button, and deep links to every lesson that uses it — so the full set of
+ * copy button, and deep links to every lesson that uses it, so the full set of
  * illustrations to draw can be skimmed and copied from one place.
  *
  * Unlike `/svg-gallery`, the payload is tiny (~80 short prompts), so the data

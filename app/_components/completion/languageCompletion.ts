@@ -10,7 +10,7 @@
 //          completions from Pyodide/WebR/the TS language service);
 //        - the language package's own static sources where they exist
 //          (lang-python keywords/builtins/locals, lang-javascript
-//          snippets/locals) — re-assembled here so they can be guarded
+//          snippets/locals), re-assembled here so they can be guarded
 //          against firing in member-access position (`pd.|` must not
 //          offer `print`);
 //        - a curated builtin/keyword list for languages with no
@@ -20,7 +20,7 @@
 //          `obj.` / `ptr->` at least offers identifiers already in the
 //          buffer (the classic editor fallback).
 //      Static sources that a booted runtime supersedes are suppressed
-//      once `runtime.complete` is available — CodeMirror only dedupes
+//      once `runtime.complete` is available, CodeMirror only dedupes
 //      options whose label/detail/boost all match, so running both
 //      tiers at once would show visible duplicates.
 //   2. Trigger characters (`.`, `->`, `::`, `$` per language) that open
@@ -30,7 +30,7 @@
 //      on the ai-autocomplete branch), which stand down while this
 //      popup is open.
 //   3. The completion keymap at high precedence: Tab accepts, Escape
-//      closes, arrows navigate, Enter always inserts a newline — the
+//      closes, arrows navigate, Enter always inserts a newline, the
 //      same bindings the SQL playgrounds already teach.
 
 import {
@@ -55,14 +55,14 @@ import type {
   CompletionResult,
 } from "../types";
 
-/** The slice of `LanguageRuntime` this module needs — kept structural so
+/** The slice of `LanguageRuntime` this module needs, kept structural so
  *  hosts can hand in a ref-reader without importing the full type. */
 export interface CompletionRuntime {
   complete?(request: CompletionRequest): Promise<CompletionResult>;
 }
 
 export interface LanguageCompletionConfig {
-  /** Adapter id ("python", "r", "javascript", …) — selects the
+  /** Adapter id ("python", "r", "javascript", …), selects the
    *  language profile below. */
   adapterId: string;
   /** Returns the live runtime when one is booted, or null. The runtime
@@ -82,7 +82,7 @@ export interface LanguageCompletionConfig {
 // ─── Per-language profiles ────────────────────────────────────────────────
 
 /** Lezer node names inside which static keyword/builtin lists must not
- *  fire. A superset across grammars — `ifNotIn` ignores names a
+ *  fire. A superset across grammars, `ifNotIn` ignores names a
  *  particular grammar doesn't produce. */
 const DONT_COMPLETE_IN = [
   "String",
@@ -103,7 +103,7 @@ interface LanguageProfile {
    *  popup instead of re-querying the (possibly slow) runtime. */
   validFor: RegExp;
   /** Endings (looking backwards from the token start) that mark
-   *  member-access position — static/global sources are suppressed
+   *  member-access position, static/global sources are suppressed
    *  there so `pd.|` never offers top-level keywords. */
   memberEndings: string[];
   /** Typed sequences that auto-open the completion popup. */
@@ -131,7 +131,7 @@ const WORD_DEFAULT = /[\w$]*$/;
 const VALID_DEFAULT = /^[\w$]*$/;
 
 /** Completions for `$variables` present in the document plus the PHP
- *  superglobals — the only names that make sense right after `$`. */
+ *  superglobals, the only names that make sense right after `$`. */
 const phpVariableSource: CompletionSource = (ctx) => {
   const token = ctx.matchBefore(/\$[\w]*$/);
   if (!token && !ctx.explicit) return null;
@@ -158,7 +158,7 @@ const PROFILES: Record<string, LanguageProfile> = {
     validFor: VALID_DEFAULT,
     memberEndings: ["."],
     triggerEndings: ["."],
-    // Pre-boot fallback only: once the Pyodide worker answers (jedi —
+    // Pre-boot fallback only: once the Pyodide worker answers (jedi,
     // which covers keywords, builtins, and locals with richer
     // metadata), these would only add duplicate rows.
     langPack: async () => {
@@ -270,7 +270,7 @@ const FALLBACK_PROFILE: LanguageProfile = {
 // ─── Source combinators ───────────────────────────────────────────────────
 
 /** True when the current token sits in member-access position (right
- *  after one of `endings`) — where top-level names are meaningless. */
+ *  after one of `endings`), where top-level names are meaningless. */
 function inMemberPosition(
   ctx: CompletionContext,
   wordRe: RegExp,
@@ -386,7 +386,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
   const unlessRuntime = (source: CompletionSource): CompletionSource =>
     (ctx) => (runtimeCanComplete() ? null : source(ctx));
 
-  // Labels of the curated static list, once loaded — document-word
+  // Labels of the curated static list, once loaded, document-word
   // completion filters against them so `printf` isn't offered twice
   // (once with a signature, once as a bare doc word).
   const staticLabels = new Set<string>();
@@ -424,7 +424,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     );
   }
   if (profile.docWords) {
-    // Document words answer everywhere — including member position,
+    // Document words answer everywhere, including member position,
     // where they're the only fallback static languages have.
     const docWordSource = ifNotIn(DONT_COMPLETE_IN, (ctx) => {
       const res = completeAnyWord(ctx) as CmCompletionResult | null;
@@ -467,7 +467,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
       closeOnBlur: true,
       // The built-in keymap binds Enter → acceptCompletion at the
       // highest precedence; we register our own bindings below so
-      // Enter always inserts a newline and Tab accepts — the same
+      // Enter always inserts a newline and Tab accepts, the same
       // convention as the SQL playground editors. Ctrl-Space (open)
       // comes with `completionKeymap`.
       defaultKeymap: false,

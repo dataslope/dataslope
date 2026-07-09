@@ -19,7 +19,7 @@ more important skill: being able to look at a stream of data and
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A chain of shapes shrinking and changing along dotted links — a large circle refined step by step into a precise diamond"
+  aria-label="A chain of shapes shrinking and changing along dotted links, a large circle refined step by step into a precise diamond"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -79,21 +79,21 @@ mindmap
 
 You will spend most of your time on:
 
-- **Declarative data processing** — saying *what* you want, not *how*
+- **Declarative data processing**, saying *what* you want, not *how*
   to loop and accumulate
-- **LINQ pipelines** — `Where`, `Select`, `SelectMany`, `GroupBy`,
+- **LINQ pipelines**, `Where`, `Select`, `SelectMany`, `GroupBy`,
   `Aggregate`, and friends, chained into readable queries
-- **Higher-order functions** — passing behavior around as values, and
+- **Higher-order functions**, passing behavior around as values, and
   composing transformations
-- **Immutability** — designing data so it cannot be mutated behind
+- **Immutability**, designing data so it cannot be mutated behind
   your back, and using records to express it ergonomically
-- **Deferred execution and lazy evaluation** — understanding what
+- **Deferred execution and lazy evaluation**, understanding what
   happens when (and *when nothing happens at all*)
-- **Composability** — building large transformations from small,
+- **Composability**, building large transformations from small,
   named, reusable steps
-- **Side-effect management** — keeping pure logic separate from I/O,
+- **Side-effect management**, keeping pure logic separate from I/O,
   randomness, and time
-- **Functional design patterns** — pipelines, the railway pattern,
+- **Functional design patterns**, pipelines, the railway pattern,
   `Option`/`Result`-style modeling inside an OO language
 
 This course intentionally does **not** spend much time on web
@@ -107,7 +107,7 @@ Most large object-oriented codebases drown in the same handful of
 problems: tangled mutable state, deeply nested loops, transformation
 logic copy-pasted with small variations, and step-by-step procedures
 that no one wants to touch six months later. LINQ and functional
-patterns are not a silver bullet — but they directly attack each of
+patterns are not a silver bullet, but they directly attack each of
 these problems by changing the *unit of expression* from "a statement
 that mutates a variable" to "a value that is the result of a
 transformation."
@@ -137,14 +137,14 @@ persistent multi-file C# workspace, open the
 [C# Playground](/playground/csharp) in a new tab.
 </Callout>
 
-## A tiny taste — run it yourself
+## A tiny taste, run it yourself
 
 This whole course runs in your browser: every code block below is a
 live program, compiled by Roslyn the moment you press **Run**. Here
 are two programs that solve the same problem: *"From a list of
 numbers, keep the even ones, square them, and sum the result."* The
 first uses the classic imperative approach. The second uses LINQ.
-Run both — then change `n % 2 == 0` to `n % 2 == 1` in each and run
+Run both, then change `n % 2 == 0` to `n % 2 == 1` in each and run
 again to see the odd-number version.
 
 <CodeBlock
@@ -212,7 +212,7 @@ is. We will build all of those from scratch.
 
 Start with [Why LINQ Exists](./birth-of-linq) to understand the
 historical pressure that made LINQ inevitable. Then proceed through
-the menu on the left in order — each section builds on the one
+the menu on the left in order, each section builds on the one
 before it.
 
 When you're ready to test yourself, the [capstone](./capstone-data-pipeline)

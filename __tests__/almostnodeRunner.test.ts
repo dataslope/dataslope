@@ -161,7 +161,7 @@ describe("AlmostNodeRunner per-run isolation", () => {
 
   // The TypeScript worker resolves its entry via `vfs.existsSync(...)`
   // (prefer the staged, transpiled copy; otherwise transpile inline).
-  // That check is only safe because each run gets a fresh VFS — verify a
+  // That check is only safe because each run gets a fresh VFS, verify a
   // single-file run never observes a stale entry from the previous run.
   it("hands each un-staged run a VFS with no stale entry file", async () => {
     const runner = new AlmostNodeRunner();

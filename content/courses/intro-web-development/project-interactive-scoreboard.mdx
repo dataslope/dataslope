@@ -1,10 +1,10 @@
 ---
-title: Project — Interactive Scoreboard
+title: "Project: Interactive Scoreboard"
 description: A three-file capstone combining HTML structure, CSS layout, and JavaScript events.
 ---
 
 Time to combine everything: a small but complete **scoreboard** for a
-two-team game night. Three files, three jobs — exactly how you'd
+two-team game night. Three files, three jobs, exactly how you'd
 structure this on disk in a real project.
 
 Here's a working reference to study first. Click around in the
@@ -93,13 +93,13 @@ document.querySelector("#add-b").addEventListener("click", function () {
 />
 
 Notice the division of labour: the HTML never mentions colors, the
-CSS never mentions clicks, the JavaScript never invents markup — each
+CSS never mentions clicks, the JavaScript never invents markup, each
 file could be handed to a different person.
 
 ## Your turn
 
 The challenge version below has the HTML finished, most of the CSS
-finished, and an empty script. Wire it up — and add one new feature
+finished, and an empty script. Wire it up, and add one new feature
 the reference doesn't have: a **reset button**.
 
 <ChallengeCard
@@ -233,7 +233,7 @@ await new Promise((r) => setTimeout(r, 30));
 const home = (document.querySelector("#score-home").textContent || "").trim();
 const away = (document.querySelector("#score-away").textContent || "").trim();
 if (home !== "0" || away !== "0") {
-  throw new Error("Reset should zero both scores — got home='" + home + "', away='" + away + "'.");
+  throw new Error("Reset should zero both scores, got home='" + home + "', away='" + away + "'.");
 }`,
     },
     {
@@ -243,7 +243,7 @@ if (home !== "0" || away !== "0") {
 await new Promise((r) => setTimeout(r, 30));
 const home = (document.querySelector("#score-home").textContent || "").trim();
 if (home !== "1") {
-  throw new Error("After reset + one Home click the score should read '1', got '" + home + "' — remember to reset the VARIABLES, not just the text.");
+  throw new Error("After reset + one Home click the score should read '1', got '" + home + "', remember to reset the VARIABLES, not just the text.");
 }`,
     },
   ]}
@@ -251,7 +251,7 @@ if (home !== "1") {
 
 The last test is the sneaky one: if you reset only the *displayed
 text* but not the score *variables*, the next click jumps back to the
-old count. State lives in your variables; the DOM just displays it —
+old count. State lives in your variables; the DOM just displays it,
 a distinction that will matter again in the React lesson.
 
 Next, a popular shortcut for styling: [Tailwind CSS](/courses/intro-web-development/tailwind-quickstart).

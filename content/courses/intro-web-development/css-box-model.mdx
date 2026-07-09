@@ -1,20 +1,20 @@
 ---
-title: CSS — The Box Model
-description: Content, padding, border, and margin — the four layers of every element on every page.
+title: "CSS: The Box Model"
+description: Content, padding, border, and margin, the four layers of every element on every page.
 ---
 
 Every element the browser renders is a rectangle, and every rectangle
 has the same four layers, from the inside out:
 
-1. **Content** — the text or image itself; sized by `width`/`height`.
-2. **Padding** — space between the content and the border. Shares the
+1. **Content**, the text or image itself; sized by `width`/`height`.
+2. **Padding**, space between the content and the border. Shares the
    element's background.
-3. **Border** — the (optionally visible) edge of the box.
-4. **Margin** — space *outside* the border, pushing neighbours away.
+3. **Border**, the (optionally visible) edge of the box.
+4. **Margin**, space *outside* the border, pushing neighbours away.
    Always transparent.
 
-If CSS ever feels mysterious — "why is there a gap here?", "why is
-this box wider than I said?" — the answer is almost always the box
+If CSS ever feels mysterious, "why is there a gap here?", "why is
+this box wider than I said?", the answer is almost always the box
 model.
 
 <CodeBlock
@@ -39,7 +39,7 @@ model.
   </head>
   <body>
     <div class="box">Box one</div>
-    <div class="box">Box two — notice the margins between us</div>
+    <div class="box">Box two, notice the margins between us</div>
   </body>
 </html>
 `,
@@ -50,7 +50,7 @@ model.
 Try setting `padding: 0`, then `margin: 0`, and watch which gap
 disappears. That's the fastest way to internalize the difference.
 
-## `box-sizing` — one rule to keep
+## `box-sizing`, one rule to keep
 
 By default, `width` sets only the *content* width, so padding and
 border make the box bigger than the number you wrote. Nearly every
@@ -88,7 +88,7 @@ width, style, and color.
   </head>
   <body>
     <div class="frame">
-      A lighthouse at dusk — the sky did all the work.
+      A lighthouse at dusk, the sky did all the work.
     </div>
   </body>
 </html>
@@ -154,4 +154,4 @@ if (s.backgroundColor !== "rgb(219, 234, 254)") {
   ]}
 />
 
-Boxes sorted — now let's arrange them: [flexbox layout](/courses/intro-web-development/css-flexbox-layout).
+Boxes sorted, now let's arrange them: [flexbox layout](/courses/intro-web-development/css-flexbox-layout).

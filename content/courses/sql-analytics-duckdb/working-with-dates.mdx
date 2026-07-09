@@ -1,19 +1,19 @@
 ---
 title: Working with Dates and Time
-description: Time is the backbone of analytics. Truncating to periods, extracting parts, computing intervals, and building time series for trends — the date toolkit every analyst needs.
+description: Time is the backbone of analytics. Truncating to periods, extracting parts, computing intervals, and building time series for trends, the date toolkit every analyst needs.
 ---
 
 Almost every analytical question has a time dimension: revenue *per
 month*, signups *this week*, growth *year over year*. Dates are also where
 beginners stumble, because "group by month" is not as simple as it sounds.
-This page builds the date toolkit analysts use daily — truncating,
-extracting, and computing with dates — and shows how to assemble a proper
+This page builds the date toolkit analysts use daily, truncating,
+extracting, and computing with dates, and shows how to assemble a proper
 time series.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A timeline of day ticks sits inside three light blue month bands, each band dropping a thin line to one solid blue month chip below, while the same tick in every band glows yellow — dates truncated into periods, and a weekday extracted that repeats across them"
+  aria-label="A timeline of day ticks sits inside three light blue month bands, each band dropping a thin line to one solid blue month chip below, while the same tick in every band glows yellow, dates truncated into periods, and a weekday extracted that repeats across them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,7 +60,7 @@ time series.
 
 ## The core move: truncate to a period
 
-To summarize "by month", you do **not** group by the raw date — that would
+To summarize "by month", you do **not** group by the raw date, that would
 give one group per *day*. You first **truncate** each date down to the
 first of its month, so every day in March collapses to `2024-03-01`. The
 tool is `date_trunc('month', d)`.
@@ -101,8 +101,8 @@ and the same query re-buckets accordingly.
 
 ## Extract a part with `EXTRACT` / `date_part`
 
-Sometimes you want a *component* — the year, the month number, the day of
-week — rather than a truncated date. `EXTRACT(part FROM d)` (or
+Sometimes you want a *component*, the year, the month number, the day of
+week, rather than a truncated date. `EXTRACT(part FROM d)` (or
 `date_part`) pulls it out. This is how you answer "which weekday is
 busiest?" by grouping across all weeks.
 
@@ -132,9 +132,9 @@ ORDER BY
 />
 
 <Callout type="info" title="Truncate vs. extract">
-**Truncate** keeps a date but flattens it to a period start — use it for
+**Truncate** keeps a date but flattens it to a period start, use it for
 trends over time (Jan, Feb, Mar...). **Extract** pulls out a number like
-the month or weekday — use it to compare *across* periods (all Mondays,
+the month or weekday, use it to compare *across* periods (all Mondays,
 every January). They answer different questions.
 </Callout>
 
@@ -170,7 +170,7 @@ ORDER BY
 ## Filling gaps: a complete time series
 
 A subtle analytical trap: if no orders happened on some day, that day is
-simply **missing** from a grouped result — which makes a chart lie by
+simply **missing** from a grouped result, which makes a chart lie by
 skipping the gap. The fix is to generate a complete spine of dates with
 `generate_series` (or `range`) and `LEFT JOIN` the data onto it, so empty
 periods show up as zero.
@@ -178,7 +178,7 @@ periods show up as zero.
 <svg
   viewBox="0 0 640 175"
   role="img"
-  aria-label="Green day bars stand on one continuous light blue date spine of seven dots, and the two silent days keep dashed placeholder bars instead of disappearing — a generated date spine keeps empty periods visible in the series"
+  aria-label="Green day bars stand on one continuous light blue date spine of seven dots, and the two silent days keep dashed placeholder bars instead of disappearing, a generated date spine keeps empty periods visible in the series"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -233,7 +233,7 @@ ORDER BY
   day;`}
 />
 
-March 2 and 4 had no orders, yet they appear with `revenue = 0` — a
+March 2 and 4 had no orders, yet they appear with `revenue = 0`, a
 correct, gap-free series ready to chart. Skipping this step is one of the
 most common ways an analyst's trend chart misleads.
 
@@ -265,7 +265,7 @@ Truncating dates to the month is what makes per-month grouping work.`}
 
 - To produce a continuous monthly trend line.
   > A trend over time uses \`date_trunc\`; extracting the weekday compares *across* time instead.
-- [o] To compare activity **across** periods — e.g. which weekday is busiest, pooling all weeks together.
+- [o] To compare activity **across** periods, e.g. which weekday is busiest, pooling all weeks together.
   > \`EXTRACT\` pulls a component so you can group all Mondays, all Tuesdays, etc., regardless of week.
 - To keep each date unique.
   > \`EXTRACT(dow ...)\` collapses many dates to the same weekday number; it does not keep them unique.
@@ -291,5 +291,5 @@ truncate flattens dates for trends over time.`}
 A generated date spine plus a left join produces a gap-free time series.`}
 />
 
-Dates handled, the last transformation skill is **reshaping** — turning
+Dates handled, the last transformation skill is **reshaping**, turning
 long data into wide and back. That is the next page.

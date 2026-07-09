@@ -17,7 +17,7 @@ The first name found wins. If nothing matches, Python raises `NameError`.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Four nested translucent panels shrink toward the innermost local box, where a blue dot starts looking; its green match sits one layer out — Python searches local, enclosing, global, then built-in, and the first name found wins"
+  aria-label="Four nested translucent panels shrink toward the innermost local box, where a blue dot starts looking; its green match sits one layer out, Python searches local, enclosing, global, then built-in, and the first name found wins"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -36,9 +36,9 @@ The first name found wins. If nothing matches, Python raises `NameError`.
 
 Understanding scope is critical because:
 
-- **Globals are dangerous** — They make testing hard (every test must reset them), concurrency unsafe (shared mutable state), and debugging a nightmare (who changed this value?).
-- **Closures are everywhere** — Every decorator, callback, or factory function uses closures. Understanding them is non-negotiable for intermediate Python.
-- **Shadowing builtins breaks things** — Assigning `list = [1, 2, 3]` in one function can silently break code that calls `list()` in the same scope.
+- **Globals are dangerous**, They make testing hard (every test must reset them), concurrency unsafe (shared mutable state), and debugging a nightmare (who changed this value?).
+- **Closures are everywhere**, Every decorator, callback, or factory function uses closures. Understanding them is non-negotiable for intermediate Python.
+- **Shadowing builtins breaks things**, Assigning `list = [1, 2, 3]` in one function can silently break code that calls `list()` in the same scope.
 
 The LEGB rule is simple, but its implications are profound.
 
@@ -336,9 +336,9 @@ def handle_request():
 
 Problems:
 
-1. **Testing is hard** — Every test must reset `request_count`, or tests interfere with each other.
-2. **Concurrency is broken** — Two threads calling `handle_request()` at the same time can corrupt `request_count` (race condition).
-3. **Debugging is a nightmare** — Any function anywhere can modify `request_count`. Who changed it?
+1. **Testing is hard**, Every test must reset `request_count`, or tests interfere with each other.
+2. **Concurrency is broken**, Two threads calling `handle_request()` at the same time can corrupt `request_count` (race condition).
+3. **Debugging is a nightmare**, Any function anywhere can modify `request_count`. Who changed it?
 
 Better:
 

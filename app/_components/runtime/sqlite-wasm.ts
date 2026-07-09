@@ -163,7 +163,7 @@ function deserializeIntoDb(
   };
   if (typeof capi.sqlite3_deserialize !== "function") {
     throw new Error(
-      "sqlite-wasm build is missing sqlite3_deserialize — cannot import database",
+      "sqlite-wasm build is missing sqlite3_deserialize, cannot import database",
     );
   }
   const len = bytes.byteLength;
@@ -187,7 +187,7 @@ export function exportDatabase(sqlite3: Sqlite3Static, db: Database): Uint8Array
   };
   if (typeof capi.sqlite3_js_db_export !== "function") {
     throw new Error(
-      "sqlite-wasm build is missing sqlite3_js_db_export — cannot export database",
+      "sqlite-wasm build is missing sqlite3_js_db_export, cannot export database",
     );
   }
   return capi.sqlite3_js_db_export(db.pointer);
@@ -271,7 +271,7 @@ export function splitSqlStatements(sql: string): string[] {
       if (i < n) i += 2;
       continue;
     }
-    // String literal — '' is the escape sequence inside.
+    // String literal, '' is the escape sequence inside.
     if (c === "'") {
       i++;
       while (i < n) {
@@ -287,7 +287,7 @@ export function splitSqlStatements(sql: string): string[] {
       }
       continue;
     }
-    // Quoted identifier — "" or `` is the escape sequence inside.
+    // Quoted identifier, "" or `` is the escape sequence inside.
     if (c === '"' || c === "`") {
       const q = c;
       i++;

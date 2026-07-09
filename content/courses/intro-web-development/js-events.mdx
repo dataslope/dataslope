@@ -1,11 +1,11 @@
 ---
-title: JavaScript — Events
+title: "JavaScript: Events"
 description: addEventListener, the event object, reading inputs, and intercepting form submits.
 ---
 
 DOM manipulation gets interesting when it happens *in response to the
 user*. That's **events**: clicks, keypresses, typing, submitting,
-scrolling — the browser fires a named event for each, and your code
+scrolling, the browser fires a named event for each, and your code
 can listen.
 
 ## addEventListener
@@ -18,10 +18,10 @@ button.addEventListener("click", function () {
 
 Read it as: *on this element, when a `"click"` happens, run this
 function.* The function is called an **event handler**, and it runs
-every time the event fires — once per click, forever.
+every time the event fires, once per click, forever.
 
 Handlers receive an **event object** with details: which key was
-pressed, where the pointer was, and — critically for forms —
+pressed, where the pointer was, and, critically for forms,
 `event.preventDefault()`, which cancels the browser's default
 reaction (like reloading the page on submit).
 
@@ -60,7 +60,7 @@ var phrase = document.querySelector("#phrase");
 var shout = document.querySelector("#shout");
 
 form.addEventListener("submit", function (event) {
-  // A form's default submit reloads the page — cancel that and
+  // A form's default submit reloads the page, cancel that and
   // handle the input ourselves instead.
   event.preventDefault();
 
@@ -69,7 +69,7 @@ form.addEventListener("submit", function (event) {
   console.log("shouted:", text);
 });
 
-// Live feedback while typing — the "input" event fires per keystroke.
+// Live feedback while typing, the "input" event fires per keystroke.
 phrase.addEventListener("input", function () {
   console.log("typing:", phrase.value);
 });
@@ -78,7 +78,7 @@ phrase.addEventListener("input", function () {
   ]}
 />
 
-Type in the preview and submit — then check the console output. Two
+Type in the preview and submit, then check the console output. Two
 takeaways:
 
 - **`input.value`** reads what's currently typed into a field.

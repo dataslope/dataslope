@@ -4,7 +4,7 @@ name: R2 incremental-cache cleanup
 #
 # Why this exists: the R2 cache keys every object as
 # `incremental-cache/<buildId>/<hash>.cache` (see open-next.config.ts). Each
-# deploy — production AND every Cloudflare preview — writes a fresh ~1–1.4 GB
+# deploy, production AND every Cloudflare preview, writes a fresh ~1–1.4 GB
 # folder under a new build ID (one HTML+RSC `.cache` object per prerendered
 # page, ~1,600 of them), and OpenNext never deletes old ones. Left alone, the
 # bucket grows by that much per deploy forever; at active-development velocity
@@ -14,14 +14,14 @@ name: R2 incremental-cache cleanup
 # to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
 # the commit it was built from. That's what lets this job map each folder to the
 # open pull request (branch) it belongs to and keep only the latest commit per
-# branch — impossible with Next's default random build IDs.
+# branch, impossible with Next's default random build IDs.
 #
-# What it does: always keeps the live production build — a site that sits
+# What it does: always keeps the live production build, a site that sits
 # unchanged for months must never lose its cache, which would 500 the home page
 # and /courses/* (see open-next.config.ts). Every OTHER folder is kept only
 # while ALL of these hold:
 #   • younger than THRESHOLD_HOURS, AND
-#   • its commit is the current head of an OPEN pull request — i.e. the most
+#   • its commit is the current head of an OPEN pull request, i.e. the most
 #     recent commit on an active branch. Superseded commits (an older head of a
 #     still-open PR) and merged/closed PR previews no longer match, so they are
 #     pruned, AND
@@ -34,7 +34,7 @@ name: R2 incremental-cache cleanup
 #
 # Safety: the job aborts WITHOUT deleting anything if it cannot (a) positively
 # identify the live production build folder, or (b) list the repo's open pull
-# requests — so a transient error can never leave every preview "unmatched" and
+# requests, so a transient error can never leave every preview "unmatched" and
 # wipe the bucket. Run manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
@@ -108,7 +108,7 @@ jobs:
           # invocation and only deletes what is still present, so repeated
           # attempts converge on an empty folder. Returns non-zero only if the
           # folder still has objects after every attempt (a persistent, not
-          # transient, failure) — so one flaky delete no longer aborts the run.
+          # transient, failure), so one flaky delete no longer aborts the run.
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do
@@ -133,9 +133,9 @@ jobs:
 
           # 2) Map active branches to their latest commit. Each OPEN PR's head
           #    SHA is the most recent commit on that branch; a folder built from
-          #    that SHA (build IDs are commit SHAs — see next.config.ts) is the
+          #    that SHA (build IDs are commit SHAs, see next.config.ts) is the
           #    branch's live preview. Merged/closed PRs drop out of this list, so
-          #    their previews are pruned. Abort on API failure — otherwise a
+          #    their previews are pruned. Abort on API failure, otherwise a
           #    transient error would leave every folder unmatched and delete it.
           if ! pr_json="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open \
                 --json number,headRefName,headRefOid --limit 300)"; then
@@ -148,7 +148,7 @@ jobs:
             pr_branch["$sha"]="$branch (PR #$num)"
           done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
           # `${#assoc[@]}` on an EMPTY associative array trips `set -u`
-          # ("unbound variable") — bash treats a zero-element associative array
+          # ("unbound variable"), bash treats a zero-element associative array
           # as unset. Expanding its keys is safe when empty, so count those.
           pr_shas=("${!pr_branch[@]}")
           echo "Open PRs (active branches): ${#pr_shas[@]}"
@@ -161,7 +161,7 @@ jobs:
               | tr '\t' '\n' | sed '/^$/d' | grep -vx 'None' || true
           )
           if [[ ${#folders[@]} -eq 0 ]]; then
-            echo "No build folders under $PREFIX — nothing to do."
+            echo "No build folders under $PREFIX, nothing to do."
             exit 0
           fi
 
@@ -177,7 +177,7 @@ jobs:
           echo "Dry run: $DRY_RUN"
 
           # 5) Timestamp every non-production folder so active-branch previews
-          #    can be ranked newest-first — the MAX_BRANCHES cap needs a global
+          #    can be ranked newest-first, the MAX_BRANCHES cap needs a global
           #    order, not a per-folder decision.
           entries=()
           for folder in "${folders[@]}"; do
@@ -186,9 +186,9 @@ jobs:
             # Newest object in the folder (all written together at deploy time).
             # The CLI auto-paginates above 1000 objects and applies --query to
             # each page separately, so a large build folder returns one max
-            # timestamp PER PAGE (multiple lines). Collapse to the overall max —
+            # timestamp PER PAGE (multiple lines). Collapse to the overall max,
             # R2 reports LastModified in a uniform UTC ISO-8601 layout, so a
-            # lexical sort orders them chronologically — and drop the "None" a
+            # lexical sort orders them chronologically, and drop the "None" a
             # genuinely empty page emits, leaving `date` a single value to parse.
             newest="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
               --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null \
@@ -218,7 +218,7 @@ jobs:
               fi
               echo "DELETE $folder (${pr_branch[$sha]}, beyond the $MAX_BRANCHES most recent branches)"
             else
-              echo "DELETE $folder (last written $newest, not the head of any open PR — merged, closed, or superseded)"
+              echo "DELETE $folder (last written $newest, not the head of any open PR, merged, closed, or superseded)"
             fi
 
             if [[ "$DRY_RUN" == "true" ]]; then
@@ -237,7 +237,7 @@ jobs:
           echo "---"
           # DRY_RUN is always exactly "true" or "false"; choose the verb to match.
           # (A ${DRY_RUN/true/would be } substitution used to leak a literal
-          # "false" into the summary on real runs — "folders falsedeleted".)
+          # "false" into the summary on real runs, "folders falsedeleted".)
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "Folders kept: $kept | folders would be deleted: $deleted"
           else
@@ -245,7 +245,7 @@ jobs:
           fi
 
           # Surface persistent delete failures loudly, but only after every
-          # folder has been attempted — a later run will retry the stragglers.
+          # folder has been attempted, a later run will retry the stragglers.
           if (( failed > 0 )); then
             echo "::error::${failed} folder(s) could not be fully deleted after retries; the next scheduled run will retry them."
             exit 1

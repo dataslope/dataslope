@@ -1,10 +1,10 @@
 ---
 title: The Exploratory Workflow
-description: The rhythm of working with data — load, peek, chart, question, repeat
+description: The rhythm of working with data, load, peek, chart, question, repeat
 ---
 
 By now you've met all the chart-building pieces. This page is about
-*the rhythm* of using them — the loop a real analyst follows when
+*the rhythm* of using them, the loop a real analyst follows when
 sitting down with a new dataset. The loop is short, and once you
 internalize it, you'll feel much more confident in front of an
 unknown dataset.
@@ -12,7 +12,7 @@ unknown dataset.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Four station dots ride a circular loop with arrows showing its direction, the dataset square at the center — load, plot, look, refine, repeat"
+  aria-label="Four station dots ride a circular loop with arrows showing its direction, the dataset square at the center, load, plot, look, refine, repeat"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M248 125 a72 72 0 1 0 144 0 a72 72 0 1 0 -144 0 Z M256 125 a64 64 0 1 0 128 0 a64 64 0 1 0 -128 0 Z" fillRule="evenodd" fill="currentColor" opacity="0.12" />
@@ -97,7 +97,7 @@ wrong dtype or one value was suspicious.
 ## Step 2: Chart every numeric column
 
 Before asking any specific question, just histogram every numeric
-column. This is your "vibe check" — you'll spot skewed
+column. This is your "vibe check", you'll spot skewed
 distributions, weird spikes, and outliers immediately.
 
 <CodeBlock
@@ -122,7 +122,7 @@ for col in df.select_dtypes("number").columns:
   ]}
 />
 
-You'll see three histograms — one each for `total_bill`, `tip`, and
+You'll see three histograms, one each for `total_bill`, `tip`, and
 `size`. In about 15 seconds you know the distribution of every numeric
 column.
 
@@ -186,9 +186,9 @@ print(suspicious)
   ]}
 />
 
-You found three rows with very high tip percentages — all tiny
+You found three rows with very high tip percentages, all tiny
 bills. That's a real pattern: small bills tend to round up to "I
-have a $5 minimum tip in my head." Good — you've turned an outlier
+have a $5 minimum tip in my head." Good, you've turned an outlier
 into an insight.
 
 ## Step 5: Iterate until the story is done
@@ -197,7 +197,7 @@ Real exploratory analysis rarely ends with one chart. You'll cycle
 through *many* iterations, and your DataFrame will grow with
 derived columns, filtered slices, and reshaped views. That's
 normal. Use a Jupyter notebook (or this page's CodeBlocks) and
-*keep the iteration visible* — your future self will thank you.
+*keep the iteration visible*, your future self will thank you.
 
 ## Exploratory vs presentation
 
@@ -206,7 +206,7 @@ publish. Exploratory charts are quick, ugly, and iterative.
 Presentation charts are slow, polished, and intentional.
 
 A common mistake: showing your exploratory work in a meeting as if
-it were finished. The audience needs the polished version — with
+it were finished. The audience needs the polished version, with
 titles, labels, annotations, and *just the charts that matter*.
 
 | Exploratory | Presentation |
@@ -234,10 +234,10 @@ If not, you have one more iteration to do.
   > Building a polished chart before understanding the data's shape, types, and missing values means your styling effort may be wasted on a chart that answers the wrong question or is built on flawed assumptions.
 - Start a machine-learning model.
   > Building a model before examining the data is a common cause of poor results. Knowing the column types, distribution shapes, and missing-value patterns first allows you to make informed decisions about feature engineering and model choice.
-- [o] Peek at it — **df.head()**, **df.shape**, **df.dtypes**, **df.describe()** — to understand what you've got.
+- [o] Peek at it, **df.head()**, **df.shape**, **df.dtypes**, **df.describe()**, to understand what you've got.
   > The first 30 seconds of a new dataset should always be the same: peek at the structure. This catches dtype issues, missing values, outliers, and unexpected categories *before* you build analysis on top of bad assumptions.
 - Filter to a small subset and stop there.
-  > Filtering to a small subset can be a useful second step, but doing it without first peeking at the full dataset risks missing important context — like the fact that a critical column is all nulls or has the wrong dtype.
+  > Filtering to a small subset can be a useful second step, but doing it without first peeking at the full dataset risks missing important context, like the fact that a critical column is all nulls or has the wrong dtype.
 
 Build the habit. Future-you will catch many bugs by looking at the first 5 rows of every new DataFrame.`}
 />
@@ -249,7 +249,7 @@ Build the habit. Future-you will catch many bugs by looking at the first 5 rows 
   > Plotly Express does not require histograms as a prerequisite. Histogramming each numeric column is a best-practice workflow habit, not a technical requirement of the charting library.
 - It encrypts the data.
   > Histograms are visualization tools for exploring distributions; they have nothing to do with encryption or data security. Creating a histogram reads the data, it does not transform or protect it.
-- [o] It gives a "vibe check" on the data — you'll spot skewed distributions, weird spikes, and outliers in about 15 seconds.
+- [o] It gives a "vibe check" on the data, you'll spot skewed distributions, weird spikes, and outliers in about 15 seconds.
   > A grid of histograms is the visual equivalent of **df.describe()** but reveals shape, multimodality, and outliers that summary statistics hide. Make it a habit on every new dataset.
 - It computes correlations.
   > Correlation measures the linear relationship between two variables and requires at least two columns. A histogram shows the distribution of a single column; it does not compute correlations.
@@ -265,7 +265,7 @@ Histogram first, ask questions second.`}
 - Exploratory charts are interactive, presentation charts are static.
   > Interactivity is a feature, not a defining characteristic of either type. Presentation charts can be interactive (e.g., a Plotly chart in a report), and exploratory charts can be static. The real difference is audience and polish level.
 - [o] Exploratory charts are quick, many, and for *you*; presentation charts are polished, few, and for the *audience*.
-  > The two have different audiences and different standards. Exploratory: throw away after each question. Presentation: titles, annotations, labels, hand-tuned. Mixing them up — showing exploratory work in a stakeholder meeting — is a common mistake.
+  > The two have different audiences and different standards. Exploratory: throw away after each question. Presentation: titles, annotations, labels, hand-tuned. Mixing them up, showing exploratory work in a stakeholder meeting, is a common mistake.
 - Exploratory charts use color, presentation charts don't.
   > Color is used in both exploratory and presentation charts whenever it aids understanding. Presentation charts often rely heavily on color to highlight key findings. The difference between the two types is about audience and polish, not whether color is present.
 

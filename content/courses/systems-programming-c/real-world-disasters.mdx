@@ -5,7 +5,7 @@ description: How memory management bugs in C and C++ have crashed satellites, le
 
 The bug classes from the last page are not academic curiosities.
 They are the root cause of an enormous share of real-world software
-failures — from research-lab incidents to internet-scale security
+failures, from research-lab incidents to internet-scale security
 catastrophes that affected hundreds of millions of users and cost
 billions of dollars.
 
@@ -25,13 +25,13 @@ flowchart LR
     E --> I[Ariane 5<br/>Mars rover episodes]
 ```
 
-## 1. The Morris Worm (1988) — gets() and a buffer overflow
+## 1. The Morris Worm (1988), gets() and a buffer overflow
 
 <IllustrationPrompt subject="Robert Morris" photo />
 
 In November 1988, a graduate student named Robert Morris released a
 self-replicating program that within hours infected an estimated 10%
-of all computers on the internet — roughly 6,000 machines at the
+of all computers on the internet, roughly 6,000 machines at the
 time. It was the world's first major internet worm and led directly
 to the creation of CERT/CC, the first computer-emergency response
 team.
@@ -39,7 +39,7 @@ team.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A network of machines joined by thin lines: one red source node has already turned its neighbours red, the frontier nodes are yellow, and the distant green nodes still wait — the 1988 Morris worm crossing the early internet"
+  aria-label="A network of machines joined by thin lines: one red source node has already turned its neighbours red, the frontier nodes are yellow, and the distant green nodes still wait, the 1988 Morris worm crossing the early internet"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -104,7 +104,7 @@ If you see `gets(buf)` in any code, replace it immediately with
 original.
 </Callout>
 
-## 2. Code Red (2001) — IIS, .ida, and one bad URL
+## 2. Code Red (2001), IIS, .ida, and one bad URL
 
 In July 2001, a worm called Code Red infected over 350,000 Microsoft
 IIS web servers in under 14 hours and defaced their home pages with
@@ -124,10 +124,10 @@ Microsoft turned the Indexing Service off by default and the
 incident became a textbook example used in every secure-coding
 course since.
 
-## 3. SQL Slammer (2003) — 376 bytes, the whole internet
+## 3. SQL Slammer (2003), 376 bytes, the whole internet
 
 Slammer is famous for two things: it was tiny (the entire payload
-fit in a single 376-byte UDP packet) and it was *fast* — it doubled
+fit in a single 376-byte UDP packet) and it was *fast*, it doubled
 the infected population every 8.5 seconds and effectively saturated
 the global internet's routing capacity within ten minutes.
 
@@ -143,18 +143,18 @@ addresses.
 call centers degraded, large parts of South Korea's internet went
 dark for hours.
 
-## 4. Heartbleed (2014) — a two-byte length field, half a million sites
+## 4. Heartbleed (2014), a two-byte length field, half a million sites
 
 Heartbleed (CVE-2014-0160) was a vulnerability in OpenSSL's
 implementation of the TLS Heartbeat extension. It did not corrupt
-memory or crash the server — it did something arguably worse: it
+memory or crash the server, it did something arguably worse: it
 let any attacker read up to ~64 KB of the server's process memory
 *per request*, with no authentication and no log trace.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A blue vault of memory rows leaks a stream of byte squares — yellow keys and green session secrets among the gray filler — out through a small red heart-shaped opening in its wall: Heartbleed"
+  aria-label="A blue vault of memory rows leaks a stream of byte squares, yellow keys and green session secrets among the gray filler, out through a small red heart-shaped opening in its wall: Heartbleed"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -186,7 +186,7 @@ let any attacker read up to ~64 KB of the server's process memory
 The bug, distilled:
 
 ```c
-// payload_length comes from the network — attacker-controlled.
+// payload_length comes from the network, attacker-controlled.
 memcpy(response, request->data, payload_length);
 // Then send `response` (with that length) back to the attacker.
 ```
@@ -194,11 +194,11 @@ memcpy(response, request->data, payload_length);
 If the attacker claimed `payload_length = 65535` but only actually
 sent a few bytes of `data`, OpenSSL happily read 65535 bytes
 *starting at the buffer's address* and shipped them back. Those
-bytes contained anything that happened to be in the process — TLS
+bytes contained anything that happened to be in the process, TLS
 private keys, session cookies, user passwords, fragments of other
 users' HTTP requests.
 
-**Bug class:** *buffer over-read* (closely related to overflow — same
+**Bug class:** *buffer over-read* (closely related to overflow, same
 "trust attacker-supplied length" mistake, but reading rather than
 writing).
 **Fallout:** roughly 17% of all "secure" web servers in the world
@@ -212,11 +212,11 @@ received. This is the most important sentence in network parser
 code.
 </Callout>
 
-## 5. Cloudbleed (2017) — one missing `=`, a months-long leak
+## 5. Cloudbleed (2017), one missing `=`, a months-long leak
 
 In February 2017, Google's Project Zero discovered that Cloudflare's
-edge servers — which sit in front of an enormous fraction of the
-web — had been intermittently injecting fragments of *random other
+edge servers, which sit in front of an enormous fraction of the
+web, had been intermittently injecting fragments of *random other
 customers' traffic* into HTTP responses. Sensitive data showed up in
 search engine caches: private messages, OAuth tokens, password
 manager hints, hotel booking details.
@@ -234,31 +234,31 @@ if (++p >= pe) goto _test_eof;
 
 When a page ended exactly one byte short of an expected boundary,
 the parser would skip the end-of-buffer test and read past the end
-of the page buffer — into whatever happened to be in the next memory
+of the page buffer, into whatever happened to be in the next memory
 region.
 
 **Bug class:** *off-by-one*, leading to a buffer over-read.
 **Fallout:** during the worst stretch, Cloudflare estimated that
 roughly 1 in every 3.3 million HTTP requests passing through its
-edge leaked memory — a tiny rate multiplied by an enormous volume of
+edge leaked memory, a tiny rate multiplied by an enormous volume of
 traffic, over a period of months. The fix was a single character;
-the cleanup — hunting down and purging leaked fragments from search
-engine caches across the entire web — took weeks of coordinated
+the cleanup, hunting down and purging leaked fragments from search
+engine caches across the entire web, took weeks of coordinated
 work with Google, Bing, and others.
 
-## 6. Stagefright (2015) — Android, a media file, and one integer overflow
+## 6. Stagefright (2015), Android, a media file, and one integer overflow
 
 Stagefright was a family of vulnerabilities in Android's media
 framework. The headline bug allowed remote code execution on roughly
 **95% of all Android devices** simply by sending a malicious MMS
-message. The phone would parse the attached video automatically — no
+message. The phone would parse the attached video automatically, no
 user interaction required.
 
 The core defect was an *integer overflow* in a 32-bit `size` value
 inside the MP4 parser. When the parser computed `size + something`
 to allocate a buffer, the addition wrapped around to a small number;
 the parser allocated a tiny buffer, then merrily wrote attacker-
-controlled data into it as if it were huge — a classic
+controlled data into it as if it were huge, a classic
 *overflow-then-heap-buffer-overflow* combination.
 
 **Bug class:** integer overflow → heap buffer overflow.
@@ -267,28 +267,28 @@ vulnerable. The incident pushed Google to adopt monthly security
 patches and accelerated the rewrite of media parsing into
 memory-safer languages.
 
-## 7. GHOST (2015) — `gethostbyname` and a forgotten `+ 1`
+## 7. GHOST (2015), `gethostbyname` and a forgotten `+ 1`
 
 CVE-2015-0235 was a buffer overflow in glibc's `__nss_hostname_digits_dots`
 helper, reached via the venerable `gethostbyname` family. The bug:
 a length calculation forgot to include one byte for the null
 terminator, allowing a carefully sized hostname to overflow a heap
-buffer by a few bytes — enough to corrupt allocator metadata and
+buffer by a few bytes, enough to corrupt allocator metadata and
 hand control to the attacker.
 
 **Bug class:** *off-by-one* (the `+ 1` for the null terminator,
 again) → heap buffer overflow.
 **Fallout:** every Linux distribution had to push an emergency
 glibc update. Because `gethostbyname` is reached by an enormous
-range of code — mail servers, web servers, login services, anything
-that resolves a hostname — the attack surface was huge.
+range of code, mail servers, web servers, login services, anything
+that resolves a hostname, the attack surface was huge.
 
-## 8. EternalBlue / WannaCry (2017) — SMB and the NSA's leaked exploit
+## 8. EternalBlue / WannaCry (2017), SMB and the NSA's leaked exploit
 
 EternalBlue was an exploit developed by the NSA's Tailored Access
 Operations group and leaked publicly by the *Shadow Brokers* in
 April 2017. It targeted a *buffer overflow* in Microsoft's SMBv1
-file-sharing protocol — specifically, an integer truncation in the
+file-sharing protocol, specifically, an integer truncation in the
 handling of crafted FEA (File Extended Attributes) lists let
 attacker data spill out of a heap buffer.
 
@@ -304,7 +304,7 @@ in a network service.
 hardened the case for getting old C network services out of the
 trust path entirely.
 
-## 9. BlueKeep (2019) — RDP and use-after-free
+## 9. BlueKeep (2019), RDP and use-after-free
 
 CVE-2019-0708, nicknamed BlueKeep, was a *use-after-free* in
 Microsoft's Remote Desktop Protocol. A pre-authentication attacker
@@ -313,7 +313,7 @@ structure but kept a dangling pointer to it; subsequent operations
 through that pointer were attacker-controllable.
 
 Microsoft considered BlueKeep severe enough to release patches even
-for unsupported operating systems (XP, Server 2003) — something it
+for unsupported operating systems (XP, Server 2003), something it
 almost never does.
 
 **Bug class:** use-after-free.
@@ -321,13 +321,13 @@ almost never does.
 vulnerable months after disclosure. Worm-grade RDP exposure became
 a board-level conversation at many enterprises.
 
-## 10. The Therac-25 (1985–87) — race conditions, reused state, six deaths
+## 10. The Therac-25 (1985–87), race conditions, reused state, six deaths
 
 <IllustrationPrompt subject="a Therac-25 radiation therapy machine, a 1980s hospital medical linear accelerator with a patient couch" />
 
 The Therac-25 was a radiation therapy machine produced by Atomic
 Energy of Canada Limited. Between 1985 and 1987 it gave at least six
-patients massive radiation overdoses — hundreds of times the
+patients massive radiation overdoses, hundreds of times the
 intended dose. At least three died as a direct result.
 
 The Therac-25's software was written in PDP-11 assembly (not C), but
@@ -335,12 +335,12 @@ its failure modes are the systems-programming nightmare scenarios
 this course has been preparing you to recognize. They included:
 
 - **Race conditions** between operator input and the machine setup
-  routines — fast typing could "skip ahead" of internal state
+  routines, fast typing could "skip ahead" of internal state
   changes.
 - **Stale, reused state** in a one-byte flag variable (`Class3`) that
   overflowed back to 0 every 256 setup runs, silently disabling a
   safety check.
-- **No hardware interlock** to back up the software — earlier models
+- **No hardware interlock** to back up the software, earlier models
   had one; the Therac-25 removed it because "the software was now
   good enough."
 
@@ -348,10 +348,10 @@ this course has been preparing you to recognize. They included:
 and over-reliance on unverified software.
 **Fallout:** the case became the canonical "killer software" study
 taught in every software-engineering ethics course. It is the
-clearest possible argument for defense in depth — and for not
+clearest possible argument for defense in depth, and for not
 removing safety hardware on the assumption that the code is correct.
 
-## 11. Ariane 5 Flight 501 (1996) — a 64→16-bit cast, $370 million
+## 11. Ariane 5 Flight 501 (1996), a 64→16-bit cast, $370 million
 
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
@@ -360,7 +360,7 @@ scientific satellites and roughly $370 million.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A blue launch line climbs smoothly from the pad until it must pass through a narrow yellow slot — the 64-to-16-bit conversion — where it kinks red and breaks into drifting shards: Ariane 5, flight 501"
+  aria-label="A blue launch line climbs smoothly from the pad until it must pass through a narrow yellow slot, the 64-to-16-bit conversion, where it kinks red and breaks into drifting shards: Ariane 5, flight 501"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -395,13 +395,13 @@ scientific satellites and roughly $370 million.
   </g>
 </svg>
 
-The cause was not, strictly, a memory bug — but it is a textbook
+The cause was not, strictly, a memory bug, but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are
 trained to fear. The Inertial Reference System reused code from the
 Ariane 4. A 64-bit floating-point value representing "horizontal
 bias" was converted to a 16-bit signed integer. On Ariane 4 the
-value never exceeded the 16-bit range. On Ariane 5 — which had a
-faster trajectory — it did. The conversion *overflowed*, the IRS
+value never exceeded the 16-bit range. On Ariane 5, which had a
+faster trajectory, it did. The conversion *overflowed*, the IRS
 raised an exception, both redundant IRS computers (running the
 *same* code) shut down, the autopilot lost attitude data, the
 rocket veered off course, and the range safety system destroyed it.
@@ -410,17 +410,17 @@ rocket veered off course, and the range safety system destroyed it.
 to the `(int16_t)x` truncation patterns we have seen on the data
 types page).
 **Fallout:** the formal investigation produced one of the most
-widely studied accident reports in software engineering. The lesson
-— *"the same code is not safe just because it was safe in a
-different environment"* — applies directly to porting C code across
+widely studied accident reports in software engineering. The lesson,
+*"the same code is not safe just because it was safe in a
+different environment"*, applies directly to porting C code across
 architectures.
 
-## 12. PlayStation 3 hypervisor break (2010) — a glitch and a dangling mapping
+## 12. PlayStation 3 hypervisor break (2010), a glitch and a dangling mapping
 
 <IllustrationPrompt subject="George Hotz" photo />
 
 In January 2010, George Hotz (geohot) published an attack on the
-PS3's hypervisor — the privileged layer that kept the console's
+PS3's hypervisor, the privileged layer that kept the console's
 "OtherOS" Linux feature safely caged. His technique combined
 software and a literal hardware glitch: he had Linux ask the
 hypervisor to create and then tear down memory mappings while he
@@ -428,7 +428,7 @@ pulsed a wire on the memory bus at precisely the wrong moment, so
 the hypervisor's *deallocation write was lost in transit*. The
 hypervisor believed a mapping was gone; the page tables still
 contained it. Through that dangling, stale mapping he could read
-and write hypervisor-owned memory — in effect, a use-after-free
+and write hypervisor-owned memory, in effect, a use-after-free
 where the "free" itself was sabotaged from outside the software.
 
 **Bug class:** use-after-free across a privilege boundary.
@@ -475,7 +475,7 @@ take for granted:
 You will rarely write the next OpenSSL, but you will probably write
 some C or C-FFI'd code in your career. The right mindset is:
 
-> *Every length came from somewhere — and somewhere is sometimes an
+> *Every length came from somewhere, and somewhere is sometimes an
 > attacker.*
 
 If you can hold that thought every time you compute an index, write
@@ -516,7 +516,7 @@ already absorbed the most important lesson of this chapter.
 - Use-after-free.
   > Cloudbleed did not free memory and then reuse it.
 - Double-free.
-  > Same — no double free was involved.
+  > Same, no double free was involved.
 - [o] An *off-by-one* error (the end-of-buffer test used \`==\` instead of \`>=\`), causing a buffer over-read.
   > A one-character fix; weeks of cache purging to clean up.
 - An integer overflow during certificate signing.
@@ -529,18 +529,18 @@ already absorbed the most important lesson of this chapter.
 - Always free pointers immediately after allocating them.
   > That would just guarantee use-after-free bugs.
 - Always cast \`size_t\` to \`int\` to keep types simple.
-  > The opposite — that is a common source of integer-truncation bugs.
+  > The opposite, that is a common source of integer-truncation bugs.
 - [o] Cross-check every length that comes from outside the program (network, file, user) against the size of the buffer it will be written to or read from.
   > Almost every catastrophe on the page reduces to "trusted a length field that should have been validated."
 - Always use \`gets()\` because it is the simplest input function.
-  > Never use \`gets()\` — it is the canonical example of *what not to do*.`}
+  > Never use \`gets()\`, it is the canonical example of *what not to do*.`}
 />
 
 <Callout type="success" title="The most important takeaway">
 Every bug on this page was, at the time, written by a competent
 engineer who believed the code was correct. The defensive habits
-this course teaches — bounds checks, owned buffers, length
-validation, sanitizers in CI — are not paranoia. They are the
+this course teaches, bounds checks, owned buffers, length
+validation, sanitizers in CI, are not paranoia. They are the
 accumulated lessons of decades of expensive failures. Internalize
 them now, and you join a small group of C programmers who do not
 have to learn them the hard way.

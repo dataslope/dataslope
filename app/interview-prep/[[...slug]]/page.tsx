@@ -1,11 +1,11 @@
 /**
- * Catch-all route for `/interview-prep` — renders an MDX page resolved from
+ * Catch-all route for `/interview-prep`, renders an MDX page resolved from
  * the Fumadocs `interviewSource` loader (the `content/interview/` collection).
  *
  * Mirrors `app/courses/[...slug]/page.tsx` (same `dynamic`-mode body load,
  * same prerendering via `generateStaticParams`, same canonical/OG metadata
  * and breadcrumb/Course JSON-LD), scoped to the interview collection. The
- * raw-Markdown action buttons are intentionally omitted — the `.md` mirror is
+ * raw-Markdown action buttons are intentionally omitted, the `.md` mirror is
  * a courses/fumadocs-dev feature (see next.config.ts rewrites).
  */
 import type { Metadata } from "next";

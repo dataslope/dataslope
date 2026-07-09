@@ -1,6 +1,6 @@
 ---
 title: "The Time Dimension: What Makes Time Series Data Unique?"
-description: Why temporal data needs its own toolkit — temporal dependence, autocorrelation, the failure of the i.i.d. assumption, and why shuffling or random-splitting a time series silently destroys it.
+description: Why temporal data needs its own toolkit, temporal dependence, autocorrelation, the failure of the i.i.d. assumption, and why shuffling or random-splitting a time series silently destroys it.
 ---
 
 Before a single forecast, before `resample` or `ARIMA`, you need one idea
@@ -12,7 +12,7 @@ every mistake beginners make comes from forgetting that. This page is the
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Eleven dots ride an ordered blue wave-band with the newest glowing yellow at its tip, while below the same eleven lie scattered with no shape and one stray dot flushed red — a time series is a sequence whose order carries the signal, and shuffling turns it into dust"
+  aria-label="Eleven dots ride an ordered blue wave-band with the newest glowing yellow at its tip, while below the same eleven lie scattered with no shape and one stray dot flushed red, a time series is a sequence whose order carries the signal, and shuffling turns it into dust"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -50,10 +50,10 @@ every mistake beginners make comes from forgetting that. This page is the
 
 ## What actually is a time series?
 
-A **time series** is a sequence of observations recorded in time order —
-written `y₁, y₂, y₃, …, yₜ, …` — where the *order carries meaning*.
+A **time series** is a sequence of observations recorded in time order,
+written `y₁, y₂, y₃, …, yₜ, …`, where the *order carries meaning*.
 
-The subscript is not a row number you could reshuffle — it is a
+The subscript is not a row number you could reshuffle, it is a
 **timestamp**. `yₜ` is "the value *at time* t," and it sits between
 `yₜ₋₁` (its past) and `yₜ₊₁` (its future). Examples are everywhere:
 
@@ -79,7 +79,7 @@ is related to the values just before it.** Hot days cluster near hot days.
 A busy traffic week tends to follow a busy traffic week. Today's stock
 price is yesterday's price plus a nudge. This "a value remembers its
 recent past" property is called **temporal dependence**, and when we
-measure it as a correlation, we call it **autocorrelation** — a series
+measure it as a correlation, we call it **autocorrelation**, a series
 correlated *with itself* at an earlier time.
 
 Let's see it directly. We plot each month's airline-passenger count
@@ -131,15 +131,15 @@ ax2.set_title("After SHUFFLING")
 plt.tight_layout()
 plt.show()
 
-print("Left: a tight upward band — each month is close to the one before it.")
-print("Right: a formless cloud — shuffling deleted the relationship entirely.")
+print("Left: a tight upward band, each month is close to the one before it.")
+print("Right: a formless cloud, shuffling deleted the relationship entirely.")
 `,
     },
   ]}
 />
 
 The left panel is a tight diagonal band: this month is almost always close
-to last month. The right panel — *the exact same numbers*, just shuffled —
+to last month. The right panel, *the exact same numbers*, just shuffled,
 is a structureless blob. **The information did not live in the values. It
 lived in their order.** That single picture is the reason this course
 exists.
@@ -147,7 +147,7 @@ exists.
 <Callout type="tip" title="Autocorrelation in one sentence">
 Autocorrelation is just *correlation a series has with a time-shifted copy
 of itself*. High lag-1 autocorrelation means "this value is a good guess
-for the next value" — which is exactly what makes forecasting possible at
+for the next value", which is exactly what makes forecasting possible at
 all. A series with **zero** autocorrelation at every lag is pure noise:
 unpredictable by definition.
 </Callout>
@@ -155,7 +155,7 @@ unpredictable by definition.
 ## Why this breaks your usual statistical instincts
 
 Most introductory statistics and machine learning quietly assume your
-observations are **i.i.d.** — *independent and identically distributed*.
+observations are **i.i.d.**, *independent and identically distributed*.
 "Independent" means knowing one observation tells you nothing about
 another. "Identically distributed" means every observation is drawn from
 the same fixed distribution (same mean, same variance, forever).
@@ -167,17 +167,17 @@ A time series violates **both** halves, on purpose:
 | The rows | independent islands: `obs 1`, `obs 2`, `obs 3`, … | a chain: `y` at `t-1` → `y` at `t` → `y` at `t+1` → … |
 | Each value | stands alone | leans on the one before it |
 | Distribution | the same for every row | mean and variance drift over time |
-| Order | does not matter — shuffle freely | is everything — shuffling destroys it |
+| Order | does not matter, shuffle freely | is everything, shuffling destroys it |
 
 - **Not independent:** `y_t` depends on `y_{t-1}`. That's temporal
-  dependence — the thing we just plotted.
+  dependence, the thing we just plotted.
 - **Not identically distributed:** the airline series' average in 1949 is
   nowhere near its average in 1960 (the **trend**), and its month-to-month
   swings get *bigger* over time (changing **variance**). The distribution
   is a moving target.
 
-So the comfortable tools that assume i.i.d. data — a plain mean as "the"
-value, a standard error of `s/√n`, a random train/test split — are not
+So the comfortable tools that assume i.i.d. data, a plain mean as "the"
+value, a standard error of `s/√n`, a random train/test split, are not
 just less accurate on a time series. They are **answering the wrong
 question**, and they often fail silently, handing you a confident number
 that is wrong.
@@ -185,16 +185,16 @@ that is wrong.
 <MultipleChoice
   markdown={`A dataset has one row per hospital patient: age, blood pressure, and whether they were readmitted. A colleague calls it "time series data" because it was collected over several months. Are they right?
 
-- Yes — any data collected over time is time series data
+- Yes, any data collected over time is time series data
   > The *collection* spanning time doesn't make it a time series. What matters is whether the **order of the rows carries meaning** and whether each value depends on the previous one. Here the rows are independent patients.
-- [o] No — this is cross-sectional data; each patient is an independent unit and reordering the rows loses nothing
-  > Each row is a self-contained observation with no dependence on the row above it. You could sort by age or shuffle randomly and lose no information — the hallmark of cross-sectional, not time series, data.
-- Yes — because there is a time element in "several months"
+- [o] No, this is cross-sectional data; each patient is an independent unit and reordering the rows loses nothing
+  > Each row is a self-contained observation with no dependence on the row above it. You could sort by age or shuffle randomly and lose no information, the hallmark of cross-sectional, not time series, data.
+- Yes, because there is a time element in "several months"
   > A vague time span in the background isn't the same as an ordered index where $y_t$ depends on $y_{t-1}$. These patients are not a sequence; they're a set.
 - It depends on how many patients there are
   > Sample size has nothing to do with it. A million independent patients is still cross-sectional; twelve ordered monthly totals is a time series.
 
-A time series requires a meaningful order and dependence between consecutive values — not merely that data was gathered across some time span.`}
+A time series requires a meaningful order and dependence between consecutive values, not merely that data was gathered across some time span.`}
 />
 
 ## The four moving parts of a time series
@@ -211,15 +211,15 @@ flowchart LR
     O --> NO["Noise / residual<br/>(the unpredictable remainder)"]
 ```
 
-- **Trend** — the slow march up or down. Airline travel grew year over
+- **Trend**, the slow march up or down. Airline travel grew year over
   year.
-- **Seasonality** — a cycle with a *fixed, known period*. Passengers spike
+- **Seasonality**, a cycle with a *fixed, known period*. Passengers spike
   every summer; retail spikes every December; electricity demand spikes
   every evening. The period is calendar-locked.
-- **Cyclic** — longer swings with *no fixed period*, like economic booms
+- **Cyclic**, longer swings with *no fixed period*, like economic booms
   and recessions. Easy to confuse with seasonality, but a recession doesn't
   arrive on a schedule the way summer does.
-- **Noise** — whatever is left after the structured parts: genuinely
+- **Noise**, whatever is left after the structured parts: genuinely
   unpredictable wiggle.
 
 <Callout type="warn" title="Seasonal is not the same as cyclic">
@@ -277,13 +277,13 @@ print(" 3) GROWING VARIANCE - the summer-to-winter swing gets WIDER over time.")
 
 You can read all three structures straight off the chart: a rising trend,
 a yearly hump that repeats 12 times, and seasonal swings that get *wider*
-as the level rises. That last detail — variance growing with the level —
+as the level rises. That last detail, variance growing with the level,
 is a clue we'll cash in later when we choose between additive and
 multiplicative models and when we reach for a log transform.
 
 ## Why shuffling is sabotage (and where it sneaks in)
 
-You would never *manually* shuffle a time series — but a random train/test
+You would never *manually* shuffle a time series, but a random train/test
 split does exactly that, and it's the default in almost every ML tutorial.
 Here's the trap, made concrete.
 
@@ -299,7 +299,7 @@ in production, where the future is genuinely unavailable.
 
 *Random split (WRONG):* train and test are interleaved in time. To
 "predict" February the model is allowed to learn from January **and**
-March — it has seen the future. This is **data leakage**.
+March, it has seen the future. This is **data leakage**.
 
 | Jan | Feb | Mar | Apr | May | Jun |
 | --- | --- | --- | --- | --- | --- |
@@ -307,7 +307,7 @@ March — it has seen the future. This is **data leakage**.
 
 *Chronological split (RIGHT):* train is the earlier block, test is the
 later block. The model only ever learns from the past to predict the
-future — exactly the situation it will face in real life.
+future, exactly the situation it will face in real life.
 
 <Callout type="danger" title="The cardinal rule of time series">
 **You may only use the past to predict the future, never the reverse.**
@@ -315,7 +315,7 @@ Any procedure that lets information from later time steps influence a
 prediction about an earlier one is **data leakage**, and it inflates your
 accuracy with a number you can never reproduce in production. A random
 train/test split is the most common way this rule gets broken. We devote a
-whole page to doing splits correctly — it's that important.
+whole page to doing splits correctly, it's that important.
 </Callout>
 
 Let's *measure* the leakage, not just assert it. We'll quantify how much
@@ -362,14 +362,14 @@ print(f"Naive forecast error (time order intact): {ordered_mae:6.1f}")
 print(f"Naive forecast error (shuffled):          {shuffled_mae:6.1f}")
 print()
 print("With order intact, 'tomorrow = today' is a decent forecast.")
-print("Shuffled, the same rule is useless — because there's no 'last month' anymore.")
+print("Shuffled, the same rule is useless, because there's no 'last month' anymore.")
 `,
     },
   ]}
 />
 
 With the time order intact, the dead-simple rule "next month equals this
-month" has a modest error — there's real structure to exploit. Shuffle the
+month" has a modest error, there's real structure to exploit. Shuffle the
 series and that same rule's error roughly *triples*, because a shuffled
 "previous value" is just a random other month. The predictability was a
 property of the *sequence*, and the moment you treat the data as an
@@ -383,7 +383,7 @@ unordered set, it's gone.
 - It throws away too much data for testing
   > The proportion of held-out data isn't the issue. Even a 99/1 random split leaks, because the single test point is still surrounded in time by training points.
 - [o] It leaks future information into training: test points end up time-surrounded by training points, so the model "sees" the future and reports accuracy it can never achieve in production
-  > A randomly chosen test point from March is flanked in the training set by February and April. The model effectively interpolates between known future and past values — information it will never have when forecasting for real.
+  > A randomly chosen test point from March is flanked in the training set by February and April. The model effectively interpolates between known future and past values, information it will never have when forecasting for real.
 - It only works if the series is stationary
   > Stationarity is a separate concern. A random split leaks regardless of stationarity; the leakage comes from interleaving time, not from the series' statistical properties.
 
@@ -396,25 +396,25 @@ This isn't academic. Treating temporal data as an unordered table, or
 evaluating it with a leaky split, produces forecasts that *look* great in
 a notebook and lose money in production:
 
-- **Energy demand** — a utility under-forecasts the evening peak and has to
+- **Energy demand**, a utility under-forecasts the evening peak and has to
   buy emergency power at 10x the price, or over-forecasts and pays to spin
   up plants that idle.
-- **Inventory planning** — a retailer that ignores seasonality orders summer
+- **Inventory planning**, a retailer that ignores seasonality orders summer
   stock for a winter product, eating storage costs and stock-outs at once.
-- **Web traffic / capacity** — a team validates an auto-scaling model with a
+- **Web traffic / capacity**, a team validates an auto-scaling model with a
   random split, ships it, and gets paged at 3 a.m. when the real Monday
   spike it "predicted perfectly" in testing arrives unannounced.
-- **Public health** — case-count forecasts that leak future data overstate
+- **Public health**, case-count forecasts that leak future data overstate
   confidence, and confident-but-wrong forecasts erode trust fast.
 
 In every case the failure is the same: the order of the data was the most
-important variable, and it got thrown away — either by shuffling, or by an
+important variable, and it got thrown away, either by shuffling, or by an
 evaluation that pretended the future was available.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A gentle weekly traffic wave ripples beneath a green band of forecast comfort until one red spike erupts straight through it with alarm ticks flying — a model validated with a leaky split looks calm right up until the real future arrives unannounced"
+  aria-label="A gentle weekly traffic wave ripples beneath a green band of forecast comfort until one red spike erupts straight through it with alarm ticks flying, a model validated with a leaky split looks calm right up until the real future arrives unannounced"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="40" y="171" width="560" height="3" rx="1.5" fill="currentColor" opacity="0.25" />
@@ -444,9 +444,9 @@ build here transfers directly.
 Here's a habit worth forming on day one: **always start with a trivial
 baseline.** Two are classic:
 
-- The **naive forecast** — predict the next value equals the last value
+- The **naive forecast**, predict the next value equals the last value
   (`ŷₜ = yₜ₋₁`). Surprisingly hard to beat on many series.
-- The **seasonal naive forecast** — predict the next value equals the value
+- The **seasonal naive forecast**, predict the next value equals the value
   one full season ago (`ŷₜ = yₜ₋ₘ`, with `m = 12` for monthly data with
   yearly seasonality). For strongly seasonal series, this is the baseline
   to beat.
@@ -454,7 +454,7 @@ baseline.** Two are classic:
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two thin arrows converge on tomorrow's yellow dot along a timeline of blue readings: a short blue hop from yesterday's value and a long green arc from the same month one year back — the naive and seasonal-naive baselines every real model must beat"
+  aria-label="Two thin arrows converge on tomorrow's yellow dot along a timeline of blue readings: a short blue hop from yesterday's value and a long green arc from the same month one year back, the naive and seasonal-naive baselines every real model must beat"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -556,7 +556,7 @@ print("Any real model must beat the BETTER of these baselines to earn its keep."
 
 The seasonal-naive baseline crushes the plain naive one, because the
 airline series' strongest structure is its *yearly* cycle. This is your
-first lesson in matching the method to the structure — and a benchmark
+first lesson in matching the method to the structure, and a benchmark
 we'll hold every fancy model to.
 
 ## Practice
@@ -566,8 +566,8 @@ we'll hold every fancy model to.
   title="Measure how shuffling destroys autocorrelation"
   instructions={`The airline \`air\` series is loaded. Write a function \`lag1_autocorr(series)\` that returns the **lag-1 autocorrelation**: the Pearson correlation between the series and itself shifted forward by one step (drop the resulting missing value). Use it to fill a dict \`result\` with two keys:
 
-- \`"ordered"\` — lag-1 autocorrelation of \`air\` as-is (a float)
-- \`"shuffled"\` — lag-1 autocorrelation of \`air\` after \`air.sample(frac=1.0, random_state=0)\` (a float)
+- \`"ordered"\`, lag-1 autocorrelation of \`air\` as-is (a float)
+- \`"shuffled"\`, lag-1 autocorrelation of \`air\` after \`air.sample(frac=1.0, random_state=0)\` (a float)
 
 The ordered value should be high (above 0.8); the shuffled value should be small in magnitude (below 0.4). This is the whole thesis of the page, measured.`}
   files={[
@@ -649,8 +649,8 @@ assert all(isinstance(result[k], float) for k in result)`,
   title="Make a leakage-free chronological split"
   instructions={`Given the \`air\` series (144 monthly points), build a chronological train/test split that holds out the **last 24 months** for testing. Produce:
 
-- \`train\` — a Series of the first 120 observations
-- \`test\` — a Series of the final 24 observations
+- \`train\`, a Series of the first 120 observations
+- \`test\`, a Series of the final 24 observations
 
 The split must be **leakage-free**: every timestamp in \`train\` must come strictly *before* every timestamp in \`test\`. Do **not** shuffle.`}
   files={[
@@ -733,13 +733,13 @@ print(
 - It has more rows
   > Size is irrelevant. A three-row monthly series is a time series; a million-row customer table is not.
 - It contains a date column somewhere
-  > Merely having a date *column* doesn't make data a time series — the patient table earlier had a collection date but was cross-sectional. What matters is dependence and meaningful order.
+  > Merely having a date *column* doesn't make data a time series, the patient table earlier had a collection date but was cross-sectional. What matters is dependence and meaningful order.
 - [o] Its observations are ordered in time and each value is statistically dependent on nearby values
   > Temporal ordering *plus* dependence between neighboring values is exactly what makes the sequence a time series and what lets us forecast at all.
 - Its values are always increasing
   > Time series can trend up, down, oscillate, or wander. Monotonic growth is neither required nor common.
 
-The essence is an ordered sequence with dependence between neighbors — not size, not the mere presence of a date, not monotonicity.`}
+The essence is an ordered sequence with dependence between neighbors, not size, not the mere presence of a date, not monotonicity.`}
 />
 
 <MultipleChoice
@@ -747,7 +747,7 @@ The essence is an ordered sequence with dependence between neighbors — not siz
 
 - Tomorrow's temperature is completely random
   > High autocorrelation means the opposite of random: today is a strong clue about tomorrow.
-- [o] Today's temperature is a strong predictor of tomorrow's — consecutive values tend to be close
+- [o] Today's temperature is a strong predictor of tomorrow's, consecutive values tend to be close
   > Lag-1 autocorrelation measures how tightly each value tracks the one before it. High values mean "tomorrow looks a lot like today," which is what makes a naive forecast competitive.
 - The temperatures have no trend
   > Autocorrelation and trend are different things; a series can have strong lag-1 autocorrelation with or without a trend.
@@ -784,18 +784,18 @@ A great-in-testing, terrible-in-production gap on temporal data almost always tr
 - The holiday spike is cyclic; the booms are seasonal
   > This reverses the definitions. Fixed calendar period = seasonal; variable period = cyclic.
 
-Fixed, calendar-locked period means seasonal; variable-length swings mean cyclic — and the distinction predicts how forecastable each is.`}
+Fixed, calendar-locked period means seasonal; variable-length swings mean cyclic, and the distinction predicts how forecastable each is.`}
 />
 
 <MultipleChoice
   markdown={`Why do we insist on computing a **seasonal naive** baseline (this month = same month last year) before fitting any sophisticated model?
 
 - Because sophisticated models are always worse
-  > Sophisticated models are often better — but not always, and not for free. The baseline is how you *find out* whether the complexity earned anything.
+  > Sophisticated models are often better, but not always, and not for free. The baseline is how you *find out* whether the complexity earned anything.
 - [o] Because a model that can't beat a trivial baseline isn't adding value, and the baseline tells us how much real skill any model contributes
-  > Baselines convert "the error is 30" into "the error is 30, versus 35 for doing nothing" — that comparison is what makes an accuracy number meaningful. If ARIMA can't beat "same as last year," it's not worth its complexity.
+  > Baselines convert "the error is 30" into "the error is 30, versus 35 for doing nothing", that comparison is what makes an accuracy number meaningful. If ARIMA can't beat "same as last year," it's not worth its complexity.
 - Because seasonal naive is always the most accurate forecast
-  > It frequently isn't — good models beat it. Its job is to be a cheap, honest yardstick, not to win.
+  > It frequently isn't, good models beat it. Its job is to be a cheap, honest yardstick, not to win.
 - Because it makes the data stationary
   > Computing a baseline forecast does nothing to the series' stationarity. The baseline is an evaluation reference, not a transformation.
 
@@ -803,19 +803,19 @@ Baselines turn raw error numbers into meaningful comparisons and guard against s
 />
 
 <Callout type="success" title="Key takeaways">
-- A **time series** is an *ordered sequence of dependent observations* —
+- A **time series** is an *ordered sequence of dependent observations*,
   not a table with a date column. The **order is information**.
 - The defining property is **temporal dependence** (measured as
   **autocorrelation**): each value leans on its recent past.
-- Time series violate the **i.i.d.** assumption on both counts — values are
+- Time series violate the **i.i.d.** assumption on both counts, values are
   *dependent*, and the distribution *drifts* (trend, changing variance).
 - **Shuffling** destroys the signal; a **random train/test split** is
-  shuffling in disguise and causes **data leakage** — great test scores,
+  shuffling in disguise and causes **data leakage**, great test scores,
   terrible production.
 - The **cardinal rule**: only ever use the **past** to predict the
   **future**.
 - A series layers **trend**, **seasonality** (fixed period), **cyclic**
-  swings (variable period), and **noise** — learn to see them.
+  swings (variable period), and **noise**, learn to see them.
 - Always start with a **naive** and **seasonal-naive baseline**; real
   models must beat them to justify their complexity.
 </Callout>

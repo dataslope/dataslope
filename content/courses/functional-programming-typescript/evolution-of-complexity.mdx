@@ -1,12 +1,12 @@
 ---
 title: The Evolution of Software Complexity
-description: From small scripts to distributed systems — and the maintainability crisis that made functional programming inevitable.
+description: From small scripts to distributed systems, and the maintainability crisis that made functional programming inevitable.
 ---
 
 To understand why functional programming exists, it helps to look at
 the shape of the software we write today and trace how it got that
 way. The constraints that drove FP into the mainstream were not
-academic preferences — they were the lived experience of teams
+academic preferences, they were the lived experience of teams
 drowning in the complexity of their own programs.
 
 This chapter tells that story.
@@ -14,7 +14,7 @@ This chapter tells that story.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three containers in a row: one holding a single dot, one holding four, and a large one crammed with dots spilling over its rim — programs growing from scripts into systems that overflow our ability to track them"
+  aria-label="Three containers in a row: one holding a single dot, one holding four, and a large one crammed with dots spilling over its rim, programs growing from scripts into systems that overflow our ability to track them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -84,11 +84,11 @@ Then the machines connected. Then the users multiplied. Then the
 programs started talking to each other across networks. Each step
 added a new dimension of complexity that wasn't there before:
 
-- **Concurrency** — multiple things happening at once
-- **Distribution** — multiple machines, partial failure
-- **Asynchrony** — operations that take time and can be cancelled
-- **Persistence** — state that outlives the program
-- **Scale** — billions of users, exabytes of data
+- **Concurrency**, multiple things happening at once
+- **Distribution**, multiple machines, partial failure
+- **Asynchrony**, operations that take time and can be cancelled
+- **Persistence**, state that outlives the program
+- **Scale**, billions of users, exabytes of data
 
 A modern web service might handle tens of thousands of concurrent
 requests, each carrying its own thread of mutable state, each
@@ -99,7 +99,7 @@ in fifty years.
 ## The hidden enemy: mutable state
 
 The single largest source of complexity in software is **mutable
-shared state** — values that change over time and are visible from
+shared state**, values that change over time and are visible from
 many places at once.
 
 Consider the simplest possible mutable program:
@@ -133,7 +133,7 @@ and one of them lives inside a `setInterval`. Suddenly the question
 The behavior of any individual function now depends on **the entire
 history of every other function**, in the order they ran, on the
 threads they ran on. The program is no longer a thing you can read
-top-to-bottom — it's a four-dimensional cloud of possible execution
+top-to-bottom, it's a four-dimensional cloud of possible execution
 traces.
 
 This is sometimes called *spooky action at a distance*: changing a
@@ -147,7 +147,7 @@ writing to disk, printing to a console, mutating an argument, sending
 a network request, reading the clock, throwing an exception, updating
 a global counter.
 
-Side effects are not evil — every useful program has them — but they
+Side effects are not evil, every useful program has them, but they
 have *costs*:
 
 - **They make functions hard to test.** You can't just assert on a
@@ -238,10 +238,10 @@ sequenceDiagram
     Note over S: Should be 2, is 1
 ```
 
-Two clicks. One lost update. No error, no exception, no log line —
+Two clicks. One lost update. No error, no exception, no log line,
 just a number that is quietly wrong.
 
-Races like this are not just a nuisance — they have a body count.
+Races like this are not just a nuisance, they have a body count.
 The **Therac-25**, a radiation therapy machine of the mid-1980s,
 massively overdosed six patients, several fatally. Nancy Leveson and
 Clark Turner's landmark investigation found that the control software
@@ -250,7 +250,7 @@ edited the treatment setup quickly enough, one part of the program
 read a shared variable at exactly the wrong moment and the machine
 delivered a radiation beam without its safety configuration. The bug
 had been latent in earlier models too, but those machines had
-hardware interlocks that masked it — the Therac-25 trusted the
+hardware interlocks that masked it, the Therac-25 trusted the
 software alone. The case is now taught in every software engineering
 program in the world, and its core lesson is the lesson of this
 chapter: *state shared across concurrent activities is where the
@@ -268,15 +268,15 @@ accident.
 When a codebase is small, you can hold its mental model in your head.
 You know which functions mutate what, which call orders are valid,
 which states are reachable. As the codebase grows, that mental model
-becomes too large for any single person — and yet the *language
+becomes too large for any single person, and yet the *language
 itself* still assumes a single coherent reasoner.
 
 The classic symptoms of a codebase that has outgrown its style:
 
-- "I'm afraid to rename this function — I don't know who calls it"
+- "I'm afraid to rename this function, I don't know who calls it"
 - "Every change requires three days of manual QA"
 - "The new hire spent two weeks just learning the data flow"
-- "We don't refactor — we add code around the bug"
+- "We don't refactor, we add code around the bug"
 
 These are not failures of *people*. They are failures of *technique*.
 A language and a style that scaled to 1,000 lines does not
@@ -289,7 +289,7 @@ single, radical claim:
 
 > If you build your program out of pure functions over immutable
 > values, and you push side effects to the edges, the parts of your
-> program you care most about — the logic — become as easy to reason
+> program you care most about, the logic, become as easy to reason
 > about as arithmetic.
 
 The rest of this course is about how to actually do that, in
@@ -304,7 +304,7 @@ The shape of a computation changes accordingly:
 | Side effects | sprinkled wherever convenient | pushed to the edges, visible in the types |
 | Reading the code | replay the history in your head | substitute values, like arithmetic |
 
-The next chapter looks at where these ideas *came from* — the
+The next chapter looks at where these ideas *came from*, the
 mathematical and historical roots of functional programming, from
 lambda calculus through Lisp and Haskell to the modern ecosystem.
 
@@ -320,7 +320,7 @@ lambda calculus through Lisp and Haskell to the modern ecosystem.
 - TypeScript cannot type-check mutable variables
   > TypeScript does type-check mutable variables. The issue is not typing but reasoning: types describe shape, not history.
 - It always causes the program to crash
-  > Mutable state rarely crashes — that would be easier to debug. It usually produces *silently incorrect* results, which is much worse.
+  > Mutable state rarely crashes, that would be easier to debug. It usually produces *silently incorrect* results, which is much worse.
 
 Mutable shared state turns local code into globally entangled code, which is the single largest source of complexity in real systems.`}
 />

@@ -14,7 +14,7 @@ one*.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two rows with identical contents are told apart only by the numbered teal key tab on each — a primary key gives look-alike rows distinct identity"
+  aria-label="Two rows with identical contents are told apart only by the numbered teal key tab on each, a primary key gives look-alike rows distinct identity"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -81,8 +81,8 @@ identity is still clear.
 
 A primary key matters because PostgreSQL enforces two guarantees:
 
-1. **Unique** — no two rows can have the same key value.
-2. **Not null** — every row must have a key value.
+1. **Unique**, no two rows can have the same key value.
+2. **Not null**, every row must have a key value.
 
 Those two rules are a design promise: every row can be pointed at, and
 no pointer has to mean "maybe this row, maybe that one."

@@ -8,19 +8,19 @@
  * Rendered server-side into the prerendered page, that multi-hundred-kB
  * payload lives in Vercel's durable ISR store, and every edge-cache miss
  * (each region, each eviction, each prefetch) re-reads it as billed ISR
- * Reads — the gallery was the single largest ISR reader on the project.
+ * Reads, the gallery was the single largest ISR reader on the project.
  *
  * Instead, the page is now a tiny static shell and the heavy payload ships
  * as `public/svg-gallery/data.json`, a plain static asset that the client
  * fetches on mount. Files under `public/` are served straight from the CDN
  * and never touch the ISR store, so opening the gallery costs zero ISR
- * Reads. A slower first paint is fine — the page is a development review
+ * Reads. A slower first paint is fine, the page is a development review
  * tool.
  *
  * The collector (`lib/svgGallery.ts`) is TypeScript that shares its
  * unit-tested extraction helpers with the `remarkSvgLabels` build plugin, so
  * this script bundles it with esbuild into node_modules/.cache and imports
- * the bundle — the same esbuild-at-build-time approach as
+ * the bundle, the same esbuild-at-build-time approach as
  * `build-almostnode-workers.mjs`.
  *
  * Idempotent. Runs from the `dev` and `build` scripts; the JSON reflects the
@@ -60,6 +60,6 @@ const json = JSON.stringify(courses);
 await writeFile(OUT_FILE, json);
 
 console.log(
-  `[svg-gallery] wrote public/svg-gallery/data.json — ${total} graphics in ` +
+  `[svg-gallery] wrote public/svg-gallery/data.json, ${total} graphics in ` +
     `${courses.length} courses (${Math.round(json.length / 1024)} kB)`,
 );

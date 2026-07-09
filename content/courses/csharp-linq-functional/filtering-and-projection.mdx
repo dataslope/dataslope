@@ -1,13 +1,13 @@
 ---
 title: Filtering and Projection
-description: Where and Select — the two most important LINQ operators, and the mental model that makes every other operator easy
+description: Where and Select, the two most important LINQ operators, and the mental model that makes every other operator easy
 ---
 
 If you only learned two LINQ operators, you'd cover 80% of every
 data-processing task you'll ever do:
 
-- **`Where`** — keep the elements that satisfy a predicate.
-- **`Select`** — transform each element into something else.
+- **`Where`**, keep the elements that satisfy a predicate.
+- **`Select`**, transform each element into something else.
 
 These two are the **filter** and **map** primitives that almost every
 functional language has. In modern C#, they're extension methods on
@@ -17,7 +17,7 @@ understanding them shapes how you think about everything else.
 <svg
   viewBox="0 0 640 260"
   role="img"
-  aria-label="Shapes fall through two horizontal bars: the yellow bar catches some circles on top while others pass, and everything passing the blue bar comes out as squares — Where then Select"
+  aria-label="Shapes fall through two horizontal bars: the yellow bar catches some circles on top while others pass, and everything passing the blue bar comes out as squares, Where then Select"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ a converter: each thing that comes in becomes something else on the
 way out. The shape of the sequence may change (different element
 type), but the *order* is preserved.
 
-## `Where` — filtering
+## `Where`, filtering
 
 `Where` takes a predicate (`Func<T, bool>`) and returns a sequence
 containing only the elements for which the predicate is true.
@@ -109,10 +109,10 @@ Console.WriteLine(string.Join(", ", everyOther));
 />
 
 The two-argument lambda `(name, index) => ...` opts into the indexed
-overload. Useful, but use it sparingly — most code is clearer
+overload. Useful, but use it sparingly, most code is clearer
 without indices.
 
-## `Select` — projecting
+## `Select`, projecting
 
 `Select` takes a selector (`Func<TSource, TResult>`) and produces a
 new sequence with the function applied to each element. This is
@@ -133,7 +133,7 @@ var labels = nums.Select(n => $"#{n}");
 Console.WriteLine(string.Join(",", doubled));
 Console.WriteLine(string.Join(",", labels));
 
-// Type may change — int -> string.
+// Type may change, int -> string.
 Console.WriteLine(labels.GetType().Name);
 `,
     },
@@ -142,7 +142,7 @@ Console.WriteLine(labels.GetType().Name);
 
 Note that the result type follows the lambda's return type. Project
 ints into strings, strings into lengths, records into anonymous
-objects — anything you want.
+objects, anything you want.
 
 ### Anonymous and tuple projections
 
@@ -162,14 +162,14 @@ var people = new[] {
     new Person("Chiara", 29, "Berlin"),
 };
 
-// Anonymous type — handy for the next stage only.
+// Anonymous type, handy for the next stage only.
 var summary1 = people.Select(p => new { p.Name, IsAdult = p.Age >= 18 });
 foreach (var s in summary1)
     Console.WriteLine($"{s.Name} adult? {s.IsAdult}");
 
 Console.WriteLine();
 
-// Tuple projection — also works.
+// Tuple projection, also works.
 var summary2 = people.Select(p => (p.Name, Decade: p.Age / 10 * 10));
 foreach (var (name, decade) in summary2)
     Console.WriteLine($"{name} → {decade}s");
@@ -216,7 +216,7 @@ record Order(string Product, decimal Price, int Quantity);
   ]}
 />
 
-Two `Where` clauses chain naturally — they don't have to be combined
+Two `Where` clauses chain naturally, they don't have to be combined
 into one giant predicate. Each one expresses a *single intent*; the
 pipeline as a whole reads top to bottom.
 
@@ -235,7 +235,7 @@ flowchart TD
 
 For an order with `Product = "Gizmo"`, the first `Where` rejects it
 and *neither subsequent operator runs*. This is part of what makes
-LINQ pipelines efficient — the work for "dropped" elements is
+LINQ pipelines efficient, the work for "dropped" elements is
 skipped entirely.
 
 ## `Select` is not a loop
@@ -294,7 +294,7 @@ public static class PeopleFilter
 {
     public static IEnumerable<string> AdultNamesUpper(IEnumerable<Person> people)
     {
-        // your code here — use Where and Select
+        // your code here, use Where and Select
         return new string[0];
     }
 }
@@ -324,10 +324,10 @@ public static class PeopleFilter
   markdown={`Given \`var result = nums.Where(n => n > 10).Select(n => n * 2);\`, which statement is correct?
 
 - The pipeline runs immediately and \`result\` is a \`List<int>\`.
-  > LINQ operators are deferred — nothing has been enumerated yet. \`result\` is an \`IEnumerable<int>\`, not a list.
+  > LINQ operators are deferred, nothing has been enumerated yet. \`result\` is an \`IEnumerable<int>\`, not a list.
 - The \`Select\` lambda runs for every element of \`nums\`, regardless of the filter.
   > Pipelined operators only invoke later steps for elements that survive earlier steps; \`Select\` does not run for elements that \`Where\` rejected.
-- [o] \`result\` is a deferred \`IEnumerable<int>\` — neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
+- [o] \`result\` is a deferred \`IEnumerable<int>\`, neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
   > LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
 - \`Where\` and \`Select\` can only be used on \`List<T>\` and arrays.
   > They are extension methods on \`IEnumerable<T>\`, which is implemented by virtually every collection in .NET and by hand-written iterators.

@@ -117,7 +117,7 @@ describe("registry", () => {
       "pg_workspaces",
       JSON.stringify([
         { id: "old", name: "Old", playground: "sqlite", createdAt: 2, lastUsedAt: 9 },
-        { id: 7, name: "bad" }, // invalid — must be filtered out
+        { id: 7, name: "bad" }, // invalid, must be filtered out
       ]),
     );
     const { getWorkspaceRegistry } = await import(
@@ -262,7 +262,7 @@ describe("deleteWorkspace", () => {
 /**
  * Minimal in-memory Web Locks stub modelling exclusive, *queued* requests.
  * A request for a free name is granted immediately; a request for a held name
- * waits until the holder releases (its callback's promise settles) — or
+ * waits until the holder releases (its callback's promise settles), or
  * rejects if the request's `AbortSignal` fires first, which is how the real
  * API surfaces both our grace-window timeout and caller-unmount cancellation.
  */

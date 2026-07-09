@@ -1,6 +1,6 @@
 ---
 title: The Call Stack
-description: How the CPU keeps track of nested function calls — frames, local variables, return addresses, and stack overflows.
+description: How the CPU keeps track of nested function calls, frames, local variables, return addresses, and stack overflows.
 ---
 
 When one function calls another, *something* has to remember:
@@ -17,7 +17,7 @@ question in C++ has an obvious answer.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A spring-loaded plate dispenser: blue plates stacked in a translucent canister, a green plate being pushed down on top while a faded one pops up and away — calls pile onto the stack and unwind from the same end"
+  aria-label="A spring-loaded plate dispenser: blue plates stacked in a translucent canister, a green plate being pushed down on top while a faded one pops up and away, calls pile onto the stack and unwind from the same end"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -48,8 +48,8 @@ question in C++ has an obvious answer.
 
 Each function call gets its own little block of memory called a
 **stack frame**. The frame holds the function's parameters, local
-variables, and bookkeeping (most importantly, the **return address**
-— *where in the caller's code execution should resume when this
+variables, and bookkeeping (most importantly, the **return address**,
+*where in the caller's code execution should resume when this
 function returns*).
 
 ```mermaid
@@ -205,15 +205,15 @@ void increment(int x) {     // x is a local, initialized to a copy of the argume
 }                           // x dies; the caller's variable is unchanged.
 ```
 
-That is why "pass by value doesn't modify the caller" — the
+That is why "pass by value doesn't modify the caller", the
 parameter and the argument live in *different stack frames* and have
 *different addresses*.
 
 ## Stack overflow
 
 The stack is *finite*. On most desktop OSes it's about 1 MB to 8 MB.
-If you call functions deep enough — typically through unbounded
-recursion — the stack runs out of room, and the program crashes
+If you call functions deep enough, typically through unbounded
+recursion, the stack runs out of room, and the program crashes
 with a **stack overflow**.
 
 <CodeBlock
@@ -245,7 +245,7 @@ rewrite it as a loop.
 
 This failure mode is so emblematic of programming that when Jeff
 Atwood and Joel Spolsky launched their programmer Q&A site in 2008,
-they let the community vote on a name — and *Stack Overflow* won.
+they let the community vote on a name, and *Stack Overflow* won.
 The crash you just learned about is the namesake of the website
 where a generation of programmers went to ask about it.
 
@@ -254,10 +254,10 @@ where a generation of programmers went to ask about it.
 We saw this in the "How Computers Run Programs" chapter. The stack
 is one of several regions:
 
-- **Text / code** — the compiled instructions.
-- **Data** — globals, statics, string literals.
-- **Heap** — grows upward as you `new` things.
-- **Stack** — grows downward as you call functions.
+- **Text / code**, the compiled instructions.
+- **Data**, globals, statics, string literals.
+- **Heap**, grows upward as you `new` things.
+- **Stack**, grows downward as you call functions.
 
 The stack grows toward the heap; the heap grows toward the stack.
 On 32-bit systems they could in principle meet. On modern 64-bit
@@ -269,7 +269,7 @@ practice.
 If you want to convince yourself the stack really exists, the
 program below prints the address of each frame's local variable.
 Notice that the addresses are *spaced apart by similar amounts* as
-the call depth increases — that spacing is roughly the size of a
+the call depth increases, that spacing is roughly the size of a
 stack frame.
 
 <CodeBlock
@@ -317,7 +317,7 @@ You will use this picture *constantly* when you reason about:
 - **Move semantics.** Moving a `std::vector` is fast because we move
   the *handle* on the stack, not the heap data.
 - **RAII.** A local object's destructor runs when its frame is
-  popped — that's how `std::unique_ptr` knows when to free memory.
+  popped, that's how `std::unique_ptr` knows when to free memory.
 - **Performance.** Stack allocation is essentially free; heap
   allocation costs a system call (eventually).
 - **Crashes.** Most segfaults trace back to "you dereferenced a
@@ -379,6 +379,6 @@ The stack is the secret protagonist of every C++ program.
   > Parameters are just local variables that the language sets up for you on entry.`}
 />
 
-Up next: zoom out from the stack to the *whole* memory model — what
+Up next: zoom out from the stack to the *whole* memory model, what
 the heap is, what global data looks like, and how programs juggle
 all three.

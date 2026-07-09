@@ -1,6 +1,6 @@
 ---
 title: Memory Bugs
-description: A field guide to leaks, use-after-free, double-free, buffer overflows, off-by-one, and uninitialized reads — and how to avoid them
+description: A field guide to leaks, use-after-free, double-free, buffer overflows, off-by-one, and uninitialized reads, and how to avoid them
 ---
 
 C gives you control of every byte, and with it the freedom to break
@@ -19,14 +19,14 @@ The bug classes we will cover:
 - Dangling stack pointer
 - Type confusion / strict aliasing
 
-These are not "exotic" bugs — they are the source of an enormous
+These are not "exotic" bugs, they are the source of an enormous
 share of real-world security vulnerabilities (CVEs). Recognizing the
 patterns is half the battle.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A red bug with thin legs crawls along a row of blue memory cells, and the two cells just behind it sit tilted and turned yellow — memory bugs corrupt whatever they touch"
+  aria-label="A red bug with thin legs crawls along a row of blue memory cells, and the two cells just behind it sit tilted and turned yellow, memory bugs corrupt whatever they touch"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -63,7 +63,7 @@ patterns is half the battle.
 
 After `free(p)` the memory is returned to the allocator and may be
 handed out by the next `malloc`. Reading or writing through `p` is
-undefined behavior — sometimes it "works", sometimes it returns
+undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
 <CodeBlock
@@ -136,7 +136,7 @@ int main(void) {
 
   // ↓ Undefined behavior. Some allocators detect and abort here.
   free(p);
-  printf("freed twice — if you see this, the allocator silently accepted it\\n");
+  printf("freed twice, if you see this, the allocator silently accepted it\\n");
   return 0;
 }
 `,
@@ -144,7 +144,7 @@ int main(void) {
   ]}
 />
 
-**Cure:** same as above — `free(p); p = NULL;`. `free(NULL)` is
+**Cure:** same as above, `free(p); p = NULL;`. `free(NULL)` is
 guaranteed by the standard to be a no-op, so the second call becomes
 harmless.
 
@@ -193,13 +193,13 @@ and clear ownership documentation.
 
 Writing past the end of an allocation (stack or heap) is the canonical
 C bug. Depending on the layout it may corrupt neighboring variables,
-allocator metadata, or — historically, before stack protections — the
+allocator metadata, or, historically, before stack protections, the
 function's return address, leading to remote code execution.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Blue blocks stacked past the rim of the left box send a red one toppling over the shared wall toward the green value in the box next door — a buffer overflow corrupting its neighbour"
+  aria-label="Blue blocks stacked past the rim of the left box send a red one toppling over the shared wall toward the green value in the box next door, a buffer overflow corrupting its neighbour"
   style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -287,7 +287,7 @@ int main(void) {
   // Copies 5 chars but leaves dst un-terminated.
   memcpy(dst, src, 5);
 
-  // printf walks until it finds '\\0' — wherever that happens to be.
+  // printf walks until it finds '\\0', wherever that happens to be.
   printf("dst = %s   (probably garbage at the end)\\n", dst);
   return 0;
 }
@@ -303,7 +303,7 @@ the terminator. Or use length-aware functions like `snprintf`.
 
 `malloc` does *not* zero memory. Stack variables are *not*
 zero-initialized either (unlike Python/Java). Reading them before
-writing returns whatever bytes happen to be there — often the
+writing returns whatever bytes happen to be there, often the
 previous user's data.
 
 <CodeBlock
@@ -334,7 +334,7 @@ int main(void) {
 
 - Initialize every variable at declaration: `int local = 0;`.
 - Use `calloc` instead of `malloc` when you want zeros.
-- Compile with `-Wall -Wextra` — modern compilers warn about many
+- Compile with `-Wall -Wextra`, modern compilers warn about many
   uninitialized reads.
 
 ## 7. Dangling stack pointer
@@ -407,8 +407,8 @@ int main(void) {
 />
 
 Reading bytes through a `char *` is *legal* (the standard
-specifically allows it). Reading an `int` through a `float *` —
-without going via a `union` or `memcpy` — is generally a strict
+specifically allows it). Reading an `int` through a `float *`,
+without going via a `union` or `memcpy`, is generally a strict
 aliasing violation, another form of undefined behavior.
 
 **Cure:** when you really need to reinterpret bytes, use `memcpy` or
@@ -422,7 +422,7 @@ the language:
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three red arrows fly toward a green core and each is stopped by a successively deeper blue wall — warnings, sanitizers, and runtime checks giving defense in depth for memory safety"
+  aria-label="Three red arrows fly toward a green core and each is stopped by a successively deeper blue wall, warnings, sanitizers, and runtime checks giving defense in depth for memory safety"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -471,7 +471,7 @@ the language:
 <ChallengeCard
   adapter="c"
   title="Allocate, use, and free correctly"
-  instructions={`Implement \`char *make_greeting(const char *name)\` so that it returns a heap-allocated string of the form \`Hello, NAME!\` (without the literal word "NAME" — substitute the parameter). The provided \`main\` calls it, prints the result, and frees it. Make sure not to leak and not to overflow.`}
+  instructions={`Implement \`char *make_greeting(const char *name)\` so that it returns a heap-allocated string of the form \`Hello, NAME!\` (without the literal word "NAME", substitute the parameter). The provided \`main\` calls it, prints the result, and frees it. Make sure not to leak and not to overflow.`}
   files={[
     {
       filename: "main.c",
@@ -630,7 +630,7 @@ int main(void) {
 - [o] The C standard explicitly declares the read undefined behavior; the compiler is allowed to assume it never happens and may optimize accordingly, producing surprising results.
   > UB is about what the language guarantees, not just about runtime values.
 - It always reads the value zero.
-  > It does not — stack memory contains whatever the previous use left there.
+  > It does not, stack memory contains whatever the previous use left there.
 - The OS will trap and terminate the program.
   > The OS rarely traps this; the bug is silent until something goes wrong.`}
 />

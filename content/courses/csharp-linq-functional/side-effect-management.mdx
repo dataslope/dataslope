@@ -1,9 +1,9 @@
 ---
 title: Side-Effect Management
-description: Functional core, imperative shell — pushing IO to the edges so the heart of your program stays pure, testable, and easy to reason about
+description: Functional core, imperative shell, pushing IO to the edges so the heart of your program stays pure, testable, and easy to reason about
 ---
 
-LINQ pipelines work best when their lambdas are **pure** — they
+LINQ pipelines work best when their lambdas are **pure**, they
 read inputs, return outputs, and *do nothing else*. Real programs,
 of course, have to do plenty of impure work: read files, hit the
 network, write to a database, print to a console, check the clock.
@@ -108,8 +108,8 @@ Console.WriteLine($"Sum: {sales.Sum()}");
   ]}
 />
 
-To test the *parsing rule* — "non-numeric and non-positive entries
-are dropped" — you'd have to mock a file reader, capture console
+To test the *parsing rule*, "non-numeric and non-positive entries
+are dropped", you'd have to mock a file reader, capture console
 output, and assert on log lines. The logic is *trapped* inside the
 IO.
 
@@ -149,7 +149,7 @@ public static class SalesParser
 effects. You can hand-write tests for it without ever touching a
 file, the console, or any infrastructure.
 
-The shell — the four lines after the class — is so small there's
+The shell, the four lines after the class, is so small there's
 almost nothing to test.
 
 ## Threading the "world" through arguments
@@ -204,7 +204,7 @@ The same trick works for randomness (`Random rng`), configuration
 
 ## What about logging?
 
-Logging is a side effect — but most teams accept it inside pure code
+Logging is a side effect, but most teams accept it inside pure code
 because it's "harmless". A pragmatic compromise:
 
 - Don't log inside lambdas that LINQ may run many times or never.
@@ -240,7 +240,7 @@ The function still returns *data*. The shell decides whether
 <ChallengeCard
   adapter="csharp"
   title="Keep the core pure"
-  instructions={`Implement \`Report.Build\` in \`Report.cs\` as a **pure** function — no \`Console\`, no \`DateTime.UtcNow\`, no file IO. It takes all of its inputs explicitly (\`lines\`, \`today\`, \`windowDays\`) and returns a string:
+  instructions={`Implement \`Report.Build\` in \`Report.cs\` as a **pure** function, no \`Console\`, no \`DateTime.UtcNow\`, no file IO. It takes all of its inputs explicitly (\`lines\`, \`today\`, \`windowDays\`) and returns a string:
 
 1. Parse each line as \`"yyyy-MM-dd,status,amount"\` (use \`decimal.Parse\` with \`InvariantCulture\` for the amount). Skip lines that fail to parse.
 2. Keep entries where \`status == "paid"\` **and** \`date >= today.AddDays(-windowDays)\`.
@@ -256,7 +256,7 @@ Because time and configuration are arguments rather than ambient state, the outp
 using System.Collections.Generic;
 using System.Linq;
 
-// "Shell" — fixed inputs (pretending these came from a file / clock).
+// "Shell", fixed inputs (pretending these came from a file / clock).
 var rawLines = new[] {
     "2026-05-01,paid,120", "2026-05-12,paid,300", "2026-05-20,pending,75",
     "garbage line",        "2026-05-25,paid,40",  "2026-05-26,refund,-50",
@@ -371,12 +371,12 @@ can adopt.
 - Because \`DateTime.UtcNow\` is slow.
   > It is essentially free. Performance is not the reason.
 - Because static calls are forbidden inside LINQ lambdas.
-  > Not true — you can call any method inside a lambda. The objection is about *purity*, not legality.
-- [o] To make the function deterministic and testable — the same inputs always produce the same output, and tests can supply any time/seed they want.
+  > Not true, you can call any method inside a lambda. The objection is about *purity*, not legality.
+- [o] To make the function deterministic and testable, the same inputs always produce the same output, and tests can supply any time/seed they want.
   > Hidden environmental reads (clock, RNG, environment variables) make a function impure and untestable. Lifting those reads to parameters turns the function into a pure, predictable building block; the shell stays responsible for sourcing the real values.
 - To improve thread safety.
   > A side benefit in some cases (avoiding shared \`Random\` instances, for example), but the primary motivation is testability and reasoning.
 
-This single discipline — *push reads out, return data in* — is the
+This single discipline, *push reads out, return data in*, is the
 core habit behind "functional core, imperative shell".`}
 />

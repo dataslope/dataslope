@@ -285,7 +285,7 @@ describe("C# adapter specifics", () => {
 
   it("hasImport does not match unrelated namespaces with the same prefix", () => {
     // `using System.Linq.Expressions;` should NOT match a query for
-    // `System` — substring matching would otherwise confuse the
+    // `System`, substring matching would otherwise confuse the
     // packages drawer's "already imported?" check.
     expect(
       csharpAdapter.hasImport(
@@ -356,7 +356,7 @@ describe("Web adapter specifics", () => {
     for (const f of webAdapter.defaultWorkspace ?? []) {
       expect(f.content.trim().length).toBeGreaterThan(0);
     }
-    // The HTML pane must not reference the siblings explicitly — the
+    // The HTML pane must not reference the siblings explicitly, the
     // whole point is the implicit CodePen-style composition.
     const html = webAdapter.defaultWorkspace![0].content;
     expect(html).not.toContain("styles.css");
@@ -393,7 +393,7 @@ describe("React adapter specifics", () => {
 
   it("seeds fresh workspaces with the main/App/styles trio in the regular tabbed layout", () => {
     // The React playground uses the standard tabbed editor + files pane
-    // (like JS/TS) — the split panes and hidden files rail are web-only.
+    // (like JS/TS), the split panes and hidden files rail are web-only.
     expect(reactAdapter.splitEditors).toBeUndefined();
     expect(reactAdapter.hideFilesPane).toBeUndefined();
     const names = (reactAdapter.defaultWorkspace ?? []).map((f) => f.filename);
@@ -480,7 +480,7 @@ describe("web/react challenge harnesses", () => {
     expect(harness).not.toContain("<script>");
     expect(harness).toContain(HARNESS_BEGIN);
     expect(harness).toContain("__dsPreviewHarnessDone");
-    // Everything must live inside the IIFE — top-level await would
+    // Everything must live inside the IIFE, top-level await would
     // delay module evaluation and therefore the load event the harness
     // itself waits for (a deadlock).
     expect(harness.trim().startsWith(";(function () {")).toBe(true);

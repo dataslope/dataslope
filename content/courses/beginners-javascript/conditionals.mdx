@@ -1,12 +1,12 @@
 ---
 title: Conditionals and Decisions
-description: How a program chooses what to do next — `if`, `else`, `else if`, `switch`, and how to keep them readable.
+description: How a program chooses what to do next, `if`, `else`, `else if`, `switch`, and how to keep them readable.
 ---
 
 So far our programs have run their statements straight through from
 top to bottom. Every line, every time. The instant a program starts
-making **decisions** — *"if the user is logged in, show their name;
-otherwise show 'Sign in'"* — it starts looking like real software.
+making **decisions**, *"if the user is logged in, show their name;
+otherwise show 'Sign in'"*, it starts looking like real software.
 
 That capacity for decision-making is called **control flow**, and
 the most fundamental tool for it is the `if` statement.
@@ -177,7 +177,7 @@ because that condition matches first.
 ## Guard clauses: prefer early returns
 
 A common pattern in modern code is to write **guard clauses** at
-the top of a function — handle the "bad" or "trivial" cases first
+the top of a function, handle the "bad" or "trivial" cases first
 and return early, so the main logic stays at the top level
 without a giant pyramid of nested `if`s.
 
@@ -188,7 +188,7 @@ Compare. Both functions compute the same thing.
   files={[
     {
       filename: "main.js",
-      starterCode: `// Nested style — hard to read past a few levels.
+      starterCode: `// Nested style, hard to read past a few levels.
 function shippingCost1(weight, distance, isPriority) {
   let cost;
   if (weight > 0) {
@@ -206,7 +206,7 @@ function shippingCost1(weight, distance, isPriority) {
   return cost;
 }
 
-// Guard-clause style — flat and easy to follow.
+// Guard-clause style, flat and easy to follow.
 function shippingCost2(weight, distance, isPriority) {
   if (weight <= 0) return 0;
   if (distance <= 0) return 0;
@@ -241,7 +241,7 @@ if (isLoggedIn === true) { ... }
 if (isLoggedIn) { ... }
 ```
 
-Booleans are *already* booleans — you don't need to test whether
+Booleans are *already* booleans, you don't need to test whether
 they equal `true`. Same for the negation: write `if (!isLoggedIn)`,
 not `if (isLoggedIn === false)`.
 
@@ -371,7 +371,7 @@ screening question for programming interviews, and Jeff Atwood's
 follow-up post "Why Can't Programmers.. Program?" made it famous by
 reporting something interviewers kept rediscovering: a remarkable
 share of candidates with computer science degrees struggled to
-write it on a whiteboard. The exercise tests nothing exotic — just
+write it on a whiteboard. The exercise tests nothing exotic, just
 whether conditionals, ordering, and the remainder operator are
 truly at your fingertips rather than vaguely familiar. Which makes
 it the perfect end-of-page check for you, right now:
@@ -404,7 +404,7 @@ specific case (`% 15 === 0`) first, then the more general cases.
 If we reversed the order, every multiple of 15 would print `"Fizz"`
 and the most specific case would never run.
 
-(We have not formally met `for` loops yet — that is the next page.
+(We have not formally met `for` loops yet, that is the next page.
 For now, just take it on faith that the body runs once for each
 `n` from `1` to `30`.)
 
@@ -420,7 +420,7 @@ For now, just take it on faith that the body runs once for each
 - \`"go"\` if the colour is \`"green"\`
 - \`"unknown signal"\` for anything else (including the empty string)
 
-Use comparisons and conditionals, not a lookup table — practise the syntax.`}
+Use comparisons and conditionals, not a lookup table, practise the syntax.`}
   files={[
     {
       filename: "main.js",
@@ -489,7 +489,7 @@ if (action("") !== "unknown signal") throw new Error("empty string should also b
 - [o] Guard clauses keep the main logic at the top indent level, making the function easier to read and easier to extend
   > Each guard clause handles an edge case and exits, so the "happy path" stays flat and obvious. Deeply nested \`if\` blocks hide the main logic inside a pyramid and make it painful to add new conditions later.
 - Guard clauses are the only way to return from a function
-  > A function can \`return\` from anywhere — inside a loop, at the end, or inside a nested \`if\`; guard clauses are simply one pattern for using early returns cleanly.
+  > A function can \`return\` from anywhere, inside a loop, at the end, or inside a nested \`if\`; guard clauses are simply one pattern for using early returns cleanly.
 
 Guard clauses are a style choice that consistently makes code more readable in practice, with no performance trade-off.`}
 />

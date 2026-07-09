@@ -1,11 +1,11 @@
 ---
 title: From Ingres to PostgreSQL
-description: How a Berkeley research project from the 1970s became the database in your browser — Ingres, POSTGRES, Postgres95, and the name nobody can pronounce.
+description: How a Berkeley research project from the 1970s became the database in your browser, Ingres, POSTGRES, Postgres95, and the name nobody can pronounce.
 ---
 
 The previous page ended with IBM's System R proving the relational
 model could work. This page follows the West Coast branch of the
-family tree — the one that leads directly to the PostgreSQL engine
+family tree, the one that leads directly to the PostgreSQL engine
 running inside this course.
 
 ## Berkeley reads the papers
@@ -15,7 +15,7 @@ running inside this course.
 In the early 1970s, Michael Stonebraker and Eugene Wong at the
 University of California, Berkeley read Codd's relational papers and
 decided to build their own relational database. The result, developed
-through the mid-1970s, was **Ingres** — a working relational system
+through the mid-1970s, was **Ingres**, a working relational system
 with its own query language, QUEL, built by professors and a rotating
 cast of graduate students on Unix machines.
 
@@ -23,7 +23,7 @@ Ingres mattered for a reason beyond its technology: its source code
 was distributed freely, at the cost of a tape. People could study a
 real relational database the way you might read code on GitHub today.
 Ingres alumni and the Ingres codebase seeded much of the early
-database industry — among others, Sybase was co-founded by an Ingres
+database industry, among others, Sybase was co-founded by an Ingres
 alum, and Sybase's SQL Server was later licensed to Microsoft, where
 its descendants became Microsoft SQL Server. Trace back far enough,
 and a surprising amount of the database world has Berkeley in its
@@ -32,7 +32,7 @@ ancestry.
 ## POSTGRES: what comes after Ingres
 
 By the mid-1980s Stonebraker wanted to fix what he saw as the
-relational model's practical limits — among them, that commercial
+relational model's practical limits, among them, that commercial
 systems of the day handled only a fixed menu of simple types. In 1986
 he launched a new Berkeley project to build a database that could be
 *extended*: user-defined types, rules, smarter handling of complex
@@ -40,7 +40,7 @@ data. He named it **POSTGRES**, literally "after Ingres."
 
 POSTGRES was a research vehicle, and it had a research-grade quirk:
 it did not speak SQL. It used its own language, POSTQUEL. By the
-1990s, that was a problem — SQL had won.
+1990s, that was a problem, SQL had won.
 
 ```mermaid
 flowchart TD
@@ -56,14 +56,14 @@ In 1994, two Berkeley graduate students, Andrew Yu and Jolly Chen,
 replaced POSTQUEL with SQL and released the result as **Postgres95**.
 When the Berkeley project wound down, the code did something unusual
 for academic software: it refused to die. A volunteer community
-picked it up, and in 1996 the project was renamed **PostgreSQL** — a
+picked it up, and in 1996 the project was renamed **PostgreSQL**, a
 compromise that kept the Postgres heritage while advertising the SQL
 support. The community has maintained and advanced it continuously
 ever since, which is why the version numbers seem to start
 mysteriously high: the 1996 release was numbered 6.0, continuing the
 Berkeley lineage rather than starting over.
 
-The name is widely considered the project's worst design decision —
+The name is widely considered the project's worst design decision,
 the official pronunciation is "post-gres-cue-ell," nearly everyone
 just says "Postgres," and the documentation cheerfully accepts both.
 The project's elephant mascot is named Slonik. Stonebraker, like Codd
@@ -93,14 +93,14 @@ Postgres95 → PostgreSQL → the tab you have open right now.
 
 PostgreSQL's history explains some of its personality. Because
 POSTGRES was built around extensibility, PostgreSQL has unusually
-rich types and lets you define your own — which is why the
+rich types and lets you define your own, which is why the
 data-types chapter could treat types as a real design vocabulary
 rather than a fixed menu. Because it grew up in a research lab and
 then a volunteer community rather than a sales organization, it has a
-long tradition of saying *no* to writes that violate declared rules —
+long tradition of saying *no* to writes that violate declared rules,
 the strictness you have been relying on every time a constraint
 rejected a bad row in this course.
 
 Tools shape habits. It is easier to design carefully on a database
-that takes your declared rules seriously — and now you know why this
+that takes your declared rules seriously, and now you know why this
 one does.

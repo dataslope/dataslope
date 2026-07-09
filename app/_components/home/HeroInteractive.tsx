@@ -3,9 +3,18 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
-import { ChevronDown, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  Code2,
+  Database,
+  Globe,
+  ListChecks,
+  Loader2,
+  type LucideIcon,
+} from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
@@ -13,17 +22,19 @@ import {
 } from "../languageIcons";
 import {
   CODE_CHALLENGES,
-  CONCEPT_QUESTION,
+  CONCEPT_QUESTIONS,
   SQL_CHALLENGES,
+  WEB_CODE_BLOCKS,
   type HomeCodeChallenge,
   type HomeSqlChallenge,
+  type HomeWebBlock,
 } from "./challenges";
 
 // The editor/runtime-backed cards are heavy (CodeMirror + a WASM runtime), so
-// they're code-split and rendered client-only — only the active tab mounts.
+// they're code-split and rendered client-only, only the active tab mounts.
 // The fallback renders inside the RippleFrame, on top of the ripple halo, so
 // its fill must be fully opaque (the page-surface token, not a translucent
-// tint) — otherwise the rings show through while a tab's card loads.
+// tint), otherwise the rings show through while a tab's card loads.
 const CardLoading = () => (
   <div className="flex min-h-[26rem] flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm text-[var(--ds-gray-500)] dark:border-white/10">
     <Loader2
@@ -42,17 +53,22 @@ const SqlChallengeCard = dynamic(() => import("../SqlChallengeCard"), {
   ssr: false,
   loading: CardLoading,
 });
+const MdxCodeBlock = dynamic(() => import("../MdxCodeBlock"), {
+  ssr: false,
+  loading: CardLoading,
+});
 const MultipleChoiceQuestion = dynamic(
   () => import("../multipleChoice/MultipleChoiceQuestion"),
   { ssr: false, loading: CardLoading },
 );
 
-type TabId = "code" | "sql" | "mcq";
+type TabId = "code" | "sql" | "web" | "mcq";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "code", label: "Code Challenge" },
-  { id: "sql", label: "SQL Challenge" },
-  { id: "mcq", label: "Multiple Choice Questions" },
+const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
+  { id: "code", label: "Programming", icon: Code2 },
+  { id: "sql", label: "SQL", icon: Database },
+  { id: "web", label: "Web", icon: Globe },
+  { id: "mcq", label: "Multiple Choice", icon: ListChecks },
 ];
 
 function OptionIcon({ id }: { id: string }) {
@@ -92,7 +108,7 @@ function PickerSelect({
       >
         {/* Magic UI ShimmerButton as the select trigger. The background tracks
             the page surface (--color-fd-background: white in light, #121212 in
-            dark — see app/home.css) so the trigger reads as part of the page
+            dark, see app/home.css) so the trigger reads as part of the page
             rather than a floating dark pill; text/border/chevron flip per theme
             so they stay legible on either surface, with the blue shimmer as the
             accent edge. */}
@@ -107,7 +123,7 @@ function PickerSelect({
               className="min-w-40 justify-between gap-2 border-[color:var(--ds-gray-200)] px-3.5 py-1.5 text-sm font-medium text-[color:var(--ds-gray-900)] focus-visible:outline-none dark:border-white/10 dark:text-white"
             >
               {active && <OptionIcon id={active.iconId} />}
-              {/* Render the label explicitly — a bare <Select.Value/> shows the
+              {/* Render the label explicitly, a bare <Select.Value/> shows the
                   raw (lowercased) value instead of the option's label. */}
               <Select.Value className="flex-1 truncate text-left">
                 {active?.label ?? value}
@@ -143,10 +159,17 @@ function PickerSelect({
   );
 }
 
+/** Centered row wrapper for a panel's picker / control strip. `z-20` lifts
+ *  it above the RippleFrame's ripple (a later sibling that would otherwise
+ *  paint its rings over these opaque controls). */
+function ControlRow({ children }: { children: React.ReactNode }) {
+  return <div className="relative z-20 flex justify-center">{children}</div>;
+}
+
 /**
  * Wraps a preview card with a Magic UI Ripple that is centered on the card
  * (both axes) and sized from the card's shorter edge, so its largest circle
- * reaches a bit beyond that edge — a soft halo rather than a ring
+ * reaches a bit beyond that edge, a soft halo rather than a ring
  * spanning the whole card. The card renders on top (opaque), so the rings read
  * as a halo around it. The ripple re-sizes itself as the card's measured box
  * changes (e.g. when the runtime loads or the viewport resizes).
@@ -165,7 +188,7 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect();
   }, []);
 
-  // Size the ripple from the card's SHORTER edge so it stays subtle — the
+  // Size the ripple from the card's SHORTER edge so it stays subtle, the
   // largest circle reaches a bit beyond that edge for a soft halo without
   // spreading the full width of the card. Fall back to a sensible size
   // until the card is measured.
@@ -178,14 +201,14 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
   return (
     <div ref={ref} className="relative">
       {/* Box is the size of the largest circle, centered on the card. No
-          overflow clip — the rings are meant to spill slightly past the card;
+          overflow clip, the rings are meant to spill slightly past the card;
           the page itself is kept from widening by <main>'s overflow-x-clip. */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
         style={{ width: maxCircle, height: maxCircle }}
       >
         {/* No mask: the Ripple ships a built-in solid→transparent fade that
-            would hide the rings — drop it so the ripple stays fully visible.
+            would hide the rings, drop it so the ripple stays fully visible.
             The rings fade naturally via their own decreasing opacity. */}
         <Ripple
           className="[mask-image:none]"
@@ -205,17 +228,19 @@ function CodeChallengePanel() {
   const challenge =
     CODE_CHALLENGES.find((c) => c.adapter === adapterId) ?? CODE_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-2">
-      <PickerSelect
-        label="Language"
-        value={adapterId}
-        onValueChange={setAdapterId}
-        options={CODE_CHALLENGES.map((c: HomeCodeChallenge) => ({
-          value: c.adapter,
-          label: c.label,
-          iconId: c.adapter,
-        }))}
-      />
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Language"
+          value={adapterId}
+          onValueChange={setAdapterId}
+          options={CODE_CHALLENGES.map((c: HomeCodeChallenge) => ({
+            value: c.adapter,
+            label: c.label,
+            iconId: c.adapter,
+          }))}
+        />
+      </ControlRow>
       <RippleFrame>
         <MdxChallengeCard
           key={challenge.adapter}
@@ -236,17 +261,19 @@ function SqlChallengePanel() {
   const challenge =
     SQL_CHALLENGES.find((c) => c.dialect === dialect) ?? SQL_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-2">
-      <PickerSelect
-        label="Dialect"
-        value={dialect}
-        onValueChange={setDialect}
-        options={SQL_CHALLENGES.map((c: HomeSqlChallenge) => ({
-          value: c.dialect,
-          label: c.label,
-          iconId: c.dialect,
-        }))}
-      />
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Dialect"
+          value={dialect}
+          onValueChange={setDialect}
+          options={SQL_CHALLENGES.map((c: HomeSqlChallenge) => ({
+            value: c.dialect,
+            label: c.label,
+            iconId: c.dialect,
+          }))}
+        />
+      </ControlRow>
       <RippleFrame>
         <SqlChallengeCard
           key={challenge.dialect}
@@ -264,15 +291,89 @@ function SqlChallengePanel() {
   );
 }
 
+function WebPanel() {
+  const [flavor, setFlavor] = useState<string>("web");
+  const block =
+    WEB_CODE_BLOCKS.find((b) => b.flavor === flavor) ?? WEB_CODE_BLOCKS[0];
+  return (
+    <div className="flex flex-col gap-4">
+      <ControlRow>
+        <PickerSelect
+          label="Flavor"
+          value={flavor}
+          onValueChange={setFlavor}
+          options={WEB_CODE_BLOCKS.map((b: HomeWebBlock) => ({
+            value: b.flavor,
+            label: b.label,
+            iconId: b.adapter,
+          }))}
+        />
+      </ControlRow>
+      <RippleFrame>
+        <MdxCodeBlock
+          key={block.flavor}
+          adapter={block.adapter}
+          files={block.files}
+          entryFilename={block.entryFilename}
+          tailwind={block.tailwind}
+        />
+      </RippleFrame>
+    </div>
+  );
+}
+
+function McqPanel() {
+  const [index, setIndex] = useState(0);
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Numbered button group (shadcn) to pick which question to try. */}
+      <ControlRow>
+        <ButtonGroup aria-label="Choose a question">
+          {CONCEPT_QUESTIONS.map((_, i) => {
+            const active = i === index;
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Question ${i + 1}`}
+                aria-pressed={active}
+                onClick={() => setIndex(i)}
+                className={
+                  active
+                    ? "relative z-10 inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-blue-500)] bg-[var(--ds-blue-500)] text-sm font-semibold text-white"
+                    : "inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                }
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+        </ButtonGroup>
+      </ControlRow>
+      <RippleFrame>
+        <MultipleChoiceQuestion
+          key={index}
+          markdown={CONCEPT_QUESTIONS[index]}
+          badge="Concept Check"
+        />
+      </RippleFrame>
+    </div>
+  );
+}
+
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
 
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Tab bar */}
-      <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      {/* Tab bar. Bottom margin gives the active-item underline room while
+          keeping the pickers close below; a roomier row gap keeps the tabs
+          from crowding when they wrap onto multiple lines on narrow screens;
+          and desktop gets wider horizontal spacing between items. */}
+      <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-5 sm:gap-x-12">
         {TABS.map((t) => {
           const active = t.id === tab;
+          const Icon = t.icon;
           return (
             <button
               key={t.id}
@@ -280,13 +381,17 @@ export function HeroInteractive() {
               onClick={() => setTab(t.id)}
               className={
                 active
-                  ? "relative text-base font-semibold text-[var(--ds-gray-900)] dark:text-white"
-                  : "relative text-base font-medium text-[var(--ds-gray-500)] transition-colors hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
+                  ? "relative inline-flex items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] dark:text-white"
+                  : "relative inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-colors hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
               }
             >
+              <Icon size={16} aria-hidden="true" />
               {t.label}
+              {/* Active-item underline (a short bar in the label's own
+                  colour), desktop only (on mobile the bold, darker label
+                  already marks the active tab). */}
               {active && (
-                <span className="absolute -bottom-2 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-[var(--ds-blue-500)]" />
+                <span className="absolute -bottom-2 left-1/2 hidden h-0.5 w-5 -translate-x-1/2 rounded-full bg-current sm:block" />
               )}
             </button>
           );
@@ -299,14 +404,8 @@ export function HeroInteractive() {
       <div>
         {tab === "code" && <CodeChallengePanel />}
         {tab === "sql" && <SqlChallengePanel />}
-        {tab === "mcq" && (
-          <RippleFrame>
-            <MultipleChoiceQuestion
-              markdown={CONCEPT_QUESTION}
-              badge="Concept Check"
-            />
-          </RippleFrame>
-        )}
+        {tab === "web" && <WebPanel />}
+        {tab === "mcq" && <McqPanel />}
       </div>
     </div>
   );

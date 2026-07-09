@@ -1,5 +1,5 @@
 /**
- * Schema introspection for the inline SQL surfaces — verifies the SQL
+ * Schema introspection for the inline SQL surfaces, verifies the SQL
  * result rows are mapped into both completion schema shapes, and that
  * failures degrade to the empty schema instead of throwing.
  */

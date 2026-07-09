@@ -24,7 +24,7 @@ export const useSettingsStore = create<SqlSettingsState>((set) => ({
   outputFontSize: 13,
   editorTheme: DEFAULT_PLAYGROUND_SETTINGS.editorTheme,
   wordWrap: true,
-  clearBeforeRun: false,
+  clearBeforeRun: DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun,
   setFontSize: (fontSize) => set({ fontSize }),
   setOutputFontSizeEnabled: (outputFontSizeEnabled) =>
     set({ outputFontSizeEnabled }),

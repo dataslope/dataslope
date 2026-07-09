@@ -28,7 +28,7 @@ import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
 
 // ────────────────────────────────────────────────────────────────────────────
-// Contexts — table action callbacks + node selection state
+// Contexts, table action callbacks + node selection state
 // ────────────────────────────────────────────────────────────────────────────
 
 interface ErTableActions {
@@ -282,7 +282,7 @@ function ErTableNode({ data }: NodeProps) {
             >
               <div className="ex-title">Copy Name</div>
             </ContextMenu.Item>
-            {/* Export submenu — opens to the side showing all 4 formats */}
+            {/* Export submenu, opens to the side showing all 4 formats */}
             <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
               <Menu.Trigger
                 className="example-item ctx-export-trigger ctx-export-trigger-bordered"
@@ -391,7 +391,7 @@ function ErTableNode({ data }: NodeProps) {
 const nodeTypes: NodeTypes = { erTable: ErTableNode };
 
 // ────────────────────────────────────────────────────────────────────────────
-// Custom ELK edge — renders bend-point paths produced by the ELK router.
+// Custom ELK edge, renders bend-point paths produced by the ELK router.
 // When a table is selected, connected edges are highlighted and animated;
 // unconnected edges are shown in a low-saturation subtle color.
 // ────────────────────────────────────────────────────────────────────────────
@@ -476,7 +476,7 @@ const elk = new ELK();
 // Helpers
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Unique ELK port id — encodes table + column + side. */
+/** Unique ELK port id, encodes table + column + side. */
 function elkPortId(
   tableName: string,
   colName: string,
@@ -686,7 +686,7 @@ export interface ErDiagramPaneProps {
   columnsByEntity: Record<string, TableColumnInfo[]>;
   foreignKeysByEntity: Record<string, ForeignKeyInfo[]>;
   isDark?: boolean;
-  // Context-menu callbacks — same actions as the .sql-tree sidebar.
+  // Context-menu callbacks, same actions as the .sql-tree sidebar.
   // All are optional; if none are provided the context menu is omitted.
   onPreview?: (name: string, kind: "table" | "view") => void;
   onModifyStructure?: (name: string) => void;
@@ -719,7 +719,7 @@ export function ErDiagramPane({
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
-  // Four-phase overlay lifecycle — mirrors the pyodide-style fade used by
+  // Four-phase overlay lifecycle, mirrors the pyodide-style fade used by
   // the R / Python playgrounds:
   //   "covering"    ELK still computing; opaque background hides the empty
   //                 ReactFlow canvas.
@@ -839,7 +839,7 @@ export function ErDiagramPane({
         columnsByEntity,
         foreignKeysByEntity,
       );
-      if (cancelled || layoutGen.current !== gen) return; // stale — discard
+      if (cancelled || layoutGen.current !== gen) return; // stale, discard
       setNodes(n);
       setEdges(e);
       finishLoading(true);

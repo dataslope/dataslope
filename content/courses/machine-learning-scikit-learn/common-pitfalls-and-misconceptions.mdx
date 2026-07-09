@@ -1,6 +1,6 @@
 ---
 title: Common Pitfalls and Misconceptions
-description: A field guide to the mistakes that quietly sink machine learning projects — what the trap is, why it fools smart people, and exactly how to avoid it.
+description: A field guide to the mistakes that quietly sink machine learning projects, what the trap is, why it fools smart people, and exactly how to avoid it.
 ---
 
 Most machine learning failures are not exotic. They are the same handful of
@@ -12,13 +12,13 @@ dangerous. A model that crashes is annoying but honest. A model that scores
 
 This page is a catalog of those traps. For each one: **what the trap is**,
 **why it fools people**, and **the fix**. Read it once now, then come back
-to it whenever a result looks too good to be true — because that feeling is
+to it whenever a result looks too good to be true, because that feeling is
 usually right.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue training card and a green test card sit on either side of a solid wall, but one green test dot has slipped onto the training side and sits circled in red — leakage smuggles test information into training"
+  aria-label="A blue training card and a green test card sit on either side of a solid wall, but one green test dot has slipped onto the training side and sits circled in red, leakage smuggles test information into training"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -59,7 +59,7 @@ know. The two most common forms are *preprocessing before the split* and
 *target leakage*.
 
 **Why it fools people.** Leakage produces spectacular validation and even
-test scores — that is its signature. Everything looks like a triumph. The
+test scores, that is its signature. Everything looks like a triumph. The
 model only fails once it meets genuinely new data, often in production,
 where the leaked information is gone. By then the damage is done.
 
@@ -112,12 +112,12 @@ print("(imputation, target encoding) the gap can be enormous.")
 
 **Target leakage** is the nastier cousin: a *feature* secretly encodes the
 answer. A model predicting whether a patient has a disease, fed a column
-like `was_prescribed_the_disease_drug`, will look perfect — it is reading
+like `was_prescribed_the_disease_drug`, will look perfect, it is reading
 the diagnosis, not predicting it. The feature is a *consequence* of the
 target, not a legitimate cause available beforehand.
 
 **The fix.** Split **first**, and fit every learned transformation (scaling,
-imputing, encoding, feature selection) on the training set only — which a
+imputing, encoding, feature selection) on the training set only, which a
 `Pipeline` makes automatic. For target leakage, ask of every feature: *would
 I actually have this value, with this meaning, at the moment I need to
 predict?* If not, drop it.
@@ -178,14 +178,14 @@ red flag, never a trophy.
 ## (c) Ignoring class imbalance
 
 **The trap.** On a dataset where one class is rare, you celebrate a high
-accuracy while the model quietly ignores the rare class entirely — which is
+accuracy while the model quietly ignores the rare class entirely, which is
 often the *only* class you care about.
 
 **Why it fools people.** Accuracy is intuitive and usually trustworthy, so
 people reach for it reflexively. But when most cases share one label, a model
-that *always* predicts that majority label — learning nothing — scores high
+that *always* predicts that majority label, learning nothing, scores high
 accuracy by default. Real lending data makes the trap concrete: most loans are
-repaid, so defaults are the rare class — and the only class a lender truly
+repaid, so defaults are the rare class, and the only class a lender truly
 cares about catching.
 
 <CodeBlock
@@ -240,31 +240,31 @@ the confusion matrix instead.
 **The trap.** Optimizing one number to the exclusion of everything else, and
 losing sight of what the number leaves out.
 
-**Why it fools people.** A single metric is comforting — it makes "better"
+**Why it fools people.** A single metric is comforting, it makes "better"
 unambiguous and progress measurable. But every metric is a lossy summary.
 Maximize precision alone and you may tank recall (catch only the easy,
 obvious cases). Maximize accuracy and you may trample the rare class.
-Optimize a proxy hard enough and it stops reflecting the real goal — the
+Optimize a proxy hard enough and it stops reflecting the real goal, the
 metric becomes a target and ceases to be a good measure.
 
 **The fix.** Choose your metric to match the *real cost structure* of the
 problem, and watch a small basket of metrics, not one. A missed fraud and a
-false fraud alert cost very different amounts; let that asymmetry — not
-convenience — pick your metric. When two metrics trade off (precision vs.
+false fraud alert cost very different amounts; let that asymmetry, not
+convenience, pick your metric. When two metrics trade off (precision vs.
 recall), decide the balance you actually want *before* you optimize.
 
 <Callout type="tip" title="The metric must encode what you actually care about">
 Before optimizing anything, ask: what does a mistake *cost*, and are all
 mistakes equal? If a false negative is ten times worse than a false
-positive, accuracy — which treats them the same — is the wrong target.
+positive, accuracy, which treats them the same, is the wrong target.
 Pick the metric that mirrors real-world costs, then keep an eye on the
 others it ignores.
 </Callout>
 
 ## (e) Not setting random seeds
 
-**The trap.** Leaving the random pieces of your workflow — the split, a
-forest's bootstrap sampling, a `KMeans` initialization — unseeded, so every
+**The trap.** Leaving the random pieces of your workflow, the split, a
+forest's bootstrap sampling, a `KMeans` initialization, unseeded, so every
 run gives different numbers.
 
 **Why it fools people.** It rarely causes an obvious error, just a slow
@@ -305,12 +305,12 @@ print("Which one do you report? With a fixed random_state, there is one answer."
 **The fix.** Set `random_state` (and `np.random.seed` where relevant) on
 every component that has one: the split, the model, the search. Reproducible
 results are the bedrock of honest comparison and of anyone being able to
-reproduce your work — including future you.
+reproduce your work, including future you.
 
 ## (f) Tuning against the test set / repeated peeking
 
-**The trap.** Using the test score to guide your choices — picking a model,
-a threshold, a hyperparameter, or just deciding when to stop — and then
+**The trap.** Using the test score to guide your choices, picking a model,
+a threshold, a hyperparameter, or just deciding when to stop, and then
 reporting that same test score as if it were untouched.
 
 **Why it fools people.** Each individual peek feels harmless: "I just
@@ -322,12 +322,12 @@ final number becomes an optimistic fiction, and you cannot feel it happening.
 **The fix.** Make *all* decisions with cross-validation or a separate
 validation set. The test set is unlocked exactly **once**, at the very end,
 after everything is frozen. If you truly need another round of experiments
-after looking, you need fresh data — the spent test set cannot be reused
+after looking, you need fresh data, the spent test set cannot be reused
 honestly. This is the same discipline as the practical-workflow chapter,
 restated because it is violated so often.
 
 <Callout type="danger" title="Repeated peeking is slow-motion leakage">
-You do not need to train on the test set to ruin it — you only need to keep
+You do not need to train on the test set to ruin it, you only need to keep
 *consulting* it. Every model you keep because it beat the others on the test
 set has been selected using the test set. Decide with validation data; spend
 the test set once.
@@ -339,7 +339,7 @@ the test set once.
 range of anything it was trained on.
 
 **Why it fools people.** A model that is accurate *within* its training
-range feels trustworthy everywhere — but it has only ever seen a slice of
+range feels trustworthy everywhere, but it has only ever seen a slice of
 reality. Outside that slice, it is guessing, and different model types guess
 in wildly different (and sometimes absurd) ways. A linear model marches its
 straight line off to infinity; a tree-based model goes *flat*, predicting a
@@ -384,7 +384,7 @@ print(
 
 The forest's two predictions are *identical* and stuck far below the true
 price: a tree-based model predicts by averaging training targets, so once you
-leave the range it saw, it just returns a constant near the edge — it cannot
+leave the range it saw, it just returns a constant near the edge, it cannot
 invent a value larger than anything in its training set. The linear model at
 least keeps climbing, but it is extrapolating a straight line you would have
 no reason to trust outside the data. **The fix:** know your training range, be
@@ -403,7 +403,7 @@ because both share a hidden common cause. The model exploits the association
 happily; it says nothing about what would happen if you *intervened*.
 
 A model might find ice-cream sales a strong predictor of drownings. Banning
-ice cream will not save a single swimmer — hot weather drives both. **The
+ice cream will not save a single swimmer, hot weather drives both. **The
 fix:** keep prediction and causation in separate mental boxes. A model
 answers "given what I observe, what is likely?" To answer "what should we
 *change*?" you need a controlled experiment or careful causal reasoning, not
@@ -426,7 +426,7 @@ sense. But more *features* can absolutely hurt: irrelevant ones add noise
 the model can overfit to, correlated ones muddle interpretation, and a
 high-cardinality junk column can even mislead importance measures. More
 features also means more chances for one of them to be a leak. And more
-*data* helps most when it is *relevant and representative* — a million more
+*data* helps most when it is *relevant and representative*, a million more
 rows of the same narrow situation will not teach a model about situations it
 still has never seen.
 
@@ -469,14 +469,14 @@ print("More columns made the model WORSE -- the noise drowned the signal.")
 />
 
 **The fix:** prefer features with a plausible connection to the target, and
-let evidence — cross-validation, importance, domain knowledge — decide what
+let evidence, cross-validation, importance, domain knowledge, decide what
 stays. Quality and relevance beat raw quantity. When you do want more data,
 seek data that covers *new* situations, not just more of the same.
 
 <Callout type="info" title="The pattern behind every pitfall">
 Look back and you will see one theme. Almost every trap on this page is a
 way of **fooling yourself about what your model has truly seen and truly
-learned** — leaking the test set, scoring on memorized data, hiding behind a
+learned**, leaking the test set, scoring on memorized data, hiding behind a
 flattering metric, mistaking memory for skill. The cure is always the same
 posture: relentless honesty about what is held out, what is measured, and
 what the number really means.
@@ -491,7 +491,7 @@ system praised for 99.9% accuracy that never caught a single fraud, because
 fraud was 0.1% of cases. A business "insight" that changing a predictive
 feature would move an outcome, acted on at great cost, when the feature was
 a mere symptom. Google Flu Trends, launched in 2008, famously over-predicted
-flu cases for years as the patterns it had latched onto drifted — a 2014
+flu cases for years as the patterns it had latched onto drifted, a 2014
 *Science* paper dubbed it "the parable of Google Flu." Every one was
 preventable by a habit on this page. Learning to *expect* these traps is a
 large part of what separates a practitioner who can be trusted from one who
@@ -518,7 +518,7 @@ the right way.
    \`cross_val_score(...).mean()\`).
 
 By scaling **inside** the pipeline, each fold is scaled using only its own
-training portion — no leakage. The tests check that \`pipe\` is a
+training portion, no leakage. The tests check that \`pipe\` is a
 proper two-step pipeline (so scaling happens inside cross-validation) and
 that \`correct_cv\` is a believable accuracy.`}
   files={[
@@ -597,7 +597,7 @@ is already fitted for you as \`model\`, and its predictions are in
 2. Compute the **recall on defaults** (the \`True\` class) and store it in
    \`rare_recall\` (use \`recall_score(y, pred, pos_label=True)\`).
 
-You should find a respectable \`acc\` next to a \`rare_recall\` of 0.0 — the
+You should find a respectable \`acc\` next to a \`rare_recall\` of 0.0, the
 model looks fine on accuracy yet catches none of the loans that lose money.
 The tests check that \`acc\` is high (above 0.75) while \`rare_recall\` is
 exactly 0.0, demonstrating the trap.`}
@@ -671,7 +671,7 @@ Fitting any learned transformation must happen on the training data only, which 
 <MultipleChoice
   markdown={`A model scores 1.000 accuracy on the data it was trained on. What is the right reaction?
 
-- Celebrate — the model is perfect and ready to deploy
+- Celebrate, the model is perfect and ready to deploy
   > A perfect training score reflects memorization, not generalization, and says nothing about performance on new data.
 - [o] Treat it as a red flag and check performance on held-out data, since a perfect training score usually signals memorization
   > A flexible model can memorize its training rows, so a perfect training score is a warning to evaluate on data the model never saw.
@@ -761,7 +761,7 @@ Prediction reflects association; only an experiment or careful causal reasoning 
 <MultipleChoice
   markdown={`When is adding more **features** likely to *hurt* a model rather than help it?
 
-- Never — additional features can only add information and improve a model
+- Never, additional features can only add information and improve a model
   > Irrelevant or redundant features add noise the model can overfit and can even mislead importance measures, so more features can certainly hurt.
 - Only when the features are perfectly correlated with the target
   > Features correlated with the target are useful; the harm comes from *irrelevant* or noisy features, not from informative ones.

@@ -21,7 +21,7 @@ export interface AllowList {
 /**
  * Compiles a wildcard origin entry into an anchored RegExp.
  *
- * A `*` matches one or more characters *within a single hostname label* —
+ * A `*` matches one or more characters *within a single hostname label*,
  * i.e. it never matches a `.` (a label separator) or `/` (a path separator).
  * That keeps a pattern like `https://dataslope-*.vercel.app` scoped to the
  * intended host: it can match `dataslope-abc123.vercel.app` but never

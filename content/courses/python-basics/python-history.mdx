@@ -3,7 +3,7 @@ title: "Interesting discussions: The Story of Python"
 description: An optional deep-dive into where Python came from, why it makes whitespace matter, and the debates that shaped it
 ---
 
-You have finished the working parts of the course — you can write functions,
+You have finished the working parts of the course, you can write functions,
 build classes, and reason about scope and generators. This page is different.
 It is optional, and there is no code to run and no challenge to pass. It is here
 for the curious reader who, having learned *how* Python works, now wants the
@@ -15,7 +15,7 @@ you know them, the language stops feeling arbitrary.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Along one thin timeline, a tiny blue dot grows into a green dot, then a yellow disc, and finally a large haloed blue circle — a holiday hobby project growing into Python"
+  aria-label="Along one thin timeline, a tiny blue dot grows into a green dot, then a yellow disc, and finally a large haloed blue circle, a holiday hobby project growing into Python"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="80" y1="110" x2="560" y2="110" stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" />
@@ -39,8 +39,8 @@ you know them, the language stops feeling arbitrary.
 <IllustrationPrompt subject="Guido van Rossum" photo />
 
 In late December 1989, a programmer named **Guido van Rossum** found himself
-with a quiet week. His office at CWI — the Centrum Wiskunde & Informatica, a
-national research institute in the Netherlands — was closed for the Christmas
+with a quiet week. His office at CWI, the Centrum Wiskunde & Informatica, a
+national research institute in the Netherlands, was closed for the Christmas
 holidays, and he was looking for a project to occupy the time. He had recently
 worked on a teaching language called **ABC**, and while he admired its ideas, he
 had a long list of things he would have done differently. So over that holiday
@@ -56,7 +56,7 @@ itself is a comedy reference, not a reptile one.
 
 The first public release, **Python 0.9.0**, went out to the `alt.sources`
 Usenet newsgroup in **February 1991**. It already had functions, exceptions, and
-the core data types — lists, dictionaries, strings — that you have spent this
+the core data types, lists, dictionaries, strings, that you have spent this
 course learning. The language has grown enormously since, but its character was
 set in that first holiday.
 
@@ -76,20 +76,20 @@ timeline
 ## The most divisive decision: whitespace as syntax
 
 By the time Python appeared, nearly every mainstream language marked blocks of
-code with explicit delimiters — curly braces `{ ... }` in C, JavaScript, and
+code with explicit delimiters, curly braces `{ ... }` in C, JavaScript, and
 Java, or keywords like `begin ... end` in Pascal. Guido made a different choice,
 and it is the one that still defines how Python *looks*: blocks are marked by
 **indentation itself**.
 
 His reasoning was almost mischievously simple. Programmers already indent their
 code to show structure to other humans. The indentation is right there, doing
-its job for the reader — so why should the compiler ignore it and demand a
+its job for the reader, so why should the compiler ignore it and demand a
 *second*, redundant set of braces? Let the indentation be the structure. The
 consequence is that badly indented Python does not merely look messy; it refuses
 to run. There is no "silently wrong" indentation, and there is no decades-long
 argument about whether the opening brace goes on the same line or the next.
 
-People feel strongly about this in both directions. Some find it liberating —
+People feel strongly about this in both directions. Some find it liberating,
 one whole category of style bikeshedding simply vanishes. Others miss the
 explicit delimiters of C-like languages and find the reliance on invisible
 characters unnerving. Either way, it is non-negotiable in Python, and it is the
@@ -101,7 +101,7 @@ language.
 Significant whitespace had a side effect Guido may not have fully anticipated:
 it took an old, low-grade argument and poured gasoline on it. If whitespace is
 *syntax*, then the choice between indenting with **tab characters** and
-indenting with **spaces** is no longer purely cosmetic — it can change whether a
+indenting with **spaces** is no longer purely cosmetic, it can change whether a
 program even parses.
 
 The debate itself is older than Python, older than programming; it goes back to
@@ -109,7 +109,7 @@ typewriters and word processors, where a "tab" was a physical jump to the next
 stop. In code, each side has a genuine point:
 
 - **The case for tabs.** A tab is one character that each developer can *display*
-  at whatever width they like — two spaces to fit more on screen, eight for
+  at whatever width they like, two spaces to fit more on screen, eight for
   easier reading. That flexibility is a real accessibility win: a developer with
   low vision can widen the indentation without touching the file. With spaces,
   everyone is locked to the same visual width.
@@ -128,7 +128,7 @@ block and you get a hard `TabError`, where Python 2 would silently guess.
 The tabs-versus-spaces argument is well-known enough that the HBO comedy
 *Silicon Valley* built an entire relationship-ending fight around it: a
 character cannot abide his partner using spaces. It is played for laughs, but
-the writers were drawing on something real — this genuinely is the kind of thing
+the writers were drawing on something real, this genuinely is the kind of thing
 that can stall a code review. The lesson is the lesson of the Zen of Python:
 pick the obvious convention (four spaces) and spend your energy on the actual
 problem.
@@ -141,7 +141,7 @@ worked on before it. ABC was designed to be learnable, readable, and forgiving,
 and Python inherited those instincts. They were eventually distilled into *The
 Zen of Python* (PEP 20), the 19 aphorisms by **Tim Peters** that you can still
 print by running `import this`. Lines like "Readability counts" and "There
-should be one — and preferably only one — obvious way to do it" are not
+should be one, and preferably only one, obvious way to do it" are not
 decoration; they are the criteria by which Python features are accepted or
 rejected to this day.
 
@@ -154,7 +154,7 @@ long-standing warts all at once. The most visible changes:
 
 - `print` became a *function*: `print("hi")`, where Python 2 wrote `print "hi"`
   as a statement.
-- All strings became Unicode by default, with `bytes` as a separate type — a
+- All strings became Unicode by default, with `bytes` as a separate type, a
   genuine relief for anyone who had ever wrangled non-English text.
 - Integer division split in two: `/` always returns a float, and `//` does floor
   division. In Python 2, `5 / 2` quietly gave `2`.
@@ -172,7 +172,7 @@ Python 3.
 ## From BDFL to Steering Council
 
 For most of its life, Python had an unusual form of government. Guido held the
-half-joking title of **BDFL** — Benevolent Dictator For Life — meaning that on
+half-joking title of **BDFL**, Benevolent Dictator For Life, meaning that on
 the rare occasions the community could not reach consensus, he made the final
 call. It worked for nearly three decades.
 
@@ -183,7 +183,7 @@ a divided community was part of what led Guido to **step down as BDFL in July
 2018**. In his place the community designed a new governance model: an elected
 five-person **Steering Council**, chosen annually by the core developers, which
 now makes the final decisions on Python Enhancement Proposals. Python had grown
-too large for a single benevolent dictator — a sign of success more than
+too large for a single benevolent dictator, a sign of success more than
 failure.
 
 ## CPython and its cousins
@@ -196,13 +196,13 @@ course. But it is not the only one:
 - **Jython** runs on the Java Virtual Machine and can call Java libraries.
 - **IronPython** targets the .NET runtime.
 - **MicroPython** is a slim build for microcontrollers with kilobytes of memory.
-- **WebAssembly builds** let CPython run directly inside a web browser — which is
+- **WebAssembly builds** let CPython run directly inside a web browser, which is
   precisely how every code block in this course executes, with no install at all.
 
 ## The GIL: Python's longest-running debate
 
 Finally, the design argument that has outlasted all the others. CPython has a
-**Global Interpreter Lock**, the GIL — a single lock that ensures only one
+**Global Interpreter Lock**, the GIL, a single lock that ensures only one
 thread runs Python bytecode at a time. The GIL makes CPython's memory management
 simpler and single-threaded code faster, and for I/O-bound work (waiting on a
 network or a disk) it rarely matters. But it has one famous consequence: spinning
@@ -214,7 +214,7 @@ serious attempt traded away single-threaded speed, and so was rejected. The most
 promising effort yet, led by **Sam Gross**, finally shipped as an experimental
 **free-threaded build** in Python 3.13 (PEP 703). It is opt-in and still
 maturing, but for the first time true multi-core Python looks plausible. It is a
-space worth watching — and a fitting note to end on, because it shows that even
+space worth watching, and a fitting note to end on, because it shows that even
 after 35 years, the most fundamental questions about Python are still being
 worked out in the open.
 
@@ -252,7 +252,7 @@ worked out in the open.
 - It encrypts Python bytecode to prevent reverse engineering
   > The GIL has nothing to do with security or encryption.
 - [o] It allows only one thread to execute Python bytecode at a time
-  > This is why threads do not speed up CPU-bound Python — and why removing the GIL has been debated for years.
+  > This is why threads do not speed up CPU-bound Python, and why removing the GIL has been debated for years.
 - It locks the global namespace so variables cannot be reassigned
   > The GIL is about threads and bytecode execution, not variable assignment.
 - It compiles Python to a single global executable

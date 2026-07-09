@@ -1,9 +1,9 @@
 ---
-title: Challenge Cards — PostgreSQL
+title: "Challenge Cards: PostgreSQL"
 description: Sandbox for `<SqlChallengeCard dialect="postgres">` variations.
 ---
 
-PostgreSQL challenges run via **PGlite** — a full PostgreSQL instance
+PostgreSQL challenges run via **PGlite**, a full PostgreSQL instance
 compiled to WebAssembly that boots entirely in your browser.
 
 ## 1. JOIN basics
@@ -322,7 +322,7 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
 ## 4. Large result sets (infinite scroll)
 
 The result pane virtualises its rows so a `SELECT *` against a 10k-row
-table stays responsive — only the rows actually inside the viewport
+table stays responsive, only the rows actually inside the viewport
 are rendered. The **Tables** viewer above the editor pages its rows
 in on scroll (infinite scroll) rather than loading all 10,000 up front.
 
@@ -416,11 +416,11 @@ ORDER BY
 />
 ```
 
-## 5. Remote dataset — Northwind from GitHub
+## 5. Remote dataset, Northwind from GitHub
 
 `remoteInitSql` clones a complete sample database from the
 [dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
-before the first run — here the classic **Northwind** store (the
+before the first run, here the classic **Northwind** store (the
 Postgres port, snake_case names). The script is fetched from
 raw.githubusercontent.com and prepared for PGlite (psql meta-commands
 and `CREATE DATABASE` lines are stripped); `initSql` (when present)
@@ -429,7 +429,7 @@ still runs afterwards for challenge-specific extras.
 <SqlChallengeCard
   dialect="postgres"
   title="Five most expensive products"
-  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products — columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products, columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
   remoteInitSql="postgres/northwind_postgres.sql"
   tables={["products", "categories", "suppliers"]}
   starterCode={`-- Your query here:
@@ -473,7 +473,7 @@ LIMIT
 <SqlChallengeCard
   dialect="postgres"
   title="Five most expensive products"
-  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products — columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products, columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
   remoteInitSql="postgres/northwind_postgres.sql"
   tables={["products", "categories", "suppliers"]}
   starterCode={`-- Your query here:

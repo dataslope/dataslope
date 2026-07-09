@@ -1,12 +1,12 @@
 ---
 title: Sampling Distributions
-description: The distribution of a statistic over many repeated samples — the single most important and most-confused idea in inference. Carefully separating the population distribution, one sample's distribution, and the sampling distribution of a statistic.
+description: The distribution of a statistic over many repeated samples, the single most important and most-confused idea in inference. Carefully separating the population distribution, one sample's distribution, and the sampling distribution of a statistic.
 ---
 
 If there is one idea to truly *get* in this entire course, it is this
 one. Every confidence interval you'll ever build, every p-value you'll
 ever interpret, every "margin of error" you'll ever quote rests on a
-single concept: the **sampling distribution** — the distribution of a
+single concept: the **sampling distribution**, the distribution of a
 *statistic* (like x̄) computed over *many repeated samples*.
 
 It is also the most confused idea in statistics, because three different
@@ -19,7 +19,7 @@ until it's concrete.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Three stacked shapes share one yellow truth line: the population's wide hump, one sample's scruffy dots whose own blue mean tick lands slightly off the line, and at the bottom the slim green hump of the means themselves — the sampling distribution that inference actually lives on"
+  aria-label="Three stacked shapes share one yellow truth line: the population's wide hump, one sample's scruffy dots whose own blue mean tick lands slightly off the line, and at the bottom the slim green hump of the means themselves, the sampling distribution that inference actually lives on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -63,7 +63,7 @@ until it's concrete.
 
 ## The three distributions you must keep separate
 
-Here are the three. Read them slowly — the differences are the whole
+Here are the three. Read them slowly, the differences are the whole
 lesson.
 
 | Distribution | What spreads | Key fact |
@@ -78,18 +78,18 @@ lesson.
    fixed and usually unknown.
 2. **The distribution of one sample** is the spread of the raw values in
    the `n` data points you actually collected. It's a noisy snapshot of
-   the population distribution — same general shape, and it looks *more
+   the population distribution, same general shape, and it looks *more
    like* the population as `n` grows. This is what a histogram of your
    DataFrame shows.
 3. **The sampling distribution of a statistic** is something else
-   entirely. It is the distribution of *a single summary number* — say
-   the sample mean x̄ — computed over **many different samples**,
+   entirely. It is the distribution of *a single summary number*, say
+   the sample mean x̄, computed over **many different samples**,
    each of size `n`. It does **not** describe raw data at all. It
    describes how your *estimate* bounces around from sample to sample.
 
 <Callout type="danger" title="The confusion that breaks everything">
 (a) and (b) describe **individual data values**. (c) describes a
-**statistic** — one number per sample. A histogram of your 200 data
+**statistic**, one number per sample. A histogram of your 200 data
 points is **(b)**, not (c). To see (c), you'd have to collect 200 data
 points, compute their mean, then do that *again and again*, and histogram
 the resulting *means*. (b) and (c) have totally different widths: (c) is
@@ -99,7 +99,7 @@ the root of most misread confidence intervals.
 
 ## Building the sampling distribution by hand
 
-In real life you collect *one* sample, compute *one* mean, and stop — you
+In real life you collect *one* sample, compute *one* mean, and stop, you
 never see the sampling distribution directly. But in code we can do the
 impossible: draw thousands of samples from a known population and watch
 the sampling distribution materialize. This single simulation is the
@@ -167,20 +167,20 @@ Two facts jump out, and they are the two pillars of inference:
 
 - **The sampling distribution is centered on μ.** The mean of all the
   sample means lands right on the population mean. The sample mean is
-  *unbiased* — aimed at the truth.
+  *unbiased*, aimed at the truth.
 - **The sampling distribution is much narrower than the population.** Its
   spread (here ~3) is far smaller than σ (here 18). Averaging `n`
   values cancels out a lot of individual noise, so the *estimate* is much
   more stable than any single data point.
 
-That second spread — the standard deviation of the sampling distribution
-— is so important it gets its own name, the **standard error**, and its
+That second spread, the standard deviation of the sampling distribution,
+is so important it gets its own name, the **standard error**, and its
 own page (*Standard Error*).
 
 ## Comparing the three side by side
 
 Let's put all three distributions on screen at once so the difference in
-*width* is impossible to miss. Same population, same `n` — but three
+*width* is impossible to miss. Same population, same `n`, but three
 fundamentally different things.
 
 <CodeBlock
@@ -238,7 +238,7 @@ print(f"(c) sampling dist of x-bar  -> sd = {many_means.std():5.2f}  (FAR narrow
   ]}
 />
 
-Look at the widths. (a) and (b) are roughly the *same* width — because
+Look at the widths. (a) and (b) are roughly the *same* width, because
 (b) is just a small, noisy sample of (a), so its raw values spread out
 about as much as the population's. But (c) is *dramatically* narrower,
 hugging μ. The raw data spreads over tens of units; the *mean*
@@ -254,16 +254,16 @@ over the place.
 - [o] The distribution of one sample (a noisy snapshot of the population distribution)
   > Plotting the raw values of a single collected sample shows distribution (b): it mirrors the population's shape, complete with the skew and tail.
 - The population distribution exactly
-  > It *resembles* the population distribution but isn't exactly it — it's a finite, noisy sample. With only 100 points it will differ from the true population shape by chance.
+  > It *resembles* the population distribution but isn't exactly it, it's a finite, noisy sample. With only 100 points it will differ from the true population shape by chance.
 - The standard error distribution
   > "Standard error" is a single number (the sd of the sampling distribution), not a distribution of raw data values. A histogram of 100 raw times isn't this.
 
-A histogram of your collected data points is *one sample* — distribution (b) — no matter how many points it has.`}
+A histogram of your collected data points is *one sample*, distribution (b), no matter how many points it has.`}
 />
 
 ## Watch the spread shrink as n grows
 
-The center of the sampling distribution doesn't move with `n` — it sits
+The center of the sampling distribution doesn't move with `n`, it sits
 on μ regardless. What changes is the **spread**: bigger samples
 produce sample means that cluster more tightly around μ. Let's vary
 `n` and overlay the sampling distributions.
@@ -313,7 +313,7 @@ print("Notice: SD roughly HALVES when n goes up 4x (5->20, 20->80, 80->320).")
   ]}
 />
 
-Two things to internalize. First, **every** curve is centered on 50 —
+Two things to internalize. First, **every** curve is centered on 50,
 more data doesn't move the target, it sharpens your aim at it. Second,
 look at the printed standard deviations: each time `n` quadruples
 (5→20→80→320), the spread roughly *halves*. That's the `1/√n` law
@@ -324,12 +324,12 @@ The spread of the **sampling distribution** has very little to do with
 how spread out any *one* sample looks. A single sample of skewed,
 high-variance data still produces a *mean* that's quite stable across
 repeats. People glance at one wide histogram of raw data and conclude
-"my estimate must be very uncertain" — but the estimate's uncertainty is
+"my estimate must be very uncertain", but the estimate's uncertainty is
 governed by `σ / √n`, which shrinks fast. Wide data, narrow
 estimate.
 </Callout>
 
-## More samples vs. larger samples — a crucial difference
+## More samples vs. larger samples, a crucial difference
 
 Here's a subtle trap. There are two "more" levers in the simulation: the
 number of samples we draw (`n_samples`) and the size of each sample
@@ -339,7 +339,7 @@ classic error.
 - Drawing **more samples** just renders the sampling distribution more
   smoothly. It does **not** make the sampling distribution narrower, and
   it does **not** improve any single real-world estimate. In real life you
-  only ever get *one* sample anyway — the thousands of samples are a
+  only ever get *one* sample anyway, the thousands of samples are a
   simulation device.
 - Using a **larger sample size `n`** genuinely narrows the sampling
   distribution and makes each estimate more precise. This is the lever
@@ -379,8 +379,8 @@ print("  -> SD shrinks steadily. Larger n is what sharpens the estimate.")
 />
 
 The first block holds `n=40` and cranks the number of samples from 500 to
-32,000 — and the spread of the sampling distribution *barely moves*. The
-second block holds the number of samples and grows `n` — and the spread
+32,000, and the spread of the sampling distribution *barely moves*. The
+second block holds the number of samples and grows `n`, and the spread
 falls steadily. **Precision comes from bigger samples, not from more of
 them.** In the real world you get one sample; its size is the lever you
 actually control.
@@ -391,11 +391,11 @@ actually control.
 - Increase \`n_samples\` (draw 50,000 samples instead of 5,000)
   > Drawing more samples only renders the simulated sampling distribution more smoothly. It doesn't narrow it, and in real life you only ever collect one sample, so this changes nothing about real precision.
 - [o] Increase \`n\` (make each sample 4x larger)
-  > A larger sample size narrows the sampling distribution (its sd is $\\sigma/\\sqrt{n}$), so each individual estimate is more precise — the lever that genuinely improves real-world precision.
+  > A larger sample size narrows the sampling distribution (its sd is $\\sigma/\\sqrt{n}$), so each individual estimate is more precise, the lever that genuinely improves real-world precision.
 - Keep \`n\` the same but average the 5,000 sample means together
   > Averaging all 5,000 means is a simulation artifact you could never do with one real sample; it estimates $\\mu$ well only because you secretly collected $5000 \\times n$ data points.
 - Neither change affects precision; precision is fixed by the population
-  > Precision is not fixed by the population alone — it depends on $n$ through $\\sigma/\\sqrt{n}$. A larger sample demonstrably tightens the estimate.
+  > Precision is not fixed by the population alone, it depends on $n$ through $\\sigma/\\sqrt{n}$. A larger sample demonstrably tightens the estimate.
 
 The size of each sample drives precision; the number of samples is just how clearly you can *see* the sampling distribution in a simulation.`}
 />
@@ -412,7 +412,7 @@ number.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Three little sampling distributions side by side — a slim blue hump for the mean, a green hump for the median, and a yellow lopsided hump for the maximum leaning against its wall — every statistic you can compute has its own distribution across repeated samples"
+  aria-label="Three little sampling distributions side by side, a slim blue hump for the mean, a green hump for the median, and a yellow lopsided hump for the maximum leaning against its wall, every statistic you can compute has its own distribution across repeated samples"
   style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-300)">
@@ -484,7 +484,7 @@ Each statistic gets a different sampling distribution, with its own
 center, spread, and even shape. The mean's and median's are roughly
 bell-shaped; the maximum's is lopsided and lives way out in the right
 tail. The key takeaway: *sampling distribution* is not a fact about the
-mean specifically — it's a fact about **any** quantity you estimate from
+mean specifically, it's a fact about **any** quantity you estimate from
 a sample. That generality is what lets us attach uncertainty to medians,
 proportions, regression slopes, and more.
 
@@ -509,8 +509,8 @@ off that picture. We'll formalize the bell shape of the mean's version in
 1. Draw 3000 samples of size 50 (use \`rng.choice(population, size=n, replace=False)\`), computing the **mean** of each.
 2. Store the 3000 means in a NumPy array named \`means\`.
 3. Compute a dict \`summary\` with:
-   - \`"center"\` — the mean of \`means\` (a float)
-   - \`"spread"\` — the standard deviation of \`means\` (a float)
+   - \`"center"\`, the mean of \`means\` (a float)
+   - \`"spread"\`, the standard deviation of \`means\` (a float)
 
 The \`center\` should land very close to the population mean (~50), and the \`spread\` should be far **smaller** than the population's own standard deviation (~12).`}
   files={[
@@ -587,9 +587,9 @@ assert abs(summary["spread"] - float(np.std(means))) < 1e-9`,
 
 Produce a dict \`result\` with:
 
-- \`"sd_small"\` — sd of the 2000 sample means at \`n = 25\` (a float)
-- \`"sd_big"\` — sd of the 2000 sample means at \`n = 100\` (a float)
-- \`"ratio"\` — \`sd_small / sd_big\` (a float)
+- \`"sd_small"\`, sd of the 2000 sample means at \`n = 25\` (a float)
+- \`"sd_big"\`, sd of the 2000 sample means at \`n = 100\` (a float)
+- \`"ratio"\`, \`sd_small / sd_big\` (a float)
 
 Because \`n_big\` is **4x** \`n_small\`, the spread should roughly **halve**, so \`ratio\` should be near 2 (the $\\sqrt{4}=2$ rule). Tests allow a generous window around 2.`}
   files={[
@@ -666,7 +666,7 @@ print(result)
   markdown={`In one sentence, what *is* a sampling distribution?
 
 - The histogram of the raw values in the sample you collected
-  > That's the distribution of *one sample* — a picture of raw data values. A sampling distribution is about a *statistic*, not raw values.
+  > That's the distribution of *one sample*, a picture of raw data values. A sampling distribution is about a *statistic*, not raw values.
 - The distribution of all the values in the population
   > That's the *population* distribution. A sampling distribution describes a computed statistic across repeated samples, not the population's raw values.
 - [o] The distribution of a statistic (e.g., the mean) computed over many repeated samples of size n
@@ -674,26 +674,26 @@ print(result)
 - The distribution you'd get by collecting one enormous sample
   > One enormous sample gives you a better picture of the *population* distribution, not a sampling distribution. The sampling distribution requires imagining *many* samples and one statistic each.
 
-It's the distribution of an *estimate* across hypothetical repeated samples — the foundation of all inference.`}
+It's the distribution of an *estimate* across hypothetical repeated samples, the foundation of all inference.`}
 />
 
 <MultipleChoice
   markdown={`Your population of incomes is heavily right-skewed with sd \`sigma = 30000\`. You take samples of \`n = 100\`. Compared to the population distribution, the **sampling distribution of the mean** will be:
 
 - About the same width (sd ≈ 30000) and same skew
-  > The sampling distribution of the mean is far narrower than the population — averaging cancels noise. Its sd is roughly $\\sigma/\\sqrt{n} = 30000/10 = 3000$, not 30000.
+  > The sampling distribution of the mean is far narrower than the population, averaging cancels noise. Its sd is roughly $\\sigma/\\sqrt{n} = 30000/10 = 3000$, not 30000.
 - [o] Much narrower (sd ≈ 3000, i.e., $\\sigma/\\sqrt{n}$) and centered on the true mean
-  > The mean's sampling distribution has spread $\\sigma/\\sqrt{n}$, here $30000/\\sqrt{100}=3000$, and sits on $\\mu$ — far tighter than the raw-income spread.
+  > The mean's sampling distribution has spread $\\sigma/\\sqrt{n}$, here $30000/\\sqrt{100}=3000$, and sits on $\\mu$, far tighter than the raw-income spread.
 - Wider than the population, because skew adds uncertainty
   > Averaging reduces, not increases, spread. The sampling distribution of the mean is always narrower than the population for $n>1$, regardless of skew.
 - Identical to the distribution of one sample of 100 incomes
-  > One sample of 100 incomes is raw data (~$\\sigma$ wide). The sampling distribution of the *mean* is the distribution of the *average* of such samples — about $\\sqrt{100}=10$ times narrower.
+  > One sample of 100 incomes is raw data (~$\\sigma$ wide). The sampling distribution of the *mean* is the distribution of the *average* of such samples, about $\\sqrt{100}=10$ times narrower.
 
-The mean's sampling distribution is centered on $\\mu$ with spread $\\sigma/\\sqrt{n}$ — much tighter than the raw data.`}
+The mean's sampling distribution is centered on $\\mu$ with spread $\\sigma/\\sqrt{n}$, much tighter than the raw data.`}
 />
 
 <MultipleChoice
-  markdown={`A teammate says: "I plotted my 500 data points and they're clearly not normal — so I can't trust the sample mean." What's the most accurate response?
+  markdown={`A teammate says: "I plotted my 500 data points and they're clearly not normal, so I can't trust the sample mean." What's the most accurate response?
 
 - They're right; non-normal data makes the sample mean untrustworthy
   > The trustworthiness of the *mean* depends on the *sampling distribution* of the mean, not on the shape of the raw data. Non-normal raw data is fine for estimating a mean.
@@ -713,9 +713,9 @@ Judging an estimate by the raw-data histogram confuses distribution (b) with dis
 - Drawing 10x as many samples in your simulation
   > More simulated samples only render the sampling distribution more smoothly; its width is unchanged. (In real life you collect just one sample anyway.)
 - [o] Increasing the size n of each sample
-  > The sampling distribution's spread is $\\sigma/\\sqrt{n}$, so a larger $n$ directly narrows it — this is the lever that improves estimate precision.
+  > The sampling distribution's spread is $\\sigma/\\sqrt{n}$, so a larger $n$ directly narrows it, this is the lever that improves estimate precision.
 - Choosing a statistic with a higher value, like the max instead of the mean
-  > Switching statistics changes the sampling distribution's center and shape, but a "higher value" doesn't make it narrower — the max's sampling distribution is actually quite wide and skewed.
+  > Switching statistics changes the sampling distribution's center and shape, but a "higher value" doesn't make it narrower, the max's sampling distribution is actually quite wide and skewed.
 - Recentering the data to have mean zero
   > Shifting all values by a constant moves the center but leaves every spread unchanged. It doesn't narrow the sampling distribution.
 
@@ -728,7 +728,7 @@ Only a larger sample size shrinks the spread of the sampling distribution.`}
 - No; only the mean has a sampling distribution
   > Every statistic computed from a sample has a sampling distribution. The mean is just the most common example, not the only one.
 - [o] Yes; any statistic computed from a sample (median, max, sd, proportion, …) has its own sampling distribution
-  > Recognizing that the concept applies to *any* statistic — each with its own center, spread, and shape — is what lets us attach uncertainty to medians, proportions, slopes, and more.
+  > Recognizing that the concept applies to *any* statistic, each with its own center, spread, and shape, is what lets us attach uncertainty to medians, proportions, slopes, and more.
 - Only if the data is normally distributed
   > The existence of a sampling distribution doesn't depend on the data being normal. The median's sampling distribution exists for any population; its shape just varies.
 - Only for samples larger than 30
@@ -743,23 +743,23 @@ Only a larger sample size shrinks the spread of the sampling distribution.`}
 - Because 1,500 is close to the size of the population
   > 1,500 is a tiny fraction of a national population; the precision doesn't come from covering most people. It comes from the narrowness of the sampling distribution.
 - [o] Because the sampling distribution of the estimate is narrow (its spread is governed by $\\sigma/\\sqrt{n}$), so the estimate barely moves from sample to sample
-  > The margin of error is read off the sampling distribution, whose spread scales as $1/\\sqrt{n}$ and is independent of how large the *population* is — so a modest $n$ already yields a tight estimate.
+  > The margin of error is read off the sampling distribution, whose spread scales as $1/\\sqrt{n}$ and is independent of how large the *population* is, so a modest $n$ already yields a tight estimate.
 - Because everyone in the country answers roughly the same way
   > Respondents differ a lot; the population can be highly variable. The estimate is still precise because *averaging* a random sample yields a tight sampling distribution.
 - Because more people would not change the result at all
   > More people *would* tighten the estimate somewhat (precision $\\propto \\sqrt{n}$). The point is that even 1,500 already gives a narrow sampling distribution, not that $n$ is irrelevant.
 
-A small margin of error reflects a narrow *sampling distribution*, which depends on $n$ — not on the population's size.`}
+A small margin of error reflects a narrow *sampling distribution*, which depends on $n$, not on the population's size.`}
 />
 
 <Callout type="success" title="Key takeaways">
 - Keep three things separate: **(a)** the population distribution of raw values, **(b)** one sample's distribution of raw values, **(c)** the **sampling distribution** of a *statistic* over many samples.
 - A histogram of your data is **(b)**, not (c). The sampling distribution describes an *estimate*, not raw data, and is **much narrower**.
-- The sampling distribution of the mean is **centered on μ** and has spread `σ / √n` — it tightens as `n` grows.
+- The sampling distribution of the mean is **centered on μ** and has spread `σ / √n`, it tightens as `n` grows.
 - **Larger samples** sharpen the estimate; **more samples** only smooth the simulated picture (in real life you collect just one).
-- *Every* statistic — mean, median, max, proportion — has its own sampling distribution. This single idea underlies standard errors, confidence intervals, and p-values.
+- *Every* statistic, mean, median, max, proportion, has its own sampling distribution. This single idea underlies standard errors, confidence intervals, and p-values.
 </Callout>
 
 We saw the mean's sampling distribution come out roughly bell-shaped even
-when the population wasn't. That's not a coincidence — it's the **Central
+when the population wasn't. That's not a coincidence, it's the **Central
 Limit Theorem**, the engine of classical inference, and it's next.

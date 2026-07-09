@@ -18,7 +18,7 @@ crawl bandwidth liability with zero user benefit.
 
 The **web-facing** logo assets the app actually uses stay in `public/`:
 
-- `public/logo-files/SVG/*.svg` — referenced by the home page
+- `public/logo-files/SVG/*.svg`, referenced by the home page
   (`app/_components/home/BeamSection.tsx`, `HomeFooter.tsx`)
 - `public/logo-files/4x/*.png`, `public/dataslope-logo-blue.svg`,
   `public/dataslope-blue@4x.png`

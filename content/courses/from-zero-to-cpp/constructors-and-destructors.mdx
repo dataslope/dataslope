@@ -1,6 +1,6 @@
 ---
 title: Constructors and Destructors
-description: How objects come into being and how they clean up — the special member functions you must understand.
+description: How objects come into being and how they clean up, the special member functions you must understand.
 ---
 
 Every C++ object has a beginning and an end. The **constructor**
@@ -12,7 +12,7 @@ management in C++.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A green disc emerges from a yellow mold, travels along a thin line, then gently dissolves into smaller and fainter dots — a constructor builds the object and a destructor unmakes it at the end"
+  aria-label="A green disc emerges from a yellow mold, travels along a thin line, then gently dissolves into smaller and fainter dots, a constructor builds the object and a destructor unmakes it at the end"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -78,7 +78,7 @@ int main() {
 The `: who_(std::move(who))` part is the **member initializer
 list**. It runs *before* the constructor's body and initializes
 each field. Always prefer the initializer list over assignment
-inside the body — it constructs each field directly instead of
+inside the body, it constructs each field directly instead of
 default-constructing and then overwriting.
 
 ## Multiple constructors (overloads)
@@ -124,7 +124,7 @@ If you still want it, write `Rect() = default;`.
 ## The destructor releases resources
 
 The destructor is a method named `~ClassName` that takes no
-parameters. It runs automatically when an object's lifetime ends —
+parameters. It runs automatically when an object's lifetime ends,
 at the closing brace of its scope for a local, at `delete` for a
 heap object, when the program ends for a global.
 
@@ -173,7 +173,7 @@ flowchart TD
 ```
 
 For a local on the stack, "allocate storage" and "deallocate" are
-free — just adjusting the stack pointer. For a heap object created
+free, just adjusting the stack pointer. For a heap object created
 with `new`, allocation happens first and deallocation happens at
 `delete`.
 
@@ -192,10 +192,10 @@ If your class manages a resource that the compiler doesn't know how
 to copy (a raw `new`-allocated buffer, an open file handle, a
 socket), you usually need three coordinated functions:
 
-1. The **destructor** — releases the resource.
-2. The **copy constructor** — defines what it means to copy the
+1. The **destructor**, releases the resource.
+2. The **copy constructor**, defines what it means to copy the
    object.
-3. The **copy assignment operator** — defines what it means to
+3. The **copy assignment operator**, defines what it means to
    replace an existing object's contents with another's.
 
 This trio is called the **Rule of Three**. The standard library
@@ -291,5 +291,5 @@ int main() {
   > It does not.`}
 />
 
-Next: how classes can extend other classes — *inheritance* and the
+Next: how classes can extend other classes, *inheritance* and the
 runtime polymorphism that makes interfaces dynamic.

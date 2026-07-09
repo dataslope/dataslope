@@ -1,5 +1,5 @@
 /**
- * Layout for the Fumadocs-powered `/fumadocs-dev` route — the
+ * Layout for the Fumadocs-powered `/fumadocs-dev` route, the
  * development-only component gallery (code blocks, challenge cards,
  * loading states, …) that used to live at `/learn`.
  *
@@ -17,6 +17,7 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { devSource } from "@/lib/source";
+import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 
 export default function FumadocsDevLayout({
   children,
@@ -28,6 +29,10 @@ export default function FumadocsDevLayout({
       <DocsLayout
         tree={devSource.pageTree}
         tabs={false}
+        // Use the site's shared light/dark pill toggle in place of Fumadocs's
+        // default segmented theme switch, so the docs chrome matches the home
+        // header, mobile drawer, and playground settings.
+        slots={{ themeSwitch: ThemePillToggleSlot }}
         // Don't prefetch sidebar links. The sidebar renders hundreds of
         // lesson links per page; with Next.js's default viewport prefetch
         // every visible link fans out segment requests, and on Vercel each

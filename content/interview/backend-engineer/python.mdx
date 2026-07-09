@@ -8,7 +8,7 @@ not just syntax. Review the Q&A, then the concept checks.
 
 ## Q&A
 
-### Mutable vs immutable types — why does it matter?
+### Mutable vs immutable types, why does it matter?
 
 Immutable values (`int`, `str`, `tuple`, `frozenset`) can't change after
 creation; mutable ones (`list`, `dict`, `set`) can. It matters for
@@ -25,7 +25,7 @@ like `None` (`if x is None`). They can disagree: two equal lists are
 
 ### What's the mutable-default-argument trap?
 
-A default argument is evaluated **once**, at definition time — so a
+A default argument is evaluated **once**, at definition time, so a
 `def f(x, acc=[])` shares one list across all calls:
 
 <CodeBlock
@@ -66,7 +66,7 @@ print(add(2))   # [2]  <- fresh list each call`,
 
 A list builds and holds **all** items in memory; a generator (`yield`, or
 a generator expression) produces items **lazily**, one at a time. Use a
-generator for large or streaming sequences to keep memory flat — `sum(x*x
+generator for large or streaming sequences to keep memory flat, `sum(x*x
 for x in range(10_000_000))` never materializes the squares. The
 `fibonacci` generator below uses `yield` in an infinite loop, which is
 safe precisely because `next` pulls only as many values as you ask for.
@@ -78,7 +78,7 @@ safe precisely because `next` pulls only as many values as you ask for.
       filename: "main.py",
       starterCode: `def fibonacci():
     a, b = 0, 1
-    while True:          # infinite sequence — safe because it's lazy
+    while True:          # infinite sequence, safe because it's lazy
         yield a
         a, b = b, a + b
 
@@ -119,7 +119,7 @@ print(passthrough(sorted, [3, 1, 2], reverse=True))   # [3, 2, 1]`,
 ### What is the GIL, and when does it bite?
 
 CPython's **Global Interpreter Lock (GIL)** lets only one thread execute
-Python bytecode at a time. So threads don't speed up **CPU-bound** work —
+Python bytecode at a time. So threads don't speed up **CPU-bound** work,
 use
 `multiprocessing` (separate processes) for that. Threads still help
 **I/O-bound** work (network, disk), where they wait, not compute; `async`
@@ -205,7 +205,7 @@ slow()  # slow took 0.1000s (approx)`,
 Python resolves names in four scopes in order: **L**ocal (inside the
 current function), **E**nclosing (outer function for nested functions),
 **G**lobal (module level), **B**uilt-in. A closure is a nested function
-that captures variables from its enclosing scope — those variables survive
+that captures variables from its enclosing scope, those variables survive
 even after the outer function returns. Below, `increment` closes over
 `count` from `make_counter` and uses `nonlocal` to keep updating that same
 captured variable across calls.
@@ -242,7 +242,7 @@ works automatically.
 Threads share the same process memory and are lightweight, but the GIL
 prevents true parallel CPU execution. `multiprocessing` spawns separate
 processes with their own memory space, bypassing the GIL and achieving
-real parallelism for CPU-bound work — at the cost of inter-process
+real parallelism for CPU-bound work, at the cost of inter-process
 communication overhead and higher memory usage. `asyncio` is a third
 option: single-threaded cooperative concurrency for I/O-bound async code.
 
@@ -354,15 +354,15 @@ insertion order.
 A `set` is an unordered collection of unique, hashable elements backed by
 a hash table. Membership test (`in`) is O(1) versus O(n) for a list. Use
 a set when you need fast "have I seen this element?" checks, deduplication,
-or set operations (union, intersection, difference) — all O(n) or better.
+or set operations (union, intersection, difference), all O(n) or better.
 
 ### What is name mangling in Python?
 
 A class attribute with a double-underscore prefix (but no trailing double
 underscore), like `__secret`, is name-mangled by Python to
 `_ClassName__secret`. This makes accidental overriding in subclasses less
-likely. It is **not** private — it is still accessible by the mangled
-name — but it signals strong internal use.
+likely. It is **not** private, it is still accessible by the mangled
+name, but it signals strong internal use.
 
 ### What are `__slots__` and when should you use them?
 
@@ -403,7 +403,7 @@ other implementations use different GC strategies.
 
 Type hints (introduced in PEP 484) annotate variable, parameter, and
 return types using syntax like `def greet(name: str) -> str`. They are
-**not enforced at runtime** by default — Python remains dynamically typed.
+**not enforced at runtime** by default, Python remains dynamically typed.
 Their value is for static analysis tools (mypy, pyright), IDE completion,
 and documentation. `from __future__ import annotations` defers evaluation
 of annotations.
@@ -432,7 +432,7 @@ memory-efficient, suitable as arguments to functions like `sum` or `max`.
 ### What does `finally` guarantee?
 
 The `finally` block of a `try`/`except`/`finally` statement runs
-**always** — whether an exception is raised, caught, or not raised at all,
+**always**, whether an exception is raised, caught, or not raised at all,
 and even if there is a `return` statement in `try` or `except`. It is
 used for cleanup (closing files, releasing locks) that must happen
 regardless of outcome. It does not suppress exceptions. In `read_file`
@@ -454,7 +454,7 @@ def read_file(path):
 each element once; elements are then compared by their key values. This
 enables case-insensitive sort (`key=str.lower`), sorting by attribute
 (`key=lambda x: x.age`), or multi-key sort (`key=lambda x: (x.last, x.first)`).
-The sort is stable — equal keys preserve the original relative order.
+The sort is stable, equal keys preserve the original relative order.
 
 <CodeBlock
   adapter="python"
@@ -503,7 +503,7 @@ print(list(Range3()))  # [1, 2, 3]`,
 
 F-strings (formatted string literals, PEP 498) embed expressions directly
 in string literals: `f"Hello, {name}!"`. They are evaluated at parse time
-into efficient bytecode — faster than `%`-formatting and `str.format()` —
+into efficient bytecode, faster than `%`-formatting and `str.format()`,
 and support arbitrary expressions, method calls, and format specs
 (`f"{value:.2f}"`). They are the preferred formatting method in modern
 Python.
@@ -546,13 +546,13 @@ print(Date.is_leap(2023))      # False`,
 
 ### What is the difference between `__repr__` and `__str__`?
 
-`__repr__` is meant for **developers** — it should return an unambiguous
+`__repr__` is meant for **developers**, it should return an unambiguous
 string, ideally one that could be passed to `eval()` to recreate the
-object. `__str__` is for **end users** — a readable, human-friendly
+object. `__str__` is for **end users**, a readable, human-friendly
 representation. `repr()` falls back to `__repr__` if `__str__` is
 missing. In an interactive REPL, the result of `repr()` is displayed.
 
-### How does Python handle exceptions — what is the exception hierarchy?
+### How does Python handle exceptions, what is the exception hierarchy?
 
 All exceptions inherit from `BaseException`. User-defined exceptions
 should inherit from `Exception`. `KeyboardInterrupt` and `SystemExit`
@@ -574,7 +574,7 @@ except ZeroDivisionError as e:
 except (TypeError, ValueError):
     pass
 else:
-    print("no exception — runs only on success")
+    print("no exception, runs only on success")
 finally:
     print("always runs")
 ```
@@ -630,19 +630,19 @@ print(add(2))
 \`\`\`
 
 - \`[1]\` then \`[2]\`
-  > That's what you'd get with a fresh list each call — but a default argument is created only once.
+  > That's what you'd get with a fresh list each call, but a default argument is created only once.
 - [o] \`[1]\` then \`[1, 2]\`
   > The default list is evaluated once at definition time and **shared** across calls, so the second call appends to the same list.
 - \`[1]\` then \`[1]\`
   > The list persists *and* keeps growing across calls; the second call sees the first call's element.
 - It raises an error on the second call.
-  > It runs fine — that's exactly why the shared-state bug is so easy to miss.`}
+  > It runs fine, that's exactly why the shared-state bug is so easy to miss.`}
 />
 
 <MultipleChoice
   markdown={`When should you use \`is\` instead of \`==\`?
 
-- Always — \`is\` is just a faster \`==\`.
+- Always, \`is\` is just a faster \`==\`.
   > They mean different things: \`is\` tests object **identity**, not value equality, so swapping them changes behavior.
 - [o] For comparing against singletons like \`None\` (\`if x is None\`).
   > \`is\` checks identity, which is exactly right for the unique \`None\` object; value comparisons should use \`==\`.

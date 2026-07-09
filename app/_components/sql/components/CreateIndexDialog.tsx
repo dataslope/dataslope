@@ -9,8 +9,8 @@ import { buildCreateIndexSql, suggestIndexName } from "../utils/ddl";
  * Shared "Create Index" dialog for the SQLite / Postgres / DuckDB
  * playgrounds. The form, validation and `CREATE INDEX` generation are
  * identical across the three engines (the syntax is standard SQL), so
- * only the `getColumns` / `onSubmit` callbacks — which touch the
- * dialect-specific engine — are supplied by each playground.
+ * only the `getColumns` / `onSubmit` callbacks, which touch the
+ * dialect-specific engine, are supplied by each playground.
  */
 export interface CreateIndexDialogProps {
   open: boolean;
@@ -45,7 +45,7 @@ export function CreateIndexDialog({
   const [submitting, setSubmitting] = useState(false);
 
   // Reset the form during the render that flips `open` to true (React's
-  // "adjust state when a prop changes" pattern — done in render, not an
+  // "adjust state when a prop changes" pattern, done in render, not an
   // effect, so there's no cascading-render lint violation). The
   // column-load effect below then fetches the default table's columns.
   const [wasOpen, setWasOpen] = useState(false);
@@ -251,7 +251,7 @@ export function CreateIndexDialog({
               <div className="sql-create-field">
                 <span className="sql-create-label">SQL to run</span>
                 <pre className="sql-create-preview">
-                  {previewSql || "— select a table and column —"}
+                  {previewSql || "-- select a table and column"}
                 </pre>
               </div>
             </div>

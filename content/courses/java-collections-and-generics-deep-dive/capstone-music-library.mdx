@@ -11,7 +11,7 @@ exercises all of it.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A central blue library card of stacked record bars links by thin gray lines to four small views — an ordered blue row, a scattered green set, descending yellow ranks, and a key wired to its value"
+  aria-label="A central blue library card of stacked record bars links by thin gray lines to four small views, an ordered blue row, a scattered green set, descending yellow ranks, and a key wired to its value"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -53,10 +53,10 @@ exercises all of it.
 You'll build a small **MusicLibrary** that ingests tracks and
 answers four queries:
 
-1. `byArtist(name)` — all tracks for an artist, in insertion order
-2. `genres()` — the set of all unique genres
-3. `topRated(n)` — the top `n` tracks by rating (ties broken by title)
-4. `albumsByArtist(name)` — the *unique* album names for an artist,
+1. `byArtist(name)`, all tracks for an artist, in insertion order
+2. `genres()`, the set of all unique genres
+3. `topRated(n)`, the top `n` tracks by rating (ties broken by title)
+4. `albumsByArtist(name)`, the *unique* album names for an artist,
    in insertion order
 
 Each query corresponds directly to a collection shape we've studied:
@@ -250,16 +250,16 @@ public class MusicLibrary {
 
 That single class touches every major idea in the course:
 
-- **Right shape per query** — one map of lists, one map of sets,
+- **Right shape per query**, one map of lists, one map of sets,
   one set, one list (Data Modeling).
-- **`computeIfAbsent` for "map of \\*"** — concise, race-free against
+- **`computeIfAbsent` for "map of \\*"**, concise, race-free against
   itself (Maps).
-- **`LinkedHashSet`** — uniqueness *and* insertion order (Sets).
-- **`Comparator` composition** — `reversed().thenComparing(...)`
+- **`LinkedHashSet`**, uniqueness *and* insertion order (Sets).
+- **`Comparator` composition**, `reversed().thenComparing(...)`
   to combine two ordering criteria (Comparable & Comparator).
-- **Safe getters** — every returned collection is an unmodifiable
+- **Safe getters**, every returned collection is an unmodifiable
   view (Immutable Collections + Architecture).
-- **`record`-backed value objects** for `Track` — typed data, free
+- **`record`-backed value objects** for `Track`, typed data, free
   `equals`/`hashCode`/`toString` (Equality and Hashing).
 
 ## Test your understanding

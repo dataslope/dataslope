@@ -35,7 +35,7 @@ export function formatSqlSchemaText(
     lines.push(`${kind} ${entity.name} (${cols.join(", ")})`);
     if (lines.join("\n").length > MAX_SCHEMA_CHARS) {
       // `lines` holds the entities already rendered (including this one), so
-      // the unrendered remainder is the difference — no +1.
+      // the unrendered remainder is the difference, no +1.
       const remaining = schema.entities.length - lines.length;
       if (remaining > 0) lines.push(`… and ${remaining} more entities`);
       break;

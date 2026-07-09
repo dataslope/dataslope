@@ -5,7 +5,7 @@
  *
  * MDX content can't import TypeScript modules, so this component
  * accepts the adapter as a string id (e.g. `"python"`) and resolves it
- * to the corresponding adapter instance — mirroring `<MdxCodeBlock>`.
+ * to the corresponding adapter instance, mirroring `<MdxCodeBlock>`.
  *
  * Usage in MDX (instructions can be a markdown string or a JSX node;
  * every card passes a `files` array, each file carrying its own

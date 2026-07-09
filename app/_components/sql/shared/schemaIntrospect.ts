@@ -6,10 +6,10 @@
 // APIs; the inline blocks only hold a generic `exec(sql)` handle, so
 // this helper derives the same two schema shapes from plain SQL:
 //
-//   - `completion` — the rich `SqlCompletionSchema` consumed by the
+//   - `completion`, the rich `SqlCompletionSchema` consumed by the
 //     bespoke engine in `sqlCompletion.ts` (columns with types, FKs
 //     for join suggestions);
-//   - `langSchema` — the flat `Record<table, columns>` handed to
+//   - `langSchema`, the flat `Record<table, columns>` handed to
 //     `@codemirror/lang-sql`'s built-in schema completion.
 //
 // Everything is best-effort: introspection failures resolve to an
@@ -85,7 +85,7 @@ function columnsSql(dialect: SqlDialect): string {
 
 // Foreign keys per dialect: rows of (tbl, col, ref_table, ref_col).
 // DuckDB's information_schema constraint views don't expose FK column
-// pairs reliably across versions, so FKs are skipped there — join
+// pairs reliably across versions, so FKs are skipped there, join
 // suggestions simply fall back to matching column names.
 function foreignKeysSql(dialect: SqlDialect): string | null {
   if (dialect === "sqlite") {
@@ -112,7 +112,7 @@ function foreignKeysSql(dialect: SqlDialect): string | null {
 }
 
 /** Build both completion schema shapes for the current database state.
- *  Never throws — failures resolve to `EMPTY_SCHEMAS`. */
+ *  Never throws, failures resolve to `EMPTY_SCHEMAS`. */
 export async function introspectSqlSchemas(
   exec: SqlExec,
   dialect: SqlDialect,
@@ -159,7 +159,7 @@ export async function introspectSqlSchemas(
         (entity.foreignKeys ??= []).push(fk);
       }
     } catch {
-      // FK metadata is a ranking nicety — carry on without it.
+      // FK metadata is a ranking nicety, carry on without it.
     }
   }
 

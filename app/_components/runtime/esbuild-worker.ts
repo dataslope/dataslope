@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-// esbuild-wasm bundling worker — the transform step behind the React
+// esbuild-wasm bundling worker, the transform step behind the React
 // playground. Mirrors the TS language worker's loading strategy: the
 // heavy dependency (esbuild's browser build + its WASM binary) is pulled
 // from the pinned jsDelivr package with `importScripts`, so the bundler
@@ -13,7 +13,7 @@
 //   - relative imports resolve against the virtual file system (the
 //     playground's tabs), trying the usual extension/index candidates;
 //   - bare imports (`react`, `react-dom/client`, any npm package)
-//     rewrite to pinned esm.sh URLs and stay external — the browser
+//     rewrite to pinned esm.sh URLs and stay external, the browser
 //     fetches them as native ES modules inside the preview iframe.
 //
 // CSS imported from user code comes back as a separate output file that
@@ -25,7 +25,7 @@
 import { ESBUILD_WASM_CDN_BASE } from "./cdn";
 import { esmShUrlFor, isBareSpecifier } from "./esmResolve";
 
-// Minimal surface of the esbuild browser API this worker uses —
+// Minimal surface of the esbuild browser API this worker uses,
 // esbuild-wasm is intentionally not an npm dependency (the pin in
 // cdn.ts is the single source of truth), so the types live here.
 interface EsbuildLocation {
@@ -97,7 +97,7 @@ declare const self: DedicatedWorkerGlobalScope & {
 // throw would leave the adapter waiting on `ready` forever.
 const initPromise = (async () => {
   self.importScripts(`${ESBUILD_WASM_CDN_BASE}/lib/browser.min.js`);
-  // `worker: false` — we ARE the worker; esbuild would otherwise nest one.
+  // `worker: false`, we ARE the worker; esbuild would otherwise nest one.
   await self.esbuild.initialize({
     wasmURL: `${ESBUILD_WASM_CDN_BASE}/esbuild.wasm`,
     worker: false,
@@ -217,7 +217,7 @@ function vfsPlugin(files: Map<string, string>): EsbuildPlugin {
           errors: [
             {
               text:
-                `Cannot resolve "${args.path}" from "${args.importer}" — ` +
+                `Cannot resolve "${args.path}" from "${args.importer}", ` +
                 `no matching file in the workspace tabs.`,
             },
           ],
@@ -266,7 +266,7 @@ async function bundle(msg: InMessage): Promise<void> {
       outdir: "/out",
       // Inline sourcemaps so DevTools stack traces and breakpoints point
       // at the user's pane sources (main.tsx:12) instead of bundle
-      // offsets. Costs bundle bytes in the srcdoc — fine at snippet
+      // offsets. Costs bundle bytes in the srcdoc, fine at snippet
       // scale. (Browser `error` events don't consume sourcemaps, so the
       // output panel still reports bundle positions; DevTools maps.)
       sourcemap: "inline",

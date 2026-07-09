@@ -6,11 +6,11 @@ import { ChevronDown } from "lucide-react";
 const FAQS: { q: string; a: string }[] = [
   {
     q: "Do I need to sign up or install anything?",
-    a: "No. Everything runs in your browser — no account, no sign-in, and nothing to install beyond the one-time language runtime that downloads automatically on your first run.",
+    a: "No. Everything runs in your browser, no account, no sign-in, and nothing to install beyond the one-time language runtime that downloads automatically on your first run.",
   },
   {
     q: "Is it really free?",
-    a: "Yes — all the courses, playgrounds, and quizzes are completely free and fully accessible, with no paywall on any of the content.",
+    a: "Yes, all the courses, playgrounds, and quizzes are completely free and fully accessible, with no paywall on any of the content.",
   },
   {
     q: "How does code run without a server?",
@@ -18,7 +18,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Which languages and databases are supported?",
-    a: "Python, R, JavaScript, TypeScript, PHP, C, C++, Java, and C# — plus SQLite, PostgreSQL, and DuckDB for SQL.",
+    a: "Python, R, JavaScript, TypeScript, PHP, C, C++, Java, and C#, plus SQLite, PostgreSQL, and DuckDB for SQL.",
   },
   {
     q: "Is my work saved?",
@@ -26,7 +26,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Can I use it on mobile?",
-    a: "Yes — the site and playgrounds are responsive. A larger screen is more comfortable for serious coding, but everything works on a phone.",
+    a: "Yes, the site and playgrounds are responsive. A larger screen is more comfortable for serious coding, but everything works on a phone.",
   },
 ];
 

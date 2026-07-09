@@ -282,11 +282,11 @@ const LOAD_MORE_THRESHOLD_ROWS = 25;
 // measures each header cell, freezes those widths and switches to
 // `table-layout: fixed` (plus a trailing filler column that absorbs any
 // leftover space, so columns only take the width their content needs).
-// Frozen widths keep the grid predictable — entering/leaving inline cell
-// edit or streaming in more rows can no longer reflow every column — and
+// Frozen widths keep the grid predictable, entering/leaving inline cell
+// edit or streaming in more rows can no longer reflow every column, and
 // they're what the drag-to-resize header handles adjust.
 const COL_MIN_WIDTH = 48;
-// Cap for the *measured* width — mirrors the auto-layout `max-width` clamp
+// Cap for the *measured* width, mirrors the auto-layout `max-width` clamp
 // the CSS applies to cells, so one long value can't take the whole pane.
 // Users can still drag a column wider, up to COL_MAX_WIDTH.
 const COL_MAX_MEASURED_WIDTH = 340;
@@ -463,8 +463,8 @@ export function sqlValueEqual(a: unknown, b: unknown): boolean {
   return false;
 }
 
-/** True when two results have the same statement *shape* — same set count,
- *  same per-set has-result-ness and column names — i.e. they look like
+/** True when two results have the same statement *shape*, same set count,
+ *  same per-set has-result-ness and column names, i.e. they look like
  *  re-runs of the same statements (an edit/sort/filter re-fetch, or the user
  *  re-running the same tab) rather than a different query. Cheaper than
  *  `queryResultsIdentical`, which also compares every cell. */
@@ -634,7 +634,7 @@ function ResultViewImpl({
     Record<number, { page: number }>
   >({});
   // In-grid filter ("find in results") text, keyed by result-set index. A
-  // view-only narrowing of the materialized rows — see `utils/resultFilter`.
+  // view-only narrowing of the materialized rows, see `utils/resultFilter`.
   const [filterByIndex, setFilterByIndex] = useState<Record<number, string>>(
     {},
   );
@@ -676,8 +676,8 @@ function ResultViewImpl({
   // Result-set indices currently showing a *server-side* filtered re-query
   // (pushdown, for engine-paged results). Maps idx → the pre-filter total row
   // count (for the "filtered from N" readout). Its presence means further
-  // filter edits re-query the engine — even after the filtered result becomes
-  // small enough to fit in memory — rather than switching to client-filtering.
+  // filter edits re-query the engine, even after the filtered result becomes
+  // small enough to fit in memory, rather than switching to client-filtering.
   const [serverFilterByIndex, setServerFilterByIndex] = useState<
     Record<number, number>
   >({});
@@ -703,7 +703,7 @@ function ResultViewImpl({
   // drives a loading overlay over the result table so the wait is visible.
   const [filterPending, setFilterPending] = useState(false);
   // Hold the overlay on screen for a minimum time (then fade) so a fast filter
-  // doesn't blink — see `useMinVisible` / FILTER_OVERLAY_MIN_MS.
+  // doesn't blink, see `useMinVisible` / FILTER_OVERLAY_MIN_MS.
   const filterOverlayActive = useMinVisible(filterPending, FILTER_OVERLAY_MIN_MS);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
   const noResultsRef = useRef<HTMLDivElement>(null);
@@ -736,8 +736,8 @@ function ResultViewImpl({
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     if (preserved || sameResultShape(result, prevResultRef.current)) {
-      // A reload of the same statements (edit/sort/filter re-fetch — which
-      // preserves state — or a same-shape re-run, including a queued
+      // A reload of the same statements (edit/sort/filter re-fetch, which
+      // preserves state, or a same-shape re-run, including a queued
       // re-fetch that arrives without a preserve slot): keep the active
       // result-set tab, clamped to the new set count. (Clamping rather than
       // restoring from a single "preserved" slot is robust when an edit
@@ -748,20 +748,20 @@ function ResultViewImpl({
     } else {
       // Fresh run: land on the first set that actually returned a result
       // table. A multi-statement script commonly ends in a SELECT after
-      // DDL/DML setup statements — defaulting to Set 1 would show the
+      // DDL/DML setup statements, defaulting to Set 1 would show the
       // "no result set returned" notice instead of the data just queried.
       const firstWithTable = (result?.sets ?? []).findIndex((s) => s !== null);
       setActiveSetIdx(firstWithTable >= 0 ? firstWithTable : 0);
     }
     // A fresh result (or a filter/sort/edit reload) settles any pending filter
-    // overlay — the rows shown now already reflect the applied filter.
+    // overlay, the rows shown now already reflect the applied filter.
     setFilterPending(false);
     // Scroll the result table back to the top whenever a new result arrives
     // (fresh query run or lazy page navigation).
     resultSetsScrollRef.current?.scrollTo(0, 0);
     if (focusFilterAfterReloadRef.current) {
       focusFilterAfterReloadRef.current = false;
-      // A server-side filter reload re-mounts the grid and steals focus —
+      // A server-side filter reload re-mounts the grid and steals focus,
       // restore it to the filter input (and its caret) so typing continues.
       requestAnimationFrame(() => {
         const el = document.querySelector<HTMLInputElement>(
@@ -828,7 +828,7 @@ function ResultViewImpl({
   // Compose the lazy SQL for a server-side filter + sort pushdown: wrap the
   // original base query as a subquery with a native `WHERE` (LIKE/ILIKE), then
   // apply ORDER BY for the active sort. Either part may be absent. This is the
-  // DBeaver model — the filtered query re-pages through the engine, so infinite
+  // DBeaver model, the filtered query re-pages through the engine, so infinite
   // scroll is preserved instead of loading the whole result into memory.
   const composeLazyQuery = useCallback(
     (
@@ -1092,7 +1092,7 @@ function ResultViewImpl({
       const edits = pendingEditsByIndex[setIdx];
       if (!edits || edits.size === 0) return;
       // Resolve primary-key column indices once so each edited row can be
-      // identified by its PK value(s) — stable even if the row has moved
+      // identified by its PK value(s), stable even if the row has moved
       // position since the previous edit (Postgres changes ctid on UPDATE).
       const pkCols = pkColumnsForSet(set);
       const pkColIndexes = pkCols
@@ -1178,7 +1178,7 @@ function ResultViewImpl({
         }
         refetchSql = refetchSql ?? baseSql;
       } else if (result?.querySql) {
-        // Materialized result (no lazy paging) — e.g. a multi-statement run, or
+        // Materialized result (no lazy paging), e.g. a multi-statement run, or
         // a query with its own `LIMIT`. Re-run the original query so the result
         // keeps its shape, but order the *edited* statement by its primary key
         // so the edited row keeps its place instead of jumping to the bottom
@@ -1269,7 +1269,7 @@ function ResultViewImpl({
     [],
   );
 
-  // Commit the pending edits when exactly one result set has them — used by the
+  // Commit the pending edits when exactly one result set has them, used by the
   // Ctrl/⌘+Enter shortcut. (Restricting to a single set avoids a stale-closure
   // double-commit; the multi-set case is rare and still has per-set footer
   // buttons.)
@@ -1284,7 +1284,7 @@ function ResultViewImpl({
   }, [pendingEditsByIndex, result, commitEdits]);
 
   // Ctrl/⌘+Enter commits pending cell edits. Scoped to when focus is NOT in the
-  // CodeMirror editor, whose own keymap owns Ctrl/⌘+Enter for "run query" — so
+  // CodeMirror editor, whose own keymap owns Ctrl/⌘+Enter for "run query", so
   // the two never collide (the editor binding only fires while it's focused).
   useEffect(() => {
     if (Object.keys(pendingEditsByIndex).length === 0) return;
@@ -1541,7 +1541,7 @@ function ResultViewImpl({
     return (
       <div ref={noResultsRef} className="sql-result-ok">
         <CheckCircle size={14} aria-hidden="true" />
-        Statement executed successfully — no result set returned.
+        Statement executed successfully, no result set returned.
       </div>
     );
   }
@@ -1604,7 +1604,7 @@ function ResultViewImpl({
       });
       if (canFilter && rawFilter && !serverFiltered) {
         // startIdx is 0 here (fullyLoaded), so each row's index in `set.values`
-        // is its absolute position — keep it as the original index so edits /
+        // is its absolute position, keep it as the original index so edits /
         // selection / delete stay correct.
         const matchedIdx = filterResultRowIndices(
           set.values,
@@ -1717,7 +1717,7 @@ function ResultViewImpl({
           {activeSetIsNull && (
             <div ref={noResultsRef} className="sql-result-ok">
               <CheckCircle size={14} aria-hidden="true" />
-              Statement executed successfully — no result set returned.
+              Statement executed successfully, no result set returned.
             </div>
           )}
           {activeSetData &&
@@ -1875,7 +1875,7 @@ function ResultViewImpl({
             if (isLazy) {
               const baseSql = result.lazyBaseSql ?? result.lazySql ?? "";
               // Page / page-size changes re-page the *current* query, which
-              // already encodes any pushed-down filter + sort — so they keep the
+              // already encodes any pushed-down filter + sort, so they keep the
               // filter instead of reverting to the full table.
               const effectiveLazySql = result.lazySql ?? baseSql;
               handlePageChange = (p: number) => {
@@ -2260,7 +2260,7 @@ export function ResultTableBody({
   const [renameInput, setRenameInput] = useState("");
 
   // ── Column statistics dialog ───────────────────────────────────────────
-  // Computed once, from the loaded rows, when the dialog opens (a snapshot —
+  // Computed once, from the loaded rows, when the dialog opens (a snapshot,
   // no reactive recompute while the modal is up).
   const [statsDialog, setStatsDialog] = useState<{
     name: string;
@@ -2271,7 +2271,7 @@ export function ResultTableBody({
   // ── Column widths ──────────────────────────────────────────────────────
   // Explicit pixel width per leaf column id, frozen from a one-time
   // auto-layout measurement and then user-adjustable via the header drag
-  // handles (the model every desktop SQL IDE uses — DBeaver, DataGrip,
+  // handles (the model every desktop SQL IDE uses, DBeaver, DataGrip,
   // TablePlus: size to content once, keep stable, let the user resize).
   // `null` = not measured yet → the table renders one frame with the
   // browser's natural auto layout and the layout effect below freezes
@@ -2285,8 +2285,8 @@ export function ResultTableBody({
   const colWidthsRef = useRef(colWidths);
   colWidthsRef.current = colWidths;
   // Re-measure only when the column set changes (a different query shape).
-  // Re-fetches of the same shape — cell-edit/sort/filter reloads, paging,
-  // infinite-scroll appends — keep the frozen widths so the grid never
+  // Re-fetches of the same shape, cell-edit/sort/filter reloads, paging,
+  // infinite-scroll appends, keep the frozen widths so the grid never
   // reflows under the user.
   const colSig = `${deletable ? "select" : ""}${set.columns.join("")}`;
   const [prevColSig, setPrevColSig] = useState(colSig);
@@ -2392,7 +2392,7 @@ export function ResultTableBody({
     }
     // Auto-increment / IDENTITY columns regenerate on insert, so neither
     // a PK nor a UNIQUE constraint on such a column actually blocks
-    // duplication — the new row gets a fresh value.
+    // duplication, the new row gets a fresh value.
     const blocking = constraintInfo.filter(
       (c) => (c.isPrimaryKey || c.isUnique) && !c.isAutoIncrement,
     );
@@ -2417,14 +2417,14 @@ export function ResultTableBody({
   // The editor cell reads the live pending-edit / active-cell state through
   // refs so the `columns` memo below does NOT depend on them. Without this the
   // memo recomputes on every keystroke, TanStack rebuilds the columns, and the
-  // inline <input> remounts each keystroke — which re-fires autofocus+select
+  // inline <input> remounts each keystroke, which re-fires autofocus+select
   // (so the value re-selects as you type) and resets the caret.
   const pendingEditsRef = useRef(pendingEdits);
   pendingEditsRef.current = pendingEdits;
   const activeEditCellRef = useRef(activeEditCell);
   activeEditCellRef.current = activeEditCell;
   // `originalIndices` is rebuilt every render by the parent (new array, same
-  // content) — read it via a ref in the `columns` memo so that memo (and thus
+  // content), read it via a ref in the `columns` memo so that memo (and thus
   // the editor <input>) doesn't churn/remount on each keystroke.
   const originalIndicesRef = useRef(originalIndices);
   originalIndicesRef.current = originalIndices;
@@ -2505,9 +2505,9 @@ export function ResultTableBody({
               const displayName = renamedColumnsRef.current.get(ci) ?? c;
               const sortTitle =
                 sorted === "asc"
-                  ? "Sorted ascending — click to sort descending"
+                  ? "Sorted ascending, click to sort descending"
                   : sorted === "desc"
-                    ? "Sorted descending — click to clear sort"
+                    ? "Sorted descending, click to clear sort"
                     : "Click to sort ascending";
               const colId = `col-${ci}-${c}`;
 
@@ -2617,7 +2617,7 @@ export function ResultTableBody({
                             {isReadOnly && (
                               <span
                                 className="sql-result-th-readonly"
-                                title="Read-only — generated column"
+                                title="Read-only, generated column"
                               >
                                 <Lock size={10} aria-label="Read-only column" />
                               </span>
@@ -2806,7 +2806,7 @@ export function ResultTableBody({
                 pendingEditsRef.current?.has(cellKey) ?? false;
               const pendingValue = pendingEditsRef.current?.get(cellKey);
               const rawValue = info.getValue();
-              // Binary columns aren't editable inline — a text/date picker
+              // Binary columns aren't editable inline, a text/date picker
               // would corrupt the bytes. Render a read-only marker; the row
               // context menu's "Edit cell in modal" opens a hex/base64 viewer.
               if (editorKind === "blob" || rawValue instanceof Uint8Array) {
@@ -2815,7 +2815,7 @@ export function ResultTableBody({
                     className={
                       rawValue === null ? "sql-cell-null" : "sql-cell-blob"
                     }
-                    title="Binary value — right-click → Edit cell in modal to view bytes"
+                    title="Binary value, right-click → Edit cell in modal to view bytes"
                   >
                     {formatCellValue(rawValue)}
                   </span>
@@ -2862,8 +2862,8 @@ export function ResultTableBody({
               if (isActiveEdit) {
                 // Enum columns get a dropdown of their declared labels instead
                 // of a free-text editor. The committed value is the chosen
-                // label (a plain string) — the same value the text editor would
-                // produce — so the engine casts it to the enum type on write.
+                // label (a plain string), the same value the text editor would
+                // produce, so the engine casts it to the enum type on write.
                 if (enumValues && enumValues.length > 0) {
                   const cur = hasPendingEdit ? pendingValue : rawValue;
                   const curStr =
@@ -2914,7 +2914,7 @@ export function ResultTableBody({
                 // the parsed JS array is written back and each engine binds it
                 // as a real array (Postgres via pglite, DuckDB via a bound
                 // parameter). Invalid/partial JSON is kept as raw text so the
-                // user can keep typing — it surfaces a clear engine error on
+                // user can keep typing, it surfaces a clear engine error on
                 // commit rather than silently writing garbage.
                 if (editorKind === "array") {
                   const source = hasPendingEdit ? pendingValue : rawValue;
@@ -2963,7 +2963,7 @@ export function ResultTableBody({
                 // is a recognizable date string. The committed value preserves
                 // the original's exact format (separator, fractional seconds,
                 // timezone suffix), so it round-trips just like the free-text
-                // editor — see cellEditing.ts. Falls back to the text input
+                // editor, see cellEditing.ts. Falls back to the text input
                 // below when the value isn't a parseable temporal string.
                 if (
                   editorKind === "date" ||
@@ -3101,7 +3101,7 @@ export function ResultTableBody({
       }),
     ],
     // `activeEditCell` and `pendingEdits` are read via refs (above), and the
-    // `on*` callbacks are stable in behaviour — each is an inline arrow in the
+    // `on*` callbacks are stable in behaviour, each is an inline arrow in the
     // parent that only forwards to a stable setter bound to a stable `idx`, so
     // a stale identity is equivalent. Excluding both keeps this memo stable
     // across keystrokes so the editor <input> doesn't remount each keystroke
@@ -3172,7 +3172,7 @@ export function ResultTableBody({
 
   // Freeze the auto-layout column widths before the first paint of a new
   // result shape. Virtualized grids materialize their rows in the
-  // virtualizer's own layout effect (a second commit in the same frame) —
+  // virtualizer's own layout effect (a second commit in the same frame),
   // wait for that commit so widths reflect real cell content, not just the
   // headers.
   useLayoutEffect(() => {
@@ -3290,12 +3290,12 @@ export function ResultTableBody({
           onDoubleClick={
             editable && !isSelect && ci >= 0 && !isBlobCell
               ? () => {
-                  // Generated/read-only columns can't be edited — explain why
+                  // Generated/read-only columns can't be edited, explain why
                   // instead of silently doing nothing on double-click.
                   const colName = set.columns[ci] ?? "";
                   if (keyHints?.readOnly?.has(colName)) {
                     toastManager.add({
-                      title: `"${colName}" is a generated column — its value is computed from other columns and can't be edited.`,
+                      title: `"${colName}" is a generated column, its value is computed from other columns and can't be edited.`,
                       data: { kind: "info" },
                     });
                     return;
@@ -3317,7 +3317,7 @@ export function ResultTableBody({
         }}
       >
         {cells}
-        {/* Filler cell — absorbs the leftover width so data columns keep
+        {/* Filler cell, absorbs the leftover width so data columns keep
             their natural (content) width instead of stretching. */}
         <td
           className="sql-result-td-filler"
@@ -3363,7 +3363,7 @@ export function ResultTableBody({
                     if (cell === null || cell.colIdx < 0) return;
                     const colName = set.columns[cell.colIdx] ?? "";
                     const cellKey = `${absoluteRow}:${cell.colIdx}`;
-                    // Binary values open a read-only hex/base64 viewer — editing
+                    // Binary values open a read-only hex/base64 viewer, editing
                     // bytes as text would corrupt them on commit.
                     if (cell.value instanceof Uint8Array) {
                       setModalEditCell({
@@ -3527,7 +3527,7 @@ export function ResultTableBody({
               {...props}
               className="sql-result-table-wrap"
               onContextMenu={(e) => {
-                // Open the row menu only for right-clicks on a data row —
+                // Open the row menu only for right-clicks on a data row,
                 // column headers have their own menu, and the virtualizer's
                 // aria-hidden spacer rows and empty space keep the native
                 // browser menu.
@@ -3545,7 +3545,7 @@ export function ResultTableBody({
           {/* Explicit per-column widths (once measured) + a width-less
               filler col. With table-layout:fixed and width:100%, the
               filler absorbs all leftover space, so the data columns only
-              take the width they need — and resizing one column never
+              take the width they need, and resizing one column never
               reflows its neighbours. */}
           <colgroup>
             {table.getAllLeafColumns().map((col) => (
@@ -3897,7 +3897,7 @@ function FilterInput({
 }: {
   /** The currently *applied* filter (what the rows reflect). */
   value: string;
-  /** Commit a new filter — called debounced while typing, immediately on clear. */
+  /** Commit a new filter, called debounced while typing, immediately on clear. */
   onChange: (value: string) => void;
   /** Notified when a debounced commit is pending (true) / settled (false). */
   onPendingChange?: (pending: boolean) => void;
@@ -3943,7 +3943,7 @@ function FilterInput({
       setText(next); // instant + local: keystrokes are never dropped
       clearTimer();
       if (next === committedRef.current) {
-        // Typed back to the applied value — nothing to (re-)apply.
+        // Typed back to the applied value, nothing to (re-)apply.
         onPendingChange?.(false);
         return;
       }
@@ -4086,7 +4086,7 @@ export function ResultPager({
       {showFilter && (
         // ResultPager is itself keyed by result-set index at its call site, so
         // FilterInput remounts (and its local text resets) when the active set
-        // changes — each set keeps its own filter.
+        // changes, each set keeps its own filter.
         <FilterInput
           value={filterText}
           onChange={(v) => onFilterChange?.(v)}

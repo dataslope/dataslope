@@ -1,6 +1,6 @@
 ---
 title: Constructors and Object Lifecycle
-description: How objects are born, live, and die — and how to design constructors that produce only valid objects
+description: How objects are born, live, and die, and how to design constructors that produce only valid objects
 ---
 
 A **constructor** is a special method that runs once, when a new
@@ -10,12 +10,12 @@ throwing an exception, callers are entitled to assume the object is
 ready to use.
 
 This page is about constructors and the broader **lifecycle** of an
-object — birth, life, and eventual death.
+object, birth, life, and eventual death.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="One object at three moments along a thin baseline: a dashed circle with a yellow arc under construction, a solid blue circle wearing a green live ring, and a faded circle dissolving into drifting dots — built, used, collected"
+  aria-label="One object at three moments along a thin baseline: a dashed circle with a yellow arc under construction, a solid blue circle wearing a green live ring, and a faded circle dissolving into drifting dots, built, used, collected"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="90" y="152" width="460" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
@@ -104,7 +104,7 @@ fully initialized*, in one atomic step.
 
 If you do not declare any constructor at all, Java gives you a free
 one with no parameters that does nothing. The moment you declare
-*any* constructor, the default disappears — so if you want a no-arg
+*any* constructor, the default disappears, so if you want a no-arg
 constructor *and* a custom one, you have to declare both yourself.
 
 <CodeBlock
@@ -213,8 +213,8 @@ the program's lifetime.
 
 ## `final` fields and "immutable" objects
 
-Fields declared `final` must be assigned exactly once — either
-inline or in the constructor — and then never again. An object whose
+Fields declared `final` must be assigned exactly once, either
+inline or in the constructor, and then never again. An object whose
 fields are all `final` (and which holds only references to other
 immutable things) is called **immutable**. Immutable objects are
 *remarkably* useful:
@@ -254,7 +254,7 @@ chapter.
   markdown={`Why do constructors not have a return type?
 
 - Because they return \`void\`
-  > They don't even return \`void\` — the return type is omitted entirely.
+  > They don't even return \`void\`, the return type is omitted entirely.
 - [o] Because their "return value" is the newly created object, handed back by \`new\`, not by the constructor itself
   > The constructor's job is to initialize, not to return.
 - Because Java's syntax does not allow return types in any method
@@ -366,5 +366,5 @@ rejected: low must be less than high
 
 Constructors are the front gate of every class you'll ever write.
 They are where you decide what *kinds* of objects can exist. Next we
-look at one of OOP's most powerful — and most over-used —
+look at one of OOP's most powerful, and most over-used,
 relationships: **inheritance and polymorphism**.

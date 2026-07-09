@@ -13,7 +13,7 @@ import { getClangFormat } from "./clangFormat";
 // Run C# in the browser via the official .NET WebAssembly runtime
 // (Mono compiled to WASM) + Roslyn's C# scripting engine
 // (Microsoft.CodeAnalysis.CSharp.Scripting). The runtime bundle is
-// fetched from a CDN on first load — same "everything in the
+// fetched from a CDN on first load, same "everything in the
 // browser" approach used by Pyodide (Python), WebR (R), browsercc
 // (C/C++), CheerpJ (Java) and php-wasm (PHP) elsewhere in this
 // repo. No server-side compilation.
@@ -236,7 +236,7 @@ function hasCSharpTopLevel(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the .NET base class library — always available
+  // Highlights from the .NET base class library, always available
   // through Roslyn's scripting host, no install step. Clicking
   // inserts the corresponding `using` at the top of the editor.
   {
@@ -383,7 +383,7 @@ Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
  *
  *  Handles `using Ns;`, `using static Ns.Type;`, `using Alias = Ns;`,
  *  and `global using Ns;`. Only strips directives at the very top of
- *  the file (before any non-using, non-blank, non-comment line) — any
+ *  the file (before any non-using, non-blank, non-comment line), any
  *  using directive that appears after a class or namespace declaration
  *  is intentionally left in place. Multi-line using directives (an
  *  extremely rare formatting style) are not stripped. */
@@ -441,7 +441,7 @@ class CSharpRuntime implements LanguageRuntime {
     const decoder = new TextDecoder();
     const extraBodies: string[] = [];
     for (const [path, bytes] of this.stagedFiles) {
-      // Skip the entry file — its content is passed directly via
+      // Skip the entry file, its content is passed directly via
       // `code` and must not be appended again.
       if (path === entry) continue;
       const body = stripCSharpUsings(decoder.decode(bytes));
@@ -486,16 +486,16 @@ export const csharpAdapter: LanguageAdapter = {
     engine: "Roslyn (CSharpScript) on Mono / .NET WebAssembly",
     engineUrl: "https://learn.microsoft.com/dotnet/core/wasm/",
     notes:
-      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) and the resulting IL is executed by the .NET runtime compiled to WebAssembly — no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`).",
+      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) and the resulting IL is executed by the .NET runtime compiled to WebAssembly, no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`).",
   },
   // CodeMirror's clike mode handles C#. `text/x-csharp` is the
   // standard MIME alias for C# inside that mode.
   codeMirrorMode: "text/x-csharp",
-  // .NET runtime + Roslyn assembly bundle from jsDelivr — see cdn.ts.
+  // .NET runtime + Roslyn assembly bundle from jsDelivr, see cdn.ts.
   coldDownloadMB: 35,
   // Compiles (Roslyn) on every run, so later runs are faster, not instant.
   compiled: true,
-  // clang-format Microsoft style (see formatCode) — keep in sync.
+  // clang-format Microsoft style (see formatCode), keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,
   packages: PACKAGES,
@@ -530,7 +530,7 @@ export const csharpAdapter: LanguageAdapter = {
       >
         .NET base class library
       </a>{" "}
-      and ship with the WebAssembly runtime — no install step needed.
+      and ship with the WebAssembly runtime, no install step needed.
     </>
   ),
   importSnippet: (name) => `using ${name};`,

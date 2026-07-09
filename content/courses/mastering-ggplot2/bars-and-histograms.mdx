@@ -1,17 +1,17 @@
 ---
 title: Bars and Histograms
-description: Counting and binning in depth — position adjustments, bin width, and why a histogram is a bar chart of a binned statistic.
+description: Counting and binning in depth, position adjustments, bin width, and why a histogram is a bar chart of a binned statistic.
 ---
 
 Bars are everywhere in analytics, and almost every bar chart is really
 a *statistic* made visible. This page goes deep on the two most common
-counting stats — `stat_count` (bars) and `stat_bin` (histograms) — and
+counting stats, `stat_count` (bars) and `stat_bin` (histograms), and
 the **position adjustments** that decide how bars share space.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="The same two-color bars three ways — side by side (dodge), stacked, and stretched to a common full height under a dashed line (fill) — three position adjustments of one data set"
+  aria-label="The same two-color bars three ways, side by side (dodge), stacked, and stretched to a common full height under a dashed line (fill), three position adjustments of one data set"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -47,7 +47,7 @@ values land in each.
 **Continuous `hwy` (values 12 to 44) → `stat_bin` cuts the range into
 equal bins → count per bin → `geom_histogram` draws one bar per bin.**
 
-The single most important knob is the **bin width** — it changes the
+The single most important knob is the **bin width**, it changes the
 story the histogram tells:
 
 <CodeBlock
@@ -83,14 +83,14 @@ ggplot(mpg, aes(hwy)) +
 <Callout type="warn" title="Always choose your bins consciously">
 ggplot2 defaults to 30 bins and *prints a message telling you to pick a
 better value*. The default is rarely ideal. Set `bins =` or
-`binwidth =` deliberately — the same data can look unimodal or jagged
+`binwidth =` deliberately, the same data can look unimodal or jagged
 depending on this one choice.
 </Callout>
 
 ## Bar charts: counts across categories
 
 `geom_bar()` is the categorical cousin: count rows per category.
-Mapping a second categorical variable to `fill` splits each bar — and
+Mapping a second categorical variable to `fill` splits each bar, and
 now we must decide *how* the sub-bars share space. That decision is the
 **position adjustment**.
 
@@ -157,9 +157,9 @@ ggplot(mpg, aes(x = class, fill = drv)) +
 
 Each position answers a different question from the *same* data:
 
-- **stack** — "what is the total, and its composition?"
-- **dodge** — "how do the groups compare within each category?"
-- **fill** — "what is the proportion mix, ignoring totals?"
+- **stack**, "what is the total, and its composition?"
+- **dodge**, "how do the groups compare within each category?"
+- **fill**, "what is the proportion mix, ignoring totals?"
 
 This is the grammar again: you do not switch chart *types*, you switch
 one *position* argument and the chart re-poses to answer a new
@@ -167,7 +167,7 @@ question.
 
 <Callout type="info" title="Position is its own grammar component">
 Position adjustments also apply beyond bars. \`position = "jitter"\` on
-points nudges overlapping dots apart so you can see density —
+points nudges overlapping dots apart so you can see density,
 \`geom_jitter()\` is just \`geom_point(position = "jitter")\`.
 </Callout>
 
@@ -194,7 +194,7 @@ ggplot(mpg, aes(x = drv, y = class)) +
   > Bin width has nothing to do with color.
 - The number of rows in the data set.
   > The data is fixed; bin width only changes how it is grouped for display.
-- [o] How finely the continuous range is sliced before counting — too wide hides structure, too narrow makes the histogram noisy.
+- [o] How finely the continuous range is sliced before counting, too wide hides structure, too narrow makes the histogram noisy.
   > Bin width is the central choice; it can make one data set look smooth or spiky.
 - Whether the x-axis is continuous or discrete.
   > The x variable is continuous regardless; bin width affects the grouping, not the type.
@@ -229,7 +229,7 @@ one for side-by-side group comparison.`}
 - [o] The proportion (relative composition) within each category, by stretching every bar to the same full height.
   > Fill normalizes to 1.0 so you compare mix, at the cost of losing absolute totals.
 - Nothing different; they are identical.
-  > They answer different questions — composition-with-totals vs. proportions.
+  > They answer different questions, composition-with-totals vs. proportions.
 
 \`fill\` trades away absolute counts to make proportional composition
 directly comparable across categories.`}
@@ -244,6 +244,6 @@ directly comparable across categories.`}
 - **Position adjustments** decide how overlapping bars share space:
   `stack` (totals + composition), `dodge` (side-by-side), `fill`
   (proportions).
-- Positions extend beyond bars — `jitter` separates overlapping points.
+- Positions extend beyond bars, `jitter` separates overlapping points.
 - Switching the *question* often means switching a *position*, not the
   chart type.

@@ -17,7 +17,7 @@ There are three slogans that capture the approach.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two grids of state cells: the left grid contains three red illegal cells among the blue, the right grid simply has gaps where those cells would be — tight types make illegal states unrepresentable instead of merely flagged"
+  aria-label="Two grids of state cells: the left grid contains three red illegal cells among the blue, the right grid simply has gaps where those cells would be, tight types make illegal states unrepresentable instead of merely flagged"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -53,10 +53,10 @@ There are three slogans that capture the approach.
   </g>
 </svg>
 
-## Slogan 1 — "Make illegal states unrepresentable"
+## Slogan 1, "Make illegal states unrepresentable"
 
 The phrase comes from Yaron Minsky of Jane Street, the trading firm
-that famously runs its entire business on OCaml — an environment
+that famously runs its entire business on OCaml, an environment
 where a software bug can lose millions of dollars before a human
 notices. His advice for surviving that environment became one of
 FP's most quoted design principles.
@@ -72,14 +72,14 @@ Consider a "remote data" wrapper used to model an API request:
   files={[
     {
       filename: "main.ts",
-      starterCode: `// ✗ WEAK MODEL — many illegal combinations
+      starterCode: `// ✗ WEAK MODEL, many illegal combinations
 type ProfileWeak = {
   loading: boolean;
   data: { name: string } | null;
   error: string | null;
 };
 
-// All of these are legally constructible — and all are bugs:
+// All of these are legally constructible, and all are bugs:
 const a: ProfileWeak = { loading: true, data: { name: "x" }, error: null };
 const b: ProfileWeak = { loading: false, data: null, error: null };
 const c: ProfileWeak = { loading: true, data: null, error: "x" };
@@ -90,7 +90,7 @@ console.log(a, b, c);
   ]}
 />
 
-The weak model allows "loading and have data and have an error" —
+The weak model allows "loading and have data and have an error",
 nonsense. With a discriminated union, only the *real* states are
 representable:
 
@@ -99,7 +99,7 @@ representable:
   files={[
     {
       filename: "main.ts",
-      starterCode: `// ✓ TIGHT MODEL — only valid states can be written
+      starterCode: `// ✓ TIGHT MODEL, only valid states can be written
 type Profile<A> =
   | { kind: "idle" }
   | { kind: "loading" }
@@ -111,9 +111,9 @@ const r2: Profile<{ name: string }> = { kind: "loading" };
 const r3: Profile<{ name: string }> = { kind: "loaded", data: { name: "Ada" } };
 const r4: Profile<{ name: string }> = { kind: "failed", error: "404" };
 
-// You CANNOT construct { kind: "loading", data: { name: "x" } } — extra fields
-// You CANNOT construct { kind: "loaded" } — missing data
-// You CANNOT construct { kind: "failed", data: ... } — wrong shape
+// You CANNOT construct { kind: "loading", data: { name: "x" } }, extra fields
+// You CANNOT construct { kind: "loaded" }, missing data
+// You CANNOT construct { kind: "failed", data: ... }, wrong shape
 
 const render = <A,>(p: Profile<A>, show: (a: A) => string): string => {
   switch (p.kind) {
@@ -163,16 +163,16 @@ type Form<A, E> =
 
 The transition functions become tiny, total, and exhaustive.
 
-## Slogan 2 — "Parse, don't validate"
+## Slogan 2, "Parse, don't validate"
 
 This slogan is the title of a 2019 essay by Alexis King that became
-one of the most-shared pieces of writing in the typed-FP world —
+one of the most-shared pieces of writing in the typed-FP world,
 required reading in many teams' onboarding documents. The essay's
 insight fits in one sentence:
 
 Validation is a *runtime check* that *returns the same type* you
 already had. Parsing is a runtime check that *returns a stricter
-type* — and from then on, the rest of the program *knows* the
+type*, and from then on, the rest of the program *knows* the
 constraint is satisfied because of the type signature.
 
 <CodeBlock
@@ -180,7 +180,7 @@ constraint is satisfied because of the type signature.
   files={[
     {
       filename: "main.ts",
-      starterCode: `// ✗ VALIDATE — the constraint is checked, then immediately forgotten
+      starterCode: `// ✗ VALIDATE, the constraint is checked, then immediately forgotten
 function validateNonEmpty(s: string): boolean {
   return s.length > 0;
 }
@@ -191,7 +191,7 @@ function greetA(name: string) {
   console.log(\`Hello, \${name}\`);
 }
 
-// ✓ PARSE — the constraint becomes part of the type
+// ✓ PARSE, the constraint becomes part of the type
 type NonEmpty = string & { readonly __brand: "NonEmpty" };
 
 function parseNonEmpty(s: string): NonEmpty | null {
@@ -221,7 +221,7 @@ it *is* a string), but you cannot use a plain `string` anywhere a
 `NonEmpty` is expected. The compiler propagates the guarantee.
 
 This is called a **branded type** (or *nominal* type). The `__brand`
-field exists only in the type system — at runtime it's still a
+field exists only in the type system, at runtime it's still a
 plain string.
 
 ### A small parser library
@@ -270,7 +270,7 @@ if (e.kind === "ok" && a.kind === "ok") {
 // The compiler refuses these even though the raw values are valid:
 // inviteAdult("ada@example.com", 36);              // strings/numbers, not brands
 // inviteAdult(e.kind === "ok" ? e.value : ("" as Email), a.kind === "ok" ? a.value : (0 as Age));
-// because Age is not AdultAge — you must call parseAdult first.
+// because Age is not AdultAge, you must call parseAdult first.
 `,
     },
   ]}
@@ -280,7 +280,7 @@ The branded types create a *staircase* of trust. Each `parse` step
 goes one level up; the deeper into the program you go, the
 stronger the guarantees the types carry.
 
-## Slogan 3 — "If it compiles, it (probably) works"
+## Slogan 3, "If it compiles, it (probably) works"
 
 The combination of:
 
@@ -290,7 +290,7 @@ The combination of:
 - `Option`/`Result` for *what could be missing or wrong*
 
 …means that vast classes of bugs simply cannot exist in your
-program. Not "would be caught by tests" — *cannot exist*. The
+program. Not "would be caught by tests", *cannot exist*. The
 compiler refuses to build them.
 
 This is what people mean when they say functional programmers
@@ -317,7 +317,7 @@ Then implement \`next(state, event)\` that handles the events
 needed payload), throwing if a transition doesn't make sense.
 
 Use exhaustive matching. **Do not allow** writing a "paying" state
-without an address — that's what the type system is for.
+without an address, that's what the type system is for.
 
 **Expected output**
 
@@ -443,7 +443,7 @@ export function next(state: Checkout, event: Event): Checkout {
 - Parsing happens at compile time; validation happens at runtime
   > Both run at runtime. The difference is what they *return*.
 - [o] Validation checks a constraint and returns the same type; parsing checks a constraint and returns a *stricter* type that carries the proof going forward
-  > Once you have a value of the stricter type, the rest of the program doesn't need to re-check the constraint — the type system does.
+  > Once you have a value of the stricter type, the rest of the program doesn't need to re-check the constraint, the type system does.
 - Validation is faster than parsing
   > No meaningful difference; both are typically a few CPU cycles.
 

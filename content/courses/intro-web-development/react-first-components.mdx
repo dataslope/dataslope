@@ -1,10 +1,10 @@
 ---
-title: React — First Components
-description: Components, JSX, props, and state — the ideas behind the most popular UI library, running in your browser.
+title: "React: First Components"
+description: Components, JSX, props, and state, the ideas behind the most popular UI library, running in your browser.
 ---
 
 In the scoreboard project you kept state in variables and manually
-updated the DOM to match. That works — and it's exactly the pain
+updated the DOM to match. That works, and it's exactly the pain
 **React** removes. React's deal is:
 
 > Describe what the UI should look like *for any given state*. When
@@ -12,7 +12,7 @@ updated the DOM to match. That works — and it's exactly the pain
 
 ## Components and JSX
 
-A React app is built from **components** — functions that return
+A React app is built from **components**, functions that return
 markup. The markup-in-JavaScript syntax is called **JSX**:
 
 ```tsx
@@ -25,7 +25,7 @@ JSX looks like HTML with three differences you'll hit immediately:
 `class` becomes `className`, `{curly braces}` embed JavaScript
 expressions, and components compose like elements: `<Welcome />`.
 
-These lessons use **TSX** — JSX with TypeScript — compiled entirely
+These lessons use **TSX**, JSX with TypeScript, compiled entirely
 in your browser (the first Run downloads the ~3 MB toolchain once).
 
 <CodeBlock
@@ -73,18 +73,18 @@ createRoot(document.getElementById("root")!).render(<App />);
 
 Three ideas in that one file:
 
-- **Props** — `Badge` receives `label` like a function argument.
+- **Props**, `Badge` receives `label` like a function argument.
   Same component, different data, four badges.
-- **Lists** — `topics.map(...)` turns an array into elements; `key`
+- **Lists**, `topics.map(...)` turns an array into elements; `key`
   tells React which is which.
-- **Mounting** — `createRoot(...).render(<App />)` attaches the
+- **Mounting**, `createRoot(...).render(<App />)` attaches the
   component tree to the page's `<div id="root">`. Every React app
   has exactly one of these lines.
 
-## State — the scoreboard, the React way
+## State, the scoreboard, the React way
 
 `useState` gives a component a piece of state and a function to
-change it. Call the setter and React re-renders — no
+change it. Call the setter and React re-renders, no
 `querySelector`, no manual `textContent` updates, no
 reset-the-variable-AND-the-display bugs:
 
@@ -103,7 +103,7 @@ function Scoreboard() {
   return (
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
       <h1>
-        Home {home} — {away} Away
+        Home {home}, {away} Away
       </h1>
       <button onClick={() => setHome(home + 1)}>+1 Home</button>{" "}
       <button onClick={() => setAway(away + 1)}>+1 Away</button>{" "}

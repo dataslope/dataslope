@@ -6,13 +6,13 @@ description: Habits of thought that separate analysts who produce trustworthy wo
 Tools are only as good as the person wielding them. A spreadsheet
 in the hands of a careful analyst can outperform Pandas in the
 hands of a careless one. This chapter is about the *habits of
-mind* that distinguish good analytical work — habits that apply
+mind* that distinguish good analytical work, habits that apply
 no matter what tool you eventually pick up.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A bar chart where one red bar towers suspiciously above the calm blue rest — the analyst habit of questioning a surprising number instead of trusting it"
+  aria-label="A bar chart where one red bar towers suspiciously above the calm blue rest, the analyst habit of questioning a surprising number instead of trusting it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -41,7 +41,7 @@ We will walk through each.
 ### 1. Be skeptical of your data
 
 The most dangerous assumption is that your data is correct. It
-almost never is — at least, not entirely. Before you trust a
+almost never is, at least, not entirely. Before you trust a
 number, ask:
 
 - **Where did it come from?** Which system collected it, when,
@@ -85,7 +85,7 @@ would have made the eventual conclusion wrong.
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# A small "orders" table — a few suspicious values hidden in there
+# A small "orders" table, a few suspicious values hidden in there
 orders = pd.DataFrame(
     {
         "order_id": range(1, 11),
@@ -107,12 +107,12 @@ print(orders[(orders["amount"] <= 0) | (orders["amount"] > 100000)])
   ]}
 />
 
-The naive total includes a giant outlier and a refund — both of
+The naive total includes a giant outlier and a refund, both of
 which deserve investigation before the number is reported.
 
 ### 3. Prefer evidence over intuition (and intuition over guesses)
 
-Your gut is useful for *generating hypotheses* — "I think
+Your gut is useful for *generating hypotheses*, "I think
 customers from New York spend more." Your gut is bad at
 *confirming* those hypotheses. Check.
 
@@ -153,8 +153,8 @@ analysis in three months. Can they follow what you did?
 Even small companies eventually have an investor, a board
 member, a regulator, or an internal compliance officer who asks
 *"how did you arrive at this number?"* The analysts who can
-answer in two minutes — by re-running a script and walking
-through it — are the ones whose careers thrive.
+answer in two minutes, by re-running a script and walking
+through it, are the ones whose careers thrive.
 
 This is why we will spend a whole chapter on **Reproducible
 Analysis**. It is not academic. It is professional self-defense.
@@ -172,7 +172,7 @@ produces X, you stop looking. Counter: deliberately try to
 ### Survivorship bias
 
 Your dataset only contains the things that *made it through*
-some filter — users who completed onboarding, planes that
+some filter, users who completed onboarding, planes that
 landed, companies that did not go bankrupt. Conclusions about
 "users" or "companies" are really conclusions about the
 *surviving* subset.
@@ -199,8 +199,8 @@ mantra to memorize.
 
 Running fifty comparisons and reporting only the one that turned
 out interesting. The standard defense in scientific work is
-**pre-registering** your hypotheses — writing them down before
-looking at the data — but in business work the discipline is
+**pre-registering** your hypotheses, writing them down before
+looking at the data, but in business work the discipline is
 less common, so the temptation is constant.
 
 ## A small skepticism drill
@@ -279,7 +279,7 @@ just a tool-using activity.
 - The mean function in Pandas is broken
   > \`df["score"].mean()\` computed the correct arithmetic mean of the values in the column; the problem was with interpretation, not computation.
 - There were too few rows
-  > The dataset had 15 rows — enough to compute a meaningful mean; the issue was that grouping by channel revealed a pattern the overall mean concealed.
+  > The dataset had 15 rows, enough to compute a meaningful mean; the issue was that grouping by channel revealed a pattern the overall mean concealed.
 - [o] All the low scores came in through one channel; aggregating across channels hid the variation that mattered
   > This is a small Simpson's-paradox-flavored example. Always look at meaningful sub-groups before trusting an aggregate.
 - The scores were on a wrong scale
@@ -310,7 +310,7 @@ Awareness of Simpson's paradox is one of the few things that consistently separa
   > Pandas has hundreds of methods; no analyst memorizes them all, and that is not what the chapter calls professional self-defense.
 - Charting everything
   > Visualization is valuable, but the chapter's "professional self-defense" specifically refers to making analyses auditable and reproducible.
-- [o] Treating every analysis as if it will be audited — i.e., making it reproducible, traceable, and explainable
+- [o] Treating every analysis as if it will be audited, i.e., making it reproducible, traceable, and explainable
   > When (not if) someone asks "how did you arrive at this number?", being able to re-run a script and walk through it is what protects you and your team.
 - Drinking lots of coffee
   > Caffeine is not among the chapter's analytical habits; this is a humorous distractor.

@@ -1,19 +1,19 @@
 ---
 title: GROUP BY ALL and Grouping Sets
-description: DuckDB conveniences that make aggregation faster to write and more powerful — GROUP BY ALL, plus ROLLUP, CUBE, and GROUPING SETS for subtotals and multi-level summaries.
+description: DuckDB conveniences that make aggregation faster to write and more powerful, GROUP BY ALL, plus ROLLUP, CUBE, and GROUPING SETS for subtotals and multi-level summaries.
 ---
 
 The last page covered `GROUP BY` as you would write it in any database.
 DuckDB adds a few conveniences that remove ceremony and unlock
 multi-level summaries in a single query. This page covers `GROUP BY ALL`
 (a daily time-saver) and grouping sets (`ROLLUP`, `CUBE`, `GROUPING
-SETS`) for subtotals — the kind of thing you would otherwise stitch
+SETS`) for subtotals, the kind of thing you would otherwise stitch
 together with several queries.
 
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Six blue detail chips join by thin gray lines into two green subtotal chips, which join into one yellow grand total — one rolled-up query returning every level of summary at once"
+  aria-label="Six blue detail chips join by thin gray lines into two green subtotal chips, which join into one yellow grand total, one rolled-up query returning every level of summary at once"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -43,22 +43,22 @@ together with several queries.
   </g>
 </svg>
 
-## `GROUP BY ALL` — stop repeating yourself
+## `GROUP BY ALL`, stop repeating yourself
 
 A normal grouped query forces you to list the grouping columns *twice*:
 once in `SELECT`, once in `GROUP BY`. On a wide query that is tedious and
-error-prone — add a dimension to `SELECT` and forget to add it to `GROUP
+error-prone, add a dimension to `SELECT` and forget to add it to `GROUP
 BY`, and you get an error (or worse, a wrong result in databases that
 allow it).
 
 `GROUP BY ALL` tells DuckDB: *group by every selected column that is not
 inside an aggregate.* You write the dimensions once. Here it is over a real
-file of Lending Club loan results — default rate by loan `grade` and
+file of Lending Club loan results, default rate by loan `grade` and
 `home_ownership`, two dimensions you name only in the `SELECT`:
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="GROUP BY ALL infers the grouping columns — over a real loan file"
+  title="GROUP BY ALL infers the grouping columns, over a real loan file"
   starterCode={`SELECT
   grade,
   home_ownership,
@@ -74,7 +74,7 @@ ORDER BY
 />
 
 The result is identical to writing `GROUP BY grade, home_ownership`, but
-the intent is clearer and the query is harder to get wrong — you cannot
+the intent is clearer and the query is harder to get wrong, you cannot
 add a dimension to `SELECT` and forget it below. This is one of the small
 ergonomics that make DuckDB pleasant for fast analysis.
 
@@ -93,7 +93,7 @@ etc.) are summarized; everything else becomes a grouping key.
 ## The subtotal problem
 
 Suppose you have revenue per `(region, product)` and you *also* want the
-revenue per region overall, and the grand total — all in one result.
+revenue per region overall, and the grand total, all in one result.
 Plain `GROUP BY` gives only the finest level. Running three separate
 queries works but is clumsy and hard to combine. **Grouping sets** solve
 this in one pass.
@@ -105,7 +105,7 @@ flowchart TB
     G --> L3["grand total"]
 ```
 
-## `ROLLUP` — hierarchical subtotals
+## `ROLLUP`, hierarchical subtotals
 
 `ROLLUP(region, product)` produces the detailed rows **plus** a subtotal
 per region **plus** a grand total. It is perfect for hierarchies where
@@ -142,7 +142,7 @@ subtotals**. The row where *both* are `NULL` is the **grand total**. The
 `NULL`s are SQL's way of saying "this column is not part of this subtotal
 level."
 
-## `CUBE` — every combination of subtotals
+## `CUBE`, every combination of subtotals
 
 Where `ROLLUP` follows one hierarchy, `CUBE(region, product)` produces
 subtotals for **every** combination: per region, per product, *and* the
@@ -175,12 +175,12 @@ ORDER BY
 />
 
 You now have per-region subtotals, per-product subtotals, the detail, and
-the grand total — the full cross-tabulation, in one query.
+the grand total, the full cross-tabulation, in one query.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A two-by-two grid of blue detail cells grows a green margin column, a yellow margin row, and a red corner total — CUBE computing the detail and every marginal subtotal in a single pass"
+  aria-label="A two-by-two grid of blue detail cells grows a green margin column, a yellow margin row, and a red corner total, CUBE computing the detail and every marginal subtotal in a single pass"
   style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -281,7 +281,7 @@ column's values.`}
 
 - When you only want the finest-grained detail rows.
   > Plain \`GROUP BY\` gives just the detail; both CUBE and ROLLUP add subtotals.
-- [o] When you want subtotals for **every** combination — per region, per product, and the grand total — not just one hierarchy.
+- [o] When you want subtotals for **every** combination, per region, per product, and the grand total, not just one hierarchy.
   > CUBE generates all marginal subtotals, whereas ROLLUP follows a single hierarchy (product within region within all).
 - When you want fewer rows than \`ROLLUP\`.
   > CUBE generally produces *more* subtotal rows than ROLLUP, not fewer.
@@ -293,5 +293,5 @@ hierarchy of them.`}
 />
 
 You can now summarize at multiple levels in a single query. But what if
-you want to filter *based on a group's summary* — "only regions with
+you want to filter *based on a group's summary*, "only regions with
 revenue over \$1000"? That needs `HAVING`, which is next.

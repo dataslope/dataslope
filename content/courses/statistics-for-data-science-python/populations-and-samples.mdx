@@ -1,11 +1,11 @@
 ---
 title: Populations and Samples
-description: The population–sample distinction at the heart of inference — parameters you can't observe, statistics you compute to estimate them, and why bigger samples sharpen the estimate rather than change the target.
+description: The population–sample distinction at the heart of inference, parameters you can't observe, statistics you compute to estimate them, and why bigger samples sharpen the estimate rather than change the target.
 ---
 
 In *Statistical Thinking* we said your data is one noisy slice of a
-larger reality. This page gives that idea its proper vocabulary —
-**population** and **sample**, **parameter** and **statistic** — and
+larger reality. This page gives that idea its proper vocabulary,
+**population** and **sample**, **parameter** and **statistic**, and
 makes one arrow precise: you compute a statistic from a sample to
 *estimate* a parameter of a population you can't fully see. Almost
 every method in the rest of the course is a tool for drawing that arrow
@@ -20,7 +20,7 @@ wobbles every time you collect new data. Let's pin them down.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A vast field of gray dots hides a yellow ring at its heart while nine scattered dots glow blue; past a solid arrow the same nine reappear in a small tray whose green summary dot is the only number you can actually compute — a sample statistic estimating a population parameter you never see"
+  aria-label="A vast field of gray dots hides a yellow ring at its heart while nine scattered dots glow blue; past a solid arrow the same nine reappear in a small tray whose green summary dot is the only number you can actually compute, a sample statistic estimating a population parameter you never see"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="36" y="22" width="380" height="186" rx="18" fill="var(--ds-blue-500)" fillOpacity="0.06" />
@@ -114,7 +114,7 @@ wobbles every time you collect new data. Let's pin them down.
 ## Population vs. sample
 
 The **population** is the entire collection of units you actually care
-about — every customer, every transaction this design could ever
+about, every customer, every transaction this design could ever
 generate, every wafer the machine could ever produce. The **sample** is
 the subset you managed to observe and put in a DataFrame.
 
@@ -129,7 +129,7 @@ flowchart TD
 The loop is the whole idea: the parameter lives in the population (top
 right), you can't see it directly, so you draw a sample, compute a
 statistic, and use that statistic to estimate the parameter. The dotted
-arrows are *inference* — uncertain by nature. The solid arrows are
+arrows are *inference*, uncertain by nature. The solid arrows are
 *things you actually do* (sampling and computing), which are concrete
 and exact.
 
@@ -146,7 +146,7 @@ why "just collect all of it" usually isn't even possible in principle.
 ## Why we sample instead of taking a census
 
 A **census** measures every unit in the population. When you can do one
-cheaply, do it — there's no uncertainty to estimate. But for most
+cheaply, do it, there's no uncertainty to estimate. But for most
 data-science questions a census is impossible, impractical, or
 pointless:
 
@@ -154,20 +154,20 @@ pointless:
   every possible session, is wildly expensive when 2,000 well-chosen
   observations answer the question.
 - **The population is infinite or future-facing.** You literally cannot
-  measure "all sessions this design will ever serve" — most of them
+  measure "all sessions this design will ever serve", most of them
   haven't happened yet.
 - **Measurement destroys the unit.** A factory testing battery
   lifetime to failure can't ship the batteries it tested. Destructive
   testing *forces* sampling.
 - **A good sample is enough.** This is the punchline of the whole
   course: a modest, representative sample estimates a population
-  parameter with quantifiable precision. You don't need everything —
+  parameter with quantifiable precision. You don't need everything,
   you need enough, collected well.
 
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A shelf of identical batteries, two of them snapped in half by lifetime testing with a small yellow data spark above each — when measurement destroys the unit, you can only ever test a sample, never the whole shipment"
+  aria-label="A shelf of identical batteries, two of them snapped in half by lifetime testing with a small yellow data spark above each, when measurement destroys the unit, you can only ever test a sample, never the whole shipment"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="132" width="500" height="3" rx="1.5" fill="var(--ds-gray-400)" />
@@ -203,7 +203,7 @@ pointless:
 Sampling isn't a sad approximation you settle for. It's the entire
 basis of efficient measurement: a 1,500-person poll can speak for a
 nation because statistics tells you *exactly how precise* that estimate
-is. The catch is that the sample must be collected without bias — the
+is. The catch is that the sample must be collected without bias, the
 subject of *Sampling and Bias*.
 </Callout>
 
@@ -212,10 +212,10 @@ subject of *Sampling and Bias*.
 This is the distinction to burn into memory.
 
 - A **parameter** is a number that describes the **population**. It's
-  fixed (the process has some true value) but **unknown** — you can't
+  fixed (the process has some true value) but **unknown**, you can't
   see it. Parameters get Greek letters.
 - A **statistic** is a number you compute from the **sample**. It's
-  **known** (you can calculate it) but **varies** — a different sample
+  **known** (you can calculate it) but **varies**, a different sample
   gives a different value. Statistics get Latin letters or "hats."
 
 | Quantity | Population **parameter** (unknown, fixed) | Sample **statistic** (known, varies) |
@@ -232,7 +232,7 @@ Latin/hat = your best guess from data.** The statistic is the
 estimate μ, p̂ to estimate `p`, and so on.
 
 <Callout type="danger" title="The #1 confusion: reporting a statistic as a parameter">
-Writing "average revenue per user is \$48.20" — full stop — quietly
+Writing "average revenue per user is \$48.20", full stop, quietly
 claims you measured the *population*. You didn't. You measured
 `x̄ = 48.20` from a sample, and the population μ is *near* it but
 uncertain. The honest sentence names the estimate and its error:
@@ -247,13 +247,13 @@ claims are born.
 In World War II the Allies wanted to know a hidden population parameter:
 how many tanks Germany was producing. The population size `N` was a
 military secret. But captured and destroyed tanks carried sequential
-**serial numbers** on their gearboxes and chassis — a *sample* drawn
+**serial numbers** on their gearboxes and chassis, a *sample* drawn
 from that population. Statisticians reasoned that if the highest serial
 number you've seen is `m` from a sample of `k` tanks, a good estimate of
 the total is roughly `m + m/k − 1` (the largest observed value, nudged
 up to account for the gap above it). The estimates this produced were
 strikingly close to actual German production figures revealed after the
-war — and far more accurate than conventional intelligence. It's a vivid
+war, and far more accurate than conventional intelligence. It's a vivid
 case of the whole game: a fixed unknown parameter (`N`), a sample
 statistic (the serial numbers you happened to see), and an estimator
 built to bridge the two.
@@ -276,7 +276,7 @@ draw samples and watch the statistics estimate the (now visible) truth.
 rng = np.random.default_rng(42)
 
 # We DEFINE the population, so we know the true parameters exactly.
-# (In real life these are hidden — that's the whole problem.)
+# (In real life these are hidden, that's the whole problem.)
 MU_TRUE = 100.0  # population mean       (parameter)
 SIGMA_TRUE = 15.0  # population sd         (parameter)
 
@@ -298,7 +298,7 @@ print("Your statistic lands NEAR the parameter, but not exactly on it.")
   ]}
 />
 
-The estimate misses by a little — that miss is *estimation error*, and
+The estimate misses by a little, that miss is *estimation error*, and
 it's unavoidable from a finite sample. Crucially, the error isn't a
 mistake you made; it's the price of not seeing the whole population.
 
@@ -314,7 +314,7 @@ samples; we explain *why* in *Measures of Spread*.
 
 Here's the idea that unlocks everything later. Because a statistic
 depends on *which* sample you happened to draw, it **changes from
-sample to sample** — which means a statistic is itself a **random
+sample to sample**, which means a statistic is itself a **random
 variable** with its own distribution. The sample mean isn't a fixed
 number; it's a number that *would have come out differently* with a
 different sample.
@@ -354,10 +354,10 @@ print(f"Spread of the sample means (std): {sample_means.std():.2f}")
 />
 
 Two things to notice, because they preview the next several pages.
-First, the sample means **pile up around the true μ** — the
+First, the sample means **pile up around the true μ**, the
 statistic is "aimed" at the parameter (it's *unbiased*). Second, they
-have a **spread of their own**. That spread — how much an estimate
-wobbles sample-to-sample — is the *standard error*, and the whole
+have a **spread of their own**. That spread, how much an estimate
+wobbles sample-to-sample, is the *standard error*, and the whole
 distribution of a statistic across samples is a *sampling
 distribution*. We devote entire pages to them: *Sampling Distributions*
 and *Standard Error*.
@@ -365,7 +365,7 @@ and *Standard Error*.
 <MultipleChoice
   markdown={`You compute the mean salary of a random sample of 200 employees and get \\$72,400. A teammate says "so the average salary at the company is \\$72,400." What's the precise issue?
 
-- Nothing — the sample mean *is* the company average
+- Nothing, the sample mean *is* the company average
   > The sample mean equals the average *of those 200 people*, not of the whole company. Treating $\\bar{x}$ as $\\mu$ skips over sampling error.
 - The sample is too small for any conclusion
   > 200 is a respectable sample. The problem isn't the size; it's stating a sample statistic as if it were the population parameter, with no uncertainty attached.
@@ -377,7 +377,7 @@ and *Standard Error*.
 The sample mean estimates the population mean; it doesn't equal it.`}
 />
 
-## Estimates have error — and it shrinks as n grows
+## Estimates have error, and it shrinks as n grows
 
 Estimation error is unavoidable, but it's not uncontrollable. The most
 important lever is **sample size**: as `n` grows, your statistic
@@ -423,12 +423,12 @@ The error trends toward zero as `n` grows (it's jagged because each
 sample is still random, but the envelope shrinks). A key, often-missed
 detail: precision improves with √n, **not** `n`. To halve your
 error you need roughly **four times** the data. That diminishing return
-is exactly why a national poll uses ~1,500 people, not 1,500,000 — past
+is exactly why a national poll uses ~1,500 people, not 1,500,000, past
 a point, more data buys very little extra precision. We'll quantify this
 with the standard error formula `σ / √n` in *Standard Error*.
 
 <Callout type="danger" title="Misconception: a bigger sample changes the population">
-A bigger sample does **not** change the population or its parameters —
+A bigger sample does **not** change the population or its parameters,
 μ, σ, and `p` are properties of the population and don't
 care how much you sampled. What grows with `n` is the **precision of
 your estimate**: x̄ clusters more tightly around the unchanged
@@ -447,7 +447,7 @@ your estimate**: x̄ clusters more tightly around the unchanged
 - The estimate's precision improves 10x because the sample grew 10x
   > Precision scales with $\\sqrt{n}$, so a 10x larger sample improves precision by about $\\sqrt{10} \\approx 3.2$x, not 10x.
 
-More data sharpens the estimate of a fixed parameter — it doesn't change the parameter.`}
+More data sharpens the estimate of a fixed parameter, it doesn't change the parameter.`}
 />
 
 ## Practice the population–sample loop
@@ -459,9 +459,9 @@ More data sharpens the estimate of a fixed parameter — it doesn't change the p
 
 A single \`sample\` of size 120 has been drawn. From **the sample only**, produce a dict named \`estimates\` with:
 
-- \`"x_bar"\` — the sample mean (a float)
-- \`"s"\` — the sample standard deviation using **ddof=1** (a float)
-- \`"mean_error"\` — the signed estimation error \`x_bar - MU_TRUE\` (a float)
+- \`"x_bar"\`, the sample mean (a float)
+- \`"s"\`, the sample standard deviation using **ddof=1** (a float)
+- \`"mean_error"\`, the signed estimation error \`x_bar - MU_TRUE\` (a float)
 
 Use \`sample.mean()\` and \`sample.std(ddof=1)\`. All three values must be plain Python floats.`}
   files={[
@@ -535,8 +535,8 @@ assert abs(estimates["s"] - float(np.std(sample, ddof=1))) < 1e-9`,
 
 A \`sample\` of 400 users (an array of 0s and 1s) has been drawn. Produce:
 
-- \`p_hat\` — the sample proportion of churners, i.e. the **mean** of the 0/1 sample (a float).
-- \`abs_error\` — the absolute error \`abs(p_hat - P_TRUE)\` (a float).
+- \`p_hat\`, the sample proportion of churners, i.e. the **mean** of the 0/1 sample (a float).
+- \`abs_error\`, the absolute error \`abs(p_hat - P_TRUE)\` (a float).
 
 For a 0/1 array, the proportion of 1s is just its mean. Make both values plain Python floats.`}
   files={[
@@ -591,7 +591,7 @@ assert abs(p_hat - float(np.mean(sample))) < 1e-9`,
 <Callout type="tip" title="What both challenges quietly demonstrate">
 You computed statistics (x̄, `s`, p̂) from a sample and
 compared them to parameters (μ, σ, `p`) you'd normally never
-see. In real work the parameter stays hidden — so instead of measuring
+see. In real work the parameter stays hidden, so instead of measuring
 the error directly, you *estimate* it with a standard error or a
 confidence interval. That's the leap we make in *Standard Error* and
 *Confidence Intervals*.
@@ -605,7 +605,7 @@ confidence interval. That's the leap we make in *Standard Error* and
 - The mean of the 1,200 rows in your loaded DataFrame
   > That's a value you computed from a sample, which makes it a statistic ($\\bar{x}$), not a parameter.
 - [o] The true average lifetime of *every* battery this factory will ever produce
-  > A property of the entire (here, conceptual and infinite) population is a parameter — fixed but unobservable, exactly the thing a sample statistic estimates.
+  > A property of the entire (here, conceptual and infinite) population is a parameter, fixed but unobservable, exactly the thing a sample statistic estimates.
 - The proportion of survey respondents who answered "yes"
   > Computed from the respondents you sampled, this is a statistic ($\\hat{p}$). Respondents are a sample, not the whole population.
 - The standard deviation of last week's recorded sensor readings
@@ -621,7 +621,7 @@ Parameters describe the whole population and are unknown; statistics are compute
   > The numeric type of a parameter is irrelevant. The obstacle is access to the population, not arithmetic.
 - Because Pandas can't hold that many rows
   > Tooling limits aren't the fundamental issue; even with unlimited compute you couldn't observe the population here. The population is conceptual.
-- [o] Because the population is conceptual and partly in the future — it includes all sessions the flow *could* generate, most of which haven't happened
+- [o] Because the population is conceptual and partly in the future, it includes all sessions the flow *could* generate, most of which haven't happened
   > Recognizing that the population is an unbounded, future-facing process explains why you can only ever sample from it and must estimate its parameters.
 - Because measurement always changes the parameter's value
   > Observing data doesn't generally alter the underlying parameter. The reason you can't compute it directly is that you can't observe the whole population, not that you disturb it.
@@ -633,9 +633,9 @@ Many populations are processes, not finite lists, so their parameters can only b
   markdown={`A statistic like the sample mean is best described as:
 
 - A fixed constant that's the same for any sample from the population
-  > If it were the same for every sample, it would carry no sampling variability — but a different sample gives a different mean. That variability is the whole reason inference is uncertain.
+  > If it were the same for every sample, it would carry no sampling variability, but a different sample gives a different mean. That variability is the whole reason inference is uncertain.
 - [o] A random variable: its value depends on which sample you drew, so it has a distribution across possible samples
-  > Treating the statistic as a quantity that varies sample-to-sample — with its own spread (the sampling distribution) — is what underlies standard errors and confidence intervals.
+  > Treating the statistic as a quantity that varies sample-to-sample, with its own spread (the sampling distribution), is what underlies standard errors and confidence intervals.
 - An exact copy of the population parameter it estimates
   > It's an *estimate* of the parameter, generally close but not exactly equal. The gap is estimation error.
 - A value that only exists once you've measured the entire population
@@ -652,7 +652,7 @@ Seeing statistics as random variables is the foundation for everything in the sa
 - It shrinks by a factor of 4, in proportion to the sample size
   > Precision improves with $\\sqrt{n}$, not $n$, so a 4x larger sample doesn't give a 4x reduction in error. That overstates the gain.
 - [o] It shrinks by about a factor of 2, because precision scales with $\\sqrt{n}$ and $\\sqrt{4} = 2$
-  > Tying the error reduction to $\\sqrt{n}$ captures the diminishing returns of more data — quadrupling $n$ only halves the typical error.
+  > Tying the error reduction to $\\sqrt{n}$ captures the diminishing returns of more data, quadrupling $n$ only halves the typical error.
 - It doesn't change, because the population mean is fixed
   > The population mean being fixed is true but unrelated; the *estimate's* precision still improves as $n$ grows. The fixed target is what you're getting better at hitting.
 
@@ -669,21 +669,21 @@ The $\\sqrt{n}$ rule is why huge samples bring only modest extra precision.`}
 - $\\sigma$ is computed from your sample and $s$ is the unknown population value
   > Reversed. $s$ is the sample standard deviation you compute; $\\sigma$ is the unknown population standard deviation.
 - $N$ is your sample size and $n$ is the population size
-  > Conventionally $N$ denotes the population size and $n$ the sample size — the opposite of what's stated here.
+  > Conventionally $N$ denotes the population size and $n$ the sample size, the opposite of what's stated here.
 
 Greek letters (and plain symbols) name unknown population parameters; Latin letters and hats name the sample statistics that estimate them.`}
 />
 
 <Callout type="success" title="Key takeaways">
 - The **population** is everything you care about (often conceptual/infinite); the **sample** is what you observed.
-- A **parameter** (μ, σ, `p`) describes the population — fixed but unknown. A **statistic** (x̄, `s`, p̂) is computed from the sample — known but varies.
+- A **parameter** (μ, σ, `p`) describes the population, fixed but unknown. A **statistic** (x̄, `s`, p̂) is computed from the sample, known but varies.
 - You **estimate** parameters with statistics; the gap between them is unavoidable **estimation error**.
 - A statistic is a **random variable**: it changes sample to sample and has its own distribution.
 - Bigger `n` **sharpens the estimate** (precision ∝ √n); it does **not** change the population or its parameters.
-- We **sample** because a census is usually impossible, costly, or unnecessary — a well-collected sample is enough.
+- We **sample** because a census is usually impossible, costly, or unnecessary, a well-collected sample is enough.
 </Callout>
 
-Next, *Sampling and Bias* tackles the part this page assumed away —
+Next, *Sampling and Bias* tackles the part this page assumed away,
 getting a sample that actually represents the population. Then *Standard
 Error* quantifies how much an estimate wobbles, and *Confidence
 Intervals* turns that wobble into an honest range for the parameter you

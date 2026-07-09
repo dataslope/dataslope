@@ -1,17 +1,17 @@
 ---
 title: Welcome
-description: A foundations-first tour of classic Natural Language Processing with Python and NLTK — built around intuition, trade-offs, and the reasoning behind every step in a text pipeline.
+description: A foundations-first tour of classic Natural Language Processing with Python and NLTK, built around intuition, trade-offs, and the reasoning behind every step in a text pipeline.
 ---
 
 <Figure
   slug="conversation"
-  alt="People in conversation with overlapping speech bubbles — the raw material of natural language processing"
+  alt="People in conversation with overlapping speech bubbles, the raw material of natural language processing"
   priority
 />
 
 Welcome to **Natural Language Processing with Python**. This course is for
-the person who can already write Python — strings, lists, loops,
-dictionaries, a comprehension or two, maybe a regular expression — and who
+the person who can already write Python, strings, lists, loops,
+dictionaries, a comprehension or two, maybe a regular expression, and who
 keeps hearing the phrase "natural language processing" and wants to
 understand what it *actually is*, not just which function to call.
 
@@ -20,7 +20,7 @@ verb. "New York" is two words but one thing. "don't" hides the word "not"
 inside a contraction. A period sometimes ends a sentence and sometimes ends
 "Dr." Computers are superb at exact, regular data and hopeless at the
 ambiguous, irregular, context-soaked data that is ordinary text. NLP is the
-collection of techniques we use to bridge that gap — to turn a paragraph a
+collection of techniques we use to bridge that gap, to turn a paragraph a
 human wrote into something a program can count, compare, and reason about.
 
 This is not an API reference. You can always look up the arguments to
@@ -32,7 +32,7 @@ lemmatization. That judgment is the real subject of this course.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A speech-bubble card full of uneven blue marks becomes a tidy grid of blue cells — turning human language into structure a program can count"
+  aria-label="A speech-bubble card full of uneven blue marks becomes a tidy grid of blue cells, turning human language into structure a program can count"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -63,9 +63,9 @@ lemmatization. That judgment is the real subject of this course.
 
 ## Your first taste, right now
 
-Enough preamble — let us actually *do* some NLP. The block below takes a
+Enough preamble, let us actually *do* some NLP. The block below takes a
 sentence, splits it into words, and counts how often each one appears. It uses
-nothing but plain Python, so it runs the instant you press **Run** — no
+nothing but plain Python, so it runs the instant you press **Run**, no
 downloads, no waiting. **This whole course runs inside your browser**, and this
 is the first proof.
 
@@ -91,7 +91,7 @@ print("Distinct words:", len(counts))
   ]}
 />
 
-Three lines of real work — split, count, rank — and you already have a tiny
+Three lines of real work, split, count, rank, and you already have a tiny
 text analysis. Try the one tweak the comment invites: **change the sentence**
 to a line of your own and run it again. Notice that "the" almost certainly tops
 the chart; that lopsidedness is a deep fact about language we will return to.
@@ -101,7 +101,7 @@ properly is the first real lesson of the course.
 
 <Callout type="info" title="No setup required">
 Every code block on every page runs a full Python environment right here, in
-this page. There is nothing to install — no Python, no NLTK, no data
+this page. There is nothing to install, no Python, no NLTK, no data
 packages. Edit the code, press **Run**, and the output appears beneath the
 editor. The challenge cards work the same way: write a solution, press
 **Check Answer**, and see which tests pass. The blocks that use NLTK quietly
@@ -126,9 +126,9 @@ You do **not** need:
 - Statistics or heavy mathematics.
 
 <Callout type="warn" title="This is a foundations course, on purpose">
-We focus on the classic, transparent toolkit of NLP — tokenization,
+We focus on the classic, transparent toolkit of NLP, tokenization,
 normalization, stopwords, stemming, lemmatization, frequency analysis,
-part-of-speech tagging, and n-grams — all through **NLTK**, the Natural
+part-of-speech tagging, and n-grams, all through **NLTK**, the Natural
 Language Toolkit. We deliberately **do not** cover deep learning,
 transformers, BERT, GPT, attention, or word embeddings beyond the occasional
 concept. Those are wonderful topics, but they make far more sense once the
@@ -142,11 +142,11 @@ By the end you will be able to:
 
 - Explain *why* raw text is hard for computers, in terms of ambiguity and
   structure.
-- Break text into sentences and words correctly — and explain why
+- Break text into sentences and words correctly, and explain why
   `text.split()` is not tokenization.
 - Normalize text (case folding, punctuation stripping) and reason about what
   that normalization throws away.
-- Decide *whether* to remove stopwords — and recognize the tasks where
+- Decide *whether* to remove stopwords, and recognize the tasks where
   removing them is a serious mistake.
 - Choose between **stemming** and **lemmatization** and justify the choice.
 - Measure a text with frequency distributions and lexical diversity.
@@ -174,7 +174,7 @@ nearly every page.
 
 The counting demo above was pure Python. Here is what the *real* toolkit looks
 like: a complete, classic NLP pipeline that takes a short paragraph and runs it
-through the whole journey of this course — split into words, normalize, drop
+through the whole journey of this course, split into words, normalize, drop
 stopwords, reduce to dictionary roots, and count what is left. This one uses
 NLTK, so the first run pauses briefly to load the data it needs; press **Run**,
 and open the collapsed setup section above the editor if you are curious what is
@@ -244,7 +244,7 @@ print("Lemmas:  ", lemmas)
 />
 
 Five short steps, and a result a program can actually work with. You do not
-yet need to understand every line — that is what the next pages are for. But
+yet need to understand every line, that is what the next pages are for. But
 notice the *shape* already: **tokenize, normalize, filter, reduce, count.**
 That shape barely changes from project to project. Every technique in this
 course is a way to do one of those steps better, or a reason to skip one of
@@ -254,11 +254,11 @@ them on purpose.
 
 You will meet three kinds of widget:
 
-1. **Executable code blocks** — like the one above. Edit and re-run them as
+1. **Executable code blocks**, like the one above. Edit and re-run them as
    much as you like; experimentation is the entire point.
-2. **Challenge cards** — small problems with tests. You write the
+2. **Challenge cards**, small problems with tests. You write the
    solution and press **Check Answer** to see which tests pass.
-3. **Multiple-choice questions** — quick conceptual checks with an
+3. **Multiple-choice questions**, quick conceptual checks with an
    explanation for *every* option, right or wrong.
 
 <Callout type="info" title="Each code block starts fresh">
@@ -278,14 +278,14 @@ why.
 
 We take the slower, more durable path. For every step in the pipeline we ask
 the same questions: **What ambiguity or structural problem does this solve?
-Why does it exist? When should you reach for it — and when should you
+Why does it exist? When should you reach for it, and when should you
 absolutely not? What do people get wrong about it? Where does it show up in
 the real world?** Tools only make sense once you understand the job they
 were built for.
 
 <Callout type="tip" title="How to use this course">
-Run every code block. Then change something — the input text, a rule, the
-order of two steps — and predict what will happen before you press **Run**
+Run every code block. Then change something, the input text, a rule, the
+order of two steps, and predict what will happen before you press **Run**
 again. The gap between what you expected and what you got is exactly where
 the learning happens.
 </Callout>

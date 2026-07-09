@@ -25,7 +25,7 @@
   margin: 0 0 2rem;
 }
 
-/* Escape hatches back to the rest of the site — this index is a sitemapped
+/* Escape hatches back to the rest of the site, this index is a sitemapped
    search-landing page and previously had no navigation at all. */
 .siteLinks {
   display: flex;

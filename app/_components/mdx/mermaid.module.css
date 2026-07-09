@@ -1,14 +1,14 @@
 .wrap {
   position: relative;
   /* 15px matches themeVariables.fontSize so Mermaid measures and renders at
-     the same size — container controls what the SVG inherits */
+     the same size, container controls what the SVG inherits */
   font-size: 15px;
   font-family: var(--font-sans), Inter, system-ui, sans-serif;
 }
 
 /* Borderless simple shapes: the brand fill carries the color, no outline. JS
    (adaptNodes) enforces this inline and decides per shape; this is a backstop
-   for the simple primitives only. `path` is intentionally excluded — cylinders
+   for the simple primitives only. `path` is intentionally excluded, cylinders
    and other structured shapes keep a subtle stroke that adaptNodes manages. */
 .diagram :global(.node) rect,
 .diagram :global(.node) polygon,
@@ -18,7 +18,7 @@
 }
 
 /* Inline code in diagram labels. Authors mark code-only shapes (type names,
-   identifiers, calls — e.g. `std::unique_ptr`, `value_counts()`) by wrapping the
+   identifiers, calls, e.g. `std::unique_ptr`, `value_counts()`) by wrapping the
    text in a <code> tag in the MDX; render those spans in the app's mono face
    (JetBrains Mono) instead of the browser's default monospace, with no inherited
    prose-code background/padding. Applies to both the inline diagram and the

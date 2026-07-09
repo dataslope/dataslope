@@ -3,7 +3,7 @@ title: Generic Abstractions and Type Classes
 description: Parametric polymorphism, ad-hoc polymorphism, and the type-class-as-record pattern that fits TypeScript.
 ---
 
-Functional programmers love **generic** code — code that works
+Functional programmers love **generic** code, code that works
 for *every* shape of data, not just one. That's not laziness or
 showing-off; it's a real engineering discipline: when a function
 is generic, it has *fewer ways to misbehave*, because it knows
@@ -12,7 +12,7 @@ less about its arguments.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A stencil plate with one diamond-shaped hole, and beneath it three identical diamonds stamped in blue, yellow, and green — generic code fixes the shape while letting the payload vary"
+  aria-label="A stencil plate with one diamond-shaped hole, and beneath it three identical diamonds stamped in blue, yellow, and green, generic code fixes the shape while letting the payload vary"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M220 30 H420 V110 H220 Z M320 42 L352 70 L320 98 L288 70 Z" fillRule="evenodd" fill="currentColor" opacity="0.16" />
@@ -56,7 +56,7 @@ console.log(id({ x: 1 }));
   ]}
 />
 
-`id` is *fully* generic — its type `<A>(a: A) => A` doesn't
+`id` is *fully* generic, its type `<A>(a: A) => A` doesn't
 constrain `A` at all. Because it knows nothing about `A`, the
 *only* thing it can do is return its argument. That's a powerful
 property: from the type alone, you can prove what the function
@@ -65,7 +65,7 @@ does.
 This is a deep idea from category theory called *parametricity*:
 the more polymorphic a function is, the fewer behaviors are
 compatible with its type. A function `<A>(xs: A[]) => A[]` might
-reverse, sort by some external order, dedupe, or do nothing — but
+reverse, sort by some external order, dedupe, or do nothing, but
 it cannot invent new `A` values, because it doesn't know how. The
 types tell you a great deal before you've read any code.
 
@@ -108,7 +108,7 @@ guarantees they all work for *every* `A`.
 ## Ad-hoc polymorphism: "different behavior per type"
 
 Sometimes a function *does* need to know something extra about its
-type — for example, "I know how to compare two values for
+type, for example, "I know how to compare two values for
 equality". In Haskell that's called a **type class**:
 
 ```haskell
@@ -197,7 +197,7 @@ const ordString: Ord<string> = {
 const sortBy = <A,>(ord: Ord<A>, xs: ReadonlyArray<A>): ReadonlyArray<A> =>
   [...xs].sort(ord.compare);
 
-// Reverse an Ord — a "derived instance"
+// Reverse an Ord, a "derived instance"
 const reverseOrd = <A,>(o: Ord<A>): Ord<A> => ({
   compare: (x, y) => -o.compare(x, y) as Ordering,
 });
@@ -240,7 +240,7 @@ few independent lineages:
 - `Semigroup` → `Monoid`
 - `Eq` → `Ord`
 
-The arrows mean "extends" — every `Ord` instance is also an `Eq`
+The arrows mean "extends", every `Ord` instance is also an `Eq`
 (it can decide equality from "neither less nor greater"). Every
 `Monad` is an `Applicative`, etc.
 
@@ -254,7 +254,7 @@ plus generic functions that consume those records.
 
 A `Set<string>` that uses case-sensitive equality is, in a real
 sense, a *different data structure* from one that uses
-case-insensitive equality — even though the values are the same.
+case-insensitive equality, even though the values are the same.
 Type classes let you write **one** set implementation that works
 with either, by parameterizing it on `Eq<string>`.
 
@@ -288,9 +288,9 @@ For an empty list, return \`undefined\`.
 
 The provided instances are:
 
-- \`sumSG\`     — numbers under \`+\`
-- \`prodSG\`    — numbers under \`*\`
-- \`stringSG\`  — strings under \`+\`
+- \`sumSG\`, numbers under \`+\`
+- \`prodSG\`, numbers under \`*\`
+- \`stringSG\`, strings under \`+\`
 
 **Expected output**
 
@@ -360,13 +360,13 @@ export function combineAll<A>(
   markdown={`What does it mean for a TypeScript function to be *parametrically polymorphic* over type \`A\`?
 
 - It accepts any argument and uses \`typeof\` to dispatch
-  > That's the opposite — that's *runtime* dispatch on a single, untyped argument.
+  > That's the opposite, that's *runtime* dispatch on a single, untyped argument.
 - It must work for some specific union of concrete types
   > Closer, but parametric means *every* type, not a chosen list.
 - [o] It works uniformly for every choice of \`A\` and makes no assumptions about \`A\`'s structure
   > Parametric polymorphism gives the strongest guarantees: because the function knows *nothing* about \`A\`, very few behaviors are compatible with its type.
 - It uses \`unknown\` everywhere and casts at the boundary
-  > That defeats the purpose — \`unknown\` erases the polymorphism.
+  > That defeats the purpose, \`unknown\` erases the polymorphism.
 
-Parametric polymorphism is the source of "from the type, I can predict the behavior" — one of FP's most underrated benefits.`}
+Parametric polymorphism is the source of "from the type, I can predict the behavior", one of FP's most underrated benefits.`}
 />

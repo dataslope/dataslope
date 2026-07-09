@@ -3,7 +3,7 @@ title: SELECT Basics
 description: Choosing columns, reading every row, and understanding that a query returns a brand-new result table without touching the original data.
 ---
 
-`SELECT` is the workhorse of SQL — the statement you will write more
+`SELECT` is the workhorse of SQL, the statement you will write more
 than any other. We met it as a calculator; now we use it to *read
 data from tables*, which is what it was truly built for.
 
@@ -87,11 +87,11 @@ FROM
   employees;`}
 />
 
-You asked for two columns, so you got two columns — for **every**
+You asked for two columns, so you got two columns, for **every**
 row in the table. `SELECT` decides the *columns*; by default you get
 *all the rows*. Narrowing the rows is the next page's job (`WHERE`).
 
-## SELECT * — every column
+## SELECT *, every column
 
 `*` is shorthand for "all columns, in their defined order":
 
@@ -115,14 +115,14 @@ FROM
 />
 
 `SELECT *` is handy for exploring a table quickly. In real queries,
-though, it is usually better to name the exact columns you need —
+though, it is usually better to name the exact columns you need,
 it is clearer, and you are not pulling back data you will not use.
 
 ## A query produces a new result, not a changed table
 
 This is a subtle but liberating idea: a `SELECT` **never changes the
-underlying table.** It computes a fresh **result set** — its own
-little table — and hands that back to you. The stored data sits
+underlying table.** It computes a fresh **result set**, its own
+little table, and hands that back to you. The stored data sits
 untouched, ready for the next question.
 
 ```mermaid
@@ -135,7 +135,7 @@ Because of this, you can run as many `SELECT`s as you like, in any
 order, experimenting freely. You cannot "break" data by reading it.
 
 <Callout type="info" title="Result sets are tables too">
-The output of a query has rows and columns — it *is* a table, just a
+The output of a query has rows and columns, it *is* a table, just a
 temporary one. This is why you can build bigger queries by feeding
 one query's result into another, an idea we reach in the
 **Composing Queries** section.
@@ -159,7 +159,7 @@ answer*, not echoing the table:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice', 'Engineering', 120000),
   ('Bob',   'Sales',        72000);`}
-  starterCode={`-- salary first, then dept, then name — any order you want
+  starterCode={`-- salary first, then dept, then name, any order you want
 SELECT
   salary,
   dept,
@@ -222,7 +222,7 @@ perfect for answering "what are the possible values here?"
   > A \`SELECT\` may sort its *result*, but it does not reorder or change the stored table.
 - It deletes the columns you did not select.
   > Unselected columns are simply not returned; they remain safely in the table.
-- [o] Nothing — \`SELECT\` reads the data and returns a new result set, leaving the stored table unchanged.
+- [o] Nothing, \`SELECT\` reads the data and returns a new result set, leaving the stored table unchanged.
   > Because reads do not modify storage, you can run any number of \`SELECT\`s freely without risk.
 - It locks the table so no one else can read it.
   > A basic \`SELECT\` does not lock others out; reading data is a safe, non-destructive operation.
@@ -235,7 +235,7 @@ A \`SELECT\` produces a fresh result and never alters the underlying table.`}
 
 - All five values, including the repeats.
   > \`DISTINCT\` exists precisely to remove repeats, so it would not return all five.
-- [o] Two rows: "Sales" and "Eng" — each distinct value once.
+- [o] Two rows: "Sales" and "Eng", each distinct value once.
   > \`DISTINCT\` collapses duplicate values so each unique value appears a single time.
 - The single most common value only.
   > \`DISTINCT\` keeps every unique value, not just the most frequent one.

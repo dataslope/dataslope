@@ -7,13 +7,13 @@ You began this course knowing basic SQL but unsure how analysts actually
 *use* it. Now you can profile an unfamiliar dataset, summarize millions of
 rows, rank and accumulate with window functions, reshape data, compose
 readable pipelines, and turn raw rows into trustworthy business metrics.
-More importantly, you understand **why** each technique exists — which is
+More importantly, you understand **why** each technique exists, which is
 the part that outlasts any one tool.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A thin path climbs through three small cards — a blue table, green aggregate bars, and a yellow trend line — then continues past the last card as a solid green arrow pointing onward and upward"
+  aria-label="A thin path climbs through three small cards, a blue table, green aggregate bars, and a yellow trend line, then continues past the last card as a solid green arrow pointing onward and upward"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path
@@ -56,13 +56,13 @@ the part that outlasts any one tool.
 
 The course moved deliberately from *mindset* to *technique* to *insight*:
 
-1. **Analytical mindset** — OLAP, thinking in datasets.
-2. **Exploration** — profile, slice, sort.
-3. **Summarization** — aggregates, `GROUP BY`, `HAVING`.
-4. **Window functions** — rank, running totals.
-5. **Transformation** — `CASE`, dates, pivots.
-6. **Composition** — CTEs, subqueries.
-7. **Insight** — metrics, reproducibility.
+1. **Analytical mindset**, OLAP, thinking in datasets.
+2. **Exploration**, profile, slice, sort.
+3. **Summarization**, aggregates, `GROUP BY`, `HAVING`.
+4. **Window functions**, rank, running totals.
+5. **Transformation**, `CASE`, dates, pivots.
+6. **Composition**, CTEs, subqueries.
+7. **Insight**, metrics, reproducibility.
 
 Each layer rested on the one before it. Window functions only made sense
 once aggregation did; metrics only made sense once you could compose
@@ -79,7 +79,7 @@ If you remember only a handful of things, make it these:
 - **Explore in a loop.** Ask, query, look, and let each result sharpen the
   next question.
 - **A metric is a definition first, SQL second.** State it in a sentence,
-  then translate it literally — and say which denominator you used.
+  then translate it literally, and say which denominator you used.
 - **Compose for humans.** CTEs, honest names, and stable ordering make
   analysis readable, reproducible, and trustworthy.
 
@@ -90,10 +90,10 @@ the slice in `WHERE`, the summary in `GROUP BY`, the per-row context in
 what this course set out to give you.
 </Callout>
 
-## One last query — the whole course in one screen
+## One last query, the whole course in one screen
 
 This query uses a CTE pipeline, conditional aggregation, a window
-function, safe division, and a stable ordering — nearly every idea from
+function, safe division, and a stable ordering, nearly every idea from
 the course, working together. Read it top to bottom and predict the result
 before running it.
 
@@ -148,9 +148,9 @@ ORDER BY
   month;`}
 />
 
-If you can read that and explain each column — the filtered sum, the
+If you can read that and explain each column, the filtered sum, the
 share-of-total window, the month-over-month `LAG`, the divide-by-zero
-guard — you have genuinely learned to think analytically in SQL.
+guard, you have genuinely learned to think analytically in SQL.
 
 ## Try it yourself
 
@@ -236,27 +236,27 @@ ORDER BY
 
 This was an **analytical SQL** course. Natural next steps include:
 
-- **Joins for analysis in depth** — combining fact and dimension tables,
+- **Joins for analysis in depth**, combining fact and dimension tables,
   semi/anti joins, and `ASOF` joins for time-aligned data.
-- **Statistical functions** — percentiles, `MEDIAN`, correlation, and
+- **Statistical functions**, percentiles, `MEDIAN`, correlation, and
   approximate aggregates for very large data.
-- **Reading real files** — pointing DuckDB at CSV and Parquet, and
+- **Reading real files**, pointing DuckDB at CSV and Parquet, and
   querying data straight from cloud storage.
-- **From query to chart** — feeding your summaries into a visualization or
+- **From query to chart**, feeding your summaries into a visualization or
   notebook to communicate the story.
-- **dbt and analytics engineering** — turning ad-hoc queries into tested,
+- **dbt and analytics engineering**, turning ad-hoc queries into tested,
   documented, reproducible data models.
 
-And if you skipped the **Interesting discussions** pages —
+And if you skipped the **Interesting discussions** pages,
 [Thinking in Datasets](/courses/sql-analytics-duckdb/thinking-in-datasets)
 and
-[Reproducible Analytical Workflows](/courses/sql-analytics-duckdb/reproducible-analytical-workflows)
-— they are worth a look now that the mechanics are second nature: one is
+[Reproducible Analytical Workflows](/courses/sql-analytics-duckdb/reproducible-analytical-workflows),
+they are worth a look now that the mechanics are second nature: one is
 the mindset behind the whole craft, the other the habits that make your
 numbers trustworthy.
 
-But there is no rush. The analytical way of thinking you built here — *many
-rows in, few numbers out; explore in a loop; define before you compute* —
+But there is no rush. The analytical way of thinking you built here, *many
+rows in, few numbers out; explore in a loop; define before you compute*,
 is the foundation everything else stands on. Keep asking questions of
 data, keep writing queries, and the rest will follow.
 

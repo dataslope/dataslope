@@ -1,6 +1,6 @@
 ---
 title: Scope and the Scope Chain
-description: The rules that decide *which variable a name refers to* — and the mental model that makes them obvious.
+description: The rules that decide *which variable a name refers to*, and the mental model that makes them obvious.
 ---
 
 When your program writes the name `x`, the runtime has to figure
@@ -48,11 +48,11 @@ scope around it? And the one around that?*
 
 JavaScript has three kinds of scope:
 
-- **Global scope** — the outermost level. Variables declared here
+- **Global scope**, the outermost level. Variables declared here
   are visible everywhere.
-- **Function scope** — created when a function runs. Each call to
+- **Function scope**, created when a function runs. Each call to
   a function gets its own.
-- **Block scope** — created by any `{ ... }` block. Each `if`,
+- **Block scope**, created by any `{ ... }` block. Each `if`,
   `for`, or stand-alone block has its own.
 
 Variables declared with `let` and `const` respect *block* scope.
@@ -70,12 +70,12 @@ scope, which is one of the reasons we avoid `var`.
 
 function show() {
   const inside = "I am inside show";
-  console.log(outside); // visible — global wraps around function
-  console.log(inside); // visible — current scope
+  console.log(outside); // visible, global wraps around function
+  console.log(inside); // visible, current scope
 }
 
 show();
-console.log(outside); // visible — global
+console.log(outside); // visible, global
 // console.log(inside);   // ReferenceError: inside is not defined
 `,
     },
@@ -153,7 +153,7 @@ greet("Ada");
 />
 
 `stamp` is found in the block. `greeting` is not in the block, not
-in the function — found in the global. `name` is not in the block,
+in the function, found in the global. `name` is not in the block,
 found in the function. The runtime walks outward until it succeeds.
 
 ## Each function call gets its own scope
@@ -174,7 +174,7 @@ into another.
 }
 
 console.log(counter()); // 1
-console.log(counter()); // 1 — not 2!
+console.log(counter()); // 1, not 2!
 console.log(counter()); // 1
 `,
     },
@@ -183,13 +183,13 @@ console.log(counter()); // 1
 
 Each call starts with `n = 0`, increments it to `1`, returns, and
 the local `n` is then discarded. We will see in the *closures*
-chapter how to make `n` persist across calls — that's a more
+chapter how to make `n` persist across calls, that's a more
 advanced trick.
 
 ## Shadowing: same name, different scopes
 
 When a name is declared in an inner scope that already exists in
-an outer scope, the inner one **shadows** the outer one — the
+an outer scope, the inner one **shadows** the outer one, the
 outer is still there, just hidden inside the inner scope.
 
 <CodeBlock
@@ -206,7 +206,7 @@ function modify() {
 }
 
 modify();
-console.log("outside:", user); // unchanged — modify() never touched the outer 'user'
+console.log("outside:", user); // unchanged, modify() never touched the outer 'user'
 `,
     },
   ]}
@@ -248,13 +248,13 @@ caller();
 
 The output is `"country is Wonderland"`. Even though `describe()`
 is *called from* `caller()`, the `country` it sees is the one
-visible from where `describe` was *written* — the global scope.
+visible from where `describe` was *written*, the global scope.
 
 This is **lexical scoping**, and it is the foundation of closures
 (coming next). If JavaScript used *dynamic* scope instead,
 `describe()` would have looked up the *caller's* `country` and
 printed `"Looking-Glass-Land"`. Lexical scope is far easier to
-reason about — and it is what JavaScript (and almost every other
+reason about, and it is what JavaScript (and almost every other
 modern language) uses.
 
 ## Why globals are dangerous
@@ -287,7 +287,7 @@ function reset() {
 add();
 add();
 add();
-console.log(count); // 3 — but who set this? where? when?
+console.log(count); // 3, but who set this? where? when?
 
 // Better style: each function operates on values it is given,
 // and returns new values. State is explicit and local.
@@ -333,7 +333,7 @@ function square(n) {
   return n * n;
 }
 
-// This does NOT work — 'x' is in the "temporal dead zone":
+// This does NOT work, 'x' is in the "temporal dead zone":
 // console.log(x);
 // const x = 5;
 `,
@@ -387,7 +387,7 @@ Two things to notice:
    the topic of the next page.
 2. The lookups for `name`, `greeting`, and `planet` are happening
    through the scope chain that was set up when `inner` was
-   defined — not when `inner` is called.
+   defined, not when `inner` is called.
 
 ## Challenge
 
@@ -414,7 +414,7 @@ console.log(compute());
       solutionCode: `function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
-    total += i; // assign to the OUTER total — no inner declaration
+    total += i; // assign to the OUTER total, no inner declaration
   }
   return total;
 }
@@ -439,7 +439,7 @@ console.log(compute());
   markdown={`In JavaScript, when the runtime needs to resolve a variable name, where does it look?
 
 - Only in the current function's scope
-  > If the name is not found in the current scope, the runtime does not stop there — it continues outward through each enclosing scope until the name is found or the global scope is exhausted.
+  > If the name is not found in the current scope, the runtime does not stop there, it continues outward through each enclosing scope until the name is found or the global scope is exhausted.
 - Only in the global scope
   > The global scope is checked last, not first; the runtime starts at the innermost scope where the reference appears and works outward, so a local declaration always shadows a global one with the same name.
 - [o] First in the current scope, then in the enclosing scope, and so on outward through the *scope chain* until either it finds the name or reaches the global scope
@@ -447,5 +447,5 @@ console.log(compute());
 - Wherever the function was called from (dynamic scoping)
   > JavaScript uses *lexical* (static) scoping, not dynamic scoping. The scope chain is fixed at the point where the code is written, not at the point where the function is called.
 
-Lexical scoping makes the meaning of a name predictable from the source code — you don't need to know who called a function to know which variable it sees.`}
+Lexical scoping makes the meaning of a name predictable from the source code, you don't need to know who called a function to know which variable it sees.`}
 />

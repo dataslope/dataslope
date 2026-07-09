@@ -5,16 +5,16 @@ description: Learn choose-explore-unchoose search, pruning, and classic backtrac
 
 Some problems offer no clever shortcut. No greedy rule finds all valid Sudoku grids; no DP table enumerates every permutation. When the answer genuinely requires *searching* a space of possibilities, the question becomes: how do you search exhaustively without being stupid about it?
 
-Backtracking is the disciplined answer. Build a candidate solution one choice at a time; the moment the partial candidate cannot possibly be completed into a valid solution, abandon it — *prune the branch* — and undo the last choice to try the next option. The name "backtrack" was coined by the American mathematician D. H. Lehmer in the 1950s, but the method is older than the term: it is Trémaux's maze strategy from the graph chapter, applied to a maze of *decisions* instead of corridors. The template never changes:
+Backtracking is the disciplined answer. Build a candidate solution one choice at a time; the moment the partial candidate cannot possibly be completed into a valid solution, abandon it, *prune the branch*, and undo the last choice to try the next option. The name "backtrack" was coined by the American mathematician D. H. Lehmer in the 1950s, but the method is older than the term: it is Trémaux's maze strategy from the graph chapter, applied to a maze of *decisions* instead of corridors. The template never changes:
 
 **choose → explore → un-choose**
 
-Make a choice, recurse into the world where that choice stands, then take the choice back so the loop can try the next one. The un-choose step is what separates backtracking from plain recursion — and forgetting it is the bug you will write most often on this page.
+Make a choice, recurse into the world where that choice stands, then take the choice back so the loop can try the next one. The un-choose step is what separates backtracking from plain recursion, and forgetting it is the bug you will write most often on this page.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A small decision tree: the gray left branch ends at a red dead end and is abandoned, dashed circles wait unexplored, and the bold green branch threads down to a solid green goal — choose, explore, un-choose"
+  aria-label="A small decision tree: the gray left branch ends at a red dead end and is abandoned, dashed circles wait unexplored, and the bold green branch threads down to a solid green goal, choose, explore, un-choose"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
@@ -67,7 +67,7 @@ sequenceDiagram
 
 ## Permutations
 
-The cleanest first example: print every ordering of `{1, 2, 3}`. The choice at position `idx` is "which remaining element goes here?", implemented as a swap; the un-choose is the swap back. Watch the symmetry in the code — `swap`, recurse, `swap` — that is the template in its purest form. (There are n! permutations, so this is inherently factorial work; backtracking doesn't make exponential spaces small, it just avoids exploring them redundantly.)
+The cleanest first example: print every ordering of `{1, 2, 3}`. The choice at position `idx` is "which remaining element goes here?", implemented as a swap; the un-choose is the swap back. Watch the symmetry in the code, `swap`, recurse, `swap`, that is the template in its purest form. (There are n! permutations, so this is inherently factorial work; backtracking doesn't make exponential spaces small, it just avoids exploring them redundantly.)
 
 <CodeBlock
   adapter="cpp"
@@ -101,7 +101,7 @@ int main() {
 
 ## Subsets
 
-For subsets, each element poses a yes/no question — in or out? — giving 2^n subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
+For subsets, each element poses a yes/no question, in or out?, giving 2^n subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
 
 <CodeBlock
   adapter="cpp"
@@ -130,7 +130,7 @@ int main() {
   ]}
 />
 
-For subsets specifically there is also a non-recursive route worth knowing: count from 0 to 2^n − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101` — elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
+For subsets specifically there is also a non-recursive route worth knowing: count from 0 to 2^n − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101`, elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
 
 <CodeBlock
   adapter="cpp"
@@ -162,9 +162,9 @@ int main() {
 
 ## N-Queens
 
-The aristocrat of backtracking puzzles: place n queens on an n×n chessboard so that none attacks another. It was posed for the standard board by the chess composer Max Bezzel in 1848, drew the attention of Gauss, and has been the canonical backtracking demo ever since — Dijkstra used it in 1972 to showcase structured programming. (For the record: the 8×8 board has 92 solutions out of 4.4 billion ways to place 8 queens — pruning is not optional.)
+The aristocrat of backtracking puzzles: place n queens on an n×n chessboard so that none attacks another. It was posed for the standard board by the chess composer Max Bezzel in 1848, drew the attention of Gauss, and has been the canonical backtracking demo ever since, Dijkstra used it in 1972 to showcase structured programming. (For the record: the 8×8 board has 92 solutions out of 4.4 billion ways to place 8 queens, pruning is not optional.)
 
-The setup does most of the work. Place one queen per row, so the only choice per level is the column; then attacks reduce to three constraint arrays — columns, and the two diagonal directions, where `r - c` is constant on one diagonal family and `r + c` on the other. A placement is legal only if all three slots are free; mark them (choose), recurse to the next row (explore), unmark them (un-choose).
+The setup does most of the work. Place one queen per row, so the only choice per level is the column; then attacks reduce to three constraint arrays, columns, and the two diagonal directions, where `r - c` is constant on one diagonal family and `r + c` on the other. A placement is legal only if all three slots are free; mark them (choose), recurse to the next row (explore), unmark them (un-choose).
 
 <CodeBlock
   adapter="cpp"
@@ -205,7 +205,7 @@ int main() {
 
 ## Sudoku solver
 
-A full Sudoku solver is the same skeleton at industrial scale: find the next empty cell, try digits 1–9, keep any digit that violates no row/column/box constraint, recurse, and erase the digit if the recursion reports failure. Note the return-value plumbing — `solve` returns `true` the moment any branch completes the grid, and that `true` short-circuits all the way up, freezing the successful choices in place. The empty grid below solves instantly; paste in a hard puzzle (replace some `'.'` with digits) and it still solves in a blink, because constraint pruning kills almost every branch within a few cells.
+A full Sudoku solver is the same skeleton at industrial scale: find the next empty cell, try digits 1–9, keep any digit that violates no row/column/box constraint, recurse, and erase the digit if the recursion reports failure. Note the return-value plumbing, `solve` returns `true` the moment any branch completes the grid, and that `true` short-circuits all the way up, freezing the successful choices in place. The empty grid below solves instantly; paste in a hard puzzle (replace some `'.'` with digits) and it still solves in a blink, because constraint pruning kills almost every branch within a few cells.
 
 <CodeBlock
   adapter="cpp"
@@ -252,7 +252,7 @@ int main() {
 
 ## Word search
 
-Backtracking on a grid: does the word `ABCCED` appear as a path of adjacent cells, each cell used at most once? The choose step marks the current cell with a sentinel `'#'` so the path cannot revisit it; the un-choose restores the original letter. That restoration is essential — a cell that failed for *this* path may be exactly what a *different* path needs later.
+Backtracking on a grid: does the word `ABCCED` appear as a path of adjacent cells, each cell used at most once? The choose step marks the current cell with a sentinel `'#'` so the path cannot revisit it; the un-choose restores the original letter. That restoration is essential, a cell that failed for *this* path may be exactly what a *different* path needs later.
 
 <CodeBlock
   adapter="cpp"
@@ -296,7 +296,7 @@ int main() {
 
 ## Pruning techniques
 
-Backtracking lives or dies by pruning — the difference between exploring a tree of billions of nodes and a tree of thousands. Three habits compound: **check constraints before recursing**, not after (the N-Queens code never even enters an attacked column); **fail fast** by rejecting partial states the moment they become hopeless, which kills the whole subtree beneath them; and **order choices well**, trying the most constrained option first (serious Sudoku solvers pick the empty cell with the fewest legal digits, not the next one in reading order). None of these change correctness — only how much of the exponential tree you are forced to visit.
+Backtracking lives or dies by pruning, the difference between exploring a tree of billions of nodes and a tree of thousands. Three habits compound: **check constraints before recursing**, not after (the N-Queens code never even enters an attacked column); **fail fast** by rejecting partial states the moment they become hopeless, which kills the whole subtree beneath them; and **order choices well**, trying the most constrained option first (serious Sudoku solvers pick the empty cell with the fewest legal digits, not the next one in reading order). None of these change correctness, only how much of the exponential tree you are forced to visit.
 
 ## Practice
 
@@ -475,7 +475,7 @@ int main() {
 - Sort -> scan -> stop.
   > Greedy style.
 - [o] Choose -> explore -> un-choose.
-  > Make a choice, recurse on it, then undo it on the way back up — the backbone of backtracking.
+  > Make a choice, recurse on it, then undo it on the way back up, the backbone of backtracking.
 - Hash -> lookup -> return.
   > Not the core pattern.
 - Push all nodes into a queue.

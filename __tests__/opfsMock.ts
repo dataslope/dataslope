@@ -157,7 +157,7 @@ export function makeOpfsRoot(): object {
 /** Reads the raw MockDir tree from a root created by makeOpfsRoot.
  *  Used in tests to inspect internal state without going through the API. */
 export function _getRootDir(root: object): MockDir {
-  // Internal: we keep a reference by convention here — the handle IS the
+  // Internal: we keep a reference by convention here, the handle IS the
   // dir, but we need the underlying MockDir. Use a WeakMap for this.
   // For simplicity in tests, expose a helper that bypasses the handle.
   void root;

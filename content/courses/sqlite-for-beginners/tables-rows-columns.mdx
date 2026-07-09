@@ -1,13 +1,13 @@
 ---
 title: Tables, Rows, and Columns
-description: How SQLite tables are built from rows, columns, cells, and schemas — and the one design question that makes every table make sense.
+description: How SQLite tables are built from rows, columns, cells, and schemas, and the one design question that makes every table make sense.
 ---
 
 A SQLite database stores information in **tables**. A table looks
 a lot like a spreadsheet grid, but it has a stronger purpose: it
 stores facts about **one kind of thing** in a predictable
 structure. If tables, rows, and columns make sense, the rest of
-SQL starts to feel much less mysterious — every query you will
+SQL starts to feel much less mysterious, every query you will
 ever write is just a way of asking questions about this grid.
 
 ## The big picture
@@ -49,7 +49,7 @@ of thing: pets.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A table card with a solid header and faint gray rows, where the middle row slides out to the right on a yellow band carrying its blue, green, and yellow values — a single row is one complete record"
+  aria-label="A table card with a solid header and faint gray rows, where the middle row slides out to the right on a yellow band carrying its blue, green, and yellow values, a single row is one complete record"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -96,7 +96,7 @@ flowchart LR
 
 Rows answer the question: **which one?** Which pet? Mochi. Which
 pet? Biscuit. A row should describe one specific thing, event, or
-fact — never a pile of several.
+fact, never a pile of several.
 
 ## Columns are attributes
 
@@ -115,8 +115,8 @@ flowchart TB
 Columns answer the question: **what about it?** What is the pet's
 name? What species? What age?
 
-A column should hold one kind of value, and a cell — the crossing
-of one row and one column — should usually hold exactly one value.
+A column should hold one kind of value, and a cell, the crossing
+of one row and one column, should usually hold exactly one value.
 Store `cat`, not `cat, dog, bird`, in a single cell. A column
 named `misc` that holds phone numbers, dates, and notes is a
 warning sign that the table has lost track of what it is about.
@@ -150,8 +150,8 @@ has a grain you can say out loud in one breath:
 | `orders` | Each row is one order. |
 | `products` | Each row is one product. |
 
-If you cannot finish the sentence — or the honest answer is
-"sometimes a customer, sometimes an order, sometimes a note" —
+If you cannot finish the sentence, or the honest answer is
+"sometimes a customer, sometimes an order, sometimes a note",
 the table is trying to store too many kinds of facts at once.
 Watch what that looks like:
 
@@ -163,7 +163,7 @@ Watch what that looks like:
 Is one row a product? A customer? An order? It is a little of
 each, and the cost shows immediately: the notebook's price and
 Ada's phone number are copied into both rows. When Ada's number
-changes, someone must find and fix every copy — miss one, and the
+changes, someone must find and fix every copy, miss one, and the
 table disagrees with itself. The cure is to give each kind of
 thing its own table and connect them, which is exactly where this
 course is heading over the next few pages.
@@ -235,7 +235,7 @@ first row you see will always appear first.
 ## See it in SQLite
 
 Run this example and connect each result part to the words you
-learned: table, row, column, cell — and notice the grain: each row
+learned: table, row, column, cell, and notice the grain: each row
 is one pet.
 
 <SqlCodeBlock
@@ -263,7 +263,7 @@ ORDER BY
   id;`}
 />
 
-Try changing the query to `SELECT name, species FROM pets;` — that
+Try changing the query to `SELECT name, species FROM pets;`, that
 asks SQLite for two columns instead of all four. The stored table
 does not change; you are simply choosing which attributes to look
 at.
@@ -322,6 +322,6 @@ at.
   > One kind of thing is the goal, not a warning sign.`}
 />
 
-Next: if two rows can look identical — two customers named John
-Smith in Springfield — how does the database tell them apart? That
+Next: if two rows can look identical, two customers named John
+Smith in Springfield, how does the database tell them apart? That
 is the job of the **primary key**.

@@ -1,6 +1,6 @@
 ---
 title: Pure Functions
-description: The smallest, most important idea in functional programming — and why every later chapter depends on it.
+description: The smallest, most important idea in functional programming, and why every later chapter depends on it.
 ---
 
 If you remember only one idea from this entire course, make it this
@@ -9,12 +9,12 @@ inputs, and which has no observable side effects.**
 
 That's it. Pure functions are the atom of functional programming.
 Composition, immutability, type-driven design, parallelism, testing,
-caching — they all get easier when the building blocks are pure.
+caching, they all get easier when the building blocks are pure.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A sealed function box with one inlet and one outlet; dotted side channels from outside shapes are stopped by red bars above and below — a pure function's output depends on its input alone"
+  aria-label="A sealed function box with one inlet and one outlet; dotted side channels from outside shapes are stopped by red bars above and below, a pure function's output depends on its input alone"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -88,13 +88,13 @@ const add = (x: number, y: number): number => x + y;
 const doubled = (xs: readonly number[]): readonly number[] =>
   xs.map((x) => x * 2);
 
-// IMPURE: reads from "outside" — the current time.
+// IMPURE: reads from "outside", the current time.
 const nowMs = (): number => Date.now();
 
 // IMPURE: writes to the console.
 const greet = (name: string): void => console.log(\`Hello, \${name}\`);
 
-// IMPURE: mutates its argument — a hidden side effect.
+// IMPURE: mutates its argument, a hidden side effect.
 const appendOne = (xs: number[]): void => {
   xs.push(1);
 };
@@ -113,7 +113,7 @@ console.log(box);
 />
 
 `add` and `doubled` are pure. `nowMs`, `greet`, and `appendOne` are
-not — and each is impure in a *different* way.
+not, and each is impure in a *different* way.
 
 ## The four superpowers of pure functions
 
@@ -151,7 +151,7 @@ between tests, and reason about ordering. Pure tests are free.
 ### 2. They're safe to run in parallel
 
 Two threads (or web workers, or async tasks) calling a pure function
-with the same input cannot interfere — there's nothing shared to
+with the same input cannot interfere, there's nothing shared to
 interfere with. This is why functional pipelines parallelize so
 easily.
 
@@ -192,7 +192,7 @@ console.log("calls:", calls);
 />
 
 You can only do this for pure functions. Memoizing an impure
-function changes its behavior — you might cache "what time it is".
+function changes its behavior, you might cache "what time it is".
 
 ### 4. They're easy to reason about
 
@@ -324,9 +324,9 @@ miniature.
   title="Pure core, impure shell"
   instructions={`Implement two **pure** functions in \`stats.ts\`:
 
-- \`sumOfSquares(xs: readonly number[]): number\` — the sum of the
+- \`sumOfSquares(xs: readonly number[]): number\`, the sum of the
   squares of its inputs.
-- \`meanOfSquares(xs: readonly number[]): number\` — the average of
+- \`meanOfSquares(xs: readonly number[]): number\`, the average of
   the squares of its inputs, or \`0\` for an empty input.
 
 Do **not** print, mutate the input, or read external state. The
@@ -388,13 +388,13 @@ export function meanOfSquares(xs: readonly number[]): number {
   markdown={`Which of these TypeScript functions is **pure**?
 
 - \`const roll = (): number => Math.floor(Math.random() * 6) + 1;\`
-  > Not pure — it reads from a random number generator, so two calls with no arguments can give different results.
+  > Not pure, it reads from a random number generator, so two calls with no arguments can give different results.
 - [o] \`const triple = (x: number): number => x * 3;\`
   > Output depends only on the input, and the function has no side effects.
 - \`const logAndReturn = (x: number): number => { console.log(x); return x; };\`
-  > Not pure — it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
+  > Not pure, it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
 - \`const push = (xs: number[], x: number): void => { xs.push(x); };\`
-  > Not pure — it mutates its argument and returns void.
+  > Not pure, it mutates its argument and returns void.
 
 A pure function must satisfy both rules: same inputs → same output, and no side effects of any kind. Only \`triple\` meets both.`}
 />

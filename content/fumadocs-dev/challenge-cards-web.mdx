@@ -1,6 +1,6 @@
 ---
-title: Challenge Cards — Web (HTML/CSS/JS)
-description: Web challenges assert on the real DOM of the sandboxed preview — structure, styles, and behaviour.
+title: "Challenge Cards: Web (HTML/CSS/JS)"
+description: Web challenges assert on the real DOM of the sandboxed preview, structure, styles, and behaviour.
 ---
 
 Web challenge tests are JavaScript snippets that run **inside the
@@ -33,7 +33,7 @@ other language's harness.
 <html>
   <body>
     <h1>Ada Lovelace</h1>
-    <p>The first computer programmer — a mathematician and writer.</p>
+    <p>The first computer programmer, a mathematician and writer.</p>
     <ul>
       <li>Wrote the first published algorithm</li>
       <li>Collaborated with Charles Babbage</li>
@@ -67,7 +67,7 @@ if (!paragraphs.some((p) => /mathematician/i.test(p.textContent || ""))) {
       name: "An unordered list has at least two items",
       code: `const items = document.querySelectorAll("ul li");
 if (items.length < 2) {
-  throw new Error("Add a <ul> with at least two <li> items — found " + items.length + ".");
+  throw new Error("Add a <ul> with at least two <li> items, found " + items.length + ".");
 }`,
     },
   ]}

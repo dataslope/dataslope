@@ -1,6 +1,6 @@
 ---
 title: The simple_white Template
-description: Why this course uses a specific Plotly template — and how to pick a different one if you need to
+description: Why this course uses a specific Plotly template, and how to pick a different one if you need to
 ---
 
 You've seen the same argument appear in every chart on every page
@@ -10,13 +10,13 @@ of this course:
 template="simple_white"
 ```
 
-Now is a good time to stop and explain *why* — and to introduce
+Now is a good time to stop and explain *why*, and to introduce
 the larger idea of Plotly **templates**.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A fan of tinted style sheets stacked behind one clean front sheet holding a minimal chart with a green check — a template as a ready-made bundle of styling"
+  aria-label="A fan of tinted style sheets stacked behind one clean front sheet holding a minimal chart with a green check, a template as a ready-made bundle of styling"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -66,10 +66,10 @@ Plotly ships with about a dozen named templates. The main ones are:
 
 | Template | Look |
 | --- | --- |
-| `plotly` | The default — gray background, dotted gridlines |
+| `plotly` | The default, gray background, dotted gridlines |
 | `plotly_white` | White background, blue/orange palette |
-| `plotly_dark` | Dark background — good for dashboards |
-| `simple_white` | Pure white, very minimal — *this course's default* |
+| `plotly_dark` | Dark background, good for dashboards |
+| `simple_white` | Pure white, very minimal, *this course's default* |
 | `ggplot2` | Mimics R's ggplot2 theme |
 | `seaborn` | Mimics Python's Seaborn defaults |
 | `none` | No styling at all |
@@ -97,7 +97,7 @@ fig = px.scatter(
     y="bill_length_mm",
     color="species",
     template="simple_white",
-    title="Penguins — change the template above to see other styles",
+    title="Penguins, change the template above to see other styles",
 )
 fig.show()
 `,
@@ -118,13 +118,13 @@ because:
   gridlines competing with the data.
 - **The data is the loudest thing on the page.** That matches the
   central message of this course: charts are *for the data*.
-- **It prints well.** Light background, dark ink — readable on
+- **It prints well.** Light background, dark ink, readable on
   paper, in slides, and on both light and dark documentation
   themes.
 - **It looks professional out of the box.** No fiddling needed
   before sharing with a colleague.
 
-**Other templates are completely valid** — `plotly_dark` is great
+**Other templates are completely valid**, `plotly_dark` is great
 for dashboards, `presentation` is great for slide decks,
 `ggplot2` is loved by statisticians. We use `simple_white` here for
 consistency and clarity, not because it is "best."
@@ -190,7 +190,7 @@ in *any* template still communicates the story.
 
 ## Composing your own template (optional, advanced)
 
-You can also create *partial* templates — small overrides on top
+You can also create *partial* templates, small overrides on top
 of an existing one. For example, change the default font:
 
 ```python
@@ -210,11 +210,11 @@ and dashboards.
   markdown={`What does a Plotly **template** control?
 
 - The numeric data plotted.
-  > Templates have no access to the data in a chart — they only control visual appearance. The data is determined by the DataFrame and the encoding arguments (**x=**, **y=**, etc.) passed to the Plotly Express function.
+  > Templates have no access to the data in a chart, they only control visual appearance. The data is determined by the DataFrame and the encoding arguments (**x=**, **y=**, etc.) passed to the Plotly Express function.
 - Which chart type is used.
-  > Chart type is determined by which Plotly Express function you call (**px.bar**, **px.scatter**, **px.line**, etc.). A template cannot change a bar chart into a scatter plot — it only changes how any given chart looks.
+  > Chart type is determined by which Plotly Express function you call (**px.bar**, **px.scatter**, **px.line**, etc.). A template cannot change a bar chart into a scatter plot, it only changes how any given chart looks.
 - [o] The visual styling: background, gridlines, default colors, fonts, and other purely cosmetic settings.
-  > A template is a named bundle of styling defaults. It does not change any analytical content — only how the chart *looks*. Templates are layered on top of whatever encodings you've already chosen.
+  > A template is a named bundle of styling defaults. It does not change any analytical content, only how the chart *looks*. Templates are layered on top of whatever encodings you've already chosen.
 - Whether the chart is interactive.
   > Interactivity in Plotly charts comes from the Plotly.js rendering engine and is independent of the template. Every Plotly Express chart supports hover, zoom, and legend-click regardless of which template is applied.
 
@@ -225,10 +225,10 @@ Templates are pure cosmetics. Your encoding choices (**x**, **y**, **color**, ..
   markdown={`Why does this course pick **template="simple_white"** as the default?
 
 - It is the only template that supports interactive charts.
-  > Every Plotly Express template supports the full set of interactive behaviors — hover, zoom, pan, and legend-click. Interactivity is a property of the Plotly rendering engine, not of any particular template.
+  > Every Plotly Express template supports the full set of interactive behaviors, hover, zoom, pan, and legend-click. Interactivity is a property of the Plotly rendering engine, not of any particular template.
 - It is required by Plotly Express.
   > **template="simple_white"** is entirely optional. Plotly Express has its own default template (called **plotly**) that applies automatically when no template argument is provided.
-- [o] It removes visual noise (no gray background, minimal gridlines), letting the data stand out — and it prints / renders cleanly on most surfaces.
+- [o] It removes visual noise (no gray background, minimal gridlines), letting the data stand out, and it prints / renders cleanly on most surfaces.
   > **simple_white** is a deliberately minimal style: light background, light gridlines, clean fonts. It works well for both screen and print, and lets the encoded data be the most prominent element. Other templates (e.g., **plotly_dark**) are perfectly valid for other contexts.
 - **simple_white** makes charts render faster.
   > Template selection has no meaningful effect on rendering speed. Charts render quickly or slowly based on the number of data points and the complexity of the figure, not the visual theme applied.

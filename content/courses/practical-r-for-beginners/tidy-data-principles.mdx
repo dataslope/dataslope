@@ -1,6 +1,6 @@
 ---
 title: Tidy Data Principles
-description: The most important conceptual idea in modern data analysis — a simple, three-rule recipe for shaping data so that every tool just works.
+description: The most important conceptual idea in modern data analysis, a simple, three-rule recipe for shaping data so that every tool just works.
 ---
 
 In 2014, Hadley Wickham wrote a paper that quietly changed how a
@@ -13,7 +13,7 @@ A dataset is *tidy* when:
 2. **Each observation forms a row.**
 3. **Each type of observational unit forms a table.**
 
-That's it. Three rules. They sound obvious. They are not — most
+That's it. Three rules. They sound obvious. They are not, most
 real-world data violates them.
 
 The payoff: once your data is tidy, *every modern R tool just
@@ -24,7 +24,7 @@ modeling function expects tidy input. Getting your data tidy is
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Circles, squares, and triangles each settle into their own labeled column while one stray triangle waits below for the single empty slot — every variable a column, every observation a row"
+  aria-label="Circles, squares, and triangles each settle into their own labeled column while one stray triangle waits below for the single empty slot, every variable a column, every observation a row"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -76,7 +76,7 @@ downstream wants.
 
 ## What "messy" looks like
 
-Here is the same data, but **wide** — years spread across columns:
+Here is the same data, but **wide**, years spread across columns:
 
 <CodeBlock
   adapter="r"
@@ -98,7 +98,7 @@ What's wrong with this? Two things:
 
 1. **"Year" is a variable**, but it's hidden in the column names
    `y2022`, `y2023`. To compute the average population across
-   years, you can't write `mean(year)` — there is no `year`
+   years, you can't write `mean(year)`, there is no `year`
    column.
 2. **The same variable (population) lives in multiple columns.**
    This makes vectorized operations awkward and plotting nearly
@@ -130,8 +130,8 @@ each with its own tool:
 | Split combined columns | `separate` / `unite` |
 | Separate observational units | `join` / split into multiple tables |
 
-Once the data is tidy, it flows straight into analysis — `ggplot`,
-`dplyr`, and models — and from there into insight.
+Once the data is tidy, it flows straight into analysis, `ggplot`,
+`dplyr`, and models, and from there into insight.
 
 We'll meet the actual reshaping tools (`pivot_longer`,
 `pivot_wider`) on the "Reshaping Data" page later. For now, the
@@ -139,7 +139,7 @@ goal is just to *recognize* tidy versus messy.
 
 ## A side-by-side comparison
 
-The same idea — average population per city across years —
+The same idea, average population per city across years,
 written two ways:
 
 <CodeBlock
@@ -187,7 +187,7 @@ number of years; the wide version requires explicitly enumerating
 the year columns. Add a `y2024` column, and the wide solution
 breaks; the tidy solution does not.
 
-## "Observational unit" — what to put in one table
+## "Observational unit", what to put in one table
 
 Rule 3 says: each type of observation gets its own table.
 Concrete example: imagine a music library where you record every
@@ -201,7 +201,7 @@ A *bad* table might combine song info and play info:
 | 2 | 2026-05-01 09:02 | Yesterday | Help! | The Beatles | 125 |
 
 The song title, album, artist, and duration are repeated for
-every play. That's wasteful and dangerous — fix a typo in one row
+every play. That's wasteful and dangerous, fix a typo in one row
 and now two rows disagree.
 
 The tidy approach: split into two tables.
@@ -231,7 +231,7 @@ ggplot(tidy, aes(x = year, y = population, color = city)) +
 
 That single expression works because `year` is a column,
 `population` is a column, and `city` is a column. Try doing the same with the
-wide form — you can't, without reshaping first.
+wide form, you can't, without reshaping first.
 
 ## Two acid tests
 
@@ -267,11 +267,11 @@ further.
 <MultipleChoice
   markdown={`A spreadsheet has columns: \`country\`, \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\`. Is it tidy?
 
-- Yes — every row is one country.
+- Yes, every row is one country.
   > While every row does represent one country, the column names \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\` encode the variable "year" as column headers rather than as values in a \`year\` column, which violates tidy rule 1.
-- [o] No — "year" is hidden in the column names, so year is not a variable in its own right.
-  > The tidy form has columns \`country\`, \`year\`, \`gdp\` — one row per country-year combination.
-- Yes — every column has a name.
+- [o] No, "year" is hidden in the column names, so year is not a variable in its own right.
+  > The tidy form has columns \`country\`, \`year\`, \`gdp\`, one row per country-year combination.
+- Yes, every column has a name.
   > Having named columns is a basic requirement, not a sufficient condition for tidiness; the structure of *what* those columns represent is what matters.
 - It depends on how many countries there are.
   > The number of rows (countries) does not affect whether the format is tidy; the issue is the structure of the columns, not the number of rows.`}

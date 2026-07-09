@@ -1,6 +1,6 @@
 {
     "title": "Mastering ggplot2: The Grammar of Graphics in R",
-    "description": "A deep, intuition-first course on ggplot2 and the Grammar of Graphics — for analysts who can already make charts but want to truly understand how ggplot2 thinks.",
+    "description": "A deep, intuition-first course on ggplot2 and the Grammar of Graphics, for analysts who can already make charts but want to truly understand how ggplot2 thinks.",
     "root": true,
     "tags": {
         "language": [

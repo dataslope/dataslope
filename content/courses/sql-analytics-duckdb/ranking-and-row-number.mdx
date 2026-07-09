@@ -1,6 +1,6 @@
 ---
 title: Ranking and ROW_NUMBER
-description: Numbering and ranking rows within groups — ROW_NUMBER, RANK, DENSE_RANK — and the per-group top-N pattern that powers "best per category" questions.
+description: Numbering and ranking rows within groups, ROW_NUMBER, RANK, DENSE_RANK, and the per-group top-N pattern that powers "best per category" questions.
 ---
 
 A huge family of analytical questions is about **position**: "the top 3
@@ -14,7 +14,7 @@ the end.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A podium where two green dots share the tallest step marked with one pip, the second step holds only a dashed empty ring, and a blue dot stands on the third step marked with three pips — when rows tie, RANK hands out two golds and no silver"
+  aria-label="A podium where two green dots share the tallest step marked with one pip, the second step holds only a dashed empty ring, and a blue dot stands on the third step marked with three pips, when rows tie, RANK hands out two golds and no silver"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -68,13 +68,13 @@ ORDER BY
   rn;`}
 />
 
-The biggest order is `rn = 1`, the next `rn = 2`, and so on — a clean
+The biggest order is `rn = 1`, the next `rn = 2`, and so on, a clean
 sequential rank over the whole table.
 
 ## Ranking *within* groups with `PARTITION BY`
 
 Add `PARTITION BY` and the numbering **restarts** in each group. This is
-how you ask "rank within each region" — every region gets its own 1, 2,
+how you ask "rank within each region", every region gets its own 1, 2,
 3.
 
 <SqlCodeBlock
@@ -158,7 +158,7 @@ ORDER BY
 
 This is the canonical "best N per category" shape: **partition** by the
 category, **order** by the measure, **rank** with `ROW_NUMBER`, and
-**keep** ranks ≤ N with `QUALIFY`. Internalize it — you will use it
+**keep** ranks ≤ N with `QUALIFY`. Internalize it, you will use it
 constantly.
 
 ## `ROW_NUMBER` vs `RANK` vs `DENSE_RANK`
@@ -167,11 +167,11 @@ The three ranking functions differ only in how they handle **ties** (rows
 with equal `ORDER BY` values). The difference matters and is a frequent
 source of confusion.
 
-- **`ROW_NUMBER`** — always distinct: 1, 2, 3, 4. Ties are broken
+- **`ROW_NUMBER`**, always distinct: 1, 2, 3, 4. Ties are broken
   arbitrarily; no two rows share a number.
-- **`RANK`** — ties share a number, then it **skips**: 1, 1, 3, 4. (Two
+- **`RANK`**, ties share a number, then it **skips**: 1, 1, 3, 4. (Two
   golds, no silver.)
-- **`DENSE_RANK`** — ties share a number, **no skip**: 1, 1, 2, 3.
+- **`DENSE_RANK`**, ties share a number, **no skip**: 1, 1, 2, 3.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -235,7 +235,7 @@ Choosing between them:
   > Without an order there is no basis for which row is "1", so \`ROW_NUMBER\` needs \`ORDER BY\` in the window.
 - Because \`ORDER BY\` sorts the final output.
   > The window's \`ORDER BY\` controls the numbering, not the final result order (which is the outer \`ORDER BY\`).
-- It does not — \`ORDER BY\` is optional for \`ROW_NUMBER\`.
+- It does not, \`ORDER BY\` is optional for \`ROW_NUMBER\`.
   > A meaningful row number requires an ordering; omitting it makes the numbers arbitrary or invalid.
 
 \`ROW_NUMBER\` numbers rows in a defined order, so the window must specify
@@ -247,7 +247,7 @@ that order.`}
 
 - 1, 2, 3
   > That is \`ROW_NUMBER\` behavior; \`RANK\` lets the two 100s tie.
-- [o] 1, 1, 3 — the tied 100s both get rank 1, and the next rank skips to 3.
+- [o] 1, 1, 3, the tied 100s both get rank 1, and the next rank skips to 3.
   > \`RANK\` gives equal values the same rank and then skips the consumed positions.
 - 1, 1, 2
   > That is \`DENSE_RANK\`, which does not skip; \`RANK\` skips to 3.
@@ -279,7 +279,7 @@ because it breaks ties.`}
 - Because \`WHERE\` cannot compare numbers.
   > \`WHERE\` compares numbers fine; the issue is timing relative to window functions.
 - [o] Window functions are computed after \`WHERE\` runs, so you cannot filter on a window result in \`WHERE\`; \`QUALIFY\` filters after windows are computed.
-  > \`QUALIFY\` is to window functions what \`HAVING\` is to aggregates — a filter applied once the window values exist.
+  > \`QUALIFY\` is to window functions what \`HAVING\` is to aggregates, a filter applied once the window values exist.
 - Because \`QUALIFY\` sorts the rows.
   > \`QUALIFY\` filters; it does not sort.
 - Because \`WHERE\` only works on the first partition.
@@ -305,5 +305,5 @@ see.`}
 />
 
 Ranking answers "where does this row stand?" The next page answers a
-different positional question — "how does this row's value accumulate or
-compare over time?" — with running totals and moving averages.
+different positional question, "how does this row's value accumulate or
+compare over time?", with running totals and moving averages.

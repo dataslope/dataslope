@@ -127,7 +127,7 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
 
   df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
   \`\`\`
-  > Correct — imports pandas as pd and creates the DataFrame properly.
+  > Correct, imports pandas as pd and creates the DataFrame properly.
 - \`\`\`python
   import numpy as np
   df = np.array([[1, 2], [3, 4]])

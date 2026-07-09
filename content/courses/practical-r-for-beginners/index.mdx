@@ -1,10 +1,10 @@
 ---
 title: Welcome
-description: A friendly, narrative-driven introduction to R for learners who want to understand data, statistics, and computational thinking — no programming background required.
+description: A friendly, narrative-driven introduction to R for learners who want to understand data, statistics, and computational thinking, no programming background required.
 ---
 
 Welcome to **Practical R for Beginners**. Before a single word of
-theory, here is R doing what R is for. The block below is **live** —
+theory, here is R doing what R is for. The block below is **live**,
 this whole course runs R inside your browser, with nothing to install.
 Click **Run**, then change `c(68, 71, 70, 74, 72, 69, 75)` to your own
 numbers and run it again.
@@ -27,7 +27,7 @@ cat("warmest:", max(temps), "  coolest:", min(temps), "\\n")
 
 That is the entire shape of data analysis in R: name a collection of
 numbers, then ask questions of the whole collection at once. You did
-not loop over the seven days — you said `mean(temps)` and got one
+not loop over the seven days, you said `mean(temps)` and got one
 answer. By the end of this course that same gesture will summarize
 thousands of rows just as easily.
 
@@ -39,20 +39,20 @@ This course is for you if any of these sound familiar:
   no idea how the calculations are done in the real world.
 - You can use a spreadsheet to add up a column, but the moment a
   dataset has thousands of rows or messy values, you feel stuck.
-- You are curious about data science, research, or analytics — but
+- You are curious about data science, research, or analytics, but
   every tutorial you find starts with `tidyverse pipelines` or
   `Bayesian inference` and leaves you behind on page one.
 
 You do **not** need any prior programming experience. You do not need
 to remember calculus, linear algebra, or the difference between a
-median and a mode. We will build everything from the ground up — and
+median and a mode. We will build everything from the ground up, and
 we will build it the way working data analysts actually think about
 problems.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A solid blue data cube flows along gray arrows into a yellow script card marked by a green prompt chevron, and on into a green card of rising bars — raw data, a few lines of R, and a chart that tells the story"
+  aria-label="A solid blue data cube flows along gray arrows into a yellow script card marked by a green prompt chevron, and on into a green card of rising bars, raw data, a few lines of R, and a chart that tells the story"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -83,15 +83,15 @@ problems.
 
 <Callout type="info" title="What is R, in one sentence?">
 R is a programming language designed by statisticians, for
-statisticians, to make working with data — counting it, summarizing
-it, visualizing it, modeling it — feel as direct and expressive as
+statisticians, to make working with data, counting it, summarizing
+it, visualizing it, modeling it, feel as direct and expressive as
 sketching a graph on a notebook page.
 </Callout>
 
 ## How this course is organized
 
-We open with one short chapter on *why* R exists — the shift from a
-world starved for data to one drowning in it — and then we start
+We open with one short chapter on *why* R exists, the shift from a
+world starved for data to one drowning in it, and then we start
 writing code almost immediately. Every concept after that is grounded
 in a question a data analyst actually asks: *What does this dataset
 look like? Are these two groups really different? Is this number more
@@ -99,7 +99,7 @@ interesting than random chance?*
 
 From there the path is steady: computational thinking, then vectors,
 tabular data, transformation, exploration, visualization, and
-statistical reasoning — closing with a mini project that ties every
+statistical reasoning, closing with a mini project that ties every
 piece together. A few optional "deeper history" chapters near the end
 tell the fuller story of where R came from, for when you are curious;
 they are asides, not prerequisites.
@@ -111,8 +111,8 @@ By the end of this course you will be able to:
 - **Read a dataset** into R and describe what is in it without
   guessing.
 - **Clean and reshape** messy data into a tidy, analysis-ready form.
-- **Visualize** distributions and relationships with `ggplot2`, and —
-  more importantly — *interpret* what you see.
+- **Visualize** distributions and relationships with `ggplot2`, and,
+  more importantly, *interpret* what you see.
 - **Reason statistically** about variability, uncertainty, and what
   makes a finding meaningful versus accidental.
 - **Write small R programs** that other people (including future-you)
@@ -127,7 +127,7 @@ foundational: thinking clearly about data.
 ## How to use the interactive widgets
 
 Every code block on these pages is **live**. R runs directly in your
-browser through [WebR](https://docs.r-wasm.org/webr/latest/) — a full
+browser through [WebR](https://docs.r-wasm.org/webr/latest/), a full
 WebAssembly build of R that loads on demand. There is nothing to
 install, no environment to configure.
 
@@ -138,11 +138,11 @@ You will see four kinds of interactive content:
    variable in one block is not visible in the next unless the block
    has its own setup code.
 2. **Multi-file code blocks.** Some examples span two or three R
-   files — the entry script `source()`s the others. This is how real
+   files, the entry script `source()`s the others. This is how real
    analyses are organized.
 3. **Challenge cards.** Small problems with tests. Edit the
    code, click *Run*, and see whether your solution passes. Peek at
-   the solution if you get stuck — peeking is learning.
+   the solution if you get stuck, peeking is learning.
 4. **Multiple-choice questions.** Quick comprehension checks. Wrong
    answers get specific feedback, so a miss is a learning moment.
 
@@ -158,7 +158,7 @@ run; after that, it is instant for the rest of the session.
 <IllustrationPrompt subject="a Palmer penguin" />
 
 Here is a small example of the kind of analysis we will build
-toward — on a real dataset, the **Palmer penguins**: body
+toward, on a real dataset, the **Palmer penguins**: body
 measurements of 333 penguins from three species, collected at a
 research station in Antarctica. Do not worry about understanding
 every line yet; by the middle of the course you will.

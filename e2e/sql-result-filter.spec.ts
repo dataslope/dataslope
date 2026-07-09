@@ -7,7 +7,7 @@ import { test, expect, type Page } from "@playwright/test";
 // the engine, so:
 //   • it matches across the WHOLE result, not just the loaded window, and
 //   • paging / infinite scroll is preserved (the filtered result is itself
-//     paged — only one page is loaded, never the whole table).
+//     paged, only one page is loaded, never the whole table).
 // Verified on all three engines (the LIKE/ILIKE dialect differs).
 // ─────────────────────────────────────────────────────────────────────
 
@@ -22,7 +22,7 @@ async function runSql(page: Page, sql: string) {
 
 // Wait until the engine is idle (no run spinner). A query holds the engine's
 // "running" lock through its post-run schema refresh; the filter re-query is
-// dropped if fired during that window — exactly as a real user waits for the
+// dropped if fired during that window, exactly as a real user waits for the
 // grid to settle before (re-)typing a filter.
 async function waitIdle(page: Page) {
   await expect(page.locator(".run-btn-spinner")).toHaveCount(0, {
@@ -72,7 +72,7 @@ for (const { id, route, create } of ENGINES) {
     await expect(pagerInfo).toContainText("of 600", { timeout: 40_000 });
     await waitIdle(page);
 
-    // The filter field is a normal ENABLED input — no "load all" button, no
+    // The filter field is a normal ENABLED input, no "load all" button, no
     // disabled state (engine-paged results are filterable via pushdown).
     const input = page.locator(".sql-result-filter-input");
     await expect(input).toBeVisible();
@@ -80,7 +80,7 @@ for (const { id, route, create } of ENGINES) {
     expect(await page.locator(".sql-result-filter-trigger").count()).toBe(0);
 
     // (1) Filter "even" → 300 matches across the whole 600, but only ONE page
-    //     (50) is loaded — proving the filter is pushed down AND the result is
+    //     (50) is loaded, proving the filter is pushed down AND the result is
     //     still paged (not loaded entirely into memory).
     await input.fill("even");
     await expect(pagerInfo).toContainText("filtered from 600", {
@@ -108,7 +108,7 @@ for (const { id, route, create } of ENGINES) {
 }
 
 // A materialized (LIMIT) result stays in memory, so its filter is client-side
-// (exact displayed-text match, instant — no re-query) — verified on SQLite.
+// (exact displayed-text match, instant, no re-query), verified on SQLite.
 test("SQLite: a small in-memory (LIMIT) result filters client-side", async ({
   page,
 }) => {

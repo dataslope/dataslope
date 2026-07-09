@@ -5,7 +5,7 @@
  *
  * Used by `MdxCodeBlock` so MDX content can reference an adapter by
  * its short id string (e.g. `"python"`) instead of importing the
- * adapter module directly — MDX content has no TypeScript import
+ * adapter module directly, MDX content has no TypeScript import
  * surface of its own.
  */
 import type { LanguageAdapter } from "../types";

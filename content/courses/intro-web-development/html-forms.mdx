@@ -1,10 +1,10 @@
 ---
-title: HTML — Forms & Inputs
-description: Collecting user input with form, label, input, and button — and why labels matter.
+title: "HTML: Forms & Inputs"
+description: Collecting user input with form, label, input, and button, and why labels matter.
 ---
 
 Everything you've built so far only *shows* things. Forms are how
-pages *ask* for things: search boxes, sign-ups, checkout pages —
+pages *ask* for things: search boxes, sign-ups, checkout pages,
 they're all built from the same handful of elements.
 
 ## The core four
@@ -18,14 +18,14 @@ they're all built from the same handful of elements.
 ```
 
 - `<form>` groups related controls and defines what happens on submit.
-- `<input>` is the workhorse — its `type` attribute changes what it
+- `<input>` is the workhorse, its `type` attribute changes what it
   accepts: `text`, `email`, `number`, `password`, `checkbox`, `date`…
 - `<label>` names a control. Its `for` attribute points at the
   input's `id`, which is what links them.
 - `<button type="submit">` submits the form.
 
 <Callout type="info" title="Labels are not optional">
-Clicking a label focuses its input (try it below — great for tiny
+Clicking a label focuses its input (try it below, great for tiny
 checkboxes), and screen readers announce the label when the input is
 focused. An unlabeled input is a guessing game for a lot of your
 users. Always pair them.
@@ -70,7 +70,7 @@ users. Always pair them.
 />
 
 Submitting this form reloads the page (that's a form's default
-behaviour — it sends its data to a server). In the JavaScript lessons
+behaviour, it sends its data to a server). In the JavaScript lessons
 you'll intercept the submit event and handle the data yourself,
 which is how most modern pages do it.
 
@@ -155,4 +155,4 @@ if ((button.getAttribute("type") || "submit").toLowerCase() !== "submit") {
 />
 
 That's the essential HTML toolkit. Time to make it look like
-something: [CSS — getting started](/courses/intro-web-development/css-getting-started).
+something: [CSS, getting started](/courses/intro-web-development/css-getting-started).

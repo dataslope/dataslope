@@ -3,14 +3,14 @@ title: API Modeling & Contracts
 description: Treat types as contracts between modules, services, and teams.
 ---
 
-As systems grow, they're split into modules, services, and teams. Each boundary is a potential failure point: miscommunication, inconsistent data shapes, forgotten error cases. In dynamically typed languages, these issues surface at runtime — in production, under load, after deployment.
+As systems grow, they're split into modules, services, and teams. Each boundary is a potential failure point: miscommunication, inconsistent data shapes, forgotten error cases. In dynamically typed languages, these issues surface at runtime, in production, under load, after deployment.
 
 TypeScript offers a better way: **types as contracts**. By modeling your API surfaces with precise types, you move entire classes of integration bugs to compile time. In this chapter, you'll learn to design contracts that span module boundaries, model request/response cycles, separate domain logic from transport concerns, and build systems where the compiler enforces compatibility.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A blue module and a green module each point a thin arrow into the same yellow contract capsule between them, beneath a small green check — a shared type contract makes both sides meet exactly"
+  aria-label="A blue module and a green module each point a thin arrow into the same yellow contract capsule between them, beneath a small green check, a shared type contract makes both sides meet exactly"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -252,7 +252,7 @@ You can generalize the response pattern with a generic `Result<T, E>` or `ApiRes
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Two identical envelopes differ only in the seal at the tip of the flap: one sealed green, one sealed red — a single generic envelope wraps every response with a success-or-error status the caller must inspect"
+  aria-label="Two identical envelopes differ only in the seal at the tip of the flap: one sealed green, one sealed red, a single generic envelope wraps every response with a success-or-error status the caller must inspect"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -321,7 +321,7 @@ if (orderResp.status === "ok") {
   ]}
 />
 
-Now every handler returns `ApiResponse<T>`, and the client knows to check `.status` before accessing `.data`. This is a **uniform interface** — a contract that spans your entire API surface.
+Now every handler returns `ApiResponse<T>`, and the client knows to check `.status` before accessing `.data`. This is a **uniform interface**, a contract that spans your entire API surface.
 
 ---
 
@@ -330,7 +330,7 @@ Now every handler returns `ApiResponse<T>`, and the client knows to check `.stat
 A well-architected system separates:
 1. **Domain layer**: Pure business logic and types (e.g., `User`, `Order`).
 2. **Application layer**: Use cases that orchestrate domain logic (e.g., `getUserById`, `placeOrder`).
-3. **Transport layer**: HTTP handlers, WebSocket listeners, CLI parsers — anything that talks to the outside world.
+3. **Transport layer**: HTTP handlers, WebSocket listeners, CLI parsers, anything that talks to the outside world.
 
 Types enforce these boundaries:
 
@@ -400,7 +400,7 @@ export type ApiResponse<T> =
 />
 
 Here:
-- `domain.ts` knows nothing about HTTP or `ApiResponse` — it just finds users.
+- `domain.ts` knows nothing about HTTP or `ApiResponse`, it just finds users.
 - `application.ts` wraps domain logic in `ApiResponse`, making errors explicit.
 - `transport.ts` serializes the response to JSON.
 
@@ -590,8 +590,8 @@ You've learned how to:
 - **Separate domain, application, and transport layers** using types to enforce boundaries.
 - **Use discriminated unions** for endpoints with multiple response shapes.
 
-Types as contracts shift entire classes of integration bugs leftward — from production to compile time. They're living documentation that never goes stale. In the next chapter, we'll apply these ideas to **error handling**, modeling failures as values rather than exceptions.
+Types as contracts shift entire classes of integration bugs leftward, from production to compile time. They're living documentation that never goes stale. In the next chapter, we'll apply these ideas to **error handling**, modeling failures as values rather than exceptions.
 
 ---
 
-**Next**: [Error Handling with Types](./error-handling-with-types) — using `Result<T, E>` to make errors explicit and composable.
+**Next**: [Error Handling with Types](./error-handling-with-types), using `Result<T, E>` to make errors explicit and composable.

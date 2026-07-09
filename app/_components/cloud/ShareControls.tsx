@@ -68,7 +68,7 @@ export function ShareControls({
           type="button"
           className="header-btn"
           onClick={() => setShareOpen(true)}
-          title="Share this playground — anyone with the link can open a copy"
+          title="Share this playground, anyone with the link can open a copy"
         >
           <Share2 size={14} aria-hidden="true" />
           <span>Share</span>
@@ -103,7 +103,7 @@ function ShareDialog({
 
   useEffect(() => {
     if (open) {
-      // A share is a snapshot of "now" — clear the previous link so reopening
+      // A share is a snapshot of "now", clear the previous link so reopening
       // the dialog never suggests an old link reflects new edits.
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset synced to the open prop, same pattern as WorkspaceBadge's dialogs
       setUrl(null);
@@ -118,14 +118,14 @@ function ShareDialog({
     try {
       const bundle = await buildBundle();
       if (!bundle) {
-        setError("The playground is still loading — try again in a moment.");
+        setError("The playground is still loading, try again in a moment.");
         return;
       }
       const res = await createShare(bundle);
       setUrl(res.url);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Sharing failed — please retry.",
+        err instanceof Error ? err.message : "Sharing failed, please retry.",
       );
     } finally {
       setBusy(false);
@@ -139,7 +139,7 @@ function ShareDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard unavailable — the input below stays selectable */
+      /* clipboard unavailable, the input below stays selectable */
     }
   }, [url]);
 
@@ -158,7 +158,7 @@ function ShareDialog({
           <Dialog.Description className="confirm-desc">
             Creates a link to a snapshot of the current files
             {" "}and state. Anyone with the link can view it and open
-            their own copy — no one can edit yours. Later edits aren&rsquo;t
+            their own copy, no one can edit yours. Later edits aren&rsquo;t
             shared until you create a new link.
           </Dialog.Description>
 

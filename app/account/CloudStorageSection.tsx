@@ -4,7 +4,7 @@
  * Account-page management for cloud storage: every cloud-saved workspace and
  * share link on the account, across all playgrounds. The in-playground Cloud
  * dialog only shows its own playground's saves; this is the one place to see
- * (and free up) everything — which matters because the storage quota is
+ * (and free up) everything, which matters because the storage quota is
  * account-wide, and because revoking a share link is only possible here.
  */
 
@@ -228,7 +228,7 @@ export function CloudStorageSection() {
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">Loading…</p>
       ) : workspaces.length === 0 ? (
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">
-          No cloud saves yet — use Back up in a playground&rsquo;s workspace
+          No cloud saves yet, use Back up in a playground&rsquo;s workspace
           menu.
         </p>
       ) : (
@@ -275,7 +275,7 @@ export function CloudStorageSection() {
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">Loading…</p>
       ) : shares.length === 0 ? (
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">
-          No share links yet — use the Share button in any playground.
+          No share links yet, use the Share button in any playground.
         </p>
       ) : (
         <ul className="mt-1 divide-y divide-[var(--ds-gray-100)] dark:divide-white/5">

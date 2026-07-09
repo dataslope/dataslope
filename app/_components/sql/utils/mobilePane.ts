@@ -12,7 +12,7 @@ export type SqlMobilePane = "schema" | "editor" | "results";
  *
  * Each query tab remembers the last pane the user looked at; activating a tab
  * restores that pane rather than carrying the previous tab's pane over. The one
- * override: a tab is never dropped onto an empty Results surface — if the
+ * override: a tab is never dropped onto an empty Results surface, if the
  * remembered pane is "results" but the tab has no output to show, fall back to
  * the Editor ("no results ⇒ show the editor"). A tab with no remembered pane
  * (e.g. a freshly created one) defaults to the Editor.

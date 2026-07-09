@@ -1,6 +1,6 @@
 ---
 title: Functions and Modularity
-description: Functions as named, reusable units of behavior — parameters, return values, by-value vs by-reference, and overloading.
+description: Functions as named, reusable units of behavior, parameters, return values, by-value vs by-reference, and overloading.
 ---
 
 A **function** is a named, reusable chunk of code. It takes some
@@ -21,7 +21,7 @@ write our own.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three yellow call sites send dotted arguments into one blue function box marked with an italic f, and three green results fan back out — one definition reused from many places"
+  aria-label="Three yellow call sites send dotted arguments into one blue function box marked with an italic f, and three green results fan back out, one definition reused from many places"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -70,11 +70,11 @@ int add(int a, int b) {     // return type, name, parameter list
 
 The parts:
 
-- **Return type** (`int`) — what kind of value flows back to the
+- **Return type** (`int`), what kind of value flows back to the
   caller. Use `void` if the function returns nothing.
-- **Name** (`add`) — what callers will use to invoke it.
-- **Parameter list** (`int a, int b`) — typed slots for the inputs.
-- **Body** (between `{` and `}`) — the code that runs when the
+- **Name** (`add`), what callers will use to invoke it.
+- **Parameter list** (`int a, int b`), typed slots for the inputs.
+- **Body** (between `{` and `}`), the code that runs when the
   function is called.
 
 A function must have one **definition** (the body) and may have many
@@ -87,7 +87,7 @@ A function must have one **definition** (the body) and may have many
       filename: "main.cpp",
       starterCode: `#include <iostream>
 
-// Declaration — tells the compiler "this exists".
+// Declaration, tells the compiler "this exists".
 int square(int n);
 
 int main() {
@@ -95,7 +95,7 @@ int main() {
   return 0;
 }
 
-// Definition — the actual body.
+// Definition, the actual body.
 int square(int n) { return n * n; }
 `,
     },
@@ -137,7 +137,7 @@ cheap-to-copy types like `int`, `double`, `bool`, `char`.
 void doubled(int& x) { x *= 2; }
 ```
 
-The function receives a *reference* — essentially a second name for
+The function receives a *reference*, essentially a second name for
 the caller's variable. Modifying it modifies the caller's variable.
 
 ### By const reference: a read-only alias
@@ -502,7 +502,7 @@ int main() {
 <ChallengeCard
   adapter="cpp"
   title="Library split: arithmetic"
-  instructions={`Open \`arith.cpp\` and implement \`gcd(a, b)\` using Euclid's algorithm — repeatedly replace \`(a, b)\` with \`(b, a % b)\` until \`b == 0\`. Return the absolute value of \`a\` at that point (assume positive inputs). \`main\` prints \`gcd(48, 18)\` which should be \`6\`.`}
+  instructions={`Open \`arith.cpp\` and implement \`gcd(a, b)\` using Euclid's algorithm, repeatedly replace \`(a, b)\` with \`(b, a % b)\` until \`b == 0\`. Return the absolute value of \`a\` at that point (assume positive inputs). \`main\` prints \`gcd(48, 18)\` which should be \`6\`.`}
   entryFilename="main.cpp"
   files={[
     {
@@ -558,7 +558,7 @@ int gcd(int a, int b) {
   markdown={`A function takes a parameter as \`const std::string&\`. What does that mean?
 
 - The function gets a copy of the string that it cannot modify.
-  > It does not get a copy — \`&\` means *reference*, not value.
+  > It does not get a copy, \`&\` means *reference*, not value.
 - The function gets a pointer to the caller's string.
   > It gets a *reference*, which is similar in spirit but different in syntax and safety.
 - [o] The function gets an alias for the caller's string, with a promise not to modify it.
@@ -587,7 +587,7 @@ int gcd(int a, int b) {
   > A call would have parentheses with arguments and no return type.
 - [o] A function **declaration**: it tells the compiler the signature without providing the body.
   > The body (the *definition*) can appear later, or in another file.
-- A typo — function bodies are mandatory.
+- A typo, function bodies are mandatory.
   > Declarations without bodies are valid and common.
 - A way to make the function virtual.
   > That would require the \`virtual\` keyword inside a class.`}

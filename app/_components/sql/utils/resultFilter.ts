@@ -8,7 +8,7 @@
  *  untouched.
  *
  *  Matching is a case-insensitive substring test. A leading `column:` prefix
- *  — where `column` names a real column in the result — scopes the match to
+ *, where `column` names a real column in the result, scopes the match to
  *  that single column; otherwise the term is matched against every column.
  *  Because the prefix only activates when it names an existing column, a value
  *  that merely contains a colon (a `12:30` time, or free text like `note: hi`
@@ -89,7 +89,7 @@ export function filterResultRowIndices(
   return out;
 }
 
-/** Whether the in-grid (client-side) filter can be offered for a result set —
+/** Whether the in-grid (client-side) filter can be offered for a result set,
  *  i.e. the *whole* result is already in memory, so filtering its rows is
  *  complete and correct.
  *
@@ -97,7 +97,7 @@ export function filterResultRowIndices(
  *  "lazy" result it is true only when the loaded rows cover the entire result
  *  starting at offset 0: a single page that happened to fit the whole result
  *  (rows ≤ the page size), or an "All"/infinite result that has been fully
- *  loaded. A partially-loaded lazy result returns false — filtering only the
+ *  loaded. A partially-loaded lazy result returns false, filtering only the
  *  loaded window would mislead the user; covering it needs a SQL `WHERE`
  *  pushdown (a separate change). */
 export function canClientFilterResult(params: {
@@ -115,7 +115,7 @@ export function canClientFilterResult(params: {
 // Server-side filter pushdown (for engine-paged / "lazy" results)
 //
 // When the whole result isn't in memory, filtering it client-side would only
-// see the loaded window. Instead — like DBeaver — we wrap the original query
+// see the loaded window. Instead, like DBeaver, we wrap the original query
 // as a subquery and push the filter down as a native SQL predicate, re-paged
 // through the engine so infinite scroll is preserved. The match is a
 // case-insensitive substring per column (LIKE on SQLite, ILIKE on Postgres /
@@ -155,14 +155,14 @@ function sqlStringLiteral(s: string): string {
  *  engine-paged query. Returns `null` when the filter has no term (the caller
  *  should query without a `WHERE`).
  *
- *  - Case-insensitive substring per column via `LIKE` (SQLite — ASCII
+ *  - Case-insensitive substring per column via `LIKE` (SQLite, ASCII
  *    case-insensitive) or `ILIKE` (Postgres, DuckDB), against `CAST(col AS …)`
  *    so non-text columns are searchable too.
  *  - A leading `column:term` (when `column` names a real result column) scopes
  *    the match to that one column; otherwise the term is matched against every
  *    column with `OR`.
  *  - The term is escaped for both the SQL string literal and `LIKE` wildcards
- *    (`ESCAPE '\'`), so arbitrary text — quotes, `%`, `_` — is literal and
+ *    (`ESCAPE '\'`), so arbitrary text, quotes, `%`, `_`, is literal and
  *    injection-safe. */
 export function buildResultFilterWhere(
   columnNames: readonly string[],

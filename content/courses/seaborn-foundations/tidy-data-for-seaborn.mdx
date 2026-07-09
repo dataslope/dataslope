@@ -1,24 +1,24 @@
 ---
 title: Tidy Data for Seaborn
-description: Why Seaborn wants one variable per column and one observation per row — and how to reshape your data so plotting becomes trivial.
+description: Why Seaborn wants one variable per column and one observation per row, and how to reshape your data so plotting becomes trivial.
 ---
 
 Before you draw a single chart, you have to get the **shape** of your data
-right. Almost every frustrating moment with Seaborn — "why won't it color
-by group?", "why is my x-axis a mess?" — traces back to a table that is
+right. Almost every frustrating moment with Seaborn, "why won't it color
+by group?", "why is my x-axis a mess?", traces back to a table that is
 shaped the wrong way.
 
 Seaborn is built for **tidy data**. Once your table is tidy, plotting feels
 effortless: you just name columns and the roles they should play. When it
 is *not* tidy, you fight the library on every line.
 
-This page is foundational. Take your time with it — the payoff is every
+This page is foundational. Take your time with it, the payoff is every
 later chapter.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three short labeled columns beside one long two-column table where their colors stack block over block next to a value column — a wide table melting into tidy long form"
+  aria-label="Three short labeled columns beside one long two-column table where their colors stack block over block next to a value column, a wide table melting into tidy long form"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -96,7 +96,7 @@ flowchart TD
 Let's make that concrete. Imagine three cities' average temperatures across
 three months.
 
-A **wide** table — convenient for a human to scan, one column per city:
+A **wide** table, convenient for a human to scan, one column per city:
 
 | month | London | Tokyo | Cairo |
 | ----- | ------ | ----- | ----- |
@@ -104,7 +104,7 @@ A **wide** table — convenient for a human to scan, one column per city:
 | Feb   | 6      | 9     | 16    |
 | Mar   | 9      | 12    | 20    |
 
-The same data, **tidy/long** — one row per `(month, city)` observation:
+The same data, **tidy/long**, one row per `(month, city)` observation:
 
 | month | city   | temp |
 | ----- | ------ | ---- |
@@ -114,8 +114,8 @@ The same data, **tidy/long** — one row per `(month, city)` observation:
 | Jan   | Tokyo  | 8    |
 | ...   | ...    | ...  |
 
-Notice what happened: the *city* — which was hidden in the **column
-headers** of the wide table — became an honest **variable** in its own
+Notice what happened: the *city*, which was hidden in the **column
+headers** of the wide table, became an honest **variable** in its own
 column. That is the whole trick, because Seaborn can only map things that
 are columns.
 
@@ -174,7 +174,7 @@ display(long)
   ]}
 />
 
-Three rows became nine — the table got *longer*, and `city` is now
+Three rows became nine, the table got *longer*, and `city` is now
 something we can point Seaborn at.
 
 <MultipleChoice
@@ -183,12 +183,12 @@ something we can point Seaborn at.
 - A column header, exactly as it was before.
   > In the wide table the cities *were* column headers. The whole point of melting was to stop that being true.
 - [o] A variable stored in its own column, with one value per row.
-  > Melting moved the city names out of the headers and into a real \`city\` column — now each row records which city its \`temp\` belongs to.
+  > Melting moved the city names out of the headers and into a real \`city\` column, now each row records which city its \`temp\` belongs to.
 - An index that pandas hides from Seaborn.
   > \`melt\` does not move data into the index; it creates ordinary columns that Seaborn can map directly.
 
 Tidying turns information that lived in *structure* (column names) into
-information that lives in *data* (cell values) — which is the only kind
+information that lives in *data* (cell values), which is the only kind
 Seaborn can map to x, y, or hue.`}
 />
 
@@ -197,12 +197,12 @@ Seaborn can map to x, y, or hue.`}
 Here is the reason all of this matters. Seaborn's whole interface is
 "assign a **column** to a **visual role**":
 
-- `x="month"` — column on the x-axis
-- `y="temp"` — column on the y-axis
-- `hue="city"` — column that decides color
+- `x="month"`, column on the x-axis
+- `y="temp"`, column on the y-axis
+- `hue="city"`, column that decides color
 
 That last one is only possible because `city` is a column. With the wide
-table there was no single column to hand to `hue` — the cities were three
+table there was no single column to hand to `hue`, the cities were three
 *separate* columns, which is exactly the wrong shape.
 
 <CodeBlock
@@ -246,7 +246,7 @@ matplotlib version: a loop over cities, three `plot` calls, manual colors,
 a hand-built legend. Tidy data is what buys you the brevity.
 
 <Callout type="tip" title="Most built-in datasets are already tidy">
-The datasets we use throughout this course — `tips`, `penguins`, `mpg` —
+The datasets we use throughout this course, `tips`, `penguins`, `mpg`,
 arrive tidy. Real-world data (spreadsheets, exports, pivot tables) often
 does not, so `melt` is one of the most useful tools in your kit.
 </Callout>
@@ -254,7 +254,7 @@ does not, so `melt` is one of the most useful tools in your kit.
 ## When wide is actually the right shape
 
 Tidy is the default, but not a law. A few charts genuinely want a **matrix**
-(wide) layout — most importantly the **heatmap**, where rows and columns
+(wide) layout, most importantly the **heatmap**, where rows and columns
 are both meaningful axes and each cell is a value. We'll meet that in the
 correlation-heatmaps chapter. The reverse of `melt` is `pivot`, which
 spreads a long table back into a wide matrix:
@@ -270,7 +270,7 @@ spreads a long table back into a wide matrix:
 flights = sns.load_dataset("flights")
 display(flights.head())
 
-# Pivot to a WIDE matrix (year x month) — the shape a heatmap wants.
+# Pivot to a WIDE matrix (year x month), the shape a heatmap wants.
 matrix = flights.pivot(index="month", columns="year", values="passengers")
 display(matrix.iloc[:5, :5])
 `,
@@ -286,7 +286,7 @@ for heatmaps and similar grid views.** When in doubt, go long.
 <ChallengeCard
   adapter="python"
   title="Tidy up a gradebook"
-  instructions={`The DataFrame \`scores\` is **wide** — one column per subject:
+  instructions={`The DataFrame \`scores\` is **wide**, one column per subject:
 
 | student | math | reading |
 | ------- | ---- | ------- |
@@ -351,16 +351,16 @@ tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
 ## Common tidy-data mistakes
 
 - **Values trapped in column headers.** `2019`, `2020`, `2021` as separate
-  columns means "year" is a variable hiding in the headers — melt it.
+  columns means "year" is a variable hiding in the headers, melt it.
 - **One column holding two variables.** A `"London_temp"` column mixes city
   and measurement. Split it (e.g. with `str.split`) before plotting.
 - **Aggregates pasted into the data.** A "Total" row or column is a summary,
-  not an observation. Seaborn can compute totals for you — drop it from the
+  not an observation. Seaborn can compute totals for you, drop it from the
   raw table.
 
 <Callout type="warn" title="Tidy first, plot second">
-If a Seaborn call is fighting you — you can't get `hue` to work, or the
-x-axis has the wrong thing on it — stop and look at the table's *shape*
+If a Seaborn call is fighting you, you can't get `hue` to work, or the
+x-axis has the wrong thing on it, stop and look at the table's *shape*
 before touching plot parameters. Nine times out of ten the fix is a `melt`,
 not a new keyword argument.
 </Callout>
@@ -393,7 +393,7 @@ with one colored line per region. What should you do first?
 - [o] \`melt\` the four region columns into a \`region\` column and a \`sales\` column, then map \`hue="region"\`.
   > Melting moves the region names out of the headers into a real \`region\` column, which is exactly what \`hue\` needs.
 - Plot each region with four separate \`relplot\` calls.
-  > That technically works but throws away everything Seaborn offers — one tidy call gives you all four lines, a shared scale, and a legend automatically.
+  > That technically works but throws away everything Seaborn offers, one tidy call gives you all four lines, a shared scale, and a legend automatically.
 - Sort the DataFrame by \`month\` and call \`relplot\` on the wide table.
   > Sorting doesn't change the shape; \`relplot\` still has no single column to color by.
 
@@ -406,7 +406,7 @@ column is the unlock for \`hue\`, \`col\`, and friends.`}
 instead of tidy/long?
 
 - You want to color a scatter plot by a categorical group.
-  > Coloring by a group needs that group in a single column — a tidy/long job.
+  > Coloring by a group needs that group in a single column, a tidy/long job.
 - You want one panel per category with \`col=\`.
   > Faceting with \`col\` also reads a single column, so it wants tidy/long data.
 - [o] You are drawing a **heatmap**, where rows and columns are both axes and each cell is a value.
@@ -423,7 +423,7 @@ right choice; almost everything else wants tidy/long.`}
 what does \`id_vars\` control?
 
 - The columns that get stacked into the new long columns.
-  > That's the opposite — the columns *not* listed in \`id_vars\` are the ones that get stacked.
+  > That's the opposite, the columns *not* listed in \`id_vars\` are the ones that get stacked.
 - [o] The identifier column(s) to keep as-is, repeated alongside each stacked value.
   > \`id_vars\` names the columns to preserve; every other column is melted into the \`metric\`/\`amount\` pair, with the id values repeated per row.
 - The new name for the column of values.
@@ -437,5 +437,5 @@ name column (\`var_name\`) and a value column (\`value_name\`).`}
 
 You now have the single most important prerequisite for everything that
 follows: **data in the right shape**. Next, let's look at the two kinds of
-variables Seaborn cares about — continuous and categorical — and how that
+variables Seaborn cares about, continuous and categorical, and how that
 distinction drives every chart choice.

@@ -3,16 +3,16 @@ title: Hash Tables
 description: Learn hashing, collisions, load factor, unordered containers, and classic hash-map problem patterns in C++
 ---
 
-Arrays gave us a miracle: element `i`, instantly. But the miracle only works when your question is a *number*. What if you want to look things up by name — `scores["ada"]`, `visited[(x, y)]`, `count["the"]`? Sorted structures can do it in O(log n), but there is a trick that gets you back to (nearly) array speed: *turn the key into a number yourself*. Run the key through a **hash function** that scrambles it into an integer, take it modulo the array size, and use the result as an index. That is the entire idea of the hash table, and it makes insert, lookup, and erase O(1) *on average*.
+Arrays gave us a miracle: element `i`, instantly. But the miracle only works when your question is a *number*. What if you want to look things up by name, `scores["ada"]`, `visited[(x, y)]`, `count["the"]`? Sorted structures can do it in O(log n), but there is a trick that gets you back to (nearly) array speed: *turn the key into a number yourself*. Run the key through a **hash function** that scrambles it into an integer, take it modulo the array size, and use the result as an index. That is the entire idea of the hash table, and it makes insert, lookup, and erase O(1) *on average*.
 
-The idea is as old as commercial computing — Hans Peter Luhn of IBM described hashing and bucket-chaining in an internal memo in 1953, a year before FORTRAN — and it has become arguably the most-used data structure on Earth. Every Python `dict`, every JavaScript object, every cache and symbol table and database index of a certain kind is a descendant of this page.
+The idea is as old as commercial computing, Hans Peter Luhn of IBM described hashing and bucket-chaining in an internal memo in 1953, a year before FORTRAN, and it has become arguably the most-used data structure on Earth. Every Python `dict`, every JavaScript object, every cache and symbol table and database index of a certain kind is a descendant of this page.
 
-But notice the asterisk on "on average." Two different keys can hash to the same bucket, and everything interesting about hash tables — their design, their tuning parameters, and one spectacular real-world security failure we will get to — flows from how they handle those **collisions**.
+But notice the asterisk on "on average." Two different keys can hash to the same bucket, and everything interesting about hash tables, their design, their tuning parameters, and one spectacular real-world security failure we will get to, flows from how they handle those **collisions**.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three colored key dots feed a solid blue hash box, and thin lines drop them into indexed buckets — the green and yellow keys land in the same bucket and chain together as a collision"
+  aria-label="Three colored key dots feed a solid blue hash box, and thin lines drop them into indexed buckets, the green and yellow keys land in the same bucket and chain together as a collision"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -95,9 +95,9 @@ Hash tables are fast because most buckets stay short. If too many keys collide, 
 
 ## Collisions: chaining
 
-Collisions are not a defect; they are a mathematical certainty. With even 23 random keys in 365 buckets, the odds of a collision pass 50% — the birthday paradox working against you. So every hash table needs a collision policy.
+Collisions are not a defect; they are a mathematical certainty. With even 23 random keys in 365 buckets, the odds of a collision pass 50%, the birthday paradox working against you. So every hash table needs a collision policy.
 
-The oldest policy is **chaining** (Luhn's original): each bucket holds a little list of every entry that landed there. Lookup hashes to the bucket, then walks the chain comparing actual keys. As long as chains stay short — a few entries — performance stays effectively constant.
+The oldest policy is **chaining** (Luhn's original): each bucket holds a little list of every entry that landed there. Lookup hashes to the bucket, then walks the chain comparing actual keys. As long as chains stay short, a few entries, performance stays effectively constant.
 
 ```mermaid
 flowchart LR
@@ -185,7 +185,7 @@ Open addressing is friendlier to caches (everything lives in one array) but more
 
 ## Load factor and rehashing
 
-Load factor is `size / bucket_count` — how full the table is. Keep it low and collisions stay rare but memory is wasted; let it climb and chains lengthen or probe runs snake across the array. When the load factor crosses a threshold (libstdc++'s `unordered_map` defaults to 1.0), the table allocates more buckets and **rehashes**: every key's bucket is recomputed against the new capacity. Rehashing is the hash table's version of vector reallocation, and the same amortized argument applies — rare O(n) events paid for by many cheap inserts.
+Load factor is `size / bucket_count`, how full the table is. Keep it low and collisions stay rare but memory is wasted; let it climb and chains lengthen or probe runs snake across the array. When the load factor crosses a threshold (libstdc++'s `unordered_map` defaults to 1.0), the table allocates more buckets and **rehashes**: every key's bucket is recomputed against the new capacity. Rehashing is the hash table's version of vector reallocation, and the same amortized argument applies, rare O(n) events paid for by many cheap inserts.
 
 ```mermaid
 flowchart TD
@@ -226,13 +226,13 @@ int main() {
 
 The "O(1) average" promise has a dark corollary: if *all* keys land in one bucket, a hash table degrades into a linked list, and every operation costs O(n). For decades that was treated as a statistical impossibility. Then someone weaponized it.
 
-At the Chaos Communication Congress in December 2011, researchers Alexander Klink and Julian Wälde showed that the hash functions used by PHP, ASP.NET, Java, Python, Ruby, and others were deterministic and publicly documented — so an attacker could *precompute* tens of thousands of strings that all hash to the same bucket. Send those strings as ordinary HTTP POST parameters, which web frameworks helpfully insert into a hash table, and each insert costs O(n): the server burns minutes of CPU on a single small request. A handful of requests could pin an entire server. Vendors shipped emergency patches; the long-term fix, adopted across language runtimes, was to *randomize* hashing per process — most famously via SipHash, a keyed hash function designed by Jean-Philippe Aumasson and Daniel J. Bernstein in 2012 specifically for hash tables, now used by Python, Ruby, Rust, and others.
+At the Chaos Communication Congress in December 2011, researchers Alexander Klink and Julian Wälde showed that the hash functions used by PHP, ASP.NET, Java, Python, Ruby, and others were deterministic and publicly documented, so an attacker could *precompute* tens of thousands of strings that all hash to the same bucket. Send those strings as ordinary HTTP POST parameters, which web frameworks helpfully insert into a hash table, and each insert costs O(n): the server burns minutes of CPU on a single small request. A handful of requests could pin an entire server. Vendors shipped emergency patches; the long-term fix, adopted across language runtimes, was to *randomize* hashing per process, most famously via SipHash, a keyed hash function designed by Jean-Philippe Aumasson and Daniel J. Bernstein in 2012 specifically for hash tables, now used by Python, Ruby, Rust, and others.
 
 The lesson generalizes beyond security: hash tables are only as good as the spread of their hash function *on your actual keys*. "O(1) average" is a promise about good hashing, not a law of nature.
 
 ## `std::unordered_map` and `std::unordered_set`
 
-Back to the standard library. `std::unordered_map<K,V>` stores key-value pairs; `std::unordered_set<K>` stores unique keys. Common operations include `operator[]`, `find`, `count`, `insert`, `erase`, and range-for iteration. One sharp edge worth knowing: `ages["nobody"]` does not just *look up* — if the key is absent, `operator[]` **inserts** it with a default value. Use `find` or `count` when you only want to ask.
+Back to the standard library. `std::unordered_map<K,V>` stores key-value pairs; `std::unordered_set<K>` stores unique keys. Common operations include `operator[]`, `find`, `count`, `insert`, `erase`, and range-for iteration. One sharp edge worth knowing: `ages["nobody"]` does not just *look up*, if the key is absent, `operator[]` **inserts** it with a default value. Use `find` or `count` when you only want to ask.
 
 <CodeBlock
   adapter="cpp"
@@ -304,7 +304,7 @@ int main() {
 
 ## Custom hash for a type
 
-The standard library knows how to hash strings and numbers, but not your own structs — to put a `Point` in an `unordered_set` you must supply both an equality operator and a hasher. The hasher below mixes the two coordinates by multiplying one by a large prime before XOR-ing; without some mixing, points like `(1,2)` and `(2,1)` would collide systematically.
+The standard library knows how to hash strings and numbers, but not your own structs, to put a `Point` in an `unordered_set` you must supply both an equality operator and a hasher. The hasher below mixes the two coordinates by multiplying one by a large prime before XOR-ing; without some mixing, points like `(1,2)` and `(2,1)` would collide systematically.
 
 <CodeBlock
   adapter="cpp"
@@ -345,7 +345,7 @@ int main() {
 
 A huge fraction of interview and real-world problems reduce to one of three hash-map reflexes. Learn the shapes and you will start seeing them everywhere.
 
-**Frequency counting** maps each value to a count — `freq[word]++` does all the work, since `operator[]` creates missing entries at zero.
+**Frequency counting** maps each value to a count, `freq[word]++` does all the work, since `operator[]` creates missing entries at zero.
 
 <CodeBlock
   adapter="cpp"
@@ -373,7 +373,7 @@ int main() {
   ]}
 />
 
-**Two Sum** is the canonical "trade memory for time" move. The O(n²) approach checks every pair; the hash version walks the array once, asking at each element "have I already seen `target - x`?" — turning a pair search into n single lookups. This is the trick the complexity chapter promised when you wrote `countPairs` the slow way.
+**Two Sum** is the canonical "trade memory for time" move. The O(n²) approach checks every pair; the hash version walks the array once, asking at each element "have I already seen `target - x`?", turning a pair search into n single lookups. This is the trick the complexity chapter promised when you wrote `countPairs` the slow way.
 
 <CodeBlock
   adapter="cpp"
@@ -403,7 +403,7 @@ int main() {
   ]}
 />
 
-**Canonical keys** group things that are "the same" under some transformation. Anagrams of each other become identical when you sort their letters, so the sorted word makes a perfect hash key — `eat`, `tea`, and `ate` all file under `aet`. Inventing the right canonical form is the creative step; the map does the rest.
+**Canonical keys** group things that are "the same" under some transformation. Anagrams of each other become identical when you sort their letters, so the sorted word makes a perfect hash key, `eat`, `tea`, and `ate` all file under `aet`. Inventing the right canonical form is the creative step; the map does the rest.
 
 <CodeBlock
   adapter="cpp"

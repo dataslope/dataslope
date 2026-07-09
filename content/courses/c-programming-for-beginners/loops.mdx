@@ -1,13 +1,13 @@
 ---
 title: Loops
-description: while, do-while, and for — how to make programs repeat
+description: while, do-while, and for, how to make programs repeat
 ---
 
 A **loop** runs the same block of code over and over until some
 condition tells it to stop. Combined with conditionals, loops give
 you all the expressive power you need to do anything a computer can
-do. (That's a theorem, actually — the *structured programming
-theorem* — but you don't have to take a class to feel it.)
+do. (That's a theorem, actually, the *structured programming
+theorem*, but you don't have to take a class to feel it.)
 
 C has three loop forms. They differ in style; the substance is the
 same.
@@ -15,7 +15,7 @@ same.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="The same two-shape motif stamped five times along a dotted line, ending at a red octagon — repeat until the condition says stop"
+  aria-label="The same two-shape motif stamped five times along a dotted line, ending at a red octagon, repeat until the condition says stop"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -86,7 +86,7 @@ Trace it:
 | 3 | 3 | 3 ≤ 5 = true | 4 |
 | 4 | 4 | 4 ≤ 5 = true | 5 |
 | 5 | 5 | 5 ≤ 5 = true | 6 |
-| 6 | 6 | 6 ≤ 5 = **false** | — exit |
+| 6 | 6 | 6 ≤ 5 = **false** |, exit |
 
 **If you forget to update `i`**, the loop runs forever. This is the
 beginner's nightmare:
@@ -334,7 +334,7 @@ condition, body, update, back to condition.
 <ChallengeCard
   adapter="c"
   title="Factorial of N"
-  instructions={`Compute \`N!\` (\`N\` factorial — the product of all integers from \`1\` to \`N\`) for \`N = 6\` and print the result followed by a newline. The expected output is \`720\`.`}
+  instructions={`Compute \`N!\` (\`N\` factorial, the product of all integers from \`1\` to \`N\`) for \`N = 6\` and print the result followed by a newline. The expected output is \`720\`.`}
   files={[
     {
       filename: "main.c",
@@ -435,10 +435,10 @@ for (int i = 0; i < 10; i += 2) {
 - 10
   > \`10\` would be the count if \`i\` increased by \`1\` each time. Here it increases by \`2\`, so there are half as many iterations.
 - [o] 5
-  > \`i\` takes the values 0, 2, 4, 6, 8 — five iterations. At \`i == 10\`, the condition is false and the loop exits.
+  > \`i\` takes the values 0, 2, 4, 6, 8, five iterations. At \`i == 10\`, the condition is false and the loop exits.
 - 6
-  > \`i == 10\` does *not* run the body, because the condition is \`i < 10\` (not \`i <= 10\`). The values are 0, 2, 4, 6, 8 — five, not six.
-- Infinite — the loop never stops.
+  > \`i == 10\` does *not* run the body, because the condition is \`i < 10\` (not \`i <= 10\`). The values are 0, 2, 4, 6, 8, five, not six.
+- Infinite, the loop never stops.
   > \`i\` keeps growing by \`2\` and eventually reaches \`10\`, where \`i < 10\` becomes false and the loop ends.
 
 To count iterations of a \`for\` loop, list the values of the loop counter that satisfy the condition. Each one corresponds to one execution of the body.`}

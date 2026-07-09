@@ -1,6 +1,6 @@
 ---
 title: Collections and Data Organization
-description: Lists, dictionaries, sets, and arrays — choosing the right container for the job
+description: Lists, dictionaries, sets, and arrays, choosing the right container for the job
 ---
 
 A single variable holds one value. Real programs need to organize
@@ -14,7 +14,7 @@ one of the most valuable habits you can build.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three containers side by side, all in shades of green — an ordered stack of squares, a card of key-to-value rows joined by thin lines, and a loose circle of unique dots — list, dictionary, and set"
+  aria-label="Three containers side by side, all in shades of green, an ordered stack of squares, a card of key-to-value rows joined by thin lines, and a loose circle of unique dots, list, dictionary, and set"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -70,8 +70,8 @@ Each one is good at something the others are bad at.
 
 int[] scores = { 91, 84, 77, 65 };
 
-Console.WriteLine(scores[0]); // 91 — first element
-Console.WriteLine(scores[3]); // 65 — last element
+Console.WriteLine(scores[0]); // 91, first element
+Console.WriteLine(scores[3]); // 65, last element
 Console.WriteLine(scores.Length);
 
 scores[2] = 80;
@@ -122,7 +122,7 @@ it allocates a bigger one and copies the old contents.
 
 ## `Dictionary<TKey, TValue>`: a phone book
 
-A dictionary maps **keys** to **values**. Lookup by key is fast —
+A dictionary maps **keys** to **values**. Lookup by key is fast,
 even for a dictionary with millions of entries.
 
 <CodeBlock
@@ -175,7 +175,7 @@ using System.Collections.Generic;
 var visited = new HashSet<string>();
 visited.Add("home");
 visited.Add("about");
-visited.Add("home"); // ignored — already there
+visited.Add("home"); // ignored, already there
 
 Console.WriteLine(visited.Count);            // 2
 Console.WriteLine(visited.Contains("home")); // True
@@ -185,7 +185,7 @@ Console.WriteLine(visited.Contains("blog")); // False
   ]}
 />
 
-A set's `Contains` is roughly as fast as a dictionary's lookup —
+A set's `Contains` is roughly as fast as a dictionary's lookup,
 much faster than scanning a list.
 
 ## Picking the right collection
@@ -285,7 +285,7 @@ You'll write this dozens of times in real programs.
   title="Word frequency counter"
   instructions={`Implement \`WordCounter.Counts(string text)\` returning a \`Dictionary<string, int>\` where each key is a word from the input and the value is how many times it appeared.
 
-Words are separated by single spaces. Compare words *as-is* — case-sensitive, no trimming.
+Words are separated by single spaces. Compare words *as-is*, case-sensitive, no trimming.
 
 \`Program.cs\` uses the sentence \`"the cat and the dog and the cat"\` and prints (one line per word, in any order, but matching the expected lines exactly):
 
@@ -358,7 +358,7 @@ public static class WordCounter
 - \`List<string>\`
   > Scanning a list for membership becomes slow as it grows.
 - \`string[]\`
-  > Same problem — and arrays don't grow.
+  > Same problem, and arrays don't grow.
 - [o] \`HashSet<string>\`
   > Sets are designed for fast membership tests and automatic de-duplication.
 - \`Dictionary<string, string>\`
@@ -369,9 +369,9 @@ public static class WordCounter
   markdown={`What happens if you read \`dict[key]\` for a key that doesn't exist in a \`Dictionary\`?
 
 - It returns \`null\`
-  > The indexer doesn't return \`null\` for a missing key — it throws instead.
+  > The indexer doesn't return \`null\` for a missing key, it throws instead.
 - It returns a default value silently
-  > It doesn't — \`TryGetValue\` is the safe alternative.
+  > It doesn't, \`TryGetValue\` is the safe alternative.
 - [o] It throws a \`KeyNotFoundException\`
   > Use \`ContainsKey\` or \`TryGetValue\` to look up safely.
 - It adds the key with a default value

@@ -1,6 +1,6 @@
 ---
 title: What Database Design Is (and Why It Matters)
-description: See how day-one schema shortcuts turn into expensive design debt, and learn what database design actually means — choosing tables, relationships, and rules before code depends on them.
+description: See how day-one schema shortcuts turn into expensive design debt, and learn what database design actually means, choosing tables, relationships, and rules before code depends on them.
 ---
 
 A bad schema rarely feels bad on the first day. You create one table,
@@ -9,16 +9,16 @@ screen works. The demo goes well. Everyone moves on.
 
 The trap is that day-one success can hide design choices that become
 expensive only after real data, real users, and real features arrive.
-A quick flat table avoids the hard questions — *What is the real
+A quick flat table avoids the hard questions, *What is the real
 entity here? Which facts repeat? What must be unique? What
-relationship should the database protect?* — but those questions do
+relationship should the database protect?*, but those questions do
 not disappear. They come back later as bugs, cleanup scripts,
 confusing reports, and a creeping fear of changing anything.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A small neat blue iceberg tip above the waterline hides a much larger red mass below — day-one ease concealing the real cost of poor design"
+  aria-label="A small neat blue iceberg tip above the waterline hides a much larger red mass below, day-one ease concealing the real cost of poor design"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.15">
@@ -81,7 +81,7 @@ ORDER BY
 
 Nothing about that `UPDATE` was illegal SQL. The database did exactly
 what it was told. The problem is the *design*: Ada's email was not one
-fact anymore — it was many copies of a fact, and every copy had to be
+fact anymore, it was many copies of a fact, and every copy had to be
 kept in sync forever, by hand, by every program and person who ever
 touches the table. This failure has a name, the **update anomaly**,
 and it is the single most common symptom of a schema that skipped its
@@ -92,7 +92,7 @@ the chapter on normalization.
 A shortcut in the schema can save one hour today and cost ten minutes
 on every future change. The problem is not only the first cleanup. It
 is the repeated cost paid by every developer and every feature after
-that — and unlike code, which you can rewrite tomorrow, data
+that, and unlike code, which you can rewrite tomorrow, data
 outlives code. If a million rows store a confused idea, every new
 version of the software must either understand that confusion or pay
 to clean it up.
@@ -108,7 +108,7 @@ inconsistent ways. Concretely, it means deciding:
 - Which facts become columns?
 - Which rows need stable identity, and what provides it?
 - Which tables point to which other tables?
-- Which values must be present, unique, or limited — and how will
+- Which values must be present, unique, or limited, and how will
   the database *enforce* that?
 
 SQL syntax is how you express a design. It is not the design itself.
@@ -119,7 +119,7 @@ modeling decisions *behind* the SQL.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="One table stands decided while a second is still a dashed outline holding a question mark — design answers questions before they are built"
+  aria-label="One table stands decided while a second is still a dashed outline holding a question mark, design answers questions before they are built"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -183,7 +183,7 @@ erDiagram
 That is design thinking. Not "how many columns can fit in one table?"
 but "what distinct things does the system need to remember, and how
 do they connect?" No SQL reference manual can answer the
-title-versus-copy question for you — it is a question about the
+title-versus-copy question for you, it is a question about the
 *meaning* of the system, and answering questions like it is the skill
 this course teaches.
 
@@ -251,7 +251,7 @@ meaning.
 
 Why does this deserve a whole course? Because application code does
 not talk to vague ideas like "an order" in the abstract. It talks to
-tables, columns, keys, and constraints — and it hardens around them.
+tables, columns, keys, and constraints, and it hardens around them.
 The schema becomes a contract between the database and every program
 that uses it: the web app, the admin dashboard, the import job, the
 reporting script, the analyst with a SQL console. A feature may look
@@ -260,9 +260,9 @@ about stored facts. If the facts are cleanly modeled, the feature is
 small. If they are tangled, the feature becomes a rewrite.
 
 Here is the cheerful version of that story. A product manager asks:
-*"Which customers bought a notebook?"* In a cleanly designed schema
-— customers, products, orders, and order items as separate, related
-tables — the answer is a short join along known relationships:
+*"Which customers bought a notebook?"* In a cleanly designed schema,
+customers, products, orders, and order items as separate, related
+tables, the answer is a short join along known relationships:
 
 <SqlCodeBlock
   dialect="postgres"
@@ -328,7 +328,7 @@ ORDER BY
 The query is not magic. It is possible because the schema already
 knows what a customer, an order, an order item, and a product *are*.
 Now imagine the same store had stored each order as one free-text
-note — `Ada bought 2 notebooks and 5 pens`. The same feature request
+note, `Ada bought 2 notebooks and 5 pens`. The same feature request
 becomes a project: parse the text, handle misspellings, decide
 whether `notebook` and `notebooks` match, clean up old rows, and
 *then* maybe get an answer. The difference is not developer talent.
@@ -337,7 +337,7 @@ feature depends on.
 
 The same logic applies to rules. If `order_items.quantity` carries
 `CHECK (quantity > 0)` in the schema, every report, export, and
-calculation can simply trust that stored quantities are positive — no
+calculation can simply trust that stored quantities are positive, no
 matter which of the many programs writing to the database produced
 them. A rule that lives in one application's validation code protects
 one door; a rule that lives in the schema protects the whole
@@ -401,13 +401,13 @@ and the chapters follow it:
    diagrams designers use to discuss them.
 4. Choosing **keys**: stable identities that other rows can point to.
 5. Adding **constraints**: rules that make impossible data impossible.
-6. **Normalizing**: giving every fact exactly one home — and knowing
+6. **Normalizing**: giving every fact exactly one home, and knowing
    when to deliberately break that rule.
 7. **Evolving** the model safely as requirements change.
 
 None of this was obvious when databases were young. The idea that
-data should live in plain tables related by values — rather than in
-pointer-linked hierarchies that only programmers could navigate —
+data should live in plain tables related by values, rather than in
+pointer-linked hierarchies that only programmers could navigate,
 was a genuinely radical proposal in 1970, and the company that funded
 it was slow to embrace it. That story, and the unlikely path that
 leads from a Berkeley research project to the PostgreSQL engine
@@ -417,5 +417,5 @@ section at the end of the course. Read it whenever you want a break
 from diagrams.
 
 Next, we start where every design starts: learning to see the
-*things* — the entities — hiding inside a plain-English description
+*things*, the entities, hiding inside a plain-English description
 of a system.

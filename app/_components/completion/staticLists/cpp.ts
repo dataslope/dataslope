@@ -1,7 +1,7 @@
 import type { Completion } from "@codemirror/autocomplete";
 import { C_KEYWORDS, C_LIBC } from "./c";
 
-// Static completion tier for the C++ playground surfaces — the C list
+// Static completion tier for the C++ playground surfaces, the C list
 // plus C++ keywords and the common std:: vocabulary. See c.ts for why
 // this is a curated list rather than a language server.
 

@@ -1,16 +1,16 @@
 ---
 title: How TypeScript Works
-description: Inside the compiler — from source code to type-checked JavaScript, and how your editor uses the language service.
+description: Inside the compiler, from source code to type-checked JavaScript, and how your editor uses the language service.
 ---
 
 TypeScript is often described as "JavaScript with types." But what does that actually *mean*? What happens when you write `let x: number = 42;` and hit save? How does the compiler know that `x = "hello"` is an error? And how does your editor instantly underline mistakes and suggest fixes before you even run the code?
 
-This page takes you inside TypeScript's architecture — from the relationship between TypeScript and JavaScript, through the compiler's internal pipeline, to the language service that powers VS Code, WebStorm, and every other modern editor.
+This page takes you inside TypeScript's architecture, from the relationship between TypeScript and JavaScript, through the compiler's internal pipeline, to the language service that powers VS Code, WebStorm, and every other modern editor.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Twin block towers: the left one is wrapped in green scaffolding, the right one stands identical but bare beside a yellow play button, joined by a thin arrow — types support the build, then erase completely before the code runs"
+  aria-label="Twin block towers: the left one is wrapped in green scaffolding, the right one stands identical but bare beside a yellow play button, joined by a thin arrow, types support the build, then erase completely before the code runs"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -52,7 +52,7 @@ This page takes you inside TypeScript's architecture — from the relationship b
 
 Here's the most important fact about TypeScript: **TypeScript is a syntactic superset of JavaScript.** That means every valid JavaScript program is a valid TypeScript program. If you take a `.js` file and rename it to `.ts`, it compiles. You don't have to change a single character.
 
-TypeScript adds *optional annotations* on top of JavaScript. These annotations describe the *types* of values — whether a variable holds a number, a string, an object with specific properties, or a function with a particular signature. The TypeScript compiler checks these annotations against your code, reports errors, and then *erases the types* to produce plain JavaScript.
+TypeScript adds *optional annotations* on top of JavaScript. These annotations describe the *types* of values, whether a variable holds a number, a string, an object with specific properties, or a function with a particular signature. The TypeScript compiler checks these annotations against your code, reports errors, and then *erases the types* to produce plain JavaScript.
 
 Let's see this in action:
 
@@ -62,7 +62,7 @@ Let's see this in action:
     {
       filename: "main.ts",
       starterCode: `let x = 10; // no annotation, but TypeScript infers x: number
-// x = "hello";  // tsc rejects this even without an annotation —
+// x = "hello";  // tsc rejects this even without an annotation,
 //                  inference already locked x to 'number'.
 
 let y: number = 10;
@@ -81,9 +81,9 @@ console.log("y is", y);
   ]}
 />
 
-The code above shows the key mechanic: TypeScript checks that `x` and `y` are used consistently as numbers — whether the type came from an explicit annotation or from inference. But the *runtime* code — the JavaScript that actually executes — has no mention of `: number` at all. Types exist only at *compile time*.
+The code above shows the key mechanic: TypeScript checks that `x` and `y` are used consistently as numbers, whether the type came from an explicit annotation or from inference. But the *runtime* code, the JavaScript that actually executes, has no mention of `: number` at all. Types exist only at *compile time*.
 
-You can verify the "erased" half of that claim right here: this page's in-browser runner deliberately behaves like the *runtime* side of TypeScript — it strips the types and executes. If you uncomment `y = "hello"` and run, the sandbox will shrug and print `hello`, exactly as the compiled JavaScript would. The *checking* half is the compiler's job, done before the code ships; it's what your editor and `tsc` add on top. Holding both halves in your head — checked before, erased after — is the single most important model in this chapter.
+You can verify the "erased" half of that claim right here: this page's in-browser runner deliberately behaves like the *runtime* side of TypeScript, it strips the types and executes. If you uncomment `y = "hello"` and run, the sandbox will shrug and print `hello`, exactly as the compiled JavaScript would. The *checking* half is the compiler's job, done before the code ships; it's what your editor and `tsc` add on top. Holding both halves in your head, checked before, erased after, is the single most important model in this chapter.
 
 ## Compile time vs. runtime
 
@@ -107,7 +107,7 @@ function greet(name) {
 
 The `: string` annotations vanish. There's no runtime type-checking of the `name` parameter. If you call `greet(42)` from JavaScript (or from untyped legacy code), the function will happily return `"Hello, 42!"`. TypeScript can't protect you from code it doesn't type-check.
 
-This is by design. Type erasure keeps TypeScript's output clean and fast. It also means TypeScript can compile to older JavaScript versions (ES5, ES3) while using modern syntax (classes, async/await). The tradeoff is that TypeScript assumes you've type-checked your whole program — it doesn't add runtime guards.
+This is by design. Type erasure keeps TypeScript's output clean and fast. It also means TypeScript can compile to older JavaScript versions (ES5, ES3) while using modern syntax (classes, async/await). The tradeoff is that TypeScript assumes you've type-checked your whole program, it doesn't add runtime guards.
 
 <Callout type="warning" title="TypeScript is not a runtime guard">
 If you're writing a public API or receiving data from an external source (like a REST endpoint), TypeScript alone won't validate it. You'll need runtime validation libraries (like Zod, io-ts, or Yup) to check incoming data at runtime. TypeScript's types are a *compile-time contract*, not a runtime fence.
@@ -115,7 +115,7 @@ If you're writing a public API or receiving data from an external source (like a
 
 ## The structural type system (a first look)
 
-One of TypeScript's defining features is its **structural type system** (also known as duck typing). In languages like Java or C#, two types are compatible only if one explicitly inherits from the other. In TypeScript, two types are compatible if they have the *same shape* — the same properties and methods.
+One of TypeScript's defining features is its **structural type system** (also known as duck typing). In languages like Java or C#, two types are compatible only if one explicitly inherits from the other. In TypeScript, two types are compatible if they have the *same shape*, the same properties and methods.
 
 <CodeBlock
   adapter="typescript"
@@ -145,7 +145,7 @@ const incomplete = { name: "Charlie" };
   ]}
 />
 
-TypeScript doesn't care about class hierarchies or explicit `implements` declarations (though you can use them). It cares whether the object has the *right properties*. This makes TypeScript feel like JavaScript — where you often pass around plain objects — rather than forcing OOP patterns.
+TypeScript doesn't care about class hierarchies or explicit `implements` declarations (though you can use them). It cares whether the object has the *right properties*. This makes TypeScript feel like JavaScript, where you often pass around plain objects, rather than forcing OOP patterns.
 
 We'll explore structural typing in depth later. For now, just know: **TypeScript checks structure, not names.**
 
@@ -153,7 +153,7 @@ We'll explore structural typing in depth later. For now, just know: **TypeScript
 
 When you run `tsc` (the TypeScript compiler) or save a file in VS Code, your code flows through a multi-stage pipeline. Each stage transforms or analyzes the code, building up information until the type checker can prove your program is safe (or report errors).
 
-Before we open it up, one detail worth savoring: **the TypeScript compiler is written in TypeScript.** Every stage you're about to read about — scanner, parser, binder, checker, emitter — is itself TypeScript source code, type-checked by an earlier build of itself. This is a classic compiler tradition called *self-hosting* (C's compilers are written in C, for the same reason), and it doubles as the ultimate confidence test: a language good enough to build its own hundred-thousand-line compiler is good enough for your application.
+Before we open it up, one detail worth savoring: **the TypeScript compiler is written in TypeScript.** Every stage you're about to read about, scanner, parser, binder, checker, emitter, is itself TypeScript source code, type-checked by an earlier build of itself. This is a classic compiler tradition called *self-hosting* (C's compilers are written in C, for the same reason), and it doubles as the ultimate confidence test: a language good enough to build its own hundred-thousand-line compiler is good enough for your application.
 
 Here's the high-level flow:
 
@@ -182,7 +182,7 @@ Let's walk through each stage:
 
 ### 1. Scanner (Lexer)
 
-The **scanner** reads your source code character by character and breaks it into **tokens** — the smallest meaningful units of syntax. For example, the line:
+The **scanner** reads your source code character by character and breaks it into **tokens**, the smallest meaningful units of syntax. For example, the line:
 
 ```typescript
 let x: number = 42;
@@ -199,7 +199,7 @@ The scanner doesn't understand *meaning* yet. It just recognizes keywords (`let`
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="One continuous gray strip of source text is marked with white cut lines, and below it the same strip has been chopped into separate colored token chips — the scanner turning raw characters into discrete tokens"
+  aria-label="One continuous gray strip of source text is marked with white cut lines, and below it the same strip has been chopped into separate colored token chips, the scanner turning raw characters into discrete tokens"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -239,7 +239,7 @@ The scanner doesn't understand *meaning* yet. It just recognizes keywords (`let`
 
 ### 2. Parser
 
-The **parser** takes the stream of tokens and builds an **Abstract Syntax Tree (AST)** — a tree structure representing the program's syntactic structure. For the line above, the AST node might look like:
+The **parser** takes the stream of tokens and builds an **Abstract Syntax Tree (AST)**, a tree structure representing the program's syntactic structure. For the line above, the AST node might look like:
 
 ```
 VariableStatement
@@ -254,7 +254,7 @@ The AST captures the *structure* of the code: "This is a variable declaration na
 
 ### 3. Binder
 
-The **binder** walks the AST and builds a **symbol table** — a map from names (`x`, `myFunction`) to their declarations. This is where TypeScript figures out *scope*. If you reference `x` inside a function, the binder determines which `x` you mean (the global one? a local variable? a parameter?).
+The **binder** walks the AST and builds a **symbol table**, a map from names (`x`, `myFunction`) to their declarations. This is where TypeScript figures out *scope*. If you reference `x` inside a function, the binder determines which `x` you mean (the global one? a local variable? a parameter?).
 
 The binder also links `import` and `export` statements across files, building a module graph. By the end of the binding phase, TypeScript knows what every identifier refers to.
 
@@ -274,7 +274,7 @@ The type checker verifies that:
 - Properties accessed on objects actually exist
 - Control flow makes sense (e.g., you don't use a variable before it's defined)
 
-If the type checker finds a violation, it reports an error. But it doesn't stop — it keeps checking the rest of the program so you can see all errors at once.
+If the type checker finds a violation, it reports an error. But it doesn't stop, it keeps checking the rest of the program so you can see all errors at once.
 
 ### 5. Emitter
 
@@ -286,11 +286,11 @@ The emitter also:
 - Generates **declaration files** (`.d.ts`) that describe the types of your exports, so other TypeScript projects can import and type-check against your code.
 - Applies transformations (like JSX → `React.createElement` or decorators → metadata).
 
-The output is clean, readable JavaScript — often indistinguishable from what a human would write.
+The output is clean, readable JavaScript, often indistinguishable from what a human would write.
 
 ## Control flow analysis
 
-One of TypeScript's most powerful features is **control flow analysis** — the compiler's ability to track how types change within branches, loops, and conditionals.
+One of TypeScript's most powerful features is **control flow analysis**, the compiler's ability to track how types change within branches, loops, and conditionals.
 
 <CodeBlock
   adapter="typescript"
@@ -326,7 +326,7 @@ We'll cover narrowing deeply in later lessons. For now, recognize that TypeScrip
 
 When you open a `.ts` file in VS Code or WebStorm, you get instant feedback: red squiggles under errors, autocomplete as you type, tooltips showing function signatures, refactorings like "Rename Symbol" that work across files. How?
 
-The TypeScript compiler exposes a **language service** — an API that editors can call to ask questions like:
+The TypeScript compiler exposes a **language service**, an API that editors can call to ask questions like:
 
 - "What's the type of this variable?"
 - "What properties does this object have?" (for autocomplete)
@@ -372,7 +372,7 @@ Type-checking a large codebase (tens of thousands of files) would be slow if Typ
 
 **Incremental compilation**: When you change one file, TypeScript only re-checks that file and the files that import it (transitively). Unchanged files are skipped.
 
-**Declaration files** (`.d.ts`): When you import a third-party library (like React or Lodash), TypeScript doesn't re-check the library's source code. It reads the `.d.ts` declaration file — a compact summary of the library's types — which is much faster to parse.
+**Declaration files** (`.d.ts`): When you import a third-party library (like React or Lodash), TypeScript doesn't re-check the library's source code. It reads the `.d.ts` declaration file, a compact summary of the library's types, which is much faster to parse.
 
 **`tsc --watch` mode**: In watch mode, the compiler stays running, keeping an in-memory representation of your project. When you save a file, it incrementally updates its internal state rather than restarting from scratch. This makes type-checking feel near-instantaneous.
 
@@ -383,7 +383,7 @@ These optimizations are why TypeScript scales to massive codebases (Microsoft's 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A grid of file tiles stays dim except one yellow edited file and the two blue files that import it, joined by dotted edges — incremental compilation re-checks only what changed"
+  aria-label="A grid of file tiles stays dim except one yellow edited file and the two blue files that import it, joined by dotted edges, incremental compilation re-checks only what changed"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -417,15 +417,15 @@ TypeScript's type checker is powerful, but it has limits:
 
 **It can't prevent all logic errors.** TypeScript catches *type* errors (passing a string where a number is expected), but it won't catch off-by-one errors, infinite loops, or wrong business logic.
 
-**It can't enforce exhaustiveness without help.** If you add a new case to a union type, TypeScript won't automatically force you to handle it everywhere — unless you use specific patterns (like `never` checks) that we'll cover later.
+**It can't enforce exhaustiveness without help.** If you add a new case to a union type, TypeScript won't automatically force you to handle it everywhere, unless you use specific patterns (like `never` checks) that we'll cover later.
 
-**It trusts your annotations.** If you write `const x: number = "hello" as any as number`, TypeScript believes you. Type assertions (`as`) and `any` are escape hatches — use them sparingly, or you'll defeat the purpose of static types.
+**It trusts your annotations.** If you write `const x: number = "hello" as any as number`, TypeScript believes you. Type assertions (`as`) and `any` are escape hatches, use them sparingly, or you'll defeat the purpose of static types.
 
 Despite these limits, TypeScript catches the *majority* of bugs that plague JavaScript codebases: typos, refactoring mistakes, mismatched function arguments, missing properties, and null/undefined errors.
 
 ## Types as a design language
 
-Beyond catching bugs, TypeScript changes *how you think about code*. Types become a **design language** — a way to communicate intent, document contracts, and encode constraints.
+Beyond catching bugs, TypeScript changes *how you think about code*. Types become a **design language**, a way to communicate intent, document contracts, and encode constraints.
 
 When you write:
 
@@ -438,7 +438,7 @@ function fetchUser(id: string): Promise<User | null> {
 You're saying:
 
 - "This function takes a string ID."
-- "It returns a Promise — it's asynchronous."
+- "It returns a Promise, it's asynchronous."
 - "The result is either a `User` object or `null` (maybe the user doesn't exist)."
 
 Future you (and your teammates) don't have to read the implementation or write a test to understand this contract. It's right there in the signature. And if you refactor `fetchUser` to return `User | NotFoundError` instead of `User | null`, TypeScript will *force* every caller to update their error handling.
@@ -474,9 +474,9 @@ The types never reach production. They're a *compile-time tool* for correctness 
 - They are converted into runtime type guards
   > TypeScript does not generate any runtime checking code from annotations; type erasure removes them entirely.
 - [o] They are erased during compilation and do not exist in the emitted JavaScript
-  > TypeScript performs type checking at *compile time*, then removes all type annotations before emitting JavaScript. The runtime behavior is identical to plain JS — there's no runtime type enforcement unless you add it yourself.
+  > TypeScript performs type checking at *compile time*, then removes all type annotations before emitting JavaScript. The runtime behavior is identical to plain JS, there's no runtime type enforcement unless you add it yourself.
 - They are kept as comments in the JavaScript output
   > The emitter strips type annotations completely; they do not appear as comments or in any other form in the JavaScript output.
 
-This is why TypeScript is so fast and lightweight: it adds zero runtime overhead. The tradeoff is that you can't rely on TypeScript to validate data from external sources (like APIs) — you need runtime validation for that.`}
+This is why TypeScript is so fast and lightweight: it adds zero runtime overhead. The tradeoff is that you can't rely on TypeScript to validate data from external sources (like APIs), you need runtime validation for that.`}
 />

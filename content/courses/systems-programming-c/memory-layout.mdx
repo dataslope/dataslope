@@ -1,6 +1,6 @@
 ---
 title: Process Memory Layout
-description: Text, data, BSS, heap, and stack — where every variable in a C program lives
+description: Text, data, BSS, heap, and stack, where every variable in a C program lives
 ---
 
 A running C program is not just "code." Its address space is
@@ -122,7 +122,7 @@ address of all.
 ## Text and read-only data
 
 The text segment holds the compiled instructions of every function in
-your program. It is typically mapped *read-only* — the CPU will fault
+your program. It is typically mapped *read-only*, the CPU will fault
 if you try to write to it. Many systems also put string literals and
 other `const` data in a read-only segment called `.rodata`.
 
@@ -130,14 +130,14 @@ This is why writing through `char *s = "hello"; s[0] = 'X';` is
 undefined behavior: the literal `"hello"` lives in `.rodata`, and the
 OS will not let you modify it.
 
-## Data and BSS — the globals
+## Data and BSS, the globals
 
 C splits globals into two pieces purely as a file-size optimization:
 
 - `.data` holds globals with explicit non-zero initializers. Those
   initial bytes have to be stored in the executable file.
 - `.bss` ("Block Started by Symbol") holds globals initialized to
-  zero. They take *no space in the executable file* — the OS just
+  zero. They take *no space in the executable file*, the OS just
   zeroes a region of memory at load time.
 
 <CodeBlock
@@ -149,7 +149,7 @@ C splits globals into two pieces purely as a file-size optimization:
 
 int counter = 0; // BSS (zero init takes no file bytes)
 int answer = 42; // DATA (must store the 42 in the binary)
-int big[10000];  // BSS — does NOT bloat the binary by 40 KB
+int big[10000];  // BSS, does NOT bloat the binary by 40 KB
 
 int main(void) {
   counter++;
@@ -167,7 +167,7 @@ global does **not** make your binary 40 MB larger, because BSS is
 
 The name, by the way, is one of computing's oldest living fossils.
 "Block Started by Symbol" was an assembler directive on the IBM 704
-in the mid-1950s — a machine programmed with punched cards, a decade
+in the mid-1950s, a machine programmed with punched cards, a decade
 before C existed. The directive reserved a block of memory without
 storing its contents, which is exactly what the segment still does.
 Like `a.out` from the toolchain chapter, it is a name that outlived
@@ -177,7 +177,7 @@ because the *idea* it names never stopped being useful.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Initialized globals travel as solid blue crates with real contents, while the zeroed globals' spot is only a dashed outline carrying a small yellow manifest tag — BSS ships as metadata, not bytes"
+  aria-label="Initialized globals travel as solid blue crates with real contents, while the zeroed globals' spot is only a dashed outline carrying a small yellow manifest tag, BSS ships as metadata, not bytes"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -246,7 +246,7 @@ int main(void) {
   ]}
 />
 
-The `counter` is *not* on the stack — if it were, it would be reset
+The `counter` is *not* on the stack, if it were, it would be reset
 to zero on every call.
 
 ## Stack and heap: the two dynamic regions
@@ -275,7 +275,7 @@ one critical rule:
 <Callout type="warn" title="Never return the address of a local variable">
 A local variable lives in your stack frame. When you return, the
 frame is gone. A pointer to it now refers to whatever the next
-function call uses — almost always *not* what you wanted.
+function call uses, almost always *not* what you wanted.
 </Callout>
 
 <CodeBlock
@@ -287,7 +287,7 @@ function call uses — almost always *not* what you wanted.
 
 int *bad(void) {
   int x = 42; // lives on the stack
-  return &x;  // returning the address of a soon-to-die local — UB!
+  return &x;  // returning the address of a soon-to-die local, UB!
 }
 
 int main(void) {
@@ -316,7 +316,7 @@ caller `free` it, or (b) have the caller pass in a buffer.
       starterCode: `#include <stdio.h>
 
 int next_id(void) {
-  // your code here — make the counter persist across calls
+  // your code here, make the counter persist across calls
   int counter = 0;
   return ++counter;
 }
@@ -358,13 +358,13 @@ int main(void) {
 <MultipleChoice
   markdown={`In which segment does a large zero-initialized global like \`int big[100000];\` live, and what does that mean for the executable file size?
 
-- \`.data\` — the binary grows by ~400 KB to store the zeros.
+- \`.data\`, the binary grows by ~400 KB to store the zeros.
   > That would be true if the array were *non-zero* initialized.
-- [o] \`.bss\` — only metadata is stored; the OS zeroes the region at load time, so the binary stays small.
+- [o] \`.bss\`, only metadata is stored; the OS zeroes the region at load time, so the binary stays small.
   > BSS exists precisely so zero-initialized globals do not bloat your binary.
-- The heap — \`malloc\` is called implicitly at program start.
+- The heap, \`malloc\` is called implicitly at program start.
   > Globals are not heap-allocated; they have static storage duration.
-- The stack — the runtime pushes the array on entry to \`main\`.
+- The stack, the runtime pushes the array on entry to \`main\`.
   > The stack is for function locals, not globals.`}
 />
 

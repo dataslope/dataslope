@@ -3,14 +3,14 @@ title: Setup and tsconfig.json
 description: Installing TypeScript, understanding the compiler, and configuring tsconfig.json for maximum type safety.
 ---
 
-Now that you understand *why* TypeScript exists and *how* it works, let's get practical. This page covers the essentials: installing TypeScript, running the compiler, and — most importantly — configuring `tsconfig.json` to catch as many bugs as possible.
+Now that you understand *why* TypeScript exists and *how* it works, let's get practical. This page covers the essentials: installing TypeScript, running the compiler, and, most importantly, configuring `tsconfig.json` to catch as many bugs as possible.
 
 We'll keep it minimal. You don't need a complex build pipeline, a framework, or a bundler to learn TypeScript. The in-browser playground on this site is enough for most lessons. But if you want to experiment locally, this page shows you how.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A panel of six strictness switches: five are flipped up — the large green master among them — while one neglected switch still hangs down in red — tsconfig as a bank of compiler checks you switch on"
+  aria-label="A panel of six strictness switches: five are flipped up, the large green master among them, while one neglected switch still hangs down in red, tsconfig as a bank of compiler checks you switch on"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }}>
@@ -136,7 +136,7 @@ Let's break down the most important options.
 
 ## Essential compiler options
 
-### `target` — What JavaScript version to emit
+### `target`, What JavaScript version to emit
 
 The `target` option controls which JavaScript version TypeScript compiles to. Modern options:
 
@@ -160,7 +160,7 @@ TypeScript will *downlevel* modern syntax to your target. If you use `async`/`aw
 The `target` setting *only* affects syntax transpilation, not APIs. If you use `Promise` or `Map` but target ES5, you'll need a polyfill like `core-js` at runtime.
 </Callout>
 
-### `module` — What module system to use
+### `module`, What module system to use
 
 The `module` option controls how `import`/`export` statements are compiled:
 
@@ -180,7 +180,7 @@ Example:
 
 Most modern projects use `ESNext` modules. If you're working with Node.js and not using `"type": "module"`, use `CommonJS`.
 
-### `lib` — What built-in APIs are available
+### `lib`, What built-in APIs are available
 
 The `lib` option tells TypeScript which JavaScript APIs and DOM types exist in your runtime. Common values:
 
@@ -210,7 +210,7 @@ Example for a Node.js server (no DOM):
 
 If you omit `lib`, TypeScript infers a default based on `target`. But being explicit is clearer.
 
-### `outDir` and `rootDir` — Where files go
+### `outDir` and `rootDir`, Where files go
 
 - **`outDir`**: Where TypeScript puts compiled `.js` files. Common values: `./dist`, `./build`, `./out`.
 - **`rootDir`**: The root of your source files. TypeScript mirrors the directory structure from `rootDir` into `outDir`.
@@ -228,7 +228,7 @@ Example:
 
 If you have `src/utils/helpers.ts`, the output will be `dist/utils/helpers.js`.
 
-### `strict` — The master strictness flag
+### `strict`, The master strictness flag
 
 The `strict` option is a meta-flag that enables *all* of TypeScript's strictness checks:
 
@@ -252,9 +252,9 @@ The `strict` option is a meta-flag that enables *all* of TypeScript's strictness
 
 With `strict: true`, TypeScript becomes a powerful bug-catching tool. Without it, you're typing with one hand tied behind your back.
 
-### `noImplicitAny` — No untyped variables
+### `noImplicitAny`, No untyped variables
 
-If you don't annotate a variable and TypeScript can't infer its type, the default is `any` — which disables type checking for that value.
+If you don't annotate a variable and TypeScript can't infer its type, the default is `any`, which disables type checking for that value.
 
 ```typescript
 // Without noImplicitAny:
@@ -276,7 +276,7 @@ function add(a: number, b: number): number {
 
 This catches typos, missing parameters, and logic errors early.
 
-### `strictNullChecks` — Prevent null/undefined bugs
+### `strictNullChecks`, Prevent null/undefined bugs
 
 In JavaScript, `null` and `undefined` are *everywhere*. You can call a function that returns an object, but it might return `null` instead. Without `strictNullChecks`, TypeScript treats `null` and `undefined` as valid values for *every* type:
 
@@ -292,16 +292,16 @@ let name: string | null = null;  // Explicit: name can be string OR null
 
 // TypeScript forces you to check for null before using 'name':
 if (name !== null) {
-  console.log(name.toUpperCase()); // Safe — TypeScript narrows the type
+  console.log(name.toUpperCase()); // Safe, TypeScript narrows the type
 }
 ```
 
-This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's own: he invented the null reference for ALGOL W in 1965 ("simply because it was so easy to implement," he said), and in a 2009 conference talk he publicly apologized, estimating that null dereferences had cost the industry a billion dollars in crashes and vulnerabilities over the decades since. JavaScript inherited the mistake *twice over* — it has both `null` and `undefined` — which makes `strictNullChecks` arguably the single highest-value flag in the entire compiler.
+This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's own: he invented the null reference for ALGOL W in 1965 ("simply because it was so easy to implement," he said), and in a 2009 conference talk he publicly apologized, estimating that null dereferences had cost the industry a billion dollars in crashes and vulnerabilities over the decades since. JavaScript inherited the mistake *twice over*, it has both `null` and `undefined`, which makes `strictNullChecks` arguably the single highest-value flag in the entire compiler.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two copies of the same road with a missing stretch: on top the blue traveler is a step away from the unmarked hole crossed out in red, while below a solid green plate covers the gap and the traveler is already safely across — strictNullChecks makes the null hole visible and handled"
+  aria-label="Two copies of the same road with a missing stretch: on top the blue traveler is a step away from the unmarked hole crossed out in red, while below a solid green plate covers the gap and the traveler is already safely across, strictNullChecks makes the null hole visible and handled"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -329,7 +329,7 @@ This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's
   </g>
 </svg>
 
-### `noUncheckedIndexedAccess` — Safer array/object indexing
+### `noUncheckedIndexedAccess`, Safer array/object indexing
 
 When you access an array element or object property via an index, JavaScript returns `undefined` if the key doesn't exist. TypeScript, by default, *assumes* the element exists:
 
@@ -361,7 +361,7 @@ This prevents a common class of bugs. It's not enabled by `strict`, so you must 
 }
 ```
 
-### `exactOptionalPropertyTypes` — Distinguish missing from undefined
+### `exactOptionalPropertyTypes`, Distinguish missing from undefined
 
 In TypeScript, an optional property (`name?: string`) can be:
 
@@ -392,7 +392,7 @@ This is a niche setting, but useful when APIs distinguish between "field not pro
 }
 ```
 
-### `esModuleInterop` — Better CommonJS/ES module compatibility
+### `esModuleInterop`, Better CommonJS/ES module compatibility
 
 If you're importing CommonJS modules (like most npm packages) into an ES module project, you'll want:
 
@@ -418,9 +418,9 @@ import * as express from "express"; // Awkward
 
 It's a quality-of-life feature with no downside. Always enable it.
 
-### `skipLibCheck` — Faster compilation
+### `skipLibCheck`, Faster compilation
 
-TypeScript normally type-checks the `.d.ts` declaration files in `node_modules`. This can be slow (thousands of files) and usually isn't necessary — you trust that React, Lodash, etc. have correct types.
+TypeScript normally type-checks the `.d.ts` declaration files in `node_modules`. This can be slow (thousands of files) and usually isn't necessary, you trust that React, Lodash, etc. have correct types.
 
 ```json
 {
@@ -432,7 +432,7 @@ TypeScript normally type-checks the `.d.ts` declaration files in `node_modules`.
 
 This skips type-checking third-party declarations, speeding up compilation. The tradeoff is that you won't catch errors in poorly-typed libraries. In practice, this is fine.
 
-### `forceConsistentCasingInFileNames` — Cross-platform safety
+### `forceConsistentCasingInFileNames`, Cross-platform safety
 
 On macOS and Windows, file systems are case-insensitive: `myFile.ts` and `myfile.ts` are the same file. On Linux, they're different. If you import `./MyFile` on Mac (but the file is `myfile.ts`), your code works locally but breaks on Linux CI.
 
@@ -485,7 +485,7 @@ If you're building a browser app, add `"DOM"` and `"DOM.Iterable"` to `lib`. If 
 
 ## Running TypeScript in the browser (this course)
 
-Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser, transpiles your code to JavaScript, and executes it using [almostnode](https://almostnode.dev/) — a browser-based Node.js runtime. (Like a production build, the in-page runner erases the types before executing; the red-squiggle, refuse-to-build experience described on this page is what `tsc` and your editor add on a real machine.)
+Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser, transpiles your code to JavaScript, and executes it using [almostnode](https://almostnode.dev/), a browser-based Node.js runtime. (Like a production build, the in-page runner erases the types before executing; the red-squiggle, refuse-to-build experience described on this page is what `tsc` and your editor add on a real machine.)
 
 Try it:
 
@@ -525,13 +525,13 @@ Yes, strict mode requires more annotations. Yes, you'll have to check for `null`
 
 As your project grows, strict types pay dividends:
 
-- **Refactoring is safe.** Rename a function, and TypeScript updates all call sites — or tells you which ones don't match.
+- **Refactoring is safe.** Rename a function, and TypeScript updates all call sites, or tells you which ones don't match.
 - **Bugs are caught early.** Typos, type mismatches, and null-pointer dereferences fail at compile time, not in production.
 - **Onboarding is faster.** New developers can navigate the codebase with autocomplete and go-to-definition, without reading tribal knowledge docs.
 
 ## What's next
 
-You now know how to install TypeScript, run the compiler, and configure `tsconfig.json` for safety. But you haven't written much TypeScript yet — just seen snippets.
+You now know how to install TypeScript, run the compiler, and configure `tsconfig.json` for safety. But you haven't written much TypeScript yet, just seen snippets.
 
 In the next section, we'll dive into the **core type system**: primitives, objects, arrays, functions, and the building blocks you'll use every day. That's where TypeScript's real power emerges.
 

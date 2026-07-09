@@ -1,5 +1,5 @@
 /**
- * XML sitemap — emitted at `/sitemap.xml`.
+ * XML sitemap, emitted at `/sitemap.xml`.
  *
  * Lists the home page, the `/courses` catalog index, every prerendered lesson
  * resolved from the Fumadocs `courseSource` loader (the same page set behind
@@ -8,7 +8,7 @@
  * static lessons that previously had no sitemap.
  *
  * Generated at build time as a static route, so it costs nothing at request
- * time — consistent with the site's static-content model. URLs resolve
+ * time, consistent with the site's static-content model. URLs resolve
  * against `SITE_URL`.
  *
  * The raw-Markdown mirrors (`*.md`, `/llms/`) and the dev-only
@@ -39,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   });
 
-  // The course-catalog index page (app/courses/page.tsx — not a source page,
+  // The course-catalog index page (app/courses/page.tsx, not a source page,
   // so it's added explicitly).
   entries.set(abs("/courses"), {
     url: abs("/courses"),
@@ -69,7 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   // Playground hub + per-language landing pages (static; high-intent "online
-  // <lang> playground" queries). Now indexable — see app/robots.ts.
+  // <lang> playground" queries). Now indexable, see app/robots.ts.
   for (const path of getPlaygroundPaths()) {
     const url = abs(path);
     entries.set(url, {

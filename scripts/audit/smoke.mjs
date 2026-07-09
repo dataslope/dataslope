@@ -20,7 +20,7 @@ console.log("== /learn loaded ==");
 console.log("title:", await page.title());
 await page.screenshot({ path: `${OUT}/00-learn-index.png`, fullPage: false });
 
-// 2) A python lesson with a code block — try to RUN a JS block first (native, no CDN)
+// 2) A python lesson with a code block, try to RUN a JS block first (native, no CDN)
 await page.goto(`${BASE}/learn/javascript`, { waitUntil: "networkidle", timeout: 60000 });
 const runBtns = page.locator(".run-btn, button:has-text('Run')");
 console.log("JS page run buttons:", await runBtns.count());

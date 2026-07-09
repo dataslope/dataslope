@@ -13,7 +13,7 @@
  * The archive also carries a top-level `workspace.json` that captures
  * the registry entry (name, playground, createdAt). On import we use
  * `workspace.json` rather than `meta.json` because the playground id is
- * required to register the workspace in the right list — and the rest
+ * required to register the workspace in the right list, and the rest
  * of the metadata is restored under a fresh workspace id so two
  * imports of the same archive don't clash.
  */
@@ -33,7 +33,7 @@ const WORKSPACES_DIR = "workspaces";
 const ARCHIVE_HEADER_FILE = "workspace.json";
 
 interface ArchiveHeader {
-  /** Schema marker — bumped if the on-disk layout changes. */
+  /** Schema marker, bumped if the on-disk layout changes. */
   version: 1;
   /** Registry display name at export time. */
   name: string;
@@ -65,7 +65,7 @@ async function getWorkspaceDir(
 type DirIterable = AsyncIterable<[string, FileSystemHandle]>;
 
 /** Recursively writes every file under `dir` into `zipFolder` at the
- *  same relative path. Directory order is unspecified — JSZip handles
+ *  same relative path. Directory order is unspecified, JSZip handles
  *  that on its end. */
 async function addDirToZip(
   dir: FileSystemDirectoryHandle,
@@ -94,7 +94,7 @@ async function extractZipIntoDir(
   /** Slash-terminated prefix inside the zip we're currently importing. */
   prefix: string,
 ): Promise<void> {
-  // Two passes — once to materialise directories (so out-of-order
+  // Two passes, once to materialise directories (so out-of-order
   // entries don't try to write into a not-yet-created folder), once for
   // files. JSZip flattens nested folders into path-style entries so we
   // walk the entry table directly rather than relying on its tree.
@@ -200,7 +200,7 @@ export async function exportWorkspaceToZip(
   try {
     wsDir = await getWorkspaceDir(workspaceId, false);
   } catch {
-    // Directory missing — nothing to export.
+    // Directory missing, nothing to export.
     return null;
   }
 
@@ -257,7 +257,7 @@ export interface ImportWorkspaceOptions {
   nameOverride?: string;
   /** When supplied, the imported workspace is restricted to this
    *  playground. If the archive's header reports a different
-   *  playground the import is rejected — this protects users from
+   *  playground the import is rejected, this protects users from
    *  loading a SQLite archive into the Python playground by mistake. */
   expectedPlayground?: string;
 }
@@ -303,7 +303,7 @@ export async function importWorkspaceFromZip(
   }
   if (!headerEntry) {
     throw new Error(
-      "Not a workspace archive — workspace.json is missing.",
+      "Not a workspace archive, workspace.json is missing.",
     );
   }
 
@@ -332,14 +332,14 @@ export async function importWorkspaceFromZip(
   const created = await createWorkspace(name, header.playground);
 
   // Drop the freshly-created `files/` and `db/` directories before
-  // extraction — `createWorkspace` makes them empty, but JSZip may
+  // extraction, `createWorkspace` makes them empty, but JSZip may
   // restore alternative subtrees (e.g. `data/`) that we don't want
   // mixed with stale handles.
   let dstDir: FileSystemDirectoryHandle;
   try {
     dstDir = await getWorkspaceDir(created.id, false);
   } catch {
-    // Workspace directory missing — bail out and remove the orphan
+    // Workspace directory missing, bail out and remove the orphan
     // registry entry so the user isn't left with a half-imported
     // workspace.
     const registry = getWorkspaceRegistry().filter((e) => e.id !== created.id);
@@ -349,7 +349,7 @@ export async function importWorkspaceFromZip(
 
   await extractZipIntoDir(zip, dstDir, prefix);
 
-  // Re-write meta.json so the on-disk name matches the registry entry —
+  // Re-write meta.json so the on-disk name matches the registry entry,
   // the source archive's meta still carries the original workspace's
   // name + createdAt which would otherwise be confusing.
   try {

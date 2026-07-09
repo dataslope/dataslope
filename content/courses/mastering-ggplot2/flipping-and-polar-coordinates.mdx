@@ -1,17 +1,17 @@
 ---
 title: Flipping and Polar Coordinates
-description: The grammar's most striking payoff — turning a bar chart into a pie chart by changing only the coordinate system, and flipping axes the right way.
+description: The grammar's most striking payoff, turning a bar chart into a pie chart by changing only the coordinate system, and flipping axes the right way.
 ---
 
 This is the page where the Grammar of Graphics earns its keep in the
 most visible way possible. We promised early on that **a pie chart is a
 stacked bar chart in polar coordinates**. Now you will build exactly
-that — changing *one component* and nothing else.
+that, changing *one component* and nothing else.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Left: vertical bars become horizontal bars; right: a stacked bar wraps into a pie — coordinate systems reshaping the same data"
+  aria-label="Left: vertical bars become horizontal bars; right: a stacked bar wraps into a pie, coordinate systems reshaping the same data"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -46,7 +46,7 @@ that — changing *one component* and nothing else.
 ## Flipping coordinates
 
 `coord_flip()` swaps the x and y axes. It is the clean way to make
-horizontal bars — useful when category labels are long and would
+horizontal bars, useful when category labels are long and would
 overlap on a vertical axis:
 
 <CodeBlock
@@ -93,7 +93,7 @@ which is why we use it here.
 
 ## From bar to pie: change one component
 
-Now the famous transformation. Start with a single **stacked bar** —
+Now the famous transformation. Start with a single **stacked bar**,
 one bar, segmented by drivetrain:
 
 <CodeBlock
@@ -131,7 +131,7 @@ ggplot(mpg, aes(x = factor(1), fill = drv)) +
   ]}
 />
 
-You just made a pie chart — and you did it without a `geom_pie()`
+You just made a pie chart, and you did it without a `geom_pie()`
 (there is no such thing in ggplot2, by design). The pie *is* the
 stacked bar, re-expressed in polar coordinates.
 
@@ -141,13 +141,13 @@ flowchart TD
 ```
 
 In Cartesian space, a count became a *height*. In polar space, that
-same count becomes an *angle*. Same data, same stat, same geom — only
+same count becomes an *angle*. Same data, same stat, same geom, only
 the **coordinate system** differs.
 
 ## Bullseye: polar on the x
 
 Mapping the *other* angle (`theta = "x"`) bends the bar chart into a
-circular "coxcomb" / wind-rose style — the shape Florence Nightingale
+circular "coxcomb" / wind-rose style, the shape Florence Nightingale
 made famous:
 
 <CodeBlock
@@ -166,12 +166,12 @@ ggplot(mpg, aes(x = class, fill = class)) +
   ]}
 />
 
-<Callout type="warn" title="Pies are usually a poor choice — and that is the point">
+<Callout type="warn" title="Pies are usually a poor choice, and that is the point">
 ggplot2 makes pie charts *deliberately* awkward (no \`geom_pie\`)
 because humans judge **angles** far less accurately than **lengths**. A
 bar chart is almost always easier to read. The lesson here is not "make
 pies"; it is that the grammar reveals pies and bars to be *the same
-chart* under different coordinates — a profound conceptual point even
+chart* under different coordinates, a profound conceptual point even
 though the pie itself is rarely the best display.
 </Callout>
 
@@ -185,7 +185,7 @@ though the pie itself is rarely the best display.
 - [o] Draw a single stacked bar (count by fill) and apply \`coord_polar(theta = "y")\` so the bar's height becomes an angle.
   > A pie is a stacked bar re-expressed in polar coordinates.
 - Pies are impossible in ggplot2.
-  > They are possible — just built from a bar plus polar coordinates.
+  > They are possible, just built from a bar plus polar coordinates.
 
 The absence of \`geom_pie\` is intentional: the grammar shows a pie to be
 a stacked bar under a polar coordinate system.`}
@@ -199,7 +199,7 @@ a stacked bar under a polar coordinate system.`}
 - It changes the statistic; the count is recomputed.
   > The stat (count) is unchanged; the same counts are reused.
 - [o] It changes only the coordinate system; the count that was a bar *height* in Cartesian space becomes a slice *angle* in polar space.
-  > Same data, stat, and geom — the coordinate system re-expresses height as angle.
+  > Same data, stat, and geom, the coordinate system re-expresses height as angle.
 - It changes the data; rows are aggregated differently.
   > The data and aggregation are identical; only the coordinate space differs.
 
@@ -218,7 +218,7 @@ types.`}
 - [o] Because people judge lengths (bars) more accurately than angles (pie slices), so the design nudges users toward more readable charts.
   > The friction encodes a perceptual best practice.
 - Because polar coordinates are not supported.
-  > Polar coordinates are fully supported — that is how pies are made.
+  > Polar coordinates are fully supported, that is how pies are made.
 
 The design reflects a perceptual fact: angle is a weaker channel than
 length, so bars usually communicate better than pies.`}
@@ -226,11 +226,11 @@ length, so bars usually communicate better than pies.`}
 
 ## Key takeaways
 
-- `coord_flip()` swaps the axes — the clean way to get horizontal bars
+- `coord_flip()` swaps the axes, the clean way to get horizontal bars
   and prove orientation is a *coordinate* decision.
-- A **pie chart is a single stacked bar under `coord_polar(theta="y")`**
-  — a count becomes an angle instead of a height.
+- A **pie chart is a single stacked bar under `coord_polar(theta="y")`**,
+a count becomes an angle instead of a height.
 - There is **no `geom_pie()`** by design, because length beats angle for
   human perception.
 - Changing the coordinate system re-expresses the *same* data, stat, and
-  geom — the grammar's most vivid payoff.
+  geom, the grammar's most vivid payoff.

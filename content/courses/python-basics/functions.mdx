@@ -8,7 +8,7 @@ Functions package code so it can be reused, named, and tested. Every program is 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A blue caller dot sends a small yellow argument along a thin arrow into a named function card, and a green result dot rides the lower arrow back — call a function, get a value back"
+  aria-label="A blue caller dot sends a small yellow argument along a thin arrow into a named function card, and a green result dot rides the lower arrow back, call a function, get a value back"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -38,12 +38,12 @@ Functions package code so it can be reused, named, and tested. Every program is 
 
 Functions are **the** fundamental building block of modern programs:
 
-- **Every API** — whether it's a REST endpoint, a library method, or a CLI command — is ultimately a function call with inputs and outputs.
-- **Testing** — Unit tests verify one function at a time. Your test suite is only as good as your functions are isolated.
-- **Functional programming** — Pure functions (same input → same output, no side effects) make code easier to reason about, parallelize, and debug.
-- **The call stack** — Your entire program is a tree of function calls. When you see a traceback, each line is a function that called the next.
+- **Every API**, whether it's a REST endpoint, a library method, or a CLI command, is ultimately a function call with inputs and outputs.
+- **Testing**, Unit tests verify one function at a time. Your test suite is only as good as your functions are isolated.
+- **Functional programming**, Pure functions (same input → same output, no side effects) make code easier to reason about, parallelize, and debug.
+- **The call stack**, Your entire program is a tree of function calls. When you see a traceback, each line is a function that called the next.
 
-Think of every `import requests; requests.get(url)` or `df.groupby("category").mean()` — each is a function doing one job well, composed with others.
+Think of every `import requests; requests.get(url)` or `df.groupby("category").mean()`, each is a function doing one job well, composed with others.
 
 ## Etymology: functions vs mathematical functions
 
@@ -283,7 +283,7 @@ except TypeError as e:
 />
 
 <Callout type="tip" title="When to use / and *">
-Use **positional-only** (`/`) when the parameter name is an implementation detail and you want freedom to rename it later (e.g., `len(obj)` — who cares what the parameter is called?). Use **keyword-only** (`*`) when you have many parameters or when the meaning isn't obvious from position alone (`open(file, *, encoding="utf-8")`).
+Use **positional-only** (`/`) when the parameter name is an implementation detail and you want freedom to rename it later (e.g., `len(obj)`, who cares what the parameter is called?). Use **keyword-only** (`*`) when you have many parameters or when the meaning isn't obvious from position alone (`open(file, *, encoding="utf-8")`).
 </Callout>
 
 ## Return values
@@ -495,7 +495,7 @@ def fibonacci(n):
     return fibonacci(n - 1) + fibonacci(n - 2)
 ```
 
-Here, `lru_cache` is a **decorator** — a function that takes a function and returns a wrapped version with caching.
+Here, `lru_cache` is a **decorator**, a function that takes a function and returns a wrapped version with caching.
 
 ## Challenges
 

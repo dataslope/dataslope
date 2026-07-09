@@ -1,6 +1,6 @@
 ---
 title: Decision Trees
-description: A model you can read like a flowchart — a cascade of yes/no questions that splits the data into ever-purer groups. Intuitive, requires no scaling, and the gateway to random forests.
+description: A model you can read like a flowchart, a cascade of yes/no questions that splits the data into ever-purer groups. Intuitive, requires no scaling, and the gateway to random forests.
 ---
 
 Every model so far has been, in some sense, a formula. A linear regression
@@ -11,13 +11,13 @@ could explain to a colleague by drawing on a whiteboard.
 A **decision tree** is different. It is a model you can *read*. It is
 nothing more than a flowchart of yes/no questions: "Is the flipper shorter
 than 206 mm? If yes, is the bill shorter than 43 mm? ..." Follow the answers
-down the branches and you arrive at a prediction. That is the entire model —
+down the branches and you arrive at a prediction. That is the entire model,
 questions and answers, all the way down.
 
 This readability is why trees matter even in an era of giant models. They
 are the most *interpretable* nontrivial model in the toolkit, they need no
-feature scaling, they handle nonlinear patterns automatically, and — most
-importantly for this course — they are the building block of random
+feature scaling, they handle nonlinear patterns automatically, and, most
+importantly for this course, they are the building block of random
 forests and gradient boosting, the workhorses of tabular machine learning.
 Understand the single tree and the powerful ensembles a few pages from now
 will make sense.
@@ -25,7 +25,7 @@ will make sense.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A yellow question diamond splits along thin lines into two more diamonds and four leaf cards, each card tinted and filled almost purely blue or green — a decision tree is a cascade of yes-or-no questions ending in confident bins"
+  aria-label="A yellow question diamond splits along thin lines into two more diamonds and four leaf cards, each card tinted and filled almost purely blue or green, a decision tree is a cascade of yes-or-no questions ending in confident bins"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -80,7 +80,7 @@ discovers one.
 <Callout type="info" title="What 'recursive partitioning' means">
 The formal name for what a tree does is *recursive partitioning*. It splits
 the data into two groups, then splits each of those groups, then splits
-those, and so on — recursively. Each split is a single question about a
+those, and so on, recursively. Each split is a single question about a
 single feature. The result is a set of non-overlapping regions, and every
 example that lands in a region gets the same prediction.
 </Callout>
@@ -93,7 +93,7 @@ that makes the two resulting groups as *pure* as possible.
 
 "Pure" means homogeneous with respect to the target. For classification, a
 group is pure if it contains mostly one class. The tree measures impurity
-with a number — usually **Gini impurity** or **entropy** — and chooses the
+with a number, usually **Gini impurity** or **entropy**, and chooses the
 split that reduces it the most. For regression, "pure" means low variance:
 the tree picks the split that makes the values within each group as close
 together as possible (it minimizes squared error).
@@ -117,7 +117,7 @@ coefficients: just questions, branches, and leaves.
 A tree is made of **nodes**. The top node is the **root**. Each internal
 node asks a question and has two children. A node with no children is a
 **leaf**, and a leaf holds the prediction (a class, or a number). The
-**depth** is the length of the longest path from root to leaf — it is the
+**depth** is the length of the longest path from root to leaf, it is the
 single most important knob you will tune.
 </Callout>
 
@@ -157,7 +157,7 @@ print(f"Test accuracy:  {tree.score(X_test, y_test):.3f}")
 />
 
 A shallow tree already classifies most penguins correctly, and the train and
-test scores are close together — a sign it has learned a real pattern
+test scores are close together, a sign it has learned a real pattern
 rather than memorized noise. The API is identical to every other
 scikit-learn model: `fit` to learn, `score` to evaluate, `predict` to make
 predictions. You already know how to drive a tree; the new part is
@@ -166,8 +166,8 @@ understanding what it learned.
 <Callout type="success" title="No scaling, no problem">
 Notice we did **not** scale the features, even though they live on wildly
 different ranges (body mass is in the thousands of grams, bill length near
-40 mm). Trees ask threshold questions one feature at a time — "is this value
-above *x*?" — so the *units* of each feature are irrelevant. This is a
+40 mm). Trees ask threshold questions one feature at a time, "is this value
+above *x*?", so the *units* of each feature are irrelevant. This is a
 genuine convenience that distance-based models like KNN do not enjoy.
 </Callout>
 
@@ -215,11 +215,11 @@ Read each box from the top down. The first line is the **question** (e.g.
 goes right. `samples` is how many training examples reached that node;
 `value` shows how those examples break down across the three classes; and
 `class` is the majority label the node would predict. The color intensity
-reflects purity — a deep, solid color means the node is dominated by one
+reflects purity, a deep, solid color means the node is dominated by one
 class.
 
 The very first split alone (a flipper-length threshold) peels off nearly all
-the Gentoo penguins — which have by far the longest flippers — into an almost
+the Gentoo penguins, which have by far the longest flippers, into an almost
 pure leaf. That is the tree discovering, with zero guidance from you, that
 flipper length is one of the single most informative measurements.
 
@@ -267,11 +267,11 @@ print(f"Test R^2:  {tree.score(X_test, y_test):.3f}")
   ]}
 />
 
-The mechanics are identical to the classifier — `fit`, `score`, `predict` —
+The mechanics are identical to the classifier, `fit`, `score`, `predict`,
 which is exactly the point of scikit-learn's consistent API. One important
 visual consequence: because each leaf outputs a single constant, a
 regression tree's predictions form a **staircase**, not a smooth curve. The
-next code block makes that vivid with a synthetic one-feature curve — we use
+next code block makes that vivid with a synthetic one-feature curve, we use
 made-up data here on purpose, because a single input plotted against a known
 smooth function is the clearest way to *see* the staircase.
 
@@ -306,7 +306,7 @@ plt.show()
   ]}
 />
 
-The shallow tree (depth 2) draws a coarse staircase with just a few steps —
+The shallow tree (depth 2) draws a coarse staircase with just a few steps,
 it captures the broad shape but misses detail. The deep tree (depth 8)
 chases nearly every wiggle, including the noise. That contrast is the whole
 story of the next section.
@@ -314,7 +314,7 @@ story of the next section.
 ## The one knob that matters: `max_depth` and overfitting
 
 A tree left to grow without limit will keep splitting until every leaf is
-pure — in the worst case, one training example per leaf. Such a tree gets
+pure, in the worst case, one training example per leaf. Such a tree gets
 **100% training accuracy** by sheer memorization, and it is almost useless
 on new data. This is the overfitting you met on the train/test split page,
 and trees are unusually prone to it because they are so flexible.
@@ -354,7 +354,7 @@ for depth in [1, 2, 3, 5, 10, None]:
 />
 
 Read down the columns. The **train** score marches steadily toward `1.000`
-as the tree is allowed to grow deeper — deeper trees can always fit the
+as the tree is allowed to grow deeper, deeper trees can always fit the
 training data better. But the **test** score climbs, plateaus, and may even
 dip. Once the gap between the two columns yawns open, the extra depth is
 buying memorization, not understanding. The sweet spot is a depth where
@@ -362,16 +362,16 @@ test accuracy is high *and* close to train accuracy.
 
 | Tree depth | Behavior | Result |
 | --- | --- | --- |
-| Shallow (depth 1-2) | Too simple to capture the pattern | Underfit — high bias |
+| Shallow (depth 1-2) | Too simple to capture the pattern | Underfit, high bias |
 | Medium (depth 3-5) | Captures structure without chasing noise | Generalizes well |
-| Deep (no limit) | Carves out a region for nearly every row | Overfit — high variance |
+| Deep (no limit) | Carves out a region for nearly every row | Overfit, high variance |
 
 <Callout type="danger" title="An unlimited tree will memorize its training data">
 The default `DecisionTreeClassifier()` has **no depth limit**. On most
 datasets it will reach 100% training accuracy by carving out a tiny region
 for nearly every row. That perfect training score is a warning sign, not an
-achievement. Always constrain the tree — with `max_depth`,
-`min_samples_leaf`, or `min_samples_split` — and judge it on the test set.
+achievement. Always constrain the tree, with `max_depth`,
+`min_samples_leaf`, or `min_samples_split`, and judge it on the test set.
 </Callout>
 
 <Callout type="tip" title="More than one way to prune">
@@ -380,7 +380,7 @@ forbids leaves smaller than *n* examples (so the tree cannot carve out a
 region for a single point), `min_samples_split` requires a node to hold at
 least *n* examples before it may split, and `ccp_alpha` performs principled
 cost-complexity pruning. Tuning these well is a job for **cross-validation**
-and **hyperparameter tuning**, both covered in their own chapters — for now,
+and **hyperparameter tuning**, both covered in their own chapters, for now,
 `max_depth` is enough to build intuition.
 </Callout>
 
@@ -426,11 +426,11 @@ Resampling the training data can move the root split from one feature to
 another. The predictions are often still reasonable, but the *structure* is
 brittle, and brittleness means **high variance**: the model's answer
 depends too much on the particular data it happened to see. Hold onto this
-frustration — it is precisely the problem that **random forests** solve a
+frustration, it is precisely the problem that **random forests** solve a
 couple of pages from now, by averaging many such unstable trees into one
 stable prediction.
 
-## When to use a tree — and when not to
+## When to use a tree, and when not to
 
 A single decision tree is the right tool when:
 
@@ -476,7 +476,7 @@ tabular machine learning:
 - **Credit and lending.** Simple, auditable trees support decisions that
   must be explained to applicants and regulators.
 - **Medical triage and clinical rules.** "If temperature > X and white
-  blood cell count > Y, escalate" — clinical decision rules are often
+  blood cell count > Y, escalate", clinical decision rules are often
   literal trees that a clinician can follow without a computer.
 - **Churn and marketing.** Which customers are about to leave, and what
   single factor pushed them over the edge?
@@ -510,7 +510,7 @@ missing measurements) across 3 species. \`X\` (four numeric measurements) and
 The tests check the depth-limited tree's configuration, that the split is
 the right size, that the depth-3 tree generalizes reasonably (test accuracy
 above 0.85), and that the unlimited tree reaches a perfect training
-score — the memorization you should be wary of.`}
+score, the memorization you should be wary of.`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
@@ -613,10 +613,10 @@ Splitting on purity is what lets a tree separate the classes one question at a t
   markdown={`A \`DecisionTreeClassifier()\` with no \`max_depth\` reaches 100% accuracy on the training set but only 84% on the test set. What is the most likely explanation?
 
 - The test set is mislabeled
-  > Mislabeled test data would depress the test score for unrelated reasons, but here the pattern — perfect training, lower test — is exactly what an unconstrained tree does by memorizing training rows. It is overfitting, not a data quality issue.
+  > Mislabeled test data would depress the test score for unrelated reasons, but here the pattern, perfect training, lower test, is exactly what an unconstrained tree does by memorizing training rows. It is overfitting, not a data quality issue.
 - The tree is underfitting and needs to be shallower
-  > Underfitting means the model is too simple even for the training data. A training accuracy of 100% is the opposite — the tree is too flexible and has memorized the data. Making it shallower would reduce overfitting, not add complexity.
-- [o] The tree overfit — with no depth limit it grew until it memorized the training rows, so its training score is inflated and the test score is the honest estimate
+  > Underfitting means the model is too simple even for the training data. A training accuracy of 100% is the opposite, the tree is too flexible and has memorized the data. Making it shallower would reduce overfitting, not add complexity.
+- [o] The tree overfit, with no depth limit it grew until it memorized the training rows, so its training score is inflated and the test score is the honest estimate
   > An unconstrained tree can carve out a region for nearly every training point. The large train-minus-test gap is the classic signature of overfitting; limiting depth usually helps.
 - 100% training accuracy proves the model is excellent
   > A perfect training score with a significantly lower test score is a warning sign, not evidence of excellence. The test score is the honest measure; the training score merely shows the tree memorized its examples.
@@ -628,13 +628,13 @@ A perfect training score next to a much lower test score signals memorization, n
   markdown={`Why do decision trees **not** require feature scaling (standardization), unlike K-nearest neighbors or many linear models?
 
 - Trees internally scale every feature before splitting
-  > Decision trees do not scale features internally — they use the raw values directly. They simply do not *need* scaling because each split question uses a single feature's order, which is unaffected by scale.
+  > Decision trees do not scale features internally, they use the raw values directly. They simply do not *need* scaling because each split question uses a single feature's order, which is unaffected by scale.
 - [o] A tree asks threshold questions on one feature at a time ("is this value above x?"), and the answer to such a question does not change if you rescale that feature
-  > Because each split compares a single feature to a threshold, the units or range of features are irrelevant — multiplying a column by 1000 does not change the order of its values or the chosen split point.
+  > Because each split compares a single feature to a threshold, the units or range of features are irrelevant, multiplying a column by 1000 does not change the order of its values or the chosen split point.
 - Trees only work on data that is already normalized to [0, 1]
   > Decision trees work on raw, unscaled data of any range. The penguins and diamonds examples on this page all use unscaled features with very different ranges.
 - Scaling would make trees overfit
-  > Scaling does not cause overfitting in decision trees — but it is simply unnecessary, because threshold-based splits are invariant to the scale of individual features.
+  > Scaling does not cause overfitting in decision trees, but it is simply unnecessary, because threshold-based splits are invariant to the scale of individual features.
 
 Scale-invariance is one of the genuine conveniences of tree-based models.`}
 />
@@ -643,7 +643,7 @@ Scale-invariance is one of the genuine conveniences of tree-based models.`}
   markdown={`What does a **leaf** node store, and how does a tree make a prediction for a new example?
 
 - The leaf stores a regression coefficient that is multiplied by the input
-  > Decision trees do not use linear coefficients at the leaves. A classification leaf stores the majority class, and a regression leaf stores the mean target value — both are constants, not formulas.
+  > Decision trees do not use linear coefficients at the leaves. A classification leaf stores the majority class, and a regression leaf stores the mean target value, both are constants, not formulas.
 - [o] The example is routed down the tree by answering each question; the leaf it lands in supplies the prediction (the majority class for classification, or the average target for regression)
   > A prediction is just a path from root to leaf following yes/no answers. Classification leaves predict the most common class among their training examples; regression leaves predict those examples' mean.
 - Every leaf stores the entire training set and runs a distance search
@@ -658,13 +658,13 @@ A tree's prediction is the value attached to whichever leaf the example reaches.
   markdown={`Decision trees are described as "unstable" or "high variance." What does this mean in practice?
 
 - They produce different predictions every time you call \`.predict\`, even on the same input
-  > A fitted decision tree is deterministic: given the same input, it always returns the same prediction. Instability refers to sensitivity to the *training data* — a different training sample can produce a very different tree structure.
+  > A fitted decision tree is deterministic: given the same input, it always returns the same prediction. Instability refers to sensitivity to the *training data*, a different training sample can produce a very different tree structure.
 - They require a GPU to train reliably
   > Decision trees are CPU-bound algorithms and train efficiently on CPU. GPU acceleration is associated with deep learning workloads, not tree-based models.
 - [o] A small change in the training data can produce a substantially different tree structure (e.g. a different feature chosen at the root), because each split is committed to greedily and everything below depends on it
   > Instability refers to sensitivity of the learned *structure* to the training sample. This high variance is exactly what ensembles like random forests reduce by averaging many trees trained on resampled data.
 - The accuracy randomly changes each epoch during training
-  > Decision trees do not train in epochs — they make a single greedy pass to build the tree, and the result is deterministic for a given training set. Accuracy instability refers to different trees built from different training samples, not repeated runs on the same data.
+  > Decision trees do not train in epochs, they make a single greedy pass to build the tree, and the result is deterministic for a given training set. Accuracy instability refers to different trees built from different training samples, not repeated runs on the same data.
 
 Instability is a property of the learning process, and it motivates the ensemble methods covered next.`}
 />

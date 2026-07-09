@@ -1,16 +1,16 @@
 // Remote sample datasets (SQL scripts, CSV/parquet files, SQLite
 // databases), fetched from the companion dataslope/datasets GitHub
 // repository and cached so that every code block, challenge card, and
-// playground that references a file shares ONE download — across
+// playground that references a file shares ONE download, across
 // languages (Python, R, SQLite, Postgres, DuckDB, …), across pages,
 // and across visits.
 //
 // How a dataset is fetched (three layers, all per-URL):
 //
-//   1. In-flight memo (module-level Map<url, Promise>) — dedupes
+//   1. In-flight memo (module-level Map<url, Promise>), dedupes
 //      concurrent and repeated requests within one JS context. Workers
 //      get their own module instance and therefore their own memo.
-//   2. Cache API (`caches.open`) — persistent, shared by the main
+//   2. Cache API (`caches.open`), persistent, shared by the main
 //      thread and every worker on the origin. A file downloaded by the
 //      SQLite worker is served from here when the DuckDB worker (or a
 //      hard-reloaded page) asks for it later. Best-effort: quota
@@ -18,7 +18,7 @@
 //      silently degrade to a plain network fetch.
 //   3. Network, via two hosts:
 //        - cdn.jsdelivr.net (primary): serves GitHub repos with
-//          `access-control-allow-origin: *` and — for ref-pinned URLs —
+//          `access-control-allow-origin: *` and, for ref-pinned URLs,
 //          a one-year immutable HTTP cache, so even fetches that bypass
 //          this module benefit.
 //        - raw.githubusercontent.com (fallback): also CORS-enabled and
@@ -99,7 +99,7 @@ export function resolveDatasetUrl(pathOrUrl: string): string {
  *  should be tried. Repo-relative paths get the jsDelivr URL first
  *  (immutable HTTP caching) with raw.githubusercontent.com as the
  *  fallback host; full URLs are used as-is. The first candidate is the
- *  canonical cache key — a download that succeeded via the fallback
+ *  canonical cache key, a download that succeeded via the fallback
  *  host is still stored under the canonical URL, so later lookups hit
  *  regardless of which host happened to serve the bytes. */
 function datasetUrlCandidates(pathOrUrl: string): string[] {
@@ -110,7 +110,7 @@ function datasetUrlCandidates(pathOrUrl: string): string[] {
 // ─── Layer 1: in-flight memo ────────────────────────────────────────
 // Failed downloads are evicted so a transient network error doesn't
 // poison the sample for the rest of the session. (Workers get their own
-// module instance and therefore their own memo — the Cache API layer
+// module instance and therefore their own memo, the Cache API layer
 // below is what makes a download shared across contexts.)
 const textCache = new Map<string, Promise<string>>();
 const bytesCache = new Map<string, Promise<Uint8Array>>();
@@ -146,7 +146,7 @@ let datasetCachePromise: Promise<Cache | null> | null = null;
 
 /** Open (once per context) the persistent dataset cache, or resolve to
  *  null when the Cache API is unavailable (Node, file://, some private
- *  modes) or fails — callers then fall through to the network. Kicks
+ *  modes) or fails, callers then fall through to the network. Kicks
  *  off a background sweep of stale entries on first open. */
 function openDatasetCache(): Promise<Cache | null> {
   if (typeof caches === "undefined") return Promise.resolve(null);
@@ -169,7 +169,7 @@ function openDatasetCache(): Promise<Cache | null> {
  *  entries for the default datasets repo at any ref other than the
  *  current pin. The latter both cleans up after a `DATASETS_REF` bump
  *  and keeps hand-written mutable URLs (e.g. `…/datasets/main/…`) from
- *  serving stale bytes forever — they degrade to per-session caching. */
+ *  serving stale bytes forever, they degrade to per-session caching. */
 async function sweepStaleEntries(cache: Cache): Promise<void> {
   const names = await caches.keys();
   await Promise.all(
@@ -201,7 +201,7 @@ async function sweepStaleEntries(cache: Cache): Promise<void> {
 interface CachedFetchResult {
   response: Response;
   /** True when the bytes are now retrievable from the Cache API (hit,
-   *  or stored after a miss) — i.e. a per-context memo may safely drop
+   *  or stored after a miss), i.e. a per-context memo may safely drop
    *  its copy and re-read locally later. */
   persisted: boolean;
 }
@@ -230,7 +230,7 @@ async function cachedFetch(
       await cache.put(canonicalUrl, response.clone());
       persisted = true;
     } catch {
-      // Quota exceeded / opaque restrictions — persistence is best-effort.
+      // Quota exceeded / opaque restrictions, persistence is best-effort.
     }
   }
   return { response, persisted };
@@ -318,7 +318,7 @@ export function datasetFileName(pathOrUrl: string): string {
  *  downloaded through the cached path above and written into the
  *  runtime's virtual filesystem before each run, so init/starter code
  *  reads a local file (`pd.read_csv("penguins.csv")`,
- *  `read.csv("penguins.csv")`) — identical UX in every language, no
+ *  `read.csv("penguins.csv")`), identical UX in every language, no
  *  per-language CORS quirks, and lessons never embed raw URLs. */
 export interface DatasetStageSpec {
   /** Path inside the dataslope/datasets repo (e.g. `"csv/penguins.csv"`)

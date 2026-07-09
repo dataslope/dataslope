@@ -1,18 +1,18 @@
 ---
 title: Welcome
-description: "An intuition-first tour of classical time series analysis and statistical forecasting with pandas and statsmodels — built around the one idea that changes everything: in time series, the order of the data IS the information."
+description: "An intuition-first tour of classical time series analysis and statistical forecasting with pandas and statsmodels, built around the one idea that changes everything: in time series, the order of the data IS the information."
 ---
 
 <Figure
   slug="line-chart"
-  alt="A minimal line chart tracing a value over time — the shape of time series data"
+  alt="A minimal line chart tracing a value over time, the shape of time series data"
   priority
 />
 
 Welcome to **Time Series Analysis with Python**. You already know how to
 load a DataFrame, filter it, group it, and plot a line chart. You can
 answer "*what happened?*" This course teaches the harder, more valuable
-question: "*what happens next — and how much should I trust my answer?*"
+question: "*what happens next, and how much should I trust my answer?*"
 
 That second question is where time series analysis lives. A table of
 sales numbers and a table of *monthly* sales numbers look almost
@@ -20,12 +20,12 @@ identical, but they are not the same kind of object. The second one has
 a **spine**: each row is glued to the rows before and after it by the
 passage of time. Reorder the rows of an ordinary table and you lose
 nothing. Reorder the rows of a time series and you have **destroyed the
-data** — because in a time series, the *order is the information*.
+data**, because in a time series, the *order is the information*.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="The same six blue points twice: on the left they are joined in order by a line that tells a story, while on the right they lie shuffled and unconnected beneath a small red cross — in a time series, the order is the information"
+  aria-label="The same six blue points twice: on the left they are joined in order by a line that tells a story, while on the right they lie shuffled and unconnected beneath a small red cross, in a time series, the order is the information"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -75,7 +75,7 @@ need any prior time series, signal processing, or forecasting
 background. We build all of that from intuition.
 </Callout>
 
-## This whole course runs in your browser — try it now
+## This whole course runs in your browser, try it now
 
 There is no setup, no install, no download. Every code block on every
 page is a real Python interpreter (pandas, NumPy, matplotlib, statsmodels)
@@ -87,7 +87,7 @@ appears underneath.
 So let's start with the most famous time series in science. Since 1958,
 an observatory near the summit of Mauna Loa, Hawaii, has measured the
 carbon dioxide in Earth's atmosphere, month after month, without a break.
-The result — the **Keeling Curve** — is the running real-world example for
+The result, the **Keeling Curve**, is the running real-world example for
 this entire course. The block below loads the monthly readings, puts them
 on a proper datetime timeline, and plots them.
 
@@ -129,7 +129,7 @@ print(f"First reading: {co2.iloc[0]:.1f} ppm   Latest: {co2.iloc[-1]:.1f} ppm")
 />
 
 Two structures jump out, and the whole course lives between them. There's
-a **relentless upward trend** — CO₂ has climbed from about 316 ppm in 1959
+a **relentless upward trend**, CO₂ has climbed from about 316 ppm in 1959
 to well over 420 ppm today. And riding on top of it is a small, perfectly
 regular **annual sawtooth**: every year the curve dips and rises by a few
 ppm as Northern-Hemisphere plants inhale CO₂ each growing season and
@@ -141,7 +141,7 @@ sawtooth, or to 60 to smooth it into the bare trend, and re-run.
 <Callout type="info" title="A true story you can verify from the data itself">
 **Charles David Keeling** began these continuous measurements in 1958 and
 maintained them for decades; the record is now the longest of its kind.
-The monthly average first crossed **400 ppm in May 2013** — a number you
+The monthly average first crossed **400 ppm in May 2013**, a number you
 can find yourself with `co2[co2 >= 400].index[0]` in the block above. Every
 claim we make about this series is checkable in the very data you're
 running, which is exactly the spirit of the course.
@@ -149,8 +149,8 @@ running, which is exactly the spirit of the course.
 
 ## See the thesis in ten seconds
 
-Here is the whole course in one experiment. We take a real monthly series
-— airline passenger counts — and measure how strongly each month relates
+Here is the whole course in one experiment. We take a real monthly series,
+airline passenger counts, and measure how strongly each month relates
 to the month before it (its **lag-1 autocorrelation**). Then we *shuffle*
 the rows and measure again. Run it.
 
@@ -197,16 +197,16 @@ print("Shuffling threw that predictability in the trash. The order WAS the signa
   ]}
 />
 
-The ordered series has a lag-1 correlation near **0.95** — knowing this
+The ordered series has a lag-1 correlation near **0.95**, knowing this
 month tells you almost exactly what last month was. After shuffling, that
 structure collapses toward zero. Every tool in this course exists to
-*find, measure, and exploit* that kind of temporal structure — and the
+*find, measure, and exploit* that kind of temporal structure, and the
 final third of the course is about **not fooling yourself** when you use
 it to predict the future.
 
 <Callout type="tip" title="The mantra for this whole course">
 Cross-sectional data answers "*who?*" Time series data answers
-"*when?*" — and "when" comes with a rule cross-sectional data never has:
+"*when?*", and "when" comes with a rule cross-sectional data never has:
 **you may only ever learn from the past to predict the future, never the
 reverse.** Break that rule and every accuracy number you compute becomes
 a comfortable lie.
@@ -220,10 +220,10 @@ no story connecting them. This course is the opposite. For every concept
 and every transformation we ask:
 
 - **What temporal problem does it solve?** Why was it invented?
-- **When should you use it — and when should you *not*?**
+- **When should you use it, and when should you *not*?**
 - **What do people get wrong about it?** (The misconceptions sink more
   projects than the math ever does.)
-- **Where does it show up in real work?** — energy demand, inventory
+- **Where does it show up in real work?**, energy demand, inventory
   planning, web traffic, retail sales.
 
 You will still see formulas and tests, but only when they make the
@@ -234,11 +234,11 @@ know which question you're asking and whether the answer makes sense.
 
 - Recognize **why temporal data needs its own toolkit** and why ordinary
   machine-learning habits (shuffling, random splits) quietly corrupt it.
-- Wield pandas's **time machinery** — `DatetimeIndex`, frequencies,
+- Wield pandas's **time machinery**, `DatetimeIndex`, frequencies,
   partial-string slicing, `shift`, `resample`, `rolling`.
 - **Resample** between time resolutions (daily ⇄ weekly ⇄ monthly) and
   know when you are *summarizing* versus *inventing* data.
-- Fill **missing timestamps** the right way — and explain why forward-fill,
+- Fill **missing timestamps** the right way, and explain why forward-fill,
   back-fill, and interpolation are three different *assumptions*, not three
   buttons.
 - **Decompose** a series into trend, seasonality, and residual, and read
@@ -263,20 +263,20 @@ capstone end-to-end pipeline.
 
 Each section builds on the one before it. The conceptual heart of the
 course is the run of pages on **stationarity**, **differencing**,
-**ACF/PACF**, and especially **chronological validation** — if those
+**ACF/PACF**, and especially **chronological validation**, if those
 click, forecasting becomes a craft you can reason about instead of a
 black box you poke.
 
 <Callout type="warn" title="The most important page is near the end">
 We treat **validation** as the single most important topic in the whole
-course — more important than any individual model. A mediocre model
+course, more important than any individual model. A mediocre model
 honestly evaluated is worth ten brilliant models evaluated with a leaky
 random split. We will hammer this point until it is reflex.
 </Callout>
 
 ## The tools we use
 
-We lean on four libraries and nothing heavier — no scikit-learn, no deep
+We lean on four libraries and nothing heavier, no scikit-learn, no deep
 learning, no automated forecasting frameworks. Classical time series
 analysis needs surprisingly little machinery.
 
@@ -300,19 +300,19 @@ to inspect.
 Real time series teaching needs data with *visible* structure. We use a
 small, hand-picked cast that runs instantly in your browser:
 
-- **The Keeling Curve** (atmospheric CO₂ at Mauna Loa, monthly since 1959)
-  — our real-world hero series, loaded straight from a public dataset. It
+- **The Keeling Curve** (atmospheric CO₂ at Mauna Loa, monthly since 1959),
+our real-world hero series, loaded straight from a public dataset. It
   has a textbook **trend** plus a clean **12-month seasonal** cycle, and is
   strongly non-stationary. We return to it again and again: resampling,
   rolling means, decomposition, differencing, ACF/PACF, and forecasting.
-- **Airline passengers** (144 monthly points, 1949-1960) — a second classic
+- **Airline passengers** (144 monthly points, 1949-1960), a second classic
   hero. Unlike CO₂, its seasonal swing *grows* with the level, which makes
   it the textbook case for multiplicative decomposition and the log
   transform. Two real series with *different* seasonal behavior teach more
   than one.
-- **Simulated series** with *known* trend, seasonality, and noise — so we
+- **Simulated series** with *known* trend, seasonality, and noise, so we
   can check whether a tool recovers the truth we baked in.
-- **Small, gappy sensor and traffic series** — for practicing missing-data
+- **Small, gappy sensor and traffic series**, for practicing missing-data
   strategies where the right answer depends on the assumption you make.
 
 Nothing here is bigger than a thousand numbers. Time series intuition does
@@ -323,12 +323,12 @@ hundred well-chosen points show it more clearly than a million noisy ones.
 
 You'll meet three kinds of interactive elements:
 
-1. **Code blocks** — editable, runnable Python. Change a window size, a
+1. **Code blocks**, editable, runnable Python. Change a window size, a
    differencing order, an ARIMA parameter, and re-run to see the effect.
-2. **Challenge cards** — small problems with tests. Write a
+2. **Challenge cards**, small problems with tests. Write a
    solution, click **Submit**, and see which tests pass. These are where
    the learning sticks, so do them.
-3. **Multiple-choice questions** — quick conceptual checks with an
+3. **Multiple-choice questions**, quick conceptual checks with an
    explanation for *every* option, right or wrong.
 
 Let's begin where every honest time series project must: with *why* this

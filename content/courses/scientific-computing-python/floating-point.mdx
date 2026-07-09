@@ -13,7 +13,7 @@ working scientists.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A number line whose blue ticks crowd together on the left and spread apart to the right holds a green value hovering between two ticks, the nearest tick circled in yellow — floating point numbers are a finite grid, and every value snaps to the closest mark"
+  aria-label="A number line whose blue ticks crowd together on the left and spread apart to the right holds a green value hovering between two ticks, the nearest tick circled in yellow, floating point numbers are a finite grid, and every value snaps to the closest mark"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="110" width="500" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -88,11 +88,11 @@ for x in [1.0, 2.0, 0.5, 0.1, -3.0, float("inf"), float("nan")]:
 
 A few things to notice:
 
-- `1.0` has exponent $1023$ (the bias) and mantissa $0$ — it is
+- `1.0` has exponent $1023$ (the bias) and mantissa $0$, it is
   literally $1 \cdot 2^0$.
 - `2.0` differs from `1.0` in *one bit*: the exponent.
 - `0.1` has a non-zero mantissa, because $0.1$ cannot be written
-  exactly in binary — it is a repeating binary fraction.
+  exactly in binary, it is a repeating binary fraction.
 
 ## Machine epsilon
 
@@ -128,10 +128,10 @@ first **15 to 16 decimal digits**. Beyond that, the value is noise.
 
 Three special "numbers" appear all the time:
 
-- **`+inf` / `-inf`** — produced by `1.0 / 0.0` or by overflow
-- **`nan`** — *not a number*, produced by indeterminate forms like
+- **`+inf` / `-inf`**, produced by `1.0 / 0.0` or by overflow
+- **`nan`**, *not a number*, produced by indeterminate forms like
   `0.0 / 0.0` or `inf - inf`
-- **`-0.0`** — yes, negative zero, distinguishable from `+0.0`
+- **`-0.0`**, yes, negative zero, distinguishable from `+0.0`
   in a few rare cases
 
 NaN is special because it is **not equal to anything, including
@@ -189,7 +189,7 @@ print(round(1.5))  # 2
 print(round(2.5))  # 2
 print(round(3.5))  # 4
 
-# This is *not* a Python bug — it is the IEEE 754 standard.
+# This is *not* a Python bug, it is the IEEE 754 standard.
 # Banker's rounding keeps the average rounding error at zero.
 `,
     },
@@ -265,7 +265,7 @@ for k in range(0, 18):
   ]}
 />
 
-Truncation error shrinks like $h^2$ at first — you can see the
+Truncation error shrinks like $h^2$ at first, you can see the
 error drop by a factor of $100$ for each factor-of-10 reduction in
 $h$. But around $h = 10^{-6}$, *round-off* takes over and the error
 starts to **grow**. The optimum is somewhere near $h = \sqrt[3]{\epsilon}$.
@@ -279,7 +279,7 @@ A float can hold values from roughly $2 \times 10^{-308}$ to
 $1.8 \times 10^{308}$ before underflow/overflow. Inside that range,
 arithmetic is reliable. Outside, things go wrong silently.
 
-The classic trap: computing $\log(\sum_i e^{x_i})$ — the *log-sum-exp*
+The classic trap: computing $\log(\sum_i e^{x_i})$, the *log-sum-exp*
 that appears all over physics and machine learning. If any $x_i$ is
 around $1000$, then $e^{x_i}$ overflows to `inf`. The trick is to
 subtract the maximum first.

@@ -1,12 +1,12 @@
 ---
 title: "Resampling and Aggregation: Changing the Temporal Resolution"
-description: Downsampling versus upsampling — using resample() to summarize a series to a coarser grid (and why sum vs mean matters) or to stretch it onto a finer grid (and why that invents data rather than discovering it).
+description: Downsampling versus upsampling, using resample() to summarize a series to a coarser grid (and why sum vs mean matters) or to stretch it onto a finer grid (and why that invents data rather than discovering it).
 ---
 
 Real time series rarely arrive at the resolution you want to analyze them
 at. Sensors log every second but you reason in hours; sales come in daily
 but the business plans monthly. **Resampling** is how you change the
-*temporal resolution* of a series — and it splits cleanly into two
+*temporal resolution* of a series, and it splits cleanly into two
 operations with very different risks.
 
 ```mermaid
@@ -26,7 +26,7 @@ flowchart TB
   *which* summary: sum? mean? last value?
 - **Upsampling** goes from coarse to fine (monthly → daily). You have
   *fewer* points than the target grid and must **invent** the in-between
-  values. This does not create information — it encodes an assumption.
+  values. This does not create information, it encodes an assumption.
 
 <Callout type="info" title="resample is groupby for time">
 `df.resample("ME")` is the time-aware twin of `df.groupby(...)`. It slices
@@ -39,7 +39,7 @@ names the summary.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Twenty-eight small day tiles merge into four green week bars and then into one yellow month block, a single red day leaving a fading trace at every scale — resampling rolls a fine calendar up into a coarser one, carrying its days' influence along"
+  aria-label="Twenty-eight small day tiles merge into four green week bars and then into one yellow month block, a single red day leaving a fading trace at every scale, resampling rolls a fine calendar up into a coarser one, carrying its days' influence along"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -93,8 +93,8 @@ names the summary.
 
 ## Downsampling: summarizing to a coarser grid
 
-Let's build a daily series — website visits with a slow upward trend and a
-weekend dip — and roll it up.
+Let's build a daily series, website visits with a slow upward trend and a
+weekend dip, and roll it up.
 
 <CodeBlock
   adapter="python"
@@ -129,7 +129,7 @@ print(visits.resample("ME").mean().round(1))
   ]}
 />
 
-One series, two resamples, two very different numbers — and they answer
+One series, two resamples, two very different numbers, and they answer
 different questions:
 
 - `resample("W").sum()` → "**how many** visits did we get each week?"
@@ -151,7 +151,7 @@ This is the choice beginners get wrong most often. The rule:
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="On the left, four green rain squares combine into one tall green column; on the right, four blue readings at different heights settle into a single short blue bar at their middle level — flows add up to a sum, while levels summarize as a mean"
+  aria-label="On the left, four green rain squares combine into one tall green column; on the right, four blue readings at different heights settle into a single short blue bar at their middle level, flows add up to a sum, while levels summarize as a mean"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -219,13 +219,13 @@ print(
   markdown={`You have **hourly air-temperature** readings and want one value per day. Which resampling aggregation is correct?
 
 - \`resample("D").sum()\`
-  > Summing 24 hourly temperatures produces a meaningless number in the hundreds. Temperature is a *level*, not a flow — adding it up has no physical meaning.
+  > Summing 24 hourly temperatures produces a meaningless number in the hundreds. Temperature is a *level*, not a flow, adding it up has no physical meaning.
 - [o] \`resample("D").mean()\`
   > Temperature is a level/rate, so the natural daily summary is the average of the day's hourly readings. (A max/min is also reasonable if you specifically want the day's high or low.)
 - \`resample("D").count()\`
   > \`count\` returns *how many* readings there were that day (usually 24), not the temperature itself. It answers a question about data completeness, not climate.
 - It doesn't matter; all aggregations give the same answer
-  > They give very different answers — sum is ~24x the mean here. Choosing the aggregation that matches the quantity is the whole point.
+  > They give very different answers, sum is ~24x the mean here. Choosing the aggregation that matches the quantity is the whole point.
 
 Levels (temperature, price) call for \`mean\` (or min/max); flows (sales, visits) call for \`sum\`.`}
 />
@@ -233,7 +233,7 @@ Levels (temperature, price) call for \`mean\` (or min/max); flows (sales, visits
 ### More than one summary at once
 
 You don't have to pick a single aggregation. `.agg([...])` returns several
-columns side by side — handy for a quick profile of each bucket.
+columns side by side, handy for a quick profile of each bucket.
 
 <CodeBlock
   adapter="python"
@@ -291,7 +291,7 @@ print("leaving the steady rise - the long-run trend, laid bare.")
 />
 
 <Callout type="tip" title="Downsampling is a seasonality filter">
-The yearly resample above has *no* sawtooth — averaging a full year folds
+The yearly resample above has *no* sawtooth, averaging a full year folds
 the 12-month seasonal cycle into a single number. Downsampling to the
 seasonal period (or a multiple of it) is a quick, crude way to *see the
 trend* without the seasonality shouting over it. We'll do this far more
@@ -304,7 +304,7 @@ meaningless.)
 
 Upsampling is the riskier direction. Going monthly → daily, you're asking
 for ~30x more rows than you have data for. pandas inserts the new
-timestamps but leaves them empty — because it has no honest value to put
+timestamps but leaves them empty, because it has no honest value to put
 there.
 
 <CodeBlock
@@ -337,7 +337,7 @@ print(f"NaNs introduced  : {daily.isna().sum()}  <- pandas refuses to fabricate 
 />
 
 Those `NaN`s are pandas being *honest*: it knows the value on January 15th
-1949, but it has no idea what happened on January 16th — that day was never
+1949, but it has no idea what happened on January 16th, that day was never
 measured. To get numbers there you must **assume** something, and the
 assumption you choose is a modeling decision (the entire subject of the
 next page):
@@ -377,8 +377,8 @@ print("it forced us to declare what we believe happened between observations.")
 <Callout type="danger" title="Upsampling does not create information">
 The most dangerous misconception about resampling: that upsampling
 *reveals* finer detail. It does not. A monthly series upsampled to daily
-has exactly as much information as it did before — one real number per
-month — now smeared across 30 invented slots. Every value between the real
+has exactly as much information as it did before, one real number per
+month, now smeared across 30 invented slots. Every value between the real
 observations is a guess whose quality depends entirely on whether your
 fill assumption matches reality. Never report upsampled points as if they
 were measured.
@@ -387,7 +387,7 @@ were measured.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three solid blue monthly dots on a coarse timeline drop down to a fine daily row where only their three slots are solid and every in-between slot is a dashed outline — upsampling lays down a finer grid, but the new values are assumptions, not measurements"
+  aria-label="Three solid blue monthly dots on a coarse timeline drop down to a fine daily row where only their three slots are solid and every in-between slot is a dashed outline, upsampling lays down a finer grid, but the new values are assumptions, not measurements"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -437,7 +437,7 @@ were measured.
 <MultipleChoice
   markdown={`A colleague upsamples a **monthly** revenue series to **daily** with linear interpolation and announces, "Now we have daily revenue figures." What's the problem?
 
-- Nothing — interpolation correctly recovers the daily values
+- Nothing, interpolation correctly recovers the daily values
   > Interpolation can't recover values that were never recorded. The smooth daily line is a straight-line *guess* between the two monthly anchors, not measured daily revenue.
 - Linear interpolation is too slow on large data
   > Performance isn't the issue here; correctness of interpretation is. Even if it ran instantly, the "daily revenue" would still be fabricated.
@@ -454,7 +454,7 @@ Upsampling reshapes the grid and forces an assumption; it never adds information
 - **Downsampling** *must* aggregate (`.sum()`, `.mean()`, `.last()`, ...)
   because many points fall in each new bucket.
 - **Upsampling** has *at most one* original point per new bucket, so there's
-  nothing to aggregate — you use `.asfreq()` to lay down the grid, then a
+  nothing to aggregate, you use `.asfreq()` to lay down the grid, then a
   fill method to populate it.
 
 <MultipleChoice
@@ -467,7 +467,7 @@ Upsampling reshapes the grid and forces an assumption; it never adds information
 - Both directions need an aggregation
   > Upsampling has at most one real point per new slot, so there's nothing to aggregate. It needs a fill rule, not a summary.
 - Neither needs anything; pandas picks automatically
-  > pandas deliberately refuses to pick for you — it leaves \`NaN\`s on upsample and requires an explicit method on downsample, precisely so you make the modeling choice consciously.
+  > pandas deliberately refuses to pick for you, it leaves \`NaN\`s on upsample and requires an explicit method on downsample, precisely so you make the modeling choice consciously.
 
 Coarser grid -> aggregate the many; finer grid -> fill the gaps.`}
 />
@@ -479,7 +479,7 @@ Coarser grid -> aggregate the many; finer grid -> fill the gaps.`}
   title="Daily visits to weekly totals"
   instructions={`A daily \`visits\` Series (90 days) is loaded. Build \`weekly_total\`: the **total** visits per week, with weeks ending on **Sunday** (the \`"W"\` default). The result should be a Series indexed by week-ending dates.
 
-Then also compute \`busiest_week\` — the week-ending \`Timestamp\` with the highest total.`}
+Then also compute \`busiest_week\`, the week-ending \`Timestamp\` with the highest total.`}
   files={[
     {
       filename: "main.py",
@@ -532,10 +532,10 @@ assert isinstance(weekly_total, pd.Series)`,
 <ChallengeCard
   adapter="python"
   title="Choose the right aggregation for each series"
-  instructions={`You have two daily series for June: \`rainfall_mm\` (millimetres of rain that fell each day — a FLOW) and \`humidity_pct\` (the day's average relative humidity — a LEVEL). Produce a one-row-per-month summary as a dict \`june\` with:
+  instructions={`You have two daily series for June: \`rainfall_mm\` (millimetres of rain that fell each day, a FLOW) and \`humidity_pct\` (the day's average relative humidity, a LEVEL). Produce a one-row-per-month summary as a dict \`june\` with:
 
-- \`"total_rain"\` — June's total rainfall (the correct aggregation for a flow), as a float
-- \`"avg_humidity"\` — June's typical humidity (the correct aggregation for a level), as a float rounded to 1 decimal
+- \`"total_rain"\`, June's total rainfall (the correct aggregation for a flow), as a float
+- \`"avg_humidity"\`, June's typical humidity (the correct aggregation for a level), as a float rounded to 1 decimal
 
 Pick \`sum\` vs \`mean\` to match what each quantity *means*.`}
   files={[
@@ -598,8 +598,8 @@ assert all(isinstance(v, float) for v in june.values())`,
 
 Produce:
 
-- \`annual\` — a Series of each year's **mean** CO₂ (\`co2.resample("YE").mean()\`)
-- \`rise_per_year\` — the average ppm increase per year across the record, computed as \`(annual.iloc[-1] - annual.iloc[0]) / (len(annual) - 1)\` (a float)
+- \`annual\`, a Series of each year's **mean** CO₂ (\`co2.resample("YE").mean()\`)
+- \`rise_per_year\`, the average ppm increase per year across the record, computed as \`(annual.iloc[-1] - annual.iloc[0]) / (len(annual) - 1)\` (a float)
 
 CO₂ is a concentration, so the right aggregation is \`mean\`, not \`sum\`. The series rises by a couple of ppm per year, so \`rise_per_year\` should be positive (and comfortably above 1).`}
   files={[
@@ -671,7 +671,7 @@ assert 50 <= len(annual) <= 80, f"Expected ~60+ yearly points, got {len(annual)}
 - [o] \`sum\`, because ticket counts are a flow that accumulates over the month
   > Counts of events are flows; the month's volume is the sum of its days. \`sum\` answers "how many in total," which is the question asked.
 - \`last\`, because only the final day matters
-  > \`last\` keeps a single day's count and discards the rest of the month — it answers nothing about the month's volume.
+  > \`last\` keeps a single day's count and discards the rest of the month, it answers nothing about the month's volume.
 - \`max\`, because the busiest day represents the month
   > \`max\` reports the single worst day, not the monthly total. It's a useful extra statistic but not "how many that month."
 
@@ -686,7 +686,7 @@ Event counts are flows, so the monthly volume is a \`sum\`; \`mean\` would answe
   (temperature, price). Picking the wrong one produces nonsense.
 - **Upsampling** (coarse → fine) **invents** the in-between values. `asfreq`
   lays down the grid as `NaN`s; you then fill with an *assumption*.
-- **Upsampling adds no information** — never present interpolated points as
+- **Upsampling adds no information**, never present interpolated points as
   measurements.
 - Downsampling to (a multiple of) the seasonal period is a quick way to see
   the underlying **trend**.
@@ -694,5 +694,5 @@ Event counts are flows, so the monthly volume is a \`sum\`; \`mean\` would answe
 
 Upsampling left us staring at a grid full of `NaN`s, and even real-world
 data arrives with holes. How you fill those gaps is not a button-press but
-a genuine assumption about what happened when you weren't looking — which
+a genuine assumption about what happened when you weren't looking, which
 is exactly the next page.

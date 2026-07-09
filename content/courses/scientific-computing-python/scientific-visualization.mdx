@@ -1,6 +1,6 @@
 ---
 title: Scientific Visualization
-description: Plot the right thing the right way — communicate data and computations clearly
+description: Plot the right thing the right way, communicate data and computations clearly
 ---
 
 A scientific plot is not decoration. It is *evidence*. Done well,
@@ -14,7 +14,7 @@ avoiding the common pitfalls (chiefly: bad colormaps).
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A clean chart of blue data points scattered around a smooth light blue trend band, with a fading colorbar at the side — a figure built carefully enough to serve as evidence"
+  aria-label="A clean chart of blue data points scattered around a smooth light blue trend band, with a fading colorbar at the side, a figure built carefully enough to serve as evidence"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -71,7 +71,7 @@ grid for many similar series. Don't decorate; *encode*.
 ## The matplotlib object model
 
 Stop using `plt.plot()` calls in isolation. Adopt the **Figure /
-Axes** style — it scales from one panel to a 4 × 4 grid without
+Axes** style, it scales from one panel to a 4 × 4 grid without
 breaking a sweat.
 
 <CodeBlock
@@ -107,16 +107,16 @@ plt.show()
 
 Three habits that pay off forever:
 
-- `fig, ax = plt.subplots(...)` — explicit container variables
-- `constrained_layout=True` — eliminates 90% of "labels are cut
+- `fig, ax = plt.subplots(...)`, explicit container variables
+- `constrained_layout=True`, eliminates 90% of "labels are cut
   off" pain
 - A small loop at the end to apply consistent styling to every
   panel
 
 ## 2-D fields: heatmaps and contours
 
-Whenever the data is a function of two variables — temperature on
-a grid, a 2-D probability density, a confusion matrix — you have
+Whenever the data is a function of two variables, temperature on
+a grid, a 2-D probability density, a confusion matrix, you have
 two great options.
 
 <CodeBlock
@@ -156,8 +156,8 @@ the absolute value at every point matters.
 
 ## Colormaps: choose perceptually uniform
 
-Avoid the legacy `jet` colormap. It is **perceptually nonuniform**
-— it has bright cyan and yellow bands that look like ridges even
+Avoid the legacy `jet` colormap. It is **perceptually nonuniform**,
+it has bright cyan and yellow bands that look like ridges even
 where the data is flat. Use the modern perceptually uniform
 colormaps:
 
@@ -175,7 +175,7 @@ colormaps:
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
-# A ramp shown in three colormaps — convert to grayscale to test perceptual uniformity
+# A ramp shown in three colormaps, convert to grayscale to test perceptual uniformity
 ramp = np.linspace(0, 1, 256).reshape(1, -1)
 ramp = np.tile(ramp, (40, 1))
 
@@ -191,7 +191,7 @@ plt.show()
   ]}
 />
 
-Look at the `jet` ramp — you'll see false "bands" of bright cyan
+Look at the `jet` ramp, you'll see false "bands" of bright cyan
 and yellow. `viridis` and `cividis` look like smooth gradients,
 because they actually are.
 
@@ -259,7 +259,7 @@ plt.show()
 3-D is genuinely useful for *surfaces* and for tracing
 3-dimensional trajectories (like the Lorenz attractor). It is
 almost always *worse* than 2-D contours or small multiples for
-quantitative comparison — humans cannot read depth accurately.
+quantitative comparison, humans cannot read depth accurately.
 
 ## Small multiples
 
@@ -364,7 +364,7 @@ def phase_portrait(
 />
 
 Separating the plotting logic from the computation lets you reuse
-the same visualization for many systems — and makes it trivial to
+the same visualization for many systems, and makes it trivial to
 restyle every figure in a paper from a single place.
 
 ## A short checklist before you publish a figure
@@ -394,7 +394,7 @@ restyle every figure in a paper from a single place.
 - A grayscale ramp
   > A grayscale ramp is sequential with no midpoint, making it unable to distinguish positive from negative anomalies.
 
-Match the colormap to the *structure* of the data — sequential for one-sided, diverging for two-sided, cyclic for angular.`}
+Match the colormap to the *structure* of the data, sequential for one-sided, diverging for two-sided, cyclic for angular.`}
 />
 
 <MultipleChoice

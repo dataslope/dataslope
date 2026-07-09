@@ -5,14 +5,14 @@ description: How to define a table's shape with CREATE TABLE, choose columns and
 
 So far, the runnable blocks have quietly created tables for you with
 their `initSql`. Now you will create them yourself. Defining a table
-is how you give a database its structure — and it is more
+is how you give a database its structure, and it is more
 interesting than it sounds, because a table definition is really a
 set of *promises* about your data.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Column header chips being lowered into place above an empty grid — a table's structure is defined before any data arrives"
+  aria-label="Column header chips being lowered into place above an empty grid, a table's structure is defined before any data arrives"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -64,7 +64,7 @@ integer `id`, a text `title`, a text `author`, and an integer
 
 ## Adding rules with constraints
 
-Beyond a name and type, each column can carry **constraints** —
+Beyond a name and type, each column can carry **constraints**,
 rules the database enforces on every row. They turn a table from a
 loose grid into a guardrail for clean data. The common ones:
 
@@ -109,7 +109,7 @@ nonsensical years.
 
 <Callout type="info" title="Constraints are documentation that bites">
 A good set of constraints tells the next person (and future you)
-what the data *means* — "a book must have a title," "a year is
+what the data *means*, "a book must have a title," "a year is
 positive." Unlike a comment, the database actually **enforces**
 these promises, so they can never quietly drift out of date.
 </Callout>
@@ -148,7 +148,7 @@ guaranteed-unique id without you tracking the numbers yourself.
 ## Removing a table
 
 To delete an entire table and all its rows, use `DROP TABLE`. Handle
-with care — it is permanent.
+with care, it is permanent.
 
 ```sql
 DROP TABLE books;
@@ -161,7 +161,7 @@ DROP TABLE books;
 
 - It inserts new rows into an existing table.
   > Inserting rows is done with \`INSERT\`; \`CREATE TABLE\` defines the table's structure, not its data.
-- [o] It defines a new table's structure — its name, columns, and their types and rules.
+- [o] It defines a new table's structure, its name, columns, and their types and rules.
   > \`CREATE TABLE\` is how you declare the shape (schema) of a table before any rows go in.
 - It permanently deletes a table.
   > Deleting a table is \`DROP TABLE\`; \`CREATE TABLE\` does the opposite.

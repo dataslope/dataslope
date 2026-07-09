@@ -19,7 +19,7 @@ export function isSingleSelectSql(sql: string, noComments?: string): boolean {
 }
 
 /** If `sql` is a bare single-table `SELECT * FROM <table>` (optionally with
- *  a trailing LIMIT / OFFSET, and nothing else — no WHERE, JOIN, ORDER BY,
+ *  a trailing LIMIT / OFFSET, and nothing else, no WHERE, JOIN, ORDER BY,
  *  GROUP BY, comma-joins, subqueries, or multiple statements), return the
  *  unquoted table name. Used to make a hand-typed full-table preview
  *  editable, exactly like opening the table from the sidebar: because the
@@ -46,7 +46,7 @@ export function bareTableSelectSource(
 }
 
 /** Per-statement source table for a (possibly multi-statement) query, one
- *  entry per statement in execution order — so it lines up positionally with
+ *  entry per statement in execution order, so it lines up positionally with
  *  the `sets` array a multi-statement run produces (each engine yields one set,
  *  possibly null, per statement). An entry is the bare-selected table name when
  *  that statement is an editable `SELECT * FROM <table>` against a real table
@@ -65,12 +65,12 @@ export function bareTableSelectSources(
 /** Rebuild a (possibly multi-statement) query so the statement at `stmtIndex`
  *  is ordered by its primary key, leaving the other statements verbatim. Used
  *  after an inline cell edit so the edited row keeps its place instead of
- *  jumping to the bottom — Postgres and DuckDB move an updated row to the end of
+ *  jumping to the bottom, Postgres and DuckDB move an updated row to the end of
  *  the heap under MVCC, so an unordered re-fetch surfaces it last.
  *
  *  Only a bare `SELECT * FROM <table>` with no existing ORDER BY *and no
  *  LIMIT/OFFSET* is rewritten: appending `ORDER BY <pk>` then returns the same
- *  rows in a stable order. A LIMIT/OFFSET query is left untouched — ordering it
+ *  rows in a stable order. A LIMIT/OFFSET query is left untouched, ordering it
  *  would change *which* rows the window shows (the chosen rows are arbitrary
  *  without an ORDER BY), so that's left as the engine returns it. The rewrite
  *  stays a bare select (ORDER BY included), so the set is still detected as

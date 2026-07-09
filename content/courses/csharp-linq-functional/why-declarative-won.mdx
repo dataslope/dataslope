@@ -1,12 +1,12 @@
 ---
 title: Half a Century of Declarative Ideas
-description: An optional deep-dive — where declarative programming came from, and why every mainstream language went functional after 2005
+description: An optional deep-dive, where declarative programming came from, and why every mainstream language went functional after 2005
 ---
 
 This optional discussion is for readers who finished the course and
 want the longer story. The course's opening chapter compressed fifty
 years of history into a few paragraphs; here we slow down and give
-the ideas their due. Nothing below is required to use LINQ well —
+the ideas their due. Nothing below is required to use LINQ well,
 but it explains why the patterns you just learned appear, in nearly
 identical form, in every modern language.
 
@@ -42,13 +42,13 @@ instead of steps* had been brewing for half a century.
 ```mermaid
 timeline
     title A short history of declarative ideas
-    1958 : LISP — functions as values, lists as primary data structure
-    1972 : Prolog — programs as logical relations
-    1974 : SEQUEL/SQL — describe the answer set, not the loop
-    1985 : Miranda → 1990 Haskell — pure, lazy, statically typed functional programming
-    1995 : Ruby/Smalltalk style — collect/select/inject collection methods
-    2003 : C# 2.0 — generics + iterators (the substrate for LINQ)
-    2007 : C# 3.0 — LINQ ships
+    1958 : LISP, functions as values, lists as primary data structure
+    1972 : Prolog, programs as logical relations
+    1974 : SEQUEL/SQL, describe the answer set, not the loop
+    1985 : Miranda → 1990 Haskell, pure, lazy, statically typed functional programming
+    1995 : Ruby/Smalltalk style, collect/select/inject collection methods
+    2003 : C# 2.0, generics + iterators (the substrate for LINQ)
+    2007 : C# 3.0, LINQ ships
 ```
 
 Each step contributed something specific that you can still point to
@@ -66,18 +66,18 @@ in a LINQ pipeline today:
   don't instruct" could be an entire language.
 - **SQL** (mid-1970s, originally called SEQUEL at IBM) was the
   breakthrough that mattered commercially. It showed that ordinary
-  working programmers — not just researchers — will happily write
+  working programmers, not just researchers, will happily write
   declarative queries when the syntax is friendly. Hundreds of
   thousands of people who would never touch a research language
   wrote `SELECT ... WHERE ... GROUP BY` every day for decades. LINQ's
   query syntax is a direct homage.
 - **Haskell** (1990) showed that an *entire program* can be built
   out of composed pure functions, with laziness as a first-class
-  concept — the same laziness you met in this course as deferred
+  concept, the same laziness you met in this course as deferred
   execution.
 - **Smalltalk and Ruby** popularized collection methods like
   `select`, `collect`, and `inject` that take blocks of code as
-  arguments — recognizably `Where`, `Select`, and `Aggregate` with
+  arguments, recognizably `Where`, `Select`, and `Aggregate` with
   different names.
 
 Functional programming was never a fringe idea, in other words. It
@@ -93,13 +93,13 @@ So why did the mainstream suddenly start borrowing in the 2000s?
 Two pressures arrived at almost the same time.
 
 The first was hardware. For decades, programmers enjoyed what Herb
-Sutter — chair of the ISO C++ committee — memorably called the
+Sutter, chair of the ISO C++ committee, memorably called the
 "free lunch": you wrote your program, waited a year, and the next
 generation of CPUs simply ran it faster. In a famous 2005 article,
 "The Free Lunch Is Over", Sutter pointed out that single-core clock
 speeds had hit a wall; the transistors kept coming, but they were
 being spent on *more cores*, not faster ones. From now on, programs
-that wanted to get faster would have to run on many cores at once —
+that wanted to get faster would have to run on many cores at once,
 and the biggest obstacle to running code on many cores is **shared
 mutable state**. Two threads mutating the same object need locks,
 and locks breed deadlocks, races, and heisenbugs. Immutable data
@@ -109,8 +109,8 @@ number of threads, forever, safely.
 The second pressure was scale. Smartphones, the cloud, and
 software-as-a-service meant teams of dozens working on
 million-line codebases. The imperative pain points from the
-course's opening chapter — mutable state, nesting, copy-paste
-drift — stopped being theoretical annoyances and started costing
+course's opening chapter, mutable state, nesting, copy-paste
+drift, stopped being theoretical annoyances and started costing
 real money.
 
 ```mermaid
@@ -131,13 +131,13 @@ answers, each in its own accent: Java got streams and lambdas
 (2014), JavaScript got arrow functions and a functional standard
 library culture, Python leaned harder on comprehensions, C++ got
 lambdas and a ranges library, Swift and Kotlin and Rust were
-*designed* with the functional toolkit built in. C# — thanks to
-LINQ — got there earlier than most.
+*designed* with the functional toolkit built in. C#, thanks to
+LINQ, got there earlier than most.
 
 ## The same pipeline, everywhere
 
-A useful way to see the convergence: here is the same query — even
-numbers, squared, summed — as you would write it in four languages.
+A useful way to see the convergence: here is the same query, even
+numbers, squared, summed, as you would write it in four languages.
 
 ```csharp
 // C#
@@ -162,7 +162,7 @@ nums.iter().filter(|n| *n % 2 == 0).map(|n| n * n).sum()
 Four ecosystems, four syntaxes, one idea: a lazy (or lazy-ish)
 pipeline of higher-order operators over a sequence. If you ever
 switch languages, this part of your C# knowledge travels with you
-intact — only the spelling changes.
+intact, only the spelling changes.
 
 ## And run it once more, for old times' sake
 
@@ -185,7 +185,7 @@ Console.WriteLine(nums.Where(n => n % 2 == 0).Select(n => n * n).Sum());
 
 That `220` is carrying a lot of history: Lisp's functions-as-values,
 SQL's describe-the-answer, Haskell's laziness, and a 2005 hardware
-crisis — all compiled by Roslyn and executed in your browser tab.
+crisis, all compiled by Roslyn and executed in your browser tab.
 
 <MultipleChoice
   markdown={`What is the defining characteristic of **declarative** code, as discussed on this page?

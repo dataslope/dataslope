@@ -30,7 +30,7 @@ const mcqs = page.locator('[aria-label="Multiple choice question"]');
 const nMcq = await mcqs.count();
 note(`MCQs found: ${nMcq}`);
 
-// Q1: single-answer — does clicking a choice auto-submit?
+// Q1: single-answer, does clicking a choice auto-submit?
 const q1 = mcqs.nth(0);
 await shotEl(q1, "10-mcq-initial");
 const q1mode = await q1.locator('[class*="modeLabel"]').textContent().catch(() => "");
@@ -41,7 +41,7 @@ note(`Q1 inputs: ${await q1inputs.count()}, type=${await q1inputs.first().getAtt
 await q1.locator('[class*="choice"]').first().click();
 await page.waitForTimeout(600);
 const q1bannerAfterClick = await q1.locator('[class*="banner"]').count();
-note(`Q1 banner appeared after a single click (no Submit btn)? ${q1bannerAfterClick > 0 ? "YES — auto-submits" : "no"}`);
+note(`Q1 banner appeared after a single click (no Submit btn)? ${q1bannerAfterClick > 0 ? "YES, auto-submits" : "no"}`);
 await shotEl(q1, "11-mcq-single-after-click");
 // can we change the answer now?
 const q1disabled = await q1inputs.first().isDisabled().catch(() => null);

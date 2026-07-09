@@ -213,7 +213,7 @@ every product must have a price.
 ## Try it: encode the rule yourself
 
 A table already exists in the database below, but it was created
-without the price rule — right now nothing stops a negative price.
+without the price rule, right now nothing stops a negative price.
 Add the missing constraint. (You can add a constraint to an existing
 table with `ALTER TABLE ... ADD CONSTRAINT name CHECK (...)`.)
 
@@ -255,7 +255,7 @@ ADD CONSTRAINT products_price_nonnegative CHECK (price >= 0);`}
 Once it passes, convince yourself the rule is real: open the page's
 earlier block (or the playground) and try inserting a negative price
 into a table with this constraint. The error message names the
-constraint — one more reason to give constraints readable names
+constraint, one more reason to give constraints readable names
 instead of accepting the defaults.
 
 ## Quick check

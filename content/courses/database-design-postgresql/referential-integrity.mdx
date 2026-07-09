@@ -14,7 +14,7 @@ links.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three child squares point up at their parents along thin lines, but one line ends at a red cross where its parent should be — an orphan reference to a parent that does not exist"
+  aria-label="Three child squares point up at their parents along thin lines, but one line ends at a red cross where its parent should be, an orphan reference to a parent that does not exist"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -290,14 +290,14 @@ If it can exist unattached, set the reference to null.
 ## Try it: one delete, no leftovers
 
 Time to use a cascade yourself. The schema below has posts and
-comments, and `comments.post_id` is declared `ON DELETE CASCADE` —
+comments, and `comments.post_id` is declared `ON DELETE CASCADE`,
 comments are dependent details that should not outlive their post.
 Your job is a single statement.
 
 <SqlChallengeCard
   dialect="postgres"
   title="Delete a post and let the cascade clean up"
-  instructions={`Post 1 ('Spam post') must go. Write a single \`DELETE\` statement that removes the post with \`id = 1\` from \`posts\`. Do **not** delete from \`comments\` yourself — the foreign key's \`ON DELETE CASCADE\` should remove that post's comments automatically. Post 2 and its comment must survive.`}
+  instructions={`Post 1 ('Spam post') must go. Write a single \`DELETE\` statement that removes the post with \`id = 1\` from \`posts\`. Do **not** delete from \`comments\` yourself, the foreign key's \`ON DELETE CASCADE\` should remove that post's comments automatically. Post 2 and its comment must survive.`}
   initSql={`CREATE TABLE posts (
   id    INTEGER PRIMARY KEY,
   title TEXT NOT NULL

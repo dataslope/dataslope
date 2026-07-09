@@ -1,6 +1,6 @@
 ---
 title: Methods and Modularity
-description: Packaging logic into named, reusable pieces — and the discipline of writing small, focused methods
+description: Packaging logic into named, reusable pieces, and the discipline of writing small, focused methods
 ---
 
 A **method** is a named block of code that takes inputs, does
@@ -15,7 +15,7 @@ box of behavior."
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three leaning runner capsules spaced along a track pass a yellow baton dot from hand to hand — methods handing arguments and results to one another"
+  aria-label="Three leaning runner capsules spaced along a track pass a yellow baton dot from hand to hand, methods handing arguments and results to one another"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="158" width="520" height="4" rx="2" fill="currentColor" opacity="0.18" />
@@ -71,11 +71,11 @@ Console.WriteLine(Square(Square(3))); // 9, then 81
 
 Read the declaration left to right:
 
-- **`int`** — the method **returns** an `int`.
-- **`Square`** — the method's **name**.
-- **`(int x)`** — it takes one **parameter** named `x` of type
+- **`int`**, the method **returns** an `int`.
+- **`Square`**, the method's **name**.
+- **`(int x)`**, it takes one **parameter** named `x` of type
   `int`.
-- **`{ return x * x; }`** — the **body** runs when the method is
+- **`{ return x * x; }`**, the **body** runs when the method is
   called.
 
 Calling the method (`Square(5)`) takes its body, plugs in the
@@ -272,7 +272,7 @@ Console.WriteLine(Add("hello, ", "world"));
   ]}
 />
 
-Use overloading sparingly — too many overloads can confuse readers.
+Use overloading sparingly, too many overloads can confuse readers.
 The common cases are:
 
 - "Same operation on different primitive types."
@@ -511,7 +511,7 @@ Console.WriteLine($"max={Stats.Max(data)}");
   > The compile-time difference is negligible.
 - The language requires it
   > It doesn't.
-- [o] Small focused methods are easier to name, test, reuse, and reason about — and changes stay localized
+- [o] Small focused methods are easier to name, test, reuse, and reason about, and changes stay localized
   > This is the central argument for modularity.
 - Smaller methods use less memory
   > Method size has almost no impact on memory usage.`}

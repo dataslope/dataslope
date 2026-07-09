@@ -1,17 +1,17 @@
 ---
 title: Many-to-Many Relationships
-description: When rows on both sides can connect to many rows on the other — and the junction table that makes it possible.
+description: When rows on both sides can connect to many rows on the other, and the junction table that makes it possible.
 ---
 
 Some relationships do not fit "one row points to one other row." A
 student takes **many** courses; a course holds **many** students.
 This is a **many-to-many** relationship, and it needs a special
-structure — because no single foreign key can express it.
+structure, because no single foreign key can express it.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two columns of dots — students and courses — joined through a column of small junction pills, each pill recording one student-course pairing"
+  aria-label="Two columns of dots, students and courses, joined through a column of small junction pills, each pill recording one student-course pairing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -62,7 +62,7 @@ flowchart LR
 ```
 
 Ada connects to two courses; Math connects to two students. The
-links cross over each other — you cannot capture that with a single
+links cross over each other, you cannot capture that with a single
 column on either table.
 
 ## The junction table
@@ -137,13 +137,13 @@ ORDER BY
 
 The query "walks" from `enrollments` out to both `students` and
 `courses`, producing one readable row per connection. Notice the
-junction's primary key is the **pair** `(student_id, course_id)` —
+junction's primary key is the **pair** `(student_id, course_id)`,
 a composite key that prevents enrolling the same student in the same
 course twice.
 
 <Callout type="info" title="The junction table can hold its own facts">
 A junction row often carries extra columns about the *relationship
-itself* — an `enrolled_on` date, a `grade`, a `role`. These belong
+itself*, an `enrolled_on` date, a `grade`, a `role`. These belong
 to the pairing, not to either table alone, so the junction table is
 their natural home.
 </Callout>
@@ -179,7 +179,7 @@ ORDER BY
   c.title;`}
 />
 
-Same three tables, different question — "students per course"
+Same three tables, different question, "students per course"
 instead of "courses per student." The junction table answers both
 without any change to the schema.
 
@@ -208,7 +208,7 @@ A lone foreign key can express "many" on just one side, so many-to-many needs a 
 - [o] To store one row per connection, holding a foreign key to each of the two related tables.
   > Each junction row links one row from each side, turning a many-to-many into two one-to-many links.
 - To replace the need for primary keys.
-  > Junction tables rely on keys — often a composite primary key — rather than replacing them.
+  > Junction tables rely on keys, often a composite primary key, rather than replacing them.
 - To speed up queries by caching results.
   > A junction table models relationships; it is not a results cache.
 

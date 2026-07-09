@@ -1,5 +1,5 @@
 /**
- * Catch-all route for course lessons — renders an MDX page resolved from
+ * Catch-all route for course lessons, renders an MDX page resolved from
  * the Fumadocs `courseSource` loader at `/courses/<course>/<lesson>`.
  *
  * Static params are generated from the source so every MDX file under
@@ -102,7 +102,7 @@ export default async function CoursePage(props: CoursePageProps) {
     // Each course folder's meta.json sets `root: true`, so Fumadocs scopes the
     // sidebar and breadcrumb tree to that course (the root folder's title is the
     // course name). `includeRoot: true` adds that root as the breadcrumb's
-    // leading crumb — linking to the course index — which surfaces the course
+    // leading crumb, linking to the course index, which surfaces the course
     // name on every lesson page. Without it the breadcrumb excludes the root,
     // and since the course is the only node in scope it would render nothing.
     <DocsPage toc={toc} full={page.data.full} breadcrumb={{ includeRoot: true }}>
@@ -150,7 +150,7 @@ export async function generateMetadata(
 
   const { title, description } = page.data;
   // `page.url` is the lesson's canonical path (e.g. /courses/python-basics/loops).
-  // Relative here — Next resolves it against `metadataBase` (app/layout.tsx).
+  // Relative here, Next resolves it against `metadataBase` (app/layout.tsx).
   const url = page.url;
 
   return {

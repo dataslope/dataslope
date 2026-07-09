@@ -1,9 +1,9 @@
 ---
 title: Continuous Distributions
-description: Uniform, Exponential, and Normal — why probability for continuous variables is area under a curve, why the density height is not a probability, and how to compute interval probabilities and quantiles with scipy.stats.
+description: Uniform, Exponential, and Normal, why probability for continuous variables is area under a curve, why the density height is not a probability, and how to compute interval probabilities and quantiles with scipy.stats.
 ---
 
-Wait times, salaries, temperatures, response latencies, heights — these
+Wait times, salaries, temperatures, response latencies, heights, these
 don't come in whole-number counts. They're **continuous**: between any
 two possible values there's always another. That one fact forces a
 different way of thinking about probability than the discrete world of
@@ -13,7 +13,7 @@ time.
 Here's the shift. For a count, "what's the probability of exactly 3
 tickets?" is a sensible question with a real answer. For a continuous
 quantity, "what's the probability the wait is exactly 5.000000... minutes?"
-has the answer **zero** — there are infinitely many possible values, so
+has the answer **zero**, there are infinitely many possible values, so
 no single one carries any probability on its own. Instead, probability
 for continuous variables lives in **intervals**, and it's computed as
 **area under a curve**. Internalize that and the rest of this page falls
@@ -22,7 +22,7 @@ into place.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three density silhouettes stand along one thin baseline — a bell, a flat plateau, and a decaying slide — with one green interval slice holding real probability and a red hairline at a single point holding none — for continuous variables probability is area, and a point has zero width"
+  aria-label="Three density silhouettes stand along one thin baseline, a bell, a flat plateau, and a decaying slide, with one green interval slice holding real probability and a red hairline at a single point holding none, for continuous variables probability is area, and a point has zero width"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="50" y="164" width="540" height="3" rx="1.5" fill="var(--ds-gray-400)" />
@@ -42,14 +42,14 @@ into place.
 ## The big idea: probability is area under the PDF
 
 A continuous distribution is described by a **probability density
-function (PDF)** — a smooth curve. The curve itself is *not*
+function (PDF)**, a smooth curve. The curve itself is *not*
 probability. Probability is the **area** under the curve between two
 values:
 
 `P(a < X < b) = area under the PDF from a to b`
 
 The total area under any PDF is exactly 1 (something must happen). A
-single point has zero width, so it has zero area — which is why
+single point has zero width, so it has zero area, which is why
 P(X = exact value) = 0 for continuous variables. You always ask
 about ranges.
 
@@ -63,7 +63,7 @@ flowchart TD
 <Callout type="danger" title="Misconception #1: the PDF height is a probability">
 The **height** of a PDF is a *density*, not a probability. It can even
 be **greater than 1**. For a `Uniform(0, 0.5)`, the density is 2
-everywhere on that interval — a perfectly valid PDF, because what must
+everywhere on that interval, a perfectly valid PDF, because what must
 stay ≤ 1 is the **area** (2 × 0.5 = 1), not the height. Never read a
 y-axis density value as "the probability of that x." Probability is
 always an area, never a height.
@@ -77,15 +77,15 @@ mental model is genuinely different.
 | | **Discrete (PMF)** | **Continuous (PDF)** |
 | --- | --- | --- |
 | Shape | Bars at 0, 1, 2, … | A smooth curve |
-| Height means | `P(X = k)` — directly a probability | A *density* — **not** a probability |
+| Height means | `P(X = k)`, directly a probability | A *density*, **not** a probability |
 | `P` over a range | **Sum** of bar heights | **Area** under the curve |
 
 <Callout type="info" title="Why P(X = x) = 0 isn't a paradox">
 "The probability of any exact value is zero" sounds like it means
-nothing can happen — but *some* value always occurs. The resolution:
+nothing can happen, but *some* value always occurs. The resolution:
 with infinitely many possibilities, probability spreads across
 intervals, not points. It's like asking which exact real number a dart
-lands on along a line — the dart lands *somewhere*, yet the chance of
+lands on along a line, the dart lands *somewhere*, yet the chance of
 any pre-named exact point is zero. So we ask "within 1mm of here?"
 (an interval) instead.
 </Callout>
@@ -93,7 +93,7 @@ any pre-named exact point is zero. So we ask "within 1mm of here?"
 ## Uniform: every value equally likely
 
 The **Uniform** distribution spreads probability **evenly** over an
-interval [a, b] — a flat PDF. It's the simplest continuous
+interval [a, b], a flat PDF. It's the simplest continuous
 distribution and the natural model when you have no reason to favor any
 value over another in a range: a random timestamp within an hour, a
 spawn point along a line, the raw output of a random-number generator.
@@ -101,7 +101,7 @@ spawn point along a line, the raw output of a random-number generator.
 In scipy the convention is `loc = a` (the left edge) and
 `scale = b - a` (the **width**), so `Uniform(0, 10)` is
 `stats.uniform(loc=0, scale=10)`. This `loc`/`scale` convention runs
-through almost every scipy distribution — learn it once here.
+through almost every scipy distribution, learn it once here.
 
 <CodeBlock
   adapter="python"
@@ -124,7 +124,7 @@ fig = px.line(
     x=x,
     y=d.pdf(x),
     labels={"x": "x", "y": "density"},
-    title="Uniform(0, 10) PDF — flat; area, not height, is probability",
+    title="Uniform(0, 10) PDF, flat; area, not height, is probability",
 )
 fig.show()
 `,
@@ -133,7 +133,7 @@ fig.show()
 />
 
 <Callout type="tip" title="Interval probability = cdf(b) − cdf(a)">
-The **cumulative distribution function (CDF)** gives P(X ≤ x) — the
+The **cumulative distribution function (CDF)** gives P(X ≤ x), the
 area to the *left* of x. So the area between a and b is just
 `cdf(b) - cdf(a)`. This one identity computes *every* interval
 probability for *every* continuous distribution. You'll use it
@@ -143,7 +143,7 @@ constantly.
 ## Exponential: waiting time until the next event
 
 The **Exponential** distribution models the **time between** independent
-events that happen at a constant rate — the continuous partner of the
+events that happen at a constant rate, the continuous partner of the
 Poisson from *Discrete Distributions*. If support tickets arrive
 Poisson-style at some rate, the *gap* between consecutive tickets is
 Exponential. Real uses:
@@ -179,7 +179,7 @@ fig = px.line(
     x=x,
     y=d.pdf(x),
     labels={"x": "minutes until next event", "y": "density"},
-    title="Exponential(mean=5): wait times — most short, a long right tail",
+    title="Exponential(mean=5): wait times, most short, a long right tail",
 )
 fig.show()
 `,
@@ -189,7 +189,7 @@ fig.show()
 
 The exponential is **right-skewed**: short waits are most likely, but
 there's a long tail of occasional long waits. Its defining quirk is
-*memorylessness* — having already waited 10 minutes tells you nothing
+*memorylessness*, having already waited 10 minutes tells you nothing
 about how much longer you'll wait. That's a strong assumption, and a
 reason it sometimes *doesn't* fit (a machine that wears out gets *more*
 likely to fail over time, violating memorylessness).
@@ -207,7 +207,7 @@ events or timing the gaps between them.
 The **Normal** (Gaussian) distribution is the famous symmetric bell
 curve, defined by a mean μ (center) and standard deviation σ
 (spread): `stats.norm(loc=mu, scale=sigma)`. It models quantities that
-pile up around a center with symmetric tails — measurement errors,
+pile up around a center with symmetric tails, measurement errors,
 aggregated noise, many natural and human measurements. It's so central
 that it gets its own page next, *The Normal Distribution*, where we
 cover the 68–95–99.7 rule and z-scores. Here we just meet it as another
@@ -225,7 +225,7 @@ from scipy import stats
 # Test scores: mean 100, standard deviation 15.
 d = stats.norm(loc=100, scale=15)
 
-print(f"P(score < 100)        = {d.cdf(100):.4f}   (half — it's symmetric)")
+print(f"P(score < 100)        = {d.cdf(100):.4f}   (half, it's symmetric)")
 print(f"P(90 < score < 120)   = {d.cdf(120) - d.cdf(90):.4f}")
 print(f"P(score > 130)        = {d.sf(130):.4f}")
 
@@ -249,7 +249,7 @@ reverse: *probability → value*. "What wait time are 90% of waits below?"
 "What score puts you in the top 5%?" That's the **percent-point function
 (`ppf`)**, the inverse of the CDF, also called the **quantile function**.
 
-`ppf(0.9)` returns the value x such that P(X ≤ x) = 0.9 — the 90th
+`ppf(0.9)` returns the value x such that P(X ≤ x) = 0.9, the 90th
 percentile. It's the tool for setting thresholds, SLAs, and cutoffs.
 
 ```mermaid
@@ -288,7 +288,7 @@ print(f"90th percentile score  = {scores.ppf(0.9):.1f}")
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A bell curve with most of its area filled green up to a yellow cutoff post, and a solid yellow probability chip above sending a straight gray arrow down at the post — the ppf question runs in reverse: name the probability, get back the value that traps it"
+  aria-label="A bell curve with most of its area filled green up to a yellow cutoff post, and a solid yellow probability chip above sending a straight gray arrow down at the post, the ppf question runs in reverse: name the probability, get back the value that traps it"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="152" width="480" height="3" rx="1.5" fill="var(--ds-gray-400)" />
@@ -372,7 +372,7 @@ assert abs(p_between - expected) < 1e-9`,
   title="Find a threshold with ppf"
   instructions={`Customer wait times follow an **Exponential** distribution with a **mean of 4 minutes**.
 
-You want to publish a service-level promise: "**90%** of customers are served within X minutes." Find that X — the value such that \`P(X <= x) = 0.90\`.
+You want to publish a service-level promise: "**90%** of customers are served within X minutes." Find that X, the value such that \`P(X <= x) = 0.90\`.
 
 - Build \`d = stats.expon(scale=4)\` (the \`scale\` is the mean).
 - Use the **percent-point function**: \`d.ppf(0.90)\`.
@@ -451,7 +451,7 @@ print("\\nHeight can exceed 1; AREA never does.")
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`For a continuous random variable \`X\`, what is \`P(X = 7.0)\` — the probability it equals exactly 7.0?
+  markdown={`For a continuous random variable \`X\`, what is \`P(X = 7.0)\`, the probability it equals exactly 7.0?
 
 - It equals the height of the PDF at 7.0
   > The PDF height is a density, not a probability; a single point still has zero width and so zero area.
@@ -477,7 +477,7 @@ For continuous variables, always ask about an interval, never an exact value.`}
 - The distribution is invalid and should be renormalized
   > It is already a valid, normalized PDF; its area is exactly 1, so no renormalization is needed.
 
-A skinny interval forces a tall density so the total area stays at 1 — height is not probability.`}
+A skinny interval forces a tall density so the total area stays at 1, height is not probability.`}
 />
 
 <MultipleChoice
@@ -486,7 +486,7 @@ A skinny interval forces a tall density so the total area stays at 1 — height 
 - \`d.pdf(8) - d.pdf(2)\`
   > Subtracting PDF heights is meaningless; interval probability comes from the CDF (areas), not the PDF.
 - [o] \`d.cdf(8) - d.cdf(2)\`
-  > The CDF gives the area to the left of a value, so the difference \`cdf(8) - cdf(2)\` is exactly the area between 2 and 8 — the interval probability.
+  > The CDF gives the area to the left of a value, so the difference \`cdf(8) - cdf(2)\` is exactly the area between 2 and 8, the interval probability.
 - \`d.cdf(8) + d.cdf(2)\`
   > Adding the two left-tail areas double-counts the region below 2 and overshoots; you need the difference.
 - \`d.ppf(8) - d.ppf(2)\`
@@ -501,7 +501,7 @@ A skinny interval forces a tall density so the total area stays at 1 — height 
 - \`d.cdf(0.95)\`
   > \`cdf\` maps a *value* to a probability; passing 0.95 treats it as a value, giving the area below 0.95, not a percentile.
 - [o] \`d.ppf(0.95)\`
-  > The percent-point function is the inverse of the CDF: given the probability 0.95 it returns the value with 95% of outcomes below it — exactly the 95th percentile.
+  > The percent-point function is the inverse of the CDF: given the probability 0.95 it returns the value with 95% of outcomes below it, exactly the 95th percentile.
 - \`d.sf(0.95)\`
   > \`sf\` is the right-tail probability for a *value* (1 − cdf), not a way to recover a percentile from a probability.
 - \`d.pdf(0.95)\`
@@ -515,7 +515,7 @@ A skinny interval forces a tall density so the total area stays at 1 — height 
 
 - They should have read 50, not 0.6, as the probability
   > Neither axis gives a point probability; the x-value 50 isn't a probability either.
-- Nothing — that's a correct reading of a density plot
+- Nothing, that's a correct reading of a density plot
   > It is incorrect: a density height is not a probability, and a single point has zero probability.
 - The height should have been read off the x-axis instead
   > The error isn't which axis; it's treating a density (height) as a probability at all.
@@ -528,7 +528,7 @@ Reading density heights as probabilities is the single most common error with co
 <Callout type="success" title="Key takeaways">
 - Continuous variables use a **PDF**; **probability is area** under it,
   and the total area is 1.
-- The **PDF height is a density, not a probability** — it can exceed 1.
+- The **PDF height is a density, not a probability**, it can exceed 1.
   P(X = exact value) = 0; always ask about intervals.
 - **`cdf(b) − cdf(a)`** gives any interval probability P(a < X < b);
   **`sf`** gives the right tail; **`ppf`** inverts the CDF to find

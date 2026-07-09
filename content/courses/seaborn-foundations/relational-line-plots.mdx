@@ -1,23 +1,23 @@
 ---
 title: Line Plots
-description: relplot with kind='line' for ordered data — trends, automatic aggregation, and confidence bands.
+description: relplot with kind='line' for ordered data, trends, automatic aggregation, and confidence bands.
 ---
 
 A scatter plot shows a *cloud* of independent points. A **line plot** is
 different in one crucial way: it connects points with segments, and that
-connection makes a promise — that the space *between* two points is
+connection makes a promise, that the space *between* two points is
 meaningful, a continuous path from one to the next. You only get to make
 that promise when the x-axis is **ordered**.
 
 That is the whole idea behind a line plot: it is the chart for an **ordered
-x** — usually time, or a measured sequence — where you want to see a
+x**, usually time, or a measured sequence, where you want to see a
 **trend**, a direction of travel. Reach for it when "what happens as x
 increases?" is the question.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="An ordered series joined into one continuous blue line inside a translucent confidence band, drawn over thin gray axes — the connection promises the space between points is meaningful"
+  aria-label="An ordered series joined into one continuous blue line inside a translucent confidence band, drawn over thin gray axes, the connection promises the space between points is meaningful"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
@@ -45,10 +45,10 @@ increases?" is the question.
 * **Data it needs:** an **ordered** x (numeric or time-like) and a
   **numeric** y. The order of x is what gives the connecting line its
   meaning.
-* **What it highlights best:** the *trend* over the ordered axis — rising,
+* **What it highlights best:** the *trend* over the ordered axis, rising,
   falling, cyclical, leveling off. The eye follows the slope.
 * **What it hides or distorts:** the individual observations behind an
-  aggregated line, and — dangerously — it *implies* a path even where none
+  aggregated line, and, dangerously, it *implies* a path even where none
   exists if x is not really ordered.
 * **When it breaks:** too many overlapping lines turn into unreadable
   "spaghetti," and an unsorted x makes the line zig-zag back on itself.
@@ -85,7 +85,7 @@ sns.relplot(
   ]}
 />
 
-Air travel grew steadily over the decade — you read that off the slope
+Air travel grew steadily over the decade, you read that off the slope
 instantly. But look closely: there are **twelve** rows for each year (one
 per month), yet you see a *single* line with a shaded band around it. That
 is not an accident. It is Seaborn doing statistics for you.
@@ -97,7 +97,7 @@ Here is the most important thing to understand about Seaborn line plots:
 By default it plots their **mean** as the line, and draws a translucent
 **confidence band** around it to show how *uncertain* that mean is.
 
-The `fmri` dataset makes this vivid — it has many measurements at each
+The `fmri` dataset makes this vivid, it has many measurements at each
 timepoint. Color by `event` and you get one aggregated line per event,
 each with its own band.
 
@@ -128,7 +128,7 @@ sns.relplot(
 The solid line is the **mean signal** at each timepoint; the shaded ribbon
 is a **95% confidence interval** for that mean. A *narrow* band means the
 mean is well-pinned-down (many consistent observations); a *wide* band
-means it is uncertain. You did not group, average, or compute an interval —
+means it is uncertain. You did not group, average, or compute an interval,
 naming the columns was enough.
 
 <Callout type="info" title="A line plot is often a summary, not raw data">
@@ -142,11 +142,11 @@ individual observations are summarized away.
 
 What the band represents is up to you, via the **`errorbar`** argument:
 
-* `errorbar=("ci", 95)` — a **95% confidence interval** of the mean (the
+* `errorbar=("ci", 95)`, a **95% confidence interval** of the mean (the
   default). It answers "how sure am I about where the *mean* is?"
-* `errorbar="sd"` — one **standard deviation** of the data. It answers "how
-  *spread out* are the individual observations?" — a different question.
-* `errorbar=None` — **no band at all**, just the mean line.
+* `errorbar="sd"`, one **standard deviation** of the data. It answers "how
+  *spread out* are the individual observations?", a different question.
+* `errorbar=None`, **no band at all**, just the mean line.
 
 Watch the band switch meaning. With `"sd"`, it shows the spread of the raw
 signal, which is typically wider than a confidence interval.
@@ -205,7 +205,7 @@ sns.relplot(
 <Callout type="warn" title="A confidence interval is not the data's spread">
 A 95% CI says where the *mean* probably lies; standard deviation says how
 far individual points scatter. They are different quantities and usually
-different widths. State which one your band shows — readers cannot tell
+different widths. State which one your band shows, readers cannot tell
 them apart by looking, and confusing them overstates or understates your
 certainty.
 </Callout>
@@ -241,7 +241,7 @@ sns.relplot(
   ]}
 />
 
-Color separates the regions; dash style separates the events — four lines
+Color separates the regions; dash style separates the events, four lines
 that you can still tell apart. But this is also where line plots start to
 strain: every extra line competes for the same space.
 
@@ -251,13 +251,13 @@ Two mistakes hurt line plots more than any others.
 
 **1. Don't draw a line between unordered categories.** A line *asserts*
 that x flows from one value to the next. If x is a set of unordered
-categories — `species`, `island`, `payment_method` — there is no
+categories, `species`, `island`, `payment_method`, there is no
 "between," and the connecting segments invent a progression that does not
 exist. That is misleading. Use a bar or point plot for unordered
 categories; save the line for genuinely ordered axes.
 
 **2. Watch for spaghetti.** Pile on too many groups and the lines tangle
-into an unreadable knot — the infamous "spaghetti plot." Past a handful of
+into an unreadable knot, the infamous "spaghetti plot." Past a handful of
 series, color stops disambiguating them. The fixes: plot fewer lines,
 split them into panels with `col=`, or highlight just the one or two that
 matter.
@@ -275,13 +275,13 @@ unordered categories \`day\` = Thur, Fri, Sat, Sun when treated as plain
 categories?
 
 - A line plot cannot display categorical data at all; Seaborn will error.
-  > Seaborn will happily draw it — the problem is that the result *misleads*, not that it fails.
+  > Seaborn will happily draw it, the problem is that the result *misleads*, not that it fails.
 - [o] The connecting segments imply a continuous progression *between* categories that has no real meaning.
   > A line asserts that the space between points is a path. Between unordered categories there is no "between," so the slopes invent a trend that does not exist.
 - Lines can only be drawn for numeric x-values, never for dates.
   > Lines work for dates and other ordered axes; the issue here is that the categories are *unordered*, not that they are non-numeric.
 - A line plot would hide the individual tip amounts.
-  > Summarizing is true of line plots generally, but it is not what makes them *wrong* for unordered categories — the false implied path is.
+  > Summarizing is true of line plots generally, but it is not what makes them *wrong* for unordered categories, the false implied path is.
 
 A line earns its connecting segments only when x is genuinely ordered; for
 unordered categories, a bar or point plot tells the truth.`}
@@ -357,7 +357,7 @@ g = sns.relplot(
 instead of a scatter plot?
 
 - The x-variable is stored as a string rather than a number.
-  > Storage type is not the deciding factor — an ordered string axis can suit a line, and a numeric but unordered axis can ruin one.
+  > Storage type is not the deciding factor, an ordered string axis can suit a line, and a numeric but unordered axis can ruin one.
 - [o] The x-variable is **ordered**, so the segment connecting two points represents a meaningful progression.
   > A line plot's connecting segments encode "what happens between these x-values," which is only honest when x has a real order, like time or a sequence.
 - The x-variable has more unique values than the y-variable.
@@ -380,7 +380,7 @@ draw by default?
   > The default aggregate is the mean, not the maximum.
 - [o] A single line of the **mean** signal at each timepoint, surrounded by a translucent confidence band.
   > With multiple y-values per x, Seaborn aggregates to the mean and shades a 95% confidence interval around it by default.
-- Nothing — it raises an error because there are duplicate x-values.
+- Nothing, it raises an error because there are duplicate x-values.
   > Duplicate x-values are exactly the case line plots handle by aggregating; no error occurs.
 
 Repeated y-values at the same x trigger Seaborn's default aggregation: a
@@ -420,10 +420,10 @@ description and fix?
   > Time is already ordered here; the trouble is the *number of lines*, not the shape or order of x.
 
 When line count outruns what color can separate, the cure is fewer lines or
-small multiples — not transparency.`}
+small multiples, not transparency.`}
 />
 
 You have now met both members of the relational family: scatter plots for
 clouds of points and line plots for ordered trends. Next we turn to a
-different question entirely — not how two variables relate, but how a
-*single* variable is distributed — starting with **histograms**.
+different question entirely, not how two variables relate, but how a
+*single* variable is distributed, starting with **histograms**.

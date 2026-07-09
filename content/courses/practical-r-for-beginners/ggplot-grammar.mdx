@@ -1,6 +1,6 @@
 ---
 title: The ggplot2 Grammar
-description: ggplot2's central idea — that every plot is data + aesthetic mapping + geometry + scales + faceting — and how that idea makes building rich, principled visualizations almost mechanical.
+description: ggplot2's central idea, that every plot is data + aesthetic mapping + geometry + scales + faceting, and how that idea makes building rich, principled visualizations almost mechanical.
 ---
 
 `ggplot2` is the most influential R package of the last 20 years.
@@ -21,14 +21,14 @@ The components:
 | **Scales** | How do data values map to visual values (axis breaks, color palettes)? |
 | **Facets** | Do we want a grid of small charts split by some variable? |
 | **Coordinates** | Cartesian, polar, flipped? |
-| **Theme** | Cosmetic styling — fonts, colors, gridlines. |
+| **Theme** | Cosmetic styling, fonts, colors, gridlines. |
 
 Each part is added with `+`.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three translucent panes — one holding data dots, one holding axes, one holding a trend mark — overlap diagonally, layering into a single chart the way ggplot adds components"
+  aria-label="Three translucent panes, one holding data dots, one holding axes, one holding a trend mark, overlap diagonally, layering into a single chart the way ggplot adds components"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -106,10 +106,10 @@ A small map of the most-used geoms:
 
 | Geom | What it draws |
 | --- | --- |
-| `geom_point()` | dots — scatterplots |
+| `geom_point()` | dots, scatterplots |
 | `geom_line()` | line connecting points in x order |
-| `geom_bar()` | bars (counts) — needs only x |
-| `geom_col()` | bars (specified heights) — needs x and y |
+| `geom_bar()` | bars (counts), needs only x |
+| `geom_col()` | bars (specified heights), needs x and y |
 | `geom_histogram()` | a histogram of one variable |
 | `geom_density()` | a smoothed density |
 | `geom_boxplot()` | boxplots |
@@ -174,7 +174,7 @@ variable. ggplot makes this trivial with `facet_wrap()` and
   ]}
 />
 
-One line — `facet_wrap(~ species)` — and you get three
+One line, `facet_wrap(~ species)`, and you get three
 side-by-side panels, one per species. *Small multiples*, the
 single most powerful visualization technique for spotting
 group-level differences.
@@ -297,7 +297,7 @@ p + theme_classic()
   ]}
 />
 
-For most analytical work, `theme_minimal()` is a great default —
+For most analytical work, `theme_minimal()` is a great default,
 clean, gridded, modern.
 
 ```mermaid
@@ -312,13 +312,13 @@ flowchart TB
 <MultipleChoice
   markdown={`What's the difference between writing \`geom_point(color = "red")\` and \`geom_point(aes(color = "red"))\`?
 
-*Hint: think about what \`aes()\` is for — mapping data to a property versus setting a property to a fixed value.*
+*Hint: think about what \`aes()\` is for, mapping data to a property versus setting a property to a fixed value.*
 
 - They are equivalent.
   > The \`aes()\` wrapper changes the meaning: one sets a constant color, the other maps a value to the color scale.
 - The first errors; only the second works.
   > Both forms are syntactically valid; the difference is in behavior, not whether they produce an error.
-- [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category — usually not red — and adds a useless legend.
+- [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category, usually not red, and adds a useless legend.
   > Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
 - The second is faster.
   > Speed is not the distinction here; the difference is setting a constant versus mapping to a scale.`}
@@ -334,7 +334,7 @@ flowchart TB
 - \`plot(mtcars$hp, mtcars$mpg)\`
   > \`plot()\` is base R's generic plot function, not a ggplot2 call; it produces a basic scatterplot but does not use the grammar-of-graphics layer system.
 - \`ggplot(mtcars, hp, mpg) + scatter()\`
-  > \`ggplot()\` takes a data frame and optionally an \`aes()\` call as arguments — bare column names are not valid in the second and third positions, and \`scatter()\` is not a ggplot2 function.`}
+  > \`ggplot()\` takes a data frame and optionally an \`aes()\` call as arguments, bare column names are not valid in the second and third positions, and \`scatter()\` is not a ggplot2 function.`}
 />
 
 <MultipleChoice
@@ -345,7 +345,7 @@ flowchart TB
 - \`group_by(species)\`
   > \`group_by()\` is a dplyr verb for grouping rows before summarization; it has no effect inside a ggplot call.
 - \`color = species\`
-  > Setting \`color = species\` inside \`aes()\` colors the points by species in a single panel — it does not split the chart into separate panels.
+  > Setting \`color = species\` inside \`aes()\` colors the points by species in a single panel, it does not split the chart into separate panels.
 - \`split(species)\`
   > \`split()\` is a base R function that partitions a vector or data frame into a list; it is not a ggplot2 layer and cannot be added to a plot with \`+\`.`}
 />
@@ -416,5 +416,5 @@ if (!grepl("body_mass_g", ys)) stop("y should be body_mass_g")`,
 />
 
 We can now make principled, well-labeled charts. The next page
-is about *reading* them — what to look for when a chart lands on
+is about *reading* them, what to look for when a chart lands on
 your desk.

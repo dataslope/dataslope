@@ -13,11 +13,11 @@
  * separate "Cloud" dialog with a second list, each local row carries its
  * backup status, backups that exist only on the account are listed as
  * "on your account" rows, and the active workspace gets one "Back up"
- * action. Sharing stays separate (ShareControls) — publishing an immutable
+ * action. Sharing stays separate (ShareControls), publishing an immutable
  * link is a different intent than saving.
  *
  * Workspace switching is implemented as `setActiveWorkspaceId` followed
- * by `window.location.reload()` — engines and editor state rebuild from
+ * by `window.location.reload()`, engines and editor state rebuild from
  * scratch as a side effect of the reload, which is both simpler and
  * indistinguishable from an in-place tear-down to the user.
  */
@@ -94,20 +94,20 @@ export interface WorkspaceBadgeProps {
   /** Currently-active workspace display name. */
   activeWorkspaceName: string;
   /** Optional controlled state for the full workspace-manager drawer.
-   *  Lets a host open the manager directly — e.g. the mobile hamburger
+   *  Lets a host open the manager directly, e.g. the mobile hamburger
    *  menu, which hides the badge pill but still needs a way in. When
    *  omitted the badge manages the manager itself. */
   managerOpen?: boolean;
   onManagerOpenChange?: (open: boolean) => void;
   /** True when the active workspace is an unsaved draft that the user has
-   *  changed — surfaces a "Save" button next to the badge. Drafts (the
+   *  changed, surfaces a "Save" button next to the badge. Drafts (the
    *  auto-created default) stay out of the saved list until saved. */
   unsaved?: boolean;
   /** Invoked with the chosen name when the user saves an unsaved draft.
    *  The host promotes the draft to a saved workspace (see
    *  `saveDraftWorkspace`). */
   onSave?: (name: string) => void | Promise<void>;
-  /** Serializes the CURRENT playground state into a bundle — the same
+  /** Serializes the CURRENT playground state into a bundle, the same
    *  builder the Share dialog uses. Powers "Back up" for the active
    *  workspace; when omitted, the backup action is hidden (cloud rows and
    *  statuses still render). */
@@ -126,8 +126,8 @@ function formatBytes(bytes: number): string {
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-/** A friendly default name for a newly-created workspace — e.g.
- *  "Workspace 2" — instead of a raw `toLocaleString()` timestamp (which
+/** A friendly default name for a newly-created workspace, e.g.
+ *  "Workspace 2", instead of a raw `toLocaleString()` timestamp (which
  *  was meaningless and truncated in the header badge). Reads naturally
  *  next to the auto-created "Default <playground>". */
 function defaultWorkspaceName(
@@ -153,7 +153,7 @@ function formatRelative(timestamp: number): string {
 }
 
 /** One-line backup status for a workspace, e.g. "Backed up 5m ago". "Opened
- *  since" flags that the backup predates the last open — the registry tracks
+ *  since" flags that the backup predates the last open, the registry tracks
  *  opens, not edits, so it's a prompt to back up again, not a diff. */
 function backupStatusText(
   meta: CloudWorkspaceMeta | undefined,
@@ -226,7 +226,7 @@ export function WorkspaceBadge({
     () => new Map(),
   );
 
-  // Hydrate registry on the client only — `getWorkspaceRegistry` reads
+  // Hydrate registry on the client only, `getWorkspaceRegistry` reads
   // localStorage which is undefined on the server. Re-read whenever the
   // popover or manager is opened so we always reflect deletions from
   // other tabs.
@@ -251,7 +251,7 @@ export function WorkspaceBadge({
 
   // Cloud backups for this playground. Cloud saves share ids with local
   // workspaces, so `cloudById` decorates local rows with their backup and
-  // `cloudOnly` is the remainder — backups with no copy on this device.
+  // `cloudOnly` is the remainder, backups with no copy on this device.
   const cloud = useCloudBackups(playgroundId, popoverOpen || managerOpen);
   const { refresh: refreshCloud } = cloud;
   const cloudById = useMemo(() => {
@@ -294,7 +294,7 @@ export function WorkspaceBadge({
       setCloudError(null);
       try {
         await openCloudSave(playgroundId, meta, activeWorkspaceId);
-        // success ends in a navigation — no state to restore
+        // success ends in a navigation, no state to restore
       } catch (err) {
         setCloudError(err instanceof Error ? err.message : String(err));
         setCloudBusyId(null);
@@ -328,13 +328,13 @@ export function WorkspaceBadge({
   }
   const badgeTitle = `Active workspace: ${activeWorkspaceName || "(unnamed)"}${
     backupDot
-      ? ` — ${backupStatusText(activeMeta, activeStale).toLowerCase()}`
+      ? `, ${backupStatusText(activeMeta, activeStale).toLowerCase()}`
       : ""
   }`;
 
   // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`
   // call is independent so we fire them in parallel and stream results
-  // into the size map as they land — no flicker on subsequent opens
+  // into the size map as they land, no flicker on subsequent opens
   // because the previous map is retained between renders.
   useEffect(() => {
     if (!popoverOpen) return;
@@ -430,7 +430,7 @@ export function WorkspaceBadge({
                   Workspaces are separate copies of this playground&rsquo;s
                   files{isSqlPlayground(playgroundId) ? " and database" : ""},
                   auto-saved in this browser as you work. Backing up puts a
-                  snapshot on your account so you can open it on any device —
+                  snapshot on your account so you can open it on any device,
                   it only changes when you back up again.
                 </div>
               )}
@@ -478,7 +478,7 @@ export function WorkspaceBadge({
                 {showCloud && cloudOnly.length > 0 && (
                   <>
                     <div className="workspace-popover-subheader">
-                      Cloud — not on this device
+                      Cloud, not on this device
                     </div>
                     {cloudOnly.map((meta) => (
                       <button
@@ -594,7 +594,7 @@ export function WorkspaceBadge({
         <Menu.Root>
           <Menu.Trigger
             className={`workspace-save-btn${unsaved ? "" : " quiet"}`}
-            title="Save this workspace — locally, to your account, or both"
+            title="Save this workspace, locally, to your account, or both"
           >
             <Save size={12} aria-hidden="true" />
             <span>Save</span>
@@ -670,7 +670,7 @@ export function WorkspaceBadge({
                     <div className="ex-title">Save locally + back up</div>
                     <div className="ex-desc">
                       {!isDraft
-                        ? "Already saved locally — use “Back up to cloud”"
+                        ? "Already saved locally, use “Back up to cloud”"
                         : cloud.signedOut
                           ? "Sign in to enable cloud backups"
                           : "Name it here and keep a copy on your account"}
@@ -721,7 +721,7 @@ function SaveWorkspaceDialog({
   onConfirm,
 }: {
   open: boolean;
-  /** True for the Save menu's "Save locally + back up" path — the copy and
+  /** True for the Save menu's "Save locally + back up" path, the copy and
    *  the primary button reflect that a cloud backup follows the save. */
   alsoBackUp: boolean;
   defaultName: string;
@@ -742,7 +742,7 @@ function SaveWorkspaceDialog({
           <Dialog.Description className="confirm-desc">
             {alsoBackUp
               ? "Give this workspace a name to add it to your saved list. It stays in this browser, and a snapshot is backed up to your account."
-              : "Give this workspace a name to add it to your saved list. Saved workspaces live in this browser — use “Back up to cloud” in the Save menu to keep a copy on your account."}
+              : "Give this workspace a name to add it to your saved list. Saved workspaces live in this browser, use “Back up to cloud” in the Save menu to keep a copy on your account."}
           </Dialog.Description>
           <form
             className="sql-rename-form"
@@ -867,7 +867,7 @@ function WorkspaceManagerDrawer({
       setOperationError(null);
       try {
         await openCloudSave(playgroundId, meta, activeWorkspaceId);
-        // success ends in a navigation — no state to restore
+        // success ends in a navigation, no state to restore
       } catch (err) {
         setOperationError(err instanceof Error ? err.message : String(err));
         setCloudBusyId(null);
@@ -927,7 +927,7 @@ function WorkspaceManagerDrawer({
         const ok = await downloadWorkspaceZip(ws.id);
         if (!ok) {
           setOperationError(
-            "Couldn't export workspace — persistent storage may be unavailable.",
+            "Couldn't export workspace, persistent storage may be unavailable.",
           );
         }
       } catch (err) {
@@ -982,8 +982,8 @@ function WorkspaceManagerDrawer({
                     </Drawer.Title>
                     <Drawer.Description className="pkg-drawer-hint">
                       {isSqlPlayground(playgroundId)
-                        ? "Each workspace is a separate, saved copy of this playground’s files and database — switch between them to keep projects apart. Everything stays in your browser."
-                        : "Each workspace is a separate, saved copy of this playground’s files — switch between them to keep projects apart. Everything stays in your browser."}
+                        ? "Each workspace is a separate, saved copy of this playground’s files and database, switch between them to keep projects apart. Everything stays in your browser."
+                        : "Each workspace is a separate, saved copy of this playground’s files, switch between them to keep projects apart. Everything stays in your browser."}
                       {showCloud &&
                         " Rows with a cloud mark are also backed up to your account."}
                     </Drawer.Description>
@@ -1153,7 +1153,7 @@ function WorkspaceManagerDrawer({
                             cloudById.has(ws.id) &&
                             (isSqlPlayground(playgroundId) ? (
                               // SQL backups replay into the current session
-                              // database — the workspace itself isn't touched,
+                              // database, the workspace itself isn't touched,
                               // so no confirmation is needed.
                               <ActionButton
                                 label="Open backup"
@@ -1220,7 +1220,7 @@ function WorkspaceManagerDrawer({
                   {showCloud && cloudOnly.length > 0 && (
                     <>
                       <div className="workspace-manager-cloud-header">
-                        Cloud — not on this device
+                        Cloud, not on this device
                       </div>
                       {cloudOnly.map((meta) => (
                         <div key={meta.id} className="workspace-manager-item">
@@ -1274,7 +1274,7 @@ function WorkspaceManagerDrawer({
                         <>
                           {" "}
                           Free backups expire after {INACTIVITY_EXPIRY_DAYS}
-                          {" "}days of inactivity — opening one resets its
+                          {" "}days of inactivity, opening one resets its
                           clock.
                         </>
                       )}

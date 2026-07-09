@@ -1,6 +1,6 @@
 ---
 title: Concat vs Merge
-description: Two ways to combine datasets — stacking and joining — and how to choose between them.
+description: Two ways to combine datasets, stacking and joining, and how to choose between them.
 ---
 
 Two datasets rarely live alone. You'll often need to combine
@@ -10,7 +10,7 @@ them.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Left: one small table stacks on top of another along a downward arrow. Right: two tables sit side by side with their yellow key columns linked row by row — concat stacks, merge matches"
+  aria-label="Left: one small table stacks on top of another along a downward arrow. Right: two tables sit side by side with their yellow key columns linked row by row, concat stacks, merge matches"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="318" y="30" width="4" height="180" rx="2" fill="currentColor" opacity="0.08" />
@@ -91,13 +91,13 @@ flowchart LR
 ```
 
 - **concat** = glue tables together by position. No matching
-  happens. "Here are three months of sales — stack them into
+  happens. "Here are three months of sales, stack them into
   one DataFrame."
 - **merge** = bring columns from another table by matching a
   key. "For each employee, look up their department from the
   departments table."
 
-## Concat — when shapes match
+## Concat, when shapes match
 
 <CodeBlock
   adapter="python"
@@ -139,12 +139,12 @@ print(side_by_side)
   ]}
 />
 
-Horizontal concat is fast but **fragile** — it lines rows up by
+Horizontal concat is fast but **fragile**, it lines rows up by
 *position*, not by any key. If the two frames were sorted
 differently, you'd silently mis-pair people with names. Prefer
 `merge` whenever a real key exists.
 
-## Merge — joining on a key
+## Merge, joining on a key
 
 <CodeBlock
   adapter="python"
@@ -187,7 +187,7 @@ from the other table by matching `dept_id`.
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# Two months of orders — concat them
+# Two months of orders, concat them
 m1 = pd.DataFrame({"order_id": [1, 2], "customer_id": [10, 11], "amount": [50, 75]})
 m2 = pd.DataFrame({"order_id": [3, 4], "customer_id": [10, 12], "amount": [40, 90]})
 
@@ -196,7 +196,7 @@ print("After concat:")
 print(all_orders)
 print()
 
-# A customer lookup table — merge it in
+# A customer lookup table, merge it in
 customers = pd.DataFrame(
     {
         "customer_id": [10, 11, 12],
@@ -220,7 +220,7 @@ data sources), then **merge** in lookup tables to enrich.
 | Situation | Tool |
 | --- | --- |
 | Same columns, different time periods | concat (axis=0) |
-| Same rows in same order, more columns to add | concat (axis=1) — but prefer merge if there's a key |
+| Same rows in same order, more columns to add | concat (axis=1), but prefer merge if there's a key |
 | Same row entities, columns from another table by key | **merge** |
 | Combining 12 monthly files into one yearly file | concat |
 | Adding customer details to each order | merge |
@@ -255,7 +255,7 @@ indexes first or use `merge` with an explicit key.
 - merge
   > Merge joins tables by matching a key column; stacking twelve files with identical columns needs \`concat\`, not a key-based join.
 - [o] concat with \`axis=0\` (stack rows) and \`ignore_index=True\`
-  > Same shape, no key — stacking is the right operation.
+  > Same shape, no key, stacking is the right operation.
 - pivot
   > Pivot reshapes an existing table from long to wide form; it does not combine separate files.
 - join
@@ -270,9 +270,9 @@ This is the canonical concat use case.`}
 - concat axis=0
   > \`concat\` axis=0 stacks rows from tables with the same columns; it cannot look up a name from a separate table by matching an ID column.
 - concat axis=1
-  > \`concat\` axis=1 joins by position, not by key — if the two tables are in different orders, rows would be silently mismatched.
+  > \`concat\` axis=1 joins by position, not by key, if the two tables are in different orders, rows would be silently mismatched.
 - [o] \`orders.merge(customers, on="customer_id")\`
-  > Merge matches rows by the shared key — exactly what's needed for lookups.
+  > Merge matches rows by the shared key, exactly what's needed for lookups.
 - groupby
   > \`groupby\` aggregates rows within a single table; it cannot bring columns from a separate lookup table.
 
@@ -286,7 +286,7 @@ Whenever a *key* relates the two tables, merge.`}
   > Horizontal \`concat\` is not meaningfully slower than merge for typical datasets; the concern is correctness, not performance.
 - It does not work with strings
   > String columns are fully supported by \`concat\`; the risk is incorrect row pairing, not a type restriction.
-- [o] It pairs rows by index/position rather than by a key — easy to silently mis-align rows if the two frames are in different orders
+- [o] It pairs rows by index/position rather than by a key, easy to silently mis-align rows if the two frames are in different orders
   > Even if it works today, a future sort or reset on one frame breaks the pairing. Use merge when you have an ID.
 - It is deprecated
   > Horizontal \`pd.concat\` is not deprecated; it is a supported operation with a well-understood (but potentially dangerous) alignment behavior.

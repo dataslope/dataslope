@@ -17,7 +17,7 @@ export interface AskAiFile {
 /**
  * One on-page widget (challenge card, code block, multiple-choice question,
  * SQL playground shell) captured at send time. `content` is a packed
- * plain-text description of the widget's live state — instructions, the
+ * plain-text description of the widget's live state, instructions, the
  * user's current code, output, test results, selected answers. The server
  * treats every field as untrusted DATA and re-clips against the token budget.
  */
@@ -35,7 +35,7 @@ export interface AskAiWidgetContext {
 
 /**
  * Client-collected context that travels with a question. Every string here is
- * treated by the server as untrusted DATA (never instructions) — the system
+ * treated by the server as untrusted DATA (never instructions), the system
  * prompt says so explicitly. All fields are optional and bounded; the server
  * re-packs everything against a per-tier token budget.
  */
@@ -85,7 +85,7 @@ export interface AskAiRequest {
 }
 
 /**
- * POST body for `/api/ai/suggest` — three suggested questions for the panel's
+ * POST body for `/api/ai/suggest`, three suggested questions for the panel's
  * empty state and after each answer. Same context shape as chat; no question.
  * Tracked on suggestion-specific counters, so it never consumes the member's
  * Ask AI chat budget.
@@ -108,7 +108,7 @@ export interface ChatMessage {
 }
 
 /**
- * POST body for `/api/ai/complete` — AI inline autocomplete (pro-only).
+ * POST body for `/api/ai/complete`, AI inline autocomplete (pro-only).
  * `prefix`/`suffix` are the document text before/after the cursor; both are
  * re-truncated server-side, so the client doesn't have to be exact. All
  * strings are treated as untrusted DATA, never instructions.
@@ -130,7 +130,7 @@ export interface AiCompleteResponse {
 }
 
 /**
- * Response body for `GET /api/ai/complete` — the capability probe the editor
+ * Response body for `GET /api/ai/complete`, the capability probe the editor
  * extension uses to decide whether to request completions at all. `enabled`
  * is only true for signed-in pro members with a configured provider; the POST
  * handler re-checks server-side regardless.
@@ -150,7 +150,7 @@ export type AskAiStreamEvent =
   | { type: "error"; message: string };
 
 /**
- * Response body for `GET /api/ai/usage` — today's Ask AI chat quota for the
+ * Response body for `GET /api/ai/usage`, today's Ask AI chat quota for the
  * signed-in member, so the panel can show "N prompts left today".
  * `requestsRemaining` is clamped to ≥ 0.
  */

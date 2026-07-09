@@ -1,6 +1,6 @@
 ---
 title: "Text Normalization: Case Folding and Punctuation"
-description: Why we lowercase text and strip punctuation — to make tokens that should be equal actually compare equal — and what that normalization quietly throws away. When case folding helps, when it destroys meaning (acronyms, names, shouting), and how to strip punctuation safely.
+description: Why we lowercase text and strip punctuation, to make tokens that should be equal actually compare equal, and what that normalization quietly throws away. When case folding helps, when it destroys meaning (acronyms, names, shouting), and how to strip punctuation safely.
 ---
 
 After tokenization you have a list of word-shaped strings. But to a computer,
@@ -10,14 +10,14 @@ triple-count "the" and miss matches constantly. **Normalization** is the step
 that reduces this surface-level variation so that tokens which *should* be
 treated as the same actually are.
 
-The two workhorse normalization steps — and the focus of this page — are
+The two workhorse normalization steps, and the focus of this page, are
 **case folding** (lowercasing) and **punctuation stripping**. Both are
 simple to do and surprisingly consequential to get wrong.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A messy tilted stack of blue word chips in mixed sizes — one trailing a red punctuation dot — passes through a green normalizer box marked with two equal bars and comes out as four identical aligned green chips"
+  aria-label="A messy tilted stack of blue word chips in mixed sizes, one trailing a red punctuation dot, passes through a green normalizer box marked with two equal bars and comes out as four identical aligned green chips"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -55,7 +55,7 @@ simple to do and surprisingly consequential to get wrong.
 Computers compare strings by their exact characters, so `"The" == "the"` is
 `False`. For most counting and matching tasks, that distinction is noise: you
 do not care that one "the" started a sentence and another did not. Case
-folding — usually just `str.lower()` — collapses all of them into one form.
+folding, usually just `str.lower()`, collapses all of them into one form.
 
 ```mermaid
 flowchart LR
@@ -84,13 +84,13 @@ print("Distinct lowercased:", len(set(folded)), "->", set(folded))
 />
 
 Six "different" words became two. If your goal is to count how often each
-word appears, that collapse is exactly right — "The" at the start of a
+word appears, that collapse is exactly right, "The" at the start of a
 sentence and "the" in the middle are the same word, and you want them tallied
 together.
 
 <Callout type="info" title="lower() vs casefold()">
 Python has two lowercasing methods. `str.lower()` is the everyday choice.
-`str.casefold()` is more aggressive and handles some non-English cases — most
+`str.casefold()` is more aggressive and handles some non-English cases, most
 famously the German "ß", which `casefold()` turns into "ss". For English text
 they behave identically; reach for `casefold()` when you are doing
 case-insensitive matching across many languages. Throughout this course we
@@ -113,11 +113,11 @@ door.
   ALL-CAPS is a feature worth keeping, not erasing.
 - **Part-of-speech tagging.** Taggers use capitalization as a hint that a
   word is a proper noun. Lowercasing *before* tagging removes that hint and
-  can make the tagger worse — a reason to tag first, normalize later.
+  can make the tagger worse, a reason to tag first, normalize later.
 
 <Callout type="warn" title="Normalization is information destruction (on purpose)">
 Every normalization step *deletes* information so that the remaining tokens
-compare more easily. That is its entire job — but it means the step can never
+compare more easily. That is its entire job, but it means the step can never
 be undone, and if the information you deleted mattered to your task, you have
 quietly made things worse. Always ask: *what am I throwing away, and does my
 task need it?* For plain word-counting, casing is noise. For entity
@@ -129,7 +129,7 @@ recognition, casing is signal.
   files={[
     {
       filename: "main.py",
-      starterCode: `# Same letters, very different meanings — case is the only clue.
+      starterCode: `# Same letters, very different meanings, case is the only clue.
 print("US".lower(), "  <- 'US' the country becomes the pronoun 'us'")
 print("WHO".lower(), " <- 'WHO' the organization becomes the question word 'who'")
 print("Apple".lower(), "<- the company becomes the fruit")
@@ -160,17 +160,17 @@ import string
 
 text = "Hello, World! It's a GREAT day... isn't it?"
 
-# Approach 1 — keep only alphabetic tokens after a naive split.
+# Approach 1, keep only alphabetic tokens after a naive split.
 approach1 = [w for w in text.split() if w.isalpha()]
 print("1. isalpha filter: ", approach1)
 
-# Approach 2 — strip punctuation characters from each token with str.translate.
+# Approach 2, strip punctuation characters from each token with str.translate.
 table = str.maketrans("", "", string.punctuation)
 approach2 = [w.translate(table) for w in text.lower().split()]
 approach2 = [w for w in approach2 if w]  # drop any now-empty strings
 print("2. translate:      ", approach2)
 
-# Approach 3 — pull out runs of letters with a regular expression.
+# Approach 3, pull out runs of letters with a regular expression.
 approach3 = re.findall(r"[a-z]+", text.lower())
 print("3. regex findall:  ", approach3)
 
@@ -181,12 +181,12 @@ print("string.punctuation =", repr(string.punctuation))
   ]}
 />
 
-Compare the three results carefully — they disagree, and the disagreements
+Compare the three results carefully, they disagree, and the disagreements
 are instructive:
 
 - **Approach 1** (`isalpha` filter) drops "World!" *entirely* because the
   whole token "World!" is not alphabetic. That is probably not what you
-  wanted — you lost the word, not just the punctuation.
+  wanted, you lost the word, not just the punctuation.
 - **Approach 2** (`translate`) removes punctuation *characters*, turning
   "World!" into "world" and "It's" into "its". It keeps the words but glues
   contractions together ("its").
@@ -200,7 +200,7 @@ what your stripping actually does* rather than trusting it blindly.
 <Callout type="tip" title="The order trap, again">
 Strip punctuation *after* tokenizing, not before. If you delete all the
 periods first, you destroy the very clues a sentence tokenizer needs to find
-sentence boundaries — and you may even merge two sentences into one run-on.
+sentence boundaries, and you may even merge two sentences into one run-on.
 Tokenize, then clean.
 </Callout>
 
@@ -210,7 +210,7 @@ Tokenize, then clean.
 - Because it makes the text take up less memory
   > Lowercase characters take exactly the same amount of memory as uppercase ones; "lossy" here means information is permanently destroyed, not that storage is reduced.
 - [o] Because it permanently discards capitalization, which sometimes carries real meaning (e.g., "Apple" vs "apple", "US" vs "us"), and that information cannot be recovered afterward
-  > Case folding throws away the distinction between upper and lower case. For word-counting that distinction is noise, but for names and acronyms it is signal — and once folded, it is gone for good.
+  > Case folding throws away the distinction between upper and lower case. For word-counting that distinction is noise, but for names and acronyms it is signal, and once folded, it is gone for good.
 - Because it always introduces spelling errors
   > Lowercasing does not introduce spelling errors; it changes case uniformly and preserves every character except its letter case.
 - Because it converts the text into a different language
@@ -231,8 +231,8 @@ flowchart TB
 ```
 
 For a search index or a word-frequency study, the gains dominate and the
-losses are irrelevant — lowercase away. For named-entity recognition or
-emphasis-sensitive sentiment, the losses can be fatal — be careful, or skip
+losses are irrelevant, lowercase away. For named-entity recognition or
+emphasis-sensitive sentiment, the losses can be fatal, be careful, or skip
 the step. Same operation, opposite verdict, depending on the task.
 
 ## Your turn: write a normalizer
@@ -253,7 +253,7 @@ For example, \`normalize("Hello, World!")\` should return \`['hello',
 
 (Heads up: because step 2 removes the apostrophe, a contraction like "it's"
 will become "its". That is a real side effect of character-level punctuation
-stripping — you do not need to fix it here, just be aware of it.)`}
+stripping, you do not need to fix it here, just be aware of it.)`}
   files={[
     {
       filename: "main.py",
@@ -336,7 +336,7 @@ confuses companies with common nouns. What went wrong?
 
 - Lowercasing is too slow for news text
   > Lowercasing with \`str.lower()\` is extremely fast regardless of text volume; the problem is that it destroys the capitalization signal the entity recognizer relies on.
-- [o] Capitalization is a key signal for recognizing names, and lowercasing first destroyed it — for this task, case folding is harmful
+- [o] Capitalization is a key signal for recognizing names, and lowercasing first destroyed it, for this task, case folding is harmful
   > Named-entity recognition leans heavily on capitalization to spot proper nouns. Folding case away up front removes the exact clue the task depends on. Some tasks should skip or delay normalization.
 - The system needed more punctuation, not less
   > The issue has nothing to do with punctuation; the problem is that lowercasing erased the capitalization pattern that distinguishes proper nouns like "Apple" from common nouns.
@@ -353,14 +353,14 @@ you?
 
 - "World!" becomes "World" with the "!" removed
   > \`isalpha()\` tests the whole token, not individual characters; since "World!" contains a non-alphabetic character, the entire token is rejected, not just the punctuation.
-- [o] The entire token "World!" is dropped, because the whole string is not alphabetic — so you lose the word, not just the punctuation
+- [o] The entire token "World!" is dropped, because the whole string is not alphabetic, so you lose the word, not just the punctuation
   > \`"World!".isalpha()\` is \`False\` because of the "!", so the filter discards the whole token. To keep the word and only remove the mark, strip the punctuation characters (e.g., with \`str.translate\` or a regex) instead of filtering whole tokens.
 - It raises an error
   > \`isalpha()\` never raises an error; it simply returns \`False\` for any string containing a non-alphabetic character, causing the whole token to be filtered out by the list comprehension.
 - It splits into "World" and "!"
-  > The \`isalpha()\` filter does not split tokens; it evaluates the token as a whole and either keeps it or drops it entirely — splitting is a job for a tokenizer, not a character filter.
+  > The \`isalpha()\` filter does not split tokens; it evaluates the token as a whole and either keeps it or drops it entirely, splitting is a job for a tokenizer, not a character filter.
 
-Knowing exactly what each stripping technique does — including what it deletes — is the difference between clean data and silent data loss.`}
+Knowing exactly what each stripping technique does, including what it deletes, is the difference between clean data and silent data loss.`}
 />
 
 <MultipleChoice

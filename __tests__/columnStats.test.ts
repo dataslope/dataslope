@@ -32,7 +32,7 @@ describe("asFiniteNumber", () => {
   });
 });
 
-describe("computeColumnStats — counts & nulls", () => {
+describe("computeColumnStats, counts & nulls", () => {
   it("handles an empty column", () => {
     const s = computeColumnStats([]);
     expect(s.total).toBe(0);
@@ -64,7 +64,7 @@ describe("computeColumnStats — counts & nulls", () => {
   });
 });
 
-describe("computeColumnStats — numeric columns", () => {
+describe("computeColumnStats, numeric columns", () => {
   it("aggregates integer values (min/max/sum/mean/median)", () => {
     const s = computeColumnStats([1, 2, 3, 3, null]);
     expect(s.kind).toBe("numeric");
@@ -100,7 +100,7 @@ describe("computeColumnStats — numeric columns", () => {
   });
 });
 
-describe("computeColumnStats — text columns", () => {
+describe("computeColumnStats, text columns", () => {
   it("classifies non-numeric strings as text with length stats", () => {
     const s = computeColumnStats(["apple", "banana", "apple", null]);
     expect(s.kind).toBe("text");
@@ -127,7 +127,7 @@ describe("computeColumnStats — text columns", () => {
   });
 });
 
-describe("computeColumnStats — boolean / blob / mixed", () => {
+describe("computeColumnStats, boolean / blob / mixed", () => {
   it("classifies real JS booleans (PG boolean) as boolean", () => {
     const s = computeColumnStats([true, false, true]);
     expect(s.kind).toBe("boolean");
@@ -153,7 +153,7 @@ describe("computeColumnStats — boolean / blob / mixed", () => {
   });
 });
 
-describe("computeColumnStats — distinct & top", () => {
+describe("computeColumnStats, distinct & top", () => {
   it("does not collapse a number and the equivalent string", () => {
     const s = computeColumnStats([1, "1"]);
     expect(s.distinct).toBe(2);

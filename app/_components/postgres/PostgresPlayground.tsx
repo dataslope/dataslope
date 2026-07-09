@@ -494,7 +494,7 @@ function PgTypeSelector({
 
   // When the field is empty or still holds the column's committed type (i.e.
   // the user opened the list via the chevron rather than typing a search
-  // fragment), show every group so all types stay discoverable — including
+  // fragment), show every group so all types stay discoverable, including
   // committed types absent from the built-in list such as
   // `character varying(15)`. Only filter once they type a partial that is
   // not itself a known type.
@@ -788,7 +788,7 @@ function PgStructureColumnRow({
 
 /** Row for a generated column inside the Postgres structure drawer.
  *  PostgreSQL only supports STORED generated columns, so there is no
- *  storage-type selector — only the expression is editable. */
+ *  storage-type selector, only the expression is editable. */
 function PgGeneratedColumnRow({
   col,
   onExpressionChange,
@@ -1219,7 +1219,7 @@ function PostgresPlaygroundInner() {
   // PGlite runs one statement batch at a time. Rather than drop a run that
   // arrives while the engine is busy (which would silently lose, e.g., the
   // re-fetch after a second edit), we coalesce the latest such request here and
-  // run it the moment the in-flight one settles — see `drainPendingRun`, called
+  // run it the moment the in-flight one settles, see `drainPendingRun`, called
   // from every engine-busy path's `finally`.
   const runSqlForTabRef = useRef<
     | ((
@@ -1251,7 +1251,7 @@ function PostgresPlaygroundInner() {
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const openSettingsTab = useCallback(() => {
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
-      // Settings tab is active — close it and return to a query tab.
+      // Settings tab is active, close it and return to a query tab.
       setSettingsOpen(false);
       const fallback = tabsRef.current[0]?.id;
       if (fallback) {
@@ -1259,11 +1259,11 @@ function PostgresPlaygroundInner() {
         setActiveTabId(fallback);
       }
     } else if (settingsOpenRef.current) {
-      // Settings tab is in the tab bar but not active — activate it.
+      // Settings tab is in the tab bar but not active, activate it.
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
     } else {
-      // Settings tab is not open — add it and make it active.
+      // Settings tab is not open, add it and make it active.
       setSettingsOpen(true);
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
@@ -1288,7 +1288,7 @@ function PostgresPlaygroundInner() {
       : activeSample.filename;
   // Tab reordering is delegated to the generic TabBar; no externalised
   // drag state or sensors are needed for the tab strip. `setDraggingTabId`
-  // remains in the hook signature for legacy compatibility — passed a
+  // remains in the hook signature for legacy compatibility, passed a
   // no-op below.
   const setDraggingTabId = useCallback(() => {}, []);
 
@@ -1375,7 +1375,7 @@ function PostgresPlaygroundInner() {
     if (!view || !engine) return;
     const sql = activeSqlForEditor(view).trim();
     if (!sql) {
-      showToast("Nothing to explain — the query is empty.", "warn");
+      showToast("Nothing to explain, the query is empty.", "warn");
       return;
     }
     void (async () => {
@@ -1482,7 +1482,7 @@ function PostgresPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return;
       if (runningRef.current) {
-        // Engine busy — queue the latest request (coalescing a burst) instead
+        // Engine busy, queue the latest request (coalescing a burst) instead
         // of dropping it; it runs when the in-flight one settles.
         pendingRunRef.current = () =>
           runSqlForTabRef.current?.(
@@ -1498,7 +1498,7 @@ function PostgresPlaygroundInner() {
       }
       const trimmed = sql.trim();
       if (!trimmed) {
-        showToast("Nothing to run — the query is empty.", "warn");
+        showToast("Nothing to run, the query is empty.", "warn");
         return;
       }
       runningRef.current = true;
@@ -1509,7 +1509,7 @@ function PostgresPlaygroundInner() {
       const t0 = performance.now();
       const noComments = stripSqlComments(trimmed);
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
-      // editable, just like opening the table from the sidebar — but only
+      // editable, just like opening the table from the sidebar, but only
       // for an actual table (not a view), so edits never fail on commit.
       const isTable = (name: string) => tablesRef.current.includes(name);
       if (!sourceTable) {
@@ -1575,7 +1575,7 @@ function PostgresPlaygroundInner() {
           elapsedMs,
           success: true,
         });
-        // Refresh the schema sidebar in the background — don't hold the run
+        // Refresh the schema sidebar in the background, don't hold the run
         // lock (which blocks the next re-page: filter / sort / page) on slow
         // PGlite introspection, since a re-page doesn't change the schema.
         void refreshSchema().catch(() => undefined);
@@ -1651,7 +1651,7 @@ function PostgresPlaygroundInner() {
   }, [runSqlForTab]);
 
   // Run just the statement under the editor cursor (the toolbar "Run statement"
-  // affordance — mirrors the Ctrl/⌘+Enter keymap).
+  // affordance, mirrors the Ctrl/⌘+Enter keymap).
   const runStatementAtCursor = useCallback(() => {
     const view = editorRef.current;
     const tab = tabsRef.current.find(
@@ -1795,8 +1795,8 @@ function PostgresPlaygroundInner() {
   useEffect(() => {
     let cancelled = false;
     // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount — e.g. a browser
-    // back-then-forward return to the playground — can re-acquire it instead
+    // client-side navigation away) so a later remount, e.g. a browser
+    // back-then-forward return to the playground, can re-acquire it instead
     // of colliding with this document's own stale lock.
     const lockController = new AbortController();
     if (editorHostRef.current && !editorRef.current) {
@@ -1862,7 +1862,7 @@ function PostgresPlaygroundInner() {
               return;
             }
           } catch {
-            /* Web Locks unavailable — proceed without cross-tab exclusivity. */
+            /* Web Locks unavailable, proceed without cross-tab exclusivity. */
           }
         } catch {
           /* proceed in-memory */
@@ -2154,7 +2154,7 @@ function PostgresPlaygroundInner() {
 
   // "Open in new workspace": create a fresh workspace and switch to it WITHOUT
   // reloading the page. A reload races PGlite's per-origin OPFS access-handle
-  // pool against the outgoing page's worker — the reloaded page then throws
+  // pool against the outgoing page's worker, the reloaded page then throws
   // `createSyncAccessHandle ... already an open access handle` and hangs on
   // "Loading PostgreSQL engine…". Doing it in-place lets us close the old
   // engine (freeing the pool) *before* the new one opens.
@@ -2208,7 +2208,7 @@ function PostgresPlaygroundInner() {
 
   // From the "open in another tab" conflict overlay: create a fresh
   // workspace and switch to it. No engine is open in the conflict case
-  // (the boot was skipped), so a reload is the simplest safe path — the
+  // (the boot was skipped), so a reload is the simplest safe path, the
   // new workspace id isn't locked, so it boots normally.
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
@@ -2394,7 +2394,7 @@ function PostgresPlaygroundInner() {
       const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "postgresql" });
       if (formatted === code) {
-        showToast("Already formatted — nothing to change.");
+        showToast("Already formatted, nothing to change.");
         return;
       }
       view.dispatch({
@@ -2626,7 +2626,7 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
-      // Exclude generated columns and serial/sequence columns — PostgreSQL
+      // Exclude generated columns and serial/sequence columns, PostgreSQL
       // forbids explicit values for GENERATED ALWAYS columns and nextval()
       // PKs will duplicate-key on reuse.
       const skipCols = new Set(
@@ -2668,7 +2668,7 @@ function PostgresPlaygroundInner() {
       if (!engine) return;
       try {
         const allCols = await engine.listColumns(name, selectedSchemaRef.current);
-        // Generated columns are computed server-side — never accept input.
+        // Generated columns are computed server-side, never accept input.
         const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
@@ -2767,7 +2767,7 @@ function PostgresPlaygroundInner() {
     async (name: string) => {
       const engine = engineRef.current;
       const schema = selectedSchemaRef.current;
-      // Display SQL is for the editor tab only — actual execution uses
+      // Display SQL is for the editor tab only, actual execution uses
       // parameterized execParams below to prevent injection.
       const displaySql = `SELECT\n  column_name AS name,\n  data_type AS type,\n  is_nullable,\n  column_default AS default\nFROM information_schema.columns\nWHERE table_schema = '${schema.replace(/'/g, "''")}'\n  AND table_name = '${name.replace(/'/g, "''")}'\nORDER BY ordinal_position;`;
       const tab: QueryTab = {
@@ -3283,7 +3283,7 @@ function PostgresPlaygroundInner() {
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
   // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs — the database binary itself never leaves the browser.
+  // the query tabs, the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
@@ -3612,7 +3612,7 @@ function PostgresPlaygroundInner() {
   );
 
   // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment — the sidebar copy may be retired).
+  // menu (the latter is an experiment, the sidebar copy may be retired).
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}
@@ -5389,7 +5389,7 @@ function ImportDialog<
           "Parse a CSV file and import its rows into a new or existing table.",
         accept: ".csv,text/csv",
         dropLabel: "Drop a CSV file here",
-        dropHint: "or click to browse — .csv",
+        dropHint: "or click to browse, .csv",
         Icon: FileText,
       };
     }
@@ -5400,7 +5400,7 @@ function ImportDialog<
           "Parse a JSON array of objects and import its rows into a new or existing table.",
         accept: ".json,application/json",
         dropLabel: "Drop a JSON file here",
-        dropHint: "or click to browse — .json (array of objects)",
+        dropHint: "or click to browse, .json (array of objects)",
         Icon: FileJson,
       };
     }
@@ -5410,7 +5410,7 @@ function ImportDialog<
         "Read a Parquet file and add its rows into a new or existing table.",
       accept: ".parquet,application/octet-stream",
       dropLabel: "Drop a Parquet file here",
-      dropHint: "or click to browse — .parquet",
+      dropHint: "or click to browse, .parquet",
       Icon: Database,
     };
   }, [flavor]);
@@ -5530,7 +5530,7 @@ function ImportDialog<
               aria-hidden="true"
             />
             <span>
-              This is a playground — your data is only held in browser memory
+              This is a playground, your data is only held in browser memory
               and will not be persisted on reload.
             </span>
           </div>

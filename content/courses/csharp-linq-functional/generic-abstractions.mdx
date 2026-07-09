@@ -1,11 +1,11 @@
 ---
 title: Generic Abstractions
-description: How `IEnumerable<T>` became a universal language for sequences — and how to write your own generic, type-safe pipeline helpers
+description: How `IEnumerable<T>` became a universal language for sequences, and how to write your own generic, type-safe pipeline helpers
 ---
 
 LINQ is *not* "a library that works on lists". It's a library that
-works on **any sequence** — arrays, lists, dictionaries, file lines,
-network records, custom iterators — through a single generic
+works on **any sequence**, arrays, lists, dictionaries, file lines,
+network records, custom iterators, through a single generic
 interface: `IEnumerable<T>`.
 
 This unification is what makes the same `.Where(...).Select(...)`
@@ -16,7 +16,7 @@ It is also a fantastic case study in how generics enable
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three identical translucent containers with the same blue tab, each holding completely different contents — a circle, a triangle, a pair of bars — one generic shape, any element type"
+  aria-label="Three identical translucent containers with the same blue tab, each holding completely different contents, a circle, a triangle, a pair of bars, one generic shape, any element type"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -225,7 +225,7 @@ self-documenting.
 
 ## Building a generic key-grouped histogram
 
-A satisfying use of constraints + generics — count by an arbitrary
+A satisfying use of constraints + generics, count by an arbitrary
 key extracted from any sequence.
 
 <ChallengeCard
@@ -236,7 +236,7 @@ key extracted from any sequence.
 1. Count how many elements of \`source\` produce each key (via \`keySelector\`).
 2. Return \`(key, count)\` pairs ordered by key **ascending**.
 
-The \`where TKey : notnull\` constraint lets \`TKey\` be used as a grouping/dictionary key. The *same* operator must work unchanged for both demos in \`Program.cs\` — words grouped by length (\`TKey = int\`) and numbers grouped by parity (\`TKey = string\`).`}
+The \`where TKey : notnull\` constraint lets \`TKey\` be used as a grouping/dictionary key. The *same* operator must work unchanged for both demos in \`Program.cs\`, words grouped by length (\`TKey = int\`) and numbers grouped by parity (\`TKey = string\`).`}
   entryFilename="Program.cs"
   files={[
     {
@@ -344,7 +344,7 @@ preserve type safety at every call site, and grow a library that
 scales as the program grows.
 
 LINQ is the showcase: dozens of operators, each generic, each
-working on every sequence type, every projection type — all from a
+working on every sequence type, every projection type, all from a
 single ten-line interface.
 
 <MultipleChoice
@@ -355,9 +355,9 @@ single ten-line interface.
 - The lambda parameter \`s\` is declared as \`string\`, which is how \`T\` is decided.
   > Close, but inverted. The compiler first infers \`T\` from the *source*, then types the lambda accordingly.
 - [o] The compiler infers \`T = string\` from the source array's element type, then specializes \`MyWhere\` for \`string\`.
-  > C# infers generic type arguments by looking at the call site — most importantly the type of the source expression — and then synthesizes a strongly typed specialization. No casting, no boxing, full IntelliSense.
+  > C# infers generic type arguments by looking at the call site, most importantly the type of the source expression, and then synthesizes a strongly typed specialization. No casting, no boxing, full IntelliSense.
 - \`T\` is resolved at runtime by reflection.
-  > No — generic type resolution happens at compile time in C#. Reflection is not involved at the call site.
+  > No, generic type resolution happens at compile time in C#. Reflection is not involved at the call site.
 
 This is why writing one generic method buys you type-safe behavior across every element type.`}
 />

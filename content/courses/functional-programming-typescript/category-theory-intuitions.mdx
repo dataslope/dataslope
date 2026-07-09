@@ -1,11 +1,11 @@
 ---
 title: Category Theory Intuitions
-description: Functor, Applicative, and Monad — explained as everyday patterns you've already been using.
+description: Functor, Applicative, and Monad, explained as everyday patterns you've already been using.
 ---
 
 Category theory has a fearsome reputation. The good news is that
 *every working FP programmer* uses three category-theoretic
-patterns daily — usually without naming them. This chapter gives
+patterns daily, usually without naming them. This chapter gives
 you the names and, more importantly, the intuitions.
 
 We'll keep all the code in plain TypeScript. No libraries, no
@@ -14,7 +14,7 @@ Greek letters.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A square diagram: along the top a plain circle becomes a square, along the bottom the same circle inside a capsule becomes a square inside a capsule, with dotted arrows lifting one world into the other — the functor pattern"
+  aria-label="A square diagram: along the top a plain circle becomes a square, along the bottom the same circle inside a capsule becomes a square inside a capsule, with dotted arrows lifting one world into the other, the functor pattern"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -105,18 +105,18 @@ console.log(ArrayFunctor.map([1, 2, 3], (x) => x * 2));
 
 ### Functor laws (intuitions)
 
-A functor's `map` must obey two laws — both perfectly sensible:
+A functor's `map` must obey two laws, both perfectly sensible:
 
-1. **Identity:** `map(fa, x => x) === fa` — mapping with the
+1. **Identity:** `map(fa, x => x) === fa`, mapping with the
    identity function changes nothing.
-2. **Composition:** `map(map(fa, f), g) === map(fa, x => g(f(x)))`
-    — mapping with `f` then `g` is the same as mapping with
+2. **Composition:** `map(map(fa, f), g) === map(fa, x => g(f(x)))`,
+mapping with `f` then `g` is the same as mapping with
    `g ∘ f`.
 
 These laws guarantee `map` is "structure-preserving": it doesn't
 secretly rearrange the container, drop elements, duplicate things,
 or fail in surprising ways. If you've ever felt that
-`array.map((x) => x)` should equal `array` — that's the functor
+`array.map((x) => x)` should equal `array`, that's the functor
 identity law.
 
 ```mermaid
@@ -134,8 +134,8 @@ Functors lift a *one-argument* function into the container. What
 about two-argument functions? That's where **Applicative** comes
 in. It adds two extras:
 
-- `of(a)` — put a plain value into the container ("wrap")
-- `ap(ff, fa)` — given a wrapped function and a wrapped value,
+- `of(a)`, put a plain value into the container ("wrap")
+- `ap(ff, fa)`, given a wrapped function and a wrapped value,
   apply one to the other.
 
 With those, you can lift any n-argument function.
@@ -182,7 +182,7 @@ The intuition: applicative is for combining **independent**
 computations. "Get config A AND config B in parallel, then combine
 them" is applicative. Either both succeed, or the whole thing
 fails (if you use the validation-style applicative, both errors
-even get collected — see below).
+even get collected, see below).
 
 ### Accumulating validation errors
 
@@ -245,8 +245,8 @@ flatMap<A, B>(fa: F<A>, f: (a: A) => F<B>): F<B>
 ```
 
 The difference from `map`:
-- `map`     takes `(a: A) => B`        — the inner function returns a bare value.
-- `flatMap` takes `(a: A) => F<B>`     — the inner function itself returns a container.
+- `map`     takes `(a: A) => B`, the inner function returns a bare value.
+- `flatMap` takes `(a: A) => F<B>`, the inner function itself returns a container.
 
 `flatMap` *flattens* the resulting `F<F<B>>` back to `F<B>`. That
 flattening is the whole point: each step contributes its own
@@ -317,7 +317,7 @@ sequential.
 Monads earned their mystique honestly. The concept entered
 programming through Eugenio Moggi's dense theoretical papers around
 1990, and Philip Wadler then showed Haskell programmers how monads
-could structure real programs — including, famously, how a *pure*
+could structure real programs, including, famously, how a *pure*
 language could finally do I/O without compromising itself. The
 mathematics is real, and it is genuinely abstract.
 
@@ -326,31 +326,31 @@ Iry's 2009 satirical history of programming languages, which has a
 fictional Wadler reassuring programmers that there's nothing to
 fear because *"a monad is just a monoid in the category of
 endofunctors."* The joke stuck precisely because it captures how
-most monad explanations feel — technically true and totally
+most monad explanations feel, technically true and totally
 unhelpful.
 
 There is even a name for why tutorials so often fail here: the
 **monad tutorial fallacy**, coined by Brent Yorgey. The pattern
 finally *clicks* for someone after they've worked through enough
-concrete examples — and then, flush with insight, they write a
+concrete examples, and then, flush with insight, they write a
 tutorial built around whatever metaphor (burritos, boxes, conveyor
 belts) happened to accompany their personal click, which transfers
 nothing. The fix is the approach this chapter took: no metaphors,
 just `Option`, `Array`, and `Promise`, side by side, until you
 notice they share a shape. If the shape *hasn't* clicked yet, that
-is normal — keep writing `flatMap` chains and it will.
+is normal, keep writing `flatMap` chains and it will.
 
 ## Why this matters
 
 Once you see Functor / Applicative / Monad, you start noticing
 them *everywhere*: lists, options, results, promises, parsers,
 streams, optics, state, reducers, even React reducers and Redux
-thunks. They're not magic — they're just **the shape of code that
+thunks. They're not magic, they're just **the shape of code that
 threads a context through**.
 
 Libraries like fp-ts, Effect, and zio formalize these. But the
 patterns belong to the structure of computation, not to any
-library. You can — and we have — write them in plain TypeScript
+library. You can, and we have, write them in plain TypeScript
 in a dozen lines.
 
 ## A small challenge
@@ -438,12 +438,12 @@ export function map2<A, B, C>(
 
 - Whenever the operation might throw an error
   > Errors alone don't decide it; it depends on whether the *next step* itself returns a container.
-- [o] When the function you want to apply returns another value of the same container type — for example \`(a: A) => Option<B>\` — and you want a flat \`Option<B>\` instead of \`Option<Option<B>>\`
+- [o] When the function you want to apply returns another value of the same container type, for example \`(a: A) => Option<B>\`, and you want a flat \`Option<B>\` instead of \`Option<Option<B>>\`
   > \`flatMap\` is the operator that *flattens* one layer of container. \`map\` would leave you nested.
 - When you want to combine two independent containers
   > That's applicative (\`map2\`/\`ap\`), not monad.
 - When you want to discard the wrapper completely
   > That's \`getOrElse\` for \`Option\`, not \`flatMap\`.
 
-The shape of the inner function — \`A => B\` vs \`A => F<B>\` — is what tells you which operator to use.`}
+The shape of the inner function, \`A => B\` vs \`A => F<B>\`, is what tells you which operator to use.`}
 />

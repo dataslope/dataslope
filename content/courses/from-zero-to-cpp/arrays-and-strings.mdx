@@ -1,6 +1,6 @@
 ---
 title: Arrays and Strings
-description: Storing many values at once — from raw C arrays to std::array, std::vector, and std::string.
+description: Storing many values at once, from raw C arrays to std::array, std::vector, and std::string.
 ---
 
 Almost every program needs to hold *many* values of the same type:
@@ -12,7 +12,7 @@ pick is one of the most useful judgement calls in the language.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="The same rounded container shown three times, each wider and holding more dots, with a green plus where the next item lands — an elastic vector stretches to fit its contents"
+  aria-label="The same rounded container shown three times, each wider and holding more dots, with a green plus where the next item lands, an elastic vector stretches to fit its contents"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -232,7 +232,7 @@ for (int& x : v) {
 }
 ```
 
-Prefer #2 and #3 when you don't actually need the index — they're
+Prefer #2 and #3 when you don't actually need the index, they're
 shorter and harder to get wrong.
 
 > **Indexing safety.** `v[i]` does *not* bounds-check. `v.at(i)`
@@ -274,7 +274,7 @@ int main() {
 
 For performance-critical code you'd use a single flat vector and
 compute the index yourself (`r * cols + c`). That keeps everything
-in one contiguous block — friendlier to the CPU cache.
+in one contiguous block, friendlier to the CPU cache.
 
 ## Challenges
 
@@ -403,4 +403,4 @@ int main() {
 />
 
 Next: how to bundle multiple values together into a single named
-type — *structs* and aggregates.
+type, *structs* and aggregates.

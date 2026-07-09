@@ -7,12 +7,12 @@
  *
  * The keyframe names are global. CSS modules only rename @keyframes defined
  * inside the module itself, so the module stylesheets can reference these
- * names directly — each consuming component just has to import this file:
+ * names directly, each consuming component just has to import this file:
  *
  *   import "@/app/_components/runOverlayAnimations.css";
  *
- * The overlay *rule* sets (sizes, masks, gradients) stay with each consumer —
- * they differ by design tokens — only the motion is shared. */
+ * The overlay *rule* sets (sizes, masks, gradients) stay with each consumer,
+ * they differ by design tokens, only the motion is shared. */
 
 @keyframes ds-run-wave-back {
   from {

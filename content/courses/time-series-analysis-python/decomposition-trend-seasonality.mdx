@@ -1,6 +1,6 @@
 ---
 title: "Decomposing the Signals: Dissecting Trend, Seasonality, and Residuals"
-description: Splitting a series into trend, seasonal, and residual components with seasonal_decompose — additive vs multiplicative models, why AirPassengers needs multiplicative (or a log), reading the residual as a diagnostic, and deseasonalizing to reveal true growth.
+description: Splitting a series into trend, seasonal, and residual components with seasonal_decompose, additive vs multiplicative models, why AirPassengers needs multiplicative (or a log), reading the residual as a diagnostic, and deseasonalizing to reveal true growth.
 ---
 
 A real time series is several stories told at once: a slow climb, a yearly
@@ -28,7 +28,7 @@ and known noise, then ask `seasonal_decompose` to hand the pieces back.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A blue observed ridge sits above the steady yellow seasonal wave it contains — decomposition pulls one series apart into components like trend and season"
+  aria-label="A blue observed ridge sits above the steady yellow seasonal wave it contains, decomposition pulls one series apart into components like trend and season"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -77,38 +77,38 @@ print("yearly wave repeated 8 times; the Residual is just the leftover noise.")
 />
 
 Four panels: the original on top, then the smooth **trend** it extracted,
-the repeating **seasonal** wave, and the **residual** — what's left when you
+the repeating **seasonal** wave, and the **residual**, what's left when you
 subtract the other two. For data we built additively, the residual is
 shapeless noise, exactly as it should be.
 
 <Callout type="info" title="How seasonal_decompose actually works (the short version)">
-1. **Trend** — estimate it with a centered moving average whose window is
+1. **Trend**, estimate it with a centered moving average whose window is
    the seasonal period (so the season averages out). This is why the trend
    has `NaN`s at both ends: the moving average needs a full window.
-2. **Seasonal** — subtract the trend, then *average* the leftovers at each
+2. **Seasonal**, subtract the trend, then *average* the leftovers at each
    position in the cycle (all Januaries together, all Februaries, ...). That
    average shape is repeated across the whole span.
-3. **Residual** — whatever remains after removing trend and seasonal.
+3. **Residual**, whatever remains after removing trend and seasonal.
 
 It's a deliberately simple recipe, which makes it fast, transparent, and a
-great first look — not a forecasting model.
+great first look, not a forecasting model.
 </Callout>
 
 ## Additive or multiplicative? Read the seasonal swings
 
-The choice between the two models isn't a coin flip — the data tells you:
+The choice between the two models isn't a coin flip, the data tells you:
 
 - **Additive** (`Observed = Trend + Seasonal + Residual`): use it when the
   seasonal swings are **roughly the same size** regardless of the level. The
   summer bump is "+30" whether the series sits at 100 or at 500.
 - **Multiplicative** (`Observed = Trend x Seasonal x Residual`): use it when
-  the seasonal swings **grow with the level**. The summer bump is "+30%" — so
+  the seasonal swings **grow with the level**. The summer bump is "+30%", so
   it's small when the series is low and large when it's high.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two waves climb side by side: the green one swings by the same amount all the way up, while the blue one swings wider and wider inside a faint light-blue funnel as its level rises — constant-size swings are additive, swings that grow with the level are multiplicative"
+  aria-label="Two waves climb side by side: the green one swings by the same amount all the way up, while the blue one swings wider and wider inside a faint light-blue funnel as its level rises, constant-size swings are additive, swings that grow with the level are multiplicative"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -173,8 +173,8 @@ print("because a fixed-size additive season can't track a swing that grows.")
   ]}
 />
 
-The additive residual carries **visible leftover structure** — its swings are
-largest where the level sits farthest from its average — because an additive
+The additive residual carries **visible leftover structure**, its swings are
+largest where the level sits farthest from its average, because an additive
 model insists the seasonal swing is a fixed size and *can't* represent a swing
 that grows with the level. That structure is the model telling you "wrong
 assumption." The multiplicative residual, by contrast, is a flat, featureless
@@ -182,7 +182,7 @@ band around 1.0: the right model leaves behind nothing but noise.
 
 <Callout type="tip" title="The residual is your report card">
 A good decomposition leaves a residual that looks like **structureless
-noise** — no trend, no repeating wave, no funnel. *Any* leftover pattern
+noise**, no trend, no repeating wave, no funnel. *Any* leftover pattern
 means a component was mis-estimated or the wrong model was chosen. You'll
 use this exact instinct later to judge forecasting models: fit is good when
 the residuals are boring.
@@ -192,7 +192,7 @@ the residuals are boring.
 
 Not every real series is multiplicative. The airline swing grows with the
 level; the **CO₂** swing does not. The atmosphere's annual breath is a roughly
-**constant ±3 ppm** whether CO₂ sits at 320 or at 420 — the seasonal
+**constant ±3 ppm** whether CO₂ sits at 320 or at 420, the seasonal
 amplitude barely changes across sixty years. That constant-size swing is the
 signature of an **additive** series, so CO₂ decomposes cleanly with
 `model="additive"`.
@@ -230,7 +230,7 @@ print("regardless of the level -> ADDITIVE, no log needed (unlike the airline da
 />
 
 The seasonal component is the same few-ppm wave repeated identically every
-year — Northern-Hemisphere forests pulling CO₂ down through summer and
+year, Northern-Hemisphere forests pulling CO₂ down through summer and
 releasing it through winter. Because that swing does not scale with the
 rising level, an *additive* model fits without a log. Two real series, two
 different answers: always let the data tell you which model it wants.
@@ -241,9 +241,9 @@ different answers: always let the data tell you which model it wants.
 - Additive, because the peaks are always above the trend
   > "Above the trend" doesn't decide it; the *size* of the swing does. Here the swing grows from ~20 to ~100, which an additive model (fixed-size season) can't represent.
 - [o] Multiplicative, because the seasonal swing grows in proportion to the level (~10% of the level in both eras)
-  > +20 on 200 and +100 on 1000 are both about 10% — a constant *percentage*, which is exactly multiplicative seasonality. The swing scales with the level.
+  > +20 on 200 and +100 on 1000 are both about 10%, a constant *percentage*, which is exactly multiplicative seasonality. The swing scales with the level.
 - Neither; the series has no seasonality
-  > It clearly has a repeating summer peak — that's seasonality. The only question is whether its size is constant (additive) or proportional (multiplicative).
+  > It clearly has a repeating summer peak, that's seasonality. The only question is whether its size is constant (additive) or proportional (multiplicative).
 - It doesn't matter which you pick
   > It matters a lot: an additive fit here leaves a funnel-shaped residual (visible misfit), while multiplicative leaves clean noise. The wrong choice corrupts every downstream component.
 
@@ -255,12 +255,12 @@ When the seasonal swing scales with the level (constant percentage), the model i
 There's an elegant shortcut. Taking the **logarithm** of a multiplicative
 series makes it *additive*, because `log(T x S x R) = log T + log S + log R`.
 A log compresses the big late-period swings and stretches the small early
-ones until they're the same size — exactly what an additive model wants.
+ones until they're the same size, exactly what an additive model wants.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Blue swings that grow ever larger around a midline pass through a hollow yellow lens and come out as calm green swings of equal size — the log transform turns multiplicative growth into the additive world classical models live in"
+  aria-label="Blue swings that grow ever larger around a midline pass through a hollow yellow lens and come out as calm green swings of equal size, the log transform turns multiplicative growth into the additive world classical models live in"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -344,7 +344,7 @@ models live in.
 
 ## Deseasonalizing: revealing the real growth
 
-One of decomposition's most practical payoffs is **seasonal adjustment** —
+One of decomposition's most practical payoffs is **seasonal adjustment**,
 removing the seasonal component so the underlying trend isn't drowned out by
 the yearly wave. "Are sales *really* up, or is it just December?" is a
 deseasonalizing question.
@@ -397,7 +397,7 @@ print("divided out, the steady climb in demand is unmistakable.")
 
 <Callout type="danger" title="The decomposition 'trend' is not a forecast">
 Just like a rolling mean, the **trend** component is a *backward-looking
-smoother* of data you already have — it even has `NaN`s at both ends where
+smoother* of data you already have, it even has `NaN`s at both ends where
 the moving average runs out. It describes the past; it does not project the
 future. To forecast, you still need a model (ARIMA is coming). Seeing the
 trend curve and imagining it "continuing" is the same misconception we
@@ -470,14 +470,14 @@ print("max reconstruction error:", max_err)
   title="Detect multiplicative seasonality from the data"
   instructions={`The decision between additive and multiplicative comes down to one question: **do the seasonal swings grow with the level?** Measure that directly on the airline \`air\` series.
 
-For each calendar year, compute two numbers: the year's **mean** level and the year's **range** (its max minus its min — a proxy for the size of the seasonal swing). Then compute the correlation between the yearly means and the yearly ranges.
+For each calendar year, compute two numbers: the year's **mean** level and the year's **range** (its max minus its min, a proxy for the size of the seasonal swing). Then compute the correlation between the yearly means and the yearly ranges.
 
 Produce:
 
-- \`yearly_mean\` — a Series of each year's mean (use \`air.resample("YE").mean()\`)
-- \`yearly_range\` — a Series of each year's (max - min)
-- \`swing_level_corr\` — the correlation between \`yearly_mean\` and \`yearly_range\` (a float)
-- \`is_multiplicative\` — \`True\` if \`swing_level_corr > 0.7\`
+- \`yearly_mean\`, a Series of each year's mean (use \`air.resample("YE").mean()\`)
+- \`yearly_range\`, a Series of each year's (max - min)
+- \`swing_level_corr\`, the correlation between \`yearly_mean\` and \`yearly_range\` (a float)
+- \`is_multiplicative\`, \`True\` if \`swing_level_corr > 0.7\`
 
 A strong positive correlation means the swing scales with the level, so the series is **multiplicative** (which the airline data clearly is).`}
   files={[
@@ -551,7 +551,7 @@ assert len(yearly_mean) == 12 and len(yearly_range) == 12`,
   markdown={`In the equation \`Observed = Trend + Seasonal + Residual\`, what should the **residual** ideally look like?
 
 - A clean repeating wave
-  > A repeating wave in the residual means *leftover seasonality* — the seasonal component was under-estimated. A good residual has no such pattern.
+  > A repeating wave in the residual means *leftover seasonality*, the seasonal component was under-estimated. A good residual has no such pattern.
 - A steady upward slope
   > A slope in the residual means *leftover trend*. The trend component should have absorbed it; its presence signals a misfit.
 - [o] Structureless noise with no visible trend, cycle, or funnel
@@ -568,7 +568,7 @@ A well-specified decomposition leaves only patternless noise in the residual; an
 - Because the data is missing there
   > The observed data exists at the ends; it's the *trend estimate* that's undefined there, not the raw data.
 - [o] Because the trend is a centered moving average over the seasonal period, and a full window isn't available at the edges
-  > Estimating the trend needs a full-period window centered on each point. Near the boundaries there aren't enough neighbours on one side, so the moving average — and thus the trend — is undefined.
+  > Estimating the trend needs a full-period window centered on each point. Near the boundaries there aren't enough neighbours on one side, so the moving average, and thus the trend, is undefined.
 - Because seasonality cannot be computed at the edges
   > The *seasonal* component is defined everywhere (it's a repeated average shape). It's specifically the moving-average *trend* that runs out of window at the ends.
 - Because of a bug in statsmodels
@@ -601,15 +601,15 @@ Because logs turn multiplication into addition, an additive decomposition of \`l
   a centered moving average (hence the end `NaN`s), the seasonal by averaging
   per cycle-position, and the residual as the remainder.
 - A **`log`** turns a multiplicative series additive and tames growing
-  variance — a step we'll reuse for stationarity.
+  variance, a step we'll reuse for stationarity.
 - The **residual is a diagnostic**: a funnel or leftover wave means the wrong
   model or a mis-estimated component.
 - **Deseasonalizing** (subtract or divide out the seasonal) reveals the true
-  underlying growth — but the trend component is still a *smoother*, not a
+  underlying growth, but the trend component is still a *smoother*, not a
   forecast.
 </Callout>
 
-We keep bumping into the same words — the airline series' growing variance
+We keep bumping into the same words, the airline series' growing variance
 and persistent trend make it "non-stationary," and we keep promising to fix
 that. It's time to make that idea precise: what stationarity *is*, why
 classical models demand it, and how to test for it.

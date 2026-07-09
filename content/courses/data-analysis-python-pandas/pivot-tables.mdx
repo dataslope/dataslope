@@ -1,16 +1,16 @@
 ---
 title: Pivot Tables
-description: pivot_table — Pandas's answer to spreadsheet pivot tables — with aggregation, multi-level indexes, and totals.
+description: pivot_table, Pandas's answer to spreadsheet pivot tables, with aggregation, multi-level indexes, and totals.
 ---
 
-If you've ever made a pivot table in Excel — drag region to
-rows, product to columns, sum of sales to values — Pandas's
+If you've ever made a pivot table in Excel, drag region to
+rows, product to columns, sum of sales to values, Pandas's
 `pivot_table` is the exact same idea, expressed in code.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A long three-column table beside a compact matrix with green row labels, yellow column labels, and blue dots sized by their value — a pivot table taking shape"
+  aria-label="A long three-column table beside a compact matrix with green row labels, yellow column labels, and blue dots sized by their value, a pivot table taking shape"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -161,7 +161,7 @@ The result has a MultiIndex on the columns. Beautiful for
 reporting; sometimes annoying for further computation (you may
 want to flatten).
 
-## Margins — row and column totals
+## Margins, row and column totals
 
 <CodeBlock
   adapter="python"
@@ -194,7 +194,7 @@ print(p)
 />
 
 This produces a row and column called `Total` containing the
-overall sums — exactly like an Excel pivot's grand totals.
+overall sums, exactly like an Excel pivot's grand totals.
 
 ## Multiple index or column levels
 
@@ -293,7 +293,7 @@ print(summary)
 
 A single call replaces a multi-step `groupby + unstack` and turns
 53,940 rows into a compact cut-by-color grid. (Read it carefully and
-you will see the same skew from the GroupBy chapter — the "best"
+you will see the same skew from the GroupBy chapter, the "best"
 combinations are not always the priciest, because carat varies
 across the cells.)
 

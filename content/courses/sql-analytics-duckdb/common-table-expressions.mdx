@@ -6,7 +6,7 @@ description: CTEs (WITH clauses) turn one tangled query into a readable pipeline
 Analytical questions get complicated fast: filter, then aggregate, then
 rank, then compare. Cramming all of that into one nested query is how SQL
 earns its reputation for being unreadable. **Common Table Expressions
-(CTEs)** — the `WITH` clause — are the cure. They let you build a query as
+(CTEs)**, the `WITH` clause, are the cure. They let you build a query as
 a sequence of named, readable steps, like a recipe. This is arguably the
 most important *style* skill in analytical SQL, so it gets a page of its
 own.
@@ -14,7 +14,7 @@ own.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="Three stacked query cards form a pipeline — two named CTE steps in blue and green joined by solid downward arrows into one wider yellow final query — building the result step by step instead of nesting it inside out"
+  aria-label="Three stacked query cards form a pipeline, two named CTE steps in blue and green joined by solid downward arrows into one wider yellow final query, building the result step by step instead of nesting it inside out"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -57,8 +57,8 @@ FROM (
 WHERE avg_order > 100;
 ```
 
-The actual steps — *keep paid orders, average per region, keep big
-averages* — are scrambled. A reader has to mentally unwrap it.
+The actual steps, *keep paid orders, average per region, keep big
+averages*, are scrambled. A reader has to mentally unwrap it.
 
 ## The fix: a pipeline of named steps
 
@@ -135,7 +135,7 @@ genuine accelerator:
 - **Readability.** Named steps document the logic; the query *is* its own
   explanation.
 - **Iteration.** You can run a CTE pipeline and inspect any step by
-  temporarily selecting from it — perfect for the question-query-look loop.
+  temporarily selecting from it, perfect for the question-query-look loop.
 - **Reuse within a query.** A CTE can be referenced multiple times below
   its definition, so you compute something once and use it twice.
 - **Composability.** Complex analyses become a stack of simple
@@ -198,7 +198,7 @@ one inscrutable nest.
 <svg
   viewBox="0 0 640 165"
   role="img"
-  aria-label="One solid green step is echoed by matching green sockets inside two waiting queries downstream — a CTE is computed once and referenced as many times as the query needs"
+  aria-label="One solid green step is echoed by matching green sockets inside two waiting queries downstream, a CTE is computed once and referenced as many times as the query needs"
   style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -223,7 +223,7 @@ one inscrutable nest.
 ## A note on recursive CTEs
 
 CTEs can also be **recursive** (`WITH RECURSIVE`), which lets a query
-reference itself to walk hierarchies — org charts, category trees, graph
+reference itself to walk hierarchies, org charts, category trees, graph
 paths. It is a powerful corner of SQL, but it leans toward data
 *structure* rather than the summarizing analytics this course focuses on,
 so we only flag it here. When you meet a "find all descendants" problem,
@@ -251,7 +251,7 @@ CTEs restructure a query into readable, named, sequential steps.`}
 
 - Only the original tables, never \`a\`.
   > A later CTE can build on an earlier one; that chaining is the whole point.
-- [o] The CTE \`a\` defined above it, as well as base tables — CTEs can build on earlier CTEs.
+- [o] The CTE \`a\` defined above it, as well as base tables, CTEs can build on earlier CTEs.
   > Each CTE may reference any CTE defined before it, forming a pipeline.
 - Only \`b\` itself.
   > A non-recursive CTE does not reference itself; it can reference earlier CTEs.
@@ -277,5 +277,5 @@ Named steps let analysts inspect and iterate on each stage of a pipeline.`}
 />
 
 CTEs are the *named* way to build sub-results. SQL also has unnamed,
-inline ones — **subqueries** — each with its own best use. That contrast
+inline ones, **subqueries**, each with its own best use. That contrast
 is the next page.

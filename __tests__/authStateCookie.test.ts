@@ -1,5 +1,5 @@
 /**
- * OAuth `state` cookie scoping (lib/auth/server.ts) — the fix for the "first
+ * OAuth `state` cookie scoping (lib/auth/server.ts), the fix for the "first
  * Google sign-in fails with ?error=state_mismatch, clicking again works" loop.
  *
  * The one-time `state` cookie set by the sign-in POST must come back on the
@@ -9,7 +9,7 @@
  * on the apex. The fix scopes the cookie to the registrable domain and aligns
  * its lifetime with the server-side state's 10-minute window.
  *
- * Two layers of coverage, both with a mocked D1 (statement echo — no network,
+ * Two layers of coverage, both with a mocked D1 (statement echo, no network,
  * same posture as adminPromotion.test.ts / polarBilling.test.ts):
  *   - `oauthStateCookieDomain`: the derivation rules, including the hosts
  *     where a Domain attribute must NOT be emitted (browsers reject a Domain
@@ -29,7 +29,7 @@ describe("oauthStateCookieDomain", () => {
   });
 
   it("keeps a subdomain base URL scoped to that subdomain", () => {
-    // Domain=www.dataslope.com covers www and *.www — never the apex. That is
+    // Domain=www.dataslope.com covers www and *.www, never the apex. That is
     // the correct (narrowest) scope when the callback host is the subdomain.
     expect(oauthStateCookieDomain("https://www.dataslope.com")).toBe(
       "www.dataslope.com",
@@ -125,7 +125,7 @@ describe("sign-in/social state cookie", () => {
     expect(cookie).toMatch(/samesite=lax/i);
 
     // redirect_uri stays pinned to BETTER_AUTH_URL regardless of the
-    // request's own host — that pinning is why the domain scope is needed.
+    // request's own host, that pinning is why the domain scope is needed.
     const { url } = (await res.json()) as { url: string };
     expect(new URL(url).searchParams.get("redirect_uri")).toBe(
       "https://dataslope.com/api/auth/callback/google",

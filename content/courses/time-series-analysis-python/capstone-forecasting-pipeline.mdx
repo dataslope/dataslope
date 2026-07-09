@@ -1,10 +1,10 @@
 ---
 title: "Capstone: Building and Evaluating an End-to-End Statistical Forecasting Pipeline"
-description: One complete workflow that threads the whole course together — explore, stabilize variance, difference to stationarity, identify orders, split chronologically, fit a model, forecast with uncertainty, and prove skill against a baseline with honest out-of-sample metrics.
+description: One complete workflow that threads the whole course together, explore, stabilize variance, difference to stationarity, identify orders, split chronologically, fit a model, forecast with uncertainty, and prove skill against a baseline with honest out-of-sample metrics.
 ---
 
 This is where it all comes together. Across the course you collected a
-toolkit — datetime indexing, resampling, gap-filling, decomposition,
+toolkit, datetime indexing, resampling, gap-filling, decomposition,
 stationarity testing, differencing, ACF/PACF reading, ARIMA, and honest
 validation. Here we run the *entire* pipeline, start to finish, on the
 airline series, and end with the only question that matters: **does our model
@@ -23,7 +23,7 @@ flowchart TD
     H -->|"yes"| I["9. Ship, monitor, retrain"]
 ```
 
-Before the code, here is the whole pipeline as a walkthrough — what each stage
+Before the code, here is the whole pipeline as a walkthrough, what each stage
 does and why:
 
 <Steps>
@@ -61,7 +61,7 @@ Read the ACF and PACF of the stationary series to choose the ARIMA terms.
 
 **Split chronologically**
 
-Hold out the most recent stretch as the "future" — never shuffle a time
+Hold out the most recent stretch as the "future", never shuffle a time
 series.
 
 </Step>
@@ -85,7 +85,7 @@ Project forward and carry prediction intervals, not just a single point line.
 **Beat the baseline?**
 
 Compare honest out-of-sample error against a trivial baseline and check the
-residuals — if it fails, revise the orders.
+residuals, if it fails, revise the orders.
 
 </Step>
 <Step>
@@ -97,7 +97,7 @@ Put the model to work, watch it on new data, and refit as the series evolves.
 </Step>
 </Steps>
 
-## Step 1 — Load and look
+## Step 1, Load and look
 
 Every forecast starts with eyes on the data. We name what we see *before*
 touching a model.
@@ -105,7 +105,7 @@ touching a model.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A thin path climbs in three straight legs from a blue starting dot through blue and yellow stations to a green flag planted at the summit, while a red pitfall dot sits just off the trail — the forecasting pipeline as one journey from raw data to a validated forecast"
+  aria-label="A thin path climbs in three straight legs from a blue starting dot through blue and yellow stations to a green flag planted at the summit, while a red pitfall dot sits just off the trail, the forecasting pipeline as one journey from raw data to a validated forecast"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -189,7 +189,7 @@ print(" - GROWING VARIANCE: the summer-winter swing widens over time (-> log).")
   ]}
 />
 
-## Step 2 — Confirm non-stationarity, then plan the transforms
+## Step 2, Confirm non-stationarity, then plan the transforms
 
 We don't guess; we test. The raw series should fail the ADF test, and the
 fix-up sequence (log for variance, a regular difference for trend, a seasonal
@@ -248,10 +248,10 @@ print("difference at lag 12 (D=1). That's the recipe the data itself prescribed.
   ]}
 />
 
-## Step 3 — Decompose to understand the structure
+## Step 3, Decompose to understand the structure
 
 A multiplicative decomposition confirms what the eye saw and gives us a clean
-picture of each component — useful for sanity-checking and for explaining the
+picture of each component, useful for sanity-checking and for explaining the
 forecast to stakeholders.
 
 <CodeBlock
@@ -298,7 +298,7 @@ print("Multiplicative: summer runs ~+25-30% above trend, winter dips below.")
   ]}
 />
 
-## Step 4 — Identify orders from the stationary series
+## Step 4, Identify orders from the stationary series
 
 With the series made stationary, the ACF/PACF become readable. We're looking
 for the regular short-lag structure (for `p`, `q`) and any leftover spike at
@@ -351,19 +351,19 @@ print("Reasonable starting orders: ARIMA(1,1,1) with a seasonal (1,1,1,12) part.
   ]}
 />
 
-## Step 5-7 — Split, fit, and forecast (honestly)
+## Step 5-7, Split, fit, and forecast (honestly)
 
 Now the part everything else was for. We **hold out the last 24 months**,
-fit on the past only, and forecast that held-out future. We fit two models —
+fit on the past only, and forecast that held-out future. We fit two models,
 a **seasonal** ARIMA (the extra terms at lag 12 we just justified) and a
-**plain** ARIMA (no seasonal terms) — and we keep a **seasonal-naive
+**plain** ARIMA (no seasonal terms), and we keep a **seasonal-naive
 baseline**. Then we score all three on the held-out months with honest
 out-of-sample metrics.
 
 <Callout type="info" title="What 'seasonal ARIMA' adds">
 A seasonal ARIMA is just ARIMA with the *same AR/I/MA machinery repeated at
 the seasonal lag*. `order=(1,1,1)` handles the month-to-month dynamics;
-`seasonal_order=(1,1,1,12)` handles the year-to-year dynamics — including the
+`seasonal_order=(1,1,1,12)` handles the year-to-year dynamics, including the
 seasonal difference we found we needed. It's the natural home for the
 lag-12 structure plain ARIMA left in its residuals.
 </Callout>
@@ -444,17 +444,17 @@ print("residual spike warned about on the ARIMA page.")
   ]}
 />
 
-The seasonal model posts the lowest error on data it never saw — and it
+The seasonal model posts the lowest error on data it never saw, and it
 **beats the baseline**, which is the bar every model must clear. Plain ARIMA
 captures the trend but, lacking seasonal terms, leaves the yearly cycle in its
 errors, so it trails the seasonal model. The gap between them is precisely the
 seasonality that plain ARIMA's lag-12 residual spike warned about on the ARIMA
-page — the residual diagnostic, paid off in hard numbers.
+page, the residual diagnostic, paid off in hard numbers.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three horizontal error bars grow from the same wall toward a yellow baseline mark: the gray baseline bar reaches it exactly, the blue model stops just short of it, and the green seasonal model is much shorter — an error score only means something when it beats the baseline on the same honest test"
+  aria-label="Three horizontal error bars grow from the same wall toward a yellow baseline mark: the gray baseline bar reaches it exactly, the blue model stops just short of it, and the green seasonal model is much shorter, an error score only means something when it beats the baseline on the same honest test"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -474,7 +474,7 @@ page — the residual diagnostic, paid off in hard numbers.
   </g>
 </svg>
 
-## Step 8 — Visualize the forecast against reality
+## Step 8, Visualize the forecast against reality
 
 <CodeBlock
   adapter="python"
@@ -553,7 +553,7 @@ assumptions you *checked* (stationarity), whose orders you *justified*
 that the actuals fall inside. Anything less is a guess wearing a lab coat.
 </Callout>
 
-## Step 9 — Real life: it doesn't end at the notebook
+## Step 9, Real life: it doesn't end at the notebook
 
 In production, a forecast is a living thing:
 
@@ -562,7 +562,7 @@ In production, a forecast is a living thing:
 - **Monitor the error.** Track the live forecast error over time; if it drifts
   up, the world has changed (a *regime shift*) and the model needs attention.
 - **Keep the baseline running.** If the fancy model ever stops beating
-  seasonal-naive in production, fall back to the baseline — it's cheaper and,
+  seasonal-naive in production, fall back to the baseline, it's cheaper and,
   in that moment, better.
 - **Respect the horizon.** Short-horizon forecasts are trustworthy; far-out
   ones come with wide bands for a reason. Don't promise precision the
@@ -571,7 +571,7 @@ In production, a forecast is a living thing:
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three production stages — a blue model box, a green monitoring dot, and a yellow retraining tile — joined in a loop by thin curved arrows, while a red drift dot escapes the cycle along a thin line — a deployed forecast lives in a monitor, detect, and refit cycle"
+  aria-label="Three production stages, a blue model box, a green monitoring dot, and a yellow retraining tile, joined in a loop by thin curved arrows, while a red drift dot escapes the cycle along a thin line, a deployed forecast lives in a monitor, detect, and refit cycle"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -612,10 +612,10 @@ In production, a forecast is a living thing:
   title="Run the stationarity pipeline end to end"
   instructions={`Reproduce the diagnosis stage on the loaded \`air\` series. Build a dict \`report\` recording the ADF p-value at each stage of the standard airline recipe:
 
-- \`"raw"\` — ADF p-value of \`air\`
-- \`"log"\` — ADF p-value of \`np.log(air)\`
-- \`"log_diff"\` — ADF p-value of \`np.log(air).diff()\`
-- \`"log_diff_sdiff"\` — ADF p-value of \`np.log(air).diff().diff(12)\`
+- \`"raw"\`, ADF p-value of \`air\`
+- \`"log"\`, ADF p-value of \`np.log(air)\`
+- \`"log_diff"\`, ADF p-value of \`np.log(air).diff()\`
+- \`"log_diff_sdiff"\`, ADF p-value of \`np.log(air).diff().diff(12)\`
 
 Drop NaNs before each test. Also set \`is_stationary_final\` to \`True\` if the final stage's p-value is below 0.05. The full recipe should reach stationarity.`}
   files={[
@@ -715,9 +715,9 @@ assert all(isinstance(v, float) for v in report.values())`,
 
 Produce a dict \`evaluation\` with these exact key names:
 - \`"snaive_mae"\`, \`"snaive_rmse"\`, \`"mean_mae"\`, \`"mean_rmse"\` (all floats)
-- \`"snaive_better"\` — \`True\` if seasonal-naive has the lower MAE
+- \`"snaive_better"\`, \`True\` if seasonal-naive has the lower MAE
 
-Use only \`train\` to build both forecasts — never peek at the test set.`}
+Use only \`train\` to build both forecasts, never peek at the test set.`}
   files={[
     {
       filename: "main.py",
@@ -830,11 +830,11 @@ Logging stabilizes the variance that grows with the level, aligning the series w
 - [o] That it beat the seasonal-naive **baseline** on the same honest, held-out test
   > An error figure only has meaning relative to a reference. Beating "same as last year" on data the model never saw is what proves the model added real skill.
 - That it used more parameters than the alternatives
-  > More parameters is a cost, not evidence of value — it raises overfitting risk. Skill is shown by out-of-sample performance versus a baseline, not by complexity.
+  > More parameters is a cost, not evidence of value, it raises overfitting risk. Skill is shown by out-of-sample performance versus a baseline, not by complexity.
 - That its forecast line looked smooth
   > Visual smoothness says nothing about accuracy. A smooth, confident, wrong forecast is still wrong; the baseline comparison on held-out data is the real test.
 
-An out-of-sample error is meaningful only against a baseline on the same honest test — beating seasonal-naive is the proof of added skill.`}
+An out-of-sample error is meaningful only against a baseline on the same honest test, beating seasonal-naive is the proof of added skill.`}
 />
 
 <MultipleChoice
@@ -849,7 +849,7 @@ An out-of-sample error is meaningful only against a baseline on the same honest 
 - Decompose -> forecast the trend component -> stop
   > The decomposition trend is a backward-looking smoother, not a forecast, and this skips stationarity, fitting, the chronological split, and validation entirely.
 
-Diagnose and prepare first, hold out the future before fitting, and finish by proving skill against a baseline — order matters.`}
+Diagnose and prepare first, hold out the future before fitting, and finish by proving skill against a baseline, order matters.`}
 />
 
 <Callout type="success" title="Course wrap-up">
@@ -860,7 +860,7 @@ You can now take a raw, messy, seasonal, non-stationary series and:
 - test and engineer **stationarity** with the ADF test and **differencing**;
 - read **ACF/PACF** to propose **ARIMA** orders;
 - **fit** a model and forecast with honest **uncertainty**;
-- and — most importantly — **validate chronologically**, measure with
+- and, most importantly, **validate chronologically**, measure with
   **MAE/RMSE/MAPE**, and prove your model **beats a baseline** without leaking
   the future.
 

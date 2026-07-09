@@ -3,7 +3,7 @@
  * D1 UPDATE that completes the ADMIN_EMAILS / ADMIN_USER_IDS bootstrap on
  * sign-in requests. D1 is mocked with a statement recorder, so assertions
  * cover the decision logic (when a statement runs at all) and the SQL/bind
- * shape — same no-network posture as polarBilling.test.ts.
+ * shape, same no-network posture as polarBilling.test.ts.
  */
 import { describe, it, expect } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";

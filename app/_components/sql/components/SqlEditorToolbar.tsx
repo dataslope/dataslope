@@ -7,7 +7,7 @@ export interface SqlEditorToolbarProps {
   loaded: boolean;
   running: boolean;
   hasEditorSelection: boolean;
-  /** True when the active tab holds more than one statement — enables the
+  /** True when the active tab holds more than one statement, enables the
    *  "Run statement at cursor" affordance (and matches the Ctrl/⌘+Enter
    *  keymap, which runs just the statement under the cursor in that case). */
   hasMultipleStatements: boolean;
@@ -122,8 +122,8 @@ export function SqlEditorToolbar({
           className="kbd-group"
           title={
             isMac
-              ? "Cmd + Enter — run the selection, or all statements"
-              : "Ctrl + Enter — run the selection, or all statements"
+              ? "Cmd + Enter, run the selection, or all statements"
+              : "Ctrl + Enter, run the selection, or all statements"
           }
         >
           <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>

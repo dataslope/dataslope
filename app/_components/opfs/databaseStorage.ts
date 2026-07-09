@@ -36,7 +36,7 @@ interface PendingDbWrite {
 // Async write queue (module-level singleton)
 // ---------------------------------------------------------------------------
 
-/** Map key: `${workspaceId}/${name}` — newer writes overwrite older ones. */
+/** Map key: `${workspaceId}/${name}`, newer writes overwrite older ones. */
 const pending = new Map<string, PendingDbWrite>();
 let scheduled = false;
 
@@ -113,7 +113,7 @@ if (typeof window !== "undefined") {
  * identified by `(workspaceId, name)`. Returns immediately; the actual I/O
  * happens on the next idle callback (or `pagehide`).
  *
- * Falls back gracefully when OPFS is unavailable — the write is silently
+ * Falls back gracefully when OPFS is unavailable, the write is silently
  * dropped (the database lives only in the engine's in-memory state).
  */
 export function writeDatabase(

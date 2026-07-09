@@ -1,7 +1,7 @@
 // Declarative catalogue of the sample SQLite databases offered by the
 // SQL playground's database-selector. Each entry owns its own seed
-// payload — either an embedded schema + seed function, or a `remoteSql`
-// reference into the dataslope/datasets GitHub repo — and the editor
+// payload, either an embedded schema + seed function, or a `remoteSql`
+// reference into the dataslope/datasets GitHub repo, and the editor
 // tabs that should be opened the first time the user lands on that
 // database, so adding a new sample is a one-entry change.
 
@@ -25,7 +25,7 @@ export interface SqliteSampleDatabase extends SqlSampleDatabaseBase {
   seed?: (db: Database) => void;
   /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
    *  SQL script that creates *and* populates the database. Fetched from
-   *  raw.githubusercontent.com when the sample is loaded — see
+   *  raw.githubusercontent.com when the sample is loaded, see
    *  remoteDatasets.ts. */
   remoteSql?: string;
   /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
@@ -36,7 +36,7 @@ export interface SqliteSampleDatabase extends SqlSampleDatabaseBase {
   defaultTabs: QueryTabSeed[];
 }
 
-/** Serialisable subset of SqliteSampleDatabase — safe to send through
+/** Serialisable subset of SqliteSampleDatabase, safe to send through
  *  postMessage (no function properties). */
 export type SqliteSampleMetadata = Omit<SqliteSampleDatabase, "seed">;
 
@@ -46,7 +46,7 @@ export type SqliteSampleMetadata = Omit<SqliteSampleDatabase, "seed">;
 // keys, indices, and triggers so the playground can showcase the full
 // suite of relational features. The engine enables `PRAGMA
 // foreign_keys = ON` at init, so the FOREIGN KEY clauses below are
-// actually enforced — references must stay consistent on every insert.
+// actually enforced, references must stay consistent on every insert.
 // Notable additions:
 //   - cards.user_id              REFERENCES users(user_id)
 //   - transactions.user_id       REFERENCES users(user_id)
@@ -351,7 +351,7 @@ function seedCreditCard(db: Database): void {
   // result pagination in the playground without bloating the source
   // file with hand-written rows. The generator is intentionally
   // seeded/deterministic so query results stay stable across reloads
-  // and across users — matching the spirit of the curated rows above.
+  // and across users, matching the spirit of the curated rows above.
   const merchants: Array<[string, string, string, string, string]> = [
     ["Amazon", "Seattle", "WA", "US", "E-Commerce"],
     ["Walmart", "Bentonville", "AR", "US", "Retail"],
@@ -369,7 +369,7 @@ function seedCreditCard(db: Database): void {
     ["Spotify", "Stockholm", "", "SE", "Entertainment"],
     ["McDonald's", "Chicago", "IL", "US", "Food & Beverage"],
   ];
-  // Pseudo-random but fully deterministic — small LCG keyed by row id.
+  // Pseudo-random but fully deterministic, small LCG keyed by row id.
   const rand = (n: number, mod: number) => ((n * 2654435761) >>> 0) % mod;
   const startId = transactions.length + 1;
   const targetTotal = 260;
@@ -442,7 +442,7 @@ const CC_DEFAULT_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 2: chinook.db — the complete Chinook music store database
+// Sample 2: chinook.db, the complete Chinook music store database
 // (v1.4.5), fetched from the dataslope/datasets GitHub repo at load
 // time. Table names are PascalCase: Album, Artist, Track, Genre,
 // MediaType, Playlist, PlaylistTrack, Customer, Employee, Invoice,
@@ -465,7 +465,7 @@ const CHINOOK_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 3: northwind.db — the classic Northwind store, fetched from
+// Sample 3: northwind.db, the classic Northwind store, fetched from
 // the dataslope/datasets GitHub repo at load time. Table names are
 // PascalCase: Categories, Customers, Employees, OrderDetails, Orders,
 // Products, Shippers, Suppliers.

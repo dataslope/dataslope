@@ -48,7 +48,7 @@ print(f"Required n per variant: {int(n) + 1}")
 ### Why fix the sample size in advance instead of "peeking"?
 
 Repeatedly checking and stopping as soon as p < 0.05 (**peeking**)
-massively inflates the false-positive rate — you'll eventually cross the
+massively inflates the false-positive rate, you'll eventually cross the
 threshold by chance. Either fix n up front, or use methods designed for
 continuous monitoring (sequential testing / always-valid p-values).
 
@@ -61,15 +61,15 @@ rate well above 30%. Commit to the sample size before you start.
 
 ### What are common A/B testing pitfalls?
 
-- **Novelty / primacy effects** — behavior changes just because something is new; run longer.
-- **Sample ratio mismatch** — the split isn't actually 50/50, signaling a bug.
-- **Network/interference effects** — treatment leaks to control (social features); use cluster randomization.
-- **Multiple comparisons** — testing many metrics inflates false positives; correct for it.
-- **Simpson's paradox** — an aggregate effect reverses within segments.
+- **Novelty / primacy effects**, behavior changes just because something is new; run longer.
+- **Sample ratio mismatch**, the split isn't actually 50/50, signaling a bug.
+- **Network/interference effects**, treatment leaks to control (social features); use cluster randomization.
+- **Multiple comparisons**, testing many metrics inflates false positives; correct for it.
+- **Simpson's paradox**, an aggregate effect reverses within segments.
 
 ### The experiment shows no significant difference. What can you conclude?
 
-Not "the feature does nothing" — only that you **failed to detect** an
+Not "the feature does nothing", only that you **failed to detect** an
 effect at your power. Report the confidence interval: a tight CI around
 zero supports "no meaningful effect," while a wide CI means the test was
 underpowered and inconclusive.
@@ -356,9 +356,9 @@ ATT is appropriate when you only care about the effect on the group that would a
 <MultipleChoice
   markdown={`An analyst checks the running p-value every hour and plans to stop the test "as soon as it's significant." Why is this a problem?
 
-- It's fine — stopping early just saves traffic.
+- It's fine, stopping early just saves traffic.
   > Stopping the moment p < 0.05 is exactly the issue: it doesn't preserve the error rate.
-- [o] Repeated "peeking" inflates the false-positive rate far above 5% — you'll eventually cross the threshold by chance.
+- [o] Repeated "peeking" inflates the false-positive rate far above 5%, you'll eventually cross the threshold by chance.
   > Each look is another chance to get a fluke significant result; fix n in advance or use sequential/always-valid methods.
 - It reduces the test's statistical power to zero.
   > Peeking inflates Type I error; it doesn't zero out power.

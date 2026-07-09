@@ -1,24 +1,24 @@
 ---
 title: Logistic Regression
-description: Despite its name, this is a classification algorithm — a linear score squashed into a probability, then a threshold. The interpretable workhorse for predicting yes-or-no.
+description: Despite its name, this is a classification algorithm, a linear score squashed into a probability, then a threshold. The interpretable workhorse for predicting yes-or-no.
 ---
 
 Let us clear up the most confusing name in machine learning before we do
 anything else. **Logistic regression is a classification algorithm.** It
-predicts *categories* — spam or not, one species or another, will-churn or
-will-stay — not numbers. The word "regression" in its name is a historical
+predicts *categories*, spam or not, one species or another, will-churn or
+will-stay, not numbers. The word "regression" in its name is a historical
 accident about the math under the hood, and it trips up nearly every
 newcomer. Whenever you see "logistic regression," think **classifier**.
 
 With that settled: logistic regression is to classification what linear
-regression is to predicting numbers — the simple, fast, interpretable
+regression is to predicting numbers, the simple, fast, interpretable
 baseline you reach for first and that everything fancier has to beat. It is
 probably the single most widely deployed classifier in the world.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Blue dots on one side and green dots on the other, separated by a translucent yellow boundary band; dots fade as they approach the band — a linear score squashed into probabilities and thresholded into classes"
+  aria-label="Blue dots on one side and green dots on the other, separated by a translucent yellow boundary band; dots fade as they approach the band, a linear score squashed into probabilities and thresholded into classes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ regression is a *classification* algorithm.
 </Callout>
 
 <Callout type="info" title="Where this sits">
-The four-move workflow is unchanged — **load, split, train, evaluate** — and
+The four-move workflow is unchanged, **load, split, train, evaluate**, and
 this is still a `.fit()` / `.predict()` estimator like the ones in **Your
 First Model, End to End**. What is new is *how* it makes a decision and the
 extra `.predict_proba()` method for probabilities. If linear regression's
@@ -69,11 +69,11 @@ regression reuses the same weighted-sum idea.
 You want a yes-or-no answer, and ideally a *confidence* with it. Is this
 transaction fraudulent? Is this penguin a Gentoo or an Adelie? Will this
 user click? A bare label ("fraud") is useful, but a **probability**
-("87% chance of fraud") is far more useful — it lets you rank cases, set
+("87% chance of fraud") is far more useful, it lets you rank cases, set
 thresholds, and decide how much to trust each call.
 
 Linear regression cannot do this directly. Its straight line runs off to
-plus and minus infinity, so it happily predicts -0.3 or 1.8 — nonsense as a
+plus and minus infinity, so it happily predicts -0.3 or 1.8, nonsense as a
 probability, which must live between 0 and 1. Logistic regression is the fix:
 it keeps linear regression's interpretable weighted-sum core but **bends the
 output into the 0-to-1 range** so it reads as a genuine probability.
@@ -85,19 +85,19 @@ the whole algorithm follows:
 
 **Features → linear score `z` → sigmoid squash → probability `p` → threshold at 0.5 → class 1 or class 0**
 
-**Step 1 — a linear score.** Exactly like linear regression, the model
+**Step 1, a linear score.** Exactly like linear regression, the model
 computes a weighted sum of the features plus a constant:
 `z = intercept + w1*x1 + w2*x2 + ...`. This `z` can be any number, from
 hugely negative to hugely positive. A large positive `z` leans toward
 "yes"; a large negative `z` leans toward "no."
 
-**Step 2 — squash with the sigmoid.** We feed `z` through the **sigmoid**
+**Step 2, squash with the sigmoid.** We feed `z` through the **sigmoid**
 function, `p = 1 / (1 + e^-z)`. The sigmoid is an S-shaped curve that takes
 any number and gently maps it into the open interval (0, 1). Very negative
 `z` maps near 0, very positive `z` near 1, and `z = 0` maps to exactly 0.5.
 Now the output is a legitimate probability.
 
-**Step 3 — threshold into a class.** A probability is not yet a decision. We
+**Step 3, threshold into a class.** A probability is not yet a decision. We
 apply a **threshold**, by default 0.5: if `p >= 0.5` predict class 1,
 otherwise class 0. That is the difference between `.predict_proba()` (gives
 you `p`) and `.predict()` (gives you the class after thresholding).
@@ -144,8 +144,8 @@ print("z =  5  -> p =", round(1 / (1 + np.exp(-5)), 3))
 />
 
 See how `z = 0` lands exactly on `p = 0.5` (the threshold line), and how the
-curve flattens toward 0 and 1 at the edges. The point where `z = 0` — and
-therefore `p = 0.5` — is the **decision boundary**: on one side the model
+curve flattens toward 0 and 1 at the edges. The point where `z = 0`, and
+therefore `p = 0.5`, is the **decision boundary**: on one side the model
 predicts class 1, on the other class 0.
 
 ## The decision boundary is a straight line
@@ -211,7 +211,7 @@ strong on data where a straight boundary cleanly separates the classes.
 Logistic regression finds its coefficients by iterative optimization. On
 some datasets the default iteration budget is too small and you get a
 "failed to converge" warning. Passing `max_iter=1000` simply gives the
-optimizer more steps. It does not change the model — it just lets the fit
+optimizer more steps. It does not change the model, it just lets the fit
 finish settling. (Scaling the features, covered in the data-prep chapter,
 also helps it converge faster.)
 </Callout>
@@ -220,7 +220,7 @@ also helps it converge faster.)
 
 This is the part worth slowing down for, because the *probability* is often
 the whole reason to use logistic regression. `.predict()` gives you the
-class. `.predict_proba()` gives you the probability behind that class — the
+class. `.predict_proba()` gives you the probability behind that class, the
 model's confidence.
 
 <CodeBlock
@@ -263,18 +263,18 @@ A few things to read off that table. `predict_proba` returns **one column
 per class**, in the order shown by `model.classes_` (alphabetical, so Adelie
 then Gentoo), and **each row sums to 1** (the probabilities of all classes
 must add up). The predicted class is simply the column with the higher
-probability — that is, applying the 0.5 threshold to the class-1 (Gentoo)
+probability, that is, applying the 0.5 threshold to the class-1 (Gentoo)
 probability.
 
 <Callout type="tip" title="predict is just predict_proba plus a threshold">
 For binary logistic regression, `model.predict(X)` is *exactly*
 `model.predict_proba(X)[:, 1] >= 0.5`. The class is the probability after
 thresholding. This means you can change the cutoff yourself: if one kind of
-mistake is far worse than the other — say, missing a fraud case versus
-flagging a clean one — you might predict the positive class whenever its
+mistake is far worse than the other, say, missing a fraud case versus
+flagging a clean one, you might predict the positive class whenever its
 probability exceeds, say, 0.3 instead of 0.5, trading more false alarms for
-fewer misses. Choosing that threshold well —
-using precision, recall, and ROC curves — is a core skill the course's
+fewer misses. Choosing that threshold well,
+using precision, recall, and ROC curves, is a core skill the course's
 classification-evaluation material covers in depth.
 </Callout>
 
@@ -318,7 +318,7 @@ print("Matches model.predict():", np.array_equal(default, model.predict(X_test))
 />
 
 Raise the threshold and the model becomes more reluctant to say "Gentoo";
-lower it and it says "Gentoo" more freely. Same model, same probabilities —
+lower it and it says "Gentoo" more freely. Same model, same probabilities,
 only the cutoff moved. The probability is the model's real output; the
 threshold is a *decision* you control.
 
@@ -372,14 +372,14 @@ for name, c in coefs[-2:]:
 The precise statement is that each coefficient is the change in the **log-
 odds** of class 1 per unit of the feature, but you rarely need that
 phrasing day to day. The *sign* tells you the direction of the push and the
-*magnitude* tells you the strength — and, just as with linear regression,
+*magnitude* tells you the strength, and, just as with linear regression,
 magnitudes are only comparable when the features share a scale.
 
 <Callout type="warn" title="Coefficient size depends on feature scale">
 The same caution from linear regression applies: a coefficient's magnitude
 is tied to its feature's units, so do not read raw coefficient sizes as a
 clean importance ranking. Logistic regression also genuinely *benefits* from
-scaled features — it converges faster and the coefficients become
+scaled features, it converges faster and the coefficients become
 comparable. The data-preparation chapter shows how to scale inside a
 pipeline so it stays leak-free.
 </Callout>
@@ -388,7 +388,7 @@ pipeline so it stays leak-free.
 
 Logistic regression extends naturally to more than two classes. Bring back
 the third penguin species, Chinstrap, and scikit-learn handles three classes
-for you — it learns a score per class and picks the highest. (The classic
+for you, it learns a score per class and picks the highest. (The classic
 teaching dataset for this was Fisher's iris flowers, but the community now
 favors the Palmer penguins, partly because Fisher was a prominent
 eugenicist.) The code is identical; only the number of probability columns
@@ -431,14 +431,14 @@ species is the column with the largest probability. The mental model is the
 same: linear scores, squashed and normalized into probabilities, then the
 biggest one wins.
 
-## When to use it — and when not to
+## When to use it, and when not to
 
 <Callout type="success" title="When to reach for logistic regression">
 Use it when you want a **fast, interpretable classification baseline**, when
 you need **calibrated-ish probabilities** rather than just labels, when the
 classes are roughly separable by a straight boundary, or when you must
 *explain* which features drive the decision and in which direction. As with
-linear regression, it is almost always the right *first* classifier — beat
+linear regression, it is almost always the right *first* classifier, beat
 it before reaching for anything heavier.
 </Callout>
 
@@ -447,7 +447,7 @@ The flip side is that its straight-line boundary is also its ceiling.
 - **Nonlinear boundaries.** If the classes are separated by a curve or a
   ring rather than a straight line, a single linear cut cannot split them.
   The classic illustration is two interleaving moons or concentric
-  circles — logistic regression draws one straight line through them and
+  circles, logistic regression draws one straight line through them and
   fails. You either engineer nonlinear features or switch to a model that
   bends, like a decision tree, a random forest, or an SVM with a nonlinear
   kernel.
@@ -488,7 +488,7 @@ print("A single straight boundary cannot fully separate two crescents.")
   ]}
 />
 
-The accuracy is mediocre — not because the model is broken, but because the
+The accuracy is mediocre, not because the model is broken, but because the
 problem's true boundary is *curved* and logistic regression can only draw a
 *straight* one. That is the assumption talking. On data with a roughly
 linear boundary (like the Adelie-vs-Gentoo penguins earlier), the very same
@@ -496,7 +496,7 @@ model shines.
 
 <Callout type="info" title="Evaluation goes deeper than accuracy">
 Accuracy is a fine first headline, but for classification it can badly
-mislead — especially with imbalanced classes, where predicting the majority
+mislead, especially with imbalanced classes, where predicting the majority
 every time scores high while being useless. Precision, recall, the confusion
 matrix, and the ROC curve tell the real story, and the course's
 classification-evaluation material gives them full treatment. We are
@@ -521,7 +521,7 @@ not the scoring.
   different model.
 - **"Higher accuracy always means a better classifier."** Not with
   imbalanced classes. A model that ignores the rare class can post high
-  accuracy and be worthless — which is why the metrics pages exist.
+  accuracy and be worthless, which is why the metrics pages exist.
 
 ## Real-world applications
 
@@ -529,7 +529,7 @@ Logistic regression is, quietly, one of the most-deployed models anywhere,
 precisely because it is fast, interpretable, and outputs probabilities:
 
 - **Medicine.** Estimating the probability a tumor is malignant, a patient
-  will be readmitted, or a treatment will succeed — where clinicians need to
+  will be readmitted, or a treatment will succeed, where clinicians need to
   see *why*, feature by feature.
 - **Finance.** Credit scoring and fraud detection lean on it heavily;
   regulators often *require* models whose decisions can be explained, which
@@ -541,7 +541,7 @@ precisely because it is fast, interpretable, and outputs probabilities:
   is not earning its keep.
 
 In every case the draw is the same trio: **probabilities, interpretability,
-and speed** — a straight-line decision you can read off the coefficients.
+and speed**, a straight-line decision you can read off the coefficients.
 
 ## Your turn
 
@@ -652,12 +652,12 @@ assert 0.0 <= p_gentoo <= 1.0, f"Expected a probability in [0, 1], got {p_gentoo
 <MultipleChoice
   markdown={`Despite its name, what kind of task is logistic regression built for?
 
-- [o] Classification — predicting a category (and a probability), such as Adelie versus Gentoo
+- [o] Classification, predicting a category (and a probability), such as Adelie versus Gentoo
   > The "regression" in the name refers to the linear score it computes internally; the model's output is a class. It is a classification algorithm.
 - Predicting a continuous number, like linear regression
   > Logistic regression predicts a discrete class (and a probability), not a continuous number. That is the job of linear regression. The "regression" in its name refers to the internal linear score, not the type of output.
 - Clustering unlabeled data into groups
-  > Clustering is an unsupervised task that groups data without labels. Logistic regression is a supervised classifier — it requires labeled training examples and produces a class prediction for new inputs.
+  > Clustering is an unsupervised task that groups data without labels. Logistic regression is a supervised classifier, it requires labeled training examples and produces a class prediction for new inputs.
 - Reducing the number of features in a dataset
   > Dimensionality reduction is a separate task (handled by methods like PCA). Logistic regression uses all features provided to it in order to make class predictions.
 
@@ -672,9 +672,9 @@ The internal linear score is squashed into a probability and thresholded into a 
 - [o] It squashes the unbounded linear score into a probability between 0 and 1
   > The linear score can be any real number, but a probability must be in (0, 1). The S-shaped sigmoid maps any score into that range so the output reads as a probability.
 - It selects which features to keep
-  > Feature selection is a separate preprocessing step. The sigmoid function operates on the output of the linear score computation — it maps a single number to a probability — and plays no role in deciding which features to use.
+  > Feature selection is a separate preprocessing step. The sigmoid function operates on the output of the linear score computation, it maps a single number to a probability, and plays no role in deciding which features to use.
 - It computes the accuracy of the model
-  > Accuracy is computed by comparing predictions to true labels during evaluation. The sigmoid is part of the model's forward pass — it converts the score to a probability — not part of the evaluation step.
+  > Accuracy is computed by comparing predictions to true labels during evaluation. The sigmoid is part of the model's forward pass, it converts the score to a probability, not part of the evaluation step.
 
 The sigmoid is the step that turns a raw score into a usable confidence.`}
 />
@@ -683,7 +683,7 @@ The sigmoid is the step that turns a raw score into a usable confidence.`}
   markdown={`For a binary logistic regression, how does \`model.predict(X)\` relate to \`model.predict_proba(X)\`?
 
 - They are unrelated methods that can disagree
-  > They are directly related: \`predict\` is exactly \`predict_proba\` plus a threshold. They can never disagree — the class returned by \`predict\` is always the class with the highest probability from \`predict_proba\`.
+  > They are directly related: \`predict\` is exactly \`predict_proba\` plus a threshold. They can never disagree, the class returned by \`predict\` is always the class with the highest probability from \`predict_proba\`.
 - \`predict\` ignores probabilities and uses the raw features
   > \`predict\` does not bypass the probability step. It calls the same underlying computation as \`predict_proba\` and then applies a 0.5 threshold to the class-1 probability to produce a hard label.
 - [o] \`predict\` applies a threshold (default 0.5) to the class-1 probability from \`predict_proba\`
@@ -700,7 +700,7 @@ Because of this, you can move the threshold yourself to trade false positives ag
 - The dataset is too small to fit
   > \`make_moons\` by default produces hundreds of points, and logistic regression fits quickly on data that size. The poor accuracy is not due to insufficient data but to the model's fundamental limitation: a single straight decision boundary.
 - Logistic regression cannot output probabilities
-  > Logistic regression always produces probabilities via \`predict_proba\` — that is one of its core features. The problem here is the shape of the boundary, not the ability to output probabilities.
+  > Logistic regression always produces probabilities via \`predict_proba\`, that is one of its core features. The problem here is the shape of the boundary, not the ability to output probabilities.
 - \`make_moons\` produces continuous targets, not classes
   > \`make_moons\` produces binary class labels (0 and 1), making it a classification problem that logistic regression can handle. The difficulty is geometric: the two classes are not linearly separable.
 - [o] Its decision boundary is a straight line, but the true boundary between the crescents is curved

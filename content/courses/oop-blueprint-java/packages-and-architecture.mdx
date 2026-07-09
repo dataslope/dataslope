@@ -1,6 +1,6 @@
 ---
 title: Packages and Architecture
-description: Organizing many classes into packages and layers — how OOP scales from a handful of classes to a real system
+description: Organizing many classes into packages and layers, how OOP scales from a handful of classes to a real system
 ---
 
 A real Java program has dozens or hundreds of classes. Without
@@ -10,12 +10,12 @@ units. **Layered architecture** is a broader pattern for grouping
 packages into a sensible whole.
 
 This page is about scaling OOP from "ten files" to "a thousand
-files" — *without* losing the qualities that make OOP worth using.
+files", *without* losing the qualities that make OOP worth using.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three wide translucent layers — blue, green, and yellow — each holding its own small cluster of class shapes — packages grouped into a layered architecture"
+  aria-label="Three wide translucent layers, blue, green, and yellow, each holding its own small cluster of class shapes, packages grouped into a layered architecture"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -40,7 +40,7 @@ files" — *without* losing the qualities that make OOP worth using.
 
 <Callout type="info" title="Note about the playgrounds on this page">
 The CheerpJ-based Java code blocks in this course don't model
-packages literally — they put all files in one flat workspace. So
+packages literally, they put all files in one flat workspace. So
 the examples below describe packages in the way a *real* multi-file
 Java project would lay them out, but you can still run the code in
 the playground without typing the `package` keyword. We will use
@@ -50,7 +50,7 @@ file in the code blocks shows where it would live.
 
 ## What a package is
 
-A Java package is a *namespace* — a labeled folder of related
+A Java package is a *namespace*, a labeled folder of related
 classes. The package name is part of a class's *fully qualified
 name*. The class `java.util.ArrayList` lives in the package
 `java.util`. Class names only need to be unique within a package.
@@ -101,8 +101,8 @@ clashes:
 | Personal project | `dev.you.project` |
 | Company | `com.company.product` |
 
-Inside that prefix, name packages by *what they're about* — `account`,
-`customer`, `payments` — not by what kind of class they contain
+Inside that prefix, name packages by *what they're about*, `account`,
+`customer`, `payments`, not by what kind of class they contain
 (avoid `utils`, `helpers`, `objects`).
 
 ## Visibility, revisited
@@ -113,11 +113,11 @@ their meaning:
 | Modifier | Visible from |
 | --- | --- |
 | `private` | The declaring class only |
-| *(no modifier)* — *package-private* | Other classes in the **same package** |
+| *(no modifier)*, *package-private* | Other classes in the **same package** |
 | `protected` | Same package, **and** subclasses anywhere |
 | `public` | Anywhere |
 
-The default — *package-private* — is more useful than beginners
+The default, *package-private*, is more useful than beginners
 realize. It lets the classes within a package share helpers without
 exposing them to the whole program. Reach for `public` only when a
 class is part of your package's *external API*.
@@ -139,7 +139,7 @@ flowchart LR
 
 `TxValidator` is package-private. Within `com.bank.account` it's
 freely available; from outside, it's invisible. That isolation is
-*real* encapsulation — at the package level.
+*real* encapsulation, at the package level.
 
 ## Layered architecture
 
@@ -162,8 +162,8 @@ flowchart TB
 
 The cardinal rule: **dependencies point inward**. The UI may depend
 on application services. Application services may depend on the
-domain model. The domain model — the actual business objects, the
-heart of the system — should depend on *nothing else in your code*.
+domain model. The domain model, the actual business objects, the
+heart of the system, should depend on *nothing else in your code*.
 
 This is sometimes called a **hexagonal** or **clean** architecture.
 The headline benefit: you can swap the UI (CLI to web to mobile)
@@ -237,8 +237,8 @@ How do you know when to split a class into a new package?
 | --- | --- |
 | Two unrelated subjects in the same package | Split into two packages |
 | A class is only used within its package | Make it package-private |
-| Classes within a package import very little from outside | A good sign — high *cohesion* |
-| Every package imports from every other | A bad sign — low cohesion, high *coupling* |
+| Classes within a package import very little from outside | A good sign, high *cohesion* |
+| Every package imports from every other | A bad sign, low cohesion, high *coupling* |
 
 The goal is **high cohesion within packages** (classes in a package
 belong together) and **low coupling between packages** (packages
@@ -282,7 +282,7 @@ Even though the playground keeps everything flat, we can still
 deliberately under-decorated example: a domain model (`Book`,
 `Catalog`), an application service (`LibraryService`), and a
 "CLI"-style presentation (`Main`). Notice that `LibraryService` never
-prints anything — it just orchestrates. Printing is a presentation
+prints anything, it just orchestrates. Printing is a presentation
 concern.
 
 <CodeBlock
@@ -321,7 +321,7 @@ public class Book {
   public String author() { return author; }
   @Override
   public String toString() {
-    return title + " — " + author;
+    return title + ", " + author;
   }
 }
 `,
@@ -385,7 +385,7 @@ package. The domain doesn't move.
   markdown={`Which is the most useful default discipline for choosing access modifiers?
 
 - Make every class \`public\` so nothing is hidden by accident
-  > That's the opposite of useful — it locks you into a public API everywhere.
+  > That's the opposite of useful, it locks you into a public API everywhere.
 - Make every member \`protected\` because it's "in the middle"
   > Protected is more permissive than you usually want.
 - [o] Make everything as restrictive as possible (\`private\` by default, package-private when needed) and widen only when there's a real reason
@@ -401,7 +401,7 @@ package. The domain doesn't move.
   > Domain shouldn't depend on infrastructure.
 - Domain should depend on the presentation layer
   > Definitely not; the domain is the most independent piece.
-- [o] From the outer layers (presentation, infrastructure) toward the inner core (application, domain) — the domain depends on nothing else of yours
+- [o] From the outer layers (presentation, infrastructure) toward the inner core (application, domain), the domain depends on nothing else of yours
   > This is the "dependencies point inward" rule that keeps the core swappable.
 - All layers should depend on every other layer equally
   > That recreates the spaghetti you're trying to avoid.`}
@@ -411,7 +411,7 @@ package. The domain doesn't move.
   markdown={`What is the goal expressed by "high cohesion, low coupling"?
 
 - Maximize the number of imports across packages
-  > That maximizes coupling — the opposite.
+  > That maximizes coupling, the opposite.
 - Combine all classes into one giant package so nothing has to import anything
   > That maximizes coupling and destroys cohesion.
 - [o] Classes within a package should belong together; packages should depend on each other as little as possible

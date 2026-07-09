@@ -11,7 +11,7 @@ import {
 export interface DuckDbRemoteFile {
   /** Path inside the dataslope/datasets GitHub repo, or a full URL. */
   path: string;
-  /** Filename to register in the virtual filesystem — what the seed SQL
+  /** Filename to register in the virtual filesystem, what the seed SQL
    *  refers to, e.g. `read_parquet('trips.parquet')`. Defaults to the
    *  basename of `path`. */
   registerAs?: string;
@@ -22,7 +22,7 @@ export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
   sql?: string;
   /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
    *  SQL script that creates *and* populates the database, fetched from
-   *  raw.githubusercontent.com when the sample is loaded — see
+   *  raw.githubusercontent.com when the sample is loaded, see
    *  remoteDatasets.ts. The script itself can also read remote data
    *  directly (e.g. `... FROM read_parquet('https://raw.githubusercontent.com/…')`),
    *  since duckdb-wasm can query CORS-enabled https URLs natively. */
@@ -181,7 +181,7 @@ INSERT INTO events VALUES
 const ANALYTICS_TABS: QueryTabSeed[] = [
   {
     title: "Events per country",
-    code: `-- Group by a STRUCT field — DuckDB lets you reach into\n-- nested values with dot syntax, no UNNEST required.\nSELECT properties.country AS country,\n       COUNT(*) AS events,\n       SUM(properties.value) AS total_value\nFROM events\nGROUP BY country\nORDER BY events DESC;`,
+    code: `-- Group by a STRUCT field, DuckDB lets you reach into\n-- nested values with dot syntax, no UNNEST required.\nSELECT properties.country AS country,\n       COUNT(*) AS events,\n       SUM(properties.value) AS total_value\nFROM events\nGROUP BY country\nORDER BY events DESC;`,
   },
   {
     title: "PIVOT example",
@@ -235,14 +235,14 @@ const PARQUET_DEMO_TABS: QueryTabSeed[] = [
 // with credit grade, interest rate, term, borrower income, loan
 // purpose, and whether the loan ultimately defaulted. The data lives as
 // a Parquet file in the dataslope/datasets repo and is loaded over
-// jsDelivr — the same CDN the rest of the playground uses — then
+// jsDelivr, the same CDN the rest of the playground uses, then
 // materialized into a single `loans` table so it shows up in the schema
 // browser like the inline samples.
 //
 // The file was added to dataslope/datasets after the pinned DATASETS_REF
 // (a repo-relative path would 404 against the pin), so the URL targets
 // `@main`. jsDelivr serves it CORS-enabled; the dataset cache treats
-// mutable-ref URLs as per-session — see remoteDatasets.ts.
+// mutable-ref URLs as per-session, see remoteDatasets.ts.
 const LENDING_CLUB_PARQUET_URL =
   "https://cdn.jsdelivr.net/gh/dataslope/datasets@main/lending-club-loan-results.parquet";
 
@@ -264,7 +264,7 @@ const LENDING_CLUB_TABS: QueryTabSeed[] = [
   },
   {
     title: "Profile every column",
-    code: `-- DuckDB's SUMMARIZE profiles the whole table in one shot —\n-- type, min/max, approximate quantiles, null %, and counts.\nSUMMARIZE loans;`,
+    code: `-- DuckDB's SUMMARIZE profiles the whole table in one shot:\n-- type, min/max, approximate quantiles, null %, and counts.\nSUMMARIZE loans;`,
   },
 ];
 
@@ -300,7 +300,7 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
     label: "Lending Club loans",
     filename: "lending_club.duckdb",
     description:
-      "~205k real consumer loans — credit grade, rate, purpose, and default.",
+      "~205k real consumer loans, credit grade, rate, purpose, and default.",
     remoteFiles: [
       { path: LENDING_CLUB_PARQUET_URL, registerAs: "loans.parquet" },
     ],
@@ -313,7 +313,7 @@ export const DUCKDB_BLANK_DATABASE: DuckDbSampleDatabase = {
   id: "blank",
   label: "New Database",
   filename: "untitled.duckdb",
-  description: "Empty DuckDB database — start from scratch.",
+  description: "Empty DuckDB database, start from scratch.",
   sql: "",
   defaultTabs: [{ title: "Query 1", code: "" }],
 };

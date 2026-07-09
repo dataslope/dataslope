@@ -1,6 +1,6 @@
 ---
 title: Histograms
-description: The chart that shows the *shape* of one variable — distribution, skew, and outliers
+description: The chart that shows the *shape* of one variable, distribution, skew, and outliers
 ---
 
 A **histogram** answers a single, fundamental question: **what
@@ -8,14 +8,14 @@ does the distribution of this one variable look like?** Where do
 most values cluster? Is the distribution symmetric or skewed? Are
 there outliers? Is it bell-shaped, uniform, or bimodal?
 
-You will use histograms constantly during *exploratory analysis* —
+You will use histograms constantly during *exploratory analysis*,
 every time you load a new dataset, you should histogram every
 numeric column as part of getting acquainted.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Columns of stacked dots inside faint pill containers form a bell shape, with a yellow dot crowning the tallest column — the distribution of one variable"
+  aria-label="Columns of stacked dots inside faint pill containers form a bell shape, with a yellow dot crowning the tallest column, the distribution of one variable"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -104,7 +104,7 @@ You can see immediately: most bills are between $10-25, the
 distribution has a *right tail* (a few large bills), and very few
 bills exceed $40.
 
-## Bin width matters — a lot
+## Bin width matters, a lot
 
 The number of bins you choose changes how the distribution looks.
 Too few bins hide structure; too many bins create noise.
@@ -124,7 +124,7 @@ fig = px.histogram(
     x="total_bill",
     nbins=30,
     template="simple_white",
-    title="Bill distribution with nbins=30 — try other values",
+    title="Bill distribution with nbins=30, try other values",
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
@@ -134,7 +134,7 @@ fig.show()
 />
 
 Edit the code: try `nbins=5`, then `100`. You'll see two failure
-modes — too-few hides the shape; too-many turns the chart into
+modes, too-few hides the shape; too-many turns the chart into
 noise.
 
 A useful default heuristic is the **square-root rule**: number of
@@ -176,14 +176,14 @@ fig.show()
 on top of each other so you can compare their *shapes*. Other
 options:
 
-- `barmode="stack"` — stacks the counts (good for showing
+- `barmode="stack"`, stacks the counts (good for showing
   composition, bad for comparing distributions).
-- `barmode="group"` — places bars side by side per bin (can get
+- `barmode="group"`, places bars side by side per bin (can get
   noisy fast).
 
 ## Histograms of *proportions* with `histnorm`
 
-If your groups have very different sizes, counts are misleading —
+If your groups have very different sizes, counts are misleading,
 the larger group will always have taller bars. Use `histnorm` to
 normalize:
 
@@ -235,7 +235,7 @@ When you look at a histogram, ask:
 1. **Where is the center?** (Mode, median, mean.)
 2. **How spread out is it?** (Standard deviation, IQR.)
 3. **Is it symmetric or skewed?** Most real-world distributions
-   (income, wait times, page views) are *right-skewed* — a long
+   (income, wait times, page views) are *right-skewed*, a long
    tail of large values.
 4. **Are there multiple peaks (bimodality)?** This often signals
    *two mixed populations*, which is a big analytical clue.
@@ -322,7 +322,7 @@ assert "mass" in title or "body" in title, "x-axis should be body mass"`,
 - A comparison across distinct categories.
   > Bar charts are designed for comparing values across categories; a histogram's x-axis represents a continuous numeric range, not discrete categories.
 - [o] The distribution (shape, spread, center, skew) of a single numeric variable.
-  > A histogram divides the range of one variable into bins and counts how many values fall in each. The resulting shape reveals the distribution — where values cluster, how spread out they are, whether the distribution is skewed, and whether there are multiple peaks.
+  > A histogram divides the range of one variable into bins and counts how many values fall in each. The resulting shape reveals the distribution, where values cluster, how spread out they are, whether the distribution is skewed, and whether there are multiple peaks.
 - A trend over time.
   > Line charts show how a value changes over an ordered axis such as time; histograms show how many observations fall in each value range, with no time dimension.
 
@@ -333,11 +333,11 @@ For trends over time, use a line chart; for relationships between two variables,
   markdown={`What happens if you choose **too few bins** for a histogram?
 
 - The chart looks noisy.
-  > A noisy, spiky chart is actually the symptom of **too many** bins, not too few; too few bins produce the opposite — a smooth but over-simplified outline.
+  > A noisy, spiky chart is actually the symptom of **too many** bins, not too few; too few bins produce the opposite, a smooth but over-simplified outline.
 - The chart fails to render.
   > Plotly renders histograms with any bin count greater than zero without error; bin count affects the visual, not whether the chart compiles.
-- [o] Structure in the distribution (e.g., bimodality, fine clustering) gets averaged away — you only see a coarse outline.
-  > Too few bins is the visual equivalent of zooming out — you lose detail. Too many bins is the opposite: noise overwhelms signal. The sweet spot reveals *real* structure without amplifying random fluctuations. A common starting heuristic is √n bins, where n is the row count.
+- [o] Structure in the distribution (e.g., bimodality, fine clustering) gets averaged away, you only see a coarse outline.
+  > Too few bins is the visual equivalent of zooming out, you lose detail. Too many bins is the opposite: noise overwhelms signal. The sweet spot reveals *real* structure without amplifying random fluctuations. A common starting heuristic is √n bins, where n is the row count.
 
 Always sweep through 2-3 bin counts when first exploring a histogram.`}
 />
@@ -349,7 +349,7 @@ Always sweep through 2-3 bin counts when first exploring a histogram.`}
   > Raw counts are perfectly valid data values; using them is a design choice, not a rule violation.
 - Raw counts force a log scale.
   > Raw counts impose no constraint on the axis scale; a log scale is a separate choice the analyst makes independently.
-- [o] The larger group will always have taller bars, even if the *shape* of the distributions is similar — counts confound group size with distribution shape.
+- [o] The larger group will always have taller bars, even if the *shape* of the distributions is similar, counts confound group size with distribution shape.
   > To compare *shapes* fairly, normalize: use **histnorm="probability density"** or **"percent"**. That way each group's distribution integrates to the same total, and you can compare apples to apples.
 - Raw counts are always wrong.
   > Raw counts are not inherently wrong; they are the appropriate representation when the groups are the same size or when the absolute count is the quantity of interest.
@@ -365,9 +365,9 @@ When comparing distributions across groups, the question "is this group differen
 - A long tail on the right side.
   > A long right tail indicates a right-skewed (positively skewed) distribution, which is a different shape property from bimodality.
 - [o] Two distinct peaks separated by a valley.
-  > Two peaks usually means your data contains two underlying populations mixed together (e.g., "two species of fish in one tank measurement"). Bimodality is a strong analytical clue — almost always worth investigating.
+  > Two peaks usually means your data contains two underlying populations mixed together (e.g., "two species of fish in one tank measurement"). Bimodality is a strong analytical clue, almost always worth investigating.
 - All bars at the same height.
-  > Bars at uniform height indicate a uniform (flat) distribution where all value ranges are equally common — a distinct shape that is neither bimodal nor unimodal.
+  > Bars at uniform height indicate a uniform (flat) distribution where all value ranges are equally common, a distinct shape that is neither bimodal nor unimodal.
 
 Catching bimodality early can completely change your analysis. A summary statistic like the mean would fall *between* the two modes, making it misleading.`}
 />
@@ -376,7 +376,7 @@ Catching bimodality early can completely change your analysis. A summary statist
   markdown={`Which question would a histogram **NOT** help answer?
 
 - "What's the most common range of values?"
-  > The most common range — the mode or peak bin — is one of the first things a histogram answers, as it corresponds to the tallest bar.
+  > The most common range, the mode or peak bin, is one of the first things a histogram answers, as it corresponds to the tallest bar.
 - "Are there outliers far from the typical range?"
   > Outliers appear as isolated bars far from the central mass; a histogram reveals them clearly.
 - [o] "What's the correlation between income and education?"

@@ -20,6 +20,7 @@ import {
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
+import { Highlighter } from "@/components/ui/highlighter";
 import {
   stashCheckoutPeriod,
   startProCheckout,
@@ -27,13 +28,16 @@ import {
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
- *  not-available row (red ✕) — kept in place so the rows line up across plans
+ *  not-available row (red ✕), kept in place so the rows line up across plans
  *  for direct comparison. */
 type Feature = {
   text: string;
   icon?: LucideIcon;
   note?: string;
   included?: boolean;
+  /** Optional substring of `text` to wrap in a Magic UI underline
+   *  highlight (used to draw the eye to the headline Pro perks). */
+  highlight?: string;
 };
 
 interface Plan {
@@ -50,7 +54,7 @@ interface Plan {
   features: Feature[];
   cta: string;
   href: string;
-  /** The promoted tier — green CTA + inline badge (no border/shadow). */
+  /** The promoted tier, green CTA + inline badge (no border/shadow). */
   highlighted?: boolean;
   badge?: string;
   /** CTA starts a Polar checkout (signed-in users) instead of navigating. */
@@ -62,7 +66,7 @@ const FEATURE_COUNT = 9;
 const PLANS: Plan[] = [
   {
     name: "Guest",
-    description: "Jump straight in — no account needed.",
+    description: "Jump straight in, no account needed.",
     priceMonthly: "$0",
     priceAnnual: "$0",
     noteMonthly: "No sign-in required",
@@ -75,7 +79,7 @@ const PLANS: Plan[] = [
       {
         icon: HardDrive,
         text: "Save workspaces locally",
-        note: "Browser only — no cloud persistence",
+        note: "Browser only, no cloud persistence",
       },
       { text: "No cloud storage", included: false },
       {
@@ -83,11 +87,7 @@ const PLANS: Plan[] = [
         text: "Share playgrounds",
         note: "Share links expire 30 days after creation",
       },
-      {
-        icon: Sparkles,
-        text: "3 “Ask AI” messages every 24 hours",
-        note: "Across playgrounds, challenges, code blocks & lessons",
-      },
+      { text: "No “Ask AI” messages", included: false },
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
@@ -151,6 +151,7 @@ const PLANS: Plan[] = [
         icon: Database,
         text: "10 GB of cloud storage",
         note: "Total across all playgrounds",
+        highlight: "10 GB",
       },
       {
         icon: Share2,
@@ -161,11 +162,13 @@ const PLANS: Plan[] = [
         icon: Sparkles,
         text: "Unlimited “Ask AI” messages",
         note: "Fair use policy applies",
+        highlight: "Unlimited",
       },
       {
         icon: WandSparkles,
         text: "Unlimited AI-suggested autocomplete",
         note: "Inline, context-aware code completions in every playground",
+        highlight: "Unlimited",
       },
     ],
     cta: "Go Pro",
@@ -180,13 +183,52 @@ const PLANS: Plan[] = [
 // all of the subgrid's rows.
 const COL_START = ["lg:col-start-1", "lg:col-start-2", "lg:col-start-3"];
 
-function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
+/** Two features are "the same" (so the row can be collapsed on mobile) when
+ *  their text, note, and availability all match. */
+function sameFeature(a: Feature, b: Feature): boolean {
+  return (
+    a.text === b.text &&
+    (a.note ?? "") === (b.note ?? "") &&
+    a.included !== false === (b.included !== false)
+  );
+}
+
+/** Render the feature text, wrapping `feature.highlight` (if present) in a
+ *  Magic UI underline highlight. */
+function FeatureText({ feature }: { feature: Feature }) {
+  const at = feature.highlight ? feature.text.indexOf(feature.highlight) : -1;
+  if (!feature.highlight || at === -1) return <>{feature.text}</>;
+  return (
+    <>
+      {feature.text.slice(0, at)}
+      <Highlighter action="underline" color="#20C621" padding={-2} isView>
+        <span className="font-semibold">{feature.highlight}</span>
+      </Highlighter>
+      {feature.text.slice(at + feature.highlight.length)}
+    </>
+  );
+}
+
+function FeatureRow({
+  feature,
+  last,
+  mobileHidden = false,
+}: {
+  feature: Feature;
+  last: boolean;
+  /** Hide on mobile (shown only in the desktop comparison grid) because the
+   *  feature is identical to the previous plan's, the mobile layout replaces
+   *  these repeats with an "Everything in <plan>, plus" line. */
+  mobileHidden?: boolean;
+}) {
   const included = feature.included !== false;
   // Supported → the feature's own icon; missing → an ✕. Both sit in a filled
   // circle (green / red) with a white glyph.
   const Icon = included ? (feature.icon ?? Check) : X;
   return (
-    <div className={`flex gap-3 ${last ? "lg:pb-8" : ""}`}>
+    <div
+      className={`${mobileHidden ? "hidden lg:flex" : "flex"} gap-3 ${last ? "lg:pb-8" : ""}`}
+    >
       <span
         className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
           included ? "bg-[var(--ds-green-500)]" : "bg-[var(--ds-red-500)]"
@@ -195,8 +237,12 @@ function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
       >
         <Icon size={12} strokeWidth={2.5} className="text-white" />
       </span>
-      <span className="text-[15px] leading-snug text-[var(--ds-gray-900)] dark:text-white">
-        {feature.text}
+      {/* leading-relaxed (not snug) so the Magic UI underline under a
+          highlighted word (Pro's "10 GB" / "Unlimited") clears the wrapped
+          continuation line instead of crowding it. Applied to every column's
+          rows so the three stay vertically consistent. */}
+      <span className="text-[15px] leading-relaxed text-[var(--ds-gray-900)] dark:text-white">
+        <FeatureText feature={feature} />
         {feature.note && (
           <span className="mt-0.5 block text-[13px] text-[var(--ds-gray-400)]">
             {feature.note}
@@ -209,7 +255,7 @@ function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
 
 /**
  * CTA for the Pro column. Where it sends the visitor depends on who they are:
- * signed out → /sign-in (an account is required — the Polar customer is
+ * signed out → /sign-in (an account is required, the Polar customer is
  * keyed to the user id); already Pro → /account (manage the subscription);
  * signed-in free member → straight into Polar's hosted checkout for the
  * period selected by the monthly/annual toggle. If billing isn't configured
@@ -223,7 +269,7 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const sessionUser = session?.user as
     | { plan?: string; role?: string }
     | undefined;
-  // Admins are treated as Pro everywhere (lib/ai/tier.ts) — route them to
+  // Admins are treated as Pro everywhere (lib/ai/tier.ts), route them to
   // their account page rather than into a checkout for a plan they already
   // effectively have, mirroring app/account/AccountClient.tsx.
   const isPro =
@@ -233,11 +279,11 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   async function handleClick() {
     setError(null);
     // While the first session fetch is in flight a signed-in user would be
-    // misrouted to /sign-in (which bounces to /account, never checkout) —
+    // misrouted to /sign-in (which bounces to /account, never checkout),
     // ignore clicks until the session state is known.
     if (isPending) return;
     if (!session) {
-      // Remember the chosen billing period across the sign-in detour — the
+      // Remember the chosen billing period across the sign-in detour, the
       // buyer lands on /account afterwards, whose Upgrade button honors it
       // (otherwise an annual purchase silently becomes monthly). The explicit
       // ?next= pins that destination: sign-in otherwise returns the user to
@@ -280,10 +326,14 @@ function PlanColumn({
   plan,
   annual,
   colClass,
+  prevPlan,
 }: {
   plan: Plan;
   annual: boolean;
   colClass: string;
+  /** The plan one tier down (undefined for Guest). Its features collapse the
+   *  repeated rows on mobile behind an "Everything in <plan>, plus" line. */
+  prevPlan?: Plan;
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
@@ -337,11 +387,35 @@ function PlanColumn({
         </Link>
       )}
 
+      {/* Mobile only: each paid column stacks below the one before it, so
+          repeating every shared line is noise. Lead with an "Everything in
+          <previous plan>, plus" note and show only the rows that differ. The
+          desktop comparison grid (lg+) still renders every row so the three
+          columns line up. */}
+      {prevPlan && (
+        <div className="flex items-center gap-3 lg:hidden">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ds-green-500)]"
+            aria-hidden="true"
+          >
+            <Check size={12} strokeWidth={2.5} className="text-white" />
+          </span>
+          <span className="text-[15px] font-semibold leading-snug text-[var(--ds-gray-900)] dark:text-white">
+            Everything in {prevPlan.name}, plus:
+          </span>
+        </div>
+      )}
+
       {plan.features.map((feature, i) => (
         <FeatureRow
           key={feature.text}
           feature={feature}
           last={i === FEATURE_COUNT - 1}
+          mobileHidden={
+            prevPlan !== undefined &&
+            prevPlan.features[i] !== undefined &&
+            sameFeature(feature, prevPlan.features[i])
+          }
         />
       ))}
     </div>
@@ -367,16 +441,16 @@ export function PricingSection({
             Pricing
           </h2>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
-            Every course, interview track, and playground is free to use — and
+            Every course, interview track, and playground is free to use, and
             anyone can share a playground with a link. Create a free account
             for cloud saves, or go Pro for storage that never expires.
           </p>
         </div>
       )}
 
-      {/* Monthly / annual billing toggle — only the paid tier's price reacts. */}
+      {/* Monthly / annual billing toggle, only the paid tier's price reacts. */}
       <div className="mb-10 flex items-center justify-center">
-        <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/10 dark:bg-white/5">
+        <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/15 dark:bg-[#121212]">
           {(["monthly", "annual"] as const).map((option) => {
             const active = billing === option;
             return (
@@ -409,18 +483,25 @@ export function PricingSection({
         </div>
       </div>
 
-      {/* Comparison: bordered (no fill), no gaps between plans, thin dividers
-          between them, and feature rows aligned via subgrid. */}
-      <div className="rounded-2xl border border-[var(--ds-gray-200)] dark:border-white/10">
-        <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
-          {PLANS.map((plan, i) => (
-            <PlanColumn
-              key={plan.name}
-              plan={plan}
-              annual={annual}
-              colClass={COL_START[i]}
-            />
-          ))}
+      {/* Comparison: bordered, no gaps between plans, thin dividers between
+          them, and feature rows aligned via subgrid. The striped-shell gives
+          it the same diagonal-offset elevation as the code blocks / challenge
+          cards. The stripe layer sits behind an OPAQUE inner surface (the
+          bordered card below), so it only shows in the down-right offset
+          sliver, not through the table body. */}
+      <div className="ds-striped-shell rounded-2xl">
+        <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
+          <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+            {PLANS.map((plan, i) => (
+              <PlanColumn
+                key={plan.name}
+                plan={plan}
+                annual={annual}
+                colClass={COL_START[i]}
+                prevPlan={i > 0 ? PLANS[i - 1] : undefined}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

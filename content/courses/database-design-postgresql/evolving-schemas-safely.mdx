@@ -20,7 +20,7 @@ steps, not one dramatic rewrite:
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Version circles climb along thin connecting lines, each one carrying a larger green wedge of completed change — a migration advancing in small deliberate steps"
+  aria-label="Version circles climb along thin connecting lines, each one carrying a larger green wedge of completed change, a migration advancing in small deliberate steps"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -279,7 +279,7 @@ NOT NULL` would fail, because the old rows have no value yet.
 <SqlChallengeCard
   dialect="postgres"
   title="Add a required column without breaking old rows"
-  instructions={`Add a required \`category\` column to \`tasks\` in three steps, in one script: (1) \`ALTER TABLE tasks ADD COLUMN category TEXT;\` — nullable at first; (2) backfill every existing row with \`UPDATE tasks SET category = 'general' ...\`; (3) tighten with \`ALTER TABLE tasks ALTER COLUMN category SET NOT NULL;\`. When you are done, both existing tasks must have the category \`'general'\` and the column must be \`NOT NULL\`.`}
+  instructions={`Add a required \`category\` column to \`tasks\` in three steps, in one script: (1) \`ALTER TABLE tasks ADD COLUMN category TEXT;\`, nullable at first; (2) backfill every existing row with \`UPDATE tasks SET category = 'general' ...\`; (3) tighten with \`ALTER TABLE tasks ALTER COLUMN category SET NOT NULL;\`. When you are done, both existing tasks must have the category \`'general'\` and the column must be \`NOT NULL\`.`}
   initSql={`CREATE TABLE tasks (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     title TEXT NOT NULL,
@@ -334,7 +334,7 @@ SET NOT NULL;`}
 />
 
 The sequence matters more than the syntax. On a production table with
-millions of rows, each of those three steps might ship days apart —
+millions of rows, each of those three steps might ship days apart,
 but the logical order, *add, backfill, verify, tighten*, is exactly
 what you just wrote.
 

@@ -5,7 +5,7 @@ description: The battleship story behind SQLite, how it became the most deployed
 
 Every database course has to pick an engine, and this one picks
 SQLite. That choice deserves an explanation, because SQLite is a
-genuinely odd database — and the things that make it odd are the
+genuinely odd database, and the things that make it odd are the
 things that make it perfect for learning. The explanation starts,
 of all places, on a warship.
 
@@ -21,13 +21,13 @@ system: a separate database server process that his application
 connected to.
 
 The arrangement had a failure mode that drove him up the wall.
-Whenever the database server was down or misconfigured — which
-was not his code and not his fault — his application could not
+Whenever the database server was down or misconfigured, which
+was not his code and not his fault, his application could not
 run, and *his* program was the one showing the error dialog. The
 people seeing the failure blamed the software in front of them.
 
 So Hipp asked a heretical question: what if the database were not
-a separate server at all? What if it were just a **library** —
+a separate server at all? What if it were just a **library**,
 code living inside the application itself, reading and writing an
 ordinary file, with no server to be down? In mid-2000 he built
 exactly that and released it as SQLite. There was nothing to
@@ -45,13 +45,13 @@ flowchart TB
 ```
 
 This design is called an **embedded** database. Both designs are
-useful — they solve different problems — but the embedded design
+useful, they solve different problems, but the embedded design
 turned out to solve a problem almost every program has.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Two tall faded server racks stand behind a geometric equals sign that points to one small yellow file packed with the same colored data dots — SQLite carries a whole database in one little file, no server room required"
+  aria-label="Two tall faded server racks stand behind a geometric equals sign that points to one small yellow file packed with the same colored data dots, SQLite carries a whole database in one little file, no server room required"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.1">
@@ -94,8 +94,8 @@ turned out to solve a problem almost every program has.
 What began as one engineer's fix for an annoying error dialog is
 now, by a wide margin, **the most widely deployed database engine
 in the world**. SQLite ships inside every iPhone and every Android
-phone. It is inside every major web browser — Chrome, Firefox,
-Safari — and built into Windows and macOS. It stores your text
+phone. It is inside every major web browser, Chrome, Firefox,
+Safari, and built into Windows and macOS. It stores your text
 message history, your browser history, your photo metadata, your
 podcast subscriptions. The SQLite project estimates there are over
 a *trillion* SQLite databases in active use.
@@ -104,7 +104,7 @@ You have probably used SQLite hundreds of times today without
 knowing it. There is a decent chance a copy of it is involved in
 displaying this very page.
 
-And the entire thing is **public domain** — not just open source,
+And the entire thing is **public domain**, not just open source,
 but given away with no license at all. Anyone may use it, for
 anything, forever. That generosity is a large part of why it
 spread everywhere.
@@ -128,7 +128,7 @@ A database that lives in two billion phones cannot afford to lose
 data, so the SQLite project developed one of the most famous
 testing cultures in all of software. The test suites contain
 *hundreds of times* more code than the library itself, and they
-exercise **100% of the branches** in the code — verified to the
+exercise **100% of the branches** in the code, verified to the
 strict MC/DC standard used to certify avionics software. The
 tests deliberately simulate power failures, full disks, out-of-
 memory conditions, and corrupted files, because somewhere out
@@ -138,7 +138,7 @@ database right now.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="A small blue database file stands calmly inside a thin ring dotted with solid green check marks — SQLite has earned trust through an enormous amount of careful testing"
+  aria-label="A small blue database file stands calmly inside a thin ring dotted with solid green check marks, SQLite has earned trust through an enormous amount of careful testing"
   style={{ display: "block", width: "100%", maxWidth: "420px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="320" cy="92" r="70" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" />
@@ -164,7 +164,7 @@ data in some of the most demanding environments in the world.
 
 ## One database, one ordinary file
 
-A SQLite database — all its tables, indexes, and rows — lives in
+A SQLite database, all its tables, indexes, and rows, lives in
 a single ordinary file on disk, often named something like
 `app.db`. You can copy it, email it, back it up by dragging it,
 and hand it to a colleague. That single-file design is why apps,
@@ -198,8 +198,8 @@ flowchart TB
 Put the pieces together and you get an unusually good classroom:
 
 - **Zero configuration.** No server to install, no users or ports
-  to set up. You spend your attention on tables, rows, and SQL —
-  the ideas — instead of on plumbing. (In this course it goes one
+  to set up. You spend your attention on tables, rows, and SQL,
+  the ideas, instead of on plumbing. (In this course it goes one
   step further: SQLite compiled to WebAssembly runs right in your
   browser.)
 - **Real SQL.** SQLite speaks the same core SQL as PostgreSQL,
@@ -221,7 +221,7 @@ flowchart LR
 No tool is right for everything, and SQLite's documentation is
 refreshingly blunt about its limits. Because the whole database is
 one file with no central server, SQLite shines when an
-application needs **local** storage — and struggles when *many
+application needs **local** storage, and struggles when *many
 users must write to the same database at the same moment* from
 different machines. A busy social network or a bank's central
 ledger calls for a client-server database, where a dedicated
@@ -235,8 +235,8 @@ flowchart TB
     A -->|"Learning SQL"| D["SQLite is the friendly start"]
 ```
 
-Knowing a tool's limits is part of knowing the tool. For learning
-— and for an enormous share of real software — SQLite is exactly
+Knowing a tool's limits is part of knowing the tool. For learning,
+and for an enormous share of real software, SQLite is exactly
 right.
 
 ## Check your understanding
@@ -296,5 +296,5 @@ right.
 You now know what a database is, why the relational model won,
 and why this course's engine fits in your browser tab. Time to
 stop reading about tables and start taking them apart: the next
-section opens up rows, columns, keys, and types — the anatomy of
+section opens up rows, columns, keys, and types, the anatomy of
 everything you will query for the rest of the course.

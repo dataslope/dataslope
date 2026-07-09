@@ -6,14 +6,14 @@ description: Summary statistics can describe wildly different datasets identical
 There is one habit that separates careful analysts from the rest, and
 it is almost embarrassingly simple: **before you trust a summary
 statistic, plot the data and look at it.** This page makes the case
-in the most vivid way the field has ever found — two datasets where
+in the most vivid way the field has ever found, two datasets where
 the numbers agree perfectly and the *pictures* could not be more
 different.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two panels share the same dotted trend line, but the left is a tidy upward cloud while the right hides a dinosaur shape — identical statistics, different pictures"
+  aria-label="Two panels share the same dotted trend line, but the left is a tidy upward cloud while the right hides a dinosaur shape, identical statistics, different pictures"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -55,8 +55,8 @@ different.
 <IllustrationPrompt subject="Francis Anscombe" photo />
 
 In 1973, the statistician **Francis Anscombe** built four small
-datasets specifically to make a point. All four share — to two
-decimal places — the same mean of x, the same mean of y, the same
+datasets specifically to make a point. All four share, to two
+decimal places, the same mean of x, the same mean of y, the same
 variance, the same correlation, and the *same* fitted regression
 line. By every standard summary number, they are identical.
 
@@ -90,7 +90,7 @@ print("\\nFour datasets. The summary statistics are essentially identical.")
 
 The means line up, the spreads line up, the correlation is about 0.82
 for all four. A model would treat them as the same data. Now **plot
-them** — one panel each — and the illusion collapses.
+them**, one panel each, and the illusion collapses.
 
 <CodeBlock
   adapter="python"
@@ -108,7 +108,7 @@ aq = pd.read_csv("anscombe.csv")`,
     facet_col="dataset",
     facet_col_wrap=2,
     template="simple_white",
-    title="Anscombe's quartet — same statistics, four different shapes",
+    title="Anscombe's quartet, same statistics, four different shapes",
 )
 fig.show()
 `,
@@ -120,8 +120,8 @@ Look at what the numbers hid: dataset **I** is a genuine linear
 cloud; **II** is a smooth curve (a straight-line model is the wrong
 model entirely); **III** is a perfect line dragged off course by a
 single outlier; **IV** is a vertical stack whose entire correlation
-comes from one stray point. The correlation coefficient — 0.82 for
-all of them — sees none of this.
+comes from one stray point. The correlation coefficient, 0.82 for
+all of them, sees none of this.
 
 ## The Datasaurus Dozen (2017)
 
@@ -129,9 +129,9 @@ all of them — sees none of this.
 
 Anscombe's point was so good that, in **2017**, Justin Matejka and
 George Fitzmaurice at Autodesk pushed it to its logical extreme.
-Starting from Alberto Cairo's "Datasaurus" — a scatter of points that
-forms a cartoon **dinosaur** yet has unremarkable summary statistics
-— they generated *twelve more* datasets that share the same mean,
+Starting from Alberto Cairo's "Datasaurus", a scatter of points that
+forms a cartoon **dinosaur** yet has unremarkable summary statistics,
+they generated *twelve more* datasets that share the same mean,
 standard deviation, and correlation to two decimal places while
 looking like stars, lines, circles, and slanted clouds.
 
@@ -164,7 +164,7 @@ print("\\n13 datasets. The summaries are essentially the same row, repeated.")
 />
 
 The means hover around 54 and 48, the standard deviations around 17
-and 26, the correlation near −0.06 — for every single one, *including*
+and 26, the correlation near −0.06, for every single one, *including*
 the dinosaur. Now plot them and find the dino:
 
 <CodeBlock
@@ -184,7 +184,7 @@ dd = pd.read_csv("datasaurus.csv")`,
     facet_col_wrap=4,
     height=700,
     template="simple_white",
-    title="The Datasaurus Dozen — identical statistics, wildly different shapes",
+    title="The Datasaurus Dozen, identical statistics, wildly different shapes",
 )
 fig.update_xaxes(matches=None, showticklabels=False)
 fig.update_yaxes(matches=None, showticklabels=False)
@@ -194,14 +194,14 @@ fig.show()
   ]}
 />
 
-There it is — a dinosaur, a star, two parallel lines, a bullseye —
+There it is, a dinosaur, a star, two parallel lines, a bullseye,
 all sharing one row of summary statistics. If you had only the
 numbers, you would never know.
 
 <Callout type="warn" title="The cheapest insight in this whole course">
 Mean, standard deviation, and correlation are a three-number summary
-of a cloud that may contain a dinosaur. The shapes they miss —
-curves, clusters, outliers, two populations mixed together — are
+of a cloud that may contain a dinosaur. The shapes they miss,
+curves, clusters, outliers, two populations mixed together, are
 *exactly* the ones that change the conclusion. Before you summarize,
 before you model, before you trust a single statistic: **scatter the
 data and look at it.** It costs one line of code.
@@ -218,7 +218,7 @@ data and look at it.** It costs one line of code.
 Show that summary statistics can't tell the four datasets apart, then show that the *shapes* differ.
 
 1. Build a variable \`mean_y\` = the mean of column \`y\` across the **whole** DataFrame, rounded to 2 decimals. (All four datasets share the same mean y, so this equals each group's mean y.)
-2. Build a Plotly figure \`fig\` that draws a **scatter plot faceted by \`dataset\`** — one panel per dataset — using \`px.scatter\` with \`facet_col="dataset"\`.
+2. Build a Plotly figure \`fig\` that draws a **scatter plot faceted by \`dataset\`**, one panel per dataset, using \`px.scatter\` with \`facet_col="dataset"\`.
 
 The point: one number summarizes all four, but the four pictures are different.`}
   files={[

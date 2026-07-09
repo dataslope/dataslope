@@ -12,7 +12,7 @@ datasets that wobble can be large enough to make you pick the wrong model.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Five rows of segmented bars; in each row the single yellow held-out segment slides one position along, so every segment takes a turn as the test set — k-fold cross-validation"
+  aria-label="Five rows of segmented bars; in each row the single yellow held-out segment slides one position along, so every segment takes a turn as the test set, k-fold cross-validation"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -89,7 +89,7 @@ print(f"Std deviation:         {scores.std():.3f}")
 Nothing changed but the luck of the draw, yet the accuracy swings by more
 than ten percentage points from the unluckiest split to the luckiest. If you
 had run *one* split and reported its number as "the" accuracy, you might
-have been several points too optimistic or too pessimistic — and you would
+have been several points too optimistic or too pessimistic, and you would
 never have known. Which split is the "true" one? None of them. The truth is
 somewhere in the middle, and a single split cannot tell you where.
 
@@ -161,7 +161,7 @@ print(f"Report it as: {scores.mean():.3f} plus or minus {scores.std():.3f}")
 
 That mean is a far more trustworthy estimate than any single split, and the
 standard deviation is the error bar you were missing. The right way to
-report a cross-validated result is *mean plus or minus standard deviation* —
+report a cross-validated result is *mean plus or minus standard deviation*,
 never a single bare number pretending to be exact.
 
 <Callout type="info" title="Stratification comes free for classifiers">
@@ -189,7 +189,7 @@ fits and can be noisy. For most work, 5 or 10 folds is the sweet spot.
 
 Here is a subtle and dangerous mistake. If you scale your features using the
 whole dataset *before* cross-validating, every fold's "test" portion has
-already influenced the scaler — information has leaked from test to train,
+already influenced the scaler, information has leaked from test to train,
 and your CV score is optimistic. The fix is to put preprocessing **inside**
 the cross-validation, so it is re-fit from scratch on each fold's training
 data. A `Pipeline` does this automatically.
@@ -227,7 +227,7 @@ Because the `StandardScaler` lives inside the pipeline, each fold scales
 using only its own training portion. The cross-validation now faithfully
 mimics what happens at deployment, where you must scale new data using
 statistics learned in the past. We will build pipelines properly in their
-own chapter — for now, the lesson is: **anything that learns from data
+own chapter, for now, the lesson is: **anything that learns from data
 belongs inside the cross-validation loop.**
 
 <Callout type="danger" title="Preprocess inside, not before">
@@ -240,7 +240,7 @@ preprocessing and model together in a `Pipeline` so every fold is honest.
 
 A common confusion: "If I cross-validate, do I still need a test set?" For
 the most rigorous estimate, **yes**. Here is the reasoning. You typically
-use cross-validation to *choose* things — which model, which
+use cross-validation to *choose* things, which model, which
 hyperparameters. The moment you select the option with the best CV score,
 that score is slightly optimistic, because you picked the winner of a
 contest with some luck in it. A final, untouched test set gives you one
@@ -259,7 +259,7 @@ set is for the *final, honest report* after the decisions are made.
 
 ## When cross-validation needs care
 
-The plain k-fold shuffle assumes rows are independent and interchangeable —
+The plain k-fold shuffle assumes rows are independent and interchangeable,
 the same assumption the random split makes, and it fails in the same places:
 
 - **Time series.** Use `TimeSeriesSplit`, which always trains on the past
@@ -277,7 +277,7 @@ time, `GroupKFold` for grouped data.
 ## Common misconceptions
 
 - **"Cross-validation prevents overfitting."** It does not change how a
-  model fits — it *measures* generalization more reliably so you can *detect*
+  model fits, it *measures* generalization more reliably so you can *detect*
   overfitting and choose better. The fixing is still up to you.
 - **"More folds is always better."** Beyond 10, you pay a lot of compute for
   diminishing returns, and leave-one-out can be noisy.
@@ -293,8 +293,8 @@ time, `GroupKFold` for grouped data.
 Cross-validation is the default evaluation protocol in nearly every applied
 ML project and every Kaggle competition. When a paper claims a model is
 better, the credible ones back it with cross-validated scores and standard
-deviations, not a single lucky split. Whenever data is scarce — medical
-studies, niche business problems — cross-validation is what lets a few
+deviations, not a single lucky split. Whenever data is scarce, medical
+studies, niche business problems, cross-validation is what lets a few
 hundred rows yield a trustworthy estimate.
 
 ## Your turn
@@ -316,7 +316,7 @@ hundred rows yield a trustworthy estimate.
 
 The tests check that \`cv_scores\` has 10 entries, that \`mean_score\`
 matches \`cv_scores.mean()\`, and that the mean is a strong accuracy
-(above 0.9) — which it should be for this very separable pair.`}
+(above 0.9), which it should be for this very separable pair.`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
@@ -381,11 +381,11 @@ assert abs(mean_score - cv_scores.mean()) < 1e-9`,
 - It is slower than cross-validation
   > A single train/test split is actually faster than cross-validation, which requires training the model k times. Speed is an advantage of single splits, not a problem.
 - It always overestimates accuracy
-  > A single split can go either way — it can be optimistic or pessimistic depending on which rows land in the test set. The problem is that you cannot know which, and there is no error bar to warn you.
+  > A single split can go either way, it can be optimistic or pessimistic depending on which rows land in the test set. The problem is that you cannot know which, and there is no error bar to warn you.
 - [o] The score depends on which rows happened to land in the test set, so it is a noisy estimate with no error bar
   > A single split is one roll of the dice; reshuffle and the number moves. Cross-validation averages many splits to stabilize the estimate.
 - It cannot be used with classifiers
-  > A single train/test split works perfectly well with classifiers. The limitation is statistical — high variance due to depending on one particular split — not a compatibility issue.
+  > A single train/test split works perfectly well with classifiers. The limitation is statistical, high variance due to depending on one particular split, not a compatibility issue.
 
 The weakness is variance in the estimate, not speed or a fixed direction of bias.`}
 />
@@ -394,10 +394,10 @@ The weakness is variance in the estimate, not speed or a fixed direction of bias
   markdown={`In 5-fold cross-validation, how many times is each row used for **testing**?
 
 - Five times
-  > Each row is used for *training* in four of the five rounds, not testing. Testing happens in exactly one round — the one where the row's fold is held out.
+  > Each row is used for *training* in four of the five rounds, not testing. Testing happens in exactly one round, the one where the row's fold is held out.
 - Zero times
   > Every row is tested exactly once. The defining property of k-fold cross-validation is that every row participates in a test fold in exactly one of the k rounds.
-- [o] Exactly once — each row sits in the test fold in exactly one of the five rounds
+- [o] Exactly once, each row sits in the test fold in exactly one of the five rounds
   > Each fold serves as the test set once, so every row is tested a single time and used for training in the other four rounds.
 - It depends on the random seed
   > The number of times each row is used for testing is always exactly one in k-fold cross-validation, regardless of how the folds were assigned. The seed can affect *which* fold a row lands in, but not *how many* times it is tested.
@@ -409,7 +409,7 @@ This is what lets cross-validation use all the data for both training and testin
   markdown={`Why should preprocessing like \`StandardScaler\` be placed *inside* a \`Pipeline\` that is cross-validated, rather than applied to the whole dataset first?
 
 - It runs faster inside a pipeline
-  > A pipeline does not make preprocessing faster; it adds a small overhead. The reason to use a pipeline is correctness — preventing data leakage — not speed.
+  > A pipeline does not make preprocessing faster; it adds a small overhead. The reason to use a pipeline is correctness, preventing data leakage, not speed.
 - Pipelines are required by \`cross_val_score\`
   > \`cross_val_score\` works with any estimator, not just pipelines. Pipelines are recommended to prevent leakage, not because they are technically required.
 - [o] So the scaler is re-fit on each fold's training portion only, preventing information from the test fold leaking into training
@@ -424,11 +424,11 @@ The point is leakage prevention: anything that learns from data must be re-fit w
   markdown={`After using cross-validation to choose your model and hyperparameters, why keep a separate untouched test set?
 
 - Because cross-validation cannot score classifiers
-  > Cross-validation works with classifiers by default — \`cross_val_score\` even uses stratified folds for them. The reason to keep a test set is to have a final unbiased estimate, not because CV cannot score classifiers.
+  > Cross-validation works with classifiers by default, \`cross_val_score\` even uses stratified folds for them. The reason to keep a test set is to have a final unbiased estimate, not because CV cannot score classifiers.
 - [o] Because selecting the option with the best CV score makes that score slightly optimistic; a final untouched test set gives one clean, unbiased number
   > Picking the winner of a noisy contest favors lucky candidates, so the winning CV score is a bit inflated. The held-out test set reports performance after all choices are locked in.
 - Because the test set trains the final model
-  > The test set is never used for training — it is held out until final evaluation. The final model is trained on all the non-test data, typically after choices are locked in using cross-validation.
+  > The test set is never used for training, it is held out until final evaluation. The final model is trained on all the non-test data, typically after choices are locked in using cross-validation.
 - Because cross-validation uses the test set internally
   > Cross-validation operates only on the non-test portion of the data. The test set is kept completely separate so it remains an unbiased final checkpoint.
 
@@ -440,10 +440,10 @@ CV is for decision-making with a stable signal; the test set is for the final ho
 
 - k-fold cannot be used for regression
   > k-fold cross-validation works fine with regression tasks, including revenue prediction. The problem here is the temporal ordering of rows, not the regression target.
-- [o] The data is ordered in time; plain k-fold would train on future months to predict past ones, which is impossible in reality — use \`TimeSeriesSplit\`
+- [o] The data is ordered in time; plain k-fold would train on future months to predict past ones, which is impossible in reality, use \`TimeSeriesSplit\`
   > Shuffled folds let the model peek at the future. Time-aware splitting trains on the past and tests on later periods, matching real use.
 - k-fold requires at least 100 folds for time series
-  > There is no minimum fold requirement for time series, and \`TimeSeriesSplit\` typically uses far fewer folds (5 or 10) — the same range as regular k-fold. The issue is ordering, not fold count.
+  > There is no minimum fold requirement for time series, and \`TimeSeriesSplit\` typically uses far fewer folds (5 or 10), the same range as regular k-fold. The issue is ordering, not fold count.
 - Revenue data cannot be cross-validated
   > Revenue forecasting can absolutely be cross-validated; the key is using \`TimeSeriesSplit\` to respect the temporal order so the model never trains on future data to predict the past.
 

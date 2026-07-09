@@ -436,7 +436,7 @@ export function useSidebarActions(
       void (async () => {
       try {
         const allCols = await engine.listColumns(name);
-        // Generated columns are computed by SQLite — never accept input.
+        // Generated columns are computed by SQLite, never accept input.
         const cols = allCols.filter((c) => c.generated === null);
         const initValues: Record<string, string> = {};
         for (const c of cols) initValues[c.name] = "";
@@ -599,7 +599,7 @@ export function useSidebarActions(
       try {
         const sets = await engine.exec(`SELECT * FROM ${quoteIdent(name)}`);
         if (!sets || sets.length === 0) {
-          showToast(`"${name}" is empty — no data to export.`, "warn");
+          showToast(`"${name}" is empty, no data to export.`, "warn");
           return;
         }
         const { columns, values: rows } = sets[0];

@@ -5,7 +5,7 @@
  * the first tab stop on every page. Pages here don't share a stable content
  * id, so activation focuses the page's main landmark (falling back to the
  * first h1) instead of relying on a fragment target. Styled by
- * `.skip-to-content` in globals.css — visually hidden until focused.
+ * `.skip-to-content` in globals.css, visually hidden until focused.
  */
 export default function SkipToContent() {
   return (

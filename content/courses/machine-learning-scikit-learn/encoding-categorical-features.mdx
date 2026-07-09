@@ -1,6 +1,6 @@
 ---
 title: Encoding Categorical Features
-description: Models do arithmetic, but categories like "red" and "Tokyo" are words. How to turn them into numbers honestly — and the encoding mistake that quietly teaches your model something false.
+description: Models do arithmetic, but categories like "red" and "Tokyo" are words. How to turn them into numbers honestly, and the encoding mistake that quietly teaches your model something false.
 ---
 
 A scikit-learn model multiplies, adds, and compares numbers. It has no idea
@@ -9,7 +9,7 @@ of exactly these: color, country, product category, blood type, payment
 method. Before any model can use them, these **categorical features** must
 become numbers.
 
-The obvious way to do that is also, for most categories, the *wrong* way —
+The obvious way to do that is also, for most categories, the *wrong* way,
 and the mistake is subtle enough that it ships in real systems all the
 time. This page is about encoding categories correctly, why the tempting
 shortcut backfires, and how `OneHotEncoder` does it right.
@@ -17,7 +17,7 @@ shortcut backfires, and how `OneHotEncoder` does it right.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three colored category pills each become a row of cells in which exactly one cell lights up with a one — one-hot encoding gives every category its own honest yes-or-no column"
+  aria-label="Three colored category pills each become a row of cells in which exactly one cell lights up with a one, one-hot encoding gives every category its own honest yes-or-no column"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -59,7 +59,7 @@ Consider a tiny dataset describing T-shirts:
 | green | L    | Paris | 25    |
 | blue  | S    | Tokyo | 18    |
 
-The `price` column is already numeric — a model can use it directly. But
+The `price` column is already numeric, a model can use it directly. But
 `color`, `size`, and `city` are text. If you hand this table straight to
 `LogisticRegression` or `KNeighborsClassifier`, you get an error, because
 there is no sensible way to compute "red times a weight."
@@ -116,15 +116,15 @@ Encoding an **unordered** (nominal) category as a single integer column
 (red=0, green=1, blue=2) makes the model believe in an ordering and in
 distances that do not exist. The model will treat "blue > green > red" as
 meaningful and may fit a smooth trend across categories that are not on any
-scale at all. The bug does not crash — it silently degrades the model and
+scale at all. The bug does not crash, it silently degrades the model and
 can hide for a long time.
 </Callout>
 
 ### When integer labels *are* fine: genuinely ordinal data
 
-The shortcut is not always wrong. It is wrong for **nominal** categories —
+The shortcut is not always wrong. It is wrong for **nominal** categories,
 ones with no inherent order (color, city, payment method). It is perfectly
-reasonable for **ordinal** categories — ones with a real, meaningful order.
+reasonable for **ordinal** categories, ones with a real, meaningful order.
 
 T-shirt **size** is ordinal: small < medium < large is a true ordering, and
 the "distance" from S to L really is larger than from S to M. Encoding it
@@ -161,7 +161,7 @@ categories?**
 
 <Callout type="tip" title="Ask: would sorting these categories mean anything?">
 Sorting sizes (S, M, L) into an order is meaningful. Sorting colors (red,
-green, blue) into an order is arbitrary — any order is as good as any
+green, blue) into an order is arbitrary, any order is as good as any
 other, which is precisely the signal that an integer encoding would invent
 information. Ordinal data has a natural sort; nominal data does not.
 </Callout>
@@ -199,7 +199,7 @@ default, safe choice for nominal categories.
 
 scikit-learn's `OneHotEncoder` does this, and unlike a one-off pandas
 trick, it **remembers** the categories it saw during `fit` so it can apply
-the exact same columns at predict time. That memory matters — we will use
+the exact same columns at predict time. That memory matters, we will use
 it in a moment.
 
 <CodeBlock
@@ -235,7 +235,7 @@ print(encoded)
   ]}
 />
 
-Three text columns became several 0/1 columns — one per distinct value
+Three text columns became several 0/1 columns, one per distinct value
 across all three features (3 colors + 3 sizes + 3 cities = 9 columns here).
 `get_feature_names_out()` tells you exactly which column is which, so you
 never lose track of what `color_blue` refers to.
@@ -252,7 +252,7 @@ many categories the sparse default saves a great deal of memory.
 
 The toy table makes the mechanics clear, but the same call works unchanged
 on real data. The **diamonds** dataset has 53,940 rows and three categorical
-columns — `cut`, `color`, and `clarity` — alongside its numeric features. We
+columns, `cut`, `color`, and `clarity`, alongside its numeric features. We
 sample 4,000 rows with a fixed `random_state` purely for speed; one-hot
 encoding a column does not depend on how many rows you feed it, so a sample
 is enough to see the result quickly.
@@ -285,18 +285,18 @@ print("First row's cut:", sample["cut"].iloc[0], "->", encoded[0])
   ]}
 />
 
-The single `cut` column expands into five 0/1 columns — one for each grade
-(`Fair`, `Good`, `Very Good`, `Premium`, `Ideal`) — and every row still has
+The single `cut` column expands into five 0/1 columns, one for each grade
+(`Fair`, `Good`, `Very Good`, `Premium`, `Ideal`), and every row still has
 exactly one `1`. Nothing about the call changed from the toy example; only
 the data did.
 
-<Callout type="info" title="Diamonds' categories actually have an order — so they are a judgement call">
+<Callout type="info" title="Diamonds' categories actually have an order, so they are a judgement call">
 Unlike colors, the diamond grades are *ordinal*: `cut` runs
 Fair < Good < Very Good < Premium < Ideal, and `clarity` runs from `I1` up
 to `IF`. Because a real order exists, encoding them with `OrdinalEncoder`
 (supplying that order explicitly) is **defensible** and keeps the
-representation compact. One-hot is still a safe default — it never imposes a
-wrong order — which is why we use it here, but this is exactly the kind of
+representation compact. One-hot is still a safe default, it never imposes a
+wrong order, which is why we use it here, but this is exactly the kind of
 column where you have a genuine choice. Contrast that with truly unordered
 labels like the color *names* red/green/blue, where one-hot is the only
 honest option.
@@ -304,7 +304,7 @@ honest option.
 
 ## Seeing the trap cost real accuracy
 
-The integer-label mistake is not just theoretically untidy — it measurably
+The integer-label mistake is not just theoretically untidy, it measurably
 hurts. Let us prove it the way the preprocessing page proved scaling
 matters: train the same model two ways on the same data, once with integer
 labels and once with one-hot encoding, and compare.
@@ -370,7 +370,7 @@ The integer-label model is stuck near coin-flip accuracy, while the one-hot
 model recovers the real per-city risk almost perfectly. The reason is
 exactly the false-order problem: a single weight on the integer column can
 only express a *monotonic* trend (risk going steadily up or down as the
-label increases), but the true pattern zig-zags — high, low, high, low — and
+label increases), but the true pattern zig-zags, high, low, high, low, and
 no ordering of the integers can match it. One-hot encoding gives each city
 its own weight, so the model fits each city's risk independently. The
 encoding choice, not the algorithm, decided whether the model could learn.
@@ -388,7 +388,7 @@ penalty for integer-labeling a nominal feature.
 
 Here is a problem one-hot encoding must solve. You `fit` the encoder on
 your training data, which contains the cities `Tokyo`, `Paris`, and
-`Berlin`. Months later, a new record arrives with city `London` — a value
+`Berlin`. Months later, a new record arrives with city `London`, a value
 the encoder never saw. What should happen?
 
 By default the encoder raises an error, because it does not have a
@@ -425,7 +425,7 @@ print("London ->", out[1])  # all zeros: 'none of the known cities'
 />
 
 `Paris` gets its usual one-hot row. `London`, never seen during `fit`,
-becomes all zeros — the encoder does not invent a column or crash; it
+becomes all zeros, the encoder does not invent a column or crash; it
 simply records "unknown." Crucially, the *number* of output columns stays
 fixed at what the encoder learned during `fit`, so the shape your model
 expects never changes from one batch to the next.
@@ -433,7 +433,7 @@ expects never changes from one batch to the next.
 <Callout type="info" title="Why fixed output columns matter">
 A trained model expects an exact number of input columns, in an exact
 order. Because `OneHotEncoder` locks in its columns at `fit` time, every
-later `transform` produces that same set of columns — even when new
+later `transform` produces that same set of columns, even when new
 categories show up. Without `handle_unknown="ignore"`, an unseen category
 would otherwise break this contract. This is also why you must `fit` the
 encoder on training data only and reuse it, exactly like the scaler on the
@@ -443,7 +443,7 @@ from the training set.
 
 <Callout type="danger" title="Encode using the encoder you fit on training data">
 Do not call `pd.get_dummies` separately on your train and test sets and
-hope the columns line up — they will not if a category is missing from one
+hope the columns line up, they will not if a category is missing from one
 split, and your model will receive mismatched columns. Fit a single
 `OneHotEncoder` on the training data and use it to transform everything.
 (The pipelines page shows how to bundle this with your model so it happens
@@ -453,7 +453,7 @@ automatically and leak-free.)
 ## The dummy-variable detail (and why scikit-learn does not force it)
 
 You may have heard, from a statistics course, that for $k$ categories you
-should create only $k-1$ columns — dropping one as a "reference" — to avoid
+should create only $k-1$ columns, dropping one as a "reference", to avoid
 perfect collinearity (the dropped column is implied when all the others are
 0). `OneHotEncoder` supports this via `drop="first"`, but does **not** do it
 by default, and for most machine learning models that is fine:
@@ -464,7 +464,7 @@ by default, and for most machine learning models that is fine:
 
 For classical *inferential* linear regression where you interpret
 coefficients, dropping a column keeps them identifiable. For prediction
-with regularized or tree models — the focus of this course — keeping all
+with regularized or tree models, the focus of this course, keeping all
 columns is a perfectly normal default. Know that the option exists; do not
 agonize over it.
 
@@ -475,7 +475,7 @@ free, and it is not always the best tool:
 
 - **High-cardinality features.** A `zip_code` or `user_id` column with
   thousands of distinct values would explode into thousands of mostly-zero
-  columns — wide, sparse, and slow. For very high cardinality, other
+  columns, wide, sparse, and slow. For very high cardinality, other
   techniques (target encoding, hashing, embeddings) are usually better;
   one-hot becomes unwieldy.
 - **Genuinely ordinal features.** As covered above, if a real order exists
@@ -491,7 +491,7 @@ free, and it is not always the best tool:
 <Callout type="info" title="Common misconception: 'more columns means more information'">
 One-hot encoding does not *add* information; it *re-represents* the same
 information in a form the model can use without inventing a false order.
-With very high cardinality, all those extra columns can actually *hurt* —
+With very high cardinality, all those extra columns can actually *hurt*,
 they add sparsity and dimensions without adding signal, making models
 slower and more prone to overfitting. Use one-hot when the number of
 distinct categories is modest.
@@ -510,8 +510,8 @@ records are full of labels:
   scale of mild/moderate/severe is ordinal (integer encoding preserves the
   order).
 - **E-commerce.** Product category, payment method, and shipping region are
-  classic nominal features. Mishandling them — for instance, integer-labeling
-  product categories — is a common, quiet source of weaker models.
+  classic nominal features. Mishandling them, for instance, integer-labeling
+  product categories, is a common, quiet source of weaker models.
 
 The reasoning is always the same: numbers in, but *honest* numbers that do
 not assert relationships the world does not contain.
@@ -530,8 +530,8 @@ its \`cut\` column.
 
 1. Create a \`OneHotEncoder\` with \`handle_unknown="ignore"\` and
    \`sparse_output=False\` and store it in \`encoder\`.
-2. Fit-transform the \`cut\` column — pass \`sample[["cut"]]\` (a DataFrame,
-   note the double brackets) — and store the resulting array in \`encoded\`.
+2. Fit-transform the \`cut\` column, pass \`sample[["cut"]]\` (a DataFrame,
+   note the double brackets), and store the resulting array in \`encoded\`.
 3. Store the encoder's output column names (from
    \`get_feature_names_out()\`) in \`columns\` (as a list).
 
@@ -617,7 +617,7 @@ assert len(columns) == encoded.shape[1], f"Expected {encoded.shape[1]} names, go
 
 - It uses too much memory compared to one-hot encoding
   > A single integer column actually uses *less* memory than one-hot; the problem is meaning, not memory.
-- [o] It invents a false ordering and false distances — the model treats blue (2) as "greater than" red (0) and green as the midpoint, relationships that do not exist among colors
+- [o] It invents a false ordering and false distances, the model treats blue (2) as "greater than" red (0) and green as the midpoint, relationships that do not exist among colors
   > A single integer column imposes order and spacing on categories that have neither, so the model learns relationships the data does not contain.
 - It will raise an error when the model is trained
   > Integer-labeled categories train without error; the harm is a silently weaker model, which is why the bug is easy to miss.
@@ -633,13 +633,13 @@ Colors have no natural order, so any integer assignment fabricates an ordering t
 - City: New York=0, London=1, Tokyo=2
   > Cities have no natural order, so an integer encoding would invent a false ranking; this is a nominal feature.
 - Color: red=0, green=1, blue=2
-  > Colors are unordered, so integer labels fabricate an ordering — the classic nominal-encoding mistake.
+  > Colors are unordered, so integer labels fabricate an ordering, the classic nominal-encoding mistake.
 - [o] T-shirt size: S=0, M=1, L=2
   > Size has a real order (S < M < L) with meaningful spacing, so an integer encoding preserves genuine information rather than inventing it.
 - Payment method: cash=0, card=1, crypto=2
   > Payment methods have no inherent order, so this is nominal and an integer encoding would assert a false ranking.
 
-Integer encoding is right exactly when the categories have a true, meaningful order — that is, when they are ordinal.`}
+Integer encoding is right exactly when the categories have a true, meaningful order, that is, when they are ordinal.`}
 />
 
 <MultipleChoice

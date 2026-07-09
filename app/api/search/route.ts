@@ -3,14 +3,14 @@
  *
  * The docs sources run in Fumadocs `dynamic` mode, so the stock
  * `createFromSource(source)` would read each lesson's MDX from disk at request
- * time to build its index — which throws on Cloudflare Workers (no filesystem)
+ * time to build its index, which throws on Cloudflare Workers (no filesystem)
  * and 500s. Its "advanced" index is also ~54 MB, too big for a Worker.
  *
  * Instead we build a lightweight Orama "simple" index (one document per page)
  * from a compact, prose-only input array that is precomputed at build time and
  * bundled into the Worker (`lib/generated/search-index.js`, see
  * `scripts/build-search-index.mjs`). The index is built once per isolate on
- * first request and lives only in Worker memory — never shipped to the
+ * first request and lives only in Worker memory, never shipped to the
  * browser. No filesystem access happens at request time.
  *
  * The site is English-only, so the Orama English stemmer is used.

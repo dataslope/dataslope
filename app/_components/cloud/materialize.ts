@@ -5,13 +5,13 @@
  *
  * Code playgrounds materialize into a real local workspace (OPFS files +
  * localStorage manifest) *before* navigation, so the playground boots it like
- * any other workspace — no playground code involvement at all.
+ * any other workspace, no playground code involvement at all.
  *
  * SQL playgrounds can't be materialized from the outside: their state lives
  * in the engine (rebuilt by replaying the bundle's SQL dump) and in
  * per-database tab storage. For those we stash a tiny **pending-bundle ref**
  * in sessionStorage and navigate; the playground applies it after its engine
- * boots (fetching the bundle again by reference keeps the marker small —
+ * boots (fetching the bundle again by reference keeps the marker small,
  * sessionStorage can't hold a multi-MB dump).
  */
 
@@ -96,11 +96,11 @@ export function setPendingBundleRef(
       JSON.stringify(ref),
     );
   } catch {
-    /* private mode — the open flow surfaces its own error */
+    /* private mode, the open flow surfaces its own error */
   }
 }
 
-/** Reads AND clears the pending ref (one attempt per navigation — a failed
+/** Reads AND clears the pending ref (one attempt per navigation, a failed
  *  apply must not loop on every reload). */
 export function takePendingBundleRef(
   playgroundId: string,

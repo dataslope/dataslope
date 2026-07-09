@@ -4,7 +4,7 @@
  * description, then a difficulty + language meta line aligned on a fixed
  * grid column (so language icons line up across rows).
  *
- * `LangIcon` and `LevelBars` are exported too — the catalog's filter sidebar
+ * `LangIcon` and `LevelBars` are exported too, the catalog's filter sidebar
  * reuses them as row glyphs.
  */
 import type { IconType } from "react-icons";
@@ -18,9 +18,20 @@ import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseGlyph } from "./courseArt";
 
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
-const HOVER_BG = "hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.08]";
+// Hover affordance: no background fill, just a subtle shift of the glyph +
+// title toward the brand blue, and a gentle darkening of the description.
+const HOVER_TEXT =
+  "transition-colors group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
+// The glyph both recolours and nudges to the right on hover, so the whole row
+// feels responsive. `transition-[color,transform]` animates both at once.
+const HOVER_GLYPH =
+  "transition-[color,translate] duration-200 group-hover:translate-x-1 group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
+// The description shifts a shade darker on hover, subtle enough to read as a
+// whole-card affordance without competing with the title's blue.
+const HOVER_DESC =
+  "transition-colors group-hover:text-[var(--ds-gray-600)] dark:group-hover:text-[var(--ds-gray-300)]";
 
-/** Neutral database glyph for "sql" — the shared language-icon registry only
+/** Neutral database glyph for "sql", the shared language-icon registry only
  *  has per-engine marks (SQLite/PostgreSQL/DuckDB); path from the mockup. */
 function SqlIcon({ size = 16 }: { size?: number }) {
   return (
@@ -87,19 +98,26 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      // Dense index list — don't viewport-prefetch every course row
+      // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
-      className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}
+      className="group -mx-3 grid grid-cols-[30px_1fr] items-start gap-4 px-3 py-6"
     >
-      <CourseGlyph slug={course.slug} tags={course.tags} size={32} />
+      <CourseGlyph
+        slug={course.slug}
+        tags={course.tags}
+        size={22}
+        className={`mt-0.5 text-[var(--ds-gray-900)] dark:text-white ${HOVER_GLYPH}`}
+      />
       <span className="flex min-w-0 flex-col gap-[5px]">
         <span
-          className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING}`}
+          className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING} ${HOVER_TEXT}`}
         >
           {course.title}
         </span>
-        <span className="line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)]">
+        <span
+          className={`line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)] ${HOVER_DESC}`}
+        >
           {course.description}
         </span>
         {/* Difficulty + language, below the description and aligned with it.

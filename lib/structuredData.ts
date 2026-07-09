@@ -3,7 +3,7 @@
  *
  * Rendered via the <JsonLd> component (app/_components/JsonLd.tsx) into
  * `<script type="application/ld+json">` tags. Unlike the Metadata API,
- * JSON-LD has no `metadataBase` resolution — every `url`/`@id` here must be
+ * JSON-LD has no `metadataBase` resolution, every `url`/`@id` here must be
  * absolute, so we build them against `SITE_URL`.
  *
  * Coverage:
@@ -16,7 +16,7 @@ import { SITE_URL } from "@/lib/site";
 
 const ORG_NAME = "DataSlope";
 const SITE_DESCRIPTION =
-  "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.";
+  "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 
 /** Resolves a site-relative path to an absolute URL for JSON-LD. */
 export function absUrl(path: string): string {

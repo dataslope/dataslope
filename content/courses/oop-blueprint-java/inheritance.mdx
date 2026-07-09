@@ -1,21 +1,21 @@
 ---
 title: Inheritance
-description: The "is-a" relationship — extending classes, calling `super`, and the trade-offs of building tall class trees
+description: The "is-a" relationship, extending classes, calling `super`, and the trade-offs of building tall class trees
 ---
 
 **Inheritance** is the relationship that says one class *is a kind
 of* another. A `Dog` *is a* `Mammal`. A `SavingsAccount` *is a*
-`BankAccount`. A `Square` *is a* `Rectangle` — well, *maybe* — we'll
+`BankAccount`. A `Square` *is a* `Rectangle`, well, *maybe*, we'll
 come back to that.
 
 Inheritance is the most famous OOP feature and also the most
 overused. This page will teach you how it works in Java and *when* it
-is the right tool — not just how to type `extends`.
+is the right tool, not just how to type `extends`.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three concentric translucent blue rings with one green dot at the very center — a Dog is a Mammal is an Animal, inheritance as nested membership"
+  aria-label="Three concentric translucent blue rings with one green dot at the very center, a Dog is a Mammal is an Animal, inheritance as nested membership"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -45,7 +45,7 @@ classDiagram
     Animal <|-- Cat
 ```
 
-The hollow arrow `<|--` in UML means **inheritance** — *Dog
+The hollow arrow `<|--` in UML means **inheritance**, *Dog
 is-an Animal*. In Java, the keyword is `extends`.
 
 <CodeBlock
@@ -134,7 +134,7 @@ flowchart LR
 constructor on the `Dog`-being-built to set up `name`. It must be
 the *first statement* in the subclass constructor.
 
-If you omit `super(...)`, Java silently inserts `super()` — a call to
+If you omit `super(...)`, Java silently inserts `super()`, a call to
 the parent's *no-arg* constructor. If the parent doesn't have a
 no-arg constructor, that silent insertion fails and you must call
 the right one explicitly.
@@ -225,8 +225,8 @@ and adds a bonus on top. If the salary formula in `Employee` changes
 
 You can opt *out* of being extended:
 
-- `final class Foo { ... }` — no class may `extends Foo`.
-- `final` on a method — subclasses may not override it.
+- `final class Foo { ... }`, no class may `extends Foo`.
+- `final` on a method, subclasses may not override it.
 
 ```mermaid
 flowchart LR
@@ -234,7 +234,7 @@ flowchart LR
     C["public final class Money<br/>(closed)"] --x D["class Coin extends Money<br/>compile error"]
 ```
 
-`final` is a useful design tool. Java's `String` is `final` — for
+`final` is a useful design tool. Java's `String` is `final`, for
 good reason; if anyone could subclass `String` and break its rules,
 the entire JVM's security model would collapse.
 
@@ -266,8 +266,8 @@ relationship in mathematics does not always translate cleanly into
 behavioral substitutability in software.
 
 The principle hiding in that example has a name. In a 1987 keynote,
-**Barbara Liskov** — who would go on to win the 2008 Turing Award for
-her work on data abstraction — articulated what we now call the
+**Barbara Liskov**, who would go on to win the 2008 Turing Award for
+her work on data abstraction, articulated what we now call the
 **Liskov Substitution Principle**: anywhere a program expects the
 parent type, an instance of the child type must work *correctly*, not
 just compile. The square/rectangle puzzle is the canonical
@@ -378,7 +378,7 @@ public class Main {
 - [o] Invokes the parent class's constructor with the given arguments to initialize the parent part of the new object
   > It must be the first statement of the subclass constructor.
 - Creates an entirely separate parent object
-  > No second object is created — the subclass instance *is* also an instance of the parent.
+  > No second object is created, the subclass instance *is* also an instance of the parent.
 - Marks the constructor as overriding
   > Constructors aren't overridden; \`@Override\` is for methods.`}
 />
@@ -400,7 +400,7 @@ public class Main {
   markdown={`Which is the *best* reason to choose inheritance over composition?
 
 - You want to reuse code from another class
-  > Composition can do that too — and usually more safely.
+  > Composition can do that too, and usually more safely.
 - The other class has many methods
   > Method count is not a design criterion.
 - [o] The new class is genuinely a *kind of* the other class, and the parent was designed for extension

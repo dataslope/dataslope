@@ -1,5 +1,5 @@
 ---
-title: CSS — Flexbox Layout
+title: "CSS: Flexbox Layout"
 description: Arranging boxes in rows and columns with display flex, gap, justify-content, and align-items.
 ---
 
@@ -23,8 +23,8 @@ work on the web:
 | --- | --- |
 | `flex-direction` | `row` (default) or `column` |
 | `gap` | space *between* items (no margin juggling) |
-| `justify-content` | distribution along the main axis — `flex-start`, `center`, `space-between`… |
-| `align-items` | alignment on the cross axis — `stretch`, `center`… |
+| `justify-content` | distribution along the main axis, `flex-start`, `center`, `space-between`… |
+| `align-items` | alignment on the cross axis, `stretch`, `center`… |
 | `flex-wrap` | allow items to wrap onto new lines |
 
 <CodeBlock
@@ -104,12 +104,12 @@ work on the web:
 Two patterns worth memorizing from that stylesheet:
 
 - **`margin-right: auto`** on one flex item absorbs all free space,
-  shoving its siblings to the far end — the classic navbar split.
+  shoving its siblings to the far end, the classic navbar split.
 - **`flex: 1`** on the cards makes each one stretch to share the row
   equally.
 
-And the most-searched CSS question of all time — *center something
-horizontally and vertically* — is three lines now:
+And the most-searched CSS question of all time, *center something
+horizontally and vertically*, is three lines now:
 
 ```css
 .parent { display: flex; justify-content: center; align-items: center; }
@@ -187,7 +187,7 @@ horizontally and vertically* — is three lines now:
       name: ".tiers is a flex container",
       code: `const s = getComputedStyle(document.querySelector(".tiers"));
 if (s.display !== "flex") {
-  throw new Error("Set display: flex on .tiers — got display: " + s.display + ".");
+  throw new Error("Set display: flex on .tiers, got display: " + s.display + ".");
 }`,
     },
     {
@@ -209,4 +209,4 @@ if (s.justifyContent !== "center") {
   ]}
 />
 
-Structure ✓ style ✓ — time for behaviour: [JavaScript meets the DOM](/courses/intro-web-development/js-dom-basics).
+Structure ✓ style ✓, time for behaviour: [JavaScript meets the DOM](/courses/intro-web-development/js-dom-basics).

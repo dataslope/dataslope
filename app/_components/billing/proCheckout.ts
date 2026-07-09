@@ -61,7 +61,7 @@ export async function startProCheckout(
     return null;
   } catch (err) {
     // $fetch can throw (network failures / configured-to-throw clients)
-    // instead of returning {error} — either way the caller gets a message.
+    // instead of returning {error}, either way the caller gets a message.
     const status = (err as { status?: number })?.status;
     return billingError(status, "Couldn't start checkout. Please try again.");
   }
@@ -70,7 +70,7 @@ export async function startProCheckout(
 /**
  * Open Polar's customer portal (invoices, payment method, cancel/renew) for
  * the signed-in user. Only works for users who actually have a Polar
- * customer record — i.e. they've been through checkout; comped/admin Pro
+ * customer record, i.e. they've been through checkout; comped/admin Pro
  * users get an error message instead.
  */
 export async function openBillingPortal(): Promise<string | null> {
@@ -112,7 +112,7 @@ export function stashCheckoutPeriod(period: CheckoutPeriod): void {
   try {
     sessionStorage.setItem(PENDING_PERIOD_KEY, period);
   } catch {
-    // Storage unavailable — the buyer just defaults to monthly on /account.
+    // Storage unavailable, the buyer just defaults to monthly on /account.
   }
 }
 
@@ -130,7 +130,7 @@ export function takeCheckoutPeriod(): CheckoutPeriod | null {
 
 /**
  * After returning from checkout, the webhook that flips `plan` to 'pro' can
- * land a moment after the redirect — and the session cookie cache can lag up
+ * land a moment after the redirect, and the session cookie cache can lag up
  * to five minutes on top. Poll the session with the cookie cache bypassed
  * (each poll also refreshes the cookie) until the plan reads 'pro' or we
  * give up. Returns true once Pro is active.
@@ -147,7 +147,7 @@ export async function waitForProActivation(
       const plan = (data?.user as { plan?: string } | undefined)?.plan;
       if ((plan ?? "").toLowerCase() === "pro") return true;
     } catch {
-      // transient — keep polling
+      // transient, keep polling
     }
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }

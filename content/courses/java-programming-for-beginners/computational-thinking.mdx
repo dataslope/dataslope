@@ -1,6 +1,6 @@
 ---
 title: Computational Thinking
-description: The four habits — decomposition, pattern recognition, abstraction, and algorithm design — that turn a vague task into something a machine can actually do
+description: The four habits, decomposition, pattern recognition, abstraction, and algorithm design, that turn a vague task into something a machine can actually do
 ---
 
 The hardest part of programming is rarely the syntax. It is
@@ -106,10 +106,10 @@ Pattern recognition is what turns a one-off solver into a fluent
 programmer. After a few months you will start to see:
 
 - *Iterate over a collection and count things that satisfy a
-  condition* — you do this hundreds of times.
-- *Look something up in a table given a key* — you do this hundreds
+  condition*, you do this hundreds of times.
+- *Look something up in a table given a key*, you do this hundreds
   of times.
-- *Combine two collections into a third* — you do this hundreds of
+- *Combine two collections into a third*, you do this hundreds of
   times.
 
 We will spend whole lessons later on the patterns that show up most
@@ -132,7 +132,7 @@ of software design: build interfaces clean enough that other people
 When you write a method called `gradeExam(String[] answers, String[] key)`,
 its *callers* see only "give me answers and a key, get a score
 back." That is their abstraction. Inside, you can do whatever you
-want — change the algorithm, optimize it, fix bugs — without
+want, change the algorithm, optimize it, fix bugs, without
 disturbing the callers.
 
 ```mermaid
@@ -200,7 +200,7 @@ Suppose the task is: *given a paragraph, find the most common word.*
 5. Print it.
 
 **Recognize patterns.** Steps 3 and 4 are both *patterns we have
-seen*: "tally" and "find the max." Good — we don't have to invent
+seen*: "tally" and "find the max." Good, we don't have to invent
 those from scratch.
 
 **Abstract.** We can hide the implementation of each step behind a
@@ -212,7 +212,7 @@ small named method: `splitIntoWords(text)`, `countOccurrences(words)`,
 inside. The "find the max" algorithm we wrote above can be reused
 almost verbatim for step 4.
 
-We are not going to implement the full thing now — we don't yet know
+We are not going to implement the full thing now, we don't yet know
 about maps or strings. But notice how *the four habits did the hard
 part*. Translating into Java becomes a clerical task.
 
@@ -252,7 +252,7 @@ What can you abstract behind a name?
 You should arrive at something like: *split into lines* → *filter
 lines containing "Java"* → *print each remaining line*. Two of those
 three steps are extremely common patterns. The whole problem is, at
-its core, "filter a collection by a condition" — which is one of the
+its core, "filter a collection by a condition", which is one of the
 most common patterns in all of programming.
 
 This is the kind of mental work you will do *before every program*

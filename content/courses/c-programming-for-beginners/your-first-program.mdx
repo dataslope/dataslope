@@ -1,6 +1,6 @@
 ---
 title: Your First Program
-description: Read, run, and modify your first C program — and understand every character of it
+description: Read, run, and modify your first C program, and understand every character of it
 ---
 
 It is time. We have talked about hardware, history, and thinking.
@@ -14,7 +14,7 @@ unbroken ever since.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A terminal window with a green prompt arrow, a blinking cursor block, and redacted output bars — a first program about to print its first words"
+  aria-label="A terminal window with a green prompt arrow, a blinking cursor block, and redacted output bars, a first program about to print its first words"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="120" y="40" width="400" height="170" rx="14" fill="currentColor" opacity="0.07" />
@@ -91,7 +91,7 @@ step. `#include <stdio.h>` means:
 > "Paste the contents of the standard header file `stdio.h` here."
 
 `stdio.h` (short for *standard input/output header*) is part of the
-**C standard library**. It tells the compiler what `printf` is — its
+**C standard library**. It tells the compiler what `printf` is, its
 type, the kinds of arguments it accepts, and so on. Without this
 line, the compiler would not know what `printf` means.
 
@@ -103,21 +103,21 @@ program into memory, jumps to `main` and starts executing.
 
 Let's break the signature apart:
 
-- `int` — the return type. `main` returns an integer. By convention,
+- `int`, the return type. `main` returns an integer. By convention,
   `0` means "success" and any non-zero value means "something went
   wrong".
-- `main` — the special name the C runtime looks for.
-- `(void)` — the parameter list. `void` is an explicit way to say
+- `main`, the special name the C runtime looks for.
+- `(void)`, the parameter list. `void` is an explicit way to say
   "this function takes no arguments". (You may sometimes see
-  `int main(int argc, char *argv[])` instead — that version of `main`
+  `int main(int argc, char *argv[])` instead, that version of `main`
   accepts command-line arguments, which we'll meet later.)
-- `{ ... }` — the **function body**, a block of code that runs when
+- `{ ... }`, the **function body**, a block of code that runs when
   `main` is called.
 
 ### `printf("Hello, world!\n");`
 
 `printf` is a function from the standard library. It prints formatted
-output. Here we're passing it a single argument — the string
+output. Here we're passing it a single argument, the string
 `"Hello, world!\n"`.
 
 The `\n` at the end is an **escape sequence**. It represents a single
@@ -146,7 +146,7 @@ but explicit is better than implicit.
 6. The operating system **delivers those bytes to the terminal**.
 7. You see **`Hello, world!`**.
 
-In our browser sandbox, every step still happens — the compiler is
+In our browser sandbox, every step still happens, the compiler is
 just bundled into the same web page you are reading, and the
 "terminal" is a panel to the right of the editor.
 
@@ -156,7 +156,7 @@ The fastest way to learn syntax is to break it on purpose. Try each
 of these in turn in the code block above; run; observe what the
 compiler or runtime tells you; then fix it.
 
-### Experiment 1 — remove the semicolon
+### Experiment 1, remove the semicolon
 
 ```c
 printf("Hello, world!\n")
@@ -166,7 +166,7 @@ You'll see an error like `expected ';' before 'return'`. The compiler
 keeps reading until it sees something that *cannot* follow what came
 before. That mismatch is what produces the error.
 
-### Experiment 2 — remove the `\n`
+### Experiment 2, remove the `\n`
 
 ```c
 printf("Hello, world!");
@@ -177,7 +177,7 @@ the browser sandbox this is mostly cosmetic; in a real terminal, the
 shell prompt would appear on the same line as your output. Subtle
 bugs like this are why we use `\n`.
 
-### Experiment 3 — print two things
+### Experiment 3, print two things
 
 ```c
 printf("Hello, ");
@@ -309,5 +309,5 @@ The preprocessor literally copies the contents of \`stdio.h\` into your translat
 - The closing brace \`}\`
   > A closing brace ends a block or function body, not a statement. Statements inside that block still each need their own semicolon.
 
-Forgetting semicolons is by far the most common syntax error for newcomers to C. Read your compiler's error messages carefully — they almost always point to the right line (or the line just after the missing semicolon).`}
+Forgetting semicolons is by far the most common syntax error for newcomers to C. Read your compiler's error messages carefully, they almost always point to the right line (or the line just after the missing semicolon).`}
 />

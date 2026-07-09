@@ -10,12 +10,12 @@ A *SavingsAccount* is a kind of *BankAccount*. A *Circle* and a
 Object-oriented languages let you mirror that "is-a" structure in
 code through **inheritance**. And once you have a family of related
 types, you can write code that doesn't care which member it's
-holding — that's **polymorphism**.
+holding, that's **polymorphism**.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A parent capsule connected down to two child capsules; each child carries the parent's blue dot plus a new shape of its own — a family of types sharing and extending behavior"
+  aria-label="A parent capsule connected down to two child capsules; each child carries the parent's blue dot plus a new shape of its own, a family of types sharing and extending behavior"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -119,7 +119,7 @@ works, not just add new methods. The base marks the method
       starterCode: `using System;
 
 Animal a = new Dog("Rex");
-a.Speak(); // "Rex barks!" — even though a's declared type is Animal
+a.Speak(); // "Rex barks!", even though a's declared type is Animal
 
 a = new Cat("Whiskers");
 a.Speak(); // "Whiskers meows."
@@ -160,7 +160,7 @@ Look at the last block carefully. The variable `a` is declared as
 `Cat`. At runtime, `a.Speak()` calls **the right version** based
 on what `a` really is.
 
-That ability — "one call site, many possible behaviors" — is
+That ability, "one call site, many possible behaviors", is
 **polymorphism**.
 
 ## Why polymorphism matters
@@ -180,7 +180,7 @@ its own `Speak()`, and every existing call site that says
 
 ## `abstract` classes: forcing the family to fill in the blanks
 
-Sometimes the base class can't define a method itself — it only
+Sometimes the base class can't define a method itself, it only
 knows that every subclass *must* provide one. That's an **abstract
 method** on an **abstract class**.
 
@@ -197,7 +197,7 @@ foreach (var s in shapes)
 
 public abstract class Shape
 {
-    public abstract double Area(); // no body — derived classes MUST override
+    public abstract double Area(); // no body, derived classes MUST override
 
     public void Describe() => Console.WriteLine($"area = {Area():F2}");
 }
@@ -226,7 +226,7 @@ public class Square : Shape
   ]}
 />
 
-`Shape` *cannot* be instantiated directly — there's no such thing
+`Shape` *cannot* be instantiated directly, there's no such thing
 as "a shape" with no specific kind. But the array `Shape[]` can
 hold any subclass, and `Describe()` uses each subclass's `Area()`
 without caring which kind it is.
@@ -234,7 +234,7 @@ without caring which kind it is.
 ## Interfaces: a contract, not a family
 
 An **interface** is a list of methods/properties that a class
-promises to provide. It's pure shape — no fields, no behavior.
+promises to provide. It's pure shape, no fields, no behavior.
 
 <CodeBlock
   adapter="csharp"
@@ -284,7 +284,7 @@ relationship. A better rule:
   and the subclass extends the base in a substitutable way.
 - Use **composition** ("has-a") when one class merely uses another.
 
-A `Car` *has* an `Engine` — it isn't *a kind of* `Engine`. So
+A `Car` *has* an `Engine`, it isn't *a kind of* `Engine`. So
 `Car` should hold a field of type `Engine`, not inherit from it.
 
 ## Practice
@@ -399,7 +399,7 @@ foreach (var s in shapes)
 - Always prefer inheritance
   > A common over-use that produces brittle hierarchies.
 - Always prefer composition
-  > Too absolute — sometimes "is-a" really is the right model.
+  > Too absolute, sometimes "is-a" really is the right model.
 - Inheritance for unrelated types, composition for related types
   > That's backwards.
 - [o] Use inheritance for genuine "is-a" relationships; use composition for "has-a" relationships

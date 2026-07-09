@@ -1,14 +1,14 @@
 ---
 title: Promises and async/await
-description: From callbacks to Promises, and finally to async/await — the modern way to write async code that reads top-to-bottom.
+description: From callbacks to Promises, and finally to async/await, the modern way to write async code that reads top-to-bottom.
 ---
 
 The previous chapter taught you the *idea* of asynchronous code
 using plain callbacks. Modern JavaScript wraps that idea in two
 much nicer tools:
 
-- **Promises** — objects that represent a future value.
-- **`async`/`await`** — syntax that lets you write Promise-based
+- **Promises**, objects that represent a future value.
+- **`async`/`await`**, syntax that lets you write Promise-based
   code as if it were synchronous.
 
 By the end of this chapter, you'll be able to read and write
@@ -17,7 +17,7 @@ real-world async code.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A yellow orb splits along two dotted paths into a green orb and a red orb — pending, fulfilled, rejected"
+  aria-label="A yellow orb splits along two dotted paths into a green orb and a red orb, pending, fulfilled, rejected"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -157,7 +157,7 @@ you don't, the chain has no idea to wait for it.
 
 ## `async`/`await`: promise-based code that reads top-to-bottom
 
-`async`/`await` is just syntactic sugar over Promises — but it's
+`async`/`await` is just syntactic sugar over Promises, but it's
 the syntax most modern code uses.
 
 - A function marked `async` *always* returns a Promise.
@@ -231,7 +231,7 @@ main();
   ]}
 />
 
-Try, catch, finally — the same shapes you already know from
+Try, catch, finally, the same shapes you already know from
 synchronous code. That's the magic of `async`/`await`: async code
 that *looks* like the synchronous code you've been writing all
 along.
@@ -244,7 +244,7 @@ start *several* operations at once and wait for all of them.
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="Three parallel lanes of dots running side by side, then converging into a single green circle — many promises awaited as one"
+  aria-label="Three parallel lanes of dots running side by side, then converging into a single green circle, many promises awaited as one"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -329,14 +329,14 @@ async function inParallel() {
 difference is when you `await`: starting *all* the promises before
 the first `await` lets the host work on them concurrently.
 
-A common bug: writing the parallel version like this —
+A common bug: writing the parallel version like this,
 
 ```javascript
 const a = await fakeFetch("/a", 300);
 const b = await fakeFetch("/b", 300);
 ```
 
-— which is *sequential*, because each `await` blocks before the
+This is *sequential*, because each `await` blocks before the
 next call starts.
 
 ### `Promise.allSettled`, `Promise.race`, `Promise.any`
@@ -465,7 +465,7 @@ plain `for...of` loop (sequential) or `Promise.all(arr.map(...))`
 
 A rejected promise that has no `.catch` (and isn't `await`ed in a
 `try/catch`) becomes an *unhandled rejection*. Always handle
-errors *somewhere* — at the top of your chain at minimum.
+errors *somewhere*, at the top of your chain at minimum.
 
 ## Mental model: `await` is a "pause point"
 
@@ -518,7 +518,7 @@ predictable.
     },
     {
       filename: "client.js",
-      starterCode: `// Simulated network helpers — both return Promises.
+      starterCode: `// Simulated network helpers, both return Promises.
 
 function delay(ms, value) {
   return new Promise((res) => setTimeout(() => res(value), ms));
@@ -677,7 +677,7 @@ retry(flaky, 5)
   const pb = fetchB();
   const [a, b] = await Promise.all([pa, pb]);
   \`\`\`
-  > Both \`fetchA()\` and \`fetchB()\` are *called* before any \`await\` runs, so the host kicks off both right away. \`Promise.all\` then waits for both to settle. The first snippet, by contrast, only starts \`fetchB()\` after \`fetchA()\` has fully fulfilled — that's sequential, not concurrent.
+  > Both \`fetchA()\` and \`fetchB()\` are *called* before any \`await\` runs, so the host kicks off both right away. \`Promise.all\` then waits for both to settle. The first snippet, by contrast, only starts \`fetchB()\` after \`fetchA()\` has fully fulfilled, that's sequential, not concurrent.
 - 
   \`\`\`javascript
   await fetchA();

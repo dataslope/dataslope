@@ -44,7 +44,7 @@ yourself in the foot.
 char greeting[] = "hello";
 ```
 
-That declaration creates a 6-element array of `char` — five letters
+That declaration creates a 6-element array of `char`, five letters
 plus a hidden `\0`:
 
 ```text
@@ -62,7 +62,7 @@ everything goes wrong.
 
 ## String literals
 
-A double-quoted constant like `"hello"` is a **string literal** — a
+A double-quoted constant like `"hello"` is a **string literal**, a
 read-only array of `char` somewhere in your program's data segment.
 The compiler appends the `\0` for you.
 
@@ -72,7 +72,7 @@ A `char *` points to that array's first byte:
 const char *msg = "hello";   // points to read-only memory
 ```
 
-Note `const` — modifying a string literal is undefined behavior:
+Note `const`, modifying a string literal is undefined behavior:
 
 ```c
 char *p = "hello";
@@ -161,7 +161,7 @@ truncation:
 char buf[32];
 int needed = snprintf(buf, sizeof(buf), "Hello, %s! You are %d.", name, age);
 if (needed >= (int)sizeof(buf)) {
-    // truncated — handle it
+    // truncated, handle it
 }
 ```
 
@@ -169,7 +169,7 @@ if (needed >= (int)sizeof(buf)) {
 **Every** time you write into a character buffer, ask yourself:
 *how big is the buffer? Could the data I'm writing be longer? What
 happens if it is?* If you can't answer those questions, your code
-has a bug — usually a security bug.
+has a bug, usually a security bug.
 </Callout>
 
 ## Reading strings safely
@@ -228,7 +228,7 @@ int main(void) {
 />
 
 The idiomatic C way to walk a null-terminated string is even more
-direct — using the `\0` itself as the stop condition:
+direct, using the `\0` itself as the stop condition:
 
 ```c
 for (const char *p = s; *p != '\0'; p++) {
@@ -314,7 +314,7 @@ int main(void) {
   markdown={`What value does \`strlen("hello")\` return?
 
 - 4
-  > That undercounts by one — \`"hello"\` has five letters (h-e-l-l-o), and \`strlen\` counts all of them.
+  > That undercounts by one, \`"hello"\` has five letters (h-e-l-l-o), and \`strlen\` counts all of them.
 - [o] 5
   > \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
 - 6

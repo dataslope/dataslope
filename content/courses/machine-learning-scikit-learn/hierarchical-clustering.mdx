@@ -1,14 +1,14 @@
 ---
 title: Hierarchical Clustering
-description: Building a whole family tree of clusters from the bottom up — how agglomerative merging works, how to read a dendrogram, and why "you do not have to commit to k upfront" is both its superpower and its cost.
+description: Building a whole family tree of clusters from the bottom up, how agglomerative merging works, how to read a dendrogram, and why "you do not have to commit to k upfront" is both its superpower and its cost.
 ---
 
 K-means asked you to make an awkward promise before you had even seen the
 results: *how many clusters do you want?* You had to commit to `k`, then
 hope the elbow agreed. **Hierarchical clustering** refuses to make you
 choose so early. Instead of producing one flat partition, it builds an
-entire **tree of clusters** — from "every point is its own cluster" all the
-way up to "everything is one big cluster" — and lets you decide *afterward*
+entire **tree of clusters**, from "every point is its own cluster" all the
+way up to "everything is one big cluster", and lets you decide *afterward*
 where to slice it.
 
 That tree, drawn as a diagram called a **dendrogram**, is the real prize.
@@ -18,14 +18,14 @@ dataset nests together at every level of granularity. For many problems
 that picture is worth more than any single set of labels.
 
 This page assumes you have met clustering on the **K-Means Clustering**
-page. We will lean on the same instincts — distance, "similar things belong
-together," standardize before you measure distance — and add a new one:
+page. We will lean on the same instincts, distance, "similar things belong
+together," standardize before you measure distance, and add a new one:
 *structure*.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A dendrogram fuses six leaf dots into ever larger clusters — hierarchical clustering builds the whole tree and lets you cut it afterward at any height"
+  aria-label="A dendrogram fuses six leaf dots into ever larger clusters, hierarchical clustering builds the whole tree and lets you cut it afterward at any height"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.35">
@@ -63,7 +63,7 @@ together," standardize before you measure distance — and add a new one:
 K-means and hierarchical clustering are both unsupervised and both
 distance-based, but they think differently. K-means starts with `k` centers
 and shuffles points around them. Hierarchical clustering never places
-centers at all — it grows a tree by repeatedly fusing the two closest
+centers at all, it grows a tree by repeatedly fusing the two closest
 clusters. Neither is "better"; they answer slightly different questions and
 fail in different ways.
 </Callout>
@@ -74,7 +74,7 @@ Real groupings are often **nested**, not flat. Think about how you would
 organize animals: at a coarse level, mammals vs birds vs fish. Zoom in and
 mammals split into primates, carnivores, rodents. Zoom further and
 carnivores split into cats and dogs. There is no single "correct" number of
-groups — it depends on how closely you want to look. A flat method like
+groups, it depends on how closely you want to look. A flat method like
 k-means forces you to pick one zoom level. Hierarchical clustering captures
 *all* of them at once.
 
@@ -96,7 +96,7 @@ Where you see this in the wild:
 
 ## The intuition: start apart, merge the closest, repeat
 
-The most common form is **agglomerative** — a fancy word for "bottom-up,
+The most common form is **agglomerative**, a fancy word for "bottom-up,
 by merging." (There is also a top-down "divisive" variant, but
 agglomerative is what you will use and what scikit-learn provides.) The
 recipe is almost embarrassingly simple:
@@ -130,19 +130,19 @@ Read that diagram bottom-up, the way the algorithm builds it. First `a` and
 joins the `{c, d}` cluster because it is closer to them than to `{a, b}`.
 Finally the two remaining clusters fuse at the top. Every fork is a merge,
 and the *height* at which two branches join tells you how far apart those
-clusters were when they merged — the key to reading the real thing.
+clusters were when they merged, the key to reading the real thing.
 
 <Callout type="tip" title="The big idea: height encodes distance">
 In a dendrogram, the vertical position of each merge is the distance
 between the two clusters that fused there. Low merges joined very similar
 things; high merges joined things that were quite different. So the tree is
-not just a grouping — it is a *map of similarity*, with the y-axis as the
+not just a grouping, it is a *map of similarity*, with the y-axis as the
 ruler.
 </Callout>
 
 ## Clustering blobs with `AgglomerativeClustering`
 
-If you just want flat labels — "put these points into `k` groups" —
+If you just want flat labels, "put these points into `k` groups",
 scikit-learn's `AgglomerativeClustering` builds the tree internally and
 cuts it for you at the `k` you ask for. The interface mirrors k-means, but
 notice there is **no `n_init`**: the algorithm is deterministic, with no
@@ -177,17 +177,17 @@ print("Total points:        ", counts.sum())
   ]}
 />
 
-On clean blobs this gives essentially the same answer k-means would — four
+On clean blobs this gives essentially the same answer k-means would, four
 sensible groups. The difference is what is happening underneath: there are
 no centroids and no iteration toward them. The model fused points and
 sub-clusters until only four remained, then handed you the result of
 cutting the tree at that level.
 
-<Callout type="info" title="No random_state, no n_init — and why">
+<Callout type="info" title="No random_state, no n_init, and why">
 Agglomerative clustering is **deterministic**: given the same data and the
 same linkage rule, it always produces the same tree. There is no random
 initialization to get unlucky with, so there is nothing to restart. That is
-one genuine advantage over k-means — you never wonder whether a different
+one genuine advantage over k-means, you never wonder whether a different
 seed would have changed your clusters.
 </Callout>
 
@@ -199,7 +199,7 @@ and for that we use SciPy, whose `linkage` and `dendrogram` functions are
 the standard tools.
 
 A dendrogram of 300 points is an unreadable smear, so we plot a **small
-sample** — about 18 points — where every leaf and merge is legible. This is
+sample**, about 18 points, where every leaf and merge is legible. This is
 not a limitation of the method; it is just good visualization. You read the
 *shape* on a small or summarized sample, then apply the method at full
 scale for the labels.
@@ -223,7 +223,7 @@ Z = linkage(X_scaled, method="ward")
 
 plt.figure(figsize=(9, 4))
 dendrogram(Z)
-plt.title("Dendrogram (ward linkage) — read the merges bottom to top")
+plt.title("Dendrogram (ward linkage), read the merges bottom to top")
 plt.xlabel("point index")
 plt.ylabel("merge distance (height)")
 plt.show()
@@ -238,7 +238,7 @@ Spend a moment reading it, because this picture is the whole point:
   as its own cluster.
 - **Each upside-down U** is a merge. The two branches under it are the
   clusters that fused; the **height** of the U is how far apart they were.
-- **Short merges near the bottom** join very similar points — these are your
+- **Short merges near the bottom** join very similar points, these are your
   tight, confident sub-clusters.
 - **The tall merges near the top** join groups that are quite different.
   See those one or two big vertical jumps? They are where the three real
@@ -248,7 +248,7 @@ Spend a moment reading it, because this picture is the whole point:
 <Callout type="tip" title="Choose k by where the tree has the biggest gap">
 To pick the number of clusters from a dendrogram, imagine a horizontal line
 sliding down from the top. Cut where you cross the **tallest vertical
-stretch with no merges** — the biggest jump in merge distance. Cutting
+stretch with no merges**, the biggest jump in merge distance. Cutting
 there separates groups that were very far apart while keeping together
 groups that were close. On the plot above, that long gap before the final
 merges points squarely at three clusters.
@@ -258,7 +258,7 @@ merges points squarely at three clusters.
 
 The dendrogram makes hierarchical clustering's superpower concrete: **one
 tree gives you every `k` at once.** You do not refit anything to change the
-number of clusters — you just slide the cut line. SciPy's `fcluster` does
+number of clusters, you just slide the cut line. SciPy's `fcluster` does
 exactly this.
 
 <CodeBlock
@@ -277,7 +277,7 @@ X_scaled = StandardScaler().fit_transform(X)
 # Build the tree ONCE.
 Z = linkage(X_scaled, method="ward")
 
-# Now cut it at several different k values — no refitting needed.
+# Now cut it at several different k values, no refitting needed.
 for k in [2, 3, 4, 5]:
     labels = fcluster(Z, t=k, criterion="maxclust")
     sizes = np.bincount(labels)[1:]  # fcluster labels start at 1
@@ -289,7 +289,7 @@ for k in [2, 3, 4, 5]:
 
 The same tree yields 2, 3, 4, or 5 clusters depending only on where you
 slice. With k-means you would have had to rerun the algorithm from scratch
-for each `k`. Here the expensive part — building the tree — happens once,
+for each `k`. Here the expensive part, building the tree, happens once,
 and exploring different granularities is free.
 
 ## Linkage: what "distance between two clusters" even means
@@ -297,23 +297,23 @@ and exploring different granularities is free.
 There is a subtlety we glossed over. "Merge the two closest clusters" is
 clear when clusters are single points. But once a cluster contains many
 points, what is the distance *between two clusters*? There are several
-reasonable definitions, and the choice — called the **linkage** — changes
+reasonable definitions, and the choice, called the **linkage**, changes
 the shape of the tree. The three you will meet most:
 
 - **Ward** (the default and usually the safe first choice). Merges the two
   clusters that increase the total within-cluster variance the least. It
-  favors compact, roughly equal-sized, spherical clusters — much like
+  favors compact, roughly equal-sized, spherical clusters, much like
   k-means in spirit. Use it as your default for numeric data.
 - **Complete (maximum) linkage.** Distance between clusters is the distance
-  between their two *farthest* points. This is cautious about merging — a
-  cluster only joins another if *all* its members are reasonably close —
+  between their two *farthest* points. This is cautious about merging, a
+  cluster only joins another if *all* its members are reasonably close,
   so it produces compact clusters but can break up clusters that have any
   spread.
 - **Average linkage.** Distance is the average over all pairs of points,
   one from each cluster. A middle ground between complete and the more
   permissive single linkage.
 
-(There is a fourth, **single linkage** — nearest pair of points — which can
+(There is a fourth, **single linkage**, nearest pair of points, which can
 chain clusters together through stepping-stone points. It is occasionally
 useful for elongated shapes but notoriously prone to "chaining" stray
 points into one giant cluster, so reach for it deliberately, not by
@@ -332,7 +332,7 @@ from sklearn.preprocessing import StandardScaler
 X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
 X_scaled = StandardScaler().fit_transform(X)
 
-# Same data, same k — only the linkage rule changes.
+# Same data, same k, only the linkage rule changes.
 for link in ["ward", "complete", "average"]:
     agg = AgglomerativeClustering(n_clusters=4, linkage=link)
     labels = agg.fit_predict(X_scaled)
@@ -349,7 +349,7 @@ average sits in between, and ward keeps things balanced. When a clustering
 looks odd, switching the linkage is one of the first knobs to try.
 
 <Callout type="warn" title="Linkage choice changes your answer">
-There is no universally correct linkage — it encodes an *assumption* about
+There is no universally correct linkage, it encodes an *assumption* about
 what a cluster should look like. Ward and complete both prefer compact
 clusters; single linkage can string distant points into one long chain.
 Picking a linkage is a modeling decision, not a default to ignore. When in
@@ -415,18 +415,18 @@ plt.show()
 />
 
 Now you can get scikit-learn's labels for any `k` and visualize the same
-tree they came from — the best of both libraries.
+tree they came from, the best of both libraries.
 
 ## On real data: grouping California districts
 
 Synthetic blobs make the dendrogram legible, but the method is the same on
 real features. Here we cluster California census districts using only their
-numeric attributes — no target, just structure. Two real-world details show
+numeric attributes, no target, just structure. Two real-world details show
 up immediately. First, the features live on wildly different scales
 (`Population` is in the thousands, `AveRooms` is a single digit), so without
 `StandardScaler` the largest-magnitude column would dominate every distance.
 Second, agglomerative clustering is roughly *O(n²)*, so we draw a **random
-sample of 400 districts** rather than all ~20,000 — large enough to find
+sample of 400 districts** rather than all ~20,000, large enough to find
 structure, small enough to stay fast. We fix `random_state` on `.sample` so
 the draw is reproducible; the clustering itself needs no seed.
 
@@ -446,7 +446,7 @@ from sklearn.preprocessing import StandardScaler
 # (Clustering is deterministic; the seed here only fixes WHICH rows we draw.)
 sample = housing.sample(n=400, random_state=0)
 
-# Features only — clustering is unsupervised. Scale so no column dominates.
+# Features only, clustering is unsupervised. Scale so no column dominates.
 X_scaled = StandardScaler().fit_transform(sample)
 
 # No random_state on the model itself: agglomerative clustering is deterministic.
@@ -462,7 +462,7 @@ print("Districts per cluster:", counts)
   ]}
 />
 
-You get three groups of districts with no labels to check against — that is
+You get three groups of districts with no labels to check against, that is
 clustering. The clusters tend to track things like income and location, but
 the point here is mechanical: the exact same `fit_predict` you ran on blobs
 works on real, unscaled, differently-sized features, *once you standardize*.
@@ -487,8 +487,8 @@ flowchart TD
 
 | | K-means | Hierarchical (agglomerative) |
 |---|---|---|
-| Must choose `k` upfront? | Yes | No — cut the tree afterward |
-| Randomness | Yes (needs `n_init`) | No — deterministic |
+| Must choose `k` upfront? | Yes | No, cut the tree afterward |
+| Randomness | Yes (needs `n_init`) | No, deterministic |
 | Speed / scale | Fast, scales to millions | Slow, struggles past a few thousand points |
 | Output | Flat labels + centroids | A full tree (dendrogram) you can cut anywhere |
 | Cluster shape | Round / spherical only | Depends on linkage; still distance-based |
@@ -504,11 +504,11 @@ thousands is usually out of the question. When your data is large, k-means
 a dendrogram on a representative *sample* to understand the structure.
 </Callout>
 
-## When to use hierarchical clustering — and when not to
+## When to use hierarchical clustering, and when not to
 
 **Reach for it when:**
 
-- You do not know `k` and want the data to suggest it — slide the cut down
+- You do not know `k` and want the data to suggest it, slide the cut down
   the tree to the biggest gap.
 - The structure is plausibly **nested** (taxonomies, sub-segments,
   topic/subtopic hierarchies).
@@ -519,22 +519,22 @@ a dendrogram on a representative *sample* to understand the structure.
 
 **Avoid it when:**
 
-- The dataset is **large** — it will be slow and memory-hungry. Use k-means
+- The dataset is **large**, it will be slow and memory-hungry. Use k-means
   and dendrogram a sample instead.
 - You need to assign **brand-new points** to clusters after fitting.
   K-means can do this instantly (find the nearest centroid); plain
   agglomerative clustering has no centroids and no natural "predict for a
   new point," so you would refit.
 - The clusters are highly non-convex *and* you are using ward or complete
-  linkage — those still prefer compact shapes, so they share k-means's
+  linkage, those still prefer compact shapes, so they share k-means's
   blind spot for crescents and rings. (Single linkage or density methods
   like DBSCAN handle those better.)
 
 <Callout type="info" title="A note on judging the result">
 Hierarchical clustering, like k-means, gives you groups without telling you
 whether they are *good*. The dendrogram's gaps are a strong visual hint,
-but to put a number on cluster quality — how separated and cohesive the
-clusters are — you use metrics like the **silhouette score**. We keep that
+but to put a number on cluster quality, how separated and cohesive the
+clusters are, you use metrics like the **silhouette score**. We keep that
 deep dive on the **Evaluating Clusters** page rather than repeating it here;
 the same metrics apply no matter which clustering algorithm produced the
 labels.
@@ -543,12 +543,12 @@ labels.
 ## Common misconceptions
 
 - **"Hierarchical clustering avoids choosing `k`."** It avoids choosing `k`
-  *before* fitting. To get actual flat labels you still pick a cut level —
+  *before* fitting. To get actual flat labels you still pick a cut level,
   the tree just lets you do it afterward, with the dendrogram as a guide.
 - **"The dendrogram's left-to-right order means something."** The horizontal
   ordering of leaves is partly cosmetic (chosen to avoid crossing
-  branches). Only the **vertical** structure — what merges with what, and at
-  what height — carries meaning.
+  branches). Only the **vertical** structure, what merges with what, and at
+  what height, carries meaning.
 - **"It is always better than k-means because it shows more."** It shows
   more but costs far more. On large data, hierarchical clustering is simply
   impractical, and k-means wins on speed and the ability to label new
@@ -556,7 +556,7 @@ labels.
 - **"Linkage is a minor technical detail."** Linkage encodes what you think
   a cluster *is*. Changing it from ward to single can completely reshape the
   result. It is a real modeling choice.
-- **"You can skip standardizing because there are no centroids."** No — it
+- **"You can skip standardizing because there are no centroids."** No, it
   is still a distance-based method. Unscaled features let the
   largest-magnitude feature dominate every distance, exactly as in k-means.
   Standardize first.
@@ -571,7 +571,7 @@ labels.
   instructions={`You are given \`X\`: 150 unlabeled points forming 3 blobs
 (the true labels are hidden, as in real clustering).
 
-1. Standardize \`X\` with \`StandardScaler\` into \`X_scaled\` — hierarchical
+1. Standardize \`X\` with \`StandardScaler\` into \`X_scaled\`, hierarchical
    clustering is distance-based, so features must be on a comparable scale.
 2. Fit \`AgglomerativeClustering\` with \`n_clusters=3\` and \`linkage="ward"\`
    on \`X_scaled\`. Store the per-point labels in \`labels\` (use
@@ -681,7 +681,7 @@ assert 0 < largest_cluster <= len(X), f"Largest cluster out of range: {largest_c
   markdown={`In **agglomerative** hierarchical clustering, how does the process begin?
 
 - With \`k\` randomly placed cluster centers
-  > Randomly placed cluster centers are the starting point for K-means, not agglomerative clustering. Agglomerative clustering begins with no centers at all — every individual point is its own cluster.
+  > Randomly placed cluster centers are the starting point for K-means, not agglomerative clustering. Agglomerative clustering begins with no centers at all, every individual point is its own cluster.
 - With every point already assigned to one of \`k\` groups
   > Pre-assigning points to k groups and iterating is how K-means works. Agglomerative clustering starts with no groups at all, then builds structure bottom-up by repeatedly merging the two closest clusters.
 - [o] With every individual point as its own separate cluster, which are then merged two at a time
@@ -696,8 +696,8 @@ The method builds upward from singletons by merging, recording the full tree alo
   markdown={`In a dendrogram, what does the **height** at which two branches merge represent?
 
 - The number of points in the resulting cluster
-  > The width or bar length in a dendrogram relates to cluster membership, but the *height* of a merge specifically encodes the distance between the two clusters that fused there — not their combined size.
-- [o] The distance between the two clusters at the moment they were merged — higher means they were more different
+  > The width or bar length in a dendrogram relates to cluster membership, but the *height* of a merge specifically encodes the distance between the two clusters that fused there, not their combined size.
+- [o] The distance between the two clusters at the moment they were merged, higher means they were more different
   > The y-axis is the merge distance. Short, low merges join very similar clusters; tall merges join clusters that were far apart, which is why a large gap before the top suggests a natural number of clusters.
 - The order in which the points were loaded
   > The horizontal order of leaves in a dendrogram is partly cosmetic (arranged to minimize crossing branches) and does not reflect loading order. The height encodes distance, not sequence.
@@ -714,10 +714,10 @@ Reading the vertical heights is how you interpret similarity and decide where to
   > Hierarchical clustering is significantly *slower* than K-means on large datasets because its cost grows roughly quadratically with the number of points. Speed is actually one of its main disadvantages.
 - It guarantees spherical clusters
   > Neither hierarchical clustering nor K-means guarantees spherical clusters; both are distance-based and tend to find round-ish shapes by default. Ward linkage produces compact clusters, but not a guarantee of perfect spheres.
-- [o] You do not have to commit to the number of clusters before fitting — one tree can be cut at any level to yield different numbers of clusters
+- [o] You do not have to commit to the number of clusters before fitting, one tree can be cut at any level to yield different numbers of clusters
   > Building the tree once lets you explore every \`k\` by sliding the cut, and it is deterministic with no random restarts. K-means, by contrast, fixes \`k\` upfront and must be rerun for each new value.
 - It can label brand-new points instantly without refitting
-  > Assigning a new point to a cluster is actually a weakness of agglomerative clustering — it has no centroids and no natural way to place a new point without refitting. K-means, with its centroids, handles this straightforwardly.
+  > Assigning a new point to a cluster is actually a weakness of agglomerative clustering, it has no centroids and no natural way to place a new point without refitting. K-means, with its centroids, handles this straightforwardly.
 
 Its flexibility about \`k\` and its deterministic tree are the real selling points; speed is not one of them.`}
 />
@@ -728,7 +728,7 @@ Its flexibility about \`k\` and its deterministic tree are the real selling poin
 - It cannot handle numeric features
   > Hierarchical clustering is designed for numeric features and uses distance calculations on them. It is actually categorical or mixed-type data that requires more care.
 - It requires labels to run
-  > Hierarchical clustering is unsupervised — it requires no labels. It discovers structure purely from the distances between unlabeled data points.
+  > Hierarchical clustering is unsupervised, it requires no labels. It discovers structure purely from the distances between unlabeled data points.
 - [o] Its time and memory cost grows roughly with the square of the number of points, so hundreds of thousands of points become impractically slow and memory-hungry
   > Comparing all pairs of clusters scales quadratically (or worse), which is fine for a few thousand points but prohibitive at half a million. K-means scales far better; you can still dendrogram a representative sample.
 - Dendrograms can only display exactly 10 points
@@ -743,8 +743,8 @@ Hierarchical clustering trades scalability for structure, so very large data cal
 - Standardizing is only needed for k-means, not hierarchical clustering
   > Both K-means and hierarchical clustering are distance-based and suffer equally from unscaled features. Hierarchical clustering has no centroids, but it still computes distances between points, so the same scaling requirement applies.
 - It converts the labels into numbers
-  > Hierarchical clustering has no labels to convert — it is unsupervised. Standardizing numeric features adjusts their scale so that all features contribute comparably to distance calculations.
-- [o] Hierarchical clustering merges clusters based on distance, and without standardizing, the feature with the largest numeric range dominates every distance — so you scale to give each feature an equal say
+  > Hierarchical clustering has no labels to convert, it is unsupervised. Standardizing numeric features adjusts their scale so that all features contribute comparably to distance calculations.
+- [o] Hierarchical clustering merges clusters based on distance, and without standardizing, the feature with the largest numeric range dominates every distance, so you scale to give each feature an equal say
   > Like k-means, agglomerative clustering is distance-based even though it has no centroids. Unscaled features let the biggest-magnitude column drive the merges, so standardizing first keeps the comparison fair.
 - Standardizing guarantees the clusters will be perfectly spherical
   > Standardizing adjusts the scale of features but does not constrain cluster shape. The shape of resulting clusters depends on the data structure and the linkage method, not on whether features were standardized.

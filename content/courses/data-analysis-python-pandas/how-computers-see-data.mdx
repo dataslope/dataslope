@@ -1,19 +1,19 @@
 ---
 title: How Computers See Data
-description: A gentle look under the hood — bits, bytes, files, types, and the long chain that turns a CSV on disk into rows and columns in Pandas.
+description: A gentle look under the hood, bits, bytes, files, types, and the long chain that turns a CSV on disk into rows and columns in Pandas.
 ---
 
 You can use Pandas productively for years without understanding
 how the bits get from disk to memory. But a little mental
 model of what is going on underneath will save you from
-mysterious bugs — *why is this column a string when I expected
-a number?* — and it will make the rest of the course feel less
+mysterious bugs, *why is this column a string when I expected
+a number?*, and it will make the rest of the course feel less
 like magic.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A letter, a digit, and a colored pixel each dissolve downward into a row of on-off dots — everything a computer stores becomes patterns of bits"
+  aria-label="A letter, a digit, and a colored pixel each dissolve downward into a row of on-off dots, everything a computer stores becomes patterns of bits"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,7 +60,7 @@ like magic.
 
 At the lowest level, every byte your computer stores is a number
 between 0 and 255. There are no strings, no dates, no
-booleans, no DataFrames — just bytes.
+booleans, no DataFrames, just bytes.
 
 The trick is **interpretation**. The same eight bits can mean a
 small integer, a character of text, a fraction of a pixel
@@ -106,7 +106,7 @@ quoting), and no schema. Despite all of that, it is the most
 widely exchanged tabular data format in the world.
 </Callout>
 
-## Types — what a byte "is"
+## Types, what a byte "is"
 
 When Pandas reads the CSV above, it does not just store
 characters. It looks at each column and *guesses* a type:
@@ -159,7 +159,7 @@ print(df.dtypes)
 />
 
 Notice that `joined` came in as `object` (a plain string), not
-as a date. Pandas is conservative — it does not assume a string
+as a date. Pandas is conservative, it does not assume a string
 that *looks* like a date *is* a date. You can fix that:
 
 <CodeBlock
@@ -183,14 +183,14 @@ print(df)
 />
 
 Now `joined` is `datetime64[ns]` and you can do date arithmetic
-on it — sort chronologically, filter by year, compute the number
+on it, sort chronologically, filter by year, compute the number
 of days since onboarding. We will return to dates and times in
 their own chapter.
 
 ## Memory layout: rows or columns?
 
 Spreadsheets *display* data in rows and columns, but most
-modern analytical systems — including Pandas — store data
+modern analytical systems, including Pandas, store data
 **column by column** in memory. Why?
 
 - All values in a column have the same type (all integers, all
@@ -217,7 +217,7 @@ city: Tokyo, Karachi, Shanghai
 ```
 
 This is one of the reasons Pandas is fast on operations like
-`df["age"].mean()` — it can stride through one contiguous
+`df["age"].mean()`, it can stride through one contiguous
 chunk of memory and skip the others entirely.
 
 ## The journey of `pd.read_csv("orders.csv")`
@@ -319,7 +319,7 @@ print("First zip:", df["zip"].iloc[0], "<-- preserved!")
   ]}
 />
 
-This is a real bug pattern in production analytics — the kind of
+This is a real bug pattern in production analytics, the kind of
 thing that costs careers when a "data cleaning" step quietly
 corrupts the source data.
 
@@ -329,7 +329,7 @@ A 1-million-row DataFrame with 10 numeric columns is about 80
 MB in memory (8 bytes per `float64` × 10 columns × 1M rows). A
 typical laptop has 8–32 GB of RAM, so this is small. But:
 
-- A 100M-row × 50-column dataset is ~40 GB — too big.
+- A 100M-row × 50-column dataset is ~40 GB, too big.
 - Strings (`object` dtype) take *much* more memory per value
   than numbers because each string is a separate Python object.
 - Lots of duplication in a string column can be collapsed by
@@ -364,7 +364,7 @@ This is why CSV files are portable across every OS, language, and tool.`}
   > Type inference that converts digit-only strings to integers is documented and intentional behavior; leading-zero loss is the expected consequence of integer representation.
 - The CSV file is corrupted
   > The CSV contains the text \`04210\`; the file is intact. The loss of the leading zero happens during type inference, not during file reading.
-- [o] Pandas inferred the column as \`int64\` (because all values look like integers) and integers cannot have leading zeros — the \`0\` is dropped silently
+- [o] Pandas inferred the column as \`int64\` (because all values look like integers) and integers cannot have leading zeros, the \`0\` is dropped silently
   > This is the canonical example of type inference biting you. Fix it by passing \`dtype={"zip": "string"}\` to \`pd.read_csv\`.
 - ZIP codes are not real data
   > ZIP codes are valid data; the chapter uses them as an example precisely because they are real and frequently mishandled by automatic type inference.

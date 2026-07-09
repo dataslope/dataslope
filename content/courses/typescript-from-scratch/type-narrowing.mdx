@@ -5,8 +5,8 @@ description: Control flow analysis and type guards that refine union types branc
 
 When you work with union types (`string | number`, `Shape`, `Result<T>`),
 the compiler doesn't initially know *which* member of the union you have.
-But TypeScript is smart: it tracks control flow — `if` checks, `switch`
-statements, `throw`s — and **narrows** the type in each branch based on
+But TypeScript is smart: it tracks control flow, `if` checks, `switch`
+statements, `throw`s, and **narrows** the type in each branch based on
 what your code reveals. This is called **type narrowing** (or "control
 flow analysis"), and it's one of TypeScript's most powerful features.
 
@@ -18,7 +18,7 @@ functions**.
 <svg
   viewBox="0 0 640 260"
   role="img"
-  aria-label="A mixed batch of shapes falls through two sieve trays: the green triangle and red pentagon rest on the first, the yellow square is caught by the second, and only the blue circle reaches the cup at the bottom — each type guard lets fewer possibilities through"
+  aria-label="A mixed batch of shapes falls through two sieve trays: the green triangle and red pentagon rest on the first, the yellow square is caught by the second, and only the blue circle reaches the cup at the bottom, each type guard lets fewer possibilities through"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -101,7 +101,7 @@ print(42);
 
 **What the compiler now knows:** Inside the `if` branch, `value` is
 definitely a `string`. Inside the `else` branch, it's definitely a
-`number`. The narrowing is automatic — you don't need a cast or
+`number`. The narrowing is automatic, you don't need a cast or
 assertion.
 
 `typeof` works for all primitive types:
@@ -271,7 +271,7 @@ property, so it must be a `Circle`.
 
 ## Truthiness narrowing
 
-TypeScript can narrow based on **truthiness checks** — if a value is
+TypeScript can narrow based on **truthiness checks**, if a value is
 truthy or falsy:
 
 <CodeBlock
@@ -367,7 +367,7 @@ graph TD
 ## User-defined type predicates
 
 Sometimes the compiler can't infer narrowing on its own. You can define a
-**type predicate** — a function that returns `x is T` instead of
+**type predicate**, a function that returns `x is T` instead of
 `boolean`:
 
 <CodeBlock
@@ -403,7 +403,7 @@ complex checks in a reusable function.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Shapes ride a belt beneath a gray magnifying lens: the circle past the lens emerges wearing a green certification ring while squares pass unmarked — a user-defined type predicate teaches the compiler which values to trust as the narrowed type"
+  aria-label="Shapes ride a belt beneath a gray magnifying lens: the circle past the lens emerges wearing a green certification ring while squares pass unmarked, a user-defined type predicate teaches the compiler which values to trust as the narrowed type"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -479,7 +479,7 @@ The predicate `isDog` narrows `Dog | Cat` based on the presence of
 
 ## Assertion functions
 
-TypeScript 3.7+ supports **assertion functions** — functions that throw
+TypeScript 3.7+ supports **assertion functions**, functions that throw
 if a condition is false, and *assert* the type if they return:
 
 <CodeBlock
@@ -709,7 +709,7 @@ early-return patterns, refining the type in each branch.
 This is the magic that makes union types practical: you declare a broad
 type (`string | number | null`), then let the compiler track the
 narrowing as you drill down to specifics. No casts, no `any`, no
-runtime overhead — just compile-time proof that your code is safe.
+runtime overhead, just compile-time proof that your code is safe.
 
 In the next chapter, [Any, Unknown,
 Never](./any-unknown-never), we'll explore the three "special" types:

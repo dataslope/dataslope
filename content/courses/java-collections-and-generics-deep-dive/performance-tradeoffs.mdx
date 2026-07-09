@@ -1,6 +1,6 @@
 ---
 title: Performance Tradeoffs
-description: Big-O, cache locality, capacity, and load factor — the numbers behind "which container should I pick?"
+description: Big-O, cache locality, capacity, and load factor, the numbers behind "which container should I pick?"
 ---
 
 Every collection implements a contract, and every implementation
@@ -13,7 +13,7 @@ This chapter is the cheat sheet you'll come back to.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three stacks of steps under three dots: the green dot needs one step, the blue dot three, the yellow dot seven — the same operation costs differently in different containers"
+  aria-label="Three stacks of steps under three dots: the green dot needs one step, the blue dot three, the yellow dot seven, the same operation costs differently in different containers"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -88,7 +88,7 @@ flowchart TD
 `ArrayList` keeps a backing `Object[]`. When it fills up, it
 allocates a new array that is **1.5×** the size, copies, and
 discards the old one. That copy is what makes the *worst-case*
-`add` `O(n)` — but it happens rarely enough that the *amortized*
+`add` `O(n)`, but it happens rarely enough that the *amortized*
 cost is `O(1)`.
 
 If you know roughly how many elements you'll add, **pre-size**:
@@ -127,9 +127,9 @@ public class Main {
 
 `HashMap` has *two* knobs:
 
-- **Initial capacity** — the number of buckets in the backing
+- **Initial capacity**, the number of buckets in the backing
   table. Defaults to 16.
-- **Load factor** — the threshold ratio of `size / capacity` at
+- **Load factor**, the threshold ratio of `size / capacity` at
   which the table doubles and rehashes. Defaults to 0.75.
 
 Both values matter. A too-small initial capacity causes repeated
@@ -178,10 +178,10 @@ A short, honest list:
 
 ## When HashSet vs. TreeSet vs. LinkedHashSet actually matters
 
-- **`HashSet`** — fastest, no order. Default choice for "set of stuff."
-- **`LinkedHashSet`** — keeps insertion order. Tiny extra cost. Use
+- **`HashSet`**, fastest, no order. Default choice for "set of stuff."
+- **`LinkedHashSet`**, keeps insertion order. Tiny extra cost. Use
   it for any output that must be deterministic.
-- **`TreeSet`** — sorted, supports range queries. Worth `O(log n)`
+- **`TreeSet`**, sorted, supports range queries. Worth `O(log n)`
   when you need sorted iteration or "next element after `x`."
 
 ## The cost of generics: autoboxing

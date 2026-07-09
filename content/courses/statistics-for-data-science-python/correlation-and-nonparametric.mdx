@@ -6,19 +6,19 @@ description: Measuring relationships with Pearson and Spearman correlation, a li
 So far we've compared **means** (t-tests, ANOVA) and **categories**
 (chi-square). This page covers two more everyday jobs:
 
-- **Correlation** — how strongly do two numeric variables *move
+- **Correlation**, how strongly do two numeric variables *move
   together*? (Do customers who spend more also visit more often?)
-- **Nonparametric tests** — what do you do when the t-test's assumptions
-  fail — tiny samples, brutal outliers, or ordinal (ranked) data?
+- **Nonparametric tests**, what do you do when the t-test's assumptions
+  fail, tiny samples, brutal outliers, or ordinal (ranked) data?
 
 Both keep the same mindset as the rest of the course: get a number (an
-effect size or a statistic), get a p-value, and — above all — interpret
+effect size or a statistic), get a p-value, and, above all, interpret
 it honestly.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A scatter of blue dots climbs steeply then flattens while one red outlier sits far off the pattern; the straight yellow line the outlier dragged misses the bend that the green rank-following curve hugs — Pearson measures straight lines, Spearman follows any monotonic climb"
+  aria-label="A scatter of blue dots climbs steeply then flattens while one red outlier sits far off the pattern; the straight yellow line the outlier dragged misses the bend that the green rank-following curve hugs, Pearson measures straight lines, Spearman follows any monotonic climb"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
@@ -46,18 +46,18 @@ it honestly.
   </g>
 </svg>
 
-## Part A — Correlation: how two variables move together
+## Part A, Correlation: how two variables move together
 
 A **correlation coefficient** condenses the relationship between two
 numeric variables into a single number in **[−1, +1]**:
 
-- **+1** — perfect positive: when one goes up, the other goes up,
+- **+1**, perfect positive: when one goes up, the other goes up,
   exactly in step.
-- **0** — no *(linear)* relationship.
-- **−1** — perfect negative: one up, the other down, exactly.
+- **0**, no *(linear)* relationship.
+- **−1**, perfect negative: one up, the other down, exactly.
 
 Because it's already on a fixed, unitless scale, the correlation
-coefficient **is an effect size** — it tells you not just *whether* a
+coefficient **is an effect size**, it tells you not just *whether* a
 relationship exists but *how strong* it is (we'll revisit this framing in
 *Effect Sizes*).
 
@@ -121,7 +121,7 @@ zero*.
 
 The synthetic example was engineered to be linear; real data isn't always
 so obliging, but sometimes it is. In the **Palmer penguins** dataset,
-flipper length and body mass move together for an obvious reason — bigger
+flipper length and body mass move together for an obvious reason, bigger
 penguins have bigger everything. Run it and you'll find a strong, clean
 positive correlation.
 
@@ -140,7 +140,7 @@ r, p = stats.pearsonr(clean["flipper_length_mm"], clean["body_mass_g"])
 
 print(f"Pearson r = {r:.3f}   (p = {p:.2e})")
 print("A strong positive link: longer flippers go with heavier birds.")
-print("But remember — this is association, not proof one CAUSES the other.")
+print("But remember, this is association, not proof one CAUSES the other.")
 `,
     },
   ]}
@@ -186,12 +186,12 @@ Reach for **Spearman** when the relationship is monotonic-but-curved,
 when the data is **ordinal** (ranks, Likert scales), or when **outliers**
 would yank Pearson around. Reach for **Pearson** when you specifically
 care about *linear* strength and the data is roughly straight-line
-without extreme points. When unsure, compute both — a big gap between
+without extreme points. When unsure, compute both, a big gap between
 them is itself informative.
 </Callout>
 
 <Callout type="danger" title="Misconception: r near 0 means 'no relationship'">
-Pearson r near 0 means **no LINEAR relationship** — there could be a
+Pearson r near 0 means **no LINEAR relationship**, there could be a
 strong **curved** one. The textbook example is a U-shape (like y = x²
 centered at 0): the variables are tightly related, yet Pearson r is
 almost exactly 0 because the upward and downward halves cancel. **Always
@@ -228,7 +228,7 @@ print("This is exactly why you plot the data before trusting a number.")
 
 The U-shape above shows one way correlation can mislead. The most famous
 demonstration shows four ways at once. In 1973 Francis Anscombe
-published four tiny datasets — the **Anscombe quartet** — engineered to
+published four tiny datasets, the **Anscombe quartet**, engineered to
 share the *same* Pearson correlation (about **0.82**) along with the
 same means and standard deviations. Run this on the real data and read
 the `corr_xy` column: four datasets, one correlation.
@@ -253,7 +253,7 @@ print("All four have r ~ 0.82. The correlation cannot tell them apart.")
   ]}
 />
 
-A correlation of 0.82 sounds like a clean linear relationship — and for
+A correlation of 0.82 sounds like a clean linear relationship, and for
 dataset `I` it is. But `II` is a perfect curve (Pearson, demanding a
 straight line, undersells it), `III` is a perfect line dragged off by a
 single outlier, and `IV` is a vertical stack whose entire correlation
@@ -273,7 +273,7 @@ aq = pd.read_csv("anscombe.csv")`,
       starterCode: `# Same r = 0.82 in every panel. The shapes could not be more different.
 fig = px.scatter(
     aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
-    trendline="ols", title="Anscombe's quartet — identical correlation, four pictures",
+    trendline="ols", title="Anscombe's quartet, identical correlation, four pictures",
 )
 fig.show()
 `,
@@ -282,7 +282,7 @@ fig.show()
 />
 
 <Callout type="tip" title="The reflex Anscombe is teaching">
-A single number — correlation, mean, slope — is a *lossy compression* of
+A single number, correlation, mean, slope, is a *lossy compression* of
 your data. Before you trust one, scatter the two variables. The cost is
 one line of code, the payoff is catching curves, outliers, and leverage
 points that no coefficient will ever warn you about. The *Datasaurus
@@ -294,14 +294,14 @@ joke to thirteen datasets that even draw a dinosaur.
 
 Two variables can move together because A causes B, because B causes A,
 because a hidden **third variable** drives both, or by sheer coincidence.
-Ice-cream sales and drowning deaths correlate strongly — not because ice
+Ice-cream sales and drowning deaths correlate strongly, not because ice
 cream is dangerous, but because **hot weather** boosts both. A
 correlation, no matter how strong or how tiny its p-value, **cannot**
 establish causation on its own.
 
 <Callout type="warn" title="Correlation ≠ causation">
 A significant correlation tells you two variables are *associated*, full
-stop. To claim one *causes* the other you need more — a randomized
+stop. To claim one *causes* the other you need more, a randomized
 experiment (see *A/B Testing*), or careful causal reasoning that rules
 out confounders. We catalogue the ways this goes wrong (confounding,
 spurious correlation, reverse causation) in *Statistical Fallacies*.
@@ -313,12 +313,12 @@ Correlation says *how strongly* two variables move together; **simple
 linear regression** goes one step further and fits the **best straight
 line** through the cloud, giving you two interpretable numbers:
 
-- the **slope** — the predicted change in *y* per one-unit increase in
+- the **slope**, the predicted change in *y* per one-unit increase in
   *x* (the "effect per unit"), in real units, and
-- **R²** — the fraction of *y*'s variance the line explains (R² = r² for
+- **R²**, the fraction of *y*'s variance the line explains (R² = r² for
   simple regression).
 
-That's as far as we'll take regression in this course — it's a big topic
+That's as far as we'll take regression in this course, it's a big topic
 of its own. The intuition is enough: a slope is an effect-per-unit, R² is
 variance-explained. `stats.linregress` hands you both, plus a p-value for
 the slope.
@@ -387,10 +387,10 @@ effect sizes, see *Effect Sizes*.
 A coefficient near 0 rules out a straight-line trend, not a relationship in general, which is why you plot the data.`}
 />
 
-## Part B — Nonparametric tests: when t-tests are unsafe
+## Part B, Nonparametric tests: when t-tests are unsafe
 
 t-tests lean on the sampling distribution of the **mean** being roughly
-normal. The CLT usually delivers that — but not always. **Nonparametric**
+normal. The CLT usually delivers that, but not always. **Nonparametric**
 tests are the distribution-free backups for when it doesn't.
 
 Reach for them when:
@@ -401,7 +401,7 @@ Reach for them when:
   meaningful.
 
 Their trick: throw away the raw magnitudes and work with **ranks**
-instead. Ranks don't care how far out an outlier is — only its order — so
+instead. Ranks don't care how far out an outlier is, only its order, so
 these tests are naturally robust.
 
 ```mermaid
@@ -420,7 +420,7 @@ is the rank-based cousin of the **independent** two-sample t-test, and
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A top row of wildly different sized dots — one enormous red outlier among small blue values — funnels down into a bottom row of identical evenly spaced dots numbered one to five — converting values to ranks keeps their order but strips the outlier of its size"
+  aria-label="A top row of wildly different sized dots, one enormous red outlier among small blue values, funnels down into a bottom row of identical evenly spaced dots numbered one to five, converting values to ranks keeps their order but strips the outlier of its size"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -493,14 +493,14 @@ print("read on whether the two groups differ.")
 **How to read it.** `mannwhitneyu` returns the U statistic and a p-value.
 A small p-value says one group tends to produce larger values than the
 other. Note it's testing a shift in the *distribution* (often summarized
-via the median), not the mean — which is exactly why it survives outliers
+via the median), not the mean, which is exactly why it survives outliers
 that would distort a mean.
 
 ### Wilcoxon signed-rank: paired data, robustly
 
 **The question it answers:** for **matched pairs** (same units, two
 conditions), did the values shift? It's the robust stand-in for the paired
-t-test — it ranks the *differences* and checks whether they lean
+t-test, it ranks the *differences* and checks whether they lean
 positive or negative.
 
 <CodeBlock
@@ -542,7 +542,7 @@ print("more appropriate than a paired t-test on these scores.")
 Nonparametric tests make **fewer assumptions**, but that safety isn't
 free. When the data *is* roughly normal, the matching t-test has slightly
 **more power** (it uses the magnitudes, not just the order). So don't
-reflexively go nonparametric — use it when the assumptions genuinely fail,
+reflexively go nonparametric, use it when the assumptions genuinely fail,
 and use the t-test when they hold. It's a tradeoff, not a free upgrade.
 </Callout>
 
@@ -550,7 +550,7 @@ and use the t-test when they hold. It's a tradeoff, not a free upgrade.
 "Distribution-free" is not "assumption-free." Mann–Whitney and Wilcoxon
 still require **independent** observations (and Wilcoxon needs genuinely
 **paired** data). They drop the *normality* assumption, not the
-independence one — no test rescues you from dependent or badly collected
+independence one, no test rescues you from dependent or badly collected
 data. They also have their own conditions (e.g. similar distribution
 *shapes* for the cleanest median interpretation).
 </Callout>
@@ -570,7 +570,7 @@ data. They also have their own conditions (e.g. similar distribution
 For independent groups with outliers or small samples, Mann-Whitney U is the robust counterpart to the independent t-test.`}
 />
 
-## Challenge 1 — Pearson vs Spearman
+## Challenge 1, Pearson vs Spearman
 
 <ChallengeCard
   adapter="python"
@@ -643,12 +643,12 @@ assert spearman_stronger == bool(abs(spearman_r) > abs(pearson_r))`,
   ]}
 />
 
-## Challenge 2 — Pick and run the right nonparametric test
+## Challenge 2, Pick and run the right nonparametric test
 
 <ChallengeCard
   adapter="python"
   title="Two independent groups, the robust way"
-  instructions={`Two **independent** groups of users were shown different page layouts; you have their \`time_on_page\` values (in seconds). The data is skewed with outliers, so a t-test is unsafe — use the right **nonparametric** test for two independent groups.
+  instructions={`Two **independent** groups of users were shown different page layouts; you have their \`time_on_page\` values (in seconds). The data is skewed with outliers, so a t-test is unsafe, use the right **nonparametric** test for two independent groups.
 
 - Run the appropriate test (rank-based, for **independent** groups) with a **two-sided** alternative.
 - Store the p-value as a float named **\`p_value\`**.
@@ -722,7 +722,7 @@ assert differ == bool(p_value <= alpha)`,
 1. **Correlation implies causation.** It implies *association* only; a
    confounder, reverse causation, or coincidence can produce it
    (*Statistical Fallacies*).
-2. **r near 0 means "no relationship."** It means no *linear* one — a
+2. **r near 0 means "no relationship."** It means no *linear* one, a
    curved relationship can be strong with r ≈ 0. Plot the data.
 3. **Pearson on ranked/ordinal or outlier-heavy data.** Use **Spearman**
    for monotonic/ordinal, and rank-based **nonparametric tests** when
@@ -770,7 +770,7 @@ Spearman shines for monotonic-but-curved relationships, ordinal data, and outlie
   > An r of 0.85 is a strong correlation, so weakness is not the flaw. The problem is the leap to causation.
 - The p-value should be larger for a real effect
   > A tiny p-value indicates the association is unlikely to be zero; it does not justify a causal claim. The error is interpretive, not about the p-value's size.
-- [o] Correlation does not imply causation — a confounder (hot weather) plausibly drives both, so the causal claim is unsupported
+- [o] Correlation does not imply causation, a confounder (hot weather) plausibly drives both, so the causal claim is unsupported
   > A strong, significant association can arise from a third variable influencing both, so concluding that one causes the other ignores confounding.
 - Spearman should have been used instead of Pearson
   > Switching correlation methods would not address the issue; no correlation coefficient, by itself, can establish causation.
@@ -817,13 +817,13 @@ Slope is the effect per unit (in real units); R² is the fraction of variance th
 - **Pearson** = linear association on raw values (outlier-sensitive);
   **Spearman** = monotonic association on ranks (robust, good for ordinal
   or curved data). **r ≈ 0 means no *linear* relationship**, not "no
-  relationship" — plot the data.
-- **Correlation ≠ causation** — association can come from confounders or
+  relationship", plot the data.
+- **Correlation ≠ causation**, association can come from confounders or
   coincidence (*Statistical Fallacies*).
 - **Regression**, lightly: **slope** = effect per unit (real units), **R²**
   = variance explained. That intuition is all you need here.
 - **Nonparametric** tests are the distribution-free backups: **Mann–Whitney
-  U** for independent groups, **Wilcoxon signed-rank** for paired — use
+  U** for independent groups, **Wilcoxon signed-rank** for paired, use
   them for small/skewed/outlier-heavy/ordinal data. They drop *normality*,
   **not independence**.
 </Callout>

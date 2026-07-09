@@ -4,7 +4,7 @@
  * Why a separate stylesheet?
  *
  * Outside of the Tailwind-opt-in routes (home, /courses index, /pricing,
- * /account, /admin, legal — see app/tailwind.css) this app uses CSS modules +
+ * /account, /admin, legal, see app/tailwind.css) this app uses CSS modules +
  * plain CSS. By importing Tailwind's preflight (`@import 'tailwindcss'`)
  * and the Fumadocs UI presets only from the docs-route layouts
  * (app/courses/[...slug]/layout.tsx, app/fumadocs-dev/layout.tsx,
@@ -23,7 +23,7 @@
    with the app/tailwind.css root. That sharing is load-bearing: both roots
    must generate the SAME utility layer so the App Router's unpredictable
    stylesheet ordering across client-side navigations can never flip a
-   base/variant pair (`hidden md:block`, `flex md:hidden`, …) — see the
+   base/variant pair (`hidden md:block`, `flex md:hidden`, …), see the
    header comment in tailwind.shared.css. Add new @source globs THERE,
    never here. */
 @import "tailwindcss" source(none);
@@ -39,7 +39,7 @@
 /* ── Tailwind v4 border-color default hardening (intermittent black borders) ──
    Tailwind v4's preflight resets every element to `border: 0 solid`, which
    leaves the default border *color* at `currentColor` (the near-black text
-   color) — it dropped v3's gray default. Fumadocs restores a sensible gray
+   color), it dropped v3's gray default. Fumadocs restores a sensible gray
    default in its own `@layer base` (`* { border-color: var(--color-fd-border) }`),
    and on a normal page load that rule wins because it's imported after Tailwind
    above.
@@ -49,14 +49,14 @@
    navigation into a docs route. When the preflight's `@layer base` rule ends up
    applied after Fumadocs's (same layer → later source order wins), the
    `border: 0 solid` shorthand resets border-color back to `currentColor` and
-   every border relying on the default paints black — until a hard refresh
+   every border relying on the default paints black, until a hard refresh
    restores the server cascade. That's the "refreshing fixes it" symptom.
 
    Re-declaring the default in `@layer base` wouldn't help: it shares the same
    layer and is equally vulnerable to the reorder. Instead we pin the default
    one layer up, in `@layer components`. Layer precedence (components > base) is
    independent of stylesheet/chunk order, so this always beats the base-layer
-   preflight no matter how the App Router orders the chunks — while still losing
+   preflight no matter how the App Router orders the chunks, while still losing
    to Tailwind/Fumadocs border-color *utilities* (`@layer utilities`), so
    intentional colored borders (callouts, focus rings, …) are unaffected. */
 @layer components {
@@ -72,25 +72,25 @@
 /* ── Segment-CSS reorder hardening, part 2: layout-chrome visibility ─────────
    Same root cause as the border-color block above (the App Router doesn't order
    the docs segments' CSS chunks deterministically on a client-side navigation),
-   but a different casualty — and one layer up.
+   but a different casualty, and one layer up.
 
    Fumadocs's mobile navbar (`#nd-subnav`) carries both a base `display:flex`
    utility and a `md:hidden` (`display:none` at ≥48rem) utility. Both live in
    `@layer utilities`, so which one wins on desktop is decided purely by their
    source order within that layer. On a normal load Tailwind emits the responsive
    `md:hidden` after the base `flex`, so the navbar is hidden on desktop. When the
-   reorder flips them, `flex` wins and the mobile navbar paints on desktop — as a
+   reorder flips them, `flex` wins and the mobile navbar paints on desktop, as a
    sticky bar whose height is `--fd-header-height` (0px on desktop), so its logo +
    search + sidebar-toggle overflow a zero-height box and the top of the page
    looks sliced off (the "negative top margin" / cut-off-header symptom), until a
    hard refresh restores the server cascade.
 
    The border fix could move one layer up (components > base) because its rival
-   sits in `@layer base`. This rival sits in `@layer utilities` — the top layer —
+   sits in `@layer base`. This rival sits in `@layer utilities`, the top layer,
    so the only thing that always beats it regardless of chunk order is an
    *unlayered* rule (unlayered styles outrank every `@layer`). Re-assert the
    desktop-hidden invariant here, scoped to ≥48rem so the navbar still shows on
-   mobile where it's the only nav. `#id` specificity is incidental — being
+   mobile where it's the only nav. `#id` specificity is incidental, being
    unlayered is what makes this win the cascade no matter how the chunks land.
 
    The companion, root-cause mitigation is the shared @source list in
@@ -99,7 +99,7 @@
    correctly-ordered `flex`/`md:hidden` pair and can't flip the navbar.
    (`experimental.cssChunking: 'strict'` in next.config.ts was originally
    meant to be that mitigation, but it is webpack-only and this project
-   builds with Turbopack — see the note in next.config.ts.) This rule is the
+   builds with Turbopack, see the note in next.config.ts.) This rule is the
    belt-and-suspenders that holds even if the two sheets ever diverge. */
 @media (min-width: 48rem) {
   #nd-subnav {
@@ -108,7 +108,7 @@
 }
 
 /* The --font-sans (Inter) and --font-mono (JetBrains Mono) variables are
-   published on <html> by next/font in app/layout.tsx — the single place the
+   published on <html> by next/font in app/layout.tsx, the single place the
    webfonts load. Don't redeclare them here: an unlayered :root re-definition
    would tie next/font's html-class rule on specificity and leave the winner
    to stylesheet order, which the App Router doesn't guarantee across
@@ -163,7 +163,7 @@ samp {
    Active/hover: bump text further toward full foreground and add a
    background tint so keyboard-focus and pointer state are visible. */
 
-/* Light mode — base text near-black, active + hover darker bg + text */
+/* Light mode, base text near-black, active + hover darker bg + text */
 :root:not(.dark) #nd-sidebar {
   --color-fd-muted-foreground: hsl(0, 0%, 22%);
 }
@@ -179,7 +179,7 @@ samp {
   color: hsl(0, 0%, 4%);
 }
 
-/* Dark mode — base text near-white, active + hover lighter bg + text */
+/* Dark mode, base text near-white, active + hover lighter bg + text */
 .dark #nd-sidebar {
   --color-fd-muted-foreground: hsl(0, 0%, 82%);
 }
@@ -196,7 +196,7 @@ samp {
 }
 
 /* Sidebar separator labels (rendered as <p> by Fumadocs SidebarSeparator)
-   should read as section dividers, not navigation targets — use a softer
+   should read as section dividers, not navigation targets, use a softer
    color so they recede behind the linked page items. */
 :root:not(.dark) #nd-sidebar p {
   color: hsl(0, 0%, 52%);
@@ -205,7 +205,7 @@ samp {
   color: hsl(0, 0%, 48%);
 }
 
-/* Sidebar footer bar (GitHub icon + theme toggle SVGs) — remove the
+/* Sidebar footer bar (GitHub icon + theme toggle SVGs), remove the
    input-like border and secondary background, and dim the icons so they
    don't compete with the navigation links. */
 #nd-sidebar div.border.rounded-lg {
@@ -226,7 +226,7 @@ samp {
    Re-add a subtle background + slightly stronger icon on hover so the
    control reads as interactive, matching the hover tint used by the
    sidebar's navigation items. The background is applied to the individual
-   icon under the pointer (svg:hover) — not the wrapper — so only the sun
+   icon under the pointer (svg:hover), not the wrapper, so only the sun
    or moon being hovered highlights, mirroring the active icon's own
    rounded background.
 
@@ -257,7 +257,7 @@ samp {
   letter-spacing: 0;
 }
 
-/* Item 3: Dark mode — make the sidebar use the same background as the content
+/* Item 3: Dark mode, make the sidebar use the same background as the content
    area (#121212) instead of the default card color (#191919). Also bring
    prose body text in line with the Fumadocs foreground token so it matches
    the rest of the UI instead of defaulting to Tailwind Typography's gray. */
@@ -292,7 +292,7 @@ h6 {
 /* ── Syntax highlighting (highlight.js, GitHub theme) ────────────────
    Inlined directly (rather than @import "highlight.js/styles/github.css")
    so light/dark variants can be scoped cleanly. The background on .hljs
-   is left transparent — the surrounding <pre> in the CSS module already
+   is left transparent, the surrounding <pre> in the CSS module already
    sets the block background, so we only need token colours here.
    ─────────────────────────────────────────────────────────────────── */
 
@@ -453,7 +453,7 @@ h6 {
 }
 
 /* Remove the default vertical margins Tailwind Typography adds to <li>
-   elements — the .5em top/bottom spacing is too loose for tightly-packed
+   elements, the .5em top/bottom spacing is too loose for tightly-packed
    instruction lists inside challenge and quiz cards. */
 .prose :where(li):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
   margin-top: 0;
@@ -466,7 +466,7 @@ h6 {
   white-space: nowrap;
 }
 
-/* Suppress the default hljs padding/background — our <pre> handles both. */
+/* Suppress the default hljs padding/background, our <pre> handles both. */
 pre code.hljs {
   display: block;
   overflow-x: auto;
@@ -515,10 +515,10 @@ code.hljs {
 }
 
 /* ── Table and callout font-size override ────────────────────────────────
-   Tables and callouts are compact, information-dense contexts — scale
+   Tables and callouts are compact, information-dense contexts, scale
    their prose text back to 1rem (16px) with tighter leading.
 
-   Fumadocs v16 callouts don't use [data-callout] or .callout — the
+   Fumadocs v16 callouts don't use [data-callout] or .callout, the
    CalloutContainer renders a plain <div> with an inline CSS custom
    property (--callout-color). That property is the most reliable hook.
    ─────────────────────────────────────────────────────────────────────── */
@@ -554,7 +554,7 @@ code.hljs {
 .prose .fd-step > p strong {
   font-weight: 600;
 }
-/* Title — the first paragraph: 600-weight, matching the 1rem prose body
+/* Title, the first paragraph: 600-weight, matching the 1rem prose body
    size, with a 12px gap down to its description. */
 .prose .fd-step > p:first-child {
   font-size: 1rem;
@@ -563,7 +563,7 @@ code.hljs {
   margin-top: 0;
   margin-bottom: 0.75rem;
 }
-/* Description — slightly smaller than the title, with the body line-height
+/* Description, slightly smaller than the title, with the body line-height
    (1.75). Its margins are zeroed so the only vertical gap between steps is
    the explicit one set on `.fd-step` below. */
 .prose .fd-step > p:not(:first-child) {

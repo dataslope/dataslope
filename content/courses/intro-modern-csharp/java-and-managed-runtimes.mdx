@@ -1,23 +1,23 @@
 ---
 title: Java and the Rise of Managed Runtimes
-description: How a small language for set-top boxes became the most important enterprise platform of the 1990s — and what a "managed runtime" really is
+description: How a small language for set-top boxes became the most important enterprise platform of the 1990s, and what a "managed runtime" really is
 ---
 
 *This is one of the optional deep-dive chapters promised in
-[The Road to C#](./the-road-to-csharp) — the full version of the
+[The Road to C#](./the-road-to-csharp), the full version of the
 Java story, and a closer look at where "managed runtimes" came
 from.*
 
 If C# has a single parent in the world of language design, it is
 **Java**. The two languages look astonishingly similar at the syntax
 level, and that is not an accident. To understand C#, you have to
-understand what Java did first — and *why* Microsoft eventually felt
+understand what Java did first, and *why* Microsoft eventually felt
 the need to build its own answer.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="One blue square fans out along thin lines to three different pedestals, each topped by the same translucent green layer carrying an identical copy of the square — write once, run anywhere on a virtual machine"
+  aria-label="One blue square fans out along thin lines to three different pedestals, each topped by the same translucent green layer carrying an identical copy of the square, write once, run anywhere on a virtual machine"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -90,7 +90,7 @@ Two key consequences:
 
 1. **One bytecode, many platforms.** A `.class` file compiled on
    Windows could be copied to Linux and run there *unchanged*, as
-   long as a JVM was installed. This was a huge promise — and it
+   long as a JVM was installed. This was a huge promise, and it
    mostly held up.
 2. **The JVM stood between your code and the operating system.**
    The JVM could enforce rules: no reading memory you didn't own,
@@ -127,16 +127,16 @@ The managed runtime takes responsibility for three painful things:
 | **Memory safety** | A wrong pointer can read or corrupt any memory. | The runtime refuses; you get an exception instead. |
 
 The benefit is enormous. Whole categories of bugs that haunted C
-and C++ programmers — use-after-free, double-free, memory leaks,
-buffer overflows — *largely disappear* in a managed language.
+and C++ programmers, use-after-free, double-free, memory leaks,
+buffer overflows, *largely disappear* in a managed language.
 
 The cost is that the runtime is doing real work for you: the
 garbage collector occasionally pauses your program to clean up; the
 bytecode has to be translated to real machine code at run time
 (usually by a **just-in-time** or **JIT** compiler).
 
-For most software, this trade — slight runtime overhead for
-*dramatically* fewer bugs — is one of the best deals in computing.
+For most software, this trade, slight runtime overhead for
+*dramatically* fewer bugs, is one of the best deals in computing.
 
 ## The "Write Once, Run Anywhere" promise
 
@@ -153,8 +153,8 @@ flowchart TD
 
 In an era when every operating system had its own incompatible
 APIs, the ability to ship one binary that ran *everywhere* was
-revolutionary. Banks, telecoms, and governments — which often ran a
-zoo of different machines — fell in love with the idea.
+revolutionary. Banks, telecoms, and governments, which often ran a
+zoo of different machines, fell in love with the idea.
 
 ## Why this terrified Microsoft
 
@@ -166,7 +166,7 @@ Companies could write their software in Java and run it on whatever
 operating system was cheapest. That was a direct attack on
 Microsoft's core business.
 
-Second, **Java's owner was Sun Microsystems** — a Microsoft
+Second, **Java's owner was Sun Microsystems**, a Microsoft
 competitor. Microsoft built its own implementation of Java
 ("Visual J++") and tried to add Windows-specific extensions, which
 Sun argued violated the contract. The two companies ended up in a
@@ -181,7 +181,7 @@ flowchart TD
 ```
 
 That left Microsoft with a choice: either continue with a hostile
-relationship to Java, or build its **own** managed runtime — a
+relationship to Java, or build its **own** managed runtime, a
 direct, Microsoft-owned competitor to the JVM, with a brand-new
 language designed around it.
 
@@ -210,7 +210,7 @@ void MakeAndForget()
     for (int i = 0; i < 1_000_000; i++)
         big.Add(i);
     Console.WriteLine($"created a list with {big.Count} ints");
-    // We return without doing anything — no cleanup.
+    // We return without doing anything, no cleanup.
     // The .NET runtime will reclaim 'big' later, automatically.
 }
 
@@ -239,8 +239,8 @@ Managed runtimes are not magic. They make explicit trade-offs:
 | Same code on multiple OSes | A runtime must be installed alongside your app |
 | Rich standard library | Harder to do *extremely* low-level work |
 
-For 95% of software — web apps, business systems, games (most of
-Unity is C#), tools, scripts — these trade-offs are an obviously
+For 95% of software, web apps, business systems, games (most of
+Unity is C#), tools, scripts, these trade-offs are an obviously
 good deal. That is why managed runtimes won, and why every major
 new language since 2000 (C#, Go, Swift, Kotlin, Rust's high-level
 ergonomics) has borrowed ideas from them.

@@ -36,7 +36,7 @@ export function StatsBento({
       Icon: GraduationCap,
       name: `${stats.courses} free courses`,
       description:
-        "Hands-on, browser-based courses with interactive code blocks — all free, no sign-up, no paywall.",
+        "Hands-on, browser-based courses with interactive code blocks, all free, no sign-up, no paywall.",
       href: "/courses",
       cta: "Browse courses",
       className: "col-span-3 lg:col-span-2",
@@ -46,7 +46,7 @@ export function StatsBento({
       Icon: Briefcase,
       name: "Free interview prep",
       description:
-        "Role-based preparation — data analyst, data scientist, data & analytics engineer, ML, and backend.",
+        "Role-based preparation, data analyst, data scientist, data & analytics engineer, ML, and backend.",
       href: "/interview-prep",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
@@ -67,7 +67,7 @@ export function StatsBento({
       Icon: SquareTerminal,
       name: `${stats.runnableCodeBlocks.toLocaleString()}+ runnable code blocks`,
       description:
-        "Run every example inline — Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
+        "Run every example inline, Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
       className: "col-span-3 lg:col-span-2",
       iconClassName: "mb-3 h-9 w-9",
       background: <DiamondBackground />,

@@ -12,13 +12,13 @@ import { jsxSvgToHtml } from "../lib/jsxSvgToHtml";
 // The gallery is only useful if its IDs match the labels rendered on the live
 // lesson pages. These tests pin that parity: extractSvgGraphics() must yield the
 // same IDs (for <svg> graphics) that the remarkSvgLabels plugin stamps onto the
-// page — and never a Mermaid label.
+// page, and never a Mermaid label.
 
 const labeller = remark().use(remarkMdx).use(remarkMdxMermaid).use(remarkSvgLabels);
 
 // figIds the plugin stamps; `svgOnly` keeps just those whose immediately
 // preceding sibling is an <svg> node (the plugin inserts each label right after
-// its graphic) — i.e. excluding Mermaid labels.
+// its graphic), i.e. excluding Mermaid labels.
 function onPageIds(raw: string, p: string, svgOnly: boolean): string[] {
   const vf = new VFile({ value: raw, path: p });
   const tree = labeller.runSync(labeller.parse(vf), vf) as unknown as {
@@ -84,7 +84,7 @@ describe("extractSvgGraphics", () => {
 
   it("parses lessons whose frontmatter contains JSX-like text", () => {
     // error-handling-with-types.mdx carries TSX generics (`<T,>`) in its
-    // frontmatter — a frontmatter-unaware MDX parse would throw. Blanking the
+    // frontmatter, a frontmatter-unaware MDX parse would throw. Blanking the
     // frontmatter lets it through and still yields its two graphics.
     const rel = "content/courses/typescript-from-scratch/error-handling-with-types.mdx";
     const graphics = extractSvgGraphics(read(rel), abs(rel));

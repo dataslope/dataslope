@@ -15,7 +15,7 @@ evaluated at a *finite* number of bits, with a *bounded* error. Those
 two `sin`s do not behave the same way, and the gap between them is
 where computational science lives.
 
-This page introduces a *mindset* — the conviction that **every number
+This page introduces a *mindset*, the conviction that **every number
 on a computer is slightly wrong**, and that doing science well means
 making the wrongness controllable. The chapters that follow will make
 each idea precise; here we just want to internalize the shape of the
@@ -24,7 +24,7 @@ problem.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A perfect green circle in one card faces its computed twin in the next — the same shape rebuilt from straight blue segments — mathematics is exact, computation approximates"
+  aria-label="A perfect green circle in one card faces its computed twin in the next, the same shape rebuilt from straight blue segments, mathematics is exact, computation approximates"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ flowchart TD
 
 Three lossy steps separate mathematics from a number you can print.
 
-1. **Discretization.** A continuous quantity — time, space, a wave —
+1. **Discretization.** A continuous quantity, time, space, a wave,
    is replaced by samples on a finite grid.
 2. **Floating-point arithmetic.** Each sample is stored in at most
    64 bits, so almost no real number is represented exactly.
@@ -73,7 +73,7 @@ it.
 A 64-bit IEEE 754 double can represent about $1.8 \times 10^{308}$
 distinct positive values, but it cannot represent any of them
 exactly between most pairs. The spacing between representable
-numbers near $1$ is about $\epsilon \approx 2.22 \times 10^{-16}$ —
+numbers near $1$ is about $\epsilon \approx 2.22 \times 10^{-16}$,
 the famous *machine epsilon*. You will see this number again and
 again.
 
@@ -118,7 +118,7 @@ contract:
 > nearest representable float. The relative error of any single
 > operation is at most $\epsilon/2$.
 
-This sounds reassuring — and for a *single* operation it is. The
+This sounds reassuring, and for a *single* operation it is. The
 trouble is that long calculations chain millions of operations
 together, and the errors interact.
 
@@ -137,14 +137,14 @@ Some interactions are catastrophic:
   huge output error.
 
 There is a single number that captures how good your *data* needs to
-be for a *problem* (not an algorithm — a *problem*) to be solvable at
+be for a *problem* (not an algorithm, a *problem*) to be solvable at
 all: the **condition number**. If a problem has a condition number of
 $10^{18}$, then a relative input error of $\epsilon \approx 10^{-16}$
-becomes a relative output error of $\epsilon \cdot 10^{18} = 100$ —
+becomes a relative output error of $\epsilon \cdot 10^{18} = 100$,
 utterly useless. No clever algorithm can fix this; the *problem*
 itself is broken at 64-bit precision. We will meet condition numbers
 properly, with runnable examples, in *Numerical Stability and
-Conditioning* — for now, just hold onto the idea that some problems
+Conditioning*, for now, just hold onto the idea that some problems
 amplify error and some do not, regardless of how you compute.
 
 ## Approximation: a finite version of an infinite idea
@@ -155,7 +155,7 @@ Argument reduction plus a small Taylor expansion. `math.log(x)`?
 A rational approximation of carefully chosen degree.
 
 You can build your own from scratch. Here is a Taylor approximation
-of $\sin$ around zero — a sequence of polynomials that converge to
+of $\sin$ around zero, a sequence of polynomials that converge to
 $\sin$ as you add more terms.
 
 <CodeBlock
@@ -270,7 +270,7 @@ This is *the* foundational fact of numerical computing.`}
 - It measures how fast a solver will run
   > Runtime depends on the algorithm, matrix size, and hardware; the condition number measures accuracy potential, not computational speed.
 - [o] It measures how much a relative input error gets amplified into a relative output error: a problem with $\\kappa = 10^k$ can lose up to $k$ digits of precision regardless of algorithm
-  > The condition number is a property of the *problem*, not of the *algorithm*. It puts a fundamental ceiling on accuracy — no clever code can beat it.
+  > The condition number is a property of the *problem*, not of the *algorithm*. It puts a fundamental ceiling on accuracy, no clever code can beat it.
 - It measures memory usage
   > Memory usage for a dense $n \times n$ matrix is $O(n^2)$ regardless of the condition number; the two quantities are unrelated.
 - It measures the symmetry of $A$

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * RuntimeBootNotice — the first-execution loading affordance shared by
+ * RuntimeBootNotice, the first-execution loading affordance shared by
  * <CodeBlock> and <ChallengeCard>.
  *
  * Shown while a runtime is downloading / instantiating on the first Run
@@ -34,13 +34,13 @@ export interface RuntimeBootNoticeProps {
   /** Current stage line from the adapter; falls back to a generic
    *  "Setting up the <language> runtime…" when empty. */
   statusMessage?: string;
-  /** True while a first-run (cold) download is in flight — adds the
+  /** True while a first-run (cold) download is in flight, adds the
    *  "downloads once" reassurance and the size hint. */
   cold?: boolean;
   /** Approximate cold download size in MB (adapter.coldDownloadMB). */
   downloadMB?: number;
   /** Compiled languages (Java, C, C++, C#). No longer changes the boot
-   *  copy — every runtime now reads "much faster" — but kept so existing
+   *  copy, every runtime now reads "much faster", but kept so existing
    *  call sites still type-check. */
   compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for an indeterminate boot
@@ -80,7 +80,7 @@ export function RuntimeBootNotice({
               This can take a moment on first load
             </span>
             <span className={styles.hint}>
-              {downloadMB ? `Downloading (~${downloadMB} MB) — ` : ""}This
+              {downloadMB ? `Downloading (~${downloadMB} MB), ` : ""}This
               happens once. Later runs are much faster.
             </span>
           </>
@@ -107,7 +107,7 @@ export function RuntimeBootNotice({
 
 // ─── Code-block layout preview ─────────────────────────────────────────
 // A static, non-interactive mock of a <CodeBlock> frozen in its loading
-// state — the real card chrome (header, editor, action bar, output
+// state, the real card chrome (header, editor, action bar, output
 // panel) reused via the shared CSS modules, with a faux editor instead
 // of a live CodeMirror instance. Lets the loading display be reviewed in
 // context without booting a runtime (and without the route-land warm-up
@@ -142,7 +142,7 @@ export interface CodeBlockLoadingPreviewProps
   langId?: string;
   /** Two-character fallback used when no glyph icon exists. */
   logoText?: string;
-  /** Faux editor contents (purely visual — no editing or execution). */
+  /** Faux editor contents (purely visual, no editing or execution). */
   code: string;
 }
 
@@ -184,7 +184,7 @@ export function CodeBlockLoadingPreview({
         </div>
       </div>
 
-      {/* Faux editor — a styled code listing in place of CodeMirror. */}
+      {/* Faux editor, a styled code listing in place of CodeMirror. */}
       <div className={`${challengeStyles.editor} ${challengeStyles.topBorderLight}`}>
         <div className={styles.previewEditor} aria-hidden>
           {lines.map((line, i) => (
@@ -248,7 +248,7 @@ export function CodeBlockLoadingPreview({
         </div>
       </div>
 
-      {/* No "Output" header while loading — matches the real block,
+      {/* No "Output" header while loading, matches the real block,
           which hides it until user code actually runs. */}
       <div
         className={`${challengeStyles.outputPanel} ${codeBlockStyles.outputRunning}`}
@@ -349,7 +349,7 @@ function codeBlockItems(): ShowcaseItem[] {
     {
       title: "Live boot, in a code block (simulated)",
       blurb:
-        "Exactly what a learner sees on a first Run — the full code-block card frozen in its loading state: a disabled Run button, the staged status beside it, and the boot notice in the output panel. The loader and bar are animating; the rest is a static preview (no runtime).",
+        "Exactly what a learner sees on a first Run, the full code-block card frozen in its loading state: a disabled Run button, the staged status beside it, and the boot notice in the output panel. The loader and bar are animating; the rest is a static preview (no runtime).",
       jsx: `<CodeBlockLoadingPreview
   language="Python"
   version="3.13.2"
@@ -395,7 +395,7 @@ function codeBlockItems(): ShowcaseItem[] {
   language="Python"
   version="3.13.2"
   code={pandasSnippet}
-  statusMessage="Installing data packages — first run only…"
+  statusMessage="Installing data packages, first run only…"
   cold
   fraction={0.7}
 />`,
@@ -405,7 +405,7 @@ function codeBlockItems(): ShowcaseItem[] {
           version="3.13.2"
           langId="python"
           code={SAMPLE_CODE}
-          statusMessage="Installing data packages — first run only…"
+          statusMessage="Installing data packages, first run only…"
           cold
           fraction={0.7}
         />
@@ -418,7 +418,7 @@ function codeBlockItems(): ShowcaseItem[] {
 function noticeItems(): ShowcaseItem[] {
   return [
     {
-      title: "Cold start — just begun",
+      title: "Cold start, just begun",
       blurb:
         "The first stage floor: the worker has started and the runtime download is about to stream in.",
       jsx: `<RuntimeBootNotice
@@ -439,7 +439,7 @@ function noticeItems(): ShowcaseItem[] {
       ),
     },
     {
-      title: "Cold start — downloading",
+      title: "Cold start, downloading",
       blurb:
         "Mid-download. The bar shows real position; the percentage is derived from the adapter's stage weights.",
       jsx: `<RuntimeBootNotice
@@ -460,9 +460,9 @@ function noticeItems(): ShowcaseItem[] {
       ),
     },
     {
-      title: "Cold start — finishing (compiled language)",
+      title: "Cold start, finishing (compiled language)",
       blurb:
-        "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready). The boot copy promises that later runs are much faster for every runtime.",
+        "Near the end (the bar never hits 100%, the notice unmounts the moment the runtime is ready). The boot copy promises that later runs are much faster for every runtime.",
       jsx: `<RuntimeBootNotice
   language="C#"
   statusMessage="Preparing C# compiler…"

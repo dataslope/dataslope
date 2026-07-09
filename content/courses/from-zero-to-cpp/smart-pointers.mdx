@@ -1,6 +1,6 @@
 ---
 title: Smart Pointers
-description: unique_ptr, shared_ptr, weak_ptr — RAII for heap memory.
+description: unique_ptr, shared_ptr, weak_ptr, RAII for heap memory.
 ---
 
 Raw `new`/`delete` are easy to get wrong. The standard library's
@@ -10,17 +10,17 @@ never write `delete` again.
 
 There are three to know:
 
-- `std::unique_ptr<T>` — exclusive owner. Lightweight, free of
+- `std::unique_ptr<T>`, exclusive owner. Lightweight, free of
   overhead. Use this first; it covers most cases.
-- `std::shared_ptr<T>` — shared owner. Multiple shared_ptrs can
+- `std::shared_ptr<T>`, shared owner. Multiple shared_ptrs can
   hold the same object; the last one to die deletes it.
-- `std::weak_ptr<T>` — non-owning observer of a `shared_ptr`. Used
+- `std::weak_ptr<T>`, non-owning observer of a `shared_ptr`. Used
   to break cycles or watch an object without keeping it alive.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three panels: one dot firmly tied to its green box, three dots sharing one box with a count badge of three, and a faint dot watching a box through a barely-there dotted line — unique, shared, and weak ownership"
+  aria-label="Three panels: one dot firmly tied to its green box, three dots sharing one box with a count badge of three, and a faint dot watching a box through a barely-there dotted line, unique, shared, and weak ownership"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -94,7 +94,7 @@ int main() {
 two reasons: it's exception-safe in surprising ways, and you never
 have to write the type twice.
 
-A `unique_ptr` cannot be copied — only **moved** (next chapter).
+A `unique_ptr` cannot be copied, only **moved** (next chapter).
 That single restriction enforces "exactly one owner" at compile
 time:
 
@@ -154,7 +154,7 @@ int main() {
   ]}
 />
 
-Use `shared_ptr` only when you truly need shared ownership — a node
+Use `shared_ptr` only when you truly need shared ownership, a node
 in a graph that several roots can reach, a cached object accessed
 from multiple subsystems. Defaulting to `shared_ptr` "just in case"
 is a common over-correction; the reference count costs CPU and
@@ -164,7 +164,7 @@ clouds ownership.
 
 A common shared-pointer trap: two objects each hold a `shared_ptr`
 to the other. Neither's count ever hits zero, so neither is
-destroyed — a **cycle leak**.
+destroyed, a **cycle leak**.
 
 ```mermaid
 flowchart TD
@@ -182,7 +182,7 @@ std::shared_ptr<Node> parent = std::make_shared<Node>();
 std::weak_ptr<Node>   peek   = parent;     // doesn't keep parent alive
 
 if (auto p = peek.lock()) {
-    p->doSomething();   // safe — we have a real shared_ptr now
+    p->doSomething();   // safe, we have a real shared_ptr now
 } else {
     // the parent is gone
 }
@@ -208,7 +208,7 @@ A practical heuristic:
 - **Use `std::unique_ptr` by default.**
 - **Reach for `std::shared_ptr` only when ownership is genuinely
   shared.**
-- **Use raw pointers/references for non-owning views — function
+- **Use raw pointers/references for non-owning views, function
   parameters that just read the object.**
 
 ## Smart pointer ≠ everywhere
@@ -304,11 +304,11 @@ int main() {
   > Default to \`unique_ptr\`; only upgrade when needed.
 - For all polymorphic objects.
   > Polymorphism does not by itself require shared ownership.
-- [o] When the lifetime of the object is genuinely shared across multiple owners that may release it in any order — and \`unique_ptr\` cannot capture that.
+- [o] When the lifetime of the object is genuinely shared across multiple owners that may release it in any order, and \`unique_ptr\` cannot capture that.
   > The reference count keeps the object alive until the last owner is gone.
 - For any object larger than 64 bytes.
   > Size is unrelated to ownership shape.`}
 />
 
-Next: the *move* in `std::move(a)` — what it actually does, and why
+Next: the *move* in `std::move(a)`, what it actually does, and why
 it makes returning heavy objects from functions cheap.

@@ -1,5 +1,5 @@
 /* ============================================================================
- * tailwind.shared.css — the single @source list, dark variant, design tokens,
+ * tailwind.shared.css, the single @source list, dark variant, design tokens,
  * and keyframes shared by EVERY Tailwind root in the app.
  * ----------------------------------------------------------------------------
  * This app has two Tailwind roots (files that `@import "tailwindcss"`):
@@ -9,7 +9,7 @@
  *
  * Next.js scopes each stylesheet to the routes that import it, but after a
  * client-side navigation BOTH can be applied to the document at once, and the
- * App Router does not guarantee which <link> ends up later in <head> — the
+ * App Router does not guarantee which <link> ends up later in <head>, the
  * order follows the user's navigation history (see #528/#541; with Turbopack,
  * Next 16's default bundler, there is no cssChunking option to pin it). Both
  * roots emit into the same cascade layers (`base`, `components`, `utilities`),
@@ -19,7 +19,7 @@
  * The invariant that makes stylesheet order irrelevant: BOTH ROOTS MUST
  * GENERATE THE SAME UTILITY CSS. Tailwind orders utilities deterministically
  * within a root, so when the roots compile from one shared @source list, the
- * two sheets' utility layers are interchangeable — whichever the router puts
+ * two sheets' utility layers are interchangeable, whichever the router puts
  * last, every base/variant pair (`hidden md:block`, `flex lg:grid`,
  * `block dark:hidden`, …) still resolves the same way.
  *
@@ -30,7 +30,7 @@
  * the admin sheet's `md:block`); /learn → home → back to /learn re-showed the
  * mobile navbar on desktop (the home sheet's later `flex` beat `md:hidden`).
  *
- * So: NEVER add an @source to one root only — add it HERE.
+ * So: NEVER add an @source to one root only, add it HERE.
  * __tests__/cssCascadeParity.test.ts compiles both roots and fails if their
  * utility layers diverge.
  *
@@ -41,14 +41,18 @@
  * display/spacing pairs can. The parity test allowlists exactly that set.
  * ==========================================================================*/
 
-/* ── Sources — the union scanned by BOTH roots ────────────────────────────
+/* ── Sources, the union scanned by BOTH roots ────────────────────────────
  * `source(none)` in each root disables Tailwind's automatic content crawl
  * (which would walk content/, public/, cdn-assets/, agent-outputs/ and add
  * minutes to a cold compile), so utility classes are generated ONLY for the
  * files matched here. ADD A GLOB HERE when a new directory starts using
- * Tailwind classes — never in just one of the two roots. */
+ * Tailwind classes, never in just one of the two roots. */
 @source "../components/**/*.{ts,tsx}";
 @source "./_components/home/**/*.{ts,tsx}";
+/* The site-wide light/dark pill toggle lives at the _components root (not
+   under home/) because the playground and Fumadocs surfaces render it too;
+   scan it explicitly so its utilities generate for BOTH Tailwind roots. */
+@source "./_components/ThemePillToggle.tsx";
 /* The header's account control lives here; without this glob its Tailwind
    classes (e.g. the avatar's `size-*`) are never generated, so the avatar
    image falls back to its intrinsic ~96px size. */
@@ -69,7 +73,7 @@
    styles, so scanning them too is harmless). */
 @source "./courses/**/*.{ts,tsx}";
 /* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
-   non-learn root needs these too — that is the point of the union: the home/
+   non-learn root needs these too, that is the point of the union: the home/
    admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so
    that when it is ordered after the learn sheet, its later `flex`/`grid`
    copies can't flip the docs chrome (mobile navbar, TOC, search dialog)
@@ -77,7 +81,7 @@
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
 /* ── Dark variant ─────────────────────────────────────────────────────────
- * Class-based dark mode (a `.dark` ancestor — set by next-themes on /learn
+ * Class-based dark mode (a `.dark` ancestor, set by next-themes on /learn
  * and by the app's own toggle elsewhere). The selector shape matches the one
  * Fumadocs UI registers (`fumadocs-ui/css/lib/base.css`) so `dark:*`
  * utilities compile to byte-identical rules in both roots. */
@@ -92,7 +96,7 @@
  * playground palette (app/_components/playground.css defines `--border`,
  * `--primary`, `--accent`, `--radius` at :root, and playgroundTheme.ts writes
  * `--border` & friends as inline styles on <html> while any playground is
- * mounted — including the home page's embedded showcase). With the stock
+ * mounted, including the home page's embedded showcase). With the stock
  * names, `border-border` etc. resolved to the playground's dark-slate palette
  * whenever a playground sheet loaded after this one. The `--ui-` namespace
  * makes the two token systems disjoint. If you install a new shadcn/Magic UI
@@ -173,10 +177,11 @@
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
   --animate-ripple: ripple var(--duration, 2s) ease infinite;
   --animate-blink-cursor: blink-cursor 1s step-end infinite;
+  --animate-shiny-text: shiny-text 8s infinite;
 }
 
 /* Keyframes for the Magic UI animations declared above. Each Magic UI
- * component installed via the shadcn registry may add its own keyframes here —
+ * component installed via the shadcn registry may add its own keyframes here,
  * keep this list in sync with the components under components/ui. */
 @keyframes marquee {
   from {
@@ -232,8 +237,19 @@
     opacity: 0;
   }
 }
+@keyframes shiny-text {
+  0%,
+  90%,
+  100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;
+  }
+  30%,
+  60% {
+    background-position: calc(100% + var(--shiny-width)) 0;
+  }
+}
 
-/* The Magic UI animations above are all infinite and purely decorative —
+/* The Magic UI animations above are all infinite and purely decorative,
  * disable them outright for users who prefer reduced motion. (The JS-driven
  * counterparts check useReducedMotion / matchMedia themselves.) */
 @media (prefers-reduced-motion: reduce) {
@@ -242,7 +258,8 @@
   .animate-shimmer-slide,
   .animate-spin-around,
   .animate-ripple,
-  .animate-blink-cursor {
+  .animate-blink-cursor,
+  .animate-shiny-text {
     animation: none !important;
   }
 }

@@ -11,15 +11,15 @@ a *named box* somewhere in memory that holds a value of a known
 If you only take three things from this page, take these:
 
 1. A variable is a *name* the compiler gives to a *piece of memory*.
-2. Every variable in C# has a *type* — the compiler always knows it.
+2. Every variable in C# has a *type*, the compiler always knows it.
 3. Assignment `x = y` copies a value from one box into another (for
-   value types) or copies a *reference* (for reference types — more
+   value types) or copies a *reference* (for reference types, more
    on that next chapter).
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three labeled jars on a shelf: two hold solid colored balls while the third is empty with only a dashed outline inside — variables as named boxes in memory, one not yet assigned"
+  aria-label="Three labeled jars on a shelf: two hold solid colored balls while the third is empty with only a dashed outline inside, variables as named boxes in memory, one not yet assigned"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="90" y="186" width="470" height="4" rx="2" fill="currentColor" opacity="0.15" />
@@ -80,12 +80,12 @@ Console.WriteLine($"price = {price}, admin? {isAdmin}");
 
 Read each declaration left to right:
 
-- `int age = 30;` — "make a variable named `age`, of type `int`,
+- `int age = 30;`, "make a variable named `age`, of type `int`,
   whose initial value is `30`."
-- `double price = 19.99;` — "of type `double`" (floating-point
+- `double price = 19.99;`, "of type `double`" (floating-point
   number).
-- `string name = "Ada";` — "of type `string`."
-- `bool isAdmin = true;` — "of type `bool`."
+- `string name = "Ada";`, "of type `string`."
+- `bool isAdmin = true;`, "of type `bool`."
 
 Once a variable has a type, it keeps that type *forever*. You
 cannot later put a string into `age`.
@@ -96,7 +96,7 @@ age = "thirty";   // ❌ does not compile
 ```
 
 The compiler refuses. That refusal is a feature, not an
-annoyance — it prevents whole categories of bugs.
+annoyance, it prevents whole categories of bugs.
 
 ## `var`: let the compiler figure it out
 
@@ -107,7 +107,7 @@ List<string> names = new List<string>();
 ```
 
 C# lets you replace the left-hand type with `var`. The variable is
-*still* statically typed — the compiler just figures the type out
+*still* statically typed, the compiler just figures the type out
 from the right-hand side.
 
 <CodeBlock
@@ -148,9 +148,9 @@ it `age`, and writes the number `30` into it.
 | `name` | `'Ada'` |
 | `isAdmin` | `true` |
 
-That is slightly oversimplified — strings and lists
+That is slightly oversimplified, strings and lists
 actually live on the *heap*, with a small reference on the stack
-pointing to them — but for value types like `int` and `bool` it's
+pointing to them, but for value types like `int` and `bool` it's
 exactly right.
 
 When you write:
@@ -167,7 +167,7 @@ age = 31;
 Sometimes you want a value that you absolutely cannot change after
 it's set. C# gives you two tools.
 
-`const` — set at compile time, never changes:
+`const`, set at compile time, never changes:
 
 <CodeBlock
   adapter="csharp"
@@ -187,7 +187,7 @@ Console.WriteLine($"Pi = {Pi}, max retries = {MaxRetries}");
   ]}
 />
 
-`readonly` — set once, usually in a constructor (we'll see this
+`readonly`, set once, usually in a constructor (we'll see this
 later with classes). It's the same *intent* as `const`, but works
 for values you can't know at compile time.
 
@@ -215,7 +215,7 @@ if (outer > 5)
 }
 
 Console.WriteLine($"outside: outer={outer}");
-// Console.WriteLine(inner);   // ❌ would not compile — 'inner' is out of scope
+// Console.WriteLine(inner);   // ❌ would not compile, 'inner' is out of scope
 `,
     },
   ]}
@@ -309,7 +309,7 @@ Console.WriteLine($"decimal : 0.1 + 0.2 = {pennies}");
   ]}
 />
 
-If that output surprises you — great, that surprise is exactly why
+If that output surprises you, great, that surprise is exactly why
 this rule matters.
 
 ## Practice
@@ -388,6 +388,6 @@ Console.WriteLine($"b = {b}");
   > It uses more.
 - [o] \`double\` has small rounding errors for decimal fractions (e.g., \`0.1 + 0.2 != 0.3\`); \`decimal\` is exact for the decimal numbers humans care about
   > \`decimal\` stores base-10 fractions precisely, so money amounts add up correctly.
-- They're the same — pick either one
+- They're the same, pick either one
   > They behave differently for fractions, which is exactly why money needs \`decimal\`.`}
 />

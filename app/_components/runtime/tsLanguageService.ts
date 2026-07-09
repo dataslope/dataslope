@@ -2,7 +2,7 @@
 
 // Main-thread client for the shared TypeScript language service worker
 // (ts-language-worker.ts). One worker serves both the JavaScript and
-// TypeScript adapters — it's spawned lazily on the first completion
+// TypeScript adapters, it's spawned lazily on the first completion
 // request and reused for the page's lifetime. If the worker can't boot
 // (CDN blocked, importScripts failure) the module remembers the failure
 // and answers every request with an empty result instead of respawning.
@@ -55,7 +55,7 @@ function getWorker(): Worker | null {
       return null;
     }
     worker.addEventListener("error", () => {
-      // Boot failure (typescript.js unreachable) — stop asking; the
+      // Boot failure (typescript.js unreachable), stop asking; the
       // static keyword/snippet sources still serve these editors.
       failed = true;
       worker?.terminate();
@@ -65,7 +65,7 @@ function getWorker(): Worker | null {
   return worker;
 }
 
-// Extensions the language service can analyse — everything else in the
+// Extensions the language service can analyse, everything else in the
 // workspace (CSVs, images, …) is irrelevant to completion.
 const ANALYZABLE_RE = /\.(ts|tsx|js|jsx|mjs|cjs|json)$/i;
 
@@ -81,14 +81,14 @@ export function decodeWorkspaceTextFiles(
     try {
       out.set(path, decoder.decode(bytes));
     } catch {
-      // Undecodable bytes — skip; completion just won't see this file.
+      // Undecodable bytes, skip; completion just won't see this file.
     }
   }
   return out;
 }
 
 /** Assemble a completion request: the staged workspace snapshot (from
- *  the last Run — best-effort context for cross-file imports) with the
+ *  the last Run, best-effort context for cross-file imports) with the
  *  live editor doc overlaid on the active file. */
 export function buildTsCompletionRequest(
   staged: Map<string, string>,
@@ -124,7 +124,7 @@ export function completeWithTsService(
       resolve({ list: msg.completions, replaceLength: msg.replaceLength });
     };
     w.addEventListener("message", onMessage);
-    // If the worker dies mid-request the pending promise would leak —
+    // If the worker dies mid-request the pending promise would leak,
     // resolve empty on error so callers never hang.
     const onError = () => {
       w.removeEventListener("message", onMessage);

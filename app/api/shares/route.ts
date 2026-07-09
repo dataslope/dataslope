@@ -1,13 +1,13 @@
 /**
  * Playground share links.
  *
- * POST /api/shares — mint a share: uploads an immutable snapshot bundle and
+ * POST /api/shares, mint a share: uploads an immutable snapshot bundle and
  *   returns { share, url }. Works for BOTH signed-in members and guests:
  *   - members: counts against their storage quota + share cap; the link obeys
  *     the free-tier inactivity retention (pro links don't expire).
  *   - guests: smaller size cap, fixed ~30-day expiry, and per-IP + global
  *     daily creation budgets (salted-hash counters, no raw IPs stored).
- * GET /api/shares — list the signed-in member's live share links.
+ * GET /api/shares, list the signed-in member's live share links.
  *
  * Multipart body identical to PUT /api/workspaces/:id (`meta` + `bundle`).
  */
@@ -96,7 +96,7 @@ export async function POST(request: Request): Promise<Response> {
     ? limitsForTier(tier).maxItemBytes
     : GUEST_SHARE_MAX_BYTES;
 
-  // Guest budget gate BEFORE buffering the upload — a rate-limited guest
+  // Guest budget gate BEFORE buffering the upload, a rate-limited guest
   // shouldn't cost a multi-MB body read. The reservation is an atomic
   // check-and-increment, so concurrent requests can't slip past the caps;
   // a slot is consumed even if the upload later fails (fail-closed).

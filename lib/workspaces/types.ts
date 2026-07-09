@@ -5,7 +5,7 @@
  * self-contained snapshot of a playground workspace. Code playgrounds carry
  * their files verbatim; SQL playgrounds carry a SQL dump (DDL + data) plus the
  * query tabs, and are rebuilt on open by replaying the dump through the
- * in-browser engine — the database binary itself is never uploaded (it is
+ * in-browser engine, the database binary itself is never uploaded (it is
  * derived state, and dumps compress far better than engine images).
  *
  * The bundle bytes live in R2; D1 keeps a metadata row whose `manifest` column
@@ -34,7 +34,7 @@ export const SQL_PLAYGROUND_IDS: readonly SqlDialect[] = [
 ];
 
 /** Code playgrounds (one per `app/playground/<id>` route). Kept as a literal
- *  list — the Worker cannot enumerate the route tree at request time.
+ *  list, the Worker cannot enumerate the route tree at request time.
  *  Guarded against drift by __tests__/workspacesCloud.test.ts, which compares
  *  this list to the actual `app/playground/<id>` directories: forgetting to
  *  add a new playground here breaks its Save/Share with "Unknown playground". */
@@ -174,7 +174,7 @@ export interface BundleManifest {
   database?: string;
 }
 
-/** Serialized-manifest ceiling. Anything larger is rejected — the manifest is
+/** Serialized-manifest ceiling. Anything larger is rejected, the manifest is
  *  a UI summary, not a data channel. */
 export const MANIFEST_MAX_BYTES = 16 * 1024;
 

@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 
 const BASE = process.env.BASE ?? "http://localhost:3457";
 const browser = await chromium.launch();
-// ignoreHTTPSErrors mirrors playwright.config.ts — the sandbox trips on
+// ignoreHTTPSErrors mirrors playwright.config.ts, the sandbox trips on
 // jsDelivr's cert chain, which real browsers accept. Needed for CDN runtimes.
 const ctx = await browser.newContext({
   viewport: { width: 1280, height: 900 },

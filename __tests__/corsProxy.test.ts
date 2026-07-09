@@ -29,7 +29,7 @@ describe("parseAllowedOrigins", () => {
   });
 });
 
-describe("isOriginInAllowList — exact origins", () => {
+describe("isOriginInAllowList, exact origins", () => {
   it("accepts configured production and localhost origins", () => {
     expect(isOriginInAllowList("https://dataslope.com", ALLOW)).toBe(true);
     expect(isOriginInAllowList("https://www.dataslope.com", ALLOW)).toBe(true);
@@ -45,7 +45,7 @@ describe("isOriginInAllowList — exact origins", () => {
   });
 });
 
-describe("isOriginInAllowList — Vercel preview wildcards", () => {
+describe("isOriginInAllowList, Vercel preview wildcards", () => {
   it("accepts branch/commit preview deployments under the team scope", () => {
     expect(
       isOriginInAllowList(

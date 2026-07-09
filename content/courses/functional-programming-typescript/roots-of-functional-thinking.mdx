@@ -5,7 +5,7 @@ description: From lambda calculus and Lisp to ML, Haskell, Erlang, Scala, and th
 
 Functional programming is older than most languages people use today.
 Its ideas were not invented in response to JavaScript or React or
-microservices — they were invented in the 1930s, before computers
+microservices, they were invented in the 1930s, before computers
 existed in any practical form. Understanding that lineage is the
 single best way to demystify FP. Most of the "weird" vocabulary
 (*lambda*, *combinator*, *functor*, *monad*) comes from a coherent
@@ -16,7 +16,7 @@ This chapter is the cliff-notes version of that history.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A lambda glyph in a circle on the left branches through dotted generations of nodes into a column of green squares — a century-old intellectual lineage flowing into today's languages"
+  aria-label="A lambda glyph in a circle on the left branches through dotted generations of nodes into a column of green squares, a century-old intellectual lineage flowing into today's languages"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -80,7 +80,7 @@ all be *encoded* as functions.
 
 The TypeScript equivalent of `λx. x + 1` is the arrow function `(x)
 => x + 1`. The keyword `lambda` is almost everywhere in functional
-languages — it's the name of the abstraction that wraps a body in a
+languages, it's the name of the abstraction that wraps a body in a
 parameter.
 
 <CodeBlock
@@ -95,7 +95,7 @@ const apply = <A, B>(f: (a: A) => B, a: A): B => f(a);
 console.log(identity(42));
 console.log(apply((n: number) => n + 1, 41));
 
-// We can even encode booleans as functions — pure lambda calculus
+// We can even encode booleans as functions, pure lambda calculus
 const T =
   <A,>(a: A) =>
   (_b: A): A =>
@@ -114,7 +114,7 @@ console.log(cond(F, "yes", "no")); // "no"
 />
 
 The key insight: a function is not just a tool *inside* a program.
-It is a *value* — the most fundamental value the language has.
+It is a *value*, the most fundamental value the language has.
 Everything in functional programming follows from taking that idea
 seriously.
 
@@ -155,7 +155,7 @@ but it became *usable* with Lisp.
 
 In 1973, **Robin Milner** designed **ML** to write proofs about
 programs. ML introduced the world to **Hindley–Milner type
-inference** — the idea that a compiler can figure out the types of
+inference**, the idea that a compiler can figure out the types of
 your program *automatically*, even without annotations, and reject
 any program that doesn't type-check.
 
@@ -192,15 +192,15 @@ console.log(unwrapOr(none<number>(), 0));
 
 In 1990, **Haskell** went further. It is a pure, lazy, statically
 typed functional language. *Pure* means it has no side effects in
-the language itself — every function returns a value and that's it.
+the language itself, every function returns a value and that's it.
 Effects (I/O, randomness, mutation) are modeled as *data* and
 sequenced by a special abstraction called a `Monad`. We will explore
 this idea, gently, much later.
 
 Haskell is where most of the vocabulary you'll hear in modern FP
 ("functor", "applicative", "monad", "kind", "typeclass") was crystallized.
-TypeScript cannot fully express these patterns — its type system lacks
-"higher-kinded types" — but the *intuitions* transfer perfectly.
+TypeScript cannot fully express these patterns, its type system lacks
+"higher-kinded types", but the *intuitions* transfer perfectly.
 
 ## Erlang: functional concurrency (1986)
 
@@ -216,7 +216,7 @@ message passing**. Each phone call lived in its own process. The
 processes shared no memory. They communicated only by sending
 immutable messages. If a process crashed, a supervisor restarted it.
 
-This combination — immutability plus isolated processes — is what
+This combination, immutability plus isolated processes, is what
 later inspired Akka (Scala), the Actor model in Swift, Elixir, and
 parts of modern distributed systems design. Erlang showed that
 functional ideas were *practical* at industrial scale, not just
@@ -234,8 +234,8 @@ shipped on:
 - **OCaml** continued in research and crept into industry (Jane
   Street, Facebook's Flow and Hack toolchain).
 
-These languages proved you could write large business systems —
-banks, e-commerce, build tools — in a functional style without
+These languages proved you could write large business systems,
+banks, e-commerce, build tools, in a functional style without
 abandoning your existing infrastructure. They also normalized ideas
 that were once "academic": immutable collections, pattern matching,
 algebraic data types, persistent data structures.
@@ -244,10 +244,10 @@ algebraic data types, persistent data structures.
 
 <IllustrationPrompt subject="Brendan Eich" photo />
 
-JavaScript had functions as first-class values from day one — and
+JavaScript had functions as first-class values from day one, and
 that is not an accident. When Netscape recruited Brendan Eich in
-1995, the pitch that drew him in was the chance to put **Scheme** —
-a famously elegant Lisp dialect — in the browser. Management then
+1995, the pitch that drew him in was the chance to put **Scheme**,
+a famously elegant Lisp dialect, in the browser. Management then
 decided the new language had to *look* like Java, and Eich built the
 first version in a now-legendary ten days in May 1995. The result
 was a language with Java's curly braces but Scheme's soul:
@@ -265,7 +265,7 @@ A few things changed that:
 - **ES5 (2009)** added these methods to `Array.prototype`.
 - **Promises and ES6 (2015)** made composing async operations feel
   more like building values than driving state machines.
-- **React (2013)** treated the UI as a *pure function of state* —
+- **React (2013)** treated the UI as a *pure function of state*,
   arguably the single biggest mainstreaming event for functional
   thinking in front-end work.
 - **Redux (2015)** modeled state as immutable values transformed by
@@ -285,7 +285,7 @@ flowchart TD
     J --> TS
 ```
 
-By 2018, "functional JavaScript" was no longer a niche style — it
+By 2018, "functional JavaScript" was no longer a niche style, it
 was the *default* idiom of the most popular UI library in the world.
 But pure JavaScript still lacked the *type system* to make
 functional design watertight. That's where TypeScript enters the
@@ -301,7 +301,7 @@ identical, but in TypeScript you can:
   compiler force exhaustive handling
 - Express generic abstractions without losing precision
 - Model `Option`, `Result`, `IO`, `Task`, and `State` as types
-- Detect entire classes of bug at compile time — `null`,
+- Detect entire classes of bug at compile time, `null`,
   forgotten error cases, partial functions
 
 This is what the rest of the course will build. The next chapter
@@ -385,10 +385,10 @@ third is the style we will spend the rest of the course mastering.
   markdown={`What is the lambda calculus, and why does it matter for functional programming?
 
 - A category of bugs that occur in JavaScript closures
-  > No — though closures are *implementations* of lambda abstraction, "lambda calculus" refers to a formal system, not a bug pattern.
+  > No, though closures are *implementations* of lambda abstraction, "lambda calculus" refers to a formal system, not a bug pattern.
 - A library for working with mathematical functions in TypeScript
   > It is not a library. It is a formal system that predates computers.
-- [o] A 1936 formal system in which functions are the only primitive — Turing-complete and the foundation of functional programming
+- [o] A 1936 formal system in which functions are the only primitive, Turing-complete and the foundation of functional programming
   > The lambda calculus is where the *idea* "everything is a function" was first made rigorous. Every functional language is, at heart, a way of writing programs in that system.
 - A type-inference algorithm used by Haskell and ML
   > Type inference (Hindley–Milner) is a *separate* invention from the lambda calculus, though it operates on lambda-calculus-like programs.

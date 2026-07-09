@@ -1,9 +1,9 @@
 ---
 title: Color and Fill Scales
-description: How ggplot2 turns data into color — discrete palettes, continuous gradients, the color vs fill distinction, and choosing perceptually honest scales.
+description: How ggplot2 turns data into color, discrete palettes, continuous gradients, the color vs fill distinction, and choosing perceptually honest scales.
 ---
 
-Color is the most powerful — and most abused — aesthetic. ggplot2
+Color is the most powerful, and most abused, aesthetic. ggplot2
 handles it through **color and fill scales**, and understanding them
 turns color from a guessing game into a deliberate choice. This is a
 foundational page, so it has extra practice questions.
@@ -11,7 +11,7 @@ foundational page, so it has extra practice questions.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A legend sidebar with three colored keys tethered by thin matching lines to their dots inside the chart — every legend is a color scale showing its work"
+  aria-label="A legend sidebar with three colored keys tethered by thin matching lines to their dots inside the chart, every legend is a color scale showing its work"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -55,9 +55,9 @@ foundational page, so it has extra practice questions.
 Two color aesthetics exist because marks have an outline and an
 interior:
 
-- **`color`** — the *outline* of points, the stroke of lines, the
+- **`color`**, the *outline* of points, the stroke of lines, the
   border of bars.
-- **`fill`** — the *interior* of areas: bars, boxes, ribbons, tiles.
+- **`fill`**, the *interior* of areas: bars, boxes, ribbons, tiles.
 
 Each has its own family of scales: `scale_color_*()` and
 `scale_fill_*()`. Use the one that matches the aesthetic you mapped.
@@ -212,7 +212,7 @@ data.
 - A diverging scale centered on a midpoint.
   > Diverging scales are for continuous data with a meaningful center, not categories.
 - No scale at all; categorical variables cannot use color.
-  > They can and often do — via a qualitative scale.
+  > They can and often do, via a qualitative scale.
 
 Categorical data has no order, so it needs distinct hues rather than a
 gradient that would imply a ranking.`}
@@ -241,7 +241,7 @@ that create misleading bright bands.`}
   > A diverging scale implies a meaningful center; not all data has one.
 - For categorical variables with many levels.
   > Categorical data needs a qualitative palette, not a diverging gradient.
-- [o] When the variable has a meaningful midpoint — like zero, an average, or a target — so values above and below it should read as opposite directions.
+- [o] When the variable has a meaningful midpoint, like zero, an average, or a target, so values above and below it should read as opposite directions.
   > Diverging scales encode "below vs. above" a real center.
 - Whenever you want the plot to look more colorful.
   > Color choice should reflect the data's structure, not decoration.
@@ -256,21 +256,21 @@ without a real midpoint invents a division that is not in the data.`}
 - \`scale_color_brewer\` does not exist.
   > It exists; it simply targets the wrong aesthetic here.
 - Brewer palettes do not work on bars.
-  > Brewer palettes work on bars — via the *fill* scale.
+  > Brewer palettes work on bars, via the *fill* scale.
 - [o] The bars use the \`fill\` aesthetic, so they are governed by \`scale_fill_*\`; a \`scale_color_*\` controls the unused outline aesthetic instead.
   > You must match the scale family to the aesthetic you mapped (\`fill\` here).
 - You needed to set \`color = drv\` as a constant.
   > The issue is the scale family, not mapping vs. setting.
 
 Color scales and fill scales are separate families. Style the aesthetic
-you actually mapped — \`fill\` for bar interiors.`}
+you actually mapped, \`fill\` for bar interiors.`}
 />
 
 ## Quick challenge: match the scale to the aesthetic
 
 The bars below map `drv` to **fill**, so they must be styled with a
 `scale_fill_*`. Build a ggplot object `p` that fills the bars with the
-ColorBrewer `"Set2"` palette using the *correct* scale family — then the
+ColorBrewer `"Set2"` palette using the *correct* scale family, then the
 test confirms a fill scale (not a color scale) was added.
 
 <ChallengeCard
@@ -311,12 +311,12 @@ print(p)
 
 ## Key takeaways
 
-- **`color`** styles outlines/lines; **`fill`** styles interiors —
+- **`color`** styles outlines/lines; **`fill`** styles interiors,
   match the scale family (`scale_color_*` vs `scale_fill_*`) to the
   aesthetic you mapped.
 - **Categorical** color → a *qualitative* palette of distinct hues;
   **continuous** color → a *gradient* (prefer **viridis**).
 - **Diverging** scales suit data with a meaningful midpoint only.
 - Use **`scale_*_manual()`** for exact, semantic colors.
-- Color always costs the reader decoding effort — map it only when it
+- Color always costs the reader decoding effort, map it only when it
   earns its place.

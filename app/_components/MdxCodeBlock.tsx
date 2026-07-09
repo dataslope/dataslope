@@ -39,10 +39,10 @@ interface MdxCodeBlockProps {
   datasets?: DatasetStageSpec[];
   label?: string;
   showFileTabBar?: boolean;
-  /** Importable module names to pre-install alongside the runtime —
+  /** Importable module names to pre-install alongside the runtime,
    *  see `CodeBlockProps.packages`. */
   packages?: string[];
-  /** Inject the pinned Tailwind in-browser compiler into the preview —
+  /** Inject the pinned Tailwind in-browser compiler into the preview,
    *  see `CodeBlockProps.tailwind`. Preview adapters (web/react) only. */
   tailwind?: boolean;
 }

@@ -1,6 +1,6 @@
 {
     "title": "Natural Language Processing with Python",
-    "description": "A foundations-first course on classic NLP with NLTK — tokenization, normalization, stopwords, stemming, lemmatization, frequency analysis, POS tagging, and n-grams. Built around intuition: what each preprocessing step solves, when to use it, and when it quietly hurts you. For learners comfortable with Python strings, lists, loops, and basic regular expressions.",
+    "description": "A foundations-first course on classic NLP with NLTK, tokenization, normalization, stopwords, stemming, lemmatization, frequency analysis, POS tagging, and n-grams. Built around intuition: what each preprocessing step solves, when to use it, and when it quietly hurts you. For learners comfortable with Python strings, lists, loops, and basic regular expressions.",
     "root": true,
     "tags": {
         "language": [

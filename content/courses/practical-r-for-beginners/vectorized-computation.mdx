@@ -1,6 +1,6 @@
 ---
 title: Vectorized Computation
-description: Why R lets you write `prices * 1.08` to add tax to a thousand prices at once — and why that one idea changes how you think about programming.
+description: Why R lets you write `prices * 1.08` to add tax to a thousand prices at once, and why that one idea changes how you think about programming.
 ---
 
 In most programming languages, if you want to add 1 to every
@@ -25,7 +25,7 @@ often *much* faster.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A row of cells holding light blue dots passes under one wide plus-one bar that presses on every cell at once, leaving a row of darker blue dots below — vectorized computation transforms the whole vector in a single step"
+  aria-label="A row of cells holding light blue dots passes under one wide plus-one bar that presses on every cell at once, leaving a row of darker blue dots below, vectorized computation transforms the whole vector in a single step"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.1">
@@ -144,7 +144,7 @@ flowchart TD
 ## Recycling: when lengths differ
 
 If the two vectors are *different lengths*, R **recycles** the
-shorter one — it repeats it as needed to match the length of the
+shorter one, it repeats it as needed to match the length of the
 longer one.
 
 <CodeBlock
@@ -152,13 +152,13 @@ longer one.
   files={[
     {
       filename: "main.r",
-      starterCode: `# Length 6 + length 1 — the scalar gets recycled
+      starterCode: `# Length 6 + length 1, the scalar gets recycled
 c(10, 20, 30, 40, 50, 60) + 1
 
-# Length 6 + length 2 — (1, 2) is repeated as (1,2,1,2,1,2)
+# Length 6 + length 2, (1, 2) is repeated as (1,2,1,2,1,2)
 c(10, 20, 30, 40, 50, 60) + c(1, 2)
 
-# Length 6 + length 3 — (1,2,3) repeats as (1,2,3,1,2,3)
+# Length 6 + length 3, (1,2,3) repeats as (1,2,3,1,2,3)
 c(10, 20, 30, 40, 50, 60) + c(1, 2, 3)
 `,
     },
@@ -167,7 +167,7 @@ c(10, 20, 30, 40, 50, 60) + c(1, 2, 3)
 
 This is most useful in the very common case where one vector is
 length 1 (a "scalar"). When the lengths don't divide evenly, R
-will *warn* you — that warning almost always means a bug:
+will *warn* you, that warning almost always means a bug:
 
 <CodeBlock
   adapter="r"
@@ -245,7 +245,7 @@ diff(daily_sales)
 
 ## A small but mighty example: standardizing a vector
 
-A common data-prep step is *standardizing* a vector — subtracting
+A common data-prep step is *standardizing* a vector, subtracting
 the mean and dividing by the standard deviation, so the result has
 mean 0 and standard deviation 1.
 
@@ -279,7 +279,7 @@ column.
 
 In most interpreted languages, a `for` loop in user code has
 overhead at every step. In R, every vectorized operation is
-implemented in highly-optimized C under the hood — when you write
+implemented in highly-optimized C under the hood, when you write
 `x + y`, R does the whole computation in one call to a fast
 internal routine.
 
@@ -294,7 +294,7 @@ flowchart TB
   style slow fill:#fee2e2
 ```
 
-You can — and sometimes should — write loops in R. But your *first
+You can, and sometimes should, write loops in R. But your *first
 instinct* should always be: "is there a vectorized way to express
 this?" 95% of the time, there is.
 
@@ -307,7 +307,7 @@ this?" 95% of the time, there is.
   > Multiplication here is element-wise, not a single product of everything; you get a vector back, not one number.
 - [o] \`10 20 30\`
   > The \`10\` is recycled to match the length of the vector, then multiplied element-wise.
-- An error — different lengths
+- An error, different lengths
   > A length-1 value is recycled to match the vector, so this is valid rather than an error.
 - \`c(10, 2, 3)\`
   > The \`10\` multiplies *every* element, not just the first one.`}
@@ -331,7 +331,7 @@ this?" 95% of the time, there is.
 
 - Because \`for\` loops are forbidden in R.
   > \`for\` loops are valid R syntax; they are just rarely the most concise or efficient way to process a vector when a vectorized alternative exists.
-- [o] Because operations and most built-in functions are *vectorized* — they automatically apply to every element.
+- [o] Because operations and most built-in functions are *vectorized*, they automatically apply to every element.
   > This is R's signature design choice and is the reason R code for data work is so compact.
 - Because R secretly rewrites loops as parallel code.
   > R does not automatically parallelize loops; vectorized operations are fast because they are implemented as optimized C routines, not because of hidden parallelism.
@@ -347,7 +347,7 @@ temperatures in Fahrenheit using the formula `F = C * 9/5 + 32`.
 <ChallengeCard
   adapter="r"
   title="Vectorized temperature conversion"
-  instructions={`Given \`celsius\`, compute \`fahrenheit\` as a vector. No loops needed — use vectorized arithmetic.`}
+  instructions={`Given \`celsius\`, compute \`fahrenheit\` as a vector. No loops needed, use vectorized arithmetic.`}
   files={[
     {
       filename: "main.r",

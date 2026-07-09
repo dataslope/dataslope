@@ -1,11 +1,11 @@
 /**
  * Ask AI suggested-questions endpoint.
  *
- * POST — three context-grounded questions for the panel's empty state and
+ * POST, three context-grounded questions for the panel's empty state and
  * after each answer. Signed-in only (it spends provider tokens), but tracked
  * on suggestion-specific daily counters (migration 0006) so it never consumes
  * the member's Ask AI chat budget. Always served by the cheapest configured
- * provider (free tier config first) regardless of the member's tier —
+ * provider (free tier config first) regardless of the member's tier,
  * suggestions are a UI nicety, not the answer itself.
  *
  * Failures return an error status and the client silently hides the section;
@@ -47,11 +47,11 @@ function json(data: unknown, status = 200): Response {
 }
 
 /** How long we'll wait on the provider. Suggestions that arrive after this
- *  are stale — the user has started typing their own question. */
+ *  are stale, the user has started typing their own question. */
 const PROVIDER_TIMEOUT_MS = 10_000;
 
 export async function POST(request: Request): Promise<Response> {
-  // Cookie-authenticated mutation that spends provider tokens — same
+  // Cookie-authenticated mutation that spends provider tokens, same
   // cross-site posture as the shares/workspaces routes.
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
@@ -82,7 +82,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!model) return json({ error: "Not configured." }, 503);
 
   // --- Budgets (suggestion-specific per-user counters + global ceiling).
-  // The request slot is reserved atomically up front — this endpoint is
+  // The request slot is reserved atomically up front, this endpoint is
   // auto-fired by the client, so a deferred count would let concurrent
   // bursts through the daily cap. ---
   const day = utcDay(Date.now());
@@ -108,7 +108,7 @@ export async function POST(request: Request): Promise<Response> {
     system: suggestSystemPrompt(surface),
   });
 
-  // --- Call the provider (bounded — late suggestions are useless). ---
+  // --- Call the provider (bounded, late suggestions are useless). ---
   const abort = new AbortController();
   const timeout = setTimeout(() => abort.abort(), PROVIDER_TIMEOUT_MS);
   let result;
@@ -131,7 +131,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const questions = parseSuggestedQuestions(result.text);
 
-  // Bill exact usage when reported, else the char/4 estimate. Best-effort —
+  // Bill exact usage when reported, else the char/4 estimate. Best-effort,
   // a failed write must not fail the response, but log the undercount.
   const inTok = result.inputTokens || approxInputTokens;
   const outTok = result.outputTokens || estimateTokens(result.text);

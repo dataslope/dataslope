@@ -2,7 +2,7 @@ import "@/app/tailwind.css";
 import { LegalShell } from "../_components/legal/LegalShell";
 
 export const metadata = {
-  title: "Terms of Service — Dataslope",
+  title: "Terms of Service, Dataslope",
   description: "The terms that govern your use of Dataslope.",
 };
 

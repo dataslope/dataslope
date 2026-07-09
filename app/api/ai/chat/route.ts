@@ -6,7 +6,7 @@
  * enforces per-user + global budgets, then streams the provider's answer
  * straight through as Server-Sent Events.
  *
- * `force-dynamic` keeps it off the incremental cache — it reads the session,
+ * `force-dynamic` keeps it off the incremental cache, it reads the session,
  * calls an external API, and streams, so it must run per request (same posture
  * as app/api/auth/[...all]/route.ts). Streaming works natively on the Workers
  * runtime: we return a ReadableStream and pipe the upstream SSE through it.
@@ -35,7 +35,7 @@ function json(data: unknown, status = 200): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  // Cookie-authenticated mutation that spends provider tokens — same
+  // Cookie-authenticated mutation that spends provider tokens, same
   // cross-site posture as the shares/workspaces routes.
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
@@ -97,7 +97,7 @@ export async function POST(request: Request): Promise<Response> {
   });
 
   // --- Call the provider. `upstreamAbort` lets us stop paying for tokens the
-  // moment the client disconnects (Stop button / navigation) — see cancel(). ---
+  // moment the client disconnects (Stop button / navigation), see cancel(). ---
   const upstreamAbort = new AbortController();
   let upstream: ReadableStream<Uint8Array>;
   try {
@@ -143,7 +143,7 @@ export async function POST(request: Request): Promise<Response> {
             usageOut = parsed.usage.completion_tokens ?? usageOut;
           }
         } catch {
-          // keepalive / partial JSON line — ignore.
+          // keepalive / partial JSON line, ignore.
         }
       };
       const reader = upstream.getReader();
@@ -160,7 +160,7 @@ export async function POST(request: Request): Promise<Response> {
             handleLine(line);
           }
         }
-        // Flush the decoder and process any unterminated final line — the
+        // Flush the decoder and process any unterminated final line, the
         // provider's usage chunk may arrive without a trailing newline, and
         // dropping it would silently fall back to estimated billing.
         buffer += decoder.decode();
@@ -183,7 +183,7 @@ export async function POST(request: Request): Promise<Response> {
         // it, else a char/4 estimate of what streamed before any interruption).
         const inTok = usageIn || approxInputTokens;
         const outTok = usageOut || estimateTokens(answer);
-        // A failed write undercounts usage against the daily budgets — it
+        // A failed write undercounts usage against the daily budgets, it
         // must not fail the (already-streamed) response, but log it so
         // undercounting is visible in the Worker logs rather than silent.
         const write = recordUsage(env, user.id, day, inTok, outTok).catch(
@@ -194,7 +194,7 @@ export async function POST(request: Request): Promise<Response> {
     },
     cancel() {
       // Client disconnected (Stop button / navigation): abort the provider
-      // fetch so we stop streaming — and stop being billed — immediately.
+      // fetch so we stop streaming, and stop being billed, immediately.
       upstreamAbort.abort();
     },
   });

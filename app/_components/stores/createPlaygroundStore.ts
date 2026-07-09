@@ -15,7 +15,7 @@ export interface PlaygroundState {
   files: PlaygroundFile[];
   /** The currently-active tab. Can be a file id or `SETTINGS_TAB_ID`. */
   activeTabId: string;
-  /** The most recently active *file* — used when the user closes the
+  /** The most recently active *file*, used when the user closes the
    *  Settings tab so we can return to a sensible code tab. */
   activeFileId: string;
   /** Per-file in-memory editor contents. Persisted to OPFS via

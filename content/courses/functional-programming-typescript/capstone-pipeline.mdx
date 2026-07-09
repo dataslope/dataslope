@@ -1,5 +1,5 @@
 ---
-title: Capstone — A Functional Data Pipeline
+title: "Capstone: A Functional Data Pipeline"
 description: Combine everything from the course into a single, multi-file, end-to-end functional program.
 ---
 
@@ -18,7 +18,7 @@ There is no library involved; just plain TypeScript.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Raw text bars descend a five-step staircase, becoming typed blue shapes, then validated green ones while a red reject falls off the edge, and finally merge into one large green result on the lowest step — the whole pipeline from parsing to report"
+  aria-label="Raw text bars descend a five-step staircase, becoming typed blue shapes, then validated green ones while a red reject falls off the edge, and finally merge into one large green result on the lowest step, the whole pipeline from parsing to report"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -244,7 +244,7 @@ export function runReport(raws: ReadonlyArray<string>): Report {
 Run the example. Every function in `parse.ts`, `transform.ts`, and
 `pipeline.ts` is pure. Every type in `types.ts` is immutable.
 Every error is a value. The only impure code is the four
-`console.log`s in `main.ts` — and that's exactly where it should
+`console.log`s in `main.ts`, and that's exactly where it should
 be: the **edge** of the program.
 
 ## What patterns from the course you just used
@@ -279,7 +279,7 @@ Try these on your own:
    `byProduct` entries.)
 3. Make the pipeline **async**: change `parseRow` to a
    `TaskResult<string, Sale>` and have the shell run them in
-   parallel. Notice how little the *core* changes — most of the
+   parallel. Notice how little the *core* changes, most of the
    work is on the boundary.
 4. Add **branded types**: make `SKU` a branded `string`, and have
    `parseRow` produce a `Sale` whose `sku` field has that brand.
@@ -298,10 +298,10 @@ of building this way.
   > Modules help with organization, but the deeper property is something else.
 - Every \`.ts\` file is small
   > Helpful, but not the structural reason.
-- [o] All business logic lives in pure functions that take data and return data, with side effects confined to a tiny shell — so each piece can be tested with plain inputs, and the parts you'll want to change live where you expect them
+- [o] All business logic lives in pure functions that take data and return data, with side effects confined to a tiny shell, so each piece can be tested with plain inputs, and the parts you'll want to change live where you expect them
   > The architectural choice of "pure core, imperative shell" is what turns a *style* (FP) into a *system property* (maintainability).
 - The program is short
   > Toy programs are easy to test for many reasons; the *real* benefit scales to large programs.
 
-When you scale this same pattern from one screen of code to a hundred thousand lines, the property does not break — the codebase still consists of pure transforms plus thin adapters.`}
+When you scale this same pattern from one screen of code to a hundred thousand lines, the property does not break, the codebase still consists of pure transforms plus thin adapters.`}
 />

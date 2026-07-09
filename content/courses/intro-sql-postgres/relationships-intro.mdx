@@ -1,17 +1,17 @@
 ---
 title: Relationships Between Tables
-description: The big idea that makes a database "relational" — how separate tables connect, and the three shapes those connections take.
+description: The big idea that makes a database "relational", how separate tables connect, and the three shapes those connections take.
 ---
 
 We have built up tables, rows, columns, and primary keys. Now we
 reach the idea that gives **relational** databases their name and
-their power: tables do not live in isolation — they **relate** to
+their power: tables do not live in isolation, they **relate** to
 one another.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two table cards drift together like puzzle pieces — the knob on one carries a shared value dot that fits the notch waiting in the other"
+  aria-label="Two table cards drift together like puzzle pieces, the knob on one carries a shared value dot that fits the notch waiting in the other"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -42,12 +42,12 @@ one another.
 ## Why split data across tables at all?
 
 A natural first instinct is to cram everything into one giant table.
-Resist it. Real information has natural *kinds of things* —
-customers, orders, products — and each kind deserves its own table.
+Resist it. Real information has natural *kinds of things*,
+customers, orders, products, and each kind deserves its own table.
 
 Why? Because mixing them forces duplication. If every order row also
 stored the customer's full name, address, and phone number, then a
-customer with 50 orders would have their details copied 50 times —
+customer with 50 orders would have their details copied 50 times,
 and changing their phone number would mean fixing 50 rows.
 
 ```mermaid
@@ -65,7 +65,7 @@ flowchart LR
 
 The relational answer: keep each kind of thing in its own table, and
 **connect** them with a shared value. Each order simply stores the
-customer's `id` — a tiny reference — instead of copying all their
+customer's `id`, a tiny reference, instead of copying all their
 details.
 
 ## How the connection works
@@ -137,13 +137,13 @@ erDiagram
 Every relationship is really two sentences, one from each side. For
 customers and orders: *"a customer has many orders"* **and** *"an
 order belongs to one customer."* Saying both out loud tells you the
-shape — here, one-to-many.
+shape, here, one-to-many.
 </Callout>
 
 ## See a relationship in action
 
 Two tables, linked by `customer_id`. The query walks the link to
-show each order beside the name of the customer who placed it —
+show each order beside the name of the customer who placed it,
 without the name ever being duplicated in the orders table.
 
 <SqlCodeBlock
@@ -208,7 +208,7 @@ Splitting data into related tables stores each fact once and connects the pieces
 - Many-to-many.
   > Many-to-many would require each order to belong to several customers as well, which is not the case here.
 - No relationship at all.
-  > There is clearly a relationship — orders reference customers — so "none" is incorrect.
+  > There is clearly a relationship, orders reference customers, so "none" is incorrect.
 
 A customer having many orders, each tied to one customer, is one-to-many.`}
 />

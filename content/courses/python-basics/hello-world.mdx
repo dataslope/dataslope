@@ -1,6 +1,6 @@
 ---
 title: Your First Python Program
-description: print, comments, docstrings, and the Zen of Python — writing real code from line one
+description: print, comments, docstrings, and the Zen of Python, writing real code from line one
 ---
 
 There is a tradition, almost as old as programming itself, that the first
@@ -21,13 +21,13 @@ Python makes that exactly as short as you would hope.
 That is the entire program. No `main`, no semicolons, no header files, no
 compilation step. One line, and it runs. Compare that to the same program in
 C, which needs an `#include`, a `main` function, a `return`, and curly braces
-just to print one line. Python's brevity here is not an accident — it is a
+just to print one line. Python's brevity here is not an accident, it is a
 design value, and we will see where that value came from in a moment.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two program cards side by side: the left is packed edge to edge with faint boilerplate bars, the right holds a single bold green line in open space — in Python, Hello World is just the one line"
+  aria-label="Two program cards side by side: the left is packed edge to edge with faint boilerplate bars, the right holds a single bold green line in open space, in Python, Hello World is just the one line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="30" width="200" height="150" rx="14" fill="currentColor" opacity="0.06" />
@@ -47,8 +47,8 @@ design value, and we will see where that value came from in a moment.
 
 <Callout type="info" title="You don't need to install anything">
 Everything in this course runs in the browser, so there is nothing to set up.
-Later — when you want to run scripts on your own machine, install third-party
-libraries, and wire Python into your editor — you will install Python locally
+Later, when you want to run scripts on your own machine, install third-party
+libraries, and wire Python into your editor, you will install Python locally
 and create a *virtual environment*. We cover exactly how to do that near the
 end of the course, on the **Virtual Environments and pip** page. For now, the
 browser is your Python.
@@ -62,7 +62,7 @@ famous when it reappeared in *The C Programming Language* (1978), the book he
 wrote with Dennis Ritchie. It has been the ritual first program ever since.
 
 The choice is also practical. Printing output is the simplest possible form of
-**input/output** — I/O — and every program is, at bottom, about I/O: it reads
+**input/output**, I/O, and every program is, at bottom, about I/O: it reads
 some data, transforms it, and writes some results. `print` is your first taste
 of that loop, which is why we begin here rather than with arithmetic or
 variables.
@@ -70,7 +70,7 @@ variables.
 ## The `print` function
 
 `print` is a built-in function that writes its arguments to **standard
-output** — usually the terminal, or in our case the output panel below each
+output**, usually the terminal, or in our case the output panel below each
 block. It is more flexible than it first looks.
 
 When you pass several arguments, `print` joins them with a space:
@@ -117,7 +117,7 @@ print("done")
 />
 
 Finally, `print` is not limited to strings. You can hand it numbers, lists,
-dictionaries, almost anything — Python calls `str()` on each argument to turn
+dictionaries, almost anything, Python calls `str()` on each argument to turn
 it into text first:
 
 <CodeBlock
@@ -157,7 +157,7 @@ Notice what Python does *not* have: a `/* ... */` style for multi-line comments.
 That omission is deliberate. The rationale was that long comments should be
 broken into short lines anyway, and a block of `#` lines does that job fine.
 People sometimes use a triple-quoted string to "comment out" a block, but be
-careful — that is a string the interpreter actually evaluates and then throws
+careful, that is a string the interpreter actually evaluates and then throws
 away, not a true comment:
 
 <CodeBlock
@@ -216,7 +216,7 @@ pdoc parse these docstrings to build entire API references automatically.
 ## The Zen of Python
 
 Python's brevity, its dislike of boilerplate, its preference for one obvious way
-to do things — these are not random. They are written down. Run the line below:
+to do things, these are not random. They are written down. Run the line below:
 
 <CodeBlock
   adapter="python"
@@ -229,13 +229,13 @@ to do things — these are not random. They are written down. Run the line below
   ]}
 />
 
-What prints is **the Zen of Python**, a set of 19 guiding aphorisms — "Beautiful
+What prints is **the Zen of Python**, a set of 19 guiding aphorisms, "Beautiful
 is better than ugly," "Explicit is better than implicit," "Simple is better than
 complex," "Readability counts." They were written by **Tim Peters**, one of
 Python's most prolific early contributors, and they have been hidden inside
 Python as an Easter egg since 2004. You can return to them any time by running
 `import this`. They explain a surprising amount of why Python looks the way it
-does — including the most famous decision of all, which we tackle on the next
+does, including the most famous decision of all, which we tackle on the next
 page: significant whitespace.
 
 ## Your first challenges
@@ -250,7 +250,7 @@ Hello, Grace!
 \`\`\`
 
 Do not hardcode the literal string \`"Hello, Grace!"\`. The variable \`name = "Grace"\`
-is already defined for you — use it in your \`print\` call. You can use string
+is already defined for you, use it in your \`print\` call. You can use string
 concatenation, an f-string, or \`.format()\`.`}
   files={[
     {
@@ -354,5 +354,5 @@ print("a", "b", "c", sep="-", end="!")
 
 You have run code, printed in three different ways, written a comment, added a
 docstring, and met the Zen of Python. Next we will look at why those four
-spaces of indentation matter so much — the one rule that defines how Python
+spaces of indentation matter so much, the one rule that defines how Python
 looks.

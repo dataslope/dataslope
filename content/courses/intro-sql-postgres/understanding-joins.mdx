@@ -1,10 +1,10 @@
 ---
 title: Understanding Joins
-description: The big picture of combining tables — what a join actually does, why it matches rows on a condition, and how to picture the result before writing one.
+description: The big picture of combining tables, what a join actually does, why it matches rows on a condition, and how to picture the result before writing one.
 ---
 
 A **join** combines rows from two tables into a single result by
-**matching them on a condition** — almost always a foreign key
+**matching them on a condition**, almost always a foreign key
 meeting the primary key it points to. Joins are how the relational
 model delivers on its promise: data split for storage, recombined
 for answers. This page builds the intuition; the next two cover the
@@ -13,7 +13,7 @@ specific kinds.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two tables zip together — rows angle in from each side and click into combined rows where their yellow key dots align"
+  aria-label="Two tables zip together, rows angle in from each side and click into combined rows where their yellow key dots align"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -92,7 +92,7 @@ FROM
 
 Read it: *"From orders, joined to customers wherever the order's
 `customer_id` equals the customer's `id`, give me the order id, the
-customer name, and the amount."* The `ON` clause is the heart — it
+customer name, and the amount."* The `ON` clause is the heart, it
 states which rows belong together.
 
 ## Table aliases keep joins readable
@@ -127,7 +127,7 @@ would be unreadable otherwise.
 
 <Callout type="info" title="Why prefix columns at all?">
 Both tables might have a column named `id`. Writing `o.id` versus
-`c.id` removes the ambiguity — it tells the database (and the
+`c.id` removes the ambiguity, it tells the database (and the
 reader) *which* table's `id` you mean. When a column name exists in
 only one table, the prefix is optional, but using it consistently
 keeps joins clear.
@@ -145,7 +145,7 @@ flowchart TB
     T -->|"no"| D["Discard pairing"]
 ```
 
-You do not literally write that loop — remember, SQL is declarative.
+You do not literally write that loop, remember, SQL is declarative.
 You *describe the match* with `ON`, and the database finds an
 efficient way to perform it. But this "keep the matching pairs"
 picture is exactly what a join means.
@@ -154,7 +154,7 @@ picture is exactly what a join means.
 
 There is one more crucial question: what about rows that have **no
 match**? An order with a missing customer, or a customer with no
-orders — do they appear or vanish? The answer depends on the *kind*
+orders, do they appear or vanish? The answer depends on the *kind*
 of join, and that is precisely what the next two pages, **Inner
 Joins** and **Outer Joins**, are about.
 
@@ -181,7 +181,7 @@ A join merges related rows from two tables based on a matching condition.`}
 - It chooses which columns appear in the output.
   > Choosing output columns is the job of \`SELECT\`; \`ON\` specifies how rows are matched.
 - [o] It states the condition for matching rows between the two tables.
-  > \`ON\` defines which order pairs with which customer — here, equal \`customer_id\` and \`id\`.
+  > \`ON\` defines which order pairs with which customer, here, equal \`customer_id\` and \`id\`.
 - It sorts the combined result.
   > Sorting is \`ORDER BY\`; \`ON\` defines the match.
 - It limits how many rows are returned.

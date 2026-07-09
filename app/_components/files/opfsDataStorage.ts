@@ -39,8 +39,8 @@ async function getDataDir(
     const wsDir = await root.getDirectoryHandle("workspaces", { create });
     const wDir = await wsDir.getDirectoryHandle(workspaceId, { create });
     // `await` (not a bare `return`) so a NotFoundError from the missing
-    // `data/` dir — expected on first load before any data file is
-    // written — is caught here and returned as `null` instead of
+    // `data/` dir, expected on first load before any data file is
+    // written, is caught here and returned as `null` instead of
     // rejecting the caller's promise (which, fire-and-forget, would
     // surface as an uncaught rejection).
     return await wDir.getDirectoryHandle("data", { create });
@@ -50,7 +50,7 @@ async function getDataDir(
 }
 
 // ---------------------------------------------------------------------------
-// Manifest — tracks VirtualFile metadata so empty folders survive reloads
+// Manifest, tracks VirtualFile metadata so empty folders survive reloads
 // ---------------------------------------------------------------------------
 
 const MANIFEST_NAME = "__manifest.json";

@@ -4,13 +4,13 @@ description: How a Norwegian simulation language and a Californian research lab 
 ---
 
 *This is one of the optional deep-dive chapters promised in
-[The Road to C#](./the-road-to-csharp) — the long version of a story
+[The Road to C#](./the-road-to-csharp), the long version of a story
 told there in two paragraphs.*
 
 The software crisis of the late 1960s left the industry with a
 problem: as programs grew, the **procedural style** of "many
 functions over shared global data" collapsed under its own weight.
-The fix was a different way of organizing programs —
+The fix was a different way of organizing programs,
 **object-oriented programming**, or **OOP**.
 
 The idea sounds simple once you have heard it:
@@ -24,7 +24,7 @@ how software is structured.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Loose data dots and behavior bars are drawn along thin lines into a sealed green capsule that bundles one dot with its bar, a second capsule already formed below — data and functions becoming objects"
+  aria-label="Loose data dots and behavior bars are drawn along thin lines into a sealed green capsule that bundles one dot with its bar, a second capsule already formed below, data and functions becoming objects"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -74,13 +74,13 @@ how software is structured.
 
 The first object-oriented language was **Simula**, designed in
 Norway by **Ole-Johan Dahl** and **Kristen Nygaard** in the 1960s.
-Simula was created to simulate real-world systems — ships docking in
+Simula was created to simulate real-world systems, ships docking in
 a harbor, customers queueing at a bank, particles in a physics
 experiment.
 
 When you simulate the real world, you very quickly notice that the
 world isn't made of *functions and global variables*. The world is
-made of **things** — ships, customers, particles — and each thing
+made of **things**, ships, customers, particles, and each thing
 has its own state and its own behavior.
 
 ```mermaid
@@ -96,8 +96,8 @@ flowchart LR
 
 Dahl and Nygaard's insight was: let's just *say that* in the
 language. A ship is a `Ship`. It carries its own data and its own
-behavior with it. That single idea — packaging data and behavior
-together — is the heart of OOP.
+behavior with it. That single idea, packaging data and behavior
+together, is the heart of OOP.
 
 ## Smalltalk: everything is an object
 
@@ -106,7 +106,7 @@ together — is the heart of OOP.
 A few years later in California, **Alan Kay** and his colleagues at
 **Xerox PARC** built **Smalltalk**, a language and environment that
 pushed the idea to its limit: in Smalltalk, *everything is an
-object* — numbers, text, even the code itself. Objects communicated
+object*, numbers, text, even the code itself. Objects communicated
 by **sending messages** to each other.
 
 Smalltalk also gave us many other ideas we now take for granted:
@@ -177,8 +177,8 @@ Look closely:
   **interface** the rest of the program is allowed to use.
 - The class itself is the *boundary*.
 
-That tiny example contains the entire seed of OOP. Everything else —
-inheritance, polymorphism, design patterns — is just elaboration on
+That tiny example contains the entire seed of OOP. Everything else,
+inheritance, polymorphism, design patterns, is just elaboration on
 this idea.
 
 ## Procedural vs object-oriented, side by side
@@ -211,7 +211,7 @@ The object-oriented way:
 
 class BankAccount
 {
-    private decimal balance; // hidden — nobody outside can touch it
+    private decimal balance; // hidden, nobody outside can touch it
 
     public void Deposit(decimal amount)
     {
@@ -298,7 +298,7 @@ on OOP because it offered something procedural code couldn't:
   comment.
 
 When Microsoft eventually designed C#, OOP was the default
-assumption. C# was object-oriented from line one — which is why you
+assumption. C# was object-oriented from line one, which is why you
 spent a large part of this course learning to think in objects. The
 `Counter` and `BankAccount` you met in the Objects section of this
 course are direct descendants of the ships Dahl and Nygaard
@@ -314,7 +314,7 @@ simulated in a Norwegian harbor sixty years ago.
 - Computers can be replaced more often
   > Unrelated.
 - [o] Data and the operations that act on it are bundled together, with a boundary that prevents outsiders from changing the data directly
-  > That is the seed idea — every other OOP concept is built on top of it.
+  > That is the seed idea, every other OOP concept is built on top of it.
 - Programs no longer need variables
   > They very much do; OOP is about organizing them, not removing them.`}
 />
@@ -329,5 +329,5 @@ simulated in a Norwegian harbor sixty years ago.
 - [o] So no code outside \`BankAccount\` can bypass the rules in \`Deposit\` and \`Withdraw\` and corrupt the balance
   > \`private\` is what gives the class authority to enforce its own invariants.
 - C# requires every field to be private
-  > It doesn't — \`public\` and other modifiers are also allowed; you choose deliberately.`}
+  > It doesn't, \`public\` and other modifiers are also allowed; you choose deliberately.`}
 />

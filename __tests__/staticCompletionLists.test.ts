@@ -1,9 +1,9 @@
 /**
- * Sanity checks over the curated static completion lists — no duplicate
+ * Sanity checks over the curated static completion lists, no duplicate
  * labels (CodeMirror would render both rows), well-formed entries, and
  * a few spot checks that the lists carry what learners reach for.
  * Snippet entries (which carry an `apply` function) may intentionally
- * shadow a keyword of the same label — VS Code shows both too.
+ * shadow a keyword of the same label, VS Code shows both too.
  */
 import { describe, it, expect } from "vitest";
 import type { Completion } from "@codemirror/autocomplete";

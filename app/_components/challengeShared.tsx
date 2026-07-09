@@ -3,12 +3,12 @@
 /**
  * Shared helpers used by both `<ChallengeCard>` and `<SqlChallengeCard>`:
  *
- *   - `renderInstructions(input)`  — accepts either a React node (used
+ *   - `renderInstructions(input)`, accepts either a React node (used
  *     verbatim) or a markdown string (rendered via react-markdown + GFM).
- *   - `useChallengeToasts()`       — minimal in-card toast manager. Each
+ *   - `useChallengeToasts()`, minimal in-card toast manager. Each
  *     card mounts its own viewport so toasts feel attached to the card
  *     even when many are on the page.
- *   - `FormatIcon` / `CopyIcon` / `PlayIcon` — icon glyphs reused by
+ *   - `FormatIcon` / `CopyIcon` / `PlayIcon`, icon glyphs reused by
  *     both cards.
  */
 
@@ -30,7 +30,7 @@ import remarkGfm from "remark-gfm";
 // runtime boot. A bar that only moves on those few events looks stuck
 // for the long middle of a download, so this hook animates the
 // displayed fraction asymptotically toward a ceiling a little above
-// the latest report — classic capped pseudo-progress. It never reaches
+// the latest report, classic capped pseudo-progress. It never reaches
 // 1: completion is signalled by the boot UI unmounting, not the bar.
 
 /** Smooth a stage-floor boot fraction for display. Returns null (render
@@ -50,7 +50,7 @@ export function useCreepingBootFraction(
 
   useEffect(() => {
     if (!active || target == null) {
-      // Reset for the next boot — scheduled, not set synchronously in
+      // Reset for the next boot, scheduled, not set synchronously in
       // the effect body.
       const reset = window.setTimeout(() => setDisplay(null), 0);
       return () => window.clearTimeout(reset);
@@ -75,13 +75,13 @@ export function useCreepingBootFraction(
 
 // ─── Mid-run "preparing" wait ─────────────────────────────────────────
 // Some runtimes block *inside* a run to download/install something before
-// the user's code executes — Python's two-phase data-package install, its
+// the user's code executes, Python's two-phase data-package install, its
 // on-demand `loadPackagesFromImports`, R installing a `library()` on
 // demand. Those arrive via `RunOptions.onStatus(message, preparing)`.
 // This hook turns that stream into a `preparing` flag the surface uses to
 // show the runtime boot notice for the duration. The transition to
-// visible is debounced (~150 ms) so an all-cached run — which reports
-// preparing→done almost instantly — never flashes the notice.
+// visible is debounced (~150 ms) so an all-cached run, which reports
+// preparing→done almost instantly, never flashes the notice.
 
 const PREPARING_SHOW_DELAY_MS = 150;
 
@@ -92,7 +92,7 @@ export interface MidRunPreparing {
   message: string;
   /** Feed every `onStatus(message, preparing)` from a run here. */
   report: (message: string, preparing?: boolean) => void;
-  /** Clear all state — call at the start of each run. */
+  /** Clear all state, call at the start of each run. */
   reset: () => void;
 }
 
@@ -221,7 +221,7 @@ export interface ChallengeToastApi {
   dismiss: (id: number) => void;
 }
 
-/** Tiny self-contained toast manager — one queue per card. Toasts
+/** Tiny self-contained toast manager, one queue per card. Toasts
  *  auto-dismiss after 2.4s; the user can also click the close button. */
 export function useChallengeToasts(): ChallengeToastApi {
   const [toasts, setToasts] = useState<ChallengeToast[]>([]);
@@ -334,8 +334,8 @@ export function useShortId(prefix: string): string {
 // ─── Test results rail ───────────────────────────────────────────────
 // Shared by `<ChallengeCard>` and `<SqlChallengeCard>`: a minimal
 // pass/fail readout. A vertical rail runs down the left; each test is a
-// circle on the rail — green (--ds-green-500) with a white check for a
-// pass, red (--ds-red-500) with a white ✕ for a fail — and the rail
+// circle on the rail, green (--ds-green-500) with a white check for a
+// pass, red (--ds-red-500) with a white ✕ for a fail, and the rail
 // segment below each circle is painted in that test's colour. Rows are
 // just the test name; the description, the test's code/checks, and the
 // exact error message live in a click-popover so the list stays clean.
@@ -391,7 +391,7 @@ export function TestResultsRail({
           <Popover.Root>
             <Popover.Trigger
               className={railStyles.testRailItemBtn}
-              aria-label={`${t.name} — ${TEST_STATE_LABEL[t.state]}. View details`}
+              aria-label={`${t.name}, ${TEST_STATE_LABEL[t.state]}. View details`}
             >
               <span className={railStyles.testRailName}>{t.name}</span>
               <Info size={13} className={railStyles.testRailInfoIcon} aria-hidden />

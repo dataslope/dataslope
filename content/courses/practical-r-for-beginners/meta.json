@@ -1,6 +1,6 @@
 {
     "title": "Practical R for Beginners",
-    "description": "A narrative-driven course in data analysis, statistical thinking, and visualization with R — for learners with little or no programming background.",
+    "description": "A narrative-driven course in data analysis, statistical thinking, and visualization with R, for learners with little or no programming background.",
     "root": true,
     "tags": {
         "language": [

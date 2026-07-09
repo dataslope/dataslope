@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * CodePen-style split editors for the playground — one always-visible
+ * CodePen-style split editors for the playground, one always-visible
  * CodeMirror editor per workspace file (HTML on top, then CSS, then
  * JS), stacked vertically in the editor pane instead of the tabbed
  * single editor. Offered by adapters that set `splitEditors` (web).
@@ -18,7 +18,7 @@
  *
  * Focusing an editor reports the file as "active" so the Run button
  * label, Format target, and completion filename all track the pane the
- * user is working in — same semantics as focusing a tab.
+ * user is working in, same semantics as focusing a tab.
  */
 
 import { useEffect, useMemo, useRef } from "react";
@@ -49,14 +49,16 @@ export interface SplitEditorsProps {
   wordWrap: boolean;
   /** Write-through for user edits (buffer + OPFS + dirty mark). */
   onChange: (fileId: string, content: string) => void;
-  /** A pane gained focus — make its file the active one. */
+  /** A pane gained focus, make its file the active one. */
   onFocusFile: (fileId: string) => void;
   /** Mod-Enter / Mod-Shift-Enter inside any pane. */
   onRun: () => void;
   onRunSecondary: () => void;
   /** Create a new workspace file (same handler as the tab bar's "+");
-   *  the new file appears as an additional pane. */
-  onAddFile: () => void;
+   *  the new file appears as an additional pane. Omitted when the
+   *  adapter disables adding files (e.g. the fixed HTML/CSS/JS trio), in
+   *  which case the "+ New file" footer button is hidden. */
+  onAddFile?: () => void;
   /** Expose each pane's EditorView so Format/Copy can target the
    *  active pane. Called with `null` on teardown. */
   registerView: (fileId: string, view: EditorView | null) => void;
@@ -172,7 +174,7 @@ function SplitEditor({
   const suppressRef = useRef(false);
 
   // Callback props live in refs so the editor mounts exactly once per
-  // file — the pattern every other editor mount in the app uses.
+  // file, the pattern every other editor mount in the app uses.
   const onChangeRef = useRef(onChange);
   const onFocusRef = useRef(onFocusFile);
   const onRunRef = useRef(onRun);
@@ -282,7 +284,7 @@ function SplitEditor({
       themeCompRef.current = null;
       wrapCompRef.current = null;
     };
-    // Mount once per (file id, filename) — a rename remounts with the
+    // Mount once per (file id, filename), a rename remounts with the
     // right language mode; everything else flows through refs or
     // compartment reconfigures below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -385,7 +387,7 @@ function SplitEditor({
 export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
   const { files, onAddFile } = props;
   // Stable pane order: entry-ish files first (HTML pages / TSX mounts),
-  // then styles, then scripts — the CodePen convention — with filename
+  // then styles, then scripts, the CodePen convention, with filename
   // ties broken alphabetically. Files keep their identity (keyed by id)
   // so reordering tabs later doesn't remount editors.
   const ordered = useMemo(() => {
@@ -414,14 +416,16 @@ export default function PlaygroundSplitEditors(props: SplitEditorsProps) {
         ))}
       </div>
       <div className="split-editor-footer">
-        <button
-          type="button"
-          className="split-editor-add"
-          onClick={onAddFile}
-          aria-label="Add a new file"
-        >
-          ＋ New file
-        </button>
+        {onAddFile && (
+          <button
+            type="button"
+            className="split-editor-add"
+            onClick={onAddFile}
+            aria-label="Add a new file"
+          >
+            ＋ New file
+          </button>
+        )}
         <span className="split-editor-footer-hint">
           rename or close files in the tabbed editor (Change View)
         </span>

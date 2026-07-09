@@ -4,13 +4,13 @@ description: The shape of your data shapes the code you write. Long format unloc
 ---
 
 The exact same information can be laid out two very different
-ways. Knowing how — and *when* — to switch between them is one
+ways. Knowing how, and *when*, to switch between them is one
 of the most empowering skills in data analysis.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A wide table with blue, green, and yellow value columns beside a tall narrow table where the same colors repeat down a single column — one dataset, two shapes"
+  aria-label="A wide table with blue, green, and yellow value columns beside a tall narrow table where the same colors repeat down a single column, one dataset, two shapes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -89,8 +89,8 @@ three years can be stored two ways:
 | Bilal | 2022 | 6 |
 | ... | ... | ... |
 
-Both are "the same data." But the second form — long, or
-*tidy* — is what almost every analytical and plotting library
+Both are "the same data." But the second form, long, or
+*tidy*, is what almost every analytical and plotting library
 prefers.
 
 ## The tidy data principles
@@ -102,7 +102,7 @@ Hadley Wickham's famous tidy data rules:
 3. Each **type of observational unit** is a table.
 
 In the wide table, `2022`, `2023`, `2024` are *values* of a
-variable (year) — but they are sitting in column names. That's
+variable (year), but they are sitting in column names. That's
 the tell-tale sign of "untidy" data.
 
 ```mermaid
@@ -114,7 +114,7 @@ flowchart TD
 `melt` converts wide-to-long. `pivot` (or `pivot_table`) does the
 reverse.
 
-## Melt — wide to long
+## Melt, wide to long
 
 <CodeBlock
   adapter="python"
@@ -148,7 +148,7 @@ print(long)
   ]}
 />
 
-## Pivot — long to wide
+## Pivot, long to wide
 
 <CodeBlock
   adapter="python"
@@ -180,9 +180,9 @@ for `pivot_table` (next page).
 
 Long format plays better with:
 
-- **GroupBy** — group by year, average happiness:
+- **GroupBy**, group by year, average happiness:
   `long.groupby("year")["happiness"].mean()`
-- **Plotting libraries** (Plotly, Seaborn) — pass `x="year"`,
+- **Plotting libraries** (Plotly, Seaborn), pass `x="year"`,
   `y="happiness"`, `color="person"`.
 - **Joining** other long datasets.
 
@@ -250,7 +250,7 @@ the column name, then enrich it (parse, sort, type-cast).
   instructions={`Given the wide DataFrame \`temps\` (city × month), produce a long DataFrame called \`long\` with these exact columns:
 
 - \`city\` (string)
-- \`month\` (string — "jan", "feb", "mar")
+- \`month\` (string, "jan", "feb", "mar")
 - \`temp\` (numeric)
 
 It should have 9 rows (3 cities × 3 months).`}
@@ -312,10 +312,10 @@ assert int(row["temp"].iloc[0]) == 6`,
   markdown={`In the wide table \`person | 2022 | 2023 | 2024\`, why is "year" considered a hidden variable?
 
 - It is not
-  > Year is a variable (it has multiple values: 2022, 2023, 2024), but it is encoded in the column names rather than in a dedicated column of values — that is precisely what makes it "hidden."
+  > Year is a variable (it has multiple values: 2022, 2023, 2024), but it is encoded in the column names rather than in a dedicated column of values, that is precisely what makes it "hidden."
 - Years are integers
   > The data type of the year values is irrelevant; the issue is that they appear as column headers instead of as rows in a dedicated \`year\` column.
-- [o] The years are sitting in column *names*, not in a column of *values* — to do anything year-aware you must first lift them out
+- [o] The years are sitting in column *names*, not in a column of *values*, to do anything year-aware you must first lift them out
   > That column-names-are-values smell is the classic signal that you should melt.
 - The data is corrupted
   > The data is structurally valid; it is simply in wide format, which encodes a variable (year) in column names rather than in a value column.
@@ -327,7 +327,7 @@ Recognizing this pattern is most of the battle.`}
   markdown={`Which operation reshapes wide → long?
 
 - pivot
-  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction — from long to wide; it takes values from rows and spreads them across new columns.
+  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction, from long to wide; it takes values from rows and spreads them across new columns.
 - merge
   > \`merge\` joins two DataFrames together on a common key; it does not reshape a single DataFrame from wide to long.
 - [o] melt
@@ -345,10 +345,10 @@ melt unpivots; pivot pivots.`}
   > Plotting libraries can accept wide DataFrames for some chart types, but they require more manual configuration; they prefer long format because column-to-aesthetic mapping is cleaner.
 - It uses less memory
   > Long format typically uses *more* memory than wide format for the same data because it repeats identifier columns (like \`person\`) once per observation row.
-- [o] They map columns to plot aesthetics (x, y, color, facet) — a single tidy column for each variable plugs straight in
+- [o] They map columns to plot aesthetics (x, y, color, facet), a single tidy column for each variable plugs straight in
   > Once you internalize the "one column per variable" rule, plotting becomes mechanical.
 - Wide format is deprecated
-  > Wide format is not deprecated; it remains the preferred form for human-readable reports and spreadsheet exports — the choice depends on the use case.
+  > Wide format is not deprecated; it remains the preferred form for human-readable reports and spreadsheet exports, the choice depends on the use case.
 
 The same principle underlies Seaborn, Plotly Express, and ggplot2.`}
 />

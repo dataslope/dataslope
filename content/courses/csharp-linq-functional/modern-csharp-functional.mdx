@@ -5,19 +5,19 @@ description: A version-by-version tour of the C# features that made functional-s
 
 C# started life in 2002 as a deliberate response to Java, with the
 same OO-centric flavor. Over twenty years it absorbed an enormous
-amount from F#, Haskell, Scala, and TypeScript — to the point where
+amount from F#, Haskell, Scala, and TypeScript, to the point where
 modern C# is comfortably a *multi-paradigm* language with first-class
 functional support.
 
 This page is a short, opinionated tour of the features that matter
 for functional thinking, in roughly the order they appeared. You do
 not need to memorize the version numbers. You do need to recognize
-the syntax — every page after this will use them freely.
+the syntax, every page after this will use them freely.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A quilt of small colored feature chips connecting by dots to one large blue pill bearing a lambda arrow — many language features serving one idea"
+  aria-label="A quilt of small colored feature chips connecting by dots to one large blue pill bearing a lambda arrow, many language features serving one idea"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -107,7 +107,7 @@ Func<int, int> times = x => x * factor;
 Console.WriteLine(times(3)); // 30
 
 factor = 100;
-Console.WriteLine(times(3)); // 300 — the lambda *captured* factor, not its value
+Console.WriteLine(times(3)); // 300, the lambda *captured* factor, not its value
 `,
     },
   ]}
@@ -210,7 +210,7 @@ Console.WriteLine(Describe(null));
   ]}
 />
 
-Switch expressions are *expressions* — they return a value, which
+Switch expressions are *expressions*, they return a value, which
 means they compose. You can use one anywhere you'd use an
 expression: inside `Select`, as a method body, as an argument.
 
@@ -231,7 +231,7 @@ var a = new Person("Ada", 36);
 var b = new Person("Ada", 36);
 var older = a with { Age = 37 };
 
-Console.WriteLine(a == b);     // True — equality by value, not by reference
+Console.WriteLine(a == b);     // True, equality by value, not by reference
 Console.WriteLine(a);          // Person { Name = Ada, Age = 36 }
 Console.WriteLine(older);      // Person { Name = Ada, Age = 37 }
 Console.WriteLine(a == older); // False
@@ -272,11 +272,11 @@ Console.WriteLine(answer);
 />
 
 Local functions can be `static` (recommended when they don't capture
-outer variables) — this prevents accidental closure-related bugs.
+outer variables), this prevents accidental closure-related bugs.
 
 ## Tuples and deconstruction (C# 7)
 
-Tuples are ad-hoc, lightweight value types — perfect for returning
+Tuples are ad-hoc, lightweight value types, perfect for returning
 multiple values without inventing a class.
 
 <CodeBlock
@@ -298,7 +298,7 @@ Console.WriteLine($"lo={lo}, hi={hi}, mean={mean:F2}");
 
 ## Collection expressions (C# 12)
 
-The new `[ ... ]` literal works for arrays, lists, spans, and more —
+The new `[ ... ]` literal works for arrays, lists, spans, and more,
 the compiler picks the right type.
 
 <CodeBlock
@@ -356,7 +356,7 @@ record Sale(string Region, string Product, decimal Amount);
 
 Every page after this one uses some subset of these features. With
 the historical setup complete, we can leave history behind and start
-building the functional toolkit from first principles — beginning
+building the functional toolkit from first principles, beginning
 with the most important idea of all: **pure functions**.
 
 <MultipleChoice

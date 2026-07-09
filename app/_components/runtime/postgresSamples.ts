@@ -13,7 +13,7 @@ export interface PostgresSampleDatabase extends SqlSampleDatabaseBase {
    *  SQL script that creates *and* populates the database. Fetched from
    *  raw.githubusercontent.com when the sample is loaded and prepared
    *  for PGlite (psql meta-commands and CREATE/DROP DATABASE statements
-   *  stripped) — see remoteDatasets.ts and postgres.ts. */
+   *  stripped), see remoteDatasets.ts and postgres.ts. */
   remoteSql?: string;
   defaultTabs: QueryTabSeed[];
 }
@@ -444,7 +444,7 @@ const CREDIT_CARD_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 2: chinook.pg — the complete Chinook music store database
+// Sample 2: chinook.pg, the complete Chinook music store database
 // (v1.4.5, auto-increment PKs variant), fetched from the
 // dataslope/datasets GitHub repo at load time. Table names are
 // snake_case singular: album, artist, track, genre, media_type,
@@ -467,7 +467,7 @@ const CHINOOK_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 3: northwind.pg — the classic Northwind database (the
+// Sample 3: northwind.pg, the classic Northwind database (the
 // pgsql-flavoured port), fetched from the dataslope/datasets GitHub
 // repo at load time. Table names are snake_case plural: categories,
 // customers, employees, order_details, orders, products, region,
@@ -520,7 +520,7 @@ export const POSTGRES_BLANK_DATABASE: PostgresSampleDatabase = {
   id: "blank",
   label: "New Database",
   filename: "untitled.pg",
-  description: "Empty database — start from scratch.",
+  description: "Empty database, start from scratch.",
   sql: "",
   defaultTabs: [{ title: "Query 1", code: "" }],
 };

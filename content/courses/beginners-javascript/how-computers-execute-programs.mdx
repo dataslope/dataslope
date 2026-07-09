@@ -1,12 +1,12 @@
 ---
 title: How Computers Execute Programs
-description: A clear, beginner-friendly mental model of how a computer turns your code into behaviour — step by step.
+description: A clear, beginner-friendly mental model of how a computer turns your code into behaviour, step by step.
 ---
 
 You can write a lot of code without knowing exactly what a computer
 is doing under the hood. But a beginner who builds a *correct mental
-model* of program execution will progress faster — and will be far
-better at debugging — than one who just memorises syntax.
+model* of program execution will progress faster, and will be far
+better at debugging, than one who just memorises syntax.
 
 This page builds that mental model from scratch. We are going to
 zoom out, look at a computer the way it really is, and watch a
@@ -69,11 +69,11 @@ program run from the inside.
 Strip away the screen, the keyboard, and the operating system, and
 *every* computer in your life is made of three things:
 
-1. **A CPU** — a tiny machine that, in a loop, reads instructions
+1. **A CPU**, a tiny machine that, in a loop, reads instructions
    and carries them out. Billions of times per second.
-2. **Memory (RAM)** — a vast row of numbered "boxes", each of which
+2. **Memory (RAM)**, a vast row of numbered "boxes", each of which
    can hold a small chunk of data (often, one byte = 8 bits).
-3. **A bus** — the wiring between the CPU and the memory, plus
+3. **A bus**, the wiring between the CPU and the memory, plus
    everything else (disk, network, keyboard, screen).
 
 That's it. Every program in the world is, at the bottom, a
@@ -136,7 +136,7 @@ flowchart TB
 ```
 
 The first stage, called **parsing**, reads your text and turns it
-into a structured tree — the way you might diagram a sentence in
+into a structured tree, the way you might diagram a sentence in
 school. The next stage, often called **compilation** (modern engines
 use a mix of **interpretation** and **just-in-time compilation**),
 turns that tree into machine-level instructions the CPU can run.
@@ -157,7 +157,7 @@ caches. A simpler, very useful model is this:
 That's it. Five things to internalise:
 
 1. Programs are read **top to bottom**.
-2. Each **statement** does something — declare a variable, change a
+2. Each **statement** does something, declare a variable, change a
    value, print, call a function, decide whether to continue.
 3. The runtime keeps a **set of variables**, each bound to some
    **value**.
@@ -222,7 +222,7 @@ around. The simple version, sufficient for now:
   is currently running* and the small, short-lived variables that
   belong to it.
 - The **heap** is a big general pool where the runtime stores
-  longer-lived things — most importantly, **objects and arrays**.
+  longer-lived things, most importantly, **objects and arrays**.
 
 When you write:
 
@@ -249,7 +249,7 @@ flowchart TD
 ```
 
 You will not need to think about this every day. But it explains
-some real behaviour later — for example, why two variables can
+some real behaviour later, for example, why two variables can
 point to the *same* array and changing it through one variable
 seems to change the other.
 
@@ -265,7 +265,7 @@ program goes like this:
    decisions, repeats blocks.
 5. Side effects (printing, drawing, network) leak out into the
    world as they happen.
-6. When all statements have been processed, the program ends —
+6. When all statements have been processed, the program ends,
    unless it has scheduled future work (a timer, a network request,
    an event handler), in which case the runtime sticks around
    waiting for those.
@@ -314,7 +314,7 @@ because when we wrote `let y = x;`, the value `10` was copied into
 
 - Memorising all of JavaScript's built-in functions
   > Knowing the standard library is helpful, but memorisation is not a debugging skill; the ability to trace execution step by step is what lets you find out *why* a specific program is misbehaving.
-- [o] "Pretending to be the runtime" — walking through the program one line at a time, writing down the value of each variable after each step
+- [o] "Pretending to be the runtime", walking through the program one line at a time, writing down the value of each variable after each step
   > When a program does something unexpected, the fastest way to figure out why is to simulate the runtime yourself, step by step. Most bugs reveal themselves the moment you do this carefully.
 - Restarting your computer
   > Restarting a computer doesn't change source code or fix logic errors; bugs in a program are reproducible regardless of whether the machine has been restarted.

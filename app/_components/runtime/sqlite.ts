@@ -35,7 +35,7 @@ type SqliteWorkerResponse =
 // module-wide so a new boot can terminate a predecessor that was never
 // disposed (or whose boot is still in flight): a leftover worker keeps the
 // workspace's exclusive opfs-sahpool access handles open, which makes the
-// next engine's OPFS acquisition fail with NoModificationAllowedError —
+// next engine's OPFS acquisition fail with NoModificationAllowedError,
 // seen on dev StrictMode remounts and client-side route changes.
 let activeWorker: Worker | null = null;
 let rejectActivePending: ((reason: Error) => void) | null = null;

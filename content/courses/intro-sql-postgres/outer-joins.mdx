@@ -1,6 +1,6 @@
 ---
 title: Outer Joins
-description: Keeping unmatched rows on purpose — LEFT, RIGHT, and FULL joins — and why NULLs appear where a match is missing.
+description: Keeping unmatched rows on purpose, LEFT, RIGHT, and FULL joins, and why NULLs appear where a match is missing.
 ---
 
 An inner join silently drops rows that have no match. But sometimes
@@ -68,7 +68,7 @@ flowchart TB
 ```
 
 The key insight: the left table is **fully preserved**. The right
-table is "optional" — it contributes data when it can and `NULL`s
+table is "optional", it contributes data when it can and `NULL`s
 when it cannot.
 
 <SqlCodeBlock
@@ -98,7 +98,7 @@ ORDER BY
   c.name;`}
 />
 
-Linus appears, with `NULL` for `order_id` and `amount` — the join's
+Linus appears, with `NULL` for `order_id` and `amount`, the join's
 honest way of saying "this customer matched nothing." An inner join
 would have hidden him entirely.
 
@@ -131,8 +131,8 @@ ORDER BY
 />
 
 Linus and Mae have no orders, so their joined `o.id` is `NULL`, and
-the filter keeps exactly them. This pattern — *outer join, then test
-for `NULL`* — answers a whole family of "who is missing?" questions.
+the filter keeps exactly them. This pattern, *outer join, then test
+for `NULL`*, answers a whole family of "who is missing?" questions.
 
 ## RIGHT and FULL joins
 
@@ -140,7 +140,7 @@ Once `LEFT JOIN` makes sense, its siblings are easy:
 
 - **`RIGHT JOIN`** keeps every row from the **right** table instead
   of the left. It is just a `LEFT JOIN` with the tables mentally
-  swapped — most people simply reorder the tables and use `LEFT`.
+  swapped, most people simply reorder the tables and use `LEFT`.
 - **`FULL JOIN`** keeps **every row from both** tables, filling
   `NULL`s on whichever side lacks a match.
 
@@ -158,11 +158,11 @@ table → `LEFT JOIN`. Keep both → `FULL JOIN`. Keep only matched rows
 the join.
 </Callout>
 
-## Why NULLs appear — and that it is correct
+## Why NULLs appear, and that it is correct
 
 The `NULL`s in an outer join are not a glitch; they are the *truth*.
 There genuinely is no order for Linus, so "his order amount" is
-genuinely unknown/absent — exactly what `NULL` means (recall the
+genuinely unknown/absent, exactly what `NULL` means (recall the
 **Working with NULL** page). Outer joins and `NULL` are natural
 partners: the join preserves a row, and `NULL` faithfully marks the
 information that the missing side could not supply.
@@ -207,7 +207,7 @@ Unmatched columns in an outer join are filled with NULL, the marker for absent v
 - [o] A \`LEFT JOIN\` from customers to orders, then \`WHERE o.id IS NULL\`.
   > Keeping all customers and then filtering for the NULL (unmatched) side isolates those with no orders.
 - A \`LEFT JOIN\` then \`WHERE o.id IS NOT NULL\`.
-  > Testing \`IS NOT NULL\` keeps the matched customers — the opposite of who you want.
+  > Testing \`IS NOT NULL\` keeps the matched customers, the opposite of who you want.
 - \`SELECT DISTINCT\` on the orders table.
   > The orders table only contains customers who *did* order, so it cannot list those who never did.
 
@@ -234,7 +234,7 @@ A full join keeps all rows from both tables, using NULLs where either side is un
 <SqlChallengeCard
   dialect="postgres"
   title="Customers who never ordered"
-  instructions={`Return the \`name\` of every customer who has **never** placed an order, sorted alphabetically (A to Z). The starter already LEFT JOINs \`orders\` onto \`customers\` — add the filter that keeps only the unmatched customers.`}
+  instructions={`Return the \`name\` of every customer who has **never** placed an order, sorted alphabetically (A to Z). The starter already LEFT JOINs \`orders\` onto \`customers\`, add the filter that keeps only the unmatched customers.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL

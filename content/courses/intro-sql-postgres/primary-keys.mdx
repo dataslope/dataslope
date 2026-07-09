@@ -11,7 +11,7 @@ foundational ideas in relational databases.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three rows with identical values are told apart only by the numbered key badges on the left — each row has its own identity"
+  aria-label="Three rows with identical values are told apart only by the numbered key badges on the left, each row has its own identity"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -85,19 +85,19 @@ it gives each row an unmistakable identity.
 
 ## The two rules a primary key enforces
 
-A primary key is not just a label — the database actively **enforces**
+A primary key is not just a label, the database actively **enforces**
 two guarantees on it:
 
-1. **Unique** — no two rows can have the same primary key value. Try
+1. **Unique**, no two rows can have the same primary key value. Try
    it, and the database rejects the row.
-2. **Not null** — every row must have a value (it can never be
+2. **Not null**, every row must have a value (it can never be
    empty or "unknown").
 
 These guarantees are exactly what make a primary key trustworthy as
 an identity.
 
 <Callout type="info" title="Why not use the name as the key?">
-Couldn't we just say "the name identifies the customer"? No — names
+Couldn't we just say "the name identifies the customer"? No, names
 repeat, change (marriage, typos), and can be missing. A good
 primary key is **stable** (never changes) and **guaranteed unique**.
 That is why tables so often use a dedicated, meaningless number like
@@ -111,7 +111,7 @@ There are two flavors of primary key:
 - A **natural key** is a real-world value that happens to be unique,
   like a country's ISO code or a book's ISBN.
 - A **surrogate key** is an artificial value created just to be an
-  identifier — most often an auto-incrementing number like `id`.
+  identifier, most often an auto-incrementing number like `id`.
 
 ```mermaid
 flowchart LR
@@ -128,7 +128,7 @@ generate them automatically, as we will see when we create tables.
 
 Run this. The first insert succeeds; the second tries to reuse
 primary key `1` and PostgreSQL **refuses** it, protecting the
-table's integrity. Read the error message — it is the database
+table's integrity. Read the error message, it is the database
 defending the uniqueness rule.
 
 <SqlCodeBlock
@@ -153,7 +153,7 @@ FROM
 />
 
 That rejection is a *good* thing. The database is stopping you from
-creating two rows with the same identity — exactly the ambiguity we
+creating two rows with the same identity, exactly the ambiguity we
 set out to avoid.
 
 ## Check your understanding
@@ -185,7 +185,7 @@ A primary key gives each row a unique, reliable identity within its table.`}
 - It must change every time the row is updated.
   > A good primary key is *stable* and should not change; constant change would defeat its purpose.
 
-A primary key must be unique and never null — the two guarantees that make it trustworthy.`}
+A primary key must be unique and never null, the two guarantees that make it trustworthy.`}
 />
 
 <MultipleChoice

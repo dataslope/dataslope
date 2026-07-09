@@ -1,10 +1,10 @@
 ---
 title: Faceting and Small Multiples
-description: One chart per group, arranged in a grid — the antidote to spaghetti charts
+description: One chart per group, arranged in a grid, the antidote to spaghetti charts
 ---
 
 When a single chart starts to crowd, the fix is almost never "make
-the chart bigger." It's **make many small charts** — one per
+the chart bigger." It's **make many small charts**, one per
 category, arranged in a grid with shared axes. This pattern is
 called **small multiples** (a term coined by Edward Tufte) or
 **faceting**.
@@ -15,7 +15,7 @@ visualization, and Plotly Express makes it almost free.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Three small panels with shared baselines repeat the same dot motif — rising, flat, and falling — one little chart per group instead of one crowded chart"
+  aria-label="Three small panels with shared baselines repeat the same dot motif, rising, flat, and falling, one little chart per group instead of one crowded chart"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -112,7 +112,7 @@ fig = px.scatter(
     facet_col="day",
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
     template="simple_white",
-    title="Tip vs bill — full grid: time x day, color = smoker",
+    title="Tip vs bill, full grid: time x day, color = smoker",
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
@@ -149,7 +149,7 @@ fig = px.line(
     facet_col="country",
     facet_col_wrap=3,
     template="simple_white",
-    title="Life expectancy over time — small multiples",
+    title="Life expectancy over time, small multiples",
     labels={"year": "Year", "lifeExp": "Life expectancy"},
 )
 fig.show()
@@ -159,7 +159,7 @@ fig.show()
 />
 
 `facet_col_wrap=3` tells Plotly to wrap to a new row after every 3
-panels — handy when you have many categories.
+panels, handy when you have many categories.
 
 ## Shared vs independent axes
 
@@ -167,7 +167,7 @@ By default, faceted Plotly Express charts use **shared axes**:
 every panel has the same x range and the same y range. This makes
 *comparison* straightforward.
 
-Sometimes you want each panel to **scale independently** — for
+Sometimes you want each panel to **scale independently**, for
 example, if one country has a tiny range and another has a huge
 range, sharing axes might flatten the small one.
 
@@ -197,10 +197,10 @@ sophisticated information graphic in major newspapers uses them.
 
 ## When NOT to facet
 
-- When you have **2 or 3 series** — overlap them on one chart.
+- When you have **2 or 3 series**, overlap them on one chart.
 - When the *interaction between groups* matters more than the
-  individual groups — overlapping series let you see crossover.
-- When the categories aren't *comparable* — facets only make sense
+  individual groups, overlapping series let you see crossover.
+- When the categories aren't *comparable*, facets only make sense
   when the panels are "like with like."
 
 ## Check your understanding
@@ -215,7 +215,7 @@ sophisticated information graphic in major newspapers uses them.
 - [o] Split the chart into multiple small panels, one per value of a categorical column, usually with shared axes.
   > Faceting is the implementation of *small multiples*: replace one busy chart with many small, comparable ones. Each panel shows the same encoding for a different slice of the data, and shared axes let the reader compare them directly.
 - Add a third color to the legend.
-  > Faceting affects the spatial layout of the chart — creating separate panels — not the legend or its color count.
+  > Faceting affects the spatial layout of the chart, creating separate panels, not the legend or its color count.
 
 **facet_col=...** and **facet_row=...** are the two arguments that turn one chart into a grid.`}
 />
@@ -227,12 +227,12 @@ sophisticated information graphic in major newspapers uses them.
   > Ink usage is not the key advantage; in fact, small multiples often use more total ink than a single chart because axes and labels are repeated across panels.
 - They render faster.
   > Rendering speed depends on data volume and browser performance, not on whether axes are shared; this is not a meaningful advantage of small multiples.
-- [o] Any difference between panels reflects a real difference in the **data**, not a difference in scale — making comparison fast and honest.
+- [o] Any difference between panels reflects a real difference in the **data**, not a difference in scale, making comparison fast and honest.
   > Shared axes are the secret to small multiples. With a shared y range, a taller bar in one panel really means a bigger value than a shorter bar in another panel. With independent axes, the same visual height could mean different things.
 - They never need labels.
   > Small multiples still require axis labels, panel titles (usually the category value), and a legend where applicable; shared axes reduce label repetition but do not eliminate the need for labels entirely.
 
-Default to shared axes. Use independent axes only when you have a specific reason — and label them clearly.`}
+Default to shared axes. Use independent axes only when you have a specific reason, and label them clearly.`}
 />
 
 <MultipleChoice
@@ -241,8 +241,8 @@ Default to shared axes. Use independent axes only when you have a specific reaso
 - Make the chart bigger.
   > A bigger canvas makes the tangle of lines larger, not more readable; the problem is the number of overlapping lines, which a larger chart does not reduce.
 - Use brighter colors.
-  > Brighter colors increase contrast but do not resolve the fundamental problem — 30 overlapping lines in 30 bright colors are still unreadable.
-- [o] Facet into small multiples — one mini-chart per series — with shared axes.
+  > Brighter colors increase contrast but do not resolve the fundamental problem, 30 overlapping lines in 30 bright colors are still unreadable.
+- [o] Facet into small multiples, one mini-chart per series, with shared axes.
   > The "spaghetti chart" is a structural problem, and small multiples are the structural fix. 30 lines tangled together become 30 small charts arranged in a grid, comparable at a glance.
 - Reduce the number of decimal places.
   > Decimal precision affects the text in tooltips and axis tick labels, not the visual overlap of lines on the chart; it cannot fix the structural problem of too many overlapping series.

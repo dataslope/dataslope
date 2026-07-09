@@ -1,7 +1,7 @@
 // Opt-in Playwright config for sandboxed remote environments (e.g. Claude
 // Code on the web), where the pinned @playwright/test expects a browser
 // build that isn't installed but the container ships a compatible Chromium
-// at /opt/pw-browsers/chromium. Never picked up automatically — run with:
+// at /opt/pw-browsers/chromium. Never picked up automatically, run with:
 //
 //   npx playwright test --config playwright.local.config.ts …
 //

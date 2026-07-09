@@ -26,7 +26,7 @@ export interface UseAskAi {
   error: string | null;
   /** Tier that served the last answer (from the `done` event). */
   tier: MemberTier | null;
-  /** Set when the server returns 401 — the caller should show a sign-in CTA. */
+  /** Set when the server returns 401, the caller should show a sign-in CTA. */
   needsSignIn: boolean;
   send: (question: string) => void;
   stop: () => void;
@@ -132,7 +132,7 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
               else if (ev.type === "done") setTier(ev.tier);
               else if (ev.type === "error") setError(ev.message);
             } catch {
-              // partial line — ignore
+              // partial line, ignore
             }
           }
         }

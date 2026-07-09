@@ -1,14 +1,14 @@
 ---
 title: Statistical Fallacies
-description: The recurring reasoning traps that sink real analyses — Simpson's paradox, confounding, p-hacking, base-rate neglect, survivorship bias, regression to the mean, cherry-picking, and the Texas sharpshooter — what each one is, a concrete example, and how to avoid it.
+description: The recurring reasoning traps that sink real analyses, Simpson's paradox, confounding, p-hacking, base-rate neglect, survivorship bias, regression to the mean, cherry-picking, and the Texas sharpshooter, what each one is, a concrete example, and how to avoid it.
 ---
 
 Most bad data science isn't a coding bug. The code runs, the numbers are
-correct, the chart is beautiful — and the conclusion is *wrong* anyway,
+correct, the chart is beautiful, and the conclusion is *wrong* anyway,
 because the reasoning had a hole in it. These holes are old, named, and
 recurring. Learning their names is one of the highest-leverage things you
 can do, because once you can *name* a trap you start spotting it in the
-wild, in your colleagues' analyses, and — the hard part — in your own.
+wild, in your colleagues' analyses, and, the hard part, in your own.
 
 This page is a field guide to the classics. For each one: **what it is**,
 **a concrete example**, and **how to avoid it**. None of them require
@@ -18,7 +18,7 @@ real bad features, and made it into real headlines.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two dot clusters each climb upward along their own blue and green trend lines, yet one red line drawn through everything together slopes firmly downward — Simpson's paradox in miniature: the combined trend can contradict every group it contains"
+  aria-label="Two dot clusters each climb upward along their own blue and green trend lines, yet one red line drawn through everything together slopes firmly downward, Simpson's paradox in miniature: the combined trend can contradict every group it contains"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
@@ -63,7 +63,7 @@ these leaks:
 ## Simpson's paradox: a trend that reverses when you split the data
 
 **What it is.** A relationship that holds in the *aggregated* data can
-**reverse** when you break the data into subgroups — or vice versa. The
+**reverse** when you break the data into subgroups, or vice versa. The
 overall trend and the within-group trend point in opposite directions.
 It happens when a lurking variable is distributed unevenly across the
 groups you're comparing.
@@ -86,7 +86,7 @@ flip when we disaggregate.
       filename: "main.py",
       starterCode: `import pandas as pd
 
-# Two departments. "Easy" admits ~60%, "Hard" admits ~25% — for EVERYONE.
+# Two departments. "Easy" admits ~60%, "Hard" admits ~25%, for EVERYONE.
 # Within each department, women are admitted at a HIGHER rate than men.
 # But women mostly apply to the Hard department; men to the Easy one.
 data = pd.DataFrame(
@@ -116,7 +116,7 @@ print(agg["rate"].round(3))
 />
 
 Read the two tables against each other. Within every department, women
-are admitted more often — yet pooled together, men come out ahead,
+are admitted more often, yet pooled together, men come out ahead,
 purely because women concentrated in the hard-to-enter department. Same
 numbers, opposite story.
 
@@ -136,11 +136,11 @@ flowchart TD
 there a grouping variable distributed unevenly across the things I'm
 comparing?* Break the data down by plausible lurking variables and check
 whether the story survives. If the aggregate and the subgroups disagree,
-the subgroups are usually the more honest answer — but which one is
+the subgroups are usually the more honest answer, but which one is
 "right" depends on the causal question you're actually asking.
 
 <Callout type="warn" title="Simpson's paradox in dashboards">
-This is not an exotic textbook curiosity — it bites in routine work.
+This is not an exotic textbook curiosity, it bites in routine work.
 "Conversion went up overall but down in every single segment" is a real
 thing that happens when traffic mix shifts. Whenever an overall metric
 moves, glance at the segment breakdown before you celebrate or panic.
@@ -164,8 +164,8 @@ Always check whether a lurking variable's distribution differs across the groups
 ## Confounding and correlation vs causation
 
 **What it is.** Two variables move together (they correlate), and it's
-tempting to conclude one *causes* the other. But a **confounder** — a
-third variable Z that influences *both* X and Y — can manufacture the
+tempting to conclude one *causes* the other. But a **confounder**, a
+third variable Z that influences *both* X and Y, can manufacture the
 correlation with no causal link between X and Y at all.
 
 ```mermaid
@@ -176,7 +176,7 @@ flowchart TD
 ```
 
 **Concrete example.** Ice cream sales correlate with drowning deaths.
-Banning ice cream will not save swimmers — *hot weather* drives both:
+Banning ice cream will not save swimmers, *hot weather* drives both:
 people buy more ice cream **and** swim more when it's hot. Weather is the
 confounder. The X–Y correlation is real; the causal story is fake.
 
@@ -186,10 +186,10 @@ standard for breaking confounding is a **randomized experiment**:
 randomly assigning who gets X severs the link from any confounder to X,
 which is exactly why A/B tests license causal claims (we lean on this in
 *A/B Testing*). Without randomization, control for confounders you can
-measure — but you can never be sure you've caught them all.
+measure, but you can never be sure you've caught them all.
 
 <Callout type="danger" title="The phrase to delete from your vocabulary">
-"The data shows X causes Y" — from observational data alone, it almost
+"The data shows X causes Y", from observational data alone, it almost
 never does. Correlation is necessary for causation but nowhere near
 sufficient. We explore this whole tangle in *Correlation and
 Nonparametric Tests*; here the point is just to make "could a confounder
@@ -210,7 +210,7 @@ rate.
 
 **Concrete example.** Test whether each of 20 unrelated variables
 predicts churn. Even if none truly does, roughly one will come back
-`p < 0.05` — and if you publish *that* one as "the finding," you've
+`p < 0.05`, and if you publish *that* one as "the finding," you've
 reported noise as signal. Let's watch it happen.
 
 <CodeBlock
@@ -256,12 +256,12 @@ one and you've laundered chance into a "discovery."
 - **Correct for multiple comparisons** (e.g., Bonferroni: use
   α / m for `m` tests; or control the false discovery rate).
 - Treat results found by exploration as **hypotheses to confirm on fresh
-  data**, not conclusions — the central discipline of *Exploratory
+  data**, not conclusions, the central discipline of *Exploratory
   Statistical Analysis*.
 
 <Callout type="warn" title="Bonferroni in one line">
 Running `m` tests and want an overall 5% error rate? Compare each
-p-value to `0.05 / m` instead of `0.05`. For 20 tests that's `0.0025` —
+p-value to `0.05 / m` instead of `0.05`. For 20 tests that's `0.0025`,
 which would have killed every false positive in the simulation above.
 It's conservative, but it's a safe default.
 </Callout>
@@ -276,7 +276,7 @@ result feel far more conclusive than it is.
 
 **Concrete example.** A disease affects 1 in 1,000 people. A test is 99%
 accurate (1% false-positive rate, catches all true cases). You test
-positive. Your chance of actually having the disease is *not* 99% — it's
+positive. Your chance of actually having the disease is *not* 99%, it's
 about **9%**. Run the numbers on 100,000 people:
 
 <CodeBlock
@@ -316,7 +316,7 @@ here is forgetting to do it at all.
 
 **How to avoid it.** Always ask "how common is this in the first place?"
 before trusting a positive result. For rare events, a single positive is
-weak evidence — confirm with a second, independent test.
+weak evidence, confirm with a second, independent test.
 
 <MultipleChoice
   markdown={`A fraud detector flags 2% of all transactions and is "95% accurate." Most transactions are legitimate. A flagged transaction is most likely to be:
@@ -330,13 +330,13 @@ weak evidence — confirm with a second, independent test.
 - Equally likely to be fraud or legitimate
   > Whether it is 50/50 depends entirely on the base rate and error rates; with rare fraud it skews heavily toward false positive, not an even split.
 
-For rare events, even accurate detectors produce mostly false alarms — that's base-rate neglect.`}
+For rare events, even accurate detectors produce mostly false alarms, that's base-rate neglect.`}
 />
 
 ## Survivorship bias
 
 **What it is.** Drawing conclusions from only the cases that "survived"
-some selection, while the ones that didn't make it are invisible —
+some selection, while the ones that didn't make it are invisible,
 silently dropped from your data. The survivors are a biased sample, so
 any pattern you find in them may be an artifact of *what got filtered
 out*, not a real effect.
@@ -346,7 +346,7 @@ decide where to add armor, and found bullet holes concentrated on the
 wings and tail. The instinct was to armor those spots. The
 statistician Abraham Wald pointed out the opposite: armor the
 *untouched* areas (engines, cockpit). The planes hit *there* never came
-back — so the holes you *see* mark the survivable hits. The data was
+back, so the holes you *see* mark the survivable hits. The data was
 literally the survivors.
 
 ```mermaid
@@ -374,14 +374,14 @@ ones, simply because part of any extreme value was *luck*, and luck
 doesn't repeat. An unusually high reading is high partly because the
 random component happened to be high that time; next time, the random
 part is typically closer to average, so the value drifts back toward the
-mean — **with no intervention required**. The very word "regression"
+mean, **with no intervention required**. The very word "regression"
 comes from this phenomenon: Francis Galton, studying the heights of
 parents and their children in the 1880s, noticed that exceptionally tall
 parents tended to have children closer to average height, and called it
 "regression toward mediocrity."
 
 **Concrete example.** The "Sports Illustrated jinx": athletes featured on
-the cover often slump afterward. No curse — they made the cover after a
+the cover often slump afterward. No curse, they made the cover after a
 career-best stretch (partly luck), and ordinary performance afterward
 looks like a decline. The same logic explains why "punishing the worst
 performers seems to work" and "rewarding the best seems to backfire":
@@ -390,7 +390,7 @@ both groups were partly lucky/unlucky and drift back regardless.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Dots from a first measurement drift along thin lines toward a second column: the ringed high flyers sink back toward the yellow mean line and the ringed strugglers float up to it, with no intervention anywhere — extreme readings carry luck, and luck does not repeat"
+  aria-label="Dots from a first measurement drift along thin lines toward a second column: the ringed high flyers sink back toward the yellow mean line and the ringed strugglers float up to it, with no intervention anywhere, extreme readings carry luck, and luck does not repeat"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -462,7 +462,7 @@ flowchart TD
 **How to avoid it.** Whenever you select a group *because* it was
 extreme and then re-measure, expect a drift toward the mean even if
 nothing was done. To attribute a change to an intervention, you need a
-**control group** that was equally extreme but untreated — only the gap
+**control group** that was equally extreme but untreated, only the gap
 *between* the groups isolates the real effect.
 
 <Callout type="danger" title="Regression to the mean masquerades as success">
@@ -476,12 +476,12 @@ group, you can't separate the treatment from the inevitable bounce-back.
 
 **Cherry-picking** is reporting only the data points, time windows, or
 subgroups that support your conclusion and quietly dropping the rest.
-"Sales are up!" — measured from the one low month you chose as the
+"Sales are up!", measured from the one low month you chose as the
 starting point.
 
 The **Texas sharpshooter fallacy** is its formal cousin: fire a gun at a
 barn, *then* paint the target around the tightest cluster of holes, and
-declare yourself a marksman. In data terms — find a pattern in the data
+declare yourself a marksman. In data terms, find a pattern in the data
 *first*, then construct the hypothesis to fit that exact pattern, and
 present it as if you'd predicted it. The cluster looks meaningful only
 because you drew the target after seeing where the bullets landed.
@@ -494,7 +494,7 @@ flowchart TD
   D --> E["Pattern is an artifact<br/>of where you aimed"]
 ```
 
-**Concrete example.** A "cancer cluster" near a factory looks alarming —
+**Concrete example.** A "cancer cluster" near a factory looks alarming,
 but if you scan thousands of neighborhoods, some will show high counts by
 chance, and zooming in on the worst one *after the fact* (drawing the
 target around it) manufactures a story from noise. The same logic powers
@@ -504,7 +504,7 @@ strategy was tuned on the very history it's tested against.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Bullet holes scattered at random across a faint barn wall, with bright red and yellow target rings painted afterwards around the one chance cluster — the Texas sharpshooter draws the bullseye after the shooting, and so does an analyst who builds the hypothesis around the pattern"
+  aria-label="Bullet holes scattered at random across a faint barn wall, with bright red and yellow target rings painted afterwards around the one chance cluster, the Texas sharpshooter draws the bullseye after the shooting, and so does an analyst who builds the hypothesis around the pattern"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="24" width="520" height="166" rx="14" fill="currentColor" opacity="0.06" />
@@ -542,7 +542,7 @@ bullseye proves nothing.
 Simpson's paradox, p-hacking, the garden of forking paths, cherry-picking,
 and the Texas sharpshooter are all variations on one theme: *the analysis
 was shaped by the data instead of decided in advance.* The antidote is
-always the same — decide first, then look, then **confirm on fresh
+always the same, decide first, then look, then **confirm on fresh
 data**. That discipline is the heart of *Exploratory Statistical
 Analysis*.
 </Callout>
@@ -551,12 +551,12 @@ Analysis*.
 
 Every fallacy above is a way of reasoning past the data. The simplest
 one of all is reasoning past the *picture*: trusting summary statistics
-without ever plotting. We met **Anscombe's quartet** earlier — four
+without ever plotting. We met **Anscombe's quartet** earlier, four
 datasets with the same mean, variance, and correlation but four
 different shapes. In 2017, Justin Matejka and George Fitzmaurice at
 Autodesk pushed the joke to its limit. Starting from Alberto Cairo's
-"Datasaurus" — a scatter of points that forms a cartoon dinosaur yet has
-unremarkable summary statistics — they generated **twelve more**
+"Datasaurus", a scatter of points that forms a cartoon dinosaur yet has
+unremarkable summary statistics, they generated **twelve more**
 datasets that share the *same* mean, standard deviation, and correlation
 to two decimal places, while looking like stars, circles, lines, and
 slanted clouds.
@@ -590,7 +590,7 @@ print("\\n13 datasets. The summary statistics are essentially identical.")
 />
 
 The means hover around 54 and 48, the standard deviations around 17 and
-26, the correlation near −0.06 — for every single one, including the
+26, the correlation near −0.06, for every single one, including the
 dinosaur. Now plot them and the summaries fall apart completely:
 
 <CodeBlock
@@ -605,7 +605,7 @@ dd = pd.read_csv("datasaurus.csv")`,
       starterCode: `# Same stats in every panel. Find the dinosaur.
 fig = px.scatter(
     dd, x="x", y="y", facet_col="dataset", facet_col_wrap=4,
-    height=700, title="The Datasaurus Dozen — identical statistics, wildly different shapes",
+    height=700, title="The Datasaurus Dozen, identical statistics, wildly different shapes",
 )
 fig.update_xaxes(matches=None, showticklabels=False)
 fig.update_yaxes(matches=None, showticklabels=False)
@@ -620,8 +620,8 @@ Of every trap on this page, this is the one a single line of code
 prevents. Mean, standard deviation, and correlation are a three-number
 summary of a cloud that may contain a dinosaur. Before you summarize,
 before you test, **scatter the data and look at it.** The shapes you'd
-otherwise miss — curves, clusters, outliers, two populations mixed
-together — are exactly the ones that change the conclusion.
+otherwise miss, curves, clusters, outliers, two populations mixed
+together, are exactly the ones that change the conclusion.
 </Callout>
 
 ## Practice
@@ -635,8 +635,8 @@ Determine whether **Simpson's paradox** is present by comparing the **aggregate*
 
 Produce two variables:
 
-- \`agg_winner\`: the string \`"A"\` or \`"B"\` — whichever group has the higher **overall** conversion rate (pooled across devices).
-- \`within_winner\`: the string \`"A"\` or \`"B"\` — the group that has the higher conversion rate **within both** devices (the same group wins on each device in this data).
+- \`agg_winner\`: the string \`"A"\` or \`"B"\`, whichever group has the higher **overall** conversion rate (pooled across devices).
+- \`within_winner\`: the string \`"A"\` or \`"B"\`, the group that has the higher conversion rate **within both** devices (the same group wins on each device in this data).
 
 Conversion rate = \`conversions / visitors\`. A paradox exists when \`agg_winner != within_winner\`.`}
   files={[
@@ -819,7 +819,7 @@ Correct for multiple comparisons (e.g., Bonferroni) and confirm discoveries on n
 <MultipleChoice
   markdown={`A study of successful entrepreneurs finds most dropped out of college, and concludes dropping out boosts success. The fatal flaw is:
 
-- [o] Survivorship bias — it only looks at successful people and ignores the far larger number of dropouts who failed
+- [o] Survivorship bias, it only looks at successful people and ignores the far larger number of dropouts who failed
   > Sampling only on the outcome (success) hides the dropouts who did not succeed, so the "pattern" reflects the selection filter, not a real advantage.
 - Regression to the mean
   > Regression to the mean involves extreme values drifting toward average on re-measurement, which is not what is happening in this selected sample.
@@ -836,7 +836,7 @@ To judge dropping out, you must compare success rates among dropouts AND non-dro
 
 - Base-rate neglect
   > Base-rate neglect concerns the prevalence of a condition when reading a test, not the re-measurement of an extreme group.
-- [o] Regression to the mean — the most extreme readings tend to fall toward average on re-measurement even with no treatment
+- [o] Regression to the mean, the most extreme readings tend to fall toward average on re-measurement even with no treatment
   > Selecting the highest values captures people whose reading was partly unlucky-high; on re-measurement those readings drift down regardless of treatment.
 - Survivorship bias
   > No cases are being filtered out by survival here; everyone enrolled is re-measured, so the issue is the extreme-selection rebound, not survivorship.
@@ -853,7 +853,7 @@ A control group that was equally extreme but untreated is what isolates the trea
   > Confounding involves a third variable driving two others; here the problem is constructing the hypothesis after seeing where the pattern landed.
 - Base-rate neglect
   > Base-rate neglect is about ignoring prevalence when interpreting a positive result, not about drawing a hypothesis around a found pattern.
-- [o] The Texas sharpshooter fallacy — drawing the target around the cluster after seeing where the shots landed
+- [o] The Texas sharpshooter fallacy, drawing the target around the cluster after seeing where the shots landed
   > Forming the hypothesis to fit a pattern discovered in the data, then presenting it as a prediction, treats a postdiction as if it were a forecast.
 - Regression to the mean
   > Regression to the mean is about extremes drifting back on re-measurement, unrelated to retrofitting a hypothesis to a discovered cluster.
@@ -862,11 +862,11 @@ Patterns found by searching must be confirmed on fresh, independent data before 
 />
 
 <Callout type="success" title="Key takeaways">
-- **Simpson's paradox:** an aggregate trend can reverse within subgroups — check for an uneven lurking variable.
-- **Confounding:** a third variable can create a correlation with no causal link — randomization breaks it.
-- **P-hacking / multiple comparisons:** run enough tests and chance hands you "significance" — correct and confirm.
+- **Simpson's paradox:** an aggregate trend can reverse within subgroups, check for an uneven lurking variable.
+- **Confounding:** a third variable can create a correlation with no causal link, randomization breaks it.
+- **P-hacking / multiple comparisons:** run enough tests and chance hands you "significance", correct and confirm.
 - **Base-rate neglect:** for rare events, even accurate tests yield mostly false positives.
-- **Survivorship bias:** the cases that dropped out carry information you can't see — ask what's missing.
-- **Regression to the mean:** extremes drift back on their own — you need a control group to credit an intervention.
+- **Survivorship bias:** the cases that dropped out carry information you can't see, ask what's missing.
+- **Regression to the mean:** extremes drift back on their own, you need a control group to credit an intervention.
 - **Cherry-picking / Texas sharpshooter:** decide the hypothesis *before* you look, report everything, and confirm on new data.
 </Callout>

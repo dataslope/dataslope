@@ -332,7 +332,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     return lines.join("\n");
   }, [engineRef]);
 
-  /** Display label for the active database, e.g. "chinook.sqlite" — the
+  /** Display label for the active database, e.g. "chinook.sqlite", the
    *  rename-aware filename shown in the DB selector. */
   const activeDatabaseLabel = useCallback(async (): Promise<string> => {
     const engine = engineRef.current;

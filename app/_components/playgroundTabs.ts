@@ -8,11 +8,11 @@ import type { LanguageAdapter } from "./types";
 export const SETTINGS_TAB_ID = "__settings__";
 
 /** A file slot rendered as a tab in the non-SQL playgrounds. The file
- *  contents are NOT stored here — code lives in OPFS under
+ *  contents are NOT stored here, code lives in OPFS under
  *  `workspaces/<wsId>/files/<id>` and is shadowed by an in-memory
  *  dirty buffer in the Zustand store. */
 export interface PlaygroundFile {
-  /** Stable tab id. Doubles as the OPFS filename — never derive it from
+  /** Stable tab id. Doubles as the OPFS filename, never derive it from
    *  `filename` since renames must not touch OPFS. */
   id: string;
   /** User-visible path inside the workspace's virtual filesystem
@@ -24,7 +24,7 @@ export interface PlaygroundFile {
   pristineFilename: string;
 }
 
-/** Convenience: the canonical "primary" filename for a workspace —
+/** Convenience: the canonical "primary" filename for a workspace,
  *  `${exportBaseFilename}.${defaultFileExtension}`. Used as the
  *  default file in fresh workspaces and (for non-multi-entry
  *  languages) as the file shown in the Run dropdown when the user
@@ -87,7 +87,7 @@ interface ManifestPayload {
   files: PlaygroundFile[];
   activeFileId: string;
   /** Ids of the files whose editor tabs are open, in tab order. The tab
-   *  strip shows a SUBSET of the workspace files — closing a tab hides
+   *  strip shows a SUBSET of the workspace files, closing a tab hides
    *  its editor without deleting the file. Absent in manifests written
    *  before this field existed (and by the share-materialize path):
    *  loadManifest then defaults to "all files open". */
@@ -163,6 +163,6 @@ export function saveManifest(
       JSON.stringify(payload),
     );
   } catch {
-    /* quota / private mode — ignore. */
+    /* quota / private mode, ignore. */
   }
 }

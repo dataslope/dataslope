@@ -1,10 +1,10 @@
 ---
-title: JavaScript — Meet the DOM
+title: "JavaScript: Meet the DOM"
 description: The document object, querySelector, and changing text, styles, and classes from code.
 ---
 
 When the browser reads your HTML, it builds a live, in-memory model of
-the page called the **DOM** (*Document Object Model*) — a tree of
+the page called the **DOM** (*Document Object Model*), a tree of
 objects, one per element. JavaScript can reach into that tree and
 change anything: text, attributes, styles, structure. Every "the page
 just updated" moment on the web is DOM manipulation.
@@ -20,7 +20,7 @@ var button  = document.querySelector("#save");     // by id
 var items   = document.querySelectorAll("li");     // ALL matches
 ```
 
-`querySelector` takes exactly the selectors you learned in CSS — one
+`querySelector` takes exactly the selectors you learned in CSS, one
 language, two uses.
 
 ## Changing what you selected
@@ -32,7 +32,7 @@ button.style.background = "tomato";      // set one inline style
 ```
 
 Prefer `classList` over `style` for anything you already have CSS
-for — it keeps the "what it looks like" decision in the stylesheet.
+for, it keeps the "what it looks like" decision in the stylesheet.
 
 <CodeBlock
   adapter="web"
@@ -72,7 +72,7 @@ console.log("The list has", items.length, "chores");
 // Change text from code:
 title.textContent = "Chore list (" + items.length + " items)";
 
-// Mark the first chore as done by ADDING A CLASS —
+// Mark the first chore as done by ADDING A CLASS,
 // the .done styling itself lives in the stylesheet.
 items[0].classList.add("done");
 
@@ -83,7 +83,7 @@ console.log("First chore:", items[0].textContent);
 />
 
 Note where the `<script src="script.js">` tag sits: at the **end of
-`<body>`**. Scripts run the moment the parser reaches them — placing
+`<body>`**. Scripts run the moment the parser reaches them, placing
 them last guarantees every element above already exists, so
 `querySelector` finds what it's looking for.
 
@@ -159,5 +159,5 @@ if (!el.classList.contains("featured")) {
   ]}
   />
 
-The page changes — but only once, when the script runs. Next lesson
+The page changes, but only once, when the script runs. Next lesson
 makes it respond to the user: [events](/courses/intro-web-development/js-events).

@@ -14,7 +14,7 @@
  * aborts with `Module not found: Can't resolve '/assets/runtime-...'`.
  *
  * We don't use `WorkerRuntime` (the playground spawns its own dedicated
- * Web Worker via the LanguageAdapter contract) — only `VirtualFS` and
+ * Web Worker via the LanguageAdapter contract), only `VirtualFS` and
  * `Runtime`. But Turbopack still statically analyses every `new URL(...,
  * import.meta.url)` in `index.mjs`, so the bad string has to go away
  * even if the surrounding class is dead code at runtime.
@@ -51,7 +51,7 @@ for (const target of TARGETS) {
   }
   const src = readFileSync(target, "utf8");
   if (!BAD_URL_RE.test(src)) {
-    // Already patched — or future almostnode versions may have fixed
+    // Already patched, or future almostnode versions may have fixed
     // it upstream. Either way, nothing to do.
     continue;
   }

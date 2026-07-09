@@ -19,7 +19,7 @@ single, coherent workflow.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Six small panels from a parameter sweep, each tracing a different predator-prey cycle: one flatlines in red, one stable green orbit stands out — a simulation explored across its parameters"
+  aria-label="Six small panels from a parameter sweep, each tracing a different predator-prey cycle: one flatlines in red, one stable green orbit stands out, a simulation explored across its parameters"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.08">
@@ -275,7 +275,7 @@ What this little project demonstrates:
 ## A phase portrait
 
 The classical way to look at a predator–prey system is in phase
-space — predator on one axis, prey on the other. Closed orbits
+space, predator on one axis, prey on the other. Closed orbits
 mean sustained oscillations; spirals mean damped or growing
 oscillations; runaway escape means extinction.
 
@@ -317,8 +317,8 @@ plt.show()
   ]}
 />
 
-Different starting populations spiral *into the same equilibrium*
-— a behavior driven entirely by the prey's logistic carrying
+Different starting populations spiral *into the same equilibrium*,
+a behavior driven entirely by the prey's logistic carrying
 capacity. Without that term the orbits would be perfect closed
 loops (the classic Lotka–Volterra cycle).
 
@@ -416,7 +416,7 @@ together by reproducible code.
 
 - For aesthetic reasons
   > Aesthetic preference is not a scientific justification; the page makes clear that the dual reporting serves a statistical purpose.
-- [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw — and they come with quantifiable uncertainty
+- [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw, and they come with quantifiable uncertainty
   > Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
 - It is required by the language
   > Python imposes no requirement to report multiple statistics; the choice is driven by scientific methodology, not language rules.

@@ -1,12 +1,12 @@
 ---
 title: Function Composition
-description: Plumbing small pure functions into pipelines — the operational heart of declarative code, plus currying and partial application.
+description: Plumbing small pure functions into pipelines, the operational heart of declarative code, plus currying and partial application.
 ---
 
 If pure functions are the atoms of FP, **composition** is the
 chemistry: the operation that takes two (or many) functions and
 glues them into one. Once your functions are pure, you can build
-entire programs by composing them — *no shared state, no
+entire programs by composing them, *no shared state, no
 intermediate variables, no plumbing*.
 
 This chapter covers function composition, the closely related
@@ -16,7 +16,7 @@ helper functions (`compose` and `pipe`) you'll use everywhere.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three colored stations inside one long capsule pass a baton left to right; seen from outside, a single dot enters and a single dot leaves — composed functions behave as one function"
+  aria-label="Three colored stations inside one long capsule pass a baton left to right; seen from outside, a single dot enters and a single dot leaves, composed functions behave as one function"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="80" y="50" width="480" height="110" rx="55" fill="currentColor" opacity="0.07" />
@@ -194,7 +194,7 @@ console.log(normalize("  Functional Programming  "));
 />
 
 `normalize` is a value. You can pass it to `Array#map`, store it,
-re-export it, test it. It is just *itself* — three small functions
+re-export it, test it. It is just *itself*, three small functions
 glued together.
 
 ## Pipelines vs nested calls: the readability test
@@ -281,7 +281,7 @@ trivial: you supply some arguments now and the rest later.
 
 ## Partial application
 
-You can partially apply any function — curried or not — by binding
+You can partially apply any function, curried or not, by binding
 some arguments and leaving others as parameters.
 
 <CodeBlock
@@ -410,7 +410,7 @@ console.log(names);
 Each step has a name and a single job. You can read the pipeline as
 prose. You can lift any step into a separate file. You can test any
 step in isolation. And the *order* of the steps is just the order of
-arguments to `pipe` — no reshuffling of loops.
+arguments to `pipe`, no reshuffling of loops.
 
 ## A multi-file challenge
 
@@ -420,14 +420,14 @@ arguments to `pipe` — no reshuffling of loops.
   instructions={`In \`text.ts\`, implement five tiny pure helpers and a
 \`pipe\` of them. Each helper does exactly one thing.
 
-- \`trim(s)\` — strip surrounding whitespace
-- \`lower(s)\` — lowercase
-- \`stripPunct(s)\` — replace non-alphanumeric, non-space characters with a space
-- \`collapseSpaces(s)\` — collapse runs of whitespace to one
-- \`hyphenate(s)\` — replace spaces with hyphens
-- \`slug(s)\` — pipeline of the above, in this order
+- \`trim(s)\`, strip surrounding whitespace
+- \`lower(s)\`, lowercase
+- \`stripPunct(s)\`, replace non-alphanumeric, non-space characters with a space
+- \`collapseSpaces(s)\`, collapse runs of whitespace to one
+- \`hyphenate(s)\`, replace spaces with hyphens
+- \`slug(s)\`, pipeline of the above, in this order
 
-Use \`pipe\` (already in the file). Do not write \`s.trim().toLowerCase()…\` — compose the named helpers explicitly with \`pipe\`.
+Use \`pipe\` (already in the file). Do not write \`s.trim().toLowerCase()…\`, compose the named helpers explicitly with \`pipe\`.
 
 **Expected output**
 

@@ -1,6 +1,6 @@
 ---
 title: Nested Data Structures
-description: Modelling the real world by combining arrays and objects — and the small skills (safe navigation, deep updates, JSON) that make it pleasant.
+description: Modelling the real world by combining arrays and objects, and the small skills (safe navigation, deep updates, JSON) that make it pleasant.
 ---
 
 A single object or array can only get you so far. Real-world data
@@ -12,7 +12,7 @@ just about anything.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Translucent rounded boxes nested inside one another, with smaller shapes tucked away at every level — structure inside structure"
+  aria-label="Translucent rounded boxes nested inside one another, with smaller shapes tucked away at every level, structure inside structure"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -75,7 +75,7 @@ console.log(order.items.length, "line items");
 />
 
 That single value packs a lot of information. The skill is being
-able to *picture* its shape — to know where things live.
+able to *picture* its shape, to know where things live.
 
 ```mermaid
 flowchart TB
@@ -125,7 +125,7 @@ expression returns `undefined` instead of throwing.
 const sparse = { user: null };
 
 console.log(noisy.user?.profile?.name); // "Ada"
-console.log(sparse.user?.profile?.name); // undefined — no crash!
+console.log(sparse.user?.profile?.name); // undefined, no crash!
 console.log(sparse.user?.profile?.name ?? "anonymous"); // "anonymous"
 
 // Works for arrays too:
@@ -248,7 +248,7 @@ console.log("new email:     ", reMailed.customer.email);
 
 Notice we had to spread *each level* we wanted to copy. The
 remaining nested objects are shared (still by reference), which is
-fine — they're unchanged.
+fine, they're unchanged.
 
 Real codebases sometimes use helper libraries (like Immer) to make
 deep updates pleasant. For a first pass, the explicit spread style
@@ -290,7 +290,7 @@ matching element is replaced by a new object via spread.
 A nested structure of objects, arrays, numbers, strings, booleans,
 and `null` is precisely the set of things you can store as **JSON**
 (JavaScript Object Notation). JSON is the universal exchange
-format of the web — every API you'll ever call either accepts or
+format of the web, every API you'll ever call either accepts or
 returns JSON.
 
 JavaScript ships with two functions for converting between JSON
@@ -315,8 +315,8 @@ console.log(text);
 // JSON text -> object
 const back = JSON.parse(text);
 console.log(back.customer.name);
-console.log(back === order); // false — it's a brand-new object
-console.log(JSON.stringify(back) === text); // true — equivalent contents
+console.log(back === order); // false, it's a brand-new object
+console.log(JSON.stringify(back) === text); // true, equivalent contents
 
 // Pretty-printed JSON:
 console.log(JSON.stringify(order, null, 2));
@@ -423,7 +423,7 @@ module.exports = { lineTotal, ordersByCustomer };
   ]}
 />
 
-Notice the inner nested loops (`for order... for item...`) — they
+Notice the inner nested loops (`for order... for item...`), they
 mirror the *shape* of the data. When the data has two levels of
 nesting, the loop usually does too.
 
@@ -517,7 +517,7 @@ console.log(getPath({}, "x", "n/a"));
 - It automatically creates missing properties
   > Optional chaining does *not* create properties; it short-circuits to \`undefined\` when a link is missing. Creating a missing property requires an explicit assignment.
 - [o] It safely returns \`undefined\` if any link in the chain is \`null\` or \`undefined\`, instead of throwing a \`TypeError\` and crashing the program
-  > Real-world data is often partial — some fields are missing, optional, or not yet loaded. \`?.\` lets you write \`user?.address?.city\` and get back \`undefined\` for any missing link, instead of an exception. Combined with \`??\` for defaults, it replaces many lines of defensive \`if\` checks.
+  > Real-world data is often partial, some fields are missing, optional, or not yet loaded. \`?.\` lets you write \`user?.address?.city\` and get back \`undefined\` for any missing link, instead of an exception. Combined with \`??\` for defaults, it replaces many lines of defensive \`if\` checks.
 - It is a faster form of array indexing
   > \`?.\` can be used with bracket notation (\`arr?.[0]\`) but it is not an indexing optimisation; it adds a null check, which is the opposite of a speed-up.
 

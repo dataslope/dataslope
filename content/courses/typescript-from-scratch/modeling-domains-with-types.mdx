@@ -3,14 +3,14 @@ title: Modeling Domains with Types
 description: Make illegal states unrepresentable with precise type design
 ---
 
-The difference between mediocre TypeScript and great TypeScript often comes down to **how you model your domain**. A well-designed type system doesn't just catch typos — it makes *entire classes of bugs impossible*. This is the idea behind **making illegal states unrepresentable**: if a combination of values doesn't make sense in your domain, the type system shouldn't allow it to exist.
+The difference between mediocre TypeScript and great TypeScript often comes down to **how you model your domain**. A well-designed type system doesn't just catch typos, it makes *entire classes of bugs impossible*. This is the idea behind **making illegal states unrepresentable**: if a combination of values doesn't make sense in your domain, the type system shouldn't allow it to exist.
 
 This chapter is the capstone of type-driven design. We'll take sloppy, bug-prone type definitions and evolve them into precise, self-documenting structures that use discriminated unions, literal types, and careful narrowing to eliminate invalid states. By the end, you'll see how the compiler can enforce your business logic at compile time, long before any code runs.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Three solid state cards are joined by thin arrows along the only transitions the domain allows; a red dashed shortcut between the ends is crossed out, and a dashed empty card floats apart with no connections at all — illegal states and transitions have nowhere to exist"
+  aria-label="Three solid state cards are joined by thin arrows along the only transitions the domain allows; a red dashed shortcut between the ends is crossed out, and a dashed empty card floats apart with no connections at all, illegal states and transitions have nowhere to exist"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -82,11 +82,11 @@ type User = {
 
 At first glance, this looks fine. But think about the combinations it allows:
 
-- `isActive: true, isSuspended: true` — Is the user active or suspended? Both?
-- `isSuspended: false, suspensionReason: "Violated terms"` — The user isn't suspended, but there's a suspension reason?
-- `isAdmin: true, isActive: false` — An inactive admin? Does that mean they still have admin privileges?
+- `isActive: true, isSuspended: true`, Is the user active or suspended? Both?
+- `isSuspended: false, suspensionReason: "Violated terms"`, The user isn't suspended, but there's a suspension reason?
+- `isAdmin: true, isActive: false`, An inactive admin? Does that mean they still have admin privileges?
 
-These are **illegal states**: combinations that don't make sense in your domain. The type system isn't helping you — it's allowing garbage in, and you'll have to write defensive code everywhere to check for these contradictions.
+These are **illegal states**: combinations that don't make sense in your domain. The type system isn't helping you, it's allowing garbage in, and you'll have to write defensive code everywhere to check for these contradictions.
 
 <CodeBlock
   adapter="typescript"
@@ -106,11 +106,11 @@ type BadUser = {
 // Now we have to check for nonsense at runtime
 function canAccessAdmin(user: BadUser): boolean {
   if (user.isSuspended) {
-    console.log("User is suspended — no admin access");
+    console.log("User is suspended, no admin access");
     return false;
   }
   if (!user.isActive) {
-    console.log("User is inactive — no admin access");
+    console.log("User is inactive, no admin access");
     return false;
   }
   if (user.isAdmin) {
@@ -204,7 +204,7 @@ Now the compiler enforces that:
 
 - An `"active"` user always has a `role` (member or admin).
 - A `"suspended"` user always has a `reason`.
-- An `"inactive"` user has neither — just the status.
+- An `"inactive"` user has neither, just the status.
 
 You can't create a user who is both active and suspended. You can't forget the suspension reason. The type system has encoded your business logic.
 
@@ -247,9 +247,9 @@ type SloppyOrder = {
 
 This allows nonsense like:
 
-- `status: "draft", paymentId: "pay123"` — A draft with a payment ID?
-- `status: "shipped", trackingNumber: undefined` — Shipped but no tracking?
-- `status: "paid", cancellationReason: "Out of stock"` — Paid *and* cancelled?
+- `status: "draft", paymentId: "pay123"`, A draft with a payment ID?
+- `status: "shipped", trackingNumber: undefined`, Shipped but no tracking?
+- `status: "paid", cancellationReason: "Out of stock"`, Paid *and* cancelled?
 
 The type is too loose. Let's tighten it with a discriminated union:
 
@@ -368,7 +368,7 @@ Now each state carries exactly the data it needs:
 You can't forget the tracking number when marking an order as shipped. You can't have a draft with a payment ID. The compiler enforces the business logic.
 
 <Callout type="info" title="Redundancy is fine">
-Notice that `shippingAddress` appears in multiple variants. That's okay! Each variant is self-contained. The alternative — trying to share fields with inheritance or intersection types — often leads to more complexity than it's worth.
+Notice that `shippingAddress` appears in multiple variants. That's okay! Each variant is self-contained. The alternative, trying to share fields with inheritance or intersection types, often leads to more complexity than it's worth.
 </Callout>
 
 ## Replacing booleans with variants
@@ -439,12 +439,12 @@ console.log(
   ]}
 />
 
-Each payment method is a distinct variant with its own fields. No optional properties, no runtime checks for "is this a credit card or a bank account?" — the type tells you.
+Each payment method is a distinct variant with its own fields. No optional properties, no runtime checks for "is this a credit card or a bank account?", the type tells you.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="On the left a grid of eight boolean combinations includes two crossed out in red; on the right a single dial points at one of exactly three positions — replacing boolean soup with one variant field leaves illegal mixes no place to live"
+  aria-label="On the left a grid of eight boolean combinations includes two crossed out in red; on the right a single dial points at one of exactly three positions, replacing boolean soup with one variant field leaves illegal mixes no place to live"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -722,21 +722,21 @@ Which type definition makes illegal states **unrepresentable**?
 - \`type Flag = { kind: "disabled" | "enabled-all" | "enabled-percentage"; percentage?: number }\`
   > This allows \`kind: "disabled", percentage: 50\` (disabled but with a percentage?). The discriminant and the optional field are independent, so invalid combinations are possible.
 
-Discriminated unions eliminate ambiguity by making each state explicit and self-contained. If a field only makes sense in one state, include it in that state's variant — not as a shared optional field.`}
+Discriminated unions eliminate ambiguity by making each state explicit and self-contained. If a field only makes sense in one state, include it in that state's variant, not as a shared optional field.`}
 />
 
 ## Principles of domain modeling
 
 As you design types for your application, keep these principles in mind:
 
-1. **Make illegal states unrepresentable.** If two fields are mutually exclusive, don't use booleans or optionals — use a discriminated union.
+1. **Make illegal states unrepresentable.** If two fields are mutually exclusive, don't use booleans or optionals, use a discriminated union.
 2. **Use literal types for constrained values.** If a field can only be `"low" | "medium" | "high"`, don't type it as `string`.
 3. **Encode business rules in types.** If a shipped order must have a tracking number, put `trackingNumber` in the `"shipped"` variant, not as an optional field on the base type.
 4. **Avoid boolean soup.** Multiple booleans (`isX`, `isY`, `isZ`) are usually a sign you need a discriminated union.
 5. **Prefer specificity over flexibility.** It's better to have a type that's "too narrow" and refine it later than to have a type that's "too loose" and allows garbage.
 
 <Callout type="warning" title="Balance precision and pragmatism">
-Don't go overboard. If a field genuinely is optional in all contexts (like a user's middle name), use `middleName?: string`. The goal isn't to eliminate every `?` or `| null` — it's to eliminate *invalid combinations* of fields that represent logically impossible states.
+Don't go overboard. If a field genuinely is optional in all contexts (like a user's middle name), use `middleName?: string`. The goal isn't to eliminate every `?` or `| null`, it's to eliminate *invalid combinations* of fields that represent logically impossible states.
 </Callout>
 
 ## Recap
@@ -752,4 +752,4 @@ The payoff is massive: fewer runtime checks, better autocomplete, clearer code, 
 - **Use literal types for constrained values.** `"low" | "medium" | "high"` is better than `string`.
 - **Exhaustiveness checking:** Add `const _exhaustive: never = x` in the default case to catch missing variants.
 
-Next up: [Generics Basics](./generics-basics), where we explore how to write reusable, type-safe code that works with any type — without losing type information to `any`.
+Next up: [Generics Basics](./generics-basics), where we explore how to write reusable, type-safe code that works with any type, without losing type information to `any`.

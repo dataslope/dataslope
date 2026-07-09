@@ -5,12 +5,12 @@ description: List, dict, set, and generator comprehensions
 
 A **comprehension** is a compact way to build a list, dict, set, or generator by transforming and filtering an iterable. Comprehensions are arguably the most Pythonic feature in the language. They turn "loop over this, filter that, transform these" into a single readable expression. Once you internalize the pattern, you will reach for them constantly in data pipelines, API response shaping, config munging, and anywhere you transform collections.
 
-Every snippet on this page runs in your browser — no setup required.
+Every snippet on this page runs in your browser, no setup required.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A blue capsule of four dots feeds through one solid green machine and emerges as a green capsule of three squares — a comprehension loops, filters, and transforms in a single expression"
+  aria-label="A blue capsule of four dots feeds through one solid green machine and emerges as a green capsule of three squares, a comprehension loops, filters, and transforms in a single expression"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -491,7 +491,7 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
   markdown={`What is the key advantage of a generator expression over a list comprehension?
 
 - Generators are always faster.
-  > Not always — list access is O(1), generator iteration has per-item overhead.
+  > Not always, list access is O(1), generator iteration has per-item overhead.
 - [o] Generators use O(1) memory regardless of input size.
   > Generators produce items lazily, one at a time.
 - Generators support slicing.

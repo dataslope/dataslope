@@ -1,5 +1,5 @@
 ---
-title: HTML — Text, Links & Lists
+title: "HTML: Text, Links & Lists"
 description: Marking up meaning inside text, linking pages together with anchors and attributes, and building lists.
 ---
 
@@ -9,7 +9,7 @@ type most often: inline text markup, the anchor element that puts the
 
 ## Attributes
 
-Elements can carry **attributes** — name/value pairs inside the
+Elements can carry **attributes**, name/value pairs inside the
 opening tag that configure the element:
 
 ```html
@@ -24,17 +24,17 @@ this link points to. Attribute values always belong in quotes.
 Block elements like `<p>` stack vertically; **inline** elements mark
 up meaning *within* a line of text:
 
-- `<strong>` — importance (rendered bold by default)
-- `<em>` — emphasis (rendered italic)
-- `<code>` — a fragment of code
-- `<a href="…">` — a link
+- `<strong>`, importance (rendered bold by default)
+- `<em>`, emphasis (rendered italic)
+- `<code>`, a fragment of code
+- `<a href="…">`, a link
 
 ## Lists
 
 Two kinds you'll use constantly:
 
-- `<ul>` — an *unordered* list (bullets)
-- `<ol>` — an *ordered* list (numbers)
+- `<ul>`, an *unordered* list (bullets)
+- `<ol>`, an *ordered* list (numbers)
 
 Both contain only `<li>` (list item) children.
 
@@ -51,15 +51,15 @@ Both contain only `<li>` (list item) children.
     <p>
       I'm following a course on <em>web development</em>. The single
       most useful reference is
-      <a href="https://developer.mozilla.org">MDN Web Docs</a> —
+      <a href="https://developer.mozilla.org">MDN Web Docs</a>,
       <strong>bookmark it now</strong>.
     </p>
 
     <h2>Languages, in order of appearance</h2>
     <ol>
-      <li>HTML — structure</li>
-      <li>CSS — style</li>
-      <li>JavaScript — behaviour</li>
+      <li>HTML, structure</li>
+      <li>CSS, style</li>
+      <li>JavaScript, behaviour</li>
     </ol>
 
     <h2>Snacks that pair well with coding</h2>
@@ -75,7 +75,7 @@ Both contain only `<li>` (list item) children.
   ]}
 />
 
-Click the link in the preview — it opens the real MDN site. Links,
+Click the link in the preview, it opens the real MDN site. Links,
 buttons, and text selection all behave like a normal page because the
 preview *is* a normal (sandboxed) page.
 
@@ -109,7 +109,7 @@ preview *is* a normal (sandboxed) page.
       <li>
         <a href="https://developer.mozilla.org/en-US/docs/Learn">MDN Learn web development</a>
       </li>
-      <li>HTML living standard — the elements chapter</li>
+      <li>HTML living standard, the elements chapter</li>
       <li>A blog post about how browsers render pages</li>
     </ol>
   </body>
@@ -123,7 +123,7 @@ preview *is* a normal (sandboxed) page.
       name: "An <ol> with at least three items",
       code: `const items = document.querySelectorAll("ol li");
 if (items.length < 3) {
-  throw new Error("The ordered list needs at least three <li> items — found " + items.length + ".");
+  throw new Error("The ordered list needs at least three <li> items, found " + items.length + ".");
 }`,
     },
     {
@@ -133,7 +133,7 @@ if (items.length < 3) {
 if (!link) throw new Error("Put an <a> link inside one of the list items.");
 const href = link.getAttribute("href") || "";
 if (!href.startsWith("https://")) {
-  throw new Error("The link's href should start with https:// — got '" + href + "'.");
+  throw new Error("The link's href should start with https://, got '" + href + "'.");
 }`,
     },
     {

@@ -1,6 +1,6 @@
 ---
 title: Your First Model, End to End
-description: The complete machine learning workflow on one tiny dataset — load, split, train, evaluate, predict — so the shape of every future model becomes second nature.
+description: The complete machine learning workflow on one tiny dataset, load, split, train, evaluate, predict, so the shape of every future model becomes second nature.
 ---
 
 You have seen the cardinal rule (judge a model on data it has never seen)
@@ -11,14 +11,14 @@ build a real, working model from start to finish.
 By the end of this page you will have trained a classifier on real penguin
 measurements, asked it to label penguins it never saw, and measured exactly
 how often it was right. More importantly, you will have internalized a
-shape — **load, split, train, evaluate** — that every model in this course
+shape, **load, split, train, evaluate**, that every model in this course
 repeats without exception. Once that shape is automatic, learning a new
 algorithm becomes a matter of swapping one line.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Four stations joined by thin gray arrows — a solid blue dataset dot, a split pair, a yellow training ring, and a green circle carrying a white check — load, split, train, evaluate"
+  aria-label="Four stations joined by thin gray arrows, a solid blue dataset dot, a split pair, a yellow training ring, and a green circle carrying a white check, load, split, train, evaluate"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-400)">
@@ -46,7 +46,7 @@ algorithm becomes a matter of swapping one line.
 
 <Callout type="info" title="What you already know going in">
 This page assumes you have read the welcome page and **The Train/Test
-Split**. We will not re-derive *why* we hold data back — we will just do
+Split**. We will not re-derive *why* we hold data back, we will just do
 it, correctly, as a habit. If the phrase "test set" feels fuzzy, revisit
 that page first; everything here builds on it.
 </Callout>
@@ -62,8 +62,8 @@ labeled examples, then apply that rule to new, unlabeled cases.
 The end-to-end workflow is the disciplined way to do that **without
 fooling yourself**. Anyone can call `.fit()` and admire a number. The
 workflow's job is to make sure the number you admire actually predicts the
-future. It does that by enforcing one separation — the data you learn from
-versus the data you grade yourself on — at every single step.
+future. It does that by enforcing one separation, the data you learn from
+versus the data you grade yourself on, at every single step.
 
 <Callout type="tip" title="Why memorize a shape?">
 Algorithms come and go, but the workflow is invariant. A linear regression,
@@ -104,7 +104,7 @@ set, and you *predict* on the real world.
 
 We will use the **Palmer Penguins** dataset: body measurements of penguins
 observed near Palmer Station, Antarctica. Each penguin has four
-measurements — bill length, bill depth, flipper length, body mass — and
+measurements, bill length, bill depth, flipper length, body mass, and
 belongs to one of three species: *Adelie*, *Gentoo*, or *Chinstrap*. After
 dropping the handful of rows with missing measurements we have 342
 penguins. The features are `X` (342 rows, 4 columns) and the species labels
@@ -140,7 +140,7 @@ name. The model's job is to learn the connection between those four numbers
 and the species, well enough to label a penguin it has never measured.
 
 <Callout type="info" title="Strings as labels are fine here">
-scikit-learn classifiers accept string labels like `"Adelie"` directly —
+scikit-learn classifiers accept string labels like `"Adelie"` directly,
 they keep the readable names internally and handle the integer bookkeeping
 for you. (Many of scikit-learn's built-in toy datasets hand you integer
 codes instead and a separate list of names; with a real CSV the names come
@@ -214,7 +214,7 @@ print("Test set is locked away until the very end.")
 />
 
 From here on, `X_test` and `y_test` go in a drawer. The model will not see
-them during training. We will only unlock them once — at the end — to get a
+them during training. We will only unlock them once, at the end, to get a
 single honest score.
 
 <Callout type="warn" title="Split before you touch the data">
@@ -227,7 +227,7 @@ nothing to leak, but keep the habit: split first, learn second.
 
 ## Move 3: choose an estimator and fit it
 
-Now we pick a model. In scikit-learn, every model is an **estimator** — an
+Now we pick a model. In scikit-learn, every model is an **estimator**, an
 object with a `.fit()` method that learns from data and a `.predict()`
 method that applies what it learned. We will use
 `KNeighborsClassifier`, one of the most intuitive classifiers there is.
@@ -236,7 +236,7 @@ Its idea, in one sentence: **to label a new penguin, find the few training
 penguins most similar to it and let them vote.** "Similar" means closest in
 measurement-space. With `n_neighbors=5`, each new penguin is labeled by the
 majority species among its five nearest training neighbors. There is no
-heavy math — the model essentially *remembers* the training penguins and
+heavy math, the model essentially *remembers* the training penguins and
 compares.
 
 <CodeBlock
@@ -271,7 +271,7 @@ print(model)
 />
 
 That is the whole of training: construct the estimator, then call `.fit()`
-on the **training** features and labels. The model has now "learned" — for
+on the **training** features and labels. The model has now "learned", for
 KNN that simply means it has stored the training penguins in a way it can
 search quickly.
 
@@ -284,8 +284,8 @@ is the whole reason scikit-learn is pleasant to use.
 </Callout>
 
 If you would rather use a different estimator, the change is a single line.
-Here is the identical workflow with `LogisticRegression` — a linear model
-you will study in depth on its own page — to drive home how interchangeable
+Here is the identical workflow with `LogisticRegression`, a linear model
+you will study in depth on its own page, to drive home how interchangeable
 estimators are.
 
 <CodeBlock
@@ -363,7 +363,7 @@ for p, t in zip(predictions, truth):
 />
 
 Most or all of those eight will match. But eight penguins is far too few to
-judge a model — you could get lucky or unlucky. For an honest, stable
+judge a model, you could get lucky or unlucky. For an honest, stable
 number we score on the *entire* test set at once.
 
 **Score** asks the model how often it is right across all held-out
@@ -406,7 +406,7 @@ print(f"Same thing, computed by hand:  {manual:.1%}")
 
 The two numbers are identical, because `.score()` for a classifier is
 exactly "predict everything, then take the fraction correct." Around 79% on
-unseen penguins — a trustworthy result, because not one of those test
+unseen penguins, a trustworthy result, because not one of those test
 penguins influenced training. (It is not higher because raw KNN measures
 distance, and body mass in grams dwarfs a bill length in millimeters; the
 **feature scaling** page later fixes exactly this and pushes the score well
@@ -414,7 +414,7 @@ into the 90s.)
 
 <Callout type="info" title="What .score() means depends on the task">
 For a **classifier**, `.score()` returns accuracy (fraction correct). For a
-**regressor** — a model predicting a number — `.score()` returns R²
+**regressor**, a model predicting a number, `.score()` returns R²
 instead, a different quantity entirely. Same method name, different meaning,
 because "how good is this?" means different things for categories versus
 numbers. The **Regression Metrics** page and the course's
@@ -424,7 +424,7 @@ tell you. For now, treat accuracy as a first, rough headline.
 
 ## Predicting on a brand-new penguin
 
-In the real world you do not have an answer key — that is the entire point
+In the real world you do not have an answer key, that is the entire point
 of a model. You measure a penguin in the field, hand the four numbers to the
 trained model, and it tells you the species. Let us do exactly that.
 
@@ -462,7 +462,7 @@ print("Predicted species:", prediction[0])
 
 Two details here are easy to trip over, and both are worth burning in.
 
-First, the input is a list **of lists** — `[[...]]`, not `[...]`.
+First, the input is a list **of lists**, `[[...]]`, not `[...]`.
 scikit-learn always expects a 2D array of shape `(n_samples, n_features)`,
 even for a single sample. One penguin is "one row of four features," so it
 is `[[39.1, 18.7, 181.0, 3750.0]]`. Hand it a flat list and you will get a
@@ -472,7 +472,7 @@ Second, `predict` returns an **array**, one prediction per input row, so we
 index `prediction[0]` to read the single answer.
 
 <Callout type="warn" title="The shape mistake everyone makes once">
-`model.predict([39.1, 18.7, 181.0, 3750.0])` fails — that is a single flat
+`model.predict([39.1, 18.7, 181.0, 3750.0])` fails, that is a single flat
 list, which scikit-learn reads as ambiguous. Always pass a 2D structure:
 `[[39.1, 18.7, 181.0, 3750.0]]` for one sample, or a list of such rows for
 many. The rule is "rows are samples, columns are features," even when there
@@ -483,7 +483,7 @@ Try changing those four numbers and re-running. A long bill on a long
 flipper with heavy body mass (say `[48.0, 15.0, 220.0, 5500.0]`) will push
 the prediction toward *Gentoo*; a short, deep bill on a lighter body leans
 *Adelie*. You are now using a machine learning model the way it is meant to
-be used — feeding it new inputs and trusting its output because you measured
+be used, feeding it new inputs and trusting its output because you measured
 its accuracy first.
 
 ## The whole workflow on one screen
@@ -530,7 +530,7 @@ print("New penguin predicted as:", model.predict(new_penguin)[0])
 />
 
 Six lines of logic, ignoring imports and comments. Load, split, train,
-evaluate, use. Read it until it feels boring — boring is the goal, because a
+evaluate, use. Read it until it feels boring, boring is the goal, because a
 workflow you do not have to think about frees your attention for the
 decisions that actually matter.
 
@@ -542,24 +542,24 @@ where the shortcuts are so you recognize when a later page is filling a gap.
 
 - **The data needed barely any preparation.** We dropped a few rows with
   missing measurements and used the numbers as-is. But our four features are
-  on *wildly* different scales — body mass in the thousands of grams, bill
-  depth in the tens of millimeters — which is exactly why raw KNN only
+  on *wildly* different scales, body mass in the thousands of grams, bill
+  depth in the tens of millimeters, which is exactly why raw KNN only
   reached the high 70s. Real datasets pile on more: text categories, more
-  missing values, features that must be scaled. The fix — `Pipeline` and
-  `ColumnTransformer` — gets its own page, and crucially it keeps the prep
+  missing values, features that must be scaled. The fix, `Pipeline` and
+  `ColumnTransformer`, gets its own page, and crucially it keeps the prep
   from leaking across the split.
 - **One split can be noisy.** With only 342 penguins, a single test set is a
   thin sample; a different `random_state` shifts the score a little.
   **Cross-validation** replaces one split with several and reports a steadier
   estimate. That, too, is a dedicated page.
 - **We never tuned anything.** We picked `n_neighbors=5` out of thin air.
-  Choosing such settings *properly* — without peeking at the test set — is
+  Choosing such settings *properly*, without peeking at the test set, is
   what the tuning pages are about.
 
 <Callout type="danger" title="Never tune against the test set">
 It is tempting to try `n_neighbors=3`, check the test score, try `7`, check
 again, and keep the best. The instant you make choices based on the test
-score, that score stops being honest — you have started fitting the test
+score, that score stops being honest, you have started fitting the test
 set by hand. Model selection belongs to a validation set or
 cross-validation, never the final test set. We flag it here so the habit
 forms early.
@@ -577,11 +577,11 @@ learning to do each move more carefully.
   deployed model fits during training and predicts forever after.
 - **"A higher training score means a better model."** The training score
   measures memory, not skill. The number that matters is the **test**
-  score. A model can ace the training data and flop on new data — that gap
+  score. A model can ace the training data and flop on new data, that gap
   is overfitting, covered in its own page.
 - **"`.score()` always means accuracy."** Only for classifiers. For
   regressors it returns R². The method name is shared; the meaning is not.
-- **"`predict` needs the labels too."** No — `predict` takes *only*
+- **"`predict` needs the labels too."** No, `predict` takes *only*
   features and returns its guess for the labels. You pass `y` to `.fit()`
   (to learn) and to `.score()` (to grade), but never to `.predict()`.
 - **"One sample can be a flat list."** scikit-learn always wants 2D input,
@@ -601,7 +601,7 @@ supervised machine learning system in production:
   watch history to predict what you will play next.
 
 The dataset is bigger, the estimator fancier, the preparation more
-elaborate — but the four moves are identical to what you just ran on 342
+elaborate, but the four moves are identical to what you just ran on 342
 penguins. That is why this page matters more than any single algorithm: you
 have learned the frame that holds all of them.
 
@@ -723,7 +723,7 @@ assert accuracy > 0.7, f"Expected accuracy above 0.7, got {accuracy}"`,
 - [o] Load the data, split into train/test, train (fit) on the training set, evaluate (score) on the test set
   > Loading comes first, then the split, then fitting on the training portion, and finally scoring on the held-out portion. Using the model on new inputs comes after this honest evaluation.
 - Train, evaluate, load, split
-  > Training before loading is impossible — you need data first. Additionally, training before splitting means the model would see all the data during training, leaving no honest held-out set for evaluation.
+  > Training before loading is impossible, you need data first. Additionally, training before splitting means the model would see all the data during training, leaving no honest held-out set for evaluation.
 - Load, train, split, evaluate
   > Splitting must happen before training. If the model is trained on the full dataset first and split happens afterward, the model has already seen the test data and the evaluation is dishonest.
 
@@ -740,7 +740,7 @@ The split must happen before training so the test set stays unseen.`}
 - [o] A 2D structure with one row: \`[[39.1, 18.7, 181.0, 3750.0]]\`
   > scikit-learn always expects input shaped (n_samples, n_features). A single sample is still one row inside a list, so it must be doubly nested.
 - The training labels \`y_train\` as well
-  > \`predict\` takes only the feature matrix — no labels are needed or accepted. Labels are passed to \`fit\` during training and to \`score\` during evaluation, but never to \`predict\`.
+  > \`predict\` takes only the feature matrix, no labels are needed or accepted. Labels are passed to \`fit\` during training and to \`score\` during evaluation, but never to \`predict\`.
 
 \`predict\` returns one prediction per row, so even one sample is wrapped as a row.`}
 />
@@ -748,14 +748,14 @@ The split must happen before training so the test set stays unseen.`}
 <MultipleChoice
   markdown={`For a classifier, what does \`model.score(X_test, y_test)\` return?
 
-- [o] Accuracy — the fraction of test samples the model labeled correctly
+- [o] Accuracy, the fraction of test samples the model labeled correctly
   > For classifiers, \`.score()\` is accuracy: predict every test row, then take the fraction that match the true labels. It is identical to \`(model.predict(X_test) == y_test).mean()\`.
 - The number of training samples used
   > The number of training samples is a property of the data split, not something \`score\` reports. For a classifier, \`score\` returns the fraction of test samples labeled correctly.
 - The model's internal loss value
   > Internal loss is used during training optimization and is not what \`score\` exposes. For classifiers, \`score\` returns accuracy on the provided \`X\` and \`y\`.
 - The probability that the model is correct on average
-  > Accuracy (what \`score\` returns for classifiers) is the fraction of examples where the predicted label matches the true label — a ratio over the test set, not a probability estimate per prediction.
+  > Accuracy (what \`score\` returns for classifiers) is the fraction of examples where the predicted label matches the true label, a ratio over the test set, not a probability estimate per prediction.
 
 For regressors the same method returns R² instead, which is a different quantity.`}
 />
@@ -763,11 +763,11 @@ For regressors the same method returns R² instead, which is a different quantit
 <MultipleChoice
   markdown={`You want to try \`KNeighborsClassifier\` instead of \`LogisticRegression\` in your workflow. How much of the load/split/train/evaluate code has to change?
 
-- All of it — each estimator needs a different workflow
-  > The workflow shape (load, split, fit, evaluate) does not change when you swap estimators. Only the constructor line changes; everything else — the split, the \`fit\` call, the \`score\` call — stays the same.
+- All of it, each estimator needs a different workflow
+  > The workflow shape (load, split, fit, evaluate) does not change when you swap estimators. Only the constructor line changes; everything else, the split, the \`fit\` call, the \`score\` call, stays the same.
 - The split must be redone with a different \`random_state\`
   > The same split can be reused with any estimator. The split is independent of the model choice; \`random_state\` only controls reproducibility, not compatibility with a specific algorithm.
-- [o] Essentially one line — the line that constructs the estimator; \`.fit()\`, \`.score()\`, and \`.predict()\` are called the same way
+- [o] Essentially one line, the line that constructs the estimator; \`.fit()\`, \`.score()\`, and \`.predict()\` are called the same way
   > Every scikit-learn estimator shares the fit/predict/score interface, so swapping models changes only the constructor line. That uniformity is the point of memorizing the workflow shape.
 - The data must be reloaded in a different format
   > Different classifiers in scikit-learn accept the same input formats (NumPy arrays or pandas DataFrames). No reloading is needed; the data prepared for one estimator works with any other.
@@ -779,13 +779,13 @@ The shared interface is exactly why the workflow is worth internalizing once.`}
   markdown={`A classmate calls \`model.predict(X_test)\` and is confused that they did not have to pass \`y_test\`. What is the right explanation?
 
 - \`predict\` always needs the labels; their code has a bug
-  > \`predict\` does not take labels — it is designed to work on new data where the true labels are unknown. Labels go to \`fit\` (for training) and \`score\` (for evaluation), never to \`predict\`.
+  > \`predict\` does not take labels, it is designed to work on new data where the true labels are unknown. Labels go to \`fit\` (for training) and \`score\` (for evaluation), never to \`predict\`.
 - \`predict\` uses \`y_test\` internally even though it is not written
-  > After training, \`predict\` uses only the model's learned parameters (weights, rules, or stored neighbors) — not the test labels. Passing \`y_test\` to \`predict\` would be circular and is not supported.
+  > After training, \`predict\` uses only the model's learned parameters (weights, rules, or stored neighbors), not the test labels. Passing \`y_test\` to \`predict\` would be circular and is not supported.
 - [o] \`predict\` takes only features and returns the model's guessed labels; you pass \`y\` to \`.fit()\` to learn and to \`.score()\` to grade, but never to \`.predict()\`
   > Prediction is the model applying what it already learned, so it needs only the inputs. The true labels are required to *learn* (fit) and to *grade* (score), not to predict.
 - \`predict\` and \`score\` are the same method
   > \`predict\` and \`score\` are distinct methods with different signatures and purposes. \`predict(X)\` returns an array of guessed labels; \`score(X, y)\` compares predictions to true labels and returns a single metric.
 
-In production there is no answer key at all — predict must work from features alone.`}
+In production there is no answer key at all, predict must work from features alone.`}
 />

@@ -21,7 +21,7 @@ const RUN_TIMEOUT = 150_000;
 const RESULTS_DIR = path.join(process.cwd(), "audit-results");
 
 // AUDIT_ISOLATE=1 reloads the runtime before every snippet so each runs in
-// a pristine session. This matters for stateful runtimes — e.g. WebR keeps
+// a pristine session. This matters for stateful runtimes, e.g. WebR keeps
 // packages attached across runs, so a warm sweep can let one package's
 // functions mask another's (data.table::wday vs lubridate::wday). Slower,
 // but gives accurate per-snippet results.
@@ -67,7 +67,7 @@ async function acceptDiscardIfPresent(page: Page) {
     await danger.waitFor({ state: "visible", timeout: 2500 });
     await danger.click();
   } catch {
-    // No dialog — the snippet auto-loaded (editor matched / was empty).
+    // No dialog, the snippet auto-loaded (editor matched / was empty).
   }
 }
 

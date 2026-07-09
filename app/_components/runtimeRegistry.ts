@@ -5,11 +5,11 @@
 // independent "scopes" so that side effects can't leak between
 // unrelated user surfaces:
 //
-//   - `RuntimeScope.Fumadocs` — every `<CodeBlock>` and
+//   - `RuntimeScope.Fumadocs`, every `<CodeBlock>` and
 //     `<ChallengeCard>` rendered on the /learn route shares one
 //     runtime per language. Navigating between learn pages preserves
 //     that runtime.
-//   - `RuntimeScope.Playground` — the full `<Playground>` keeps its
+//   - `RuntimeScope.Playground`, the full `<Playground>` keeps its
 //     own runtime instance, isolated from anything the learn route
 //     might have installed, monkey-patched, or staged into the VFS.
 //
@@ -24,7 +24,7 @@
 // cross-scope cost is mostly WASM instantiation rather than a network
 // round-trip.
 //
-// Sharing the runtime does NOT share user state within a scope either —
+// Sharing the runtime does NOT share user state within a scope either,
 // every adapter resets its global scope at the start of each `run()`
 // (Python wipes `globals()`, R wipes `.GlobalEnv`, JS/TS execute in a
 // fresh function scope, the compiled languages recompile from scratch).
@@ -37,7 +37,7 @@
 // ─── Eviction ───────────────────────────────────────────────────────────
 // Caching runtimes for the whole SPA session used to be unbounded:
 // flipping the home hero's language picker (or reading learn pages in
-// several languages) stacked a WASM VM per language — Pyodide alone is
+// several languages) stacked a WASM VM per language, Pyodide alone is
 // hundreds of MB. The registry now keeps at most
 // `MAX_RUNTIMES_PER_SCOPE` *disposable* runtimes per scope and evicts
 // the least-recently-used beyond that, calling `runtime.dispose()` so
@@ -47,7 +47,7 @@
 //     `retainRuntime` while mounted, so a runtime is never torn down
 //     under a block that could still Run against it. Only unretained
 //     runtimes (all their blocks unmounted) are eviction candidates.
-//   - Runtimes that can't free their resources (no `dispose` hook —
+//   - Runtimes that can't free their resources (no `dispose` hook,
 //     CheerpJ's page-level JVM, the .NET runtime) are never evicted:
 //     dropping the cache entry would leak the old VM *and* boot a new
 //     one on the next request. They don't count against the cap.
@@ -68,7 +68,7 @@ export const RuntimeScope = {
 export type RuntimeScope = (typeof RuntimeScope)[keyof typeof RuntimeScope];
 
 const cache = new Map<string, Promise<LanguageRuntime>>();
-// Keys whose init promise has resolved — lets callers tell a cold start
+// Keys whose init promise has resolved, lets callers tell a cold start
 // (runtime still downloading) from a warm one (already initialised) so the
 // UI can show "first run only" boot copy without lying on later runs.
 const ready = new Set<string>();
@@ -83,7 +83,7 @@ export const MAX_RUNTIMES_PER_SCOPE = 2;
 
 // Resolved runtime per key, so eviction can reach `dispose()`.
 const resolved = new Map<string, LanguageRuntime>();
-// Live claims per key — while > 0 the runtime is not an eviction candidate.
+// Live claims per key, while > 0 the runtime is not an eviction candidate.
 const retainCounts = new Map<string, number>();
 // LRU bookkeeping: a monotonically increasing sequence stamped on access.
 let useSeq = 0;
@@ -102,7 +102,7 @@ export function onRuntimeEvicted(listener: EvictionListener): () => void {
 
 /** Pin `(scope, adapter)` while a surface that runs against it is mounted,
  *  making it ineligible for eviction. Returns a release function (safe to
- *  call more than once) — ideal as a `useEffect` cleanup. */
+ *  call more than once), ideal as a `useEffect` cleanup. */
 export function retainRuntime(
   scope: RuntimeScope,
   adapterId: string,
@@ -146,7 +146,7 @@ function evictExcessRuntimes(scope: RuntimeScope, keepKey: string): void {
     try {
       void runtime?.dispose?.();
     } catch {
-      // Best-effort teardown — the entry is gone either way, so the next
+      // Best-effort teardown, the entry is gone either way, so the next
       // request boots fresh.
     }
     const adapterId = key.slice(scopePrefix.length);
@@ -156,11 +156,11 @@ function evictExcessRuntimes(scope: RuntimeScope, keepKey: string): void {
 }
 
 /** Boot-progress report: a human-readable stage line plus an optional
- *  coarse overall fraction (0..1) — see `LanguageAdapter.init`. */
+ *  coarse overall fraction (0..1), see `LanguageAdapter.init`. */
 export type BootProgressListener = (message: string, fraction?: number) => void;
 
 // Every caller of `getSharedRuntime` that passes a progress callback is
-// subscribed for the duration of the boot — not just the first caller.
+// subscribed for the duration of the boot, not just the first caller.
 // This matters because boots usually start from a silent warm-up
 // (route land / scroll-into-view) and the user only *sees* progress if
 // the Run-click subscriber that arrives mid-boot still receives stage
@@ -201,7 +201,7 @@ function settleProgress(key: string): void {
 
 // Cold-boot timing via the Performance API (visible in DevTools and
 // collectable later): one `runtime-boot:<scope>:<adapter>` measure per
-// first init. Best-effort — never let instrumentation break a boot.
+// first init. Best-effort, never let instrumentation break a boot.
 function markBoot(key: string, promise: Promise<unknown>): void {
   try {
     if (typeof performance === "undefined" || !performance.mark) return;
@@ -233,8 +233,8 @@ export function isRuntimeReady(scope: RuntimeScope, adapterId: string): boolean 
  *
  *  Every caller's optional `onProgress` callback is subscribed to the
  *  in-flight boot's stage events (with the current stage replayed on
- *  subscribe), so a caller that attaches mid-boot — e.g. a Run click
- *  while a warm-up download is in progress — still renders live
+ *  subscribe), so a caller that attaches mid-boot, e.g. a Run click
+ *  while a warm-up download is in progress, still renders live
  *  progress. Subscriptions end when the boot settles. */
 export function getSharedRuntime(
   scope: RuntimeScope,
@@ -255,7 +255,7 @@ export function getSharedRuntime(
       (runtime) => {
         // A stale boot whose cache entry was already dropped (evicted
         // mid-boot, or superseded after a failure) must not resurrect
-        // registry state — free it and hand the caller the runtime
+        // registry state, free it and hand the caller the runtime
         // they were promised anyway.
         if (cache.get(key) !== promise) {
           try {
@@ -272,7 +272,7 @@ export function getSharedRuntime(
         return runtime;
       },
       (err) => {
-        // Don't cache failures — let the next caller retry.
+        // Don't cache failures, let the next caller retry.
         if (cache.get(key) === promise) cache.delete(key);
         settleProgress(key);
         throw err;

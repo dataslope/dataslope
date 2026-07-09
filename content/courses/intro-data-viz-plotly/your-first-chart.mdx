@@ -1,6 +1,6 @@
 ---
 title: Your First Chart
-description: A guided walkthrough of building a chart from scratch — every choice explained
+description: A guided walkthrough of building a chart from scratch, every choice explained
 ---
 
 We're going to slow down and build a single chart together, one
@@ -11,7 +11,7 @@ feel ready to make a chart from any dataset placed in front of you.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A small crane lowers the next data point on a cable toward its empty outlined slot in a half-built chart — building a chart one decision at a time"
+  aria-label="A small crane lowers the next data point on a cable toward its empty outlined slot in a half-built chart, building a chart one decision at a time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -44,7 +44,7 @@ feel ready to make a chart from any dataset placed in front of you.
 
 ## The data
 
-We'll use Plotly's built-in `tips` dataset — restaurant tip data
+We'll use Plotly's built-in `tips` dataset, restaurant tip data
 collected by a single waiter over a few weeks. It is small,
 relatable, and has both numeric and categorical columns.
 
@@ -86,9 +86,9 @@ This is two questions, really:
 
 Walk through the data types:
 
-- `total_bill` — quantitative.
-- `tip` — quantitative.
-- `smoker` — categorical (Yes / No).
+- `total_bill`, quantitative.
+- `tip`, quantitative.
+- `smoker`, categorical (Yes / No).
 
 When we have *two quantitative* variables, a **scatter plot** is
 almost always the right starting point. (Lines connect points; we
@@ -121,7 +121,7 @@ fig.show()
 />
 
 This is the absolute minimum. We can already see that yes, bigger
-bills tend to come with bigger tips — there's a clear upward
+bills tend to come with bigger tips, there's a clear upward
 cloud. But the chart is anonymous: no title, no axis labels, no
 groups.
 
@@ -175,7 +175,7 @@ fig.show()
 With `trendline="ols"`, Plotly Express fits an ordinary-least-
 squares line to each color group. Suddenly the question "is the
 relationship different?" gets a visual answer: the two lines'
-slopes are similar — bigger bills predict bigger tips at roughly
+slopes are similar, bigger bills predict bigger tips at roughly
 the same rate for both groups.
 
 ### Step 4: title, labels, and the simple_white template
@@ -219,7 +219,7 @@ The chart now communicates without needing any external context:
 - The **template** (`simple_white`) gives a clean look that won't
   fight the data.
 
-### Step 5: a finishing touch — hover information
+### Step 5: a finishing touch, hover information
 
 The default hover already shows the x and y values. Let's enrich
 it with the party size and the day, so a single hover tells the
@@ -287,7 +287,7 @@ question, which sends you back to the top of the loop.
 3. **Default styling.** The default Plotly template has a gray
    background and gridlines that fight your data. Use
    `template="simple_white"` from the start.
-4. **Encoding everything.** Color, size, shape, faceting — all at
+4. **Encoding everything.** Color, size, shape, faceting, all at
    once produces visual mush. Add encodings one at a time and
    stop when the question is answered.
 
@@ -329,13 +329,13 @@ fig.show()
   markdown={`What should be the **first** step when starting a new chart?
 
 - Pick a color palette.
-  > Color palette selection is a late-stage styling decision. Without a clear question, there is no basis for choosing which variables to encode or which encodings to use — making a color palette choice at this point is premature.
+  > Color palette selection is a late-stage styling decision. Without a clear question, there is no basis for choosing which variables to encode or which encodings to use, making a color palette choice at this point is premature.
 - Pick a chart type.
   > Chart type follows from the question and the data types involved. Picking a chart type before knowing what you're asking leads to forcing data into an ill-fitting form rather than letting the question drive the choice.
 - [o] Decide what *question* the chart will answer.
   > Without a clear question, every later choice becomes arbitrary. The question shapes the data filtering, the chart type, and the encoding decisions. "Pretty" charts that don't answer a question are decoration, not analysis.
 - Pick a template.
-  > Templates control only visual styling and are independent of what the chart is trying to communicate. Template choice is the last thing to finalize, not the first — any template can be changed without affecting the chart's analytical content.
+  > Templates control only visual styling and are independent of what the chart is trying to communicate. Template choice is the last thing to finalize, not the first, any template can be changed without affecting the chart's analytical content.
 
 Build the muscle: *question first, chart second*. Every time.`}
 />
@@ -344,7 +344,7 @@ Build the muscle: *question first, chart second*. Every time.`}
   markdown={`You have two **quantitative** variables and want to see if they're related. Which chart type is the natural starting point?
 
 - Pie chart.
-  > Pie charts show how a whole divides into named parts, using angle as the encoding. They require a discrete categorical dimension and a single quantity for each slice — they cannot show the relationship between two continuous quantitative variables.
+  > Pie charts show how a whole divides into named parts, using angle as the encoding. They require a discrete categorical dimension and a single quantity for each slice, they cannot show the relationship between two continuous quantitative variables.
 - Bar chart.
   > Bar charts compare a quantitative value across discrete categories. They require one categorical axis and one quantitative axis. When both variables are quantitative and you want to see if they are related, a bar chart is not the right form.
 - [o] Scatter plot (**px.scatter**).
@@ -361,11 +361,11 @@ A line chart would be wrong here unless the data has a meaningful *order* (like 
 - It makes the chart load faster.
   > Chart loading speed depends on the number of data points and figure complexity, not on label strings. **labels={}** is purely a display-string override with no performance effect.
 - It changes the data values.
-  > **labels={}** only changes the display text shown on axes, legends, and hover tooltips — it does not modify the underlying DataFrame values or column names in any way.
+  > **labels={}** only changes the display text shown on axes, legends, and hover tooltips, it does not modify the underlying DataFrame values or column names in any way.
 - [o] It overrides the raw column names with human-readable labels (e.g., "Total bill (USD)" instead of "total_bill") for axes, legend, and hover.
   > Real-world column names are often abbreviated or snake_cased. **labels={}** lets you keep the code referencing the column name but display readable strings to the reader. A small habit that hugely improves chart clarity.
 - It hides the legend.
-  > Legend visibility is controlled by **fig.update_layout(showlegend=False)**. **labels={}** has no effect on whether the legend is shown — it only replaces the text strings used for labels.
+  > Legend visibility is controlled by **fig.update_layout(showlegend=False)**. **labels={}** has no effect on whether the legend is shown, it only replaces the text strings used for labels.
 
 A chart with raw column names like **gdpPercap** and **lifeExp** reads as unfinished. Take the extra 20 seconds to label.`}
 />

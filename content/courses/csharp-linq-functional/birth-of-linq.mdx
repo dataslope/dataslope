@@ -5,8 +5,8 @@ description: The imperative pain that made LINQ inevitable, the declarative idea
 
 Before we touch LINQ, we have to understand the *problem* LINQ
 solves. LINQ did not appear because Microsoft thought it would be
-elegant. It appeared because real codebases — millions of lines of
-object-oriented C# and C++ and Java — were drowning in a very
+elegant. It appeared because real codebases, millions of lines of
+object-oriented C# and C++ and Java, were drowning in a very
 specific style of bug that had nothing to do with algorithms. The
 bugs lived in the *shape* of the code itself.
 
@@ -103,16 +103,16 @@ flowchart TB
 ```
 
 **Mutable state**: a variable that can change at any time, from any
-place, is a variable nobody fully understands — the value of `total`
+place, is a variable nobody fully understands, the value of `total`
 on line 130 depends on every prior line that touched it.
 **Nesting**: as transformations grow, imperative code grows
-*inward* — a filter-and-group becomes a `for` inside an `if` inside a
+*inward*, a filter-and-group becomes a `for` inside an `if` inside a
 `foreach` inside a `try`. **Repetition**: the same
 filter/project/aggregate loop shape gets copy-pasted with small
 variations, and a year later a bug fix lands in three of the five
 copies. **Non-composable procedures**: `ComputeReportA()` does seven
-things in a fixed order, and `ComputeReportB()` — which needs steps
-2, 4, and 6 — can only copy-paste or grow ten boolean parameters.
+things in a fixed order, and `ComputeReportB()`, which needs steps
+2, 4, and 6, can only copy-paste or grow ten boolean parameters.
 
 None of these costs show up in a textbook 20-line example. They all
 show up by the time the codebase is 200,000 lines.
@@ -175,8 +175,8 @@ record Person(string Name, string City, int Age);
 />
 
 Forty lines, and every one of them is a place a bug can live. The
-LINQ equivalent — which we'll learn to write properly over the
-coming chapters — is *one expression*:
+LINQ equivalent, which we'll learn to write properly over the
+coming chapters, is *one expression*:
 
 ```csharp
 var report = people
@@ -186,7 +186,7 @@ var report = people
     .OrderByDescending(r => r.Avg);
 ```
 
-You don't have to *understand* that yet — just notice that the LINQ
+You don't have to *understand* that yet, just notice that the LINQ
 version is the same length as the English sentence.
 
 ## The declarative idea
@@ -196,21 +196,21 @@ declarative when it describes **what** result you want, leaving the
 **how** to the runtime, library, or compiler. You have already used
 declarative systems, possibly without noticing:
 
-- **SQL**: `SELECT city, AVG(age) FROM people GROUP BY city` — you
+- **SQL**: `SELECT city, AVG(age) FROM people GROUP BY city`, you
   do not write the loop that scans the table or the hash map that
   does the grouping. The database does.
-- **HTML and CSS**: `<button class="primary">Save</button>` — you do
+- **HTML and CSS**: `<button class="primary">Save</button>`, you do
   not write the pixel-by-pixel rendering routine.
 
 In both cases you describe *the shape of the answer* and the system
-figures out the steps. The idea is much older than C# — it runs from
+figures out the steps. The idea is much older than C#, it runs from
 Lisp in 1958 through SQL in the 1970s to Haskell in 1990, a story we
 keep for the [Interesting discussions
 section](/courses/csharp-linq-functional/why-declarative-won) at the
 end of the course.
 
 Watch the shift happen in miniature, in C#. Four ways of saying
-*"the even numbers, doubled, as a comma-separated string"* — run it
+*"the even numbers, doubled, as a comma-separated string"*, run it
 and check that all four agree:
 
 <CodeBlock
@@ -225,7 +225,7 @@ using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5, 6 };
 
-// 1. Fully imperative — index loop, manual string building.
+// 1. Fully imperative, index loop, manual string building.
 var sb = new StringBuilder();
 for (int i = 0; i < nums.Length; i++)
 {
@@ -238,18 +238,18 @@ for (int i = 0; i < nums.Length; i++)
 }
 Console.WriteLine("v1: " + sb.ToString());
 
-// 2. foreach — a slight step up.
+// 2. foreach, a slight step up.
 var parts = new List<string>();
 foreach (var n in nums)
     if (n % 2 == 0)
         parts.Add((n * 2).ToString());
 Console.WriteLine("v2: " + string.Join(", ", parts));
 
-// 3. LINQ method syntax — declarative pipeline.
+// 3. LINQ method syntax, declarative pipeline.
 var v3 = string.Join(", ", nums.Where(n => n % 2 == 0).Select(n => n * 2));
 Console.WriteLine("v3: " + v3);
 
-// 4. LINQ query syntax — looks like SQL.
+// 4. LINQ query syntax, looks like SQL.
 var v4 = string.Join(", ",
     from n in nums where n % 2 == 0 select n * 2);
 Console.WriteLine("v4: " + v4);
@@ -261,7 +261,7 @@ Console.WriteLine("v4: " + v4);
 All four print `4, 8, 12`. They are **operationally equivalent**.
 They are not **cognitively equivalent**. Each version, top to
 bottom, moves further from "I am driving a CPU" toward "I am
-describing a result" — and because the declarative versions are
+describing a result", and because the declarative versions are
 built from named, independent steps, you can splice in a `.Skip(1)`
 or reorder operators without rewriting anything around them. That
 property is called **composability**, and it is the hidden
@@ -293,17 +293,17 @@ in production, sometimes hours after deployment.
 
 <IllustrationPrompt subject="Erik Meijer" photo />
 
-The Microsoft team — with Anders Hejlsberg, C#'s lead architect, and
-Erik Meijer among the central figures — asked a deceptively simple
+The Microsoft team, with Anders Hejlsberg, C#'s lead architect, and
+Erik Meijer among the central figures, asked a deceptively simple
 question: *"What if `where` and `select` were part of the C#
 language, and worked the same way regardless of what they were
-querying?"* The answer shipped in C# 3.0 (2007) as **LINQ** —
+querying?"* The answer shipped in C# 3.0 (2007) as **LINQ**,
 **L**anguage **In**tegrated **Q**uery.
 
 ## The features that had to ship first
 
 LINQ could not exist in C# 2.0. Several language features had to
-land together to make it possible — and each one is now a pillar of
+land together to make it possible, and each one is now a pillar of
 everyday C#:
 
 | Feature | What it gave us | Without it… |
@@ -336,12 +336,12 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-// 1. LINQ to Objects — over an in-memory collection.
+// 1. LINQ to Objects, over an in-memory collection.
 var nums = new[] { 1, 2, 3, 4, 5 };
 var doubled = nums.Where(n => n % 2 == 1).Select(n => n * 2);
 Console.WriteLine("Objects: " + string.Join(", ", doubled));
 
-// 2. LINQ to XML — same operators, over XML elements.
+// 2. LINQ to XML, same operators, over XML elements.
 var xml = XElement.Parse(@"
   <people>
     <p name='Ada' age='36' />
@@ -373,7 +373,7 @@ That translation trick rests on a distinction worth knowing from day
 one. **LINQ to Objects** runs on `IEnumerable<T>`: lambdas compile
 to ordinary methods, and the pipeline executes in your process.
 **LINQ to providers** runs on `IQueryable<T>`: lambdas become
-*expression trees* — data structures describing the lambda — which a
+*expression trees*, data structures describing the lambda, which a
 provider walks and translates into another language entirely.
 
 ```mermaid
@@ -390,10 +390,10 @@ This course is about **LINQ to Objects** and the functional thinking
 behind it. Once you have that mental model, `IQueryable` is a small
 extra step.
 
-## What LINQ changed — and what it didn't
+## What LINQ changed, and what it didn't
 
 The cultural shift LINQ produced was bigger than the technical one.
-Before LINQ, querying was something *special* — a separate language
+Before LINQ, querying was something *special*, a separate language
 bolted onto your "real" code. After LINQ, you could refactor a query
 like any other C# method; types flowed end-to-end, so renaming
 `Person.City` made the compiler catch every query that referenced
@@ -408,7 +408,7 @@ getting faster per-core and went multi-core (making shared mutable
 state a concurrency hazard), and codebases grew tenfold (making
 implicit data flow unmaintainable). Functional programming had spent
 forty years answering exactly these problems, and mainstream
-languages began absorbing the answers — immutability, pure
+languages began absorbing the answers, immutability, pure
 functions, higher-order functions, pipelines.
 
 Two misconceptions are worth heading off right now, because they
@@ -416,7 +416,7 @@ will come up at work:
 
 - *"Functional programming means no objects."* No. In a modern C#
   codebase you will still have services, interfaces, and classes.
-  Functional patterns mostly target the *data-processing layer* —
+  Functional patterns mostly target the *data-processing layer*,
   the place where most bugs live. The adoption is **additive**, not
   a rewrite.
 - *"Declarative is slower."* In modern .NET, LINQ over arrays and
@@ -434,8 +434,8 @@ Here is the scorecard this course will keep coming back to:
 | Repetitive transformation logic | Higher-order functions parameterized by behavior |
 | Step-by-step procedures | Composed pure functions, each independently usable |
 
-The next page tours the modern C# features — lambdas, records,
-`yield`, pattern matching — that make those answers ergonomic.
+The next page tours the modern C# features, lambdas, records,
+`yield`, pattern matching, that make those answers ergonomic.
 After that, we build the toolkit from first principles, starting
 with pure functions.
 
@@ -449,7 +449,7 @@ with pure functions.
 - [o] Extension methods
   > Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
 - Expression trees
-  > Expression trees are what let LINQ to Providers translate lambdas into SQL — they are not how \`Where\` is attached to a collection.
+  > Expression trees are what let LINQ to Providers translate lambdas into SQL, they are not how \`Where\` is attached to a collection.
 
 Extension methods are the trick. \`Enumerable.Where\` is a static method
 on the \`Enumerable\` class; the \`this\` modifier on its first parameter
@@ -464,7 +464,7 @@ had grown a new method.`}
   > That is a common caricature of functional programming, but it is not what this course teaches. Modern C# functional style is additive, not a rewrite.
 - Use functional patterns only in greenfield F# projects.
   > Functional patterns belong in normal C# code, in normal OO codebases. This course is specifically about applying them in C#.
-- [o] Apply functional patterns — immutability, pure functions, pipelines — primarily to the data-processing layers, while keeping the rest of the OO design.
+- [o] Apply functional patterns, immutability, pure functions, pipelines, primarily to the data-processing layers, while keeping the rest of the OO design.
   > The functional renaissance was additive: functional ideas mostly attack the place most bugs live (data transformation and state mutation), and coexist with OO services, interfaces, and classes.
 - Avoid LINQ in production code because it is slower than imperative loops.
   > LINQ to Objects is competitive with hand loops in the vast majority of code paths, and the readability benefit is usually decisive.

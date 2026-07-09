@@ -1,20 +1,20 @@
 // Shared CheerpJ loader used by the Java playground.
 //
 // CheerpJ (https://cheerpj.com/) is a full OpenJDK runtime + JIT
-// compiled to WebAssembly that runs entirely in the browser — the same
+// compiled to WebAssembly that runs entirely in the browser, the same
 // "everything in the browser" approach used by Pyodide (Python),
 // WebR (R), php-wasm (PHP), and browsercc (C/C++) elsewhere in this
 // repo. CheerpJ itself does not ship `tools.jar`, so we supply a Java 8
 // `tools.jar` (which contains `com.sun.tools.javac.Main`) and load it
 // into CheerpJ's in-memory `/str/` filesystem at runtime; we then drive
 // `javac` on user source and run the resulting class with
-// `cheerpjRunMain` — exactly what JavaFiddle does
+// `cheerpjRunMain`, exactly what JavaFiddle does
 // (https://github.com/leaningtech/javafiddle). Without it `cheerpjRunMain`
 // fails with "Could not find or load main class
 // com.sun.tools.javac.Main".
 //
 // The jar is fetched cross-origin from unpkg (the `dataslope-tools-jar`
-// npm package — see TOOLS_JAR_CDN in cdn.ts) rather than served from this
+// npm package, see TOOLS_JAR_CDN in cdn.ts) rather than served from this
 // app's own origin, so Vercel never handles its ~18 MB of bandwidth. We
 // fetch the bytes ourselves and inject them via `cheerpjAddStringFile`
 // instead of relying on CheerpJ's `/app` → origin mapping; that is what
@@ -28,7 +28,7 @@
 // tag (rather than `import()`), wait for it to fire `onload`, then
 // call `cheerpjInit` exactly once per page.
 //
-// `status: "none"` suppresses CheerpJ's own loading banner — the
+// `status: "none"` suppresses CheerpJ's own loading banner, the
 // playground UI already renders its own.
 
 import { TOOLS_JAR_CDN } from "./cdn";
@@ -38,7 +38,7 @@ const CHEERPJ_LOADER_URL = `https://cjrtnc.leaningtech.com/${CHEERPJ_VERSION}/lo
 
 // Where we mount tools.jar inside CheerpJ's in-memory /str/ filesystem;
 // java.tsx puts this on the classpath. `/str/` is CheerpJ's
-// host-populated, read-only FS — the same one user .java sources are
+// host-populated, read-only FS, the same one user .java sources are
 // staged into.
 export const TOOLS_JAR_VFS_PATH = "/str/tools.jar";
 // ─── Public types ──────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
     const w = window as CheerpJWindow;
 
     // Start downloading tools.jar from the CDN immediately, in parallel
-    // with loading + initialising CheerpJ's (separately hosted) runtime —
+    // with loading + initialising CheerpJ's (separately hosted) runtime,
     // both are large. The bytes are injected into /str/ once init
     // completes, before any cheerpjRunMain call. The no-op `.catch`
     // suppresses an "unhandled rejection" warning during the window before
@@ -107,7 +107,7 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         }
 
         // Mount tools.jar (javac) into CheerpJ's /str/ FS before the first
-        // cheerpjRunMain — java.tsx references it via TOOLS_JAR_VFS_PATH on
+        // cheerpjRunMain, java.tsx references it via TOOLS_JAR_VFS_PATH on
         // the classpath.
         w.cheerpjAddStringFile(TOOLS_JAR_VFS_PATH, await jarBytesPromise);
 
@@ -121,7 +121,7 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
     };
 
     // Reuse an existing loader script tag if some other module already
-    // injected it — avoids the "CheerpJ: Already initialized" error
+    // injected it, avoids the "CheerpJ: Already initialized" error
     // from cheerpjInit if React StrictMode mounts twice in dev.
     const existing = document.querySelector<HTMLScriptElement>(
       `script[src="${CHEERPJ_LOADER_URL}"]`,

@@ -1,6 +1,6 @@
 ---
 title: Data Structures Intuition
-description: vector, list, map, set, unordered_map — what each is for, and how to pick.
+description: vector, list, map, set, unordered_map, what each is for, and how to pick.
 ---
 
 A container is a place to keep a collection of values. Different
@@ -10,12 +10,12 @@ you constant-time lookup by key. Picking the right container is
 often a bigger performance win than any micro-optimization.
 
 This chapter sketches the standard containers and when to reach for
-each — without diving into their implementations.
+each, without diving into their implementations.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Four vessels on a shelf: a tray of dots in a row, a chain of linked beads, a branching tree of dots, and a grid of pigeonholes — each container shapes its costs differently"
+  aria-label="Four vessels on a shelf: a tray of dots in a row, a chain of linked beads, a branching tree of dots, and a grid of pigeonholes, each container shapes its costs differently"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -83,7 +83,7 @@ each — without diving into their implementations.
 
 ## Sequence containers
 
-### `std::vector<T>` — the default
+### `std::vector<T>`, the default
 
 - Contiguous in memory.
 - Indexing `v[i]` is O(1).
@@ -92,47 +92,47 @@ each — without diving into their implementations.
 
 Use it for almost everything. The CPU loves contiguous memory.
 
-### `std::array<T, N>` — fixed size
+### `std::array<T, N>`, fixed size
 
 - Like `std::vector` but the size is part of the type and there is no
   heap allocation.
 - Use when the size is known at compile time.
 
-### `std::deque<T>` — double-ended
+### `std::deque<T>`, double-ended
 
 - Push/pop at *both* ends in amortized O(1).
 - Indexing is O(1) but slower than vector (the storage is broken
   into chunks).
 - Use when you need a queue or you frequently prepend.
 
-### `std::list<T>` — doubly linked
+### `std::list<T>`, doubly linked
 
 - Insert/erase anywhere in O(1) **if** you already have an iterator
   to the position.
-- Indexing is O(n) — there's no `[i]`.
+- Indexing is O(n), there's no `[i]`.
 - Each node lives on the heap; cache-hostile.
 - In practice, used rarely. `std::vector` wins on most workloads.
 
 ## Associative containers
 
-### `std::map<K, V>` — sorted dictionary
+### `std::map<K, V>`, sorted dictionary
 
 - Keys are unique, kept in sorted order.
 - Lookup, insert, erase: **O(log n)**.
 - Iteration visits keys in order.
 - Implemented as a balanced tree.
 
-### `std::set<K>` — sorted set
+### `std::set<K>`, sorted set
 
 - Same as `map` but stores keys only.
 
-### `std::unordered_map<K, V>` — hash dictionary
+### `std::unordered_map<K, V>`, hash dictionary
 
 - Keys are unique; *no* ordering.
 - Average lookup, insert, erase: **O(1)**. Worst case O(n).
 - Implemented as a hash table.
 
-### `std::unordered_set<K>` — hash set
+### `std::unordered_set<K>`, hash set
 
 - Same as `unordered_map` but stores keys only.
 
@@ -201,7 +201,7 @@ A short checklist:
 6. **Need to push/pop at both ends?** `std::deque` (or just two
    vectors, depending).
 7. **Need fast insertion in the middle by iterator?** Maybe
-   `std::list` — but profile first.
+   `std::list`, but profile first.
 
 ## A note on iteration cost
 
@@ -209,7 +209,7 @@ The CPU loads memory in cache lines. Contiguous data (vector, array)
 is read in big efficient chunks. Pointer-chasing data (list, set,
 map, unordered_map) jumps around the heap and often pays a cache
 miss for every element. For workloads dominated by iteration,
-`std::vector` is usually fastest — sometimes dramatically so —
+`std::vector` is usually fastest, sometimes dramatically so,
 even when an algorithmic analysis suggests otherwise.
 
 Rule of thumb: **don't choose `std::list` to "save copies." It will
@@ -222,7 +222,7 @@ The classic use case for an ordered map, in one tiny exercise:
 <ChallengeCard
   adapter="cpp"
   title="Word frequency"
-  instructions={`Count how many times each word appears in the vector \`words\`, then print each distinct word and its count — separated by a single space, one pair per line, in **alphabetical order**.
+  instructions={`Count how many times each word appears in the vector \`words\`, then print each distinct word and its count, separated by a single space, one pair per line, in **alphabetical order**.
 
 For the provided input, the expected output is exactly:
 
@@ -306,5 +306,5 @@ int main() {
   > \`unordered_map\` is generally faster for plain lookup.`}
 />
 
-Next: the meta-skill that ties this all together — *debugging* and
+Next: the meta-skill that ties this all together, *debugging* and
 reasoning about programs.

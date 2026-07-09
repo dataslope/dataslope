@@ -1,6 +1,6 @@
 ---
 title: Interfaces
-description: Pure contracts — describing what an object can do without saying anything about what it is
+description: Pure contracts, describing what an object can do without saying anything about what it is
 ---
 
 An **interface** in Java is a *contract*. It says "any class that
@@ -10,13 +10,13 @@ implementation. It is the most flexible building block in OOP.
 
 If a class is "what an object *is*," an interface is "what an object
 *can do*." A `Cat`, a `Doorbell`, and a `MotionSensor` are completely
-unrelated kinds of things — but all three could implement an
+unrelated kinds of things, but all three could implement an
 interface called `Noisy` because all three can make a sound.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="One large green ring emblem joined by thin lines to a light green circle, square, and triangle that each wear a small copy of it — an interface as a capability badge worn by otherwise unrelated classes"
+  aria-label="One large green ring emblem joined by thin lines to a light green circle, square, and triangle that each wear a small copy of it, an interface as a capability badge worn by otherwise unrelated classes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -120,7 +120,7 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
   ]}
 />
 
-Notice the loop in `Main`. It does not know — and does not care —
+Notice the loop in `Main`. It does not know, and does not care,
 which class each element is. It only knows that each one is a
 `Noisy`, and therefore can be sent the message `sound()`.
 
@@ -217,7 +217,7 @@ exist yet. The method signature has no opinion. *That* is what
 
 ## Default methods: a small modern wrinkle
 
-Since Java 8, an interface may include `default` methods — methods
+Since Java 8, an interface may include `default` methods, methods
 *with* a body that implementers inherit unless they override it.
 Default methods are useful when you want to add a method to an
 interface without breaking every existing implementer.
@@ -286,7 +286,7 @@ time.
 
 Imagine a checkout system that supports several payment processors
 (Stripe, PayPal, a test fake). Each is a totally different
-implementation, but the checkout doesn't care — it just wants
+implementation, but the checkout doesn't care, it just wants
 something that can `charge(amount)`.
 
 ```mermaid
@@ -371,7 +371,7 @@ classDiagram
 />
 
 `Checkout` programs against the interface `PaymentProcessor`. Adding
-a new payment provider tomorrow means writing one new class — no
+a new payment provider tomorrow means writing one new class, no
 changes to `Checkout`. That is the design payoff of interfaces.
 
 ## Practice
@@ -517,7 +517,7 @@ name: 1
 - Always write \`interface\` for every class
   > Not every class needs an interface; the principle is about *types in signatures*.
 - Never use concrete classes
-  > Concrete classes are required to actually have an instance — somebody must implement the interface.
+  > Concrete classes are required to actually have an instance, somebody must implement the interface.
 - [o] When declaring variables, parameters, and return types, prefer the more general interface type so callers aren't locked to a specific implementation
   > This is how interfaces unlock loose coupling.
 - Use only abstract classes

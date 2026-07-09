@@ -10,7 +10,7 @@ import { PricingSection } from "../_components/home/PricingSection";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
-const PAGE_TITLE = "Pricing — Dataslope";
+const PAGE_TITLE = "Pricing, Dataslope";
 const PAGE_DESCRIPTION =
   "Dataslope pricing in detail. Every course, interview track, and playground is free. Compare the Guest, Free Member, and Pro plans, with footnotes covering cloud storage, sharing, AI usage, and billing.";
 
@@ -87,7 +87,7 @@ export default function PricingPage() {
                 Pricing
               </h1>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
-                Every course, interview track, and playground is free to use —
+                Every course, interview track, and playground is free to use,
                 no account required, and anyone can share a playground with a
                 link. Create a free account for cloud saves, or go Pro for
                 storage that never expires. The detailed notes below the table
@@ -114,8 +114,8 @@ export default function PricingPage() {
 
               <ol className="mt-8 space-y-6">
                 <Footnote n={1} lead="Free to learn, always.">
-                  Courses, interview prep, and the playgrounds — including
-                  unlimited code executions across all 11 languages — are
+                  Courses, interview prep, and the playgrounds, including
+                  unlimited code executions across all 11 languages, are
                   completely free on every tier, including as a guest with no
                   sign-in. A paid plan only adds cloud storage, sharing, and
                   more AI chat; it never puts learning content behind a paywall.
@@ -126,7 +126,7 @@ export default function PricingPage() {
                   device you&apos;re using. They&apos;re private to that browser,
                   never uploaded, and persist until you clear your site data.
                   Because they aren&apos;t synced, they won&apos;t follow you to
-                  another device or browser — that&apos;s what cloud saves are
+                  another device or browser, that&apos;s what cloud saves are
                   for.
                 </Footnote>
 
@@ -143,7 +143,7 @@ export default function PricingPage() {
                 >
                   A cloud workspace counts as inactive once it hasn&apos;t been
                   opened or edited for about 30 days. After that it may be
-                  removed from the cloud to free up space — your local copy, if
+                  removed from the cloud to free up space, your local copy, if
                   you have one, is untouched. Opening or editing a workspace
                   resets its clock. Upgrading to Pro removes this limit entirely:
                   Pro cloud saves are kept for as long as you&apos;re subscribed.
@@ -151,7 +151,7 @@ export default function PricingPage() {
 
                 <Footnote n={5} lead="“100 MB / 10 GB of cloud storage.”">
                   Your quota is the combined size of everything you keep in the
-                  cloud — saved workspaces, databases, and any files you upload —
+                  cloud, saved workspaces, databases, and any files you upload,
                   totaled across all playgrounds, not measured per playground. If
                   you reach the limit you can still open and export existing
                   work; you&apos;ll just need to free up space (or upgrade)
@@ -159,9 +159,9 @@ export default function PricingPage() {
                 </Footnote>
 
                 <Footnote n={6} lead="“Share playgrounds.”">
-                  Sharing creates a link to a snapshot of your playground —
+                  Sharing creates a link to a snapshot of your playground,
                   the files, and for SQL playgrounds the database and queries
-                  — taken at the moment you share. Anyone who opens the link
+, taken at the moment you share. Anyone who opens the link
                   gets their own private copy to run and edit; nobody can
                   change your original through a link, and later edits
                   aren&apos;t shared until you create a new link.{" "}
@@ -178,7 +178,7 @@ export default function PricingPage() {
                 <Footnote n={7} lead="“Ask AI” messages.">
                   “Ask AI” is the in-app assistant available inside playgrounds,
                   challenges, code blocks, and lessons. Your limit is counted
-                  across all of those surfaces on a rolling 24-hour window —
+                  across all of those surfaces on a rolling 24-hour window,
                   Guests get 3, Free Members up to 10, and Pro is unlimited. A
                   rolling window means each message frees up again 24 hours after
                   you send it, rather than all resetting at a fixed time of day.
@@ -186,7 +186,7 @@ export default function PricingPage() {
 
                 <Footnote
                   n={8}
-                  lead="“Unlimited ‘Ask AI’ — fair use policy applies” (Pro)."
+                  lead="“Unlimited ‘Ask AI’, fair use policy applies” (Pro)."
                 >
                   Unlimited covers normal interactive use. To keep the assistant
                   fast and available for everyone, we may rate-limit usage that
@@ -200,7 +200,7 @@ export default function PricingPage() {
                 >
                   As you type in any playground, Pro offers inline,
                   context-aware code completions you can accept with a keystroke
-                  — like an AI pair programmer suggesting the next line. It&apos;s
+, like an AI pair programmer suggesting the next line. It&apos;s
                   unlimited under the same fair-use policy as Ask AI (see note 8),
                   and it&apos;s a Pro-only feature: the Guest and Free Member
                   tiers don&apos;t include autocomplete suggestions.
@@ -208,7 +208,7 @@ export default function PricingPage() {
 
                 <Footnote n={10} lead="Monthly vs. annual billing.">
                   The toggle above the table switches the Pro price between
-                  monthly ($4.99/mo) and annual ($40/yr — about $3.33/mo, a 33%
+                  monthly ($4.99/mo) and annual ($40/yr, about $3.33/mo, a 33%
                   saving). Annual is a single up-front payment covering twelve
                   months. Prices are in US dollars and may be subject to tax
                   depending on where you are.
@@ -218,8 +218,8 @@ export default function PricingPage() {
                   You can cancel Pro at any time and keep Pro features until the
                   end of the period you&apos;ve already paid for. After that your
                   account returns to the Free Member tier and your cloud data
-                  becomes subject to the Free limits again — the 100 MB quota and
-                  the one-month inactivity cleanup — so export anything you want
+                  becomes subject to the Free limits again, the 100 MB quota and
+                  the one-month inactivity cleanup, so export anything you want
                   to keep beyond those limits before you downgrade.
                 </Footnote>
               </ol>

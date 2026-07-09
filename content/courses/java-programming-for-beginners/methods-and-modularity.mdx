@@ -14,7 +14,7 @@ If variables are *nouns*, methods are *verbs*.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three identical code clusters stacked in one card all reach along thin gray lines to a single named green capsule, which alone produces the result — write the pattern once, call it by name"
+  aria-label="Three identical code clusters stacked in one card all reach along thin gray lines to a single named green capsule, which alone produces the result, write the pattern once, call it by name"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -48,7 +48,7 @@ If variables are *nouns*, methods are *verbs*.
 
 Imagine writing a 500-line `main` method that does everything. By
 the time you reach line 400, even you have forgotten what lines
-100-200 do. The fix is to give each chunk a *name* — a method — and
+100-200 do. The fix is to give each chunk a *name*, a method, and
 *call* the method from `main`.
 
 A well-designed Java program reads, at the top level, like a
@@ -200,8 +200,8 @@ each in its own method.
   ]}
 />
 
-Read `main`. You can understand the *story* — load scores, take the
-average, take the maximum, print both — without reading the bodies
+Read `main`. You can understand the *story*, load scores, take the
+average, take the maximum, print both, without reading the bodies
 of `sum`, `average`, or `maximum`. The methods provide
 **abstraction**: callers see the *what*, not the *how*.
 
@@ -215,7 +215,7 @@ This is a subtle point and worth stating once carefully.
 When you call a method, the arguments are **copied** into the
 parameters. For primitives, that means the value itself is copied
 (so changes inside the method don't affect the caller). For
-reference types, the *reference* (the address) is copied — but it
+reference types, the *reference* (the address) is copied, but it
 still points at the same object on the heap, so the method *can*
 mutate the object's contents.
 
@@ -282,7 +282,7 @@ based on the argument types.
   ]}
 />
 
-This is purely a convenience for readers — the same *name* across
+This is purely a convenience for readers, the same *name* across
 methods that conceptually do the same thing for different inputs.
 
 <MultipleChoice
@@ -321,8 +321,8 @@ them. Use small, single-purpose methods.
   title="MathTools with min and max"
   instructions={`Implement a class \`MathTools\` with two **static** methods:
 
-- \`int min(int[] xs)\` — return the smallest element.
-- \`int max(int[] xs)\` — return the largest element.
+- \`int min(int[] xs)\`, return the smallest element.
+- \`int max(int[] xs)\`, return the largest element.
 
 \`Main.java\` is fixed; it calls both and prints:
 

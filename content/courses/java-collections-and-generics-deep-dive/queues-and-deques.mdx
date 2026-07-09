@@ -1,6 +1,6 @@
 ---
 title: Queues and Deques
-description: Queue, Deque, ArrayDeque, and PriorityQueue — the FIFO and double-ended structures behind BFS, schedulers, and priority workflows
+description: Queue, Deque, ArrayDeque, and PriorityQueue, the FIFO and double-ended structures behind BFS, schedulers, and priority workflows
 ---
 
 Lists are about *position*. Sets are about *presence*. Maps are about
@@ -16,7 +16,7 @@ removal at the ends**:
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two rounded tracks: the top queue takes a green dot in through one thin gray arrow on the left and lets a blue dot out on the right, while the bottom deque wears a pair of opposite arrows at each end — both ends open"
+  aria-label="Two rounded tracks: the top queue takes a green dot in through one thin gray arrow on the left and lets a blue dot out on the right, while the bottom deque wears a pair of opposite arrows at each end, both ends open"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="170" y="44" width="300" height="48" rx="24" fill="var(--ds-blue-500)" fillOpacity="0.1" />
@@ -80,14 +80,14 @@ classDiagram
 `Queue` has two versions of each operation: a "soft" one that returns
 `null` or `false` on failure (`offer`, `poll`, `peek`), and a "loud"
 one that throws on failure (`add`, `remove`, `element`). **Prefer
-the soft versions** — they make queue-emptiness a value, not an
+the soft versions**, they make queue-emptiness a value, not an
 exception.
 
 ## ArrayDeque: the modern default
 
 `ArrayDeque` is the default implementation of `Deque`, and the
 default implementation of `Queue` in modern code. It is a circular
-buffer of `Object` — contiguous memory, no node allocation per
+buffer of `Object`, contiguous memory, no node allocation per
 element, very fast.
 
 ```mermaid
@@ -164,7 +164,7 @@ public class Main {
 
 ## Use ArrayDeque as a stack (LIFO)
 
-You can also use it as a stack — and you *should*, instead of the
+You can also use it as a stack, and you *should*, instead of the
 legacy `java.util.Stack`:
 
 <CodeBlock
@@ -199,7 +199,7 @@ API, no inheritance leaks, no unnecessary synchronization.
 ## A canonical algorithm: BFS with a queue
 
 Breadth-first search on a graph is the queue's textbook job. Every
-node is *visited* in the order it was discovered — exactly FIFO.
+node is *visited* in the order it was discovered, exactly FIFO.
 
 <CodeBlock
   adapter="java"
@@ -351,7 +351,7 @@ public class Scheduler {
 />
 
 `Comparator.comparingInt(Task::deadline)` extracts the deadline and
-orders ascending — the smallest deadline comes out first. We will go
+orders ascending, the smallest deadline comes out first. We will go
 deeper on comparators in the next chapter.
 
 ## Practice
@@ -466,7 +466,7 @@ public class SlidingWindow<E> {
 
 - Iteration throws \`UnsupportedOperationException\`
   > It does not.
-- [o] Iteration walks the underlying heap array, which is *not* in sorted order — drain via \`poll()\` if you need sorted order
+- [o] Iteration walks the underlying heap array, which is *not* in sorted order, drain via \`poll()\` if you need sorted order
   > Heap order only guarantees the *root* is the smallest; the rest is partially ordered.
 - It is \`O(n²)\`
   > Iteration is \`O(n)\`.

@@ -5,19 +5,19 @@ description: A hands-on course on numerical methods, mathematical modeling, and 
 
 <Figure
   slug="calculator"
-  alt="A calculator — a stand-in for turning Python into a mathematical instrument"
+  alt="A calculator, a stand-in for turning Python into a mathematical instrument"
   priority
 />
 
 Welcome to **Scientific Computing with Python**. This course is for
 learners who already know Python as a *programming language* and now
-want to use it as a *mathematical instrument* — a way to model the
+want to use it as a *mathematical instrument*, a way to model the
 physical world, solve equations that have no closed-form solution,
 simulate systems too complex to reason about by hand, and analyze
 data that arrives in matrices rather than rows.
 
 Here is the kind of thing that lies ahead. The two snippets below
-compute exactly the same million sine-squared values — one with a
+compute exactly the same million sine-squared values, one with a
 Python loop, one as a single NumPy array expression. **Run it**, then
 change `N` to `5_000_000` and run again. Watch the gap widen.
 
@@ -55,7 +55,7 @@ print(f"Speedup     : {(t1 - t0) / (t3 - t2):7.0f}x faster, same answer")
 
 That hundred-to-thousand-fold speedup, from *one line* of NumPy, is
 the first idea of the course. **This whole course runs in your
-browser** — there is nothing to install, no kernel to configure, no
+browser**, there is nothing to install, no kernel to configure, no
 cloud account. Every code block, including the one you just ran, is a
 live CPython interpreter compiled to WebAssembly, with the full
 scientific stack already loaded.
@@ -70,7 +70,7 @@ experiments other scientists can reproduce a decade from now.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A smooth green curve in one card crosses a thin gray arrow and reappears in the next card as a row of discrete blue sample dots — continuous laws of nature turned into computation, one step at a time"
+  aria-label="A smooth green curve in one card crosses a thin gray arrow and reappears in the next card as a row of discrete blue sample dots, continuous laws of nature turned into computation, one step at a time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -93,7 +93,7 @@ experiments other scientists can reproduce a decade from now.
 </svg>
 
 <Callout type="info" title="Prerequisites">
-You should already be comfortable with Python syntax — variables,
+You should already be comfortable with Python syntax, variables,
 functions, classes, list comprehensions, imports. Some exposure to
 calculus and linear algebra will help, but we will revisit the math
 from a computational angle. No prior experience with NumPy, SciPy,
@@ -105,7 +105,7 @@ or numerical analysis is required.
 Most modern science is computation. A biologist sequencing genomes,
 an economist forecasting GDP, a physicist colliding particles, an
 engineer designing an airfoil, a climate scientist projecting sea
-level rise — every one of them spends more time looking at the
+level rise, every one of them spends more time looking at the
 output of a Python kernel than at a laboratory bench. The
 *scientific method* is increasingly the *computational scientific
 method*, and the lingua franca of that method is the SciPy
@@ -140,8 +140,8 @@ flowchart TD
 
 The course has six pillars:
 
-1. **The story.** Where scientific computing came from — from human
-   "computers" to FORTRAN to MATLAB to NumPy — and why the field
+1. **The story.** Where scientific computing came from, from human
+   "computers" to FORTRAN to MATLAB to NumPy, and why the field
    looks the way it does today. Two short chapters, then we compute.
 2. **Numerical foundations.** Floating point, stability, error,
    condition number, and the *vectorized* style of thinking that
@@ -160,7 +160,7 @@ The course has six pillars:
 
 ## How the interactive widgets work
 
-Every code block runs in your browser via **Pyodide** — a full
+Every code block runs in your browser via **Pyodide**, a full
 CPython 3.13 build compiled to WebAssembly that ships NumPy, SciPy,
 pandas, Matplotlib, SymPy, and Plotly. There is nothing to install.
 
@@ -184,7 +184,7 @@ open the [Python Playground](/playground/python) in a new tab.
 ## A taste of the deep end
 
 The opening benchmark was one line. Here is a complete scientific
-computation you will be able to write — and *understand deeply* — by
+computation you will be able to write, and *understand deeply*, by
 the end: simulating a damped pendulum and visualizing its phase
 portrait. Run it now if you like; the point is not to follow every
 line yet, but to see where two short story chapters and a handful of
@@ -229,5 +229,5 @@ plt.show()
 />
 
 Right now this code is probably mostly mysterious. By the end of the
-course, every line — the choice of solver, the tolerance, the
-phase-space plot, even the units — will feel obvious.
+course, every line, the choice of solver, the tolerance, the
+phase-space plot, even the units, will feel obvious.

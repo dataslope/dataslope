@@ -1,12 +1,12 @@
 ---
 title: Enums
-description: Type-safe fixed sets of values — enums as full-fledged objects with state and behavior
+description: Type-safe fixed sets of values, enums as full-fledged objects with state and behavior
 ---
 
 Lots of values in our programs come from **small, fixed sets**: days
 of the week, traffic-light colors, payment methods, user roles,
 HTTP methods. You could represent each by an `int` or a `String`,
-and at first that even feels natural — but you would be throwing
+and at first that even feels natural, but you would be throwing
 away type safety and inviting a class of avoidable bugs.
 
 Java's **`enum`** is the right tool. It is a class whose instances
@@ -17,7 +17,7 @@ in Java to use.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A selector dial whose needle can only rest on five fixed detent dots — an enum is a small, closed set of named instances"
+  aria-label="A selector dial whose needle can only rest on five fixed detent dots, an enum is a small, closed set of named instances"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -47,9 +47,9 @@ in Java to use.
 
 | Representation | What you get |
 | --- | --- |
-| A `String` — `"red"` / `"amber"` / `"green"` (or `"Red"`, `"RED"`, `"gren"`!) | Typos, invalid values, no autocomplete |
-| An `int` — `0` / `1` / `2` | Magic numbers, no meaning, out-of-range values |
-| An `enum` — `RED`, `AMBER`, `GREEN` | Type-safe, self-documenting, exhaustive |
+| A `String`, `"red"` / `"amber"` / `"green"` (or `"Red"`, `"RED"`, `"gren"`!) | Typos, invalid values, no autocomplete |
+| An `int`, `0` / `1` / `2` | Magic numbers, no meaning, out-of-range values |
+| An `enum`, `RED`, `AMBER`, `GREEN` | Type-safe, self-documenting, exhaustive |
 
 <CodeBlock
   adapter="java"
@@ -60,7 +60,7 @@ in Java to use.
   public static void main(String[] args) {
     respond("red"); // What if you typo "Red"?
     respond("amber");
-    respond("orange"); // not a real state — no warning!
+    respond("orange"); // not a real state, no warning!
   }
 
   static void respond(String light) {
@@ -131,8 +131,8 @@ Three concrete benefits in that small change:
 Java enums are not just integer codes with names. **Each enum
 constant is a full object**, and the enum *type* is a class. That
 means each constant can carry its own state and define its own
-behavior. The example below — planets that each know their own
-surface gravity — is a small classic: it comes from the official
+behavior. The example below, planets that each know their own
+surface gravity, is a small classic: it comes from the official
 Java tutorial, written when enums arrived in Java 5 to show that
 this feature was something far richer than C's integer enums.
 
@@ -191,7 +191,7 @@ A few things to notice:
 - The constants `MERCURY, VENUS, EARTH, MARS` are listed first,
   followed by a semicolon, *then* the rest of the class body.
 - Enums have private final fields and a constructor, just like
-  ordinary classes. You cannot call the constructor yourself —
+  ordinary classes. You cannot call the constructor yourself,
   Java calls it once for each declared constant.
 - Methods like `surfaceGravity()` work like any other instance
   method. Each enum constant gets to compute its own answer.
@@ -252,7 +252,7 @@ alternative to a giant `switch` over a `String` operator.
 | `values()` | Returns an array of all constants, in declaration order |
 | `valueOf(String)` | Returns the constant with the given name (throws if missing) |
 | `name()` | Returns the constant's name as a `String` |
-| `ordinal()` | Returns the constant's position (0-based) — useful, but use sparingly |
+| `ordinal()` | Returns the constant's position (0-based), useful, but use sparingly |
 
 Concretely, for the `Light` enum:
 
@@ -406,7 +406,7 @@ SUNDAY weekend? true
 - You can create new enum instances with \`new\` at runtime
   > You cannot. Enum instances are fixed at declaration.
 - Enums cannot have fields or methods
-  > They can — they are a kind of class.
+  > They can, they are a kind of class.
 - [o] Each enum constant is an object, and the enum type may have its own fields, constructor, and methods
   > Enums are essentially classes with a closed list of instances.`}
 />

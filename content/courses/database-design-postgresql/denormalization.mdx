@@ -14,7 +14,7 @@ shortcut around design; it is a trade-off you make with your eyes open.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A green fact from one table is copied into another, but the copy wears a yellow badge ring and a thin sync line back to its source — duplication done deliberately, with eyes open"
+  aria-label="A green fact from one table is copied into another, but the copy wears a yellow badge ring and a thin sync line back to its source, duplication done deliberately, with eyes open"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -211,8 +211,8 @@ according to the system's rules.
 
 ## Spot it in the wild: Northwind's "duplicated" prices
 
-The classic **Northwind** sample database — Microsoft's demo store,
-ported to PostgreSQL — is a nice place to see this thinking in a
+The classic **Northwind** sample database, Microsoft's demo store,
+ported to PostgreSQL, is a nice place to see this thinking in a
 finished schema. Its `products` table stores `unit_price`, the
 catalog price today. Its `order_details` table *also* stores a
 `unit_price` on every order line. Duplication? Run the query and
@@ -243,14 +243,14 @@ LIMIT
   12;`}
 />
 
-Those disagreements are not bugs — they are history. Prices rose, and
+Those disagreements are not bugs, they are history. Prices rose, and
 the old order lines kept the price the customer actually paid. This
 is the most important nuance on the page: what looks like a
 duplicated fact is sometimes *two different facts that happen to
 share a name*. "What does this product cost?" and "what did this
 customer pay on that day?" have different answers, different owners,
 and different update rules, so they each deserve a column. A copied
-fact needs a sync plan; a historical fact needs the opposite — a
+fact needs a sync plan; a historical fact needs the opposite, a
 guarantee that nobody will ever "fix" it to match the catalog. Part
 of designing well is telling those two situations apart.
 

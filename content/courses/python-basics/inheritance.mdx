@@ -3,12 +3,12 @@ title: Inheritance and Polymorphism
 description: Subclassing, super(), method overriding, and duck typing
 ---
 
-A class can **inherit** from another, getting all its attributes and methods for free. The new class can add behavior, override behavior, or both. Inheritance is one of the pillars of object-oriented programming — but it's also easy to overuse.
+A class can **inherit** from another, getting all its attributes and methods for free. The new class can add behavior, override behavior, or both. Inheritance is one of the pillars of object-oriented programming, but it's also easy to overuse.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue parent card holding a circle and a square links down a thin line to a green child card holding the same blue circle, the square redone in yellow, and a brand-new green triangle — inherit, override, extend"
+  aria-label="A blue parent card holding a circle and a square links down a thin line to a green child card holding the same blue circle, the square redone in yellow, and a brand-new green triangle, inherit, override, extend"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="320" y1="95" x2="320" y2="125" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
@@ -35,11 +35,11 @@ A class can **inherit** from another, getting all its attributes and methods for
 
 Inheritance shows up everywhere in Python:
 
-- **Framework base classes** — `unittest.TestCase`, `django.db.models.Model`, `flask.views.MethodView`, `http.server.BaseHTTPRequestHandler`
-- **Abstract base classes** — `collections.abc.Iterable`, `numbers.Number`, `abc.ABC`
-- **Exception hierarchies** — `BaseException → Exception → ValueError`
-- **Mixins** — Small classes that add a single behavior (logging, serialization, access control)
-- **Liskov Substitution Principle** — A subclass should be usable anywhere the parent is
+- **Framework base classes**, `unittest.TestCase`, `django.db.models.Model`, `flask.views.MethodView`, `http.server.BaseHTTPRequestHandler`
+- **Abstract base classes**, `collections.abc.Iterable`, `numbers.Number`, `abc.ABC`
+- **Exception hierarchies**, `BaseException → Exception → ValueError`
+- **Mixins**, Small classes that add a single behavior (logging, serialization, access control)
+- **Liskov Substitution Principle**, A subclass should be usable anywhere the parent is
 
 Understanding inheritance is essential for working with frameworks and designing extensible systems. But remember: **composition is often better than inheritance**. We'll cover that too.
 
@@ -232,7 +232,7 @@ print(issubclass(Dog, Animal))  # True
 `isinstance(obj, Class)` returns `True` if `obj` is an instance of `Class` **or any subclass**. `type(obj) is Class` only returns `True` for exact type matches.
 
 <Callout type="warn" title="Prefer isinstance over type checks">
-Use \`isinstance(x, int)\` instead of \`type(x) is int\`. The former allows subclasses (e.g., \`bool\` is a subclass of \`int\`); the latter does not. In general, checking types at all is un-Pythonic — prefer duck typing and "ask forgiveness, not permission" (EAFP).
+Use \`isinstance(x, int)\` instead of \`type(x) is int\`. The former allows subclasses (e.g., \`bool\` is a subclass of \`int\`); the latter does not. In general, checking types at all is un-Pythonic, prefer duck typing and "ask forgiveness, not permission" (EAFP).
 </Callout>
 
 ## Multiple inheritance and the MRO
@@ -287,7 +287,7 @@ classDiagram
 ```
 
 <Callout type="warn" title="Multiple inheritance is powerful but tricky">
-Most well-designed codebases either **avoid multiple inheritance** or restrict it to **mixins** — small classes that add a single piece of behavior (e.g., \`LoggingMixin\`, \`JSONSerializableMixin\`). Deep multiple-inheritance hierarchies are hard to reason about and debug.
+Most well-designed codebases either **avoid multiple inheritance** or restrict it to **mixins**, small classes that add a single piece of behavior (e.g., \`LoggingMixin\`, \`JSONSerializableMixin\`). Deep multiple-inheritance hierarchies are hard to reason about and debug.
 </Callout>
 
 ## Abstract base classes
@@ -329,7 +329,7 @@ except TypeError as e:
 Use ABCs when you want to **enforce a contract**: "any subclass must implement these methods". This is common in framework design.
 
 <Callout type="info" title="ABCs in the standard library">
-Python's \`collections.abc\` module defines many useful ABCs: \`Iterable\`, \`Sequence\`, \`Mapping\`, \`Set\`, etc. If you want to check "does this object behave like a list?", use \`isinstance(obj, collections.abc.Sequence)\` instead of \`isinstance(obj, list)\` — it allows any list-like object, not just \`list\`.
+Python's \`collections.abc\` module defines many useful ABCs: \`Iterable\`, \`Sequence\`, \`Mapping\`, \`Set\`, etc. If you want to check "does this object behave like a list?", use \`isinstance(obj, collections.abc.Sequence)\` instead of \`isinstance(obj, list)\`, it allows any list-like object, not just \`list\`.
 </Callout>
 
 ## Composition over inheritance
@@ -356,9 +356,9 @@ class Car(Engine):  # bad!
 
 Why prefer composition?
 
-- **Flexibility** — You can swap out components (e.g., `ElectricEngine` vs `GasEngine`) without changing the `Car` class hierarchy.
-- **Easier to understand** — "a Car has an Engine" is clearer than "a Car is an Engine".
-- **Avoids fragile base class problem** — Changes to a base class can break subclasses in surprising ways.
+- **Flexibility**, You can swap out components (e.g., `ElectricEngine` vs `GasEngine`) without changing the `Car` class hierarchy.
+- **Easier to understand**, "a Car has an Engine" is clearer than "a Car is an Engine".
+- **Avoids fragile base class problem**, Changes to a base class can break subclasses in surprising ways.
 
 <Callout type="tip" title="When to use inheritance">
 Use inheritance when:

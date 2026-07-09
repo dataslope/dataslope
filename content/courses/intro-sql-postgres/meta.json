@@ -1,6 +1,6 @@
 {
     "title": "Introduction to SQL and Relational Databases with PostgreSQL",
-    "description": "A beginner-friendly course on SQL and relational database foundations with PostgreSQL — conceptual, visual, and hands-on, with zero database or programming experience required.",
+    "description": "A beginner-friendly course on SQL and relational database foundations with PostgreSQL, conceptual, visual, and hands-on, with zero database or programming experience required.",
     "root": true,
     "tags": {
         "language": [

@@ -1,33 +1,33 @@
 ---
-title: Why SQL — and Why PostgreSQL
+title: "Why SQL: and Why PostgreSQL"
 description: The 1970 paper that changed everything, the language that lost its name to an aircraft company, and the Berkeley project that became PostgreSQL.
 ---
 
 You know what a database is. Now: why do we talk to it in a strange
 little language called SQL, and why does this course use a database
-named PostgreSQL? Both answers are stories — true ones, with a
+named PostgreSQL? Both answers are stories, true ones, with a
 research lab, a trademark dispute, and a race that IBM lost to a
-startup — and knowing them will make the language feel less like
+startup, and knowing them will make the language feel less like
 arbitrary syntax and more like the punchline of a very good idea.
 
 ## 1970: Codd's dangerous idea
 
 <IllustrationPrompt subject="Edgar F. Codd" photo />
 
-In the late 1960s, databases already existed — and they were
+In the late 1960s, databases already existed, and they were
 miserable to use. Data was stored in rigid hierarchies and
 networks, where the *paths* between records were baked into the
 design. To find anything, a programmer had to know exactly how the
 data was physically wired together and navigate it step by step,
 like following directions through a maze. Want to ask a question
-nobody anticipated when the maze was built? Too bad — you might
+nobody anticipated when the maze was built? Too bad, you might
 have to restructure everything.
 
 Then, in June 1970, a British-born mathematician at IBM's San Jose
 research lab named **Edgar F. Codd** published a paper with the
 unglamorous title *"A Relational Model of Data for Large Shared
 Data Banks."* Its idea was radical in its simplicity: store all
-data in plain tables — what mathematicians call **relations** — and
+data in plain tables, what mathematicians call **relations**, and
 let people ask *any* question later, in a logical language, without
 knowing or caring how the data is physically stored.
 
@@ -40,7 +40,7 @@ flowchart TB
 That is the whole relational idea in one sentence: **a relational
 database organizes data into tables, and lets those tables relate
 to one another through shared values.** Customers in one table,
-orders in another, and a shared value — the customer's id — tying
+orders in another, and a shared value, the customer's id, tying
 each order back to its customer:
 
 ```mermaid
@@ -57,20 +57,20 @@ erDiagram
     }
 ```
 
-(Don't worry about reading this diagram precisely yet — we will
+(Don't worry about reading this diagram precisely yet, we will
 learn the notation properly later. For now, just feel the shape:
 two simple tables, one link.)
 
 The model brought three gifts. **Simplicity:** there is exactly one
-shape to learn — the table. **Flexibility:** because data is not
+shape to learn, the table. **Flexibility:** because data is not
 locked into pre-built paths, you can pose brand-new questions at
 any time just by writing a new query. **No duplication:** each fact
-is stored once and *referenced* everywhere else — the cure for the
+is stored once and *referenced* everywhere else, the cure for the
 "copies that disagree" nightmare from the previous page.
 
 <Callout type="info" title='Why the name "relational"?'>
 A common guess is that "relational" refers to the relationships
-between tables. Reasonable — but the name actually comes from
+between tables. Reasonable, but the name actually comes from
 mathematics, where a **relation** is essentially a table of rows.
 The relationships are real and important either way; the name just
 honors the math.
@@ -78,8 +78,8 @@ honors the math.
 
 ## SEQUEL, the trademark, and the race IBM lost
 
-Codd's paper was theory. Someone had to build it. IBM — which had a
-lucrative non-relational database product to protect — moved
+Codd's paper was theory. Someone had to build it. IBM, which had a
+lucrative non-relational database product to protect, moved
 cautiously, but in the mid-1970s its San Jose lab launched a
 research project called **System R** to prove a relational database
 could actually work. Two researchers on the project, **Donald
@@ -98,7 +98,7 @@ you will hear both "sequel" and "S-Q-L," and both are fine.
 
 Meanwhile, the published System R papers were being read very
 carefully in California by a young programmer named **Larry
-Ellison**. His small company — later renamed **Oracle** — raced to
+Ellison**. His small company, later renamed **Oracle**, raced to
 build a commercial implementation and shipped one in **1979**,
 *before* IBM brought its own relational product to market. The
 language born in IBM's research lab made a startup rich first.
@@ -174,12 +174,12 @@ With most programming, you write out every step (the left side).
 With SQL, you simply *state the goal* and the database figures out
 the steps. This style is called **declarative**, and it is a big
 deal for two reasons. First, it is why SQL reads almost like
-English — SEQUEL's founding goal. Second, because you only describe
+English, SEQUEL's founding goal. Second, because you only describe
 the result, the database is free to find the *fastest* way to
 produce it, and to change that strategy as your data grows, without
 you rewriting a single query.
 
-Try it. You will not write any steps below — only the *what*:
+Try it. You will not write any steps below, only the *what*:
 
 <SqlCodeBlock
   dialect="postgres"
@@ -213,10 +213,10 @@ essence of SQL.
 
 One more consequence of the standardization story: because SQL
 became a shared **standard**, the same core language works across
-many database systems — PostgreSQL, MySQL, SQLite, SQL Server,
+many database systems, PostgreSQL, MySQL, SQLite, SQL Server,
 Oracle, and more. Each system adds its own extra features and small
-dialect quirks, but the heart of the language — `SELECT`, `WHERE`,
-`JOIN`, `GROUP BY` — is shared. Learn the fundamentals once and you
+dialect quirks, but the heart of the language, `SELECT`, `WHERE`,
+`JOIN`, `GROUP BY`, is shared. Learn the fundamentals once and you
 can talk to almost any relational database on Earth.
 
 ## Berkeley's answer: from Ingres to Postgres
@@ -228,22 +228,22 @@ from IBM's lab, at the University of California, Berkeley,
 professor **Michael Stonebraker** read Codd's paper and built his
 own relational database in the mid-1970s: **Ingres**. A decade
 later, in 1986, he started a successor project and named it, with
-academic directness, **Postgres** — as in *post-Ingres*. (For this
+academic directness, **Postgres**, as in *post-Ingres*. (For this
 body of work Stonebraker eventually received the Turing Award,
 computing's highest honor.)
 
 Postgres originally spoke its own query language, not SQL. In the
 mid-1990s, two Berkeley graduate students, Andrew Yu and Jolly
 Chen, replaced it with a SQL interpreter and released the result as
-open source. In 1996 the project took its modern name —
-**PostgreSQL** — wearing its whole lineage in one slightly awkward
+open source. In 1996 the project took its modern name,
+**PostgreSQL**, wearing its whole lineage in one slightly awkward
 word: *Postgres*, the post-Ingres project, plus *QL* for the query
 language that conquered the world.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A sturdy three-step stack of blue slabs, darkest at the base, carrying small green and yellow data dots on top — PostgreSQL as a dependable foundation"
+  aria-label="A sturdy three-step stack of blue slabs, darkest at the base, carrying small green and yellow data dots on top, PostgreSQL as a dependable foundation"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="190" y="196" width="260" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -260,12 +260,12 @@ language that conquered the world.
 <Callout type="info" title="How do you say it?">
 Officially: "post-GRES-cue-ell." In practice, nearly everyone just
 says **"Postgres,"** and so does this course. The project's
-elephant mascot even has a name — *Slonik*, from a Russian word for
+elephant mascot even has a name, *Slonik*, from a Russian word for
 a little elephant.
 </Callout>
 
-Today PostgreSQL is **free and open source** — anyone can use it,
-read its code, and run it without paying for a license — and after
+Today PostgreSQL is **free and open source**, anyone can use it,
+read its code, and run it without paying for a license, and after
 decades of continuous development it is one of the most trusted
 databases in the world, running everything from weekend side
 projects to some of the largest applications in existence.
@@ -281,26 +281,26 @@ three reasons that matter specifically to a learner:
 2. **It is strict in the helpful way.** Postgres enforces data
    types and rules carefully, so it teaches good habits and catches
    mistakes early instead of silently accepting bad data.
-3. **It is honest about results.** What you see is what is stored —
+3. **It is honest about results.** What you see is what is stored,
    a great property when you are building a mental model of how
    data behaves.
 
 <Callout type="info" title="You are running real PostgreSQL right now">
-The runnable SQL blocks in this course use **PGlite** — the actual
+The runnable SQL blocks in this course use **PGlite**, the actual
 PostgreSQL engine compiled to run inside your web browser. It is
 not a simplified imitation. When a query works here, it works in a
 "real" PostgreSQL too.
 </Callout>
 
 One scope note: PostgreSQL is a deep system with many operational
-features — replication, backups, performance tuning, security
+features, replication, backups, performance tuning, security
 roles. Those belong to the world of **database administration**,
 and this course deliberately leaves them alone. We are here for the
 foundation: SQL and relational thinking, the layer everything else
 is built on.
 
 Let's confirm the machinery works. The simplest possible query asks
-PostgreSQL to compute something and hand it back — no tables
+PostgreSQL to compute something and hand it back, no tables
 required:
 
 <SqlCodeBlock
@@ -313,7 +313,7 @@ required:
 
 You just ran a query against a direct descendant of Codd's 1970
 idea, in a language descended from SEQUEL, on an engine descended
-from a Berkeley research project — all inside a browser tab. The
+from a Berkeley research project, all inside a browser tab. The
 concepts section starts next, and from here on, you write SQL on
 nearly every page.
 
@@ -372,7 +372,7 @@ A shared standard means your SQL knowledge carries over from one relational data
 - A programming language that competes with SQL.
   > PostgreSQL is a database system that *uses* SQL; it is not itself a programming language competing with SQL.
 - [o] A free, open-source relational database management system that stores tables and runs SQL queries.
-  > That captures it: the software that manages relational data and answers SQL queries, available freely and openly — with a lineage going back to Berkeley's Ingres and Postgres projects.
+  > That captures it: the software that manages relational data and answers SQL queries, available freely and openly, with a lineage going back to Berkeley's Ingres and Postgres projects.
 - A cloud hosting provider.
   > Cloud providers may *offer* PostgreSQL, but PostgreSQL itself is the database software, not a hosting company.
 

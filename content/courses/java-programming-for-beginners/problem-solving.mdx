@@ -17,7 +17,7 @@ math.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Four stations on a thin gray loop — a blue understand dot, a yellow plan diamond, a green do square, and a checked review circle — with small arrowheads carrying the cycle around: understand, plan, carry out, look back"
+  aria-label="Four stations on a thin gray loop, a blue understand dot, a yellow plan diamond, a green do square, and a checked review circle, with small arrowheads carrying the cycle around: understand, plan, carry out, look back"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="140" y="40" width="360" height="150" rx="75" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
@@ -69,7 +69,7 @@ Could it be simpler? If not, revise the plan and loop back.
 </Steps>
 
 These steps look obvious written down. But almost every beginner
-mistake comes from skipping one of them — usually by jumping
+mistake comes from skipping one of them, usually by jumping
 straight to step 3.
 
 ## Step 1: Understand the problem
@@ -80,7 +80,7 @@ of the integers from 1 to n.*
 Before you touch the keyboard, answer:
 
 - **What is the input?** A single positive integer, call it `n`.
-- **What is the output?** A single integer — the sum.
+- **What is the output?** A single integer, the sum.
 - **Tiny example.** If `n = 5`, the output is `15` because
   `1+2+3+4+5 = 15`.
 - **Edge cases.** What if `n = 1`? Output should be `1`. What if `n
@@ -153,7 +153,7 @@ We have a choice: silently return `0`, or refuse and report an
 error. We will learn later (in the chapter on exceptions) how to
 refuse politely.
 
-Is the code as clear as possible? Yes — three lines for three ideas.
+Is the code as clear as possible? Yes, three lines for three ideas.
 
 What about Plan B, the formula? In Java that's literally one line:
 `int sum = n * (n + 1) / 2;`. It is faster (no loop). It is also
@@ -176,9 +176,9 @@ were not stuck on the *algorithm*; you were intimidated by the
 ### Move 2: Talk it through (out loud, even to nobody)
 
 Programmers literally talk to objects on their desks. There is a
-classic technique called **rubber duck debugging** — you explain
+classic technique called **rubber duck debugging**, you explain
 your code, line by line, to a rubber duck. The duck never answers,
-but somehow halfway through you say *"…and then it adds X — wait,
+but somehow halfway through you say *"…and then it adds X, wait,
 that's the bug!"*. The act of forming sentences in plain language
 forces your brain to confront things it was skipping over.
 
@@ -187,7 +187,7 @@ forces your brain to confront things it was skipping over.
 If something doesn't work, do not stare at the whole 50-line
 program. **Strip it down**. Remove everything that is not necessary
 to reproduce the bug. You'll often delete the bug by accident
-halfway through — which itself tells you where the bug was.
+halfway through, which itself tells you where the bug was.
 
 ### Move 4: Take a walk
 
@@ -202,7 +202,7 @@ debugger.
 - Open your editor and start typing
   > That's step 3 of Pólya's method, not step 1.
 - Look up the fastest sorting algorithm
-  > Premature — you don't yet know the problem.
+  > Premature, you don't yet know the problem.
 - [o] Ask clarifying questions: what does "sort" mean here? Sort by what? Where does the data come from? Where should the result go?
   > Understanding the problem comes first.
 - Buy a faster computer
@@ -272,7 +272,7 @@ where N is the number of vowels.`}
 />
 
 (For *Hello, beautiful World!* the vowels are e, o, e, a, u, i, u,
-o — eight of them.)
+o, eight of them.)
 
 <MultipleChoice
   markdown={`What is "rubber duck debugging"?
@@ -289,5 +289,5 @@ o — eight of them.)
 
 You now have a real, repeatable problem-solving method. Use it on
 every challenge in this course. In the next section we finally start
-learning Java in earnest — beginning with what really happens when
+learning Java in earnest, beginning with what really happens when
 you write `int x = 5;`.

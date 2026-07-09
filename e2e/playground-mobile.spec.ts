@@ -40,7 +40,7 @@ function hasNoHorizontalOverflow(page: Page) {
   });
 }
 
-test.describe("SQL playgrounds — mobile layout (390×844)", () => {
+test.describe("SQL playgrounds, mobile layout (390×844)", () => {
   test.use({ viewport: MOBILE, hasTouch: true, isMobile: true });
 
   for (const engine of ENGINES) {
@@ -55,7 +55,7 @@ test.describe("SQL playgrounds — mobile layout (390×844)", () => {
       const tabBar = page.locator(".sql-mobile-tabs");
       const resultsTab = tabBar.getByRole("tab", { name: "Results" });
 
-      // No horizontal page overflow — the core "unusable on mobile" bug.
+      // No horizontal page overflow, the core "unusable on mobile" bug.
       expect(await hasNoHorizontalOverflow(page)).toBe(true);
 
       // Bottom tab bar is the mobile navigation.
@@ -124,7 +124,7 @@ test.describe("SQL playgrounds — mobile layout (390×844)", () => {
 
     // Switching between query tabs runs the per-tab restore (the observer reads
     // each tab's data-tab-id + .active). With no tab holding results, every
-    // activation lands on the Editor — and never on the disabled Results pane.
+    // activation lands on the Editor, and never on the disabled Results pane.
     await tabs.first().click();
     await expect(root).toHaveAttribute("data-mobile-pane", "editor");
     await tabs.last().click();
@@ -132,7 +132,7 @@ test.describe("SQL playgrounds — mobile layout (390×844)", () => {
   });
 });
 
-test.describe("SQL playgrounds — desktop layout unchanged (1280×800)", () => {
+test.describe("SQL playgrounds, desktop layout unchanged (1280×800)", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("sqlite: 3-pane IDE, sidebar inline, no bottom tab bar", async ({

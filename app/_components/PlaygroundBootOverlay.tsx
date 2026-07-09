@@ -3,9 +3,9 @@
 // Full-screen boot overlay shared by every playground (the language
 // playgrounds via <Playground>, the SQL playgrounds via
 // <SqlPlaygroundShell>). It mirrors the <RuntimeBootNotice> used by the
-// embedded code blocks / challenge cards — the brand "assemble + quarter
+// embedded code blocks / challenge cards, the brand "assemble + quarter
 // turn" diamond, a status line, a first-run download hint, and a
-// determinate progress bar — so a multi-second cold start reads the same
+// determinate progress bar, so a multi-second cold start reads the same
 // everywhere. Styling lives in playground.css (`.playground-boot-*`).
 
 import { useEffect, useState, type ReactNode } from "react";
@@ -20,7 +20,7 @@ const BOOT_OVERLAY_FADE_MS = 400;
 /** Minimum time (ms) the boot overlay stays fully visible, measured from
  *  mount, before it is allowed to fade out. On a warm revisit the runtime
  *  is already booted and `loaded` flips within a frame or two; without this
- *  floor the overlay would appear for a single frame and vanish — a jarring
+ *  floor the overlay would appear for a single frame and vanish, a jarring
  *  "blink". Holding it briefly makes re-entering a playground read as a
  *  deliberate transition. Cold boots take far longer than this, so the floor
  *  is a no-op there (the overlay fades the instant boot finishes). */
@@ -87,7 +87,7 @@ function BootTitle({ message }: { message: ReactNode }) {
 
 export interface PlaygroundBootOverlayProps {
   /** Runtime / language name (e.g. "Python"). Retained for call-site
-   *  compatibility — the boot copy no longer names the runtime. */
+   *  compatibility, the boot copy no longer names the runtime. */
   title: string;
   /** Current stage line (the playground's loading caption). */
   statusMessage: ReactNode;
@@ -96,12 +96,12 @@ export interface PlaygroundBootOverlayProps {
   /** Approximate cold download size in MB. */
   downloadMB?: number;
   /** Compiled languages (Java, C, C++, C#). No longer changes the boot
-   *  copy — every runtime now reads "much faster" — but kept so existing
+   *  copy, every runtime now reads "much faster", but kept so existing
    *  call sites still type-check. */
   compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for no bar. */
   fraction?: number | null;
-  /** Render the error state (red, no spinner/bar — just the message). */
+  /** Render the error state (red, no spinner/bar, just the message). */
   error?: boolean;
   /** Extra class on the overlay root (e.g. the SQLite fade-out). */
   className?: string;
@@ -144,7 +144,7 @@ export function PlaygroundBootOverlay({
                 This can take a moment on first load
               </span>
               <span className="playground-boot-hint playground-boot-hint-sub">
-                {downloadMB ? `Downloading (~${downloadMB} MB) — ` : ""}This
+                {downloadMB ? `Downloading (~${downloadMB} MB), ` : ""}This
                 happens once. Later runs are much faster.
               </span>
             </div>

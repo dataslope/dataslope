@@ -3,6 +3,7 @@
 import { BlurFade } from "@/components/ui/blur-fade";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { Highlighter } from "@/components/ui/highlighter";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { AnimationPauseGate } from "./AnimationPauseGate";
 import { HomeNav } from "./HomeNav";
 import { HeroMarquee } from "./HeroMarquee";
@@ -65,7 +66,7 @@ export function HomeClient({
             {/* The visible "heading" is the animated marquee; give screen
                 readers and the document outline a real h1 instead. */}
             <h1 className="sr-only">
-              Dataslope — learn Python, SQL, R, JavaScript and more in your
+              Dataslope, learn Python, SQL, R, JavaScript and more in your
               browser
             </h1>
             <AnimationPauseGate>
@@ -76,14 +77,16 @@ export function HomeClient({
                   immediately understands the product before the interactive
                   demo below. */}
               <BlurFade delay={0.12}>
-                <p className="mx-auto mt-8 max-w-2xl text-center text-lg text-[var(--ds-gray-600)] [text-wrap:pretty] sm:text-xl dark:text-[var(--ds-gray-300)]">
-                  Dataslope is a platform to learn programming and prep for
-                  coding interviews — every course and playground is{" "}
-                  <span className="font-semibold text-[var(--ds-gray-900)] dark:text-white">
-                    100% free
-                  </span>
-                  , interactive, and runs entirely in your browser, no sign-up
-                  required.
+                <p className="mx-auto mt-14 max-w-xl text-center [text-wrap:pretty]">
+                  <AnimatedShinyText className="max-w-none text-[18px] tracking-tight">
+                    Learn programming and prepare for coding interviews. Every
+                    course and playground is 100% free, interactive, and runs
+                    entirely in your browser,{" "}
+                    <Highlighter action="underline" color="#20C621" isView>
+                      no sign-up required
+                    </Highlighter>
+                    .
+                  </AnimatedShinyText>
                 </p>
               </BlurFade>
               <BlurFade delay={0.18}>
@@ -101,7 +104,7 @@ export function HomeClient({
               subtitle={
                 <>
                   Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,
-                  SQLite, Postgres, and DuckDB —{" "}
+                  SQLite, Postgres, and DuckDB,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>
                     free
                   </Highlighter>

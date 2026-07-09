@@ -1,6 +1,6 @@
 ---
 title: Pointers and References
-description: The two ways to name memory in C++ — when to use which, common bugs, and how to picture them.
+description: The two ways to name memory in C++, when to use which, common bugs, and how to picture them.
 ---
 
 A **pointer** holds a memory address. A **reference** is an alias
@@ -9,13 +9,13 @@ for an existing variable. Both are how C++ lets one piece of code
 will use most often once functions and objects start sharing data.
 
 Beginners often find pointers intimidating. Don't be. A pointer is
-just a number — the address of a byte in memory — with a type
+just a number, the address of a byte in memory, with a type
 attached so the compiler knows how to interpret what's there.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two name tags tether down to one blue dot while a small pointer box on the left stores its address and aims a thin arrow at it — references alias an object, pointers hold where it lives"
+  aria-label="Two name tags tether down to one blue dot while a small pointer box on the left stores its address and aims a thin arrow at it, references alias an object, pointers hold where it lives"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -94,13 +94,13 @@ int main() {
 
 Two operators do most of the pointer work:
 
-- `&x` — take the address of `x`. Type: `T*` if `x` is `T`.
-- `*p` — dereference `p` to read or write the pointed-to value.
+- `&x`, take the address of `x`. Type: `T*` if `x` is `T`.
+- `*p`, dereference `p` to read or write the pointed-to value.
 
 ## `nullptr`: the pointer that points to nothing
 
 A pointer that holds the special value `nullptr` does not point at
-any object. Dereferencing it is undefined behavior — usually a
+any object. Dereferencing it is undefined behavior, usually a
 crash. Initialize every pointer to *something* (often `nullptr`)
 and check before dereferencing.
 
@@ -143,7 +143,7 @@ Hoare introduced null into the ALGOL W language in 1965, and in a
 > have probably caused a billion dollars of pain and damage in the
 > last forty years.
 
-C++ inherits the mistake — every pointer type carries a "maybe
+C++ inherits the mistake, every pointer type carries a "maybe
 nothing" state whether you want it or not. The discipline that
 keeps you safe is the same one Hoare wished he had enforced:
 treat "can this be null?" as a question you answer *deliberately*
@@ -250,7 +250,7 @@ int main() {
 
   std::cout << *p << "\\n";       // 10
   std::cout << *(p + 1) << "\\n"; // 20
-  std::cout << p[2] << "\\n";     // 30 — same as *(p + 2)
+  std::cout << p[2] << "\\n";     // 30, same as *(p + 2)
   std::cout << p[4] << "\\n";     // 50
   return 0;
 }
@@ -263,7 +263,7 @@ Pointer arithmetic moves in *steps of the pointed-to type's size*:
 `p + 1` advances by `sizeof(int)` bytes, not by 1 byte. This is
 exactly what makes array indexing work.
 
-In modern C++ we usually prefer `std::vector` over raw arrays — it
+In modern C++ we usually prefer `std::vector` over raw arrays, it
 carries its own size, grows itself, and frees itself. Pointer
 arithmetic is then internal to the implementation, not your daily
 code.
@@ -415,7 +415,7 @@ int main() {
 <ChallengeCard
   adapter="cpp"
   title="Sum a C-array with pointer arithmetic"
-  instructions={`Implement \`int sum(const int* data, int n)\` that returns the sum of the first \`n\` ints starting at \`data\`. Use pointer arithmetic (or indexing — they're equivalent). \`main\` runs the function on \`{1, 2, 3, 4, 5}\` and should print \`15\`.`}
+  instructions={`Implement \`int sum(const int* data, int n)\` that returns the sum of the first \`n\` ints starting at \`data\`. Use pointer arithmetic (or indexing, they're equivalent). \`main\` runs the function on \`{1, 2, 3, 4, 5}\` and should print \`15\`.`}
   files={[
     {
       filename: "main.cpp",
@@ -513,6 +513,6 @@ int main() {
   > Only if \`p\` is invalid; for a valid pointer the syntax is perfectly well-defined.`}
 />
 
-Next: how to ask the operating system for memory you really need —
+Next: how to ask the operating system for memory you really need,
 *dynamic memory* with `new`, `delete`, and the modern-C++ tools
 that automate them.

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
 import { Highlighter } from "@/components/ui/highlighter";
+import { BorderBeam } from "@/components/ui/border-beam";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -11,7 +12,6 @@ import {
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 import { EmbeddedPlayground } from "./EmbeddedPlayground";
-import { useTheme } from "./theme";
 
 const SQL_IDS = new Set(["postgres", "sqlite", "duckdb"]);
 
@@ -54,7 +54,7 @@ function PlaygroundSwitcher({
     >
       <Select.Trigger
         aria-label="Switch playground"
-        className="inline-flex min-w-44 items-center gap-2 rounded-lg border border-[var(--ds-gray-300)] bg-white px-4 py-2 text-sm font-medium text-[var(--ds-gray-800)] shadow-sm transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]"
+        className="relative inline-flex min-w-44 items-center gap-2 rounded-lg border border-[var(--ds-gray-300)] bg-white px-4 py-2 text-sm font-medium text-[var(--ds-gray-800)] shadow-sm transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]"
       >
         {active && <PlaygroundGlyph id={active.id} />}
         <Select.Value className="flex-1 text-left">
@@ -63,6 +63,13 @@ function PlaygroundSwitcher({
         <Select.Icon className="text-[var(--ds-gray-400)]">
           <ChevronDown size={16} />
         </Select.Icon>
+        {/* Green border beam traveling around the selector's edge. */}
+        <BorderBeam
+          size={40}
+          duration={6}
+          colorFrom="var(--ds-green-400)"
+          colorTo="var(--ds-green-600)"
+        />
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner
@@ -93,16 +100,12 @@ function PlaygroundSwitcher({
  *  a link to the full page. */
 export function PlaygroundShowcase() {
   const [playgroundId, setPlaygroundId] = useState("postgres");
-  const { theme } = useTheme();
   const name = languageName(playgroundId);
   const isSql = SQL_IDS.has(playgroundId);
-  // Yellow reads well behind dark text in light mode but washes out behind
-  // the light link text in dark mode, so use brand blue there.
-  const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
 
   const subtitle = isSql
-    ? `A full in-browser SQL workbench — query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
-    : `A full in-browser ${name} playground — write and run real ${name} instantly. Pick any language from the switcher below.`;
+    ? `A full in-browser SQL workbench, query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
+    : `A full in-browser ${name} playground, write and run real ${name} instantly. Pick any language from the switcher below.`;
 
   return (
     <div className="px-4 sm:px-6">
@@ -121,7 +124,7 @@ export function PlaygroundShowcase() {
         <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
       </div>
 
-      <div className="mx-auto max-w-7xl">
+      <div className="group ds-striped-shell ds-striped-shell-green-hover mx-auto max-w-7xl">
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
@@ -130,9 +133,10 @@ export function PlaygroundShowcase() {
           href={playgroundHref(playgroundId)}
           className="group inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
+          <SquareTerminal size={16} aria-hidden="true" />
           <span>
             Open the{" "}
-            <Highlighter action="highlight" color={highlightColor} isView>
+            <Highlighter action="circle" color="#20C621" isView>
               {name}
             </Highlighter>{" "}
             playground

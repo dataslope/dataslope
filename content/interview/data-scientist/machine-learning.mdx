@@ -1,6 +1,6 @@
 ---
 title: Machine Learning
-description: Data Scientist Machine Learning interview questions — bias–variance, regularization, cross-validation, metrics — with answers, concept checks, and a runnable metrics challenge.
+description: Data Scientist Machine Learning interview questions, bias–variance, regularization, cross-validation, metrics, with answers, concept checks, and a runnable metrics challenge.
 ---
 
 Modeling questions probe whether you understand generalization, not just
@@ -15,7 +15,7 @@ metrics challenge.
 error from being too sensitive to the training data (overfitting). Simple
 models → high bias, low variance; flexible models → low bias, high
 variance. The goal is the sweet spot that minimizes total error on unseen
-data — tuned via model complexity, regularization, and more data.
+data, tuned via model complexity, regularization, and more data.
 
 ### How do you detect and fix overfitting?
 
@@ -57,7 +57,7 @@ print("Lasso coefs:", lasso.coef_)  # some may be exactly 0
 ### What is cross-validation and why use it?
 
 Instead of one train/test split, **k-fold CV** rotates which fold is the
-validation set and averages the score — a less noisy, less luck-dependent
+validation set and averages the score, a less noisy, less luck-dependent
 estimate of generalization that also uses all data for both training and
 validation across folds. For time series, use a **forward-chaining**
 split (never validate on the past).
@@ -83,7 +83,7 @@ print(f"CV accuracy: {scores.mean():.3f} ± {scores.std():.3f}")
   ]}
 />
 
-### Precision vs recall — when do you favor each?
+### Precision vs recall, when do you favor each?
 
 **Precision** = of predicted positives, how many were right; **recall** =
 of actual positives, how many you caught. Favor **recall** when misses
@@ -223,7 +223,7 @@ print(f"R²:   {r2_score(y_true, y_pred):.3f}")
 ### What is feature scaling and when is it necessary?
 
 Feature scaling (standardization or min-max normalization) puts features on a comparable scale.
-It is **necessary** for distance-based models — k-Nearest Neighbors (kNN), support vector machines (SVM), k-means — and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
+It is **necessary** for distance-based models, k-Nearest Neighbors (kNN), support vector machines (SVM), k-means, and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
 Tree-based models (decision trees, random forests, GBMs) are **invariant** to monotonic feature transforms and do not require scaling.
 
 The code applies `StandardScaler` to a matrix whose two columns live on
@@ -317,7 +317,7 @@ print("Explained variance ratio:", pca.explained_variance_ratio_.round(3))
 ### What is the curse of dimensionality?
 
 As dimensionality grows, data becomes increasingly sparse: the volume of the space grows exponentially and the nearest neighbor becomes almost as far as the farthest neighbor.
-This hurts distance-based methods — kNN, SVM with a radial basis function (RBF) kernel, k-means — and increases the sample size needed to learn accurate models.
+This hurts distance-based methods, kNN, SVM with a radial basis function (RBF) kernel, k-means, and increases the sample size needed to learn accurate models.
 Remedies include dimensionality reduction (PCA, autoencoders), feature selection, and regularization.
 
 ### What is logistic regression and how does it output probabilities?
@@ -353,8 +353,8 @@ print(f"Test accuracy: {accuracy_score(y_test, model.predict(X_test)):.3f}")
 
 ### What is the difference between a generative and a discriminative model?
 
-A **discriminative model** learns `P(y|x)` directly — the conditional probability of the label given input (logistic regression, SVM, neural nets).
-A **generative model** learns the joint `P(x, y)` or the data distribution per class — Naive Bayes, Gaussian mixture model (GMM) — then applies Bayes' theorem to classify.
+A **discriminative model** learns `P(y|x)` directly, the conditional probability of the label given input (logistic regression, SVM, neural nets).
+A **generative model** learns the joint `P(x, y)` or the data distribution per class, Naive Bayes, Gaussian mixture model (GMM), then applies Bayes' theorem to classify.
 Generative models can generate new data and work better with limited labeled data; discriminative models typically achieve higher classification accuracy with enough labeled data.
 
 ### How does a decision tree split?
@@ -491,8 +491,8 @@ SHAP is preferred for model explanation; tree impurity importance is fine for a 
   markdown={`A model scores 99% accuracy on the training set but 72% on held-out data. Most likely diagnosis?
 
 - Underfitting (high bias).
-  > Underfitting shows poor performance on the training set too — here training accuracy is very high.
-- [o] Overfitting (high variance) — it memorized the training data and generalizes poorly.
+  > Underfitting shows poor performance on the training set too, here training accuracy is very high.
+- [o] Overfitting (high variance), it memorized the training data and generalizes poorly.
   > A large train-vs-test gap is the signature of overfitting; remedies include more data, regularization, or a simpler model.
 - The test set is simply easier than the training set.
   > That would make test accuracy *higher*, not lower.
@@ -503,12 +503,12 @@ SHAP is preferred for model explanation; tree impurity importance is fine for a 
 <MultipleChoice
   markdown={`A fraud classifier sees 1% fraud. A model that predicts "not fraud" for **everything** scores 99% accuracy. What does this illustrate?
 
-- The model is excellent — 99% accuracy is hard to beat.
+- The model is excellent, 99% accuracy is hard to beat.
   > It catches zero fraud; accuracy is high only because the classes are wildly imbalanced.
 - [o] Accuracy misleads on imbalanced data; precision/recall (or F1 / PR-AUC) better reflect performance on the rare class.
-  > With 1% positives, predicting all-negative is 99% accurate yet useless — track recall on the positive class.
+  > With 1% positives, predicting all-negative is 99% accurate yet useless, track recall on the positive class.
 - Precision and recall would also both be high here.
-  > Recall on fraud is 0 and precision is undefined/0 — both expose the failure accuracy hides.
+  > Recall on fraud is 0 and precision is undefined/0, both expose the failure accuracy hides.
 - The fix is to collect less data.
   > Less data doesn't address class imbalance; changing the metric (and possibly resampling/thresholding) does.`}
 />

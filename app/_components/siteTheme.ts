@@ -2,7 +2,7 @@
 // needs to read or set the colour scheme: the home page, the playgrounds, and
 // (by virtue of the same contract) the Fumadocs-powered /learn route.
 //
-// Contract — identical to what next-themes/Fumadocs use, so the choice is
+// Contract, identical to what next-themes/Fumadocs use, so the choice is
 // shared across routes and across same-origin documents (e.g. the home page
 // and its embedded playground iframe):
 //   - persisted under localStorage["theme"] ("light" | "dark"), and
@@ -59,7 +59,7 @@ export function setSiteTheme(theme: SiteTheme): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, theme);
   } catch {
-    /* private mode / quota — class + event still update below */
+    /* private mode / quota, class + event still update below */
   }
   applySiteThemeClass(theme);
   if (typeof window !== "undefined") {

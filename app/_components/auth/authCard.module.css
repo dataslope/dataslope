@@ -1,4 +1,4 @@
-/* Sign-in / registration — "2a Compact, refined" (Claude Design handoff).
+/* Sign-in / registration, "2a Compact, refined" (Claude Design handoff).
  *
  * A flat, shadowless, borderless auth card: filled fields with floating
  * labels, an underline tab switcher, and a 2-column social row. Every value
@@ -9,7 +9,7 @@
  * page's THEME_BOOTSTRAP), so no JS theme read is needed and there's no flash.
  * We deliberately use a CSS module (the repo's convention for bespoke UI)
  * rather than Tailwind so this route needs neither tailwind.css nor an @source
- * glob to render — its styling is fully self-contained. */
+ * glob to render, its styling is fully self-contained. */
 
 .page {
   --page-bg: #ffffff;
@@ -89,7 +89,7 @@
   border-radius: 20px;
   background: var(--card-bg);
   padding: 40px 38px;
-  /* No box-shadow, no border — a deliberate flat treatment. */
+  /* No box-shadow, no border, a deliberate flat treatment. */
 }
 
 .stack {

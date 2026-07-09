@@ -1,5 +1,5 @@
 /**
- * Shared intellisense wiring — pure-logic tests exercised through real
+ * Shared intellisense wiring, pure-logic tests exercised through real
  * CodeMirror `EditorState`/`CompletionContext` instances (no DOM
  * needed): the member-position guard that keeps static keyword lists
  * out of `pd.|`-style positions, the PHP `$variable` document scanner,
@@ -55,7 +55,7 @@ describe("inMemberPosition", () => {
       ),
     ).toBe(true);
     const scope = "std::so";
-    // `::` extends into the cpp word regex? No — cpp words are \w only,
+    // `::` extends into the cpp word regex? No, cpp words are \w only,
     // so the token is "so" and the text before it ends with "::".
     expect(
       inMemberPosition(
@@ -139,7 +139,7 @@ describe("profiles", () => {
 
   it("keeps trigger endings within member endings", () => {
     // A trigger that isn't also a member ending would auto-open a popup
-    // in which the static keyword lists then fire — the exact noise the
+    // in which the static keyword lists then fire, the exact noise the
     // guard exists to prevent.
     for (const [id, profile] of Object.entries(PROFILES)) {
       for (const trigger of profile.triggerEndings) {

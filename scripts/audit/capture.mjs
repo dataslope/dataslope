@@ -25,7 +25,7 @@ await page.screenshot({ path: `${OUT}/07-dark-lesson.png` });
 // Reset to light
 await page.evaluate(() => { localStorage.setItem("theme","light"); });
 
-// Mobile viewport — lesson + nav
+// Mobile viewport, lesson + nav
 const m = await ctx.newPage();
 await m.setViewportSize({ width: 390, height: 844 });
 await m.goto(`${BASE}/learn/python-basics/hello-world`, { waitUntil: "domcontentloaded" });

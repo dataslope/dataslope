@@ -1,6 +1,6 @@
 ---
 title: Mapping vs. Setting
-description: The single most common ggplot2 confusion — putting a property inside aes() versus outside it — explained with a clear mental model.
+description: The single most common ggplot2 confusion, putting a property inside aes() versus outside it, explained with a clear mental model.
 ---
 
 This page covers the mistake *every* ggplot2 learner makes at least
@@ -46,9 +46,9 @@ once. It is worth its own page because once it clicks, a whole class of
 There are two completely different things you might want to do with a
 visual property like color:
 
-1. **Map** it — let a *column* control it, so the value varies row by
+1. **Map** it, let a *column* control it, so the value varies row by
    row. → goes **inside** `aes()`.
-2. **Set** it — fix it to a *constant*, the same for every mark. →
+2. **Set** it, fix it to a *constant*, the same for every mark. →
    goes **outside** `aes()`.
 
 ```mermaid
@@ -79,7 +79,7 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 `color = "blue"` lives in `geom_point()`, *outside* `aes()`. Result:
-every point is exactly blue, and there is **no legend** — because no
+every point is exactly blue, and there is **no legend**, because no
 variable is being encoded.
 
 ## Mapping: a column controls it
@@ -104,7 +104,7 @@ ggplot(mpg, aes(displ, hwy, color = drv)) +
 
 Here color varies with `drv`, ggplot2 chooses the palette via a scale,
 and a legend appears automatically. *You do not get to pick the exact
-colors here* — that is the scale's job (a later chapter).
+colors here*, that is the scale's job (a later chapter).
 
 ## The classic bug
 
@@ -126,7 +126,7 @@ ggplot(mpg, aes(displ, hwy, color = "blue")) +
   ]}
 />
 
-Run it. The points are **red (or salmon), not blue** — and there is a
+Run it. The points are **red (or salmon), not blue**, and there is a
 useless legend labeled `"blue"`.
 
 Why? Because everything inside `aes()` is interpreted as **data to be
@@ -173,7 +173,7 @@ print(p_fixed)
 
 ## Does this apply to all aesthetics? Yes.
 
-The same rule governs `size`, `shape`, `alpha`, `fill` — everything:
+The same rule governs `size`, `shape`, `alpha`, `fill`, everything:
 
 - `geom_point(size = 4)` → every point size 4 (setting).
 - `aes(size = cty)` → size varies with `cty`, legend appears (mapping).
@@ -243,10 +243,10 @@ a constant inside \`aes()\` by mistake.`}
 
 ## Key takeaways
 
-- **Map** (inside `aes()`) when a *column* should control a property —
+- **Map** (inside `aes()`) when a *column* should control a property,
   the value varies per row and a legend appears.
 - **Set** (outside `aes()`, as a geom argument) when you want a
-  *constant* — applied literally, no legend.
+  *constant*, applied literally, no legend.
 - Everything **inside `aes()` is treated as data**. A constant placed
   there becomes a bogus one-category variable.
 - A legend labeled with a literal value (like `"blue"`) is the

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Users section of the admin dashboard — list, plan-switch, impersonate,
+ * Users section of the admin dashboard, list, plan-switch, impersonate,
  * ban, and remove accounts. Presentation follows the soft design kit in
  * `_components/shared.tsx` (borderless panels, hairline dividers, quiet
  * ghost actions); on small screens the table becomes a stacked card list,
@@ -10,14 +10,14 @@
  * Security model (matches the codebase's "auth gates actions, not content"
  * rule): this page is a normal client component reading the session via
  * `useSession()`, so it can stay statically prerendered like /account. The real
- * authorization happens *server-side* — every `authClient.admin.*` call hits a
+ * authorization happens *server-side*, every `authClient.admin.*` call hits a
  * Better Auth endpoint that rejects non-admins (see the `admin` plugin in
  * lib/auth/server.ts). So a non-admin who opens /admin just sees an
  * access-denied notice and can't read or mutate anything.
  *
  * "Remove" is a hard delete: it drops the user row, which cascades to their
  * sessions + accounts (ON DELETE CASCADE in migrations/0001) and frees the
- * unique email — so the person can immediately sign up again with OAuth or
+ * unique email, so the person can immediately sign up again with OAuth or
  * email/password. "Ban" is the soft alternative: blocks sign-in but keeps the
  * row (and the email) occupied. "Impersonate" becomes that user in this
  * browser (refused for admins server-side); return to /admin to stop.
@@ -91,7 +91,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 export function UsersClient() {
   const { data: session, isPending: sessionPending } = useSession();
   const [users, setUsers] = useState<AdminUser[]>([]);
-  // Total matching accounts as reported by the server — the table may hold
+  // Total matching accounts as reported by the server, the table may hold
   // more rows than one page, so `users.length` alone under-reports.
   const [total, setTotal] = useState(0);
   const [searchTruncated, setSearchTruncated] = useState(false);
@@ -113,7 +113,7 @@ export function UsersClient() {
   /**
    * Load the first page (no search) or the search results. Search runs
    * SERVER-side: filtering the loaded page client-side would silently hide
-   * every account older than the newest LIST_LIMIT — with enough sign-ups an
+   * every account older than the newest LIST_LIMIT, with enough sign-ups an
    * admin couldn't find (or ban) an old account at all. The endpoint searches
    * one field per request, so a query fans out to email + name and merges.
    */
@@ -147,7 +147,7 @@ export function UsersClient() {
 
       const failed = responses.find((r) => r.error)?.error;
       if (failed) {
-        // 401/403 means "signed in but not an admin" — show a distinct notice.
+        // 401/403 means "signed in but not an admin", show a distinct notice.
         if (failed.status === 401 || failed.status === 403) {
           setDenied(true);
         } else {
@@ -389,7 +389,7 @@ export function UsersClient() {
     </div>
   );
 
-  // Role display + toggle. Demoting is the explicit revocation path — the
+  // Role display + toggle. Demoting is the explicit revocation path, the
   // ADMIN_EMAILS/ADMIN_USER_IDS allowlists only ever *grant* (a listed user
   // is re-promoted at their next sign-in), so removal from the env list must
   // be paired with a demotion here. Self is excluded: locking yourself out
@@ -537,7 +537,7 @@ export function UsersClient() {
               : query.trim()
                 ? `${users.length} ${users.length === 1 ? "match" : "matches"}${
                     searchTruncated
-                      ? " (more exist — narrow the search)"
+                      ? " (more exist, narrow the search)"
                       : ""
                   }`
                 : users.length < total
@@ -695,12 +695,12 @@ export function UsersClient() {
             sign-in but keeps the account.{" "}
             <strong className="font-medium text-foreground">Plan</strong> and{" "}
             <strong className="font-medium text-foreground">Role</strong>{" "}
-            changes (and bans) reach the AI and admin endpoints immediately —
-            they read the session fresh — but the person&apos;s
+            changes (and bans) reach the AI and admin endpoints immediately,
+            they read the session fresh, but the person&apos;s
             header/account display can lag up to five minutes (the session
             cookie cache). Demoting an admin who is still listed in
             ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in
-            — remove them from the config too.
+, remove them from the config too.
           </p>
         </PanelBody>
       </Panel>

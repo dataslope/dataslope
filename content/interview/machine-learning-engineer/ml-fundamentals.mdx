@@ -1,6 +1,6 @@
 ---
 title: ML Fundamentals
-description: Machine Learning Engineer interview questions on supervised vs unsupervised learning, bias–variance, regularization, and data splits — with a runnable metric challenge.
+description: Machine Learning Engineer interview questions on supervised vs unsupervised learning, bias–variance, regularization, and data splits, with a runnable metric challenge.
 ---
 
 Machine Learning Engineer screens pair coding with machine learning
@@ -11,9 +11,9 @@ metric.
 
 ### Supervised vs unsupervised vs reinforcement learning?
 
-- **Supervised** — learn a mapping from inputs to **labeled** outputs (classification, regression).
-- **Unsupervised** — find structure in **unlabeled** data (clustering, dimensionality reduction).
-- **Reinforcement** — an agent learns a policy by maximizing **reward** through trial-and-error interaction.
+- **Supervised**, learn a mapping from inputs to **labeled** outputs (classification, regression).
+- **Unsupervised**, find structure in **unlabeled** data (clustering, dimensionality reduction).
+- **Reinforcement**, an agent learns a policy by maximizing **reward** through trial-and-error interaction.
 
 ### Explain the bias–variance trade-off.
 
@@ -50,9 +50,9 @@ print(f"Train: {len(X_train)}  Val: {len(X_val)}  Test: {len(X_test)}")
   ]}
 />
 
-This calls `train_test_split` twice — first carving off a 20% `X_test`
+This calls `train_test_split` twice, first carving off a 20% `X_test`
 hold-out, then splitting the remainder so `X_val` is another 20% of the
-original — yielding a 60/20/20 train/validation/test partition.
+original, yielding a 60/20/20 train/validation/test partition.
 
 ### L1 vs L2 regularization?
 
@@ -91,7 +91,7 @@ zeroes out the uninformative features, leaving a sparse model.
 ### What is data leakage, and how do you prevent it?
 
 Leakage is when information unavailable at prediction time sneaks into
-training — e.g. fitting a scaler on the **full** dataset before splitting,
+training, e.g. fitting a scaler on the **full** dataset before splitting,
 or using a feature that's a proxy for the label. It inflates offline
 metrics and collapses in production. Prevent it by fitting all transforms
 on the **training split only** and auditing features for target leakage.
@@ -144,7 +144,7 @@ model complexity without adding a penalty term to the loss.
 
 ### What is overfitting and how do you combat it?
 
-Overfitting occurs when a model memorizes training data — low training
+Overfitting occurs when a model memorizes training data, low training
 error, high validation error. Remedies include: getting more data,
 reducing model capacity, adding L1/L2 regularization, using dropout or
 batch normalization, applying data augmentation, and using early stopping.
@@ -152,7 +152,7 @@ batch normalization, applying data augmentation, and using early stopping.
 ### What is underfitting?
 
 Underfitting is when a model is too simple to capture the underlying
-pattern — both training and validation errors are high. Remedies include
+pattern, both training and validation errors are high. Remedies include
 increasing model capacity, training longer, reducing regularization
 strength, and engineering better features.
 
@@ -201,10 +201,10 @@ print(f"True theta:    {true_theta}")
 
 ### What is the difference between batch gradient descent, SGD, and mini-batch GD?
 
-**Batch GD** computes the exact gradient over all examples — stable but
-slow and memory-intensive. **SGD** uses one example — fast and noisy,
+**Batch GD** computes the exact gradient over all examples, stable but
+slow and memory-intensive. **SGD** uses one example, fast and noisy,
 which can help escape local minima, but variance is high. **Mini-batch GD**
-averages gradients over a small batch (e.g., 32–512 examples) — the
+averages gradients over a small batch (e.g., 32–512 examples), the
 practical default that balances noise, speed, and hardware utilization.
 
 ### How do you choose the learning rate?
@@ -219,7 +219,7 @@ tests (plotting loss vs. log LR) help find a good starting value.
 
 **Precision** asks, of all predicted positives, how many are correct.
 **Recall** asks, of all actual positives, how many did we catch. **F1** is
-the harmonic mean of precision and recall — useful when you want a single
+the harmonic mean of precision and recall, useful when you want a single
 metric that balances both. Choose precision when false positives are
 costly; choose recall when false negatives are. The four outcomes come
 from the confusion matrix:
@@ -289,9 +289,9 @@ PR-AUC, letting you compare a ranking on the same predictions.
 
 ### What is the difference between RMSE, MAE, and R²?
 
-**RMSE** (root mean squared error) penalizes large errors heavily —
+**RMSE** (root mean squared error) penalizes large errors heavily,
 sensitive to outliers. **MAE** (mean absolute error) treats all errors
-equally — more robust to outliers. **$R^2$** (coefficient of
+equally, more robust to outliers. **$R^2$** (coefficient of
 determination) measures the fraction of variance explained by the model;
 1.0 is perfect, 0.0 means the model is no better than predicting the mean.
 
@@ -329,8 +329,8 @@ X_train_scaled = scaler.fit_transform(X_train)  # fit only on train
 X_val_scaled   = scaler.transform(X_val)         # apply same transform
 X_test_scaled  = scaler.transform(X_test)
 
-print(f"Before scaling — mean: {X_train[:, 0].mean():.3f}  std: {X_train[:, 0].std():.3f}")
-print(f"After  scaling — mean: {X_train_scaled[:, 0].mean():.3f}  std: {X_train_scaled[:, 0].std():.3f}")
+print(f"Before scaling, mean: {X_train[:, 0].mean():.3f}  std: {X_train[:, 0].std():.3f}")
+print(f"After  scaling, mean: {X_train_scaled[:, 0].mean():.3f}  std: {X_train_scaled[:, 0].std():.3f}")
 `,
     },
   ]}
@@ -338,7 +338,7 @@ print(f"After  scaling — mean: {X_train_scaled[:, 0].mean():.3f}  std: {X_trai
 
 Note that `scaler.fit_transform` learns the mean and standard deviation
 from `X_train` only, then `scaler.transform` reuses those statistics on
-`X_val` and `X_test` — the discipline that prevents leakage from the
+`X_val` and `X_test`, the discipline that prevents leakage from the
 hold-out sets back into training.
 
 ### What is one-hot encoding?
@@ -385,9 +385,9 @@ choice of algorithm.
 
 Ensembles combine multiple models to reduce error. **Bagging** (e.g.,
 Random Forest) trains each model on a bootstrap sample independently and
-averages predictions — primarily reduces variance. **Boosting** (e.g.,
+averages predictions, primarily reduces variance. **Boosting** (e.g.,
 Gradient Boosting, XGBoost) trains models sequentially, each correcting
-the errors of the previous one — primarily reduces bias, but can overfit
+the errors of the previous one, primarily reduces bias, but can overfit
 if not regularized.
 
 ### How does a Random Forest differ from a single decision tree?
@@ -444,7 +444,7 @@ print(f"First 5 probabilities: {y_prob[:5].round(3)}")
 
 `clf.predict` returns the hard 0/1 labels for `accuracy_score`, while
 `clf.predict_proba(...)[:, 1]` exposes the underlying sigmoid
-probabilities for the positive class — the raw output before thresholding.
+probabilities for the positive class, the raw output before thresholding.
 
 ### What is the difference between a parametric and a non-parametric model?
 
@@ -459,7 +459,7 @@ models are faster at inference; non-parametric ones can be more flexible.
 To predict for a new point, kNN finds the k training examples closest in
 feature space (by a distance metric, usually Euclidean) and returns their
 majority class (classification) or mean (regression). It is instance-based
-and non-parametric — no explicit training step. Performance degrades in
+and non-parametric, no explicit training step. Performance degrades in
 high dimensions (curse of dimensionality) and scales poorly at inference.
 
 ### What is k-means clustering?
@@ -510,12 +510,12 @@ those two components retain.
 
 ### Name common activation functions and their trade-offs.
 
-**Sigmoid** squashes to `(0, 1)` but saturates — prone to vanishing
+**Sigmoid** squashes to `(0, 1)` but saturates, prone to vanishing
 gradients. **Tanh** squashes to `(-1, 1)`, zero-centred but still
 saturates. **ReLU** (`max(0, x)`) is fast and avoids saturation for
 positive inputs but "dies" at zero for negative inputs. **Leaky ReLU**
 and **ELU** fix the dying-neuron problem. **Softmax** normalizes a vector
-to a probability distribution — used in the output layer for
+to a probability distribution, used in the output layer for
 multi-class classification.
 
 ### What is the vanishing gradient problem?
@@ -529,8 +529,8 @@ normalization, and careful weight initialization (He, Xavier).
 ### What are embeddings?
 
 Embeddings are dense, low-dimensional vector representations of
-discrete entities (words, users, items, categories). They are learned —
-either as a dedicated layer or as part of a larger model — so that similar
+discrete entities (words, users, items, categories). They are learned,
+either as a dedicated layer or as part of a larger model, so that similar
 entities map to nearby vectors. Word2Vec, GloVe, and transformer-based
 embeddings are common; collaborative filtering also learns user/item
 embeddings for recommendation.
@@ -548,7 +548,7 @@ triplet loss depending on the task structure.
 Cross-entropy measures the dissimilarity between the predicted probability
 distribution and the true label distribution. For classification, MSE
 treats label differences as distances, while cross-entropy directly
-penalizes confident wrong predictions much harder — giving larger gradients
+penalizes confident wrong predictions much harder, giving larger gradients
 when the model is wrong and confident, leading to faster convergence.
 
 ### How does a support vector machine (SVM) work?
@@ -567,7 +567,7 @@ effective in high dimensions but slow on large datasets.
 
 - You increased bias.
   > A more flexible model has *lower* bias; near-zero train error reflects low bias.
-- [o] You decreased bias but increased variance — the flexible model now overfits.
+- [o] You decreased bias but increased variance, the flexible model now overfits.
   > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
 - Both bias and variance decreased.
   > If both fell, validation error would improve, not rise.
@@ -581,7 +581,7 @@ effective in high dimensions but slow on large datasets.
 - L2 (ridge).
   > L2 shrinks coefficients toward zero but rarely exactly to zero.
 - [o] L1 (lasso).
-  > The L1 penalty's geometry produces sparse solutions — some coefficients become exactly zero (feature selection).
+  > The L1 penalty's geometry produces sparse solutions, some coefficients become exactly zero (feature selection).
 - Neither can zero out coefficients.
   > L1 specifically can; that's its defining property versus L2.
 - Both zero out coefficients equally.

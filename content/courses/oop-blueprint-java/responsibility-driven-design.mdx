@@ -1,13 +1,13 @@
 ---
 title: Responsibility-Driven Design
-description: How to decide *which* object should know what and do what — the central skill of OOP modeling
+description: How to decide *which* object should know what and do what, the central skill of OOP modeling
 ---
 
 You have learned the *mechanics* of classes, interfaces, inheritance,
 and polymorphism. None of that helps if you don't know *which class
 should exist* or *which class should hold which behavior*. That
 deciding skill is **responsibility-driven design**, and it's the
-hardest — and most rewarding — part of OOP.
+hardest, and most rewarding, part of OOP.
 
 Responsibility-driven design was named by **Rebecca Wirfs-Brock** in
 the late 1980s. The whole idea fits in one sentence:
@@ -22,7 +22,7 @@ it ask for help*?"
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three index cards, each with a name bar and a few responsibility bars, fanned at slight angles — responsibility-driven design with CRC cards"
+  aria-label="Three index cards, each with a name bar and a few responsibility bars, fanned at slight angles, responsibility-driven design with CRC cards"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" transform="rotate(-8 150 120)">
@@ -65,12 +65,12 @@ acting as a central coordinator and should probably be broken up.
 
 <IllustrationPrompt subject="Kent Beck and Ward Cunningham, who introduced CRC cards" photo />
 
-The classic tool for this style of thinking is the **CRC card** —
+The classic tool for this style of thinking is the **CRC card**,
 *Class–Responsibility–Collaborator*. Kent Beck and Ward Cunningham
 introduced CRC cards in a 1989 OOPSLA paper with the disarming title
 "A Laboratory for Teaching Object-Oriented Thinking"; they had been
 using actual index cards to teach object design at Tektronix, and
-discovered that the physical card was the point — you can pick a
+discovered that the physical card was the point, you can pick a
 class up, wave it around while talking about it, and its small size
 *forces* the responsibilities to stay few. Wirfs-Brock then made the
 cards a centerpiece of responsibility-driven design. Each card has
@@ -93,7 +93,7 @@ the responsibility list spills off the card, the class is too big.
 
 ## A worked modeling example
 
-Let's design — on cards, before code — a simple **coffee shop order
+Let's design, on cards, before code, a simple **coffee shop order
 system**. From the description:
 
 > A customer chooses one or more drinks from the menu. The system
@@ -118,7 +118,7 @@ A reasonable set of cards might look like:
 
 | Class | Responsibilities | Collaborators |
 | --- | --- | --- |
-| `Drink` | Know its name and price | — |
+| `Drink` | Know its name and price |, |
 | `Menu` | Know which drinks are offered; look one up by name | `Drink` |
 | `LineItem` | Know a drink and a quantity; compute its subtotal | `Drink` |
 | `Order` | Hold a list of line items; compute total; know if paid | `LineItem` |
@@ -297,7 +297,7 @@ flowchart LR
 
 Look at this `Util.tax(invoice)` method. It looks like it operates on
 an `Invoice`, but every line is poking at `Invoice`'s fields. The
-behavior *envies* the data — it wants to live on `Invoice`.
+behavior *envies* the data, it wants to live on `Invoice`.
 
 <CodeBlock
   adapter="java"
@@ -370,7 +370,7 @@ class Invoice {
 Five lines of code moved, but the design is dramatically better.
 `Invoice` now owns both its data *and* the rules about its data. The
 caller no longer has to know the tax formula. Tomorrow's "Belgian
-invoices have a different rate" change happens in `Invoice` — not in
+invoices have a different rate" change happens in `Invoice`, not in
 every caller.
 
 ## The "tell, don't ask" rule of thumb
@@ -388,7 +388,7 @@ flowchart TD
 ```
 
 The "tell" form lets the object enforce its own rules. The "ask" form
-forces callers to re-implement those rules consistently — which they
+forces callers to re-implement those rules consistently, which they
 won't.
 
 ## Practice

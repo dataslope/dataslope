@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-// TypeScript language service in a dedicated Web Worker — the
+// TypeScript language service in a dedicated Web Worker, the
 // intellisense backend for the JavaScript and TypeScript editors.
 //
 // This is deliberately a *separate* worker from the almostnode execution
@@ -101,7 +101,7 @@ async function fetchLibClosure(seed: string[]): Promise<void> {
 function ensureLibs(): Promise<void> {
   if (!libsPromise) {
     // The target-derived default lib (`lib.es2022.full.d.ts`) references
-    // the whole ES chain plus DOM — which supplies console/fetch/timers,
+    // the whole ES chain plus DOM, which supplies console/fetch/timers,
     // matching what almostnode actually provides at runtime.
     libsPromise = fetchLibClosure([
       ts.getDefaultLibFileName(COMPILER_OPTIONS),
@@ -119,7 +119,7 @@ function ensureLibs(): Promise<void> {
 // When the cursor sits in a .tsx/.jsx file, lazily mount the pinned
 // @types/react graph at node_modules paths so Node10 module resolution
 // finds real typings for `react`, `react/jsx-runtime`, and
-// `react-dom/client` — hook signatures, prop checking, JSX intrinsics.
+// `react-dom/client`, hook signatures, prop checking, JSX intrinsics.
 // The set is closed (verified against the published packages): the only
 // out-of-package imports are csstype (from @types/react) and react
 // (from @types/react-dom). Best-effort like the libs: a failed fetch
@@ -199,7 +199,7 @@ const COMPILER_OPTIONS: tsModule.CompilerOptions = {
   allowSyntheticDefaultImports: true,
   // The React playground shares this worker for .tsx/.jsx entries; the
   // option only changes how those extensions parse, so the JS/TS
-  // adapters are unaffected. (React's own typings aren't fetched — DOM
+  // adapters are unaffected. (React's own typings aren't fetched, DOM
   // and local-workspace completions still work inside components.)
   jsx: ts.JsxEmit.ReactJSX,
   noEmit: true,
@@ -254,7 +254,7 @@ const MAX_COMPLETIONS = 300;
 
 async function complete(msg: InMessage): Promise<void> {
   await ensureLibs();
-  // JSX entries additionally get the React typings — best-effort, so a
+  // JSX entries additionally get the React typings, best-effort, so a
   // CDN hiccup degrades to DOM/workspace completions instead of none.
   if (/\.(tsx|jsx)$/i.test(msg.entry)) {
     await ensureReactTypes().catch(() => {});
@@ -272,7 +272,7 @@ async function complete(msg: InMessage): Promise<void> {
   for (const entry of info.entries) {
     // Entries with bespoke replacement ranges (optional-chain fixups,
     // string-literal rewrites, …) don't fit the simple prefix-replace
-    // contract of `LanguageRuntime.complete` — drop them.
+    // contract of `LanguageRuntime.complete`, drop them.
     if (entry.replacementSpan) continue;
     if (entry.kind === "warning") continue;
     completions.push({

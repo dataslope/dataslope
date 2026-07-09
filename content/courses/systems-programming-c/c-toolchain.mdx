@@ -1,6 +1,6 @@
 ---
 title: The C Toolchain
-description: Preprocessor, compiler, assembler, and linker — how a .c file becomes a runnable binary
+description: Preprocessor, compiler, assembler, and linker, how a .c file becomes a runnable binary
 ---
 
 A C program is not "interpreted." It goes through four well-defined
@@ -26,12 +26,12 @@ flowchart TD
 ```
 
 In one `clang hello.c -o hello` command, the driver actually runs all
-four stages in sequence — but you can stop after any one of them.
+four stages in sequence, but you can stop after any one of them.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A source sheet transforms along four thin arrows: into a taller merged sheet with a yellow pasted chip, a jagged blue assembly shard, a grid of green object squares with one gray unresolved hole, and finally a solid green runnable block with a play mark — the four stages of the C toolchain"
+  aria-label="A source sheet transforms along four thin arrows: into a taller merged sheet with a yellow pasted chip, a jagged blue assembly shard, a grid of green object squares with one gray unresolved hole, and finally a solid green runnable block with a play mark, the four stages of the C toolchain"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -103,10 +103,10 @@ four stages in sequence — but you can stop after any one of them.
 The preprocessor is a *text* engine. It runs before the compiler and
 handles every line that starts with `#`:
 
-- `#include <foo.h>` — paste the contents of `foo.h` here.
-- `#define MAX 100` — replace every occurrence of `MAX` with `100`.
-- `#ifdef DEBUG` / `#endif` — keep or drop the enclosed lines.
-- `#pragma once` — non-standard but widely supported include guard.
+- `#include <foo.h>`, paste the contents of `foo.h` here.
+- `#define MAX 100`, replace every occurrence of `MAX` with `100`.
+- `#ifdef DEBUG` / `#endif`, keep or drop the enclosed lines.
+- `#pragma once`, non-standard but widely supported include guard.
 
 It does **not** understand C syntax. It is just a smart find-and-
 replace pass.
@@ -131,7 +131,7 @@ int main(void) {
 />
 
 After preprocessing, `SQUARE(n)` literally becomes `((n) * (n))`. The
-outer parentheses are not decorative — they prevent surprises when
+outer parentheses are not decorative, they prevent surprises when
 the macro is used in expressions like `SQUARE(a + b)`.
 
 <Callout type="warn" title="Macros are textual, not function calls">
@@ -150,8 +150,8 @@ Because `#include` is just text substitution, including the same
 header twice would re-declare everything and break the build. Two
 fixes exist:
 
-1. **Include guards** — the classic `#ifndef X / #define X / #endif`.
-2. **`#pragma once`** — a one-liner supported by every modern compiler.
+1. **Include guards**, the classic `#ifndef X / #define X / #endif`.
+2. **`#pragma once`**, a one-liner supported by every modern compiler.
 
 ```c
 // shapes.h
@@ -178,18 +178,18 @@ aggressively it does this.
 
 The assembler is the simplest stage: it translates human-readable
 assembly into a binary object file (`.o` on Unix-like systems, `.obj`
-on Windows). Object files contain machine code plus *symbols* — names
+on Windows). Object files contain machine code plus *symbols*, names
 the linker can resolve.
 
 ## Stage 4: linking
 
 The linker stitches multiple object files together. It also pulls in
 standard libraries (libc for `printf`, libm for `sqrt`, etc.) and
-resolves *undefined symbols* — references that one object file makes
+resolves *undefined symbols*, references that one object file makes
 to functions defined in another.
 
 <Callout type="info" title="Why is the default output called a.out?">
-If you link without `-o`, the executable is named `a.out` — short for
+If you link without `-o`, the executable is named `a.out`, short for
 *assembler output*. The name comes from the assembler on the PDP-7
 that the first version of Unix was built on around 1969, where it was
 the fixed name of the assembler's output file. The file *format*
@@ -222,7 +222,7 @@ linker.
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="A bridge deck built inward from both banks stops short in the middle, and the green missing span hovers above the gap with an arrow showing where it must drop — the linker demanding the one definition that resolves an undefined reference"
+  aria-label="A bridge deck built inward from both banks stops short in the middle, and the green missing span hovers above the gap with an arrow showing where it must drop, the linker demanding the one definition that resolves an undefined reference"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -253,8 +253,8 @@ linker.
 </svg>
 
 <Callout type="info" title="The declaration / definition split">
-A **declaration** says "such a function exists somewhere" — that's
-what headers do. A **definition** is the actual body — that's what
+A **declaration** says "such a function exists somewhere", that's
+what headers do. A **definition** is the actual body, that's what
 `.c` files do. The compiler is happy with declarations; the *linker*
 demands at least one definition per used symbol.
 </Callout>
@@ -305,7 +305,7 @@ int mul(int a, int b) { return a * b; }
 />
 
 Try deleting `mathx.c` from the file tree (you cannot in this widget,
-but imagine it) — you would get an *"undefined reference to add"*
+but imagine it), you would get an *"undefined reference to add"*
 error from the linker, not the compiler. The compiler was happy with
 the declaration in `mathx.h`; the linker had nothing to point those
 calls at.

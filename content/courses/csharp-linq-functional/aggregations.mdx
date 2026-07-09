@@ -1,6 +1,6 @@
 ---
 title: Aggregations
-description: Reducing a sequence to a single value — Count, Sum, Min, Max, Average, and the universal Aggregate
+description: Reducing a sequence to a single value, Count, Sum, Min, Max, Average, and the universal Aggregate
 ---
 
 So far our operators have produced sequences. Aggregations are the
@@ -14,7 +14,7 @@ all of them: `Aggregate`.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A tidy grid of blue dots funnels into one large green circle with three small derived values beside it — a whole sequence collapsed to single values"
+  aria-label="A tidy grid of blue dots funnels into one large green circle with three small derived values beside it, a whole sequence collapsed to single values"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -90,8 +90,8 @@ record Product(string Name, decimal Price, int Stock);
 />
 
 The lambda overloads (`Sum(p => p.Price)`, `Count(p =>
-p.Stock > 0)`) are the same as projecting first and then aggregating
-— just a shortcut.
+p.Stock > 0)`) are the same as projecting first and then aggregating,
+just a shortcut.
 
 ## Empty-sequence behavior
 
@@ -108,7 +108,7 @@ Aggregations on empty sequences are a famous source of bugs.
 
 The pattern is: if the operator has a meaningful answer for "no
 elements" (count is 0, sum is 0), it returns that. If not, it
-throws — and you can usually pick a `…OrDefault` variant if you
+throws, and you can usually pick a `…OrDefault` variant if you
 want a sentinel.
 
 <CodeBlock
@@ -148,8 +148,8 @@ It's a useful trick for "give me the min, or zero".
 `Aggregate` (sometimes called `fold` or `reduce` elsewhere) is the
 general form. You give it:
 
-1. A **seed** — the starting accumulator value.
-2. An **accumulator function** — `(acc, element) => newAcc`.
+1. A **seed**, the starting accumulator value.
+2. An **accumulator function**, `(acc, element) => newAcc`.
 3. Optionally, a **result selector** that turns the final accumulator
    into the answer.
 
@@ -193,7 +193,7 @@ already, reach for `Aggregate`.
 ## Aggregating into a richer accumulator
 
 The accumulator doesn't have to be a simple type. It can be a tuple,
-record, or even a collection — useful when you want to compute
+record, or even a collection, useful when you want to compute
 several things in one pass.
 
 <CodeBlock
@@ -223,7 +223,7 @@ Console.WriteLine($"mean={mean:F2}  variance={var:F2}");
 
 One pass through `nums`, five quantities computed. Compared with five
 separate `Sum/Min/Max/Count/Sum` calls (which would walk the source
-five times), this is potentially much more efficient — though for
+five times), this is potentially much more efficient, though for
 small in-memory collections the difference is negligible.
 
 ## `Aggregate` is not always the best choice
@@ -272,7 +272,7 @@ returns a single int defined as:
 > add the element. Return the accumulator.
 
 That formula is a classic polynomial-rolling hash. Implement it
-with \`Aggregate\` — no \`foreach\` allowed.`}
+with \`Aggregate\`, no \`foreach\` allowed.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -324,7 +324,7 @@ public static class Checksum
 - Returns 0.
   > It does not return any value; \`Min\` on an empty non-nullable sequence throws.
 - Returns \`int.MinValue\`.
-  > Same — \`Min\` does not fabricate a value when the sequence is empty.
+  > Same, \`Min\` does not fabricate a value when the sequence is empty.
 - Returns \`null\`.
   > Returning \`null\` isn't possible for a non-nullable \`int\`, and even for nullable types the empty behavior depends on the overload.
 - [o] Throws \`InvalidOperationException\` because the sequence is empty.

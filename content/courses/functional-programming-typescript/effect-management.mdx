@@ -1,6 +1,6 @@
 ---
 title: Effect Management
-description: Separate the *description* of a side effect from its *execution* — and turn effects into first-class composable values.
+description: Separate the *description* of a side effect from its *execution*, and turn effects into first-class composable values.
 ---
 
 So far, our pure functions have one important limitation: they
@@ -9,7 +9,7 @@ read files, call APIs, write to a database, or print to the
 console. The real world is full of effects, and a real program
 has to perform them.
 
-The functional approach is not to *avoid* effects — it's to
+The functional approach is not to *avoid* effects, it's to
 **represent them as values** and then run those values in a
 single, controlled place at the edge of the program. Pure
 functions stay pure; effects become first-class data.
@@ -24,7 +24,7 @@ Moggi's theoretical work on monads to the I/O problem: a Haskell
 program could *construct a value describing the I/O it wants*, and
 the runtime would execute that description. Simon Peyton Jones later
 joked that this machinery made Haskell "the world's finest
-imperative programming language" — because effects, once they were
+imperative programming language", because effects, once they were
 values, became more controllable than in languages where they run
 loose. You don't need Haskell to use the trick. It's a few lines of
 TypeScript.
@@ -32,7 +32,7 @@ TypeScript.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Rocket capsules with unlit fuses rest in a tray and are carried around safely; only past a dotted boundary does one ignite with a yellow spark — effects described as inert values and run only at the edge"
+  aria-label="Rocket capsules with unlit fuses rest in a tray and are carried around safely; only past a dotted boundary does one ignite with a yellow spark, effects described as inert values and run only at the edge"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="130" width="260" height="60" rx="14" fill="currentColor" opacity="0.1" />
@@ -100,7 +100,7 @@ console.log(now());
 
 That's already the entire trick. An `IO<A>` is a recipe for
 producing an `A`; nothing happens until you call it. Building one,
-passing it around, returning it from a function — all pure.
+passing it around, returning it from a function, all pure.
 Running it is the impure act, and it happens at *one* place: the
 top of your program.
 
@@ -218,7 +218,7 @@ function chain<A, B>(s: Step<A>, f: (a: A) => Step<B>): Step<B> {
 
 // --- A program described as DATA ---
 const program: Step<void> = chain(now(), (t) =>
-  chain(log(\`time is \${t}\`), () => log(\`still describing — nothing has run\`)),
+  chain(log(\`time is \${t}\`), () => log(\`still describing, nothing has run\`)),
 );
 
 console.log("Built program: ", program.kind === "do" ? program.op : "empty");
@@ -269,13 +269,13 @@ Same program, two interpreters. The "real" interpreter calls
 Your business logic stays a pure description; the dirty
 side-effects are swappable.
 
-This pattern — programs as data, interpreters as functions — is
+This pattern, programs as data, interpreters as functions, is
 sometimes called *Free Monad*, *Tagless Final*, or simply
 *Dependency Inversion done with values*.
 
 ## When is this overkill?
 
-For a small script, an `IO<A> = () => A` is plenty — you don't
+For a small script, an `IO<A> = () => A` is plenty, you don't
 need an algebraic effect type. The point of this chapter isn't
 "always use Free Monad", it's:
 
@@ -296,7 +296,7 @@ flowchart TD
 ```
 
 The outer ring is the part that talks to the world. The inner core
-never does — it only manipulates *descriptions* of what it would
+never does, it only manipulates *descriptions* of what it would
 like to happen.
 
 ## A small challenge
@@ -309,10 +309,10 @@ writing two of them.
   title="Implement map and chain for IO"
   instructions={`In \`io.ts\`, implement:
 
-- \`map(io, f)\` — returns a **new IO** that, when run, runs \`io\` and applies \`f\` to its result.
-- \`chain(io, f)\` — returns a new IO that, when run, runs \`io\`, passes the result to \`f\`, and runs the IO that \`f\` returns.
+- \`map(io, f)\`, returns a **new IO** that, when run, runs \`io\` and applies \`f\` to its result.
+- \`chain(io, f)\`, returns a new IO that, when run, runs \`io\`, passes the result to \`f\`, and runs the IO that \`f\` returns.
 
-Neither function may execute anything at construction time — all
+Neither function may execute anything at construction time, all
 work must happen inside the returned thunk.
 
 \`main.ts\` builds a program from your combinators and runs it once.
@@ -391,7 +391,7 @@ export function chain<A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> {
   markdown={`What's the main benefit of representing a side effect as a value (an \`IO<A>\` thunk or similar) instead of just running it inline?
 
 - It eliminates the need for \`async\`/\`await\`
-  > Unrelated — effects can still be synchronous or asynchronous.
+  > Unrelated, effects can still be synchronous or asynchronous.
 - It hides the side effect from the rest of the program
   > Actually, it makes it *visible* in the type signature.
 - [o] It separates *describing* an effect from *running* it, so descriptions can be composed, tested, retried, swapped, or interpreted differently without changing the rest of the code

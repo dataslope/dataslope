@@ -1,10 +1,10 @@
 ---
 title: Reproducible Experiments
-description: Seeds, environments, and provenance — make your science survive contact with the future
+description: Seeds, environments, and provenance, make your science survive contact with the future
 ---
 
 A scientific result you cannot reproduce six months later is not
-science — it is folklore. **Reproducibility** is the discipline of
+science, it is folklore. **Reproducibility** is the discipline of
 making your computational experiments behave the same way every
 time, on every machine, for every collaborator, forever.
 
@@ -15,7 +15,7 @@ work after you forget how it works.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="One blue experiment card holding a code chip, a data dot, and a yellow seed feeds two thin arrows into two bar charts that match bar for bar, marked equal — the same inputs rerun give the same result every time"
+  aria-label="One blue experiment card holding a code chip, a data dot, and a yellow seed feeds two thin arrows into two bar charts that match bar for bar, marked equal, the same inputs rerun give the same result every time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -75,7 +75,7 @@ mindmap
       Different CPU vector ISA
 ```
 
-Any one of these can make a number change in the third decimal —
+Any one of these can make a number change in the third decimal,
 or change a *conclusion* entirely.
 
 ## The four pillars
@@ -91,7 +91,7 @@ or change a *conclusion* entirely.
 
 The minimum acceptable manifest is a `requirements.txt` produced
 by `pip freeze`. Even better, use a lockfile tool that captures
-*transitive* dependencies exactly — `pip-tools`, `poetry`,
+*transitive* dependencies exactly, `pip-tools`, `poetry`,
 `uv`, or `conda-lock`.
 
 A typical `pyproject.toml` snippet for a scientific project:
@@ -198,7 +198,7 @@ re-ordering workers doesn't change the answer.
 
 ## Pillar 3: Record inputs and outputs
 
-A reproducible experiment carries a **manifest** — a small text
+A reproducible experiment carries a **manifest**, a small text
 file that says exactly what was run with what parameters and what
 came out. Hash large inputs so you'd notice if they changed.
 
@@ -343,7 +343,7 @@ of your work in plain `.py` files you can test, version, and reuse.
 
 ## A reproducibility scorecard
 
-Rate your project on these axes — every project should aim for at
+Rate your project on these axes, every project should aim for at
 least 4/5:
 
 - [ ] Anyone can clone the repo and run `python run_experiment.py`

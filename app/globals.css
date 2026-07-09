@@ -12,11 +12,11 @@ html, body {
 /* Pre-paint document background, keyed off the explicit `.dark` class that
    every route applies to <html> before first paint (the per-route
    THEME_BOOTSTRAP scripts, the /playground bootstrap in app/layout.tsx, and
-   next-themes on the Fumadocs routes — /courses, /interview-prep,
+   next-themes on the Fumadocs routes, /courses, /interview-prep,
    /fumadocs-dev). A fixed dark value here painted a dark first frame
-   for light-mode users — most visibly as a dark blink when the home page's
+   for light-mode users, most visibly as a dark blink when the home page's
    embedded playground iframe loaded. The values mirror the canonical page
-   surfaces (#ffffff light / #121212 dark — see app/home.css and
+   surfaces (#ffffff light / #121212 dark, see app/home.css and
    THEME_PALETTES in playgroundTheme.ts). */
 html {
   background: #ffffff;
@@ -26,7 +26,7 @@ html.dark {
 }
 
 /* Skip-to-content link: the first tabbable element on every page (mounted in
-   the root layout). Visually hidden until keyboard focus reaches it — the
+   the root layout). Visually hidden until keyboard focus reaches it, the
    playground headers alone have ~10 tab stops before the editor. */
 .skip-to-content {
   position: fixed;
@@ -63,4 +63,128 @@ html.dark .skip-to-content {
      anywhere gets ligature substitution. */
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "clig" 0, "calt" 0, "dlig" 0;
+}
+
+/* ── Diagonal-striped hard-offset elevation ──────────────────────────────
+   The same "designed shadow" the challenge cards and code blocks use
+   (app/_components/ChallengeCard.module.css `.cardShell`), extracted here so
+   the home playground preview and the pricing table can share it for a
+   consistent outer border. The element it is applied to must be OPAQUE: it
+   sits on top of the z-index:-1 stripe layer and covers everything but the
+   down-right offset sliver. Set `--ds-shell-radius` to match the element's own
+   border-radius. */
+.ds-striped-shell {
+  position: relative;
+  isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
+  --ds-shell-offset: 6px;
+  --ds-shell-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
+  --ds-shell-stripe: 1px; /* painted band width */
+  --ds-shell-period: 4px; /* band + gap */
+  --ds-shell-border-color: var(--ds-gray-200);
+  --ds-shell-radius: 16px; /* match rounded-2xl */
+}
+.ds-striped-shell::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--ds-shell-offset) calc(-1 * var(--ds-shell-offset))
+    calc(-1 * var(--ds-shell-offset)) var(--ds-shell-offset);
+  border: 1px solid var(--ds-shell-border-color);
+  border-radius: var(--ds-shell-radius);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--ds-shell-color) 0,
+    var(--ds-shell-color) var(--ds-shell-stripe),
+    transparent var(--ds-shell-stripe),
+    transparent var(--ds-shell-period)
+  );
+  pointer-events: none;
+}
+html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
+  --ds-shell-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  --ds-shell-border-color: #2e2e2e;
+}
+@media (max-width: 768px) {
+  .ds-striped-shell {
+    --ds-shell-offset: 5px;
+  }
+}
+/* Interactive variant (the home playground preview): on hover the offset
+   border and diagonal stripes shift to brand green, echoing the facade's own
+   green hover accents. Opt-in via this modifier so the pricing table (which
+   shares .ds-striped-shell) keeps its neutral elevation. */
+.ds-striped-shell-green-hover::after {
+  transition: border-color 0.2s ease;
+}
+.ds-striped-shell-green-hover:hover {
+  --ds-shell-color: color-mix(in srgb, var(--ds-green-500) 32%, transparent);
+  --ds-shell-border-color: var(--ds-green-500);
+}
+
+/* Shared light/dark pill toggle (app/_components/ThemePillToggle.tsx). Plain
+   CSS rather than Tailwind so it renders identically on every surface,
+   including the /playground pages, which don't load a Tailwind root. The knob
+   position and glyph are keyed off the `.dark` class on <html> (set
+   pre-paint), so they never mismatch on hydration. */
+.ds-theme-pill {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 1.75rem;
+  width: 3.25rem;
+  padding: 0 0.25rem;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--ds-gray-100);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+html.dark .ds-theme-pill {
+  background: color-mix(in srgb, var(--ds-white) 7%, transparent);
+}
+.ds-theme-pill-marker {
+  position: absolute;
+  color: var(--ds-gray-400);
+  pointer-events: none;
+}
+.ds-theme-pill-marker-sun {
+  left: 0.375rem;
+}
+.ds-theme-pill-marker-moon {
+  right: 0.375rem;
+}
+.ds-theme-pill-knob {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  background: var(--ds-white);
+  color: var(--ds-gray-700);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+html.dark .ds-theme-pill-knob {
+  transform: translateX(1.5rem);
+  background: #2a2a2a;
+  color: var(--ds-white);
+}
+.ds-theme-pill-glyph-sun {
+  display: block;
+}
+.ds-theme-pill-glyph-moon {
+  display: none;
+}
+html.dark .ds-theme-pill-glyph-sun {
+  display: none;
+}
+html.dark .ds-theme-pill-glyph-moon {
+  display: block;
 }

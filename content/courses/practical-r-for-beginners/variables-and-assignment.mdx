@@ -31,7 +31,7 @@ You will see it everywhere.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three name capsules each receive a shape along a bold left-pointing arrow — assignment in R writes the value on the right into the name on the left"
+  aria-label="Three name capsules each receive a shape along a bold left-pointing arrow, assignment in R writes the value on the right into the name on the left"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,7 +58,7 @@ You will see it everywhere.
 ## Why `<-` and not `=`?
 
 If you have used most other languages, you have used `=` for
-assignment. R does support `=` for assignment too — and it works in
+assignment. R does support `=` for assignment too, and it works in
 most places. But the `<-` arrow is strongly preferred, for two
 historical and one practical reason:
 
@@ -69,7 +69,7 @@ historical and one practical reason:
   meaningful (assignment vs. comparison). The arrow `<-` removes
   any ambiguity at a glance.
 - **Distinctness from function arguments.** In a function call like
-  `mean(x = 1:10)`, the `=` is **not assignment** — it is naming an
+  `mean(x = 1:10)`, the `=` is **not assignment**, it is naming an
   argument. Reserving `<-` for true assignment keeps the two
   worlds visually separate.
 
@@ -88,9 +88,9 @@ x          # ok
 my_var     # ok and preferred style
 myVar      # also ok (camelCase)
 my.var     # ok in R (the dot is allowed!)
-.x         # ok (starts with a dot — used for "hidden" variables)
-2x         # NOT ok — cannot start with a number
-my-var     # NOT ok — `-` is the subtraction operator
+.x         # ok (starts with a dot, used for "hidden" variables)
+2x         # NOT ok, cannot start with a number
+my-var     # NOT ok, `-` is the subtraction operator
 ```
 
 A few names are reserved by the language and cannot be used as
@@ -120,14 +120,14 @@ hard part is *naming*.
 Compare these two equivalent computations:
 
 ```r
-# Version A — terrible names
+# Version A, terrible names
 x <- read.csv("data.csv")
 y <- x[x$z > 100, ]
 m <- mean(y$w)
 ```
 
 ```r
-# Version B — meaningful names
+# Version B, meaningful names
 sales        <- read.csv("data.csv")
 big_orders   <- sales[sales$amount > 100, ]
 avg_revenue  <- mean(big_orders$revenue)
@@ -145,7 +145,7 @@ Three quick guidelines for naming:
    `CustomerAge` or `customerAge`. (Both styles work, but
    `lower_snake_case` is the dominant convention in modern R.)
 3. **Save abbreviations for things that are common in your domain.**
-   `bmi` is fine. `cag` for "customer age group" is not — write
+   `bmi` is fine. `cag` for "customer age group" is not, write
    `customer_age_group`.
 
 ## Assignment is silent
@@ -159,7 +159,7 @@ see the value.
   files={[
     {
       filename: "main.r",
-      starterCode: `a <- 100 # no output — assignment is silent
+      starterCode: `a <- 100 # no output, assignment is silent
 print(a) # shows 100
 
 # Trick: parenthesize the assignment to both store and print
@@ -176,7 +176,7 @@ assign on one line and inspect on the next.
 ## Updating variables
 
 You can overwrite a variable by assigning again. R does not warn
-you — it just replaces the old value.
+you, it just replaces the old value.
 
 <CodeBlock
   adapter="r"
@@ -197,7 +197,7 @@ print(count)
 />
 
 Notice the line `count <- count + 1`. This is **not** a math
-equation (which would be nonsense — no number equals itself plus
+equation (which would be nonsense, no number equals itself plus
 one). It is a *command*: "compute `count + 1`, then store the
 result back into `count`." The right side is evaluated first, the
 left side receives the result. This pattern shows up constantly.
@@ -260,10 +260,10 @@ This *copy-on-modify* behavior is one of R's most thoughtful
 design choices. It makes R code very safe: you can pass a variable
 into a function, and the function cannot secretly mutate your
 data. The downside is that R can be memory-inefficient for *very*
-large datasets — but for the kind of work in this course, it's
+large datasets, but for the kind of work in this course, it's
 exactly what you want.
 
-(Many other languages — Python, Java, JavaScript — work
+(Many other languages, Python, Java, JavaScript, work
 differently here. If you are coming from one of those, this is one
 of R's most pleasant surprises.)
 
@@ -340,9 +340,9 @@ What is the value of \`x\`?
   markdown={`Which of these is **not** a valid R variable name?
 
 - \`my_var\`
-  > Letters, digits, underscores, and dots are allowed, and a name may start with a letter — this is valid.
+  > Letters, digits, underscores, and dots are allowed, and a name may start with a letter, this is valid.
 - \`avg.price\`
-  > Dots are allowed inside R names — this is valid (though somewhat dated style).
+  > Dots are allowed inside R names, this is valid (though somewhat dated style).
 - [o] \`2nd_quarter\`
   > R variable names cannot start with a digit.
 - \`.hidden\`
@@ -353,7 +353,7 @@ What is the value of \`x\`?
   markdown={`Why does R conventionally use \`<-\` for assignment instead of \`=\`?
 
 - \`=\` is forbidden in R.
-  > It is not — \`=\` also works for assignment in most contexts.
+  > It is not, \`=\` also works for assignment in most contexts.
 - [o] To keep assignment visually distinct from comparison (\`==\`) and from named function arguments (\`mean(x = 1:10)\`).
   > The arrow leaves no doubt that what's happening is a write, not a read or a label.
 - Because \`=\` is reserved for SQL.

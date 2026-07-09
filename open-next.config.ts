@@ -5,11 +5,11 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 //
 // DataSlope is fully static (no ISR, no `revalidate`): the ~800 lessons and
 // the home page are prerendered at build time. They must be SERVED from that
-// prerendered output, though — and that's what the incremental cache does.
+// prerendered output, though, and that's what the incremental cache does.
 //
 // Without a working `incrementalCache`, OpenNext falls back to re-rendering
 // every page on demand. That re-render runs our React server components inside
-// workerd, whose Node compatibility layer (unenv) has no filesystem — so any
+// workerd, whose Node compatibility layer (unenv) has no filesystem, so any
 // page that touches `node:fs` at request time throws `fs.readdir/readFile is
 // not implemented` and returns a 500. That hits the home page (course listing
 // via `readdir`) and all `/courses/*` lessons (Fumadocs `dynamic` mode reads
@@ -22,8 +22,8 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 // fall through to a re-render and 500 on exactly those `node:fs` pages. R2 is
 // read from identically on production and preview deployments, so previews
 // render correctly too. Each deploy's populate step writes a full copy of the
-// cache under a new build ID — ~1–1.4 GB (one HTML+RSC `.cache` object per
-// prerendered page) — so stale build folders are pruned on a schedule by
+// cache under a new build ID, ~1–1.4 GB (one HTML+RSC `.cache` object per
+// prerendered page), so stale build folders are pruned on a schedule by
 // .github/workflows/r2-cache-cleanup.yml. Reads are rare behind the edge
 // `s-maxage` cache.
 //

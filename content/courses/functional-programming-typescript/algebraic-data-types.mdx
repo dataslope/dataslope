@@ -1,6 +1,6 @@
 ---
 title: Algebraic Data Types
-description: Modeling possibility with sums and products — the type-level vocabulary that makes functional design precise.
+description: Modeling possibility with sums and products, the type-level vocabulary that makes functional design precise.
 ---
 
 When you sit down to model a domain (an order, a user, a request,
@@ -10,13 +10,13 @@ compiler can catch for you.
 
 **Algebraic data types** (ADTs) are the type-level vocabulary
 functional programmers use to build those shapes. There are exactly
-two atomic moves — *and* and *or* — and you combine them to express
+two atomic moves, *and* and *or*, and you combine them to express
 anything you need.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="On the left a capsule welds a circle and a square together into one value; on the right two dotted trails fork into a single socket bay where a triangle sits while a circle waits — products mean and, sums mean or"
+  aria-label="On the left a capsule welds a circle and a square together into one value; on the right two dotted trails fork into a single socket bay where a triangle sits while a circle waits, products mean and, sums mean or"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -75,7 +75,7 @@ these two operations.
 If you count the values a type can have, products multiply and sums
 add. A `boolean` has 2 values; a pair of booleans has `2 × 2 = 4`.
 A choice between a `boolean` and a `string` has `2 + (all strings)`.
-The cardinality literally follows the rules of arithmetic — hence
+The cardinality literally follows the rules of arithmetic, hence
 *algebraic* data types.
 
 ## Products in TypeScript: records and tuples
@@ -105,13 +105,13 @@ console.log(ada, p);
 />
 
 A product type is "all of these fields, simultaneously". TypeScript
-already has them — they're records and tuples. There's nothing
+already has them, they're records and tuples. There's nothing
 novel here.
 
 ## Sums in TypeScript: discriminated unions
 
 The interesting half. A sum says *"one of these alternatives"*. In
-TypeScript, we model it as a **discriminated union** — a union of
+TypeScript, we model it as a **discriminated union**, a union of
 record types, each with a unique tag field.
 
 <CodeBlock
@@ -154,7 +154,7 @@ A few things to notice:
    `s.kind === "circle"`. There is no need for type assertions or
    `as Circle`.
 2. If you add a new variant (`square`) and forget to handle it, the
-   compiler will warn — provided you use the `never` trick (next
+   compiler will warn, provided you use the `never` trick (next
    section).
 
 ### Exhaustiveness checking with `never`
@@ -230,7 +230,7 @@ console.log(wat);
   ]}
 />
 
-The type *allows* "active and suspended" — a nonsense state. Every
+The type *allows* "active and suspended", a nonsense state. Every
 function that takes `BadUser` now has to check at runtime: *is this
 really suspended?*
 
@@ -277,7 +277,7 @@ const d: User = { id: "u3", status: { kind: "deleted", deletedAt: 2024 } };
 
 Now "active and suspended" is *unrepresentable*. The data carried by
 each variant (`reason`, `until`, `deletedAt`) is tied to the case
-that needs it — you can never have `suspendedUntil` without also
+that needs it, you can never have `suspendedUntil` without also
 being suspended.
 
 This is the slogan "**make illegal states unrepresentable**" in
@@ -479,10 +479,10 @@ compiler tracks both layers automatically.
   instructions={`In \`shape.ts\`, define a discriminated union \`Shape\`
 that has four variants:
 
-- \`circle\` — \`radius\`
-- \`rectangle\` — \`width\`, \`height\`
-- \`triangle\` — \`base\`, \`height\`
-- \`square\` — \`side\`
+- \`circle\`, \`radius\`
+- \`rectangle\`, \`width\`, \`height\`
+- \`triangle\`, \`base\`, \`height\`
+- \`square\`, \`side\`
 
 Implement \`area(s: Shape): number\`. Use a \`switch\` and the
 \`never\` exhaustiveness pattern in the default case.
@@ -563,11 +563,11 @@ export function area(s: Shape): number {
 - Unions compile faster
   > Compilation speed is unaffected.
 - Unions use less memory at runtime
-  > Memory layout is essentially the same — both are plain objects.
+  > Memory layout is essentially the same, both are plain objects.
 - [o] A discriminated union ties each piece of data to the variant that needs it, so impossible combinations of fields cannot exist
   > With optional fields, the type permits nonsense like "active AND suspended". A union forbids that statically: each variant carries exactly the data it needs, no more.
 - Unions don't need a "kind" tag
-  > They do — the tag is what makes the union *discriminated* and what TypeScript narrows on.
+  > They do, the tag is what makes the union *discriminated* and what TypeScript narrows on.
 
 Sums forbid illegal combinations *by construction*, eliminating a class of runtime checks entirely.`}
 />

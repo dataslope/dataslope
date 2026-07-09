@@ -1,6 +1,6 @@
 ---
 title: Next Steps
-description: Where to go after mastering the grammar — the ggplot2 extension ecosystem, further reading, and how to keep thinking in components.
+description: Where to go after mastering the grammar, the ggplot2 extension ecosystem, further reading, and how to keep thinking in components.
 ---
 
 You have reached the end of the course. More importantly, you have
@@ -39,18 +39,18 @@ And you understand the *ideas* that make those components powerful:
 - Every layer runs a **stat** before its **geom** draws.
 - **Scales** translate data values to visual values and produce
   axes/legends.
-- **Coordinates** can reshape the same plot — even a bar into a pie.
+- **Coordinates** can reshape the same plot, even a bar into a pie.
 - **Facets** make honest small multiples through shared scales.
 - **Themes** restyle non-data ink through inheritance.
 
-That is not a pile of recipes — it is a *system*. It will let you read,
+That is not a pile of recipes, it is a *system*. It will let you read,
 write, and debug charts you have never seen before.
 
 ## The extension ecosystem
 
 ggplot2 was built to be *extended*, and a rich ecosystem has grown
 around it. Each package adds new components that snap into the same
-grammar — so your `+` skills transfer directly:
+grammar, so your `+` skills transfer directly:
 
 | Package | Adds | In grammar terms |
 | --- | --- | --- |
@@ -62,13 +62,13 @@ grammar — so your `+` skills transfer directly:
 | `sf` + `geom_sf` | Map geometries and projections | spatial **geoms/coords** |
 
 You do not need to learn these now. The point is that each one is
-*more of the same grammar* — new geoms, scales, or themes added with
+*more of the same grammar*, new geoms, scales, or themes added with
 `+`. Because you understand the system, picking them up is
 straightforward.
 
 ## A note on `dplyr` and data prep
 
-Many real plots need a little reshaping first — aggregating, filtering,
+Many real plots need a little reshaping first, aggregating, filtering,
 pivoting to long form. That is the job of `dplyr` and `tidyr`, ggplot2's
 tidyverse siblings. A common pattern is to prepare data with the pipe
 and feed it straight into `ggplot()`:
@@ -97,31 +97,31 @@ mpg |>
 />
 
 Notice the data is summarized *first*, then piped into a `ggplot()`
-that uses `geom_col()` (heights we computed) — every component is one
+that uses `geom_col()` (heights we computed), every component is one
 you now know.
 
 ## Further reading
 
 When you want to go deeper, three sources stand out:
 
-- ***ggplot2: Elegant Graphics for Data Analysis*** by Hadley Wickham —
+- ***ggplot2: Elegant Graphics for Data Analysis*** by Hadley Wickham,
   the definitive book, free online.
-- **The ggplot2 reference site** at `ggplot2.tidyverse.org` — every
+- **The ggplot2 reference site** at `ggplot2.tidyverse.org`, every
   geom, stat, scale, and theme, with examples.
-- **Leland Wilkinson's *The Grammar of Graphics*** — the original
+- **Leland Wilkinson's *The Grammar of Graphics***, the original
   theory, if you want the deepest foundations.
 
 ## Keep thinking in components
 
-The single habit to carry forward: when you see *any* chart — in a
-paper, a dashboard, a newspaper — pause and ask, *"What are its
+The single habit to carry forward: when you see *any* chart, in a
+paper, a dashboard, a newspaper, pause and ask, *"What are its
 components?"* What is the data, what is mapped to what, which geom,
 which stat, which coordinate system? That decomposition is the skill
 this course set out to give you, and it works far beyond ggplot2.
 
 <Callout type="success" title="Congratulations">
 You came in able to *make* charts. You leave able to *think* in the
-Grammar of Graphics — to see every visualization as a structured
+Grammar of Graphics, to see every visualization as a structured
 combination of components you can name, modify, and recombine. That is
 mastery. Go build something.
 </Callout>
@@ -139,7 +139,7 @@ mastery. Go build something.
   > They are ordinary ggplots and are fully modifiable.
 
 Because the grammar is a system, new components extend it rather than
-escape it — which is exactly why your skills generalize.`}
+escape it, which is exactly why your skills generalize.`}
 />
 
 <MultipleChoice
@@ -149,10 +149,10 @@ escape it — which is exactly why your skills generalize.`}
   > Function names are easy to look up; the deeper skill is conceptual.
 - Always preferring ggplot2 over every other tool.
   > Tool loyalty is not the goal; understanding is.
-- [o] The ability to decompose any visualization into grammar components — data, mappings, geom, stat, scale, coordinates, facets, theme — and reason about them.
+- [o] The ability to decompose any visualization into grammar components, data, mappings, geom, stat, scale, coordinates, facets, theme, and reason about them.
   > Component-thinking applies far beyond ggplot2 itself.
 - Producing pie charts efficiently.
-  > Pie charts were a teaching example, not the goal — and rarely the best display.
+  > Pie charts were a teaching example, not the goal, and rarely the best display.
 
 The lasting payoff is a way of *thinking*: seeing every chart as a
 nameable, modifiable combination of components.`}
@@ -166,5 +166,5 @@ nameable, modifiable combination of components.`}
   with the same `+` grammar you already know.
 - `dplyr`/`tidyr` handle the **data prep** that often precedes a plot,
   and pipe naturally into `ggplot()`.
-- The durable skill is **thinking in components** — it outlasts any
+- The durable skill is **thinking in components**, it outlasts any
   single function, package, or tool.

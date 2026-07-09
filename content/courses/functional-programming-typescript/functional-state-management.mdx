@@ -3,7 +3,7 @@ title: Functional State Management
 description: Reducers, immutable transitions, the State monad sketch, and how to model time-travel and undo as data.
 ---
 
-"Functional" and "state" sound like opposites — but the
+"Functional" and "state" sound like opposites, but the
 functional approach to state is actually one of the field's
 greatest hits. Two ideas underpin it:
 
@@ -14,14 +14,14 @@ greatest hits. Two ideas underpin it:
    you write `next = transition(state, event)`. The old state and
    the new state coexist; nothing was mutated.
 
-If those two ideas sound familiar — they're the foundation of
+If those two ideas sound familiar, they're the foundation of
 Redux, React's `useReducer`, Elm's update function, and pretty
 much every modern state library.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Stepping stones across water grow brighter from left to right; above each dotted hop a small yellow event pill drops in, and every earlier stone stays in place — each event yields a new state value while old states persist"
+  aria-label="Stepping stones across water grow brighter from left to right; above each dotted hop a small yellow event pill drops in, and every earlier stone stays in place, each event yields a new state value while old states persist"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -103,7 +103,7 @@ console.log(play([{ kind: "inc" }, { kind: "reset" }, { kind: "dec" }]));
   ]}
 />
 
-`reducer` is a pure function. `play` is a `reduce` over actions —
+`reducer` is a pure function. `play` is a `reduce` over actions,
 which means our entire state lifecycle is just a `fold`. That's
 how you can think of state functionally:
 
@@ -164,12 +164,12 @@ replay it on another machine, or save it for debugging.
 This exact property launched one of the most popular libraries in
 JavaScript history. In 2015, Dan Abramov wanted a flashy demo for
 his React Europe talk, *"Live React: Hot Reloading with Time
-Travel"* — edit your code while the app runs, then scrub the app's
+Travel"*, edit your code while the app runs, then scrub the app's
 state backward and forward like a video. To make the demo possible
 he and Andrew Clark distilled state management down to exactly what
 this page describes: one state value, a pure reducer, a list of
 actions. That demo library was **Redux**. The time-travel debugger
-wasn't a feature bolted onto Redux — Redux was the *minimum
+wasn't a feature bolted onto Redux, Redux was the *minimum
 machinery required* for time travel to work at all. Purity wasn't
 the marketing; it was the engineering.
 
@@ -258,7 +258,7 @@ text editor use internally.
 
 Sometimes you want to **thread** a state through a sequence of pure
 computations without making the state a global. That's modeled in
-FP by `State<S, A> = (s: S) => [A, S]` — "given the current state,
+FP by `State<S, A> = (s: S) => [A, S]`, "given the current state,
 produce a value and the next state".
 
 <CodeBlock
@@ -313,7 +313,7 @@ console.log("counter advanced to:", finalCounter);
 />
 
 The point isn't that you should write a State monad in production
-TypeScript every day — it's to *see* that mutable state isn't
+TypeScript every day, it's to *see* that mutable state isn't
 required. The same effect is achievable with a function that
 returns both an answer and the next state, composed with `chain`.
 
@@ -350,11 +350,11 @@ the history as the source of truth.
   instructions={`Implement \`reduce(state, action)\` in
 \`cart.ts\` for these actions:
 
-- \`{ kind: "add"; sku: string; qty: number }\` — add (or merge) an item; if SKU exists, increase its qty
-- \`{ kind: "remove"; sku: string }\` — drop the matching item
-- \`{ kind: "clear" }\` — empty the cart
+- \`{ kind: "add"; sku: string; qty: number }\`, add (or merge) an item; if SKU exists, increase its qty
+- \`{ kind: "remove"; sku: string }\`, drop the matching item
+- \`{ kind: "clear" }\`, empty the cart
 
-The reducer must be **pure** — return a new \`State\`; do not mutate
+The reducer must be **pure**, return a new \`State\`; do not mutate
 \`state\` or \`state.items\`.
 
 **Expected output**
@@ -452,8 +452,8 @@ export function reduce(state: State, action: Action): State {
   markdown={`Why does the reducer pattern (\`(state, action) => newState\`) make state management easier to reason about?
 
 - Because reducers can be written without TypeScript
-  > Irrelevant — most reducers in real codebases *do* use TypeScript.
-- [o] Because each transition is a pure function — same inputs give the same output — so state changes are predictable, replayable, and trivially testable
+  > Irrelevant, most reducers in real codebases *do* use TypeScript.
+- [o] Because each transition is a pure function, same inputs give the same output, so state changes are predictable, replayable, and trivially testable
   > Purity buys you predictability, replayability, time-travel debugging, and ordinary unit-testability for free.
 - Because reducers can mutate the state in place for performance
   > That defeats almost every benefit listed above.

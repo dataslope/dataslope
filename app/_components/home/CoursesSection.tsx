@@ -1,20 +1,22 @@
 "use client";
 
 /**
- * Home page Courses section — reuses the `/courses` catalog's course card
+ * Home page Courses section, reuses the `/courses` catalog's course card
  * verbatim (app/courses/_components/CourseCard.tsx) so the two surfaces stay
  * visually identical. Shows the four most popular courses by default, with
  * topic buttons (the domain tags common enough to carry a filter) that swap
  * in up to four courses per topic, and a browse-all link into the catalog.
  */
 import { useMemo, useState } from "react";
+import { Select } from "@base-ui-components/react/select";
+import { ArrowRight, ChevronDown, GraduationCap } from "lucide-react";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import Link from "../Link";
-import { ArrowRight } from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseCard } from "@/app/courses/_components/CourseCard";
 
-// (Type-only import cycle with lib/courseCatalog is fine — erased at build.)
+// (Type-only import cycle with lib/courseCatalog is fine, erased at build.)
 export interface CourseTags {
   language?: string[];
   libraries?: string[];
@@ -65,11 +67,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
 
   if (courses.length === 0) return null;
 
-  const pillBase =
-    "cursor-pointer rounded-full border px-3.5 py-1.5 text-[13.5px] font-medium transition-colors";
-  const pillIdle = `border-[var(--ds-gray-200)] text-[var(--ds-gray-600)] hover:border-[var(--ds-gray-400)] hover:text-[var(--ds-gray-900)] dark:border-white/10 dark:text-[var(--ds-gray-300)] dark:hover:border-white/25 dark:hover:text-white`;
-  const pillActive =
-    "border-[var(--ds-gray-900)] bg-[var(--ds-gray-900)] text-white dark:border-white dark:bg-white dark:text-[#121212]";
+  const activeTopicLabel = topic ? formatTagLabel(topic) : "Recommended";
 
   return (
     <section id="courses" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
@@ -82,32 +80,60 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
         </p>
       </div>
 
-      {/* Topic buttons: "Recommended" (default) + the biggest domains. The
-          default is a hand-curated ranking (lib/courseCatalog.ts), so it is
-          not labelled "Most popular" — there are no usage analytics yet. */}
-      <div className="mb-4 flex flex-wrap justify-center gap-2">
-        <button
-          type="button"
-          onClick={() => setTopic(null)}
-          aria-pressed={topic === null}
-          className={`${pillBase} ${topic === null ? pillActive : pillIdle}`}
+      {/* Topic filter: "Recommended" (default) + the biggest domains, as a
+          compact dropdown styled like the interactive preview's language
+          picker. The default is a hand-curated ranking (lib/courseCatalog.ts),
+          not "Most popular", there are no usage analytics yet. */}
+      <div className="mb-6 flex justify-center">
+        <Select.Root
+          value={topic ?? ""}
+          onValueChange={(next) => setTopic(next ? next : null)}
         >
-          Recommended
-        </button>
-        {topics.map((d) => (
-          <button
-            key={d}
-            type="button"
-            onClick={() => setTopic(d)}
-            aria-pressed={topic === d}
-            className={`${pillBase} ${topic === d ? pillActive : pillIdle}`}
-          >
-            {formatTagLabel(d)}
-          </button>
-        ))}
+          <Select.Trigger
+            aria-label="Filter courses by topic"
+            render={(triggerProps) => (
+              <ShimmerButton
+                {...triggerProps}
+                background="var(--color-fd-background)"
+                shimmerColor="#148CFF"
+                shimmerSize="0.15em"
+                borderRadius="0.625rem"
+                className="min-w-52 justify-between gap-2 border-[color:var(--ds-gray-200)] px-3.5 py-1.5 text-sm font-medium text-[color:var(--ds-gray-900)] focus-visible:outline-none dark:border-white/10 dark:text-white"
+              >
+                <Select.Value className="flex-1 truncate text-left">
+                  {activeTopicLabel}
+                </Select.Value>
+                <Select.Icon className="text-[var(--ds-gray-500)] dark:text-white/70">
+                  <ChevronDown size={14} />
+                </Select.Icon>
+              </ShimmerButton>
+            )}
+          />
+          <Select.Portal>
+            <Select.Positioner
+              sideOffset={6}
+              alignItemWithTrigger={false}
+              className="z-50"
+            >
+              <Select.Popup className="max-h-[60vh] min-w-52 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+                {[{ value: "", label: "Recommended" }, ...topics.map((d) => ({ value: d, label: formatTagLabel(d) }))].map(
+                  (o) => (
+                    <Select.Item
+                      key={o.value || "recommended"}
+                      value={o.value}
+                      className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                    >
+                      <Select.ItemText>{o.label}</Select.ItemText>
+                    </Select.Item>
+                  ),
+                )}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
       </div>
 
-      {/* Up to four cards — the same card component the /courses catalog
+      {/* Up to four cards, the same card component the /courses catalog
           renders. Cards carry their own vertical padding (py-6), so the grid
           only adds a column gap. */}
       <div className="grid gap-x-10 sm:grid-cols-2">
@@ -121,6 +147,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
           href="/courses"
           className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
         >
+          <GraduationCap size={16} aria-hidden="true" />
           Browse all {courses.length} courses
           <ArrowRight
             size={16}

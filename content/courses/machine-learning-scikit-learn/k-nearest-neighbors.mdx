@@ -1,11 +1,11 @@
 ---
 title: K-Nearest Neighbors
-description: The laziest algorithm in machine learning — it does no real training at all. To predict, it simply looks at the closest examples it has seen and takes a vote. Simple, intuitive, and a perfect lens for understanding distance and feature scaling.
+description: The laziest algorithm in machine learning, it does no real training at all. To predict, it simply looks at the closest examples it has seen and takes a vote. Simple, intuitive, and a perfect lens for understanding distance and feature scaling.
 ---
 
 Most models work hard up front. A linear regression solves for
 coefficients; a decision tree searches for the best splits. By the time
-training finishes, the original data can be thrown away — the *model* is the
+training finishes, the original data can be thrown away, the *model* is the
 learned formula or flowchart.
 
 **K-nearest neighbors** (KNN) does the opposite, and it is almost comically
@@ -13,7 +13,7 @@ simple. To predict the label of a new point, it asks one question: *which
 training examples are closest to you?* It finds the `k` nearest ones and
 lets them vote. For classification, the majority class wins. For
 regression, it averages their values. That is the entire algorithm. There
-is no equation to fit, no tree to grow — KNN just **memorizes the training
+is no equation to fit, no tree to grow, KNN just **memorizes the training
 set** and consults it at prediction time.
 
 This makes KNN the canonical example of **instance-based** or **lazy**
@@ -25,7 +25,7 @@ break a distance-based model.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A yellow query dot sits inside its translucent neighborhood circle where three green neighbors outvote two blue ones, while dots outside the circle take no part — k-nearest neighbors decides by local vote"
+  aria-label="A yellow query dot sits inside its translucent neighborhood circle where three green neighbors outvote two blue ones, while dots outside the circle take no part, k-nearest neighbors decides by local vote"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -76,7 +76,7 @@ label among them. Change `k` and you change how many neighbors get a say.
 
 <Callout type="info" title="Why 'lazy' is a technical term, not an insult">
 KNN is called a *lazy learner* because it defers all the work to prediction
-time. `fit` does almost nothing — it just stores the data (and builds an
+time. `fit` does almost nothing, it just stores the data (and builds an
 index to find neighbors quickly). Compare this to a *lazy* student who
 crams during the exam rather than studying beforehand. The cost is not
 free: a lazy learner can be slow and memory-hungry when you actually ask it
@@ -86,21 +86,21 @@ to predict, especially on large datasets.
 ## What does "closest" mean? Distance
 
 "Nearest" requires a notion of distance. By default KNN uses **Euclidean
-distance** — the straight-line distance you would measure with a ruler, the
+distance**, the straight-line distance you would measure with a ruler, the
 Pythagorean theorem extended to as many dimensions as you have features.
 Two examples are close if the sum of their squared differences across all
 features is small.
 
 This is intuitive, but it hides a trap that we will spend most of this page
 on. Euclidean distance adds up differences across features *as if every
-feature were measured in the same units*. It almost never is — and that is
+feature were measured in the same units*. It almost never is, and that is
 where scaling comes in.
 
 ## Your first KNN classifier
 
 Let us classify penguins by species. The API is, as always, identical to
 every other scikit-learn estimator. (We will see in a moment that raw KNN is
-held back here by the feature scales — but it is a fine starting point.)
+held back here by the feature scales, but it is a fine starting point.)
 
 <CodeBlock
   adapter="python"
@@ -132,7 +132,7 @@ print(f"Test accuracy with k=5: {knn.score(X_test, y_test):.3f}")
 Notice that `fit` returns instantly: there is nothing to optimize. All the
 work happens inside `score` (and `predict`), where each test penguin
 searches the training set for its five nearest neighbors and takes their
-majority vote. This works, but it is *not yet as accurate as it could be* —
+majority vote. This works, but it is *not yet as accurate as it could be*,
 and the reason, as the next sections show, is that one feature (body mass,
 in the thousands of grams) dominates the distance.
 
@@ -143,7 +143,7 @@ it directly controls the **bias-variance tradeoff** you met earlier.
 
 - **Small `k` (e.g. 1).** Each prediction is decided by a single closest
   neighbor. The decision boundary becomes jagged and wraps tightly around
-  individual points — including noisy ones. This is **low bias, high
+  individual points, including noisy ones. This is **low bias, high
   variance**: the model is sensitive to every quirk in the data and tends
   to **overfit**.
 - **Large `k` (e.g. 50).** Each prediction is an average over many
@@ -153,9 +153,9 @@ it directly controls the **bias-variance tradeoff** you met earlier.
 
 | Value of `k` | Decision boundary | Result |
 | --- | --- | --- |
-| `k = 1` | Jagged, wraps tightly around individual points | Overfit — high variance |
+| `k = 1` | Jagged, wraps tightly around individual points | Overfit, high variance |
 | `k = 5` to `15` | Local but smooth | Generalizes well |
-| `k` very large | Over-smoothed, ignores local detail | Underfit — high bias |
+| `k` very large | Over-smoothed, ignores local detail | Underfit, high bias |
 
 Let us watch test accuracy respond to `k`.
 
@@ -190,7 +190,7 @@ for k in [1, 3, 5, 15, 50, 100]:
 />
 
 Look at `k=1`: the **training** accuracy is a perfect `1.000`. That is not
-skill — with one neighbor, the closest point to any training example is
+skill, with one neighbor, the closest point to any training example is
 *itself*, so it always votes correctly. The test score is the honest one,
 and it is lower. As `k` grows, training accuracy comes down to earth while
 test accuracy rises to a plateau, then eventually falls as the model
@@ -211,7 +211,7 @@ it is taught so early: **KNN is distance-based, so the scale of your
 features matters enormously.** Euclidean distance sums squared differences
 across features. If one feature ranges over 0–1000 and another over 0–1,
 the large-range feature utterly dominates the distance, and the small one
-is ignored — no matter how informative it actually is.
+is ignored, no matter how informative it actually is.
 
 Let us prove it. We will build a dataset with one genuinely useful feature
 measured in *small* units and one pure-noise feature measured in *huge*
@@ -260,11 +260,11 @@ enormous range drowns out the perfectly predictive feature, so "nearest"
 neighbors are chosen almost entirely by noise. After
 `StandardScaler` puts both features on comparable footing (mean 0, standard
 deviation 1), the useful feature can actually influence which neighbors are
-nearest, and accuracy leaps. **Same data, same algorithm, same `k` — the
+nearest, and accuracy leaps. **Same data, same algorithm, same `k`, the
 only difference is scaling.**
 
 <Callout type="danger" title="Always scale features before KNN">
-For any distance-based model — KNN, K-means, and others — standardize your
+For any distance-based model, KNN, K-means, and others, standardize your
 features first, or the model silently weights them by their arbitrary
 units. A feature measured in dollars will crush a feature measured in
 fractions, not because it matters more, but because its numbers are bigger.
@@ -273,7 +273,7 @@ This is the most common KNN mistake by far.
 
 ### The right way: scaling inside a Pipeline
 
-Scaling manually is error-prone — it is easy to accidentally fit the scaler
+Scaling manually is error-prone, it is easy to accidentally fit the scaler
 on the whole dataset (a **data leak**) or forget to apply the same
 transform to the test set. The clean solution is a **Pipeline**, which
 chains the scaler and the model into one object that does the right thing
@@ -306,7 +306,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 raw = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
 print(f"Raw KNN test accuracy:      {raw.score(X_test, y_test):.3f}")
 
-# A pipeline that scales, then runs KNN — as one estimator.
+# A pipeline that scales, then runs KNN, as one estimator.
 pipe = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5))
 pipe.fit(X_train, y_train)
 print(f"Scaled KNN test accuracy:   {pipe.score(X_test, y_test):.3f}")
@@ -316,7 +316,7 @@ print(f"Scaled KNN test accuracy:   {pipe.score(X_test, y_test):.3f}")
 />
 
 The improvement is dramatic, and the pipeline guarantees the scaler is fit
-on the *training* fold only and reused for the test fold — exactly the
+on the *training* fold only and reused for the test fold, exactly the
 leak-free habit the train/test split page warned you to protect. From here
 on, treat "KNN" and "KNN inside a scaling pipeline" as the same thing.
 
@@ -356,7 +356,7 @@ plt.show()
 />
 
 The picture tells the whole bias-variance story in one frame. With `k=1`,
-the prediction line zig-zags through every single point — it interpolates
+the prediction line zig-zags through every single point, it interpolates
 the noise (high variance). With `k=25`, the line is so smooth it flattens
 out the genuine curve and pulls toward the global average (high bias). The
 middle value, `k=5`, tracks the real sine shape without chasing the noise.
@@ -373,7 +373,7 @@ knob becomes easier to reason about.
 
 KNN has a subtler weakness that grows with the number of features: the
 **curse of dimensionality.** In high dimensions, something deeply
-unintuitive happens — *all* points become roughly equally far from one
+unintuitive happens, *all* points become roughly equally far from one
 another. The distance to your nearest neighbor and the distance to your
 farthest neighbor converge, so "nearest" stops carrying much meaning, and
 KNN's core assumption quietly breaks down.
@@ -400,7 +400,7 @@ for d in [2, 10, 100, 1000]:
 />
 
 In 2 dimensions the farthest point is several times farther than the
-nearest — neighbors are meaningfully different distances away. By 1000
+nearest, neighbors are meaningfully different distances away. By 1000
 dimensions the ratio collapses toward 1: everything is about the same
 distance from everything else. When that happens, the "nearest" neighbors
 are barely nearer than random points, and KNN's predictions degrade. The
@@ -409,7 +409,7 @@ features, or use techniques covered later) and to **scale**, but the deeper
 lesson is that distance-based reasoning does not transfer for free to very
 high-dimensional data.
 
-## When to use KNN — and when not to
+## When to use KNN, and when not to
 
 KNN shines when:
 
@@ -433,7 +433,7 @@ Avoid KNN when:
 
 <Callout type="warn" title="Common misconceptions about KNN">
 - **"KNN does no work, so it must be cheap."** It is cheap to *train* and
-  expensive to *predict* — exactly backwards from most models. The data
+  expensive to *predict*, exactly backwards from most models. The data
   also has to live in memory.
 - **"The 'K' in KNN is the same as the 'K' in K-means."** Different `k`s
   entirely. In KNN, `k` is the number of neighbors that vote. In K-means
@@ -457,7 +457,7 @@ suggest:
 - **Image and document retrieval.** Find the most visually or semantically
   similar items by nearest neighbors in a feature space.
 - **Anomaly detection.** A point with no close neighbors is, by definition,
-  unusual — a natural outlier flag.
+  unusual, a natural outlier flag.
 - **Quick baselines and imputation.** KNN is a sensible first model to beat,
   and `KNNImputer` fills missing values from similar rows.
 
@@ -472,8 +472,8 @@ the closest data speak is a sturdy first move.
   title="Prove that scaling rescues KNN"
   category="models · k-nearest neighbors"
   estimatedTime="~7 min"
-  instructions={`The penguins dataset has features on wildly different scales —
-body mass in the thousands of grams next to a bill length near 40 mm — so
+  instructions={`The penguins dataset has features on wildly different scales,
+body mass in the thousands of grams next to a bill length near 40 mm, so
 unscaled KNN does poorly and scaling fixes it. Show both. \`X\` (four numeric
 measurements) and \`y\` (the species) are already prepared for you.
 
@@ -486,7 +486,7 @@ measurements) and \`y\` (the species) are already prepared for you.
    store its test accuracy in \`scaled_acc\`. Name the pipeline \`pipe\`.
 
 The tests check that \`pipe\` really contains a \`StandardScaler\`,
-that the scaled accuracy is high (above 0.92), and — the key lesson — that
+that the scaled accuracy is high (above 0.92), and, the key lesson, that
 scaling improved the test accuracy (\`scaled_acc > raw_acc\`).`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
@@ -568,10 +568,10 @@ assert scaled_acc > raw_acc, f"Expected scaling to help: scaled {scaled_acc:.3f}
 
 - It always uses very few features to save effort
   > KNN uses all features when computing distances, not a reduced subset. "Lazy" refers to deferring all computation to prediction time, not to using fewer features.
-- [o] It does essentially no work during \`fit\` — it just stores the training data — and defers all computation to prediction time, where it searches for the nearest examples
+- [o] It does essentially no work during \`fit\`, it just stores the training data, and defers all computation to prediction time, where it searches for the nearest examples
   > A lazy learner builds no compact model; it keeps the training set and consults it at predict time. This makes training trivial but prediction comparatively expensive.
 - It refuses to train on datasets larger than a few hundred rows
-  > KNN can technically fit any size dataset — \`fit\` just stores the data. The practical limitation at large scale is *prediction* speed, not a hard limit on training set size.
+  > KNN can technically fit any size dataset, \`fit\` just stores the data. The practical limitation at large scale is *prediction* speed, not a hard limit on training set size.
 - It picks a random subset of neighbors to avoid computation
   > KNN does not pick neighbors randomly. It computes distances to all training points and selects the k nearest ones deterministically. Random neighbor selection would be a different, less reliable algorithm.
 
@@ -582,8 +582,8 @@ The "laziness" is that learning is postponed until a prediction is actually requ
   markdown={`You run KNN with \`n_neighbors=1\` and get **100%** accuracy on the training set but mediocre accuracy on the test set. Why is the perfect training score unsurprising?
 
 - The training labels must be leaking into the model
-  > No leakage is occurring — this is an expected artifact of k=1. Each training point is its own single nearest neighbor, so it always retrieves its own label, which produces a trivially perfect training score.
-- [o] With k=1, the single nearest point to any training example is the example itself, so it always votes for the correct label — training accuracy is trivially perfect and tells you nothing about generalization
+  > No leakage is occurring, this is an expected artifact of k=1. Each training point is its own single nearest neighbor, so it always retrieves its own label, which produces a trivially perfect training score.
+- [o] With k=1, the single nearest point to any training example is the example itself, so it always votes for the correct label, training accuracy is trivially perfect and tells you nothing about generalization
   > Because each training point is its own nearest neighbor, k=1 memorizes the training set. The test score, where points look up *other* points, is the honest measure.
 - A bug in scikit-learn inflates k=1 scores
   > A perfect training score at k=1 is the mathematically correct behavior, not a bug. scikit-learn computes it accurately; the issue is that the number is meaningless as a measure of generalization.
@@ -597,8 +597,8 @@ Perfect training accuracy at k=1 is an artifact of self-matching, not evidence o
   markdown={`A dataset has one feature measured in dollars (range 0 to 100000) and one measured as a fraction (range 0 to 1). You run KNN **without scaling**. What goes wrong?
 
 - KNN cannot run on features with different units and will raise an error
-  > KNN will run without error on mixed-scale features — it simply produces poor results because the large-scale feature dominates the distance. The problem is silent degradation, not an error.
-- Nothing — KNN automatically normalizes features internally
+  > KNN will run without error on mixed-scale features, it simply produces poor results because the large-scale feature dominates the distance. The problem is silent degradation, not an error.
+- Nothing, KNN automatically normalizes features internally
   > scikit-learn's KNN does not apply any internal normalization. Scaling is the user's responsibility and must be done explicitly, typically via a \`StandardScaler\` inside a pipeline.
 - [o] Euclidean distance is dominated by the dollars feature because its numbers are far larger, so the fraction feature is effectively ignored regardless of how informative it is
   > Distance sums squared differences across features. A feature with a huge range contributes huge squared differences and swamps the others, which is why distance-based models require scaling.
@@ -615,7 +615,7 @@ Unscaled distance weights features by their arbitrary units, which is exactly wh
   > Larger k has the opposite effect: it reduces variance by averaging over more neighbors, smoothing the decision boundary. It is *smaller* k that produces jagged boundaries and high variance.
 - Larger k has no effect on bias or variance
   > Changing k directly controls the bias-variance tradeoff. Larger k reduces variance (smoother boundary) at the cost of increased bias; smaller k does the opposite.
-- [o] Larger k averages over more neighbors, which smooths the decision boundary — reducing variance but increasing bias (eventually underfitting)
+- [o] Larger k averages over more neighbors, which smooths the decision boundary, reducing variance but increasing bias (eventually underfitting)
   > Small k follows local detail closely (low bias, high variance, prone to overfit); large k smooths predictions toward the majority (high bias, low variance, prone to underfit). The best k balances the two.
 - Larger k always improves test accuracy without limit
   > Test accuracy improves as k grows from very small values, but it eventually peaks and then declines as the model over-smooths and ignores meaningful local structure. There is a sweet spot, found with cross-validation.
@@ -630,7 +630,7 @@ There is a sweet spot for k, found with cross-validation rather than by inspecti
   > KNN has no hard limit on the number of features; scikit-learn will accept any dimensionality. The curse of dimensionality is a statistical degradation in prediction quality, not a technical limitation.
 - Adding features always makes KNN faster but less accurate
   > More features make KNN *slower* at prediction (distances take longer to compute) and less accurate (the curse of dimensionality degrades the meaning of "nearest"). There is no trade-off where adding features helps speed.
-- [o] As the number of features grows large, distances between points become nearly uniform — the nearest and farthest neighbors are almost equally far away — so "nearest" loses meaning and KNN's core assumption weakens
+- [o] As the number of features grows large, distances between points become nearly uniform, the nearest and farthest neighbors are almost equally far away, so "nearest" loses meaning and KNN's core assumption weakens
   > In high dimensions, points spread out so that every pair is roughly equidistant. Since KNN relies on some points being genuinely closer than others, its predictions degrade. Reducing dimensionality and scaling help.
 - It refers to KNN using too much memory on small datasets
   > Memory usage in KNN scales with dataset size, not dimensionality. The curse of dimensionality is about distance becoming uninformative in high-dimensional spaces, not about memory consumption on small data.

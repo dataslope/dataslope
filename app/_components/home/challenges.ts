@@ -1,12 +1,14 @@
 /**
  * Content for the home page hero's interactive "try it" panel: one runnable
- * coding challenge per non-SQL language, one SQL challenge per dialect, and a
- * conceptual multiple-choice question. Kept as plain data so the hero
+ * coding challenge per non-SQL language, one SQL challenge per dialect, a set
+ * of runnable Web (HTML/CSS/JS and React) code blocks, and a handful of
+ * conceptual multiple-choice questions. Kept as plain data so the hero
  * component stays presentational.
  */
 
 import type { ChallengeTest } from "../challengeHarness";
 import type { ChallengeFile } from "../ChallengeCard";
+import type { CodeBlockFile } from "../CodeBlock";
 import type { AdapterId } from "../runtime/adapters";
 import type { SqlChallengeTest, SqlDialect } from "../SqlChallengeCard";
 
@@ -22,184 +24,172 @@ export interface HomeCodeChallenge {
   tests: ChallengeTest[];
 }
 
-const GREETING_TESTS: ChallengeTest[] = [
+// Every language solves the same task (find the longest run of consecutive
+// equal values in a fixed list and print its length), graded on stdout so it
+// works identically on every runtime. The sample list [1, 1, 2, 3, 3, 3, 2, 2]
+// has a longest run of three, so the expected output is "3".
+const LONGEST_RUN_TESTS: ChallengeTest[] = [
   {
-    id: "greeting",
-    name: "Prints the greeting",
-    description: "The program outputs exactly `Hello, Grace!`",
-    expect: { stdoutEquals: "Hello, Grace!" },
+    id: "longest_run",
+    name: "Prints the longest run length",
+    description: "The program outputs `3` (the three 3s in a row).",
+    expect: { stdoutEquals: "3" },
   },
 ];
 
-function greetInstructions(printPhrase: string): string {
-  return `Write code that outputs exactly:
+function longestRunInstructions(printHint: string): string {
+  return `\`nums\` holds a sequence of integers. A **run** is a group of consecutive equal values.
 
-\`Hello, Grace!\`
-
-Don't hardcode the whole string — a variable \`name\` is already set to \`"Grace"\`. Build the greeting from it using ${printPhrase}.`;
-}
-
-function greetMultiFile(file: string, callPhrase: string): string {
-  return `Open \`${file}\` and implement \`greet\` so the program prints exactly:
-
-\`Hello, Grace!\`
-
-\`Main\` is provided — it ${callPhrase} and prints the result.`;
+Print the length of the **longest run** with ${printHint}. For \`[1, 1, 2, 3, 3, 3, 2, 2]\` the longest run is the three \`3\`s, so the answer is \`3\`.`;
 }
 
 /**
- * The non-SQL code challenges, in dropdown order. The single-file languages
- * share the same "greet a name" task (graded on stdout, so it works on every
- * runtime); Java and C# use a small two-file workspace to show multi-file
- * support.
+ * The non-SQL code challenges, in dropdown order. Every language solves the
+ * same single-file "longest consecutive run" task so the demo reads
+ * consistently no matter which language a visitor picks.
  */
 export const CODE_CHALLENGES: HomeCodeChallenge[] = [
   {
     adapter: "python",
     label: "Python",
-    title: "Greet a name",
-    instructions: greetInstructions("an f-string, concatenation, or `.format()`"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`print()`"),
     files: [
       {
         filename: "main.py",
-        starterCode: 'name = "Grace"\n# your code here\n',
-        solutionCode: 'name = "Grace"\nprint(f"Hello, {name}!")\n',
+        starterCode: "nums = [1, 1, 2, 3, 3, 3, 2, 2]\n# your code here\n",
+        solutionCode:
+          "nums = [1, 1, 2, 3, 3, 3, 2, 2]\nlongest = current = 1\nfor i in range(1, len(nums)):\n    current = current + 1 if nums[i] == nums[i - 1] else 1\n    longest = max(longest, current)\nprint(longest)\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "r",
     label: "R",
-    title: "Greet a name",
-    instructions: greetInstructions("`paste0()` / `sprintf()` with `cat()`"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`cat()`"),
     files: [
       {
         filename: "main.R",
-        starterCode: 'name <- "Grace"\n# your code here\n',
-        solutionCode: 'name <- "Grace"\ncat(sprintf("Hello, %s!\\n", name))\n',
+        starterCode: "nums <- c(1, 1, 2, 3, 3, 3, 2, 2)\n# your code here\n",
+        solutionCode:
+          "nums <- c(1, 1, 2, 3, 3, 3, 2, 2)\ncat(max(rle(nums)$lengths))\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "javascript",
     label: "JavaScript",
-    title: "Greet a name",
-    instructions: greetInstructions("a template literal or concatenation"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`console.log()`"),
     files: [
       {
         filename: "main.js",
-        starterCode: 'const name = "Grace";\n// your code here\n',
-        solutionCode: 'const name = "Grace";\nconsole.log(`Hello, ${name}!`);\n',
+        starterCode:
+          "const nums = [1, 1, 2, 3, 3, 3, 2, 2];\n// your code here\n",
+        solutionCode:
+          "const nums = [1, 1, 2, 3, 3, 3, 2, 2];\nlet longest = 1;\nlet current = 1;\nfor (let i = 1; i < nums.length; i++) {\n  current = nums[i] === nums[i - 1] ? current + 1 : 1;\n  longest = Math.max(longest, current);\n}\nconsole.log(longest);\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "typescript",
     label: "TypeScript",
-    title: "Greet a name",
-    instructions: greetInstructions("a template literal or concatenation"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`console.log()`"),
     files: [
       {
         filename: "main.ts",
-        starterCode: 'const name: string = "Grace";\n// your code here\n',
+        starterCode:
+          "const nums: number[] = [1, 1, 2, 3, 3, 3, 2, 2];\n// your code here\n",
         solutionCode:
-          'const name: string = "Grace";\nconsole.log(`Hello, ${name}!`);\n',
+          "const nums: number[] = [1, 1, 2, 3, 3, 3, 2, 2];\nlet longest = 1;\nlet current = 1;\nfor (let i = 1; i < nums.length; i++) {\n  current = nums[i] === nums[i - 1] ? current + 1 : 1;\n  longest = Math.max(longest, current);\n}\nconsole.log(longest);\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "php",
     label: "PHP",
-    title: "Greet a name",
-    instructions: greetInstructions("`echo` with string interpolation"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`echo`"),
     files: [
       {
         filename: "main.php",
-        starterCode: '<?php\n$name = "Grace";\n// your code here\n',
-        solutionCode: '<?php\n$name = "Grace";\necho "Hello, $name!\\n";\n',
+        starterCode:
+          "<?php\n$nums = [1, 1, 2, 3, 3, 3, 2, 2];\n// your code here\n",
+        solutionCode:
+          '<?php\n$nums = [1, 1, 2, 3, 3, 3, 2, 2];\n$longest = 1;\n$current = 1;\nfor ($i = 1; $i < count($nums); $i++) {\n    $current = $nums[$i] === $nums[$i - 1] ? $current + 1 : 1;\n    if ($current > $longest) {\n        $longest = $current;\n    }\n}\necho $longest, "\\n";\n',
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "c",
     label: "C",
-    title: "Greet a name",
-    instructions: greetInstructions("`printf` with a `%s` format specifier"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`printf`"),
     files: [
       {
         filename: "main.c",
         starterCode:
-          '#include <stdio.h>\n\nint main(void) {\n    const char *name = "Grace";\n    /* your code here */\n    return 0;\n}\n',
+          "#include <stdio.h>\n\nint main(void) {\n    int nums[] = {1, 1, 2, 3, 3, 3, 2, 2};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    /* your code here */\n    return 0;\n}\n",
         solutionCode:
-          '#include <stdio.h>\n\nint main(void) {\n    const char *name = "Grace";\n    printf("Hello, %s!\\n", name);\n    return 0;\n}\n',
+          '#include <stdio.h>\n\nint main(void) {\n    int nums[] = {1, 1, 2, 3, 3, 3, 2, 2};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    int longest = 1, current = 1;\n    for (int i = 1; i < n; i++) {\n        current = nums[i] == nums[i - 1] ? current + 1 : 1;\n        if (current > longest) longest = current;\n    }\n    printf("%d\\n", longest);\n    return 0;\n}\n',
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "cpp",
     label: "C++",
-    title: "Greet a name",
-    instructions: greetInstructions("`std::cout` and the `<<` operator"),
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`std::cout`"),
     files: [
       {
         filename: "main.cpp",
         starterCode:
-          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    // your code here\n    return 0;\n}\n',
+          "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> nums = {1, 1, 2, 3, 3, 3, 2, 2};\n    // your code here\n    return 0;\n}\n",
         solutionCode:
-          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    std::cout << "Hello, " << name << "!" << std::endl;\n    return 0;\n}\n',
+          "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    std::vector<int> nums = {1, 1, 2, 3, 3, 3, 2, 2};\n    int longest = 1, current = 1;\n    for (std::size_t i = 1; i < nums.size(); i++) {\n        current = nums[i] == nums[i - 1] ? current + 1 : 1;\n        longest = std::max(longest, current);\n    }\n    std::cout << longest << std::endl;\n    return 0;\n}\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "java",
     label: "Java",
-    title: "Greet a name",
-    instructions: greetMultiFile("Greeter.java", "constructs a `Greeter`"),
-    entryFilename: "Main.java",
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`System.out.println`"),
     files: [
       {
         filename: "Main.java",
         starterCode:
-          'public class Main {\n  public static void main(String[] args) {\n    Greeter greeter = new Greeter();\n    System.out.println(greeter.greet("Grace"));\n  }\n}\n',
-      },
-      {
-        filename: "Greeter.java",
-        starterCode:
-          'public class Greeter {\n  public String greet(String name) {\n    // your code here\n    return "";\n  }\n}\n',
+          "public class Main {\n  public static void main(String[] args) {\n    int[] nums = {1, 1, 2, 3, 3, 3, 2, 2};\n    // your code here\n  }\n}\n",
         solutionCode:
-          'public class Greeter {\n  public String greet(String name) {\n    return "Hello, " + name + "!";\n  }\n}\n',
+          "public class Main {\n  public static void main(String[] args) {\n    int[] nums = {1, 1, 2, 3, 3, 3, 2, 2};\n    int longest = 1, current = 1;\n    for (int i = 1; i < nums.length; i++) {\n      current = nums[i] == nums[i - 1] ? current + 1 : 1;\n      longest = Math.max(longest, current);\n    }\n    System.out.println(longest);\n  }\n}\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
   {
     adapter: "csharp",
     label: "C#",
-    title: "Greet a name",
-    instructions: greetMultiFile("Greeter.cs", "constructs a `Greeter`"),
-    entryFilename: "Main.cs",
+    title: "Longest consecutive run",
+    instructions: longestRunInstructions("`System.Console.WriteLine`"),
     files: [
       {
-        filename: "Main.cs",
+        filename: "main.cs",
         starterCode:
-          'var greeter = new Greeter();\nSystem.Console.WriteLine(greeter.Greet("Grace"));\n',
-      },
-      {
-        filename: "Greeter.cs",
-        starterCode:
-          'public class Greeter\n{\n    public string Greet(string name)\n    {\n        // your code here\n        return "";\n    }\n}\n',
+          "int[] nums = {1, 1, 2, 3, 3, 3, 2, 2};\n// your code here\n",
         solutionCode:
-          'public class Greeter\n{\n    public string Greet(string name)\n    {\n        return $"Hello, {name}!";\n    }\n}\n',
+          "int[] nums = {1, 1, 2, 3, 3, 3, 2, 2};\nint longest = 1, current = 1;\nfor (int i = 1; i < nums.Length; i++)\n{\n    current = nums[i] == nums[i - 1] ? current + 1 : 1;\n    longest = System.Math.Max(longest, current);\n}\nSystem.Console.WriteLine(longest);\n",
       },
     ],
-    tests: GREETING_TESTS,
+    tests: LONGEST_RUN_TESTS,
   },
 ];
 
@@ -281,22 +271,252 @@ export const SQL_CHALLENGES: HomeSqlChallenge[] = [
   employeesChallenge("duckdb", "DuckDB"),
 ];
 
+export interface HomeWebBlock {
+  /** Value stored in the flavor dropdown. */
+  flavor: string;
+  /** Label shown in the flavor dropdown. */
+  label: string;
+  adapter: AdapterId;
+  entryFilename?: string;
+  files: CodeBlockFile[];
+  /** Inject the in-browser Tailwind compiler into the preview. */
+  tailwind?: boolean;
+}
+
+// A small interactive page split across the CodePen-style trio. The web
+// adapter auto-composes root-level .css/.js into the HTML, so index.html stays
+// a plain body fragment with no <link>/<script src> boilerplate.
+const WEB_INDEX_HTML = `<div class="card">
+  <h1>Hello, web!</h1>
+  <p>Edit the HTML, CSS, or JS and press Run.</p>
+  <button id="go">Click me</button>
+</div>
+`;
+
+const WEB_STYLES_CSS = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  margin: 0;
+  background: #f8fafc;
+}
+
+.card {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+`;
+
+const WEB_SCRIPT_JS = `let clicks = 0;
+const button = document.querySelector("#go");
+
+button.addEventListener("click", () => {
+  clicks += 1;
+  button.textContent = "Clicked " + clicks + (clicks === 1 ? " time" : " times");
+  console.log("clicks:", clicks);
+});
+`;
+
+// A React counter split into a mount file, the component, and a CSS import.
+// esbuild-wasm bundles the workspace in a worker and the result renders in the
+// same sandboxed preview iframe the web block uses.
+const REACT_MAIN_TSX = `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`;
+
+const REACT_APP_TSX = `import { useState } from "react";
+
+export function App() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <main className="card">
+      <h1>You clicked {count} times</h1>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+      <p>
+        Edit <code>App.tsx</code> and press Run, imports between the panes
+        bundle right in your browser.
+      </p>
+    </main>
+  );
+}
+`;
+
+const REACT_STYLES_CSS = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  margin: 0;
+  background: #f8fafc;
+}
+
+.card {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 26rem;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 1rem;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+`;
+
 /**
- * One conceptual data-science / NLP multiple-choice question, authored in the
+ * The Web preview tab shows runnable code blocks (not graded challenge cards),
+ * one per flavor. Each is a small multi-file workspace that renders a live
+ * sandboxed preview.
+ */
+export const WEB_CODE_BLOCKS: HomeWebBlock[] = [
+  {
+    flavor: "web",
+    label: "HTML",
+    adapter: "web",
+    entryFilename: "index.html",
+    files: [
+      { filename: "index.html", starterCode: WEB_INDEX_HTML },
+      { filename: "styles.css", starterCode: WEB_STYLES_CSS },
+      { filename: "script.js", starterCode: WEB_SCRIPT_JS },
+    ],
+  },
+  {
+    flavor: "react",
+    label: "React",
+    adapter: "react",
+    entryFilename: "main.tsx",
+    files: [
+      { filename: "main.tsx", starterCode: REACT_MAIN_TSX },
+      { filename: "App.tsx", starterCode: REACT_APP_TSX },
+      { filename: "styles.css", starterCode: REACT_STYLES_CSS },
+    ],
+  },
+];
+
+/**
+ * Conceptual multiple-choice questions, authored in the
  * `<MultipleChoiceQuestion>` markdown format (`[o]` marks the correct choice;
  * `>` lines are per-choice explanations shown to every learner after they
  * answer). Per the repo's authoring rule, no explanation opens with an
- * affirmative word.
+ * affirmative word. The set spans the topics the courses cover: SQL, Python /
+ * data analysis, machine learning, web development, and NLP.
  */
-export const CONCEPT_QUESTION = `In NLP, what does the **IDF** (inverse document frequency) factor in TF-IDF do?
+export const CONCEPT_QUESTIONS: string[] = [
+  // SQL, WHERE vs HAVING
+  `In SQL, which clause filters rows **after** aggregation, so it can use the result of a function like \`COUNT()\` or \`SUM()\`?
 
-- It boosts terms that appear many times within a single document
-  > That effect comes from the TF (term-frequency) factor, which counts occurrences *within* one document. IDF is computed across the whole corpus and ignores within-document counts.
-- [o] It down-weights terms that appear in many documents across the corpus
-  > IDF, typically \`log(N / df)\`, scales a term's weight inversely to how many documents contain it, so ubiquitous words like "the" contribute little while rare, distinctive words count for more.
-- It rescales each document vector to unit length
-  > Length normalization (e.g. L2) is a separate, optional step applied after weighting — it is not what IDF computes.
-- It turns raw counts into probabilities that sum to one
-  > TF-IDF weights are not a probability distribution and need not sum to one.
+- The \`WHERE\` clause
+  > \`WHERE\` filters individual rows *before* they are grouped, so it cannot reference an aggregate such as \`COUNT(*)\`.
+- [o] The \`HAVING\` clause
+  > \`HAVING\` runs after \`GROUP BY\` collapses rows into groups, so a condition like \`HAVING COUNT(*) > 5\` works on the aggregated results.
+- The \`GROUP BY\` clause
+  > \`GROUP BY\` defines how rows are collected into groups; it does not filter them.
+- The \`ORDER BY\` clause
+  > \`ORDER BY\` only sorts the final result set and plays no part in filtering.
 
-TF-IDF multiplies a term's frequency in a document (TF) by its inverse document frequency (IDF). The IDF factor shrinks the influence of terms spread across many documents and amplifies rare, discriminative ones — which is why it is a workhorse weighting for search and text classification.`;
+\`WHERE\` filters raw rows before grouping, while \`HAVING\` filters the grouped results afterward. That ordering is why an aggregate condition like \`COUNT(*) > 5\` has to live in \`HAVING\`, not \`WHERE\`.`,
+
+  // Python / pandas, column selection returns a Series
+  `In pandas, what does selecting a single column with \`df["age"]\` return?
+
+- [o] A \`Series\`
+  > A single-column selection returns a one-dimensional \`Series\` whose index matches the DataFrame's rows.
+- A \`DataFrame\`
+  > Passing a *list* of columns, like \`df[["age"]]\`, returns a DataFrame; a bare string returns a Series.
+- A plain Python \`list\`
+  > pandas keeps the data in its own labelled structure, so you still get index labels and vectorized operations, not a built-in list.
+- A NumPy \`ndarray\`
+  > The values are backed by NumPy, but the object handed back is a \`Series\`; call \`.to_numpy()\` to drop down to a raw array.
+
+Indexing a DataFrame with a single column name gives a \`Series\`; indexing with a list of names gives a \`DataFrame\`. Keeping that distinction straight avoids a lot of shape-related bugs.`,
+
+  // Machine learning, purpose of a train/test split
+  `Why split a dataset into separate **training** and **test** sets before fitting a model?
+
+- To give the model more data to memorize
+  > Holding data back *reduces* the training set; the aim is honest evaluation, not memorization.
+- [o] To estimate how well the model generalizes to unseen data
+  > Scoring on data the model never trained on approximates its performance in production, where every input is new.
+- To make training run faster
+  > Any speedup is incidental and is not the reason to hold out a test set.
+- To remove the need to tune the model
+  > A test set measures performance; it does not replace choosing hyperparameters or features.
+
+A held-out test set stands in for future, unseen inputs, so its score estimates real-world performance and exposes overfitting when training accuracy is high but test accuracy is low.`,
+
+  // Web development, the CSS box model
+  `In the CSS box model, which property adds space **inside** an element, between its content and its border?
+
+- \`margin\`
+  > \`margin\` adds space *outside* the border, pushing neighbouring elements away.
+- [o] \`padding\`
+  > \`padding\` is the space between the content and the border, inside the element's own box.
+- \`border\`
+  > \`border\` is the line drawn at the edge itself, not the space around the content.
+- \`gap\`
+  > \`gap\` sets spacing *between* flex or grid children, not inside a single element.
+
+Padding sits inside the border; margin sits outside it. A quick mnemonic: padding pads the content within the box, while margin marks the distance to everything else.`,
+
+  // NLP, tokenization
+  `In natural language processing, what does **tokenization** do?
+
+- [o] Splits text into smaller units such as words or subwords
+  > Tokenization breaks a raw string into the discrete pieces (tokens) that later steps like counting, embedding, or tagging operate on.
+- Reduces every word to its dictionary root
+  > That describes stemming or lemmatization, which runs *after* the text has been tokenized.
+- Removes common words like "the" and "is"
+  > Dropping high-frequency words is stop-word removal, a separate optional cleaning step.
+- Converts characters to lowercase
+  > Lowercasing is a normalization step; it changes casing but does not divide the text into units.
+
+Tokenization is usually the first step in an NLP pipeline: it turns a continuous string into a sequence of tokens that models and counting methods can work with.`,
+];

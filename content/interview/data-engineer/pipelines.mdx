@@ -14,11 +14,11 @@ themes.
 
 ## Q&A
 
-### Batch vs streaming — how do you choose?
+### Batch vs streaming, how do you choose?
 
-**Batch** processes bounded chunks on a schedule — simple, cheap,
+**Batch** processes bounded chunks on a schedule, simple, cheap,
 easy to reprocess; latency is minutes-to-hours. **Streaming** processes
-events continuously — low latency, but more operationally complex
+events continuously, low latency, but more operationally complex
 (state, ordering, exactly-once). Choose by the **latency requirement**:
 dashboards refreshed hourly → batch; fraud/alerting that needs seconds →
 streaming. Many systems do both (lambda/kappa).
@@ -52,8 +52,8 @@ INSERT INTO events SELECT * FROM events_stage WHERE event_date = '2024-06-01';
 
 ### Why partition large tables, and what makes a good partition key?
 
-Partitioning lets the engine **prune** — skip files/partitions that can't
-match a query — cutting scan cost dramatically. A good key is one queries
+Partitioning lets the engine **prune**, skip files/partitions that can't
+match a query, cutting scan cost dramatically. A good key is one queries
 **filter on** (usually a date like `event_date`) with even, not-too-small
 partitions. Too-granular partitioning creates many tiny files (the
 "small files problem") and hurts performance.
@@ -127,22 +127,22 @@ row-oriented, untyped, and must be fully scanned.
 
 ### What is the small files problem and how do you fix it?
 
-Writing many tiny files (e.g., one Parquet file per minute instead of one per day) creates massive metadata overhead — the engine spends more time listing and opening files than reading data. Fixes include **compaction jobs** (periodic rewrites that merge small files into fewer large ones), adjusting partition granularity, and using table formats like Delta Lake or Apache Iceberg that manage file manifests efficiently.
+Writing many tiny files (e.g., one Parquet file per minute instead of one per day) creates massive metadata overhead, the engine spends more time listing and opening files than reading data. Fixes include **compaction jobs** (periodic rewrites that merge small files into fewer large ones), adjusting partition granularity, and using table formats like Delta Lake or Apache Iceberg that manage file manifests efficiently.
 
 ### What is exactly-once vs at-least-once delivery semantics?
 
-**At-least-once** guarantees every message is delivered, but duplicates are possible on retry. **Exactly-once** guarantees each message is processed precisely once — no duplicates, no loss. Exactly-once is harder to achieve (requires coordination between producer, broker, and consumer) and carries higher latency/overhead. Many production systems accept at-least-once delivery and make the consumer **idempotent** rather than paying the cost of true exactly-once.
+**At-least-once** guarantees every message is delivered, but duplicates are possible on retry. **Exactly-once** guarantees each message is processed precisely once, no duplicates, no loss. Exactly-once is harder to achieve (requires coordination between producer, broker, and consumer) and carries higher latency/overhead. Many production systems accept at-least-once delivery and make the consumer **idempotent** rather than paying the cost of true exactly-once.
 
 ### What is Change Data Capture (CDC) and when do you use it?
 
-CDC tracks row-level changes (inserts, updates, deletes) in a source database — typically by reading the database's write-ahead log (WAL) — and propagates them downstream in near real time. Use it when you need low-latency replication of transactional data to a warehouse or lake without polling the source table, and when you must capture deletes (which a simple `WHERE updated_at > last_run` query misses).
+CDC tracks row-level changes (inserts, updates, deletes) in a source database, typically by reading the database's write-ahead log (WAL), and propagates them downstream in near real time. Use it when you need low-latency replication of transactional data to a warehouse or lake without polling the source table, and when you must capture deletes (which a simple `WHERE updated_at > last_run` query misses).
 
 The config below sets up a Debezium Postgres connector that reads the WAL
 (`plugin.name: pgoutput`) for the `public.orders` table and publishes
 change events to Kafka topics under the `cdc` prefix.
 
 ```yaml
-# Debezium connector config (Kafka Connect) — streams Postgres WAL events
+# Debezium connector config (Kafka Connect), streams Postgres WAL events
 # to a Kafka topic as JSON change events with op: "c" / "u" / "d"
 name: postgres-source
 config:
@@ -184,11 +184,11 @@ def process_partition(ds: str):  # ds = "2024-06-01" injected by Airflow
 
 ### What is ETL vs ELT?
 
-**ETL (Extract, Transform, Load)** transforms data before loading it into the target — common when the target system has limited compute or strict schema requirements. **ELT (Extract, Load, Transform)** loads raw data first, then transforms it inside the warehouse — the modern default because cloud warehouses have abundant compute and SQL transformations (dbt) run fast in-place. ELT makes raw data available for re-transformation without re-extraction.
+**ETL (Extract, Transform, Load)** transforms data before loading it into the target, common when the target system has limited compute or strict schema requirements. **ELT (Extract, Load, Transform)** loads raw data first, then transforms it inside the warehouse, the modern default because cloud warehouses have abundant compute and SQL transformations (dbt) run fast in-place. ELT makes raw data available for re-transformation without re-extraction.
 
 ### What is a lakehouse and how does it differ from a data warehouse?
 
-A **data warehouse** stores structured, processed data in a proprietary format optimized for SQL queries (e.g., Snowflake, BigQuery, Redshift). A **data lake** stores raw data in open formats (Parquet, Optimized Row Columnar (ORC), Avro) on cheap object storage. A **lakehouse** adds a transactional metadata layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of lake storage, giving you ACID transactions, schema enforcement, time travel, and efficient updates — warehouse-like reliability on lake-like open storage at lower cost.
+A **data warehouse** stores structured, processed data in a proprietary format optimized for SQL queries (e.g., Snowflake, BigQuery, Redshift). A **data lake** stores raw data in open formats (Parquet, Optimized Row Columnar (ORC), Avro) on cheap object storage. A **lakehouse** adds a transactional metadata layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of lake storage, giving you ACID transactions, schema enforcement, time travel, and efficient updates, warehouse-like reliability on lake-like open storage at lower cost.
 
 ### What is Apache Avro and when is it preferred over Parquet?
 
@@ -196,7 +196,7 @@ Avro is a **row-based**, schema-embedded binary format. It excels at **streaming
 
 ### What is ORC and how does it compare to Parquet?
 
-ORC is another columnar format — like Parquet it supports compression and predicate pushdown, and it originated in the Hive/Hadoop ecosystem. ORC has historically had slightly better compression for string-heavy data and stronger native support in Hive/Presto; Parquet has broader ecosystem support (Spark, Pandas, BigQuery, Snowflake). In practice, Parquet is the more portable choice for modern stacks.
+ORC is another columnar format, like Parquet it supports compression and predicate pushdown, and it originated in the Hive/Hadoop ecosystem. ORC has historically had slightly better compression for string-heavy data and stronger native support in Hive/Presto; Parquet has broader ecosystem support (Spark, Pandas, BigQuery, Snowflake). In practice, Parquet is the more portable choice for modern stacks.
 
 ### What is schema evolution, and how do Parquet and Avro handle it?
 
@@ -204,24 +204,24 @@ Schema evolution is the ability to change a schema (add, rename, remove, or chan
 
 ### What is a DAG in Airflow, and what are common anti-patterns?
 
-A **DAG** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls — they slow the scheduler; (2) **tasks that do too much** — large monolithic tasks make retries expensive; (3) **no idempotency** — tasks that fail partway through corrupt state; (4) **passing large data through XComs** — XComs are for small metadata, not DataFrames; use external storage.
+A **DAG** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls, they slow the scheduler; (2) **tasks that do too much**, large monolithic tasks make retries expensive; (3) **no idempotency**, tasks that fail partway through corrupt state; (4) **passing large data through XComs**, XComs are for small metadata, not DataFrames; use external storage.
 
 The two `extract` versions below contrast returning a million rows
 directly into the XCom database against writing them to S3 and returning
-only the `path` string — keeping the XCom payload tiny.
+only the `path` string, keeping the XCom payload tiny.
 
 ```python
 # Anti-pattern: XCom used to pass a large result set
 @task
 def extract():
-    return fetch_million_rows()   # serialized into XCom DB — avoid
+    return fetch_million_rows()   # serialized into XCom DB, avoid
 
 # Better: write to S3/GCS and pass only the path
 @task
 def extract():
     path = "s3://bucket/staging/run_id.parquet"
     write_parquet(fetch_million_rows(), path)
-    return path                   # tiny string in XCom — fine
+    return path                   # tiny string in XCom, fine
 ```
 
 ### What is a task vs a sensor in Airflow?
@@ -255,7 +255,7 @@ Data quality tests validate that data meets expectations before it flows downstr
 
 ### What is dbt and where does it fit in an ELT pipeline?
 
-**dbt (data build tool)** is a transformation framework that runs SQL `SELECT` statements against a warehouse and materializes the results as tables or views. It handles dependency ordering (via `ref()` calls), incremental models, testing, documentation, and lineage. It occupies the "T" in ELT — after raw data is loaded into the warehouse, dbt transforms it into clean, modeled tables for analytics.
+**dbt (data build tool)** is a transformation framework that runs SQL `SELECT` statements against a warehouse and materializes the results as tables or views. It handles dependency ordering (via `ref()` calls), incremental models, testing, documentation, and lineage. It occupies the "T" in ELT, after raw data is loaded into the warehouse, dbt transforms it into clean, modeled tables for analytics.
 
 The model below builds `fct_orders` by joining `stg_orders` to the
 `dim_customer` and `dim_date` models through `ref()` calls, which is how
@@ -278,11 +278,11 @@ JOIN {{ ref('dim_date') }}    d ON d.date_key     = o.order_date_key
 
 A layered data lake or lakehouse design:
 
-- **Bronze** — raw, unmodified source data, preserved as-is for reprocessing.
-- **Silver** — cleaned, deduplicated, conformed data; joins applied; a reliable "single source of truth."
-- **Gold** — business-level aggregates and denormalized tables optimized for specific BI or ML use cases.
+- **Bronze**, raw, unmodified source data, preserved as-is for reprocessing.
+- **Silver**, cleaned, deduplicated, conformed data; joins applied; a reliable "single source of truth."
+- **Gold**, business-level aggregates and denormalized tables optimized for specific BI or ML use cases.
 
-Each layer is idempotent — gold can always be rebuilt from silver, silver from bronze:
+Each layer is idempotent, gold can always be rebuilt from silver, silver from bronze:
 
 ```mermaid
 flowchart TD
@@ -293,15 +293,15 @@ flowchart TD
 
 ### What is a Lambda vs Kappa architecture?
 
-**Lambda** runs two parallel paths: a **batch layer** for accurate historical processing and a **speed layer** for low-latency streaming results, with a **serving layer** merging both. It is complex to maintain because logic must be written twice. **Kappa** uses a **single streaming path** for all data — historical reprocessing is done by replaying the event log (e.g., Kafka). Kappa is simpler when the streaming framework can handle batch semantics; Lambda is a fallback when streaming accuracy or replay isn't feasible.
+**Lambda** runs two parallel paths: a **batch layer** for accurate historical processing and a **speed layer** for low-latency streaming results, with a **serving layer** merging both. It is complex to maintain because logic must be written twice. **Kappa** uses a **single streaming path** for all data, historical reprocessing is done by replaying the event log (e.g., Kafka). Kappa is simpler when the streaming framework can handle batch semantics; Lambda is a fallback when streaming accuracy or replay isn't feasible.
 
 ### What are common cost optimization strategies for cloud data pipelines?
 
-Key levers: (1) **partition pruning and predicate pushdown** — read less data; (2) **right-sizing compute** — auto-scaling clusters, spot/preemptible instances for batch; (3) **columnar compressed formats** (Parquet/ORC) over CSV; (4) **incremental processing** instead of full reloads; (5) **caching** intermediate results that are queried repeatedly; (6) **storage tiering** — move cold data to cheaper storage classes; (7) **query result caching** at the warehouse layer; (8) minimizing data shuffles in distributed engines (Spark/Flink).
+Key levers: (1) **partition pruning and predicate pushdown**, read less data; (2) **right-sizing compute**, auto-scaling clusters, spot/preemptible instances for batch; (3) **columnar compressed formats** (Parquet/ORC) over CSV; (4) **incremental processing** instead of full reloads; (5) **caching** intermediate results that are queried repeatedly; (6) **storage tiering**, move cold data to cheaper storage classes; (7) **query result caching** at the warehouse layer; (8) minimizing data shuffles in distributed engines (Spark/Flink).
 
 ### What is the "fan-out" problem in pipelines?
 
-Fan-out occurs when a single upstream change triggers many downstream recomputations — for example, a correction to a dimension table invalidating thousands of downstream aggregations. Manage it with **selective invalidation** (only recompute affected partitions), **dependency graphs** that identify minimal recomputation scope, and **change data capture** that propagates only delta changes rather than full refreshes.
+Fan-out occurs when a single upstream change triggers many downstream recomputations, for example, a correction to a dimension table invalidating thousands of downstream aggregations. Manage it with **selective invalidation** (only recompute affected partitions), **dependency graphs** that identify minimal recomputation scope, and **change data capture** that propagates only delta changes rather than full refreshes.
 
 ### How do you handle schema changes from source systems without breaking downstream?
 
@@ -309,11 +309,11 @@ Strategies: (1) **land raw data in a schema-on-read layer** (Bronze) so changes 
 
 ### What is a circuit breaker pattern in data engineering?
 
-A **circuit breaker** stops a pipeline from propagating bad data downstream when a quality check fails — analogous to an electrical circuit breaker. The pipeline fails fast, alerts the team, and halts further processing rather than letting corrupt or anomalous data silently pollute dependent tables and dashboards. It is implemented as a quality gate task that the DAG must pass before proceeding.
+A **circuit breaker** stops a pipeline from propagating bad data downstream when a quality check fails, analogous to an electrical circuit breaker. The pipeline fails fast, alerts the team, and halts further processing rather than letting corrupt or anomalous data silently pollute dependent tables and dashboards. It is implemented as a quality gate task that the DAG must pass before proceeding.
 
 ### What is data lineage and why does it matter?
 
-**Data lineage** tracks the origin, movement, and transformation of data from source to final table — which source systems feed which raw tables, which transformations produce which downstream assets, and which dashboards consume them. It matters for debugging ("why did this metric change?"), impact analysis ("if I drop this column, what breaks?"), regulatory compliance (GDPR data provenance), and onboarding new engineers who need to understand the data flow.
+**Data lineage** tracks the origin, movement, and transformation of data from source to final table, which source systems feed which raw tables, which transformations produce which downstream assets, and which dashboards consume them. It matters for debugging ("why did this metric change?"), impact analysis ("if I drop this column, what breaks?"), regulatory compliance (GDPR data provenance), and onboarding new engineers who need to understand the data flow.
 
 ### What is an SLA in a data pipeline, and how do you enforce it?
 
@@ -342,9 +342,9 @@ An **SLA (Service Level Agreement)** in pipeline context is a commitment that a 
   markdown={`A 2 TB events table is almost always queried with \`WHERE event_date = '…'\`. What's the highest-impact change?
 
 - Convert it to CSV for portability.
-  > CSV is row-oriented and untyped — it would *increase* scan cost, the opposite of what's needed.
+  > CSV is row-oriented and untyped, it would *increase* scan cost, the opposite of what's needed.
 - [o] Partition (and/or order) the table by \`event_date\` so queries prune to one day's files.
-  > Partitioning on the common filter lets the engine skip the other ~99.9% of data — a massive I/O win.
+  > Partitioning on the common filter lets the engine skip the other ~99.9% of data, a massive I/O win.
 - Add every column to a single composite index.
   > Warehouse scan cost is dominated by data read; partition pruning + columnar format matter far more than a wide index.
 - Store it as one giant file.
@@ -353,4 +353,4 @@ An **SLA (Service Level Agreement)** in pipeline context is a commitment that a 
 
 ## Go deeper
 
-- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb) — querying Parquet directly.
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb), querying Parquet directly.

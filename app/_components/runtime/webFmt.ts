@@ -4,7 +4,7 @@
 // tab the user visits first.
 //
 // The version is pinned to match the installed npm package so the JS
-// and WASM builds always stay in sync — update both together.
+// and WASM builds always stay in sync, update both together.
 const WEB_FMT_VERSION = "0.2.9";
 
 // DataSlope's house style for JS/TS: 2-space indentation. web_fmt defaults

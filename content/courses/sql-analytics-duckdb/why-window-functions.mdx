@@ -1,10 +1,10 @@
 ---
 title: Why Window Functions Exist
-description: The problem GROUP BY cannot solve — keeping every row while also seeing a summary. Window functions explained from the ground up, with the OVER clause demystified.
+description: The problem GROUP BY cannot solve, keeping every row while also seeing a summary. Window functions explained from the ground up, with the OVER clause demystified.
 ---
 
 Window functions are the technique that separates casual SQL users from
-fluent analysts — and the one most people find genuinely hard at first.
+fluent analysts, and the one most people find genuinely hard at first.
 This page goes slowly and builds the *why* before any syntax, because the
 mechanics only make sense once you see the problem they solve. Because
 this is a foundational, often-confusing concept, this page has extra
@@ -13,7 +13,7 @@ practice questions.
 <svg
   viewBox="0 0 640 235"
   role="img"
-  aria-label="The same five rows take two paths: down the left line they collapse into a single green summary dot, down the right line all five survive and each carries an identical small green badge — GROUP BY summarizes instead of the rows, a window function summarizes alongside them"
+  aria-label="The same five rows take two paths: down the left line they collapse into a single green summary dot, down the right line all five survive and each carries an identical small green badge, GROUP BY summarizes instead of the rows, a window function summarizes alongside them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -50,7 +50,7 @@ practice questions.
 ## The problem `GROUP BY` cannot solve
 
 `GROUP BY` is powerful but it **destroys the individual rows**. When you
-group orders by region, you get one row per region — the orders
+group orders by region, you get one row per region, the orders
 themselves are gone. That is fine for a summary, but it fails the moment
 you want to *keep every row* and *also* show a summary beside it.
 
@@ -80,7 +80,7 @@ collapsing them. You keep all your detail *and* gain the summary.
 ## The `OVER` clause is what makes it a window
 
 Any aggregate becomes a window function when you add an `OVER (...)`
-clause. `SUM(amount)` collapses; `SUM(amount) OVER (...)` does **not** —
+clause. `SUM(amount)` collapses; `SUM(amount) OVER (...)` does **not**,
 it computes a sum over a "window" of rows and writes it onto each row.
 
 Start with the simplest possible window: `OVER ()` with empty parentheses
@@ -118,7 +118,7 @@ entire difference.
 <svg
   viewBox="0 0 640 165"
   role="img"
-  aria-label="Five faint rows of different lengths each end in an identical yellow chip stacked in one neat column — an empty OVER clause writes the same grand total onto every surviving row"
+  aria-label="Five faint rows of different lengths each end in an identical yellow chip stacked in one neat column, an empty OVER clause writes the same grand total onto every surviving row"
   style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.13">
@@ -138,11 +138,11 @@ entire difference.
   </g>
 </svg>
 
-## `PARTITION BY` — windows per group
+## `PARTITION BY`, windows per group
 
 `OVER ()` uses the whole table as one window. `PARTITION BY region` splits
 the rows into one window **per region**, so each row gets *its own
-region's* total. This is the window-function echo of `GROUP BY` — but the
+region's* total. This is the window-function echo of `GROUP BY`, but the
 rows stay.
 
 <SqlCodeBlock
@@ -184,7 +184,7 @@ flowchart TD
     N --> NT["each North row<br/>gets North total"]
 ```
 
-Now the original request is one step away — divide each `amount` by its
+Now the original request is one step away, divide each `amount` by its
 `region_total`:
 
 <SqlCodeBlock
@@ -222,7 +222,7 @@ That `pct_of_region` is impossible with `GROUP BY` alone in a single
 query, because it needs the row *and* the group total side by side.
 Window functions make it one line.
 
-## `GROUP BY` vs window — the key contrast
+## `GROUP BY` vs window, the key contrast
 
 | | `GROUP BY` | Window function (`OVER`) |
 | --- | --- | --- |
@@ -247,7 +247,7 @@ SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
 - The **function** (`SUM`, `AVG`, `COUNT`, `ROW_NUMBER`, ...) is what to
   compute.
 - **`PARTITION BY`** decides which rows belong to the same window
-  (optional — omit it for one big window).
+  (optional, omit it for one big window).
 - **`ORDER BY`** orders rows *inside* each window, which matters for
   running totals and rankings (next pages).
 
@@ -263,7 +263,7 @@ SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
 - \`GROUP BY\` keeps every row while window functions collapse them.
   > It is the reverse: \`GROUP BY\` collapses; window functions preserve rows.
 - They always return identical results.
-  > They return different shapes — one row per group vs one row per input row.
+  > They return different shapes, one row per group vs one row per input row.
 
 A window function preserves detail rows and adds a per-window summary;
 \`GROUP BY\` collapses detail into group summaries.`}
@@ -281,7 +281,7 @@ A window function preserves detail rows and adds a per-window summary;
 - Sort the rows ascending.
   > \`OVER ()\` does not sort; it defines the window as all rows.
 
-\`OVER ()\` makes the whole result a single window — the grand total lands
+\`OVER ()\` makes the whole result a single window, the grand total lands
 on every row.`}
 />
 
@@ -307,7 +307,7 @@ rows.`}
 - Because \`GROUP BY\` cannot compute a \`SUM\`.
   > \`GROUP BY\` computes sums fine; the difficulty is combining the sum with each detail row.
 - [o] It needs the individual order **and** the region total in the same row, but \`GROUP BY\` collapses the orders away.
-  > The per-row share requires row-level detail beside the group total — exactly what windows provide and \`GROUP BY\` does not.
+  > The per-row share requires row-level detail beside the group total, exactly what windows provide and \`GROUP BY\` does not.
 - Because percentages are not allowed in SQL.
   > Percentages are ordinary arithmetic; SQL handles them.
 - Because regions cannot be grouped.

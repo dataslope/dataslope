@@ -1,17 +1,17 @@
 ---
 title: Subqueries
-description: Queries inside queries — using the result of one SELECT as an input to another to answer layered questions.
+description: Queries inside queries, using the result of one SELECT as an input to another to answer layered questions.
 ---
 
 So far each question has been one `SELECT`. But some questions are
 *layered*: "show me orders bigger than the **average** order." You
-cannot know the average until you compute it — so you write a query
+cannot know the average until you compute it, so you write a query
 **inside** a query. That inner query is a **subquery**.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A query inside a query — the inner box computes a single yellow value that rises to plug into the waiting socket of the outer query"
+  aria-label="A query inside a query, the inner box computes a single yellow value that rises to plug into the waiting socket of the outer query"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ the outer query runs.
 
 ## A subquery that returns one value
 
-The simplest subquery returns a **single value** — like an average —
+The simplest subquery returns a **single value**, like an average,
 which you compare against in a `WHERE` clause:
 
 <SqlCodeBlock
@@ -85,12 +85,12 @@ ORDER BY
 />
 
 The inner `SELECT AVG(amount)` computes `40`. The outer query then
-behaves as if you had written `WHERE amount > 40` — but you never had
+behaves as if you had written `WHERE amount > 40`, but you never had
 to know the number yourself. Change the data and it stays correct.
 
 <Callout type="info" title="Why not just type the number?">
 You could run the average separately and paste `40` into your query.
-But then it is frozen — add an order and it is wrong. A subquery
+But then it is frozen, add an order and it is wrong. A subquery
 recomputes every time, so the query is always right by construction.
 </Callout>
 
@@ -127,7 +127,7 @@ ORDER BY
 />
 
 The inner query produces the set `{1, 2}`; the outer query keeps
-customers whose `id` is in that set — Ada and Grace. Linus, absent
+customers whose `id` is in that set, Ada and Grace. Linus, absent
 from the list, is excluded. (This is one of several ways to express
 the question; a join could do it too.)
 
@@ -144,11 +144,11 @@ flowchart TD
     W --- F --- S
 ```
 
-- **In `WHERE`** — the most common, as above: compare a column to a
+- **In `WHERE`**, the most common, as above: compare a column to a
   computed value or set.
-- **In `FROM`** — use a query's result as if it were a table (a
+- **In `FROM`**, use a query's result as if it were a table (a
   "derived table"), then query *that*.
-- **In `SELECT`** — produce a single extra value alongside each row.
+- **In `SELECT`**, produce a single extra value alongside each row.
 
 You will use the `WHERE` form constantly; the others appear as
 questions grow more complex.
@@ -159,7 +159,7 @@ questions grow more complex.
   markdown={`What is a subquery?
 
 - A query that can only count rows.
-  > Subqueries can return values, lists, or whole tables — not only counts.
+  > Subqueries can return values, lists, or whole tables, not only counts.
 - [o] A \`SELECT\` written inside another query, whose result is used by the outer query.
   > A subquery is nested inside another statement, and its output feeds the surrounding query.
 - A faster version of a regular query.
@@ -205,7 +205,7 @@ The subquery recomputes the value each run, so the comparison never goes stale.`
 <SqlChallengeCard
   dialect="postgres"
   title="Pricier than average"
-  instructions={`The \`products\` table has \`name\` and \`price\` columns. Return the \`name\` and \`price\` of every product priced **above the average price of all products**, sorted from the most expensive to the least. Compute the average with a subquery — do not type the number yourself.`}
+  instructions={`The \`products\` table has \`name\` and \`price\` columns. Return the \`name\` and \`price\` of every product priced **above the average price of all products**, sorted from the most expensive to the least. Compute the average with a subquery, do not type the number yourself.`}
   initSql={`CREATE TABLE products (
   id    SERIAL PRIMARY KEY,
   name  TEXT NOT NULL,

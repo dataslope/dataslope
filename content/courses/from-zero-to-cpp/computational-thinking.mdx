@@ -1,6 +1,6 @@
 ---
 title: Computational Thinking
-description: Decomposition, pattern recognition, abstraction, and algorithms — the four mental tools every programmer uses.
+description: Decomposition, pattern recognition, abstraction, and algorithms, the four mental tools every programmer uses.
 ---
 
 The hardest part of programming is not the language. It is teaching
@@ -8,11 +8,11 @@ yourself a particular way of *thinking* about problems. Computer
 scientists call this **computational thinking**, and it has four
 classic ingredients:
 
-1. **Decomposition** — break a big problem into small pieces.
-2. **Pattern recognition** — notice that two pieces are similar.
-3. **Abstraction** — ignore irrelevant details and focus on what
+1. **Decomposition**, break a big problem into small pieces.
+2. **Pattern recognition**, notice that two pieces are similar.
+3. **Abstraction**, ignore irrelevant details and focus on what
    matters.
-4. **Algorithms** — write a precise, step-by-step procedure.
+4. **Algorithms**, write a precise, step-by-step procedure.
 
 Most beginner frustration comes from trying to write code *before*
 doing those four things. This chapter is mostly prose, with a few
@@ -21,7 +21,7 @@ code blocks for illustration. The goal is to install a habit.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Four quadrants: a block split into small pieces, two matching circles highlighted around an odd triangle, a noisy cluster reduced to one clean circle, and numbered steps in a row — the four ingredients of computational thinking"
+  aria-label="Four quadrants: a block split into small pieces, two matching circles highlighted around an odd triangle, a noisy cluster reduced to one clean circle, and numbered steps in a row, the four ingredients of computational thinking"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -108,8 +108,8 @@ flowchart TD
 ```
 
 Each leaf of that tree is small enough that you could probably write
-it in 5–15 lines of C++. *That* is what you should code first — the
-leaves — not the whole thing at once.
+it in 5–15 lines of C++. *That* is what you should code first, the
+leaves, not the whole thing at once.
 
 ## Pattern recognition: spot the repetition
 
@@ -360,7 +360,7 @@ yourself to enumerate them *before* you finish the code.
 <ChallengeCard
   adapter="cpp"
   title="Count vowels"
-  instructions={`Implement a function \`int count_vowels(const std::string& s)\` that returns how many characters in \`s\` are vowels. Treat both upper- and lower-case \`a, e, i, o, u\` as vowels. \`main\` already prints the result for a fixed input — your job is to implement the function.\n\nThink through edge cases: empty string, all-vowel string, no vowels, mixed case.`}
+  instructions={`Implement a function \`int count_vowels(const std::string& s)\` that returns how many characters in \`s\` are vowels. Treat both upper- and lower-case \`a, e, i, o, u\` as vowels. \`main\` already prints the result for a fixed input, your job is to implement the function.\n\nThink through edge cases: empty string, all-vowel string, no vowels, mixed case.`}
   files={[
     {
       filename: "main.cpp",
@@ -474,4 +474,4 @@ int main() {
   > Real programs do not know in advance what input they'll get; you must reason about *categories* of input, not specific cases.`}
 />
 
-Next: variables and memory — what *is* a variable, really?
+Next: variables and memory, what *is* a variable, really?

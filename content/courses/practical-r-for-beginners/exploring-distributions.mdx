@@ -1,6 +1,6 @@
 ---
 title: Exploring Distributions
-description: Histograms, density plots, and boxplots — three ways of *seeing* the entire shape of a column at once. The visual companion to summary statistics.
+description: Histograms, density plots, and boxplots, three ways of *seeing* the entire shape of a column at once. The visual companion to summary statistics.
 ---
 
 A summary statistic compresses a column to one number. A
@@ -10,9 +10,9 @@ uses both.
 
 Three plots cover most of what you need:
 
-1. **Histogram** — counts in each bucket
-2. **Density plot** — a smooth version of the histogram
-3. **Boxplot** — a five-number summary as a picture, easy to
+1. **Histogram**, counts in each bucket
+2. **Density plot**, a smooth version of the histogram
+3. **Boxplot**, a five-number summary as a picture, easy to
    compare across groups
 
 ```mermaid
@@ -30,7 +30,7 @@ flowchart LR
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three small panels show the same skewed column three ways — histogram bars, a smooth density hump, and a horizontal boxplot — one distribution, three lenses"
+  aria-label="Three small panels show the same skewed column three ways, histogram bars, a smooth density hump, and a horizontal boxplot, one distribution, three lenses"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.06">
@@ -92,7 +92,7 @@ binning affects the impression.
 - **Spread**: narrow or wide?
 - **Skew**: long tail on the right (right-skewed) or on the left
   (left-skewed)?
-- **Modes**: one peak (unimodal) or more (multimodal — often a
+- **Modes**: one peak (unimodal) or more (multimodal, often a
   sign of a hidden grouping variable)?
 - **Gaps and outliers**: empty zones, lonely far-away values
 
@@ -283,7 +283,7 @@ par(mfrow = c(1, 1))
 - [o] right-skewed
   > "Right-skewed" means the tail extends to the right (toward larger values). It is the most common shape for natural data like income or transaction sizes.
 - bimodal
-  > Bimodal means two peaks, not a single tail — this histogram has one dominant cluster with a tail, not two separate humps.
+  > Bimodal means two peaks, not a single tail, this histogram has one dominant cluster with a tail, not two separate humps.
 - symmetric
   > A symmetric distribution has roughly equal bulk on both sides of the center; a long right tail rules that out.
 `}
@@ -366,5 +366,5 @@ cat("done\\n")
 />
 
 So far we've looked at one column at a time. The next page is
-about the *relationships* between columns — and where many of
+about the *relationships* between columns, and where many of
 the most interesting analyses begin.

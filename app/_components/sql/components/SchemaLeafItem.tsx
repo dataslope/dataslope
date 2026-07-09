@@ -6,7 +6,7 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Hash, Zap } from "lucide-react";
 
 // ────────────────────────────────────────────────────────────────────────
-// SchemaLeafItem — sidebar row for indexes and triggers. These have
+// SchemaLeafItem, sidebar row for indexes and triggers. These have
 // no per-column metadata so the row is non-expandable; the row is just
 // a name + context menu (View DDL / Copy Name / Drop).
 // ────────────────────────────────────────────────────────────────────────

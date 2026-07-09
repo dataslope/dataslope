@@ -1,10 +1,10 @@
 // jsDelivr CDN configuration for the C# .NET WebAssembly runtime
 // bundle. The bundle's assemblies (~35 MB) are committed under
 // cdn-assets/_dotnet/ but intentionally kept out of Next.js's public/
-// folder so Vercel does not serve — and charge bandwidth for — those
-// files. (Java's tools.jar is handled the same way — published as the
+// folder so Vercel does not serve, and charge bandwidth for, those
+// files. (Java's tools.jar is handled the same way, published as the
 // dataslope-tools-jar npm package and fetched from unpkg, see
-// TOOLS_JAR_CDN below — because jsDelivr refuses .jar files.)
+// TOOLS_JAR_CDN below, because jsDelivr refuses .jar files.)
 //
 // After merging any PR that changes files under cdn-assets/, bump
 // CDN_ASSETS_TAG to a new version, then create a matching Git tag
@@ -26,7 +26,7 @@ export const PGLITE_VERSION = "0.4.5";
 export const PGLITE_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/index.js`;
 export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
 
-// Java's tools.jar (~18 MB) — the OpenJDK 8 javac that CheerpJ drives —
+// Java's tools.jar (~18 MB), the OpenJDK 8 javac that CheerpJ drives,
 // is published as the standalone npm package `dataslope-tools-jar` and
 // fetched from unpkg at runtime (see cheerpj.ts), so Vercel never serves
 // it. unpkg is used rather than jsDelivr (which refuses .jar files with
@@ -60,7 +60,7 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 
 // The TypeScript compiler (~2 MB gz) powers JS/TS intellisense inside a
 // dedicated worker (see ts-language-worker.ts). Loaded from jsDelivr via
-// importScripts — same rationale as Pyodide: it stays out of the client
+// importScripts, same rationale as Pyodide: it stays out of the client
 // chunks and only downloads when a JS/TS editor first requests a
 // completion. The lib.*.d.ts standard-library declarations come from the
 // same pinned package. Keep TYPESCRIPT_VERSION in sync with the
@@ -71,14 +71,14 @@ export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TY
 // esbuild-wasm powers the React/TSX playground's transform + bundle step
 // inside a dedicated worker (see esbuild-worker.ts). The browser build is
 // pulled with importScripts and the WASM binary streamed from the same
-// pinned package — nothing lands in the client chunks; the download only
+// pinned package, nothing lands in the client chunks; the download only
 // happens when a React block/playground first boots. esbuild-wasm is NOT
 // in package.json (the worker declares the small API surface it uses),
 // so this pin is the single source of truth for the version.
 export const ESBUILD_WASM_VERSION = "0.28.1";
 export const ESBUILD_WASM_CDN_BASE = `https://cdn.jsdelivr.net/npm/esbuild-wasm@${ESBUILD_WASM_VERSION}`;
 
-// Tailwind's official in-browser compiler (@tailwindcss/browser v4) —
+// Tailwind's official in-browser compiler (@tailwindcss/browser v4),
 // injected into web-preview documents when a block/example opts in via
 // `previewTailwind`. Tailwind Labs designates it a development-time
 // compiler (it compiles utility classes on the fly with a
@@ -87,7 +87,7 @@ export const ESBUILD_WASM_CDN_BASE = `https://cdn.jsdelivr.net/npm/esbuild-wasm@
 export const TAILWIND_BROWSER_VERSION = "4.3.2";
 export const TAILWIND_BROWSER_CDN = `https://cdn.jsdelivr.net/npm/@tailwindcss/browser@${TAILWIND_BROWSER_VERSION}`;
 
-// esm.sh serves npm packages as native ES modules — the React preview's
+// esm.sh serves npm packages as native ES modules, the React preview's
 // bundler rewrites bare imports (`react`, `react-dom/client`, any npm
 // package) to pinned esm.sh URLs and marks them external, so the browser
 // fetches them directly inside the sandboxed preview iframe. See

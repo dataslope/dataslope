@@ -5,8 +5,8 @@
 // "selecting an editor theme changes the overall feel" behavior is
 // identical across playgrounds.
 //
-// The catalog is intentionally just two themes — GitHub Light and GitHub
-// Dark — which map 1:1 to the site-wide light/dark mode. The playground's
+// The catalog is intentionally just two themes, GitHub Light and GitHub
+// Dark, which map 1:1 to the site-wide light/dark mode. The playground's
 // light/dark choice is therefore the SAME choice the rest of the site uses
 // (the `theme` localStorage key + `.dark` class); see playgroundThemeSync.ts.
 //
@@ -135,7 +135,7 @@ export function getStoredEditorTheme(legacyKey?: string): string | null {
       return legacy;
     }
   } catch {
-    // localStorage unavailable — fall back to defaults.
+    // localStorage unavailable, fall back to defaults.
   }
   return null;
 }
@@ -144,7 +144,7 @@ export function setStoredEditorTheme(theme: string): void {
   try {
     localStorage.setItem(PLAYGROUND_EDITOR_THEME_STORAGE_KEY, theme);
   } catch {
-    // localStorage unavailable — state still updates for this session.
+    // localStorage unavailable, state still updates for this session.
   }
 }
 

@@ -7,12 +7,12 @@ C was designed in 1972 by Dennis Ritchie at Bell Labs as a portable
 language for rewriting the Unix kernel. More than fifty years later,
 it is still the language that the world's most important systems are
 written in. Knowing why will help you understand what to expect from
-the language — and what *not* to expect.
+the language, and what *not* to expect.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A pyramid of software blocks — runtimes, databases, kernels — stacked in two tiers, all resting on one wide solid blue slab of C at the base"
+  aria-label="A pyramid of software blocks, runtimes, databases, kernels, stacked in two tiers, all resting on one wide solid blue slab of C at the base"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -36,7 +36,7 @@ the language — and what *not* to expect.
 
 <IllustrationPrompt subject="Ken Thompson" photo />
 
-C did not appear from nowhere — it is the third draft of an idea.
+C did not appear from nowhere, it is the third draft of an idea.
 At Bell Labs in the late 1960s, Ken Thompson wrote **B**, a
 stripped-down descendant of the British language BCPL, to program a
 cast-off PDP-7 minicomputer. B had a fatal limitation: it knew only
@@ -44,7 +44,7 @@ one data type, the machine word. That was tolerable on the
 word-addressed PDP-7, but the new PDP-11 the Unix group acquired in
 1970 was *byte*-addressed, and B simply could not express "a byte"
 or "a structure." So Ritchie extended B with types and structs, and
-the extended language needed a name. After B came **C** — the joke
+the extended language needed a name. After B came **C**, the joke
 writes itself, and yes, people immediately began asking whether the
 successor would be called D or P (the next letter in "BCPL").
 
@@ -52,7 +52,7 @@ The payoff came in 1973, when Thompson and Ritchie rewrote the Unix
 kernel itself in C. This was a radical act: operating systems were
 written in assembly, period, because nothing else was believed fast
 enough. A kernel in a high-level language meant the *operating
-system itself* became portable — and when Unix spread to new
+system itself* became portable, and when Unix spread to new
 machines in the late 1970s, C went everywhere with it. Twenty years
 later, Ritchie summed up his creation with characteristic dryness:
 *"C is quirky, flawed, and an enormous success."*
@@ -76,7 +76,7 @@ compiled years ago.
 
 The C language itself is *tiny*. The whole grammar fits in a thin
 book. There are no classes, no exceptions, no garbage collector, no
-generics, no built-in dictionaries, no string type — just integers,
+generics, no built-in dictionaries, no string type, just integers,
 floats, pointers, arrays, structs, functions, and a preprocessor for
 text substitution.
 
@@ -170,13 +170,13 @@ A pragmatic course must be honest about C's costs:
 - **No exceptions.** Errors are usually returned as `int` codes.
 - **Very little type safety for void pointers.** `void*` casts are easy.
 - **Undefined behavior is everywhere.** Signed overflow, reading
-  uninitialized memory, strict aliasing violations — the compiler is
+  uninitialized memory, strict aliasing violations, the compiler is
   allowed to do *anything* in response.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A blue walker stands at the tip of a plank that runs straight past the edge of its supporting cliff, with red spikes on the ground far below — C's speed comes with no bounds checks and no runtime to catch you"
+  aria-label="A blue walker stands at the tip of a plank that runs straight past the edge of its supporting cliff, with red spikes on the ground far below, C's speed comes with no bounds checks and no runtime to catch you"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -199,7 +199,7 @@ A pragmatic course must be honest about C's costs:
 <Callout type="warn" title="Undefined behavior is not just &quot;crashes&quot;">
 "Undefined behavior" (UB) means the C standard imposes no
 requirements. The program might crash, print garbage, behave
-correctly on one machine and wrong on another, or — most dangerously —
+correctly on one machine and wrong on another, or, most dangerously,
 *appear to work in testing and fail in production*. A serious chunk
 of this course is teaching you to recognize and avoid UB.
 </Callout>
@@ -219,7 +219,7 @@ You should reach for C (or a C-compatible language) when you need:
 ## A taste of "systems thinking" in C
 
 The program below prints the size of every fundamental type *on this
-machine*. The answers are not standardized — they depend on the
+machine*. The answers are not standardized, they depend on the
 target architecture. On the WASI target you are about to run, ints
 are 32 bits and pointers are 32 bits.
 
@@ -284,7 +284,7 @@ constantly.
 
 - Because every C compiler emits the same assembly language.
   > Different targets emit completely different assembly.
-- [o] Because C exposes the underlying machine model — flat addressable memory, fixed-size values, and direct pointer arithmetic — while still letting you retarget the compiler to many CPUs.
+- [o] Because C exposes the underlying machine model, flat addressable memory, fixed-size values, and direct pointer arithmetic, while still letting you retarget the compiler to many CPUs.
   > C is high enough to be portable but low enough to map closely to hardware.
 - Because C programs are written in mnemonics like \`MOV\` and \`ADD\`.
   > Those are assembly mnemonics; C is a higher-level language than assembly.

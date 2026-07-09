@@ -1,9 +1,9 @@
 ---
-title: Code Blocks — PostgreSQL
+title: "Code Blocks: PostgreSQL"
 description: Runnable <SqlCodeBlock dialect="postgres"> examples, with the raw JSX shown beneath each one.
 ---
 
-PostgreSQL code blocks run via **PGlite** — a full Postgres compiled to
+PostgreSQL code blocks run via **PGlite**, a full Postgres compiled to
 WebAssembly, running entirely in your browser. Each example below is
 live; the raw JSX that produced it is shown directly underneath.
 
@@ -101,7 +101,7 @@ FROM
 
 ## 3. Window function
 
-A running total with a window function over a generated series — no seed
+A running total with a window function over a generated series, no seed
 data required.
 
 <SqlCodeBlock
@@ -257,11 +257,11 @@ ORDER BY
 />
 ```
 
-## 6. Remote dataset — Chinook from GitHub
+## 6. Remote dataset, Chinook from GitHub
 
 `remoteInitSql` clones a complete sample database from the
 [dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
-before the block boots — here the full **Chinook** music store (11
+before the block boots, here the full **Chinook** music store (11
 tables, snake_case names). Pass a path inside the repo (or any full URL)
 and the script is fetched from raw.githubusercontent.com, then prepared
 for PGlite (psql meta-commands and `CREATE DATABASE` lines are

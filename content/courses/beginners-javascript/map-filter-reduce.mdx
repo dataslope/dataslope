@@ -1,11 +1,11 @@
 ---
 title: Map, Filter, and Reduce
-description: The three verbs that do 80% of modern JavaScript's work on arrays — and the mental shift behind them.
+description: The three verbs that do 80% of modern JavaScript's work on arrays, and the mental shift behind them.
 ---
 
 In the *loops* chapter we wrote out the "loop and accumulate"
 pattern by hand: walk an array, build up a result. JavaScript
-gives you three built-in methods — `map`, `filter`, and `reduce` —
+gives you three built-in methods, `map`, `filter`, and `reduce`,
 that express these patterns more clearly. Once they click,
 half the loops you would otherwise write disappear.
 
@@ -15,7 +15,7 @@ core** of array processing.
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="A pipeline: four circles pass through a green bar and become squares, a yellow bar lets only two through, and a funnel merges them into one large circle — map, filter, reduce"
+  aria-label="A pipeline: four circles pass through a green bar and become squares, a yellow bar lets only two through, and a funnel merges them into one large circle, map, filter, reduce"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -131,7 +131,7 @@ console.log(seniors);
 
 // Remove falsy values from a mixed list:
 const messy = [0, "hello", "", null, "world", undefined, 7];
-const cleaned = messy.filter(Boolean); // Boolean is a function — neat trick!
+const cleaned = messy.filter(Boolean); // Boolean is a function, neat trick!
 console.log(cleaned); // ["hello", "world", 7]
 `,
     },
@@ -254,8 +254,8 @@ console.log("Top:", top);
 
 Read the first chain top-to-bottom. It says, in plain English:
 *"take the orders, keep the paid ones, get each amount, add them
-all up."* That readability — the way each step describes a small,
-clear transformation — is the whole point.
+all up."* That readability, the way each step describes a small,
+clear transformation, is the whole point.
 
 ## Other useful array methods
 
@@ -291,7 +291,7 @@ console.log(allTokens); // ["hello","world","fancy","chairs"]
   ]}
 />
 
-`some` and `every` are particularly worth remembering — they often
+`some` and `every` are particularly worth remembering, they often
 replace a hand-rolled loop with an early `return true`.
 
 ## Data flow visualised
@@ -316,8 +316,8 @@ transformations before writing code.
 Methods chained one after another walk the array multiple times.
 For small data this is fine; for arrays of millions of elements
 you might prefer a single hand-written loop or a streaming
-approach. For everyday programming, *prefer the readable version*
-— modern engines are fast, and clarity is more valuable than
+approach. For everyday programming, *prefer the readable version*,
+modern engines are fast, and clarity is more valuable than
 micro-optimisation.
 
 ## A multi-file pipeline
@@ -377,7 +377,7 @@ module.exports = { revenueByMonth, topMonth };
   title="Pipeline practice"
   instructions={`Given an array of products, each shaped like \`{ name, price, inStock }\`, write a function \`affordableInStock(products, maxPrice)\` that returns an array of *names* of products that are in stock AND have a price less than or equal to \`maxPrice\`, sorted alphabetically.
 
-Use \`.filter\`, \`.map\`, and \`.sort()\` — not a hand-written for loop.
+Use \`.filter\`, \`.map\`, and \`.sort()\`, not a hand-written for loop.
 
 Examples:
 - For \`[{name:"A", price:5, inStock:true}, {name:"B", price:20, inStock:true}, {name:"C", price:3, inStock:false}]\` with \`maxPrice=10\`, return \`["A"]\`.
@@ -476,7 +476,7 @@ if (r.length !== 1 || typeof r[0] !== "string") throw new Error("must return an 
 - [o] \`users.map((u) => ({ ...u, name: u.name.toUpperCase() }))\`
   > \`map\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map\` is the standard idiom for "produce a new array of updated objects".
 - A \`while\` loop that builds a new array index-by-index
-  > A \`while\` loop requires the most manual bookkeeping of all the options — initialising the index, checking the condition, incrementing, and pushing — none of which communicates the intent of "transform every element".
+  > A \`while\` loop requires the most manual bookkeeping of all the options, initialising the index, checking the condition, incrementing, and pushing, none of which communicates the intent of "transform every element".
 
 \`map\` makes the *intent* obvious. Hand-written loops do the same work but force the reader to figure out what you're trying to express.`}
 />

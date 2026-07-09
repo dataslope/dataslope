@@ -1,12 +1,12 @@
 ---
 title: Probability Basics
-description: Probability as the language of uncertainty — sample spaces, the basic rules, the frequentist view via simulation, the Law of Large Numbers, and odds vs probability.
+description: Probability as the language of uncertainty, sample spaces, the basic rules, the frequentist view via simulation, the Law of Large Numbers, and odds vs probability.
 ---
 
 Every honest sentence in data science eventually runs into the word
 "probably." *This change will probably lift conversion. That spike is
 probably noise. The model will probably hold up next quarter.*
-Probability is the branch of math that makes "probably" precise — it's
+Probability is the branch of math that makes "probably" precise, it's
 the **language we use to talk about uncertainty** with numbers instead
 of hand-waving.
 
@@ -20,7 +20,7 @@ the vocabulary and the handful of rules everything else rests on.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A six-wedge wheel with three faces lit blue under a yellow pointer, beside a fraction built from dots — three blue dots over a bar and six below it — probability as the share of the sample space an event covers"
+  aria-label="A six-wedge wheel with three faces lit blue under a yellow pointer, beside a fraction built from dots, three blue dots over a bar and six below it, probability as the share of the sample space an event covers"
   style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="var(--ds-gray-200)">
@@ -61,7 +61,7 @@ about the set of things that could happen. That set has a name.
 
 - The **sample space** (written S) is the complete list of possible
   outcomes of some random process. For one die roll, S = {1, 2, 3, 4, 5, 6}.
-- An **event** is any subset of the sample space — a thing that either
+- An **event** is any subset of the sample space, a thing that either
   happens or doesn't. "Roll an even number" is the event {2, 4, 6}.
 - The **probability** of an event is a number between 0 and 1 that says
   how much of the sample space that event covers (weighted by how likely
@@ -75,8 +75,8 @@ flowchart TD
   E2 --> O1
 ```
 
-When every outcome is equally likely — a fair die, a fair coin, a
-well-shuffled deck — probability is just counting:
+When every outcome is equally likely, a fair die, a fair coin, a
+well-shuffled deck, probability is just counting:
 
 `P(event) = (number of outcomes in the event) / (number of outcomes in S)`
 
@@ -85,7 +85,7 @@ equal likelihood, but it's the cleanest place to build intuition.
 
 <Callout type="info" title="Probability lives on a 0-to-1 scale">
 A probability is always between **0** (impossible) and **1** (certain).
-0.5 means "half the time." People often quote percentages (50%) — same
+0.5 means "half the time." People often quote percentages (50%), same
 thing, just multiplied by 100. If a calculation ever hands you a
 "probability" below 0 or above 1, you made an arithmetic error, full
 stop.
@@ -94,7 +94,7 @@ stop.
 ## The basic rules of probability
 
 Almost everything you'll do with probability comes from four small
-rules. None of them require proofs to believe — each one is common sense
+rules. None of them require proofs to believe, each one is common sense
 once you picture the sample space.
 
 **1. The range rule.** Every probability satisfies 0 ≤ P(A) ≤ 1,
@@ -111,17 +111,17 @@ problems are almost always easier to solve through their opposite
 ("none"), as you'll see below.
 
 **3. The addition rule (for mutually exclusive events).** If two events
-can't both happen at once — they're **mutually exclusive**, like "roll a
-2" and "roll a 5" — the chance that *either* one happens is the sum:
+can't both happen at once, they're **mutually exclusive**, like "roll a
+2" and "roll a 5", the chance that *either* one happens is the sum:
 
 `P(A or B) = P(A) + P(B)  (when A, B can't co-occur)`
 
 If they *can* overlap (like "even" and "greater than 4," which share the
 6), you'd be double-counting the overlap, so this simple form no longer
-applies — you'd subtract the shared part.
+applies, you'd subtract the shared part.
 
 **4. The multiplication rule (for independent events).** Two events are
-**independent** when one happening tells you nothing about the other —
+**independent** when one happening tells you nothing about the other,
 two separate coin flips, two unrelated users. For independent events,
 the chance they *both* happen is the product:
 
@@ -142,7 +142,7 @@ flowchart TD
 Add only when events are **mutually exclusive**; multiply only when they
 are **independent**. Misapplying these is the #1 source of wrong
 probability answers. We devote the entire next page, *Conditional
-Probability*, to what happens when independence fails — because in real
+Probability*, to what happens when independence fails, because in real
 data, it usually does.
 </Callout>
 
@@ -150,7 +150,7 @@ data, it usually does.
 
 We've been quoting probabilities like 0.5 as if handed down from above.
 But what does "the probability of heads is 0.5" actually *mean* for one
-flip? You either get heads or you don't — there's no "0.5 of a head."
+flip? You either get heads or you don't, there's no "0.5 of a head."
 
 The interpretation this course leans on is the **frequentist** one:
 the probability of an event is the **long-run fraction of times it
@@ -161,7 +161,7 @@ single trial.
 
 This view has a wonderful practical payoff: if you can *simulate* a
 process many times, you can *estimate* any probability by just counting
-how often the event occurs. You don't need a clever formula — you need a
+how often the event occurs. You don't need a clever formula, you need a
 loop and patience. This is called **Monte Carlo simulation**, and it's
 one of the most powerful tools in a data scientist's kit.
 
@@ -191,13 +191,13 @@ print(f"Estimated P(roll a 6):      {np.mean(rolls == 6):.4f}  (true: {1 / 6:.4f
   ]}
 />
 
-The estimates land very close to the true values, but not exactly — and
+The estimates land very close to the true values, but not exactly, and
 that wobble is the whole point. Simulation gives you an *approximation*
 that gets better the more trials you run. Let's make that precise.
 
 <Callout type="tip" title="Simulation beats formulas more often than you'd think">
-For tangled questions — "what's the chance at least 3 of these 5 flaky
-services are up?" — deriving an exact formula is error-prone. Simulating
+For tangled questions, "what's the chance at least 3 of these 5 flaky
+services are up?", deriving an exact formula is error-prone. Simulating
 the scenario a million times and counting is fast, hard to get wrong,
 and easy to explain to a skeptical stakeholder. When in doubt, simulate.
 </Callout>
@@ -209,7 +209,7 @@ messy, compound events with no clean formula. Suppose a checkout flow has
 three independent steps, each of which a user completes with probability
 0.8. What's the chance a user completes *all three* and converts?
 
-You could multiply (0.8³ = 0.512) — but watch how simulation gets the
+You could multiply (0.8³ = 0.512), but watch how simulation gets the
 same answer while staying flexible enough to handle steps that *aren't*
 independent or equally likely.
 
@@ -269,7 +269,7 @@ around; as the flip count climbs it homes in on 0.5.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A trail of coin-flip dots lurches far above and below the dark blue one-half line at first, then settles into a tight hug of it as the flips pile up — the Law of Large Numbers stabilizes the long run without ever fixing the short run"
+  aria-label="A trail of coin-flip dots lurches far above and below the dark blue one-half line at first, then settles into a tight hug of it as the flips pile up, the Law of Large Numbers stabilizes the long run without ever fixing the short run"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-700)" }} fill="currentColor">
@@ -335,27 +335,27 @@ print(f"After 5,000 flips: {running_prop[-1]:.3f}")
 Notice the shape: wild swings on the left that calm into a tight hug of
 the red line on the right. That's the LLN made visible. It's also
 *exactly* why a sample of 1,000 survey respondents can speak for
-millions — a theme we return to constantly in the sampling chapters.
+millions, a theme we return to constantly in the sampling chapters.
 
 <Callout type="danger" title="Misconception: the gambler's fallacy">
-The LLN says the *long-run proportion* settles down — it does **not**
+The LLN says the *long-run proportion* settles down, it does **not**
 say outcomes "balance out" in the short run. After five heads in a row,
 a fair coin is **still 50/50** on the next flip. The coin has no memory;
 it doesn't owe you a tails. Believing a result is "due" because it hasn't
 happened recently is the **gambler's fallacy**, and it has cost people
-fortunes. Independent trials don't self-correct — they just get
+fortunes. Independent trials don't self-correct, they just get
 swamped by the sheer volume of future trials.
 </Callout>
 
 <MultipleChoice
   markdown={`A fair roulette wheel has landed on red 8 times in a row. A gambler reasons: "black is overdue, so I should bet black." What's wrong with this?
 
-- Nothing — after 8 reds, black really is more likely on the next spin
+- Nothing, after 8 reds, black really is more likely on the next spin
   > Each spin is independent and has no memory of past spins. The probability of black is unchanged by the streak; the wheel cannot "owe" an outcome.
-- [o] Spins are independent, so the next spin's probability is unchanged by the streak — this is the gambler's fallacy
+- [o] Spins are independent, so the next spin's probability is unchanged by the streak, this is the gambler's fallacy
   > The streak feels meaningful, but independence means past results carry no information about the next spin. The probability is the same as it was on spin one.
 - The streak proves the wheel is biased toward red, so he should bet red
-  > An 8-red streak is unusual but not strong evidence of bias on a fair wheel — and in any case it wouldn't justify the "overdue" reasoning, which is the actual error here.
+  > An 8-red streak is unusual but not strong evidence of bias on a fair wheel, and in any case it wouldn't justify the "overdue" reasoning, which is the actual error here.
 - The Law of Large Numbers guarantees black will come up soon to balance the reds
   > The LLN is about long-run proportions over many thousands of spins, not short-run "balancing." It never promises a specific outcome is coming soon.
 
@@ -364,18 +364,18 @@ Independent events don't self-correct; the gambler's fallacy mistakes long-run s
 
 ## Odds vs probability
 
-People — and especially betting markets and medical literature — often
+People, and especially betting markets and medical literature, often
 talk in **odds** rather than probability. They're two ways of saying the
 same thing, but they're easy to confuse, and the confusion can flip a
 decision.
 
 - **Probability** is `favorable / total`. If 1 of 5 equally likely
   outcomes is a win, P = 1/5 = 0.2.
-- **Odds** are `favorable : unfavorable` — a ratio of the two *ways it
+- **Odds** are `favorable : unfavorable`, a ratio of the two *ways it
   can go*, not a fraction of the whole. The same scenario has odds of
   1 : 4 ("1 to 4").
 
-So "4-to-1 odds against" does **not** mean a 1-in-4 (25%) chance — it
+So "4-to-1 odds against" does **not** mean a 1-in-4 (25%) chance, it
 means 1 favorable for every 4 unfavorable, which is 1 out of 5, or 20%.
 The conversions:
 
@@ -412,7 +412,7 @@ print(f"\\n'3 to 1 against' -> P(win) = {odds_to_prob(odds_against):.3f}  (NOT 0
 
 <Callout type="warn" title="Misconception: odds and probability are the same number">
 "3-to-1 odds against" sounds like 1/3, but it's 1 favorable out of 4
-total outcomes — a probability of 0.25... wait, even that's a common
+total outcomes, a probability of 0.25... wait, even that's a common
 slip. "3 to 1 against" is 1 favorable per 3 unfavorable = 1/4 = 0.25,
 while "3 to 1 *in favor*" is 3/4 = 0.75. Always nail down direction
 (for or against) and remember odds are part-to-part, probability is
@@ -423,7 +423,7 @@ part-to-whole.
 
 The frequentist view defines probability through repetition, which
 raises a fair question: what does "70% chance of rain tomorrow" mean?
-There's only *one* tomorrow — you can't repeat it.
+There's only *one* tomorrow, you can't repeat it.
 
 The honest interpretation is still a long-run one: across all the days
 the forecaster called "70%," it rained on about 70% of them. The
@@ -498,8 +498,8 @@ print(p7)
 
 Do it two ways and store both as floats:
 
-- **\`p_exact\`** — use the **complement rule**: \`1 - P(all four fail)\`. Compute it directly from the number \`0.7\` (no simulation).
-- **\`p_sim\`** — estimate the same probability by simulating **100,000** sets of 4 attempts with the provided \`rng\`.
+- **\`p_exact\`**, use the **complement rule**: \`1 - P(all four fail)\`. Compute it directly from the number \`0.7\` (no simulation).
+- **\`p_sim\`**, estimate the same probability by simulating **100,000** sets of 4 attempts with the provided \`rng\`.
 
 They should agree to within about \`0.01\`.`}
   files={[
@@ -560,7 +560,7 @@ print("exact:", p_exact, "sim:", p_sim)
 - 0.25, by the addition rule
   > The addition rule is for "either/or" with mutually exclusive events. "All four heads" is an "and" question, which calls for multiplication.
 - 2.0, by adding 0.5 four times
-  > Adding probabilities here would give 2.0, which is impossible — no probability can exceed 1. That signals the wrong rule was applied.
+  > Adding probabilities here would give 2.0, which is impossible, no probability can exceed 1. That signals the wrong rule was applied.
 
 For independent "and" questions, multiply; the result shrinks fast as you add events.`}
 />
@@ -569,15 +569,15 @@ For independent "and" questions, multiply; the result shrinks fast as you add ev
   markdown={`Which pair of events is **mutually exclusive** (cannot both happen on a single trial)?
 
 - Drawing a card that is a King, and drawing a card that is a Heart
-  > The King of Hearts is both at once, so these events overlap — they are not mutually exclusive.
+  > The King of Hearts is both at once, so these events overlap, they are not mutually exclusive.
 - Rolling an even number, and rolling a number greater than 3
   > A roll of 4 or 6 satisfies both, so they can co-occur. Not mutually exclusive.
 - [o] Rolling a 2, and rolling a 5, on the same single die roll
-  > A single die roll cannot be both a 2 and a 5, so these events can never happen together — that is exactly what mutually exclusive means.
+  > A single die roll cannot be both a 2 and a 5, so these events can never happen together, that is exactly what mutually exclusive means.
 - A user being on mobile, and that user converting
   > A mobile user can certainly convert, so these events can both be true at once.
 
-Mutually exclusive means zero overlap on a single trial — that is the condition that lets you simply add probabilities.`}
+Mutually exclusive means zero overlap on a single trial, that is the condition that lets you simply add probabilities.`}
 />
 
 <MultipleChoice
@@ -588,11 +588,11 @@ Mutually exclusive means zero overlap on a single trial — that is the conditio
 - [o] 50 trials is too few; by the Law of Large Numbers, more trials would pull the estimate closer to 0.25
   > Small samples produce noisy estimates. The LLN says the estimate converges to the true value as trials increase, so adding trials is the fix.
 - Probabilities can't be estimated by simulation at all
-  > Estimating probabilities by simulation (Monte Carlo) is a standard, valid technique — it just needs enough trials to be precise.
+  > Estimating probabilities by simulation (Monte Carlo) is a standard, valid technique, it just needs enough trials to be precise.
 - The true value must actually be 0.31
   > The estimate is an approximation from limited data; it doesn't override a known true value. The discrepancy reflects sampling noise.
 
-More trials shrink simulation noise — the estimate's wobble is a feature of the method, not a defect.`}
+More trials shrink simulation noise, the estimate's wobble is a feature of the method, not a defect.`}
 />
 
 <MultipleChoice
@@ -603,11 +603,11 @@ More trials shrink simulation noise — the estimate's wobble is a feature of th
 - [o] 0.8, because 4 favorable out of 5 total equally weighted parts
   > Odds of 4 to 1 in favor mean 4 favorable for every 1 unfavorable, so 4 out of 5 parts, which is a probability of 0.8.
 - 4.0, because the odds are 4
-  > 4.0 is not a valid probability — no probability exceeds 1. Odds and probability are on different scales and must be converted.
+  > 4.0 is not a valid probability, no probability exceeds 1. Odds and probability are on different scales and must be converted.
 - 0.5, because odds always mean a coin flip
   > Even odds (1 to 1) correspond to 0.5, but 4 to 1 is far from even. The specific ratio determines the probability.
 
-Odds are part-to-part; probability is part-to-whole — convert with P = odds / (1 + odds).`}
+Odds are part-to-part; probability is part-to-whole, convert with P = odds / (1 + odds).`}
 />
 
 <MultipleChoice
@@ -616,7 +616,7 @@ Odds are part-to-part; probability is part-to-whole — convert with P = odds / 
 - The next flip is guaranteed to alternate heads and tails over time
   > Outcomes don't alternate on a schedule; flips are independent. Probability says nothing about the order of results.
 - Exactly half of any small batch of flips will be heads
-  > Small batches are noisy — 10 flips might give 7 heads. The 0.5 is about the long run, not any particular small batch.
+  > Small batches are noisy, 10 flips might give 7 heads. The 0.5 is about the long run, not any particular small batch.
 - [o] Over a very large number of flips, the fraction that come up heads approaches 0.5
   > The frequentist view defines probability as the long-run relative frequency, which the Law of Large Numbers shows converges to 0.5.
 - There is a physical force making the coin fair on each individual flip
@@ -627,12 +627,12 @@ Frequentist probability is a long-run-frequency statement, which is exactly why 
 
 <Callout type="success" title="Key takeaways">
 - A **sample space** lists all outcomes; an **event** is a subset; a **probability** is a number in **[0, 1]** measuring how much of the space the event covers.
-- **Complement**: `P(not A) = 1 − P(A)` — the go-to move for "at least one" problems.
-- **Add** mutually exclusive probabilities (either/or); **multiply** independent ones (both/and) — and only when those conditions hold.
+- **Complement**: `P(not A) = 1 − P(A)`, the go-to move for "at least one" problems.
+- **Add** mutually exclusive probabilities (either/or); **multiply** independent ones (both/and), and only when those conditions hold.
 - Probability is a **long-run frequency**; the **Law of Large Numbers** is why simulation works and why streaks don't make outcomes "due."
-- **Odds** are part-to-part (`P / (1 − P)`); **probability** is part-to-whole — don't mix them up.
+- **Odds** are part-to-part (`P / (1 − P)`); **probability** is part-to-whole, don't mix them up.
 </Callout>
 
 Next, in *Conditional Probability*, we tackle what happens when events
-are **not** independent — and meet a base-rate puzzle that fools doctors,
+are **not** independent, and meet a base-rate puzzle that fools doctors,
 juries, and analysts alike.

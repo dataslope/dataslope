@@ -1,6 +1,6 @@
 ---
 title: Classes and Objects
-description: Bundling data and behavior into a single thing — the central idea of object-oriented programming
+description: Bundling data and behavior into a single thing, the central idea of object-oriented programming
 ---
 
 Up to now, our programs have been **variables + methods**. Data
@@ -13,13 +13,13 @@ bunch of rules about how it can change," what stops some unrelated
 piece of code from just writing `balance = -9999` and breaking
 everything?
 
-The answer is the **class** — a way to bundle data and the
+The answer is the **class**, a way to bundle data and the
 behavior that owns it into a single unit.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A dashed blue blueprint card with construction marks links by thin gray lines to three solid squares — blue, green, yellow — each stamped from the same plan but holding its white state dot in a different spot"
+  aria-label="A dashed blue blueprint card with construction marks links by thin gray lines to three solid squares, blue, green, yellow, each stamped from the same plan but holding its white state dot in a different spot"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -138,12 +138,12 @@ public class BankAccount
 Read it carefully:
 
 - `public class BankAccount { ... }` declares the blueprint.
-- `Owner` and `Balance` are **fields** — data that every instance
+- `Owner` and `Balance` are **fields**, data that every instance
   owns its own copy of.
 - `Deposit` and `Withdraw` are **methods** that work on *this*
   instance's data.
 - `new BankAccount()` creates a fresh object on the heap.
-- `alice.Deposit(100)` runs `Deposit` *on `alice`* — so `Balance`
+- `alice.Deposit(100)` runs `Deposit` *on `alice`*, so `Balance`
   inside the method refers to *alice's* `Balance`, not bob's.
 
 Two objects, two independent balances, one class.
@@ -250,7 +250,7 @@ public class Point
 Public fields are convenient but expose your internals directly.
 The idiomatic C# way to expose data is via a **property**, which
 *looks* like a field at the call site but is really a pair of
-methods — a `get` and a `set` — that you can later replace with
+methods, a `get` and a `set`, that you can later replace with
 validation or computed logic without breaking callers.
 
 <CodeBlock
@@ -265,7 +265,7 @@ Console.WriteLine($"{p.Name}, adult? {p.IsAdult}");
 
 public class Person
 {
-    // auto-implemented property — the compiler creates a hidden field
+    // auto-implemented property, the compiler creates a hidden field
     public string Name { get; set; } = "";
     public int Age { get; set; }
 
@@ -321,8 +321,8 @@ Console.WriteLine($"{alice.Owner}: {alice.Balance}");
   ]}
 />
 
-Notice how the entry file reads like a *narrative* — "open an
-account, withdraw, deposit, print" — while the rules of being a
+Notice how the entry file reads like a *narrative*, "open an
+account, withdraw, deposit, print", while the rules of being a
 bank account live in their own file. That separation is the whole
 game.
 
@@ -396,7 +396,7 @@ Console.WriteLine($"perimeter={r.Perimeter()}");
 - They are two words for the same thing
   > They're related but distinct.
 - A class is created at runtime; an object is created at compile time
-  > It's the opposite — classes are described in source; objects are created at runtime.
+  > It's the opposite, classes are described in source; objects are created at runtime.
 - [o] A class is a blueprint; an object is an actual instance built from that blueprint at runtime
   > One class can have any number of objects.
 - A class is a value type; an object is a reference type

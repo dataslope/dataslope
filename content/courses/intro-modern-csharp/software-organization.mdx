@@ -9,19 +9,19 @@ eventually become an unnavigable mess.
 
 C# gives you three nested levels of organization:
 
-1. **Files** — physical containers, usually one class each.
-2. **Namespaces** — logical containers, naming and grouping types.
-3. **Projects** (and **solutions**) — compilation units that produce
+1. **Files**, physical containers, usually one class each.
+2. **Namespaces**, logical containers, naming and grouping types.
+3. **Projects** (and **solutions**), compilation units that produce
    a single output (.dll, .exe, web app, etc.).
 
 Plus a fourth, less tangible but more important layer: the
-**architecture** of your program — how its pieces talk to each
+**architecture** of your program, how its pieces talk to each
 other.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A blue project bar branches along thin lines into three translucent namespace cards, each holding its own small type shapes — files, namespaces, and projects organizing one program"
+  aria-label="A blue project bar branches along thin lines into three translucent namespace cards, each holding its own small type shapes, files, namespaces, and projects organizing one program"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -63,7 +63,7 @@ on.
 
 You *can* put multiple classes in one file (the compiler doesn't
 care), but it's a bad habit: when you want to find `BankAccount`,
-you don't want to grep — you want to open the file with that name.
+you don't want to grep, you want to open the file with that name.
 
 ```mermaid
 flowchart TD
@@ -76,7 +76,7 @@ flowchart TD
     D --> D2["<code>Withdrawal.cs</code>"]
 ```
 
-Sub-folders mirror your *conceptual* groupings — and conventionally
+Sub-folders mirror your *conceptual* groupings, and conventionally
 mirror namespaces too.
 
 ## Namespaces
@@ -125,7 +125,7 @@ A few things to notice:
 - `using Banking;` at the top of `Program.cs` is what lets us write
   `BankAccount` instead of `Banking.BankAccount`.
 - Without `using Banking;`, the call would have to be
-  `new Banking.BankAccount(...)` — explicit but verbose.
+  `new Banking.BankAccount(...)`, explicit but verbose.
 
 A common pattern is to give namespaces names like `Company.Project.Area`,
 e.g. `Acme.OrderingService.Domain`.
@@ -134,7 +134,7 @@ e.g. `Acme.OrderingService.Domain`.
 
 In a real workspace (not a single-file playground like this one),
 your code lives in a **project** described by a `.csproj` file.
-A project compiles to a single output — a console app, a library, a
+A project compiles to a single output, a console app, a library, a
 web app.
 
 Multiple projects can be grouped into a **solution** (`.sln`),
@@ -145,14 +145,14 @@ layouts:
 MyApp.sln
 ├── MyApp/               # console / web app (the "entry" project)
 │   └── MyApp.csproj
-├── MyApp.Core/          # business rules — no UI, no DB
+├── MyApp.Core/          # business rules, no UI, no DB
 │   └── MyApp.Core.csproj
 └── MyApp.Tests/         # unit tests for the above
     └── MyApp.Tests.csproj
 ```
 
 We're not setting up a multi-project workspace here, but you should
-recognize the shape — it's nearly universal in professional C#.
+recognize the shape, it's nearly universal in professional C#.
 
 ## Layering: the intuition
 

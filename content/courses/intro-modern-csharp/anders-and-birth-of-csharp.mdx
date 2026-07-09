@@ -4,7 +4,7 @@ description: How the designer of Turbo Pascal and Delphi ended up at Microsoft c
 ---
 
 *This is one of the optional deep-dive chapters promised in
-[The Road to C#](./the-road-to-csharp) — the full story of the
+[The Road to C#](./the-road-to-csharp), the full story of the
 person behind the language.*
 
 Languages don't just appear. They are designed by people, and the
@@ -16,7 +16,7 @@ the way it does, it helps to know the story of its chief designer:
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three cards step upward in deepening shades of blue to a bold solid card bearing a sharp sign — one designer's taste carried from Turbo Pascal through Delphi into C#"
+  aria-label="Three cards step upward in deepening shades of blue to a bold solid card bearing a sharp sign, one designer's taste carried from Turbo Pascal through Delphi into C#"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -42,7 +42,7 @@ the way it does, it helps to know the story of its chief designer:
 <IllustrationPrompt subject="Anders Hejlsberg" photo />
 
 Anders Hejlsberg is a Danish software engineer. He started his
-career in the early 1980s writing compilers — small programs that
+career in the early 1980s writing compilers, small programs that
 translate human-readable source code into machine code.
 
 His first famous product was **Turbo Pascal**, released by Borland
@@ -62,7 +62,7 @@ timeline
     2012 : Begins designing TypeScript at Microsoft
 ```
 
-In 1995, Anders led the design of **Delphi** at Borland — an
+In 1995, Anders led the design of **Delphi** at Borland, an
 object-oriented version of Pascal married to a visual GUI designer.
 Delphi was beloved for the same reasons as Turbo Pascal: fast
 compiles, productive tooling, real power without C++'s sharp edges.
@@ -95,7 +95,7 @@ That's what its DNA was for.
 Here are the values, plus a tiny example of what each one feels
 like in practice.
 
-### Strong static typing — but ergonomic
+### Strong static typing, but ergonomic
 
 Variables have types, and the compiler checks them. But you don't
 have to repeat yourself when the compiler can figure it out.
@@ -111,7 +111,7 @@ using System.Collections.Generic;
 // Full type written out:
 List<string> namesA = new List<string>();
 
-// Same thing, more ergonomic — 'var' lets the compiler infer the type:
+// Same thing, more ergonomic, 'var' lets the compiler infer the type:
 var namesB = new List<string>();
 
 namesA.Add("Anders");
@@ -135,7 +135,7 @@ of static types, but don't make the programmer suffer for it.
 C#'s syntax is designed so that an editor can almost always tell
 what you mean even when you're halfway through typing. That is why
 C# in Visual Studio or Rider has such powerful autocomplete and
-refactoring — the language itself was built to be easy to analyze.
+refactoring, the language itself was built to be easy to analyze.
 
 ### Pragmatic feature additions
 
@@ -154,13 +154,13 @@ adding features that solve real, common problems. Some highlights:
 | 9–12 | 2020+ | Records, top-level statements, file-scoped namespaces |
 
 Each addition was scoped to fix a *real* pain. (And many of them
-were borrowed back into Java a few years later — the influence has
+were borrowed back into Java a few years later, the influence has
 flowed both ways.)
 
 ## A quick tour of "modern C# feel"
 
 The example below uses several of these modern features. Don't
-worry about every line — just notice how clean and *readable* the
+worry about every line, just notice how clean and *readable* the
 program looks compared with, say, C++ or older Java.
 
 <CodeBlock
@@ -201,7 +201,7 @@ program: `var`, lambdas (`p => ...`), LINQ (`Where`, `Select`),
 ## Anders today
 
 Anders is still active at Microsoft. After C#, he led the design of
-**TypeScript** — a typed superset of JavaScript that has become
+**TypeScript**, a typed superset of JavaScript that has become
 just as influential in the web world as C# was in the .NET world.
 Many design choices in TypeScript will feel familiar after this
 course: structural typing, generics, nullable types, ergonomic
@@ -211,8 +211,8 @@ inference. The same hand drew both languages.
 
 You have just learned a language whose primary author cared about
 *ergonomics*, *tooling*, and *real-world productivity*. Whenever a
-piece of C# syntax felt surprisingly convenient during this course —
-`var`, `async`, pattern matching, records — there was usually a
+piece of C# syntax felt surprisingly convenient during this course,
+`var`, `async`, pattern matching, records, there was usually a
 story behind it: a real frustration in earlier languages, and a
 deliberate choice in C# to make it nicer.
 
@@ -227,8 +227,8 @@ software.
 
 - Mathematical purity above all else
   > That's closer to languages like Haskell. C# is explicitly pragmatic.
-- Minimalism — keep the language as small as possible
-  > C# is the opposite — it has grown a lot of pragmatic features over time.
+- Minimalism, keep the language as small as possible
+  > C# is the opposite, it has grown a lot of pragmatic features over time.
 - [o] Pragmatic productivity: strong static typing, but ergonomic syntax and great tooling support
   > You can trace this philosophy from Turbo Pascal through Delphi, C#, and TypeScript.
 - Direct memory control, like C
@@ -239,9 +239,9 @@ software.
   markdown={`What does \`var\` do in C#?
 
 - It declares a variable that has no type
-  > Every C# variable has a type — including \`var\` ones.
+  > Every C# variable has a type, including \`var\` ones.
 - [o] It tells the compiler to infer the variable's type from the expression on the right, while still treating the variable as statically typed
-  > \`var x = "hi";\` is exactly equivalent to \`string x = "hi";\` — the compiler figures it out.
+  > \`var x = "hi";\` is exactly equivalent to \`string x = "hi";\`, the compiler figures it out.
 - It declares a global variable
   > It has nothing to do with scope.
 - It's the same as \`dynamic\`

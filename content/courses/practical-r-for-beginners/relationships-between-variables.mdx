@@ -1,6 +1,6 @@
 ---
 title: Relationships Between Variables
-description: Scatterplots, correlations, and cross-tabulations — the toolkit for asking "does X have anything to do with Y?" and (importantly) interpreting the answer carefully.
+description: Scatterplots, correlations, and cross-tabulations, the toolkit for asking "does X have anything to do with Y?" and (importantly) interpreting the answer carefully.
 ---
 
 So far we've explored columns one at a time. But most interesting
@@ -21,7 +21,7 @@ causation.**
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two light blue panels of blue dots — on the left the dots hug a faint rising diagonal band, on the right the same number of dots drift as a shapeless cloud — strong correlation beside none at all"
+  aria-label="Two light blue panels of blue dots, on the left the dots hug a faint rising diagonal band, on the right the same number of dots drift as a shapeless cloud, strong correlation beside none at all"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -83,9 +83,9 @@ abline(lm(mpg ~ wt, data = mtcars), col = "red", lwd = 2)
 
 Two things to look for in a scatterplot:
 
-1. **Direction** — do the dots tend to rise (positive
+1. **Direction**, do the dots tend to rise (positive
    relationship) or fall (negative) from left to right?
-2. **Strength** — do the dots hug a clear line, or are they a
+2. **Strength**, do the dots hug a clear line, or are they a
    diffuse cloud?
 
 For mtcars: heavier cars get worse mileage, and the relationship
@@ -158,7 +158,7 @@ That's why scatterplots are non-negotiable.
 
 ## Categorical × categorical: cross-tabulation
 
-When both variables are categorical, you don't have positions —
+When both variables are categorical, you don't have positions,
 you have *counts of combinations*. `table()` does this in base R:
 
 <CodeBlock
@@ -187,7 +187,7 @@ to be automatic.
 ## Categorical × numeric: boxplots and grouped summaries
 
 When one variable is categorical and one is numeric, a boxplot
-per group is hard to beat — and grouped summaries put numbers on
+per group is hard to beat, and grouped summaries put numbers on
 what you see:
 
 <CodeBlock
@@ -291,7 +291,7 @@ abline(lm(mpg ~ disp, data = mtcars), col = "red", lwd = 2)
   ]}
 />
 
-Correlation around -0.85. Clearly negative. But — is engine
+Correlation around -0.85. Clearly negative. But, is engine
 displacement *causing* the worse mileage, or is it that bigger
 cars tend to have both bigger engines *and* more weight, and
 weight is the real driver? Plot `wt` vs `disp` and you'll see
@@ -300,7 +300,7 @@ by looking at the correlation matrix.
 
 This is **confounding**, and it's why the next steps in any real
 analysis usually involve multivariate methods (regression,
-modeling) — which are beyond this course but worth knowing as
+modeling), which are beyond this course but worth knowing as
 the natural next step.
 
 ## Test your understanding
@@ -312,7 +312,7 @@ the natural next step.
   > A correlation of -0.92 is close to -1, indicating a strong relationship; it is the direction (negative) and not whether one exists that this choice gets wrong.
 - One causes the other.
   > Correlation measures association, not causation; knowing the correlation tells you nothing about which variable (if either) drives the other.
-- [o] They have a strong negative linear relationship — when one tends to go up, the other tends to go down.
+- [o] They have a strong negative linear relationship, when one tends to go up, the other tends to go down.
   > Correlation measures linear association strength and direction, on a scale from -1 to +1. It does *not* establish causation.
 - One of the variables has more NAs than the other.
   > The correlation coefficient says nothing about missingness; it only quantifies the linear association between the non-missing paired values.`}
@@ -324,8 +324,8 @@ the natural next step.
 - They are completely independent.
   > Independence means no relationship of any kind; a correlation of 0 only rules out a *linear* relationship, not all possible relationships.
 - They have no relationship of any kind.
-  > A perfect curve — like a U-shape — can have a Pearson correlation near zero, even though there is a very clear nonlinear pattern.
-- [o] They have no *linear* relationship. They might still have a curved or otherwise structured relationship — only a plot will tell you.
+  > A perfect curve, like a U-shape, can have a Pearson correlation near zero, even though there is a very clear nonlinear pattern.
+- [o] They have no *linear* relationship. They might still have a curved or otherwise structured relationship, only a plot will tell you.
   > Pearson correlation only sees linear association.
 - The dataset is too small.
   > Dataset size affects the *precision* of the correlation estimate, not what a value of zero means; small samples can still be linearly related.`}
@@ -338,7 +338,7 @@ the natural next step.
   > There is no plausible mechanism by which consuming ice cream increases drowning risk; both variables are driven by a shared seasonal cause.
 - Drowning causes ice cream sales (e.g., grieving families binge).
   > Reverse causation is logically implausible here; neither variable can causally produce the other.
-- [o] A third variable — summer/hot weather — causes both. This is a *confounding* variable.
+- [o] A third variable, summer/hot weather, causes both. This is a *confounding* variable.
   > This is the classic example of why correlation does not imply causation.
 - Pure coincidence.
   > The correlation is too consistent year after year and too strong to be random noise; a shared cause (hot weather) produces it systematically.`}
@@ -353,7 +353,7 @@ For `mtcars`, compute the correlation matrix of just `mpg`,
 <ChallengeCard
   adapter="r"
   title="A small correlation matrix"
-  instructions={`Build \`cor_mat\` — a 4×4 numeric matrix of correlations among the columns \`mpg\`, \`hp\`, \`wt\`, and \`qsec\`, rounded to 2 decimal places.`}
+  instructions={`Build \`cor_mat\`, a 4×4 numeric matrix of correlations among the columns \`mpg\`, \`hp\`, \`wt\`, and \`qsec\`, rounded to 2 decimal places.`}
   files={[
     {
       filename: "main.r",
@@ -395,5 +395,5 @@ if (cor_mat["mpg","wt"] > -0.7) stop(sprintf("expected mpg~wt strongly negative,
 />
 
 We've now seen the analytical workhorses. The next section is
-about making your findings *visible* and *persuasive* — the art
+about making your findings *visible* and *persuasive*, the art
 of data visualization.

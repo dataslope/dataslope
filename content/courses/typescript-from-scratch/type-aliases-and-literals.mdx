@@ -14,7 +14,7 @@ features to build self-documenting, precise type systems.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="From a long strip of every possible value, exactly three swatches — red, green, and blue — are pulled out along thin lines and grouped above a bracket that carries a yellow name tag — literal types pick exact values and an alias names the chosen set"
+  aria-label="From a long strip of every possible value, exactly three swatches, red, green, and blue, are pulled out along thin lines and grouped above a bracket that carries a yellow name tag, literal types pick exact values and an alias names the chosen set"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -108,7 +108,7 @@ logResult("Success");
 />
 
 **What the compiler now knows:** `ID` and `Name` are still just `number`
-and `string` under the hood — TypeScript doesn't create a new runtime
+and `string` under the hood, TypeScript doesn't create a new runtime
 type. But the alias documents what each value represents. If you
 accidentally assign a `Name` to a variable expecting an `ID`, the
 compiler won't stop you (they're both `number`), but the code will be
@@ -365,7 +365,7 @@ creating enums from objects.
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three beads blur inside wide halos of possible values, then reappear frozen inside a translucent slab with no halos at all — as const narrows every member to its exact literal and locks it readonly"
+  aria-label="Three beads blur inside wide halos of possible values, then reappear frozen inside a translucent slab with no halos at all, as const narrows every member to its exact literal and locks it readonly"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -442,7 +442,7 @@ heavier. Choose based on your needs:
 ## Complex literal unions
 
 You can combine literal types with object types to create **discriminated
-unions** — we'll cover these in depth in [Unions and
+unions**, we'll cover these in depth in [Unions and
 Intersections](./unions-and-intersections), but here's a taste:
 
 <CodeBlock
@@ -472,7 +472,7 @@ handleResult(err);
   ]}
 />
 
-The literal `"success"` and `"failure"` act as **discriminators** — the
+The literal `"success"` and `"failure"` act as **discriminators**, the
 compiler uses them to narrow the type in each branch of the `if`.
 
 ## Practice: a traffic light state machine
@@ -575,7 +575,7 @@ TypeScript infers the narrowest possible type for \`const\` bindings.`}
 ## Summary
 
 Type aliases let you name types for reuse and clarity. Literal types let
-you express *specific* values in the type system — not just "a string,"
+you express *specific* values in the type system, not just "a string,"
 but *this exact string*. By combining literal types with unions, you
 create lightweight enumerations that the compiler enforces at every
 usage. The `as const` assertion turns object literals into deeply

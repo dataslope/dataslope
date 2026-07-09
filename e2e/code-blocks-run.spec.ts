@@ -17,7 +17,7 @@ import { discoverPages } from "./_discoverPages";
 
 // Default: the per-language demo pages (fast, representative). Set
 // COURSEWARE=1 to instead sweep every docs page that embeds a <CodeBlock>
-// across all courses — a long run intended for an opt-in CI job. `path` is
+// across all courses, a long run intended for an opt-in CI job. `path` is
 // the full route.
 const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/code-blocks-javascript", label: "JavaScript" },
@@ -51,7 +51,7 @@ async function runBlock(
   // (isBusy) until the runtime is ready, then again while running.
   await expect(runBtn).toBeEnabled({ timeout: 150_000 });
   await runBtn.click();
-  // Observe the run start (best-effort — interpreted runtimes are fast).
+  // Observe the run start (best-effort, interpreted runtimes are fast).
   await expect(runBtn).toBeDisabled({ timeout: 5_000 }).catch(() => {});
   await expect(runBtn).toBeEnabled({ timeout: 150_000 });
 
@@ -73,7 +73,7 @@ async function runBlock(
 
 test.describe("Code blocks run cleanly", () => {
   for (const { path: pagePath, label } of CODE_BLOCK_PAGES) {
-    test(`${label} — every code block runs without error`, async ({ page }) => {
+    test(`${label}, every code block runs without error`, async ({ page }) => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 

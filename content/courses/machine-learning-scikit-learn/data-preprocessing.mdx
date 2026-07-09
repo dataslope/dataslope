@@ -1,6 +1,6 @@
 ---
 title: Data Preprocessing and Scaling
-description: Why many models need clean, comparably-scaled numbers — and the one rule about scaling that, if you break it, quietly inflates every score you report.
+description: Why many models need clean, comparably-scaled numbers, and the one rule about scaling that, if you break it, quietly inflates every score you report.
 ---
 
 A machine learning model does not see your data the way you do. Where you
@@ -12,13 +12,13 @@ that would otherwise work beautifully.
 
 This page is about **preprocessing**: the unglamorous step of turning raw
 numbers into numbers a model can actually use. We focus on the most common
-and most important transformation — **feature scaling** — and on the single
+and most important transformation, **feature scaling**, and on the single
 rule that separates an honest pipeline from a leaky one.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A huge blue circle, a tiny green square, and a small yellow dot cross a thin gray arrow and come out the same size on the other side — scaling puts wildly different feature ranges on one common footing"
+  aria-label="A huge blue circle, a tiny green square, and a small yellow dot cross a thin gray arrow and come out the same size on the other side, scaling puts wildly different feature ranges on one common footing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -58,7 +58,7 @@ Why does that happen? It comes down to how the model measures things.
 - **Distance-based models** like k-nearest neighbors compute how "far
   apart" two examples are by, in effect, summing squared differences across
   features. A difference of 50,000 in income utterly dwarfs a difference of
-  30 in age. The age feature might as well not exist — the distance is
+  30 in age. The age feature might as well not exist, the distance is
   decided almost entirely by income, simply because its numbers are bigger.
 - **Gradient-based and regularized models** like logistic regression learn
   a weight for each feature and penalize large weights. A feature measured
@@ -72,8 +72,8 @@ footing, so the model judges features by their *information*, not their
 
 <Callout type="info" title="Scaling changes the numbers, not the meaning">
 Scaling is a monotonic, reversible rescaling of each column. It does not
-throw away information or distort the *ordering* of values within a feature
-— a taller person is still taller afterward. It only changes the *units*
+throw away information or distort the *ordering* of values within a feature,
+a taller person is still taller afterward. It only changes the *units*
 so that no single feature dominates purely because it happens to be
 measured in large numbers.
 </Callout>
@@ -88,7 +88,7 @@ $$
 z = \frac{x - \mu}{\sigma}
 $$
 
-If you have run a hypothesis test, you have seen this exact formula — it is
+If you have run a hypothesis test, you have seen this exact formula, it is
 the **z-score**. After the transform, each feature has a mean of about 0
 and a standard deviation of about 1. A value of `+2` now means "two
 standard deviations above this feature's average," and that sentence means
@@ -97,7 +97,7 @@ the same thing whether the feature was age or income.
 Let us see it on real data. The Palmer penguins dataset is a perfect
 natural example: a penguin's **body mass** runs into the thousands of grams
 (roughly 3,000–6,000), while its **bill length** is just tens of
-millimeters (around 40). Four measurements, four wildly different scales —
+millimeters (around 40). Four measurements, four wildly different scales,
 exactly the situation `StandardScaler` is built for.
 
 <CodeBlock
@@ -132,7 +132,7 @@ print("  column stds :", np.round(X_scaled.std(axis=0), 2))
 />
 
 Before scaling, the column means and standard deviations are all over the
-map — `body_mass_g` sits near 4,200 with a spread in the hundreds, while
+map, `body_mass_g` sits near 4,200 with a spread in the hundreds, while
 `bill_length_mm` sits near 44 with a spread of about 5. After scaling,
 every mean is essentially 0 and every standard deviation is essentially 1.
 The columns are now directly comparable.
@@ -140,7 +140,7 @@ The columns are now directly comparable.
 Notice the two-step shape: `scaler.fit(...)` **learns** the mean and
 standard deviation of each column, and `scaler.transform(...)` **applies**
 them. `fit_transform` just does both in one call. That `fit`/`transform`
-split is not a stylistic detail — it is the whole game, as we are about to
+split is not a stylistic detail, it is the whole game, as we are about to
 see.
 
 <Callout type="tip" title="fit learns, transform applies">
@@ -154,8 +154,8 @@ mistake in the next section.
 ## Why it matters: the same model, with and without scaling
 
 Talk is cheap. Let us prove that scaling can change a model's accuracy.
-We will train a k-nearest-neighbors classifier on the penguin data twice —
-once on the raw features, once on scaled features — using the exact same
+We will train a k-nearest-neighbors classifier on the penguin data twice,
+once on the raw features, once on scaled features, using the exact same
 split so the comparison is fair.
 
 <CodeBlock
@@ -182,7 +182,7 @@ knn_raw = KNeighborsClassifier(n_neighbors=5)
 knn_raw.fit(X_train, y_train)
 raw_acc = knn_raw.score(X_test, y_test)
 
-# 2) KNN on SCALED features (fit the scaler on train only — more on this below).
+# 2) KNN on SCALED features (fit the scaler on train only, more on this below).
 scaler = StandardScaler().fit(X_train)
 knn_scaled = KNeighborsClassifier(n_neighbors=5)
 knn_scaled.fit(scaler.transform(X_train), y_train)
@@ -200,7 +200,7 @@ feature with the largest numbers (here, `body_mass_g`, which runs into the
 thousands) dominates the distance calculation, so KNN is effectively
 classifying penguins by body mass alone and all but ignoring the other
 three measurements. After scaling, all four measurements get a fair say,
-and accuracy jumps. For a distance-based model, scaling is not optional — it
+and accuracy jumps. For a distance-based model, scaling is not optional, it
 is the difference between a model that works and one that barely tries.
 
 ## Which models care about scale, and which do not
@@ -217,7 +217,7 @@ flowchart TD
     T --> NC["Scaling is harmless<br/>but unnecessary"]
 ```
 
-**Scale-sensitive models** — scaling usually helps, sometimes a lot:
+**Scale-sensitive models**, scaling usually helps, sometimes a lot:
 
 - **k-nearest neighbors** and **support vector machines** measure distances
   between points, so a feature with big numbers dominates unless scaled.
@@ -229,7 +229,7 @@ flowchart TD
   so they are highly scale-sensitive too. (More on these in the clustering
   pages.)
 
-**Scale-invariant models** — scaling changes nothing meaningful:
+**Scale-invariant models**, scaling changes nothing meaningful:
 
 - **Decision trees** and everything built from them (**random forests**,
   **gradient boosting**). A tree splits a feature with a question like "is
@@ -241,7 +241,7 @@ flowchart TD
 <Callout type="info" title="Why trees genuinely do not care">
 A decision tree asks yes/no questions of the form "is this feature above
 some threshold?" Any scaling that preserves the order of values (which
-standardizing does — it is just subtract-and-divide by positive numbers)
+standardizing does, it is just subtract-and-divide by positive numbers)
 leaves every possible threshold split unchanged. That is why you can hand a
 random forest raw, wildly-scaled features and lose nothing. It is also why
 the wrong-vs-right leakage rule below matters far more for KNN and
@@ -297,7 +297,7 @@ print("including the", X_test.shape[0], "rows we pretend are 'unseen'.")
 
 This looks innocent and runs without error, which is exactly why it is
 dangerous. The scaler's mean and standard deviation were computed across
-*all* rows — including the test rows. The test set helped decide how the
+*all* rows, including the test rows. The test set helped decide how the
 training data gets scaled. That is **data leakage**: the test set is no
 longer truly held out.
 
@@ -330,7 +330,7 @@ X_train_scaled = scaler.transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 print("Train mean after scaling (should be ~0):", round(X_train_scaled.mean(), 6))
-# The test set, scaled with TRAIN stats, is NOT exactly mean 0 — and that is correct.
+# The test set, scaled with TRAIN stats, is NOT exactly mean 0, and that is correct.
 print("Test  mean after scaling (need not be 0):", round(X_test_scaled.mean(), 4))
 `,
     },
@@ -338,7 +338,7 @@ print("Test  mean after scaling (need not be 0):", round(X_test_scaled.mean(), 4
 />
 
 Read those two printouts carefully, because they capture the whole idea.
-The **training** mean lands almost exactly at 0 — of course it does, we
+The **training** mean lands almost exactly at 0, of course it does, we
 subtracted the training mean from the training data. The **test** mean is
 *not* exactly 0, and **that is correct**. We deliberately scaled the test
 set using the *training* set's mean and standard deviation, treating it as
@@ -347,7 +347,7 @@ would never have a fresh batch's statistics in advance; you only ever have
 what you learned at training time. Doing it this way means your test score
 faithfully simulates that reality.
 
-<Callout type="danger" title="Fit the scaler on train only — always">
+<Callout type="danger" title="Fit the scaler on train only, always">
 The rule has no exceptions for ordinary tabular modeling: **`fit` every
 preprocessing step on the training set, then `transform` both the training
 and test sets with it.** Calling `fit_transform` on the full dataset before
@@ -359,7 +359,7 @@ matter.
 
 <Callout type="tip" title="A test set that is not perfectly centered is a good sign">
 If, after scaling, your test set has mean exactly 0 and standard deviation
-exactly 1, you almost certainly fit the scaler on the test data — a leak.
+exactly 1, you almost certainly fit the scaler on the test data, a leak.
 A correctly scaled test set is *close* to centered (because it is drawn
 from the same distribution) but not *exactly* centered. Slight imperfection
 here is evidence you did it right.
@@ -373,8 +373,8 @@ test data. The model then trains on inputs that already "know" a little
 about the examples it will be graded on. The grade comes out a touch too
 high. In a one-off split the effect can be small, but it compounds badly
 inside cross-validation (covered on its own page), where the same leak
-happens in every fold and the optimism accumulates. The fix — preprocessing
-that is re-fit *inside* each split — is exactly what `Pipeline` automates,
+happens in every fold and the optimism accumulates. The fix, preprocessing
+that is re-fit *inside* each split, is exactly what `Pipeline` automates,
 which is the subject of a later page.
 
 ## MinMaxScaler: a brief alternative
@@ -416,7 +416,7 @@ print(np.round(X01, 3))
 Every column now runs from exactly 0 (its smallest value) to exactly 1
 (its largest). When should you prefer it?
 
-- Reach for **`MinMaxScaler`** when you need a **bounded** range — for
+- Reach for **`MinMaxScaler`** when you need a **bounded** range, for
   example, feeding pixel intensities in `[0, 1]`, or when downstream code
   assumes non-negative inputs in a fixed interval.
 - Reach for **`StandardScaler`** as the sensible default for most models,
@@ -456,7 +456,7 @@ It improves *scale-sensitive* models (KNN, SVM, regularized linear models,
 K-Means, PCA) and does *nothing* for tree-based models. Knowing which
 camp your model is in tells you whether scaling is essential, optional, or
 simply noise in your code. It never *hurts* accuracy for scale-invariant
-models — it just does not help.
+models, it just does not help.
 </Callout>
 
 ## Real-world applications
@@ -485,7 +485,7 @@ care goes, and where leaks creep in.
   category="preprocessing · scaling · leakage"
   estimatedTime="~7 min"
   instructions={`The penguins' four numeric measurements live on very
-different scales — \`body_mass_g\` is in the thousands while
+different scales, \`body_mass_g\` is in the thousands while
 \`bill_length_mm\` is in the tens. Scale them **without leaking the test
 set**.
 
@@ -494,7 +494,7 @@ set**.
 2. Create a \`StandardScaler\` and **fit it on \`X_train\` only**.
 3. Use it to build \`X_train_scaled\` (transform \`X_train\`) and
    \`X_test_scaled\` (transform \`X_test\`). Apply the **same** fitted
-   scaler to both — do not fit it again on the test set.
+   scaler to both, do not fit it again on the test set.
 4. Store the mean of \`X_train_scaled\` in \`train_mean\`.
 
 The tests check that the scaler was fit on the training set (so the
@@ -606,7 +606,7 @@ The z-score is the same transform you use in hypothesis testing, applied indepen
 <MultipleChoice
   markdown={`You scale the entire dataset with \`fit_transform\`, *then* call \`train_test_split\`. What is wrong with this?
 
-- Nothing — scaling order does not matter
+- Nothing, scaling order does not matter
   > Order matters precisely because \`fit\` learns statistics from the data it sees. Fitting before the split lets those statistics see the test rows.
 - The features will not be centered correctly
   > The features are centered fine; the problem is *which rows* informed the centering, not whether centering happened.
@@ -637,7 +637,7 @@ Trees ask "is this feature above a threshold?", and rescaling just moves the thr
   markdown={`After correctly scaling (fit on train, transform both), you check the means. What should you expect?
 
 - Both the training and test means are exactly 0
-  > A test mean of exactly 0 would mean the scaler was fit on the test data — the leakage bug we are trying to avoid.
+  > A test mean of exactly 0 would mean the scaler was fit on the test data, the leakage bug we are trying to avoid.
 - [o] The training mean is ~0, while the test mean is close to but not exactly 0
   > Subtracting the training mean centers the training data at 0; the test set, scaled with those same training statistics, lands nearby but not exactly at 0.
 - Both means are far from 0

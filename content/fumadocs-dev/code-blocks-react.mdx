@@ -1,5 +1,5 @@
 ---
-title: Code Blocks — React
+title: "Code Blocks: React"
 description: React blocks compile TSX with esbuild-wasm in a worker and render into a live sandboxed preview.
 ---
 
@@ -66,7 +66,7 @@ createRoot(document.getElementById("root")!).render(<Counter />);
 
 ## Props and list rendering
 
-TypeScript works throughout — interfaces, generics, and typed props
+TypeScript works throughout, interfaces, generics, and typed props
 compile in the browser exactly like in a local toolchain.
 
 <CodeBlock
@@ -92,7 +92,7 @@ function Timeline({ items }: { items: Milestone[] }) {
     <ol style={{ fontFamily: "system-ui" }}>
       {items.map((m) => (
         <li key={m.year}>
-          <strong>{m.year}</strong> — {m.event}
+          <strong>{m.year}</strong>, {m.event}
         </li>
       ))}
     </ol>

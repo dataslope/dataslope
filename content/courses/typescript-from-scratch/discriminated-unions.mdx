@@ -3,16 +3,16 @@ title: Discriminated Unions
 description: Model state machines and domain events with tagged unions
 ---
 
-Discriminated unions are the single most useful pattern in modern TypeScript. They let you model **variants** — states, events, results, commands — where each variant has different data, and the compiler helps you handle every case exhaustively.
+Discriminated unions are the single most useful pattern in modern TypeScript. They let you model **variants**, states, events, results, commands, where each variant has different data, and the compiler helps you handle every case exhaustively.
 
-The idea: define a union of object types, each with a **discriminant** field (a tag like `kind` or `type`) that uniquely identifies the variant. TypeScript's control-flow analysis narrows the union based on the discriminant, so inside a `switch` or `if` statement, you know exactly which variant you're handling — and the compiler proves you didn't miss any.
+The idea: define a union of object types, each with a **discriminant** field (a tag like `kind` or `type`) that uniquely identifies the variant. TypeScript's control-flow analysis narrows the union based on the discriminant, so inside a `switch` or `if` statement, you know exactly which variant you're handling, and the compiler proves you didn't miss any.
 
 This is how you model state machines, API responses, domain events, parser results, and anything else with "one of several possibilities." Let's see why discriminated unions are so powerful.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three identical gray parcels differ only by the small colored tag on their corner, and each rides its own thin arrow straight into the matching colored bin — the discriminant field tells the compiler exactly which variant it holds"
+  aria-label="Three identical gray parcels differ only by the small colored tag on their corner, and each rides its own thin arrow straight into the matching colored bin, the discriminant field tells the compiler exactly which variant it holds"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -58,7 +58,7 @@ This is how you model state machines, API responses, domain events, parser resul
 
 ## The discriminant field
 
-A discriminated union is a union of object types that share a common property — the **discriminant** — with distinct literal values for each variant.
+A discriminated union is a union of object types that share a common property, the **discriminant**, with distinct literal values for each variant.
 
 <CodeBlock
   adapter="typescript"
@@ -121,7 +121,7 @@ Here's the trick: assign the unhandled case to `never`. If you've covered all va
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three outlined bins each hold a parcel matching their colored tag, but a fourth parcel with a red diamond tag hovers above a bin that exists only as a dashed outline — exhaustiveness checking complains until every variant has a place to go"
+  aria-label="Three outlined bins each hold a parcel matching their colored tag, but a fourth parcel with a red diamond tag hovers above a bin that exists only as a dashed outline, exhaustiveness checking complains until every variant has a place to go"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }}>
@@ -203,7 +203,7 @@ console.log(render({ kind: "error", message: "Network failure" }));
   ]}
 />
 
-In the `default` case, we try to assign `status` to a variable of type `never`. If every variant has been handled, `status` is type `never` (the "empty" type), so the assignment succeeds. If we forgot a case, `status` still has a type (the unhandled variant), and assigning it to `never` fails with a compile error — under `tsc`, deleting the `"error"` case from the function above produces *Type '\{ kind: "error"; message: string; \}' is not assignable to type 'never'*, an error message that names the exact variant you forgot.
+In the `default` case, we try to assign `status` to a variable of type `never`. If every variant has been handled, `status` is type `never` (the "empty" type), so the assignment succeeds. If we forgot a case, `status` still has a type (the unhandled variant), and assigning it to `never` fails with a compile error, under `tsc`, deleting the `"error"` case from the function above produces *Type '\{ kind: "error"; message: string; \}' is not assignable to type 'never'*, an error message that names the exact variant you forgot.
 
 <Callout type="success" title="Add a variant, get a compile error">
 This is the dream: you add a new variant to the union (e.g., `| { kind: "cancelled" }`), and every `switch` statement that handles `Status` lights up with an error until you add the new case. The compiler becomes your refactoring assistant.
@@ -211,7 +211,7 @@ This is the dream: you add a new variant to the union (e.g., `| { kind: "cancell
 
 ## Modeling state machines
 
-Discriminated unions shine when modeling **state machines** — systems that can be in one of several states, each with different valid data.
+Discriminated unions shine when modeling **state machines**, systems that can be in one of several states, each with different valid data.
 
 Consider a data-fetching flow: you start idle, transition to loading, and then land in either success or error. Each state has its own data:
 
@@ -283,7 +283,7 @@ When you see multiple booleans (`isLoading`, `isSuccess`, `isError`) or nullable
 
 ## Domain events
 
-Discriminated unions are perfect for modeling **domain events** — things that happen in your application, where each event carries different data.
+Discriminated unions are perfect for modeling **domain events**, things that happen in your application, where each event carries different data.
 
 <CodeBlock
   adapter="typescript"
@@ -398,7 +398,7 @@ export function getData<T>(state: RemoteData<T>): T | null {
 The `remoteData.ts` module defines the union and a few helpers. The `main.ts` module imports them and simulates a fetch lifecycle. Notice how the type guards (`isLoading`, `isSuccess`) narrow the type so you can safely access variant-specific fields.
 
 <Callout type="info" title="Type guards refresh">
-A **type guard** is a function that returns `x is SomeType`. When you call it in an `if` statement, TypeScript narrows the type of `x` to `SomeType` in the true branch. We covered this in the [Type Narrowing](./type-narrowing) chapter — discriminated unions and type guards work together beautifully.
+A **type guard** is a function that returns `x is SomeType`. When you call it in an `if` statement, TypeScript narrows the type of `x` to `SomeType` in the true branch. We covered this in the [Type Narrowing](./type-narrowing) chapter, discriminated unions and type guards work together beautifully.
 </Callout>
 
 ## Challenge: Modeling a notification system
@@ -549,7 +549,7 @@ export type Notification = { type: "info"; message: string };
 - The new variant is ignored, and the \`default\` case handles it silently.
   > No. If you have exhaustiveness checking, the \`default\` case tries to assign the value to \`never\`. If a variant is unhandled, this fails at compile time, not runtime.
 
-Exhaustiveness checking is the key benefit of discriminated unions. When you add a new variant, every \`switch\` that handles the union must be updated to handle the new case — or the code won't compile. This turns runtime bugs into compile-time errors.`}
+Exhaustiveness checking is the key benefit of discriminated unions. When you add a new variant, every \`switch\` that handles the union must be updated to handle the new case, or the code won't compile. This turns runtime bugs into compile-time errors.`}
 />
 
 ## When to use discriminated unions
@@ -569,7 +569,7 @@ If you learn one advanced TypeScript pattern, make it discriminated unions. They
 
 ## Recap
 
-Discriminated unions let you model variants — states, events, commands, results — where each variant has different data and a unique tag. The compiler uses the tag (the **discriminant**) to narrow the union, so you get precise type checking and autocomplete for each variant.
+Discriminated unions let you model variants, states, events, commands, results, where each variant has different data and a unique tag. The compiler uses the tag (the **discriminant**) to narrow the union, so you get precise type checking and autocomplete for each variant.
 
 **Key takeaways:**
 
@@ -581,4 +581,4 @@ Discriminated unions let you model variants — states, events, commands, result
 
 Discriminated unions are the backbone of type-safe state management in TypeScript. They're concise, composable, and compiler-verified. Master them, and you'll write cleaner, safer code.
 
-Next: [Modeling Domains with Types](./modeling-domains-with-types), where we take the principles from discriminated unions and apply them to real-world domain modeling — evolving sloppy types into precise, self-documenting data structures that make illegal states impossible.
+Next: [Modeling Domains with Types](./modeling-domains-with-types), where we take the principles from discriminated unions and apply them to real-world domain modeling, evolving sloppy types into precise, self-documenting data structures that make illegal states impossible.

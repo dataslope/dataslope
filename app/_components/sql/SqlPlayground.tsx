@@ -6,7 +6,7 @@
 //
 // Differs from `Playground.tsx` (which wraps a single REPL-style
 // adapter) in three significant ways:
-//   1. The engine is persistent across runs and tabs — only the
+//   1. The engine is persistent across runs and tabs, only the
 //      database-selector causes a teardown/rebuild.
 //   2. The editor is multi-tab, with per-database persistence so
 //      switching databases doesn't blow away your work in the others.
@@ -591,7 +591,7 @@ function SqlPlaygroundInner() {
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
   // From the conflict overlay: create a fresh workspace and switch to it.
   // No engine is open in the conflict case, so a reload is the simplest
-  // safe path — the new workspace id isn't locked, so it boots normally.
+  // safe path, the new workspace id isn't locked, so it boots normally.
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
       try {
@@ -805,7 +805,7 @@ function SqlPlaygroundInner() {
 
   const openSettingsTab = useCallback(() => {
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
-      // Settings tab is active — close it and return to a query tab.
+      // Settings tab is active, close it and return to a query tab.
       setSettingsOpen(false);
       const fallback = tabsRef.current[0]?.id;
       if (fallback) {
@@ -813,11 +813,11 @@ function SqlPlaygroundInner() {
         setActiveTabId(fallback);
       }
     } else if (settingsOpenRef.current) {
-      // Settings tab is in the tab bar but not active — activate it.
+      // Settings tab is in the tab bar but not active, activate it.
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
     } else {
-      // Settings tab is not open — add it and make it active.
+      // Settings tab is not open, add it and make it active.
       setSettingsOpen(true);
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
@@ -886,7 +886,7 @@ function SqlPlaygroundInner() {
   } = useQueryRunner(queryRunnerRefs);
 
   // Run just the statement under the editor cursor (the toolbar "Run statement"
-  // affordance — mirrors the Ctrl/⌘+Enter keymap). Falls back to running the
+  // affordance, mirrors the Ctrl/⌘+Enter keymap). Falls back to running the
   // whole tab when the cursor isn't inside a statement.
   const runStatementAtCursor = useCallback(() => {
     const view = editorRef.current;
@@ -952,7 +952,7 @@ function SqlPlaygroundInner() {
     if (!view || !engine) return;
     const sql = activeSqlForEditor(view).trim();
     if (!sql) {
-      showToast("Nothing to explain — the query is empty.", "warn");
+      showToast("Nothing to explain, the query is empty.", "warn");
       return;
     }
     void (async () => {
@@ -1011,7 +1011,7 @@ function SqlPlaygroundInner() {
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
   // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs — the database binary itself never leaves the browser.
+  // the query tabs, the database binary itself never leaves the browser.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
@@ -1204,7 +1204,7 @@ function SqlPlaygroundInner() {
       const { format: sqlFormat } = await import("sql-formatter");
       const formatted = sqlFormat(code, { language: "sqlite" });
       if (formatted === code) {
-        showToast("Already formatted — nothing to change.");
+        showToast("Already formatted, nothing to change.");
         return;
       }
       view.dispatch({
@@ -1323,8 +1323,8 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     let cancelled = false;
     // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount — e.g. a browser
-    // back-then-forward return to the playground — can re-acquire it instead
+    // client-side navigation away) so a later remount, e.g. a browser
+    // back-then-forward return to the playground, can re-acquire it instead
     // of colliding with this document's own stale lock.
     const lockController = new AbortController();
 
@@ -1399,10 +1399,10 @@ function SqlPlaygroundInner() {
               return;
             }
           } catch {
-            /* Web Locks unavailable — proceed without cross-tab exclusivity. */
+            /* Web Locks unavailable, proceed without cross-tab exclusivity. */
           }
         } catch {
-          // Workspace bootstrap is best-effort — proceed in-memory.
+          // Workspace bootstrap is best-effort, proceed in-memory.
         }
         if (cancelled) return;
         const engine = await sqliteAdapter.createEngine(
@@ -1460,7 +1460,7 @@ function SqlPlaygroundInner() {
       // Release the workspace lock so the next mount can re-acquire it.
       lockController.abort();
       // Terminate the engine worker so its OPFS access handles are
-      // released — a zombie worker would otherwise keep the workspace's
+      // released, a zombie worker would otherwise keep the workspace's
       // opfs-sahpool locked across StrictMode remounts and client-side
       // route changes, failing the next boot's OPFS acquisition. A boot
       // still in flight here is handled by createSqliteEngine itself,
@@ -1718,7 +1718,7 @@ function SqlPlaygroundInner() {
     }
   }, [activeDbId, tablesSectionExpanded, viewsSectionExpanded]);
 
-  // PK / FK lookups for every editable source table in the current result —
+  // PK / FK lookups for every editable source table in the current result,
   // the query-wide table plus each per-set table of a multi-statement run.
   useEffect(() => {
     if (!result) return;
@@ -1972,7 +1972,7 @@ function SqlPlaygroundInner() {
   }, [result, constraintsByEntity]);
 
   // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment — the sidebar copy may be retired).
+  // menu (the latter is an experiment, the sidebar copy may be retired).
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}
@@ -2565,12 +2565,12 @@ function SqlPlaygroundInner() {
           warningText={
             <>
               This will replace the current database. Your file will{" "}
-              <strong>not</strong> be uploaded or persisted — it is only loaded
+              <strong>not</strong> be uploaded or persisted, it is only loaded
               into browser memory and will be gone on reload.
             </>
           }
           dropText="Drop a database file here"
-          browseHint="or click to browse — .sql, .db, .sqlite, .sqlite3"
+          browseHint="or click to browse, .sql, .db, .sqlite, .sqlite3"
           inputAriaLabel="Choose database file"
         />
 
@@ -2631,7 +2631,7 @@ function SqlPlaygroundInner() {
                   aria-hidden="true"
                 />
                 <span>
-                  This is a playground — your data is only held in browser
+                  This is a playground, your data is only held in browser
                   memory and will not be persisted on reload.
                 </span>
               </div>
@@ -2657,7 +2657,7 @@ function SqlPlaygroundInner() {
                   />
                   <span>Drop a CSV file here</span>
                   <span className="sql-dropzone-hint">
-                    or click to browse — .csv
+                    or click to browse, .csv
                   </span>
                   <input
                     type="file"
@@ -2873,7 +2873,7 @@ function SqlPlaygroundInner() {
                   aria-hidden="true"
                 />
                 <span>
-                  This is a playground — your data is only held in browser
+                  This is a playground, your data is only held in browser
                   memory and will not be persisted on reload.
                 </span>
               </div>
@@ -2899,7 +2899,7 @@ function SqlPlaygroundInner() {
                   />
                   <span>Drop a JSON file here</span>
                   <span className="sql-dropzone-hint">
-                    or click to browse — .json (array of objects)
+                    or click to browse, .json (array of objects)
                   </span>
                   <input
                     type="file"
@@ -3115,7 +3115,7 @@ function SqlPlaygroundInner() {
                   aria-hidden="true"
                 />
                 <span>
-                  This is a playground — your data is only held in browser
+                  This is a playground, your data is only held in browser
                   memory and will not be persisted on reload.
                 </span>
               </div>
@@ -3141,7 +3141,7 @@ function SqlPlaygroundInner() {
                   />
                   <span>Drop a Parquet file here</span>
                   <span className="sql-dropzone-hint">
-                    or click to browse — .parquet
+                    or click to browse, .parquet
                   </span>
                   <input
                     type="file"

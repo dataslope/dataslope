@@ -1,6 +1,6 @@
 ---
 title: Filtering Data
-description: Boolean masks — the single most important pattern in Pandas, used dozens of times per analysis.
+description: Boolean masks, the single most important pattern in Pandas, used dozens of times per analysis.
 ---
 
 If there is one Pandas pattern you will use more than any other,
@@ -11,7 +11,7 @@ where..."
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Rows pass a checkpoint column of green and red mask cells; only the rows beside green cells continue onward with a green badge — a boolean mask filtering a DataFrame"
+  aria-label="Rows pass a checkpoint column of green and red mask cells; only the rows beside green cells continue onward with a green badge, a boolean mask filtering a DataFrame"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -76,7 +76,7 @@ print(df[mask])
   ]}
 />
 
-Two-step or one-step — pick your style:
+Two-step or one-step, pick your style:
 
 ```python
 # Two-step (more readable for complex conditions)
@@ -115,7 +115,7 @@ print(df[df["dept"] != "Eng"])
 
 ## Combining conditions with `&`, `|`, `~`
 
-You must use `&` (and), `|` (or), `~` (not) — **not** the Python
+You must use `&` (and), `|` (or), `~` (not), **not** the Python
 keywords `and`, `or`, `not`. And **always** wrap each condition
 in parentheses, because `&` has higher precedence than `>`.
 
@@ -154,7 +154,7 @@ parentheses.
 
 A handful of methods produce boolean masks directly:
 
-### `isin` — membership
+### `isin`, membership
 
 <CodeBlock
   adapter="python"
@@ -174,7 +174,7 @@ print(df[df["dept"].isin(["Eng", "Sales"])])
   ]}
 />
 
-### `between` — ranges
+### `between`, ranges
 
 <CodeBlock
   adapter="python"
@@ -193,7 +193,7 @@ df = pd.DataFrame({
   ]}
 />
 
-### `str.contains` — substring matching
+### `str.contains`, substring matching
 
 <CodeBlock
   adapter="python"
@@ -211,7 +211,7 @@ df = pd.DataFrame({
   ]}
 />
 
-### `isna` / `notna` — missing checks
+### `isna` / `notna`, missing checks
 
 <CodeBlock
   adapter="python"
@@ -233,7 +233,7 @@ print(df[df["x"].notna()])
   ]}
 />
 
-## `query` — a string-based DSL
+## `query`, a string-based DSL
 
 Pandas has an alternative filter syntax that some people find
 more readable, especially for multi-condition filters:
@@ -394,11 +394,11 @@ assert isinstance(light_females, pd.DataFrame)`,
 - \`and\` does not exist in Python
   > \`and\` is a standard Python keyword; it exists but operates on single boolean scalars, not on entire Series of booleans.
 - It is shorter
-  > \`&\` is one character while \`and\` is three; brevity is not the reason — the difference is that \`&\` performs element-wise boolean logic on Series.
-- [o] \`and\` operates on single boolean values and tries to coerce a whole Series into one — which is ambiguous — while \`&\` is element-wise on Series
+  > \`&\` is one character while \`and\` is three; brevity is not the reason, the difference is that \`&\` performs element-wise boolean logic on Series.
+- [o] \`and\` operates on single boolean values and tries to coerce a whole Series into one, which is ambiguous, while \`&\` is element-wise on Series
   > \`a and b\` requires \`a\` to be a single True/False, but a Series of length > 1 cannot be reduced to one. Pandas raises the "ambiguous truth value" error.
 - \`&\` is faster
-  > Speed is not the reason to prefer \`&\`; the reason is correctness — \`and\` raises a ValueError on Series, while \`&\` applies the boolean operation element-wise.
+  > Speed is not the reason to prefer \`&\`; the reason is correctness, \`and\` raises a ValueError on Series, while \`&\` applies the boolean operation element-wise.
 - Pandas hates English
   > This is a humorous distractor; the restriction exists because Python's \`and\` keyword is semantically defined to work on scalar booleans, not vectorized collections.
 
@@ -424,7 +424,7 @@ Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`
   markdown={`Why is \`df.loc[mask, "col"] = value\` preferred over \`df[mask]["col"] = value\` when modifying data?
 
 - The two are equivalent
-  > The chained form \`df[mask]["col"] = value\` may operate on a temporary copy rather than the original DataFrame, meaning the assignment silently has no effect — so they are not equivalent.
+  > The chained form \`df[mask]["col"] = value\` may operate on a temporary copy rather than the original DataFrame, meaning the assignment silently has no effect, so they are not equivalent.
 - The second is shorter
   > Brevity is not the issue; the chained assignment form is shorter but may silently fail to modify the original DataFrame due to copy-on-write semantics.
 - [o] The chained form may silently operate on a *copy* and fail to update the original (the SettingWithCopyWarning); \`loc\` guarantees in-place update

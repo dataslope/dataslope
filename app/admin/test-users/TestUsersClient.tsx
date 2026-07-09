@@ -1,20 +1,20 @@
 "use client";
 
 /**
- * Test users section — create disposable accounts for exercising
+ * Test users section, create disposable accounts for exercising
  * member-gated features (AI autocomplete is pro-only; Ask AI budgets differ
  * by tier) without touching real accounts or a billing system.
  *
  * How it works: creation goes through Better Auth's admin `create-user`
  * endpoint (server-side admin check included), passing `data: { plan,
- * emailVerified: true }` — so test users are born verified (no email
+ * emailVerified: true }`, so test users are born verified (no email
  * round-trip; their @dataslope.test addresses couldn't receive one anyway)
  * with the chosen membership plan. No verification email is ever sent on
  * this path, unlike normal sign-up.
  *
  * Test accounts are identified purely by the reserved @dataslope.test email
  * domain (see TEST_EMAIL_DOMAIN): that's what this page lists, and what the
- * Users table badges as "Test". Passwords are only shown at creation time —
+ * Users table badges as "Test". Passwords are only shown at creation time,
  * to get into an existing test account, impersonate it (or remove and
  * recreate it).
  *
@@ -84,13 +84,13 @@ interface CreatedAccount {
 
 const LIST_LIMIT = 200;
 const MAX_BATCH = 10;
-/** Backstop on the pagination loop — 50 pages of 200 is far beyond any
+/** Backstop on the pagination loop, 50 pages of 200 is far beyond any
  *  plausible test-account count and keeps a server bug from looping forever. */
 const MAX_LIST_PAGES = 50;
 
 /** Random base-36 slug from the Web Crypto CSPRNG. These slugs become live
- *  credentials — default passwords and sign-in-able email prefixes on
- *  pre-verified (often Pro) accounts — so Math.random()'s guessable output
+ *  credentials, default passwords and sign-in-able email prefixes on
+ *  pre-verified (often Pro) accounts, so Math.random()'s guessable output
  *  isn't good enough. */
 function randomSlug(length = 5): string {
   const bytes = crypto.getRandomValues(new Uint8Array(length));
@@ -134,7 +134,7 @@ export function TestUsersClient() {
     setDenied(false);
     // Filter server-side (email ends with the reserved domain) and page
     // through EVERY match. Filtering one newest-first page client-side would
-    // hide any test account older than the newest LIST_LIMIT sign-ups — and
+    // hide any test account older than the newest LIST_LIMIT sign-ups, and
     // "Remove all" would silently skip it while claiming the cleanup is done.
     try {
       const collected: TestUser[] = [];
@@ -167,7 +167,7 @@ export function TestUsersClient() {
         const totalMatches = data?.total ?? collected.length;
         if (batch.length === 0 || collected.length >= totalMatches) break;
       }
-      // isTestEmail is the same domain rule — a belt-and-braces re-check.
+      // isTestEmail is the same domain rule, a belt-and-braces re-check.
       setUsers(collected.filter((u) => isTestEmail(u.email)));
     } catch {
       setError("Couldn't reach the server. Please try again.");
@@ -214,7 +214,7 @@ export function TestUsersClient() {
           name: `Test ${label} ${slug}`,
           role: "user",
           // `emailVerified: true` skips verification (a @dataslope.test address
-          // can't receive mail); `plan` sets the membership tier directly —
+          // can't receive mail); `plan` sets the membership tier directly,
           // exactly what a billing webhook would do.
           data: { plan, emailVerified: true },
         });
@@ -248,7 +248,7 @@ export function TestUsersClient() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard unavailable (permissions) — the text is on screen anyway.
+      // Clipboard unavailable (permissions), the text is on screen anyway.
     }
   }
 
@@ -406,7 +406,7 @@ export function TestUsersClient() {
         <Panel>
           <PanelHeader
             title="Create test users"
-            description={`Accounts are created verified on a reserved @${TEST_EMAIL_DOMAIN} address — no verification email, no billing.`}
+            description={`Accounts are created verified on a reserved @${TEST_EMAIL_DOMAIN} address, no verification email, no billing.`}
           />
           <PanelBody>
             <form
@@ -500,7 +500,7 @@ export function TestUsersClient() {
                   <p className="text-sm font-medium">
                     Created {created.length}{" "}
                     {created.length === 1 ? "account" : "accounts"}. Save these
-                    credentials — passwords aren&apos;t shown again.
+                    credentials, passwords aren&apos;t shown again.
                   </p>
                   <Button
                     variant="ghost"
@@ -518,7 +518,7 @@ export function TestUsersClient() {
                     .join("\n")}
                 </pre>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Sign in with these at /sign-in from a private window — or use
+                  Sign in with these at /sign-in from a private window, or use
                   Impersonate below to become one in this browser (come back to
                   /admin to stop).
                 </p>
@@ -598,7 +598,7 @@ export function TestUsersClient() {
               </p>
             ) : users.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">
-                No test users yet — create some above.
+                No test users yet, create some above.
               </p>
             ) : (
               <>
@@ -690,9 +690,9 @@ export function TestUsersClient() {
 
             <p className="text-xs leading-relaxed text-muted-foreground">
               Test users are ordinary accounts identified by the reserved
-              @{TEST_EMAIL_DOMAIN} domain — safe to remove at any time. Plan
-              changes reach the AI endpoints immediately — they read the
-              session fresh — but the account&apos;s header/plan display can
+              @{TEST_EMAIL_DOMAIN} domain, safe to remove at any time. Plan
+              changes reach the AI endpoints immediately, they read the
+              session fresh, but the account&apos;s header/plan display can
               lag up to five minutes (the session cookie cache).
             </p>
           </PanelBody>

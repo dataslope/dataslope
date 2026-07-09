@@ -1,10 +1,10 @@
 ---
 title: Word Frequencies and Lexical Diversity
-description: Once text is clean tokens, the first thing you measure is how often each word appears. NLTK's FreqDist, .most_common(), lexical diversity, hapaxes, and the long-tailed shape of language — plus why raw frequency alone is dominated by stopwords.
+description: Once text is clean tokens, the first thing you measure is how often each word appears. NLTK's FreqDist, .most_common(), lexical diversity, hapaxes, and the long-tailed shape of language, plus why raw frequency alone is dominated by stopwords.
 ---
 
 You now know how to turn a paragraph into a clean list of tokens. The
-simplest — and most useful — thing you can do with that list is *count*. How
+simplest, and most useful, thing you can do with that list is *count*. How
 many words are there? How many *distinct* words? Which words appear most? How
 varied is the vocabulary? These basic statistics are the foundation of search
 ranking, keyword extraction, spam scoring, and a surprising amount of "text
@@ -13,7 +13,7 @@ analytics".
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Bar heights collapse in a long Zipf tail beneath a smooth green curve — the two tallest gray bars are stopwords, blue bars the common content words, and the small yellow bars words seen barely once"
+  aria-label="Bar heights collapse in a long Zipf tail beneath a smooth green curve, the two tallest gray bars are stopwords, blue bars the common content words, and the small yellow bars words seen barely once"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.22">
@@ -100,13 +100,13 @@ print("Relative freq 'the': ", round(fd.freq("the"), 3))
 
 A few `FreqDist` methods you will use constantly:
 
-- `fd.most_common(n)` — the `n` highest-frequency words as `(word, count)`
+- `fd.most_common(n)`, the `n` highest-frequency words as `(word, count)`
   pairs, already sorted. The everyday workhorse.
-- `fd.N()` — the total number of word tokens (counting repeats).
-- `len(fd)` — the number of *distinct* words (the vocabulary size).
-- `fd["word"]` — the count of a word; missing words return `0` rather than
+- `fd.N()`, the total number of word tokens (counting repeats).
+- `len(fd)`, the number of *distinct* words (the vocabulary size).
+- `fd["word"]`, the count of a word; missing words return `0` rather than
   raising, because `FreqDist` is a `dict` subclass.
-- `fd.freq("word")` — the *relative* frequency, i.e. count divided by `N()`.
+- `fd.freq("word")`, the *relative* frequency, i.e. count divided by `N()`.
 
 <Callout type="info" title="FreqDist is just a smarter Counter">
 `FreqDist` subclasses `collections.Counter`, so everything you know about
@@ -194,7 +194,7 @@ once or twice. The single most frequent word ("the") often accounts for ~7%
 of all tokens by itself, and the "long tail" of rare words stretches on
 forever. (This regularity is known as **Zipf's law**.)
 
-Words that appear exactly once have their own name — **hapaxes** — and
+Words that appear exactly once have their own name, **hapaxes**, and
 `FreqDist` will list them for you. Let us visualize the lopsidedness with a
 bar chart of the top words.
 
@@ -262,7 +262,7 @@ This shape repeats in essentially every natural-language text.
 
 The long-tail shape leads directly to a practical problem. If you just ask
 "what are the most frequent words?", the answer is almost always the
-stopwords — "the", "a", "of" — which tell you *nothing* about the topic. The
+stopwords, "the", "a", "of", which tell you *nothing* about the topic. The
 content words you actually care about are buried below them.
 
 <CodeBlock
@@ -314,9 +314,9 @@ print("Top 5 WITHOUT stopwords:", FreqDist(content).most_common(5))
 />
 
 With stopwords, the most frequent word is "the" (7 times), with "a" close
-behind — function words useless for guessing the topic. Without them, "text",
+behind, function words useless for guessing the topic. Without them, "text",
 "words", "search", "user", and "engine" rise
-to the top — and you can immediately tell this passage is about search. This
+to the top, and you can immediately tell this passage is about search. This
 is *why* keyword extraction almost always removes stopwords first, and it is a
 concrete payoff of the choice you studied two pages ago.
 
@@ -325,7 +325,7 @@ concrete payoff of the choice you studied two pages ago.
 most frequent words are usually the least informative (stopwords), and even
 among content words, a word common in *this* document but also common in
 *every* document is not very distinctive. The classic fix is to weight a word
-by how rare it is across documents — the idea behind **TF-IDF**, which gets its
+by how rare it is across documents, the idea behind **TF-IDF**, which gets its
 own page later. You do not need it yet, but file away that frequency alone
 over-rewards the commonplace.
 </Callout>
@@ -338,9 +338,9 @@ unhelpful for figuring out the article's topic, and what is the usual fix?
 - The article has no topic; nothing can be done
   > Every news article has a topic; the problem is not an absence of content but that stopwords dominate raw counts and bury the topical words.
 - [o] The most frequent words are stopwords that appear in nearly all text; removing stopwords first surfaces the content words that actually indicate the topic
-  > Language is long-tailed, so function words dominate raw counts. Filtering stopwords before counting lets topical content words rise to the top — which is exactly why keyword extraction removes them first.
+  > Language is long-tailed, so function words dominate raw counts. Filtering stopwords before counting lets topical content words rise to the top, which is exactly why keyword extraction removes them first.
 - \`FreqDist\` counted wrong; use \`Counter\` instead
-  > \`FreqDist\` is built on top of \`Counter\` and counts correctly; the top-five result is accurate — it is just that stopwords genuinely are the most frequent words in most texts.
+  > \`FreqDist\` is built on top of \`Counter\` and counts correctly; the top-five result is accurate, it is just that stopwords genuinely are the most frequent words in most texts.
 - You must lemmatize before any counting will work at all
   > Lemmatization is helpful for reducing variant forms, but counting works perfectly well without it; it does not affect which words dominate the raw frequency list.
 
@@ -356,10 +356,10 @@ Raw frequency over-represents the commonplace; stopword removal is the standard 
   estimatedTime="~6 min"
   instructions={`Implement two functions over a list of tokens:
 
-1. \`lexical_diversity(tokens)\` — return the number of distinct tokens divided
+1. \`lexical_diversity(tokens)\`, return the number of distinct tokens divided
    by the total number of tokens, as a float. For an empty list, return
    \`0.0\` (avoid dividing by zero).
-2. \`top_words(tokens, n)\` — return the \`n\` most common tokens as a list of
+2. \`top_words(tokens, n)\`, return the \`n\` most common tokens as a list of
    \`(word, count)\` pairs. Use \`FreqDist\` (already imported).
 
 For example, with \`tokens = ["a", "b", "a", "c", "a", "b"]\`,
@@ -461,9 +461,9 @@ diversity, and what does that number mean?
 - [o] 40 / 100 = 0.4; on average each distinct word is used about 2.5 times, indicating moderate repetition
   > Lexical diversity is distinct ÷ total = 0.4. Lower values mean more repetition. (Equivalently, total ÷ distinct = 2.5 average uses per word.) The metric ranges from near 0, very repetitive, to near 1, every word unique.
 - 0.4; the text is completely unique with no repeats
-  > A score of 0.4 means 40% of tokens are distinct, implying 60% are repeats — so the text has significant repetition, not zero repeats; a score of 1.0 would mean every word is unique.
+  > A score of 0.4 means 40% of tokens are distinct, implying 60% are repeats, so the text has significant repetition, not zero repeats; a score of 1.0 would mean every word is unique.
 - It cannot be computed without removing stopwords
-  > Lexical diversity is simply distinct divided by total tokens; it can be computed on any token list, with or without stopwords — stopword removal changes the value but is not required.
+  > Lexical diversity is simply distinct divided by total tokens; it can be computed on any token list, with or without stopwords, stopword removal changes the value but is not required.
 
 Distinct over total is 0.4 here, signaling fairly repetitive text.`}
 />
@@ -474,7 +474,7 @@ captures a practical consequence?
 
 - Every word in a text appears roughly the same number of times
   > Zipf's law describes the opposite pattern: a small number of words are extremely frequent and a long tail of words appear rarely; uniform frequency is not observed in natural language.
-- [o] A handful of words (mostly stopwords) account for a large share of all tokens, while a great many words appear only once or twice — so raw frequency is dominated by uninformative words
+- [o] A handful of words (mostly stopwords) account for a large share of all tokens, while a great many words appear only once or twice, so raw frequency is dominated by uninformative words
   > The lopsided distribution means top-by-count is mostly function words, and the informative content sits in the long tail. This is why we remove stopwords and why frequency alone is a weak importance signal.
 - Rare words are always more frequent than common words
   > This inverts reality; Zipf's law says common words are far more frequent than rare ones, which is exactly what makes the frequency distribution long-tailed.
@@ -490,16 +490,16 @@ The lopsidedness explains both stopword dominance and the need for smarter weigh
 - A word that appears in every document
   > A word appearing in every document would be extremely common, the opposite of a hapax; hapaxes appear exactly once in the text, sitting at the far end of the long tail.
 - [o] A word that appears exactly once in the text
-  > "Hapax" (from "hapax legomenon") means a word occurring a single time. \`FreqDist.hapaxes()\` returns them. They make up a large fraction of the vocabulary in most texts — the far end of the long tail.
+  > "Hapax" (from "hapax legomenon") means a word occurring a single time. \`FreqDist.hapaxes()\` returns them. They make up a large fraction of the vocabulary in most texts, the far end of the long tail.
 - The most frequent word in the text
-  > The most frequent word has the highest count (often a stopword like "the"); a hapax has a count of exactly one — the two extremes of the frequency distribution.
+  > The most frequent word has the highest count (often a stopword like "the"); a hapax has a count of exactly one, the two extremes of the frequency distribution.
 - A punctuation token
-  > Punctuation tokens can be hapaxes if they appear only once, but the term "hapax" describes any token — word or punctuation — with a count of exactly one, not punctuation in general.
+  > Punctuation tokens can be hapaxes if they appear only once, but the term "hapax" describes any token, word or punctuation, with a count of exactly one, not punctuation in general.
 
-Hapaxes are the once-only words — abundant, and a hallmark of the long tail.`}
+Hapaxes are the once-only words, abundant, and a hallmark of the long tail.`}
 />
 
 You can now measure *which* words appear and how often. But counts treat every
-word as an isolated atom — they have no idea that "book" can be a noun or a
+word as an isolated atom, they have no idea that "book" can be a noun or a
 verb. To capture that, we need to know each word's role in the sentence:
 **part-of-speech tagging**, next.

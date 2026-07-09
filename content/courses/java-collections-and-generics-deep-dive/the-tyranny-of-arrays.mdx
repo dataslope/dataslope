@@ -5,7 +5,7 @@ description: How raw arrays and procedural data handling broke down as software 
 
 Before there were collections, there were **arrays**. Every language
 had them, every program used them, and for a long time they were
-basically *the* data structure. They are still everywhere — every
+basically *the* data structure. They are still everywhere, every
 list, every hash table, every queue you'll meet in this course is
 secretly built on top of an array. So we have to start here.
 
@@ -15,7 +15,7 @@ tells the story of why.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A sealed six-cell array cannot take one more item — adding means building the longer array below and copying every cell down thin gray lines, just to seat one yellow newcomer beside a still-empty slot"
+  aria-label="A sealed six-cell array cannot take one more item, adding means building the longer array below and copying every cell down thin gray lines, just to seat one yellow newcomer beside a still-empty slot"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="1.5">
@@ -69,7 +69,7 @@ flowchart TD
 ```
 
 By the 1990s, programs were juggling user input, network responses,
-files, caches, GUI state — data whose *size and shape were unknown at
+files, caches, GUI state, data whose *size and shape were unknown at
 compile time*. Arrays did not stretch. Arrays did not search. Arrays
 did not de-duplicate. Every team in the world was reinventing the
 same handful of container patterns on top of them.
@@ -83,7 +83,7 @@ element type. Indexing is fast because it is just arithmetic:
 address(arr[i]) = base + i * sizeof(element)
 ```
 
-That is its great strength — `O(1)` random access — and the source
+That is its great strength, `O(1)` random access, and the source
 of its great weakness: once you allocate `new int[10]`, you have ten
 slots forever.
 
@@ -117,7 +117,7 @@ Indexing is wonderful. Everything *else* is on you.
 ## Five things arrays do not do
 
 Let's list, concretely, what an application built only on raw arrays
-has to write by hand — every time, in every project.
+has to write by hand, every time, in every project.
 
 ### 1. Resize themselves
 
@@ -162,7 +162,7 @@ yourself by allocating a bigger array and copying.
   ]}
 />
 
-That little dance — `size`, `capacity`, `grow`, `copy` — is exactly
+That little dance, `size`, `capacity`, `grow`, `copy`, is exactly
 what `ArrayList` does for you. Every team that didn't have an
 `ArrayList` *wrote one*, slightly differently, with slightly
 different bugs.
@@ -172,7 +172,7 @@ different bugs.
 `int[]` has a `length` and that is it. It does not know how many
 *used* slots there are. It does not know whether it is sorted. It
 does not know whether it has duplicates. All of that is bookkeeping
-you keep in *separate* variables — and which a teammate, six months
+you keep in *separate* variables, and which a teammate, six months
 later, will forget to update.
 
 ### 3. Search efficiently
@@ -191,7 +191,7 @@ the array does not help. Every `add` has to scan everything else.
 
 Worst of all in pre-Java-5 code, an `Object[]` could hold *anything*.
 A `Customer[]` could hold a `Dog`, and the compiler would not save
-you — only a `ClassCastException` at 3 a.m. would.
+you, only a `ClassCastException` at 3 a.m. would.
 
 ## A picture of the mess
 
@@ -219,7 +219,7 @@ Stand back and the requirements for *any* fix become clear:
 1. **Resizing should be built in.** Adding an element should not be
    a project.
 2. **Different shapes of access should be different types.**
-   Sequence-of-things, set-of-unique-things, key-to-value-mapping —
+   Sequence-of-things, set-of-unique-things, key-to-value-mapping,
    each deserves a name.
 3. **Iteration should be uniform.** The way you walk over a list
    should look the same as the way you walk over a set.
@@ -230,7 +230,7 @@ Stand back and the requirements for *any* fix become clear:
    choice of "linked list versus array list" is one line, not a
    refactor.
 
-That list is the seed of the Java Collections Framework — and items
+That list is the seed of the Java Collections Framework, and items
 4 and 5 are the seed of generics. The next page meets the first
 generation of Java containers, before the JCF existed, to see why
 those goals weren't satisfied accidentally.
@@ -280,7 +280,7 @@ string.
 - They use too much memory
   > Memory use is rarely the dominant problem; arrays are actually quite memory-efficient.
 - [o] They have a fixed size and offer no built-in support for resizing, searching, uniqueness, or higher-level access patterns
-  > Arrays solve one job — O(1) indexed storage — and leave every other data-handling concern to the programmer.
+  > Arrays solve one job, O(1) indexed storage, and leave every other data-handling concern to the programmer.
 - They cannot be iterated
   > Arrays can be iterated; the issue is uniformity, not capability.
 - The Java compiler doesn't allow them in modern code

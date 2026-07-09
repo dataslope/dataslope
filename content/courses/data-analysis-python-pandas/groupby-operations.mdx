@@ -1,6 +1,6 @@
 ---
 title: GroupBy Operations
-description: Split-apply-combine — the most powerful pattern in Pandas, and arguably in all of data analysis.
+description: Split-apply-combine, the most powerful pattern in Pandas, and arguably in all of data analysis.
 ---
 
 If there is one operation that earns Pandas its keep, it is
@@ -10,7 +10,7 @@ category" question in data analysis ends up here.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Mixed colored dots in one box split along thin lines into three single-color boxes, and each box collapses into one summary row of its color — groupby's split, apply, combine"
+  aria-label="Mixed colored dots in one box split along thin lines into three single-color boxes, and each box collapses into one summary row of its color, groupby's split, apply, combine"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="55" width="130" height="120" rx="16" fill="currentColor" opacity="0.08" />
@@ -99,11 +99,11 @@ flowchart TD
     D2 --> R
 ```
 
-- **Split** — partition rows into groups based on a column's
+- **Split**, partition rows into groups based on a column's
   values.
-- **Apply** — compute something on each group (a mean, a sum, a
+- **Apply**, compute something on each group (a mean, a sum, a
   custom function).
-- **Combine** — stitch the per-group results back into one
+- **Combine**, stitch the per-group results back into one
   result.
 
 Hadley Wickham named this pattern *split-apply-combine* in 2011,
@@ -183,7 +183,7 @@ print(result)
   ]}
 />
 
-## Named aggregations — much cleaner
+## Named aggregations, much cleaner
 
 The `(column, function)` tuple syntax produces flat, well-named
 columns. This is the modern recommended style.
@@ -220,7 +220,7 @@ print(result)
   ]}
 />
 
-This pattern — `result_name=(column, function)` — produces flat
+This pattern, `result_name=(column, function)`, produces flat
 column names and self-documents the analysis. Use it.
 
 ## Grouping by multiple columns
@@ -269,9 +269,9 @@ print(flat)
   ]}
 />
 
-## `transform` — broadcast a group statistic back to rows
+## `transform`, broadcast a group statistic back to rows
 
-Sometimes you do not want a smaller summary table — you want to
+Sometimes you do not want a smaller summary table, you want to
 add a column to the *original* rows containing a group statistic.
 
 <CodeBlock
@@ -300,7 +300,7 @@ Each row now knows the average of its department, and how far it
 sits from that average. This is a hugely useful pattern for
 flagging outliers within groups.
 
-## `filter` — keep groups, not rows
+## `filter`, keep groups, not rows
 
 A different kind of group operation: keep entire groups that
 satisfy a condition.
@@ -331,7 +331,7 @@ Note: `filter` here takes a function that receives the whole
 group as a DataFrame and returns True/False. Different from
 boolean-mask filtering of rows.
 
-## `apply` — for anything else
+## `apply`, for anything else
 
 `apply` runs an arbitrary function on each group. Slower than
 the named aggregations, but flexible.
@@ -367,7 +367,7 @@ do.
 ## A realistic example, at scale
 
 Split-apply-combine earns its keep on big tables. The diamonds
-dataset has 53,940 rows — far too many to eyeball — but a single
+dataset has 53,940 rows, far too many to eyeball, but a single
 `groupby` collapses them into one tidy row per cut. Let us compute,
 for each quality of `cut`, the count, the mean price, and the
 *median* price.
@@ -398,12 +398,12 @@ print(summary)
 
 This single chained call turns 53,940 rows into a five-row answer.
 Look closely at the result and you will spot something strange:
-**Ideal** diamonds — the best cut — have the *lowest* average
+**Ideal** diamonds, the best cut, have the *lowest* average
 price, and the mean is well above the median in every group. That
 is not a bug. It is a real pattern hiding in plain sight: ideal-cut
 diamonds skew toward smaller carats, and a handful of enormous
 stones drag every group's *mean* upward while leaving the *median*
-alone. A good analyst notices the gap and follows it — which is
+alone. A good analyst notices the gap and follows it, which is
 exactly the kind of thread groupby is built to pull on.
 
 ## A multi-step challenge
@@ -413,9 +413,9 @@ exactly the kind of thread groupby is built to pull on.
   title="Price summary by cut"
   instructions={`The diamonds file is staged as \`diamonds.csv\` and loaded into \`diamonds\` for you. Build a DataFrame called \`summary\` indexed by \`cut\` with **exactly** these columns (in this order):
 
-1. \`count\` — number of diamonds of that cut
-2. \`avg_price\` — mean of \`price\`, rounded to the nearest integer
-3. \`avg_carat\` — mean of \`carat\`, rounded to 2 decimal places
+1. \`count\`, number of diamonds of that cut
+2. \`avg_price\`, mean of \`price\`, rounded to the nearest integer
+3. \`avg_carat\`, mean of \`carat\`, rounded to 2 decimal places
 
 Sort the result by \`avg_price\` descending.`}
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
@@ -495,7 +495,7 @@ assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
 - [o] The three steps of a groupby: partition rows into groups, compute something per group, stitch the results together
   > Once you see groupby through this lens, it stops feeling magical.
 - A method of sorting
-  > Sorting arranges rows in order; split-apply-combine aggregates groups of rows — the two operations have different outputs and purposes.
+  > Sorting arranges rows in order; split-apply-combine aggregates groups of rows, the two operations have different outputs and purposes.
 
 The phrase was popularized by Hadley Wickham in 2011 and applies in every tabular-data tool.`}
 />
@@ -507,7 +507,7 @@ The phrase was popularized by Hadley Wickham in 2011 and applies in every tabula
   > Both syntaxes call the same underlying aggregation engine; the named-tuple form is not meaningfully faster.
 - It supports more functions
   > Both syntaxes support the same set of aggregation functions; the difference is purely in how the output columns are named.
-- [o] It produces flat, well-named output columns instead of a MultiIndex of columns — far easier to use downstream
+- [o] It produces flat, well-named output columns instead of a MultiIndex of columns, far easier to use downstream
   > Named aggregations are the modern recommended style. The output looks like a normal table.
 - It works on Series only
   > Named aggregations work on a grouped DataFrame, not just a Series; the syntax applies whenever you call \`.agg\` on a \`DataFrameGroupBy\`.
@@ -521,8 +521,8 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
 - When you want fewer rows
   > \`agg\` is the operation that reduces rows (one row per group); \`transform\` keeps the same number of rows as the input.
 - They are equivalent
-  > \`agg\` returns a smaller DataFrame with one row per group; \`transform\` returns a Series or DataFrame with the same number of rows as the original — the outputs are different shapes.
-- [o] When you want a column added back to every original row containing its group's statistic — the result has the same shape as the input
+  > \`agg\` returns a smaller DataFrame with one row per group; \`transform\` returns a Series or DataFrame with the same number of rows as the original, the outputs are different shapes.
+- [o] When you want a column added back to every original row containing its group's statistic, the result has the same shape as the input
   > \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
 - When sorting
   > Sorting is done with \`.sort_values\` or \`.sort_index\`; neither \`agg\` nor \`transform\` performs a sort.
@@ -537,7 +537,7 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
   > A flat RangeIndex (0, 1, 2, …) is what you get after calling \`.reset_index()\`; the default output of a multi-column groupby is a MultiIndex.
 - A column index
   > A column index refers to the column axis of a DataFrame; the output of a groupby result has the group keys in the *row* index, not the column index.
-- [o] A MultiIndex — one level for column \`a\`, one level for column \`b\`
+- [o] A MultiIndex, one level for column \`a\`, one level for column \`b\`
   > Multi-column groupbys naturally produce hierarchical indexes. Call \`.reset_index()\` if you want a flat DataFrame.
 - A DatetimeIndex
   > A DatetimeIndex arises when the index contains timestamps; grouping by string or integer columns like \`a\` and \`b\` produces a MultiIndex of those values.

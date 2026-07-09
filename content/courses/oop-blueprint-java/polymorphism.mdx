@@ -1,6 +1,6 @@
 ---
 title: Polymorphism
-description: One message, many forms — how a single method call can invoke many different behaviors depending on the actual receiver
+description: One message, many forms, how a single method call can invoke many different behaviors depending on the actual receiver
 ---
 
 The Greek roots of **polymorphism** literally mean "many shapes." In
@@ -11,7 +11,7 @@ on what kind of object is actually receiving it.*
 This is what makes the lines you wrote on the previous two pages so
 powerful. When `Main` loops over a list of `Noisy` and sends each
 one `sound()`, the JVM dispatches to the *actual class* of each
-object — not the variable's declared type.
+object, not the variable's declared type.
 
 ```mermaid
 sequenceDiagram
@@ -30,7 +30,7 @@ sequenceDiagram
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three identical yellow message capsules ride solid gray arrows into three receiver cards, and each card answers with a different shape — a blue circle, a green square, a yellow triangle — the same call dispatching to different behavior at runtime"
+  aria-label="Three identical yellow message capsules ride solid gray arrows into three receiver cards, and each card answers with a different shape, a blue circle, a green square, a yellow triangle, the same call dispatching to different behavior at runtime"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -134,7 +134,7 @@ flowchart LR
     F --> S4["NEW! <code>Hexagon.draw</code> added next year"]
 ```
 
-That last node — **the new shape added next year** — is the whole
+That last node, **the new shape added next year**, is the whole
 point. You can ship `renderAll` today, and someone can plug in a
 brand new `Hexagon` tomorrow, and your function doesn't change.
 
@@ -220,9 +220,9 @@ public class Renderer {
 />
 
 `Renderer.drawAll` knows nothing about circles, squares, or
-triangles. It depends only on `Shape`. The diversity is real — each
-shape has its own internal state and computes its own representation
-— but the *interaction* with `Renderer` is uniform.
+triangles. It depends only on `Shape`. The diversity is real, each
+shape has its own internal state and computes its own representation,
+but the *interaction* with `Renderer` is uniform.
 
 ## Subtype polymorphism vs. ad-hoc polymorphism
 
@@ -247,16 +247,16 @@ polymorphism*.
 
 ## Upcasting and downcasting
 
-Going from a subtype to a supertype is automatic and always safe —
+Going from a subtype to a supertype is automatic and always safe,
 it's called **upcasting**:
 
 ```java
 Dog d = new Dog("Rex");
-Animal a = d;   // upcast, no syntax needed — every Dog is an Animal
+Animal a = d;   // upcast, no syntax needed, every Dog is an Animal
 ```
 
-Going the other way — claiming a parent-typed reference is actually a
-particular subtype — is called **downcasting**. It requires a cast
+Going the other way, claiming a parent-typed reference is actually a
+particular subtype, is called **downcasting**. It requires a cast
 expression and may fail at runtime if you're wrong.
 
 <CodeBlock
@@ -304,8 +304,8 @@ class Cat extends Animal {
   ]}
 />
 
-A heavy reliance on `instanceof` and downcasting is usually a *smell*
-— it often means the supertype is missing an abstraction. If you find
+A heavy reliance on `instanceof` and downcasting is usually a *smell*,
+it often means the supertype is missing an abstraction. If you find
 yourself writing many `if (x instanceof A) ... else if (x instanceof
 B) ...` blocks, ask whether the parent type should grow a method that
 each subtype overrides.
@@ -316,7 +316,7 @@ There is a famous design idea called the **open–closed principle**:
 software should be **open for extension** but **closed for
 modification**. The phrase was coined by **Bertrand Meyer** in his
 1988 book *Object-Oriented Software Construction*, and it resolves a
-tension that sounds paradoxical at first — how can code be extendable
+tension that sounds paradoxical at first, how can code be extendable
 *and* untouchable at the same time? Polymorphism is the answer.
 
 ```mermaid
@@ -452,7 +452,7 @@ public class Payroll {
 
 - \`Animal.speak()\` because \`a\`'s declared type is \`Animal\`
   > The declared type only restricts what method names are *visible*.
-- Neither — the compiler rejects this code
+- Neither, the compiler rejects this code
   > It compiles fine; \`Animal\` declares \`speak()\`.
 - [o] \`Dog.speak()\` because the runtime type of the object \`a\` points to is \`Dog\`
   > Java uses dynamic dispatch on instance methods.
@@ -481,7 +481,7 @@ public class Payroll {
 - You override \`equals\` and \`hashCode\` on your value classes
   > That's normal.
 - [o] Several methods in your code do \`if (x instanceof A) ... else if (x instanceof B) ...\` and call different code per branch
-  > That pattern usually points at a missing abstraction — give the parent a method and let each subtype override it.
+  > That pattern usually points at a missing abstraction, give the parent a method and let each subtype override it.
 - Your interfaces have only one method
   > Single-method interfaces are common and often fine.`}
 />

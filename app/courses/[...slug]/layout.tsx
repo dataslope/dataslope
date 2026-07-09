@@ -8,8 +8,8 @@
  * so the sidebar scopes itself to the course being read.
  *
  * This layout lives inside the required `[...slug]` catch-all (rather than
- * at `app/courses/`) so the `/courses` index — the custom course-catalog
- * page in `app/courses/page.tsx` — is NOT wrapped in the docs chrome.
+ * at `app/courses/`) so the `/courses` index, the custom course-catalog
+ * page in `app/courses/page.tsx`, is NOT wrapped in the docs chrome.
  *
  * The Tailwind/Fumadocs CSS is imported here (not in `app/layout.tsx`)
  * so it's scoped to the lesson bundle and doesn't leak into the
@@ -20,6 +20,7 @@ import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { courseSource } from "@/lib/source";
+import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 
 export default function CourseLessonLayout({
   children,
@@ -31,6 +32,10 @@ export default function CourseLessonLayout({
       <DocsLayout
         tree={courseSource.pageTree}
         tabs={false}
+        // Use the site's shared light/dark pill toggle in place of Fumadocs's
+        // default segmented theme switch, so the docs chrome matches the home
+        // header, mobile drawer, and playground settings.
+        slots={{ themeSwitch: ThemePillToggleSlot }}
         // Don't prefetch sidebar links. The sidebar renders hundreds of
         // lesson links per page; with Next.js's default viewport prefetch
         // every visible link fans out segment requests, and on Vercel each

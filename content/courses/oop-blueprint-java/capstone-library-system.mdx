@@ -10,7 +10,7 @@ through the modeling steps with us, then write the missing pieces.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A shelf of colored book spines connects by a thin line carrying a yellow loan tag to a member card with a blue person and detail bars — the capstone library system, where books, members, and loans interlock"
+  aria-label="A shelf of colored book spines connects by a thin line carrying a yellow loan tag to a member card with a blue person and detail bars, the capstone library system, where books, members, and loans interlock"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="233" y1="76" x2="420" y2="100" stroke="var(--ds-gray-300)" strokeWidth="2" />
@@ -56,15 +56,15 @@ through the modeling steps with us, then write the missing pieces.
 
 That paragraph contains everything we need.
 
-## Step 1 — find the objects
+## Step 1, find the objects
 
 Underline the nouns. The candidates are:
 
-- `Library` — coordinates everything
-- `Book` — a thing on a shelf
-- `Member` — a person registered with the library
-- `Loan` — *a fact*: this book is out to this member, until this date
-- `BorrowingPolicy` — *a rule*: who may borrow how much
+- `Library`, coordinates everything
+- `Book`, a thing on a shelf
+- `Member`, a person registered with the library
+- `Loan`, *a fact*: this book is out to this member, until this date
+- `BorrowingPolicy`, *a rule*: who may borrow how much
 
 Loans and policies are subtle and easy to miss. They're not nouns in
 the strictest sense, but they're **first-class concepts in the
@@ -72,19 +72,19 @@ domain**, so they deserve their own classes. (If you reduced them to
 fields on `Book` or methods on `Library`, the design would get
 muddier.)
 
-## Step 2 — assign responsibilities
+## Step 2, assign responsibilities
 
 Using the cards format from *Responsibility-Driven Design*:
 
 | Class | Responsibilities | Collaborators |
 | --- | --- | --- |
-| `Book` | Know its title, author, and ISBN | — |
+| `Book` | Know its title, author, and ISBN |, |
 | `Member` | Know its name and id; know its current loans; count them | `Loan` |
 | `Loan` | Know the borrowed book, the member, and the due date; know if overdue | `Book`, `Member` |
 | `BorrowingPolicy` | Decide if a given member may borrow another book | `Member` |
 | `Library` | Hold the catalog and members; create and track loans; enforce the policy | all of the above |
 
-## Step 3 — sketch the relationships
+## Step 3, sketch the relationships
 
 ```mermaid
 classDiagram
@@ -136,11 +136,11 @@ Two interesting design choices in that diagram:
    plug in different rules without touching `Library`. This is
    programming to an interface (and the Strategy pattern again).
 2. **`Loan` is a first-class object** that *aggregates* a book and a
-   member. The `Member` also keeps a list of its own loans —
-   bidirectional access — but `Loan` itself owns the due date and
+   member. The `Member` also keeps a list of its own loans,
+   bidirectional access, but `Loan` itself owns the due date and
    the "is overdue?" decision.
 
-## Step 4 — message flow for borrowing
+## Step 4, message flow for borrowing
 
 The conversation that happens when a member asks to borrow a book:
 
@@ -166,16 +166,16 @@ sequenceDiagram
 policy in turn asks the member how many loans they have. Nobody
 reaches into anyone's fields.
 
-## Step 5 — build it
+## Step 5, build it
 
 Most of the code is provided. You will finish two pieces:
 
-1. `Loan.isOverdue(int nowDay)` — return whether the current day is
+1. `Loan.isOverdue(int nowDay)`, return whether the current day is
    strictly *after* the loan's due day.
-2. `LimitPolicy.mayBorrow(Member m)` — return whether the member's
+2. `LimitPolicy.mayBorrow(Member m)`, return whether the member's
    current loan count is *strictly less than* the limit.
 
-Read `Library.borrow(...)` carefully — it's the orchestration in
+Read `Library.borrow(...)` carefully, it's the orchestration in
 miniature.
 
 <CodeBlock
@@ -408,7 +408,7 @@ public class Library {
   ]}
 />
 
-## Step 6 — read your own design
+## Step 6, read your own design
 
 If you completed the exercise, take a moment to look at what you
 just built. Notice that:
@@ -428,7 +428,7 @@ just built. Notice that:
 That is what a *pure-OOP* model looks like. The exact same shape
 scales to a real library system with thousands of books and
 hundreds of members, simply by changing the storage of `books`,
-`members`, and `active` from in-memory lists to a database — and
+`members`, and `active` from in-memory lists to a database, and
 because that storage is hidden behind `Library`'s methods, no other
 class would notice.
 
@@ -444,7 +444,7 @@ If you want to keep going, try any of these:
   pass an injected `Clock` into `Library`. This is a real-world
   pattern for testability.
 - Introduce a `Catalog` class that owns the book list and an `Audit`
-  class that records every borrow and return — splitting
+  class that records every borrow and return, splitting
   `Library`'s remaining work along its natural seams.
 
 Each of those is a textbook responsibility-driven extension.
@@ -471,7 +471,7 @@ Each of those is a textbook responsibility-driven extension.
   > Library has plenty of methods.
 - Java forbids \`Library\` from having boolean methods
   > It doesn't.
-- [o] The relevant data (the due date) lives on \`Loan\`, so the *behavior* belongs there too — that's "tell, don't ask"
+- [o] The relevant data (the due date) lives on \`Loan\`, so the *behavior* belongs there too, that's "tell, don't ask"
   > Behavior follows data; this avoids feature envy.
 - To make \`Loan\` extend \`Library\`
   > There is no inheritance between them in this design.`}
@@ -484,7 +484,7 @@ Each of those is a textbook responsibility-driven extension.
   > That defeats the whole purpose of having a policy abstraction.
 - Add a new field to \`Member\`
   > The change is about a rule, not about member state.
-- [o] Write a new class \`WeekendPolicy implements BorrowingPolicy\` and pass it into \`Library\`'s constructor — \`Library\` itself does not change
+- [o] Write a new class \`WeekendPolicy implements BorrowingPolicy\` and pass it into \`Library\`'s constructor, \`Library\` itself does not change
   > This is the open-closed principle and polymorphism in action.
 - Modify \`LimitPolicy\` to know about weekends
   > That muddles two policies and breaks the single-responsibility idea.`}

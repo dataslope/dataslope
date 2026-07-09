@@ -7,7 +7,7 @@ import { test, expect, type Page } from "@playwright/test";
 // module source on the second Run. Pyodide caches imported modules in
 // `sys.modules`, and the per-run reset only wipes `globals()`, so without
 // an explicit cache invalidation on file staging the second run re-imports
-// the STALE module — and a correct solution still fails its tests.
+// the STALE module, and a correct solution still fails its tests.
 //
 // Reproduced against the live "Implement greet() in utils.py" card on
 // /fumadocs-dev/challenge-cards-python:
@@ -31,7 +31,7 @@ interface HandleLite {
 // (challenge-solutions.spec.ts already declares it with a different shape).
 type WinDS = { __dsChallenges?: Record<string, HandleLite> };
 
-// Fire Submit (like a real button click — do NOT await the run) and poll
+// Fire Submit (like a real button click, do NOT await the run) and poll
 // the banner ref until it settles, so we don't race React's effect that
 // mirrors banner state into the imperative test handle.
 async function clickSubmitAndAwaitBanner(

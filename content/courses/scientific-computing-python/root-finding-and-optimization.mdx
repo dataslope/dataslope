@@ -1,6 +1,6 @@
 ---
 title: Root Finding and Optimization
-description: Solve equations and minimize functions — the engine room of scientific computing
+description: Solve equations and minimize functions, the engine room of scientific computing
 ---
 
 A staggering fraction of scientific work reduces to one of two
@@ -17,7 +17,7 @@ problem.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A bold blue curve dips twice — a yellow ball rests in the shallow dip while a green ball sits at the true floor marked by a dashed line — optimization can settle for a local minimum or find the global one"
+  aria-label="A bold blue curve dips twice, a yellow ball rests in the shallow dip while a green ball sits at the true floor marked by a dashed line, optimization can settle for a local minimum or find the global one"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <line x1="100" y1="185" x2="540" y2="185" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="7 6" strokeLinecap="round" />
@@ -87,7 +87,7 @@ speed matters *and* you have a reliable guess.
 
 For systems of nonlinear equations, use `fsolve` (legacy) or
 `scipy.optimize.root` (modern). Both default to a hybrid Powell
-method — secant-based, derivative-free, generally robust.
+method, secant-based, derivative-free, generally robust.
 
 <CodeBlock
   adapter="python"
@@ -114,7 +114,7 @@ print(f"residual: {np.array(F(sol.x))}")
 />
 
 Like all gradient-driven solvers, `root` finds *a* solution near
-your initial guess — there is another solution near $(-0.82,
+your initial guess, there is another solution near $(-0.82,
 -1.82)$ that requires a different start.
 
 ## Unconstrained minimization
@@ -133,7 +133,7 @@ approximation, fine up to a few hundred variables) or **L-BFGS-B**
 from scipy.optimize import minimize
 
 
-# Rosenbrock's "banana" function — the standard optimization test bed
+# Rosenbrock's "banana" function, the standard optimization test bed
 def rosen(x):
     return sum(100.0 * (x[1:] - x[:-1] ** 2) ** 2 + (1 - x[:-1]) ** 2)
 
@@ -226,7 +226,7 @@ print("constraint value (≥ 0):", (res.x[0] + res.x[1] - 3).round(6))
 
 Fitting a model $\hat y_i = m(x_i;\theta)$ to data by minimizing
 $\sum_i (y_i - \hat y_i)^2$ is the most common optimization in
-science. Don't use generic `minimize` for it — use
+science. Don't use generic `minimize` for it, use
 `scipy.optimize.curve_fit` or `least_squares`, which exploit the
 sum-of-squares structure for faster, more reliable convergence.
 
@@ -268,7 +268,7 @@ plt.show()
 />
 
 The covariance matrix `pcov` gives you parameter uncertainties for
-free — invaluable for reporting confidence intervals.
+free, invaluable for reporting confidence intervals.
 
 ### Curve-fitting real data: the Keeling curve
 
@@ -276,7 +276,7 @@ Synthetic data is convincing only up to a point. Let us fit a model
 to one of the most important measured time series in science: the
 **Keeling curve**, the monthly atmospheric CO₂ concentration recorded
 at Mauna Loa, Hawaii, continuously since 1958. The series has an
-obvious structure — a rising trend with a small yearly wobble — so a
+obvious structure, a rising trend with a small yearly wobble, so a
 sensible model is a *quadratic trend plus a one-year sinusoid*:
 
 $$
@@ -326,7 +326,7 @@ plt.show()
 />
 
 Five parameters capture six decades of data to within about a part
-per million. The fitted seasonal amplitude — a few ppm — is the
+per million. The fitted seasonal amplitude, a few ppm, is the
 breathing of the Northern Hemisphere's forests, inhaling CO₂ each
 spring and exhaling it each winter. This is what curve fitting is
 *for*: turning a wall of numbers into a handful of physically
@@ -415,7 +415,7 @@ def fit_gaussian(x, y):
   ]}
 />
 
-The `p0` heuristic — peak height, peak location, width — is the
+The `p0` heuristic, peak height, peak location, width, is the
 kind of *domain knowledge* that makes the difference between a fit
 that converges and one that wanders off into nonsense.
 
@@ -491,11 +491,11 @@ When a bracket exists, bracketing methods are virtually always the right choice.
 - It uses less memory
   > Both \`curve_fit\` and generic \`minimize\` work with dense parameter vectors of the same size; memory usage is not the distinguishing factor.
 - [o] It exploits the sum-of-squares structure (Jacobian of residuals via the Levenberg–Marquardt algorithm) for faster, more reliable convergence, and returns parameter covariances for free
-  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars — which generic \`minimize\` would not give you.
+  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars, which generic \`minimize\` would not give you.
 - It always finds the global minimum
   > Like all gradient-based methods, \`curve_fit\` finds a local minimum; it can get stuck in a wrong local minimum if the initial parameter guess is poor.
 - It only works for linear models
   > \`curve_fit\` is specifically designed for nonlinear models; for purely linear models, \`np.linalg.lstsq\` would be the more direct choice.
 
-Match the algorithm to the *structure* of the problem — least squares is special enough to deserve its own solver.`}
+Match the algorithm to the *structure* of the problem, least squares is special enough to deserve its own solver.`}
 />

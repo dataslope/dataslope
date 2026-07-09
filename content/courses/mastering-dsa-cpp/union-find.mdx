@@ -3,17 +3,17 @@ title: Union-Find (Disjoint Set Union)
 description: Learn DSU find and unite operations, path compression, union by rank, connected components, cycle detection, and Kruskal's MST in C++
 ---
 
-Picture a data center being cabled up, one link at a time. After every new cable, someone asks: "can machine 4051 reach machine 17?" You could re-run BFS after each cable — O(V + E) per question, brutal at scale. But notice how little the question actually needs: not the path, not the distance, just *are they in the same connected group?* Groups only ever **merge** (cables are added, never cut), so what we need is a structure that tracks a collection of disjoint groups under exactly two operations:
+Picture a data center being cabled up, one link at a time. After every new cable, someone asks: "can machine 4051 reach machine 17?" You could re-run BFS after each cable, O(V + E) per question, brutal at scale. But notice how little the question actually needs: not the path, not the distance, just *are they in the same connected group?* Groups only ever **merge** (cables are added, never cut), so what we need is a structure that tracks a collection of disjoint groups under exactly two operations:
 
 * `find(x)`: which group does `x` belong to? (Return a representative member as the group's ID.)
 * `unite(x, y)`: merge the groups containing `x` and `y`.
 
-That structure is **Union-Find**, also called **Disjoint Set Union (DSU)**. It answers connectivity queries in what is, for every practical purpose, constant time — via two optimizations so effective that the proof of *how* effective became a landmark of algorithm analysis. It is also the engine inside Kruskal's minimum spanning tree algorithm, where this page ends.
+That structure is **Union-Find**, also called **Disjoint Set Union (DSU)**. It answers connectivity queries in what is, for every practical purpose, constant time, via two optimizations so effective that the proof of *how* effective became a landmark of algorithm analysis. It is also the engine inside Kruskal's minimum spanning tree algorithm, where this page ends.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two translucent sets whose members link up to their roots along thin lines merge across a thin gray arrow into one set, where the old green root now answers to the surviving blue one — union by attaching one tree under another"
+  aria-label="Two translucent sets whose members link up to their roots along thin lines merge across a thin gray arrow into one set, where the old green root now answers to the surviving blue one, union by attaching one tree under another"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -168,7 +168,7 @@ graph TD
     B --> C["if ranks tied, rank[ra]++"]
 ```
 
-Combine both optimizations and something remarkable happens. In 1975, Robert Tarjan proved that m operations take O(m·α(n)) time, where α is the **inverse Ackermann function** — the inverse of a function so explosively fast-growing that it was invented (by Wilhelm Ackermann, in 1928) as a mathematical curiosity. Running Ackermann's function forward, the inputs barely move before the outputs exceed the number of atoms in the universe; running it in inverse, α(n) is at most **4** for any n you could ever store in a computer. So DSU operations are not O(1) — Tarjan also proved that no implementation can be — but they are "O(4)," which is the most charming technicality in algorithm analysis: the function grows, in theory, forever; in practice, never.
+Combine both optimizations and something remarkable happens. In 1975, Robert Tarjan proved that m operations take O(m·α(n)) time, where α is the **inverse Ackermann function**, the inverse of a function so explosively fast-growing that it was invented (by Wilhelm Ackermann, in 1928) as a mathematical curiosity. Running Ackermann's function forward, the inputs barely move before the outputs exceed the number of atoms in the universe; running it in inverse, α(n) is at most **4** for any n you could ever store in a computer. So DSU operations are not O(1), Tarjan also proved that no implementation can be, but they are "O(4)," which is the most charming technicality in algorithm analysis: the function grows, in theory, forever; in practice, never.
 
 ## Production DSU class
 
@@ -335,9 +335,9 @@ int main() {
 
 ## Kruskal's minimum spanning tree algorithm
 
-The minimum spanning tree problem is older than computers, and it was born practical: in 1926, the Czech mathematician Otakar Borůvka devised the first MST algorithm to plan the cheapest electrical grid for rural Moravia — which towns to wire to which so that everyone is connected and the total cable cost is minimal. That is exactly the modern definition: a **minimum spanning tree (MST)** connects all vertices of an undirected weighted graph with minimum total weight and no cycles.
+The minimum spanning tree problem is older than computers, and it was born practical: in 1926, the Czech mathematician Otakar Borůvka devised the first MST algorithm to plan the cheapest electrical grid for rural Moravia, which towns to wire to which so that everyone is connected and the total cable cost is minimal. That is exactly the modern definition: a **minimum spanning tree (MST)** connects all vertices of an undirected weighted graph with minimum total weight and no cycles.
 
-Joseph Kruskal's 1956 algorithm is the version everyone learns, and it is pure greed plus DSU: sort the edges by weight, then walk them cheapest-first, adding each edge *unless it would create a cycle*. The cycle test is the hard part — and it is exactly the question `unite` answers. If an edge's endpoints are already in the same set, the edge is redundant; skip it. If `unite` succeeds, the edge joined two separate islands, so keep it.
+Joseph Kruskal's 1956 algorithm is the version everyone learns, and it is pure greed plus DSU: sort the edges by weight, then walk them cheapest-first, adding each edge *unless it would create a cycle*. The cycle test is the hard part, and it is exactly the question `unite` answers. If an edge's endpoints are already in the same set, the edge is redundant; skip it. If `unite` succeeds, the edge joined two separate islands, so keep it.
 
 ```text
 Kruskal(edges, n):

@@ -1,11 +1,11 @@
 ---
-title: Challenge Cards — React
+title: "Challenge Cards: React"
 description: React challenges compile the learner's TSX in-browser and assert on the rendered DOM, including after interactions.
 ---
 
 React challenge tests run inside the preview document after the
 initial render commits, so they can assert on rendered output and even
-dispatch clicks and await re-renders. Test bodies may be `async` — a
+dispatch clicks and await re-renders. Test bodies may be `async`, a
 small `setTimeout` wait after `.click()` lets React flush the update.
 
 ## State + events
@@ -176,6 +176,283 @@ for (const expected of ["Learn JSX", "Render a list", "Ship it"]) {
   if (!texts.includes(expected)) {
     throw new Error("Missing list item: '" + expected + "'. Got: " + texts.join(", "));
   }
+}`,
+    },
+  ]}
+/>
+
+## Modules across files (multi-file)
+
+A challenge workspace can span several files. `main.tsx` mounts the app,
+`App.tsx` holds the component, and plain modules (`.ts`) are imported the
+way a real project imports them, esbuild bundles the whole workspace in
+the browser before the preview renders. Tests still run against the
+mounted DOM, so the split across files is invisible to them.
+
+<ChallengeCard
+  adapter="react"
+  title="Format prices with a shared helper"
+  entryFilename="main.tsx"
+  instructions={`The price list renders product names but no prices yet. Finish the two TODOs:
+
+1. In \`format.ts\`, implement \`formatPrice\` so that \`formatPrice(1250)\` returns \`"$12.50"\`.
+2. In \`App.tsx\`, show each product's price next to its name using \`formatPrice\`.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "App.tsx",
+      starterCode: `import { formatPrice } from "./format";
+
+interface Product {
+  id: string;
+  name: string;
+  cents: number;
+}
+
+const PRODUCTS: Product[] = [
+  { id: "pen", name: "Fountain pen", cents: 1250 },
+  { id: "ink", name: "Bottle of ink", cents: 900 },
+  { id: "pad", name: "Writing pad", cents: 450 },
+];
+
+export function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Price list</h1>
+      <ul>
+        {PRODUCTS.map((product) => (
+          <li key={product.id}>
+            {/* TODO: render the name, then the price from formatPrice */}
+            {product.name}
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+`,
+      solutionCode: `import { formatPrice } from "./format";
+
+interface Product {
+  id: string;
+  name: string;
+  cents: number;
+}
+
+const PRODUCTS: Product[] = [
+  { id: "pen", name: "Fountain pen", cents: 1250 },
+  { id: "ink", name: "Bottle of ink", cents: 900 },
+  { id: "pad", name: "Writing pad", cents: 450 },
+];
+
+export function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Price list</h1>
+      <ul>
+        {PRODUCTS.map((product) => (
+          <li key={product.id}>
+            {product.name}, {formatPrice(product.cents)}
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+`,
+    },
+    {
+      filename: "format.ts",
+      starterCode: `// TODO: return the amount as US dollars, formatPrice(1250) === "$12.50".
+export function formatPrice(cents: number): string {
+  return "";
+}
+`,
+      solutionCode: `export function formatPrice(cents: number): string {
+  return "$" + (cents / 100).toFixed(2);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "count",
+      name: "Renders one row per product",
+      code: `const items = document.querySelectorAll("ul li");
+if (items.length !== 3) {
+  throw new Error("Expected 3 product rows, found " + items.length + ".");
+}`,
+    },
+    {
+      id: "formatted_prices",
+      name: "Each row shows its price formatted as dollars",
+      code: `const text = document.querySelector("ul")?.textContent || "";
+for (const price of ["$12.50", "$9.00", "$4.50"]) {
+  if (!text.includes(price)) {
+    throw new Error("Expected to see '" + price + "' in the list. Got: " + text);
+  }
+}`,
+    },
+    {
+      id: "names_kept",
+      name: "Product names are still shown",
+      code: `const text = document.querySelector("ul")?.textContent || "";
+for (const name of ["Fountain pen", "Bottle of ink", "Writing pad"]) {
+  if (!text.includes(name)) {
+    throw new Error("Missing product name: '" + name + "'.");
+  }
+}`,
+    },
+  ]}
+/>
+
+## Composing a component + styles (multi-file)
+
+Here `App.tsx` imports a `StatusBadge` component from its own file and a
+stylesheet through a plain `import "./styles.css"`. The CSS import
+compiles straight into the preview document, so a test can assert the
+rendered badge actually picks up its class-based styles.
+
+<ChallengeCard
+  adapter="react"
+  title="Build the StatusBadge component"
+  entryFilename="main.tsx"
+  instructions={`\`App.tsx\` already renders a \`<StatusBadge>\` for every task, but the component renders nothing yet.
+
+In \`StatusBadge.tsx\`, return a \`<span>\` whose \`className\` is \`"badge "\` followed by the \`status\` (e.g. \`"badge done"\`) and whose text is the status. The \`styles.css\` file already styles \`.badge\`, \`.badge.done\`, and \`.badge.todo\`.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "App.tsx",
+      starterCode: `import { StatusBadge } from "./StatusBadge";
+
+interface Task {
+  id: number;
+  label: string;
+  status: "done" | "todo";
+}
+
+const TASKS: Task[] = [
+  { id: 1, label: "Write the tests", status: "done" },
+  { id: 2, label: "Ship the feature", status: "todo" },
+];
+
+export function App() {
+  return (
+    <main className="board">
+      <h1>Sprint board</h1>
+      <ul>
+        {TASKS.map((task) => (
+          <li key={task.id}>
+            <span className="label">{task.label}</span>
+            <StatusBadge status={task.status} />
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+`,
+    },
+    {
+      filename: "StatusBadge.tsx",
+      starterCode: `// TODO: render <span className={"badge " + status}>{status}</span>
+export function StatusBadge({ status }: { status: "done" | "todo" }) {
+  return null;
+}
+`,
+      solutionCode: `export function StatusBadge({ status }: { status: "done" | "todo" }) {
+  return <span className={"badge " + status}>{status}</span>;
+}
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  color: #1e293b;
+}
+
+.board ul {
+  list-style: none;
+  padding: 0;
+}
+
+.board li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+}
+
+.label {
+  min-width: 12rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge.done {
+  background: rgb(187, 247, 208);
+  color: rgb(22, 101, 52);
+}
+
+.badge.todo {
+  background: rgb(254, 240, 138);
+  color: rgb(133, 77, 14);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "two_badges",
+      name: "Renders a badge for each task",
+      code: `const badges = document.querySelectorAll(".badge");
+if (badges.length !== 2) {
+  throw new Error("Expected 2 badges (one per task), found " + badges.length + ".");
+}`,
+    },
+    {
+      id: "status_classes",
+      name: "Each badge carries its status class",
+      code: `if (!document.querySelector(".badge.done")) {
+  throw new Error("The completed task should render a badge with the 'done' class.");
+}
+if (!document.querySelector(".badge.todo")) {
+  throw new Error("The open task should render a badge with the 'todo' class.");
+}`,
+    },
+    {
+      id: "styled_from_css",
+      name: "The done badge picks up its background from styles.css",
+      code: `const done = document.querySelector(".badge.done");
+if (!done) throw new Error("Render the done badge first.");
+const bg = getComputedStyle(done).backgroundColor;
+if (bg !== "rgb(187, 247, 208)") {
+  throw new Error("Expected .badge.done background rgb(187, 247, 208) from styles.css, got " + bg + ".");
 }`,
     },
   ]}

@@ -1,17 +1,17 @@
 ---
 title: The Stack and the Heap
-description: The two memory regions every Java programmer thinks about — and what really happens when you call a method or create an object
+description: The two memory regions every Java programmer thinks about, and what really happens when you call a method or create an object
 ---
 
 You can write Java for years without thinking about memory. But the
-*moment* you hit a tricky bug — a `NullPointerException`, an
-unexpected shared mutation, a stack overflow — a mental model of
+*moment* you hit a tricky bug, a `NullPointerException`, an
+unexpected shared mutation, a stack overflow, a mental model of
 the **stack** and the **heap** turns confusion into clarity.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three blue stack frames hold small white references tied by thin gray lines into the green heap card — two frames share the same round object — while an untethered shape drawn only in dashed outline waits to be collected"
+  aria-label="Three blue stack frames hold small white references tied by thin gray lines into the green heap card, two frames share the same round object, while an untethered shape drawn only in dashed outline waits to be collected"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -39,14 +39,14 @@ the **stack** and the **heap** turns confusion into clarity.
 
 ```mermaid
 flowchart TD
-    subgraph Stack[Stack — one per thread]
+    subgraph Stack[Stack, one per thread]
         direction TB
         F1[main frame]
         F2[printScores frame]
         F3[average frame]
         F1 --> F2 --> F3
     end
-    subgraph Heap[Heap — shared]
+    subgraph Heap[Heap, shared]
         direction TB
         O1["int array<br/><code>length=3</code>, <code>values=80</code>,90,100"]
         O2[String 'Ada']
@@ -89,7 +89,7 @@ flowchart LR
     SREF --> STR
 ```
 
-Two different variables can hold *the same arrow* — they then refer
+Two different variables can hold *the same arrow*, they then refer
 to the *same* heap object. That is **aliasing**, and it is the
 single most important thing to picture about heap memory.
 
@@ -183,7 +183,7 @@ other. As each call returns, its frame is destroyed and its locals
 disappear. This is why recursion works at all.
 
 If recursion goes too deep, the stack runs out of room and you get
-`StackOverflowError`. Try removing the base case sometime — you'll
+`StackOverflowError`. Try removing the base case sometime, you'll
 see it instantly.
 
 ## Pass-by-value, always
@@ -255,7 +255,7 @@ caller's arrow. Modifying the *target* of the arrow does.
 ## When does heap memory get freed?
 
 When no live reference points at an object, it becomes
-**unreachable** — and eventually, the garbage collector reclaims
+**unreachable**, and eventually, the garbage collector reclaims
 the space. You almost never think about this directly. You just
 stop holding references to things you no longer need (often by
 letting variables go out of scope, or by reassigning fields).
@@ -320,11 +320,11 @@ The fix: every recursion must reach a base case.
 <MultipleChoice
   markdown={`After \`List<String> b = a;\`, how many list objects exist on the heap?
 
-- Two — \`a\` and \`b\` each point to a different list
+- Two, \`a\` and \`b\` each point to a different list
   > No, only one list exists.
-- Zero — Java doesn't allocate a list yet
+- Zero, Java doesn't allocate a list yet
   > One was already allocated when \`a\` was created.
-- [o] One — \`a\` and \`b\` are two references pointing to the *same* list
+- [o] One, \`a\` and \`b\` are two references pointing to the *same* list
   > That's aliasing.
 - One, but \`b\` is an immutable copy
   > It's not a copy at all.`}
@@ -334,10 +334,10 @@ The fix: every recursion must reach a base case.
   markdown={`A method receives a parameter of type \`Order\` and then writes \`order = new Order();\` inside its body. What does the caller observe?
 
 - The caller's variable now points to the new Order
-  > No — the parameter was a *local* reference variable.
+  > No, the parameter was a *local* reference variable.
 - The original Order is silently destroyed
   > Other references may still hold it.
-- [o] Nothing — Java is pass-by-value; reassigning the parameter only changes the local reference inside the method, not the caller's variable
+- [o] Nothing, Java is pass-by-value; reassigning the parameter only changes the local reference inside the method, not the caller's variable
   > The parameter is the method's own copy of the arrow; repointing it leaves the caller's arrow untouched.
 - A compile error
   > It compiles fine.`}

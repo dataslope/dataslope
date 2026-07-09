@@ -136,7 +136,7 @@ describe("buildMessages", () => {
       history: [],
       contextBudget: 8000,
     });
-    // Skip the system prompt — it legitimately describes these context kinds.
+    // Skip the system prompt, it legitimately describes these context kinds.
     const blob = messages.slice(1).map((m) => m.content).join("\n");
     expect(blob).not.toContain("Interactive widgets");
     expect(blob).not.toContain("highlighted");

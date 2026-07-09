@@ -7,7 +7,7 @@
  * Fumadocs's `loader()`.
  *
  * Plays the same role here as `source.config.ts` does in the official
- * Fumadocs starter — keeps schema definitions and any future remark/rehype
+ * Fumadocs starter, keeps schema definitions and any future remark/rehype
  * plugin wiring in one place so the Next.js app code can stay focused on
  * routing and rendering.
  *
@@ -17,7 +17,7 @@
  * `throwOnError: false` so a stray dollar sign that is not valid LaTeX
  * degrades to a visible inline error instead of failing the whole build.
  *
- * `rehypeKatex` MUST run before Fumadocs's default rehype plugins — in
+ * `rehypeKatex` MUST run before Fumadocs's default rehype plugins, in
  * particular the Shiki syntax highlighter (`rehypeCode`). Otherwise the
  * highlighter encounters the `$$` block-math nodes first, reads their
  * language as "math", and fails the build with "Language `math` not found".
@@ -51,7 +51,7 @@ export const courses = defineDocs({
   },
 });
 
-// Fumadocs Dev — the development-only component-gallery pages (code blocks,
+// Fumadocs Dev, the development-only component-gallery pages (code blocks,
 // challenge cards, loading states, …) that used to live loose under the old
 // `/learn` route, now under `content/fumadocs-dev/` and surfaced at
 // `/fumadocs-dev` (see `lib/source.ts`). Same `dynamic` rationale as above.
@@ -62,7 +62,7 @@ export const fumadocsDev = defineDocs({
   },
 });
 
-// Interview Prep — a docs collection under `content/interview/`, surfaced at
+// Interview Prep, a docs collection under `content/interview/`, surfaced at
 // `/interview-prep` (see `lib/source.ts`). Same `dynamic` rationale as the
 // courses collection above. fumadocs-mdx names each collection after its
 // export (`interview`), so it gets its own `?collection=interview` entries in

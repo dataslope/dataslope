@@ -5,8 +5,8 @@ description: Every supervised machine learning problem reduces to a feature matr
 
 You have now seen the same four-line shape several times: load data into `X`
 and `y`, split, fit, evaluate. It is time to slow down and ask what `X` and
-`y` actually *are*, because almost every modeling decision — what algorithm
-to use, what task you are even solving — flows directly from how your data
+`y` actually *are*, because almost every modeling decision, what algorithm
+to use, what task you are even solving, flows directly from how your data
 is shaped into these two objects.
 
 The good news is that the structure is simple and universal. Once you can
@@ -17,7 +17,7 @@ That framing is the skill this page builds.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A grid of translucent blue feature cells beside a single green target column, with one sample row highlighted — every supervised dataset splits into a feature matrix X and a target y"
+  aria-label="A grid of translucent blue feature cells beside a single green target column, with one sample row highlighted, every supervised dataset splits into a feature matrix X and a target y"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <text x="243" y="24" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="18" fontWeight="700" fill="var(--ds-blue-500)">X</text>
@@ -60,31 +60,31 @@ give those two roles standard names and standard variable conventions that
 you will see in every scikit-learn example, every textbook, and every page
 of this course:
 
-- **`X` — the feature matrix.** A 2-D table of *inputs*. Each **row** is one
+- **`X`, the feature matrix.** A 2-D table of *inputs*. Each **row** is one
   example (also called a *sample* or *observation*); each **column** is one
   *feature* (also called a *variable*, *attribute*, or *predictor*). `X` is
   capitalized because it is a matrix (two dimensions).
-- **`y` — the target.** A 1-D list of *answers*, one per row of `X`. It is the
+- **`y`, the target.** A 1-D list of *answers*, one per row of `X`. It is the
   thing you want the model to predict. `y` is lowercase because it is a
   vector (one dimension).
 
 The single most important alignment rule: **row `i` of `X` and entry `i` of
 `y` describe the same example.** The features in the first row of `X` belong
 to the answer in the first slot of `y`. If that correspondence ever breaks,
-your model learns nonsense — so we always split `X` and `y` *together*, never
+your model learns nonsense, so we always split `X` and `y` *together*, never
 separately.
 
 In one labeled dataset, the rows of the feature matrix `X` line up one-for-one
 with the entries of the target `y`:
 
-| `X` — feature matrix (one row per example) | `y` — target |
+| `X`, feature matrix (one row per example) | `y`, target |
 | --- | --- |
 | row 1: features of example 1 | answer 1 |
 | row 2: features of example 2 | answer 2 |
 | row 3: features of example 3 | answer 3 |
 
 Read the table across, not down: each row of `X` lines up with one entry of
-`y` — they describe the same example. Columns of `X` are features; the single
+`y`, they describe the same example. Columns of `X` are features; the single
 column `y` is what we predict. Hold this picture in mind and the abstract
 letters become concrete.
 
@@ -92,8 +92,8 @@ letters become concrete.
 The convention comes from the math: a model is a function `y = f(X)`, just
 like the `y = f(x)` you saw in algebra. `X` is capital because it is a whole
 matrix of inputs (many rows, many columns); `y` is lowercase because it is a
-single column of outputs. You do not have to use these names — Python does
-not care — but everyone does, so following the convention makes your code
+single column of outputs. You do not have to use these names, Python does
+not care, but everyone does, so following the convention makes your code
 instantly readable to others.
 </Callout>
 
@@ -166,13 +166,13 @@ print("Target name:    ", y.name)
 
 That is the entire idea. `houses.drop(columns=["price"])` keeps every input
 column; `houses["price"]` pulls out the one answer column. The shapes confirm
-the structure: `X` is `(6, 4)` — six examples, four features each — and `y` is
-`(6,)` — six answers. Notice `X` and `y` still have the *same number of
+the structure: `X` is `(6, 4)`, six examples, four features each, and `y` is
+`(6,)`, six answers. Notice `X` and `y` still have the *same number of
 rows*, six, which is what keeps row `i` aligned with answer `i`.
 
 <Callout type="warn" title="The most common framing bug">
 Never leave the target inside `X`. If `price` were still a column of `X`, the
-model could "predict" price by simply copying it — perfect training accuracy,
+model could "predict" price by simply copying it, perfect training accuracy,
 zero real skill. Worse, you could not use the model at all, because at
 prediction time you would not *have* the price (predicting it is the whole
 point). Always remove the target from the feature matrix. This is one
@@ -210,8 +210,8 @@ print("y.shape:", y.shape, "-> one target per sample")
 
 Whether `X` is a pandas DataFrame or a plain NumPy array, scikit-learn reads
 it the same way: rows are samples, columns are features. The shape is always
-`(n_samples, n_features)`. Internalize that ordering — rows first, features
-second — and you will rarely be confused about what an array of data
+`(n_samples, n_features)`. Internalize that ordering, rows first, features
+second, and you will rarely be confused about what an array of data
 represents.
 
 <Callout type="tip" title="A sanity check you should run every time">
@@ -224,7 +224,7 @@ reflex catches a whole category of bugs before they start.
 ### X is always 2-D, even with a single feature
 
 A subtle but extremely common stumbling block: scikit-learn expects `X` to be
-**two-dimensional** — a matrix — *even when you have only one feature*. A flat
+**two-dimensional**, a matrix, *even when you have only one feature*. A flat
 1-D list of values is not a valid feature matrix; it must be shaped as "one
 column," which is a 2-D array with a single column. The target `y`, by
 contrast, is 1-D. Mixing these up produces one of the most frequent beginner
@@ -257,7 +257,7 @@ print("X is 2-D?", X.ndim == 2, " | y is 1-D?", y.ndim == 1)
 
 The rule of thumb is simple: **`X` has two dimensions (samples by features),
 `y` has one (samples).** When you have a single feature, `reshape(-1, 1)`
-turns a flat array into the required column shape — the `-1` means "infer the
+turns a flat array into the required column shape, the `-1` means "infer the
 number of rows," and the `1` means "one column." A DataFrame avoids this trap
 naturally, because selecting columns with double brackets (`df[["col"]]`)
 already returns a 2-D structure.
@@ -267,7 +267,7 @@ If you pass a 1-D array where scikit-learn wants `X`, you will get an error
 like *"Expected 2D array, got 1D array instead... Reshape your data using
 array.reshape(-1, 1)."* When you see it, the fix is exactly what it says:
 your feature matrix is flat and needs to be shaped into columns. Now you know
-*why* — `X` is fundamentally a 2-D table.
+*why*, `X` is fundamentally a 2-D table.
 </Callout>
 
 ### Selecting features by name, not by position
@@ -310,8 +310,8 @@ print("Same feature set?      ", list(X_drop.columns) == list(X_explicit.columns
   ]}
 />
 
-Both idioms — `drop(columns=[...])` to remove the target, or `df[[...]]` to
-list the features explicitly — are common and correct. Use `drop` when "every
+Both idioms, `drop(columns=[...])` to remove the target, or `df[[...]]` to
+list the features explicitly, are common and correct. Use `drop` when "every
 column except the target" is what you want; use the explicit list when you
 want precise control over *which* features enter the model (useful once you
 start selecting features deliberately, as the *feature engineering* chapter
@@ -331,7 +331,7 @@ explores).
 - Rows are the target values; columns are the predictions
   > Target values live in the separate 1-D vector \`y\`, not in the rows of \`X\`. Predictions are produced by \`model.predict()\` and are not stored inside \`X\` either.
 
-The shape is always (n_samples, n_features) — examples down the rows, features across the columns.`}
+The shape is always (n_samples, n_features), examples down the rows, features across the columns.`}
 />
 
 ## Types of features
@@ -344,13 +344,13 @@ will meet.
 ordering both make sense: `size_sqft`, `age_years`, temperature, income.
 "Bigger" and "smaller" are meaningful, and the gap between 10 and 20 equals
 the gap between 20 and 30. Most algorithms consume numeric features directly,
-though many work better when the numbers are put on a comparable scale —
+though many work better when the numbers are put on a comparable scale,
 which is what the *preprocessing* chapter is about.
 
 **Categorical (nominal) features** are labels with no inherent order:
 `neighborhood` (downtown, suburb, rural), color, country, product category.
 There is no sense in which "suburb" is greater than "rural." Models need
-numbers, not strings, so categorical features must be **encoded** — turned
+numbers, not strings, so categorical features must be **encoded**, turned
 into numbers in a way that does *not* invent a false order. The
 *encoding categorical features* chapter covers how (one-hot encoding and
 friends).
@@ -372,7 +372,7 @@ flowchart TD
 ```
 
 <Callout type="danger" title="The classic encoding mistake">
-A tempting but wrong move is to encode a *nominal* category as 1, 2, 3 —
+A tempting but wrong move is to encode a *nominal* category as 1, 2, 3,
 mapping downtown to 1, suburb to 2, rural to 3. This secretly tells the model
 that rural (3) is "greater than" downtown (1) and that suburb is exactly
 halfway between, none of which is true. The model will dutifully act on that
@@ -380,16 +380,16 @@ fiction. Nominal categories need an encoding (like one-hot) that introduces
 **no** false ordering. We devote a full page to doing this correctly.
 </Callout>
 
-## Types of targets — and the task they imply
+## Types of targets, and the task they imply
 
 Here is the payoff for all this care: **the type of your target `y`
 determines what kind of machine learning problem you are solving.** This is
 one of the most useful diagnostics in the whole field, and it takes only a
 glance at `y`.
 
-- **Continuous target** (a number on a scale — price, temperature, sales) →
+- **Continuous target** (a number on a scale, price, temperature, sales) →
   you are doing **regression**. The model predicts a quantity.
-- **Categorical target** (a class label — spam/not-spam, the species of a
+- **Categorical target** (a class label, spam/not-spam, the species of a
   flower, which of five products) → you are doing **classification**. The
   model predicts a category.
 - **No target at all** (you have `X` but no `y`) → you are doing
@@ -399,8 +399,8 @@ glance at `y`.
 So before choosing any algorithm, look at `y`. A column of dollar amounts
 points you at regression; a column of labels points you at classification;
 the *absence* of a `y` points you at unsupervised methods. The very next two
-pages — *supervised vs. unsupervised* and *regression, classification, and
-clustering* — are built entirely on this distinction, so make sure it feels
+pages, *supervised vs. unsupervised* and *regression, classification, and
+clustering*, are built entirely on this distinction, so make sure it feels
 solid.
 
 <Callout type="info" title="The boundary can be a judgment call">
@@ -408,21 +408,21 @@ Sometimes the target's type is a *modeling choice*, not a fact. A 1-to-5 star
 rating could be treated as a number (regression) or as five ordered
 categories (classification). House prices bucketed into "low / medium / high"
 turn a regression into a classification. Part of framing a problem is
-deciding which view serves your actual goal — and there is often no single
+deciding which view serves your actual goal, and there is often no single
 right answer, only tradeoffs you will learn to weigh.
 </Callout>
 
 ## Common misconceptions
 
 - **"More features always means a better model."** Not so. Irrelevant or
-  redundant features add noise and can *hurt* performance — a problem the
+  redundant features add noise and can *hurt* performance, a problem the
   *feature engineering* page tackles head-on. Quality and relevance beat raw
   count.
 - **"The target has to be the last column."** Position is irrelevant; meaning
   is everything. The target is whatever you want to predict, wherever it sits
   in the table. You select it by name, not by location.
 - **"`X` must be a NumPy array."** A pandas DataFrame works just as well, and
-  is often better because the column names survive — which makes encoding and
+  is often better because the column names survive, which makes encoding and
   interpretation far easier. scikit-learn accepts both.
 - **"Categorical features can be dropped into a model as strings."** Almost
   all scikit-learn estimators require numeric input. Categories must be
@@ -442,7 +442,7 @@ with:
   promotions, and history with a continuous target (units sold) →
   regression.
 - A **hospital** estimating length of stay uses patient features with a
-  continuous target (days) → regression — or buckets it into short / medium /
+  continuous target (days) → regression, or buckets it into short / medium /
   long → classification, depending on how the result will be used.
 - A **streaming service** with no labels at all groups viewers by behavior
   using only `X` → unsupervised clustering.
@@ -465,8 +465,8 @@ can do it without thinking.
   category="foundations · features and targets"
   estimatedTime="~6 min"
   instructions={`A small DataFrame \`patients\` is provided. Each row is one
-patient. We want to predict whether each patient has the condition — the
-\`has_condition\` column (1 = yes, 0 = no) — from the other columns.
+patient. We want to predict whether each patient has the condition, the
+\`has_condition\` column (1 = yes, 0 = no), from the other columns.
 
 1. Build the **target** \`y\` from the \`has_condition\` column of
    \`patients\`.
@@ -571,10 +571,10 @@ The target goes into \`y\`; all other columns form \`X\`, and the target is neve
   markdown={`\`neighborhood\` takes the values "downtown", "suburb", and "rural". Why is encoding it as downtown=1, suburb=2, rural=3 a mistake?
 
 - Because scikit-learn cannot store integers
-  > scikit-learn works with integer-encoded data all the time. The problem is not the data type but the meaning those integers imply — a false ordering of categories that have no natural order.
+  > scikit-learn works with integer-encoded data all the time. The problem is not the data type but the meaning those integers imply, a false ordering of categories that have no natural order.
 - Because the numbers are too large for the model
   > The magnitude of the numbers (1, 2, 3) is not the issue. The problem is that any integer encoding of nominal categories secretly introduces a false ordering relationship between them.
-- [o] Because it invents a false order and spacing — implying rural (3) is "greater than" downtown (1) and that suburb is exactly halfway — none of which is true for an unordered category
+- [o] Because it invents a false order and spacing, implying rural (3) is "greater than" downtown (1) and that suburb is exactly halfway, none of which is true for an unordered category
   > These are nominal categories with no natural ranking. Integer-coding them fabricates an order the model will act on. An order-free encoding such as one-hot is needed.
 - Because categorical features should be deleted, not encoded
   > Deleting categorical features throws away potentially useful information. The correct approach is to encode them in a way that does not introduce a false ordering, such as one-hot encoding.
@@ -590,7 +590,7 @@ Nominal categories must be encoded without introducing a fake ordering.`}
 - Clustering, because we are grouping houses
   > Clustering is an unsupervised task with no target \`y\`. Here a labeled numeric target (price) is provided, making this a supervised regression problem.
 - [o] Regression, because the target is a continuous numeric quantity
-  > A continuous numeric target means the model predicts a number on a scale — that is regression. A categorical target would mean classification instead.
+  > A continuous numeric target means the model predicts a number on a scale, that is regression. A categorical target would mean classification instead.
 - Unsupervised learning, because prices vary
   > Unsupervised learning is used when there is no target column at all. Here a labeled numeric target (price) is provided, which makes this supervised regression, not unsupervised learning.
 
@@ -616,11 +616,11 @@ Shape is read rows-first: 342 examples, 4 features each.`}
   markdown={`Which statement about features is correct?
 
 - Adding more feature columns always improves the model
-  > Irrelevant or redundant features add noise and can degrade a model's performance — a phenomenon sometimes called the "curse of dimensionality." More features is only beneficial when those features carry genuine signal.
+  > Irrelevant or redundant features add noise and can degrade a model's performance, a phenomenon sometimes called the "curse of dimensionality." More features is only beneficial when those features carry genuine signal.
 - The target must always be the final column of the table
   > The target is identified by name and meaning, not by its position. You select it explicitly (e.g., \`df["target_col"]\`), so it can reside anywhere in the table.
 - [o] Irrelevant or redundant features can add noise and hurt performance, so relevance matters more than sheer count
-  > Quality beats quantity. Useless features dilute the signal and can degrade a model — selecting good features is its own skill, covered in the feature engineering chapter.
+  > Quality beats quantity. Useless features dilute the signal and can degrade a model, selecting good features is its own skill, covered in the feature engineering chapter.
 - A pandas DataFrame cannot be used as \`X\`; only NumPy arrays work
   > scikit-learn accepts both pandas DataFrames and NumPy arrays as input for \`X\`. DataFrames are often preferred because their column names make encoding and interpretation easier.
 

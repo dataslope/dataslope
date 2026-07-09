@@ -5,7 +5,7 @@ description: A hands-on, browser-based tour of systems programming and memory ma
 
 <Figure
   slug="cpu"
-  alt="A CPU chip — the processor whose behavior systems C code controls directly"
+  alt="A CPU chip, the processor whose behavior systems C code controls directly"
   priority
 />
 
@@ -19,16 +19,16 @@ C is the lingua franca of systems software. Operating system kernels,
 databases, language runtimes (CPython, V8, the JVM, Go's runtime),
 web servers, embedded firmware, and even other compilers are written
 in C or in C-like dialects. Learning C teaches you not just a
-language but a *model of the machine* — a small, honest model in which
+language but a *model of the machine*, a small, honest model in which
 every byte has an address, every variable has a type with a known
 size, and every allocation is yours to manage.
 
-## This course runs in your browser — try it
+## This course runs in your browser, try it
 
 Before anything else, here is the most important fact about this
 course: **every C snippet on every page is live.** Click *Run* below
-and a real `clang` compiler — running as WebAssembly inside your
-browser tab — will compile this program and execute it. No
+and a real `clang` compiler, running as WebAssembly inside your
+browser tab, will compile this program and execute it. No
 installation, no setup, no account.
 
 <CodeBlock
@@ -58,7 +58,7 @@ int main(void) {
 Change `height` to `8` and run it again. That edit–run–observe loop
 is how the whole course works: the prose explains an idea, a code
 block makes it concrete, and you are expected to poke at it. The
-pages where you break things on purpose — and there will be several —
+pages where you break things on purpose, and there will be several,
 are where C actually sinks in.
 
 <svg
@@ -134,7 +134,7 @@ I/O, and tiny in-memory simulations.
 
 ## Why "systems programming *and* memory management"?
 
-In application languages — Python, Java, JavaScript — the runtime
+In application languages, Python, Java, JavaScript, the runtime
 hides most of the machine from you. Strings have a length, lists grow
 on their own, garbage is collected silently, and a "null pointer
 exception" is the worst that usually happens.
@@ -142,7 +142,7 @@ exception" is the worst that usually happens.
 In C, you see the cost of every decision. A string is a `char*` to a
 sequence of bytes that you must remember to null-terminate. An array
 decays into a pointer when you pass it to a function. Memory you
-allocate with `malloc` stays alive until *you* free it — and if you
+allocate with `malloc` stays alive until *you* free it, and if you
 free it twice, or read from it after, or write past its end, the
 program may crash, leak, or silently corrupt unrelated data.
 
@@ -174,7 +174,7 @@ each one stands alone if you want to jump to a specific topic.
 ### 1. Getting started
 Why C still matters for systems work, the compilation pipeline
 (preprocessor → compiler → assembler → linker), and the fundamental
-types — sizes, ranges, signedness, and how integers actually sit in
+types, sizes, ranges, signedness, and how integers actually sit in
 memory (endianness).
 
 ### 2. Pointers and arrays
@@ -184,8 +184,8 @@ build up to pointer arithmetic, array decay, string literals, and the
 infamous footgun).
 
 ### 3. Memory layout
-The four segments of a Unix-style process — text, data/bss, heap, and
-stack — what lives in each, how function calls build and tear down
+The four segments of a Unix-style process, text, data/bss, heap, and
+stack, what lives in each, how function calls build and tear down
 stack frames, and how `malloc`/`free`/`calloc`/`realloc` interact with
 the heap.
 

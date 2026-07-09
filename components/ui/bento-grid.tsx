@@ -74,7 +74,7 @@ const BentoCard = ({
           card copy (white in light mode, #121212 in dark). */}
       <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
       {/* `relative z-10` lifts the copy (and CTA) above the absolute scrim and
-          hover-tint overlays — a bare `z-10` on a static element has no effect. */}
+          hover-tint overlays, a bare `z-10` on a static element has no effect. */}
       <div className="relative z-10 p-6">
         <div className="pointer-events-none flex flex-col gap-1">
           {/* Icon size/position pinned to the former hover state (scale-75,

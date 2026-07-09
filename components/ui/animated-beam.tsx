@@ -54,7 +54,7 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   const [svgDimensions, setSvgDimensions] = useState({ width: 0, height: 0 });
 
   // The gradient sweep animates SVG attributes on the main thread every
-  // frame, forever (`repeat: Infinity`) — so only run it while the beam is
+  // frame, forever (`repeat: Infinity`), so only run it while the beam is
   // actually on screen, and not at all under prefers-reduced-motion. The
   // pulse paths unmount when paused, which stops motion's rAF work entirely;
   // remounting restarts the sweep (with its stagger delay) on re-entry.

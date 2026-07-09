@@ -62,7 +62,7 @@ import { PLAYGROUNDS } from "./playgrounds";
 import { useCreepingBootFraction } from "./challengeShared";
 import { useRouter } from "next/navigation";
 import Link from "./Link";
-// Base UI primitives — used for menus, popovers, dialogs, and toasts so
+// Base UI primitives, used for menus, popovers, dialogs, and toasts so
 // that the playground gets consistent positioning, focus management,
 // and natural enter/exit animations out of the box.
 import { Menu } from "@base-ui-components/react/menu";
@@ -272,6 +272,12 @@ function computeRunButtonState(
   const primary = primaryEntryFilename(adapter);
   const primaryFile = files.find((f) => f.filename === primary) ?? null;
 
+  // Preview adapters (the web playground) always run the composed entry
+  // document, so they show a bare "Run" with no per-file chip or dropdown.
+  if (adapter.simpleRunLabel) {
+    return { primaryLabel: "Run", primaryEntry: primary, dropdownItems: [] };
+  }
+
   // Multi-entry-point adapters (C, C++, Java, C#).
   if (adapter.findEntryFiles) {
     const inputs = files.map((f) => ({
@@ -287,7 +293,7 @@ function computeRunButtonState(
       : null;
 
     if (activeEntry) {
-      // C# top-level files use the bare "Run" label per spec — the
+      // C# top-level files use the bare "Run" label per spec, the
       // file simply executes itself top-to-bottom.
       const label: ReactNode =
         activeEntry.kind === "topLevel"
@@ -309,7 +315,7 @@ function computeRunButtonState(
     // Active file is not an entry point: fall back to primary, then
     // first entry alphabetically.
     if (entries.length === 0) {
-      // No entry points at all in the workspace — keep the button
+      // No entry points at all in the workspace, keep the button
       // usable but unlabelled. The runtime will surface a compile
       // error if the user clicks it.
       return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
@@ -317,7 +323,7 @@ function computeRunButtonState(
     const primaryEntry =
       entries.find((e) => e.filename === primary) ?? entries[0];
     if (entries.length === 1) {
-      // Only one entry exists and the user isn't on it — show plain
+      // Only one entry exists and the user isn't on it, show plain
       // "Run" with no chevron per the spec, but still target that
       // entry when clicked.
       return {
@@ -348,7 +354,7 @@ function computeRunButtonState(
   const isActiveDefault =
     primaryFile !== null && primaryFile.id === activeFile.id;
   if (isActiveDefault || !primaryFile) {
-    // Active is the default file (or no default exists) — plain "Run".
+    // Active is the default file (or no default exists), plain "Run".
     return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
   }
   return {
@@ -373,7 +379,7 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
     let cancelled = false;
     void (async () => {
       // Plotly is heavy and only needed when a chart actually renders, so we
-      // lazy-load it from jsDelivr on demand — keeping it out of the client
+      // lazy-load it from jsDelivr on demand, keeping it out of the client
       // bundle and the OpenNext Worker bundle (see PLOTLY_CDN in runtime/cdn).
       const mod = await import(
         /* webpackIgnore: true */ /* turbopackIgnore: true */ PLOTLY_CDN
@@ -418,7 +424,7 @@ function PackagesDrawer({
   const [query, setQuery] = useState("");
 
   // The drawer fully unmounts when closed (Base UI's Dialog handles
-  // mount/unmount via `open`), so internal state naturally resets — no
+  // mount/unmount via `open`), so internal state naturally resets, no
   // effect needed to clear it.
 
   const filtered = useMemo(() => {
@@ -569,7 +575,7 @@ function PackagesDrawer({
 
 
 /** Merge runs of consecutive `stdout` cells (emitted separately by the
- *  JS/TS/PHP workers — one per console.log call) into a single grouped
+ *  JS/TS/PHP workers, one per console.log call) into a single grouped
  *  cell so the output pane shows one block rather than many. */
 function mergeConsecutiveStdout<T extends { type: string; content: string }>(
   cells: T[],
@@ -692,7 +698,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     null,
   );
   // Confirmations for the two destructive actions in the Settings
-  // panel — using Base UI AlertDialog for both rather than the native
+  // panel, using Base UI AlertDialog for both rather than the native
   // window.confirm so they look consistent with the rest of the UI.
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
@@ -737,7 +743,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // First-ever cold boot vs warm revisit. The WASM payload is served from
   // the browser's HTTP cache after the first boot, so only a genuine
   // first-ever boot in this browser shows the "Downloading … this happens
-  // once" reassurance — later visits just show the status line + bar.
+  // once" reassurance, later visits just show the status line + bar.
   const [isColdBoot] = useState(
     () => adapter.coldDownloadMB != null && !hasRuntimeBootedBefore(adapter.id),
   );
@@ -749,8 +755,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // bar instead of the indeterminate sweep.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
   // Loading-overlay lifecycle (show → fade → unmount) with a minimum
-  // on-screen time, so a warm revisit — where the shared runtime is
-  // already booted and `loaded` flips almost immediately — shows a
+  // on-screen time, so a warm revisit, where the shared runtime is
+  // already booted and `loaded` flips almost immediately, shows a
   // deliberate loading screen instead of a one-frame "blink". Cold boots
   // exceed the floor, so they fade the instant boot finishes.
   const { mounted: showLoadingOverlay, fading: loadingFading } =
@@ -798,7 +804,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const clearOutputsForFile = useStore((s) => s.clearOutputsForFile);
 
   // Derived: the active file's outputs (the output pane is per-tab).
-  // Declared below, next to `runButtonState` — the split view derives
+  // Declared below, next to `runButtonState`, the split view derives
   // the output pane's source from the run-target (entry) file instead
   // of the focused pane, and that needs the Run button's entry
   // resolution to exist first.
@@ -909,7 +915,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // ─── Open editor tabs ───────────────────────────────────────────────
   // The tab strip shows a SUBSET of the workspace's files: closing a tab
-  // only hides its editor — the file stays in the workspace (Files pane,
+  // only hides its editor, the file stays in the workspace (Files pane,
   // OPFS, and the run/bundle staging), so cross-file imports keep
   // resolving. Deleting a file for real happens in the Files pane or the
   // tab's "Delete File" menu item. Persisted in the workspace manifest.
@@ -954,7 +960,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const previewHostRef = useRef<HTMLDivElement | null>(null);
   const hasPreview = Boolean(adapter.outputCapabilities?.preview);
   // Ref mirror of `outputFileId` (derived next to `runButtonState`
-  // below) for callbacks — empty until its sync effect first runs;
+  // below) for callbacks, empty until its sync effect first runs;
   // readers fall back to the active file id.
   const outputFileIdRef = useRef<string>("");
   // Pane layout elements (the drag resizer wires them up in an effect
@@ -968,7 +974,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Every workspace file gets its own always-visible editor stacked in
   // the editor pane instead of the tabbed single editor. Defaults ON
   // for the web playground; the user's choice persists per adapter.
-  // The default renders on the server too — localStorage is consulted
+  // The default renders on the server too, localStorage is consulted
   // in the mount effect below so hydration stays deterministic.
   const splitAvailable = Boolean(adapter.splitEditors);
   const [splitView, setSplitViewState] = useState<boolean>(splitAvailable);
@@ -986,7 +992,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         setSplitViewState(false);
       }
     } catch {
-      /* private mode — keep the default. */
+      /* private mode, keep the default. */
     }
   }, [adapter.id, splitAvailable]);
   const splitActive = splitAvailable && splitView;
@@ -1000,7 +1006,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (on: boolean) => {
       setSplitViewState(on);
       // Switching views can change the editor arrangement (tabbed pins
-      // the editor left) — drop the resizer's inline grid template so
+      // the editor left), drop the resizer's inline grid template so
       // the new arrangement's CSS takes over at default proportions.
       panesRef.current?.style.removeProperty("grid-template-columns");
       try {
@@ -1009,7 +1015,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           String(on),
         );
       } catch {
-        /* quota / private mode — ignore. */
+        /* quota / private mode, ignore. */
       }
     },
     [adapter.id],
@@ -1021,7 +1027,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [],
   );
-  // Focusing a pane makes its file "active" — the Run button label,
+  // Focusing a pane makes its file "active", the Run button label,
   // Format target, and completion filename all track the focused pane,
   // exactly like focusing that file's tab. No doc juggling needed: the
   // panes write through to the dirty buffers on every edit.
@@ -1038,7 +1044,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Auto-run on edit (preview adapters) ─────────────────────────────
   // CodePen-style live feedback: a debounced re-run after edits (and one
   // initial run once the runtime is ready) keeps the preview current
-  // without pressing Run. Cheap by construction — each run swaps the
+  // without pressing Run. Cheap by construction, each run swaps the
   // sandboxed iframe. Persisted per adapter; defaults ON.
   const [autoRun, setAutoRunState] = useState<boolean>(hasPreview);
   useEffect(() => {
@@ -1048,12 +1054,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         window.localStorage.getItem(`playground_${adapter.id}_autorun`) ===
         "false"
       ) {
-        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* Deterministic-SSR pattern, see the split-view hydration note. */
         /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setAutoRunState(false);
       }
     } catch {
-      /* private mode — keep the default. */
+      /* private mode, keep the default. */
     }
   }, [adapter.id, hasPreview]);
   const setAutoRun = useCallback(
@@ -1065,7 +1071,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           String(on),
         );
       } catch {
-        /* quota / private mode — ignore. */
+        /* quota / private mode, ignore. */
       }
     },
     [adapter.id],
@@ -1083,19 +1089,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         `playground_${adapter.id}_editorpos`,
       );
       if (stored === "right" || stored === "top") {
-        /* Deterministic-SSR pattern — see the split-view hydration note. */
+        /* Deterministic-SSR pattern, see the split-view hydration note. */
         /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setEditorPositionState(stored);
       }
     } catch {
-      /* private mode — keep the default. */
+      /* private mode, keep the default. */
     }
   }, [adapter.id, hasPreview]);
   const setEditorPosition = useCallback(
     (pos: "left" | "right" | "top") => {
       setEditorPositionState(pos);
       // The drag resizer writes an inline grid template sized for the
-      // previous arrangement — drop it so the new arrangement's CSS
+      // previous arrangement, drop it so the new arrangement's CSS
       // takes over at its default proportions.
       panesRef.current?.style.removeProperty("grid-template-columns");
       try {
@@ -1104,7 +1110,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           pos,
         );
       } catch {
-        /* quota / private mode — ignore. */
+        /* quota / private mode, ignore. */
       }
     },
     [adapter.id],
@@ -1121,7 +1127,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // auto-runs, which skip user-facing side effects like the mobile
   // pane switch.
   const runRef = useRef<(opts?: { auto?: boolean }) => void>(() => undefined);
-  // Secondary run action (⌘/Ctrl+Shift+Enter) — runs the Run dropdown's
+  // Secondary run action (⌘/Ctrl+Shift+Enter), runs the Run dropdown's
   // first/canonical entry. Kept as a ref so the CodeMirror keymap stays
   // stable while the target entry updates as tabs/files change.
   const runSecondaryRef = useRef<() => void>(() => undefined);
@@ -1131,7 +1137,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // than jumping all the way to the end of the scroll container.
   const newRunFirstIdRef = useRef<number | null>(null);
 
-  // Pending error→ready status reset. Tracked so a new run can cancel it —
+  // Pending error→ready status reset. Tracked so a new run can cancel it,
   // otherwise failing a run and re-running within 3s would let the stale
   // timer flip the status to "ready" while the new run is still executing.
   const errorResetTimerRef = useRef<number | null>(null);
@@ -1182,8 +1188,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
+    // Default to D.clearBeforeRun when unset (only an explicit stored value
+    // overrides it), so the shared default drives first-run behaviour.
+    const storedClearBeforeRun = localStorage.getItem(
+      storageKey("clearbeforerun"),
+    );
     const savedClearBeforeRun =
-      localStorage.getItem(storageKey("clearbeforerun")) === "true";
+      storedClearBeforeRun === null
+        ? D.clearBeforeRun
+        : storedClearBeforeRun === "true";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
        useState initialisers because that would cause a hydration mismatch
@@ -1224,8 +1237,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     if (typeof window === "undefined") return;
     let cancelled = false;
     // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount — e.g. a browser
-    // back-then-forward return to the playground — can re-acquire it instead
+    // client-side navigation away) so a later remount, e.g. a browser
+    // back-then-forward return to the playground, can re-acquire it instead
     // of colliding with this document's own stale lock and showing a spurious
     // "already open in another tab" warning.
     const lockController = new AbortController();
@@ -1313,13 +1326,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             if (!cancelled && !hasLock) {
               window.sessionStorage.setItem(noticeKey, "1");
               showToast(
-                "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
+                "This workspace is already open in another tab. Edits here may conflict, switch workspaces via the badge in the header.",
                 "warn",
               );
             }
           }
         } catch {
-          /* sessionStorage / Locks unavailable — ignore. */
+          /* sessionStorage / Locks unavailable, ignore. */
         }
       } catch {
         // Workspace bootstrap failed (OPFS down, lock contention, etc.);
@@ -1380,7 +1393,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // Whatever activates a file (tab click, Files pane, split-pane focus,
   // the Ask AI edit handler, workspace hydration) must end with that
-  // file's tab open — centralized here so no activation path can strand
+  // file's tab open, centralized here so no activation path can strand
   // an active-but-closed file.
   useEffect(() => {
     if (!workspaceReady || !activeFileId) return;
@@ -1400,7 +1413,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         if (!cancelled) setVirtualFiles(loaded);
       })
       .catch(() => {
-        /* OPFS unavailable / empty — leave the data-file list empty. */
+        /* OPFS unavailable / empty, leave the data-file list empty. */
       });
     return () => {
       cancelled = true;
@@ -1616,7 +1629,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // effect and remounts it from the active file's dirty buffer.
     if (!splitActive && editorHostRef.current && !editorRef.current) {
       // Read persisted settings directly so the editor mounts with the
-      // same values the surrounding UI was hydrated with — otherwise the
+      // same values the surrounding UI was hydrated with, otherwise the
       // editor would briefly render with default theme/wrapping and then
       // flip to the saved values on the next effect.
       const initialTheme =
@@ -1632,8 +1645,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // contents land in the file's in-memory dirty buffer (synchronous)
       // and in OPFS via an async queue. We deliberately read the active
       // file and workspace ids from refs so tab switches don't require
-      // rebuilding the editor extensions. (Completion triggers — `.`,
-      // Ctrl-Space, etc. — live inside `languageCompletion` below.)
+      // rebuilding the editor extensions. (Completion triggers, `.`,
+      // Ctrl-Space, etc., live inside `languageCompletion` below.)
       const persistListener = EditorView.updateListener.of((update) => {
         if (!update.docChanged) return;
         if (!suppressPersistRef.current) {
@@ -1716,7 +1729,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           languageComp.of([]),
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
-          // AI ghost-text completion (pro members only — the extension gates
+          // AI ghost-text completion (pro members only, the extension gates
           // itself and stays inert for guests/free members). Filename is read
           // through refs so tab switches don't rebuild the editor extensions,
           // matching how the persist listener works.
@@ -1763,7 +1776,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         if (cancelled) return;
         runtimeRef.current = rt;
         // The playground can't predict what the user will type, and its
-        // audience skews toward the data stack — pre-warm the full
+        // audience skews toward the data stack, pre-warm the full
         // optional package set unconditionally (the pre-#549 behaviour,
         // now opt-in per surface via warmPackages). Fire-and-forget: a
         // run that needs packages installs them on demand regardless.
@@ -1970,7 +1983,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // before-run, output font size) to their built-in defaults. Drops the
   // matching localStorage entries so a future page load also starts
   // from defaults. The user's saved code, examples, and any other
-  // unrelated localStorage entries are intentionally left alone — the
+  // unrelated localStorage entries are intentionally left alone, the
   // separate "Clear all localStorage" action handles those.
   const restoreDefaultSettings = useCallback(() => {
     const D = DEFAULT_PLAYGROUND_SETTINGS;
@@ -1992,7 +2005,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   ]);
 
   // Clear every localStorage entry (across all playgrounds) and reload
-  // so the freshly cleared state takes effect everywhere — including
+  // so the freshly cleared state takes effect everywhere, including
   // saved editor contents, theme, and any future per-playground keys.
   // Confirmation is handled by a Base UI AlertDialog rendered below;
   // by the time this callback fires the user has already opted in.
@@ -2042,7 +2055,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const view = editorRef.current;
     const reads = filesRef.current.map(async (f) => {
       // The active editor may hold edits not yet flushed to the dirty
-      // buffer — read straight from CodeMirror in that case.
+      // buffer, read straight from CodeMirror in that case.
       if (view && f.id === activeId) {
         out.set(f.filename, encoder.encode(view.state.doc.toString()));
         return;
@@ -2061,7 +2074,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     });
     await Promise.all(reads);
 
-    // Data files (binary). Skip folder markers — only real files have
+    // Data files (binary). Skip folder markers, only real files have
     // OPFS content.
     if (wsId) {
       const dataReads = virtualFilesRef.current
@@ -2082,7 +2095,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
     if (!rt) return;
-    // The split view has no single tabbed editor — its panes write
+    // The split view has no single tabbed editor, its panes write
     // through to the dirty buffers synchronously, so reads below fall
     // back to the buffers instead.
     if (!editor && !splitActiveRef.current) return;
@@ -2158,8 +2171,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // Mirror files the runtime created during the run (e.g. an R
     // download.file() destination) into the Files pane and persist them to
     // OPFS so they survive reloads and are re-staged on the next run.
-    // Called in both the success and error paths — a file may have been
-    // written before later user code threw — and is safe to call twice
+    // Called in both the success and error paths, a file may have been
+    // written before later user code threw, and is safe to call twice
     // because the runtime clears its tracking list after the first read.
     const syncCreatedFiles = async () => {
       if (!rt.collectCreatedFiles) return;
@@ -2181,7 +2194,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           try {
             await writeDataFile(wsId, path, bytes);
           } catch {
-            // OPFS write failed — still surface it in the in-memory list.
+            // OPFS write failed, still surface it in the in-memory list.
           }
         }
         setVirtualFiles((prev) => {
@@ -2218,13 +2231,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       //     the on-disk OPFS copy so unsaved edits are visible).
       //   - All uploaded data files (read straight from OPFS).
       // Adapters that don't override `prepareFileSystem` keep
-      // single-file semantics — the call is a no-op.
+      // single-file semantics, the call is a no-op.
       if (rt.prepareFileSystem) {
         const fileMap = await collectWorkspaceFilesForRun();
         try {
           await rt.prepareFileSystem(fileMap);
         } catch (stageErr) {
-          // Surface staging errors as a non-fatal stderr cell — execution
+          // Surface staging errors as a non-fatal stderr cell, execution
           // proceeds with whatever files made it into the VFS.
           const msg =
             stageErr instanceof Error ? stageErr.message : String(stageErr);
@@ -2253,9 +2266,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         })),
       ]);
       if (collected.length === 0 && !hasPreview) {
-        // Preview adapters "output" the page itself — a run with no
+        // Preview adapters "output" the page itself, a run with no
         // console output is the normal case, not worth a toast.
-        showToast("Code ran successfully — no output.");
+        showToast("Code ran successfully, no output.");
       }
       // Keep the running overlay visible long enough for the 180ms CSS
       // transition to complete and be perceptible to the user.
@@ -2263,7 +2276,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
       setStatusState("ready");
     } catch (err) {
-      // User code may have downloaded a file before later throwing — surface
+      // User code may have downloaded a file before later throwing, surface
       // it in the Files pane even though the run ultimately errored.
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
@@ -2294,14 +2307,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // On narrow viewports the panes share the screen via a tab switcher;
       // surface the result tab automatically once the run is done so the
       // user doesn't have to swipe back themselves. Debounced auto-runs
-      // skip this — yanking the pane away mid-typing would be hostile.
+      // skip this, yanking the pane away mid-typing would be hostile.
       if (!opts?.auto) setMobileTab("output");
     }
   },
   [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
 
   // (The Mod-Enter keymap closure is kept fresh next to
-  // `runSecondaryRef` below — it needs `runButtonState`, which is
+  // `runSecondaryRef` below, it needs `runButtonState`, which is
   // derived after the run handler.)
 
   const clearOutput = useCallback(() => {
@@ -2309,7 +2322,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // shows the entry file's stream, not the focused pane's).
     const fileId = outputFileIdRef.current ?? activeFileIdRef.current;
     if (fileId) clearOutputsForFile(fileId);
-    // Clearing also tears down the live preview — removing the iframe
+    // Clearing also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
     if (hasPreview) previewHostRef.current?.replaceChildren();
     if (loaded) {
@@ -2336,8 +2349,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   // The output pane's source file. Tabs mode: the active tab (per-tab
-  // output history). Split mode: the file a Run actually executes — the
-  // Run button's resolved entry — so the console reads as ONE stream
+  // output history). Split mode: the file a Run actually executes, the
+  // Run button's resolved entry, so the console reads as ONE stream
   // regardless of which pane has focus (runCode routes its cells to the
   // same id).
   const outputFileId = useMemo(() => {
@@ -2360,7 +2373,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Keep a fresh closure available for the CodeMirror Mod-Enter keymap.
   // Runs the same entry the visible Run button would (multi-entry
   // adapters resolve to the canonical entry even when a non-entry file
-  // — e.g. a stylesheet pane — has focus).
+  //, e.g. a stylesheet pane, has focus).
   useEffect(() => {
     runRef.current = (opts) => {
       void runCode(runButtonState.primaryEntry ?? undefined, opts);
@@ -2380,7 +2393,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Auto-run driver: re-fires on every real buffer edit (the store
   // replaces the Map identity per change) and once when the runtime
   // finishes loading, so the preview renders on page open. If a run is
-  // still in flight when the debounce fires, the timer re-arms — the
+  // still in flight when the debounce fires, the timer re-arms, the
   // last edit always wins.
   const autoRunTimerRef = useRef<number | null>(null);
   useEffect(() => {
@@ -2469,7 +2482,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const openSettingsTab = useCallback(() => {
     flushActiveFileToBuffer();
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
-      // Settings tab is active — close it and return to the active file.
+      // Settings tab is active, close it and return to the active file.
       setSettingsOpen(false);
       const targetId = activeFileIdRef.current;
       if (targetId) {
@@ -2478,10 +2491,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         setActiveTabId(filesRef.current[0].id);
       }
     } else if (settingsOpenRef.current) {
-      // Settings tab is in the tab bar but not active — activate it.
+      // Settings tab is in the tab bar but not active, activate it.
       setActiveTabId(SETTINGS_TAB_ID);
     } else {
-      // Settings tab is not open — add it and make it active.
+      // Settings tab is not open, add it and make it active.
       setSettingsOpen(true);
       setActiveTabId(SETTINGS_TAB_ID);
     }
@@ -2503,7 +2516,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   /** Close a file's editor TAB. The file itself stays in the workspace
    *  (Files pane, OPFS, dirty buffer, and the run/bundle staging), so
-   *  cross-file imports keep resolving — closing `styles.css` must not
+   *  cross-file imports keep resolving, closing `styles.css` must not
    *  break `import "./styles.css"`. Reopen from the Files pane; delete
    *  for real with `deleteWorkspaceFile`. */
   const closeFileTab = useCallback(
@@ -2515,7 +2528,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const open = openTabIdsRef.current;
       if (!open.includes(fileId)) return;
       if (open.length <= 1) {
-        // Refuse to close the last open tab — the playground needs at
+        // Refuse to close the last open tab, the playground needs at
         // least one editor target.
         showToast("Can't close the last open tab.", "warn");
         return;
@@ -2524,7 +2537,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setOpenTabIds(remaining);
       if (activeFileIdRef.current === fileId) {
         // Pick a neighbour: prefer the tab that visually replaces the
-        // closed one — i.e. the previous tab in tab order, falling back
+        // closed one, i.e. the previous tab in tab order, falling back
         // to the first remaining tab.
         const closedIdx = open.indexOf(fileId);
         const next =
@@ -2545,7 +2558,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (fileId: string) => {
       const current = filesRef.current;
       if (current.length <= 1) {
-        // Refuse to delete the last file — the playground needs at
+        // Refuse to delete the last file, the playground needs at
         // least one editor target.
         showToast("Can't delete the last file.", "warn");
         return;
@@ -2595,10 +2608,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const target = filesRef.current.find((f) => f.id === fileId);
       if (!target) return;
       // Two input shapes converge here:
-      //  - Full path (contains "/") — replace the workspace path
+      //  - Full path (contains "/"), replace the workspace path
       //    outright (e.g. user types `src/utils.py` to move the
       //    file).
-      //  - Leaf only (no "/") — preserve the file's existing parent
+      //  - Leaf only (no "/"), preserve the file's existing parent
       //    directory so a tab-strip rename of `src/foo.py` to
       //    `bar.py` becomes `src/bar.py`, not `bar.py` at the root.
       let nextPath: string;
@@ -2635,7 +2648,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   /** Reorder the file tabs after a drag-and-drop drop. The generic
    *  TabBar hands us the new tab order (TabDescriptors); we project it
    *  back onto the OPEN-TAB list via id lookup. The `files` array keeps
-   *  its own (creation) order — the tab strip owns tab order, the Files
+   *  its own (creation) order, the tab strip owns tab order, the Files
    *  pane renders a sorted tree regardless. */
   const reorderFileTabs = useCallback(
     (nextDescriptors: TabDescriptor[]) => {
@@ -2731,7 +2744,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     ],
   );
 
-  /** Close every OPEN TAB except `fileId`'s — the other files stay in
+  /** Close every OPEN TAB except `fileId`'s, the other files stay in
    *  the workspace (reopen them from the Files pane). The kept tab
    *  becomes the active tab. */
   const closeOtherFileTabs = useCallback(
@@ -2750,17 +2763,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Merge workspace tabs into the Files pane ─────────────────────────
   //
   // The Files pane shows two distinct kinds of entries:
-  //   1. Workspace code files — one per tab in the tab strip
+  //   1. Workspace code files, one per tab in the tab strip
   //      (e.g. `main.py`, `src/utils.py`). Their content lives in
   //      the per-file dirty buffer + OPFS.
-  //   2. User data files — anything uploaded via the panel
+  //   2. User data files, anything uploaded via the panel
   //      (e.g. `data.csv`, `images/cat.png`). Their content lives in
   //      OPFS under `data/`.
   //
-  // Code files may live at any path (root or inside folders) — the
+  // Code files may live at any path (root or inside folders), the
   // tab strip just shows the leaf. If a data file's path collides
   // with a code file's path, the code file wins (it's the live
-  // editor target) and the data file is hidden — uploads already
+  // editor target) and the data file is hidden, uploads already
   // enforce uniqueness within `data/` so this only matters for the
   // cross-namespace edge case.
 
@@ -2779,7 +2792,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       path: f.filename,
       // Byte-size estimate from the dirty buffer. Approximate (string
       // length, not UTF-8 byte length) but accurate enough for the
-      // pane's size column — the same approximation FilesPanel uses
+      // pane's size column, the same approximation FilesPanel uses
       // everywhere else.
       size: dirtyBuffers.get(f.id)?.length ?? 0,
       isFolder: false,
@@ -2830,7 +2843,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const tabId = tabIdForFilesPath(path);
       if (tabId) {
         // Delete-from-Files-pane on a code file removes it for real
-        // (tab + buffer + OPFS) — the panel confirmed with the user
+        // (tab + buffer + OPFS), the panel confirmed with the user
         // first. `deleteWorkspaceFile` refuses to drop the last
         // remaining file (the editor needs at least one target) and
         // surfaces its own toast.
@@ -2843,7 +2856,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   /** Files-pane "Open in editor" for a workspace code file: (re)open
-   *  its tab and activate it. Data files have no editor — the panel
+   *  its tab and activate it. Data files have no editor, the panel
    *  only offers this for paths that resolve to a workspace tab. */
   const handleOpenFileFromPane = useCallback(
     (path: string) => {
@@ -2981,7 +2994,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
       // Single-file fallback: drop new content into the active editor
       // without disturbing other tabs. The split view has no single
-      // editor — write the buffer instead and let the active pane sync
+      // editor, write the buffer instead and let the active pane sync
       // itself from it.
       const view = editorRef.current;
       if (view) {
@@ -3187,7 +3200,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       )?.filename;
       const formatted = await adapter.formatCode(code, activeFilename);
       if (formatted === code) {
-        showToast("Already formatted — nothing to change.");
+        showToast("Already formatted, nothing to change.");
         return;
       }
       view.dispatch({
@@ -3209,7 +3222,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
   }, [adapter, showToast]);
 
-  // Per-pane Copy/Format for the split view — each pane header carries
+  // Per-pane Copy/Format for the split view, each pane header carries
   // its own buttons so it's unambiguous which file they act on.
   const copySplitFile = useCallback(
     (fileId: string) => {
@@ -3241,7 +3254,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         )?.filename;
         const formatted = await adapter.formatCode(code, filename);
         if (formatted === code) {
-          showToast("Already formatted — nothing to change.");
+          showToast("Already formatted, nothing to change.");
           return;
         }
         view.dispatch({
@@ -3271,7 +3284,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   interface AiReviewState {
     fileId: string;
     filename: string;
-    /** The file's contents when the review opened — "Revert all" target. */
+    /** The file's contents when the review opened, "Revert all" target. */
     original: string;
     /** Compartment holding the merge extension in the target view. */
     comp: Compartment;
@@ -3284,7 +3297,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     aiReviewRef.current = aiReview;
   }, [aiReview]);
   // A suggestion accepted by the handler but not yet materialized in an
-  // editor — applied by the effect below AFTER the tab-switch doc sync.
+  // editor, applied by the effect below AFTER the tab-switch doc sync.
   const [pendingAiEdit, setPendingAiEdit] = useState<{
     fileId: string;
     filename: string;
@@ -3317,7 +3330,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         view.dispatch({ effects: review.comp.reconfigure([]) });
         view.focus();
       } else if (!keep) {
-        // The review's editor is gone (tab switched / view remounted) —
+        // The review's editor is gone (tab switched / view remounted),
         // restore the file's buffer directly.
         updateDirtyBuffer(review.fileId, review.original);
         const wsId = workspaceIdRef.current;
@@ -3329,7 +3342,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   // Materialize a pending suggestion once the target editor is showing the
-  // file (the tab-switch doc sync above runs first — effect order matters).
+  // file (the tab-switch doc sync above runs first, effect order matters).
   useEffect(() => {
     if (!pendingAiEdit) return;
     const view = viewForFile(pendingAiEdit.fileId);
@@ -3342,7 +3355,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       return;
     }
     const comp = new Compartment();
-    // Baseline first, then swap the doc to the proposal — the merge view
+    // Baseline first, then swap the doc to the proposal, the merge view
     // recomputes the diff on doc changes, and the write-through persist
     // listeners treat the proposal like any edit (so Run previews it).
     view.dispatch({
@@ -3374,7 +3387,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       !files.some((f) => f.id === review.fileId);
     if (!detached) return;
     // The tabbed editor may now show ANOTHER file with the merge extension
-    // still attached — strip it before restoring the reviewed file's buffer.
+    // still attached, strip it before restoring the reviewed file's buffer.
     if (!review.split && editorRef.current) {
       editorRef.current.dispatch({ effects: review.comp.reconfigure([]) });
     }
@@ -3402,7 +3415,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         );
       flushActiveFileToBuffer();
       if (!existing) {
-        // A brand-new file: no baseline to diff against — create it with
+        // A brand-new file: no baseline to diff against, create it with
         // the proposed contents and open it.
         if (
           !SAFE_NEW_FILENAME.test(suggestion.filename) ||
@@ -3521,7 +3534,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // One merged output frame per run: cells produced by the same run stack
   // inside a single OUTPUT cell in chronological order (text, dataframes,
-  // figures, charts), notebook-style. Cells without a runId (defensive —
+  // figures, charts), notebook-style. Cells without a runId (defensive,
   // shouldn't occur) each get their own group.
   const outputGroups = useMemo(() => {
     const groups: OutputCell[][] = [];
@@ -3575,7 +3588,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () => {
-      // The tab strip shows the OPEN tabs only — a subset of the
+      // The tab strip shows the OPEN tabs only, a subset of the
       // workspace files (closing a tab keeps the file; reopen it from
       // the Files pane).
       const byId = new Map(files.map((f) => [f.id, f]));
@@ -3585,7 +3598,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const multiple = openFiles.length > 1;
       // The context-menu closures defer to `useCallback` handlers
       // that intentionally read refs internally. The handlers only
-      // run on user click — never during render — so the
+      // run on user click, never during render, so the
       // `react-hooks/refs` rule's transitive check is a false alarm
       // here.
       // eslint-disable-next-line react-hooks/refs
@@ -3802,7 +3815,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             />
           )}
 
-          {/* Desktop action group — hidden on narrow viewports in favour
+          {/* Desktop action group, hidden on narrow viewports in favour
               of the consolidated mobile menu below. */}
           <div className="header-actions desktop-only">
             <Menu.Root>
@@ -3916,7 +3929,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </button>
           </div>
 
-          {/* Mobile-only consolidated menu — replaces the header buttons
+          {/* Mobile-only consolidated menu, replaces the header buttons
               on narrow viewports. Base UI Drawer keeps the main menu and
               nested sections as bottom sheets so they stay within the
               viewport on narrow phones. */}
@@ -3957,7 +3970,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </Drawer.Close>
                     </div>
                     <div className="mobile-menu-drawer-body">
-                      {/* Workspace — the header badge is hidden on mobile,
+                      {/* Workspace, the header badge is hidden on mobile,
                           so open the full workspace manager from here. */}
                       {workspaceReady && (
                         <button
@@ -3974,7 +3987,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </span>
                         </button>
                       )}
-                      {/* Share — the header button that owns this dialog is
+                      {/* Share, the header button that owns this dialog is
                           desktop-only, so mirror it here (the dialog portals
                           above the drawer). Cloud backups live inside the
                           workspace manager, reached via "Workspace" above. */}
@@ -3991,7 +4004,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           ›
                         </span>
                       </button>
-                      {/* Files — the desktop icon rail (which toggles the
+                      {/* Files, the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
                           management here as a bottom-sheet instead.
                           Adapters that hide the Files pane skip it here
@@ -4300,7 +4313,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        {/* Confirm restoring built-in defaults — non-destructive but
+        {/* Confirm restoring built-in defaults, non-destructive but
             still nukes any custom settings, so confirm first. */}
         <AlertDialog.Root
           open={confirmRestoreOpen}
@@ -4335,7 +4348,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           </AlertDialog.Portal>
         </AlertDialog.Root>
 
-        {/* Confirm wiping every localStorage entry across all playgrounds —
+        {/* Confirm wiping every localStorage entry across all playgrounds,
             this is destructive (saved code, themes, settings, …) so the
             confirmation lives in a Base UI AlertDialog rather than the
             native window.confirm to match the rest of the UI. */}
@@ -4390,7 +4403,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 snippet, <strong>workspace</strong>, persisted{" "}
                 <strong>database</strong>, and uploaded{" "}
                 <strong>data file</strong> across{" "}
-                <strong>all playgrounds</strong> — including localStorage,
+                <strong>all playgrounds</strong>, including localStorage,
                 OPFS, IndexedDB, and any cached assets. The page will
                 reload immediately. This can&rsquo;t be undone.
               </AlertDialog.Description>
@@ -4450,7 +4463,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   </Popover.Positioner>
                 </Popover.Portal>
               </Popover.Root>
-              {/* Files — toggles the virtual-filesystem sidebar panel. */}
+              {/* Files, toggles the virtual-filesystem sidebar panel. */}
               <Popover.Root>
                 <Popover.Trigger
                   openOnHover
@@ -4498,7 +4511,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           )}
           <div className="playground-body-content">
         {/* File tabs: one tab per workspace file. The active tab's
-            editor + output pane appear directly below — switching tabs
+            editor + output pane appear directly below, switching tabs
             swaps both the editor doc and the output history so each
             file feels like its own self-contained workspace.
 
@@ -4514,7 +4527,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             activeTabId={activeTabId || activeFileId}
             onSelectTab={selectTab}
             onCloseTab={closeFileTab}
-            onAddTab={addNewFile}
+            onAddTab={adapter.disableAddFile ? undefined : addNewFile}
             onRenameTab={renameFileTab}
             onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
             className="playground-file-tabbar"
@@ -4859,7 +4872,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <Wand2 size={13} aria-hidden="true" />
                 <span className="ai-review-text">
                   AI suggested changes to{" "}
-                  <code>{aiReview.filename}</code> — accept or reject each
+                  <code>{aiReview.filename}</code>, accept or reject each
                   chunk in the editor.
                 </span>
                 <div className="ai-review-actions">
@@ -4903,7 +4916,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onFocusFile={focusSplitFile}
                 onRun={() => runRef.current()}
                 onRunSecondary={() => runSecondaryRef.current()}
-                onAddFile={addNewFile}
+                onAddFile={adapter.disableAddFile ? undefined : addNewFile}
                 registerView={registerSplitEditorView}
                 getRuntime={() => runtimeRef.current}
                 onCopyFile={copySplitFile}
@@ -4952,7 +4965,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </button>
             </div>
             {/* role="log": run results land here with no other cue a
-                screen-reader user could notice — polite live announcements
+                screen-reader user could notice, polite live announcements
                 mirror what sighted users see appear in the pane. */}
             <div
               className="output-body"

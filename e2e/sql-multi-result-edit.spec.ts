@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 // ─────────────────────────────────────────────────────────────────────
 // Multi-statement runs produce several result sets ("Set 1", "Set 2", …).
 // Each set must be independently editable against its OWN table: double-click
-// opens the inline editor, and a committed edit targets that set's table — not
+// opens the inline editor, and a committed edit targets that set's table, not
 // the query-wide one.
 //
 // Regression this guards: `sourceTable` used to be detected once for the whole
@@ -20,7 +20,7 @@ const S1 = "ZZ_SET1_EDIT";
 const S2 = "ZZ_SET2_EDIT";
 
 // `t1` is the first set (a `SELECT * … LIMIT 10`), `t2` the second. The string
-// column edited sits at td:nth-child(3) for t1 (name) and (4) for t2 — one past
+// column edited sits at td:nth-child(3) for t1 (name) and (4) for t2, one past
 // the leading row-select column the editable grid renders.
 const ENGINES: { id: string; route: string; t1: string; t2: string }[] = [
   { id: "SQLite", route: "/playground/sqlite", t1: "users", t2: "cards" },
@@ -80,7 +80,7 @@ for (const { id, route, t1, t2 } of ENGINES) {
     const undoBar = page.locator(".sql-edit-undo-bar");
 
     // The row-select column only appears once the table's primary key is known
-    // — which is also what enables PK-ordering on the edit re-fetch and fixes
+    //, which is also what enables PK-ordering on the edit re-fetch and fixes
     // the column offsets (a leading select column). Wait for it before editing.
     const waitForPkLoaded = () =>
       grid
@@ -96,7 +96,7 @@ for (const { id, route, t1, t2 } of ENGINES) {
     await expect(undoBar).toContainText("Updated 1 cell", { timeout: 40_000 });
     await expect(undoBar).toContainText(t1);
 
-    // Set 2 (t2, an unbounded `SELECT *`): the reported case — editing a cell
+    // Set 2 (t2, an unbounded `SELECT *`): the reported case, editing a cell
     // used to shove the row to the bottom under PG/DuckDB MVCC. Editing it right
     // after Set 1 also exercises the run queue: Set 2's re-fetch is enqueued
     // behind Set 1's still-in-flight one instead of being dropped. After the fix

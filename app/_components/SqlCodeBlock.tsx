@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * `SqlCodeBlock` — a runnable SQL snippet for the `/learn` route.
+ * `SqlCodeBlock`, a runnable SQL snippet for the `/learn` route.
  *
  * It's the SQL counterpart to `<CodeBlock>`: an editor + Run button +
  * result table, plus an optional read-only viewer of the seeded tables.
  * Unlike `<SqlChallengeCard>` it has no instructions, no Submit/grading,
- * and no reference-solution button — it's just a place to type SQL and
+ * and no reference-solution button, it's just a place to type SQL and
  * see the result set.
  *
  * Supported dialects: SQLite (via `@sqlite.org/sqlite-wasm`), DuckDB
@@ -90,7 +90,7 @@ export interface SqlCodeBlockProps {
   title?: string;
   /** Header badge label. Defaults to "SQL". */
   badge?: string;
-  /** Setup SQL run once before the first execution — creates tables,
+  /** Setup SQL run once before the first execution, creates tables,
    *  seeds data, etc. */
   initSql?: string;
   /** Remote dataset to load before `initSql`: a path inside the
@@ -155,7 +155,7 @@ export default function SqlCodeBlock({
     [dialect, title, starterCode],
   );
 
-  // Each block owns its own engine instance — sharing across blocks
+  // Each block owns its own engine instance, sharing across blocks
   // would let one block's CREATE TABLE leak into another's results. The
   // shared hook owns the cached boot+seed promise, the live engine
   // label, and the boot-progress state that drives the boot loader.
@@ -219,7 +219,7 @@ export default function SqlCodeBlock({
         // Schema-aware completion (same engine as the SQL playgrounds).
         // Seeded with an empty schema so keyword completion works right
         // away; reconfigured with live tables/columns once the block's
-        // engine boots — see `refreshCompletionSchema` below.
+        // engine boots, see `refreshCompletionSchema` below.
         completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
@@ -239,7 +239,7 @@ export default function SqlCodeBlock({
           ...closeBracketsKeymap,
           // Completion keys before `defaultKeymap` so arrows move the
           // popup selection. Enter is removed so it always inserts a
-          // newline; Tab accepts instead — matching the SQL playgrounds.
+          // newline; Tab accepts instead, matching the SQL playgrounds.
           ...completionKeymap.filter((b) => b.key !== "Enter"),
           { key: "Tab", run: acceptCompletion },
           ...defaultKeymap,
@@ -273,7 +273,7 @@ export default function SqlCodeBlock({
           view.dispatch({ effects: languageComp.reconfigure(langExt) });
         }
       } catch {
-        // SQL language extension is optional — editor still works
+        // SQL language extension is optional, editor still works
         // without syntax highlighting.
       }
     })();
@@ -316,7 +316,7 @@ export default function SqlCodeBlock({
           ],
         });
       } catch {
-        // Completion schema is a nicety — never surface as an error.
+        // Completion schema is a nicety, never surface as an error.
       }
     },
     [dialect],
@@ -401,7 +401,7 @@ export default function SqlCodeBlock({
       sql: string,
       // The caller's run sequence (from `++runSeqRef.current`). Owning
       // the increment in the caller lets it guard its own post-await
-      // state updates too — a newer run/reset supersedes both this
+      // state updates too, a newer run/reset supersedes both this
       // execution's status updates and the caller's final ones.
       mySeq: number,
     ): Promise<{
@@ -468,7 +468,7 @@ export default function SqlCodeBlock({
       }
       setStatus("ready");
       setStatusMessage("Done");
-      // The run may have created/dropped tables — refresh the
+      // The run may have created/dropped tables, refresh the
       // completion schema (and the viewer when enabled).
       try {
         const engine = await ensureEngine();
@@ -541,7 +541,7 @@ export default function SqlCodeBlock({
         toasts.show("Clipboard unavailable in this browser.", "warn");
       }
     } catch {
-      toasts.show("Couldn't copy SQL — clipboard blocked.", "warn");
+      toasts.show("Couldn't copy SQL, clipboard blocked.", "warn");
     }
   }, [toasts]);
 
@@ -560,7 +560,7 @@ export default function SqlCodeBlock({
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
-        toasts.show("Already formatted — nothing to change.");
+        toasts.show("Already formatted, nothing to change.");
       } else {
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: formatted },
@@ -570,7 +570,7 @@ export default function SqlCodeBlock({
     } catch {
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
-      toasts.show("Couldn't format — SQL may have a syntax error.", "warn");
+      toasts.show("Couldn't format, SQL may have a syntax error.", "warn");
     } finally {
       setIsFormatting(false);
     }

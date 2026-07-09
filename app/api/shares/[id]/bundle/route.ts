@@ -1,5 +1,5 @@
 /**
- * Bundle download for a share link (public — the slug is the capability).
+ * Bundle download for a share link (public, the slug is the capability).
  *
  * GET /api/shares/:id/bundle → the gzipped snapshot bytes streamed from R2.
  * Used by the "Open a copy" flow on /s/:id and by the playgrounds when they

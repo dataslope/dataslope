@@ -4,7 +4,7 @@
 // files are first transpiled to JavaScript with the official TypeScript
 // compiler (already a build dependency), then staged into almostnode's
 // VirtualFS under .js paths so CommonJS resolution picks them up
-// (almostnode's resolver tries .js/.json/.node — not .ts).
+// (almostnode's resolver tries .js/.json/.node, not .ts).
 //
 // Protocol mirrors javascript-worker.ts exactly so the adapter code can
 // share the same message shapes.
@@ -101,7 +101,7 @@ async function handlePrepareFs(
         for (const d of diagnostics) pendingDiagnostics.push(`TS (${path}): ${d}`);
       }
       // Write the transpiled JS under the .js-suffixed path. Keep the
-      // original .ts file out of the VFS — almostnode's resolver
+      // original .ts file out of the VFS, almostnode's resolver
       // wouldn't use it anyway, and dropping it avoids two competing
       // copies of the same module under different extensions.
       return [[tsToJsPath(path), encoder.encode(outputText)]];

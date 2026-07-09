@@ -526,7 +526,7 @@
 }
 
 /* "Review changes in the editor" actions under an answer that proposed a
-   file edit (playground surface only — see editSuggestions.ts). */
+   file edit (playground surface only, see editSuggestions.ts). */
 .editActions {
   display: flex;
   flex-wrap: wrap;

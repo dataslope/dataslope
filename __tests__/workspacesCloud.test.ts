@@ -1,6 +1,6 @@
 // Pure-helper tests for playground cloud saves + sharing: the bundle/manifest
 // validators (lib/workspaces/types.ts) and the retention/quota policy
-// (lib/workspaces/policy.ts). Route handlers stay thin wrappers over these —
+// (lib/workspaces/policy.ts). Route handlers stay thin wrappers over these,
 // the same convention as adminPromotion.test.ts / polarBilling.test.ts.
 import { readdirSync, existsSync } from "node:fs";
 import path from "node:path";

@@ -1,18 +1,18 @@
 ---
 title: The Grammar, and the Package That Runs It
-description: How Wilkinson reframed a chart as a combination of components, and how Wickham turned that theory into ggplot2 — ending with your first real ggplot.
+description: How Wilkinson reframed a chart as a combination of components, and how Wickham turned that theory into ggplot2, ending with your first real ggplot.
 ---
 
 The previous page left us wanting: a way to *describe* a chart
 structurally and let the computer handle the drawing. That want has a
 name, a book, and a person who turned the idea into a tool you can run.
-This page tells both halves of the story — and ends with your first
+This page tells both halves of the story, and ends with your first
 real ggplot.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A solid blue square — the founding grammar — branches along thin gray lines into three cards holding the primitives it defined: a point, a bar, and a sloped line"
+  aria-label="A solid blue square, the founding grammar, branches along thin gray lines into three cards holding the primitives it defined: a point, a bar, and a sloped line"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -48,7 +48,7 @@ theoretical, but its central idea is simple enough to change how you
 see every chart for the rest of your life.
 
 Think about natural language. There is no fixed list of "approved
-sentences" you must memorize. Instead there is a **grammar** — a set of
+sentences" you must memorize. Instead there is a **grammar**, a set of
 components (nouns, verbs, objects) and rules for combining them. From a
 small vocabulary and a few rules you can produce an infinite number of
 sentences, including ones nobody has ever spoken.
@@ -60,8 +60,8 @@ Wilkinson asked: *what if charts worked the same way?*
 | Language | Words + grammar rules | Infinitely many sentences |
 | Graphics | Graphical components + combination rules | Infinitely many charts |
 
-Instead of a **catalogue** of chart types — "bar chart," "pie chart,"
-"scatter plot," each a separate special case — Wilkinson proposed a
+Instead of a **catalogue** of chart types, "bar chart," "pie chart,"
+"scatter plot," each a separate special case, Wilkinson proposed a
 small set of **components** that *combine* to produce any chart,
 including ones without a familiar name.
 
@@ -79,27 +79,27 @@ differently the two worldviews answer the same question.
 Read that pie-chart row again. In the chart-type worldview, a pie chart
 and a stacked bar chart are unrelated items on a menu. In the grammar
 worldview, **a pie chart *is* a stacked bar chart in polar
-coordinates** — same data, same statistic, same geometry, only the
+coordinates**, same data, same statistic, same geometry, only the
 *coordinate system* changes. You will build this transformation
 yourself later in the course.
 
 <Callout type="info" title="Why this is powerful">
 When charts are *combinations of components* rather than *named types*,
 you are no longer limited to a menu. You can build any chart the
-components allow — and you can understand any chart by decomposing it
+components allow, and you can understand any chart by decomposing it
 back into its components.
 </Callout>
 
 ## From theory to a tool you can run
 
-Wilkinson's grammar was exactly that — a *theory*. Theories are
+Wilkinson's grammar was exactly that, a *theory*. Theories are
 wonderful, but you cannot run a theory on a data frame. Someone had to
 turn it into a tool real analysts could use. That someone was **Hadley
 Wickham**.
 
 <IllustrationPrompt subject="Hadley Wickham" photo />
 
-In 2005, as a graduate student, Wickham built **ggplot** — a direct
+In 2005, as a graduate student, Wickham built **ggplot**, a direct
 attempt to implement Wilkinson's grammar in R. A couple of years later
 he rewrote it from scratch with a cleaner, more consistent interface.
 That rewrite is **ggplot2**, first released on CRAN in 2007, and it is
@@ -107,7 +107,7 @@ the version everyone uses today. In 2010 he described its design in a
 paper with a perfect title: *"A Layered Grammar of Graphics."*
 
 So the name decodes literally: **gg** for **g**rammar of **g**raphics,
-and **2** because it is the second version — a full rewrite, not a
+and **2** because it is the second version, a full rewrite, not a
 patch. (There is a little more to the "2" story, and to where R itself
 came from, in [Interesting discussions](/courses/mastering-ggplot2/interesting-discussions).)
 
@@ -129,7 +129,7 @@ was an opinionated, ergonomic *way to write them down* in R:
 - A **layered** model, where a plot is built by *adding* layers with
   `+`.
 - Sensible **defaults**, so `geom_histogram()` already knows it must
-  *bin and count* — you do not specify the statistic by hand.
+  *bin and count*, you do not specify the statistic by hand.
 - **Automatic** scales, legends, and axes derived from your mappings,
   so the bookkeeping that base R made you do simply disappears.
 
@@ -145,7 +145,7 @@ Hold the two worldviews side by side:
 
 ## Your first ggplot
 
-Enough theory. Remember the base R scatter from the last page — the one
+Enough theory. Remember the base R scatter from the last page, the one
 that needed a hand-built color table and a hand-built legend? Here is
 the *same chart*, described as components:
 
@@ -169,10 +169,10 @@ Run it. Notice what you did **not** do: no color lookup table, no
 manual legend, no axis math. You declared that `cyl` *maps to* color,
 and ggplot2 produced the colored points **and** a matching legend
 automatically. The legend cannot fall out of sync because you never
-built it — it is a *consequence* of the mapping.
+built it, it is a *consequence* of the mapping.
 
-That habit of mind — state a chart as **data + mappings + layers**, and
-let the drawing follow — is the real skill this course builds. ggplot2
+That habit of mind, state a chart as **data + mappings + layers**, and
+let the drawing follow, is the real skill this course builds. ggplot2
 is how we practice it.
 
 <MultipleChoice
@@ -185,7 +185,7 @@ is how we practice it.
 - [o] It reframed a chart as a structured combination of reusable components instead of a single named chart type chosen from a menu.
   > Components plus combination rules replace a fixed catalogue of chart types.
 - It is a list of every possible chart you are allowed to make.
-  > It is the opposite of a fixed list — a generative system, like grammar in language.
+  > It is the opposite of a fixed list, a generative system, like grammar in language.
 
 Like words and grammar rules generating infinite sentences, graphical
 components and combination rules generate an open-ended space of
@@ -200,12 +200,12 @@ charts.`}
 - A pie chart uses points while a bar chart uses bars.
   > Both use a bar geometry; the difference lies elsewhere.
 - [o] A pie chart is a stacked bar chart drawn in a polar coordinate system instead of a Cartesian one.
-  > Same data, statistic, and geometry — only the coordinate system changes.
+  > Same data, statistic, and geometry, only the coordinate system changes.
 - A pie chart requires a special "pie" statistic that bars do not use.
   > No special statistic is needed; the change is the coordinate system.
 
 Decomposing both charts into components shows they share everything
-except the coordinate system — a perfect illustration of grammar
+except the coordinate system, a perfect illustration of grammar
 thinking.`}
 />
 
@@ -222,7 +222,7 @@ thinking.`}
   > \`factor()\` affects how the variable is treated, but the legend comes from the *mapping*, not from \`factor()\` alone.
 
 Because the legend is generated from the mapping rather than drawn by
-hand, it cannot drift out of sync with the data — the central advantage
+hand, it cannot drift out of sync with the data, the central advantage
 over traditional APIs.`}
 />
 
@@ -233,8 +233,8 @@ over traditional APIs.`}
 - **Hadley Wickham** turned that theory into **ggplot2** (first CRAN
   release 2007; "A Layered Grammar of Graphics," 2010). The name means
   **g**rammar of **g**raphics, version **2**.
-- ggplot2 adds a *layered* syntax (build with `+`) and *smart defaults*
-  — automatic stats, scales, and legends.
+- ggplot2 adds a *layered* syntax (build with `+`) and *smart defaults*,
+automatic stats, scales, and legends.
 - Its defining trait: you describe *what a chart is*; ggplot2 handles
   *how it is drawn*. The legend is a *consequence* of a mapping, so it
   never falls out of sync.

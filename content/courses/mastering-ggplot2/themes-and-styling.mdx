@@ -1,18 +1,18 @@
 ---
 title: Themes and Styling
-description: Themes control everything that is not data — fonts, gridlines, backgrounds, legend placement — through a single, inheritance-based system.
+description: Themes control everything that is not data, fonts, gridlines, backgrounds, legend placement, through a single, inheritance-based system.
 ---
 
 A **theme** controls every part of a plot that is **not tied to the
 data**: the background color, the gridlines, the fonts, the legend
 position, the spacing. Crucially, changing the theme *cannot* change
-what the plot *means* — it only changes how it *looks*. That clean
+what the plot *means*, it only changes how it *looks*. That clean
 separation is itself a grammar idea.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A theme card holding color swatches, gridline strips, and a title-bar token points along a thin gray arrow to a chart wearing all of it — tinted panel, gridlines, title, and styled bars"
+  aria-label="A theme card holding color swatches, gridline strips, and a title-bar token points along a thin gray arrow to a chart wearing all of it, tinted panel, gridlines, title, and styled bars"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -54,9 +54,9 @@ separation is itself a grammar idea.
 
 Every plot is made of two kinds of "ink":
 
-- **Data ink** — the marks that encode data (points, bars, lines).
+- **Data ink**, the marks that encode data (points, bars, lines).
   Controlled by geoms, mappings, and scales.
-- **Non-data ink** — axes, gridlines, background, labels, legend
+- **Non-data ink**, axes, gridlines, background, labels, legend
   styling. Controlled by the **theme**.
 
 The theme owns all of the non-data ink. You can hand the same data plot
@@ -118,7 +118,7 @@ p + theme_classic() # axis lines, no grid -> a traditional look
 
 One function call, the whole appearance changes, the data untouched.
 Other built-ins include `theme_bw()`, `theme_light()`, and
-`theme_void()` (which removes *all* non-data ink — handy for maps).
+`theme_void()` (which removes *all* non-data ink, handy for maps).
 
 ## Fine control with theme()
 
@@ -126,10 +126,10 @@ For surgical tweaks, `theme()` exposes hundreds of individual
 **elements**. You target a named element and set it with an
 `element_*()` helper:
 
-- `element_text()` — text (size, color, face, angle)
-- `element_line()` — lines (gridlines, ticks, axis lines)
-- `element_rect()` — rectangles (backgrounds, legend boxes)
-- `element_blank()` — *remove* the element entirely
+- `element_text()`, text (size, color, face, angle)
+- `element_line()`, lines (gridlines, ticks, axis lines)
+- `element_rect()`, rectangles (backgrounds, legend boxes)
+- `element_blank()`, *remove* the element entirely
 
 <CodeBlock
   adapter="r"
@@ -173,7 +173,7 @@ flowchart TD
 ```
 
 Set the root `text` element's font once, and *every* text element
-inherits it — titles, axis labels, legend text — unless you override a
+inherits it, titles, axis labels, legend text, unless you override a
 specific one:
 
 <CodeBlock
@@ -200,7 +200,7 @@ they say otherwise.
 <Callout type="info" title="Why inheritance matters">
 Inheritance is what lets `theme_minimal(base_size = 16)` resize an
 *entire* plot's text proportionally with one number. Without
-inheritance you would set the size of every text element by hand — the
+inheritance you would set the size of every text element by hand, the
 same drudgery the grammar removed from drawing. The theme system
 applies the grammar's "describe once, propagate everywhere" philosophy
 to styling.
@@ -218,12 +218,12 @@ to styling.
 - The statistical transformation applied to the data.
   > That is the stat component; themes never alter computations.
 
-A theme changes only how the plot *looks*, never what it *means* — the
+A theme changes only how the plot *looks*, never what it *means*, the
 clean data/style separation at the core of the theme system.`}
 />
 
 <MultipleChoice
-  markdown={`You set \`theme(text = element_text(color = "navy"))\` and *all* text — titles, axis labels, legend — turns navy. Why does one setting affect so many elements?
+  markdown={`You set \`theme(text = element_text(color = "navy"))\` and *all* text, titles, axis labels, legend, turns navy. Why does one setting affect so many elements?
 
 - Because \`text\` is a special keyword that recolors the whole image.
   > It is not a global recolor; it is the *root* of the text hierarchy.
@@ -256,8 +256,8 @@ from the theme.`}
 
 ## Key takeaways
 
-- A **theme** controls **non-data ink** — background, gridlines, fonts,
-  legend position — never the data's meaning.
+- A **theme** controls **non-data ink**, background, gridlines, fonts,
+  legend position, never the data's meaning.
 - **Complete themes** (`theme_minimal()`, `theme_classic()`, ...)
   restyle everything in one call.
 - `theme()` plus `element_text/line/rect/blank()` give **per-element**

@@ -9,7 +9,7 @@ you will perform on a DataFrame. Pandas keeps it simple.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A stack of jumbled bars passes along a subtle line and reorders into a neat descending stack with small yellow rank medals beside the leaders — sort_values and rank at work"
+  aria-label="A stack of jumbled bars passes along a subtle line and reorders into a neat descending stack with small yellow rank medals beside the leaders, sort_values and rank at work"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.3">
@@ -71,7 +71,7 @@ print(df.sort_values("salary", ascending=False))
   ]}
 />
 
-Sort by multiple columns — earlier columns take priority:
+Sort by multiple columns, earlier columns take priority:
 
 <CodeBlock
   adapter="python"
@@ -92,7 +92,7 @@ print(df.sort_values(["dept", "salary"], ascending=[True, False]))
   ]}
 />
 
-`sort_values` returns a *new* DataFrame — it does not modify the
+`sort_values` returns a *new* DataFrame, it does not modify the
 original. If you want to overwrite, reassign:
 
 ```python
@@ -117,7 +117,7 @@ print(df.sort_index())
   ]}
 />
 
-This is especially common with time-series data — `df
+This is especially common with time-series data, `df
 .sort_index()` on a DatetimeIndex gives you chronological order.
 
 ## Stable sorts and ties
@@ -238,11 +238,11 @@ print(df)
 The `rank` method has a `method` argument controlling how ties
 are broken:
 
-- `"average"` (default) — tied rows get the average of their
+- `"average"` (default), tied rows get the average of their
   ranks.
-- `"min"` — tied rows all get the lowest rank.
-- `"dense"` — like `"min"` but no gaps between ranks.
-- `"first"` — break ties by original order.
+- `"min"`, tied rows all get the lowest rank.
+- `"dense"`, like `"min"` but no gaps between ranks.
+- `"first"`, break ties by original order.
 
 <CodeBlock
   adapter="python"
@@ -306,7 +306,7 @@ compose into something powerful.
 - Sorts only by department
   > Both keys are active; the second key (\`"salary"\`) determines the order of rows within each department group.
 - [o] Sorts by department ascending; within each department, sorts by salary descending
-  > The two lists are positional — the *n*-th element of \`ascending\` controls the *n*-th sort key.
+  > The two lists are positional, the *n*-th element of \`ascending\` controls the *n*-th sort key.
 - Throws an error
   > Passing a list to \`ascending\` is documented behavior; Pandas requires both lists to have the same length, which they do here.
 
@@ -321,7 +321,7 @@ Multi-column sorts give you fine-grained control of tie-breaking.`}
 - One returns a Series, one a DataFrame
   > Both \`sort_values(...).head(3)\` and \`nlargest(3, ...)\` return a DataFrame.
 - [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
-  > For a top-N query, prefer \`nlargest\`/\`nsmallest\` — the intent is clearer than sort-then-head.
+  > For a top-N query, prefer \`nlargest\`/\`nsmallest\`, the intent is clearer than sort-then-head.
 - \`nlargest\` requires the data to be pre-sorted
   > \`nlargest\` finds the top N values from an unsorted Series or column internally; pre-sorting is not required.
 

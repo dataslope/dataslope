@@ -1,6 +1,6 @@
 ---
 title: Subsetting and Filtering
-description: How to ask a dataset the question "show me only the rows I care about, and only the columns I need" — the everyday operation of data analysis.
+description: How to ask a dataset the question "show me only the rows I care about, and only the columns I need", the everyday operation of data analysis.
 ---
 
 The single most common operation in data analysis is some flavor
@@ -8,14 +8,14 @@ of: **keep some of the rows, keep some of the columns, ignore the
 rest.**
 
 R has more than one way to do this. On this page we'll learn the
-*base R* way — using `[ , ]` — because it builds directly on
+*base R* way, using `[ , ]`, because it builds directly on
 what you already know about vectors. On the next pages we'll meet
 `dplyr`, which gives a more readable syntax for the same ideas.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A translucent window marks a small block of rows and columns inside a faint table, and the lifted copy reappears as its own small table to the right — keep some rows, keep some columns, ignore the rest"
+  aria-label="A translucent window marks a small block of rows and columns inside a faint table, and the lifted copy reappears as its own small table to the right, keep some rows, keep some columns, ignore the rest"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -118,7 +118,7 @@ mtcars[1:5, ]
 # Specific rows by name (mtcars has rownames!)
 mtcars[c("Mazda RX4", "Fiat 128"), ]
 
-# Rows by logical condition — the most useful pattern
+# Rows by logical condition, the most useful pattern
 mtcars[mtcars$mpg > 25, ]
 
 # Combine conditions
@@ -128,8 +128,8 @@ mtcars[mtcars$mpg > 20 & mtcars$cyl == 4, ]
   ]}
 />
 
-The third form — passing a *logical vector* of the same length as
-the number of rows — is the workhorse. Every "filter" you'll ever
+The third form, passing a *logical vector* of the same length as
+the number of rows, is the workhorse. Every "filter" you'll ever
 do is some variation of it.
 
 ## Selecting rows AND columns at once
@@ -190,7 +190,7 @@ right side?"*
 ## A common pitfall: missing values in the condition
 
 If your filter condition involves a column with `NA`s, those rows
-become problematic — `NA > 5` is `NA`, not `FALSE`, and indexing
+become problematic, `NA > 5` is `NA`, not `FALSE`, and indexing
 with `NA` yields a row of all `NA`s.
 
 <CodeBlock
@@ -200,7 +200,7 @@ with `NA` yields a row of all `NA`s.
       filename: "main.r",
       starterCode: `data(airquality)
 
-# Naive filter — includes rows of all NAs!
+# Naive filter, includes rows of all NAs!
 naive <- airquality[airquality$Ozone > 100, ]
 head(naive)
 nrow(naive)
@@ -234,7 +234,7 @@ the helper:
 # Sort by mpg ascending
 head(mtcars[order(mtcars$mpg), c("mpg", "cyl", "wt")])
 
-# Descending — wrap in -
+# Descending, wrap in -
 head(mtcars[order(-mtcars$mpg), c("mpg", "cyl", "wt")])
 
 # By two columns: first cyl ascending, then mpg descending within each
@@ -255,7 +255,7 @@ then use those positions as row indices.
 - \`df[cols, rows]\`
   > The order is reversed here; R follows the row-first, column-second convention from matrix notation, so columns do not come first.
 - [o] \`df[rows, cols]\`
-  > Rows first, columns second — same convention as matrices in mathematics.
+  > Rows first, columns second, same convention as matrices in mathematics.
 - \`df[rows][cols]\`
   > Chaining two separate bracket calls like this does not select rows and then columns; the second bracket would subset the result of the first, which is not a reliable way to filter rows and select columns simultaneously.
 - \`df.rows.cols\`
@@ -278,7 +278,7 @@ then use those positions as row indices.
 <MultipleChoice
   markdown={`Why is \`airquality[airquality$Ozone > 100, ]\` potentially dangerous?
 
-- It's not — it works perfectly.
+- It's not, it works perfectly.
   > The expression silently includes rows where \`Ozone\` is \`NA\` as rows of all-\`NA\` values rather than excluding them, which corrupts downstream analyses.
 - [o] \`Ozone\` contains NAs, and \`NA > 100\` evaluates to NA, which produces rows of all NAs in the result.
   > Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
@@ -340,5 +340,5 @@ if (nrow(heavy_inefficient) != nrow(expected)) stop(sprintf("expected %s rows, g
 />
 
 We've now seen the *bracket* way to wrangle data. It is powerful
-but verbose. The next big topic is **tidy data** — a principle for
+but verbose. The next big topic is **tidy data**, a principle for
 how to *shape* your data so wrangling becomes easy.

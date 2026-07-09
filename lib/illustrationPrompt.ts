@@ -5,7 +5,7 @@
  *
  * Keeping the prompt template AND the semantic-filename logic here means the
  * lesson card, the gallery card, and the deep-link anchor all agree on the
- * exact prompt text and the exact file slug for a given subject — there is one
+ * exact prompt text and the exact file slug for a given subject, there is one
  * source of truth, and no per-instance `name` prop has to be authored into the
  * 100+ MDX call sites.
  *
@@ -88,7 +88,7 @@ function slugify(value: string): string {
 }
 
 /**
- * Semantic file-name stem (no extension) for a subject — e.g.
+ * Semantic file-name stem (no extension) for a subject, e.g.
  * "Leland Wilkinson" → "leland-wilkinson-portrait",
  * "a duck (the DuckDB mascot)…" → "duckdb-duck-mascot".
  *

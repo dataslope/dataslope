@@ -13,13 +13,13 @@ import { discoverPages } from "./_discoverPages";
 // so the spec doesn't have to re-parse MDX. `window.__dsChallenges`
 // hands us a programmatic setFileContent/submit/getTestResults trio
 // so we don't have to round-trip every character through CodeMirror's
-// contenteditable — that pathway is fragile against IME / paste /
+// contenteditable, that pathway is fragile against IME / paste /
 // indent extensions.
 //
 // Pages and per-card runs are slow because each runtime fetches its
 // WASM toolchain from a CDN on first load (browsercc, Pyodide, WebR,
 // php-wasm, pglite, sqlite-wasm). The per-test timeouts in
-// playwright.config.ts already allow for that — we don't need extra
+// playwright.config.ts already allow for that, we don't need extra
 // retry logic here.
 
 type SolutionFilePayload = { filename: string; source: string };
@@ -50,7 +50,7 @@ declare global {
 
 // Default: the per-language/dialect demo pages. Set COURSEWARE=1 to sweep
 // every docs page that embeds a <ChallengeCard> or <SqlChallengeCard>
-// across all courses — a long, opt-in CI run. `path` is the full route.
+// across all courses, a long, opt-in CI run. `path` is the full route.
 const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/challenge-cards-javascript", label: "JavaScript" },
   { path: "/fumadocs-dev/challenge-cards-typescript", label: "TypeScript" },
@@ -202,13 +202,13 @@ async function runOneCard(
 
 test.describe("Challenge solutions", () => {
   for (const { path: pagePath, label } of CHALLENGE_PAGES) {
-    test(`${label} — every challenge solution passes`, async ({ page }) => {
+    test(`${label}, every challenge solution passes`, async ({ page }) => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
       await page.goto(pagePath);
       // Cards register on `window.__dsChallenges` from a `useEffect`
-      // that fires once the React tree commits — wait until at least
+      // that fires once the React tree commits, wait until at least
       // one card has registered before reading the manifest, so we
       // don't race the initial render.
       await page.waitForFunction(
@@ -239,7 +239,7 @@ test.describe("Challenge solutions", () => {
       }
 
       // Anything thrown into pageerror during the sweep is worth
-      // surfacing — it usually means a runtime crashed before its
+      // surfacing, it usually means a runtime crashed before its
       // banner could settle.
       expect(pageErrors, "no uncaught page errors during run").toEqual([]);
     });

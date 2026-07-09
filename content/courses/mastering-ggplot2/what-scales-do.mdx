@@ -1,6 +1,6 @@
 ---
 title: What Scales Do
-description: Scales are the translators between data values and visual values — and the source of every axis and legend in a ggplot.
+description: Scales are the translators between data values and visual values, and the source of every axis and legend in a ggplot.
 ---
 
 Mappings say *which column controls which aesthetic*. **Scales** decide
@@ -67,7 +67,7 @@ flowchart TD
 ## Every aesthetic has a scale
 
 There is one scale per aesthetic in use. You usually never see them
-because ggplot2 adds defaults automatically — but they are always
+because ggplot2 adds defaults automatically, but they are always
 there:
 
 | Aesthetic | Default scale (example) | Visible as |
@@ -83,7 +83,7 @@ Once you see it, you can guess almost any scale function's name.
 
 ## Making a hidden scale visible
 
-These two plots are **identical** — the second just writes out the
+These two plots are **identical**, the second just writes out the
 scale ggplot2 was adding silently:
 
 <CodeBlock
@@ -118,7 +118,7 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 You add a scale explicitly only when you want to **change** something
-its default does — the breaks, the limits, the labels, the
+its default does, the breaks, the limits, the labels, the
 transformation, the palette.
 
 ## Scales control four things
@@ -126,11 +126,11 @@ transformation, the palette.
 A scale governs how data becomes visual *and* how that mapping is
 labeled. Concretely, you reach for a scale to set:
 
-1. **Limits** — the range of data the scale covers.
-2. **Breaks** — where ticks / legend keys appear.
-3. **Labels** — the text at those breaks (e.g. `$1,000` instead of
+1. **Limits**, the range of data the scale covers.
+2. **Breaks**, where ticks / legend keys appear.
+3. **Labels**, the text at those breaks (e.g. `$1,000` instead of
    `1000`).
-4. **Transformation** — e.g. a log scale.
+4. **Transformation**, e.g. a log scale.
 
 <CodeBlock
   adapter="r"
@@ -152,12 +152,12 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 The points did not move in *meaning*; you only changed how the x scale
-*presents* itself — which ticks, with which labels, over which range.
+*presents* itself, which ticks, with which labels, over which range.
 
 <Callout type="info" title="Why this matters conceptually">
 Scales are where "data space" meets "visual space." Keeping this
-component separate means you can completely restyle an axis or legend —
-log-transform it, relabel it, recolor it — *without touching the data,
+component separate means you can completely restyle an axis or legend,
+log-transform it, relabel it, recolor it, *without touching the data,
 the mapping, or the geom.* Each component stays independent.
 </Callout>
 
@@ -183,7 +183,7 @@ visible axis or legend.`}
 - Because \`scale_x_continuous()\` is broken.
   > It works; it simply matches what was already happening.
 - Because scales only affect color, never position.
-  > Position aesthetics (x, y) have scales too — that is exactly what this is.
+  > Position aesthetics (x, y) have scales too, that is exactly what this is.
 - [o] Because ggplot2 was already adding that scale by default; writing it out just makes the implicit default explicit.
   > Every aesthetic gets a default scale; stating it changes nothing until you alter its settings.
 - Because the data has no continuous columns.
@@ -195,11 +195,11 @@ Default scales are added for every aesthetic. You only write a scale to
 
 ## Key takeaways
 
-- **Scales translate data values into visual values** — positions,
-  colors, sizes — and produce the **axes and legends**.
+- **Scales translate data values into visual values**, positions,
+  colors, sizes, and produce the **axes and legends**.
 - There is **one scale per aesthetic**; ggplot2 adds defaults
   automatically, named `scale_<aesthetic>_<type>()`.
 - You add a scale explicitly to change **limits, breaks, labels, or
-  transformations** — or the palette for color/fill.
+  transformations**, or the palette for color/fill.
 - Scales keep "data space" and "visual space" cleanly separated, so you
   can restyle one without touching the others.

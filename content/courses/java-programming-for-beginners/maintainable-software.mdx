@@ -1,11 +1,11 @@
 ---
 title: Writing Maintainable Software
-description: Code is read far more often than it is written — the practices that make programs survive contact with humans (including future you)
+description: Code is read far more often than it is written, the practices that make programs survive contact with humans (including future you)
 ---
 
 A working program is the start of the job, not the end. Real
 software lives for years and is read, modified, and extended by
-many people — often including a future version of yourself who has
+many people, often including a future version of yourself who has
 forgotten how it works. **Maintainability** is the property of code
 that survives this reality gracefully.
 
@@ -16,7 +16,7 @@ about *taste*.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A workshop shadow board: two tools hang exactly on their outlines while a third floats back toward the empty silhouette that shows where it belongs — maintainable code keeps everything in its place"
+  aria-label="A workshop shadow board: two tools hang exactly on their outlines while a third floats back toward the empty silhouette that shows where it belongs, maintainable code keeps everything in its place"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.07">
@@ -116,9 +116,9 @@ Compare two versions of the same logic.
 
 Version B is longer. It is also *much* easier to:
 
-- Read — each line says what it does.
-- Test — each helper can be tested in isolation.
-- Change — moving from a 10% discount to a 15% discount is a
+- Read, each line says what it does.
+- Test, each helper can be tested in isolation.
+- Change, moving from a 10% discount to a 15% discount is a
   one-line change in a method named for that exact rule.
 
 ## Names tell the story
@@ -166,7 +166,7 @@ One `OrderManager` that does too much splits into a focused class per job:
 You don't have to split early. But when you notice the "and" in
 your description, refactor toward focused classes.
 
-## DRY — but not over-DRY
+## DRY, but not over-DRY
 
 "Don't Repeat Yourself." If the *same logic* appears in three
 places, a bug-fix has to be made three times. Extract it.
@@ -324,7 +324,7 @@ month the marketing team says "make shipping free above $40" or
   > Naming is a side effect.
 - It needs more methods
   > It needs fewer responsibilities, not more methods.
-- [o] It is doing too many unrelated things — the word "and" in its description hints that it should be split into several focused classes
+- [o] It is doing too many unrelated things, the word "and" in its description hints that it should be split into several focused classes
   > Each responsibility (parse, validate, save, email) belongs in its own focused class.
 - It should be made \`abstract\`
   > Abstractness doesn't address the responsibility problem.`}
@@ -333,5 +333,5 @@ month the marketing team says "make shipping free above $40" or
 Writing software that other people (including yourself in six
 months) can change happily is a slow-built skill. The exercises in
 the rest of this course quietly practice it. Next we move from
-*how to write* code to *what code* — the classic **algorithms and
+*how to write* code to *what code*, the classic **algorithms and
 data structures** that every programmer should at least recognize.

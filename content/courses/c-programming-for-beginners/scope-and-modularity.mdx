@@ -6,8 +6,8 @@ description: Where names live, and how to split a real program across multiple f
 A program of any size eventually becomes too big to fit comfortably
 in one file. To grow, you need two skills:
 
-1. **Scope** — understanding *where* a name is visible.
-2. **Modularity** — splitting the program into pieces that hide
+1. **Scope**, understanding *where* a name is visible.
+2. **Modularity**, splitting the program into pieces that hide
    their internals from each other.
 
 These are the engineering disciplines that turn working code into
@@ -64,11 +64,11 @@ int main(void) {
 
 Three levels of scope appear above:
 
-- **File scope** — declared outside any function. Visible from the
+- **File scope**, declared outside any function. Visible from the
   declaration to the end of the file. `g` above.
-- **Function / block scope** — declared inside `{ ... }`. Visible
+- **Function / block scope**, declared inside `{ ... }`. Visible
   only until the matching closing brace. `x` and `y`.
-- **Function-parameter scope** — parameters behave like local
+- **Function-parameter scope**, parameters behave like local
   variables in the function body.
 
 <CodeBlock
@@ -149,7 +149,7 @@ will hammer this point home in the chapter on pointers.
 ## `static`: keeping a local across calls
 
 Sometimes you want a local variable that *remembers* its value
-across calls — a counter, perhaps. Prefix it with `static`.
+across calls, a counter, perhaps. Prefix it with `static`.
 
 <CodeBlock
   adapter="c"
@@ -295,7 +295,7 @@ Several rules of the craft are visible here:
   multiple times safely.
 
 If you later replaced `stats.c` with a faster implementation,
-nothing in `main.c` would need to change — as long as the header
+nothing in `main.c` would need to change, as long as the header
 contract stayed the same. That is the power of modularity.
 
 ## A challenge: split a calculator across files
@@ -368,11 +368,11 @@ int multiply(int a, int b) { return a * b; }
 - It makes the variable read-only.
   > \`const\` makes a variable read-only, not \`static\`. A \`static\` local variable can be both read and written; it simply persists between calls.
 - It makes the variable visible to all functions in the file.
-  > \`static\` at file scope restricts visibility to the file, but \`static\` inside a function does not change the variable's scope — it remains accessible only within that function.
+  > \`static\` at file scope restricts visibility to the file, but \`static\` inside a function does not change the variable's scope, it remains accessible only within that function.
 - [o] It gives the variable a single, persistent storage location that retains its value across calls to the function.
   > \`static\` inside a function changes the variable's *lifetime* (whole program) and *initialization rules* (initialized once), but its *scope* is still that one function.
 - It causes the variable to be initialized every time the function is called.
-  > A \`static\` local is initialized only once — the first time the function is called — and retains its value thereafter. Ordinary (non-static) locals are initialized each call.
+  > A \`static\` local is initialized only once, the first time the function is called, and retains its value thereafter. Ordinary (non-static) locals are initialized each call.
 
 Compare two ideas: \`static\` *inside* a function gives a long lifetime + local scope. \`static\` *outside* any function (at file scope) restricts the linkage to the current file.`}
 />
@@ -387,7 +387,7 @@ Compare two ideas: \`static\` *inside* a function gives a long lifetime + local 
 - [o] The local variable's memory is reclaimed when the function returns, so the pointer is left pointing at memory that may be overwritten at any time.
   > Local variables live on the stack. Once the function returns, that stack space is reused by the next call. Reading or writing through the returned pointer is undefined behavior.
 - C functions cannot return any kind of pointer.
-  > Functions can and regularly do return pointers — to heap memory, globals, or caller-supplied buffers. The restriction is only on returning pointers to the function's own local variables.
+  > Functions can and regularly do return pointers, to heap memory, globals, or caller-supplied buffers. The restriction is only on returning pointers to the function's own local variables.
 
-Functions can absolutely return pointers — to globals, to data on the heap (\`malloc\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}
+Functions can absolutely return pointers, to globals, to data on the heap (\`malloc\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}
 />

@@ -1,12 +1,12 @@
 /**
  * One share link.
  *
- * GET    /api/shares/:id — public metadata (the /s/:id page + open-a-copy
+ * GET    /api/shares/:id, public metadata (the /s/:id page + open-a-copy
  *                          flow). Expired links 404. A view refreshes the
- *                          free-tier inactivity clock (throttled — hot links
+ *                          free-tier inactivity clock (throttled, hot links
  *                          don't turn every read into a D1 write).
- * DELETE /api/shares/:id — revoke; owner only. Guest shares have no owner and
- *                          can't be revoked — they age out on their fixed TTL.
+ * DELETE /api/shares/:id, revoke; owner only. Guest shares have no owner and
+ *                          can't be revoked, they age out on their fixed TTL.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

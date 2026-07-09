@@ -3,7 +3,7 @@ title: Approximation and Error
 description: Truncation, discretization, and the art of trading one source of error for another
 ---
 
-Most quantities a scientist wants to compute are *limits* — derivatives,
+Most quantities a scientist wants to compute are *limits*, derivatives,
 integrals, infinite series, fixed points. A computer can only afford
 a *finite* version of a limit. Numerical analysis is largely the
 study of how to choose that finite version so the answer is good
@@ -17,7 +17,7 @@ how to think about the *order* of convergence of a method.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two translucent error wedges crossing in an X — truncation falling as round-off rises — with a dotted total-error curve and a green dot marking the sweet spot at the crossing"
+  aria-label="Two translucent error wedges crossing in an X, truncation falling as round-off rises, with a dotted total-error curve and a green dot marking the sweet spot at the crossing"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor">
@@ -49,7 +49,7 @@ how to think about the *order* of convergence of a method.
 ## Truncation vs round-off
 
 Pick any approximation parameter $h$ that controls the
-"resolution" — a step size, the number of terms in a series, the
+"resolution", a step size, the number of terms in a series, the
 spacing of a grid. Then the total error of a method usually has
 two contributions:
 
@@ -119,7 +119,7 @@ Theoretical analysis says the sweet spots are roughly:
 | Richardson extrapolation | $O(h^4)$ and higher | larger | even smaller |
 
 A higher-order method gives you more accuracy *and* lets you use a
-larger $h$ — a double win, paid for with a slightly more complex
+larger $h$, a double win, paid for with a slightly more complex
 update formula.
 
 ## Convergence and order

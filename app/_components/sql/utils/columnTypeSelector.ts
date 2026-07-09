@@ -1,7 +1,7 @@
 /** Helpers shared by the column-type pickers in the Modify Structure
  *  drawers across SQL dialects. They keep the picker honest about the
  *  column's *current* type even when that type isn't one of the built-in
- *  presets — e.g. a Postgres `character varying(15)`, a `varchar(15)`, or a
+ *  presets, e.g. a Postgres `character varying(15)`, a `varchar(15)`, or a
  *  DuckDB `DECIMAL(10,2)` introspected from an existing table. */
 
 /** A labelled group of built-in type strings, as rendered by the Postgres
@@ -19,7 +19,7 @@ export interface ColumnTypeGroup {
  *  column's committed type, opening the list (via the chevron or focus)
  *  should reveal every group so all types stay browsable.
  *
- *  A value counts as the "committed type" — not a search fragment —
+ *  A value counts as the "committed type", not a search fragment,
  *  whenever the input still equals it, *including* custom or parameterized
  *  types that are absent from the built-in list (`character varying(15)`,
  *  `varchar(15)`, `DECIMAL(10,2)`, …). Previously only exact matches in the

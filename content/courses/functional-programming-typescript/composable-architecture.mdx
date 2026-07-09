@@ -1,6 +1,6 @@
 ---
 title: Composable Architecture
-description: Designing systems as a pure core surrounded by thin adapters — and the architectural style functional thinking naturally produces.
+description: Designing systems as a pure core surrounded by thin adapters, and the architectural style functional thinking naturally produces.
 ---
 
 The chapters so far have given you a toolbox. Now we'll talk about
@@ -12,7 +12,7 @@ differ; the idea is the same.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A walled keep holds orderly blue dots inside; scattered effect shapes wait outside and a dotted queue passes through the single gate in the wall — a pure core that touches the world through one controlled opening"
+  aria-label="A walled keep holds orderly blue dots inside; scattered effect shapes wait outside and a dotted queue passes through the single gate in the wall, a pure core that touches the world through one controlled opening"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -75,8 +75,8 @@ core's output back out.
 Two rules carry the whole architecture:
 
 1. **Effects live at the edge.** Database calls, HTTP requests,
-   filesystem access, time, randomness — everything that touches
-   the outside world — happens in the shell. The core is given
+   filesystem access, time, randomness, everything that touches
+   the outside world, happens in the shell. The core is given
    data; it doesn't go fetch it.
 2. **Decisions live in the core.** No important business decision
    is made in the shell. The shell only knows "call this pure
@@ -93,11 +93,11 @@ business logic gets tested in microseconds.
 
 **Replaceability.** The shell is *boring* and *replaceable*. You
 can swap PostgreSQL for SQLite, REST for GraphQL, Express for
-Fastify — without touching the core. The core only knows about
+Fastify, without touching the core. The core only knows about
 your *domain*, not your *infrastructure*.
 
 **Reasoning.** When a bug appears in business logic, you don't
-have to think about "did the network glitch?" — the logic is
+have to think about "did the network glitch?", the logic is
 pure. The bug is in the function, end of story.
 
 **Evolution.** New requirements usually live in the core. You add
@@ -188,7 +188,7 @@ handler();
 Notice how easy it is to test `summarize`: it's a pure function
 of `(today, invoices) → Summary`. No mocks, no setup, no
 teardown. The shell's `handler` is so thin that almost any bug it
-could contain is "I passed the wrong thing in" — easy to spot.
+could contain is "I passed the wrong thing in", easy to spot.
 
 ## The "ports and adapters" view
 
@@ -200,17 +200,17 @@ real systems (a Postgres adapter, an in-memory adapter for tests,
 a REST adapter, etc.).
 
 ```ts
-// PORT — defined by the core, language: domain
+// PORT, defined by the core, language: domain
 type InvoiceRepo = {
   list: (customerId: string) => Promise<ReadonlyArray<Invoice>>;
 };
 
-// ADAPTER — lives in the shell, language: infrastructure
+// ADAPTER, lives in the shell, language: infrastructure
 const sqlInvoiceRepo: InvoiceRepo = {
   list: async (customerId) => /* SELECT ... */ [],
 };
 
-// The core function takes the port as a parameter — it doesn't
+// The core function takes the port as a parameter, it doesn't
 // care which adapter is wired in
 async function customerSummary(repo: InvoiceRepo, customerId: string, today: string) {
   const invoices = await repo.list(customerId);
@@ -219,7 +219,7 @@ async function customerSummary(repo: InvoiceRepo, customerId: string, today: str
 ```
 
 You can swap `sqlInvoiceRepo` for an in-memory test repo with one
-line — no code in the core knows or cares.
+line, no code in the core knows or cares.
 
 ## Composing pipelines as architecture
 
@@ -248,7 +248,7 @@ to a hundred-thousand-line system without changing shape.
   adapter="typescript"
   title="Split a single function into core and shell"
   instructions={`The starter has a function \`reportTopSpender\`
-that does everything — it reads orders from a hardcoded array,
+that does everything, it reads orders from a hardcoded array,
 computes a top spender, formats a string, and \`console.log\`s it.
 
 Refactor it: in \`core.ts\`, write a pure function

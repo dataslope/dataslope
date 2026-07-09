@@ -3,14 +3,14 @@ title: Indexes and Labels
 description: The index is Pandas's quiet superpower. Understand it once and half of the library makes sense at once.
 ---
 
-Every Series has an index. Every DataFrame has two — one for
+Every Series has an index. Every DataFrame has two, one for
 rows, one for columns. Indexes look decorative ("0, 1, 2, 3 ...")
 until you realize they are doing real work behind the scenes.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Two rows of cells with little label tags between them; matching tags connect by straight vertical lines except one crossed pair — pandas lines values up by label, not by position"
+  aria-label="Two rows of cells with little label tags between them; matching tags connect by straight vertical lines except one crossed pair, pandas lines values up by label, not by position"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -56,7 +56,7 @@ label, and you can ask Pandas to fetch values *by label* rather
 than *by position*.
 
 By default, when you create a DataFrame, the row index is a
-boring `RangeIndex` of integers — 0, 1, 2, 3 — and the column
+boring `RangeIndex` of integers, 0, 1, 2, 3, and the column
 index is the list of column names.
 
 <CodeBlock
@@ -81,7 +81,7 @@ print("Column index:", df.columns)
   ]}
 />
 
-You can replace the default index with something meaningful —
+You can replace the default index with something meaningful,
 typically a real identifier:
 
 <CodeBlock
@@ -164,7 +164,7 @@ We will see `loc` in depth in the *loc vs iloc* chapter.
 Many `merge` and `join` operations use the index as the key.
 A well-designed index makes joins trivial.
 
-## Time series indexes — the killer use case
+## Time series indexes, the killer use case
 
 The index really earns its keep when it represents a *time
 series*. A DatetimeIndex unlocks a whole subspace of Pandas
@@ -197,7 +197,7 @@ print(prices.rolling(3).mean())
 />
 
 Slicing a date range like this, computing rolling windows,
-resampling to weekly/monthly — all of these become trivial with
+resampling to weekly/monthly, all of these become trivial with
 a DatetimeIndex, and all of them are awkward without one.
 
 ## Resetting the index
@@ -237,7 +237,7 @@ You will reach for `reset_index()` constantly after a `groupby`,
 because group-by results have the grouping column promoted into
 the index.
 
-## MultiIndex — labels with multiple levels
+## MultiIndex, labels with multiple levels
 
 An index can have multiple levels. This is how Pandas
 represents grouped results when you group by more than one
@@ -275,7 +275,7 @@ MultiIndexes are powerful but get confusing fast. A common
 pattern is to do the heavy lifting with a MultiIndex and then
 `reset_index()` back to a flat DataFrame for further work.
 
-## Index vs column — which should it be?
+## Index vs column, which should it be?
 
 A useful rule of thumb:
 
@@ -296,7 +296,7 @@ and demoting via `set_index` / `reset_index` is cheap.
   > The default index is a \`RangeIndex\` of sequential integers, not a copy of any data column.
 - All NaN
   > An all-NaN index would only occur if you explicitly constructed one that way; the default is a \`RangeIndex\` of sequential integers.
-- [o] A \`RangeIndex\` — integers 0, 1, 2, ... corresponding to row positions
+- [o] A \`RangeIndex\`, integers 0, 1, 2, ... corresponding to row positions
   > Unless you specify \`index=\`, Pandas gives you boring sequential integers.
 - A timestamp
   > A timestamp index (\`DatetimeIndex\`) is possible but requires explicit construction; the default is a plain integer \`RangeIndex\`.
@@ -311,7 +311,7 @@ You can replace the default later with anything meaningful.`}
   > The value of a \`DatetimeIndex\` is its analytical capabilities, not its visual appearance in output.
 - It is required by Pandas
   > Pandas works with any index type; a \`DatetimeIndex\` is optional but unlocks a rich set of time-series operations.
-- [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups — operations that are awkward with plain integer indexes
+- [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups, operations that are awkward with plain integer indexes
   > A DatetimeIndex is the gateway to most of Pandas's time-series features.
 - It makes the data sorted automatically
   > A \`DatetimeIndex\` does not sort data automatically; you still need to call \`sort_index()\` if you need chronological order.
@@ -331,5 +331,5 @@ Time-series indexing is a great example of the value of *labeled* axes.`}
 - Renames the columns
   > Column renaming is done with \`rename(columns=...)\`; \`reset_index()\` moves the *row* index to a column, leaving column names otherwise unchanged.
 
-Knowing both directions — promote and demote — keeps you in control of where your labels live.`}
+Knowing both directions, promote and demote, keeps you in control of where your labels live.`}
 />

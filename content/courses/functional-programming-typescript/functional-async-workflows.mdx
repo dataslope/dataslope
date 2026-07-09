@@ -3,7 +3,7 @@ title: Functional Async Workflows
 description: Tasks, lazy promises, and composing asynchronous computations with `map`, `chain`, and `Result`.
 ---
 
-JavaScript's `Promise` is a good citizen of the FP world — *almost*.
+JavaScript's `Promise` is a good citizen of the FP world, *almost*.
 `Promise<A>` represents "an `A` that will arrive later". Its
 `.then` is roughly `map` (when the callback returns a value) and
 `flatMap` (when the callback returns another `Promise`). Once you
@@ -22,12 +22,12 @@ type Task<A> = () => Promise<A>;
 A `Task` is a *recipe* for an async computation. Building one does
 nothing; calling it (`task()`) actually kicks off the work. This
 is the same trick as [`IO<A>`](./effect-management) from the last
-chapter — laziness for composability.
+chapter, laziness for composability.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A coiled spiral of blue dots sits wound like a spring; past a yellow trigger dot it unrolls into a straight timeline whose green dots arrive farther and farther apart until one large final value — a Task is an async recipe that runs only when called"
+  aria-label="A coiled spiral of blue dots sits wound like a spring; past a yellow trigger dot it unrolls into a straight timeline whose green dots arrive farther and farther apart until one large final value, a Task is an async recipe that runs only when called"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -165,7 +165,7 @@ steps in parallel).
 ## Tasks that can fail: `TaskResult<E, A>`
 
 Promises model "an A that will arrive". `Result` models "an A or
-an error". Combining them gives **`TaskResult`** — the type that
+an error". Combining them gives **`TaskResult`**, the type that
 shows up in most real applications:
 
 ```ts
@@ -173,7 +173,7 @@ type TaskResult<E, A> = () => Promise<Result<E, A>>;
 ```
 
 A `TaskResult` is a recipe for an async computation that *either*
-succeeds with an `A` or fails with an `E` — and rejections from
+succeeds with an `A` or fails with an `E`, and rejections from
 the underlying promise are *not* part of the success channel.
 
 <CodeBlock
@@ -230,14 +230,14 @@ const program2 = mapTR(fetchUser("missing"), greet);
   ]}
 />
 
-The chain doesn't blow up on failure — it short-circuits as a
+The chain doesn't blow up on failure, it short-circuits as a
 *value*. You decide what to do with the `err` at the very end,
 where the result is rendered.
 
 ## Comparing imperative and functional async
 
 ```ts
-// Imperative async — control flow tangled with happy/sad paths
+// Imperative async, control flow tangled with happy/sad paths
 async function loadDashboard(uid: string) {
   let user, settings, projects;
   try { user = await fetchUser(uid); }     catch (e) { handle(e); return; }
@@ -246,14 +246,14 @@ async function loadDashboard(uid: string) {
   return { user, settings, projects };
 }
 
-// Functional async — happy path reads top-to-bottom
+// Functional async, happy path reads top-to-bottom
 const loadDashboard = (uid: string) =>
   chainTR(fetchUser(uid),     (user) =>
   chainTR(fetchSettings(uid), (settings) =>
   mapTR  (fetchProjects(uid), (projects) => ({ user, settings, projects }))));
 ```
 
-The functional version reads as one long sequence of "and then" —
+The functional version reads as one long sequence of "and then",
 the error handling has been *moved out of the code's body* into
 the structure of the type itself.
 
@@ -271,7 +271,7 @@ the structure of the type itself.
    Hello, <name>! Preferred language: <lang>.
    \`\`\`
 
-Use \`chainTR\` and \`mapTR\` — **no try/catch, no if/else for
+Use \`chainTR\` and \`mapTR\`, **no try/catch, no if/else for
 errors**. Errors must propagate via the Result channel.
 
 **Expected output**
@@ -411,10 +411,10 @@ export function run(userId: string): TaskResult<string, string> {
   markdown={`Why might you prefer \`Task<A> = () => Promise<A>\` over a bare \`Promise<A>\` in functional code?
 
 - Tasks are faster than Promises at runtime
-  > They wrap the same primitive — performance is essentially identical.
+  > They wrap the same primitive, performance is essentially identical.
 - Tasks can hold synchronous values, Promises can't
   > Both can hold synchronous values; \`Promise.resolve(x)\` is fine.
-- [o] A \`Task\` is *lazy* — building one does no work, so you can compose, retry, parallelize, or substitute it without accidentally kicking off the computation
+- [o] A \`Task\` is *lazy*, building one does no work, so you can compose, retry, parallelize, or substitute it without accidentally kicking off the computation
   > A \`Promise\` starts running the moment it's created; that's not always what you want when composing. A \`Task\` is a recipe you choose when to run.
 - Tasks cannot fail
   > They certainly can; you usually pair them with \`Result\` (as \`TaskResult<E, A>\`) for typed failure.

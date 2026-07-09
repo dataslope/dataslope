@@ -1,11 +1,11 @@
 ---
 title: Scripts and Projects
-description: A single .R file is a script. A folder full of related scripts, data, and outputs is a project. Treating analysis as a project — not a notebook of one-off commands — is what makes it reproducible.
+description: A single .R file is a script. A folder full of related scripts, data, and outputs is a project. Treating analysis as a project, not a notebook of one-off commands, is what makes it reproducible.
 ---
 
 In an interactive console, you can do anything. Type a command,
 inspect a result, type another. That's wonderful for
-exploration — and terrible for *reproducing* an analysis a week,
+exploration, and terrible for *reproducing* an analysis a week,
 a month, or a year later.
 
 The remedy is to treat your work as a **project**: a folder on
@@ -16,7 +16,7 @@ ways anyone (including future-you) can re-run.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="One folder holds three tidy cards — a blue script of code lines, a yellow card of data cells, and a green card of result bars — an analysis organized as a project anyone can re-run"
+  aria-label="One folder holds three tidy cards, a blue script of code lines, a yellow card of data cells, and a green card of result bars, an analysis organized as a project anyone can re-run"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -142,7 +142,7 @@ source("R/04-plot.R")
 cat("Done!\n")
 ```
 
-Now you have a single command — `Rscript run-all.R` — that
+Now you have a single command, `Rscript run-all.R`, that
 reproduces the entire analysis from raw data to final outputs.
 
 ## Working directory & paths
@@ -178,10 +178,10 @@ Relative paths + a consistent project root = portable code.
 ## Bringing scripts into a notebook with R Markdown / Quarto
 
 R Markdown (`.Rmd`) and its successor **Quarto** (`.qmd`) let
-you mix prose, code, and outputs in one document — perfect for
+you mix prose, code, and outputs in one document, perfect for
 analyses you want to share as readable reports.
 
-A tiny Quarto-style example (don't run this — it's just the
+A tiny Quarto-style example (don't run this, it's just the
 flavor):
 
 ````markdown
@@ -238,9 +238,9 @@ A frequent source of broken analyses: "I updated dplyr and now
 my code doesn't work." The standard fix is to **pin** package
 versions per project. Two common tools:
 
-- **`renv`** — creates a project-local library and a lockfile
+- **`renv`**, creates a project-local library and a lockfile
   (`renv.lock`) with exact package versions.
-- **`packrat`** — older predecessor of `renv`.
+- **`packrat`**, older predecessor of `renv`.
 
 A typical workflow:
 
@@ -264,7 +264,7 @@ When you finish a project, run through this list:
 4. ☐ Are there no hard-coded absolute paths?
 5. ☐ Are package versions pinned (renv, DESCRIPTION) or at
    least listed in the README?
-6. ☐ Are outputs (plots, tables) regenerated from scripts — not
+6. ☐ Are outputs (plots, tables) regenerated from scripts, not
    hand-edited?
 7. ☐ Is the project under version control?
 
@@ -279,10 +279,10 @@ can develop.
 
 - They're owned by the OS.
   > File system ownership is unrelated to this convention; the reason is analytical, not technical.
-- [o] Raw data is the immutable ground truth — preserving it means anyone can re-derive every cleaned output by re-running scripts, and accidental edits can't silently corrupt your analysis.
+- [o] Raw data is the immutable ground truth, preserving it means anyone can re-derive every cleaned output by re-running scripts, and accidental edits can't silently corrupt your analysis.
   > Treat raw data as read-only.
 - R can't write to that folder.
-  > R has no built-in restriction on writing to \`data/raw/\` — the convention is enforced by discipline, not by the file system.
+  > R has no built-in restriction on writing to \`data/raw/\`, the convention is enforced by discipline, not by the file system.
 - It's a tradition with no real reason.
   > The reason is reproducibility: if the raw file changes, you can no longer verify that your cleaned outputs match the original source.`}
 />
@@ -292,10 +292,10 @@ can develop.
 
 - It's longer to type.
   > Path length is irrelevant; a short absolute path is just as broken on another machine as a long one.
-- [o] It won't work on anyone else's machine (or even yours, after you reorganize your files) — relative paths anchored to the project root are portable.
+- [o] It won't work on anyone else's machine (or even yours, after you reorganize your files), relative paths anchored to the project root are portable.
   > Portability matters even if "anyone else" is just future-you.
 - R can't read Windows paths.
-  > R can read Windows-style paths using forward slashes or \`\\\\\` — the portability problem is that the path references a specific user's directory, not a path format issue.
+  > R can read Windows-style paths using forward slashes or \`\\\\\`, the portability problem is that the path references a specific user's directory, not a path format issue.
 - It only works for CSV files.
   > The problem applies to every file type; a hard-coded path to a PNG or an RDS file is equally broken on another machine.`}
 />
@@ -306,7 +306,7 @@ can develop.
 - They speed up script execution.
   > \`renv\` and \`packrat\` manage package versions and project-local libraries; they have no effect on script execution speed.
 - [o] They record the exact package versions a project uses, so the analysis can be reliably re-run later even after packages on CRAN have changed.
-  > Reproducibility doesn't end at code — it includes the environment around it.
+  > Reproducibility doesn't end at code, it includes the environment around it.
 - They replace base R.
   > These tools sit on top of base R and manage the project library; they do not change or remove any base R functionality.
 - They make scripts run in parallel.
@@ -318,10 +318,10 @@ can develop.
 Imagine you're starting an analysis that pulls daily stock-price
 data from a CSV, computes monthly returns, and produces a chart.
 **Without writing any code,** sketch (in plain text or comments)
-the directory structure you'd create — folder names, file names,
+the directory structure you'd create, folder names, file names,
 and what each script does.
 
-There's no automated test for this one — but a good sketch would
+There's no automated test for this one, but a good sketch would
 include:
 
 - `data/raw/` and `data/processed/` folders

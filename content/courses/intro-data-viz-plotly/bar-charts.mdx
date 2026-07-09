@@ -1,17 +1,17 @@
 ---
 title: Bar Charts
-description: The everyday workhorse — when bars are the right answer and when they aren't
+description: The everyday workhorse, when bars are the right answer and when they aren't
 ---
 
 The **bar chart** is the most-used chart type in the world for a
 reason: it answers the most common question in business and
-science — *how do these categories compare?* — using the most
+science, *how do these categories compare?*, using the most
 accurate encoding the human eye has access to.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Rounded bars rise from a shared baseline; a dotted reference line runs from the tallest green bar across the others, and a yellow arrow measures one gap — bars exist to be compared"
+  aria-label="Rounded bars rise from a shared baseline; a dotted reference line runs from the tallest green bar across the others, and a yellow arrow measures one gap, bars exist to be compared"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="90" y="200" width="460" height="4" rx="2" fill="currentColor" opacity="0.2" />
@@ -178,7 +178,7 @@ fig.show()
 />
 
 The pattern: `orientation="h"` plus swap the x and y arguments.
-Notice the bars are sorted *ascending* — for horizontal bars, that
+Notice the bars are sorted *ascending*, for horizontal bars, that
 puts the largest at the top, which matches how we read top-to-
 bottom.
 
@@ -215,7 +215,7 @@ fig.show()
   ]}
 />
 
-`category_orders={...}` is a small but invaluable trick — it forces
+`category_orders={...}` is a small but invaluable trick, it forces
 the days into chronological order instead of alphabetical.
 
 ## Stacked bars: parts of a whole, across categories
@@ -281,7 +281,7 @@ comparison is the main point, use grouped bars instead.
 1. Count the penguins per \`island\` and put the result in a DataFrame \`counts\` with two columns: \`island\` and \`n\`. (Hint: \`penguins["island"].value_counts()\` then \`.reset_index()\`, or a \`groupby\`.)
 2. Build a bar chart \`fig\` with \`px.bar\`, \`x="island"\` and \`y="n"\`, using \`template="simple_white"\`.
 
-The default y-axis already starts at zero — leave it there.`}
+The default y-axis already starts at zero, leave it there.`}
   files={[
     {
       filename: "main.py",
@@ -361,7 +361,7 @@ assert rng is None or rng[0] <= 0, "leave the bar y-axis starting at zero"`,
 - [o] For comparing a quantitative value across a small-to-medium number of discrete categories.
   > Bar charts use length-on-a-common-scale to encode quantity, which is one of the most accurate visual encodings. They're ideal when "how do these categories compare?" is the question.
 - For comparing two quantitative variables.
-  > Comparing two quantitative variables — to see if they are related — calls for a scatter plot, which places both variables on position axes. A bar chart requires one categorical and one quantitative axis.
+  > Comparing two quantitative variables, to see if they are related, calls for a scatter plot, which places both variables on position axes. A bar chart requires one categorical and one quantitative axis.
 
 For time use a line chart; for distributions use a histogram; for two-variable relationships use a scatter plot.`}
 />
@@ -388,25 +388,25 @@ Two exceptions: categories with a natural order (months, sizes) and time-based c
   > Saving space by cutting the y-axis is a poor trade-off: it breaks the visual contract that bar length represents the full magnitude from zero, causing readers to overestimate differences.
 - Required for log-scale data.
   > Log scales change the spacing between values, but they do not require a non-zero baseline. Truncating a bar chart's y-axis is a separate design choice and is not needed for log-scale axes.
-- [o] Misleading — bar length encodes magnitude *relative to zero*, so truncating exaggerates small differences and can mislead readers.
-  > This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable — for bar charts, almost never.
+- [o] Misleading, bar length encodes magnitude *relative to zero*, so truncating exaggerates small differences and can mislead readers.
+  > This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable, for bar charts, almost never.
 - The default behavior in Plotly Express.
   > Plotly Express sets the y-axis to start at zero by default for bar charts. Truncating the axis is something a developer would have to configure explicitly, so this is the opposite of the default.
 
-If you want to emphasize a small difference, use a line chart or a dot plot — not a truncated bar chart.`}
+If you want to emphasize a small difference, use a line chart or a dot plot, not a truncated bar chart.`}
 />
 
 <MultipleChoice
   markdown={`When should you use **horizontal** bars (**orientation="h"**) instead of vertical?
 
 - When you have fewer than 5 categories.
-  > The number of categories is not a criterion for orientation — what matters is label length and readability. Short labels work fine vertically even with many categories; it is long labels that make horizontal orientation necessary.
+  > The number of categories is not a criterion for orientation, what matters is label length and readability. Short labels work fine vertically even with many categories; it is long labels that make horizontal orientation necessary.
 - When you have more than 100 categories.
   > Even with many categories, 100 bars are hard to read regardless of orientation. Beyond a practical limit, filtering to a top-N is better advice. Orientation choice is driven by label length, not category count alone.
 - [o] When category labels are long, or when you have many categories that would otherwise crowd the x-axis.
   > Horizontal bars let the labels sit comfortably to the left of each bar, no rotation needed. They also let you stack a lot of categories vertically without crowding.
 - Whenever the data is sorted.
-  > Sorting bars by value is a best practice for both vertical and horizontal orientations. Sorting alone is not a reason to switch to horizontal — the choice is about label readability, not sort order.
+  > Sorting bars by value is a best practice for both vertical and horizontal orientations. Sorting alone is not a reason to switch to horizontal, the choice is about label readability, not sort order.
 
 A horizontal layout is often the small change that turns a cluttered chart into a readable one.`}
 />

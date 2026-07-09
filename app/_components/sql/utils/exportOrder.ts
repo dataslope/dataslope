@@ -3,7 +3,7 @@
  *  A dump that emits `CREATE TABLE` with *inline* `FOREIGN KEY … REFERENCES`
  *  constraints (as the Postgres and DuckDB exporters do) only re-imports if
  *  every referenced table is created before the table that references it.
- *  Emitting tables in catalog/alphabetical order breaks this — e.g. `cards`
+ *  Emitting tables in catalog/alphabetical order breaks this, e.g. `cards`
  *  references `users`, but sorts first, so the import fails with
  *  `relation "users" does not exist`.
  *
@@ -40,7 +40,7 @@ export function topoSortByForeignKeys(
  *  column's declared type so the literal re-imports cleanly.
  *
  *  The adapters flatten some values in a way that's fine for display but wrong
- *  as a raw literal — most importantly booleans are coerced to `0`/`1`, which
+ *  as a raw literal, most importantly booleans are coerced to `0`/`1`, which
  *  Postgres rejects for a `boolean` column ("expression is of type integer").
  *  Booleans are therefore emitted as `TRUE`/`FALSE` based on the column type;
  *  numbers pass through; binary becomes a `'\x…'` hex literal; everything else

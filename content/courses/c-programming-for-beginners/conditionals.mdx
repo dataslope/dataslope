@@ -1,6 +1,6 @@
 ---
 title: Conditionals
-description: if, else, else-if, switch — how to make programs choose
+description: if, else, else-if, switch, how to make programs choose
 ---
 
 A program that always does the same thing isn't very interesting.
@@ -10,7 +10,7 @@ next. They are the second pillar of computation, after sequence.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A single track reaching a yellow switch lever, then splitting into two smooth diverging lines toward a green light and a red light — a program choosing a branch"
+  aria-label="A single track reaching a yellow switch lever, then splitting into two smooth diverging lines toward a green light and a red light, a program choosing a branch"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path
@@ -102,7 +102,7 @@ int main(void) {
   if (age >= 18) {
     printf("You can vote.\\n");
   } else {
-    printf("Not quite yet — wait %d more years.\\n", 18 - age);
+    printf("Not quite yet, wait %d more years.\\n", 18 - age);
   }
   return 0;
 }
@@ -207,7 +207,7 @@ int main(void) {
 `&&` and `||` are **short-circuiting**: if the result is already
 determined after evaluating the left side, the right side is **not
 evaluated**. This lets you write safe checks like
-`if (p != NULL && p->value == 0)` — the dereference on the right
+`if (p != NULL && p->value == 0)`, the dereference on the right
 never runs when `p` is null.
 
 ## Truth values: what counts as true?
@@ -263,7 +263,7 @@ int main(void) {
 />
 
 Deep nesting is hard to read. When it grows past two levels, it's
-usually a sign to refactor — split a chunk into a separate function,
+usually a sign to refactor, split a chunk into a separate function,
 or rewrite with `&&` and `||`.
 
 ## The dangling-else pitfall
@@ -378,7 +378,7 @@ divisible by 400.
   title="Is it a leap year?"
   instructions={`A variable \`year\` is set to \`2000\`. Print exactly one line: \`leap\` if the year is a leap year, otherwise \`not leap\`.
 
-Test cases the grader uses internally (you don't need to handle multiple inputs — \`year\` is fixed at \`2000\`):
+Test cases the grader uses internally (you don't need to handle multiple inputs, \`year\` is fixed at \`2000\`):
 
 - 2000 → leap (divisible by 400)
 - 1900 → not leap (divisible by 100 but not 400)
@@ -465,7 +465,7 @@ What does the program print when \`n\` is \`1\`?
 - [o] \`one two \`
   > Execution falls through into \`case 2\`, prints \`two\`, then hits \`break\` and exits the switch.
 - A compile-time error.
-  > A missing \`break\` is legal C — fall-through is a real (if error-prone) feature, not a syntax error.
+  > A missing \`break\` is legal C, fall-through is a real (if error-prone) feature, not a syntax error.
 
 Switch fall-through is occasionally useful (when several cases share code), but it is a frequent source of bugs. Always write \`break\` unless you specifically want fall-through and you've commented why.`}
 />

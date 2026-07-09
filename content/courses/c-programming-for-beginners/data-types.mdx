@@ -1,6 +1,6 @@
 ---
 title: Data Types
-description: int, char, float, double, and friends — what they store, how big they are, and when to use each
+description: int, char, float, double, and friends, what they store, how big they are, and when to use each
 ---
 
 C is a **statically typed** language. Every variable, every function
@@ -16,7 +16,7 @@ time. The type controls three things:
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Four rounded boxes of increasing width with one, two, four, and eight byte dots beneath them — types as differently sized containers"
+  aria-label="Four rounded boxes of increasing width with one, two, four, and eight byte dots beneath them, types as differently sized containers"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -62,7 +62,7 @@ time. The type controls three things:
 | `float`   | 4 bytes      | Single-precision floating point (~6–7 decimal digits)             |
 | `double`  | 8 bytes      | Double-precision floating point (~15–16 decimal digits)           |
 
-Sizes are not nailed down by the C standard — only **minimums** are
+Sizes are not nailed down by the C standard, only **minimums** are
 guaranteed. To find the exact size on your system, use `sizeof`:
 
 <CodeBlock
@@ -124,7 +124,7 @@ flowchart TD
 `char` is the smallest integer type in C. It is one byte. A `char` can
 hold a number between roughly −128 and +127 (or 0–255 for `unsigned
 char`). When you write a character literal `'A'`, you are writing a
-small integer — the ASCII code for `A`, which is `65`.
+small integer, the ASCII code for `A`, which is `65`.
 
 <CodeBlock
   adapter="c"
@@ -148,7 +148,7 @@ int main(void) {
 
 `%c` says *interpret this number as an ASCII character*. `%d` says
 *interpret this number as a decimal integer*. The bits in the
-variable are identical either way — it is the *format string* that
+variable are identical either way, it is the *format string* that
 decides how to display them.
 
 ## Floating-point numbers
@@ -183,7 +183,7 @@ point". `%f` without modifiers uses 6 digits by default.
 
 <Callout type="warn" title="Floating point is not exact">
 Decimal fractions like \`0.1\` cannot be represented exactly in
-binary floating point — just like \`1/3\` cannot be written exactly
+binary floating point, just like \`1/3\` cannot be written exactly
 in base 10. The number you store is a *very close approximation*.
 This is why \`0.1 + 0.2\` is famously not exactly \`0.3\` in almost
 every programming language.
@@ -212,7 +212,7 @@ use floating point. Use integers and track the units yourself
 
 ## Integer division vs floating-point division
 
-Beware: in C, **dividing two integers produces an integer** —
+Beware: in C, **dividing two integers produces an integer**,
 fractional parts are thrown away.
 
 <CodeBlock
@@ -267,7 +267,7 @@ int    dollars = (int)price;   // 9
 
 ## A note on `bool`
 
-C originally had no boolean type — programmers used `int` with `0`
+C originally had no boolean type, programmers used `int` with `0`
 for false and any non-zero value for true. C99 added a real boolean
 type via the header `<stdbool.h>`:
 
@@ -305,7 +305,7 @@ You may still see older code use `int` for boolean values. Both work.
 
 Same memory, different sized chunks, different bit interpretations.
 The CPU has separate instructions for integer arithmetic and
-floating-point arithmetic — the type tells the compiler which to
+floating-point arithmetic, the type tells the compiler which to
 emit.
 
 ## Challenge: average of three numbers
@@ -365,7 +365,7 @@ int main(void) {
 \`\`\`
 
 - 3.5
-  > C's \`/\` between two \`int\`s does **integer** division — the result is itself an \`int\`, so there is no \`.5\`.
+  > C's \`/\` between two \`int\`s does **integer** division, the result is itself an \`int\`, so there is no \`.5\`.
 - 4
   > Rounding to the nearest integer would give 4, but C integer division truncates toward zero, dropping the fractional part entirely.
 - [o] 3
@@ -379,14 +379,14 @@ To get a fractional result, at least one of the operands must be a floating-poin
 <MultipleChoice
   markdown={`Which type would you choose to store the temperature of a refrigerator in degrees Celsius with one digit of precision (e.g. \`4.0\`, \`-1.5\`)?
 
-- \`int\` — temperatures are whole numbers.
+- \`int\`, temperatures are whole numbers.
   > A refrigerator can be \`-1.5\`, which an \`int\` cannot represent.
-- \`char\` — temperatures fit in one byte.
+- \`char\`, temperatures fit in one byte.
   > \`char\` can only hold whole integers in a small range; the fractional part would be lost.
-- [o] \`double\` — for accurate fractional values.
+- [o] \`double\`, for accurate fractional values.
   > \`double\` is the standard choice for general-purpose fractional numbers in C.
-- \`unsigned int\` — temperatures are always positive.
+- \`unsigned int\`, temperatures are always positive.
   > Temperatures can be negative; \`unsigned\` types cannot hold negative values.
 
-Integer types are great for counts and identifiers; for any quantity that can be fractional, use a floating-point type — typically \`double\` unless you have a specific reason to use \`float\`.`}
+Integer types are great for counts and identifiers; for any quantity that can be fractional, use a floating-point type, typically \`double\` unless you have a specific reason to use \`float\`.`}
 />

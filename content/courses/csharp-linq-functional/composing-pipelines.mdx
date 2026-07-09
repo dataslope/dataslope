@@ -1,6 +1,6 @@
 ---
 title: Composing Pipelines
-description: From one-off chains to reusable, named transformations — building your own LINQ vocabulary
+description: From one-off chains to reusable, named transformations, building your own LINQ vocabulary
 ---
 
 Once you're comfortable with LINQ, a new opportunity appears: you
@@ -14,7 +14,7 @@ vocabulary tailored to your domain.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Colored pipe segments snake down the canvas in a gentle S-curve, ending at a green outlet — pipelines assembled from named pieces"
+  aria-label="Colored pipe segments snake down the canvas in a gentle S-curve, ending at a green outlet, pipelines assembled from named pieces"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -173,7 +173,7 @@ phases. Aggregations are usually one-line and don't need wrapping.
 
 ## Composing with higher-order helpers
 
-You can also compose at the **lambda** level — building predicates
+You can also compose at the **lambda** level, building predicates
 and selectors from smaller pieces.
 
 <CodeBlock
@@ -208,12 +208,12 @@ to combine before they ever touch LINQ.
   title="Build a log-pipeline vocabulary"
   instructions={`Implement the four extension methods in \`LogExtensions.cs\` so the composed pipeline in \`Program.cs\` runs:
 
-- \`Recent(window)\` — keep events whose \`At\` falls within the past \`window\` from now.
-- \`OfLevel(level)\` — keep only events whose \`Level\` matches.
-- \`Messages()\` — project each event to its \`Message\` string.
-- \`Join(sep)\` — join the strings with the given separator.
+- \`Recent(window)\`, keep events whose \`At\` falls within the past \`window\` from now.
+- \`OfLevel(level)\`, keep only events whose \`Level\` matches.
+- \`Messages()\`, project each event to its \`Message\` string.
+- \`Join(sep)\`, join the strings with the given separator.
 
-Each method should be a tiny one-liner of LINQ — the goal is a readable vocabulary that names the intent.`}
+Each method should be a tiny one-liner of LINQ, the goal is a readable vocabulary that names the intent.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -311,7 +311,7 @@ public static class LogExtensions
   ]}
 />
 
-Notice the *shape* of the solution: each method is tiny — typically
+Notice the *shape* of the solution: each method is tiny, typically
 one line of LINQ. The power comes from naming the intent, not from
 clever code.
 
@@ -326,7 +326,7 @@ Composition is a tool, not an obligation.
 - A wrapper that takes 8 parameters is not a wrapper, it's a
   configuration object pretending to be one.
 
-The goal is to grow a *small* vocabulary that matches the domain —
+The goal is to grow a *small* vocabulary that matches the domain,
 not to abstract for abstraction's sake.
 
 <MultipleChoice
@@ -336,7 +336,7 @@ not to abstract for abstraction's sake.
   > Both allocate; the real difference is *when* and *how much*. List-based operators allocate the entire list up front.
 - The compiler refuses to chain List-returning operators in LINQ.
   > Any \`IEnumerable<T>\`-returning method (including those returning \`List<T>\`) chains fine in LINQ.
-- [o] The \`yield\` version preserves laziness — downstream operators like \`Take(5)\` can stop the source early.
+- [o] The \`yield\` version preserves laziness, downstream operators like \`Take(5)\` can stop the source early.
   > With \`yield\`, elements flow one at a time and short-circuit operators terminate the source mid-stream. A list-based version forces the entire upstream to materialize before any downstream operator sees an element.
 - Lists cannot store generic types.
   > \`List<T>\` is generic by definition. This is simply false.

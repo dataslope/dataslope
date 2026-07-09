@@ -1,6 +1,6 @@
 ---
 title: The Practical Machine Learning Workflow
-description: Every idea in this course, assembled into one repeatable, disciplined process — the order you do things in, and why that order is the whole game.
+description: Every idea in this course, assembled into one repeatable, disciplined process, the order you do things in, and why that order is the whole game.
 ---
 
 You have now met every piece of the machine learning puzzle separately:
@@ -9,7 +9,7 @@ cross-validation, tuning, interpretation. This page is where the pieces snap
 together. Because here is the secret that no single earlier page could
 teach you: in machine learning, **the order you do things in matters as
 much as the things themselves.** Do the right steps in the wrong order and
-you will fool yourself spectacularly — a great score that evaporates the
+you will fool yourself spectacularly, a great score that evaporates the
 moment real data arrives.
 
 A practical workflow is not a checklist you memorize. It is a *discipline*:
@@ -20,7 +20,7 @@ end to end on a real dataset.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Six colored station dots ride a thin circular loop whose small gray arrowhead shows the direction of travel, and a thin line exits the loop to a large green dot — the workflow is an ordered loop you repeat until it is honest to ship"
+  aria-label="Six colored station dots ride a thin circular loop whose small gray arrowhead shows the direction of travel, and a thin line exits the loop to a large green dot, the workflow is an ordered loop you repeat until it is honest to ship"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="270" cy="110" r="78" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
@@ -61,18 +61,18 @@ flowchart TD
 ```
 
 Read that diagram top to bottom and notice three things. The test set is
-sealed at step 3 and not opened until step 8 — everything in between
+sealed at step 3 and not opened until step 8, everything in between
 happens on training data alone. There is a **loop**: steps 5 through 7
 repeat as you experiment, but the loop never reaches into the test set. And
 interpretation comes *after* you trust the model's accuracy, not before. We
 will take the steps one at a time.
 
-## Step 1 — Frame the problem
+## Step 1, Frame the problem
 
 Before a single line of code, answer: **what are we predicting, and why?**
 Is the target a number (regression), a category (classification), or is
 there no target at all (clustering)? What would a *useful* result look like,
-and how will you measure it? Crucially — is this even a machine learning
+and how will you measure it? Crucially, is this even a machine learning
 problem? Plenty of questions are better answered by a simple query, a chart,
 or a domain expert than by a model.
 
@@ -82,28 +82,28 @@ disease? Accuracy will lie to you (the imbalance chapter showed why); you
 likely want recall, precision, or the area under the ROC curve.
 
 <Callout type="warn" title="The most expensive mistakes happen before any modeling">
-A model that brilliantly answers the wrong question is worthless. Framing —
-nailing down the target, the metric, and whether ML is even the right tool —
+A model that brilliantly answers the wrong question is worthless. Framing,
+nailing down the target, the metric, and whether ML is even the right tool,
 is the cheapest step to get right and the most expensive to get wrong.
 Spend real time here.
 </Callout>
 
-## Step 2 — Get and inspect the data
+## Step 2, Get and inspect the data
 
 Load the data and *look* at it before you model it. How many rows and
 columns? What types? Are there missing values, obvious errors, or absurd
-outliers? How is the target distributed — balanced or lopsided? This is the
+outliers? How is the target distributed, balanced or lopsided? This is the
 Pandas-and-plots work you already know, and it is not optional: every
 modeling decision downstream depends on what you find here.
 
 Inspection also catches disasters early. A target that is 99% one class, a
 feature that is secretly a copy of the answer, a column that is all one
-value — you want to discover these now, by looking, not three weeks later by
+value, you want to discover these now, by looking, not three weeks later by
 debugging a model that "works too well."
 
-## Step 3 — Split, and lock the test set away
+## Step 3, Split, and lock the test set away
 
-The moment you understand the data, split it — **before** you scale,
+The moment you understand the data, split it, **before** you scale,
 encode, impute, or engineer anything. Set aside a test set with
 `train_test_split` (stratified, for classification) and then *forget it
 exists* until the very end. The test set is your one honest measurement of
@@ -111,29 +111,29 @@ the future, and it is honest only as long as it stays sealed.
 
 This early-split discipline is the front-line defense against **data
 leakage**: if you compute *anything* from the whole dataset before
-splitting — a mean for scaling, a category list for encoding — information
+splitting, a mean for scaling, a category list for encoding, information
 from the test set has already seeped into training, and your evaluation is
 quietly compromised.
 
 <Callout type="danger" title="Split before you do anything that learns from data">
-Every transformation that learns from data — scaling, encoding, imputing,
-feature selection — must be fitted on the training set **only**, after the
+Every transformation that learns from data, scaling, encoding, imputing,
+feature selection, must be fitted on the training set **only**, after the
 split. Fit it on the full dataset first and you leak the test set into
 training. The split comes early for exactly this reason, and the
 \`Pipeline\` (step 5) makes doing it right automatic.
 </Callout>
 
-## Step 4 — Establish a simple baseline
+## Step 4, Establish a simple baseline
 
 Before any fancy model, build the dumbest reasonable one and measure it.
 For classification, scikit-learn's `DummyClassifier` always predicts the
 most common class; for regression, `DummyRegressor` always predicts the
-mean. These are deliberately stupid — and that is the point.
+mean. These are deliberately stupid, and that is the point.
 
 A baseline answers the question "is my real model actually adding value, or
 just clearing a bar a coin flip could clear?" If your dataset is mostly one
 class, a baseline scores that fraction by doing nothing. Our penguins are
-mildly lopsided — Adelie is the largest of the three species — so a
+mildly lopsided, Adelie is the largest of the three species, so a
 majority-class guess already gets a meaningful slice right. Without a
 baseline, you cannot tell skill from the appearance of skill.
 
@@ -173,22 +173,22 @@ print("Any real model must beat this to earn its keep.")
 <Callout type="tip" title="A baseline turns a score into a verdict">
 A bare accuracy number means nothing in isolation. "0.91" is fantastic
 against a 0.50 baseline and embarrassing against a 0.93 one. Always know
-your baseline before you celebrate — it is what converts a raw score into an
+your baseline before you celebrate, it is what converts a raw score into an
 actual judgment of skill.
 </Callout>
 
-## Step 5 — Build preprocessing and model in a Pipeline
+## Step 5, Build preprocessing and model in a Pipeline
 
 Now the real model. The non-negotiable rule from the pipelines chapter:
 bundle preprocessing and the estimator into a single `Pipeline`. A pipeline
 is not a convenience; it is the mechanism that makes leak-free evaluation
 *automatic*. When you cross-validate a pipeline, scikit-learn refits every
-preprocessing step on each fold's training portion only — so test-fold
+preprocessing step on each fold's training portion only, so test-fold
 statistics never leak into the fit.
 
 For the penguins data, the model is a `LogisticRegression`, which benefits
-from scaled features — the four measurements live on very different scales
-(body mass in grams dwarfs bill depth in millimetres) — so the pipeline is a
+from scaled features, the four measurements live on very different scales
+(body mass in grams dwarfs bill depth in millimetres), so the pipeline is a
 `StandardScaler` followed by the model.
 
 <CodeBlock
@@ -216,12 +216,12 @@ print("\\nThe pipeline is a single estimator: fit it, score it, tune it as one u
   ]}
 />
 
-## Step 6 — Evaluate with cross-validation
+## Step 6, Evaluate with cross-validation
 
 A single train/validation split gives one noisy number that can swing with
 luck, especially on small data. **Cross-validation** rotates the validation
 role through the training data and averages, giving a far steadier estimate
-of how the pipeline generalizes — *and* a spread (a standard deviation) that
+of how the pipeline generalizes, *and* a spread (a standard deviation) that
 tells you how much the estimate itself wobbles.
 
 Run it on the training data only. The test set is still sealed.
@@ -263,12 +263,12 @@ print(f"Mean CV accuracy: {scores.mean():.3f}  (+/- {scores.std():.3f})")
 
 This mean is your working estimate of quality, and the one you compare
 across experiments. It already beats the baseline from step 4 by a wide
-margin — evidence that the model is doing real work.
+margin, evidence that the model is doing real work.
 
-## Step 7 — Tune a little
+## Step 7, Tune a little
 
 With a solid pipeline and an honest CV estimate, you can tune
-hyperparameters — gently. Use `GridSearchCV` with a *small* grid (from the
+hyperparameters, gently. Use `GridSearchCV` with a *small* grid (from the
 tuning chapter), and remember it cross-validates on the training data and
 never touches the test set. Resist the urge to tune endlessly: a few values
 of the one or two hyperparameters that matter, and stop. Tuning hard against
@@ -323,11 +323,11 @@ test set to decide what to try next, it stops being unseen and its final
 number becomes a fiction. Discipline here is the whole point of the workflow.
 </Callout>
 
-## Step 8 — Evaluate ONCE on the test set
+## Step 8, Evaluate ONCE on the test set
 
 Every decision is now locked: the model, the preprocessing, the
 hyperparameters. *Now* you unlock the test set and evaluate the chosen
-model on it — a single time. This number is your honest estimate of
+model on it, a single time. This number is your honest estimate of
 real-world performance, the one you report and the one you can defend.
 
 <CodeBlock
@@ -375,16 +375,16 @@ between these two numbers is one of the most informative diagnostics in all
 of applied machine learning.
 
 <Callout type="danger" title="The test set is single-use">
-Once you have looked at the test score and used it to make *any* decision —
-"let me just try one more thing" — the test set is spent. Its honesty comes
+Once you have looked at the test score and used it to make *any* decision,
+"let me just try one more thing", the test set is spent. Its honesty comes
 entirely from having played no part in your choices. If you genuinely need
 another round of experimentation after peeking, the right move is fresh
 data, or to have set aside a second held-out set from the start.
 </Callout>
 
-## Step 9 — Interpret the model
+## Step 9, Interpret the model
 
-A trusted, accurate model is not the finish line for most real projects —
+A trusted, accurate model is not the finish line for most real projects,
 people need to know *why* it predicts what it does. Now apply the
 interpretation chapter: read coefficients (scaled), pull
 `feature_importances_` from a forest, or run `permutation_importance` on the
@@ -393,17 +393,17 @@ sense, and brief your stakeholders in the language of features, not weights.
 And keep the discipline from that chapter front of mind: importance explains
 *prediction*, never *causation*.
 
-## Step 10 — Ship, monitor, revisit
+## Step 10, Ship, monitor, revisit
 
 A model is never truly "done." The world drifts: customer behavior changes,
 sensors age, last year's patterns fade. A model that was excellent at launch
-can quietly decay. So the workflow loops at the largest scale too — deploy,
+can quietly decay. So the workflow loops at the largest scale too, deploy,
 monitor performance on fresh data, and when it slips, return to the top and
 work through the steps again with new data in hand.
 
 ## The complete worked example, start to finish
 
-Here is the entire workflow in one runnable block — frame (predict penguin
+Here is the entire workflow in one runnable block, frame (predict penguin
 species from four body measurements, scored by accuracy against a baseline),
 inspect, split, baseline, pipeline, cross-validate, tune, the single final
 test evaluation, and a quick look at what the model leaned on. This is the
@@ -484,8 +484,8 @@ set sat untouched until the final line. That is the workflow.
 <Callout type="success" title="The shape never changes">
 Frame, inspect, split, baseline, pipeline, cross-validate, tune, test once,
 interpret, iterate. From a one-line linear regression to a hundred-tree
-forest, this is the loop. Internalize the *order* — especially "split early,
-test once" — and you will avoid the mistakes that quietly sink most
+forest, this is the loop. Internalize the *order*, especially "split early,
+test once", and you will avoid the mistakes that quietly sink most
 beginner projects.
 </Callout>
 
@@ -500,7 +500,7 @@ The ten steps are a default, not a law. Real projects adapt:
   generous test set; you lean harder on cross-validation and tune very
   lightly to avoid overfitting the validation data.
 - **Pure-exploration projects** (unsupervised clustering to understand a
-  dataset) have no target and no test split in the usual sense — you judge
+  dataset) have no target and no test split in the usual sense, you judge
   with the cluster-evaluation tools instead.
 
 What never bends is the principle underneath: **be honest about what your
@@ -657,7 +657,7 @@ Splitting first is the front-line defense against data leakage.`}
 - Because baselines are faster to interpret than real models
   > Interpretation speed is not the point; the baseline exists to calibrate what a given score actually means.
 
-Against a 0.90 baseline, a 0.91 model is unimpressive — the baseline is what tells you so.`}
+Against a 0.90 baseline, a 0.91 model is unimpressive, the baseline is what tells you so.`}
 />
 
 <MultipleChoice

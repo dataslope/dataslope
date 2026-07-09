@@ -3,7 +3,7 @@ title: Branded Types
 description: Add nominal typing to TypeScript's structural system to prevent mixing semantically distinct values.
 ---
 
-TypeScript's type system is **structural** — two types are compatible if they have the same shape, regardless of their names. This is powerful and flexible, but it has a downside: values that *mean* different things can be used interchangeably if they have the same structure.
+TypeScript's type system is **structural**, two types are compatible if they have the same shape, regardless of their names. This is powerful and flexible, but it has a downside: values that *mean* different things can be used interchangeably if they have the same structure.
 
 Consider:
 ```ts
@@ -16,15 +16,15 @@ function getOrder(id: OrderId): void {}
 const userId: UserId = "user-123";
 const orderId: OrderId = "order-456";
 
-getUser(orderId); // Oops! No error — both are just strings.
+getUser(orderId); // Oops! No error, both are just strings.
 ```
 
-TypeScript can't tell them apart because they're structurally identical. This chapter introduces **branded types** (also called **opaque types** or **nominal types**) — a technique to tag values with phantom properties that make them incompatible at compile time, even though they're the same at runtime.
+TypeScript can't tell them apart because they're structurally identical. This chapter introduces **branded types** (also called **opaque types** or **nominal types**), a technique to tag values with phantom properties that make them incompatible at compile time, even though they're the same at runtime.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two identical blue cards differ only by the small tag on their corner: the green-tagged card's arrow passes the gate and earns a check, while the yellow-tagged one is stopped with a red cross — a brand makes look-alike values distinguishable to the checker"
+  aria-label="Two identical blue cards differ only by the small tag on their corner: the green-tagged card's arrow passes the gate and earns a check, while the yellow-tagged one is stopped with a red cross, a brand makes look-alike values distinguishable to the checker"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -114,7 +114,7 @@ type Cents = number & { readonly __brand: "Cents" };
 type Dollars = number & { readonly __brand: "Dollars" };
 ```
 
-Now `Cents` and `Dollars` are no longer compatible, even though they're both `number` at runtime. The `__brand` property is a **phantom** — it doesn't exist on the value, but TypeScript sees it in the type.
+Now `Cents` and `Dollars` are no longer compatible, even though they're both `number` at runtime. The `__brand` property is a **phantom**, it doesn't exist on the value, but TypeScript sees it in the type.
 
 Here's how to create branded values:
 
@@ -146,7 +146,7 @@ console.log(displayPrice(price)); // OK: Cents
   ]}
 />
 
-We use **smart constructors** (`toCents`, `toDollars`) to produce branded values. Inside the constructor, we cast the plain `number` to the branded type with `as`. Outside, users can't accidentally pass a plain `number` — they must go through the constructor.
+We use **smart constructors** (`toCents`, `toDollars`) to produce branded values. Inside the constructor, we cast the plain `number` to the branded type with `as`. Outside, users can't accidentally pass a plain `number`, they must go through the constructor.
 
 ---
 
@@ -180,7 +180,7 @@ console.log(displayPrice(price));
   ]}
 />
 
-A `unique symbol` is a type that's distinct from all others — even if two modules declare the same name, their symbols are different. This prevents accidental collisions.
+A `unique symbol` is a type that's distinct from all others, even if two modules declare the same name, their symbols are different. This prevents accidental collisions.
 
 The `declare const` trick defines the symbol's *type* without creating a runtime value. The brand exists only in the type system.
 
@@ -239,7 +239,7 @@ Smart constructors are also the perfect place to validate input. You can ensure 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Plain blue values ride a conveyor into a yellow stamping press: the one that passes leaves wearing a small green seal, while a bad one drops off below in red — a smart constructor validates first and only then applies the brand"
+  aria-label="Plain blue values ride a conveyor into a yellow stamping press: the one that passes leaves wearing a small green seal, while a bad one drops off below in red, a smart constructor validates first and only then applies the brand"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -365,7 +365,7 @@ Each module exports:
 1. The branded type (e.g., `UserId`).
 2. The smart constructor (e.g., `createUserId`).
 
-Consumers import both and can't accidentally mix IDs. The brand symbols are declared with `declare const`, so they exist only in the type system — no runtime overhead.
+Consumers import both and can't accidentally mix IDs. The brand symbols are declared with `declare const`, so they exist only in the type system, no runtime overhead.
 
 ---
 
@@ -389,7 +389,7 @@ Brands are *not* necessary for:
   title="Branded Temperature Units"
   instructions={`The read-only setup defines two branded types, \`Celsius\` and \`Fahrenheit\` (both \`number\` underneath), plus their smart constructors. Implement \`celsiusToFahrenheit\` so it accepts a \`Celsius\` value and returns the equivalent \`Fahrenheit\` value.
 
-**Conversion formula**: \`F = C × 9/5 + 32\` — so \`toCelsius(0)\` must convert to \`32\` and \`toCelsius(100)\` to \`212\`.
+**Conversion formula**: \`F = C × 9/5 + 32\`, so \`toCelsius(0)\` must convert to \`32\` and \`toCelsius(100)\` to \`212\`.
 
 Because the result type is branded, remember to cast your computed number with \`as Fahrenheit\` before returning it.`}
   files={[
@@ -564,4 +564,4 @@ Brands add a thin layer of nominal typing to TypeScript's structural world. They
 
 ---
 
-**Next**: [API Modeling & Contracts](./api-modeling-and-contracts) — treating types as contracts between modules and services.
+**Next**: [API Modeling & Contracts](./api-modeling-and-contracts), treating types as contracts between modules and services.

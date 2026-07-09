@@ -1,16 +1,16 @@
 ---
 title: R as a Calculator
-description: Get fluent with R's basic arithmetic and comparison operators. Before R is "the language of data science," it is the world's most powerful pocket calculator — and the calculator habits matter.
+description: Get fluent with R's basic arithmetic and comparison operators. Before R is "the language of data science," it is the world's most powerful pocket calculator, and the calculator habits matter.
 ---
 
 The very first thing you can do in R is *use it as a calculator*.
-This is not a throwaway exercise — every later calculation in
+This is not a throwaway exercise, every later calculation in
 every later page builds on what's on this page.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="An abacus with three rods of colored beads, some slid left and some right mid-calculation — before R is the language of data science it is a very good calculator"
+  aria-label="An abacus with three rods of colored beads, some slid left and some right mid-calculation, before R is the language of data science it is a very good calculator"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="140" y="28" width="360" height="10" rx="5" fill="currentColor" opacity="0.2" />
@@ -116,7 +116,7 @@ future you) will not have to mentally re-run the precedence rules.
 
 R has two kinds of numbers you will routinely encounter:
 
-- **doubles** (the default — floating-point real numbers).
+- **doubles** (the default, floating-point real numbers).
 - **integers** (whole numbers, marked with a trailing `L`).
 
 <CodeBlock
@@ -134,7 +134,7 @@ cat("type of y:", typeof(y), "\\n")
   ]}
 />
 
-For most practical purposes you can ignore the difference — R will
+For most practical purposes you can ignore the difference, R will
 quietly convert between them as needed. The case where it matters
 is interfacing with other systems (databases, foreign code) that
 care about the distinction.
@@ -157,8 +157,8 @@ R has a few special "numbers" that pop up in real data analysis:
       filename: "main.r",
       starterCode: `print(1 / 0) # Inf
 print(-1 / 0) # -Inf
-print(0 / 0) # NaN — "not a number"
-print(NA + 5) # NA — anything plus a missing value is missing
+print(0 / 0) # NaN, "not a number"
+print(NA + 5) # NA, anything plus a missing value is missing
 print(is.na(NA)) # TRUE
 print(is.nan(0 / 0)) # TRUE
 print(is.infinite(1 / 0)) # TRUE
@@ -196,7 +196,7 @@ Each comparison returns a **logical** value: `TRUE` or `FALSE`.
 5 != 5 # FALSE
 5 < 10 # TRUE
 5 > 10 # FALSE
-5 <= 5 # TRUE — note the difference vs. <
+5 <= 5 # TRUE, note the difference vs. <
 
 # Mix with arithmetic
 (2 + 3) > (1 * 4) # 5 > 4 is TRUE
@@ -265,7 +265,7 @@ print(ineligible)
   ]}
 />
 
-For now, use `&` and `|` (single ones) — they work on both single
+For now, use `&` and `|` (single ones), they work on both single
 values and vectors. The doubled versions (`&&` and `||`) are only
 for single-value logic inside `if` statements; we will see them
 later.
@@ -368,7 +368,7 @@ calculator: numbers in, numbers / booleans out.
 - 3.33
   > 3.33 is the result of regular division \`10 / 3\`; the modulo operator \`%%\` returns the *remainder* after integer division, which is 1.
 - 3
-  > That would be \`10 %/% 3\` — integer division.
+  > That would be \`10 %/% 3\`, integer division.
 - [o] 1
   > \`%%\` is the modulo operator: 10 divided by 3 leaves a remainder of 1.
 - 30
@@ -385,7 +385,7 @@ calculator: numbers in, numbers / booleans out.
 - [o] \`all.equal(0.1 + 0.2, 0.3)\`
   > \`all.equal()\` is R's idiom for "are these approximately equal within tolerance?"
 - \`(0.1 + 0.2) === 0.3\`
-  > R does not have a \`===\` operator — that's JavaScript.`}
+  > R does not have a \`===\` operator, that's JavaScript.`}
 />
 
 <MultipleChoice
@@ -396,7 +396,7 @@ calculator: numbers in, numbers / booleans out.
 - 80
   > That would require \`(2 + 3) * 4 ^ 2 = 5 * 16\`.
 - 196
-  > That would require \`((2 + 3) * 4) ^ 2 = 400\` — not this either.
+  > That would require \`((2 + 3) * 4) ^ 2 = 400\`, not this either.
 - [o] 50
   > Apply exponentiation first: \`4 ^ 2 = 16\`. Then multiplication: \`3 * 16 = 48\`. Then addition: \`2 + 48 = 50\`.
 - 100
@@ -408,8 +408,8 @@ calculator: numbers in, numbers / booleans out.
 Build a small tip calculator. Given a bill amount `bill` (a number)
 and a tip percentage `tip_pct` (a number like `18` for 18%), compute:
 
-- `tip` — the dollar amount of the tip, rounded to 2 decimals
-- `total` — the total bill (bill + tip), rounded to 2 decimals
+- `tip`, the dollar amount of the tip, rounded to 2 decimals
+- `total`, the total bill (bill + tip), rounded to 2 decimals
 
 Both should be plain numeric scalars.
 
@@ -456,5 +456,5 @@ cat("Total: $", total, "\\n", sep = "")
   ]}
 />
 
-In the next page we will give *names* to things — the missing piece
+In the next page we will give *names* to things, the missing piece
 that turns calculator work into actual programming.

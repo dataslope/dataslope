@@ -127,7 +127,7 @@ describe("warmRuntimeOnRouteLand", () => {
     await vi.advanceTimersByTimeAsync(1600);
     expect(failing.initSpy).toHaveBeenCalledTimes(1);
 
-    // Reject the first boot — the warm-up swallows the failure (Run /
+    // Reject the first boot, the warm-up swallows the failure (Run /
     // scroll-into-view retry through the registry) and moves on.
     failing.fail(new Error("network down"));
     await flushMicrotasks();

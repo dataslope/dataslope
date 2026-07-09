@@ -3,12 +3,12 @@ title: Virtual Environments and pip
 description: Isolating dependencies with venv, installing packages with pip, and locking versions
 ---
 
-A Python install ships with a small standard library. Anything beyond that — NumPy, requests, Flask, pandas — comes from **PyPI**, the Python Package Index. You install packages with **`pip`** and you keep projects from stepping on each other's toes with **virtual environments**.
+A Python install ships with a small standard library. Anything beyond that, NumPy, requests, Flask, pandas, comes from **PyPI**, the Python Package Index. You install packages with **`pip`** and you keep projects from stepping on each other's toes with **virtual environments**.
 
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two rooms hold their own copies of the same packages — the blue circle small in one and much larger in the other, the yellow dot present only on the left — with a solid wall between them: each project keeps its own isolated installs"
+  aria-label="Two rooms hold their own copies of the same packages, the blue circle small in one and much larger in the other, the yellow dot present only on the left, with a solid wall between them: each project keeps its own isolated installs"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -43,30 +43,30 @@ Everything you have done so far ran in the browser, with no install at all. The
 moment you want to run scripts on your own machine, install third-party
 libraries, and connect Python to your editor, you need a local Python. Install
 the **latest stable Python 3** (3.13 at the time of writing) unless a specific
-project pins you to an older version — and never use the Python 2 you might find
+project pins you to an older version, and never use the Python 2 you might find
 lurking on an older system, which reached end-of-life in 2020.
 
 How you install depends on your operating system:
 
-- **macOS** — Use [Homebrew](https://brew.sh/) (`brew install python`) or the
+- **macOS**, Use [Homebrew](https://brew.sh/) (`brew install python`) or the
   installer from [python.org/downloads](https://www.python.org/downloads/). Do
   not touch the system Python that ships with macOS; it is there for the OS, not
   for you.
-- **Windows** — Run the installer from
+- **Windows**, Run the installer from
   [python.org/downloads](https://www.python.org/downloads/) and, on the very
   first screen, **check "Add python.exe to PATH."** Forgetting that box is the
-  single most common Windows gotcha — without it, the `python` command will not
+  single most common Windows gotcha, without it, the `python` command will not
   be found in your terminal. The Microsoft Store package is a fine alternative
   that handles PATH for you.
-- **Linux** — Your package manager already has a recent Python:
+- **Linux**, Your package manager already has a recent Python:
   `sudo apt install python3 python3-pip python3-venv` on Debian/Ubuntu,
   `sudo dnf install python3 python3-pip` on Fedora.
 
 If you routinely juggle several Python versions, [`pyenv`](https://github.com/pyenv/pyenv)
 (or the modern `uv`, below) installs them side by side and switches between them
 per project. Verify any install with `python3 --version` (just `python` on
-Windows). Running `python3` with no arguments drops you into the **REPL** — read,
-eval, print, loop — an interactive prompt perfect for testing one-liners, much
+Windows). Running `python3` with no arguments drops you into the **REPL**, read,
+eval, print, loop, an interactive prompt perfect for testing one-liners, much
 like the code blocks throughout this course.
 
 ## Why virtual environments?
@@ -307,7 +307,7 @@ Most modern tools can read this file and install the listed dependencies.
 | Uninstall | `pip uninstall requests` |
 
 <Callout type="warn" title="Avoid --user">
-You may see advice to run \`pip install --user\`. Skip it. The \`--user\` flag installs packages into your home directory's \`site-packages\`, which is still global (shared across all your projects). Always work inside a virtual environment instead — it's cleaner, more portable, and more predictable.
+You may see advice to run \`pip install --user\`. Skip it. The \`--user\` flag installs packages into your home directory's \`site-packages\`, which is still global (shared across all your projects). Always work inside a virtual environment instead, it's cleaner, more portable, and more predictable.
 </Callout>
 
 ## Directory structure example
@@ -353,7 +353,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
   markdown={`What does activating a virtual environment do?
 
 - [o] It modifies your shell's \`PATH\` so \`python\` and \`pip\` point to the venv's binaries.
-  > Activation is purely a shell trick — no system-wide changes are made.
+  > Activation is purely a shell trick, no system-wide changes are made.
 - It permanently changes the system Python installation.
   > Activation is temporary and local to the current shell session. Closing the terminal reverts it.
 - It installs all packages listed in \`requirements.txt\`.
@@ -369,7 +369,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
   > Virtual environments are NOT portable. Commit a lockfile instead.
 - [o] \`requirements.txt\` or \`pyproject.toml\`, so teammates can recreate the environment.
   > Lockfiles and metadata files are portable; the venv itself is not.
-- Nothing — each developer should figure out dependencies on their own.
+- Nothing, each developer should figure out dependencies on their own.
   > Without a lockfile, your project is not reproducible.
 - Only the Python interpreter binary.
   > You should never commit binaries. Commit dependency metadata instead.`}
@@ -389,6 +389,6 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 />
 
 You now have everything you need to start writing real Python projects. Before the
-final roadmap, the next page is an optional deep-dive — *The Story of Python* —
+final roadmap, the next page is an optional deep-dive, *The Story of Python*,
 for anyone curious about where the language came from and why it makes whitespace
 matter. After that, *Next Steps* surveys what to learn next.

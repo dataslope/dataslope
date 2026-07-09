@@ -1,12 +1,12 @@
 ---
 title: The Central Limit Theorem
-description: Why the sampling distribution of the mean becomes approximately normal for large enough n, regardless of the population's shape — the engine behind most classical inference, demonstrated from clearly non-normal populations.
+description: Why the sampling distribution of the mean becomes approximately normal for large enough n, regardless of the population's shape, the engine behind most classical inference, demonstrated from clearly non-normal populations.
 ---
 
 In *Sampling Distributions* you built the sampling distribution of the
 mean and may have noticed something curious: even when the population was
 skewed, the histogram of sample means came out roughly **bell-shaped**.
-That was not luck. It is the **Central Limit Theorem (CLT)** — arguably
+That was not luck. It is the **Central Limit Theorem (CLT)**, arguably
 the most important result in all of statistics, and the reason so many
 methods "just work" with a normal-based formula even on messy, non-normal
 data.
@@ -14,13 +14,13 @@ data.
 The CLT is what lets you use clean, normal-distribution tools to build
 confidence intervals and run hypothesis tests on real-world data that is
 skewed, lumpy, or weird-shaped. Without it, every analysis would need a
-custom distribution for every dataset. The CLT says: don't bother — for
+custom distribution for every dataset. The CLT says: don't bother, for
 the **mean**, things converge to the same familiar bell curve.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Four small distributions morph from left to right — a red skewed slide, a yellow lopsided hump, a blue almost-bell, and a clean green bell — as the sample size beneath each grows from one to one hundred, the distribution of the mean forgets the parent's shape"
+  aria-label="Four small distributions morph from left to right, a red skewed slide, a yellow lopsided hump, a blue almost-bell, and a clean green bell, as the sample size beneath each grows from one to one hundred, the distribution of the mean forgets the parent's shape"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
@@ -51,8 +51,8 @@ Here is the whole idea, stated as plainly as possible:
 If you take samples of size `n` from *almost any* population (it just
 needs a finite variance) and compute the sample mean each time, then **as
 `n` gets large, the sampling distribution of that mean becomes
-approximately normal** — centered on μ, with spread `σ / √n`
-— **no matter what shape the original population has.**
+approximately normal**, centered on μ, with spread `σ / √n`,
+**no matter what shape the original population has.**
 </Callout>
 
 Read that again, because three different claims are packed in:
@@ -61,7 +61,7 @@ Read that again, because three different claims are packed in:
    stays exactly as skewed as it ever was. Only the *sampling
    distribution of x̄* turns normal.
 2. **The population's shape doesn't matter** (given finite variance).
-   Exponential, uniform, bimodal, lumpy — all of them lead to a normal
+   Exponential, uniform, bimodal, lumpy, all of them lead to a normal
    sampling distribution of the mean for large `n`.
 3. **It's an approximation that improves with `n`.** Small `n`: the
    sampling distribution still looks like the population. Large `n`: it's
@@ -76,7 +76,7 @@ flowchart TD
 ## Watch it happen from a skewed population
 
 Talk is cheap; the CLT is best *seen*. We'll start with a heavily
-right-skewed exponential population — about as un-normal as it gets — and
+right-skewed exponential population, about as un-normal as it gets, and
 build the sampling distribution of the mean at n = 1, 5, 30, 100. Watch
 the shape morph from skewed to bell.
 
@@ -132,14 +132,14 @@ print("As n grows, the skewness of x-bar marches toward 0 -> bell shape.")
 />
 
 At n = 1, the "sampling distribution of the mean" is just the
-population itself — wildly skewed (skewness ≈ 2). By n = 5 it's less
+population itself, wildly skewed (skewness ≈ 2). By n = 5 it's less
 lopsided. By n = 30 it's nearly symmetric, and by n = 100 it's a
 clean bell. The **skewness number marches toward zero** as `n` grows.
 That march is the CLT in action: averaging washes out the asymmetry.
 
 <Callout type="danger" title="The #1 CLT misconception: it does NOT normalize your data">
 The CLT says nothing about your raw data. Your exponential population is
-*still exponential* — averaging doesn't reach back and change the
+*still exponential*, averaging doesn't reach back and change the
 individual values. Only the **distribution of the sample mean** becomes
 normal. So you should *never* "invoke the CLT" to claim your dataset is
 normal, run a normality test and expect it to pass, or justify treating
@@ -147,18 +147,18 @@ normal, run a normality test and expect it to pass, or justify treating
 x̄, full stop.
 </Callout>
 
-## It's not about exponentials — try any shape
+## It's not about exponentials, try any shape
 
 The magic of the CLT is its universality. Let's throw three radically
-different populations at it — right-skewed, flat uniform, and bimodal
-(two separated humps) — and confirm the *mean's* sampling distribution
+different populations at it, right-skewed, flat uniform, and bimodal
+(two separated humps), and confirm the *mean's* sampling distribution
 goes normal in every case at large `n`. A normal curve is overlaid for
 comparison.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three wildly different parent shapes — a red skewed slide, a blue flat slab, and a yellow two-humped camel — funnel along thin solid lines into the same single green bell with its yellow center post — averaging washes out every parent's shape into one universal curve"
+  aria-label="Three wildly different parent shapes, a red skewed slide, a blue flat slab, and a yellow two-humped camel, funnel along thin solid lines into the same single green bell with its yellow center post, averaging washes out every parent's shape into one universal curve"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -239,8 +239,8 @@ print("\\nAll three sampling distributions hug the same black normal curve.")
   ]}
 />
 
-Three populations that look nothing alike — a decaying tail, a flat
-block, two separated humps — all produce a sampling distribution of the
+Three populations that look nothing alike, a decaying tail, a flat
+block, two separated humps, all produce a sampling distribution of the
 mean that snaps onto the *same* standard normal curve once standardized.
 This universality is exactly why normal-based formulas (confidence
 intervals, t-tests, z-tests) are so broadly useful: they target the
@@ -318,7 +318,7 @@ print("Lesson: 'n >= 30' is a guideline, not a guarantee.")
 
 At n = 30 the sample mean of this log-normal still carries obvious
 skew. You need `n` in the hundreds before it settles into a bell. The
-takeaway isn't "30 is wrong" — for mild skew it's fine — it's that the
+takeaway isn't "30 is wrong", for mild skew it's fine, it's that the
 right `n` **depends on the population**. The more extreme the shape, the
 more averaging it takes to normalize the mean.
 
@@ -326,7 +326,7 @@ more averaging it takes to normalize the mean.
 The CLT needs a **finite variance**. A few real distributions (the Cauchy
 distribution, certain power-law / "fat-tailed" phenomena) have infinite
 or undefined variance, and for those the sample mean does **not** settle
-into a normal bell no matter how big `n` gets — sometimes the mean
+into a normal bell no matter how big `n` gets, sometimes the mean
 doesn't stabilize at all. These are rare in everyday data but real in
 finance and network science. If your data has monstrous outliers and the
 mean keeps lurching as you add data, suspect a heavy tail and lean on the
@@ -337,7 +337,7 @@ mean keeps lurching as you add data, suspect a heavy tail and lean on the
 
 The CLT also pins down the *width* of the bell: the sampling distribution
 of the mean has standard deviation `σ / √n`. That `1/√n` is
-the same diminishing-returns law we keep meeting — and it's worth
+the same diminishing-returns law we keep meeting, and it's worth
 verifying directly.
 
 <CodeBlock
@@ -392,7 +392,7 @@ for n, e, t in zip(ns, empirical, theory):
 The simulated spread (the x markers) lands right on the `σ / √n`
 curve, even though the population is exponential. Notice the perfect
 squares in `ns` (4, 9, 16, 36, …): each time `n` quadruples, the spread
-halves. That's why precision is expensive — covered fully in *Standard
+halves. That's why precision is expensive, covered fully in *Standard
 Error*.
 
 ## Prove the CLT to yourself
@@ -470,9 +470,9 @@ print(skews)
 
 Produce a dict \`check\` with:
 
-- \`"empirical_sd"\` — the standard deviation of your 5000 sample means (a float)
-- \`"theory_sd"\` — the CLT prediction \`SIGMA / sqrt(64)\` (a float)
-- \`"rel_diff"\` — the relative difference \`abs(empirical_sd - theory_sd) / theory_sd\` (a float)
+- \`"empirical_sd"\`, the standard deviation of your 5000 sample means (a float)
+- \`"theory_sd"\`, the CLT prediction \`SIGMA / sqrt(64)\` (a float)
+- \`"rel_diff"\`, the relative difference \`abs(empirical_sd - theory_sd) / theory_sd\` (a float)
 
 The two should agree closely, so \`rel_diff\` should be small (under ~0.08).`}
   files={[
@@ -560,19 +560,19 @@ cashing in the CLT. We'll do exactly that in *Standard Error* and
 - The raw data values, once you collect enough of them
   > The CLT never claims your raw data becomes normal. Collecting more skewed data just gives you a clearer picture of the same skewed population.
 - [o] The sampling distribution of the sample mean, as n grows, for populations with finite variance
-  > The CLT is precisely a statement about the distribution of $\\bar{x}$ across repeated samples approaching normality — not about the data, and not about other statistics in general.
+  > The CLT is precisely a statement about the distribution of $\\bar{x}$ across repeated samples approaching normality, not about the data, and not about other statistics in general.
 - The population distribution itself
   > The population's shape is fixed and unaffected by sampling. The CLT describes the behavior of an *estimate* (the mean), not the population.
 - The distribution of the sample's standard deviation
   > The classic CLT is about the *mean*. While other statistics have their own limiting behavior, the CLT as usually stated concerns $\\bar{x}$, not $s$.
 
-The CLT is about the *mean's* sampling distribution becoming normal — not the data, the population, or arbitrary statistics.`}
+The CLT is about the *mean's* sampling distribution becoming normal, not the data, the population, or arbitrary statistics.`}
 />
 
 <MultipleChoice
   markdown={`Your raw data is strongly right-skewed. A colleague runs a normality test on the **raw values**, it fails, and they conclude "the CLT doesn't apply here." What's wrong with that reasoning?
 
-- Nothing — a failed normality test means the CLT can't be used
+- Nothing, a failed normality test means the CLT can't be used
   > A normality test on *raw data* is irrelevant to the CLT. The CLT is about the sampling distribution of the *mean*, which can be normal even when the raw data clearly isn't.
 - [o] The CLT is about the mean's sampling distribution, not the raw data; raw data failing a normality test is expected and doesn't block the CLT
   > Testing the raw values checks the wrong thing. The CLT predicts that $\\bar{x}$ normalizes as $n$ grows regardless of the raw data's shape, so a skewed-data result is beside the point.
@@ -588,13 +588,13 @@ The CLT governs $\\bar{x}$, so a normality test on individual data points doesn'
   markdown={`For which population would the sample mean require the **largest** $n$ before its sampling distribution looks reliably normal?
 
 - A nearly symmetric, light-tailed population
-  > Symmetric, light-tailed populations normalize at very small $n$ — sometimes $n \\approx 5$. This needs the *least* data, not the most.
+  > Symmetric, light-tailed populations normalize at very small $n$, sometimes $n \\approx 5$. This needs the *least* data, not the most.
 - A mildly right-skewed population
   > Mild skew is well-served by the classic $n \\approx 30$ guideline. It converges faster than a heavy-tailed case.
 - [o] A heavily right-skewed, heavy-tailed population (e.g., log-normal incomes)
   > Heavy skew and rare extreme values make the mean's distribution converge slowly, so it can take $n$ in the hundreds before the bell shape is trustworthy.
 - A uniform (flat) population
-  > A uniform population is symmetric and light-tailed, so its mean normalizes quickly — much faster than a skewed, heavy-tailed one.
+  > A uniform population is symmetric and light-tailed, so its mean normalizes quickly, much faster than a skewed, heavy-tailed one.
 
 The heavier the skew/tails, the more averaging (larger $n$) it takes for the CLT's bell to emerge.`}
 />
@@ -606,10 +606,10 @@ The heavier the skew/tails, the more averaging (larger $n$) it takes for the CLT
   > The population's spread is fixed, but the *mean's* spread is $\\sigma/\\sqrt{n}$, which falls as $n$ grows. They are different quantities.
 - Grows like $\\sqrt{n}$
   > It shrinks, not grows. More data makes the mean *more* stable, so its sampling distribution gets narrower.
-- [o] Shrinks like $\\sigma/\\sqrt{n}$ — quadrupling $n$ halves the spread
+- [o] Shrinks like $\\sigma/\\sqrt{n}$, quadrupling $n$ halves the spread
   > The CLT gives the spread of $\\bar{x}$ as $\\sigma/\\sqrt{n}$; since the spread scales with $1/\\sqrt{n}$, a 4x larger sample halves it.
-- Shrinks like $\\sigma/n$ — quadrupling $n$ quarters the spread
-  > The denominator is $\\sqrt{n}$, not $n$. Quadrupling $n$ divides the spread by $\\sqrt{4}=2$, halving it — not quartering it.
+- Shrinks like $\\sigma/n$, quadrupling $n$ quarters the spread
+  > The denominator is $\\sqrt{n}$, not $n$. Quadrupling $n$ divides the spread by $\\sqrt{4}=2$, halving it, not quartering it.
 
 The width of the mean's bell is $\\sigma/\\sqrt{n}$: precision improves with the *square root* of sample size.`}
 />
@@ -618,7 +618,7 @@ The width of the mean's bell is $\\sigma/\\sqrt{n}$: precision improves with the
   markdown={`Which condition is **required** for the classic CLT to guarantee normality of the sample mean?
 
 - The population must be symmetric
-  > Symmetry is not required — the whole point of the CLT is that it works for skewed populations too, given enough $n$.
+  > Symmetry is not required, the whole point of the CLT is that it works for skewed populations too, given enough $n$.
 - The sample size must be exactly 30
   > 30 is a loose rule of thumb, not a requirement. The needed $n$ depends on the population's shape; there's no exact magic number.
 - [o] The population must have a finite variance
@@ -632,7 +632,7 @@ The CLT's core requirement is a finite population variance; shape and an exact $
 <MultipleChoice
   markdown={`A risk analyst models loss sizes with a fat-tailed distribution that has **infinite variance**. They average 10,000 losses and assume the mean is normally distributed via the CLT. What's the risk?
 
-- No risk — 10,000 is plenty for the CLT
+- No risk, 10,000 is plenty for the CLT
   > Sample size can't rescue a distribution that violates the CLT's assumptions. With infinite variance the usual CLT simply doesn't apply, regardless of $n$.
 - [o] The classic CLT requires finite variance; with infinite variance the sample mean need not become normal (or even stabilize), so the normal approximation can be badly wrong
   > Infinite variance breaks the CLT's core condition, so the mean can keep lurching as data is added and the normal-based risk numbers can be severely misleading.
@@ -641,20 +641,20 @@ The CLT's core requirement is a finite population variance; shape and an exact $
 - The only issue is that 10,000 is too small; 100,000 would fix it
   > More data doesn't fix a violated assumption. If the variance is infinite, even enormous $n$ won't make the sample mean normal.
 
-The CLT's finite-variance condition is not optional — fat tails with infinite variance can defeat it at any sample size.`}
+The CLT's finite-variance condition is not optional, fat tails with infinite variance can defeat it at any sample size.`}
 />
 
 <Callout type="success" title="Key takeaways">
-- The **CLT**: for a population with **finite variance**, the *sampling distribution of the mean* becomes approximately **normal** as `n` grows — *whatever* the population's shape.
+- The **CLT**: for a population with **finite variance**, the *sampling distribution of the mean* becomes approximately **normal** as `n` grows, *whatever* the population's shape.
 - It is about the **mean's distribution**, not the raw data. The CLT does **not** make your data normal.
 - "n ≥ 30" is a **rough guideline**. Symmetric data normalizes at small `n`; heavily skewed/heavy-tailed data may need hundreds.
-- The mean's bell has spread `σ / √n` — quadrupling `n` halves it.
-- The CLT needs **finite variance**; fat-tailed distributions (Cauchy, certain power laws) can break it at any `n` — prefer robust methods there.
+- The mean's bell has spread `σ / √n`, quadrupling `n` halves it.
+- The CLT needs **finite variance**; fat-tailed distributions (Cauchy, certain power laws) can break it at any `n`, prefer robust methods there.
 - This single theorem is why normal-based confidence intervals and tests work on messy real data.
 </Callout>
 
 The CLT tells us the mean's sampling distribution is normal with spread
-`σ / √n`. That spread — the standard deviation of an *estimate* —
+`σ / √n`. That spread, the standard deviation of an *estimate*,
 is the **standard error**, the quantity we estimate from a single sample
 and the building block of every confidence interval and test statistic.
 That's next.

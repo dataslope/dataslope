@@ -2,7 +2,7 @@
 export {};
 
 // PhpWeb is an Emscripten build compiled for ENVIRONMENT=web. It reads
-// `document` and `window` during module evaluation — before any async code
+// `document` and `window` during module evaluation, before any async code
 // runs. Stub them here at module-level, before any imports, so the checks
 // pass in a worker context. Our `locateFile` override makes the fake
 // currentScript irrelevant; PHP execution never touches the real DOM.
@@ -23,7 +23,7 @@ export {};
         enumerable: false,
       });
     } catch {
-      // Already defined and non-configurable — nothing we can do; PhpWeb will
+      // Already defined and non-configurable, nothing we can do; PhpWeb will
       // fail to init if the value is wrong, and the error message will say why.
     }
   }
@@ -65,7 +65,7 @@ declare const self: DedicatedWorkerGlobalScope;
 
 const PHP_WASM_VERSION = "0.1.0";
 // php-wasm 0.1.0 exceeds jsDelivr's 150 MB package limit, so jsDelivr returns
-// 403 for every file in the package — see seanmorris/php-wasm#103. unpkg has
+// 403 for every file in the package, see seanmorris/php-wasm#103. unpkg has
 // no such limit and is the upstream-recommended CDN until that's resolved.
 const PHP_WASM_CDN = `https://unpkg.com/php-wasm@${PHP_WASM_VERSION}/`;
 
@@ -152,7 +152,7 @@ async function initPhp(): Promise<void> {
 
   post({ kind: "loading", message: "Initialising PHP runtime…" });
   php = new mod.PhpWeb({
-    // Return undefined for paths php-wasm handles internally — most
+    // Return undefined for paths php-wasm handles internally, most
     // importantly `libxml2.so`, which PhpBase suppresses with a data: URL
     // when no sharedLib supplies it (PhpBase.mjs in v0.1.0). If we resolve
     // it to a CDN URL the request 404s on every init.
@@ -220,7 +220,7 @@ async function runCode(id: number, code: string): Promise<void> {
   if (stderr) post({ kind: "output", id, cell: { type: "stderr", content: stderr } });
 }
 
-// Serialise run requests — Emscripten PHP is not reentrant.
+// Serialise run requests, Emscripten PHP is not reentrant.
 let workQueue: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(task: () => Promise<T>): Promise<T> {

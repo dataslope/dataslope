@@ -2,7 +2,7 @@
  * Tests for the TypeScript playground runtime.
  *
  * The TypeScript runtime transpiles code with the TypeScript compiler API
- * (loaded from npm) then executes it via AsyncFunction — both available in
+ * (loaded from npm) then executes it via AsyncFunction, both available in
  * Node, so these tests run without any browser APIs.
  */
 import { describe, it, expect } from "vitest";

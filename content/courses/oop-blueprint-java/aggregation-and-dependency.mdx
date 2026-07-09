@@ -1,6 +1,6 @@
 ---
 title: Aggregation and Dependency
-description: The weaker "has-a" and "uses-a" relationships — borrowed parts and temporary collaborators
+description: The weaker "has-a" and "uses-a" relationships, borrowed parts and temporary collaborators
 ---
 
 Not every relationship between two objects is the strong ownership we
@@ -9,14 +9,14 @@ saw with composition. Often one object simply *uses* another, or
 OOP tradition give these weaker relationships names: **aggregation**
 and **dependency**.
 
-Knowing the difference is not pedantry — it changes *how you draw
+Knowing the difference is not pedantry, it changes *how you draw
 your model*, *which object's constructor takes which*, and *what
 happens when one object goes away*.
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three pairs of shapes bond ever more loosely — a green part sealed inside its whole, a part docked half out of the edge, and a part merely waved at across a gap — composition, aggregation, and dependency"
+  aria-label="Three pairs of shapes bond ever more loosely, a green part sealed inside its whole, a part docked half out of the edge, and a part merely waved at across a gap, composition, aggregation, and dependency"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -60,7 +60,7 @@ flowchart TD
 
 A `Library` keeps a list of its `Member`s. But each `Member` is a
 person who exists in the world whether or not the library does. If
-the library closed tomorrow, the members would not vanish — they
+the library closed tomorrow, the members would not vanish, they
 would just stop being members. That is **aggregation**.
 
 ```mermaid
@@ -89,7 +89,7 @@ classDiagram
     Member ada = new Member("Ada");
     Member ken = new Member("Ken");
 
-    // The library aggregates them — it holds references, but didn't make them:
+    // The library aggregates them, it holds references, but didn't make them:
     Library lib = new Library();
     lib.register(ada);
     lib.register(ken);
@@ -116,7 +116,7 @@ import java.util.List;
 
 public class Library {
   // The list is owned by the Library (composition), but the Members
-  // inside it are aggregated — they were created elsewhere.
+  // inside it are aggregated, they were created elsewhere.
   private final List<Member> members = new ArrayList<>();
 
   public void register(Member m) { members.add(m); }
@@ -134,7 +134,7 @@ composition:
 1. `Library` did not call `new Member(...)`. It received the members
    from the outside.
 2. The same `Member` object could be registered with two different
-   libraries simultaneously — the membership relationship is not
+   libraries simultaneously, the membership relationship is not
    exclusive.
 
 ## Composition vs. aggregation, side by side
@@ -312,7 +312,7 @@ your classes loosely coupled and easy to recombine.
   - \`size()\` returns the number enrolled.
   - \`names()\` returns the enrolled students' names joined by \`", "\`. If the classroom is empty, return the empty string \`""\`.
 
-The students are created in \`Main\` and *handed in* — \`Classroom\`
+The students are created in \`Main\` and *handed in*, \`Classroom\`
 must not call \`new Student(...)\`.
 
 Expected output:
@@ -407,7 +407,7 @@ public class Classroom {
 - [o] Aggregation
   > The library holds references to things that live independently.
 - Dependency
-  > Dependency is briefer — a method-scope collaborator.
+  > Dependency is briefer, a method-scope collaborator.
 - Inheritance
   > No "is-a" relationship is implied between Library and Member.`}
 />
@@ -432,7 +432,7 @@ public class Classroom {
   > Speed isn't the point.
 - It saves typing
   > Often it adds typing, not removes it.
-- [o] It keeps the class loosely coupled — the same class can work with different implementations or test stand-ins
+- [o] It keeps the class loosely coupled, the same class can work with different implementations or test stand-ins
   > This is the heart of dependency injection and a major source of OOP flexibility.
 - It is required for the class to compile
   > It is not required by the compiler.`}

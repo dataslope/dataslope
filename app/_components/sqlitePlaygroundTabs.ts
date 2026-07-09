@@ -12,7 +12,7 @@ export const dbScopedKey = (dbId: string, k: string) =>
   `${STORAGE_PREFIX}db_${dbId}_${k}`;
 
 export interface QueryTab {
-  /** Stable id used as the React key — generated client-side because
+  /** Stable id used as the React key, generated client-side because
    *  tabs can be created at any time. */
   id: string;
   title: string;
@@ -65,7 +65,7 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
       }
     }
   } catch {
-    // Corrupt entry — fall through to defaults.
+    // Corrupt entry, fall through to defaults.
   }
   return defaults.map((seed) => ({
     ...seed,
@@ -76,12 +76,12 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
 
 export function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
-    // ER diagram and query-history tabs are transient — never persist them
+    // ER diagram and query-history tabs are transient, never persist them
     // so they don't reappear after a page reload or database switch.
     const persistable = tabs.filter((t) => t.kind !== "er-diagram" && t.kind !== "query-history");
     localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(persistable));
   } catch {
-    // Quota exceeded / private mode — silently ignore.
+    // Quota exceeded / private mode, silently ignore.
   }
 }
 

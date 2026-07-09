@@ -1,11 +1,11 @@
 ---
 title: What Is a Geom?
-description: Geometries are the marks ggplot2 draws — understand them as interchangeable representations of the same data and mappings.
+description: Geometries are the marks ggplot2 draws, understand them as interchangeable representations of the same data and mappings.
 ---
 
 A **geom** (geometry) is the kind of **mark** ggplot2 draws to
 represent your data: a point, a line, a bar, a box. It is the most
-visible component — when someone says "make a scatter plot" or "make a
+visible component, when someone says "make a scatter plot" or "make a
 bar chart," they are really choosing a *geom*.
 
 <svg
@@ -53,13 +53,13 @@ variables relate to what visual channels*. The geom decides *how those
 relationships are drawn*. Swap the geom and you get a different chart
 **from the same description**.
 
-From the *same* data and mappings — `aes(x = displ, y = hwy)` — each
+From the *same* data and mappings, `aes(x = displ, y = hwy)`, each
 geom draws a different chart:
 
-- `geom_point` — a scatter plot.
-- `geom_line` — a connected line.
-- `geom_bin2d` — a 2-D density.
-- `geom_smooth` — a trend line + band.
+- `geom_point`, a scatter plot.
+- `geom_line`, a connected line.
+- `geom_bin2d`, a 2-D density.
+- `geom_smooth`, a trend line + band.
 
 Watch the geom change while everything else stays fixed:
 
@@ -94,7 +94,7 @@ base + geom_smooth() # marks = a smoothed trend line + confidence band
 />
 
 You changed exactly one word and the chart's *character* changed
-completely — yet the data and mappings are identical. That is the geom
+completely, yet the data and mappings are identical. That is the geom
 doing its one job: choosing the mark.
 
 ## Geoms have required aesthetics
@@ -109,7 +109,7 @@ Each geom needs certain aesthetics to make sense, and ignores others:
 | `geom_bar()` | x | a bar whose height is the **count** at each x |
 | `geom_histogram()` | x | bars over **binned** counts of x |
 | `geom_boxplot()` | x (group), y | a five-number-summary box per group |
-| `geom_tile()` | x, y, fill | a colored cell — heatmaps |
+| `geom_tile()` | x, y, fill | a colored cell, heatmaps |
 
 Notice `geom_bar()` and `geom_histogram()` need only **x**. That is a
 clue we will unpack in the next section: those geoms *compute* their y
@@ -117,7 +117,7 @@ themselves, via a statistic.
 
 ## A line needs an order; a scatter does not
 
-A geom is not just a different look — it carries *assumptions*. Points
+A geom is not just a different look, it carries *assumptions*. Points
 are unordered: each is independent. A line **connects points in x
 order**, which only makes sense when x has a meaningful sequence (like
 time). Using a line on unordered data produces the dreaded "spaghetti":
@@ -156,7 +156,7 @@ swapping one component.
   > That is the *data* component, set in \`ggplot()\`.
 - Which columns map to x, y, and color.
   > Those are *aesthetic mappings*, set in \`aes()\`.
-- [o] The kind of mark used to represent the data — points, lines, bars, boxes, and so on.
+- [o] The kind of mark used to represent the data, points, lines, bars, boxes, and so on.
   > The geom chooses *how* the mapped data is drawn.
 - The fonts and background styling of the plot.
   > That is the *theme*.
@@ -183,10 +183,10 @@ x-values form a meaningful sequence.`}
 
 ## Key takeaways
 
-- A **geom** is the *mark* drawn — point, line, bar, box, tile.
+- A **geom** is the *mark* drawn, point, line, bar, box, tile.
 - The **same data + mappings** can be drawn by many geoms; swapping the
   geom changes the chart without changing the description.
 - Each geom has **required aesthetics** and carries **assumptions**
   (e.g. a line implies ordered x).
-- "Scatter plot" vs. "line chart" is just a change of geom — the
+- "Scatter plot" vs. "line chart" is just a change of geom, the
   grammar replaces a menu of chart types with one swappable component.

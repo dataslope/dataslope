@@ -2,9 +2,9 @@
  * OPFS workspace management.
  *
  * A workspace is a named, isolated directory inside OPFS that holds:
- *  - `meta.json`  — workspace metadata (name, playground, timestamps)
- *  - `files/`     — user code files (one file per editor tab)
- *  - `db/`        — database binaries (SQLite, etc.)
+ *  - `meta.json`, workspace metadata (name, playground, timestamps)
+ *  - `files/`, user code files (one file per editor tab)
+ *  - `db/`, database binaries (SQLite, etc.)
  *
  * The workspace registry is a lightweight list of all known workspaces stored
  * in `localStorage` so it can be read synchronously on page load. OPFS
@@ -24,7 +24,7 @@ import { isOpfsSupported, hasWebLocks } from "./featureDetect";
 // ---------------------------------------------------------------------------
 
 export interface WorkspaceEntry {
-  /** Stable, globally-unique identifier — also the OPFS directory name. */
+  /** Stable, globally-unique identifier, also the OPFS directory name. */
   id: string;
   /** User-visible display name, e.g. "My SQLite Project". */
   name: string;
@@ -50,7 +50,7 @@ const REGISTRY_KEY = "playground_workspaces";
 // The registry key was `pg_workspaces` before the #409 `pg_` → `playground_`
 // storage-namespace rename. Read it once as a fallback (and migrate it
 // forward) so users who created workspaces on the old build don't lose their
-// workspace list on upgrade — mirroring `getStoredEditorTheme`'s legacy-key
+// workspace list on upgrade, mirroring `getStoredEditorTheme`'s legacy-key
 // handling.
 const LEGACY_REGISTRY_KEY = "pg_workspaces";
 const WORKSPACES_DIR = "workspaces";
@@ -103,7 +103,7 @@ export function updateWorkspaceRegistry(entries: WorkspaceEntry[]): void {
   try {
     localStorage.setItem(REGISTRY_KEY, JSON.stringify(entries));
   } catch {
-    // Quota exceeded / private mode — silently ignore.
+    // Quota exceeded / private mode, silently ignore.
   }
 }
 
@@ -147,7 +147,7 @@ async function getWorkspaceDir(
  * OPFS, creates the `files/` and `db/` sub-directories, and (by default) adds
  * an entry to the registry in localStorage.
  *
- * Pass `{ register: false }` to create a "draft" workspace — its OPFS backing
+ * Pass `{ register: false }` to create a "draft" workspace, its OPFS backing
  * is created so the engine can persist into it, but it is NOT added to the
  * saved-workspaces registry. This backs the explicit-save model: the
  * auto-created default workspace stays a draft (it never clutters the
@@ -157,7 +157,7 @@ async function getWorkspaceDir(
  * If OPFS is unavailable the workspace entry is still returned (with no OPFS
  * backing) so callers can fall back to localStorage-only mode.
  *
- * Pass `{ id }` to create the workspace under a fixed identifier — used when
+ * Pass `{ id }` to create the workspace under a fixed identifier, used when
  * materializing a cloud copy so the local workspace keeps the cloud id and
  * the two stay paired across devices (see app/_components/cloud/).
  */
@@ -294,7 +294,7 @@ export async function renameWorkspace(
       await writable.write(JSON.stringify(meta));
       await writable.close();
     } catch {
-      // Meta write failed — registry is the authoritative name source, so the
+      // Meta write failed, registry is the authoritative name source, so the
       // rename is still effective.
     }
   }
@@ -309,7 +309,7 @@ export async function renameWorkspace(
  * source workspace is not in the registry.
  *
  * When OPFS is unavailable, the new workspace is registered with no backing
- * data — callers fall back to the in-memory path just like `createWorkspace`.
+ * data, callers fall back to the in-memory path just like `createWorkspace`.
  */
 export async function duplicateWorkspace(
   sourceId: string,
@@ -332,7 +332,7 @@ export async function duplicateWorkspace(
       });
       await copyDirectoryHandle(srcDir, dstDir);
     } catch {
-      // Source directory missing or unreadable — leave the new workspace
+      // Source directory missing or unreadable, leave the new workspace
       // empty (the registry entry is still valid).
     }
   }
@@ -365,7 +365,7 @@ async function copyDirectoryHandle(
 }
 
 // ---------------------------------------------------------------------------
-// Web Locks — cross-tab workspace exclusivity
+// Web Locks, cross-tab workspace exclusivity
 // ---------------------------------------------------------------------------
 
 /** Minimal type surface for the Web Locks API used below. */
@@ -385,8 +385,8 @@ export interface WorkspaceLockOptions {
    * unmounts (e.g. a client-side navigation away).
    *
    * Without it the lock leaks for the whole lifetime of the document, and a
-   * later remount in the *same* document — most visibly a browser
-   * back-then-forward return to the playground — re-runs this acquisition and
+   * later remount in the *same* document, most visibly a browser
+   * back-then-forward return to the playground, re-runs this acquisition and
    * collides with the document's own stale lock, reporting a spurious
    * "workspace is open in another tab" conflict.
    */
@@ -394,7 +394,7 @@ export interface WorkspaceLockOptions {
   /**
    * How long to wait for the lock before declaring a conflict, in ms
    * (default 1500). The wait lets a just-unmounted predecessor in this
-   * document — or another tab/page still tearing down — release the lock and
+   * document, or another tab/page still tearing down, release the lock and
    * hand it over, instead of racing to a false conflict. A genuinely
    * concurrent live tab holds the lock for its whole lifetime, so the wait
    * elapses and a real conflict is still reported.
@@ -411,7 +411,7 @@ export interface WorkspaceLockOptions {
  * Returns `false` if another live tab still holds the lock after the grace
  * window.
  * Returns `true` unconditionally when the Web Locks API is unavailable (no
- * enforcement possible — callers should proceed with a warning).
+ * enforcement possible, callers should proceed with a warning).
  */
 export async function acquireWorkspaceLock(
   workspaceId: string,
@@ -427,8 +427,8 @@ export async function acquireWorkspaceLock(
   return new Promise<boolean>((resolve) => {
     // The *wait* is aborted when the grace window elapses or the caller
     // unmounts before the lock is ever granted. (Once granted, the lock is
-    // instead held until `releaseSignal` aborts — see the callback below.) A
-    // queued request — rather than `ifAvailable`, which fails instantly — lets
+    // instead held until `releaseSignal` aborts, see the callback below.) A
+    // queued request, rather than `ifAvailable`, which fails instantly, lets
     // a predecessor that is mid-release hand the lock over within the window.
     const waitController = new AbortController();
     const timer = setTimeout(() => waitController.abort(), graceMs);
@@ -447,7 +447,7 @@ export async function acquireWorkspaceLock(
         resolve(true);
         // Hold the lock until the caller releases it (effect cleanup) or the
         // tab is destroyed, then settle so the browser frees it for the next
-        // waiter — e.g. this same document's next mount after a back/forward.
+        // waiter, e.g. this same document's next mount after a back/forward.
         return new Promise<void>((release) => {
           if (!releaseSignal) return; // hold until the tab is closed
           if (releaseSignal.aborted) release();

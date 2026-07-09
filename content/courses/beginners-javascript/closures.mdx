@@ -1,6 +1,6 @@
 ---
 title: Closures
-description: The single most powerful idea in JavaScript — functions remembering the scope they were born in.
+description: The single most powerful idea in JavaScript, functions remembering the scope they were born in.
 ---
 
 A **closure** is what you get when a function "remembers" the
@@ -12,7 +12,7 @@ enormous amount of real-world code starts to make sense.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A green capsule carrying a blue and a yellow dot away from a faded scope box where ghost copies of the same dots remain — a function remembering the variables it was born with"
+  aria-label="A green capsule carrying a blue and a yellow dot away from a faded scope box where ghost copies of the same dots remain, a function remembering the variables it was born with"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -105,7 +105,7 @@ across calls, without exposing it to the outside world.
     {
       filename: "main.js",
       starterCode: `function makeCounter() {
-  let count = 0; // private — no one else can see it directly
+  let count = 0; // private, no one else can see it directly
   return function () {
     count = count + 1;
     return count;
@@ -118,8 +118,8 @@ console.log(tick()); // 2
 console.log(tick()); // 3
 
 const tock = makeCounter();
-console.log(tock()); // 1 — independent counter
-console.log(tick()); // 4 — tick keeps going
+console.log(tock()); // 1, independent counter
+console.log(tick()); // 4, tick keeps going
 `,
     },
   ]}
@@ -171,7 +171,7 @@ console.log(fs[4]()); // 4
 
 Because we declared `i` with `let`, each iteration of the loop
 gets its own fresh `i`. Each function closes over *that
-iteration's* `i`. The functions print `0`, `1`, `2`, `3`, `4` —
+iteration's* `i`. The functions print `0`, `1`, `2`, `3`, `4`,
 just as you would expect.
 
 Now try the same thing with the old `var` (which is
@@ -283,7 +283,7 @@ state. No part of the program can corrupt it from outside.
 
 ## Closures and modules
 
-Modules — collections of related functions and private data —
+Modules, collections of related functions and private data,
 are essentially a use of closures. The "module pattern" in
 pre-2015 JavaScript used closures explicitly:
 
@@ -312,14 +312,14 @@ counterModule.increment();
 console.log(counterModule.value()); // 3
 counterModule.reset();
 console.log(counterModule.value()); // 0
-// counterModule.count       // undefined — count is private!
+// counterModule.count       // undefined, count is private!
 `,
     },
   ]}
 />
 
-This pattern — called the **IIFE** ("immediately invoked function
-expression") — was once everywhere. Modern code uses real
+This pattern, called the **IIFE** ("immediately invoked function
+expression"), was once everywhere. Modern code uses real
 modules (we will see them later) instead, but the underlying idea
 is still closures.
 
@@ -349,7 +349,7 @@ console.log(limiter("fifth")); // deny
     {
       filename: "rateLimiter.js",
       starterCode: `// Returns a function that allows up to \`max\` calls, then denies the rest.
-// The state (call count) lives in the closure — no globals, no leaks.
+// The state (call count) lives in the closure, no globals, no leaks.
 function makeRateLimiter(max) {
   let calls = 0;
   return function (label) {
@@ -369,7 +369,7 @@ module.exports = { makeRateLimiter };
 
 `index.js` has no way to read or reset the `calls` counter
 directly. The only way it can interact with the state is to call
-the returned function. That is **encapsulation** — and it's free,
+the returned function. That is **encapsulation**, and it's free,
 just from how closures work.
 
 ## Closures, summarised
@@ -380,7 +380,7 @@ flowchart TB
     B["The inner function refers to a variable from the outer scope"]
     C["The outer scope finishes (its call returns)"]
     D["The inner function continues to live somewhere<br/>(returned, stored, passed as a callback)"]
-    E["The variable stays alive — the inner function holds a reference to it"]
+    E["The variable stays alive, the inner function holds a reference to it"]
     A --> B --> C --> D --> E
 ```
 
@@ -394,16 +394,16 @@ created, you are looking at a closure.
   title="Build your own counter factory"
   instructions={`Write a function \`makeCounter(start)\` that returns an *object* with three methods:
 
-- \`increment()\` — increase the internal counter by 1 and return the new value.
-- \`decrement()\` — decrease the internal counter by 1 and return the new value.
-- \`value()\` — return the current value without changing it.
+- \`increment()\`, increase the internal counter by 1 and return the new value.
+- \`decrement()\`, decrease the internal counter by 1 and return the new value.
+- \`value()\`, return the current value without changing it.
 
 The starting value of the counter is the \`start\` argument (default \`0\`). Each call to \`makeCounter\` should produce an independent counter.`}
   files={[
     {
       filename: "main.js",
       starterCode: `function makeCounter(start = 0) {
-  // your code here — keep \`count\` private via closure.
+  // your code here, keep \`count\` private via closure.
   return {
     increment() {
       return 0;
@@ -503,9 +503,9 @@ if (b.value() !== 99) throw new Error("b should be 99");`,
 - A keyword that hides a variable from the outside world
   > "Closure" is a concept, not a keyword. Variable hiding is a side-effect of how scoping works, but the closure itself is the function-plus-its-captured-scope-variables package.
 - [o] A function that "remembers" the variables from the scope where it was defined, even after that scope has finished
-  > When an inner function refers to a variable from its enclosing scope, JavaScript keeps that variable alive for as long as the inner function exists. This lets us create private state, configurable functions, memoisation caches, modules, and many other powerful patterns — all built on the same underlying mechanism.
+  > When an inner function refers to a variable from its enclosing scope, JavaScript keeps that variable alive for as long as the inner function exists. This lets us create private state, configurable functions, memoisation caches, modules, and many other powerful patterns, all built on the same underlying mechanism.
 - A way to copy values into a function
-  > Closures capture *references* to variables in the outer scope, not copies of their values at the moment of creation — this is exactly why the \`var\`-in-a-loop puzzle produces unexpected results when a shared variable's final value is seen by all inner functions.
+  > Closures capture *references* to variables in the outer scope, not copies of their values at the moment of creation, this is exactly why the \`var\`-in-a-loop puzzle produces unexpected results when a shared variable's final value is seen by all inner functions.
 
 Closures are arguably the single most important idea to understand in JavaScript. Once you see them clearly, an enormous amount of "magic" in libraries and frameworks turns into ordinary code.`}
 />

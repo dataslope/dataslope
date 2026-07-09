@@ -1,10 +1,10 @@
 ---
 title: Loading Data with Pandas
-description: The minimum pandas you need to feed Plotly Express — DataFrames, columns, and basic filtering
+description: The minimum pandas you need to feed Plotly Express, DataFrames, columns, and basic filtering
 ---
 
 Plotly Express expects its data in a **pandas DataFrame**. If you've
-never used pandas before, that sentence might sound intimidating —
+never used pandas before, that sentence might sound intimidating,
 but a DataFrame is just a table, and you only need to know a handful
 of operations before you can make every chart in this course.
 
@@ -15,7 +15,7 @@ Express*.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="A friendly table with four colored column headers and rows of faint cells, one full column highlighted — a DataFrame and the Series inside it"
+  aria-label="A friendly table with four colored column headers and rows of faint cells, one full column highlighted, a DataFrame and the Series inside it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="140" y="40" width="360" height="180" rx="14" fill="currentColor" opacity="0.06" />
@@ -61,11 +61,11 @@ Express*.
 
 A **DataFrame** is a table in memory. It has:
 
-- **Rows** — usually one per observation (one country, one
+- **Rows**, usually one per observation (one country, one
   transaction, one student).
-- **Columns** — named, typed fields (e.g., `country`, `year`,
+- **Columns**, named, typed fields (e.g., `country`, `year`,
   `gdpPercap`).
-- **An index** — row labels, usually just `0, 1, 2, ...` by default.
+- **An index**, row labels, usually just `0, 1, 2, ...` by default.
 
 If you've used Excel, a DataFrame is roughly "one worksheet, with
 named column headers."
@@ -126,7 +126,7 @@ For this course, you'll see data arrive in three ways:
    ```
 
 This course uses all three. On pages that need a friendlier dataset
-than the built-ins offer — **Palmer Penguins** or **diamonds**, say —
+than the built-ins offer, **Palmer Penguins** or **diamonds**, say,
 the CSV is loaded for you and you read it with `pd.read_csv(...)`,
 exactly as you would on your own machine.
 
@@ -202,7 +202,7 @@ df["lifeExp"]   # the lifeExp column, as a Series
 
 You can also use *dot notation* if the column name is a valid
 Python identifier: `df.lifeExp`. Bracket notation is more
-universal — use it.
+universal, use it.
 
 <CodeBlock
   adapter="python"
@@ -236,7 +236,7 @@ df_both = df[(df["year"] == 2007) & (df["gdpPercap"] > 30000)]
 ```
 
 The `&` (and) and `|` (or) operators combine conditions. You **must**
-wrap each condition in parentheses — that's a Python operator-
+wrap each condition in parentheses, that's a Python operator-
 precedence quirk that trips up everyone exactly once.
 
 ### The `.query()` method
@@ -312,7 +312,7 @@ fig.show()
   ]}
 />
 
-Notice how much more useful the bar chart is when sorted by value —
+Notice how much more useful the bar chart is when sorted by value,
 the eye reads "ranking" instantly.
 
 ## Group + aggregate (just a peek)
@@ -382,7 +382,7 @@ A common *non-tidy* layout looks like:
 | Boston |  100 |  120 |  150 |
 | Tokyo  |  200 |  220 |  240 |
 
-This is "wide" — years are columns. To plot it with Plotly Express,
+This is "wide", years are columns. To plot it with Plotly Express,
 you almost always want to reshape it to **long**:
 
 | city   | year | value |
@@ -440,7 +440,7 @@ fig.show()
 
 This `wide → long` reshape pattern is one of the most common moves
 in real visualization work. Don't worry about memorizing
-`melt()` — when you need it, you'll look it up. Just **recognize**
+`melt()`, when you need it, you'll look it up. Just **recognize**
 when your data is wide and Plotly Express is complaining.
 
 ## Check your understanding
@@ -466,7 +466,7 @@ Build the habit: load a DataFrame → **df.head()** → **df.shape** → **df.de
 - **df.filter(year == 2007)**
   > \`df.filter()\` selects columns or rows by *label pattern* (regex or list), not by a boolean condition on a column's values; this syntax would raise an error.
 - **df.where(year == 2007)**
-  > \`df.where()\` keeps values where the condition is True and replaces the rest with NaN — it does not drop non-matching rows the way boolean indexing does.
+  > \`df.where()\` keeps values where the condition is True and replaces the rest with NaN, it does not drop non-matching rows the way boolean indexing does.
 - [o] **df[df["year"] == 2007]** (or **df.query("year == 2007")**)
   > Boolean indexing (**df[boolean_series]**) is the most common filtering idiom in pandas. The **.query("...")** method does the same thing with a slightly more readable string syntax. Both produce a new DataFrame containing only the matching rows.
 - **df.select("year == 2007")**
@@ -479,11 +479,11 @@ You will type one of these two patterns dozens of times in any real analysis. Pi
   markdown={`What does it mean for data to be in **tidy (long)** format?
 
 - The data has been spell-checked.
-  > "Tidy" is a structural concept about how rows, columns, and values are organized — it has nothing to do with the content quality or spelling of string values.
+  > "Tidy" is a structural concept about how rows, columns, and values are organized, it has nothing to do with the content quality or spelling of string values.
 - All numbers are integers.
   > Tidy data can contain floats, strings, or any other type; the requirement is about the one-variable-per-column structure, not the data types.
-- [o] Each variable is one column, each observation is one row, each cell holds a single value — making it easy to map columns to chart encodings.
-  > Tidy data is the "preferred shape" for Plotly Express (and ggplot2, Seaborn, and most modern viz tools). When a column maps cleanly to an encoding (**x="year"**, **color="country"**), the chart almost writes itself. Wide data — with years spread across columns — usually needs to be reshaped first.
+- [o] Each variable is one column, each observation is one row, each cell holds a single value, making it easy to map columns to chart encodings.
+  > Tidy data is the "preferred shape" for Plotly Express (and ggplot2, Seaborn, and most modern viz tools). When a column maps cleanly to an encoding (**x="year"**, **color="country"**), the chart almost writes itself. Wide data, with years spread across columns, usually needs to be reshaped first.
 - The data has fewer than 100 rows.
   > Row count has nothing to do with whether data is tidy; a tidy dataset can have millions of rows, and a non-tidy dataset can have just a handful.
 
@@ -497,7 +497,7 @@ If you find yourself fighting Plotly Express, ask yourself: *is my data tidy?* I
   > Neither matplotlib nor Plotly require sorted data; bar charts render in whatever order the rows appear in the DataFrame.
 - Sorted data is faster to plot.
   > Plotly's rendering speed is not meaningfully affected by whether the data is sorted; the benefit is perceptual, not computational.
-- [o] The eye reads a ranked / sorted bar chart almost instantly — alphabetical order obscures the actual ranking of values.
+- [o] The eye reads a ranked / sorted bar chart almost instantly, alphabetical order obscures the actual ranking of values.
   > A bar chart's *point* is usually to compare values. Sorting by value lets the reader see "biggest, then next biggest, then..." in zero conscious time. Alphabetical order is essentially random for the reader and adds an extra cognitive step.
 
 Always sort categorical bar charts by value, unless the order itself carries meaning (e.g., months of the year).`}

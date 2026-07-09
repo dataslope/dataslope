@@ -17,7 +17,7 @@ import { AdminSidebar } from "./_components/AdminSidebar";
 export const metadata: Metadata = {
   title: { default: "Admin", template: "%s · Admin" },
   description: "Manage Dataslope users.",
-  // Internal tool behind admin auth — keep it out of search results.
+  // Internal tool behind admin auth, keep it out of search results.
   robots: { index: false, follow: false },
 };
 

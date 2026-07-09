@@ -1,4 +1,4 @@
-// Branded not-found for share links — the most common negative moment in the
+// Branded not-found for share links, the most common negative moment in the
 // sharing flow (expired, revoked, or mistyped /s/ URLs land here via the
 // page's notFound()). Explains why the link stopped working and offers a way
 // forward instead of Next's bare default 404.
@@ -49,7 +49,7 @@ export default function ShareNotFound() {
               </div>
               <p className="mt-8 text-sm leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
                 Have your own work to share? Any playground can be shared as a
-                link — recipients open their own copy, and no one can edit
+                link, recipients open their own copy, and no one can edit
                 yours.
               </p>
             </div>

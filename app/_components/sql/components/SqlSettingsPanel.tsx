@@ -23,7 +23,7 @@ export interface SqlSettingsPanelProps {
   language: string;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
-  /** Optional — when provided, surfaces a "Clear all local data" action
+  /** Optional, when provided, surfaces a "Clear all local data" action
    *  alongside the localStorage clear. */
   onClearAllLocalData?: () => void;
   /** Text for the "Reset query tabs for …" action button. */
@@ -33,12 +33,12 @@ export interface SqlSettingsPanelProps {
   /** Dialect-specific extra tabs (e.g. Pragmas for SQLite, Database for
    *  Postgres/DuckDB). Forwarded verbatim to SettingsPanelContent. */
   extraTabs?: SettingsPanelProps["extraTabs"];
-  /** Close the Settings tab — forwarded to SettingsPanelContent, which
+  /** Close the Settings tab, forwarded to SettingsPanelContent, which
    *  renders the ✕ button at the right end of the settings tab bar. */
   onClose?: () => void;
 }
 
-/** Body-only SQL settings panel — same controls shared by SQLite,
+/** Body-only SQL settings panel, same controls shared by SQLite,
  *  Postgres, and DuckDB. Rendered inline inside a tab pane in every SQL
  *  playground (the dialog form has been retired). */
 export function SqlSettingsPanelContent(props: SqlSettingsPanelProps) {

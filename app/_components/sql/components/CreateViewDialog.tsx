@@ -40,7 +40,7 @@ export function CreateViewDialog({
   const [submitting, setSubmitting] = useState(false);
 
   // Reset the form during the render that flips `open` to true (React's
-  // "adjust state when a prop changes" pattern — done in render, not an
+  // "adjust state when a prop changes" pattern, done in render, not an
   // effect, so there's no cascading-render lint violation).
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
@@ -141,7 +141,7 @@ export function CreateViewDialog({
             <div className="sql-create-field">
               <span className="sql-create-label">SQL to run</span>
               <pre className="sql-create-preview">
-                {previewSql || "— name the view and write its SELECT —"}
+                {previewSql || "-- name the view and write its SELECT"}
               </pre>
             </div>
           </div>

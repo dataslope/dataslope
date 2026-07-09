@@ -46,11 +46,11 @@ int *p = a;          // same as &a[0]
 `p` and `a` point to the same byte. The differences are subtle but
 real:
 
-- `sizeof(a)` is `5 * sizeof(int)` — the total array size.
+- `sizeof(a)` is `5 * sizeof(int)`, the total array size.
 - `sizeof(p)` is the size of a pointer, typically 8.
-- `a = somewhere_else;` — **forbidden**, an array name can't be
+- `a = somewhere_else;`, **forbidden**, an array name can't be
   reassigned.
-- `p = somewhere_else;` — fine, pointers are just variables.
+- `p = somewhere_else;`, fine, pointers are just variables.
 
 <CodeBlock
   adapter="c"
@@ -81,7 +81,7 @@ standard defines indexing in terms of pointer arithmetic.
 
 ## Pointer arithmetic
 
-When you add `1` to a pointer, the compiler does not add `1` byte —
+When you add `1` to a pointer, the compiler does not add `1` byte,
 it adds the size of one element of the pointed-to type. So `p + 1`
 on an `int *` advances `4` bytes (on a typical system), landing on
 the next `int`.
@@ -128,7 +128,7 @@ int main(void) {
 
 Both print `10 20 30 40 50`. Choose whichever style makes the
 intent clearest. Idiomatic C often uses the pointer form for strings
-and the index form for numeric arrays — but neither is "more
+and the index form for numeric arrays, but neither is "more
 correct".
 
 ## The classic string-copy loop
@@ -168,8 +168,8 @@ Each iteration:
 4. Advance the pointer to the next character.
 
 The famous one-liner `while (*s) putchar(*s++);` does the same thing
-even more compactly. *Familiarize yourself with the long form first*
-— compactness is a reward you can earn later.
+even more compactly. *Familiarize yourself with the long form first*,
+compactness is a reward you can earn later.
 
 ## Arrays as function parameters: revisited
 
@@ -182,7 +182,7 @@ void show(int *arr,  int n);    // are completely equivalent
 ```
 
 Inside `show`, `arr` is a `int *`, and `sizeof(arr)` does **not**
-give you the array's size — it gives the size of a pointer. The
+give you the array's size, it gives the size of a pointer. The
 length must always be passed explicitly. This is why you see
 length-carrying APIs everywhere in C:
 
@@ -221,7 +221,7 @@ int main(void) {
   ]}
 />
 
-`comma - s` is `5` — the offset of `,` from the start of the string.
+`comma - s` is `5`, the offset of `,` from the start of the string.
 Pointer subtraction is one of the cleanest ways to compute lengths
 and positions.
 
@@ -298,7 +298,7 @@ flowchart TB
     Q["p + 2 = <code>0x108</code>"] --> C2
 ```
 
-Each cell is 4 bytes apart, but `p + 1` *adds 1 element* — the
+Each cell is 4 bytes apart, but `p + 1` *adds 1 element*, the
 arithmetic accounts for `sizeof(int)` for you.
 
 ## Challenge: sum an array via a pointer
@@ -395,7 +395,7 @@ void show(int arr[]) {
 - [o] Inside the function, \`arr\` is a pointer, not an array. \`sizeof(arr)\` is the size of a pointer (typically 8), not the array's total size.
   > When an array is passed to a function, it decays to a pointer to its first element, and the size information is lost.
 - C functions cannot compute the length of an array under any circumstances.
-  > Functions can — but only if the caller passes the length explicitly.
+  > Functions can, but only if the caller passes the length explicitly.
 
 This is why nearly every C function that takes an array also takes a length parameter, and why \`strlen\` is implemented by *scanning for \`\\0\`* rather than by reading a stored length.`}
 />

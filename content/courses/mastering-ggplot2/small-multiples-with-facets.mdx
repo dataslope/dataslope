@@ -1,11 +1,11 @@
 ---
 title: Small Multiples with Facets
-description: Faceting splits one plot into a grid of panels by a variable — why shared scales make small multiples so powerful, and facet_wrap vs facet_grid.
+description: Faceting splits one plot into a grid of panels by a variable, why shared scales make small multiples so powerful, and facet_wrap vs facet_grid.
 ---
 
 **Faceting** splits your data into subsets and draws a *separate panel*
-for each, all sharing the same scales. The result — a grid of small,
-comparable charts — is one of the most effective tools in all of data
+for each, all sharing the same scales. The result, a grid of small,
+comparable charts, is one of the most effective tools in all of data
 visualization, and ggplot2 makes it a one-line addition.
 
 <svg
@@ -102,14 +102,14 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 One busy panel with 7 overlapping groups becomes, via
-`facet_wrap(~ class)`, 7 small panels on shared axes — one group each.
+`facet_wrap(~ class)`, 7 small panels on shared axes, one group each.
 Differences *between* panels are then differences in the *data*.
 
 ## Why shared scales are the secret
 
 The magic ingredient is that **every panel uses the same x and y
 scales by default.** Because the axes are identical, any difference you
-see *between* panels is a real difference in the *data* — not an
+see *between* panels is a real difference in the *data*, not an
 artifact of different scaling. Your eye compares parallel pictures far
 faster than it parses one crowded picture.
 
@@ -191,7 +191,7 @@ ggplot(mpg, aes(displ, hwy)) +
 
 <Callout type="warn" title="Free scales break comparability">
 Independent scales make each panel readable *on its own* but **destroy
-the cross-panel comparison** that makes small multiples powerful — a
+the cross-panel comparison** that makes small multiples powerful, a
 tall bar in one panel may represent a smaller value than a short bar in
 another. Use free scales sparingly and label them clearly.
 </Callout>
@@ -213,7 +213,7 @@ compare them quickly and fairly.`}
 />
 
 <MultipleChoice
-  markdown={`You want a grid of panels crossing *two* categorical variables — drivetrain down the rows and cylinder count across the columns. Which facet function fits best?
+  markdown={`You want a grid of panels crossing *two* categorical variables, drivetrain down the rows and cylinder count across the columns. Which facet function fits best?
 
 - \`facet_wrap(~ drv + cyl)\`.
   > \`facet_wrap\` wraps panels to fit and does not cleanly assign one variable to rows and another to columns.
@@ -235,7 +235,7 @@ choice for two crossed variables.`}
   > It is valid and renders fine; the risk is interpretive.
 - It hides some of the data points.
   > It does not hide data; it rescales each panel.
-- [o] Each panel gets its own y-axis range, so panels are no longer directly comparable — equal-looking marks can represent different values.
+- [o] Each panel gets its own y-axis range, so panels are no longer directly comparable, equal-looking marks can represent different values.
   > Free scales sacrifice the cross-panel comparability that small multiples rely on.
 - It changes the faceting variable.
   > The faceting variable is unchanged; only the scaling differs.
@@ -246,11 +246,11 @@ cross-panel comparison that is the whole point of faceting.`}
 
 ## Key takeaways
 
-- **Faceting** splits data into per-group panels — small multiples that
+- **Faceting** splits data into per-group panels, small multiples that
   the eye compares quickly.
 - Panels **share scales by default**, so between-panel differences are
   real data differences.
 - `facet_wrap(~ var)` wraps one variable's levels into a grid;
   `facet_grid(rows ~ cols)` crosses two variables into a matrix.
 - `scales = "free_*"` lets panels scale independently but **breaks
-  comparability** — use it cautiously.
+  comparability**, use it cautiously.

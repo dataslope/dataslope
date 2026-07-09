@@ -1,6 +1,6 @@
 ---
 title: Where to Go Next
-description: A map of the LINQ universe beyond this course — PLINQ, IAsyncEnumerable, IQueryable, MoreLINQ, F#, and reading recommendations
+description: A map of the LINQ universe beyond this course, PLINQ, IAsyncEnumerable, IQueryable, MoreLINQ, F#, and reading recommendations
 ---
 
 You've covered the core of LINQ and functional-style C#. This page
@@ -10,7 +10,7 @@ problem you're trying to solve.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A single path forking into three thin branches toward colored destinations of different sizes, with a small sparkle beside the largest — the map of what to learn next"
+  aria-label="A single path forking into three thin branches toward colored destinations of different sizes, with a small sparkle beside the largest, the map of what to learn next"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -101,7 +101,7 @@ Console.WriteLine(string.Join(",", squares));
 />
 
 PLINQ is ideal when **each element's work is expensive and
-independent**. It is *not* a free upgrade — coordination overhead
+independent**. It is *not* a free upgrade, coordination overhead
 can make small/cheap pipelines slower. Profile before you parallelize.
 
 Topics to study: `AsParallel`, `WithDegreeOfParallelism`,
@@ -109,8 +109,8 @@ Topics to study: `AsParallel`, `WithDegreeOfParallelism`,
 
 ## Going async: IAsyncEnumerable
 
-For data that arrives over time — streams, network sources, paginated
-APIs — `IAsyncEnumerable<T>` is LINQ's asynchronous cousin.
+For data that arrives over time, streams, network sources, paginated
+APIs, `IAsyncEnumerable<T>` is LINQ's asynchronous cousin.
 
 ```csharp
 await foreach (var item in StreamItems().WhereAwait(...).SelectAwait(...))
@@ -134,7 +134,7 @@ flowchart TD
 
 `IQueryable<T>` *looks* exactly like `IEnumerable<T>` from the
 outside, but it captures your LINQ query as an **expression tree**
-that providers can translate — typically into SQL.
+that providers can translate, typically into SQL.
 
 ```csharp
 var top = db.Orders
@@ -155,7 +155,7 @@ This is the same LINQ surface, *running on a database*. Things to
 study next:
 
 - The Expression API (`Expression<Func<T, bool>>`)
-- Provider semantics — what *can* and *cannot* be translated
+- Provider semantics, what *can* and *cannot* be translated
 - When LINQ silently falls back to client evaluation, and why that's
   dangerous
 
@@ -167,7 +167,7 @@ operators the standard library lacks: `Batch`, `Window`, `Lag`,
 LINQ too), `Scan`, `Segment`, `Index`, and many more.
 
 If you've ever wanted "the missing LINQ operator", check MoreLINQ
-first — it's probably there, already battle-tested.
+first, it's probably there, already battle-tested.
 
 ## Going deeper into FP: F#
 
@@ -237,14 +237,14 @@ Happy querying.
 <MultipleChoice
   markdown={`Which statement best describes the relationship between \`IEnumerable<T>\` and \`IQueryable<T>\`?
 
-- They are unrelated — \`IQueryable<T>\` is a database-only type with its own API.
+- They are unrelated, \`IQueryable<T>\` is a database-only type with its own API.
   > \`IQueryable<T>\` inherits from \`IEnumerable<T>\`. They share the LINQ method surface.
 - [o] \`IQueryable<T>\` captures a query as an *expression tree* that a provider (like EF Core) can translate, instead of executing the LINQ in process.
   > The same \`.Where(...).Select(...)\` syntax that runs in-memory against \`IEnumerable<T>\` becomes a reified expression tree against \`IQueryable<T>\`, which providers translate (typically to SQL). This is the trick behind EF Core, LINQ to XML, LINQ to remote services, and more.
 - They are the same interface with different names for historical reasons.
   > They have different semantics: \`IEnumerable<T>\` runs delegates in-process; \`IQueryable<T>\` captures expressions for a provider.
 - \`IQueryable<T>\` is always faster because it runs on a server.
-  > Sometimes faster, sometimes much slower — and if the provider can't translate a clause, it may silently fall back to fetching everything and filtering client-side.
+  > Sometimes faster, sometimes much slower, and if the provider can't translate a clause, it may silently fall back to fetching everything and filtering client-side.
 
 Understanding this distinction is essential before you write LINQ against EF Core or any remote data source.`}
 />

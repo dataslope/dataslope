@@ -1,23 +1,23 @@
-/* Challenge card — an executable coding-challenge component for the
+/* Challenge card, an executable coding-challenge component for the
    learning pages. Mirrors the "Python Challenge" mockup pixel-tokens
    so it reads as a polished card: badge + title in the header,
    instructions block, embedded editor with a run/check toolbar,
    collapsible test-result panel, and pass/fail status banner.
 
    Although the design originated for Python, every visual element here
-   is language-agnostic — the same component is meant to host R and
+   is language-agnostic, the same component is meant to host R and
    TypeScript challenges later. */
 
 .card {
   /* Light, paper-style chrome distinct from the dark-by-default
-     CodeBlock — challenges are meant to feel like a worksheet, not a
+     CodeBlock, challenges are meant to feel like a worksheet, not a
      console.
 
      Neutral tokens (grays/slates) come from the Tailwind v4 palette
      (https://tailwindcss.com/docs/colors) and live locally in the first
      block, because Tailwind's preflight is only imported on /learn while
-     this module is also used by /playground. Brand colors — accent/success/
-     error — are NOT duplicated here: the semantic aliases below reference the
+     this module is also used by /playground. Brand colors, accent/success/
+     error, are NOT duplicated here: the semantic aliases below reference the
      global brand ramp (`--ds-*` from app/brand.css) directly. The semantic
      aliases (--ch-bg, --ch-text, --ch-accent…) are what the rest of the
      module uses. */
@@ -57,7 +57,7 @@
   --ch-overlay: color-mix(in srgb, var(--ch-slate-900) 55%, transparent);
 
   /* Inter / JetBrains Mono via the next/font variables published on <html>
-     (app/layout.tsx) — the faces themselves are loaded there once. */
+     (app/layout.tsx), the faces themselves are loaded there once. */
   --ch-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
   --ch-font-mono: var(--font-mono, ui-monospace, monospace);
   --ch-radius: 8px;
@@ -67,7 +67,7 @@
   border-radius: var(--ch-radius);
   /* Elevation is painted by the striped `.cardShell::after` (below), not a
      box-shadow, so the two never stack. `overflow: hidden` clips the card's
-     own rounded-corner content (header/editor/banner backgrounds) — which is
+     own rounded-corner content (header/editor/banner backgrounds), which is
      exactly why the offset stripe layer has to live on the shell instead, so
      it can escape this clip. */
   overflow: hidden;
@@ -80,7 +80,7 @@
 
 /* ── Striped hard-offset elevation ──────────────────────────────────────
    Replaces the solid drop shadow with a diagonal-stripe texture painted in
-   the down-right offset gap — a "designed" elevation rather than a plain
+   the down-right offset gap, a "designed" elevation rather than a plain
    shadow, while keeping the same hard-offset lift. The opaque `.card` sits
    on top of this shell (negative z-index layer) and covers everything but
    the offset sliver. Offset + colour reuse the prior shadow tokens so the
@@ -219,8 +219,8 @@
   position: fixed;
   inset: 0;
   /* The dialog is portaled to <body> (see ChallengeCard / SqlChallengeCard) so
-     a transformed ancestor — e.g. the home hero's BlurFade, whose lingering
-     `filter` turns it into the containing block — can't trap this fixed layer
+     a transformed ancestor, e.g. the home hero's BlurFade, whose lingering
+     `filter` turns it into the containing block, can't trap this fixed layer
      and shrink the backdrop to the card. Portaling drops it outside any `.card`,
      so the overlay tint is re-declared here (it can no longer inherit
      --ch-overlay / the --ch-slate-900 it derives from). */
@@ -415,8 +415,8 @@
 
 /* Filename inside the "Copy <file>" button, rendered in the mono stack so
    it reads as code. Scoped under `.solutionActionBar` (specificity 0,2,0)
-   so it overrides the ambient Tailwind-Typography `code` styling — pill
-   background, padding, and the backtick ::before/::after — the card may
+   so it overrides the ambient Tailwind-Typography `code` styling, pill
+   background, padding, and the backtick ::before/::after, the card may
    inherit when embedded inside a `.prose` region. */
 .solutionActionBar .solutionActionFileName {
   font-family: var(--font-mono, var(--ch-font-mono));
@@ -488,6 +488,30 @@
   background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
+  color: var(--ds-gray-900);
+}
+
+/* Fenced code blocks in instructions (e.g. an "expected output" sample) are a
+   real multi-line block, NOT the inline-code pill above. The ambient prose /
+   code styling the card inherits collapses their newlines by forcing
+   `white-space: nowrap` on <code>, so re-assert `pre` here (the parent <pre>
+   already preserves newlines; the inline <code> child was overriding it). */
+.instructionsBody pre {
+  margin: 8px 0 10px;
+  padding: 10px 12px;
+  background: var(--ds-gray-100);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.instructionsBody pre code {
+  display: block;
+  white-space: pre;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--ds-gray-900);
 }
 
@@ -649,7 +673,7 @@
 /* Light divider rendered above the editor / init panel. Applied via a
    modifier class from the component (rather than baked into the shared
    `.editor` / `.initWrap` base rules) so it only appears where the card
-   actually wants a separator — e.g. a code block's editor, or a
+   actually wants a separator, e.g. a code block's editor, or a
    single-file challenge card's editor that has no init drawer or file
    tab bar above it to supply one. */
 .topBorderLight {
@@ -699,7 +723,7 @@
   background: var(--ch-scrollbar-thumb-hover);
 }
 
-/* Suppress CodeMirror's default dotted focus outline — the surrounding
+/* Suppress CodeMirror's default dotted focus outline, the surrounding
    card chrome already conveys focus. */
 .editor :global(.cm-editor.cm-focused),
 .editor :global(.cm-editor) {
@@ -711,7 +735,7 @@
   outline: none !important;
 }
 
-/* Init code wrapper — collapsible read-only init panel. */
+/* Init code wrapper, collapsible read-only init panel. */
 .initWrap {
   background: var(--ch-bg-muted);
   /* bottom edge is the striped divider rendered via ::after */
@@ -756,7 +780,7 @@
 }
 
 /* Static label for short (non-collapsible) init code. Mirrors
-   `.initToggle` but isn't interactive — just identifies the block as
+   `.initToggle` but isn't interactive, just identifies the block as
    read-only initialization code. */
 .initHeaderStatic {
   display: flex;
@@ -838,7 +862,7 @@
   cursor: default;
 }
 
-/* (CM scroller layout + thin scrollbar are shared with `.editor` — see the
+/* (CM scroller layout + thin scrollbar are shared with `.editor`, see the
    grouped rules above.) */
 
 .initEditor :global(.cm-editor .cm-cursor) {
@@ -1014,12 +1038,12 @@
 }
 
 /* Hairline divider between the main Submit/Run pill and the chevron
-   that opens the dropdown — only when both halves are present. */
+   that opens the dropdown, only when both halves are present. */
 .btnGroupPrimary .runBtn:not(:last-child) {
   border-right: 1px solid color-mix(in srgb, var(--ds-white) 22%, transparent);
 }
 
-/* Chevron half of the split button — same accent fill as the main
+/* Chevron half of the split button, same accent fill as the main
    Run pill, but a thinner column reserved just for the disclosure
    arrow. Anchored to the right of `.btnGroupPrimary`. */
 .runBtnChevron {
@@ -1135,7 +1159,7 @@
 }
 
 /* Kbd chips inside the menu mirror the embedded kbd inside the Run
-   button — semi-transparent white pill on the accent background. */
+   button, semi-transparent white pill on the accent background. */
 .runMenuKbd .kbd {
   background: color-mix(in srgb, var(--ds-white) 16%, transparent);
   border: 1px solid color-mix(in srgb, var(--ds-white) 28%, transparent);
@@ -1362,7 +1386,7 @@
 }
 
 /* While a run is in flight the output body can be empty (no "Running…"
-   placeholder anymore), so reserve height for the blue wave overlay —
+   placeholder anymore), so reserve height for the blue wave overlay,
    mirrors `<CodeBlock>`'s `.outputRunning`. */
 .outputRunning {
   min-height: 84px;
@@ -1478,7 +1502,7 @@
   max-width: 100%;
 }
 
-/* DataFrame tables — kept in lockstep with `.dataframe-wrap` in
+/* DataFrame tables, kept in lockstep with `.dataframe-wrap` in
    playground.css (same declarations, generic tokens instead):
    the Jupyter-notebook default look (600-weight
    header row and index column, very subtle row striping, right-aligned
@@ -1537,7 +1561,7 @@
   background: color-mix(in srgb, var(--ch-text) 8%, transparent);
 }
 
-/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+/* Middle-truncation marker cells/columns (R runtime), pandas renders
    its own "..." cells which inherit the same muted colour. */
 .outCellHtml :global(tr.dataframe-ellipsis-row td),
 .outCellHtml :global(.dataframe-ellipsis-col) {
@@ -1645,7 +1669,7 @@
 
 /* ─── Test panel ──────────────────────────────────────────────────── */
 
-/* Transparent in both themes — the section sits directly on the card
+/* Transparent in both themes, the section sits directly on the card
    surface to keep the design clean. */
 .testPanel {
   border-top: 1px solid var(--ch-border-light);
@@ -1705,7 +1729,7 @@
   gap: 4px;
 }
 
-/* Solid, borderless chips with white text — green-500 / red-500 in
+/* Solid, borderless chips with white text, green-500 / red-500 in
    light mode, stepped down to the 600 shades in dark mode (see the
    html.dark overrides near the end of this file). */
 .testPill[data-state="pass"] {
@@ -1737,9 +1761,9 @@
 
 /* ─── Test results rail ───
    Minimal pass/fail readout: a vertical rail down the left with one
-   circle per test — green with a white check for a pass, red with a
-   white ✕ for a fail (500 shades in light mode, 600 in dark — see the
-   html.dark overrides near the end of this file) — and the rail segment
+   circle per test, green with a white check for a pass, red with a
+   white ✕ for a fail (500 shades in light mode, 600 in dark, see the
+   html.dark overrides near the end of this file), and the rail segment
    below each circle painted in that test's colour. Rows carry no boxes
    or borders; the description, test code/checks, and the exact error
    message live in a click popover. */
@@ -1872,7 +1896,7 @@
 
 /* The popup is portaled outside `.card`, so the --ch-* tokens defined on
    `.card` (and re-pointed for dark mode under `html.dark .card`) don't
-   reach it — `var(--ch-bg)` would resolve to nothing, leaving the popup
+   reach it, `var(--ch-bg)` would resolve to nothing, leaving the popup
    with a transparent background that the page shows through. Re-declare
    the token subset this popup uses, mapped to the global --ds-* palette
    (available at :root) so it stays theme-aware; the `html.dark` block
@@ -1997,7 +2021,7 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
-/* Quiet, centered verdict line on a transparent background — a bare
+/* Quiet, centered verdict line on a transparent background, a bare
    icon + short text in the verdict colour, no band or icon well. */
 .banner {
   display: flex;
@@ -2043,7 +2067,7 @@
 }
 
 /* Full-bleed: no horizontal margin so the table spans the whole card
-   width (up to the container). Top/bottom borders only — the card's own
+   width (up to the container). Top/bottom borders only, the card's own
    border supplies the left/right edges, so a boxed border + radius here
    would just inset the table needlessly. */
 .sqlResultScroll {
@@ -2091,7 +2115,7 @@
   text-align: left;
   white-space: nowrap;
   color: var(--ch-text);
-  /* Same clipping as headers — long string values get an ellipsis
+  /* Same clipping as headers, long string values get an ellipsis
      rather than blowing out the column width. */
   max-width: 320px;
   overflow: hidden;
@@ -2159,9 +2183,9 @@
    Two dark hooks are honoured so these cards theme correctly wherever
    they're embedded, not just on /learn: `html.dark` (Fumadocs / next-themes,
    the class strategy) and `html[data-theme="dark"]` (the attribute strategy
-   used by /playground — and whatever the home page's planned light/dark
+   used by /playground, and whatever the home page's planned light/dark
    toggle settles on). We rebind the card's CSS variables so the same
-   selectors keep working — no extra rules per element needed. Background
+   selectors keep working, no extra rules per element needed. Background
    matches `var(--color-fd-background)` so the card surface blends with the
    surrounding learn-page chrome (falling back to a neutral dark when those
    Fumadocs vars aren't present, e.g. on the home page). */
@@ -2178,7 +2202,7 @@
      The `var(--color-fd-background, …)` fallback keeps the component
      usable when Fumadocs is not present (e.g. Storybook / unit tests). */
   /* Neutral near-black fallback (matches the home route's #121212) for the
-     no-token case — Storybook/tests, and the solution dialog once it's portaled
+     no-token case, Storybook/tests, and the solution dialog once it's portaled
      to <body>, outside the .ds-home scope that supplies --color-fd-background.
      Avoids the blue-slate --ch-slate-900 tint the surrounding chrome dropped. */
   --ch-bg: var(--color-fd-background, #121212);
@@ -2214,7 +2238,7 @@
   --ch-shadow-border-color: #2e2e2e; /* matches dark --ch-border */
 }
 
-/* Match CodeMirror editor background to page background in dark mode —
+/* Match CodeMirror editor background to page background in dark mode,
    the default dark theme sets #0d1117 which doesn't match #121212. */
 :global(html:is(.dark, [data-theme="dark"])) .editor :global(.cm-editor),
 :global(html:is(.dark, [data-theme="dark"])) .editor :global(.cm-scroller),
@@ -2231,6 +2255,15 @@
 
 :global(html:is(.dark, [data-theme="dark"])) .instructionsBody code {
   background: #252525;
+  color: var(--ch-text);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .instructionsBody pre {
+  background: #252525;
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .instructionsBody pre code {
+  background: none;
   color: var(--ch-text);
 }
 
@@ -2299,7 +2332,7 @@
 }
 
 /* The test pill and test rail use solid green/red fills with white
-   text/numerals in both themes — light uses the 500 shades; dark steps
+   text/numerals in both themes, light uses the 500 shades; dark steps
    down to the 600 shades below so the fills sit more comfortably on
    dark surfaces. (The status banner is transparent with verdict-coloured
    text, so it adapts via the --ch-* tokens and needs nothing here.) */
@@ -2337,7 +2370,7 @@
   background: var(--ch-bg-muted);
 }
 
-/* Static label row — the panel is no longer collapsible, so this is a
+/* Static label row, the panel is no longer collapsible, so this is a
    plain header (not a button) showing the table count / loading state. */
 .tableViewerHeader {
   display: flex;

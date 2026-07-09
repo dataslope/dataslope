@@ -12,7 +12,7 @@ This case study builds a store schema from requirements to tables.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Items ride a checkout conveyor toward a receipt that records each one as a line — an order history preserving what was bought, at what price, at that moment"
+  aria-label="Items ride a checkout conveyor toward a receipt that records each one as a line, an order history preserving what was bought, at what price, at that moment"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.16">
@@ -329,7 +329,7 @@ VALUES
 
 ## Try it: total an order from its lines
 
-The schema deliberately does **not** store an order total — it would
+The schema deliberately does **not** store an order total, it would
 be a derived value that could drift out of sync with the line items.
 Instead, anyone who needs the total computes it. Your turn.
 
@@ -414,8 +414,8 @@ ORDER BY
   ]}
 />
 
-Note that the total uses `order_items.unit_price` — the price
-charged — not `products.current_price`. The mug's catalog price has
+Note that the total uses `order_items.unit_price`, the price
+charged, not `products.current_price`. The mug's catalog price has
 risen to 12.00 since this order was placed at 10.00, so totaling from
 the catalog would silently rewrite history.
 

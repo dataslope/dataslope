@@ -1,6 +1,6 @@
 ---
 title: Software Organization
-description: How classes, packages, and layers come together to form a real program — and the mental models that scale to large systems
+description: How classes, packages, and layers come together to form a real program, and the mental models that scale to large systems
 ---
 
 A program of two classes fits in your head. A program of two
@@ -9,12 +9,12 @@ collection of conventions and patterns that let humans keep
 reasoning about large codebases as if they were small ones.
 
 This page is a conceptual tour. You will not write a 2,000-class
-system here — but you will leave with mental models that scale.
+system here, but you will leave with mental models that scale.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A tidy yard of translucent shipping containers, each packed with its own small shapes, and one more container descending toward its outlined slot — packages and layers keep a big system stackable"
+  aria-label="A tidy yard of translucent shipping containers, each packed with its own small shapes, and one more container descending toward its outlined slot, packages and layers keep a big system stackable"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -63,7 +63,7 @@ By convention:
 - Packages are lowercase, with dots: `com.acme.billing`,
   `org.openrobot.vision`.
 - The convention `com.<organization>.<project>.<area>` is used to
-  guarantee globally unique names — important when libraries from
+  guarantee globally unique names, important when libraries from
   many sources end up in the same program.
 - Folder structure on disk mirrors the package: `src/com/acme/billing/Invoice.java`.
 
@@ -73,7 +73,7 @@ Packages have two practical benefits:
    class, as long as one is `com.acme.logging.Logger` and the
    other is `org.tinylogs.Logger`. No collision.
 2. **Visibility.** Classes and members declared with no access
-   modifier are **package-private** — visible only inside the same
+   modifier are **package-private**, visible only inside the same
    package. This lets a package expose a *small* public API while
    keeping internals hidden from outsiders.
 
@@ -99,13 +99,13 @@ What lives where:
 - **UI / Web:** translates external requests (HTTP, CLI, GUI
   events) into method calls, and translates results back into
   responses.
-- **Application / Service:** orchestrates a use case end to end —
-  "place an order" — by coordinating multiple domain operations.
-- **Domain:** the *heart* of the application — the classes that
+- **Application / Service:** orchestrates a use case end to end,
+  "place an order", by coordinating multiple domain operations.
+- **Domain:** the *heart* of the application, the classes that
   model your problem. `Order`, `Invoice`, `Customer`, with their
   rules. These should be the most stable, most carefully designed
   classes in the system.
-- **Infrastructure:** the messy outside world — databases, network
+- **Infrastructure:** the messy outside world, databases, network
   calls, file systems. Usually hidden behind interfaces.
 
 The chief discipline of layering: **higher layers may depend on
@@ -130,13 +130,13 @@ doesn't know if the implementation is in-memory, in Postgres, in
 a mock, or in something brand new. That single design choice makes
 the service:
 
-- **Testable** — swap in a fake `OrderRepository` in a unit test.
-- **Portable** — swap Postgres for something else and the service
+- **Testable**, swap in a fake `OrderRepository` in a unit test.
+- **Portable**, swap Postgres for something else and the service
   doesn't change.
-- **Comprehensible** — when reading `OrderProcessor`, you don't
+- **Comprehensible**, when reading `OrderProcessor`, you don't
   need to know SQL.
 
-This pattern goes by many names — dependency inversion, ports and
+This pattern goes by many names, dependency inversion, ports and
 adapters, hexagonal architecture. They are all the same shape.
 
 ## A tour of a tiny real-shaped project
@@ -164,8 +164,8 @@ src/main/java/
 Six classes, four packages, four layers. From the outside, the
 shape is exactly the same as a 200-class enterprise codebase.
 
-The wiring at startup — creating the infrastructure objects, handing
-them to the service, handing the service to the controller — is
+The wiring at startup, creating the infrastructure objects, handing
+them to the service, handing the service to the controller, is
 called **composition root**. In small programs it's a few lines of
 `new`. In larger programs, frameworks like Spring do it for you,
 but the *idea* is identical.

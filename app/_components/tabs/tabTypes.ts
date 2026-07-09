@@ -42,14 +42,14 @@ export interface TabDescriptor {
   /** True to pin to the leftmost position (and skip reorder). */
   pinned?: boolean;
   /** Optional title used for the rename dialog ("Rename tab" by
-   *  default — SQL playgrounds use "Rename query tab"). */
+   *  default, SQL playgrounds use "Rename query tab"). */
   renameDialogTitle?: string;
   /** Optional helper text shown under the rename dialog title. */
   renameDialogDescription?: string;
   /** Optional extra context menu items appended after Rename / Close. */
   contextMenuItems?: TabContextMenuItem[];
   /** When true, the built-in Rename / Close entries are NOT rendered
-   *  in the context menu — only `contextMenuItems` are. Useful for
+   *  in the context menu, only `contextMenuItems` are. Useful for
    *  kinds that should expose only a subset (e.g. SQL view-data tabs
    *  hide Rename). Built-in entries still fire via the dialog and X
    *  affordances when the underlying flags allow it. */
@@ -57,7 +57,7 @@ export interface TabDescriptor {
   /** When true, the rename dialog selects only the "stem" (substring
    *  before the last `.`) when opened, so a user can immediately type
    *  to replace the basename without nuking the extension. When false
-   *  (default) the entire label is selected — matches the SQL query-
+   *  (default) the entire label is selected, matches the SQL query-
    *  tab behaviour where labels have no extension. */
   renameSelectsStem?: boolean;
 }

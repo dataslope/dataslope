@@ -14,7 +14,7 @@ This closing chapter is a brief map of where you can go from here.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Five rounded squares tilt in unison and grow along a rising diagonal — from pale blue through green to a solid yellow — with two small floating dots for company"
+  aria-label="Five rounded squares tilt in unison and grow along a rising diagonal, from pale blue through green to a solid yellow, with two small floating dots for company"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -51,11 +51,11 @@ Everything in this course assumed single-threaded access. For shared
 state across threads, `java.util.concurrent` provides
 purpose-built containers:
 
-- **`ConcurrentHashMap`** — high-throughput, scalable hash map. Use
+- **`ConcurrentHashMap`**, high-throughput, scalable hash map. Use
   `computeIfAbsent`, `compute`, and `merge` for atomic updates.
-- **`CopyOnWriteArrayList` / `CopyOnWriteArraySet`** — for
+- **`CopyOnWriteArrayList` / `CopyOnWriteArraySet`**, for
   read-mostly data with rare writes (listeners, observers).
-- **`BlockingQueue`** family — `ArrayBlockingQueue`,
+- **`BlockingQueue`** family, `ArrayBlockingQueue`,
   `LinkedBlockingQueue`, `PriorityBlockingQueue`, used as the heart
   of producer/consumer designs.
 
@@ -71,25 +71,25 @@ not *persistent* in the functional-programming sense: you can't
 cheaply derive `list.add(x)` returning a new list that shares
 structure with the old one.
 
-If you want persistent collections — the kind Clojure, Scala, and
-Haskell use — third-party libraries provide them on the JVM:
+If you want persistent collections, the kind Clojure, Scala, and
+Haskell use, third-party libraries provide them on the JVM:
 
-- **Eclipse Collections** — primitive specializations, immutable
+- **Eclipse Collections**, primitive specializations, immutable
   variants, rich combinators.
-- **Vavr** — `List`, `Set`, `Map`, `Option`, `Try` with
+- **Vavr**, `List`, `Set`, `Map`, `Option`, `Try` with
   functional-style APIs.
-- **PCollections** — persistent vectors, maps, sets.
+- **PCollections**, persistent vectors, maps, sets.
 
 ## 4. Specialized data structures
 
 The JDK is intentionally focused on a small set of general-purpose
 structures. The wider ecosystem has specialized ones:
 
-- **Tries** (prefix trees) — for autocomplete and prefix matches.
-- **Bloom filters** — probabilistic membership tests in tiny memory.
-- **HyperLogLog** — cardinality estimation for huge streams.
-- **Roaring bitmaps** — fast set operations on integer sets.
-- **B-trees / skip lists** — when you outgrow the JDK's sorted
+- **Tries** (prefix trees), for autocomplete and prefix matches.
+- **Bloom filters**, probabilistic membership tests in tiny memory.
+- **HyperLogLog**, cardinality estimation for huge streams.
+- **Roaring bitmaps**, fast set operations on integer sets.
+- **B-trees / skip lists**, when you outgrow the JDK's sorted
   structures.
 
 Libraries: Guava, Apache Commons Collections, Eclipse Collections,
@@ -110,12 +110,12 @@ Most of what's in this course generalizes beyond Java:
 
 ## A short reading list
 
-- *Effective Java*, Joshua Bloch — Items on collections, generics,
+- *Effective Java*, Joshua Bloch, Items on collections, generics,
   `equals`/`hashCode`, immutability. The book the JDK collections
   designer wrote.
-- *Java Generics and Collections*, Naftalin & Wadler — Deeper on
+- *Java Generics and Collections*, Naftalin & Wadler, Deeper on
   generics and wildcards than anything else in print.
-- *Introduction to Algorithms*, Cormen, Leiserson, Rivest, Stein —
+- *Introduction to Algorithms*, Cormen, Leiserson, Rivest, Stein,
   The reference for the data structures underneath.
 - The official **Java tutorials** on
   [Collections](https://docs.oracle.com/javase/tutorial/collections/index.html)
@@ -134,7 +134,7 @@ master by *using*. The next time you write a function:
 4. Ask "if a caller shares this collection with someone else, can
    they hurt me?"
 
-Those four questions — *shape, index, interface, immutability* —
+Those four questions, *shape, index, interface, immutability*,
 will pay back the time you put into this course many times over.
 
 <Callout type="info" title="Thanks for finishing the course">

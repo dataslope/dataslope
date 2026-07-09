@@ -1,7 +1,7 @@
 "use client";
 
 // Dashboard navigation for /admin. To add a section, add a route folder
-// under app/admin/ and one entry to NAV below — the layout handles the rest.
+// under app/admin/ and one entry to NAV below, the layout handles the rest.
 //
 // Desktop: a sticky vertical rail. Mobile: the same items as a horizontally
 // scrollable chip row above the content (the "Admin" caption is desktop-only).

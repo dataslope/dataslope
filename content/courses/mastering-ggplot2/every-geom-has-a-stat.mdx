@@ -1,6 +1,6 @@
 ---
 title: Every Geom Has a Stat
-description: The hidden statistical transformation behind every layer — why geom_bar can draw a chart from a single column, and how stats and geoms pair up.
+description: The hidden statistical transformation behind every layer, why geom_bar can draw a chart from a single column, and how stats and geoms pair up.
 ---
 
 This is one of the most under-appreciated ideas in ggplot2, and
@@ -11,7 +11,7 @@ Sometimes that transformation does nothing; sometimes it does a lot.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A card of scattered raw blue dots crosses a thin gray arrow and reappears as a card of solid green bars — before a geom draws anything, its stat counts and summarizes the data"
+  aria-label="A card of scattered raw blue dots crosses a thin gray arrow and reappears as a card of solid green bars, before a geom draws anything, its stat counts and summarizes the data"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="35" width="210" height="140" rx="12" fill="currentColor" opacity="0.06" />
@@ -58,7 +58,7 @@ ggplot(mpg, aes(x = class)) +
   ]}
 />
 
-The answer: `geom_bar()` has a **statistic** attached — `stat_count` —
+The answer: `geom_bar()` has a **statistic** attached, `stat_count`,
 that runs first. It groups the rows by `class`, **counts** them, and
 produces a new computed variable, `count`. *That* becomes the bar
 height. The geom draws bars; the stat invented the y-values.
@@ -72,20 +72,20 @@ your raw data and the drawn marks:
 counts → computed data (7 rows: `class` + `count`) → `geom_bar` draws a
 bar per row → bar chart.**
 
-For a scatter plot the stat is `stat_identity` — it passes the data
+For a scatter plot the stat is `stat_identity`, it passes the data
 through *unchanged*, which is why `geom_point()` needs you to supply
-both x and y. For a histogram the stat is `stat_bin` — it slices x into
+both x and y. For a histogram the stat is `stat_bin`, it slices x into
 bins and counts each. **The geom is the same idea as always (draw
 marks); the stat is what differs.**
 
-## Geoms and stats are paired — but separable
+## Geoms and stats are paired, but separable
 
 Each geom ships with a default stat, and each stat ships with a default
 geom. They are two sides of one layer:
 
 | Layer | Default stat | What the stat computes |
 | --- | --- | --- |
-| `geom_point()` | `identity` | nothing — uses x, y as given |
+| `geom_point()` | `identity` | nothing, uses x, y as given |
 | `geom_bar()` | `count` | count of rows per x category |
 | `geom_histogram()` | `bin` | counts within bins of a continuous x |
 | `geom_boxplot()` | `boxplot` | quartiles, median, whiskers, outliers |
@@ -94,7 +94,7 @@ geom. They are two sides of one layer:
 
 Because they are separable, you can **override the stat**. Telling
 `geom_bar()` to use `stat = "identity"` makes it stop counting and use
-your y directly — which is *exactly* what `geom_col()` does under the
+your y directly, which is *exactly* what `geom_col()` does under the
 hood:
 
 <CodeBlock
@@ -152,7 +152,7 @@ variables, and you can reach into them.** The default histogram maps
 Because it makes the system *combinatorial*. Any stat can, in
 principle, pair with any geom. A "count" can be drawn as bars, as
 points, or as a line. Separating the *computation* from the *drawing*
-is the same move that separated mapping from scale — and it is why
+is the same move that separated mapping from scale, and it is why
 ggplot2 generalizes so far beyond a fixed menu.
 </Callout>
 
@@ -198,7 +198,7 @@ Because stat and geom are separable, overriding \`geom_bar\`'s stat to
 - [o] So the computation (e.g. counting, binning, smoothing) is independent of the drawing (bars, points, lines), letting any stat pair with different geoms.
   > Decoupling computation from drawing makes the system combinatorial and general.
 - Purely for historical reasons with no practical effect.
-  > The separation has real, practical power — e.g. \`after_stat\` and stat overrides.
+  > The separation has real, practical power, e.g. \`after_stat\` and stat overrides.
 
 Separating *what is computed* from *how it is drawn* mirrors the
 mapping/scale split and is a key reason ggplot2 generalizes so well.`}
@@ -208,8 +208,8 @@ mapping/scale split and is a key reason ggplot2 generalizes so well.`}
 
 `geom_bar()` does its counting in `stat_count`. Do that step *by hand*
 to prove there is no magic. Using the built-in `mpg`, build a named
-integer vector `class_counts` giving the number of cars in each `class`
-— exactly the heights `geom_bar(aes(x = class))` would draw.
+integer vector `class_counts` giving the number of cars in each `class`,
+exactly the heights `geom_bar(aes(x = class))` would draw.
 
 <ChallengeCard
   adapter="r"
@@ -253,5 +253,5 @@ print(class_counts)
   `stat_count`; `geom_histogram()` uses `stat_bin`; and so on.
 - Stats **create new computed variables** (like `count`, `density`)
   that become aesthetics; reach them with `after_stat()`.
-- Stat and geom are **separable** — overriding the stat is how
+- Stat and geom are **separable**, overriding the stat is how
   `geom_col()` equals `geom_bar(stat = "identity")`.

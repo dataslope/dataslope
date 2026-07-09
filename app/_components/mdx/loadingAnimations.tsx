@@ -14,7 +14,7 @@
  *    4-point star whose centre opens into a small hollow diamond.
  *    Rendered with the logo's own translucent radial gradients, the
  *    four overlapping swooshes show through as lighter petals around
- *    that hollow — this is the brand spinner shape.
+ *    that hollow, this is the brand spinner shape.
  *
  * All shapes render with `currentColor`; the CSS module sets the brand
  * blue (light/dark aware) on each wrapper unless a `color` prop overrides
@@ -22,11 +22,11 @@
  * opacity pulse.
  *
  * Exported pieces:
- *  - <DiamondMark /> — the hollow diamond as a static (non-animated) mark
+ *  - <DiamondMark />, the hollow diamond as a static (non-animated) mark
  *  - <DiamondSpinner />, <DiamondTurnSpinner />, <DiamondAssembleLoader />,
  *    <DiamondAssembleTurnLoader />, <DiamondRippleLoader />, <LogoHopLoader />
  *    (each takes an optional `color` to override the brand-blue tint)
- *  - <LoadingAnimationsGallery section=… /> — the /learn demo grid.
+ *  - <LoadingAnimationsGallery section=… />, the /learn demo grid.
  */
 
 import { useId, type CSSProperties, type ReactNode } from "react";
@@ -40,11 +40,11 @@ import styles from "./loadingAnimations.module.css";
 const LOGO_W = 1087.59;
 const LOGO_H = 682.55;
 
-/** y of the foot-cap centres — the mirror axis for the diamond. */
+/** y of the foot-cap centres, the mirror axis for the diamond. */
 const FOOT_Y = 546.66;
 /** Exact-mirror stack height (foot caps coinciding): the diamond's height.
  *  The stack reads as a 4-point star whose centre opens into a small hollow
- *  diamond — the translucent gradients let the overlapping swooshes show
+ *  diamond, the translucent gradients let the overlapping swooshes show
  *  through as petals around that hollow. */
 const MIRROR_H = FOOT_Y * 2; // 1093.32
 /** Stacked hollow-diamond height (alias for readability at use sites). */
@@ -142,7 +142,7 @@ function useSafeId(prefix: string): string {
 
 // ─── Static mark ───────────────────────────────────────────────────────
 
-/** The hollow-diamond brand shape as a plain, static SVG — the same
+/** The hollow-diamond brand shape as a plain, static SVG, the same
  *  4-point star the spinners rotate, without any animation. Renders
  *  with `currentColor`, so the parent's CSS `color` sets the tint
  *  (e.g. the playgrounds' welcome empty-states tint it brand blue via
@@ -181,7 +181,7 @@ export interface SpinnerProps {
   duration?: number;
   /** Accessible label. */
   label?: string;
-  /** Override the brand-blue tint. Any CSS colour — e.g. `"#fff"`,
+  /** Override the brand-blue tint. Any CSS colour, e.g. `"#fff"`,
    *  `"var(--ds-green-500)"`. The mark draws with `currentColor`, so this
    *  sets the colour on the loader wrapper. */
   color?: string;
@@ -216,7 +216,7 @@ export function DiamondSpinner({
   );
 }
 
-/** The diamond turning in eased half-turn steps with a brief rest —
+/** The diamond turning in eased half-turn steps with a brief rest,
  *  calmer than the continuous spin. (The diamond's 2-fold symmetry
  *  makes each 180° step land on an identical pose.) */
 export function DiamondTurnSpinner({
@@ -288,7 +288,7 @@ export function DiamondAssembleLoader({
   );
 }
 
-/** Concentric diamond outlines scale outward and fade — a radar ping.
+/** Concentric diamond outlines scale outward and fade, a radar ping.
  *  Each copy is a <g> animated with `transform-box: fill-box`, so the
  *  scale runs about the diamond's centre and non-scaling-stroke keeps
  *  the outline weight constant while the ring grows. */
@@ -334,15 +334,15 @@ export function DiamondRippleLoader({
 
 /** Combined sequence: the halves drift together (assemble), the
  *  assembled diamond makes an eased QUARTER turn, the halves part
- *  again — and because they always part along the diamond's local
+ *  again, and because they always part along the diamond's local
  *  vertical axis, the drift alternates between vertical (at 0°/180°)
  *  and horizontal (at 90°/270°) on screen. One CSS loop contains FOUR
- *  such steps — a full 360° revolution — so it lands back on the exact
+ *  such steps, a full 360° revolution, so it lands back on the exact
  *  same pose AND shading; a half turn would swap the two differently-
  *  gradiented logo halves and the loop would visibly flip. Rotation
  *  lives on the <svg> (whose viewBox is vertically symmetric around the
  *  diamond's centre, so the element centre is the rotation centre)
- *  while the translation lives on the inner half groups — the two
+ *  while the translation lives on the inner half groups, the two
  *  keyframe sets share one 4.8s timeline in the CSS. */
 export function DiamondAssembleTurnLoader({
   size = 64,
@@ -379,7 +379,7 @@ export function DiamondAssembleTurnLoader({
   );
 }
 
-/** Three small marks hop in sequence — a typing-indicator-style loader. */
+/** Three small marks hop in sequence, a typing-indicator-style loader. */
 export function LogoHopLoader({
   size = 26,
   label = "Loading…",
@@ -427,7 +427,7 @@ function DemoCard({
   blurb: string;
   wide?: boolean;
   fill?: boolean;
-  /** Dark preview backdrop — needed so a white loader variant is visible. */
+  /** Dark preview backdrop, needed so a white loader variant is visible. */
   dark?: boolean;
   children: ReactNode;
 }) {
@@ -470,12 +470,12 @@ const COLOR_VARIANTS: {
   {
     title: "Green",
     color: "var(--ds-green-500)",
-    blurb: "Brand green (var(--ds-green-500)) — success and “ready” states.",
+    blurb: "Brand green (var(--ds-green-500)), success and “ready” states.",
   },
   {
     title: "Red",
     color: "var(--ds-red-500)",
-    blurb: "Brand red (var(--ds-red-500)) — errors and destructive waits.",
+    blurb: "Brand red (var(--ds-red-500)), errors and destructive waits.",
   },
 ];
 
@@ -493,7 +493,7 @@ export default function LoadingAnimationsGallery({
           <DemoCard
             key={v.title}
             dark={v.dark}
-            title={`Diamond — ${v.title}`}
+            title={`Diamond, ${v.title}`}
             blurb={v.blurb}
           >
             <DiamondAssembleTurnLoader size={72} color={v.color} label="" />
@@ -507,7 +507,7 @@ export default function LoadingAnimationsGallery({
     <div className={`not-prose ${styles.gallery}`}>
       <DemoCard
         title="Diamond spinner"
-        blurb="The logo stacked with a vertically mirrored copy — the foot caps coincide and the translucent swooshes overlap as petals around a small hollow diamond centre. Rotates continuously; works from button-size up."
+        blurb="The logo stacked with a vertically mirrored copy, the foot caps coincide and the translucent swooshes overlap as petals around a small hollow diamond centre. Rotates continuously; works from button-size up."
       >
         <span className={styles.sizeRow}>
           <DiamondSpinner size={20} />
@@ -517,31 +517,31 @@ export default function LoadingAnimationsGallery({
       </DemoCard>
       <DemoCard
         title="Diamond half-turn"
-        blurb="The diamond turns in eased half-turn steps with a brief rest — calmer than a continuous spin for longer waits."
+        blurb="The diamond turns in eased half-turn steps with a brief rest, calmer than a continuous spin for longer waits."
       >
         <DiamondTurnSpinner size={56} />
       </DemoCard>
       <DemoCard
         title="Diamond ripple"
-        blurb="Concentric diamond outlines scale outward and fade, radar-ping style — reads well on empty surfaces."
+        blurb="Concentric diamond outlines scale outward and fade, radar-ping style, reads well on empty surfaces."
       >
         <DiamondRippleLoader size={86} />
       </DemoCard>
       <DemoCard
         title="Diamond assemble"
-        blurb="The two logo halves drift apart and snap back into the diamond — a natural fit for “preparing…” states."
+        blurb="The two logo halves drift apart and snap back into the diamond, a natural fit for “preparing…” states."
       >
         <DiamondAssembleLoader size={62} />
       </DemoCard>
       <DemoCard
         title="Diamond assemble + quarter-turn"
-        blurb="The combined sequence: the halves snap together, the diamond makes an eased quarter turn, and the halves part again — alternating vertical and horizontal drifts as the rotation carries the split axis around."
+        blurb="The combined sequence: the halves snap together, the diamond makes an eased quarter turn, and the halves part again, alternating vertical and horizontal drifts as the rotation carries the split axis around."
       >
         <DiamondAssembleTurnLoader size={72} />
       </DemoCard>
       <DemoCard
         title="Logo hop"
-        blurb="Three small marks hop in sequence — a typing-indicator-style loader for inline and chat-ish contexts."
+        blurb="Three small marks hop in sequence, a typing-indicator-style loader for inline and chat-ish contexts."
       >
         <LogoHopLoader size={28} />
       </DemoCard>

@@ -3,20 +3,20 @@ title: JavaScript Beyond the Browser
 description: How JavaScript spread from web pages to servers, command-line tools, desktops, phones, and even hardware devices.
 ---
 
-This is the second of the optional "interesting discussions" — a
+This is the second of the optional "interesting discussions", a
 tour rather than a lesson, best read with the course behind you.
 
 After Node.js, JavaScript could run *anywhere a runtime could run*.
 And it turned out that with a little effort, a JavaScript runtime
 could be embedded into almost anything. In this page we look at the
-surprising number of places JavaScript ended up — not because you
+surprising number of places JavaScript ended up, not because you
 need to write code in all of them, but because it explains *why*
 JavaScript is worth learning deeply.
 
 <svg
   viewBox="0 0 640 270"
   role="img"
-  aria-label="One large isometric cube surrounded by smaller cubes — the same language running on many platforms"
+  aria-label="One large isometric cube surrounded by smaller cubes, the same language running on many platforms"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -51,7 +51,7 @@ A **JavaScript runtime** is a program (often written in C++) that:
 1. Reads JavaScript source code.
 2. Turns it into something the CPU can actually execute (often a
    stream of low-level instructions).
-3. Provides a set of built-in capabilities for your code — like
+3. Provides a set of built-in capabilities for your code, like
    reading a file, drawing on a screen, or talking to the network.
 
 The *language* (ECMAScript) defines the syntax and core data types.
@@ -61,7 +61,7 @@ and that is why "JavaScript in a browser" and "JavaScript on a
 server" feel like slightly different worlds, even though it is the
 same language.
 
-The **language** (ECMAScript) is the same everywhere — numbers, strings,
+The **language** (ECMAScript) is the same everywhere, numbers, strings,
 booleans, variables, functions, loops, arrays, objects, promises and
 `async`/`await`. Each **runtime** then layers its own capabilities on
 top:
@@ -109,32 +109,32 @@ A huge number of small utilities you use every day, if you do any
 kind of development, are actually JavaScript programs running on
 Node.js:
 
-- **`npm`** and **`yarn`** themselves — the package managers.
-- **TypeScript** — the type checker.
-- **ESLint, Prettier** — code-quality tools.
-- **Webpack, Vite, Rollup, esbuild, Parcel** — bundlers.
-- **Jest, Vitest, Mocha** — test runners.
-- **Many static-site generators** — Hugo aside, much of the
+- **`npm`** and **`yarn`** themselves, the package managers.
+- **TypeScript**, the type checker.
+- **ESLint, Prettier**, code-quality tools.
+- **Webpack, Vite, Rollup, esbuild, Parcel**, bundlers.
+- **Jest, Vitest, Mocha**, test runners.
+- **Many static-site generators**, Hugo aside, much of the
   static-site world is JavaScript-based (Astro, Eleventy, Next.js,
   etc.).
 
 There is nothing browser-y about these tools. They read files, run
 processes, print to your terminal, exit with a status code. They are
 the spiritual descendants of the old shell scripts and Perl scripts
-of the 1980s and 1990s — just written in JavaScript now.
+of the 1980s and 1990s, just written in JavaScript now.
 
 ## Desktop applications
 
 Several wildly popular desktop applications are, under the hood,
 JavaScript running in a wrapped-up browser:
 
-- **Visual Studio Code** — Microsoft's editor.
+- **Visual Studio Code**, Microsoft's editor.
 - **Slack**, **Discord**, **Notion**, **Figma** desktop clients.
-- **Postman**, **Insomnia** — API testing tools.
+- **Postman**, **Insomnia**, API testing tools.
 - **GitHub Desktop**.
 - The original **Atom** editor.
 
-The technology that powers most of these is called **Electron** — it
+The technology that powers most of these is called **Electron**, it
 bundles a Chromium browser and Node.js together into a single
 desktop application. The user interface is HTML/CSS/JavaScript; the
 "underneath" features (filesystem, processes, notifications) are
@@ -149,15 +149,15 @@ real desktop app is part of why this pattern is so common.
 Several frameworks let you build native-feeling mobile applications
 in JavaScript:
 
-- **React Native** (Meta) — uses React-style components but renders
+- **React Native** (Meta), uses React-style components but renders
   to *real* native iOS and Android views.
-- **Ionic**, **Cordova / PhoneGap** — embed a web view in a phone
+- **Ionic**, **Cordova / PhoneGap**, embed a web view in a phone
   app and write the whole UI in HTML/CSS/JS.
-- **NativeScript** — JavaScript directly bound to native iOS and
+- **NativeScript**, JavaScript directly bound to native iOS and
   Android APIs.
 
 So a single JavaScript developer can plausibly build a website, a
-desktop app, an iOS app, and an Android app — all using one
+desktop app, an iOS app, and an Android app, all using one
 language.
 
 ## Hardware, IoT, and the weird places
@@ -167,7 +167,7 @@ JavaScript runtimes have been squeezed into surprising places:
 - **Espruino** and **Johnny-Five** let you control microcontrollers,
   LEDs, sensors, and robots using JavaScript.
 - **Embedded devices** sometimes ship a small JavaScript engine
-  (such as **Duktape** or **QuickJS** — engines designed to fit in
+  (such as **Duktape** or **QuickJS**, engines designed to fit in
   a few hundred kilobytes) so users can script behaviour.
 - **Game engines** sometimes embed JavaScript for scripting game
   rules (similar to how Lua is traditionally used).
@@ -178,12 +178,12 @@ JavaScript runtimes have been squeezed into surprising places:
 
 ## The point of this tour
 
-This course didn't *use* most of these environments — we focused on
+This course didn't *use* most of these environments, we focused on
 the language itself, with a runtime that runs JavaScript right in
 the browser. But it matters that you know:
 
 > *Once you really understand JavaScript, you can run useful code
-> almost anywhere — on a website, a server, your laptop's command
+> almost anywhere, on a website, a server, your laptop's command
 > line, a desktop app, a phone, even hardware.*
 
 The skill you are building is **portable** in a way that very few
@@ -201,13 +201,13 @@ Every JavaScript runtime, no matter where it runs, supports the same
 - `if`/`while`/`for`/`return`.
 - Promises and `async`/`await`.
 
-If you write a function that takes some numbers and returns a result
-— no files, no network — that function will run identically in
+If you write a function that takes some numbers and returns a result,
+no files, no network, that function will run identically in
 Chrome, Firefox, Safari, Node.js, Deno, Bun, an Electron app, a
 React Native app, or a smart light switch.
 
 Here is a piece of code that has nothing to do with a browser. It is
-pure JavaScript — exactly the kind of code that will run, byte for
+pure JavaScript, exactly the kind of code that will run, byte for
 byte, anywhere a JavaScript runtime exists.
 
 <CodeBlock
@@ -260,7 +260,7 @@ for (let m = 1; m <= 12; m++) {
     },
     {
       filename: "calendar.js",
-      starterCode: `// A small helper module. No browser, no network — pure JavaScript.
+      starterCode: `// A small helper module. No browser, no network, pure JavaScript.
 function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
 }
@@ -305,7 +305,7 @@ world.
   > Framework churn is real, but the reason to focus on core language features is their *portability across runtimes*, not the instability of any particular framework.
 - Because browsers will eventually stop supporting old JavaScript
   > Browsers maintain backward compatibility very carefully; the real reason to prioritise core language skills is that they transfer across every runtime, not because old JavaScript will stop working.
-- [o] Because that core works identically across every JavaScript runtime — browsers, Node.js, mobile, desktop, IoT — so the skill is broadly reusable
+- [o] Because that core works identically across every JavaScript runtime, browsers, Node.js, mobile, desktop, IoT, so the skill is broadly reusable
   > Built-in APIs and frameworks differ between runtimes, but the language itself is shared. Mastering the language pays off in every environment you will ever encounter.
 - Because runtimes are too slow to handle anything else
   > Modern JavaScript runtimes are fast enough for a wide range of tasks; the reason to focus on core language features is their universality, not runtime performance constraints.

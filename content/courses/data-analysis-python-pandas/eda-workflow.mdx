@@ -1,6 +1,6 @@
 ---
 title: The EDA Workflow
-description: A repeatable, opinionated approach to getting to know a new dataset — and why every analyst needs one.
+description: A repeatable, opinionated approach to getting to know a new dataset, and why every analyst needs one.
 ---
 
 **Exploratory Data Analysis (EDA)** is the part of analysis
@@ -14,7 +14,7 @@ This page outlines a workflow you can apply to any new dataset.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A magnifying glass hovering over a faint data grid, revealing a few bright colored dots inside its lens — exploratory analysis surfacing patterns"
+  aria-label="A magnifying glass hovering over a faint data grid, revealing a few bright colored dots inside its lens, exploratory analysis surfacing patterns"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.08">
@@ -66,10 +66,10 @@ This page outlines a workflow you can apply to any new dataset.
 You discover a new dataset in layers, and each layer makes the
 next one trustworthy:
 
-1. **Shape & types** — what are we even looking at?
-2. **Quality issues** — what's missing, duplicated, or wrong?
-3. **Distributions** — how is each column shaped?
-4. **Relationships** — how do columns move together?
+1. **Shape & types**, what are we even looking at?
+2. **Quality issues**, what's missing, duplicated, or wrong?
+3. **Distributions**, how is each column shaped?
+4. **Relationships**, how do columns move together?
 
 Only *then* can you ask real questions with confidence.
 
@@ -77,13 +77,13 @@ Without this scaffolding, beginners jump straight to `groupby`
 and chart-making, only to realize halfway through that one
 column was actually full of garbage.
 
-We will run the whole workflow on the **diamonds** dataset —
+We will run the whole workflow on the **diamonds** dataset,
 53,940 stones, with a healthy mix of numeric columns (`carat`,
 `price`, `depth`) and rich categoricals (`cut`, `color`,
 `clarity`). It is big enough that you *cannot* just eyeball it,
 which is exactly when a disciplined EDA pass earns its keep.
 
-## Step 1 — Shape and types
+## Step 1, Shape and types
 
 <CodeBlock
   adapter="python"
@@ -112,7 +112,7 @@ Questions to answer:
 - Are there obviously-wrong types (e.g., `object` where you
   expected `float64`)?
 
-## Step 2 — Eyeball the data
+## Step 2, Eyeball the data
 
 <CodeBlock
   adapter="python"
@@ -130,12 +130,12 @@ print(df.sample(5, random_state=0))  # random rows often reveal weirdness
   ]}
 />
 
-`head` shows the top — but the top is often not representative.
+`head` shows the top, but the top is often not representative.
 A random sample sometimes catches surprises: a different format
 midway through, mysterious sentinel values, NaNs you didn't
 know about.
 
-## Step 3 — Missing values
+## Step 3, Missing values
 
 <CodeBlock
   adapter="python"
@@ -157,9 +157,9 @@ print("(If nothing prints, the dataset has no missing values.)")
 />
 
 For each column with missing data, you'll need to decide
-*later* what to do — but you must know it exists *now*.
+*later* what to do, but you must know it exists *now*.
 
-## Step 4 — Per-column distributions
+## Step 4, Per-column distributions
 
 For numeric columns, look at `describe()`:
 
@@ -203,7 +203,7 @@ Questions:
 - Any category with suspiciously many entries (default values?)
 - Any category appearing twice with different spelling?
 
-## Step 5 — Relationships between columns
+## Step 5, Relationships between columns
 
 <CodeBlock
   adapter="python"
@@ -221,7 +221,7 @@ print(numeric.corr().round(2))
   ]}
 />
 
-Correlations highlight pairs of columns that move together —
+Correlations highlight pairs of columns that move together,
 sometimes useful, sometimes a hint that columns are *measuring
 the same thing*.
 
@@ -241,17 +241,17 @@ df = pd.read_csv("diamonds.csv")`,
   ]}
 />
 
-## Step 6 — Write down what you learned
+## Step 6, Write down what you learned
 
 This is the step beginners skip and pros never do. Keep a
 notebook section called "What I learned from EDA" with bullet
 points:
 
-- "`price` is heavily right-skewed — use median, not mean."
+- "`price` is heavily right-skewed, use median, not mean."
 - "`carat` and `price` are strongly correlated (~0.92)."
 - "`x`, `y`, `z` (dimensions) are nearly perfectly correlated
   with each other and with `carat`."
-- "A few rows have a dimension of exactly 0 — impossible for a
+- "A few rows have a dimension of exactly 0, impossible for a
   real diamond, so likely missing-as-zero."
 
 These notes shape every subsequent decision.
@@ -281,9 +281,9 @@ Print it. Tape it to your wall. Use it on every new dataset.
 
 - Immediately compute and reply
   > Answering before inspecting the data risks returning a number that is silently wrong due to missing values, duplicate rows, or mistyped regions.
-- Refuse — too vague
+- Refuse, too vague
   > The question is straightforward enough to answer once you understand the data; refusing skips the real work of an analyst.
-- [o] Run an EDA pass — check shape, types, missing values, distinct regions — *then* compute the answer with confidence
+- [o] Run an EDA pass, check shape, types, missing values, distinct regions, *then* compute the answer with confidence
   > Skipping EDA means you might compute the "average" while ignoring duplicates, missing rows, or merged customer records.
 - Switch to SQL
   > The tool is irrelevant here; EDA is a habit, not a technology, and skipping it in SQL is just as risky as skipping it in Pandas.
@@ -298,7 +298,7 @@ EDA is what separates a credible analyst from a calculator.`}
   > \`df.sample\` and \`df.head\` are both near-instant on most datasets; speed is not a meaningful distinction between them.
 - It uses less memory
   > Both calls return a small slice of the DataFrame; neither significantly reduces memory use during an EDA session.
-- [o] head shows only the top rows — random sampling reveals issues that may only occur in middle or end of the file
+- [o] head shows only the top rows, random sampling reveals issues that may only occur in middle or end of the file
   > Time-series files in particular often have format drift over time.
 - It returns sorted rows
   > \`df.sample\` returns rows in an unpredictable order by design; \`df.head\` returns rows in their original order. Neither sorts.
@@ -312,8 +312,8 @@ A random peek at the data is a small habit with outsized payoff.`}
 - They cause each other
   > Correlation measures co-movement, not causation; a 0.98 correlation is consistent with many causal structures or with both columns reflecting a third variable.
 - They are independent
-  > A correlation of 0.98 is almost as high as possible (maximum is 1.0) — two independent variables would have a correlation near 0.
-- [o] They are measuring something very similar — worth investigating whether one is derived from the other, or whether keeping both adds any information
+  > A correlation of 0.98 is almost as high as possible (maximum is 1.0), two independent variables would have a correlation near 0.
+- [o] They are measuring something very similar, worth investigating whether one is derived from the other, or whether keeping both adds any information
   > High correlation is a flag, not a conclusion. Investigate before either dropping or using both as separate inputs.
 - It is a bug
   > High correlation is not evidence of a code error; many legitimate column pairs (e.g., salary and annual income) are nearly perfectly correlated by design.
@@ -327,8 +327,8 @@ Correlation is a signpost, not an answer.`}
 - It is required by Pandas
   > Pandas has no concept of written notes; the library executes code, not documentation decisions.
 - It is for your manager
-  > EDA notes serve the analyst first — they capture observations that shape every subsequent decision, including ones your manager never sees.
-- [o] The next person to read your notebook (often future-you, six weeks later) will not remember the dataset's quirks — written notes preserve hard-won knowledge
+  > EDA notes serve the analyst first, they capture observations that shape every subsequent decision, including ones your manager never sees.
+- [o] The next person to read your notebook (often future-you, six weeks later) will not remember the dataset's quirks, written notes preserve hard-won knowledge
   > Undocumented EDA insights vanish the moment you close the notebook.
 - It speeds up the kernel
   > Writing notes in Markdown cells or comments does not affect kernel performance; it is a documentation practice, not a computational one.

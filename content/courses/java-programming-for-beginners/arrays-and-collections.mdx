@@ -1,10 +1,10 @@
 ---
 title: Arrays and Collections
-description: Storing many values together — fixed-size arrays, growable ArrayLists, and iterating over them safely
+description: Storing many values together, fixed-size arrays, growable ArrayLists, and iterating over them safely
 ---
 
 A single variable holds a single value. Real programs need to hold
-*many* values — a list of orders, the lines of a file, the players
+*many* values, a list of orders, the lines of a file, the players
 in a game. Java's two foundational tools are **arrays** and the
 **collections framework**, starting with `ArrayList`.
 
@@ -213,7 +213,7 @@ classic `for (int i = 0; i < list.size(); i++)` form when you do.
 ## A common pitfall: modifying while iterating
 
 You may not add to or remove from a collection inside a for-each
-loop over it — doing so throws `ConcurrentModificationException`.
+loop over it, doing so throws `ConcurrentModificationException`.
 
 ```java
 for (String task : todo) {
@@ -269,15 +269,15 @@ public class Stats {
   ]}
 />
 
-`List.of(...)` produces an *immutable* list — perfect for "just a
+`List.of(...)` produces an *immutable* list, perfect for "just a
 bag of values I won't change."
 
-## Arrays vs ArrayList — when to use which?
+## Arrays vs ArrayList, when to use which?
 
 | | Array | ArrayList |
 | --- | --- | --- |
 | Size | Fixed at creation | Grows on demand |
-| Can hold primitives directly | Yes (`int[]`) | No — must use wrapper (`List<Integer>`) |
+| Can hold primitives directly | Yes (`int[]`) | No, must use wrapper (`List<Integer>`) |
 | Speed | Slightly faster, less overhead | A little slower, but rarely the bottleneck |
 | API | Tiny (`.length`, indexing) | Rich (`add`, `remove`, `contains`, `sort`, …) |
 | When to use | Performance-critical numeric code, or when size is truly fixed | Almost everywhere else |
@@ -289,7 +289,7 @@ more often than bare arrays.
   markdown={`What happens if you try \`scores[scores.length]\` on a Java array?
 
 - Returns 0
-  > No — Java does not silently return defaults for out-of-bounds access.
+  > No, Java does not silently return defaults for out-of-bounds access.
 - Returns null
   > No.
 - [o] Throws \`ArrayIndexOutOfBoundsException\` at runtime
@@ -316,7 +316,7 @@ more often than bare arrays.
 
 - The compiler refuses to compile it
   > It compiles fine; the failure happens at runtime.
-- Nothing — that's the recommended pattern
+- Nothing, that's the recommended pattern
   > Not recommended; it throws.
 - [o] It throws \`ConcurrentModificationException\` because the iterator detects the structural change
   > The iterator notices the list changed underneath it and fails fast instead of returning garbage.

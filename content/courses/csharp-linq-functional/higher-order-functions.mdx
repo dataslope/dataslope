@@ -1,6 +1,6 @@
 ---
 title: Higher-Order Functions
-description: Functions that take functions, return functions, or both — and why this single idea is the engine of LINQ
+description: Functions that take functions, return functions, or both, and why this single idea is the engine of LINQ
 ---
 
 A **higher-order function** (HOF) is a function that does at least
@@ -20,7 +20,7 @@ in everyday C#.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A small yellow box — itself a function — drops through the slot of a larger blue machine, which emits a green box carrying a yellow core"
+  aria-label="A small yellow box, itself a function, drops through the slot of a larger blue machine, which emits a green box carrying a yellow core"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path
@@ -143,7 +143,7 @@ Console.WriteLine(FirstWhere(nums, n => n > 100));
 />
 
 One method, three different conditions, zero duplication. That is
-the LINQ idea in miniature — and it's exactly what `Enumerable.First`
+the LINQ idea in miniature, and it's exactly what `Enumerable.First`
 is, just slightly more polished.
 
 ## The two function shapes you'll see everywhere
@@ -160,7 +160,7 @@ There's a special case for predicates:
 
 | Delegate | Shape | Used for |
 | --- | --- | --- |
-| `Func<T, bool>` | A function returning bool | Filtering — also written `Predicate<T>` |
+| `Func<T, bool>` | A function returning bool | Filtering, also written `Predicate<T>` |
 
 <CodeBlock
   adapter="csharp"
@@ -214,7 +214,7 @@ Console.WriteLine(tripler(10)); // 30
 `Multiplier(3)` returns a different function. The captured `factor`
 is part of the returned function's "personality".
 
-A practical example — a predicate factory:
+A practical example, a predicate factory:
 
 <CodeBlock
   adapter="csharp"
@@ -284,8 +284,8 @@ parameterized.
 
 This is the cleanest possible separation of:
 
-- **Structure** — the operator (iterate, branch, accumulate)
-- **Policy** — the function you pass in
+- **Structure**, the operator (iterate, branch, accumulate)
+- **Policy**, the function you pass in
 
 You can change the policy without rewriting the structure, and you
 can reuse the structure across hundreds of policies.
@@ -390,14 +390,14 @@ public static class Filters
 <MultipleChoice
   markdown={`Which of the following is **not** a higher-order function?
 
-- \`Enumerable.Where\` — takes a \`Func<T, bool>\` predicate.
+- \`Enumerable.Where\`, takes a \`Func<T, bool>\` predicate.
   > \`Where\` accepts a function as a parameter, so it *is* higher-order.
-- \`Enumerable.Select\` — takes a \`Func<TSource, TResult>\` selector.
+- \`Enumerable.Select\`, takes a \`Func<TSource, TResult>\` selector.
   > \`Select\` accepts a function, so it *is* higher-order.
 - A "Multiplier" method that returns \`Func<int, int>\` for a given factor.
   > Returning a function makes a method higher-order, so this *is* higher-order.
 - [o] \`static int Add(int x, int y) => x + y;\`
-  > \`Add\` neither takes a function as a parameter nor returns one — it only operates on values. It is a perfectly ordinary first-order function.
+  > \`Add\` neither takes a function as a parameter nor returns one, it only operates on values. It is a perfectly ordinary first-order function.
 
 A higher-order function must either accept a function as an argument
 or return a function. Plain functions over plain values (like \`Add\`)

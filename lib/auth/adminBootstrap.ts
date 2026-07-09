@@ -1,5 +1,5 @@
 /**
- * Config-admin role promotion — the write half of the ADMIN_EMAILS /
+ * Config-admin role promotion, the write half of the ADMIN_EMAILS /
  * ADMIN_USER_IDS bootstrap.
  *
  * The env allowlists let the first admin exist before anyone holds the
@@ -15,7 +15,7 @@
  * One conditional UPDATE per sign-in request, nothing on the hot get-session
  * path, and a no-op (zero rows written) when every listed admin already holds
  * the role. Deliberately one-way: removing someone from the env lists revokes
- * their *allowlist* access but does not demote the column — demotion stays an
+ * their *allowlist* access but does not demote the column, demotion stays an
  * explicit admin action.
  *
  * This module stays off the Better Auth import chain so it can be unit-tested
@@ -35,7 +35,7 @@ export interface AdminBootstrapConfig {
  * `role` is NOT NULL DEFAULT 'user' (migrations/0002), so the
  * `role <> 'admin'` guard never trips over NULL. The allowlists are a
  * handful of operators at most, so promoting them all in one statement is
- * as cheap as targeting one — and it means the promotion can run *before*
+ * as cheap as targeting one, and it means the promotion can run *before*
  * a sign-in handler reads the user row, keeping the session response (and
  * the cookie cache seeded from it) fresh.
  */

@@ -3,7 +3,7 @@ title: Filtering Before Plotting
 description: Why slicing your data is half the chart, and how to do it cleanly
 ---
 
-Plotly Express is happy to draw whatever you pass it — including
+Plotly Express is happy to draw whatever you pass it, including
 2 million rows of irrelevant data. A lot of "bad" charts are
 *really* "right chart of the wrong slice of data." Spending 30
 seconds filtering your DataFrame before the plot call is one of
@@ -196,7 +196,7 @@ A chart of 200 countries is hard to read; a chart of the **top
 *facetted by month* is clear.
 
 When you find yourself fighting a chart, the answer is often *not*
-to add more encodings — it's to *remove rows*. Filter first.
+to add more encodings, it's to *remove rows*. Filter first.
 
 ## Check your understanding
 
@@ -204,13 +204,13 @@ to add more encodings — it's to *remove rows*. Filter first.
   markdown={`Why is **filtering before plotting** often more important than configuring the chart itself?
 
 - Filtering makes the chart render faster.
-  > While a smaller dataset can reduce render time marginally, performance is rarely the bottleneck with typical analysis datasets. The real value of filtering before plotting is communicative — showing the right data for the question being asked.
+  > While a smaller dataset can reduce render time marginally, performance is rarely the bottleneck with typical analysis datasets. The real value of filtering before plotting is communicative, showing the right data for the question being asked.
 - Filtering is required by Plotly.
   > Plotly Express accepts a DataFrame of any size and will attempt to plot all rows. Filtering is a best-practice data preparation step, not a technical requirement imposed by the library.
 - [o] A chart of the right subset is almost always more readable and more relevant than the same chart drawn on the entire dataset.
   > "Show less" is one of the most consistently effective moves in visualization. Picking the right rows to show is half the design decision, and it's usually a one-line pandas operation before the chart call.
 - Filtering converts the DataFrame to a chart.
-  > Filtering produces a smaller DataFrame, not a chart. The chart is created by passing the filtered DataFrame to a Plotly Express function — filtering and charting are two separate steps.
+  > Filtering produces a smaller DataFrame, not a chart. The chart is created by passing the filtered DataFrame to a Plotly Express function, filtering and charting are two separate steps.
 
 The best charts often start with the question: *what am I going to filter out?*`}
 />
@@ -221,7 +221,7 @@ The best charts often start with the question: *what am I going to filter out?*`
 - **df[df["continent"] == ["Europe", "Asia"]]**
   > Using **==** to compare a Series against a list raises a ValueError in pandas because you cannot compare a Series element-wise with a list using the equality operator. This syntax does not do what it looks like.
 - **df[df["continent"] in ["Europe", "Asia"]]**
-  > The Python **in** operator applied to a pandas Series checks membership of the *Series itself* in the list — not each element — which raises a ValueError. Element-wise membership testing requires **.isin()**.
+  > The Python **in** operator applied to a pandas Series checks membership of the *Series itself* in the list, not each element, which raises a ValueError. Element-wise membership testing requires **.isin()**.
 - [o] **df[df["continent"].isin(["Europe", "Asia"])]**
   > **.isin([...])** is the canonical "value matches any of these" filter. It also works with **~df["continent"].isin([...])** for *NOT in*. The other two syntaxes either don't do what they look like or raise an error.
 - **df.filter(continent=["Europe", "Asia"])**
@@ -234,13 +234,13 @@ The best charts often start with the question: *what am I going to filter out?*`
   markdown={`If your chart of every customer is unreadable, the **best** first move is usually to:
 
 - Add more colors.
-  > Adding colors to an unreadable chart makes it more visually complex without reducing the number of data points causing the overplotting. The root problem — too much data to read at once — is not solved by color.
+  > Adding colors to an unreadable chart makes it more visually complex without reducing the number of data points causing the overplotting. The root problem, too much data to read at once, is not solved by color.
 - Make the chart taller.
   > Increasing chart height distributes the same crowded data over more vertical pixels but does not reduce overlap or improve readability in a meaningful way. Filtering the data is a far more effective intervention.
-- [o] Filter to a meaningful subset — top N, recent dates, a specific segment — before plotting.
+- [o] Filter to a meaningful subset, top N, recent dates, a specific segment, before plotting.
   > Charts have a finite visual budget. Trying to cram every observation into one picture leads to overlap, noise, and visual mush. A well-chosen filter does more for readability than any styling tweak.
 - Switch to a 3-D chart.
   > A 3-D chart adds visual complexity without reducing the number of points. Overplotting in 2-D typically becomes even harder to read in 3-D due to occlusion and perspective distortion.
 
-Sometimes the answer is also "show many small charts" via faceting — which is itself a form of filtering applied per panel.`}
+Sometimes the answer is also "show many small charts" via faceting, which is itself a form of filtering applied per panel.`}
 />

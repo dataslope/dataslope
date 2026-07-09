@@ -8,8 +8,6 @@ import {
   ChevronDown,
   LogOut,
   Menu as Hamburger,
-  Moon,
-  Sun,
   User as UserIcon,
   X,
 } from "lucide-react";
@@ -23,7 +21,7 @@ import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
-import { useTheme } from "./theme";
+import { ThemePillToggle } from "../ThemePillToggle";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
@@ -51,7 +49,7 @@ function LangIcon({
 }
 
 /** Desktop primary-menu link. The item for the section being viewed renders
- *  in the brand accent (matching the courses-page mockup) — derived from the
+ *  in the brand accent (matching the courses-page mockup), derived from the
  *  current pathname, so `/courses/python-basics` still lights up "Courses". */
 function NavLink({
   href,
@@ -80,24 +78,6 @@ function NavLink({
   );
 }
 
-/** Light/dark toggle. The displayed glyph is driven purely by the `.dark`
- *  class on <html> (set pre-hydration) so it never mismatches on hydration. */
-function ThemeToggle() {
-  const { toggle } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
-    >
-      <Sun size={18} className="hidden dark:block" />
-      <Moon size={18} className="block dark:hidden" />
-    </button>
-  );
-}
-
 function GitHubLink() {
   return (
     <a
@@ -113,7 +93,7 @@ function GitHubLink() {
   );
 }
 
-/** Desktop "Playground" dropdown — a Base UI Menu styled to echo the
+/** Desktop "Playground" dropdown, a Base UI Menu styled to echo the
  *  playground switcher: a bordered, shadowed popup of language rows. */
 function PlaygroundMenu() {
   return (
@@ -154,6 +134,15 @@ function BrandLogo() {
       href="/"
       aria-label="Dataslope home"
       className="flex items-center gap-2"
+      // This nav only renders on "/", so a Link to "/" is a same-route no-op
+      // and nothing appears to happen. Scroll back to the top instead, the
+      // expected behaviour of clicking a site logo.
+      onClick={() => {
+        const reduce = window.matchMedia?.(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -178,7 +167,7 @@ function MobileAuthSection() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const rowClass =
-    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10";
+    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white";
 
   if (isPending) {
     return (
@@ -229,41 +218,6 @@ function MobileAuthSection() {
   );
 }
 
-/** Pill toggle switch (sun ↔ moon) for the drawer footer. The knob position and
- *  glyph are driven purely by the `.dark` class on <html> (set pre-hydration),
- *  so they never mismatch on hydration. */
-function ThemeSwitch() {
-  const { theme, toggle } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      role="switch"
-      aria-checked={theme === "dark"}
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
-      className="relative inline-flex h-7 w-[3.25rem] shrink-0 items-center rounded-full bg-[var(--ds-gray-100)] px-1 transition-colors dark:bg-white/10"
-    >
-      {/* Faint end markers so the control reads as sun ↔ moon. */}
-      <Sun
-        size={13}
-        className="pointer-events-none absolute left-1.5 text-[var(--ds-gray-400)]"
-        aria-hidden="true"
-      />
-      <Moon
-        size={13}
-        className="pointer-events-none absolute right-1.5 text-[var(--ds-gray-400)]"
-        aria-hidden="true"
-      />
-      {/* Knob: sits left in light mode, slides right in dark mode. */}
-      <span className="z-10 inline-flex size-5 items-center justify-center rounded-full bg-white text-[var(--ds-gray-700)] shadow-sm transition-transform duration-200 dark:translate-x-[1.5rem] dark:bg-[#2a2a2a] dark:text-white">
-        <Sun size={12} className="block dark:hidden" aria-hidden="true" />
-        <Moon size={12} className="hidden dark:block" aria-hidden="true" />
-      </span>
-    </button>
-  );
-}
-
 /** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
  *  drawer) holding the same navigation the desktop bar exposes inline. */
 function MobileDrawer() {
@@ -278,7 +232,7 @@ function MobileDrawer() {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#1a1a1a]">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#121212]">
           {/* Top: close button, then the auth control (Sign in / account). */}
           <div className="mb-2 flex items-center justify-end">
             <Dialog.Close
@@ -298,21 +252,21 @@ function MobileDrawer() {
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
             <Dialog.Close
               render={<Link href="/courses" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
             >
               Courses
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/interview-prep" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
             >
               Interview Prep
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/pricing" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
             >
               Pricing
             </Dialog.Close>
@@ -324,7 +278,7 @@ function MobileDrawer() {
               <Dialog.Close
                 key={p.id}
                 render={<Link href={p.href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/10"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <LangIcon
                   id={p.id}
@@ -336,7 +290,7 @@ function MobileDrawer() {
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
-            <ThemeSwitch />
+            <ThemePillToggle />
             <a
               href={GITHUB_URL}
               target="_blank"
@@ -361,7 +315,7 @@ export function HomeNav() {
   // Two thresholds (hysteresis) with a gap wider than the header's shrink
   // delta (≤16px). A single threshold caused an infinite bounce near the top:
   // toggling the header height changes the in-flow document height, and the
-  // browser's scroll-anchoring nudges scrollY to compensate — which flips the
+  // browser's scroll-anchoring nudges scrollY to compensate, which flips the
   // threshold back, resizing the header again, ad infinitum. The gap keeps that
   // compensation from ever crossing the opposite threshold.
   const [scrolled, setScrolled] = useState(false);
@@ -394,7 +348,7 @@ export function HomeNav() {
           <BrandLogo />
         </div>
 
-        {/* Center: primary menu (desktop only — visibility handled by the
+        {/* Center: primary menu (desktop only, visibility handled by the
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-1">
@@ -410,8 +364,8 @@ export function HomeNav() {
         <div className="flex items-center justify-end gap-1">
           {/* Theme + GitHub are desktop-only; on mobile the drawer carries a
               theme switch and a GitHub link instead. */}
-          <span className="ds-nav-icons items-center gap-1">
-            <ThemeToggle />
+          <span className="ds-nav-icons items-center gap-2">
+            <ThemePillToggle />
             <GitHubLink />
           </span>
           {/* Desktop-only: the mobile drawer carries its own auth control so

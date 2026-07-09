@@ -9,7 +9,7 @@
  * IntersectionObserver) so that, at send time, the Ask AI panel can attach:
  *
  *   - widgets the user explicitly pinned in the panel ("referenced"), and
- *   - widgets currently in the viewport, ranked by visibility — the model's
+ *   - widgets currently in the viewport, ranked by visibility, the model's
  *     best guess at "what the user is looking at" when the question doesn't
  *     name a target.
  *
@@ -41,7 +41,7 @@ export interface AskAiSourceOptions {
   /** Short human label shown as a chip, e.g. `Challenge: Reverse a list`. */
   label: string;
   /** Root DOM element, used for visibility tracking and document ordering.
-   *  Page-level sources (playground shells) may omit it — they count as
+   *  Page-level sources (playground shells) may omit it, they count as
    *  always visible. */
   element?: HTMLElement | null;
   getSnapshot: () => AskAiSourceSnapshot | null;
@@ -245,7 +245,7 @@ export function useAskAiSource(options: {
       element: elementRef?.current ?? null,
       getSnapshot: () => getSnapshotRef.current(),
     });
-    // elementRef is a ref — reading .current inside the effect is intentional.
+    // elementRef is a ref, reading .current inside the effect is intentional.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind, label, enabled]);
 }

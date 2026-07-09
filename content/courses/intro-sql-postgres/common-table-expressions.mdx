@@ -11,7 +11,7 @@ complex question reads as a sequence of clear steps.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A yellow-tagged query card sits above the main query, which carries a small matching chip joined by a thin line back to the name — a CTE defined once and referred to by name"
+  aria-label="A yellow-tagged query card sits above the main query, which carries a small matching chip joined by a thin line back to the name, a CTE defined once and referred to by name"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-400)" }}>
@@ -62,7 +62,7 @@ but pulled out and labelled.
 ## A subquery rewritten as a CTE
 
 Compare the two styles. First a nested subquery, then the same logic
-as a CTE — notice how the CTE version reads top-to-bottom:
+as a CTE, notice how the CTE version reads top-to-bottom:
 
 <SqlCodeBlock
   dialect="postgres"
@@ -101,7 +101,7 @@ sees the steps in order: *find big orders → count them per
 customer.*
 
 <Callout type="info" title="CTEs are about readability">
-A CTE rarely changes *what* a query computes — you could usually
+A CTE rarely changes *what* a query computes, you could usually
 write the same thing with a subquery. What changes is **clarity**.
 Naming each step makes intricate queries far easier to read, debug,
 and revisit weeks later.
@@ -154,7 +154,7 @@ ORDER BY
 Read it as a pipeline: `per_customer` sums each customer's spending,
 `big_spenders` keeps the large totals, and the final query sorts
 them. Each CTE is a labelled stage, and the data flows from one to
-the next — much clearer than nesting these as two subqueries.
+the next, much clearer than nesting these as two subqueries.
 
 ## When to reach for a CTE
 
@@ -167,7 +167,7 @@ flowchart TD
 Reach for a CTE when a query has **multiple logical steps**, when a
 subquery is getting **deeply nested**, or when you simply want the
 query to **document itself** with meaningful names. For a one-line
-filter, a plain query is fine — use CTEs where they earn their keep.
+filter, a plain query is fine, use CTEs where they earn their keep.
 
 ## Check your understanding
 

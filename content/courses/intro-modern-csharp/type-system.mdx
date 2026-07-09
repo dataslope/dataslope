@@ -12,7 +12,7 @@ programs in dynamically typed languages.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A board with circle, square, and triangle cut-outs; matching shapes drop straight into their slots — every value matched to its type"
+  aria-label="A board with circle, square, and triangle cut-outs; matching shapes drop straight into their slots, every value matched to its type"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M132 130 L508 130 Q520 130 520 142 L520 188 Q520 200 508 200 L132 200 Q120 200 120 188 L120 142 Q120 130 132 130 Z M222 165 A22 22 0 1 0 178 165 A22 22 0 1 0 222 165 Z M300 145 L340 145 L340 185 L300 185 Z M418 185 L462 185 L440 143 Z" fill="currentColor" fillRule="evenodd" opacity="0.15" />
@@ -82,7 +82,7 @@ A **type** is a *promise about what a value can do*. When you say
   operation).
 
 The compiler reads those promises and enforces them. If you try to
-call `.Substring` on `age`, you don't find out at 3 AM — you find
+call `.Substring` on `age`, you don't find out at 3 AM, you find
 out when you press Build.
 
 ## Built-in primitive types (reminder)
@@ -142,13 +142,13 @@ unless you cast explicitly with `(type)value`:
       starterCode: `using System;
 
 double price = 19.99;
-int rounded = (int)price; // explicit cast — drops the .99
+int rounded = (int)price; // explicit cast, drops the .99
 
 Console.WriteLine($"price = {price}");
 Console.WriteLine($"rounded (truncated) = {rounded}");
 
 long bigNumber = 5_000_000_000L;
-int truncated = (int)bigNumber; // overflow — produces a wrong answer
+int truncated = (int)bigNumber; // overflow, produces a wrong answer
 Console.WriteLine($"truncated = {truncated}");
 `,
     },
@@ -182,7 +182,7 @@ Console.WriteLine($"TryParse ok={ok}, result={result}");
 />
 
 `int.Parse` throws an exception on bad input. `int.TryParse`
-returns `false` and gives you a default value instead — that's
+returns `false` and gives you a default value instead, that's
 usually the safer choice when input might be junk.
 
 ## Value types vs reference types
@@ -297,7 +297,7 @@ Console.WriteLine($"b: [{string.Join(", ", b)}]");
 
 ### Why strings act "like values"
 
-Strings are reference types — but they are also **immutable**. You
+Strings are reference types, but they are also **immutable**. You
 cannot change the contents of a string once it's created. Every
 "change" creates a new string.
 
@@ -434,10 +434,10 @@ b.Add(3);
 
 What is in \`a\`?
 
-*Hint: \`List<T>\` is a reference type — think about whether \`b = a\` copies the list or just another name for it.*
+*Hint: \`List<T>\` is a reference type, think about whether \`b = a\` copies the list or just another name for it.*
 
 - \`[1, 2]\`
-  > Both variables point to the same list — \`b.Add(3)\` affects what \`a\` sees.
+  > Both variables point to the same list, \`b.Add(3)\` affects what \`a\` sees.
 - \`[3]\`
   > The original items are still there.
 - [o] \`[1, 2, 3]\`
@@ -452,7 +452,7 @@ What is in \`a\`?
 - \`(int)userInput\`
   > That's a cast, not a parse; it won't compile for strings.
 - \`int.Parse(userInput)\` and ignore the result
-  > It throws on bad input — your program will crash.
+  > It throws on bad input, your program will crash.
 - [o] \`int.TryParse(userInput, out int n)\` and handle the \`false\` case
   > \`TryParse\` returns \`false\` instead of throwing, so you can react gracefully.
 - Convert it to \`double\` first and then to \`int\`

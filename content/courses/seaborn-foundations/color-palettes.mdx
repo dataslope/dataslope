@@ -1,9 +1,9 @@
 ---
 title: Color Palettes
-description: Color is an encoding, not decoration — matching the palette type (qualitative, sequential, diverging) to your data, with an eye on perception and accessibility.
+description: Color is an encoding, not decoration, matching the palette type (qualitative, sequential, diverging) to your data, with an eye on perception and accessibility.
 ---
 
-Color is one of the most powerful channels in a chart — and one of the
+Color is one of the most powerful channels in a chart, and one of the
 easiest to misuse. The single most important idea is this: **the *kind* of
 palette you choose must match the *kind* of data it represents.** Get that
 wrong and the colors will quietly tell a story the data never said.
@@ -13,7 +13,7 @@ Seaborn gives you three families of palettes for three kinds of data.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Three fans of translucent swatch blades: one deepening through shades of a single blue, one passing from red through neutral to green, and one spreading four distinct hues — sequential, diverging, and categorical palettes"
+  aria-label="Three fans of translucent swatch blades: one deepening through shades of a single blue, one passing from red through neutral to green, and one spreading four distinct hues, sequential, diverging, and categorical palettes"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -96,11 +96,11 @@ sns.relplot(
 />
 
 No species should look bigger or more important than another, and a
-qualitative palette respects that — every hue carries equal weight.
+qualitative palette respects that, every hue carries equal weight.
 
 <Callout type="warn" title="Don't use a gradient for unordered groups">
 Coloring unordered categories with a *sequential* palette (a light-to-dark
-ramp) implies an order that isn't there — the reader will assume the dark
+ramp) implies an order that isn't there, the reader will assume the dark
 category is "more" than the light one. Keep gradients for genuine amounts.
 </Callout>
 
@@ -140,7 +140,7 @@ sns.relplot(
 Good sequential palettes are **perceptually uniform**: equal steps in the
 data look like equal steps in color, and lightness increases steadily so the
 order is unmistakable (even in grayscale). The old `jet`/rainbow maps are
-*not* — they have bright bands that read as ridges where the data is flat,
+*not*, they have bright bands that read as ridges where the data is flat,
 inventing structure. Prefer `rocket`, `mako`, `viridis`, `magma`.
 </Callout>
 
@@ -173,7 +173,7 @@ sns.heatmap(corr, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
 />
 
 Strong positive correlations glow one color, strong negatives the other, and
-near-zero cells fade to neutral — the sign is readable at a glance precisely
+near-zero cells fade to neutral, the sign is readable at a glance precisely
 because the palette has a center.
 
 ## Seeing the three side by side
@@ -219,7 +219,7 @@ type fits?
 - [o] Diverging, centered at 0.
   > Anomalies fan out from a meaningful midpoint in two directions, so a diverging palette with the neutral color at 0 makes "warmer" and "cooler" instantly readable.
 - It doesn't matter; any palette works.
-  > The palette type carries meaning here — the wrong one would misrepresent the sign of the anomaly.
+  > The palette type carries meaning here, the wrong one would misrepresent the sign of the anomaly.
 
 Data with a meaningful center (anomalies, correlations, change vs. baseline)
 calls for a diverging palette centered on that midpoint.`}
@@ -243,7 +243,7 @@ Roughly 1 in 12 men has some form of color-vision deficiency, most commonly
 trouble distinguishing red from green. Two habits keep your charts readable
 for everyone:
 
-1. **Use a colorblind-safe palette** — Seaborn ships one named `colorblind`.
+1. **Use a colorblind-safe palette**, Seaborn ships one named `colorblind`.
 2. **Never let color be the *only* cue.** Back it up with `style` (marker
    shape), direct labels, or facets, so the message survives in grayscale or
    for a colorblind reader.
@@ -282,13 +282,13 @@ sns.relplot(
   become hard to tell apart and impossible to match to a legend. Group rare
   categories, or facet instead of coloring.
 - **A rainbow map on continuous data.** As noted, it manufactures false
-  structure — use a perceptually uniform sequential map.
-- **A sequential map on signed data.** It hides the sign — use diverging.
+  structure, use a perceptually uniform sequential map.
+- **A sequential map on signed data.** It hides the sign, use diverging.
 
 <Callout type="tip" title="One question picks the palette">
 Before choosing colors, ask: *is this color showing unordered groups, an
 amount, or a value around a center?* The answer points straight at
-qualitative, sequential, or diverging — and rules the other two out.
+qualitative, sequential, or diverging, and rules the other two out.
 </Callout>
 
 ## Your turn
@@ -305,7 +305,7 @@ qualitative, sequential, or diverging — and rules the other two out.
 - \`palette="colorblind"\`.
 
 Assign the result to \`g\`. (Species is an unordered category, so a
-qualitative palette is the right type — and the colorblind one keeps it
+qualitative palette is the right type, and the colorblind one keeps it
 readable for everyone.)`}
   files={[
     {
@@ -359,7 +359,7 @@ g = sns.relplot(
 variable like \`region\` (North, South, East, West)?
 
 - Sequential.
-  > A light-to-dark ramp implies an ordering, but the regions have none — readers would wrongly infer a ranking.
+  > A light-to-dark ramp implies an ordering, but the regions have none, readers would wrongly infer a ranking.
 - [o] Qualitative.
   > Qualitative palettes give each category a distinct hue of equal weight, which is exactly right when there's no order among the groups.
 - Diverging.
@@ -377,7 +377,7 @@ old \`jet\`/rainbow colormap for continuous data?
 
 - They use fewer colors, so they render faster.
   > Speed isn't the issue; the concern is faithful perception of the values.
-- [o] They are perceptually uniform — equal data steps look like equal color steps, and lightness increases steadily, so they don't invent false structure.
+- [o] They are perceptually uniform, equal data steps look like equal color steps, and lightness increases steadily, so they don't invent false structure.
   > Rainbow maps have bright bands that read as features where the data is flat; perceptually uniform maps avoid that and stay readable even in grayscale.
 - They are the only palettes Seaborn supports.
   > Seaborn supports many palettes; these are recommended on perceptual grounds, not by exclusivity.
@@ -394,14 +394,14 @@ keep a grouped chart readable for someone with color-vision deficiency?
 
 - Increase the figure's resolution.
   > Resolution doesn't help distinguish colors that look alike to a colorblind reader.
-- [o] Encode the group with a second channel too — e.g. marker \`style\` (shape), direct labels, or facets — so color isn't the only cue.
+- [o] Encode the group with a second channel too, e.g. marker \`style\` (shape), direct labels, or facets, so color isn't the only cue.
   > Redundant encoding means the grouping survives even if the colors are indistinguishable, which is the core accessibility principle.
 - Use a darker background.
   > Background tone doesn't solve the underlying problem of relying on color alone.
 - Add more colors so there's more variety.
   > More hues make groups *harder* to tell apart, not easier, and worsen the problem.
 
-Never rely on color alone — add shape, labels, or facets so the message holds
+Never rely on color alone, add shape, labels, or facets so the message holds
 up without it.`}
 />
 
@@ -415,7 +415,7 @@ What's the likely problem?
   > Human color discrimination tops out at a handful of categorical hues; with 25 groups, colors blur together and the legend becomes unusable.
 - The colors will automatically become a gradient.
   > Seaborn keeps a categorical mapping; it doesn't silently switch to a gradient.
-- Nothing — 25 categories color cleanly.
+- Nothing, 25 categories color cleanly.
   > Far too many for distinct qualitative colors; readability collapses.
 
 Qualitative color works for ~8–10 groups at most; beyond that, group the
@@ -423,5 +423,5 @@ categories or facet instead of coloring.`}
 />
 
 Color now works *for* you instead of against you. You've reached the end of
-the aesthetics tools — next we put everything together into the craft of
+the aesthetics tools, next we put everything together into the craft of
 telling a clear story with data.

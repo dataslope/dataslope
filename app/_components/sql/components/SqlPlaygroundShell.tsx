@@ -21,8 +21,8 @@ import {
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
  * importers of `SqlMobilePane` keep working. The single-pane mobile layout
  * shows one of these surfaces at a time; desktop ignores it (the CSS only acts
- * on it below the mobile breakpoint). It lets the shared bottom tab bar — and
- * the jump-to-results / per-query-tab-restore affordances — work for all three
+ * on it below the mobile breakpoint). It lets the shared bottom tab bar, and
+ * the jump-to-results / per-query-tab-restore affordances, work for all three
  * SQL playgrounds without each playground body knowing anything about
  * responsiveness.
  */
@@ -70,19 +70,19 @@ export interface SqlPlaygroundShellProps {
    *  `MobileMenuSubSheet`. Omit to render no menu. */
   mobileMenu?: ReactNode;
   /** Real, smoothed boot fraction (0..1) when the engine reports download
-   *  progress (DuckDB). Omit for engines that don't — the shell then
+   *  progress (DuckDB). Omit for engines that don't, the shell then
    *  creeps a determinate bar over time instead. */
   bootFraction?: number | null;
   /** True when the active workspace is already open (locked) in another
    *  browser tab. The shell then shows a conflict overlay instead of the
-   *  boot overlay — opening the same OPFS-backed database in two tabs would
+   *  boot overlay, opening the same OPFS-backed database in two tabs would
    *  otherwise deadlock the engine boot (it hangs at ~90%). */
   workspaceConflict?: boolean;
   /** Invoked when the user picks "Open a new workspace" from the conflict
    *  overlay. The host should create a fresh workspace and switch to it
-   *  (a reload is fine — a new workspace id isn't locked elsewhere). */
+   *  (a reload is fine, a new workspace id isn't locked elsewhere). */
   onOpenNewWorkspace?: () => void;
-  /** Main body of the page — typically the top toolbar + sidebar +
+  /** Main body of the page, typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
   children: ReactNode;
@@ -99,7 +99,7 @@ export interface SqlPlaygroundShellProps {
  * Note: the `<Toast.Provider>` and `<Toast.Portal>` wiring is kept at
  * the per-dialect default export (one level above `…Inner`) because
  * `Toast.useToastManager()` is invoked during the Inner component's
- * render — moving the Provider inside the shell would render the
+ * render, moving the Provider inside the shell would render the
  * Provider *after* the Inner ran its hooks and trigger Base UI's
  * "missing provider" error during SSG.
  */
@@ -170,7 +170,7 @@ export function SqlPlaygroundShell({
   // Per-query-tab memory of the last bottom pane the user looked at, keyed by
   // the tab's `data-tab-id` (rendered by the shared TabBar). Activating a tab
   // restores its remembered pane instead of carrying the previous tab's pane
-  // over — so leaving tab A on Results and switching to a never-run tab B lands
+  // over, so leaving tab A on Results and switching to a never-run tab B lands
   // on B's Editor, not an empty Results. A ref (not state): it's a side table
   // that must never itself trigger a render. Session-scoped (not persisted).
   const tabPaneMemory = useRef<Map<string, SqlMobilePane>>(new Map());
@@ -181,7 +181,7 @@ export function SqlPlaygroundShell({
 
   // Comfort affordance: when the user runs a query (Run button) or opens a
   // table by double-clicking it in the schema tree, jump the mobile view to
-  // the surface that's about to show the answer — Results — so they don't
+  // the surface that's about to show the answer, Results, so they don't
   // have to hunt for the right tab after every run. Creating a new query tab
   // (the "+" button) instead jumps to the Editor, where the user will start
   // typing. Implemented with event delegation on the shell so the individual
@@ -239,7 +239,7 @@ export function SqlPlaygroundShell({
   // both placeholder states with `data-result-empty`; everything else
   // (table, error, "no rows") is real output. A MutationObserver keeps the
   // flag in sync as the user runs queries, switches tabs, or reloads a
-  // sample — without threading a prop through every playground.
+  // sample, without threading a prop through every playground.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -259,7 +259,7 @@ export function SqlPlaygroundShell({
       // (b) Did the active query tab change? React swaps the tab's `.active`
       // class and the results-pane contents in the same commit, so by the time
       // the observer runs we can read the new tab's id *and* its result-state
-      // together. On a switch, restore that tab's remembered bottom pane —
+      // together. On a switch, restore that tab's remembered bottom pane,
       // falling back to the Editor rather than landing on an empty Results.
       const activeId =
         root

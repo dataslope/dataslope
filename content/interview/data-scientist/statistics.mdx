@@ -4,7 +4,7 @@ description: Data Scientist interview questions on p-values, hypothesis testing,
 ---
 
 Statistics is the part of a Data Scientist interview most candidates are
-rustiest on. The questions below build up in a deliberate order — sampling
+rustiest on. The questions below build up in a deliberate order, sampling
 and distributions first, then estimation, then the hypothesis-testing
 machinery (which is where the p-value finally appears). Review the Q&A,
 then the concept checks.
@@ -16,7 +16,7 @@ then the concept checks.
 A **parameter** describes the population (the true mean $\mu$) and is
 usually unknown; a **statistic** is computed from a sample (the sample
 mean $\bar{x}$) and estimates the parameter. Inference is the bridge from
-statistic to parameter, with quantified uncertainty — everything below is
+statistic to parameter, with quantified uncertainty, everything below is
 about crossing that bridge responsibly.
 
 ### What is the standard error, and how does it differ from standard deviation?
@@ -58,7 +58,7 @@ population = rng.exponential(scale=5, size=100_000)  # skewed population
 sample_means = [rng.choice(population, 50).mean() for _ in range(2000)]
 print(f"SE (formula): {population.std() / 50**0.5:.3f}")
 print(f"SE (simulated): {np.std(sample_means):.3f}")
-# Both should be close — CLT at work
+# Both should be close, CLT at work
 `,
     },
   ]}
@@ -92,7 +92,7 @@ occurred:
 
 $$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
 
-Events $A$ and $B$ are independent if $P(A \mid B) = P(A)$ — knowing $B$
+Events $A$ and $B$ are independent if $P(A \mid B) = P(A)$, knowing $B$
 tells you nothing about $A$.
 
 ### What does it mean for two events to be mutually exclusive vs. independent?
@@ -115,7 +115,7 @@ posterior after observing data.
 
 The code below works the classic medical-test example: even with a 99%
 accurate test, a rare disease (1% prevalence) means a positive result
-still implies a fairly low probability of actually being sick — because
+still implies a fairly low probability of actually being sick, because
 the many false positives from the healthy majority swamp the few true
 positives. It is the canonical demonstration of why base rates matter.
 
@@ -215,7 +215,7 @@ print(f"Biased variance (n):     {biased_var:.2f}")
 It's a procedure: if you repeated the experiment many times and built an
 interval each time, about 95% of those intervals would contain the true
 parameter. It is **not** "a 95% probability the parameter is in *this*
-interval" — the parameter is fixed; the interval is what's random. For a
+interval", the parameter is fixed; the interval is what's random. For a
 mean, the interval is
 
 $$\bar{x} \pm t^{*}_{n-1} \cdot \frac{s}{\sqrt{n}}$$
@@ -380,7 +380,7 @@ $$\text{reject } H_0 \quad \text{when} \quad p < \alpha$$
 
 <Callout type="warning" title="Common misconception">
 A p-value is **not** the probability that the null hypothesis is true, and
-**not** the probability your result is a fluke — it is computed *assuming*
+**not** the probability your result is a fluke, it is computed *assuming*
 the null holds. Conflating the two is the single most common statistics
 interview slip.
 </Callout>
@@ -417,11 +417,11 @@ possible outcomes of a test form a decision matrix:
 
 |                          | $H_0$ is true                                | $H_0$ is false                              |
 | ------------------------ | -------------------------------------------- | ------------------------------------------- |
-| **Reject $H_0$**         | Type I error (false positive) — rate $\alpha$ | Correct decision — power $= 1 - \beta$       |
-| **Fail to reject $H_0$** | Correct decision — rate $1 - \alpha$          | Type II error (false negative) — rate $\beta$ |
+| **Reject $H_0$**         | Type I error (false positive), rate $\alpha$ | Correct decision, power $= 1 - \beta$       |
+| **Fail to reject $H_0$** | Correct decision, rate $1 - \alpha$          | Type II error (false negative), rate $\beta$ |
 
 Lowering $\alpha$ (a stricter test) reduces false positives but raises
-false negatives, all else equal — the two error rates trade off against
+false negatives, all else equal, the two error rates trade off against
 each other.
 
 ### What is statistical power?
@@ -436,7 +436,7 @@ of detecting a true effect if one exists. Power rises with larger sample
 size, larger effect size, lower variance, and a higher $\alpha$.
 
 The code below solves for power given an effect size (Cohen's d), a
-per-group sample size, and $\alpha$ — the standard pre-experiment check
+per-group sample size, and $\alpha$, the standard pre-experiment check
 that a planned test is sensitive enough to find the effect you care about.
 
 <CodeBlock
@@ -508,7 +508,7 @@ print("Corrected p-values:", [f"{p:.3f}" for p in p_corrected])
 P-hacking is trying many analyses, subgroups, or metrics until a
 significant result appears, then reporting only that one. It exploits the
 fact that with enough comparisons some will be significant by chance
-(Type I error inflation), and it leads to irreproducible findings — a major
+(Type I error inflation), and it leads to irreproducible findings, a major
 driver of the replication crisis. Remedies: pre-registration, Bonferroni
 or false-discovery-rate correction, and separating exploratory from
 confirmatory analysis.
@@ -557,7 +557,7 @@ understanding the causal structure.
 
 - There is a 3% probability that the null hypothesis is true.
   > A p-value is **not** the probability the null is true. It's computed *assuming* the null holds.
-- [o] If the null were true, there's a 3% chance of data this extreme (or more) — so at α = 0.05 you reject the null.
+- [o] If the null were true, there's a 3% chance of data this extreme (or more), so at α = 0.05 you reject the null.
   > That's the definition; since 0.03 < 0.05, you reject.
 - There is a 97% probability the effect is real and important.
   > Significance isn't the probability the effect is real, and says nothing about effect size.
@@ -566,15 +566,15 @@ understanding the causal structure.
 />
 
 <MultipleChoice
-  markdown={`Your A/B test concludes the new button "works" and you ship it — but in reality it has **no** effect. What kind of error is this?
+  markdown={`Your A/B test concludes the new button "works" and you ship it, but in reality it has **no** effect. What kind of error is this?
 
-- [o] A Type I error (false positive) — rejecting a true null hypothesis.
+- [o] A Type I error (false positive), rejecting a true null hypothesis.
   > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
-- A Type II error (false negative) — failing to detect a real effect.
+- A Type II error (false negative), failing to detect a real effect.
   > That's the opposite: missing an effect that *is* real.
 - Selection bias.
   > Selection bias is about how the sample was drawn, not which hypothesis-test error occurred.
-- No error — shipping is always safe.
+- No error, shipping is always safe.
   > Shipping a change that does nothing is precisely the cost of a Type I error.`}
 />
 
@@ -582,11 +582,11 @@ understanding the causal structure.
   markdown={`Why does the Central Limit Theorem matter when you compute a confidence interval for a **mean**?
 
 - It guarantees the underlying data is normally distributed.
-  > The CLT says nothing about the population's shape — that can be skewed.
+  > The CLT says nothing about the population's shape, that can be skewed.
 - [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't.
   > That's what enables normal-based intervals regardless of the population's shape.
 - It only applies when the sample size is below 30.
-  > It's the reverse — the approximation improves as n grows; "n ≥ 30" is a rough adequacy rule of thumb.
+  > It's the reverse, the approximation improves as n grows; "n ≥ 30" is a rough adequacy rule of thumb.
 - It lets you skip estimating the standard error.
   > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.`}
 />

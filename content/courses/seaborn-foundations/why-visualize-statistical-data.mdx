@@ -1,10 +1,10 @@
 ---
 title: "Why Visualize Statistical Data?"
-description: "What summary statistics hide and the human eye reveals — the case for turning numbers into pictures."
+description: "What summary statistics hide and the human eye reveals, the case for turning numbers into pictures."
 ---
 
-You can describe a dataset with a handful of numbers — a mean here, a
-standard deviation there, a correlation between two columns — and feel like
+You can describe a dataset with a handful of numbers, a mean here, a
+standard deviation there, a correlation between two columns, and feel like
 you *know* it. Those summaries are genuinely useful. They are also famous
 for being **liars**.
 
@@ -14,14 +14,14 @@ squeezed down to the *same* mean, the *same* spread, and the *same*
 correlation. If you only ever look at the numbers, you would swear they were
 identical. The moment you **plot** them, the illusion shatters.
 
-This page is about that gap — between what statistics *say* and what the
-data is *actually doing* — and why a picture closes it. It is the reason the
+This page is about that gap, between what statistics *say* and what the
+data is *actually doing*, and why a picture closes it. It is the reason the
 rest of this course exists.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Two light blue panels share one identical yellow mean line and matching summary chips, joined by a gray equals sign — yet one holds a tidy rising trend and the other two separate clusters with a canyon between them"
+  aria-label="Two light blue panels share one identical yellow mean line and matching summary chips, joined by a gray equals sign, yet one holds a tidy rising trend and the other two separate clusters with a canyon between them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -79,7 +79,7 @@ information that summaries compress away.** Let's prove it.
 In 1973 the statistician Francis Anscombe built four small datasets to make
 exactly this point. Each has 11 `(x, y)` pairs. They are now a rite of
 passage. We load them from a tidy table where every row carries a `dataset`
-label (the group, `"I"` through `"IV"`) alongside its `x` and `y` — all four
+label (the group, `"I"` through `"IV"`) alongside its `x` and `y`, all four
 groups stacked into one long DataFrame.
 
 Let's start the way many people start with a new dataset: by computing
@@ -129,7 +129,7 @@ identically. That would be a mistake.
 <Callout type="info" title="Why these particular numbers?">
 Anscombe reverse-engineered the four groups so their summaries would
 coincide. The shared correlation of ~0.82 even implies the *same* best-fit
-regression line — same slope, same intercept. The statistics are not
+regression line, same slope, same intercept. The statistics are not
 approximately equal by luck; they were *designed* to be equal.
 </Callout>
 
@@ -167,7 +167,7 @@ sns.lmplot(
   ]}
 />
 
-Four wildly different worlds — and the *same* red line slicing through each:
+Four wildly different worlds, and the *same* red line slicing through each:
 
 * **Dataset I** is what the statistics led you to expect: a genuine, noisy
   linear relationship. The line is honest here.
@@ -178,11 +178,11 @@ Four wildly different worlds — and the *same* red line slicing through each:
   drags the fitted line off the true trend. Without the plot you would never
   suspect a single rogue point is steering your model.
 * **Dataset IV** is the most unsettling: `x` is constant for ten points, and a
-  *single* far-right point — a **high-leverage** observation — invents an
+  *single* far-right point, a **high-leverage** observation, invents an
   entire slope out of nothing. Remove that one point and the "relationship"
   evaporates.
 
-Same mean, same spread, same correlation, same regression line — four
+Same mean, same spread, same correlation, same regression line, four
 completely different stories. That is the gap between numbers and reality,
 made visible in a single figure.
 
@@ -199,13 +199,13 @@ summarize a relationship.
 and correlation. What does plotting them reveal that those statistics hide?
 
 - That the datasets actually have different means once you look closely.
-  > The means really are (essentially) equal — that is the whole setup. Plotting does not contradict the summary numbers; it adds information they never carried.
-- [o] That the *shape* of each relationship is completely different — one linear, one curved, one outlier-driven, one leverage-driven.
+  > The means really are (essentially) equal, that is the whole setup. Plotting does not contradict the summary numbers; it adds information they never carried.
+- [o] That the *shape* of each relationship is completely different, one linear, one curved, one outlier-driven, one leverage-driven.
   > Summary statistics compress away shape, clustering, and outliers. The four panels expose structure (a curve, a rogue point, a single high-leverage point) that identical numbers simply cannot encode.
 - That the correlation coefficient was computed incorrectly.
   > The correlations are correct; each is about 0.82. The lesson is that a correct correlation can still describe four very different pictures.
 - That three of the four datasets are too small to analyze.
-  > All four have the same number of points (11). Size is not the issue — the issue is that equal summaries can hide unequal shapes.
+  > All four have the same number of points (11). Size is not the issue, the issue is that equal summaries can hide unequal shapes.
 
 The numbers agree; the pictures disagree. That disagreement is exactly the
 information statistical visualization recovers.`}
@@ -217,8 +217,8 @@ It helps to name *why* you are drawing a chart, because the two main reasons
 pull in different directions.
 
 **Exploratory** visualization is for **you**, while you still don't know what
-the data holds. You make many quick, rough plots — change a variable, add a
-color, switch chart types — hunting for structure and surprises. Speed and
+the data holds. You make many quick, rough plots, change a variable, add a
+color, switch chart types, hunting for structure and surprises. Speed and
 breadth matter more than polish. Anscombe's quartet is a parable about this
 phase: skip it and you ship conclusions built on a mirage.
 
@@ -227,12 +227,12 @@ something and want to communicate it clearly. Now you slow down: one careful
 chart, good labels, a deliberate color choice, everything in service of a
 single message.
 
-Most of this course lives in the exploratory world — building the instinct to
-*see* structure — but the aesthetic skills we cover later (themes, palettes,
+Most of this course lives in the exploratory world, building the instinct to
+*see* structure, but the aesthetic skills we cover later (themes, palettes,
 annotations) are what carry a finding across the bridge into explanation.
 
 <Callout type="tip" title="The goal of statistical visualization">
-Boiled down to one sentence: **the goal is to see structure** — the shape,
+Boiled down to one sentence: **the goal is to see structure**, the shape,
 groups, trends, and anomalies that summary numbers average away. Keep asking
 the three questions from the introduction of every plot you make: what does
 it reveal, what does it hide, and when would it break?
@@ -246,7 +246,7 @@ If you suspect Anscombe rigged a rare special case in 1973, a modern sequel
 puts that to rest. In 2017 Justin Matejka and George Fitzmaurice published
 the **Datasaurus dozen**: thirteen datasets that all share the same means,
 the same standard deviations, and the same correlation to two decimal
-places — and one of them is shaped, unmistakably, like a **dinosaur**. (The
+places, and one of them is shaped, unmistakably, like a **dinosaur**. (The
 dino itself was drawn by Alberto Cairo; Matejka and Fitzmaurice built the
 twelve siblings around it with an optimization that nudges points into a new
 shape while pinning the summary statistics in place.)
@@ -307,7 +307,7 @@ sns.relplot(
   ]}
 />
 
-A dinosaur, a star, an X, and a bullseye — four pictures that could not be
+A dinosaur, a star, an X, and a bullseye, four pictures that could not be
 more different, sharing one set of summary numbers. The takeaway is not
 subtle: *for any* set of summary statistics there are endlessly many datasets
 that produce them. Summaries narrow the possibilities; only a picture pins
@@ -316,7 +316,7 @@ down which one you actually have.
 <ChallengeCard
   adapter="python"
   title="Even the spread is identical"
-  instructions={`The means coincide — but so does the *spread*. Prove it with your
+  instructions={`The means coincide, but so does the *spread*. Prove it with your
 own code. Using the \`datasaurus\` DataFrame (columns \`dataset\`, \`x\`, \`y\`):
 
 1. Group by \`dataset\` and compute the **standard deviation of \`y\`** for each
@@ -418,7 +418,7 @@ display(y_means)
   ]}
 />
 
-Four groups, four identical means — and yet, as you saw above, four utterly
+Four groups, four identical means, and yet, as you saw above, four utterly
 different pictures. Holding both of those facts in your head at once is the
 whole point of this page.
 
@@ -431,7 +431,7 @@ dataset?
 - Because it makes the file smaller on disk.
   > "Compression" here is about information, not storage. The point is conceptual, not about bytes.
 - [o] Because it represents many data points with a single number, discarding the detail of how those points are arranged.
-  > A mean keeps one fact (the center) and throws away shape, spread, clustering, and outliers — which is exactly why different datasets can share a mean.
+  > A mean keeps one fact (the center) and throws away shape, spread, clustering, and outliers, which is exactly why different datasets can share a mean.
 - Because it always underestimates the true value.
   > A mean is not biased low by nature; it is simply a summary. The issue is lost detail, not a systematic error.
 - Because it can only be computed on small datasets.
@@ -446,7 +446,7 @@ inspect what was discarded.`}
 than reading their correlation coefficient?
 
 - Reporting a single number you can paste into a sentence.
-  > A coefficient wins on conciseness — that is a point *for* the statistic, not the plot.
+  > A coefficient wins on conciseness, that is a point *for* the statistic, not the plot.
 - [o] Revealing whether the relationship is straight, curved, clustered, or driven by an outlier.
   > Correlation collapses a relationship to one number about straight-line association; the scatter shows the actual shape, including curves and rogue points it cannot capture.
 - Storing the relationship compactly for later computation.
@@ -464,11 +464,11 @@ one point sits far off it. How does that single point affect a fitted
 straight-line regression?
 
 - It has no effect, because one point cannot change a line fitted to eleven.
-  > A single point can move a least-squares line substantially — that is precisely the danger the plot exposes.
+  > A single point can move a least-squares line substantially, that is precisely the danger the plot exposes.
 - It makes the correlation exactly 1.0.
   > The outlier *lowers* the correlation from a perfect fit; it does not raise it to 1.0.
 - [o] It pulls the fitted line away from the trend the other ten points follow.
-  > Least-squares fitting is sensitive to outliers, so the lone off-line point drags the line off the otherwise clean trend — visible instantly in the panel, invisible in the summary.
+  > Least-squares fitting is sensitive to outliers, so the lone off-line point drags the line off the otherwise clean trend, visible instantly in the panel, invisible in the summary.
 - It splits the data into two separate clusters.
   > There are not two clusters; there is one clear line plus a single stray point. The point distorts the fit rather than forming a group.
 
@@ -483,9 +483,9 @@ catch one in the act.`}
 - Correlation always equals 0.82 for real datasets.
   > 0.82 is just the value Anscombe chose; it is not a universal constant. The lesson is about the limits of summaries generally.
 - Larger datasets are always more trustworthy than smaller ones.
-  > Both examples use small datasets and say nothing about size being a remedy. More rows would not have revealed these shapes — only plotting does.
+  > Both examples use small datasets and say nothing about size being a remedy. More rows would not have revealed these shapes, only plotting does.
 - [o] Many different datasets can share identical summary statistics, so you must visualize the data to know its true shape.
-  > Both are explicitly constructed so the means, spreads, and correlations coincide while the shapes differ wildly — proving that summaries alone cannot identify a dataset.
+  > Both are explicitly constructed so the means, spreads, and correlations coincide while the shapes differ wildly, proving that summaries alone cannot identify a dataset.
 - Standard deviation is a more reliable summary than the mean.
   > Both examples hold the standard deviation constant *too*; no single summary escapes the problem. The fix is a picture, not a different statistic.
 
@@ -493,6 +493,6 @@ Equal summaries, unequal shapes: always plot before you trust the numbers.`}
 />
 
 You have the founding motivation for everything ahead: **numbers compress,
-pictures reveal.** Next we look at *how Seaborn thinks* — the declarative,
+pictures reveal.** Next we look at *how Seaborn thinks*, the declarative,
 column-to-role mental model that lets you turn a tidy table into a revealing
 picture in a single line.

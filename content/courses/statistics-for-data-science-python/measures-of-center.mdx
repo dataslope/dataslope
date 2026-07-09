@@ -1,13 +1,13 @@
 ---
 title: Measures of Center
-description: Mean, median, and mode — what each one captures, when each is the honest summary, and why a single "average" can mislead you on skewed data.
+description: Mean, median, and mode, what each one captures, when each is the honest summary, and why a single "average" can mislead you on skewed data.
 ---
 
-You have a column of numbers — salaries, response times, order values —
+You have a column of numbers, salaries, response times, order values,
 and someone asks the most innocent question in data science: "*what's
 the typical value?*" That word "typical" is doing a lot of work. It
-hides a choice between three different summaries — the **mean**, the
-**median**, and the **mode** — that can disagree wildly. Picking the
+hides a choice between three different summaries, the **mean**, the
+**median**, and the **mode**, that can disagree wildly. Picking the
 wrong one is how a perfectly honest analyst ends up reporting a number
 that no real person in the data would recognize.
 
@@ -19,7 +19,7 @@ center you're actually asking for, and when each one quietly lies.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Seven dots rest on a plank with the green median among them while one heavy yellow value sits far down the beam, dragging the balance-point fulcrum into empty space where no data lives — the mean is a balance point, and outliers drag it"
+  aria-label="Seven dots rest on a plank with the green median among them while one heavy yellow value sits far down the beam, dragging the balance-point fulcrum into empty space where no data lives, the mean is a balance point, and outliers drag it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="70" y="168" width="500" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -45,13 +45,13 @@ center you're actually asking for, and when each one quietly lies.
 ## The three centers, and what each one means
 
 - **Mean** (the arithmetic average): add everything up, divide by the
-  count. It's the balance point of the data — the spot where the values
+  count. It's the balance point of the data, the spot where the values
   on either side exactly counterweight each other.
 - **Median**: sort the values and take the middle one (or the average
   of the two middle ones). Half the data sits below it, half above. It
   answers "what's the value of the typical *member*?"
 - **Mode**: the most frequently occurring value. It answers "what's the
-  most *common* outcome?" — the only one of the three that makes sense
+  most *common* outcome?", the only one of the three that makes sense
   for categories like favorite color or payment method.
 
 <CodeBlock
@@ -78,8 +78,8 @@ print(f"\\nMost common count is {m.mode} (happened {m.count} times)")
   ]}
 />
 
-When data is roughly symmetric and has no extreme values — like that
-ticket count — all three land in the same neighborhood, and the choice
+When data is roughly symmetric and has no extreme values, like that
+ticket count, all three land in the same neighborhood, and the choice
 barely matters. The interesting cases are when they *diverge*. That
 divergence is not a nuisance; it's information about the shape of your
 data.
@@ -87,13 +87,13 @@ data.
 <Callout type="info" title="They agree only when the data is symmetric">
 For a perfectly symmetric, single-peaked distribution, the mean,
 median, and mode all coincide. The further apart they drift, the more
-**skewed** your data is — so the gap between mean and median is itself a
+**skewed** your data is, so the gap between mean and median is itself a
 quick read on shape (which we explore in *Shape and Outliers*).
 </Callout>
 
 ## Where the mean lies: skew and outliers
 
-The mean's defining property — it's the balance point — is also its
+The mean's defining property, it's the balance point, is also its
 weakness. A balance point is dragged toward heavy values, no matter how
 few of them there are. One billionaire in a room of teachers pulls the
 *average* net worth into the millions, even though that number
@@ -129,8 +129,8 @@ print(f"  Median = {with_ceo.median():.1f}k   <- barely moved")
 
 Adding a single person moved the **mean** by tens of thousands but
 nudged the **median** by almost nothing. That's the whole story in one
-example: the median is **robust** — resistant to a handful of extreme
-values — while the mean is **sensitive** to them. Neither is "right" in
+example: the median is **robust**, resistant to a handful of extreme
+values, while the mean is **sensitive** to them. Neither is "right" in
 the abstract; they answer different questions. But if you report the
 mean salary of that company, you'll quote a number that's higher than
 what almost everyone earns.
@@ -147,7 +147,7 @@ flowchart LR
 ```
 
 <Callout type="warn" title="Misconception: the mean is always 'the typical value'">
-On skewed data the mean is *not* typical — it's pulled toward the long
+On skewed data the mean is *not* typical, it's pulled toward the long
 tail and can sit above most of your observations. "Average household
 income" is famously misleading for exactly this reason: a few very high
 earners lift the mean well above what a middle household actually makes.
@@ -156,7 +156,7 @@ On right-skewed data, the **median** is usually the honest "typical."
 
 <Callout type="warn" title="Misconception: 'average' always means the mean">
 In everyday speech "the average" defaults to the mean, but statistically
-*average* just means "a measure of center" — the median and mode are
+*average* just means "a measure of center", the median and mode are
 averages too. When a report says "the average user," always ask which
 center they computed and whether the data is skewed.
 </Callout>
@@ -167,13 +167,13 @@ center they computed and whether the data is skewed.
   markdown={`A dataset of home prices in a neighborhood is strongly right-skewed: most homes are modest, but a few mansions sell for 10x the rest. A realtor wants to advertise the "typical" price. Which measure is the most honest summary?
 
 - The mean, because it uses every value in the data
-  > Using every value is exactly why the mean gets dragged upward here — the few mansions pull it above what most homes cost, so it overstates the "typical" price.
+  > Using every value is exactly why the mean gets dragged upward here, the few mansions pull it above what most homes cost, so it overstates the "typical" price.
 - [o] The median, because half the homes are above it and half below, unaffected by the extreme high sales
   > On right-skewed price data the median reflects the middle home and ignores how extreme the top sales are, so it matches what a typical buyer would actually pay.
 - The mode, because it's the single most common price
   > Continuous prices rarely repeat exactly, so a mode is unstable and often meaningless for home prices unless values are heavily rounded.
 - The mean, because medians throw away information
-  > The median does ignore the magnitude of the extremes, but on skewed data that is a feature, not a flaw — it is what keeps the summary representative.
+  > The median does ignore the magnitude of the extremes, but on skewed data that is a feature, not a flaw, it is what keeps the summary representative.
 
 The gap between mean and median here is itself a signal that the data is skewed.`}
 />
@@ -194,7 +194,7 @@ flowchart TD
 
 - **Mode** is the only center that works for **categorical** data (you
   can't average "red" and "blue"), and it's the right call for asking
-  "what's the most common outcome?" It also flags **multimodal** data —
+  "what's the most common outcome?" It also flags **multimodal** data,
   two peaks usually mean two groups mixed together, and *no* single
   center describes them well.
 - **Mean** is the natural choice for **symmetric** numeric data with no
@@ -208,7 +208,7 @@ flowchart TD
 <Callout type="tip" title="A practical habit: report both">
 When you're unsure, compute the mean *and* the median and look at the
 gap. If they're close, report the mean. If they diverge, that gap is
-telling you the data is skewed — report the median as the headline and
+telling you the data is skewed, report the median as the headline and
 mention the mean only with context. Showing both is often the most
 honest move.
 </Callout>
@@ -224,8 +224,8 @@ robust than the mean, but still uses most of the data. This is exactly
 how Olympic judging and many sensor pipelines discard extremes before
 averaging.
 
-**Weighted mean.** When some observations count more than others —
-larger stores, more-reliable sensors, bigger survey strata — give each a
+**Weighted mean.** When some observations count more than others,
+larger stores, more-reliable sensors, bigger survey strata, give each a
 weight. A company-wide average satisfaction score should weight each
 team by headcount, not treat a 3-person team the same as a 300-person
 one.
@@ -239,7 +239,7 @@ compound.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A sorted row of dots with its two extreme ends caught inside translucent red trim zones, and a green marker resting below the center of the surviving blue dots — the trimmed mean averages only what is left after the extremes are chopped"
+  aria-label="A sorted row of dots with its two extreme ends caught inside translucent red trim zones, and a green marker resting below the center of the surviving blue dots, the trimmed mean averages only what is left after the extremes are chopped"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="66" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
@@ -302,7 +302,7 @@ print(
 Notice the last two lines: raising the **geometric mean** to the 4th
 power exactly reproduces the total compounded growth, while the
 arithmetic mean would not. That's the tell that you're in
-geometric-mean territory — whenever the quantities *multiply* rather
+geometric-mean territory, whenever the quantities *multiply* rather
 than *add*.
 
 <Callout type="info" title="When to reach for the geometric mean">
@@ -315,7 +315,7 @@ dollars), stick with the arithmetic mean or median.
 
 ## Putting it together: a robust center summary
 
-In real EDA you rarely report a single number — you report a small
+In real EDA you rarely report a single number, you report a small
 *summary* and let the gaps between numbers tell you about shape. Here's
 the pattern you'll reuse constantly: compute several centers at once and
 read them together.
@@ -361,10 +361,10 @@ and positive, lead with the median.
 
 Compute a dictionary called **\`result\`** with exactly these keys (all values plain Python \`float\`):
 
-- \`"mean"\` — the arithmetic mean
-- \`"median"\` — the median
-- \`"trimmed_mean"\` — the **10% trimmed mean** (drop 10% from each end) using \`scipy.stats.trim_mean\`
-- \`"skew_gap"\` — \`mean\` minus \`median\`
+- \`"mean"\`, the arithmetic mean
+- \`"median"\`, the median
+- \`"trimmed_mean"\`, the **10% trimmed mean** (drop 10% from each end) using \`scipy.stats.trim_mean\`
+- \`"skew_gap"\`, \`mean\` minus \`median\`
 
 Then set a boolean **\`report_median\`** to \`True\` if \`skew_gap\` is greater than \`0\` (i.e. right-skewed, so the median is the more honest headline), else \`False\`.
 
@@ -448,11 +448,11 @@ assert report_median == (result["skew_gap"] > 0)`,
   markdown={`You compute the mean monthly spend of your users as \\$84 and the median as \\$41. What is the most defensible reading of this gap?
 
 - The data is left-skewed, so a few very low spenders pull the mean down
-  > A mean far *above* the median indicates the opposite — a right skew with a tail of high values. Left skew would put the mean *below* the median.
+  > A mean far *above* the median indicates the opposite, a right skew with a tail of high values. Left skew would put the mean *below* the median.
 - [o] The data is right-skewed; a minority of high spenders inflate the mean, so the median (\\$41) better reflects a typical user
   > When the mean sits well above the median, a long upper tail is dragging the mean up, so the median is the more representative "typical" value here.
 - The mean must be wrong because it should be close to the median
-  > Nothing is wrong with the computation — a large mean–median gap is the normal, expected signature of skewed data, not an error.
+  > Nothing is wrong with the computation, a large mean–median gap is the normal, expected signature of skewed data, not an error.
 - Half of all users spend exactly \\$84
   > The mean is a balance point, not a value that half the users hit. It is the *median* (\\$41) that has half the users below and half above.
 
@@ -463,13 +463,13 @@ A mean far above the median is one of the most common skew signals in real spend
   markdown={`A survey asks for respondents' favorite payment method (cash, credit, debit, mobile). Which measure of center even *makes sense* for this column?
 
 - The mean of the four options
-  > You cannot average category labels — there is no arithmetic meaning to "the average of cash and credit," so a mean is undefined here.
+  > You cannot average category labels, there is no arithmetic meaning to "the average of cash and credit," so a mean is undefined here.
 - The median payment method
   > A median requires the values to be ordered from low to high; unordered categories like payment methods have no meaningful middle.
-- [o] The mode — the most frequently chosen payment method
+- [o] The mode, the most frequently chosen payment method
   > For unordered categorical data the mode is the only valid center, since it simply reports which category occurs most often.
 - None of them; categorical data has no center
-  > Categorical data does have a usable center — the mode — which answers "what is the most common category?"
+  > Categorical data does have a usable center, the mode, which answers "what is the most common category?"
 
 Mode is the go-to center whenever the values are labels rather than numbers.`}
 />
@@ -486,7 +486,7 @@ Mode is the go-to center whenever the values are labels rather than numbers.`}
 - Because percentages can be negative
   > Negative percentages are fine for the arithmetic mean; the real reason is that returns *compound*, so factors should be multiplied, not added.
 
-Whenever quantities multiply to combine, the geometric mean — not the arithmetic mean — is the honest average.`}
+Whenever quantities multiply to combine, the geometric mean, not the arithmetic mean, is the honest average.`}
 />
 
 <MultipleChoice
@@ -496,7 +496,7 @@ Whenever quantities multiply to combine, the geometric mean — not the arithmet
   > A trimmed mean drops a fraction from each end and averages the rest; the median is the extreme case of trimming nearly everything, but a 10% trimmed mean still uses 80% of the data.
 - It is more sensitive to outliers than the ordinary mean
   > Trimming removes the most extreme values before averaging, which makes it *less* sensitive to outliers than the ordinary mean, not more.
-- [o] It discards a fixed percentage of the smallest and largest values, then averages what remains — a middle ground between mean and median in robustness
+- [o] It discards a fixed percentage of the smallest and largest values, then averages what remains, a middle ground between mean and median in robustness
   > By cutting off both tails before averaging, it keeps much of the mean's efficiency while gaining resistance to extreme values, sitting between the two.
 - It can only be used on symmetric data
   > It is especially useful on skewed or outlier-prone data; symmetry is not a requirement for trimming the tails.
@@ -511,7 +511,7 @@ The trimmed mean is a practical compromise when you want robustness without full
   data like income, prices, and durations.
 - **Mode** = most common value; the only center for categorical data and
   a flag for multimodality.
-- The **gap between mean and median** is a free read on skew — when they
+- The **gap between mean and median** is a free read on skew, when they
   diverge, lead with the median.
 - Reach for the **geometric mean** for compounding rates and the
   **trimmed/weighted mean** when you need robustness or unequal weights.

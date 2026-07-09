@@ -1,6 +1,6 @@
 ---
 title: Aggregate Functions
-description: The heart of analytics — collapsing many rows into a single summary number. COUNT, SUM, AVG, MIN, MAX, and why aggregation is how analysts make big data comprehensible.
+description: The heart of analytics, collapsing many rows into a single summary number. COUNT, SUM, AVG, MIN, MAX, and why aggregation is how analysts make big data comprehensible.
 ---
 
 If there is one idea at the center of analytical SQL, it is
@@ -13,7 +13,7 @@ move.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Three blue isometric cubes standing for many raw rows flow along a solid gray arrow into one large green cube — many rows in, a single summary value out"
+  aria-label="Three blue isometric cubes standing for many raw rows flow along a solid gray arrow into one large green cube, many rows in, a single summary value out"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -51,7 +51,7 @@ flowchart TD
     Agg --> One["One summary value<br/>(e.g. the average)"]
 ```
 
-That collapse — many in, one out — is the defining behavior. Everything
+That collapse, many in, one out, is the defining behavior. Everything
 else in this section is a variation on it.
 
 ## The five core aggregates
@@ -64,7 +64,7 @@ else in this section is a variation on it.
 | `MIN(col)` | What is the smallest? | cheapest sale |
 | `MAX(col)` | What is the largest? | biggest sale |
 
-A single query can compute several at once — each reads the same rows and
+A single query can compute several at once, each reads the same rows and
 produces its own number. Run all five over the real 53,940-row diamonds
 file:
 
@@ -83,7 +83,7 @@ FROM
   );`}
 />
 
-Tens of thousands of rows became one line of five numbers — a complete
+Tens of thousands of rows became one line of five numbers, a complete
 summary that would be hopeless to compute by hand.
 
 ## `COUNT(*)` vs `COUNT(column)` vs `COUNT(DISTINCT ...)`
@@ -92,7 +92,7 @@ Counting is subtler than it looks, and the distinction matters in real
 analysis:
 
 - `COUNT(*)` counts **rows**, period.
-- `COUNT(column)` counts rows where that column is **not NULL** — i.e.
+- `COUNT(column)` counts rows where that column is **not NULL**, i.e.
   present values.
 - `COUNT(DISTINCT column)` counts the number of **different** values.
 
@@ -119,13 +119,13 @@ FROM
 />
 
 "How many visits?" "How many had a known referrer?" "How many *different*
-people?" — three genuinely different business questions, three different
+people?", three genuinely different business questions, three different
 `COUNT`s. Confusing them is a common analytical error.
 
 ## Aggregates ignore `NULL` (except `COUNT(*)`)
 
 `SUM`, `AVG`, `MIN`, `MAX`, and `COUNT(column)` all **skip NULLs**. This
-is almost always what you want — an unknown value should not be treated as
+is almost always what you want, an unknown value should not be treated as
 zero and drag an average down.
 
 <SqlCodeBlock
@@ -156,13 +156,13 @@ ORDER BY
 
 Product A averages over its two real scores (5 and 3 → 4.0), ignoring the
 missing one. If `NULL` counted as 0, the average would be a misleading
-2.67. SQL's choice to skip NULLs is what makes aggregates trustworthy —
+2.67. SQL's choice to skip NULLs is what makes aggregates trustworthy,
 but you must *know* it is happening.
 
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Four solid green values pass through the slot of a blue aggregate gate toward one yellow result, while two hollow NULL rings are stopped at the bar — aggregates skip NULLs rather than counting them as zero"
+  aria-label="Four solid green values pass through the slot of a blue aggregate gate toward one yellow result, while two hollow NULL rings are stopped at the bar, aggregates skip NULLs rather than counting them as zero"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -237,7 +237,7 @@ flowchart TD
 - It removes duplicate rows.
   > Removing duplicates is \`DISTINCT\`; aggregation computes a summary.
 
-Aggregation collapses a set of rows into one summarizing number — the core
+Aggregation collapses a set of rows into one summarizing number, the core
 analytical operation.`}
 />
 
@@ -260,7 +260,7 @@ Aggregates skip NULLs, so \`AVG\` reflects only the present values.`}
   markdown={`You want the number of **distinct customers** who placed orders. Which is correct?
 
 - \`COUNT(*)\`
-  > That counts orders (rows), not distinct customers — a customer with three orders would count three times.
+  > That counts orders (rows), not distinct customers, a customer with three orders would count three times.
 - \`COUNT(customer_id)\`
   > That counts non-NULL customer ids, still once per order, so repeat customers are over-counted.
 - [o] \`COUNT(DISTINCT customer_id)\`
@@ -272,5 +272,5 @@ Aggregates skip NULLs, so \`AVG\` reflects only the present values.`}
 />
 
 A single grand total is useful, but the real power comes from computing
-one summary **per group** — revenue *per region*, average *per category*.
+one summary **per group**, revenue *per region*, average *per category*.
 That is `GROUP BY`, and it is next.

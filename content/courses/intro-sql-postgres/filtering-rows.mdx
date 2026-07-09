@@ -4,13 +4,13 @@ description: How to keep only the rows you care about using WHERE, comparison op
 ---
 
 `SELECT` chooses *columns*. `WHERE` chooses *rows*. Together they let
-you cut a table down to exactly the slice you want — the most
+you cut a table down to exactly the slice you want, the most
 common thing you will ever do in SQL.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Rows slide out of a table past a yellow test diamond — the rows that pass arrive green in a new stack while failing rows stay behind, faded"
+  aria-label="Rows slide out of a table past a yellow test diamond, the rows that pass arrive green in a new stack while failing rows stay behind, faded"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -51,7 +51,7 @@ common thing you will ever do in SQL.
 
 ## The idea: a test applied to every row
 
-A `WHERE` clause is a **condition** — a true/false test. The
+A `WHERE` clause is a **condition**, a true/false test. The
 database checks it against every row and keeps only the rows where
 the test comes out **true**.
 

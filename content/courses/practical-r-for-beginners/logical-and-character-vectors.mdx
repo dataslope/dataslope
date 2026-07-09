@@ -1,14 +1,14 @@
 ---
 title: Logical and Character Vectors
-description: Two specialized vector types that power filtering, categorization, and labeling — the bread and butter of real data work.
+description: Two specialized vector types that power filtering, categorization, and labeling, the bread and butter of real data work.
 ---
 
 So far our vectors have held numbers. But in a real dataset, you
 will see two other types just as often:
 
-- **Logical vectors** — every element is `TRUE` or `FALSE`. These
+- **Logical vectors**, every element is `TRUE` or `FALSE`. These
   are the engine of filtering.
-- **Character vectors** — every element is a string. These hold
+- **Character vectors**, every element is a string. These hold
   names, categories, labels, IDs, anything textual.
 
 This page is about both.
@@ -16,7 +16,7 @@ This page is about both.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Five numbered chips drop through a yellow test bar and light up as solid green true circles or stay faint false, beside three quoted text chips — logical and character vectors side by side"
+  aria-label="Five numbered chips drop through a yellow test bar and light up as solid green true circles or stay faint false, beside three quoted text chips, logical and character vectors side by side"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -185,7 +185,7 @@ scores < 70 | scores == 100
 
 Use `&` and `|` (single character) for vector-wise logic. R also
 has `&&` and `||` (double character), but these are for
-*single*-value control flow and behave differently — for data
+*single*-value control flow and behave differently, for data
 analysis, **always use `&` and `|`**.
 
 ## Filtering with logicals
@@ -217,7 +217,7 @@ scores[scores >= 75 & scores <= 90]
 
 This is the foundation of *filtering*. Later we will see how
 `dplyr::filter()` builds on this exact pattern for whole data
-frames — but understanding it on vectors first is what makes the
+frames, but understanding it on vectors first is what makes the
 whole library click.
 
 ```mermaid
@@ -253,7 +253,7 @@ substr(fruits, 1, 3) # first three characters of each
 />
 
 Like everything else in R, character functions are vectorized:
-`toupper()` doesn't take one string — it takes a whole vector and
+`toupper()` doesn't take one string, it takes a whole vector and
 returns a transformed one.
 
 ## Pasting strings together
@@ -319,7 +319,7 @@ emails[grepl(".com", emails, fixed = TRUE)]
 
 (Setting `fixed = TRUE` tells `grepl()` to treat the pattern as a
 plain string, not a regular expression. Regex is a whole topic of
-its own — for now, `fixed = TRUE` keeps things simple.)
+its own, for now, `fixed = TRUE` keeps things simple.)
 
 ## Categorical data: a peek at factors
 
@@ -345,7 +345,7 @@ table(severity_f)
 
 Factors look like character vectors but carry information about
 *which categories are valid* and *in what order*. They become
-important when you plot or run models — but for today, character
+important when you plot or run models, but for today, character
 vectors will do.
 
 ## Test your understanding
@@ -353,7 +353,7 @@ vectors will do.
 <MultipleChoice
   markdown={`Given \`x <- c(10, 20, 30, 40)\`, what does \`sum(x > 15)\` return?
 
-*Hint: \`x > 15\` is a logical vector, and \`sum()\` adds up \`TRUE\` (1) and \`FALSE\` (0) — it never sees the original numbers.*
+*Hint: \`x > 15\` is a logical vector, and \`sum()\` adds up \`TRUE\` (1) and \`FALSE\` (0), it never sees the original numbers.*
 
 - \`90\` (the sum of values greater than 15)
   > \`sum()\` is applied to \`x > 15\`, not to \`x\` itself, so it adds the \`TRUE\`/\`FALSE\` values rather than 20 + 30 + 40.
@@ -362,7 +362,7 @@ vectors will do.
 - \`TRUE\`
   > \`sum()\` returns a number, not a single logical value.
 - \`0.75\`
-  > That would be \`mean(x > 15)\` — the *proportion* of \`TRUE\` values, not the count.`}
+  > That would be \`mean(x > 15)\`, the *proportion* of \`TRUE\` values, not the count.`}
 />
 
 <MultipleChoice
@@ -371,11 +371,11 @@ vectors will do.
 - \`3\`
   > \`sum()\` of this logical vector would return 3 (three \`TRUE\` values), but \`mean()\` divides by the count, giving 3/4 = 0.75.
 - [o] \`0.75\`
-  > \`mean()\` treats \`TRUE\` as 1 and \`FALSE\` as 0, so the mean is \`(1+1+0+1)/4 = 0.75\` — the *proportion* of \`TRUE\` values.
+  > \`mean()\` treats \`TRUE\` as 1 and \`FALSE\` as 0, so the mean is \`(1+1+0+1)/4 = 0.75\`, the *proportion* of \`TRUE\` values.
 - \`TRUE\`
   > \`mean()\` returns a numeric value, not a logical one; the result 0.75 is not coerced back to \`TRUE\`.
 - An error
-  > \`mean()\` accepts logical vectors and silently coerces \`TRUE\`/\`FALSE\` to 1/0 before averaging — no error occurs.`}
+  > \`mean()\` accepts logical vectors and silently coerces \`TRUE\`/\`FALSE\` to 1/0 before averaging, no error occurs.`}
 />
 
 <MultipleChoice
@@ -428,5 +428,5 @@ print(passed)
 />
 
 One last topic before we leave vectors behind: what happens when a
-value is simply *missing* — R's special `NA` marker, and the
+value is simply *missing*, R's special `NA` marker, and the
 small set of rules for dealing with it.

@@ -1,12 +1,12 @@
 ---
 title: What Is Natural Language Processing?
-description: Why human text is genuinely hard for computers — lexical, structural, and referential ambiguity — and what NLP is really trying to do. We build the core intuition that text must be turned into structure before a program can use it.
+description: Why human text is genuinely hard for computers, lexical, structural, and referential ambiguity, and what NLP is really trying to do. We build the core intuition that text must be turned into structure before a program can use it.
 ---
 
 Imagine you hand a computer this sentence and ask, innocently, "how many
 words is that?"
 
-> "I can't believe Dr. Smith's startup raised \$2.5M — it's unreal!"
+> "I can't believe Dr. Smith's startup raised \$2.5M, it's unreal!"
 
 You already sense the trouble. Is "can't" one word or two ("can" + "not")?
 Does the period after "Dr" end a sentence? Is "\$2.5M" a word? Is the em dash
@@ -18,7 +18,7 @@ which marks matter, or what any of it *means*. Natural Language Processing
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Flowing wavy blue lines of human language pass through a thin gray arrow and become a tidy grid of green value cells with one bright yellow cell — free-form text turned into structure a machine can use"
+  aria-label="Flowing wavy blue lines of human language pass through a thin gray arrow and become a tidy grid of green value cells with one bright yellow cell, free-form text turned into structure a machine can use"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="none" stroke="var(--ds-blue-500)" strokeWidth="4.5" strokeLinecap="round">
@@ -48,7 +48,7 @@ which marks matter, or what any of it *means*. Natural Language Processing
 Most data a program handles is **structured**: a number is a number, a date
 has a year-month-day, a database column has a known type. Text is
 **unstructured**. It is just a sequence of characters, and all of its
-meaning — the words, the sentences, the grammar, the intent — is implied
+meaning, the words, the sentences, the grammar, the intent, is implied
 rather than labeled. Before a program can do anything useful with text, that
 implicit structure has to be made explicit.
 
@@ -59,13 +59,13 @@ flowchart TD
 ```
 
 That is the one-sentence mission of this entire course: **turn unstructured
-text into structure a program can compute with.** Everything else —
-tokenization, normalization, tagging — is a specific technique for adding a
+text into structure a program can compute with.** Everything else,
+tokenization, normalization, tagging, is a specific technique for adding a
 specific kind of structure.
 
 <Callout type="info" title="A working definition">
 **Natural Language Processing is the set of techniques for getting computers
-to work with human language** — to break it into pieces, measure it, compare
+to work with human language**, to break it into pieces, measure it, compare
 it, and extract meaning from it. "Natural" language (English, Spanish,
 Japanese) is contrasted with the "formal" languages computers were designed
 for, like Python or SQL, which are unambiguous by construction.
@@ -95,12 +95,12 @@ can be a heavy metal or the act of guiding. "Bank" can be a riverside or a
 place for money. The word is identical; only context decides.
 
 **Structural (syntactic) ambiguity** is when the same words can be grouped
-into different grammatical structures. "I saw the man with the telescope" —
+into different grammatical structures. "I saw the man with the telescope",
 did you use a telescope to see him, or did you see a man who was holding one?
 Both readings use the exact same words in the exact same order.
 
 **Referential ambiguity** is when it is unclear what a word points to. "The
-trophy didn't fit in the case because it was too big." What was too big — the
+trophy didn't fit in the case because it was too big." What was too big, the
 trophy or the case? A human knows instantly (the trophy). A computer has no
 built-in notion of which object would plausibly be "too big."
 
@@ -130,7 +130,7 @@ programs:
 
 Every one of these is a reason a later page exists. Contractions and
 punctuation motivate *tokenization*. Casing motivates *case folding*.
-Morphology motivates *stemming and lemmatization*. Keep this list in mind —
+Morphology motivates *stemming and lemmatization*. Keep this list in mind,
 we are going to dismantle it problem by problem.
 
 ## A first look: why `.split()` is not enough
@@ -163,7 +163,7 @@ hidden "not" is invisible. "butter," carries a comma stuck to it, so the word
 punctuation is separate from words.
 
 Now watch a real tokenizer handle the same sentence. Do not worry about the
-setup — it is loaded for you in the read-only section above the editor.
+setup, it is loaded for you in the read-only section above the editor.
 
 <CodeBlock
   adapter="python"
@@ -210,7 +210,7 @@ print("token count:", len(tokens))
 The tokenizer split "can't" into `ca` + `n't`, exposing the negation. It
 peeled the comma off "butter" and the exclamation mark off "Jones". It even
 left "Mr." intact rather than treating that period as a word. We will study
-exactly how it does this on the [tokenization page](./tokenization) — for now,
+exactly how it does this on the [tokenization page](./tokenization), for now,
 the point is simply that **breaking text into words is a real problem, not a
 one-liner.**
 
@@ -244,14 +244,14 @@ flowchart TD
 ```
 
 Each arrow is a technique you will learn. By the end you will be able to walk
-a paragraph all the way from the left of that diagram to the right, and —
-just as importantly — explain *why* each arrow is there and when you would
+a paragraph all the way from the left of that diagram to the right, and,
+just as importantly, explain *why* each arrow is there and when you would
 skip it.
 
 <Callout type="warn" title="A common misconception: NLP means AI that 'understands'">
 It is tempting to imagine NLP as a system that reads text and *understands*
 it the way you do. The classic techniques in this course do nothing of the
-kind. They count, match, and transform — mechanically and without
+kind. They count, match, and transform, mechanically and without
 comprehension. A frequency counter does not know what a word *means*; it
 knows how often it appears. This is not a limitation to apologize for: an
 enormous amount of useful work (search, spam filtering, topic detection) is
@@ -267,8 +267,8 @@ firmly toward the first.
 
 **Rule-based / algorithmic** approaches encode human knowledge directly: a
 list of stopwords, a set of suffix-stripping rules for stemming, a dictionary
-of positive and negative words for sentiment. They are transparent — you can
-read exactly why they did what they did — and they need no training data.
+of positive and negative words for sentiment. They are transparent, you can
+read exactly why they did what they did, and they need no training data.
 
 **Learning-based** approaches (machine learning, and the deep-learning models
 behind modern assistants) infer their behavior from large quantities of
@@ -284,7 +284,7 @@ they assume you already understand the structure of text.
 We focus on classic, rule-based and count-based NLP because it is where the
 durable intuition lives. Once you understand *why* text needs tokenizing,
 normalizing, and tagging, the modern learning-based tools become far easier
-to pick up — they still rely on most of these same ideas under the hood.
+to pick up, they still rely on most of these same ideas under the hood.
 
 ## Where NLP shows up in the real world
 
@@ -294,7 +294,7 @@ power tools you use every day:
 - **Search engines** tokenize and normalize both your query and billions of
   documents so that searching "running" can also find "runs" and "ran".
 - **Spam filters** count suspicious words and phrases to score an email.
-- **Autocomplete and predictive text** lean on n-grams — the probability of
+- **Autocomplete and predictive text** lean on n-grams, the probability of
   the next word given the last one or two.
 - **Voice assistants** convert messy spoken input into tokens before doing
   anything else.
@@ -303,7 +303,7 @@ power tools you use every day:
 - **Plagiarism and duplicate detection** compare normalized word sets and
   n-grams between documents.
 
-In every case, the first thing that happens — before any cleverness — is the
+In every case, the first thing that happens, before any cleverness, is the
 unglamorous work of turning raw text into clean, comparable units. That is
 what you are about to learn to do well.
 
@@ -323,7 +323,7 @@ kind of ambiguity?
 - There is no ambiguity here
   > "Bank" is a classic example of a word with multiple unrelated meanings; the ambiguity is real and is precisely why context-aware NLP is necessary.
 
-One word, multiple dictionary meanings — that is lexical ambiguity by definition.`}
+One word, multiple dictionary meanings, that is lexical ambiguity by definition.`}
 />
 
 <MultipleChoice
@@ -332,14 +332,14 @@ this course) actually do?
 
 - They make the computer genuinely understand the meaning of text the way a human does
   > Classic NLP techniques count, match, and transform text mechanically; the course explicitly warns against conflating processing with comprehension.
-- [o] They mechanically transform, match, and count text to expose structure — without any real comprehension
+- [o] They mechanically transform, match, and count text to expose structure, without any real comprehension
   > Classic NLP is transformation and counting: splitting, normalizing, tagging, tallying. It is enormously useful precisely because so many tasks don't require true understanding.
 - They translate all text into mathematical equations that are always exactly correct
   > NLP techniques produce approximations (counts, patterns, heuristics), not exact mathematical proofs; and NLP is applied to human language, not formal equations.
 - They only work on programming languages, not human languages
-  > Natural language — English, French, Mandarin — is exactly what NLP is designed for; "natural" in the name contrasts it from formal languages like Python.
+  > Natural language, English, French, Mandarin, is exactly what NLP is designed for; "natural" in the name contrasts it from formal languages like Python.
 
-Useful does not require understanding — a spam filter scores words without knowing what any of them mean.`}
+Useful does not require understanding, a spam filter scores words without knowing what any of them mean.`}
 />
 
 <MultipleChoice
@@ -349,13 +349,13 @@ him* or *I saw a man who had a telescope*. What kind of ambiguity is this?
 - Lexical ambiguity
   > No single word is ambiguous here; the trouble is how the phrase "with the telescope" attaches to the rest of the sentence.
 - [o] Structural (syntactic) ambiguity
-  > The same words in the same order support two different grammatical structures — two ways of grouping the phrases — which is exactly structural ambiguity.
+  > The same words in the same order support two different grammatical structures, two ways of grouping the phrases, which is exactly structural ambiguity.
 - Referential ambiguity
   > Referential ambiguity would be about an unclear pronoun like "it" or "they"; this sentence has none.
 - Morphological ambiguity
-  > Morphological ambiguity concerns a single word's form (e.g., "wound" as past tense of "wind" vs. an injury noun); here no word is individually ambiguous — the whole phrase parses two ways.
+  > Morphological ambiguity concerns a single word's form (e.g., "wound" as past tense of "wind" vs. an injury noun); here no word is individually ambiguous, the whole phrase parses two ways.
 
-Same words, same order, two valid parse trees — that is structural ambiguity.`}
+Same words, same order, two valid parse trees, that is structural ambiguity.`}
 />
 
 <MultipleChoice
@@ -391,5 +391,5 @@ This is precisely why tokenization, not whitespace splitting, is step one of a r
 />
 
 In the next section we will zoom out and look at the **whole pipeline** as a
-single picture — the standard sequence of steps that text flows through —
+single picture, the standard sequence of steps that text flows through,
 before we dive into each step in detail.

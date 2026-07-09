@@ -1,21 +1,21 @@
 ---
 title: Python for Analysis
-description: The slice of Python you actually need to be productive in Pandas — and the slices you can safely skip until later.
+description: The slice of Python you actually need to be productive in Pandas, and the slices you can safely skip until later.
 ---
 
 You do not need to be a "Python programmer" to use Pandas. You
-need a small, well-chosen subset of Python — enough to read the
+need a small, well-chosen subset of Python, enough to read the
 code you write, enough to recognize errors, and enough to glue
 together the Pandas calls that do the real work.
 
 This chapter is that subset. If you already know Python, skim.
-If you do not, read carefully — every concept here will appear
+If you do not, read carefully, every concept here will appear
 in later chapters.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A large faint territory scattered with pale dots contains one small bright green region where a handful of vivid dots cluster — the small, well-chosen slice of Python an analyst actually needs"
+  aria-label="A large faint territory scattered with pale dots contains one small bright green region where a handful of vivid dots cluster, the small, well-chosen slice of Python an analyst actually needs"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="30" width="520" height="160" rx="24" fill="currentColor" opacity="0.06" />
@@ -78,14 +78,14 @@ df = pd.read_csv("orders.csv")
 clean = df.dropna()
 ```
 
-The names are short on purpose — they appear a lot. Common
+The names are short on purpose, they appear a lot. Common
 conventions:
 
-- `df` — the current DataFrame.
-- `df_a`, `df_b` — when you have multiple.
-- `s` — a Series (one column).
-- `g` — a GroupBy object.
-- `idx` — an Index.
+- `df`, the current DataFrame.
+- `df_a`, `df_b`, when you have multiple.
+- `s`, a Series (one column).
+- `g`, a GroupBy object.
+- `idx`, an Index.
 
 ## The basic data types
 
@@ -129,7 +129,7 @@ print("Renamed 'sal' becomes:", renames["sal"])
   ]}
 />
 
-## f-strings — formatted text
+## f-strings, formatted text
 
 You will use f-strings constantly to assemble report-ready
 messages.
@@ -183,7 +183,7 @@ print(not (x == 5))
   ]}
 />
 
-Pandas uses *vectorized* versions of these on whole columns —
+Pandas uses *vectorized* versions of these on whole columns,
 `df["age"] > 30` returns a column of booleans, one per row.
 We will see this constantly.
 
@@ -284,7 +284,7 @@ df["letter"] = df["score"].apply(grade)
 
 We will see `.apply()` in detail later.
 
-## Lambdas — small inline functions
+## Lambdas, small inline functions
 
 A `lambda` is a one-line anonymous function. Useful for short
 column transformations.
@@ -350,15 +350,15 @@ It is a long list. Don't worry about:
 - Async / `await`.
 
 You will pick these up gradually if you need them. Pandas is
-forgiving — the surface area you need to be productive is small.
+forgiving, the surface area you need to be productive is small.
 
 <Callout type="info" title="Pandas is mostly chained calls">
 A typical line of analyst code looks like:
 
 `df.groupby("department")["salary"].mean().round(0).sort_values()`
 
-Reading right to left through the chain — *take df, group by
-department, pull out salary, average it, round, sort* — is
+Reading right to left through the chain, *take df, group by
+department, pull out salary, average it, round, sort*, is
 exactly how you should read it. Each step transforms the
 result of the previous step.
 </Callout>
@@ -456,14 +456,14 @@ Format specifiers like this make report-ready output trivial.`}
 
 - It is a Python bug
   > The exclusive end is an intentional design decision in Python, not a bug; it makes slice length arithmetic consistent: \`len(s[i:j]) == j - i\`.
-- [o] By convention; \`names[1:3]\` returns items at index 1 and 2, so that \`len(names[1:3]) == 3 - 1 == 2\` — the slice length equals the difference of the indices
+- [o] By convention; \`names[1:3]\` returns items at index 1 and 2, so that \`len(names[1:3]) == 3 - 1 == 2\`, the slice length equals the difference of the indices
   > The exclusive end-index makes slice arithmetic clean: \`a[i:j]\` has length \`j - i\`. Pandas' \`iloc\` uses the same convention.
 - It is a NumPy convention only
-  > Exclusive-end slicing is a core Python convention, present in lists, strings, tuples, and range — not only in NumPy arrays.
+  > Exclusive-end slicing is a core Python convention, present in lists, strings, tuples, and range, not only in NumPy arrays.
 - Slices always exclude the first item
   > Slices exclude the *last* item (the stop index), not the first; \`names[1:3]\` includes the item at index 1 and excludes the item at index 3.
 
-Same rule as Pandas' \`iloc\` — useful to remember.`}
+Same rule as Pandas' \`iloc\`, useful to remember.`}
 />
 
 <MultipleChoice
@@ -474,7 +474,7 @@ Same rule as Pandas' \`iloc\` — useful to remember.`}
 - Functions
   > Functions are needed to encapsulate reusable logic and are used with \`.apply()\` in Pandas; the chapter covers them as a prerequisite.
 - Lists and dictionaries
-  > Lists are used for column selection and multi-condition filters; dicts are used for renames, mapping, and aggregation specs — both are core Pandas building blocks.
+  > Lists are used for column selection and multi-condition filters; dicts are used for renames, mapping, and aggregation specs, both are core Pandas building blocks.
 - [o] Decorators and \`async\`/\`await\`
   > Pandas needs very little of Python's "advanced" surface area. Start with the basics; pick up the rest only if a specific problem forces you to.
 

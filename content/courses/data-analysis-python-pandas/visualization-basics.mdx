@@ -1,16 +1,16 @@
 ---
 title: Visualization Basics
-description: A first look at Plotly Express — fast, expressive charts that integrate naturally with Pandas DataFrames.
+description: A first look at Plotly Express, fast, expressive charts that integrate naturally with Pandas DataFrames.
 ---
 
 Numbers are abstract. Charts let humans *see* patterns. This
-page introduces **Plotly Express** — a high-level interface
+page introduces **Plotly Express**, a high-level interface
 that turns DataFrames into interactive charts in one line.
 
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A faint data grid flows along a line and becomes a chart — axes, blue scatter dots, a thin rising green trend line, and one yellow outlier suddenly visible to the eye"
+  aria-label="A faint data grid flows along a line and becomes a chart, axes, blue scatter dots, a thin rising green trend line, and one yellow outlier suddenly visible to the eye"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -62,7 +62,7 @@ that turns DataFrames into interactive charts in one line.
 </svg>
 
 <Callout type="info" title="Visualization is a thinking aid">
-The goal of a chart during analysis is not to look pretty —
+The goal of a chart during analysis is not to look pretty,
 it's to surface insight. A messy scatter plot you understand is
 worth more than a polished bar chart that hides the truth.
 </Callout>
@@ -103,7 +103,7 @@ A single function call:
 - Produces a legend.
 - Returns an interactive figure.
 
-## Histograms — see a distribution
+## Histograms, see a distribution
 
 <CodeBlock
   adapter="python"
@@ -131,7 +131,7 @@ for:
 - Suspicious spikes (default values? censoring?)
 - Gaps (missing ranges)
 
-## Box plots — distributions across categories
+## Box plots, distributions across categories
 
 <CodeBlock
   adapter="python"
@@ -154,7 +154,7 @@ fig.show()
 A box plot shows median, quartiles, and outliers in one
 glance. Use it to compare a numeric column across categories.
 
-## Scatter — relationships between two numerics
+## Scatter, relationships between two numerics
 
 <CodeBlock
   adapter="python"
@@ -180,13 +180,13 @@ fig.show()
 />
 
 Run it and notice how cleanly the three species separate into
-three clouds — heavier penguins have longer flippers, and Gentoos
+three clouds, heavier penguins have longer flippers, and Gentoos
 sit clearly apart in the upper-right. This penguin scatter is a
 small classic of data teaching precisely because the structure
 leaps out of the picture in a way no table of numbers ever could.
 Opacity (`opacity=0.7`) keeps overlapping points readable.
 
-## Line — trends over time
+## Line, trends over time
 
 <CodeBlock
   adapter="python"
@@ -218,10 +218,10 @@ A few line-chart rules:
 
 - The x-axis is usually time.
 - Truncating the y-axis can dramatically exaggerate small
-  changes — use `range=[0, ...]` deliberately.
+  changes, use `range=[0, ...]` deliberately.
 - One line per "thing being tracked", mapped via `color`.
 
-## Faceting — small multiples
+## Faceting, small multiples
 
 <CodeBlock
   adapter="python"
@@ -248,7 +248,7 @@ fig.show()
 Faceting splits one chart into multiple small ones. It's often
 clearer than overlaying many colors.
 
-## Choosing a chart — a quick flow
+## Choosing a chart, a quick flow
 
 ```mermaid
 flowchart TB
@@ -257,7 +257,7 @@ flowchart TB
   Q1 --> A2["Comparison across<br/>categories"] --> B2["Bar chart"]
   Q1 --> A3["Relationship between<br/>two numerics"] --> S["Scatter plot"]
   Q1 --> A4["Change over time"] --> L["Line chart"]
-  Q1 --> A5["Composition<br/>(parts of whole)"] --> ST["Stacked bar — not pie"]
+  Q1 --> A5["Composition<br/>(parts of whole)"] --> ST["Stacked bar, not pie"]
 ```
 
 We'll skip pie charts. Almost any pie chart can be replaced by
@@ -273,9 +273,9 @@ flowchart TD
   V --> N["Rich shape<br/>Slower to skim"]
 ```
 
-The cautionary tale: **Anscombe's quartet** — four datasets
+The cautionary tale: **Anscombe's quartet**, four datasets
 with identical means, identical variances, identical
-correlations, and identical regression lines — yet completely
+correlations, and identical regression lines, yet completely
 different shapes that are obvious in a scatter plot. Always
 *look* at your data, not just summarize it.
 
@@ -369,7 +369,7 @@ assert "amount" in xt.lower() or any("amount" in (tr.hovertemplate or "") for tr
   > Histograms are a strong recommendation, not a requirement; the point is that they reveal distributional shape that a mean alone cannot capture.
 - Means are slow to compute
   > Computing a mean is fast; the chapter's argument for histograms is about informational richness, not speed.
-- [o] A histogram shows the full shape — skew, multiple modes, gaps, outliers — that a single mean entirely hides
+- [o] A histogram shows the full shape, skew, multiple modes, gaps, outliers, that a single mean entirely hides
   > Anscombe's quartet is the canonical demonstration.
 - Histograms always look better
   > Visual appeal is subjective and irrelevant here; the argument for histograms is that they convey distributional information a mean cannot.
@@ -385,7 +385,7 @@ You should plot your data before summarizing it.`}
 - Too much color
   > Color overload affects clarity and aesthetics, but it does not exaggerate the apparent magnitude of changes on an axis.
 - [o] A truncated y-axis (the axis does not start at zero) makes small differences look large
-  > Truncated axes are one of the most common — and abused — chart tricks.
+  > Truncated axes are one of the most common, and abused, chart tricks.
 - A bug in Plotly
   > Plotly faithfully renders the data and axis range you provide; if the range starts above zero, that is the analyst's configuration, not a library defect.
 

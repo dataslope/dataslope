@@ -9,7 +9,7 @@ import { OG_IMAGE } from "@/lib/site";
 import styles from "./home.module.css";
 
 const PLAYGROUND_DESCRIPTION =
-  "Free online coding playgrounds that run entirely in your browser — Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
+  "Free online coding playgrounds that run entirely in your browser, Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
 
 export const metadata: Metadata = {
   title: "Online Coding Playgrounds",
@@ -69,8 +69,8 @@ const CARDS: CardEntry[] = [
   {
     id: "web",
     href: "/playground/web",
-    title: "HTML/CSS/JS",
-    desc: "Build web pages with a live sandboxed preview — HTML, CSS, and JavaScript together.",
+    title: "HTML",
+    desc: "Build web pages with a live sandboxed preview, HTML, CSS, and JavaScript together.",
   },
   {
     id: "react",
@@ -158,7 +158,7 @@ export default function Home() {
         <ul className={styles.list}>
           {CARDS.map((card) => (
             <li key={card.id}>
-              {/* Dense index list — don't viewport-prefetch every card (see
+              {/* Dense index list, don't viewport-prefetch every card (see
                   the opt-out note in app/_components/Link.tsx). */}
               <Link href={card.href} prefetch={false} className={styles.card}>
                 <span className={styles.logo}>

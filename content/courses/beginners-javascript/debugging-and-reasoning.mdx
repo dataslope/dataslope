@@ -1,11 +1,11 @@
 ---
 title: Debugging and Reasoning About Programs
-description: How to find bugs systematically — and how to write code you can reason about in the first place.
+description: How to find bugs systematically, and how to write code you can reason about in the first place.
 ---
 
 Every programmer spends more time *reading* and *debugging* code
-than writing it. The good news is that debugging is a skill — not
-a talent — and it gets dramatically easier once you have a
+than writing it. The good news is that debugging is a skill, not
+a talent, and it gets dramatically easier once you have a
 process.
 
 This chapter covers two things:
@@ -73,7 +73,7 @@ Debugging is the process of finding *where* and *why* those two
 differ. You're not "fixing the code"; you're updating your model
 until it matches reality, *then* fixing the code.
 
-> If you find yourself thinking *"this should work"* — you've
+> If you find yourself thinking *"this should work"*, you've
 > already discovered the bug. The gap between *"should"* and
 > *"does"* is the entire problem.
 
@@ -117,7 +117,7 @@ final answer.
 }
 
 // Suspicious result:
-console.log(average([1, 2, 3, "4", 5])); // not 3 — why?
+console.log(average([1, 2, 3, "4", 5])); // not 3, why?
 `,
     },
   ]}
@@ -146,7 +146,7 @@ console.log("result:", average([1, 2, 3, "4", 5]));
   ]}
 />
 
-The third iteration shows `total` becoming the string `"64"` —
+The third iteration shows `total` becoming the string `"64"`,
 that's the moment something went wrong. Now you know *where*.
 
 ### Better than `console.log`: structured logging
@@ -179,7 +179,7 @@ console.table(users, ["name", "role"]);
 
 ## Reading a stack trace
 
-When something throws, JS prints a **stack trace** — a snapshot
+When something throws, JS prints a **stack trace**, a snapshot
 of the call stack at the moment of the error.
 
 <CodeBlock
@@ -218,7 +218,7 @@ Read stack traces **top to bottom**:
 
 If a function appears in the trace but you didn't call it
 directly, the line above it called it. Walk up until you find
-*your* code (vs. library code) — that's usually the most
+*your* code (vs. library code), that's usually the most
 informative line.
 
 ## Common error patterns
@@ -265,14 +265,14 @@ try {
 
 A pattern: errors usually tell you *exactly* what went wrong if
 you read them. "Cannot read property `X` of undefined" means
-"something I expected to be an object was undefined — and I tried
+"something I expected to be an object was undefined, and I tried
 to read `X` from it." Find what that "something" is.
 
 ## Defensive thinking: invariants
 
 An **invariant** is a fact about your program that should always
-be true at a given point. Stating them in your head — or in
-comments, assertions, or tests — gives you anchors.
+be true at a given point. Stating them in your head, or in
+comments, assertions, or tests, gives you anchors.
 
 <CodeBlock
   adapter="javascript"
@@ -317,7 +317,7 @@ debugging session.
 ## Rubber-duck debugging
 
 The classic trick: explain the code, line by line, **out loud**,
-to an inanimate object — traditionally a rubber duck. The act of
+to an inanimate object, traditionally a rubber duck. The act of
 articulating "and then this returns... wait, no it doesn't"
 catches a huge fraction of bugs.
 
@@ -327,7 +327,7 @@ You don't need a duck. You just need to slow down enough to
 ## Binary search bug-hunting
 
 When the bug is "somewhere in this big code path", don't read top
-to bottom — bisect.
+to bottom, bisect.
 
 1. Pick a point in the middle.
 2. Print or check: *is the state correct here?*
@@ -341,10 +341,10 @@ This narrows down even huge codebases in a handful of steps.
 The single most powerful debugging technique: **shrink the
 failing case to the smallest reliably-reproducing example.**
 
-- "My app crashes sometimes" — useless.
-- "My app crashes when I open the user page" — better.
+- "My app crashes sometimes", useless.
+- "My app crashes when I open the user page", better.
 - "It crashes in `formatDate` when a user has no `birthday`
-  field, but not otherwise" — that's a *fix request*, not a bug
+  field, but not otherwise", that's a *fix request*, not a bug
   report.
 
 When you can reproduce a bug on demand, you've already done 80%
@@ -412,7 +412,7 @@ Symptoms you'd notice:
 
 - The `total` is correct on the first call.
 - But run `applyDiscounts(cart, 0.1)` again and the total drops
-  further every time — because each call mutates `item.price`.
+  further every time, because each call mutates `item.price`.
 
 The fix: don't mutate the caller's data.
 
@@ -425,7 +425,7 @@ function applyDiscounts(cart, discount) {
 }
 ```
 
-This is a classic *immutability bug* — the same one we warned
+This is a classic *immutability bug*, the same one we warned
 about in the functional intuition chapter.
 
 ## Challenge
@@ -516,7 +516,7 @@ if (a.length !== 3 || a[0] !== 1) throw new Error("must not mutate input");`,
   > Rewriting without understanding the cause almost always reproduces the same bug, because the flawed mental model that produced the bug the first time is still intact.
 - Search the web for "JavaScript function wrong number"
   > A query that vague won't find the actual cause; the bug is in your specific logic, not a general JavaScript problem, so web searches can't substitute for investigating the actual values your code is producing.
-- [o] Add logs that print your inputs, intermediate values, and assumptions — then re-run to see *where* the actual values diverge from what you expected
+- [o] Add logs that print your inputs, intermediate values, and assumptions, then re-run to see *where* the actual values diverge from what you expected
   > Bugs are gaps between your mental model and reality. The fastest way to close that gap is to print what you *think* is happening at each step and compare with what's actually happening. Rewriting blindly often reintroduces the same bug; reasoning from data tells you *where* the wrong value first appeared.
 - Add try/catch around the call to suppress the error
   > \`try\`/\`catch\` silences exceptions; it does nothing to fix a wrong return value, and hiding errors makes debugging harder, not easier.

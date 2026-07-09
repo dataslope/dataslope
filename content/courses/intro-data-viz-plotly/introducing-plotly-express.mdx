@@ -1,10 +1,10 @@
 ---
 title: Introducing Plotly Express
-description: Your first proper tour of the library — what it imports, what it returns, and how to read its function names
+description: Your first proper tour of the library, what it imports, what it returns, and how to read its function names
 ---
 
 You met Plotly Express on an earlier page and saw *why* it's the
-right tool. Now we slow down and look at it carefully — *as a
+right tool. Now we slow down and look at it carefully, *as a
 library*, not as magic. By the end of this page you will understand
 what `import plotly.express as px` actually does, what a Plotly
 figure *is*, how `fig.show()` works, and how to read the names of all
@@ -13,7 +13,7 @@ the chart functions.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="One small capsule of code expands along a dotted arrow into a complete figure with title, axes, data points, and legend — a single line producing a whole chart"
+  aria-label="One small capsule of code expands along a dotted arrow into a complete figure with title, axes, data points, and legend, a single line producing a whole chart"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -85,7 +85,7 @@ will begin with those two imports.
 Every Plotly Express function takes a DataFrame plus some *encoding*
 arguments and returns a **Figure** object: data first, then
 encodings, then styling. We'll keep meeting that pattern. Here it is
-one more time with the *separation of concerns* made explicit — try
+one more time with the *separation of concerns* made explicit, try
 it:
 
 <CodeBlock
@@ -119,7 +119,7 @@ fig.show()
 Notice the *separation of concerns*:
 
 - `df` is the data.
-- `x="fruit"` and `y="kg"` are *encodings* — they say "use the
+- `x="fruit"` and `y="kg"` are *encodings*, they say "use the
   fruit column for x and the kg column for y."
 - `title=...` and `template=...` are *styling*.
 
@@ -168,7 +168,7 @@ You don't normally need to think about this pipeline. But it
 explains why Plotly charts are interactive *for free*: the chart
 *is* a small JavaScript application.
 
-## The Figure object — a brief intro
+## The Figure object, a brief intro
 
 The `fig` variable returned by every Plotly Express call is a
 **Figure**. You can inspect it:
@@ -197,8 +197,8 @@ print("Y-axis title:", fig.layout.yaxis.title.text)
 />
 
 Most of the time you won't print the figure; you'll just call
-`.show()`. But knowing that `fig` is a real Python object — that
-you can modify it before showing — opens the door to more advanced
+`.show()`. But knowing that `fig` is a real Python object, that
+you can modify it before showing, opens the door to more advanced
 customization later (`fig.update_layout(...)`,
 `fig.update_traces(...)`, and so on).
 
@@ -206,12 +206,12 @@ customization later (`fig.update_layout(...)`,
 
 Throughout this course we'll use three sources of data:
 
-1. **Built-in Plotly datasets** — small, classic datasets that
+1. **Built-in Plotly datasets**, small, classic datasets that
    ship with Plotly Express. Examples: `px.data.tips()`,
    `px.data.gapminder()`, `px.data.stocks()`.
-2. **Hand-built DataFrames** — small tables we type out with
+2. **Hand-built DataFrames**, small tables we type out with
    `pd.DataFrame({...})`. Useful for tiny illustrative examples.
-3. **CSV files loaded with pandas** — the real-world workflow, and
+3. **CSV files loaded with pandas**, the real-world workflow, and
    how we'll reach for friendlier datasets the built-ins don't cover:
    **Palmer Penguins** (`penguins.csv`), **diamonds**
    (`diamonds.csv`), and a couple of famous teaching sets. These are
@@ -229,7 +229,7 @@ without the baggage.
   markdown={`What does **import plotly.express as px** do?
 
 - It imports the **plotly** module and runs it.
-  > This statement loads only the **plotly.express** sub-module, not the entire **plotly** package. It also does not run any charts — it just makes the module's functions available under the alias **px**.
+  > This statement loads only the **plotly.express** sub-module, not the entire **plotly** package. It also does not run any charts, it just makes the module's functions available under the alias **px**.
 - It installs Plotly Express.
   > Installation is done once via **pip install plotly** before you write any code. The **import** statement merely makes an already-installed package available in the current Python session.
 - [o] It loads the Plotly Express module and gives it the short alias **px**, so you can write **px.bar(...)** instead of **plotly.express.bar(...)**.
@@ -244,13 +244,13 @@ You will type this line at the top of nearly every file in this course.`}
   markdown={`A Plotly Express function call like **px.bar(df, x="month", y="sales")** returns:
 
 - A PNG image.
-  > PNG export requires an extra step — calling **fig.write_image(...)** — and depends on the **kaleido** package. The px function call itself returns a Python Figure object, not an image file.
+  > PNG export requires an extra step, calling **fig.write_image(...)**, and depends on the **kaleido** package. The px function call itself returns a Python Figure object, not an image file.
 - An HTML string.
   > An HTML representation can be generated with **fig.to_html()**, but that is a separate step. The px function call returns a Figure object, from which you can produce HTML, PNG, or an interactive widget.
 - [o] A Plotly **Figure** object that can be inspected, modified, and rendered with **fig.show()**.
   > The Figure is a Python object that holds a complete description of the chart. Calling **.show()** sends it to your browser to be drawn by Plotly.js. You can also modify the figure (e.g., **fig.update_layout(...)**) before showing it.
 - The DataFrame, sorted.
-  > Plotly Express does not sort or modify your DataFrame — it reads it and produces a Figure. If you want sorted data, you sort the DataFrame yourself before passing it to the chart function.
+  > Plotly Express does not sort or modify your DataFrame, it reads it and produces a Figure. If you want sorted data, you sort the DataFrame yourself before passing it to the chart function.
 
 The fact that **fig** is a real Python object is what makes Plotly Express extensible: you can call Plotly Express for the easy 90% and then tweak the figure for the last 10%.`}
 />
@@ -278,7 +278,7 @@ Pandas does the loading and reshaping; Plotly Express does the visualization. Tw
 - **px.data.tips()**
   > The tips dataset records restaurant bill and tip amounts over a few weeks but has no date column, so it cannot be used to demonstrate time-series charts.
 - [o] **px.data.gapminder()** or **px.data.stocks()**
-  > **gapminder()** has yearly country-level data from 1952-2007; **stocks()** has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. Penguins and tips are static datasets — no time component.
+  > **gapminder()** has yearly country-level data from 1952-2007; **stocks()** has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. Penguins and tips are static datasets, no time component.
 - **px.data.election()**
   > The election dataset contains vote counts from a Canadian election across polling districts. It is a snapshot dataset with no time dimension, making it ill-suited for time-series examples.
 

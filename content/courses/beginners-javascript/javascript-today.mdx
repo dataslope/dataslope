@@ -1,5 +1,5 @@
 ---
-title: From Toy to Everywhere — JavaScript Today
+title: "From Toy to Everywhere: JavaScript Today"
 description: How a ten-day prototype grew into the world's most-used language, and what JavaScript actually is in 2025.
 ---
 
@@ -9,15 +9,15 @@ snowflakes on personal homepages. It put a digital clock in the
 corner of a page. Serious software lived on the server, written in
 PHP, Java, or Perl; JavaScript was a sprinkle on top.
 
-This page tells the story of how that changed — slowly, then
-suddenly — and ends with a clear-eyed picture of what JavaScript
+This page tells the story of how that changed, slowly, then
+suddenly, and ends with a clear-eyed picture of what JavaScript
 *is* today, including the one distinction that will save you more
 confusion than any other as you learn.
 
 <svg
   viewBox="0 0 640 260"
   role="img"
-  aria-label="Circles, squares, and triangles bursting outward in rings from a central circle — an ecosystem exploding"
+  aria-label="Circles, squares, and triangles bursting outward in rings from a central circle, an ecosystem exploding"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.2">
@@ -83,7 +83,7 @@ ambitious. People wanted *applications*, not documents.
 
 Then two products shocked the industry: **Gmail** (2004) and
 **Google Maps** (2005). Gmail behaved like a desktop email client
-that happened to live in a browser tab — instant, no full-page
+that happened to live in a browser tab, instant, no full-page
 reloads. Google Maps let you *drag* a world map smoothly while new
 tiles streamed in under your cursor.
 
@@ -91,7 +91,7 @@ The trick underneath both was the same: JavaScript could silently
 ask the server for new data **in the background**, using a
 half-forgotten browser feature called `XMLHttpRequest`, and update
 parts of the page without reloading it. The pattern got a catchy
-name — **AJAX** (Asynchronous JavaScript And XML) — and it
+name, **AJAX** (Asynchronous JavaScript And XML), and it
 instantly reframed the language in everyone's mind. Maybe
 JavaScript wasn't a toy. Maybe it was the foundation of a new kind
 of software.
@@ -102,7 +102,7 @@ of software.
 
 Even after AJAX, raw browser programming was rough, so the
 community built layers to smooth it over. The most famous was
-**jQuery**, released by John Resig in 2006 — one line of jQuery
+**jQuery**, released by John Resig in 2006, one line of jQuery
 replaced fifty lines of cross-browser plumbing, and for years it
 was the most-used library on the web. Hundreds of libraries
 followed. The lesson stuck: when the platform lags, the JavaScript
@@ -110,8 +110,8 @@ community builds what's missing rather than waiting.
 
 <IllustrationPrompt subject="Ryan Dahl" photo />
 
-The real turning point came in 2009, when **Ryan Dahl** took V8 —
-the high-performance JavaScript engine Google built for Chrome —
+The real turning point came in 2009, when **Ryan Dahl** took V8,
+the high-performance JavaScript engine Google built for Chrome,
 and wrapped it so it could run **outside the browser**: on a
 server, or on your laptop's command line. He called the result
 **Node.js**.
@@ -119,7 +119,7 @@ server, or on your laptop's command line. He called the result
 It is hard to overstate what this changed. Until Node.js,
 JavaScript was a language *trapped* inside a browser. After it, you
 could write web servers, command-line tools, and build scripts in
-JavaScript — and share code between the browser and the server.
+JavaScript, and share code between the browser and the server.
 
 ```mermaid
 flowchart LR
@@ -137,15 +137,15 @@ flowchart LR
 
 Node.js brought a companion that mattered just as much: **npm**,
 a central registry where anyone could publish a reusable package.
-Today npm hosts millions of packages — the largest collection of
+Today npm hosts millions of packages, the largest collection of
 shared code in the history of software. (The full tour of where
-JavaScript ended up running — desktops, phones, robots, databases —
+JavaScript ended up running, desktops, phones, robots, databases,
 is a story of its own; we keep it for the [Interesting discussions
 section](/courses/beginners-javascript/javascript-beyond-the-browser)
 at the end of the course.)
 
 On top of this platform grew the **frameworks** you have probably
-heard of — React, Vue, Angular, Svelte — and an industry of build
+heard of, React, Vue, Angular, Svelte, and an industry of build
 tools: bundlers, linters, formatters, type checkers. You need none
 of them to learn the language, and this course deliberately uses
 none of them. When people say "I'm learning JavaScript" they often
@@ -160,18 +160,18 @@ called ES6) landed the largest upgrade in the language's history:
 `let` and `const`, arrow functions, classes, template literals,
 destructuring, modules, and Promises all arrived at once. Since
 then the language has shipped a small, careful release every
-year — `async`/`await` in 2017, optional chaining `?.` and nullish
+year, `async`/`await` in 2017, optional chaining `?.` and nullish
 coalescing `??` in 2020, and so on.
 
 Through all of it, the committee has kept one iron rule: **don't
 break the web**. Features are added; almost nothing is ever
 removed. A page written in 1996 should still run today. That is
-why JavaScript carries its entire history with it — `var` and
-`==` still exist, even though modern code avoids them — and why
+why JavaScript carries its entire history with it, `var` and
+`==` still exist, even though modern code avoids them, and why
 this course will occasionally say "this exists, don't use it".
 
 Here is a taste of the modern language, using several features that
-did not exist in 1995. If it looks like magic, good — by the end of
+did not exist in 1995. If it looks like magic, good, by the end of
 this course, every line will be ordinary to you:
 
 <CodeBlock
@@ -214,12 +214,12 @@ course:
 **Dynamic** means decisions about what a value *is* are made while
 the program runs. A variable can hold a number on one line and a
 string on the next. This makes the language flexible and easy to
-start with — and it means some mistakes only reveal themselves at
+start with, and it means some mistakes only reveal themselves at
 runtime, which is why we will spend real time on debugging.
 
 **Multi-paradigm** means JavaScript doesn't force one style on you.
 You can write step-by-step imperative code, organise behaviour into
-objects, or compose pure functions into pipelines — and a healthy
+objects, or compose pure functions into pipelines, and a healthy
 codebase often mixes all three. This course teaches each style and,
 more importantly, when each one shines.
 
@@ -229,14 +229,14 @@ quietly reclaims the rest. In a language like C, forgetting to
 free memory is an entire category of painful bugs; in JavaScript,
 the category simply does not exist.
 
-**First-class functions** — the Scheme inheritance from the
-previous page — means functions are values: storable, passable,
+**First-class functions**, the Scheme inheritance from the
+previous page, means functions are values: storable, passable,
 returnable. It sounds abstract and is actually the single most
 practical feature of the language. Every modern JavaScript library
 leans on it, and so will you.
 
 **Single-threaded and asynchronous** is the big one. JavaScript
-does one thing at a time — yet it handles thousands of slow
+does one thing at a time, yet it handles thousands of slow
 operations (network requests, timers, clicks) without freezing, by
 *scheduling* work instead of waiting for it. This sounds
 paradoxical now. The runtime chapters near the end of the course
@@ -248,34 +248,34 @@ things about the language.
 The single most useful mental model for a beginner is that
 "JavaScript" is used to mean three different layers:
 
-1. **The language itself** — syntax, values, functions, closures,
+1. **The language itself**, syntax, values, functions, closures,
    async. Standardized, portable, slow-changing. *This is what
    this course teaches.*
-2. **The platform APIs** — what your code can *do* depends on
+2. **The platform APIs**, what your code can *do* depends on
    where it runs. Browsers add the DOM and `fetch`; Node.js adds
    files and servers. Same language, different toolbelts.
-3. **The frameworks and tools** — React, Vue, Express, Vite,
+3. **The frameworks and tools**, React, Vue, Express, Vite,
    TypeScript, ESLint… an ever-shifting landscape built *on top of*
    the other two layers.
 
-Layer 3 changes every few years. Layer 1 essentially never changes
-— code you write in it, and the understanding you build of it,
+Layer 3 changes every few years. Layer 1 essentially never changes,
+code you write in it, and the understanding you build of it,
 does not expire. That is why this course lives in layer 1: learn
 the language deeply once, and every framework becomes "just a
 library I can read the docs for".
 
-JavaScript is honestly not the best tool for everything — heavy
+JavaScript is honestly not the best tool for everything, heavy
 numerical computing, hard real-time systems, and tiny embedded
 chips are better served by other languages. But for a *first*
 language, it is hard to beat: zero setup (a browser is a
 development environment), instant feedback, an enormous community,
-and concepts — closures, first-class functions, asynchronous
-thinking — that transfer to every language you will ever learn.
+and concepts, closures, first-class functions, asynchronous
+thinking, that transfer to every language you will ever learn.
 
 ## One last warm-up
 
 Let's run one more program before we leave the history and start
-learning properly. This one prints a small table — a hint of the
+learning properly. This one prints a small table, a hint of the
 kind of program you'll be writing yourself within a few pages.
 
 <CodeBlock
@@ -284,7 +284,7 @@ kind of program you'll be writing yourself within a few pages.
     {
       filename: "main.js",
       starterCode: `// Show a small multiplication table.
-// Don't worry about the syntax yet — we'll learn each piece.
+// Don't worry about the syntax yet, we'll learn each piece.
 function table(n) {
   console.log(\`Multiplication table for \${n}:\`);
   for (let i = 1; i <= 10; i++) {
@@ -300,8 +300,8 @@ table(12);
   ]}
 />
 
-If you understand even roughly what is happening — *a function
-called `table` prints multiplications for a given number* — you
+If you understand even roughly what is happening, *a function
+called `table` prints multiplications for a given number*, you
 already have the right instincts. The rest is detail, and the
 details start on the next page with the most fundamental question
 of all: *what does it actually mean for a computer to run a
@@ -317,7 +317,7 @@ program?*
 - The difference between Chrome and Firefox
   > Browser differences matter for compatibility, but they are a runtime-level concern; the most consequential distinction for a learner is between the language itself and the ecosystem built on top of it.
 - [o] The difference between the JavaScript *language* (stable, portable, this course's focus) and the *frameworks and tools* built on top of it (which change every few years)
-  > The language itself is the durable, transferable skill. Frameworks like React, build tools like Webpack, and even runtime APIs like \`fetch\` come and go or differ between runtimes — but \`let\`, \`const\`, \`function\`, \`if\`, \`for\`, arrays, objects, closures, and \`async\`/\`await\` will be exactly the same a decade from now.
+  > The language itself is the durable, transferable skill. Frameworks like React, build tools like Webpack, and even runtime APIs like \`fetch\` come and go or differ between runtimes, but \`let\`, \`const\`, \`function\`, \`if\`, \`for\`, arrays, objects, closures, and \`async\`/\`await\` will be exactly the same a decade from now.
 - The difference between \`==\` and \`===\`
   > Understanding \`==\` vs \`===\` is a useful JavaScript detail, but it is a single language feature rather than the overarching distinction between the stable language core and the ever-changing ecosystem that surrounds it.
 

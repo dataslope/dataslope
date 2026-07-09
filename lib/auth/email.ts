@@ -3,7 +3,7 @@
  * sent via Resend's HTTP API.
  *
  * Why Resend (and not SMTP): the Cloudflare Workers runtime can't open SMTP/TCP
- * sockets — only outbound `fetch`. Resend is a single authenticated POST, so it
+ * sockets, only outbound `fetch`. Resend is a single authenticated POST, so it
  * works from the Worker with no SDK. Swapping to another provider (e.g. AWS SES
  * via `aws4fetch`) later means changing only `sendEmail` below; the Better Auth
  * wiring in server.ts calls these helpers and is provider-agnostic.
@@ -34,7 +34,7 @@ export async function sendEmail(
 ): Promise<void> {
   const apiKey = env.RESEND_API_KEY;
   if (!apiKey) {
-    throw new Error("RESEND_API_KEY is not set — cannot send transactional email.");
+    throw new Error("RESEND_API_KEY is not set, cannot send transactional email.");
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -56,7 +56,7 @@ export async function sendEmail(
   }
 }
 
-/** Minimal, client-agnostic HTML wrapper (inline styles — email clients ignore
+/** Minimal, client-agnostic HTML wrapper (inline styles, email clients ignore
  *  <style>/external CSS). A single call-to-action button plus a copy-paste URL
  *  fallback for clients that strip links. */
 function layout(opts: { heading: string; body: string; cta: string; url: string }): string {

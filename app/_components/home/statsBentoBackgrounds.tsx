@@ -88,7 +88,7 @@ const RAIL_LABELS = [
   "Output matches",
 ];
 
-// A run that builds up to a mixed result, then re-runs all green — the
+// A run that builds up to a mixed result, then re-runs all green, the
 // "write code → some fail → fix → all pass" story, on a loop.
 const RAIL_STAGES: { states: TestState[]; hold: number }[] = [
   { states: ["pending", "pending", "pending", "pending", "pending"], hold: 650 },
@@ -110,7 +110,7 @@ const STATE_COLOR: Record<TestState, string> = {
 export function TestRailBackground() {
   const reduced = usePrefersReducedMotion();
   const [step, setStep] = useState(0);
-  // Endless loop — only tick while the card is actually on screen.
+  // Endless loop, only tick while the card is actually on screen.
   const railRef = useRef<HTMLDivElement>(null);
   const inView = useInView(railRef as RefObject<Element>);
 
@@ -358,7 +358,7 @@ interface CourseItem {
 
 /** An endless feed built on Magic UI's <AnimatedListItem>: a new pill springs
  *  in at the top each tick, older ones flow down, and the oldest exits once the
- *  visible window is full — cycling through the course list forever. */
+ *  visible window is full, cycling through the course list forever. */
 function InfiniteCourseList({ courses }: { courses: CourseItem[] }) {
   const reduced = usePrefersReducedMotion();
   const VISIBLE = 5;

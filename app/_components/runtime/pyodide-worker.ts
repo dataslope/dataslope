@@ -2,7 +2,7 @@
 
 // Pyodide runs inside a dedicated Web Worker so that:
 //   1. The bundler (Turbopack in Next.js 16) never sees Pyodide's internal
-//      `await import(e)` calls — those would otherwise fail with
+//      `await import(e)` calls, those would otherwise fail with
 //      "Cannot find module as expression is too dynamic". We sidestep
 //      Turbopack entirely by loading `pyodide.js` from the CDN with
 //      `importScripts`, which is a worker-only API and is not analysed by
@@ -28,7 +28,7 @@ const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/f
 
 // Load the Pyodide JS loader synchronously into the worker scope. This is
 // the call that would explode if attempted on the main thread under
-// Turbopack — `importScripts` is unprocessed by the bundler.
+// Turbopack, `importScripts` is unprocessed by the bundler.
 self.importScripts(PYODIDE_INDEX_URL + "pyodide.js");
 
 // ─── Output cell shape (mirrors `OutputCell` minus the bookkeeping the
@@ -42,7 +42,7 @@ interface OutputCellMessage {
 
 // ─── Protocol ──────────────────────────────────────────────────────────
 
-/** Rich completion item — mirrors `CompletionItemDetail` in ../types. */
+/** Rich completion item, mirrors `CompletionItemDetail` in ../types. */
 interface CompletionItemMessage {
   label: string;
   type?: string;
@@ -106,7 +106,7 @@ function post(msg: OutMessage) {
 
 // ─── Two-phase boot state ──────────────────────────────────────────────
 // Phase A (initPyodide / `initPromise`): the interpreter plus the
-// display/tee/reset plumbing — enough to run any stdlib-only snippet.
+// display/tee/reset plumbing, enough to run any stdlib-only snippet.
 // `ready` is posted at the end of phase A, so plain-Python blocks run
 // seconds before the data stack is in.
 // Phase B (`ensurePackages`): the heavy package set (numpy, pandas,
@@ -218,7 +218,7 @@ def _pg_emit_text(kind, s):
 
 # Tee installed over sys.stdout/sys.stderr while user code runs, so prints
 # land in _display_outputs *in order* with display() tables, figures and
-# charts — print → display(df) → print renders exactly in that sequence,
+# charts, print → display(df) → print renders exactly in that sequence,
 # like a notebook.
 class _PgTee(io.TextIOBase):
     def __init__(self, kind):
@@ -233,7 +233,7 @@ def _ensure_pd_notebook_options(pd):
     """Pin pandas' Jupyter-style display limits once per session.
 
     Pyodide is not an IPython session, so pandas falls back to its
-    terminal defaults — display.max_columns resolves to 0 (no limit) and
+    terminal defaults, display.max_columns resolves to 0 (no limit) and
     a wide frame renders every column. Pin the notebook default (20) so
     wide frames middle-truncate with "..." columns; a later explicit
     pd.set_option(...) by the user still wins because this runs once.
@@ -252,7 +252,7 @@ def display(*objs):
     # The heavy libraries arrive in boot phase B, so this must work on
     # the bare interpreter: an object can only BE a DataFrame / Axes /
     # Figure if its module is already imported, which makes sys.modules
-    # lookups exactly equivalent to the hard imports they replace —
+    # lookups exactly equivalent to the hard imports they replace,
     # without failing before phase B finishes.
     pd = sys.modules.get("pandas")
     _mpl_axes = sys.modules.get("matplotlib.axes")
@@ -263,7 +263,7 @@ def display(*objs):
         if obj is None:
             continue
         # Matplotlib Axes/Figure objects are captured by the auto-flush that
-        # runs after user code executes—skip them here to avoid printing
+        # runs after user code executes-skip them here to avoid printing
         # an unhelpful repr like "<Axes: ylabel='Density'>".
         if _mpl_axes is not None and isinstance(obj, _mpl_axes.Axes):
             continue
@@ -275,7 +275,7 @@ def display(*objs):
             # producing head+ellipsis+tail output just like a Jupyter notebook.
             h = obj._repr_html_()
             if h is None:
-                # notebook_repr_html option is disabled — fall back with limits.
+                # notebook_repr_html option is disabled, fall back with limits.
                 h = obj.to_html(
                     classes="dataframe", border=0,
                     max_rows=pd.get_option("display.max_rows"),
@@ -356,7 +356,7 @@ def _python_completions(line, column):
             break
         if match is None:
             break
-        # rlcompleter appends "(" for callables and "." for modules — strip
+        # rlcompleter appends "(" for callables and "." for modules, strip
         # those so the inserted text is just the identifier; the user can
         # decide whether to add parentheses themselves.
         clean = match.rstrip("(").rstrip(".")
@@ -367,7 +367,7 @@ def _python_completions(line, column):
     return seen, len(fragment)
 
 # ─── Per-run global reset ─────────────────────────────────────────────
-# Snapshot the names that exist after worker init — anything introduced
+# Snapshot the names that exist after worker init, anything introduced
 # by user code (variables, functions, classes, modules they import) is
 # wiped before the next run so each execution starts from a fresh state.
 # Built-ins, the helpers defined above, and the standard \`__name__\` /
@@ -403,7 +403,7 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
     "__builtins__", "__file__", "__cached__",
     "_user_code_str", "_complete_line", "_complete_column",
     "_complete_doc", "_complete_line_no",
-    # Explicitly guard the set and the helpers themselves —
+    # Explicitly guard the set and the helpers themselves,
     # set(globals().keys()) above already captures them, but listing them
     # here makes the intent obvious and guards against future reordering.
     "_PG_PROTECTED_NAMES", "_pg_reset_user_globals",
@@ -428,19 +428,19 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
   // says the surface's authored code needs the data stack (or `force`s
   // it, as the playground does), or lazily when a package-needing run
   // awaits ensurePackages(). Booting it unconditionally made every
-  // Python surface — including stdlib-only ones like the home page's
-  // hero challenge — pay hundreds of MB for numpy/pandas/scipy/
+  // Python surface, including stdlib-only ones like the home page's
+  // hero challenge, pay hundreds of MB for numpy/pandas/scipy/
   // matplotlib/plotly it never used.
 }
 
 // ─── Boot phase B: the heavy package set ───────────────────────────────
 
 // Globals (and patches) this script adds on top of SETUP_SCRIPT A. It
-// runs as ONE synchronous Python exec — no awaits — so it can never
+// runs as ONE synchronous Python exec, no awaits, so it can never
 // interleave with a concurrently executing stdlib-only run.
 const SETUP_SCRIPT_B = `
 # Patch urllib/requests once so user code can make HTTP(S) calls (subject to
-# CORS — cross-origin hosts still need the CORS proxy). Called a single time
+# CORS, cross-origin hosts still need the CORS proxy). Called a single time
 # per worker; re-patching already-patched modules is unnecessary.
 import pyodide_http
 pyodide_http.patch_all()
@@ -460,7 +460,7 @@ def _patched_show(*args, **kwargs):
     plt.close("all")
 plt.show = _patched_show
 
-# These globals postdate setup A's protected-names snapshot — protect
+# These globals postdate setup A's protected-names snapshot, protect
 # them explicitly or the per-run global reset would delete them.
 _PG_PROTECTED_NAMES |= {
     "pyodide_http", "matplotlib", "plt", "_original_show", "_patched_show",
@@ -492,7 +492,7 @@ async function loadHeavyPackages(): Promise<void> {
   await micropip.install("plotly");
   // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
   // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
-  // It does NOT bypass CORS — cross-origin hosts still need the CORS proxy.
+  // It does NOT bypass CORS, cross-origin hosts still need the CORS proxy.
   await micropip.install("pyodide_http");
 
   await pyodide.runPythonAsync(SETUP_SCRIPT_B);
@@ -521,7 +521,7 @@ function ensurePackages(): Promise<void> {
 // lazily on the first completion request. `jedi.Interpreter` analyses
 // the full editor buffer *and* the live worker globals, so completions
 // cover static code (imports, defs above the cursor) and the real
-// objects of the previous run (actual DataFrame columns) — the same
+// objects of the previous run (actual DataFrame columns), the same
 // approach JupyterLite's Pyodide kernel uses. On load failure (e.g. a
 // blocked CDN) completion falls back to the rlcompleter path above for
 // the rest of the session.
@@ -570,13 +570,13 @@ def _python_completions_jedi(doc, line_no, column, line):
             "label": name,
             "type": _JEDI_TYPE_MAP.get(c.type, "variable"),
         })
-        # Cap the payload — the popup shows a handful; CodeMirror
+        # Cap the payload, the popup shows a handful; CodeMirror
         # re-filters as the user types and re-queries past validFor.
         if len(items) >= 200:
             break
     return _json.dumps({"items": items, "replaceLength": prefix_len})
 
-# These globals postdate setup A's protected-names snapshot — protect
+# These globals postdate setup A's protected-names snapshot, protect
 # them or the per-run global reset would delete them.
 _PG_PROTECTED_NAMES |= {
     "_json", "_jedi", "_JEDI_TYPE_MAP", "_python_completions_jedi",
@@ -613,7 +613,7 @@ function ensureJedi(): Promise<boolean> {
 }
 
 // Phase-B-provided ambient names: the setup scripts define a global
-// `plt`/`matplotlib`, and pyodide_http patches urllib/http/requests —
+// `plt`/`matplotlib`, and pyodide_http patches urllib/http/requests,
 // code that *references* any of these needs phase B even when it never
 // import-statements a heavy package. False positives (say, a variable
 // named http) merely wait for the full boot, i.e. today's behaviour.
@@ -643,7 +643,7 @@ function importsBeyondStdlib(code: string): boolean | null {
 
 /** True when `code` can't run correctly on the bare (phase A)
  *  interpreter. Conservative: any uncertainty (unparseable code,
- *  unknown imports) waits for the full boot — the failure mode is
+ *  unknown imports) waits for the full boot, the failure mode is
  *  "behaves like before the two-phase split", never a broken run. */
 function runNeedsHeavyPackages(code: string): boolean {
   if (PHASE_B_AMBIENT_RE.test(code)) return true;
@@ -653,7 +653,7 @@ function runNeedsHeavyPackages(code: string): boolean {
 /** Warm-hint variant of the gate, applied per source so one snippet
  *  with an intentionally incomplete starter (unparseable) can't poison
  *  the answer for the rest. Optimistic on uncertainty: a source that
- *  doesn't parse is skipped rather than assumed heavy — the worst case
+ *  doesn't parse is skipped rather than assumed heavy, the worst case
  *  is the first Run paying the install behind the standard "first run
  *  only" notice, whereas pessimism would re-create the very
  *  download-for-everyone this hint mechanism exists to avoid. */
@@ -678,7 +678,7 @@ async function runCode(
     post({
       kind: "run-status",
       id,
-      message: "Installing data packages — first run only…",
+      message: "Installing data packages, first run only…",
       preparing: true,
     });
     await ensurePackages();
@@ -693,7 +693,7 @@ async function runCode(
   // Auto-install any Pyodide packages referenced by the user's imports
   // (e.g. `import sklearn` triggers loading of scikit-learn). Suppress the
   // loader's progress messages so they don't pollute the captured user
-  // stdout — see the comment on `pkgCallbacks` in `initPyodide()`.
+  // stdout, see the comment on `pkgCallbacks` in `initPyodide()`.
   // `preparing: true` surfaces the boot notice during the download; the
   // main thread debounces it, so an all-cached run (nothing to fetch)
   // doesn't flash the notice.
@@ -720,7 +720,7 @@ async function runCode(
       err instanceof Error ? err.message : String(err)
     }\n`;
   } finally {
-    // End the preparing window — the user's code is about to execute.
+    // End the preparing window, the user's code is about to execute.
     post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
@@ -741,7 +741,7 @@ async function runCode(
   const plotlyDefaultTemplate = theme === "light" ? "plotly" : "plotly_dark";
 
   const wrappedCode = `
-# Plotly arrives with boot phase B (micropip) — a stdlib-only run on the
+# Plotly arrives with boot phase B (micropip), a stdlib-only run on the
 # bare phase A interpreter simply skips the show() patch.
 try:
     import plotly as _plotly
@@ -784,7 +784,7 @@ finally:
 # Auto-flush any matplotlib figures that the user did not explicitly show.
 # This handles patterns like df.x.plot.density() which create a figure
 # and return an Axes object without ever calling plt.show(). Before boot
-# phase B (stdlib-only runs) pyplot isn't importable — guard via
+# phase B (stdlib-only runs) pyplot isn't importable, guard via
 # sys.modules, which is also exactly "no figures can exist yet".
 _plt = sys.modules.get("matplotlib.pyplot")
 if _plt is not None:
@@ -798,7 +798,7 @@ if _plt is not None:
 
   // Post the ordered output stream. Runs in a finally so that output
   // produced *before* an exception (prints, tables, figures) still
-  // renders — the traceback then follows it, like a notebook.
+  // renders, the traceback then follows it, like a notebook.
   const flushOutputs = () => {
     if (!pyodide) return;
     let displayOutputsRaw: unknown;
@@ -813,7 +813,7 @@ if _plt is not None:
     }
 
     // Anything the JS-level capture saw (output emitted outside the
-    // per-run tee window) is posted first — in practice this is the
+    // per-run tee window) is posted first, in practice this is the
     // pre-run package-loader failure note added above.
     if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
     if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
@@ -835,7 +835,7 @@ if _plt is not None:
           };
           post({ kind: "output", id, cell: { type: "plot", content: out.json, plot: fig } });
         } catch {
-          /* malformed figure JSON — skip the cell */
+          /* malformed figure JSON, skip the cell */
         }
       }
     }
@@ -848,7 +848,7 @@ if _plt is not None:
   }
 }
 
-/** rlcompleter fallback — used when the jedi wheel can't be loaded. */
+/** rlcompleter fallback, used when the jedi wheel can't be loaded. */
 async function completeWithRlcompleter(
   id: number,
   line: string,
@@ -920,7 +920,7 @@ async function completeCode(
   }
 
   // `null` signals a jedi-level failure on this request (e.g. a parse
-  // edge case) — fall back rather than answering with nothing.
+  // edge case), fall back rather than answering with nothing.
   if (!parsed) {
     await completeWithRlcompleter(id, line, column);
     return;
@@ -940,7 +940,7 @@ async function completeCode(
   post({ kind: "complete-result", id, completions, replaceLength });
 }
 
-// Pyodide is not reentrant — serialise all run/complete requests behind a
+// Pyodide is not reentrant, serialise all run/complete requests behind a
 // single promise chain so a completion request that arrives while a run is
 // in progress can't interleave Python execution.
 let workQueue: Promise<unknown> = Promise.resolve();
@@ -990,13 +990,13 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   }
 
   // Remove paths staged on previous runs that aren't part of the new
-  // snapshot — keeps deletes/renames in sync.
+  // snapshot, keeps deletes/renames in sync.
   for (const prev of stagedPaths) {
     if (!nextPaths.has(prev)) {
       try {
         FS.unlink(prev);
       } catch {
-        /* file may already be gone — ignore */
+        /* file may already be gone, ignore */
       }
     }
   }
@@ -1007,11 +1007,11 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   // import of one of them in `sys.modules` (the per-run global reset does
   // not touch the import cache). Evict staged-origin modules and invalidate
   // the finder caches so the next run imports the freshly-written source
-  // instead of a stale module — see _pg_evict_staged_modules in initPyodide.
+  // instead of a stale module, see _pg_evict_staged_modules in initPyodide.
   try {
     await pyodide.runPythonAsync("_pg_evict_staged_modules()");
   } catch {
-    /* best-effort — a stale import cache shouldn't abort staging */
+    /* best-effort, a stale import cache shouldn't abort staging */
   }
 }
 
@@ -1034,7 +1034,7 @@ function ensureDirs(FS: PyodideFS, absFilePath: string): void {
       try {
         FS.mkdir(cur);
       } catch {
-        /* directory may have been created concurrently — ignore */
+        /* directory may have been created concurrently, ignore */
       }
     }
   }
@@ -1080,7 +1080,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
         if (initPromise) await initPromise;
         await completeCode(id, doc, lineNumber, line, column);
       } catch {
-        // Completions are best-effort — return an empty list rather than
+        // Completions are best-effort, return an empty list rather than
         // surfacing the error to the user.
         post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
       }
@@ -1122,7 +1122,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
             .catch(() => {});
         }
       } catch {
-        // Warm-up is best-effort — a package-needing run retries and
+        // Warm-up is best-effort, a package-needing run retries and
         // surfaces the real error through its own path.
       }
     });

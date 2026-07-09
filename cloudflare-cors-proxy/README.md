@@ -8,10 +8,10 @@ The playground runtimes run entirely in the browser. When user code calls a thir
 
 Cloudflare Workers are chosen over a Next.js route handler because:
 
-- **Edge-native** — requests are served from the Cloudflare edge closest to the user, minimising latency.
-- **Independently deployable** — the proxy can be updated, scaled, or replaced without touching the Next.js app.
-- **Zero cold starts** — Workers use the V8 isolate model with no container spin-up delay.
-- **Future-proof** — as the playground evolves (e.g. almostnode Phase 1+), the proxy stays stable regardless of which framework hosts the frontend.
+- **Edge-native**, requests are served from the Cloudflare edge closest to the user, minimising latency.
+- **Independently deployable**, the proxy can be updated, scaled, or replaced without touching the Next.js app.
+- **Zero cold starts**, Workers use the V8 isolate model with no container spin-up delay.
+- **Future-proof**, as the playground evolves (e.g. almostnode Phase 1+), the proxy stays stable regardless of which framework hosts the frontend.
 
 ## How it works
 
@@ -82,8 +82,8 @@ https://staging-dataslope.subwaymatch.workers.dev    (a named alias)
 ```
 
 Listing each one is impractical, so an `ALLOWED_ORIGINS` entry may contain a `*`
-wildcard. The `*` matches **one hostname label** — one or more characters that
-are not a `.` or `/` — so it stays scoped to a single host and can never match a
+wildcard. The `*` matches **one hostname label**, one or more characters that
+are not a `.` or `/`, so it stays scoped to a single host and can never match a
 different registrable domain.
 
 The default entry `https://*-dataslope.subwaymatch.workers.dev` matches both
@@ -92,7 +92,7 @@ suffix: the `subwaymatch.workers.dev` subdomain is owner-controlled, so only the
 project owner can deploy a host that matches and an attacker cannot register one.
 (This is the mirror image of Vercel's old layout, where the variable part was a
 *suffix*; on Cloudflare it's a *prefix*.) Keep the `-dataslope` worker-name
-segment in the pattern so it matches only the app's previews — an over-broad entry
+segment in the pattern so it matches only the app's previews, an over-broad entry
 such as `https://*.subwaymatch.workers.dev` would also match every other worker on
 the subdomain.
 
@@ -102,11 +102,11 @@ To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sens
 
 - [Node.js](https://nodejs.org/) 18+
 - A [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier is sufficient)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) (installed as a dev dependency — no global install needed)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) (installed as a dev dependency, no global install needed)
 
 ## Setup
 
-> **Note — always run Wrangler with `-c wrangler.toml` here.**
+> **Note, always run Wrangler with `-c wrangler.toml` here.**
 > This proxy lives inside the `dataslope` repo, whose root is now also a
 > Cloudflare Workers project (the Next.js app, deployed via OpenNext). When
 > Wrangler is invoked without an explicit config it resolves the **repo-root**
@@ -216,7 +216,7 @@ NEXT_PUBLIC_CORS_PROXY_URL=https://dataslope-cors-proxy.<your-subdomain>.workers
 ```
 cloudflare-cors-proxy/
 ├── src/
-│   └── index.ts        # Worker entry point — all proxy logic lives here
+│   └── index.ts        # Worker entry point, all proxy logic lives here
 ├── package.json        # Dev dependencies (wrangler, TypeScript, types)
 ├── tsconfig.json       # TypeScript config for Workers runtime
 ├── wrangler.toml       # Cloudflare Worker configuration

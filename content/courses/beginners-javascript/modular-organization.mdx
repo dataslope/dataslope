@@ -1,10 +1,10 @@
 ---
 title: Modular Organization
-description: Splitting code across files with ES Modules and CommonJS — and the principles that make module boundaries useful.
+description: Splitting code across files with ES Modules and CommonJS, and the principles that make module boundaries useful.
 ---
 
 Every program starts as a single file. Then it grows. At some
-point — usually around a few hundred lines — that single file
+point, usually around a few hundred lines, that single file
 becomes painful to navigate, and you split it. *How* you split it
 is what we mean by **modular organization**.
 
@@ -15,7 +15,7 @@ principles take you 90% of the way.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Four file cards with faded code lines inside, joined by thin dependency lines — one entry module importing from the others"
+  aria-label="Four file cards with faded code lines inside, joined by thin dependency lines, one entry module importing from the others"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -91,7 +91,7 @@ flowchart TD
     I1 -->|imports| O2
 ```
 
-`users.js` and `orders.js` both have a private `helper` — neither
+`users.js` and `orders.js` both have a private `helper`, neither
 file knows about the other's.
 
 ## Two module systems in JavaScript
@@ -99,9 +99,9 @@ file knows about the other's.
 JavaScript has, historically, two module systems you'll see in
 the wild:
 
-1. **CommonJS (CJS)** — older, used by Node.js by default for
+1. **CommonJS (CJS)**, older, used by Node.js by default for
    years. Uses `require()` and `module.exports`.
-2. **ES Modules (ESM)** — the official language standard, used by
+2. **ES Modules (ESM)**, the official language standard, used by
    browsers and now widely by Node. Uses `import` and `export`.
 
 The runtime used in these lessons (`almostnode`) uses CommonJS,
@@ -150,7 +150,7 @@ can do tree-shaking and CJS generally can't.
 ## Designing a module: public vs. private
 
 A module's *public surface* is everything it exports. Everything
-else is *private* — usable only from inside the file. The
+else is *private*, usable only from inside the file. The
 golden rule:
 
 > **Export the minimum.** Internal helpers stay internal.
@@ -170,7 +170,7 @@ surface, the freer you are to change the internals.
 console.log(format(1234.5, "USD"));
 console.log(format(99, "EUR"));
 
-// We DON'T expose the helpers — and we can't even reach them.
+// We DON'T expose the helpers, and we can't even reach them.
 try {
   require("./currency").pad;
 } catch (e) {}
@@ -206,13 +206,13 @@ don't. We could rename them tomorrow and nothing else breaks.
 
 Two related ideas guide *what* belongs in a module:
 
-- **Cohesion** — how related the things inside a module are.
+- **Cohesion**, how related the things inside a module are.
   High cohesion = good.
-- **Coupling** — how dependent two modules are on each other.
+- **Coupling**, how dependent two modules are on each other.
   Low coupling = good.
 
 A module that does "user authentication and PDF rendering" has
-**low cohesion** — unrelated concerns crammed together. Split
+**low cohesion**, unrelated concerns crammed together. Split
 it.
 
 Two modules where each one constantly reaches into the other's
@@ -268,7 +268,7 @@ in `orders/`. You don't have to spelunk across the whole tree.
 
 ## Dependency direction
 
-Modules should form a **directed acyclic graph** — A may depend
+Modules should form a **directed acyclic graph**, A may depend
 on B, B may depend on C, but C must not depend on A.
 
 ```mermaid
@@ -283,11 +283,11 @@ flowchart TD
 `shared/http.js` is depended on by feature modules; it never
 depends on them. This forms layers:
 
-1. **Shared utilities** (lowest layer) — depended on by everything.
-2. **Feature modules** — depended on by entry points.
-3. **Entry points** (highest layer) — depend on features.
+1. **Shared utilities** (lowest layer), depended on by everything.
+2. **Feature modules**, depended on by entry points.
+3. **Entry points** (highest layer), depend on features.
 
-A **circular dependency** — A imports B and B imports A —
+A **circular dependency**, A imports B and B imports A,
 usually means a third module is hiding between them, waiting to
 be extracted.
 
@@ -376,13 +376,13 @@ module.exports = { add, getAll };
 
 A few things to notice:
 
-- `users.js` and `orders.js` are *peers* — neither imports the
+- `users.js` and `orders.js` are *peers*, neither imports the
   other.
 - Both depend on `shared/store.js`, which depends on nothing.
 - `index.js` is the only place where everything comes together.
 
 You could replace `shared/store.js` with a database tomorrow, and
-the feature modules wouldn't care — they only depend on the
+the feature modules wouldn't care, they only depend on the
 `{ add, getAll }` shape.
 
 ## Re-exports: a single front door per package
@@ -410,7 +410,7 @@ folder itself becomes the module boundary.
 - Imports go at the top, side by side, in groups (third-party
   first, then local).
 - A module shouldn't reach across directories to grab another
-  module's *internals* — only its public exports.
+  module's *internals*, only its public exports.
 - If two modules keep needing to know about the same thing,
   extract that thing into a third module.
 
@@ -422,10 +422,10 @@ folder itself becomes the module boundary.
   instructions={`Build a tiny budget tracker across two files.
 
 In \`budget.js\`, implement and export:
-- \`addExpense(amount, category)\` — records an expense.
-- \`addIncome(amount)\` — records income.
-- \`balance()\` — returns income minus the sum of all expenses.
-- \`expensesByCategory()\` — returns an object mapping each category to its total.
+- \`addExpense(amount, category)\`, records an expense.
+- \`addIncome(amount)\`, records income.
+- \`balance()\`, returns income minus the sum of all expenses.
+- \`expensesByCategory()\`, returns an object mapping each category to its total.
 
 In \`index.js\`, require those functions and run a quick demo.
 
@@ -546,7 +546,7 @@ if (!threw) throw new Error("must throw for negative amount");`,
   > The size of a module's public API has no bearing on runtime performance; tree-shaking in bundlers can eliminate unused exports, but keeping exports small is a design concern, not a speed concern.
 - Files with fewer exports use less memory
   > Memory usage is determined by the code and data that actually runs, not by how many names are exported; exports are essentially just references and have negligible memory cost.
-- [o] Anything you export becomes a commitment — callers can rely on it, so the more you expose, the less freedom you have to change the internals later
+- [o] Anything you export becomes a commitment, callers can rely on it, so the more you expose, the less freedom you have to change the internals later
   > Module exports define a *contract*. Once other code starts using \`pad\` or \`SYMBOLS\`, renaming or removing them risks breaking callers. Keeping internals private leaves you free to refactor without breaking anyone, which is one of the biggest long-term wins of good modular design.
 - Smaller exports look nicer in editors
   > Editor presentation is a minor aesthetic point; the real reason to minimise exports is the engineering principle of information hiding and the freedom it gives you to change internal implementation later.

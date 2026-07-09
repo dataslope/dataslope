@@ -83,7 +83,7 @@ export function GenExprEditor({
       // Flag the dispatch as programmatic so the updateListener doesn't fire
       // onChange back to the parent and cause a spurious re-render.
       // CodeMirror fires updateListener *synchronously* during dispatch, so
-      // the flag is still set when the listener runs — no race condition.
+      // the flag is still set when the listener runs, no race condition.
       isProgrammaticUpdate.current = true;
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: value },

@@ -16,7 +16,7 @@ pointer to the next node.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Three nodes, each a blue data box with a green pointer tab, chained by thin curved arrows, the last tab holding a gray square for null — a linked list"
+  aria-label="Three nodes, each a blue data box with a green pointer tab, chained by thin curved arrows, the last tab holding a gray square for null, a linked list"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -69,7 +69,7 @@ A few details worth unpacking:
 - The `next` field is a **pointer to the same kind of struct**. A
   pointer is the same size regardless of what it points at, so the
   compiler is happy.
-- A `next` value of `NULL` means "no more nodes" — the end of the
+- A `next` value of `NULL` means "no more nodes", the end of the
   list.
 
 ```mermaid
@@ -116,7 +116,7 @@ int main(void) {
   }
   printf("\\n");
 
-  // (we still have to free — see below)
+  // (we still have to free, see below)
   return 0;
 }
 `,
@@ -173,7 +173,7 @@ head = prepend(head, 5);
 head = append(head, 99);
 ```
 
-This pattern — "modify a structure, return the new root" — is one
+This pattern, "modify a structure, return the new root", is one
 way to keep the call site simple. The alternative is passing a
 `Node **` (a pointer to the head pointer). Both are correct;
 returning the new head is friendlier to read in beginner code.
@@ -189,7 +189,7 @@ prepend(10):  head -> [10 | *] -> [20 | *] -> [30 | NULL]
 
 Prepending three values gives you the list in *reverse* of insertion
 order. If you want them in insertion order with O(1) inserts, keep a
-`tail` pointer too — that's how a queue is built.
+`tail` pointer too, that's how a queue is built.
 
 ## Freeing a list
 
@@ -208,7 +208,7 @@ void list_free(Node *head) {
 ```
 
 The temptation is to write `cur = cur->next` *after* `free(cur)`.
-But that reads memory that has just been freed — undefined behavior.
+But that reads memory that has just been freed, undefined behavior.
 Always remember "save then free".
 
 ## Inserting in the middle
@@ -387,7 +387,7 @@ for (Node *cur = head; cur != NULL; cur = cur->next) {
   > Every node is reached and freed; the problem is not that nodes are left unfreed but that the code reads freed memory to get to the next node.
 - It runs forever.
   > The loop does terminate because it eventually reaches a node whose \`next\` was \`NULL\` before being freed, but it invokes undefined behavior on the way there.
-- [o] \`cur->next\` is read after \`cur\` has been freed — undefined behavior.
+- [o] \`cur->next\` is read after \`cur\` has been freed, undefined behavior.
   > By the time the loop step \`cur = cur->next\` runs, the memory at \`cur\` has already been returned to the heap. The fix is to save \`cur->next\` into a local before \`free(cur)\`.
 - It frees one node too few.
   > The loop condition \`cur != NULL\` ensures every node, including the last, is freed; the bug is about reading freed memory, not skipping a node.
@@ -407,5 +407,5 @@ This bug often *appears* to work because the freed memory hasn't been overwritte
 - has cache-friendlier access patterns.
   > Nodes are scattered across the heap, so sequential traversal causes many cache misses. A contiguous array is far more cache-friendly.
 
-In practice, modern hardware loves arrays — they're contiguous and the CPU cache prefetches the next elements. Linked lists are conceptually elegant but are slower than arrays for most real workloads. Use them when you specifically need their insertion characteristics or as a building block for more complex structures like trees and graphs.`}
+In practice, modern hardware loves arrays, they're contiguous and the CPU cache prefetches the next elements. Linked lists are conceptually elegant but are slower than arrays for most real workloads. Use them when you specifically need their insertion characteristics or as a building block for more complex structures like trees and graphs.`}
 />

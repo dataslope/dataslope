@@ -3,16 +3,16 @@ title: Structural Typing
 description: Why TypeScript cares about shape, not name
 ---
 
-Most programmers learning TypeScript come from languages like Java, C#, or C++ where types are **nominal**: two types are compatible only if they have the same *name*. If `class Dog` and `class Cat` both have a `name` property, you still can't pass a `Dog` where a `Cat` is expected — the compiler checks the class name, not the structure.
+Most programmers learning TypeScript come from languages like Java, C#, or C++ where types are **nominal**: two types are compatible only if they have the same *name*. If `class Dog` and `class Cat` both have a `name` property, you still can't pass a `Dog` where a `Cat` is expected, the compiler checks the class name, not the structure.
 
-TypeScript takes a different approach. It uses **structural typing** (also called **duck typing** for compilers): two types are compatible if they have the same *shape*. If it walks like a duck and quacks like a duck, the compiler treats it as a duck — even if it's technically a goose.
+TypeScript takes a different approach. It uses **structural typing** (also called **duck typing** for compilers): two types are compatible if they have the same *shape*. If it walks like a duck and quacks like a duck, the compiler treats it as a duck, even if it's technically a goose.
 
 This makes TypeScript remarkably flexible and composable. You can reuse types across unrelated modules without needing a shared base class or interface. But it also has surprising edge cases, especially around object literals. Let's explore how structural typing works and when it bites.
 
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Two completely different builds — one stacked from blocks, one molded in a single piece — leave exactly the same notched footprint, joined by a thin double-headed arrow, while a third object's plain footprint matches nothing — the compiler compares the shapes things cast, not what they are called"
+  aria-label="Two completely different builds, one stacked from blocks, one molded in a single piece, leave exactly the same notched footprint, joined by a thin double-headed arrow, while a third object's plain footprint matches nothing, the compiler compares the shapes things cast, not what they are called"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -70,7 +70,7 @@ function printPoint(p: Point) {
 
 // Even though origin is typed as Vector, it's compatible with Point
 const origin: Vector = { x: 0, y: 0 };
-printPoint(origin); // ✅ OK — same shape!
+printPoint(origin); // ✅ OK, same shape!
 
 // An object literal with the same shape also works
 printPoint({ x: 10, y: 20 }); // ✅ OK
@@ -79,7 +79,7 @@ printPoint({ x: 10, y: 20 }); // ✅ OK
   ]}
 />
 
-`Point` and `Vector` are structurally identical — both have `x: number` and `y: number`. So the compiler treats them as interchangeable. This is **structural compatibility**: if the shapes match, the types match.
+`Point` and `Vector` are structurally identical, both have `x: number` and `y: number`. So the compiler treats them as interchangeable. This is **structural compatibility**: if the shapes match, the types match.
 
 Contrast this with a nominal system like Java:
 
@@ -94,7 +94,7 @@ Vector v = new Vector();
 printPoint(v); // ❌ Compile error: incompatible types
 ```
 
-Even though `Point` and `Vector` have identical fields, Java rejects the call because the *names* differ. TypeScript doesn't care about names — only structure.
+Even though `Point` and `Vector` have identical fields, Java rejects the call because the *names* differ. TypeScript doesn't care about names, only structure.
 
 ```mermaid
 graph TD
@@ -148,10 +148,10 @@ welcomeUser({ id: "456", name: "Grace" }); // ✅ OK
 
 This is why TypeScript is often described as having **duck typing for compilers**: "If it looks like a duck and quacks like a duck, it's a duck."
 
-The phrase has a real lineage, and it's older than any programming language. The "duck test" — *if it looks like a duck, swims like a duck, and quacks like a duck, it's probably a duck* — was a piece of American folk reasoning long before computing. The Python community adopted it around 2000 to describe their language's habit of caring only about what an object can *do*, never what class it claims to be; Alex Martelli's postings on the comp.lang.python newsgroup are usually credited with cementing the term. TypeScript's contribution was to take this runtime philosophy and make a *compiler* enforce it: you get duck typing's flexibility, but the quack-check happens before the program ever runs.
+The phrase has a real lineage, and it's older than any programming language. The "duck test", *if it looks like a duck, swims like a duck, and quacks like a duck, it's probably a duck*, was a piece of American folk reasoning long before computing. The Python community adopted it around 2000 to describe their language's habit of caring only about what an object can *do*, never what class it claims to be; Alex Martelli's postings on the comp.lang.python newsgroup are usually credited with cementing the term. TypeScript's contribution was to take this runtime philosophy and make a *compiler* enforce it: you get duck typing's flexibility, but the quack-check happens before the program ever runs.
 
 <Callout type="info" title="Contrast with Go's interfaces">
-Go also uses structural typing for interfaces, but it's stricter: a type must implement *all* methods of an interface to satisfy it. TypeScript is more permissive — extra properties are fine, and even functions can be structurally compatible if their parameter and return types align.
+Go also uses structural typing for interfaces, but it's stricter: a type must implement *all* methods of an interface to satisfy it. TypeScript is more permissive, extra properties are fine, and even functions can be structurally compatible if their parameter and return types align.
 </Callout>
 
 ## Excess property checking: the surprise
@@ -188,7 +188,7 @@ connect(configWithTimeout);
   ]}
 />
 
-Wait — why does `myConfig` work but the inline literal would fail? This is **excess property checking**, a special-case carveout that TypeScript applies *only* to **fresh object literals**. The goal is to catch typos and accidental properties:
+Wait, why does `myConfig` work but the inline literal would fail? This is **excess property checking**, a special-case carveout that TypeScript applies *only* to **fresh object literals**. The goal is to catch typos and accidental properties:
 
 ```ts
 // Typo: "prot" instead of "port"
@@ -200,13 +200,13 @@ Without excess property checking, this typo would slip through: `prot` is an ext
 So TypeScript adds a **freshness** check: when you pass an object literal directly to a function or assign it to a typed variable, the compiler rejects any properties not declared in the target type. This is a deliberate break from pure structural typing to improve ergonomics.
 
 <Callout type="warning" title="Fresh vs. non-fresh">
-An object literal is "fresh" when it's created inline as an argument or assignment. Once you store it in a variable (even without a type annotation), it loses freshness and reverts to structural compatibility. This is why `myConfig` above works — by the time it reaches `connect`, it's no longer a fresh literal.
+An object literal is "fresh" when it's created inline as an argument or assignment. Once you store it in a variable (even without a type annotation), it loses freshness and reverts to structural compatibility. This is why `myConfig` above works, by the time it reaches `connect`, it's no longer a fresh literal.
 </Callout>
 
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="The same green parcel with a yellow ribbon takes two journeys: handed straight to the blue portal it is stopped by a red bar, but after first resting on a gray pallet it passes through and earns a check — fresh object literals get strict excess-property checks while stored variables do not"
+  aria-label="The same green parcel with a yellow ribbon takes two journeys: handed straight to the blue portal it is stopped by a red bar, but after first resting on a gray pallet it passes through and earns a check, fresh object literals get strict excess-property checks while stored variables do not"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -297,7 +297,7 @@ connectFlexible({ host: "localhost", port: 3000, timeout: 5000 }); // ✅ OK
   ]}
 />
 
-Each approach has trade-offs. Type assertions (`as Config`) are a last resort — they silence the compiler but don't make your code safer. Index signatures are better when you genuinely expect arbitrary properties (like a config object with plugin options). Storing in a variable is the cleanest if you're just working around the freshness check.
+Each approach has trade-offs. Type assertions (`as Config`) are a last resort, they silence the compiler but don't make your code safer. Index signatures are better when you genuinely expect arbitrary properties (like a config object with plugin options). Storing in a variable is the cleanest if you're just working around the freshness check.
 
 ## Structural typing in practice
 
@@ -316,7 +316,7 @@ function log(item: Loggable) {
   console.log(\`[LOG] \${item.message}\`);
 }
 
-// These all work — same shape!
+// These all work, same shape!
 log({ message: "Server started" });
 
 const error = { message: "Database connection failed", code: 500 };
@@ -356,7 +356,7 @@ function deleteUser(id: UserId) { /*...*/ }
 deleteUser(productId); // ❌ Logic error, but type-checks!
 ```
 
-Both are just `string` under the hood, so TypeScript treats them as interchangeable. This is dangerous — you could accidentally pass a product ID where a user ID is expected.
+Both are just `string` under the hood, so TypeScript treats them as interchangeable. This is dangerous, you could accidentally pass a product ID where a user ID is expected.
 
 The solution is **branded types** (also called **opaque types** or **nominal types**). You add a fake property that exists only at compile time to make the types structurally distinct:
 
@@ -383,12 +383,12 @@ TypeScript's structural typing gives you flexibility by default, but you can lay
 
 ## Challenge: Structural compatibility
 
-Let's test your understanding. The function below is typed against a small `LogEntry` interface, and — thanks to structural typing — the program feeds it objects that were never declared as `LogEntry` but happen to have the right shape (plus extra fields). Your job is just the body.
+Let's test your understanding. The function below is typed against a small `LogEntry` interface, and, thanks to structural typing, the program feeds it objects that were never declared as `LogEntry` but happen to have the right shape (plus extra fields). Your job is just the body.
 
 <ChallengeCard
   adapter="typescript"
   title="A structurally typed log formatter"
-  instructions={`Implement the body of \`formatEntry\` so it returns the entry's level in uppercase, wrapped in square brackets, followed by a space and the message — exactly like \`[INFO] App started\`.
+  instructions={`Implement the body of \`formatEntry\` so it returns the entry's level in uppercase, wrapped in square brackets, followed by a space and the message, exactly like \`[INFO] App started\`.
 
 Note the two objects passed in \`main.ts\`: neither was declared as a \`LogEntry\`, and both carry extra properties (\`uptimeMs\`, \`stack\`). Structural typing accepts them anyway, because each has at least \`level\` and \`message\`.`}
   files={[
@@ -405,7 +405,7 @@ function formatEntry(entry: LogEntry): string {
 }
 
 // Structural typing in action: not declared as LogEntry, extra
-// properties included — both are accepted because the shape fits.
+// properties included, both are accepted because the shape fits.
 const boot = { level: "info", message: "App started", uptimeMs: 12 };
 const crash = { level: "error", message: "Crash", stack: "at main.ts:1" };
 
@@ -467,28 +467,28 @@ interface Pet {
 Which statement is **true** in TypeScript's structural type system?
 
 - Both \`Dog\` and \`Pet\` are assignable to each other because they share the \`name\` property.
-  > Sharing one property isn't enough for mutual assignability — \`Pet\` has no \`breed\`, so it can't be used where a \`Dog\` is required.
+  > Sharing one property isn't enough for mutual assignability, \`Pet\` has no \`breed\`, so it can't be used where a \`Dog\` is required.
 - [o] \`Dog\` is assignable to \`Pet\` because it has all required properties (and more).
   > A \`Dog\` has everything a \`Pet\` needs (\`name\`), plus extra (\`breed\`). Structural typing allows extra properties.
 - \`Pet\` is assignable to \`Dog\` because \`Dog\` is more specific.
   > No. A \`Pet\` doesn't have a \`breed\` property, so it can't satisfy \`Dog\`. Structural typing requires *at least* the declared properties.
 - Neither is assignable to the other because they have different names.
-  > No. TypeScript uses structural typing, not nominal typing. Names don't matter — only the shape (properties and their types).
+  > No. TypeScript uses structural typing, not nominal typing. Names don't matter, only the shape (properties and their types).
 
 In structural typing, type \`A\` is assignable to type \`B\` if \`A\` has *at least* all the properties of \`B\` with compatible types. Extra properties on \`A\` are fine. This is why \`Dog\` (which has \`name\` and \`breed\`) can be used anywhere a \`Pet\` (which only needs \`name\`) is expected.`}
 />
 
 ## Recap
 
-TypeScript's structural type system checks compatibility by **shape**, not **name**. If two types have the same structure (the same properties with the same types), they're interchangeable — even if they were defined in completely separate modules with no shared ancestry.
+TypeScript's structural type system checks compatibility by **shape**, not **name**. If two types have the same structure (the same properties with the same types), they're interchangeable, even if they were defined in completely separate modules with no shared ancestry.
 
 **Key takeaways:**
 
 - **Structural compatibility:** Two types are compatible if one has all the properties of the other (with the right types). Extra properties are allowed.
 - **Excess property checking:** A special rule for *fresh object literals* that rejects undeclared properties to catch typos. Once a literal is stored in a variable, it reverts to normal structural rules.
-- **Duck typing for compilers:** If it has the right shape, it fits — no need for explicit `implements` declarations.
+- **Duck typing for compilers:** If it has the right shape, it fits, no need for explicit `implements` declarations.
 - **Simulating nominal types:** When structural typing is too loose (e.g., `UserId` vs. `ProductId` both being strings), you can use branded types to make logically distinct types structurally distinct.
 
 Structural typing makes TypeScript composable and flexible. You can define types in isolation and have them work together automatically. But it also requires care: always be aware of what shape you're actually checking, and use branding or more precise types when you need to prevent accidental misuse.
 
-Next: [Discriminated Unions](./discriminated-unions), where we combine structural typing with a "tag" field to model state machines, domain events, and other variants — the most powerful pattern in modern TypeScript.
+Next: [Discriminated Unions](./discriminated-unions), where we combine structural typing with a "tag" field to model state machines, domain events, and other variants, the most powerful pattern in modern TypeScript.

@@ -1,6 +1,6 @@
 ---
 title: Encapsulation and Abstraction
-description: The two ideas that turn a collection of classes into a maintainable program — hide what callers should not see, expose what they need
+description: The two ideas that turn a collection of classes into a maintainable program, hide what callers should not see, expose what they need
 ---
 
 We have been writing private fields and public methods without
@@ -69,13 +69,13 @@ classDiagram
       +withdraw(long cents) boolean
       +balance() long
     }
-    note for BankAccount "Outside code can deposit, withdraw,<br/>or ask for the balance — but it<br/>cannot just *set* balanceCents."
+    note for BankAccount "Outside code can deposit, withdraw,<br/>or ask for the balance, but it<br/>cannot just *set* balanceCents."
 ```
 
 ## Why does this matter?
 
 Imagine `balanceCents` were `public`. Anywhere in your codebase,
-someone could write `account.balanceCents = -1_000_000;` — and the
+someone could write `account.balanceCents = -1_000_000;`, and the
 account class would have no way to enforce the rule "a balance
 cannot be negative."
 
@@ -163,7 +163,7 @@ The `BankAccount` class is, from the outside, just:
 - "I have an owner."
 - "I have a balance."
 - "You can deposit money into me."
-- "You can ask to withdraw — I'll say yes or no."
+- "You can ask to withdraw, I'll say yes or no."
 
 That is the **abstraction**. The fact that the balance is stored as
 `balanceCents` (rather than as `balanceDollars` or as a `BigDecimal`)
@@ -216,7 +216,7 @@ setter should enforce the rules. ("`setAge` must be > 0.")
 
 ```java
 public List<Item> getItems() {
-    return items;     // returns the internal list — outside code can mutate it!
+    return items;     // returns the internal list, outside code can mutate it!
 }
 ```
 
@@ -235,7 +235,7 @@ return an unmodifiable view, or expose specific operations like
 - [o] So the class itself is the only place that decides how its own data may change, allowing it to enforce its invariants
   > Encapsulation gives the class ownership of its own rules.
 - Because the Java compiler refuses to compile public fields
-  > It compiles them fine — encapsulation is a design choice, not a language requirement.`}
+  > It compiles them fine, encapsulation is a design choice, not a language requirement.`}
 />
 
 <MultipleChoice
@@ -244,7 +244,7 @@ return an unmodifiable view, or expose specific operations like
 - It has a public field for every state value
   > That's the opposite of encapsulation.
 - It has a getter and setter for every field
-  > That is often a sign of *bad* encapsulation — the API mirrors the storage.
+  > That is often a sign of *bad* encapsulation, the API mirrors the storage.
 - [o] Its public methods are named for behaviors that callers actually need, and its fields are private
   > The API talks about *behavior*, not storage.
 - It uses the keyword \`final\` somewhere
@@ -336,7 +336,7 @@ after illegal change: 24
 
 Notice how `setTarget` *silently refuses* a bad value. The
 abstraction is "this thermostat is always sensible." Implementation
-details — bounds checks, clamping, perhaps logging — stay inside.
+details, bounds checks, clamping, perhaps logging, stay inside.
 
 Next we look at **constructors** in more depth: how an object comes
 to exist, and the entire lifecycle from birth to garbage collection.

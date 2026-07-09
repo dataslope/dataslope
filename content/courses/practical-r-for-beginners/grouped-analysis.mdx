@@ -1,6 +1,6 @@
 ---
 title: Grouped Analysis
-description: The single most powerful idea in data analysis — split your data into groups, compute something per group, combine the results. `group_by()` makes it one line.
+description: The single most powerful idea in data analysis, split your data into groups, compute something per group, combine the results. `group_by()` makes it one line.
 ---
 
 Almost every interesting analytical question is a "per-group"
@@ -34,7 +34,7 @@ In dplyr, you do it in two lines: `group_by()` + `summarise()`.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A strip of mixed blue, green, and yellow squares fans down three solid gray arrows into color-pure group cards, each collapsing its rows into one summary bar sized to the group — group_by splits, summarize reduces"
+  aria-label="A strip of mixed blue, green, and yellow squares fans down three solid gray arrows into color-pure group cards, each collapsing its rows into one summary bar sized to the group, group_by splits, summarize reduces"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="130" y="20" width="380" height="44" rx="10" fill="currentColor" opacity="0.06" />
@@ -230,8 +230,8 @@ mtcars |>
   ]}
 />
 
-This pattern — "compute a per-group statistic, then express each
-row relative to it" — is extremely common. It's how you
+This pattern, "compute a per-group statistic, then express each
+row relative to it", is extremely common. It's how you
 normalize, rank within groups, compute z-scores per category,
 etc.
 
@@ -410,5 +410,5 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
   > \`mutate\` works perfectly well after \`group_by\`; it computes each new column value within the group context while retaining all rows.`}
 />
 
-The last page in this section covers *reshaping* — switching
+The last page in this section covers *reshaping*, switching
 between wide and long forms when your data isn't yet tidy.

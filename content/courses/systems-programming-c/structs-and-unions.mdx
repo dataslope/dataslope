@@ -4,7 +4,7 @@ description: Defining composite types, struct layout, padding, alignment, bitfie
 ---
 
 A `struct` is C's way of bundling several values into one named
-record. Underneath the syntax, a struct is just a block of bytes —
+record. Underneath the syntax, a struct is just a block of bytes,
 its members live one after another in memory, possibly with **padding**
 bytes inserted to keep each member at a properly aligned address.
 
@@ -14,7 +14,7 @@ reality.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Two rows of byte boxes for the same struct: declared char-int-char, the top row needs six gray padding boxes and runs twelve bytes long, while the reordered row below packs into eight — a yellow bracket marks the four bytes saved"
+  aria-label="Two rows of byte boxes for the same struct: declared char-int-char, the top row needs six gray padding boxes and runs twelve bytes long, while the reordered row below packs into eight, a yellow bracket marks the four bytes saved"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -284,10 +284,10 @@ int main(void) {
 />
 
 The pair `user_new` / `user_free` is the standard C "constructor /
-destructor" pattern — they are just regular functions, but they
+destructor" pattern, they are just regular functions, but they
 document the ownership rule clearly.
 
-## Linked list node — a self-referential struct
+## Linked list node, a self-referential struct
 
 A struct can contain a pointer to *its own type*. This is how linked
 lists, trees, and graphs are built.
@@ -345,14 +345,14 @@ int main(void) {
 
 ## Unions
 
-A `union` is a value that can hold *any one of* several types — but
+A `union` is a value that can hold *any one of* several types, but
 only one at a time. Every member shares the same storage; the
 union's size is the size of its largest member.
 
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Three members of different widths — a wide blue, a medium green, and a small yellow — funnel along thin lines into one storage box sized for the largest, and only the green one currently sits inside — a union holds any one member at a time"
+  aria-label="Three members of different widths, a wide blue, a medium green, and a small yellow, funnel along thin lines into one storage box sized for the largest, and only the green one currently sits inside, a union holds any one member at a time"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -411,8 +411,8 @@ int main(void) {
 This *type punning* pattern is common in low-level code (graphics,
 serialization), and it has one genuinely legendary appearance. When
 id Software released the *Quake III Arena* source code in 2005,
-readers found a function that computes 1/√x — needed constantly for
-normalizing 3D vectors — by reinterpreting a float's bits as an
+readers found a function that computes 1/√x, needed constantly for
+normalizing 3D vectors, by reinterpreting a float's bits as an
 integer, shifting them right, and subtracting them from the magic
 constant `0x5f3759df`. The technique exploits exactly what the code
 block above shows: an IEEE 754 float's bit pattern, read as an
@@ -425,8 +425,8 @@ companies. The lesson for you: understanding *exactly* how your
 bytes are laid out occasionally lets you do things that look like
 magic.
 
-A "tagged union" — a struct with an enum tag and a
-union of payloads — is how C encodes sum types like `Result<Ok, Err>`.
+A "tagged union", a struct with an enum tag and a
+union of payloads, is how C encodes sum types like `Result<Ok, Err>`.
 
 <CodeBlock
   adapter="c"
@@ -478,14 +478,14 @@ int main(void) {
 ## Bitfields
 
 Sometimes you need to pack several small fields into a single
-integer — say, flags on a packet header or per-pixel data. C's
+integer, say, flags on a packet header or per-pixel data. C's
 *bitfield* syntax lets you declare members in widths smaller than a
 byte.
 
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A row of eight tiny toggle switches: the blue, green, and yellow ones are flipped up while the unused gray ones rest down — bitfields packing single-bit flags into one integer"
+  aria-label="A row of eight tiny toggle switches: the blue, green, and yellow ones are flipped up while the unused gray ones rest down, bitfields packing single-bit flags into one integer"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -544,15 +544,15 @@ int main(void) {
 />
 
 <Callout type="warn" title="Bitfields are not portable for wire formats">
-The order in which bitfields are packed into the underlying integer —
-and the integer's size — is *implementation-defined*. They are great
+The order in which bitfields are packed into the underlying integer,
+and the integer's size, is *implementation-defined*. They are great
 for in-memory flags but a poor choice for cross-platform binary
 formats; use explicit bit masks for those.
 </Callout>
 
 ## Flexible array members
 
-A struct may end with a "flexible array member" — an array of
+A struct may end with a "flexible array member", an array of
 unspecified size that lets you allocate the struct and its data in
 *one* `malloc`.
 
@@ -593,7 +593,7 @@ int main(void) {
   ]}
 />
 
-One allocation, one free, contiguous storage — friendlier to the
+One allocation, one free, contiguous storage, friendlier to the
 allocator and the CPU cache than `Buffer { size_t len; char *data; }`
 where `data` is its own allocation.
 
@@ -650,7 +650,7 @@ int main(void) {
 <ChallengeCard
   adapter="c"
   title="Length of a singly linked list"
-  instructions={`Implement \`size_t list_length(const Node *head)\` that returns the number of nodes in the list. The provided \`main\` builds a 5-node list and prints the length on one line. Do not free the list — \`main\` handles that.`}
+  instructions={`Implement \`size_t list_length(const Node *head)\` that returns the number of nodes in the list. The provided \`main\` builds a 5-node list and prints the length on one line. Do not free the list, \`main\` handles that.`}
   files={[
     {
       filename: "main.c",

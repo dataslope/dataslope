@@ -1,6 +1,6 @@
 ---
 title: Subqueries in Analytics
-description: Scalar, IN, and correlated subqueries — where each fits in analytical work, how they compare to CTEs and joins, and how to choose the clearest tool for the question.
+description: Scalar, IN, and correlated subqueries, where each fits in analytical work, how they compare to CTEs and joins, and how to choose the clearest tool for the question.
 ---
 
 A **subquery** is a query nested inside another. You met them implicitly
@@ -12,7 +12,7 @@ a rule for choosing between a subquery, a CTE, and a join.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="Green dots float above and blue dots below one solid yellow line, while a small side card shows rows collapsing into the single yellow value the line is drawn from — a subquery computes one number and every outer row is measured against it"
+  aria-label="Green dots float above and blue dots below one solid yellow line, while a small side card shows rows collapsing into the single yellow value the line is drawn from, a subquery computes one number and every outer row is measured against it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -57,7 +57,7 @@ query. Let us take them in turn.
 
 ## Scalar subquery: a single value
 
-A scalar subquery returns exactly one row, one column — a single number
+A scalar subquery returns exactly one row, one column, a single number
 you can drop into a `SELECT` or `WHERE`. It is perfect for comparing each
 row to a global summary, like "how does this order compare to the overall
 average?"
@@ -98,13 +98,13 @@ ORDER BY
 />
 
 The inner `(SELECT AVG(amount) FROM orders)` computes one number, reused
-on every row. (A window `AVG(amount) OVER ()` would also work — often the
+on every row. (A window `AVG(amount) OVER ()` would also work, often the
 choice is taste plus clarity.)
 
 ## `IN` subquery: a filter list
 
 An `IN` subquery returns a *column* of values to filter against. It
-answers "keep rows whose key appears in this other set" — e.g. "orders
+answers "keep rows whose key appears in this other set", e.g. "orders
 from customers in the loyalty program."
 
 <SqlCodeBlock
@@ -160,8 +160,8 @@ matching orders. Read it as "orders whose customer is in the gold set."
 ## Correlated subquery: one per outer row
 
 A **correlated** subquery references a column from the outer query, so it
-is conceptually re-evaluated for *each* outer row. It is expressive — "the
-average amount for *this row's* region" — but can be slower, and a window
+is conceptually re-evaluated for *each* outer row. It is expressive, "the
+average amount for *this row's* region", but can be slower, and a window
 function or join is often clearer.
 
 <SqlCodeBlock
@@ -197,14 +197,14 @@ ORDER BY
   o.amount DESC;`}
 />
 
-Notice `WHERE x.region = o.region` — the inner query depends on the outer
+Notice `WHERE x.region = o.region`, the inner query depends on the outer
 row's `region`. This works, but `AVG(amount) OVER (PARTITION BY region)`
 expresses the same idea more directly and usually runs better. Knowing
 *when not to* reach for a correlated subquery is part of the skill.
 
 ## `EXISTS`: does any matching row exist?
 
-`EXISTS` is a correlated subquery that returns true/false — "is there at
+`EXISTS` is a correlated subquery that returns true/false, "is there at
 least one matching row?" It is the natural way to ask "customers who have
 placed *any* order" without caring how many.
 
@@ -251,7 +251,7 @@ making it an efficient "has any" test.
 <svg
   viewBox="0 0 640 160"
   role="img"
-  aria-label="Three customer cards inspected for contents: the two holding yellow order dots earn a solid green lamp above, while the empty card with its dashed placeholder gets a hollow red ring — EXISTS asks only whether a match exists, never how many"
+  aria-label="Three customer cards inspected for contents: the two holding yellow order dots earn a solid green lamp above, while the empty card with its dashed placeholder gets a hollow red ring, EXISTS asks only whether a match exists, never how many"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2">
@@ -301,7 +301,7 @@ reads better.
 
 - A whole table of rows and columns.
   > That is a table subquery; a scalar subquery returns just one value.
-- [o] Exactly one row and one column — a single value usable in \`SELECT\` or \`WHERE\`.
+- [o] Exactly one row and one column, a single value usable in \`SELECT\` or \`WHERE\`.
   > A scalar subquery yields one value, ideal for comparing each row to a global summary.
 - A list of values for an \`IN\` filter.
   > A single-column list is what an \`IN\` subquery returns; a scalar returns one value.
@@ -334,7 +334,7 @@ outer row.`}
 - A correlated subquery re-computing the average per row.
   > It works but is verbose and often slower; a window function expresses the same idea more directly.
 - [o] A window function: \`AVG(amount) OVER (PARTITION BY region)\`.
-  > It attaches the per-region average to each row in one readable expression — the idiomatic analytical choice.
+  > It attaches the per-region average to each row in one readable expression, the idiomatic analytical choice.
 - A \`GROUP BY region\` query.
   > Grouping collapses the orders, so you would lose the individual rows you want to display.
 - An \`IN\` subquery.
@@ -345,5 +345,5 @@ usually the clearest tool.`}
 />
 
 You can now compose analytical queries from clear building blocks. Time to
-put everything together toward the real goal — turning data into business
+put everything together toward the real goal, turning data into business
 insight.

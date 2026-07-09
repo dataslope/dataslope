@@ -58,7 +58,7 @@ export function ImportSqlDumpDialog({
             <span>
               This will replace the current database with the contents of the
               file. Your file will <strong>not</strong> be uploaded or persisted
-              — it is only loaded into browser memory and will be gone on
+, it is only loaded into browser memory and will be gone on
               reload.
             </span>
           </div>
@@ -79,7 +79,7 @@ export function ImportSqlDumpDialog({
           >
             <Upload size={28} className="sql-dropzone-icon" aria-hidden="true" />
             <span>Drop a SQL file here</span>
-            <span className="sql-dropzone-hint">or click to browse — .sql</span>
+            <span className="sql-dropzone-hint">or click to browse, .sql</span>
             <input
               type="file"
               accept=".sql"

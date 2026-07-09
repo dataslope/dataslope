@@ -13,7 +13,7 @@ missing or unknown.
 <svg
   viewBox="0 0 640 210"
   role="img"
-  aria-label="A grid of light blue tiles where most hold a solid colored dot, one tile is present but empty, and one spot has no tile at all — only a dashed outline marks the gap — an empty value is still a value, but NULL is the tile that was never placed"
+  aria-label="A grid of light blue tiles where most hold a solid colored dot, one tile is present but empty, and one spot has no tile at all, only a dashed outline marks the gap, an empty value is still a value, but NULL is the tile that was never placed"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -172,18 +172,18 @@ what `NULL` means.
 
 Think of a `NULL` as a sealed envelope. There may be a number
 inside; you simply cannot see it. Now someone asks: "is the value
-in this envelope equal to 5?" You cannot answer *true* — you have
-not seen it. But you also cannot answer *false* — it might well be
+in this envelope equal to 5?" You cannot answer *true*, you have
+not seen it. But you also cannot answer *false*, it might well be
 5. The only honest answer is *unknown*. SQL gives exactly that
 answer: the comparison evaluates to `NULL`.
 
 The same reasoning explains the strangest-looking fact in SQL:
-`NULL = NULL` is **not** true. Two sealed envelopes — are their
+`NULL = NULL` is **not** true. Two sealed envelopes, are their
 contents equal? Who knows. Unknown again.
 
 Why does this matter in practice? Because `WHERE` keeps only rows
 whose condition is **true**. Rows where the condition is false are
-dropped — and so are rows where it is *unknown*. A condition like
+dropped, and so are rows where it is *unknown*. A condition like
 `phone = NULL` is unknown for every row, so it keeps nothing,
 silently. That is the bug, and that is why SQL provides `IS NULL`
 as a separate test that genuinely answers true or false.
@@ -278,7 +278,7 @@ values.
 <svg
   viewBox="0 0 640 150"
   role="img"
-  aria-label="A scan line hops across four slots: the first two hold only dashed empty rings, the third holds a solid green value where the arrow stops, and the fourth is never reached — COALESCE takes the first value that is not NULL"
+  aria-label="A scan line hops across four slots: the first two hold only dashed empty rings, the third holds a solid green value where the arrow stops, and the fourth is never reached, COALESCE takes the first value that is not NULL"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">

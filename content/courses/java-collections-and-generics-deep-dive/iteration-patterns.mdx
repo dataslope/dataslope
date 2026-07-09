@@ -14,7 +14,7 @@ every week, plus the single most common bug each one introduces.
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Three iteration patterns on cell strips: a green walk sweeps left to right over a thin arrow; a blue strip lifts one element out leaving a dashed gap — the iterator's safe remove; and a bottom walk halts with a red cross where a yellow outsider drops into the strip mid-iteration"
+  aria-label="Three iteration patterns on cell strips: a green walk sweeps left to right over a thin arrow; a blue strip lifts one element out leaving a dashed gap, the iterator's safe remove; and a bottom walk halts with a red cross where a yellow outsider drops into the strip mid-iteration"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -107,7 +107,7 @@ from the collection inside a for-each loop.** Doing so triggers
 ## 2. Explicit Iterator and Iterator.remove()
 
 When you need to remove while iterating, use the explicit `Iterator`
-form so you can call `it.remove()` — the only safe way to mutate
+form so you can call `it.remove()`, the only safe way to mutate
 during iteration:
 
 <CodeBlock
@@ -218,7 +218,7 @@ public class Main {
   ]}
 />
 
-`forEach` does not let you stop early — that's a `for` with a
+`forEach` does not let you stop early, that's a `for` with a
 `break`'s job. And, as with the enhanced for, you cannot modify the
 collection from inside the action.
 
@@ -293,7 +293,7 @@ iterations).
 The exception's name is misleading: it has nothing to do with
 threads. It is raised by `Iterator` when it notices the *structural
 modification count* of the collection changed since the iterator was
-created — i.e. you added or removed something behind its back.
+created, i.e. you added or removed something behind its back.
 
 ```mermaid
 sequenceDiagram
@@ -382,7 +382,7 @@ public final class FeedFilters {
   ]}
 />
 
-Three idioms, same output — and the stream version is the easiest to
+Three idioms, same output, and the stream version is the easiest to
 read in five months' time.
 
 ## Practice

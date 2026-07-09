@@ -3,12 +3,12 @@ title: Classes
 description: Defining your own types with attributes, methods, and dataclasses
 ---
 
-A **class** bundles data and behavior. Every value in Python is an instance of some class — `42` is an `int`, `"hello"` is a `str`, `[1, 2, 3]` is a `list`. Classes let you define your own types to model the problem you're solving.
+A **class** bundles data and behavior. Every value in Python is an instance of some class, `42` is an `int`, `"hello"` is a `str`, `[1, 2, 3]` is a `list`. Classes let you define your own types to model the problem you're solving.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A faint master disc presses three records below it — identical grooves, each finished with a white center label — a class is the master, and every instance is pressed from it"
+  aria-label="A faint master disc presses three records below it, identical grooves, each finished with a white center label, a class is the master, and every instance is pressed from it"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.12">
@@ -45,16 +45,16 @@ A **class** bundles data and behavior. Every value in Python is an instance of s
 
 Classes are how you model **entities** in your domain:
 
-- **Web frameworks** — Django models, Flask views, FastAPI request/response objects
-- **Data pipelines** — Pandas DataFrame methods, SQLAlchemy table definitions
-- **Games** — Player, Enemy, Item, Inventory classes
-- **APIs** — User, Order, Payment, Invoice objects
-- **Configuration** — Settings classes, feature flags, environment wrappers
+- **Web frameworks**, Django models, Flask views, FastAPI request/response objects
+- **Data pipelines**, Pandas DataFrame methods, SQLAlchemy table definitions
+- **Games**, Player, Enemy, Item, Inventory classes
+- **APIs**, User, Order, Payment, Invoice objects
+- **Configuration**, Settings classes, feature flags, environment wrappers
 
 Every major Python library uses classes to organize behavior and state. Understanding classes is essential for reading and writing idiomatic Python.
 
 <Callout type="info" title="Etymology: why 'class'?">
-The word "class" comes from **classification** — the practice of grouping things by shared characteristics. Linnaeus used classes in biological taxonomy (Kingdom, Phylum, **Class**, Order...). In programming, a class is a template for creating objects that share structure and behavior.
+The word "class" comes from **classification**, the practice of grouping things by shared characteristics. Linnaeus used classes in biological taxonomy (Kingdom, Phylum, **Class**, Order...). In programming, a class is a template for creating objects that share structure and behavior.
 </Callout>
 
 ## A minimal class
@@ -83,7 +83,7 @@ print(isinstance(d, Dog))
 
 ## The `__init__` method
 
-`__init__` is the **initializer** (not "constructor" — the object already exists when `__init__` runs). It sets up a new instance.
+`__init__` is the **initializer** (not "constructor", the object already exists when `__init__` runs). It sets up a new instance.
 
 <CodeBlock
   adapter="python"
@@ -122,7 +122,7 @@ flowchart TD
 ```
 
 <Callout type="info" title="What is 'self'?">
-`self` is just a **convention** — the name is not special. The first parameter of an instance method always receives the instance, and by convention we name it `self`. You could call it `this` or `me` or `obj`, but everyone uses `self`, so you should too.
+`self` is just a **convention**, the name is not special. The first parameter of an instance method always receives the instance, and by convention we name it `self`. You could call it `this` or `me` or `obj`, but everyone uses `self`, so you should too.
 </Callout>
 
 ## Instance attributes vs class attributes
@@ -162,7 +162,7 @@ class Bad:
 a = Bad()
 b = Bad()
 a.items.append(1)
-print(b.items)  # [1] — oops!
+print(b.items)  # [1], oops!
 \`\`\`
 
 **Always** initialize mutable per-instance data in \`__init__\`.
@@ -204,7 +204,7 @@ print(d.bark())
   ]}
 />
 
-When you write `d.bark()`, Python translates it to `Dog.bark(d)` — the instance is passed as the first argument.
+When you write `d.bark()`, Python translates it to `Dog.bark(d)`, the instance is passed as the first argument.
 
 <CodeBlock
   adapter="python"
@@ -266,7 +266,7 @@ print(Temperature.is_freezing(-1))
 - `@staticmethod` receives **nothing automatic**. It's just a function that lives in the class namespace for organizational reasons.
 
 <Callout type="tip" title="When to use @classmethod">
-Use `@classmethod` for **alternative constructors** — methods that create instances in different ways. Examples: `dict.fromkeys(...)`, `datetime.fromtimestamp(...)`, `json.loads(...)` (conceptually). The pattern is `@classmethod` returns `cls(...)`.
+Use `@classmethod` for **alternative constructors**, methods that create instances in different ways. Examples: `dict.fromkeys(...)`, `datetime.fromtimestamp(...)`, `json.loads(...)` (conceptually). The pattern is `@classmethod` returns `cls(...)`.
 </Callout>
 
 ## Properties: computed attributes
@@ -437,9 +437,9 @@ If your class is mostly "a bundle of named fields", use `@dataclass`. It's less 
   title="Bank account with deposit and withdraw"
   instructions={`Open \`account.py\` and implement the \`BankAccount\` class with:
 
-- \`__init__(self, owner, balance=0)\` — Store owner and balance.
-- \`deposit(amount)\` — Add to balance, return new balance. Raise \`ValueError\` if amount is negative.
-- \`withdraw(amount)\` — Subtract from balance, return new balance. Raise \`ValueError\` if amount is negative or exceeds balance.
+- \`__init__(self, owner, balance=0)\`, Store owner and balance.
+- \`deposit(amount)\`, Add to balance, return new balance. Raise \`ValueError\` if amount is negative.
+- \`withdraw(amount)\`, Subtract from balance, return new balance. Raise \`ValueError\` if amount is negative or exceeds balance.
 
 \`main.py\` uses your class. Do not edit \`main.py\`.`}
   entryFilename="main.py"
@@ -545,9 +545,9 @@ except ValueError:
 **product.py**: Define \`Product\` with \`__init__(self, name, price)\` and a \`__repr__\`.
 
 **cart.py**: Define \`ShoppingCart\` with:
-- \`__init__(self)\` — Initialize an empty list of items.
-- \`add(product)\` — Append a product.
-- \`total()\` — Return sum of all product prices.
+- \`__init__(self)\`, Initialize an empty list of items.
+- \`add(product)\`, Append a product.
+- \`total()\`, Return sum of all product prices.
 
 \`main.py\` uses both. Do not edit \`main.py\`.`}
   entryFilename="main.py"

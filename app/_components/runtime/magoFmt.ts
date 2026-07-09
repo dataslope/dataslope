@@ -3,7 +3,7 @@
 // only once per page load.
 //
 // The version is pinned to match the installed npm package so the JS
-// and WASM builds always stay in sync — update both together.
+// and WASM builds always stay in sync, update both together.
 const MAGO_FMT_VERSION = "0.10.3";
 
 let magoFmtInitPromise: Promise<{

@@ -1,9 +1,9 @@
 ---
 title: Smoothers and Summaries
-description: Using statistical layers to reveal trends and summaries — geom_smooth, stat_summary, and the idea that a layer can show a computed pattern rather than raw data.
+description: Using statistical layers to reveal trends and summaries, geom_smooth, stat_summary, and the idea that a layer can show a computed pattern rather than raw data.
 ---
 
-Some layers do not show your data at all — they show a **computation
+Some layers do not show your data at all, they show a **computation
 over** your data: a trend line, a group average, a confidence band.
 These statistical layers are how ggplot2 turns a cloud of points into
 an argument.
@@ -11,7 +11,7 @@ an argument.
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="A faint cloud of green points with a bold smooth curve and a translucent confidence band flowing through it — a statistical layer turning points into a trend"
+  aria-label="A faint cloud of green points with a bold smooth curve and a translucent confidence band flowing through it, a statistical layer turning points into a trend"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
@@ -58,7 +58,7 @@ ggplot(mpg, aes(displ, hwy)) +
 
 By default it uses a flexible **loess** curve (for smaller data) that
 bends to follow local structure. The grey ribbon is the **confidence
-interval** — the stat computed it for you.
+interval**, the stat computed it for you.
 
 ## Choosing the model with `method`
 
@@ -86,20 +86,20 @@ ggplot(mpg, aes(displ, hwy)) +
 line + ribbon.**
 
 Switching `method` swaps the *statistic's* model while the *geom*
-(line + ribbon) stays the same — yet another instance of separating
+(line + ribbon) stays the same, yet another instance of separating
 computation from drawing.
 
 <Callout type="warn" title="A smoother is a claim, not a fact">
 A straight `lm` line *assumes* the relationship is linear; a loess
-curve assumes it is locally smooth. Neither is "the truth" — each is a
+curve assumes it is locally smooth. Neither is "the truth", each is a
 model. Always show the raw points alongside a smoother so readers can
 judge whether the model fits.
 </Callout>
 
 ## stat_summary: summarize per group, your way
 
-When you want a custom summary — say, the **mean** of y for each x
-category with error bars — `stat_summary()` computes it on the fly
+When you want a custom summary, say, the **mean** of y for each x
+category with error bars, `stat_summary()` computes it on the fly
 without you pre-aggregating the data:
 
 <CodeBlock
@@ -121,7 +121,7 @@ ggplot(mpg, aes(class, hwy)) +
   ]}
 />
 
-The red dots are *not* in your data — `stat_summary` computed the mean
+The red dots are *not* in your data, `stat_summary` computed the mean
 per class and the `point` geom drew them on top of the raw (jittered)
 values. Notice `geom =` *inside* a stat: confirming again that stats
 and geoms are interchangeable partners.
@@ -183,7 +183,7 @@ layer and the summary layer are just two geoms stacked with `+`.
 - The median of y at each x value.
   > That is closer to a summary stat; \`method = "lm"\` fits a regression line.
 
-\`geom_smooth\` exposes a fitted model plus its uncertainty — a
+\`geom_smooth\` exposes a fitted model plus its uncertainty, a
 computation over the data, not the raw data itself.`}
 />
 
@@ -199,7 +199,7 @@ computation over the data, not the raw data itself.`}
 - Because \`mean\` requires a point geom.
   > The mean could be drawn by other geoms too (e.g. a line or bar); \`point\` is just one choice.
 
-The stat computes the summary and the chosen geom renders it — the same
+The stat computes the summary and the chosen geom renders it, the same
 separable stat/geom relationship seen with bars and histograms.`}
 />
 
@@ -216,7 +216,7 @@ separable stat/geom relationship seen with bars and histograms.`}
   > Showing points does not change the band; it changes what the reader can verify.
 
 A smoother is a claim about the data. Layering it over the raw points
-keeps the graphic honest — easy to do because both are just layers.`}
+keeps the graphic honest, easy to do because both are just layers.`}
 />
 
 ## Key takeaways
@@ -227,5 +227,5 @@ keeps the graphic honest — easy to do because both are just layers.`}
   line) and draws it with a confidence band.
 - `stat_summary()` computes a custom per-group summary (e.g. `mean`) at
   plot time and renders it through a chosen geom.
-- A smoother is a **model**, i.e. a claim — pair it with the raw data
+- A smoother is a **model**, i.e. a claim, pair it with the raw data
   so readers can judge the fit.

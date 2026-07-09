@@ -1,6 +1,6 @@
 ---
 title: Dimensional Modeling
-description: Analytics Engineer interview questions on facts, dimensions, grain, and star schemas — with answers, a concept check, and a runnable mart challenge.
+description: Analytics Engineer interview questions on facts, dimensions, grain, and star schemas, with answers, a concept check, and a runnable mart challenge.
 ---
 
 The Analytics Engineer's craft is turning raw tables into clean,
@@ -10,7 +10,7 @@ well-grained dimensional models. Review the Q&A, then build a mart.
 
 <Figure
   slug="a-risograph-of-a-warehouse"
-  alt="A risograph of a warehouse — a nod to the data warehouse a dimensional model feeds"
+  alt="A risograph of a warehouse, a nod to the data warehouse a dimensional model feeds"
 />
 
 ## Q&A
@@ -39,11 +39,11 @@ declared grain as the signal that you can model dimensionally.
 ### Star vs snowflake?
 
 **Star** keeps dimensions denormalized (one table each) for simple, fast
-joins — the Business Intelligence (BI) default. **Snowflake** normalizes
+joins, the Business Intelligence (BI) default. **Snowflake** normalizes
 dimensions into sub-tables, reducing redundancy at the cost of more joins.
 Prefer star unless a dimension is huge or genuinely shared.
 
-A star schema is exactly that shape — one central fact table surrounded by
+A star schema is exactly that shape, one central fact table surrounded by
 single-table dimensions:
 
 ```mermaid
@@ -57,7 +57,7 @@ The query below is a textbook star-schema read: the central `fact_orders`
 table joins directly to two single-table dimensions (`dim_date` and
 `dim_product`) on their surrogate keys, then sums revenue grouped by the
 descriptive attributes those dimensions provide. Because each dimension is
-one flat table, there are no extra hops — exactly the simplicity that makes
+one flat table, there are no extra hops, exactly the simplicity that makes
 the star the default shape.
 
 <SqlCodeBlock
@@ -118,33 +118,33 @@ FROM stg_customers;
 
 ### How do staging, intermediate, and mart layers differ?
 
-- **Staging** — one model per source table; light cleaning/renaming/typing, no business logic.
-- **Intermediate** — reusable business logic, joins, and reshaping.
-- **Marts** — final, consumable tables (facts + dimensions) for BI.
+- **Staging**, one model per source table; light cleaning/renaming/typing, no business logic.
+- **Intermediate**, reusable business logic, joins, and reshaping.
+- **Marts**, final, consumable tables (facts + dimensions) for BI.
 
 This layering keeps transformations modular, testable, and DRY.
 
 ### What are the three types of fact tables?
 
-- **Transaction fact** — one row per discrete event (order placed, click, payment). The most common type; naturally append-only.
-- **Periodic snapshot** — one row per entity per time period (account balance on the last day of each month). Captures state at regular intervals even when nothing changed.
-- **Accumulating snapshot** — one row per business process instance (one row per order), updated in-place as the instance moves through milestones. Multiple date FKs mark each stage.
+- **Transaction fact**, one row per discrete event (order placed, click, payment). The most common type; naturally append-only.
+- **Periodic snapshot**, one row per entity per time period (account balance on the last day of each month). Captures state at regular intervals even when nothing changed.
+- **Accumulating snapshot**, one row per business process instance (one row per order), updated in-place as the instance moves through milestones. Multiple date FKs mark each stage.
 
 ### What is the difference between additive, semi-additive, and non-additive measures?
 
-**Additive** measures (revenue, quantity) can be summed across all dimensions. **Semi-additive** measures (account balance, inventory level) can be summed across some dimensions (products, stores) but not time — summing balances across months gives a meaningless number. **Non-additive** measures (ratios, percentages, distinct counts) cannot be summed across any dimension and must be recalculated from grain-level rows.
+**Additive** measures (revenue, quantity) can be summed across all dimensions. **Semi-additive** measures (account balance, inventory level) can be summed across some dimensions (products, stores) but not time, summing balances across months gives a meaningless number. **Non-additive** measures (ratios, percentages, distinct counts) cannot be summed across any dimension and must be recalculated from grain-level rows.
 
 ### What is SCD Type 1, and when should you use it?
 
-SCD Type 1 **overwrites** the old attribute value with the new one, preserving no history. Use it when historical accuracy doesn't matter — correcting a typo in a name, for example — or when the business explicitly only cares about the current state.
+SCD Type 1 **overwrites** the old attribute value with the new one, preserving no history. Use it when historical accuracy doesn't matter, correcting a typo in a name, for example, or when the business explicitly only cares about the current state.
 
 ### What is SCD Type 2, and how is it implemented?
 
 SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
 
 The runnable example below makes this tangible. The `initSql` setup seeds a
-`dim_customer` in which customer 42 has **two** versions — an `East` row
-valid through 2023-06-14 and a `West` row valid afterward — and the comment
+`dim_customer` in which customer 42 has **two** versions, an `East` row
+valid through 2023-06-14 and a `West` row valid afterward, and the comment
 header above it shows that row layout at a glance. The query then joins
 each order to the version that was current on its `order_date`, using the
 predicate `f.order_date BETWEEN c.valid_from AND c.valid_to`. The output
@@ -181,8 +181,8 @@ JOIN dim_customer c
 ORDER BY f.order_id;`}
 />
 
-When you instead want only the **current** state of each customer — not the
-full history — you filter on the `is_current` flag, which is `TRUE` for
+When you instead want only the **current** state of each customer, not the
+full history, you filter on the `is_current` flag, which is `TRUE` for
 exactly one row per entity. That turns the versioned dimension back into a
 simple "latest value" lookup:
 
@@ -206,7 +206,7 @@ SCD Type 3 adds a **second column** to track the previous value (e.g., `region` 
 
 ### What is SCD Type 0?
 
-SCD Type 0 means the attribute **never changes** — the original value is kept forever and no update mechanism exists. Natural keys, date-of-birth, or original channel attribution are typical examples.
+SCD Type 0 means the attribute **never changes**, the original value is kept forever and no update mechanism exists. Natural keys, date-of-birth, or original channel attribution are typical examples.
 
 ### What is a conformed dimension?
 
@@ -214,15 +214,15 @@ A conformed dimension is shared across **multiple fact tables or subject areas**
 
 ### What is a degenerate dimension?
 
-A degenerate dimension is a dimensional attribute stored directly in the fact table rather than in a separate dimension table, because it has no descriptive attributes of its own. An order number or invoice number is the canonical example — it provides grouping ability but carries no extra columns worth their own table.
+A degenerate dimension is a dimensional attribute stored directly in the fact table rather than in a separate dimension table, because it has no descriptive attributes of its own. An order number or invoice number is the canonical example, it provides grouping ability but carries no extra columns worth their own table.
 
-The query below groups by `order_number` straight off the fact table — there is no `dim_order` to join — showing how a degenerate dimension still supports grouping even though it lives on the fact:
+The query below groups by `order_number` straight off the fact table, there is no `dim_order` to join, showing how a degenerate dimension still supports grouping even though it lives on the fact:
 
 ```sql
 -- order_number lives in the fact table (degenerate dimension)
 -- No separate dim_order table exists
 SELECT
-    order_number,               -- degenerate dimension — grouping only
+    order_number,               -- degenerate dimension, grouping only
     SUM(line_amount) AS total
 FROM fact_order_lines
 GROUP BY order_number;
@@ -269,13 +269,13 @@ A junk dimension bundles **miscellaneous low-cardinality flags and indicators** 
 
 ### What is a factless fact table?
 
-A factless fact table records **events or coverage** with no numeric measure — just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
+A factless fact table records **events or coverage** with no numeric measure, just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
 
-Because there is no measure to sum, you answer questions by **counting rows**. The query below counts how many distinct products were on promotion in one store over a week — the kind of coverage question a factless fact exists to answer:
+Because there is no measure to sum, you answer questions by **counting rows**. The query below counts how many distinct products were on promotion in one store over a week, the kind of coverage question a factless fact exists to answer:
 
 ```sql
 -- Factless fact: which products were on promotion per store per day
--- fact_promotion_coverage(date_sk, store_sk, product_sk) — no measures
+-- fact_promotion_coverage(date_sk, store_sk, product_sk), no measures
 
 -- "How many distinct products were promoted in store 5 last week?"
 SELECT COUNT(*) AS promoted_products
@@ -328,7 +328,7 @@ ORDER BY f.order_id, p.promotion_name;`}
 
 ### What is normalization in 3NF, and why does dimensional modeling deliberately avoid it for dimensions?
 
-Third Normal Form (3NF) eliminates all non-key dependencies and redundancy to optimize for write performance and consistency. Dimensional modeling denormalizes dimensions intentionally — collapsing hierarchies into one wide table — to minimize joins, simplify BI tool queries, and improve query readability at the cost of some redundancy.
+Third Normal Form (3NF) eliminates all non-key dependencies and redundancy to optimize for write performance and consistency. Dimensional modeling denormalizes dimensions intentionally, collapsing hierarchies into one wide table, to minimize joins, simplify BI tool queries, and improve query readability at the cost of some redundancy.
 
 ### What is a wide (one-big-table) approach, and when is it appropriate?
 
@@ -348,7 +348,7 @@ A mini-dimension extracts **rapidly changing attributes** from a large dimension
 
 ### How would you model a many-to-many relationship between customers and accounts in a bank data warehouse?
 
-Use a **bridge table** — `bridge_customer_account(account_sk, customer_sk, ownership_pct)` — between `dim_customer` and `fact_account_balance`. Each account can belong to multiple customers and vice versa. The optional weighting column allows metrics to be allocated proportionally across co-owners.
+Use a **bridge table**, `bridge_customer_account(account_sk, customer_sk, ownership_pct)`, between `dim_customer` and `fact_account_balance`. Each account can belong to multiple customers and vice versa. The optional weighting column allows metrics to be allocated proportionally across co-owners.
 
 ### What is the purpose of a date dimension, and what columns does it typically include?
 
@@ -356,7 +356,7 @@ Use a **bridge table** — `bridge_customer_account(account_sk, customer_sk, own
 
 ### When would you choose a periodic snapshot over a transaction fact?
 
-Choose a periodic snapshot when you need to **track status at regular intervals** regardless of whether a transaction occurred. Bank account balances, inventory levels, and subscription statuses are classic cases — you need the value at month-end even if no transaction happened that month. The transaction fact tells you what changed; the periodic snapshot tells you what the state was.
+Choose a periodic snapshot when you need to **track status at regular intervals** regardless of whether a transaction occurred. Bank account balances, inventory levels, and subscription statuses are classic cases, you need the value at month-end even if no transaction happened that month. The transaction fact tells you what changed; the periodic snapshot tells you what the state was.
 
 ### What does "drilling across" mean in dimensional modeling?
 
@@ -368,7 +368,7 @@ Measures in fact tables are generally fixed at event time and should not change.
 
 ### What are the trade-offs of using a hash surrogate key vs. a sequence integer?
 
-**Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic — you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
+**Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic, you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
 
 The two queries below contrast the approaches: the first hashes the natural key (computable anywhere, no central counter), while the second assigns a sequential integer with `row_number()` (compact and human-readable, but dependent on a single ordering pass):
 
@@ -389,7 +389,7 @@ FROM stg_customers;
 
 ### Why should you avoid storing percentages or ratios directly in fact tables?
 
-Percentages and ratios are **non-additive** — summing a margin percentage across orders gives a meaningless number. Instead, store the additive components (gross_revenue, cost_of_goods_sold) and let the BI layer or mart compute the ratio. This preserves flexibility and correctness across any grouping.
+Percentages and ratios are **non-additive**, summing a margin percentage across orders gives a meaningless number. Instead, store the additive components (gross_revenue, cost_of_goods_sold) and let the BI layer or mart compute the ratio. This preserves flexibility and correctness across any grouping.
 
 ### What is the difference between a confirmed vs. a conformed dimension?
 
@@ -407,7 +407,7 @@ This is a vocabulary check: the correct term is **conformed** dimension (consist
 - One row per product.
   > Products are rolled up into categories here, so product isn't the grain.
 - Grain doesn't apply to aggregated tables.
-  > Every table has a grain — defining it (here, per category) is the first modeling step.`}
+  > Every table has a grain, defining it (here, per category) is the first modeling step.`}
 />
 
 ## Challenges

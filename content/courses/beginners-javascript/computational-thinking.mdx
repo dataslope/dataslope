@@ -1,6 +1,6 @@
 ---
 title: Computational Thinking
-description: The mental moves — decomposition, pattern matching, abstraction, and algorithms — that separate "knowing syntax" from "solving problems with code".
+description: The mental moves, decomposition, pattern matching, abstraction, and algorithms, that separate "knowing syntax" from "solving problems with code".
 ---
 
 Programming is not the same as *coding*. Coding is typing the right
@@ -15,7 +15,7 @@ practice them on small JavaScript problems.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A single large square breaking apart into four smaller colored squares and then into small dots — a big problem decomposed into solvable pieces"
+  aria-label="A single large square breaking apart into four smaller colored squares and then into small dots, a big problem decomposed into solvable pieces"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <polygon points="282,85 282,125 318,105" fill="currentColor" opacity="0.25" />
@@ -52,7 +52,7 @@ code, you have to break it apart:
 - How is the bill given to the program? A single number? A list of
   items per person?
 - How is the tip calculated? A fixed percentage? Adjustable?
-- How do we round it — to the nearest cent? The nearest dollar?
+- How do we round it, to the nearest cent? The nearest dollar?
 - Do we output a single number per person, or a detailed
   breakdown?
 
@@ -112,7 +112,7 @@ one small piece of this I can solve right now?*
 
 Once you've written `splitEvenly(total, people)` above, the next
 time you face "divide one quantity equally among N consumers", you
-will recognise it. You will not redesign from scratch — you will
+will recognise it. You will not redesign from scratch, you will
 think *"oh, this is the same shape"*.
 
 Patterns can be very small ("looping over a list and summing") or
@@ -120,8 +120,8 @@ very large ("client/server communication"). Programmers build a
 library of patterns in their heads over time. A lot of "experience"
 is exactly this: more patterns recognised, more quickly.
 
-Here is one of the most fundamental patterns in all of programming
-— **accumulating a result over a list**:
+Here is one of the most fundamental patterns in all of programming,
+**accumulating a result over a list**:
 
 <CodeBlock
   adapter="javascript"
@@ -186,7 +186,7 @@ meaning every time.
 Compare:
 
 ```javascript
-// No abstraction — what is this even doing?
+// No abstraction, what is this even doing?
 const t = b + b * r;
 const p = t / n;
 ```
@@ -194,14 +194,14 @@ const p = t / n;
 …with:
 
 ```javascript
-// With abstraction — the meaning is in the names.
+// With abstraction, the meaning is in the names.
 const tipRate = 0.18;
 const total = bill + bill * tipRate;
 const perPerson = total / people;
 ```
 
 Both pieces of code do the same thing. One is readable; one is a
-small puzzle. The difference is purely *abstraction* — choosing
+small puzzle. The difference is purely *abstraction*, choosing
 good names and grouping related steps.
 
 We can abstract *further* by giving the steps themselves names:
@@ -234,8 +234,8 @@ console.log("Each person pays:", share.toFixed(2));
 />
 
 Notice how the bottom block reads almost like English: *total with
-tip, per person, log it*. The numerical details — the
-multiplication, the division — are hidden inside the functions,
+tip, per person, log it*. The numerical details, the
+multiplication, the division, are hidden inside the functions,
 where they belong.
 
 ## 4. Algorithmic thinking
@@ -250,7 +250,7 @@ outputs.
 You use algorithms all day without naming them. "How do I make
 coffee?" is an algorithm. "How do I get from home to work?" is an
 algorithm. The skill in programming is making them precise enough
-that a computer — which has zero common sense — can follow them.
+that a computer, which has zero common sense, can follow them.
 
 Suppose I ask you to write a function `isPrime(n)` that returns
 `true` if `n` is a prime number and `false` otherwise. Before
@@ -305,19 +305,19 @@ moves. The problem:
 > average, the highest, the lowest, and how many students passed
 > (60 or above).*
 
-**Decomposition** — what are the sub-problems?
+**Decomposition**, what are the sub-problems?
 
 - Compute the average.
 - Find the highest.
 - Find the lowest.
 - Count passes.
 
-**Pattern matching** — three of those (average, max, min) are
+**Pattern matching**, three of those (average, max, min) are
 instances of the "accumulator over a list" pattern. Count is too.
 
-**Abstraction** — give each sub-problem a name.
+**Abstraction**, give each sub-problem a name.
 
-**Algorithm** — the steps for each are clear; we already know them.
+**Algorithm**, the steps for each are clear; we already know them.
 
 <CodeBlock
   adapter="javascript"
@@ -440,13 +440,13 @@ console.log(countWords("   spaced   out   "));
 <MultipleChoice
   markdown={`Which of the four computational-thinking moves is most directly responsible for turning a vague task like "split a restaurant bill fairly" into something you can actually code?
 
-- [o] Decomposition — breaking the big task into small, well-defined sub-problems
+- [o] Decomposition, breaking the big task into small, well-defined sub-problems
   > The first move on any unfamiliar problem is almost always decomposition: turning a fuzzy goal into a list of concrete questions you can each answer with a few lines of code.
-- Pattern matching — noticing that this looks like a previous problem
-  > Pattern matching is useful once you're already working on a sub-problem, but it can't identify what those sub-problems are in the first place — you need decomposition first.
-- Abstraction — hiding details behind names
+- Pattern matching, noticing that this looks like a previous problem
+  > Pattern matching is useful once you're already working on a sub-problem, but it can't identify what those sub-problems are in the first place, you need decomposition first.
+- Abstraction, hiding details behind names
   > Abstraction helps manage complexity once sub-problems are identified, but the initial step of recognising *what* those sub-problems are is decomposition.
-- Algorithmic thinking — writing precise step-by-step recipes
+- Algorithmic thinking, writing precise step-by-step recipes
   > Algorithmic thinking comes after you know what each piece must do; it describes how to express a solution, not how to discover what to solve.
 
 All four moves are needed eventually, but decomposition is what gets you off the starting line.`}

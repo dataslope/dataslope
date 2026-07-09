@@ -1,9 +1,9 @@
 /**
- * Cloud-saved workspaces — list endpoint.
+ * Cloud-saved workspaces, list endpoint.
  *
  * GET /api/workspaces → { workspaces: CloudWorkspaceMeta[], usage: CloudUsage }
  *
- * Signed-in users only (cloud saves require an account; sharing does not —
+ * Signed-in users only (cloud saves require an account; sharing does not,
  * see /api/shares). Retention is evaluated at read time: rows the policy
  * says are expired are never returned and are purged in the background
  * (lib/workspaces/server.ts loadLiveUserState).

@@ -1,6 +1,6 @@
 ---
 title: Next Steps
-description: You've finished the course. Here's a curated map of where to go next — packages to learn, books to read, and habits that will keep you growing as a data analyst.
+description: You've finished the course. Here's a curated map of where to go next, packages to learn, books to read, and habits that will keep you growing as a data analyst.
 ---
 
 You started this course knowing little or no programming. You
@@ -11,7 +11,7 @@ now know how to:
   summarizing, and visualizing data.
 - Reason about uncertainty, sampling, and statistical inference
   honestly.
-- Organize a project so anyone — including future-you — can
+- Organize a project so anyone, including future-you, can
   reproduce it.
 
 That is genuinely a lot. Real, hire-able analyst skills. But of
@@ -21,7 +21,7 @@ to explore next, organized by goal.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A solid green dot fans out along thin gray lines into three colored waypoints — blue, green, and yellow — each continuing onward as a solid gray arrow — the course ends where several roads begin"
+  aria-label="A solid green dot fans out along thin gray lines into three colored waypoints, blue, green, and yellow, each continuing onward as a solid gray arrow, the course ends where several roads begin"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
@@ -68,12 +68,12 @@ The rest of this page expands on each.
 You've met `dplyr`, `tidyr`, and `ggplot2`. The full
 [**tidyverse**](https://www.tidyverse.org/) extends them with:
 
-- **`readr`** — fast, sane CSV/TSV reading (`read_csv()`).
-- **`tibble`** — better-behaved data frames.
-- **`stringr`** — consistent string functions.
-- **`forcats`** — working with categorical variables (factors).
-- **`lubridate`** — dates and times that don't fight you.
-- **`purrr`** — functional programming over lists and data
+- **`readr`**, fast, sane CSV/TSV reading (`read_csv()`).
+- **`tibble`**, better-behaved data frames.
+- **`stringr`**, consistent string functions.
+- **`forcats`**, working with categorical variables (factors).
+- **`lubridate`**, dates and times that don't fight you.
+- **`purrr`**, functional programming over lists and data
   frames (a more powerful, consistent alternative to `lapply`
   family).
 
@@ -86,11 +86,11 @@ after this course.
 
 You've met `cor()`, `lm()`, and `t.test()`. Next:
 
-- **`broom`** — turns model outputs into tidy data frames (so
+- **`broom`**, turns model outputs into tidy data frames (so
   you can pipe them into dplyr/ggplot).
-- **`glm()`** — generalized linear models: logistic regression,
+- **`glm()`**, generalized linear models: logistic regression,
   Poisson regression, etc.
-- **`tidymodels`** — a modern, consistent framework for fitting
+- **`tidymodels`**, a modern, consistent framework for fitting
   many model types: recipes for preprocessing, parsnip for
   model specification, workflows to glue it together, yardstick
   for evaluation.
@@ -105,7 +105,7 @@ ggplot2 has *enormous* depth. Things to explore:
 - Faceting (`facet_wrap`, `facet_grid`) for small-multiples
   plots.
 - Custom themes and color scales (e.g. `scale_color_viridis_c`).
-- `patchwork` — combine multiple ggplots side by side.
+- `patchwork`, combine multiple ggplots side by side.
 - Interactive plots with **`plotly`** or **`ggiraph`**.
 - The book **["ggplot2: Elegant Graphics for Data Analysis"](https://ggplot2-book.org/)**
   by Hadley Wickham, Danielle Navarro, and Thomas Pedersen.
@@ -115,9 +115,9 @@ ggplot2 has *enormous* depth. Things to explore:
 Analysis you can't share is analysis that doesn't matter. Pick
 *one* of these and learn it well:
 
-- **R Markdown** — the original "code + prose + outputs"
+- **R Markdown**, the original "code + prose + outputs"
   document format.
-- **Quarto** — R Markdown's modern successor. Works with R,
+- **Quarto**, R Markdown's modern successor. Works with R,
   Python, Julia, and others. Renders to HTML, PDF, Word, slides,
   websites, books.
 
@@ -125,14 +125,14 @@ Quarto is the better long-term bet. Read **["Quarto Guide"](https://quarto.org/d
 
 ## 5. Reproducibility and workflow tools
 
-- **git + GitHub** — version control your projects. Read
+- **git + GitHub**, version control your projects. Read
   **["Happy Git with R"](https://happygitwithr.com/)** by
   Jenny Bryan.
-- **`renv`** — pin package versions per project (you met this
+- **`renv`**, pin package versions per project (you met this
   briefly).
-- **`testthat`** — unit-test your functions. As soon as you have
+- **`testthat`**, unit-test your functions. As soon as you have
   a `R/` folder with helpers, you'll want tests.
-- **`targets`** — turn your pipeline into a dependency graph
+- **`targets`**, turn your pipeline into a dependency graph
   that re-runs only the steps that changed. Excellent once your
   analyses get bigger.
 
@@ -141,33 +141,33 @@ Quarto is the better long-term bet. Read **["Quarto Guide"](https://quarto.org/d
 R has world-class libraries in many specialized areas. Pick one
 that excites *you*:
 
-- **Time series / forecasting** — `forecast`, `fable`, `tsibble`.
-- **Geospatial** — `sf`, `terra`, `tmap`, `leaflet`.
-- **Text** — `tidytext`, `stringr`, `quanteda`.
-- **Bayesian modeling** — `brms`, `rstan`, `cmdstanr`.
-- **Machine learning** — `tidymodels`, `mlr3`, `xgboost`.
-- **Bioinformatics** — Bioconductor packages.
+- **Time series / forecasting**, `forecast`, `fable`, `tsibble`.
+- **Geospatial**, `sf`, `terra`, `tmap`, `leaflet`.
+- **Text**, `tidytext`, `stringr`, `quanteda`.
+- **Bayesian modeling**, `brms`, `rstan`, `cmdstanr`.
+- **Machine learning**, `tidymodels`, `mlr3`, `xgboost`.
+- **Bioinformatics**, Bioconductor packages.
 
 Pick *one*. Build a real little project in it. That depth will
 serve you far better than surface-level exposure to all of
 them.
 
-## 7. Practice — with real, messy data
+## 7. Practice, with real, messy data
 
 Books and courses give you clean data. The world doesn't. To
 *actually* improve, you need to wrestle with messy datasets.
 Sources:
 
-- [**Tidy Tuesday**](https://github.com/rfordatascience/tidytuesday) —
+- [**Tidy Tuesday**](https://github.com/rfordatascience/tidytuesday),
   weekly dataset + community of people doing analyses you can
   learn from. Probably the single best practice resource for R
   analysts.
-- [**Kaggle**](https://www.kaggle.com/) — datasets and competitions
+- [**Kaggle**](https://www.kaggle.com/), datasets and competitions
   (though many are too clean to teach you cleaning).
 - Public open data: city budgets, government open-data portals,
   WHO, World Bank, FiveThirtyEight.
 - **Your own life**: download your Spotify history, your
-  bank statement, your fitness tracker data — anything you're
+  bank statement, your fitness tracker data, anything you're
   curious about.
 
 A single substantial project on real data you care about teaches
@@ -175,7 +175,7 @@ more than 10 tutorials.
 
 ## 8. Habits worth keeping
 
-You've already started a few of these — keep at them:
+You've already started a few of these, keep at them:
 
 - **Always inspect new data before analyzing.** `dim`, `head`,
   `str`, `summary`, then a plot.
@@ -191,25 +191,25 @@ You've already started a few of these — keep at them:
 
 ## 9. Cultivate statistical taste
 
-Programming skill grows with practice. Statistical taste —
+Programming skill grows with practice. Statistical taste,
 knowing what's a real finding vs. an artifact, what's worth
-reporting, when to be suspicious — grows from reading good
+reporting, when to be suspicious, grows from reading good
 analyses (and bad ones) and from talking to people who think
 clearly about data. Some excellent free reads:
 
-- *"Statistical Rethinking"* by Richard McElreath — a
+- *"Statistical Rethinking"* by Richard McElreath, a
   beautifully-written Bayesian-flavored intro that builds
   intuition from the ground up.
 - *"Statistical Inference via Data Science: A ModernDive into R
-  and the Tidyverse"* — gentle modern intro, free online.
-- Andrew Gelman's blog (statmodeling.stat.columbia.edu) — long
+  and the Tidyverse"*, gentle modern intro, free online.
+- Andrew Gelman's blog (statmodeling.stat.columbia.edu), long
   treatment of common statistical mistakes, often in plain
   English.
 
 ## 10. One last thing: don't rush
 
-You learned a lot in this course. It's normal — actually
-expected — to forget half of it within a month. The
+You learned a lot in this course. It's normal, actually
+expected, to forget half of it within a month. The
 half-life of programming knowledge is short until you use it.
 
 Pick a small project this week. Open RStudio (or your editor of
@@ -240,7 +240,7 @@ That loop is the entire job. Welcome to it.
   > Function arguments can always be looked up; the harder and more lasting skill is knowing what question to ask and how to interpret the answer.
 - Writing the shortest possible code.
   > Code brevity is a minor virtue at best; clarity, correctness, and honest interpretation matter far more.
-- [o] Asking good questions of data, exploring honestly, and communicating findings clearly — the technical skills exist to serve those.
+- [o] Asking good questions of data, exploring honestly, and communicating findings clearly, the technical skills exist to serve those.
   > Tools change. Statistical and analytical thinking endures.
 - Avoiding loops.
   > Vectorization is idiomatic R, but knowing when and why to use it is a detail of craft, not the most important skill an analyst develops.
@@ -251,8 +251,8 @@ That loop is the entire job. Welcome to it.
   markdown={`Which of these is the best next step right after this course?
 
 - Memorize the dplyr cheat sheet.
-  > Cheat sheets are useful references, not the goal — memorizing function names without applying them to real questions will not advance your skills.
-- [o] Pick a real dataset you care about and complete a small end-to-end analysis — load, clean, explore, summarize, visualize, write up.
+  > Cheat sheets are useful references, not the goal, memorizing function names without applying them to real questions will not advance your skills.
+- [o] Pick a real dataset you care about and complete a small end-to-end analysis, load, clean, explore, summarize, visualize, write up.
   > Knowledge sticks when you use it on something that matters to you.
 - Learn five new languages.
   > Depth in one language and one analytical workflow produces more growth than shallow exposure to many tools simultaneously.
@@ -268,7 +268,7 @@ That loop is the entire job. Welcome to it.
   > Forgetting individual function names is normal and does not mean your foundational understanding is lost; looking things up is a skill, not a failure.
 - Memorize harder.
   > Trying to memorize every detail is both ineffective and unnecessary; fluency comes from knowing what to search for and how to read documentation.
-- [o] Look it up — \`?function_name\`, the docs, a search — and move on. Looking things up is the work.
+- [o] Look it up, \`?function_name\`, the docs, a search, and move on. Looking things up is the work.
   > Even very experienced R users look things up constantly.
 - Switch tools.
   > Forgetting a function name is not a signal that you chose the wrong tool; every language requires ongoing reference to documentation.

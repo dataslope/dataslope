@@ -3,9 +3,9 @@ title: Variables
 description: Names, assignment, and Python's dynamic typing
 ---
 
-In Python, a **variable** is a name that references an object in memory. There's no `let`, `var`, or type declaration—assignment with `=` creates the binding. This simplicity is powerful, but it comes with subtleties you need to understand to avoid surprises.
+In Python, a **variable** is a name that references an object in memory. There's no `let`, `var`, or type declaration-assignment with `=` creates the binding. This simplicity is powerful, but it comes with subtleties you need to understand to avoid surprises.
 
-Every snippet on this page runs in your browser—no setup required.
+Every snippet on this page runs in your browser-no setup required.
 
 <CodeBlock
   adapter="python"
@@ -25,7 +25,7 @@ print(name, "is", age, "years old. Pi is approximately", pi)
 <svg
   viewBox="0 0 640 200"
   role="img"
-  aria-label="Three yellow name tags hang by thin lines above two solid values, and two of the tags are tied to the same blue circle — Python variables are labels attached to values, not boxes that contain them"
+  aria-label="Three yellow name tags hang by thin lines above two solid values, and two of the tags are tied to the same blue circle, Python variables are labels attached to values, not boxes that contain them"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
@@ -52,7 +52,7 @@ Variables are the foundation of every program. In a web app, you might have `use
 
 ## Names are labels, not boxes
 
-**This is the most important mental model for Python.** Variables are not containers that hold values—they're *labels* that point to objects in memory.
+**This is the most important mental model for Python.** Variables are not containers that hold values-they're *labels* that point to objects in memory.
 
 ```mermaid
 graph LR
@@ -174,7 +174,7 @@ user_id: int = 123
 name: str = "Ada"
 ```
 
-These don't affect runtime behavior, but tools like `mypy` can check your code for type errors before you run it. In production codebases, type annotations are increasingly the norm—they catch bugs early and make code easier to understand.
+These don't affect runtime behavior, but tools like `mypy` can check your code for type errors before you run it. In production codebases, type annotations are increasingly the norm-they catch bugs early and make code easier to understand.
 </Callout>
 
 ## Naming rules and conventions
@@ -212,7 +212,7 @@ print("Reserved keywords:", keyword.kwlist)
 | Private (by convention) | leading `_` | `_internal_cache` |
 
 <Callout type="info" title="Why PEP 8?">
-Consistency makes code easier to read. When every Python project uses `snake_case` for functions and `PascalCase` for classes, you can glance at `HttpClient()` and know it's a class, or at `fetch_data()` and know it's a function—without reading the definition.
+Consistency makes code easier to read. When every Python project uses `snake_case` for functions and `PascalCase` for classes, you can glance at `HttpClient()` and know it's a class, or at `fetch_data()` and know it's a function-without reading the definition.
 </Callout>
 
 ## Multiple assignment patterns
@@ -382,7 +382,7 @@ print(nums)
 - [o] \`[1, 2, 3, 4]\`
   > \`nums\` and \`also_nums\` are two names for the same list. Mutating through one name is visible through the other.
 - A \`NameError\`
-  > No error—\`nums\` is defined before \`also_nums\` references it.
+  > No error, \`nums\` is defined before \`also_nums\` references it.
 - \`[4]\`
   > \`append\` adds to the list; it doesn't replace it.`}
 />
@@ -416,7 +416,7 @@ y = y + [30]
 - \`[10, 20, 30]\`
   > That's the value of \`y\` after the reassignment, not \`x\`.
 - An error
-  > No error—concatenating lists with \`+\` is perfectly legal.`}
+  > No error-concatenating lists with \`+\` is perfectly legal.`}
 />
 
 Next: a tour of Python's built-in data types.

@@ -1,13 +1,13 @@
 // Lints <MultipleChoice> blocks in content/courses + content/fumadocs-dev for the rules that keep
 // every question answerable, non-contradictory, and neutrally worded:
 //
-//   1. no-correct          — every question must mark exactly one `- [o]`
+//   1. no-correct, every question must mark exactly one `- [o]`
 //                            answer; a question with none is unwinnable.
-//   2. multiple-correct    — the component is single-answer, so a question
+//   2. multiple-correct, the component is single-answer, so a question
 //                            may not mark more than one `- [o]` choice.
-//   3. too-few-choices     — a question needs at least 2 choices.
-//   4. duplicate-choice    — no two choices may be verbatim identical.
-//   5. affirmative-opener  — a choice explanation may not start with an
+//   3. too-few-choices, a question needs at least 2 choices.
+//   4. duplicate-choice, no two choices may be verbatim identical.
+//   5. affirmative-opener, a choice explanation may not start with an
 //                            affirmation ("Yes.", "Right!", "Exactly,",
 //                            "This works"…). Explanations render for ALL
 //                            choices after submit, so a learner who picked a
@@ -99,7 +99,7 @@ export function isSelectFalse(body) {
 }
 
 // Rewrite an affirmative opener to a neutral statement, or return null if the
-// explanation needs no change (or can't be mechanically fixed — e.g. it is
+// explanation needs no change (or can't be mechanically fixed, e.g. it is
 // ONLY the affirmation, or a True/False label in a select-the-false question).
 export function rewriteOpener(content, { selectFalse = false } = {}) {
   const m = content.match(AFFIRM);
@@ -107,7 +107,7 @@ export function rewriteOpener(content, { selectFalse = false } = {}) {
   const word = m[1].toLowerCase();
   if (word === "true" || word === "false") return null; // leave truth-value labels alone
   let rest = content.slice(m[0].length).replace(/^\s+/, "");
-  if (!rest) return null; // explanation was only the affirmation — needs a human
+  if (!rest) return null; // explanation was only the affirmation, needs a human
   rest = rest.replace(/^([a-z])/, (c) => c.toUpperCase());
   return rest;
 }
@@ -121,16 +121,16 @@ export function lintSource(src, file) {
     const stem = (body.split("\n").find((l) => l.trim()) || "").trim().slice(0, 70);
     const add = (rule, detail) => violations.push({ file, rule, detail });
 
-    if (choices.length < 2) add("too-few-choices", `${choices.length} choice(s) — ${stem}`);
+    if (choices.length < 2) add("too-few-choices", `${choices.length} choice(s), ${stem}`);
     const correctCount = choices.filter((c) => c.correct).length;
     if (correctCount === 0) add("no-correct", stem);
-    else if (correctCount > 1) add("multiple-correct", `${correctCount} correct — ${stem}`);
+    else if (correctCount > 1) add("multiple-correct", `${correctCount} correct, ${stem}`);
 
     const seen = new Set();
     for (const c of choices) {
       const key = c.text.replace(/\s+/g, " ").trim();
       if (!key || /^(`{3,}|~{3,})/.test(key)) continue;
-      if (seen.has(key)) add("duplicate-choice", `"${c.text.slice(0, 48)}" — ${stem}`);
+      if (seen.has(key)) add("duplicate-choice", `"${c.text.slice(0, 48)}", ${stem}`);
       seen.add(key);
     }
 
@@ -141,7 +141,7 @@ export function lintSource(src, file) {
       if (!m) continue;
       const word = m[1].toLowerCase();
       if ((word === "true" || word === "false") && selectFalse) continue; // allowlisted
-      add("affirmative-opener", `"${ex.slice(0, 56)}" — ${stem}`);
+      add("affirmative-opener", `"${ex.slice(0, 56)}", ${stem}`);
     }
   }
   return violations;

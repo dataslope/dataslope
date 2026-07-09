@@ -13,7 +13,7 @@ import { useIsFramed } from "../../useIsFramed";
 
 /**
  * Shared "Dataslope" brand logo + playground switcher rendered in the
- * top-left of every playground's header. The logo is icon-only — the
+ * top-left of every playground's header. The logo is icon-only, the
  * "Dataslope" wordmark is deliberately omitted to keep the header compact.
  *
  * Extracted so that all three SQL playgrounds (and ideally other

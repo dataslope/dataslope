@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * `ChallengeCard` — an executable coding-challenge embeddable for the
+ * `ChallengeCard`, an executable coding-challenge embeddable for the
  * `/learn` pages. Visually matches the "Python Challenge" design from
  * the handoff bundle, but is intentionally language-agnostic so the
  * same component will host upcoming R and TypeScript challenges.
@@ -109,11 +109,11 @@ import {
 } from "./challengeHarness";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
 // Global keyframes for the run overlay (shared with CodeBlock and the
-// playgrounds) — the module CSS references them by their global names.
+// playgrounds), the module CSS references them by their global names.
 import "./runOverlayAnimations.css";
 import styles from "./ChallengeCard.module.css";
 // Boot-notice styles are shared with `<CodeBlock>` (which already
-// shares this card's styles for its chrome — the reuse runs both ways).
+// shares this card's styles for its chrome, the reuse runs both ways).
 import codeBlockStyles from "./CodeBlock.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
@@ -154,7 +154,7 @@ export interface ChallengeFile {
 /** Imperative driver exposed on `window.__dsChallenges[adapter::title]`
  *  so the Playwright solution sweep can load a card's reference
  *  solution and trigger the test run without driving every keystroke
- *  through the DOM. Production code must not depend on this — it is
+ *  through the DOM. Production code must not depend on this, it is
  *  a test surface and may change shape across releases. */
 export interface ChallengeTestHandle {
   adapterId: string;
@@ -183,7 +183,7 @@ interface SolutionFile {
    *  from one they should edit. */
   hasSolution: boolean;
   /** True when the displayed solution is byte-for-byte identical to the
-   *  file's `starterCode` — either because the file supplied no
+   *  file's `starterCode`, either because the file supplied no
    *  `solutionCode` (scaffold) or because its `solutionCode` matches the
    *  starter. In a multi-file workspace the modal surfaces a subtle note
    *  for these files so the learner knows the tab needs no edits. */
@@ -205,7 +205,7 @@ export interface ChallengeCardProps {
   /** Workspace files. Every challenge supplies at least one file; each
    *  file carries its own `initCode` (read-only setup), `starterCode`
    *  (the editable starter), and optional `solutionCode`. With more than
-   *  one file — or with `showFileTabBar` — a non-sortable, non-closeable
+   *  one file, or with `showFileTabBar`, a non-sortable, non-closeable
    *  tab bar appears above the editor so the learner can switch between
    *  files. Tests run against `entryFilename` (or the first file when
    *  omitted); every other file is staged into the runtime's virtual
@@ -220,8 +220,8 @@ export interface ChallengeCardProps {
    *  reads them like local files (e.g. `pd.read_csv("penguins.csv")`).
    *  Each entry names a path in the dataslope/datasets repo (or a full
    *  URL); the bytes are fetched through the globally cached dataset
-   *  path — memoised in-session and persisted via the browser's Cache
-   *  API — so every card, block, page, and visit that references the
+   *  path, memoised in-session and persisted via the browser's Cache
+   *  API, so every card, block, page, and visit that references the
    *  same file shares one download. Requires an adapter whose runtime
    *  implements `prepareFileSystem` (Python, R, JavaScript, TypeScript,
    *  PHP, …). */
@@ -231,12 +231,12 @@ export interface ChallengeCardProps {
   showFileTabBar?: boolean;
   /** Tests run when "Check Answer" is pressed. Each test's `code`
    *  should `assert`/`throw`/`stop()` on failure and be silent on
-   *  success — the language-specific harness wraps the rest. */
+   *  success, the language-specific harness wraps the rest. */
   tests: ChallengeTest[];
   /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
    *  pre-install when the card's runtime warms, merged with the modules
    *  found by scanning the card's own code (init/starter/solution/tests).
-   *  Escape hatch for imports the scan can't see — instructions that ask
+   *  Escape hatch for imports the scan can't see, instructions that ask
    *  the learner to write the import themselves, or dynamic imports.
    *  Only meaningful for runtimes with optional package sets (Python). */
   packages?: string[];
@@ -256,7 +256,7 @@ function detectIsMac(): boolean {
 
 // Pick a line-comment prefix for the language. Used only to prepend a
 // human-readable "init code runs first" notice at the top of solution
-// files — the comment must parse as a no-op in the target language so
+// files, the comment must parse as a no-op in the target language so
 // the displayed solution still pastes back as valid source.
 function lineCommentFor(codeMirrorMode: string): string {
   switch (codeMirrorMode) {
@@ -292,7 +292,7 @@ function lineNumbersWithOffset(offset: number) {
 // the wave animation in and back out within a single frame.
 const MIN_RUN_OVERLAY_MS = 300;
 
-// Sine-wave running overlay — mirrors `<CodeBlock>`'s RunOverlay so the
+// Sine-wave running overlay, mirrors `<CodeBlock>`'s RunOverlay so the
 // challenge card shows the same blue-wave hint while running/submitting.
 function RunOverlay({ active }: { active: boolean }) {
   return (
@@ -398,7 +398,7 @@ export default function ChallengeCard({
     datasetsRef.current = cardDatasets;
   }, [cardDatasets]);
 
-  // Everything this card could ask the runtime to execute — per-file
+  // Everything this card could ask the runtime to execute, per-file
   // init/starter/solution plus injected test snippets. Passed to
   // `runtime.warmPackages` as the needs-analysis input so heavy optional
   // packages (Python's data stack) only download for cards whose code
@@ -457,16 +457,16 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Theme compartments — stored so the dark/light sync effect can
+  // Theme compartments, stored so the dark/light sync effect can
   // reconfigure the CM theme without remounting the editor.
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
-  // Line-number compartment for the main editor — reconfigured when the
+  // Line-number compartment for the main editor, reconfigured when the
   // active file changes so the gutter offset tracks that file's init
   // line count (the editable region continues numbering after the init).
   const mainLineNumberCompRef = useRef<Compartment | null>(null);
-  // Language compartment — reconfigured per active file for adapters
+  // Language compartment, reconfigured per active file for adapters
   // whose workspaces mix languages (web: .html/.css/.js).
   const mainLanguageCompRef = useRef<Compartment | null>(null);
   // Slot the preview adapters (web / react) mount their sandboxed
@@ -503,7 +503,7 @@ export default function ChallengeCard({
   // `<Playground>` lives in a separate scope, so its installed
   // packages / staged VFS files cannot bleed into challenge results.
   // State isolation between cards in the same scope is the adapter's
-  // responsibility — each `run()` wipes user globals before evaluating
+  // responsibility, each `run()` wipes user globals before evaluating
   // the next snippet.
   const runtimeRef = useRef<LanguageRuntime | null>(null);
   // Outer card element + one-shot guard so the shared runtime can be warmed
@@ -511,7 +511,7 @@ export default function ChallengeCard({
   const cardRef = useRef<HTMLDivElement | null>(null);
   const warmedRef = useRef(false);
   const runSeqRef = useRef(0);
-  // Latest run handler — keeps the CodeMirror keymap closure
+  // Latest run handler, keeps the CodeMirror keymap closure
   // (registered once at mount) wired to the current function.
   const runRef = useRef<() => void>(() => {});
   // Latest submit handler. Bound to Mod-Enter from the editor's
@@ -537,7 +537,7 @@ export default function ChallengeCard({
   // until the adapter reports one); smoothed for display below.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
   // Mid-run blocking waits (e.g. Python's on-first-run package install)
-  // — surfaces the boot notice during the wait. Callbacks are stable.
+  //, surfaces the boot notice during the wait. Callbacks are stable.
   const {
     preparing: midRunPreparing,
     message: midRunMessage,
@@ -695,7 +695,7 @@ export default function ChallengeCard({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
         noActiveLine,
-        // AI ghost-text completion (pro members only — the extension gates
+        // AI ghost-text completion (pro members only, the extension gates
         // itself and stays inert for guests/free members). The active file's
         // read-only init code travels as extra prompt prefix so suggestions
         // can use the names it defines.
@@ -862,7 +862,7 @@ export default function ChallengeCard({
   // opens or the active solution file changes. We keep the doc
   // editable at the contenteditable level (relying on `readOnly` to
   // block insertions) so the user can click into the editor, move the
-  // caret, and select text — including Mod-A select-all, which is
+  // caret, and select text, including Mod-A select-all, which is
   // wired explicitly below since `editable.of(false)` would otherwise
   // drop keyboard focus and disable the default keymap.
   useEffect(() => {
@@ -912,7 +912,7 @@ export default function ChallengeCard({
   // init code. Init now belongs to a file, so switching tabs rebuilds
   // this editor with the new file's init (or tears it down when the
   // active file has none). We keep it mounted even while collapsed so
-  // the learner can see the first few lines through the gradient fade —
+  // the learner can see the first few lines through the gradient fade,
   // clicking the fade or the toggle expands it to full height.
   useEffect(() => {
     if (!activeHasInit) return;
@@ -977,7 +977,7 @@ export default function ChallengeCard({
   }, [workspaceFiles]);
 
   // Ask AI context: the card registers itself so the assistant can see the
-  // challenge the user is looking at — instructions, their current code,
+  // challenge the user is looking at, instructions, their current code,
   // output, and test results. Snapshots are pulled only at send time.
   useAskAiSource({
     kind: "challenge",
@@ -1036,7 +1036,7 @@ export default function ChallengeCard({
       filesSnapshot: Map<string, string>,
       // The caller's run sequence (from `++runSeqRef.current`). Owning
       // the increment in the caller lets it guard its own post-await
-      // state updates too — a newer run/check/reset supersedes both
+      // state updates too, a newer run/check/reset supersedes both
       // this execution's streaming updates and the caller's final ones.
       mySeq: number,
     ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
@@ -1064,7 +1064,7 @@ export default function ChallengeCard({
           : null;
       datasetsPromise?.catch(() => {});
 
-      // Re-use the shared per-adapter runtime — see runtimeRegistry.ts.
+      // Re-use the shared per-adapter runtime, see runtimeRegistry.ts.
       // Once Pyodide / WebR / CheerpJ has loaded for any block on this
       // page, every other `<CodeBlock>` and `<ChallengeCard>` for the
       // same language attaches to that same worker instead of spinning
@@ -1074,7 +1074,7 @@ export default function ChallengeCard({
       if (!runtimeRef.current) {
         // The registry subscribes this callback to the in-flight boot
         // even when a silent warm-up started it, replaying the current
-        // stage — so a Run click mid-boot shows live progress.
+        // stage, so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
@@ -1093,7 +1093,7 @@ export default function ChallengeCard({
       if (datasetsPromise) {
         if (!runtime.prepareFileSystem) {
           throw new Error(
-            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system) — remove the card's \`datasets\` prop.`,
+            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system), remove the card's \`datasets\` prop.`,
           );
         }
         setStatusMessage("Downloading dataset files…");
@@ -1110,8 +1110,8 @@ export default function ChallengeCard({
       const cells: OutputCell[] = [];
 
       // Stage files into the runtime VFS: the card's remote datasets
-      // (so init/starter code can read them like local files) and — for
-      // multi-file workspaces — every workspace file, so imports
+      // (so init/starter code can read them like local files) and, for
+      // multi-file workspaces, every workspace file, so imports
       // resolve. The entry file's bytes mirror what we pass to `run()`
       // below, including any init prelude / harness suffix the caller
       // bolted on.
@@ -1277,7 +1277,7 @@ export default function ChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      // Only the latest run owns the busy spinner — a superseded run
+      // Only the latest run owns the busy spinner, a superseded run
       // clearing it would re-enable Run/Submit mid-flight for its
       // successor.
       if (runSeqRef.current === mySeq) setActiveAction(null);
@@ -1317,7 +1317,7 @@ export default function ChallengeCard({
 
       // Split stdout cells into "user-visible" + parsed harness results.
       // Non-stdout cells (html / image / plot / stderr) pass through
-      // untouched — the harness only emits text. Also collect the raw
+      // untouched, the harness only emits text. Also collect the raw
       // stdout/stderr text so we can evaluate stdout-based expectations
       // against it.
       const finalCells: OutputCell[] = [];
@@ -1415,7 +1415,7 @@ export default function ChallengeCard({
 
   // Pin this card's runtime in the registry while the card is mounted, so
   // eviction (the per-scope LRU cap) never tears a runtime down under a
-  // card that could still Run against it — including the `runtimeRef`
+  // card that could still Run against it, including the `runtimeRef`
   // cached above.
   useEffect(
     () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
@@ -1423,7 +1423,7 @@ export default function ChallengeCard({
   );
 
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
-  // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
+  // Save-Data-guarded, one boot at a time, see runtime/warmup.ts), so
   // the time a reader spends on the page's prose pays for the runtime
   // download instead of the first Run/Submit click.
   useEffect(() => {
@@ -1451,7 +1451,7 @@ export default function ChallengeCard({
             if (!runtimeRef.current) runtimeRef.current = rt;
             // Pre-install heavy optional packages only if this card's
             // authored code (or its explicit `packages` prop) needs
-            // them — see LanguageRuntime.warmPackages. Fire-and-forget:
+            // them, see LanguageRuntime.warmPackages. Fire-and-forget:
             // a Run installs on demand regardless.
             const hint = warmHintRef.current;
             rt.warmPackages?.(hint.sources, { packages: hint.packages });
@@ -1508,7 +1508,7 @@ export default function ChallengeCard({
       persistSaveTimerRef.current = null;
     }
     setOutputs([]);
-    // Reset also tears down the live preview — removing the iframe
+    // Reset also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
     previewHostRef.current?.replaceChildren();
     setElapsed("");
@@ -1549,7 +1549,7 @@ export default function ChallengeCard({
     // If the active tab is a scaffold file (no solution of its own),
     // switch to the first solved file. The tab-switch effect snapshots
     // the unchanged scaffold out and loads the freshly-set solution
-    // buffer in — no clobbering, since we never wrote the scaffold's
+    // buffer in, no clobbering, since we never wrote the scaffold's
     // buffer above.
     if (!solvable.some((f) => f.filename === active)) {
       setActiveFilename(solvable[0].filename);
@@ -1568,7 +1568,7 @@ export default function ChallengeCard({
   // Playwright solution sweep (e2e/challenge-solutions.spec.ts) can
   // load a card's reference solution into its buffers and run the
   // tests without round-tripping every keystroke through the DOM.
-  // The registry key is a (adapter.id, title) tuple — stable across
+  // The registry key is a (adapter.id, title) tuple, stable across
   // page reloads, so the test can lock onto a card via the same
   // identifier the data attributes expose.
   const checkRef = useRef<() => Promise<void>>(() => Promise.resolve());
@@ -1617,7 +1617,7 @@ export default function ChallengeCard({
               content,
             );
           } catch {
-            /* quota / private mode — ignore, in-memory buffer still updated */
+            /* quota / private mode, ignore, in-memory buffer still updated */
           }
         }
         return true;
@@ -1673,7 +1673,7 @@ export default function ChallengeCard({
         toasts.show("Clipboard unavailable in this browser.", "warn");
       }
     } catch {
-      toasts.show("Couldn't copy code — clipboard blocked.", "warn");
+      toasts.show("Couldn't copy code, clipboard blocked.", "warn");
     }
   }, [toasts]);
 
@@ -1697,7 +1697,7 @@ export default function ChallengeCard({
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
       if (formatted === code) {
-        toasts.show("Already formatted — nothing to change.");
+        toasts.show("Already formatted, nothing to change.");
       } else {
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: formatted },
@@ -1707,7 +1707,7 @@ export default function ChallengeCard({
     } catch {
       const wait = MIN_FORMAT_MS - (performance.now() - startedAt);
       if (wait > 0) await new Promise<void>((r) => setTimeout(r, wait));
-      toasts.show("Couldn't format — code may have a syntax error.", "warn");
+      toasts.show("Couldn't format, code may have a syntax error.", "warn");
     } finally {
       setIsFormatting(false);
     }
@@ -1724,7 +1724,7 @@ export default function ChallengeCard({
   // Show the boot notice during a cold boot (status "loading") and during
   // a mid-run blocking wait (e.g. installing packages mid-run, while
   // status is "running"). The mid-run case has no runtime download and no
-  // determinate fraction — just the loader + the wait message.
+  // determinate fraction, just the loader + the wait message.
   const showBootNotice =
     status === "loading" || (status === "running" && midRunPreparing);
 
@@ -1753,7 +1753,7 @@ export default function ChallengeCard({
   // list of { filename, source } pairs so the Playwright solution
   // runner (e2e/challenge-solutions.spec.ts) can drive each card
   // without us having to parse MDX outside of next. Only files with
-  // an actual solution are included — scaffold files the learner is
+  // an actual solution are included, scaffold files the learner is
   // not expected to modify are omitted.
   const solutionTestPayload = useMemo(() => {
     const real = solutionFiles.filter((f) => f.hasSolution);
@@ -2067,8 +2067,8 @@ export default function ChallengeCard({
               </Menu.Root>
             </>
           ) : (
-            // Challenges without tests still get a plain Run pill —
-            // no menu, no dropdown — since there's nothing to
+            // Challenges without tests still get a plain Run pill,
+            // no menu, no dropdown, since there's nothing to
             // submit. The keymap above falls back to `run` for the
             // same reason.
             <button
@@ -2112,7 +2112,7 @@ export default function ChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
-          {/* Runtime status / loading message — mirrors the executable
+          {/* Runtime status / loading message, mirrors the executable
               code block's status text. While the runtime is fetching
               its WASM toolchain on first run, this surfaces "Loading
               Pyodide", "Loading browsercc clang toolchain (this can
@@ -2212,7 +2212,7 @@ export default function ChallengeCard({
           aria-live="polite"
         >
           {/* The "Output" header is hidden while the boot notice (loading
-              animation) is showing — there's no output yet, just setup.
+              animation) is showing, there's no output yet, just setup.
               It returns the moment user code actually runs. */}
           {!showBootNotice && (
             <div className={styles.outputHeader}>
@@ -2239,7 +2239,7 @@ export default function ChallengeCard({
             // assemble-and-quarter-turn loader, staged copy with the
             // cold-download size, and a determinate bar once the adapter
             // reports stage fractions (see RuntimeBootNotice). Also shown
-            // for mid-run blocking waits (package install) — no runtime
+            // for mid-run blocking waits (package install), no runtime
             // download or fraction in that case.
             <div className={codeBlockStyles.bootNoticeWrap}>
               <RuntimeBootNotice
@@ -2262,7 +2262,7 @@ export default function ChallengeCard({
               ))}
             </div>
           )}
-          {/* No "Running…" placeholder while output is empty — the blue
+          {/* No "Running…" placeholder while output is empty, the blue
               wave overlay already signals the run is in progress. */}
           <RunOverlay active={isBusy} />
         </div>
@@ -2395,14 +2395,14 @@ function SolutionModal({
     [],
   );
 
-  // Copy the active file's raw solution — not the synthetic
+  // Copy the active file's raw solution, not the synthetic
   // "init runs first" comment header that the read-only editor prepends
   // for display when the file carries its own init code.
   const activeRaw = useMemo(
     () => files.find((f) => f.filename === activeFilename)?.source ?? source,
     [files, activeFilename, source],
   );
-  // Whether the active file's solution is identical to its starter — used
+  // Whether the active file's solution is identical to its starter, used
   // to surface a subtle "no edits needed" note in multi-file workspaces.
   const activeIsUnchanged = useMemo(
     () => files.find((f) => f.filename === activeFilename)?.isUnchanged ?? false,
@@ -2420,7 +2420,7 @@ function SolutionModal({
         copiedTimerRef.current = null;
       }, 1500);
     } catch {
-      /* clipboard blocked — leave the label unchanged */
+      /* clipboard blocked, leave the label unchanged */
     }
   }, [activeRaw]);
 
@@ -2443,7 +2443,7 @@ function SolutionModal({
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
             <div className={styles.modalSubtitle}>
-              One valid answer — there may be others.
+              One valid answer, there may be others.
             </div>
           </div>
           <div className={styles.modalActions}>
@@ -2509,7 +2509,7 @@ function SolutionModal({
           <div className={styles.solutionUnchangedNote} role="note">
             <Info size={13} strokeWidth={2} aria-hidden />
             <span>
-              This file is unchanged from the starter code — no edits are
+              This file is unchanged from the starter code, no edits are
               needed here.
             </span>
           </div>
@@ -2564,13 +2564,13 @@ function SolutionModal({
   // Portal to <body> so the backdrop's `position: fixed` is sized to the
   // viewport. Left inline, an ancestor with a transform/filter (e.g. the home
   // hero's BlurFade) becomes the containing block and the backdrop shrinks to
-  // that ancestor — see app/_components/ChallengeCard.module.css (.modalBackdrop).
+  // that ancestor, see app/_components/ChallengeCard.module.css (.modalBackdrop).
   return typeof document === "undefined"
     ? modal
     : createPortal(modal, document.body);
 }
 
-/** Minimal output cell renderer — text cells use mono-spaced pre-wrap,
+/** Minimal output cell renderer, text cells use mono-spaced pre-wrap,
  *  HTML cells (DataFrames) get the table styles defined in the
  *  module, image / plot cells fall through to inline rendering. This
  *  is a trimmed copy of `<CodeBlock>`'s `OutputCellView` adjusted for

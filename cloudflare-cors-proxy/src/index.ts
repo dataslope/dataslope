@@ -1,5 +1,5 @@
 /**
- * Dataslope CORS Proxy — Cloudflare Worker
+ * Dataslope CORS Proxy, Cloudflare Worker
  *
  * Proxies HTTP/HTTPS requests on behalf of playground runtimes so that
  * third-party APIs that don't expose permissive CORS headers can be reached
@@ -14,7 +14,7 @@
  *    redirect hop (redirect: "manual" + per-hop re-validation).
  * 4. Hop-by-hop headers are stripped from both the forwarded request and the
  *    upstream response to prevent header smuggling.
- * 5. The browser's ambient Cookie header is stripped before forwarding — it is
+ * 5. The browser's ambient Cookie header is stripped before forwarding, it is
  *    never relevant to third-party upstream APIs. Explicitly-set Authorization
  *    headers are kept so authenticated API calls work.
  */
@@ -55,7 +55,7 @@ const HOP_BY_HOP_HEADERS = new Set([
   "trailer",
   "transfer-encoding",
   "upgrade",
-  // Strip the host header — Cloudflare sets the correct one for the upstream.
+  // Strip the host header, Cloudflare sets the correct one for the upstream.
   "host",
 ]);
 
@@ -70,7 +70,7 @@ const PRIVATE_IP_PATTERNS = [
   /^10\./,
   /^192\.168\./,
   /^172\.(1[6-9]|2\d|3[01])\./,
-  // IPv4 link-local (169.254.0.0/16) — also covers the cloud metadata
+  // IPv4 link-local (169.254.0.0/16), also covers the cloud metadata
   // endpoint 169.254.169.254. The IPv6 link-local equivalent (fe80:) is
   // already blocked below.
   /^169\.254\./,
@@ -181,7 +181,7 @@ export default {
     // null means no Origin header was sent (browser navigation, curl, Postman…).
     const normalizedOrigin = rawOrigin ? rawOrigin.replace(/\/+$/, "") : null;
 
-    // Requests without an Origin header are always allowed — only browser
+    // Requests without an Origin header are always allowed, only browser
     // cross-origin fetch/XHR requests reliably include an Origin header.
     // Short-circuit evaluation means isLocalhostOrigin() is only called when
     // normalizedOrigin is a non-null string (TypeScript narrows accordingly).
@@ -261,11 +261,11 @@ export default {
       stripHopByHopHeaders(request.headers),
     );
 
-    // Remove the Origin header — the caller's origin is irrelevant to the
+    // Remove the Origin header, the caller's origin is irrelevant to the
     // target server, and leaking it could expose the requester's identity.
     upstreamHeaders.delete("origin");
     upstreamHeaders.delete("referer");
-    // Strip ambient browser cookies — never relevant to third-party upstream
+    // Strip ambient browser cookies, never relevant to third-party upstream
     // APIs and must not be leaked to arbitrary hosts. Explicitly-set
     // Authorization headers are kept so authenticated API calls work.
     upstreamHeaders.delete("cookie");
@@ -274,8 +274,8 @@ export default {
     // the client's Accept-Encoding, fetch() switches to pass-through mode where
     // the returned body and Content-Encoding header can disagree (the runtime
     // may hand back a decompressed body while still reporting the upstream
-    // Content-Encoding). Clients that trust that header — e.g. pandas read_csv
-    // in Pyodide — then try to gunzip already-decoded bytes and fail with
+    // Content-Encoding). Clients that trust that header, e.g. pandas read_csv
+    // in Pyodide, then try to gunzip already-decoded bytes and fail with
     // "Not a gzipped file". Removing it lets Cloudflare transparently
     // decompress and return a clean, identity-encoded body.
     upstreamHeaders.delete("accept-encoding");
@@ -295,7 +295,7 @@ export default {
         redirect: "manual",
       };
       // Only attach a body for methods that allow one, and only on the first
-      // hop — the request body stream is consumed after the initial read.
+      // hop, the request body stream is consumed after the initial read.
       if (!["GET", "HEAD"].includes(request.method) && redirectCount === 0) {
         init.body = request.body;
       }
@@ -309,7 +309,7 @@ export default {
         return errorResponse(502, `Upstream error: ${message}`, corsHeaders);
       }
 
-      // Not a redirect — use this response.
+      // Not a redirect, use this response.
       if (response.status < 300 || response.status >= 400) {
         upstreamResponse = response;
         break;
@@ -317,7 +317,7 @@ export default {
 
       const location = response.headers.get("Location");
       if (!location) {
-        // 3xx with no Location — return as-is.
+        // 3xx with no Location, return as-is.
         upstreamResponse = response;
         break;
       }
@@ -367,7 +367,7 @@ export default {
 
     // The Workers runtime transparently decompresses gzip/brotli upstream
     // bodies, so `upstreamResponse.body` is already decoded. The upstream
-    // Content-Encoding/Content-Length no longer describe the bytes we return —
+    // Content-Encoding/Content-Length no longer describe the bytes we return,
     // leaving them in place makes clients (e.g. pandas read_csv, which trusts
     // Content-Encoding over its own `compression=` argument) try to gunzip
     // already-decompressed data, or truncate on a stale length. Drop them.

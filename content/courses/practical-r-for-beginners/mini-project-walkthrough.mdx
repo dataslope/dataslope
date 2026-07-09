@@ -1,6 +1,6 @@
 ---
 title: Mini Project Walkthrough
-description: A complete end-to-end analysis of a real built-in dataset — load, inspect, tidy, transform, summarize, visualize, interpret. This is the workflow every analysis follows.
+description: A complete end-to-end analysis of a real built-in dataset, load, inspect, tidy, transform, summarize, visualize, interpret. This is the workflow every analysis follows.
 ---
 
 You've now met every piece of the puzzle: vectors, data frames,
@@ -8,7 +8,7 @@ dplyr verbs, ggplot, summary statistics, and inference. This
 page strings them all together on a real dataset so you can see
 the whole arc of an analysis at once.
 
-We'll use the built-in **`airquality`** dataset — daily air
+We'll use the built-in **`airquality`** dataset, daily air
 quality measurements from New York during May–September 1973.
 Our question:
 
@@ -20,7 +20,7 @@ That single question will pull us through the entire workflow.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Under a bright summer sun, ozone dots climb higher as their color warms from cool blue through yellow to hot red — one real question pulling a whole analysis along"
+  aria-label="Under a bright summer sun, ozone dots climb higher as their color warms from cool blue through yellow to hot red, one real question pulling a whole analysis along"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
@@ -48,7 +48,7 @@ That single question will pull us through the entire workflow.
   </g>
 </svg>
 
-## Step 1 — Load and inspect
+## Step 1, Load and inspect
 
 Look before you leap. Always.
 
@@ -57,7 +57,7 @@ Look before you leap. Always.
   files={[
     {
       filename: "main.r",
-      starterCode: `# airquality is built into R — no loading needed
+      starterCode: `# airquality is built into R, no loading needed
 dim(airquality)
 head(airquality)
 str(airquality)
@@ -71,7 +71,7 @@ What we learn:
 
 - ~153 rows, 6 columns: `Ozone`, `Solar.R`, `Wind`, `Temp`,
   `Month`, `Day`.
-- `Ozone` and `Solar.R` have **NAs** — missing values we'll need
+- `Ozone` and `Solar.R` have **NAs**, missing values we'll need
   to handle.
 - `Month` is numeric (5 through 9) but conceptually categorical.
 - `Temp` is in degrees Fahrenheit.
@@ -79,7 +79,7 @@ What we learn:
 The rest of the walkthrough follows the standard arc:
 **Load → Inspect → Tidy → Transform → Visualize → Interpret.**
 
-## Step 2 — Tidy: handle NAs and fix types
+## Step 2, Tidy: handle NAs and fix types
 
 <CodeBlock
   adapter="r"
@@ -110,11 +110,11 @@ A few notes:
 - We *dropped* rows missing Ozone because Ozone is the variable
   we want to analyze. (`Solar.R` NAs we'll handle later if
   needed.) Dropping rows is fine **when** you've thought about
-  whether NAs are random — for now, assume yes.
+  whether NAs are random, for now, assume yes.
 - We added a `Month_name` factor with proper ordering, and a
   more reader-friendly `Temp_C` column.
 
-## Step 3 — First look: summary statistics
+## Step 3, First look: summary statistics
 
 <CodeBlock
   adapter="r"
@@ -154,7 +154,7 @@ Already the pattern emerges: July and August have the highest
 mean Ozone *and* the highest mean temperature. May and September
 are cooler and cleaner.
 
-## Step 4 — Visualize the relationship
+## Step 4, Visualize the relationship
 
 Plots will tell us more than summary tables ever can.
 
@@ -193,7 +193,7 @@ The picture is unambiguous: warmer days have higher Ozone. The
 relationship looks roughly monotonic, and a bit curvier at high
 temperatures.
 
-## Step 5 — Look at monthly variation explicitly
+## Step 5, Look at monthly variation explicitly
 
 <CodeBlock
   adapter="r"
@@ -223,11 +223,11 @@ ggplot(aq, aes(x = Month_name, y = Ozone, fill = Month_name)) +
   ]}
 />
 
-July and August have clearly higher medians and wider spreads —
+July and August have clearly higher medians and wider spreads,
 both more Ozone *and* more variable Ozone. The shoulder months
 (May, September) are tighter and lower.
 
-## Step 6 — A quick formal check
+## Step 6, A quick formal check
 
 We *see* a relationship between Temperature and Ozone, but how
 strong is it? And is it surprising given the noise?
@@ -256,7 +256,7 @@ summary(model)
 
 Reading the output:
 
-- The **correlation** is around 0.7 — a strong positive linear
+- The **correlation** is around 0.7, a strong positive linear
   relationship.
 - The regression coefficient on `Temp_C` is positive and the
   p-value is *very* small, well below any conventional cutoff.
@@ -264,10 +264,10 @@ Reading the output:
   fraction of Ozone variation is explained by temperature alone.
 
 We're not making causal claims (Ozone formation has many
-drivers!) — only describing a strong *association* in this
+drivers!), only describing a strong *association* in this
 dataset.
 
-## Step 7 — Interpret
+## Step 7, Interpret
 
 Pulling it together in a short, plain-English paragraph (this is
 literally the kind of write-up an analyst delivers):
@@ -283,8 +283,8 @@ literally the kind of write-up an analyst delivers):
 > by factors not in this dataset, like wind, precursor
 > emissions, and atmospheric mixing.
 
-That paragraph is *the deliverable*. Everything before it —
-loading, cleaning, plotting, modeling — was scaffolding to make
+That paragraph is *the deliverable*. Everything before it,
+loading, cleaning, plotting, modeling, was scaffolding to make
 it trustworthy.
 
 ## Putting it all in one script
@@ -401,8 +401,8 @@ real analysis is a longer, deeper version of the same loop.
 - Run a regression.
   > A regression before inspection can produce results that look plausible but are driven by data-quality problems you never noticed.
 - Make a plot.
-  > Plotting before inspection is premature — you won't know which variables matter, which have NAs, or what type they are.
-- [o] Inspect it — \`dim()\`, \`head()\`, \`str()\`, \`summary()\` — so you understand what's actually there before assuming anything.
+  > Plotting before inspection is premature, you won't know which variables matter, which have NAs, or what type they are.
+- [o] Inspect it, \`dim()\`, \`head()\`, \`str()\`, \`summary()\`, so you understand what's actually there before assuming anything.
   > Skipping inspection is the #1 cause of confidently-wrong analyses.
 - Compute the mean of every column.
   > Computing means before inspection misses structural problems like wrong types, missing values, or unexpected scales that would make the means meaningless.`}
@@ -413,29 +413,29 @@ real analysis is a longer, deeper version of the same loop.
 
 - Temperature causes ozone.
   > A correlation tells you two variables move together, not that one drives the other; many factors (sunlight, precursor emissions, mixing) could be responsible.
-- [o] The two vary together strongly in this dataset — a real association, but correlation alone doesn't prove causation; other plausible factors (sunlight, emissions, weather patterns) are not ruled out.
-  > Stating associations carefully — and not over-claiming — is core craft.
+- [o] The two vary together strongly in this dataset, a real association, but correlation alone doesn't prove causation; other plausible factors (sunlight, emissions, weather patterns) are not ruled out.
+  > Stating associations carefully, and not over-claiming, is core craft.
 - The model is broken.
   > A strong correlation (≈ 0.7) with a tiny p-value is exactly what a well-fitting model looks like, not a sign of failure.
 - Ozone causes temperature.
-  > Ozone is a trace gas produced partly by photochemical reactions — it does not heat the air enough to raise ambient temperature.`}
+  > Ozone is a trace gas produced partly by photochemical reactions, it does not heat the air enough to raise ambient temperature.`}
 />
 
 <MultipleChoice
   markdown={`What's the actual *deliverable* of an analysis like this one?
 
 - The raw data.
-  > Raw data is the input to the analysis, not the output — a stakeholder cannot make a decision from an uninterpreted CSV.
+  > Raw data is the input to the analysis, not the output, a stakeholder cannot make a decision from an uninterpreted CSV.
 - The R code.
   > The code is the scaffolding that makes results trustworthy and reproducible, but it is not the finding itself.
 - [o] A clearly-written, honest interpretation of what was found, backed up by reproducible code and clear visualizations.
   > Code and plots are means; communicating an honest finding is the end.
 - A p-value.
-  > A p-value is one number from one test — without context, an interpretation, and an understanding of effect size, it tells the reader almost nothing on its own.`}
+  > A p-value is one number from one test, without context, an interpretation, and an understanding of effect size, it tells the reader almost nothing on its own.`}
 />
 
 You've reached the last hands-on page of the course. What follows
-is an optional set of "deeper history" chapters — the full story of
-where statistics, statistical computing, and R itself came from —
+is an optional set of "deeper history" chapters, the full story of
+where statistics, statistical computing, and R itself came from,
 and then a closing page pointing you toward what to learn next. If
 you'd rather skip the history, jump straight to **Next Steps**.

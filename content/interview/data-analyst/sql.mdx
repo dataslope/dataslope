@@ -1,13 +1,13 @@
 ---
 title: SQL
-description: Data Analyst SQL interview questions — aggregation, joins, filtering, and NULLs — with written answers, concept checks, and runnable challenges.
+description: Data Analyst SQL interview questions, aggregation, joins, filtering, and NULLs, with written answers, concept checks, and runnable challenges.
 ---
 
 SQL is the core of almost every Data Analyst screen. This page is a
 question bank: short **Q&A** to review the ideas, **concept checks**, and
 **runnable challenges** that execute against a real in-browser database.
 
-> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted — most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted, most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
 
 ## Q&A
 
@@ -39,10 +39,10 @@ ORDER BY revenue DESC;`}
 All combine rows from two tables on a condition; they differ in which
 **unmatched** rows survive:
 
-- **INNER** — only rows with a match in *both* tables.
-- **LEFT** — all rows from the left table; `NULL`s where the right has no match.
-- **RIGHT** — all rows from the right table; `NULL`s on the left.
-- **FULL** — all rows from both; `NULL`s wherever either side is missing.
+- **INNER**, only rows with a match in *both* tables.
+- **LEFT**, all rows from the left table; `NULL`s where the right has no match.
+- **RIGHT**, all rows from the right table; `NULL`s on the left.
+- **FULL**, all rows from both; `NULL`s wherever either side is missing.
 
 "List all customers and their orders, *including customers who never
 ordered*" is the classic tell for a `LEFT JOIN`.
@@ -50,7 +50,7 @@ ordered*" is the classic tell for a `LEFT JOIN`.
 ### Why can a JOIN make a SUM too large, and how do you avoid it?
 
 Joining to a table with **multiple matching rows** duplicates the left
-row once per match — so summing a left-side column double-counts it. Fix
+row once per match, so summing a left-side column double-counts it. Fix
 it by aggregating the one-to-many side **first** (in a subquery or Common
 Table Expression, CTE) to the right grain, then joining:
 
@@ -68,7 +68,7 @@ JOIN order_totals t ON t.customer_id = c.id;
 ### How do NULLs behave in comparisons and aggregates?
 
 `NULL` means "unknown," so any comparison with it yields `NULL` (not
-true) — use `IS NULL` / `IS NOT NULL`, never `= NULL`. Aggregates like
+true), use `IS NULL` / `IS NOT NULL`, never `= NULL`. Aggregates like
 `SUM`/`AVG` **skip** `NULL`s, but `COUNT(*)` counts every row while
 `COUNT(col)` counts only non-`NULL` values. Use `COALESCE(x, 0)` to
 substitute a default.
@@ -77,7 +77,7 @@ substitute a default.
 
 `COUNT(*)` and `COUNT(1)` both count **rows** (identical performance in
 modern engines). `COUNT(col)` counts only rows where `col` **is not
-NULL** — so it can return a smaller number. `COUNT(DISTINCT col)` counts
+NULL**, so it can return a smaller number. `COUNT(DISTINCT col)` counts
 distinct non-NULL values.
 
 ### What is a self join and when would you use one?
@@ -207,9 +207,9 @@ FROM employees;
 All three assign a position within a window ordered by some column, but
 they handle ties differently:
 
-- `ROW_NUMBER` — always unique, ties get arbitrary sequential numbers.
-- `RANK` — ties share the same rank; the next rank **skips** numbers (1, 2, 2, 4).
-- `DENSE_RANK` — ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
+- `ROW_NUMBER`, always unique, ties get arbitrary sequential numbers.
+- `RANK`, ties share the same rank; the next rank **skips** numbers (1, 2, 2, 4).
+- `DENSE_RANK`, ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -311,9 +311,9 @@ FROM tests;
 
 ### What is COALESCE and how does it differ from NULLIF?
 
-`COALESCE(a, b, c)` returns the **first non-NULL** argument — handy for
+`COALESCE(a, b, c)` returns the **first non-NULL** argument, handy for
 providing a default. `NULLIF(a, b)` returns `NULL` if `a` equals `b`,
-otherwise returns `a` — useful to avoid division-by-zero by turning zero
+otherwise returns `a`, useful to avoid division-by-zero by turning zero
 denominators into `NULL`.
 
 ```sql
@@ -342,12 +342,12 @@ FROM orders;
 ### What are some common string functions?
 
 Key ones across most SQL dialects:
-- `LENGTH(s)` / `LEN(s)` — character count.
-- `UPPER(s)` / `LOWER(s)` — case conversion.
-- `TRIM(s)` / `LTRIM` / `RTRIM` — remove whitespace.
-- `SUBSTRING(s, start, len)` — extract a portion.
-- `CONCAT(a, b)` or `a || b` — concatenate.
-- `LIKE` with `%` (any chars) and `_` (one char) — pattern matching.
+- `LENGTH(s)` / `LEN(s)`, character count.
+- `UPPER(s)` / `LOWER(s)`, case conversion.
+- `TRIM(s)` / `LTRIM` / `RTRIM`, remove whitespace.
+- `SUBSTRING(s, start, len)`, extract a portion.
+- `CONCAT(a, b)` or `a || b`, concatenate.
+- `LIKE` with `%` (any chars) and `_` (one char), pattern matching.
 
 ```sql
 SELECT
@@ -453,7 +453,7 @@ DELETE FROM users WHERE id IN (SELECT id FROM dupes WHERE rn > 1);
 
 A **non-correlated** subquery runs once and its result is used by the
 outer query. A **correlated** subquery references columns from the outer
-query, so it re-executes for every row of the outer query — which can be
+query, so it re-executes for every row of the outer query, which can be
 slow on large tables.
 
 ```sql
@@ -484,7 +484,7 @@ FROM daily_sales;
 
 ### What is a CROSS JOIN?
 
-A `CROSS JOIN` produces the Cartesian product of two tables — every row
+A `CROSS JOIN` produces the Cartesian product of two tables, every row
 of the left table paired with every row of the right. It has no `ON`
 condition. Useful for generating combinations (e.g., pairing every
 product with every region), but be careful: two 1 000-row tables yield
@@ -522,13 +522,13 @@ FROM transactions;`}
   markdown={`You only want the regions whose **total** revenue exceeds 250. Which clause filters on that aggregated total?
 
 - A \`WHERE revenue > 250\` clause.
-  > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\` — and the alias \`revenue\` doesn't exist yet at that stage.
+  > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\`, and the alias \`revenue\` doesn't exist yet at that stage.
 - [o] A \`HAVING SUM(amount) > 250\` clause.
   > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.
 - Either one works; they're interchangeable.
   > They run at different stages: \`WHERE\` before grouping (row-level), \`HAVING\` after (group-level). Filtering an aggregate belongs in \`HAVING\`.
 - Neither; you must wrap the query in a subquery first.
-  > A subquery works but isn't required — \`HAVING\` filters grouped results directly.`}
+  > A subquery works but isn't required, \`HAVING\` filters grouped results directly.`}
 />
 
 <MultipleChoice
@@ -537,7 +537,7 @@ FROM transactions;`}
 - They appear with a \`total\` of \`0\`.
   > That's \`LEFT JOIN\` (+ \`COALESCE\`) behavior. \`INNER JOIN\` returns only rows with a match on both sides.
 - [o] They disappear from the result entirely.
-  > \`INNER JOIN\` keeps only customers with at least one matching order, so a customer with none is dropped — which is why "include non-buyers" needs a \`LEFT JOIN\`.
+  > \`INNER JOIN\` keeps only customers with at least one matching order, so a customer with none is dropped, which is why "include non-buyers" needs a \`LEFT JOIN\`.
 - They appear with a \`total\` of \`NULL\` and the query errors.
   > \`INNER JOIN\` omits them rather than erroring. (Under \`LEFT JOIN\`, the sum is \`NULL\` until you wrap it in \`COALESCE\`.)
 - Every other customer's row is duplicated.
@@ -584,7 +584,7 @@ ORDER BY revenue DESC;`}
 <SqlChallengeCard
   dialect="duckdb"
   title="Total spend per customer, including zero"
-  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\` — including customers who placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
+  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\`, including customers who placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
   (1, 'Ava', 'North'),
   (2, 'Ben', 'South'),

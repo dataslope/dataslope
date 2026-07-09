@@ -1,9 +1,9 @@
 ---
-title: Code Blocks — Web (HTML/CSS/JS)
+title: "Code Blocks: Web (HTML/CSS/JS)"
 description: HTML/CSS/JS blocks render a live sandboxed page preview; console output streams into the output panel.
 ---
 
-The `web` adapter runs pages on native browser primitives — no runtime
+The `web` adapter runs pages on native browser primitives, no runtime
 download at all. Each Run composes the block's files into a single
 document and swaps it into a sandboxed `<iframe>` (unique opaque
 origin, `allow-scripts` without `allow-same-origin`). `console.*`
@@ -68,7 +68,7 @@ output and uncaught errors stream back into the output panel through a
 
 ## CodePen-style implicit composition
 
-Root-level `.css` and `.js` tabs apply automatically — the HTML tab
+Root-level `.css` and `.js` tabs apply automatically, the HTML tab
 can be a plain body fragment with no `<link>` or `<script src>`
 boilerplate, exactly like CodePen's three panes.
 
@@ -79,7 +79,7 @@ boilerplate, exactly like CodePen's three panes.
     {
       filename: "index.html",
       starterCode: `<h1>Three panes, zero boilerplate</h1>
-<p>No link or script tags here — the other tabs apply implicitly.</p>
+<p>No link or script tags here, the other tabs apply implicitly.</p>
 <button id="poke">Poke</button>
 `,
     },
@@ -101,7 +101,7 @@ h1 {
   console.log("poked!");
 });
 
-console.log("composed implicitly — no script tag needed");
+console.log("composed implicitly, no script tag needed");
 `,
     },
   ]}
@@ -122,7 +122,7 @@ console.log("composed implicitly — no script tag needed");
 ## Multi-file: explicit HTML + CSS + JS references
 
 `<link rel="stylesheet" href="styles.css">` and
-`<script src="script.js">` resolve to the sibling tabs — the adapter
+`<script src="script.js">` resolve to the sibling tabs, the adapter
 inlines them into the preview document so the sandbox stays
 self-contained, and explicitly referenced files are never injected a
 second time.
@@ -168,7 +168,7 @@ button.addEventListener("click", () => {
   console.log("painted?", heading.classList.contains("painted"));
 });
 
-console.log("Page wired up — click the button in the preview.");
+console.log("Page wired up, click the button in the preview.");
 `,
     },
   ]}
@@ -189,7 +189,7 @@ console.log("Page wired up — click the button in the preview.");
 ## Tailwind variant
 
 Passing `tailwind` injects the pinned `@tailwindcss/browser` compiler
-(a development-time tool — real projects compile Tailwind at build
+(a development-time tool, real projects compile Tailwind at build
 time) into the preview document, so utility classes work with zero
 setup.
 

@@ -2,7 +2,7 @@
 // catalogues (sqliteSamples.ts / postgresSamples.ts / duckdbSamples.ts).
 // The dialect-specific DDL/seed payloads stay in their per-dialect
 // files because the SQL itself is what differs between SQLite,
-// Postgres and DuckDB — consolidating it behind a synthetic emitter
+// Postgres and DuckDB, consolidating it behind a synthetic emitter
 // layer added complexity without value during the Stage 4 audit.
 
 export interface QueryTabSeed {

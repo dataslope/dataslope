@@ -6,13 +6,13 @@ description: When pie charts are reasonable, when they fail, and what to use ins
 The **pie chart** is the most controversial chart type in data
 visualization. Some people use them constantly; many serious
 practitioners would happily ban them. This page explains *both*
-positions and gives you a clear rule for when a pie chart is — and
-isn't — the right tool.
+positions and gives you a clear rule for when a pie chart is, and
+isn't, the right tool.
 
 <svg
   viewBox="0 0 640 250"
   role="img"
-  aria-label="Four translucent wedges of a gently exploded pie, two of them nearly the same size, with a question mark between them — which slice is bigger?"
+  aria-label="Four translucent wedges of a gently exploded pie, two of them nearly the same size, with a question mark between them, which slice is bigger?"
   style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="320" cy="120" r="92" fill="currentColor" opacity="0.05" />
@@ -81,7 +81,7 @@ Recall the **Cleveland-McGill ranking** from earlier:
 5. Volume
 6. Color intensity                ← *least accurate*
 
-Pie charts encode quantity using **angles and areas** — both near
+Pie charts encode quantity using **angles and areas**, both near
 the bottom of the ranking. That's the technical core of the
 criticism: the eye is bad at comparing angles. Try the next chart:
 
@@ -106,7 +106,7 @@ fig1 = px.pie(
     names="team",
     values="share",
     template="simple_white",
-    title="Pie — can you rank these by size?",
+    title="Pie, can you rank these by size?",
 )
 fig1.show()
 
@@ -115,7 +115,7 @@ fig2 = px.bar(
     x="team",
     y="share",
     template="simple_white",
-    title="Same data as a bar — much easier to rank",
+    title="Same data as a bar, much easier to rank",
 )
 fig2.show()
 `,
@@ -146,17 +146,17 @@ the dominant category is clear. A pie works.
 - **Many slices** (more than ~5).
 - **Slices of similar size** (humans can't rank similar angles).
 - **Comparing two pies** (a famously hopeless task).
-- **3-D pies**, **exploded pies**, **donut-with-icon pies** — any
+- **3-D pies**, **exploded pies**, **donut-with-icon pies**, any
   decoration that makes it harder to read the angles.
 
 ## Better alternatives
 
 When a pie isn't a good fit, the alternatives are almost always:
 
-- **Sorted bar chart** — for comparing magnitudes.
-- **Stacked bar chart** (single tall bar) — for parts-of-a-whole
+- **Sorted bar chart**, for comparing magnitudes.
+- **Stacked bar chart** (single tall bar), for parts-of-a-whole
   with named segments.
-- **Treemap** — for nested hierarchies.
+- **Treemap**, for nested hierarchies.
 
 <CodeBlock
   adapter="python"
@@ -173,7 +173,7 @@ df = pd.DataFrame(
     }
 )
 
-# A horizontal stacked bar — communicates "parts of a whole" without angles.
+# A horizontal stacked bar, communicates "parts of a whole" without angles.
 df["total"] = "Traffic"
 fig = px.bar(
     df,
@@ -182,7 +182,7 @@ fig = px.bar(
     color="channel",
     orientation="h",
     template="simple_white",
-    title="Traffic by channel (stacked bar — pie alternative)",
+    title="Traffic by channel (stacked bar, pie alternative)",
     labels={"share": "Share (%)", "total": ""},
 )
 fig.update_layout(showlegend=True, height=200)
@@ -208,7 +208,7 @@ That single rule will keep you out of trouble.
 A pie chart, when used carelessly, makes data *harder* to read
 than the raw numbers. That undermines the whole point of
 visualization. The reason this chapter exists is not to win an
-internet argument about pies — it's to make you *think about
+internet argument about pies, it's to make you *think about
 which encoding earns its place* on every chart you make.
 
 The deeper lesson: **every chart type is a tool, and tools have
@@ -223,11 +223,11 @@ use them outside it.
 - Pie charts cannot be interactive.
   > Plotly's **px.pie()** produces fully interactive charts with hover, click-to-isolate, and legend-toggle behaviors. Interactivity is not the reason pie charts are criticized.
 - Pie charts are mathematically incorrect.
-  > Pie charts are mathematically valid representations of proportions — each slice angle is proportional to its share of the total. The problem is perceptual, not mathematical: humans compare angles less accurately than lengths.
+  > Pie charts are mathematically valid representations of proportions, each slice angle is proportional to its share of the total. The problem is perceptual, not mathematical: humans compare angles less accurately than lengths.
 - [o] Pie charts encode quantity using **angles and areas**, which the human visual system judges much less accurately than **position and length** used by bar charts.
   > The Cleveland-McGill ranking places angle and area near the *bottom* of accuracy for quantitative comparison. For 5+ slices of similar size, viewers cannot reliably rank them. A sorted bar chart makes the same comparison trivially easy.
 - Pie charts are too colorful.
-  > Color is how pie charts distinguish their slices — it is a functional part of the design, not a flaw. The criticism of pie charts is about perceptual accuracy of angle comparison, not the number of colors used.
+  > Color is how pie charts distinguish their slices, it is a functional part of the design, not a flaw. The criticism of pie charts is about perceptual accuracy of angle comparison, not the number of colors used.
 
 The criticism is empirical, not aesthetic. Bars consistently outperform pies on accuracy in controlled experiments.`}
 />
@@ -236,7 +236,7 @@ The criticism is empirical, not aesthetic. Bars consistently outperform pies on 
   markdown={`In which situation is a pie chart **most reasonable**?
 
 - Comparing the populations of 30 countries.
-  > Comparing 30 values across countries is a ranking task — a sorted horizontal bar chart handles it far better. Pie charts with 30 slices are nearly unreadable because the angles become too similar to distinguish.
+  > Comparing 30 values across countries is a ranking task, a sorted horizontal bar chart handles it far better. Pie charts with 30 slices are nearly unreadable because the angles become too similar to distinguish.
 - Showing a trend over time.
   > Time series require a chart type that conveys ordered change, such as a line chart. A pie chart has no time axis and cannot show how values evolve over time.
 - [o] Showing a part-of-a-whole composition with 2-4 slices where one slice clearly dominates.
@@ -254,19 +254,19 @@ For distributions use a histogram; for trends use a line chart; for many-categor
   > Pie charts appear in professional and academic reports regularly. There is no formal prohibition; the criticism is that they are often a poor choice for comparison tasks, not that they are categorically banned.
 - The colors might clash.
   > Color palette choices are independent of whether you use one pie or two. The fundamental problem with side-by-side pies is the perceptual difficulty of comparing angles across two separate circles, not color aesthetics.
-- [o] Comparing the same slice across two different pies requires comparing two *angles*, which the eye is poor at — and any subtle change in slice composition makes the comparison harder still.
+- [o] Comparing the same slice across two different pies requires comparing two *angles*, which the eye is poor at, and any subtle change in slice composition makes the comparison harder still.
   > This is one of the most famously hopeless visualization tasks. A paired or grouped bar chart, or a slope chart, makes the comparison much easier. If anyone gives you "two pies side by side" as analysis, you can almost always do better.
 - Two pies cannot fit on one page.
-  > Page space is not the issue — two pies can physically fit side by side. The problem is cognitive: comparing a slice in one pie to the same slice in another requires reading two different angles, which the human visual system does poorly.
+  > Page space is not the issue, two pies can physically fit side by side. The problem is cognitive: comparing a slice in one pie to the same slice in another requires reading two different angles, which the human visual system does poorly.
 
-Whenever you see paired pies, mentally translate them to paired bars — you'll see how much information is being thrown away.`}
+Whenever you see paired pies, mentally translate them to paired bars, you'll see how much information is being thrown away.`}
 />
 
 <MultipleChoice
   markdown={`The best alternative to a pie chart for showing **parts of a whole** when comparison matters is usually:
 
 - A 3-D pie chart.
-  > A 3-D pie chart makes angle comparison even harder by introducing perspective distortion — slices in the foreground appear larger than equally-sized slices at the back. It amplifies the weaknesses of the standard pie rather than solving them.
+  > A 3-D pie chart makes angle comparison even harder by introducing perspective distortion, slices in the foreground appear larger than equally-sized slices at the back. It amplifies the weaknesses of the standard pie rather than solving them.
 - A scatter plot.
   > Scatter plots are designed to show relationships between two quantitative variables. They have no concept of "parts of a whole" and are not an appropriate replacement for a pie chart in a composition task.
 - [o] A sorted bar chart, or a single stacked bar.

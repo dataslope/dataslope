@@ -10,7 +10,7 @@
  *   1. `ReturnToTracker` (mounted once in the root layout) records the
  *      last non-auth page the user visited in sessionStorage. It relies
  *      on `usePathname`, so it sees BOTH full page loads and client-side
- *      navigations — `document.referrer` misses the latter entirely.
+ *      navigations, `document.referrer` misses the latter entirely.
  *   2. The sign-in page resolves its post-auth destination as:
  *      explicit `?next=` param → tracked page → `/account`.
  *
@@ -52,7 +52,7 @@ export function readReturnTo(): string | null {
     const stored = window.sessionStorage.getItem(STORAGE_KEY);
     return isSafeReturnPath(stored) ? stored : null;
   } catch {
-    return null; // private mode — fall back to the default destination
+    return null; // private mode, fall back to the default destination
   }
 }
 
@@ -72,7 +72,7 @@ export function ReturnToTracker() {
         `${pathname}${window.location.search}${window.location.hash}`,
       );
     } catch {
-      /* private mode / quota — sign-in falls back to /account. */
+      /* private mode / quota, sign-in falls back to /account. */
     }
   }, [pathname]);
   return null;

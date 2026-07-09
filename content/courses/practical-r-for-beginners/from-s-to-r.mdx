@@ -7,15 +7,15 @@ description: The unlikely story of two New Zealand statisticians who wrote a tea
 
 In 1991, Ross Ihaka and Robert Gentleman were colleagues in the
 statistics department at the University of Auckland, New Zealand.
-They were both interested in computing — Ihaka had a PhD in
+They were both interested in computing, Ihaka had a PhD in
 statistics from Berkeley, Gentleman had done postdoctoral work on
-genetics — and both had used the **S** language at previous
+genetics, and both had used the **S** language at previous
 institutions.
 
 They had a small, local problem: they wanted to teach introductory
 statistics with a hands-on computer lab. They wanted students to
 play with data, not just read about it. The natural tool for this
-was S-PLUS — but Auckland could not afford site licenses for every
+was S-PLUS, but Auckland could not afford site licenses for every
 student machine.
 
 So they decided to write their own.
@@ -23,7 +23,7 @@ So they decided to write their own.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="A small solid blue cube passes along a solid gray arrow into a much larger green cube with smaller cubes budding beside it — the S language reborn at Auckland as R, and growing far beyond its teaching-lab roots"
+  aria-label="A small solid blue cube passes along a solid gray arrow into a much larger green cube with smaller cubes budding beside it, the S language reborn at Auckland as R, and growing far beyond its teaching-lab roots"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -57,8 +57,8 @@ So they decided to write their own.
 <IllustrationPrompt subject="Robert Gentleman" photo />
 
 They began on what they later described as a small experiment. They
-took inspiration from S in *syntax* — they wanted the language to
-feel familiar to anyone who already knew S — but built the
+took inspiration from S in *syntax*, they wanted the language to
+feel familiar to anyone who already knew S, but built the
 **implementation** from scratch, drawing also on a Lisp-family
 language called **Scheme** for the way variables and environments
 worked under the hood.
@@ -84,7 +84,7 @@ timeline
     1995 : R licensed under the GNU General Public License
     1996 : Ihaka & Gentleman publish "R: A Language for Data Analysis and Graphics"
            Core development team forms (now "R Core")
-    1997 : CRAN — the Comprehensive R Archive Network — launches
+    1997 : CRAN, the Comprehensive R Archive Network, launches
     2000 Feb : R 1.0.0 released
     2001 : First R-help mailing list community grows past hobbyist scale
 ```
@@ -102,8 +102,8 @@ A few reasons stand out.
 
 **It was free, and the license meant it would stay that way.** R
 was released under the **GNU General Public License (GPL)**. This
-meant anyone — students, researchers, companies in developing
-countries, statisticians at small institutions — could install it,
+meant anyone, students, researchers, companies in developing
+countries, statisticians at small institutions, could install it,
 share it, and build on it without paying anyone. For a research
 field that runs on graduate students, this was decisive.
 
@@ -112,12 +112,12 @@ field that runs on graduate students, this was decisive.
 designed so that *users could extend it themselves*. Anyone could
 write a function, package it up, and share it with the world.
 
-**CRAN.** In 1997, Kurt Hornik and Friedrich Leisch — Austrian
-statisticians collaborating with the R team — launched the
+**CRAN.** In 1997, Kurt Hornik and Friedrich Leisch, Austrian
+statisticians collaborating with the R team, launched the
 **Comprehensive R Archive Network**. CRAN was a single, central
 repository where anyone could submit a package, and where anyone
 could install one with a single command. Combined with R's
-extensibility, this turned R into a *platform* — a place where the
+extensibility, this turned R into a *platform*, a place where the
 world's statistical methods were collected.
 
 **Academic credibility.** R was built by statisticians, used by
@@ -128,18 +128,18 @@ industry already fluent in R, and brought it with them.
 On top of **R Core** (the language itself) sits **CRAN**, and on
 top of CRAN sits everything else:
 
-- `ggplot2` — plotting
-- `dplyr` — data wrangling
-- `caret` — machine learning
-- `shiny` — web apps
-- `lme4` — mixed models
-- `Bioconductor` — genomics
+- `ggplot2`, plotting
+- `dplyr`, data wrangling
+- `caret`, machine learning
+- `shiny`, web apps
+- `lme4`, mixed models
+- `Bioconductor`, genomics
 - ...thousands more
 
 By 2010, CRAN had over 2,000 packages. By 2020, over 16,000. Today
 there are more than 20,000. Whatever obscure statistical method you
-need — from non-parametric regression to phylogenetic tree
-estimation — there is almost certainly an R package for it, often
+need, from non-parametric regression to phylogenetic tree
+estimation, there is almost certainly an R package for it, often
 written by the original inventor of the method.
 
 ## R was always an "S dialect"
@@ -162,13 +162,13 @@ book, every tutorial, every method would have had to be rewritten
 from scratch. R inherited the entire S culture and then expanded
 it.
 
-In 2017, John Chambers — the original creator of S — gave the
+In 2017, John Chambers, the original creator of S, gave the
 keynote at the *useR!* conference. He spoke generously about R as
 "the realization of S in the open-source world." S-PLUS, the
 commercial product, was already in decline. The free, community-built
 descendant had outgrown the commercial parent.
 
-## What R inherited from S — and what it added
+## What R inherited from S, and what it added
 
 Let's look at the very same code idea, written so it would run in
 S in 1985 or in R today. The semantics are nearly identical.
@@ -189,7 +189,7 @@ print(round(bmi, 2))
 # Summary functions
 cat("min:", min(bmi), " median:", median(bmi), " max:", max(bmi), "\\n")
 
-# A linear model — one of S's signature features
+# A linear model, one of S's signature features
 model <- lm(weights ~ heights)
 print(coef(model))
 `,
@@ -197,7 +197,7 @@ print(coef(model))
   ]}
 />
 
-That same expression — `weights ~ heights` as a model formula —
+That same expression, `weights ~ heights` as a model formula,
 was an S innovation. R inherited it directly. Notice how
 *readable* it is: "regress weights on heights." That is the
 fingerprint of a language designed by people who wanted to make
@@ -214,7 +214,7 @@ But R added things S never had. A modern R script can use
       starterCode: `library(dplyr)
 data(mtcars)
 
-# A dplyr pipeline — distinctly modern-R idiom
+# A dplyr pipeline, distinctly modern-R idiom
 mtcars |>
   group_by(cyl) |>
   summarise(
@@ -230,7 +230,7 @@ mtcars |>
 
 The `|>` operator (called the *native pipe*, added to R in 4.1 in
 2021) lets you read code left-to-right: "take mtcars, group by
-cylinder, then summarize." That is **not** S syntax — it is a
+cylinder, then summarize." That is **not** S syntax, it is a
 modern R idiom built on top of decades of community experimentation.
 The same query in raw S would have been three or four nested
 function calls, much harder to read.
@@ -255,7 +255,7 @@ strengths are:
 R is not the right tool for every problem. It is not what you would
 pick to build a web backend, a large machine-learning training
 pipeline, or a real-time control system. But for **thinking with
-data** — exploring, modeling, visualizing, communicating — it is
+data**, exploring, modeling, visualizing, communicating, it is
 extraordinarily well-suited.
 
 ## Test your understanding
@@ -280,7 +280,7 @@ extraordinarily well-suited.
   > The interactive R interface (the REPL) is just the R console; CRAN is a separate online package repository, not a user interface.
 - A book series about R.
   > There are many books about R, but CRAN is a network of servers hosting packages, not a publishing series.
-- [o] The Comprehensive R Archive Network — a worldwide repository of R packages.
+- [o] The Comprehensive R Archive Network, a worldwide repository of R packages.
   > CRAN launched in 1997 and is the place from which R packages are submitted, reviewed, and distributed.
 - The compiler used to build the R interpreter.
   > R is compiled from C/Fortran source using standard compilers; CRAN is an online package archive, not a compiler.`}
@@ -290,7 +290,7 @@ extraordinarily well-suited.
   markdown={`Which of the following best explains why R has been so successful in academic statistics?
 
 - R is faster than any other language for numerical computing.
-  > R is competitive in many cases, but raw speed is not where it shines — and other languages (Julia, C++, Python with NumPy) are often faster for pure number-crunching.
+  > R is competitive in many cases, but raw speed is not where it shines, and other languages (Julia, C++, Python with NumPy) are often faster for pure number-crunching.
 - [o] It is free, extensible, and lets users contribute packages that the entire community can use.
   > The combination of "free under the GPL" + "real programming language" + "CRAN as a central package archive" is what turned R into a true platform for the world's statisticians.
 - R was bundled with university computer science textbooks.
@@ -350,5 +350,5 @@ slope <- unname(coef(model)["height"])
 />
 
 In the next chapter we will zoom out one more time and answer the
-"so what?" question — why R, specifically, matters in 2025, even in
+"so what?" question, why R, specifically, matters in 2025, even in
 a world that also has Python, Julia, and a thousand other tools.

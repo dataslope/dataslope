@@ -6,7 +6,7 @@ description: A short, opinionated roadmap for continuing your Java and software 
 You have travelled a long way. From the story of how Java was
 born, through computational thinking, classes and objects, the
 JVM, memory, collections, exceptions, debugging, simple
-algorithms, software organization, and a capstone — you now have
+algorithms, software organization, and a capstone, you now have
 the *vocabulary* and the *mental models* of a Java programmer.
 
 This short page is your roadmap forward.
@@ -14,7 +14,7 @@ This short page is your roadmap forward.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A pale green disc and a solid blue circle overlap while a thin yellow arc sweeps beneath them, two small dots floating free — an abstract closing note"
+  aria-label="A pale green disc and a solid blue circle overlap while a thin yellow arc sweeps beneath them, two small dots floating free, an abstract closing note"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <circle cx="270" cy="112" r="85" fill="var(--ds-green-500)" fillOpacity="0.12" />
@@ -40,7 +40,7 @@ these themes.
 
 ## Where to go next
 
-Below is a suggested order. You don't have to follow it strictly —
+Below is a suggested order. You don't have to follow it strictly,
 follow whichever branch excites you most.
 
 ```mermaid
@@ -66,7 +66,7 @@ flowchart TB
 ### 1. Automated testing with JUnit
 
 The single highest-value next topic. Once you can write tests, every
-future skill you learn compounds — you can experiment confidently,
+future skill you learn compounds, you can experiment confidently,
 refactor without fear, and prove your code does what you claim.
 
 Focus on:
@@ -74,7 +74,7 @@ Focus on:
 - Writing tests in the "arrange / act / assert" shape.
 - Testing one behavior per test, with a clear name.
 - Using assertions like `assertEquals`, `assertThrows`.
-- Test-driven development (TDD) as an *exercise* — write the test
+- Test-driven development (TDD) as an *exercise*, write the test
   first, watch it fail, write code to pass it.
 
 ### 2. Deeper OOP
@@ -90,17 +90,17 @@ are the classics.
 Java has evolved a lot since the early days. Two big wins for
 beginners:
 
-- **Streams** (`list.stream().filter(...).map(...).collect(...)`) —
+- **Streams** (`list.stream().filter(...).map(...).collect(...)`),
   a declarative way to transform collections.
-- **`Optional<T>`** — a type that explicitly says "this value may
+- **`Optional<T>`**, a type that explicitly says "this value may
   be absent," a better answer than `null`.
-- **`java.time`** (`LocalDate`, `Instant`, `Duration`) — the modern
+- **`java.time`** (`LocalDate`, `Instant`, `Duration`), the modern
   way to handle dates and times.
 
 ### 4. A taste of concurrency
 
-Programs that do *more than one thing at once* — handling many
-users, talking to several services, doing background work — are
+Programs that do *more than one thing at once*, handling many
+users, talking to several services, doing background work, are
 the rule, not the exception. Start with:
 
 - `Thread` and `Runnable`: the absolute basics.
@@ -130,7 +130,7 @@ a tiny REST API that does CRUD on a domain you care about.
 
 Real programs talk to databases. Start with raw **JDBC** to
 understand what is actually happening at the SQL/network level.
-Only then move to **JPA / Hibernate** — frameworks make sense once
+Only then move to **JPA / Hibernate**, frameworks make sense once
 you've felt the problem they solve.
 
 ### 8. Bigger systems

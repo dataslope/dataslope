@@ -4,9 +4,9 @@
  * Interactive shell for the SVG graphics gallery. The graphic data is collected
  * at build time (see `lib/svgGallery.ts` and `scripts/build-svg-gallery-data.mjs`)
  * into the static asset `/svg-gallery/data.json`, which
- * `SvgGalleryFromStaticData` fetches on mount — keeping the prerendered page a
- * tiny shell with zero ISR-store involvement. Everything here — the light/dark
- * theme toggle, course pagination, and per-graphic copy buttons — is
+ * `SvgGalleryFromStaticData` fetches on mount, keeping the prerendered page a
+ * tiny shell with zero ISR-store involvement. Everything here, the light/dark
+ * theme toggle, course pagination, and per-graphic copy buttons, is
  * client-side.
  *
  * The current page is mirrored into the URL as `?page=N` (1-based; page 1
@@ -26,7 +26,7 @@ type Theme = "light" | "dark";
 
 // Theme is sourced from localStorage (falling back to the OS preference) via an
 // external store, so reading it needs no effect and the server snapshot stays a
-// stable "light" — avoiding both the set-state-in-effect lint and any hydration
+// stable "light", avoiding both the set-state-in-effect lint and any hydration
 // mismatch. A module-level listener set lets the toggle notify subscribers
 // (the `storage` event doesn't fire in the same document).
 const themeListeners = new Set<() => void>();
@@ -58,7 +58,7 @@ function useTheme(): [Theme, () => void] {
 /**
  * Fetches the build-time gallery data from its static-asset home and renders
  * the gallery once it arrives. The JSON is a few hundred kB, so there's a
- * brief loading state — acceptable for a dev-only review page, and the
+ * brief loading state, acceptable for a dev-only review page, and the
  * trade that keeps the route off Vercel's ISR-read meter entirely.
  */
 export function SvgGalleryFromStaticData() {
@@ -89,7 +89,7 @@ export function SvgGalleryFromStaticData() {
       <div className={styles.inner}>
         <p className={styles.empty}>
           {failed
-            ? "Couldn't load /svg-gallery/data.json — run `npm run build:svg-gallery` and reload."
+            ? "Couldn't load /svg-gallery/data.json, run `npm run build:svg-gallery` and reload."
             : "Loading gallery data…"}
         </p>
       </div>
@@ -136,7 +136,7 @@ export function SvgGalleryClient({ courses }: { courses: GalleryCourse[] }) {
       setCopied(id);
       window.setTimeout(() => setCopied((c) => (c === id ? null : c)), 1500);
     } catch {
-      // Clipboard unavailable (e.g. insecure context) — ignore.
+      // Clipboard unavailable (e.g. insecure context), ignore.
     }
   }, []);
 
@@ -197,7 +197,7 @@ export function SvgGalleryClient({ courses }: { courses: GalleryCourse[] }) {
           </div>
           <p className={styles.subtitle}>
             Every custom inline <code>&lt;svg&gt;</code> graphic across the{" "}
-            <code>/learn</code> courses — <span className={styles.count}>{total}</span>{" "}
+            <code>/learn</code> courses, <span className={styles.count}>{total}</span>{" "}
             graphic{total === 1 ? "" : "s"} in {courses.length} course
             {courses.length === 1 ? "" : "s"}. Mermaid diagrams are excluded.
           </p>

@@ -1,7 +1,7 @@
 /**
  * Reads a section folder's `meta.json` (the Fumadocs folder config under
  * `content/<section>/<folder>/`). Used at build time to resolve the human
- * course/role name + description for breadcrumbs and Course JSON-LD — values
+ * course/role name + description for breadcrumbs and Course JSON-LD, values
  * that live in `meta.json`, not in the page's own MDX frontmatter (the index
  * page's frontmatter title is typically "Welcome"/"Overview", not the name).
  *
@@ -40,7 +40,7 @@ export async function getCourseMeta(
       root: meta.root === true,
     };
   } catch {
-    // No meta.json (loose page) or unreadable — not a course root.
+    // No meta.json (loose page) or unreadable, not a course root.
     return null;
   }
 }

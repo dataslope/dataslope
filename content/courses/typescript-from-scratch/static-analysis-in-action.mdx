@@ -10,7 +10,7 @@ This chapter reveals the compiler's inner workings: how it catches bugs at compi
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="Parcels ride a belt through a blue scanning arch on their way to the departure flag: the parcel inside the arch reveals a red flaw, while the cleared parcels beyond carry small green dots — static analysis inspects code before it ever ships"
+  aria-label="Parcels ride a belt through a blue scanning arch on their way to the departure flag: the parcel inside the arch reveals a red flaw, while the cleared parcels beyond carry small green dots, static analysis inspects code before it ever ships"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -51,7 +51,7 @@ This chapter reveals the compiler's inner workings: how it catches bugs at compi
 
 ## What the Compiler Proves
 
-When you run `tsc` (the TypeScript compiler), it doesn't just transform `.ts` files into `.js`. It performs **static analysis** — reasoning about your code without running it — and proves (or disproves) properties:
+When you run `tsc` (the TypeScript compiler), it doesn't just transform `.ts` files into `.js`. It performs **static analysis**, reasoning about your code without running it, and proves (or disproves) properties:
 
 1. **Type safety**: Every value matches the types you've declared. No accidental `string` where a `number` is expected.
 2. **Null safety**: With `strictNullChecks`, you can't access `.length` on a value that might be `null` or `undefined`.
@@ -152,7 +152,7 @@ console.log(area({ kind: "rectangle", width: 10, height: 20 }));
   ]}
 />
 
-The `never` type is a bottom type — a type with no values. If all cases are handled, `shape` in the `default` branch has type `never`, and the assignment succeeds. If you add a new variant (e.g., `{ kind: "triangle"; ... }`) and don't handle it, `shape` won't be `never`, and the compiler errors.
+The `never` type is a bottom type, a type with no values. If all cases are handled, `shape` in the `default` branch has type `never`, and the assignment succeeds. If you add a new variant (e.g., `{ kind: "triangle"; ... }`) and don't handle it, `shape` won't be `never`, and the compiler errors.
 
 Let's see what happens if we add a new shape:
 
@@ -215,7 +215,7 @@ Suppose you rename `fullName` to `name`. Every place that accesses `.fullName` b
 
 ## The Pipeline, Revisited
 
-Back in [How TypeScript Works](./how-typescript-works), near the very start of the course, we walked through the compiler's stages — scanner, parser, binder, checker, emitter — when most of them were still abstractions. Now you can read the same diagram with different eyes: every guarantee on this page is the **Checker** doing its job, and everything you've learned since (narrowing, discriminated unions, generics, mapped types) is vocabulary the checker reasons in.
+Back in [How TypeScript Works](./how-typescript-works), near the very start of the course, we walked through the compiler's stages, scanner, parser, binder, checker, emitter, when most of them were still abstractions. Now you can read the same diagram with different eyes: every guarantee on this page is the **Checker** doing its job, and everything you've learned since (narrowing, discriminated unions, generics, mapped types) is vocabulary the checker reasons in.
 
 ```mermaid
 graph TD
@@ -229,7 +229,7 @@ graph TD
     style G fill:#d4edda
 ```
 
-Notice the arrow this chapter cares about: the checker feeds two consumers. The **emitter** uses it once per build. The **language service** uses it *continuously* — every keystroke in your editor re-runs the same analysis, which is why the red squiggle under `user.emial`, the autocomplete dropdown, "Find All References," and project-wide rename are not separate features bolted onto your editor. They are one type checker, asked different questions. When you rename `fullName` to `name` and twelve files light up with errors, that's static analysis acting as a refactoring engine: the compiler has a complete, always-current map of every place each symbol flows, so nothing can hide.
+Notice the arrow this chapter cares about: the checker feeds two consumers. The **emitter** uses it once per build. The **language service** uses it *continuously*, every keystroke in your editor re-runs the same analysis, which is why the red squiggle under `user.emial`, the autocomplete dropdown, "Find All References," and project-wide rename are not separate features bolted onto your editor. They are one type checker, asked different questions. When you rename `fullName` to `name` and twelve files light up with errors, that's static analysis acting as a refactoring engine: the compiler has a complete, always-current map of every place each symbol flows, so nothing can hide.
 
 <Callout type="info" title="The Editor Is Your Compiler">
 With TypeScript, the editor *is* the compiler. Every red squiggle, autocomplete suggestion, and refactor command is driven by the same type analysis that runs at build time. This tight integration is what makes TypeScript so productive.
@@ -325,7 +325,7 @@ If you add another `else` after the `value === 0` case, it's unreachable, and th
 <svg
   viewBox="0 0 640 170"
   role="img"
-  aria-label="A solid blue route runs straight through to a green terminal, while a faint gray spur drops away to a node nothing ever reaches, ringed in red — the compiler proves that code after a return or an impossible branch can never run"
+  aria-label="A solid blue route runs straight through to a green terminal, while a faint gray spur drops away to a node nothing ever reaches, ringed in red, the compiler proves that code after a return or an impossible branch can never run"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -468,8 +468,8 @@ You've learned:
 - The **compiler pipeline**: Scanner → Parser → Binder → Checker → Emitter + Language Service.
 - How the **language service** powers your editor with autocomplete, go-to-definition, and refactoring.
 
-Static analysis shifts bugs leftward — from runtime (where they're expensive and dangerous) to compile time (where they're cheap and safe). The TypeScript compiler doesn't just translate your code; it *proves properties* about it. And the editor integration means you get this feedback instantly, as you type.
+Static analysis shifts bugs leftward, from runtime (where they're expensive and dangerous) to compile time (where they're cheap and safe). The TypeScript compiler doesn't just translate your code; it *proves properties* about it. And the editor integration means you get this feedback instantly, as you type.
 
 ---
 
-**Next**: [Next Steps](./next-steps) — where to go from here on your TypeScript journey.
+**Next**: [Next Steps](./next-steps), where to go from here on your TypeScript journey.

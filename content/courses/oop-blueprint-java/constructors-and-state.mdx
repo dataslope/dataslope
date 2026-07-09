@@ -5,13 +5,13 @@ description: Bringing objects into existence in a valid state, overloaded constr
 
 A constructor's job is small but absolute: **make sure that an object
 exists in a valid state from the moment it is born.** A class that
-fails at this lets the rest of the system inherit half-built objects
-— and half-built objects produce bugs that look like ghosts.
+fails at this lets the rest of the system inherit half-built objects,
+and half-built objects produce bugs that look like ghosts.
 
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Constructor arguments fall into an open vessel, and past a solid arrow the same vessel stands sealed with a green cap and every value settled — while a faint cracked vessel apart from them shows the half-built object a constructor prevents"
+  aria-label="Constructor arguments fall into an open vessel, and past a solid arrow the same vessel stands sealed with a green cap and every value settled, while a faint cracked vessel apart from them shows the half-built object a constructor prevents"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -121,7 +121,7 @@ declare *any* constructor, that freebie disappears.
 }
 
 class Empty {
-  // no constructor declared — Java inserts a default Empty()
+  // no constructor declared, Java inserts a default Empty()
 }
 `,
     },
@@ -132,7 +132,7 @@ class Empty {
 
 The thing constructors *really* do for design is enforce invariants
 before the object is allowed to exist. The rule "a `Person`'s age is
-never negative" is a *class* rule — and the class can enforce it by
+never negative" is a *class* rule, and the class can enforce it by
 refusing to be constructed in violation of it.
 
 <CodeBlock
@@ -232,7 +232,7 @@ reassigned.
 
 An object whose fields are all `final` and whose constructor sets
 them is **immutable**: it cannot change after creation. Immutable
-objects are extremely safe — they can be passed around freely, shared
+objects are extremely safe, they can be passed around freely, shared
 between methods, even shared between threads, with no risk of
 accidental mutation.
 
@@ -404,7 +404,7 @@ bad: invalid email
   > That freebie is only generated when no other constructor is declared.
 - It runs the two-argument constructor with \`null\` and \`0\`
   > Java does not invent argument values.
-- [o] It fails to compile — there is no matching constructor
+- [o] It fails to compile, there is no matching constructor
   > Once you declare any constructor, the implicit no-arg one disappears.
 - It produces a \`NullPointerException\` at runtime
   > The problem is detected at compile time, not runtime.`}

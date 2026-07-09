@@ -1,15 +1,15 @@
 ---
 title: Maps and Sets
-description: Two collections that make lookup almost free — and the mental model for when to reach for each
+description: Two collections that make lookup almost free, and the mental model for when to reach for each
 ---
 
 `List` is for ordered, possibly-duplicated, position-addressed data.
 But not every problem fits that shape. Two of the most useful
 collections in any language are:
 
-- **`Set`** — a bag of *unique* items, with very fast "is this in
+- **`Set`**, a bag of *unique* items, with very fast "is this in
   here?" checks.
-- **`Map`** — a collection of **key → value** pairs, with very
+- **`Map`**, a collection of **key → value** pairs, with very
   fast "what value goes with this key?" lookups.
 
 Once you have these two in your toolbox, a huge fraction of
@@ -18,7 +18,7 @@ Once you have these two in your toolbox, a huge fraction of
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="Two panels: on the left each blue key dot ties by a thin gray line to its own colored value pill — a map; on the right a stroked green region holds one dot of each color while an identical green newcomer is crossed out in red at the border — a set"
+  aria-label="Two panels: on the left each blue key dot ties by a thin gray line to its own colored value pill, a map; on the right a stroked green region holds one dot of each color while an identical green newcomer is crossed out in red at the border, a set"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="60" y="25" width="250" height="170" rx="14" fill="var(--ds-blue-500)" fillOpacity="0.05" />
@@ -65,7 +65,7 @@ public class Main {
     Set<String> seen = new HashSet<>();
     seen.add("Ada");
     seen.add("Grace");
-    seen.add("Ada"); // duplicate — ignored
+    seen.add("Ada"); // duplicate, ignored
 
     System.out.println("size = " + seen.size());
     System.out.println("contains Ada? " + seen.contains("Ada"));
@@ -79,7 +79,7 @@ public class Main {
 
 A `HashSet`:
 
-- Stores each element **at most once** — duplicates are silently
+- Stores each element **at most once**, duplicates are silently
   ignored.
 - Has **no defined order** (don't rely on iteration order).
 - Offers `add`, `remove`, `contains` in (effectively) constant
@@ -173,7 +173,7 @@ flowchart TD
 ```
 
 This is why an unsorted `HashSet` of 10 million strings can answer
-"is X in here?" in microseconds: it doesn't *search* — it *computes*
+"is X in here?" in microseconds: it doesn't *search*, it *computes*
 where the answer would be and looks there directly.
 
 For this to work, two contracts must hold for the key type:
@@ -258,7 +258,7 @@ genuinely don't know in advance.
 
 - The second add throws an exception
   > It doesn't throw.
-- [o] The second add is silently ignored — the set still contains exactly one copy
+- [o] The second add is silently ignored, the set still contains exactly one copy
   > A \`Set\` stores each element at most once, so a duplicate \`add\` is a no-op.
 - The set now contains two copies
   > Sets enforce uniqueness.

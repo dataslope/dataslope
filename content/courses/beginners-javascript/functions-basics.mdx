@@ -1,11 +1,11 @@
 ---
-title: Functions — the Building Blocks
-description: The single most important concept in programming — giving a name to a piece of work, and reusing it.
+title: "Functions: the Building Blocks"
+description: The single most important concept in programming, giving a name to a piece of work, and reusing it.
 ---
 
 If there is one concept in this whole course you should take the
-time to truly understand, it is **functions**. Everything else —
-data structures, classes, asynchronous programming, frameworks —
+time to truly understand, it is **functions**. Everything else,
+data structures, classes, asynchronous programming, frameworks,
 is built on top of functions. They are the atom of programming.
 
 <svg
@@ -89,7 +89,7 @@ console.log(double(-7)); // -14
 
 Notice four things:
 
-- The **declaration** is a recipe — it does not execute the body
+- The **declaration** is a recipe, it does not execute the body
   yet.
 - A **call** like `double(3)` *executes* the body, with `n` bound
   to `3`.
@@ -122,7 +122,7 @@ Compare these two equivalent programs:
   files={[
     {
       filename: "main.js",
-      starterCode: `// Without functions — the formula is repeated and unnamed.
+      starterCode: `// Without functions, the formula is repeated and unnamed.
 const bill1 = 80;
 const tip1 = bill1 * 0.18;
 const total1 = bill1 + tip1;
@@ -147,7 +147,7 @@ console.log("Table 3 total:", total3);
   files={[
     {
       filename: "main.js",
-      starterCode: `// With a function — the formula has a name and lives in one place.
+      starterCode: `// With a function, the formula has a name and lives in one place.
 function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
@@ -236,7 +236,7 @@ console.log(doubled);
 />
 
 (There are a couple of subtle differences between regular
-functions and arrow functions — chiefly around the `this`
+functions and arrow functions, chiefly around the `this`
 keyword. We will look at `this` later. For now, treat them as
 near-interchangeable.)
 
@@ -247,7 +247,7 @@ the secret weapon of modern JavaScript.
 
 > In JavaScript, **functions are values**. You can put them in
 > variables, pass them to other functions, return them from
-> functions, and store them in arrays and objects — exactly like
+> functions, and store them in arrays and objects, exactly like
 > numbers and strings.
 
 <CodeBlock
@@ -288,7 +288,7 @@ for (const op of operations) {
   ]}
 />
 
-If this feels like magic, that's normal — and important. We will
+If this feels like magic, that's normal, and important. We will
 return to it in the closures chapter.
 
 ## Pure functions and side effects
@@ -296,7 +296,7 @@ return to it in the closures chapter.
 A **pure function** has two properties:
 
 1. Given the same inputs, it always returns the same output.
-2. It does not affect anything outside itself — no printing, no
+2. It does not affect anything outside itself, no printing, no
    variable changes, no network calls, no file writes.
 
 A function with **side effects** does some kind of work the
@@ -304,8 +304,8 @@ outside world can observe: printing, writing files, modifying a
 shared variable.
 
 Pure functions are easier to think about, easier to test, and
-easier to reuse. Side effects are sometimes necessary — eventually
-you *do* want output and persistence — but the goal of a good
+easier to reuse. Side effects are sometimes necessary, eventually
+you *do* want output and persistence, but the goal of a good
 design is to keep them in well-marked, predictable places.
 
 <CodeBlock
@@ -321,12 +321,12 @@ function add(a, b) {
 // Impure: reads from / writes to the outside world.
 let total = 0;
 function addToTotal(n) {
-  total += n; // side effect — modifies an outside variable
-  console.log(total); // side effect — produces output
+  total += n; // side effect, modifies an outside variable
+  console.log(total); // side effect, produces output
 }
 
 console.log(add(2, 3)); // 5
-console.log(add(2, 3)); // 5  — same every time
+console.log(add(2, 3)); // 5, same every time
 
 addToTotal(2);
 addToTotal(3); // result depends on previous calls!
@@ -384,7 +384,7 @@ At the moment `bigName` is running, the call stack looks like:
 When `bigName` returns, it is removed, and we continue running
 `greet`.
 
-You will see the call stack again when we discuss debugging — most
+You will see the call stack again when we discuss debugging, most
 error messages include a stack trace that lists every function
 that was in progress when the error happened. Learning to read
 that trace is a superpower.
@@ -430,9 +430,9 @@ module.exports = { totalWithTip, perPerson };
   ]}
 />
 
-`bill.js` is a small **module** — a collection of related
+`bill.js` is a small **module**, a collection of related
 functions, exported for use by other files. `index.js` is the
-**driver** — it imports those functions and uses them. We will see
+**driver**, it imports those functions and uses them. We will see
 this pattern many more times.
 
 ## Challenge

@@ -1,10 +1,10 @@
 ---
 title: "Deeper History: Statistics Before Computers"
-description: A short history of statistics from the gambling tables of the 17th century to the rooms full of human "computers" who carried out calculations by hand — and why their constraints still shape how we work today.
+description: A short history of statistics from the gambling tables of the 17th century to the rooms full of human "computers" who carried out calculations by hand, and why their constraints still shape how we work today.
 ---
 
 <Callout type="info" title="An optional deep dive">
-You have finished the working part of the course — you can now load,
+You have finished the working part of the course, you can now load,
 clean, transform, summarize, visualize, and reason about data in R.
 These last few chapters before the wrap-up are an *optional* history:
 where statistics, statistical computing, and R itself came from. They
@@ -26,7 +26,7 @@ what statistics was like in that world.
 <svg
   viewBox="0 0 640 220"
   role="img"
-  aria-label="A worksheet fills with hand-drawn tally strokes — two blue rows already crossed off, a yellow row still growing — while a pencil rests at its corner: statistics done by human computers, one line at a time"
+  aria-label="A worksheet fills with hand-drawn tally strokes, two blue rows already crossed off, a yellow row still growing, while a pencil rests at its corner: statistics done by human computers, one line at a time"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <rect x="120" y="28" width="280" height="170" rx="10" fill="currentColor" opacity="0.06" />
@@ -66,7 +66,7 @@ The intellectual roots of statistics go back to the 1600s, when a
 small group of mathematicians began studying games of chance.
 
 - **Blaise Pascal** and **Pierre de Fermat** corresponded in 1654
-  about how to fairly split a wager when a game was interrupted —
+  about how to fairly split a wager when a game was interrupted,
   inventing the basic logic of probability in the process.
 - **John Graunt** published *Natural and Political Observations Made
   upon the Bills of Mortality* in 1662, using parish death records
@@ -74,21 +74,21 @@ small group of mathematicians began studying games of chance.
   populations by carefully counting them.
 - **Jakob Bernoulli** proved (around 1700) the **law of large
   numbers**: if you flip a fair coin enough times, the proportion
-  of heads will reliably approach one half. This sounds obvious now
-  — but it was the first mathematical bridge between *probability*
+  of heads will reliably approach one half. This sounds obvious now,
+but it was the first mathematical bridge between *probability*
   (a theoretical idea) and *data* (what we actually observe).
 
 For the next two hundred years, statistics grew slowly. A few names
 you may have heard of:
 
-- **Carl Friedrich Gauss** (early 1800s) — developed least-squares
+- **Carl Friedrich Gauss** (early 1800s), developed least-squares
   estimation while trying to predict the orbit of the asteroid
   Ceres from a handful of telescope sightings.
-- **Adolphe Quetelet** (1830s) — coined "social physics" and
+- **Adolphe Quetelet** (1830s), coined "social physics" and
   introduced the idea of the *average person*.
-- **Francis Galton** (late 1800s) — invented regression and
+- **Francis Galton** (late 1800s), invented regression and
   correlation while studying inheritance.
-- **Karl Pearson** and **R. A. Fisher** (early 1900s) — built the
+- **Karl Pearson** and **R. A. Fisher** (early 1900s), built the
   foundations of modern statistical inference.
 
 ```mermaid
@@ -108,7 +108,7 @@ timeline
 Every one of these breakthroughs was achieved without a computer.
 The arithmetic was done by hand, sometimes with mechanical
 calculators (the Brunsviga, the Marchant, the Friden), but most of
-the *thinking* — and most of the bookkeeping — was paper-and-pencil
+the *thinking*, and most of the bookkeeping, was paper-and-pencil
 work.
 
 ## What a real analysis looked like in 1920
@@ -116,11 +116,11 @@ work.
 Imagine you are R. A. Fisher, working at Rothamsted Experimental
 Station in the 1920s. You want to know whether a new fertilizer
 improves wheat yields. You design an experiment with, say, 8
-varieties of wheat planted in 5 plots each — 40 plots total. At
+varieties of wheat planted in 5 plots each, 40 plots total. At
 harvest, you have 40 numbers.
 
 The analysis you want to perform is what we now call **ANOVA**
-(analysis of variance) — a way to ask "is the difference between
+(analysis of variance), a way to ask "is the difference between
 varieties bigger than the random variation between plots?" The
 formula involves computing sums, sums of squares, and ratios of
 those quantities.
@@ -141,7 +141,7 @@ full of worked examples that were each many hours of arithmetic.
 <Callout type="info" title="Why statistical methods are so 'computational'">
 This is why many classical statistical techniques have such
 strange-looking shortcuts and rules of thumb. They were not designed
-for elegance — they were designed to *minimize the number of
+for elegance, they were designed to *minimize the number of
 multiplications a human had to do by hand*. When you see weird
 formulas in old textbooks, that is often what you are looking at:
 hand-calculation tricks frozen into the method.
@@ -154,7 +154,7 @@ built three kinds of tools.
 
 **Printed tables.** Books of values for the normal distribution,
 the t-distribution, the F-distribution, the chi-squared
-distribution — all computed once, painstakingly, and printed so
+distribution, all computed once, painstakingly, and printed so
 that everyone else could look up the answer instead of computing
 it. Some of these tables took years of work to produce.
 
@@ -163,8 +163,8 @@ its successors let you crank a handle to multiply or divide.
 Logarithms and slide rules helped further. By the 1930s a typical
 research office had several of these.
 
-**Human computers.** Large projects — astronomy, ballistics,
-actuarial science — were carried out by teams of (often female)
+**Human computers.** Large projects, astronomy, ballistics,
+actuarial science, were carried out by teams of (often female)
 mathematicians doing arithmetic in parallel. NASA's early space
 programs ran this way well into the 1960s, as immortalized in the
 book and film *Hidden Figures*.
@@ -179,7 +179,7 @@ A typical study ran top to bottom through these stages:
 6. Look up p-values in printed tables.
 7. Write up the results.
 
-That whole pipeline — every step — was manual. If you found a
+That whole pipeline, every step, was manual. If you found a
 transcription error partway through, you might have to redo hours
 of work.
 
@@ -221,8 +221,8 @@ cat("t-statistic:", round(t_stat, 3), "\\n")
 />
 
 Every line above is a step Fisher would have done by hand with a
-pencil and a Brunsviga. With R, it took us a second. And — crucially
-— if we want to check this against R's built-in t-test, it is one
+pencil and a Brunsviga. With R, it took us a second. And, crucially,
+if we want to check this against R's built-in t-test, it is one
 more line:
 
 <CodeBlock
@@ -239,12 +239,12 @@ t.test(variety_A, variety_B, var.equal = TRUE)
   ]}
 />
 
-Look at the *t* value in the output — it matches what we computed
+Look at the *t* value in the output, it matches what we computed
 manually. That is the gift of programming for statistics: you can
 build up an answer the long way to understand it, then trust the
 short way for production.
 
-## What carried over — and what didn't
+## What carried over, and what didn't
 
 The constraints of the pre-computer era shaped statistics in ways
 that are still with us:
@@ -253,8 +253,8 @@ that are still with us:
   (the t-test, ANOVA) were designed for n=10 or n=30, not n=10,000.
   That is because hand-computing anything bigger was infeasible.
 - **The use of *closed-form formulas*.** A formula is something you
-  can compute once and be done. Modern alternatives — bootstrapping,
-  simulation, Bayesian sampling — require thousands of computations
+  can compute once and be done. Modern alternatives, bootstrapping,
+  simulation, Bayesian sampling, require thousands of computations
   per analysis and were simply impossible before computers.
 - **The cultural emphasis on *publication of methods*, not data.**
   Datasets were small enough to fit in a paper appendix. There was
@@ -287,7 +287,7 @@ but practically unreachable. We will see that next.
   > Mainframe computers did not exist in the early 1900s; electronic computing only emerged in the 1940s.
 - A research grant for computation.
   > "Computer" in the early 1900s was a job title, not a funding category or a machine.
-- [o] A person — often a woman — whose job was to do arithmetic.
+- [o] A person, often a woman, whose job was to do arithmetic.
   > The word "computer" originally meant a person who performs calculations. Mechanical and then electronic computers eventually inherited the job title.
 - A pocket calculator.
   > Pocket calculators were not available until the 1970s; in the early 1900s, hand calculation was aided by mechanical adding machines and logarithm tables, not electronic devices.`}
@@ -299,8 +299,8 @@ but practically unreachable. We will see that next.
 - The math was too complicated to ever understand.
   > The underlying theory was well understood by statisticians of the era; the barrier was the computational cost of evaluating integrals and sums numerically, not conceptual difficulty.
 - It was illegal to compute these values yourself.
-  > There were no legal restrictions; the reason was purely practical — computing a full table by hand could take months or years.
-- [o] Computing those values from scratch was prohibitively expensive — so once computed, the answers were published once and reused everywhere.
+  > There were no legal restrictions; the reason was purely practical, computing a full table by hand could take months or years.
+- [o] Computing those values from scratch was prohibitively expensive, so once computed, the answers were published once and reused everywhere.
   > A table you can look up in five seconds replaces hours of hand computation.
 - They contained errors that statisticians could correct over time.
   > The tables were carefully verified and were generally reliable; they were used because evaluating the distribution functions numerically by hand was far too slow to do for every analysis.`}
@@ -319,11 +319,11 @@ the true mean is `40`.
   adapter="r"
   title="Compute a one-sample t-statistic by hand"
   instructions={`Given the vector \`yield\` (already loaded), define:
-- \`m\` — the mean of \`yield\`
-- \`s\` — the standard deviation of \`yield\`
-- \`t_stat\` — the one-sample t-statistic, \`(m - 40) / (s / sqrt(n))\`, where \`n\` is the length of yield.
+- \`m\`, the mean of \`yield\`
+- \`s\`, the standard deviation of \`yield\`
+- \`t_stat\`, the one-sample t-statistic, \`(m - 40) / (s / sqrt(n))\`, where \`n\` is the length of yield.
 
-You can use base R only — no packages needed.`}
+You can use base R only, no packages needed.`}
   files={[
     {
       filename: "main.r",
@@ -366,6 +366,6 @@ cat("mean:", m, " sd:", s, " t:", t_stat, "\\n")
 />
 
 In the next chapter, we will see how the arrival of computers
-turned this slow, careful craft into something altogether new — and
+turned this slow, careful craft into something altogether new, and
 why the most influential of those tools came from an unexpected
 place: **Bell Labs**.

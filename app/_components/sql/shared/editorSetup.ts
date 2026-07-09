@@ -78,7 +78,7 @@ export interface CreateSqlEditorExtensionsOptions {
   onRunAll: () => void;
 }
 
-// Stage 5.3 — `@codemirror/lang-sql` is loaded on demand so it lives in
+// Stage 5.3, `@codemirror/lang-sql` is loaded on demand so it lives in
 // its own chunk instead of bloating each SQL playground's main bundle.
 // The chunk is small enough that fetching it in parallel with engine
 // boot keeps the user-visible editor mount instant: the editor renders
@@ -130,7 +130,7 @@ export function makeSqlAutocompletionExtension(
 /** Build the `@codemirror/lang-sql` extension for a reconfigure
  *  dispatch (when the schema or dialect changes after the editor is
  *  mounted). The optional `schema` is the lang-sql shape used for
- *  built-in completions — it's the same `Record<table, columns>`
+ *  built-in completions, it's the same `Record<table, columns>`
  *  the SQLite playground has always passed.
  *
  *  Returns a Promise so callers can re-use the lazy-loaded chunk
@@ -158,7 +158,7 @@ export async function makeSqlLangExtension(
  *
  *  The `lang` compartment is intentionally seeded with an empty
  *  extension. The caller is expected to dispatch a reconfigure with
- *  the resolved `makeSqlLangExtension(...)` once it lands — this lets
+ *  the resolved `makeSqlLangExtension(...)` once it lands, this lets
  *  us defer the lang-sql chunk without blocking editor mount. */
 export function createSqlEditorExtensions(
   opts: CreateSqlEditorExtensionsOptions,
@@ -254,7 +254,7 @@ export function createSqlEditorExtensions(
       ...closeBracketsKeymap,
       // Completion keys must come before `defaultKeymap`, otherwise
       // ArrowUp/ArrowDown would move the cursor instead of the popup
-      // selection. Enter is removed so it always inserts a newline —
+      // selection. Enter is removed so it always inserts a newline,
       // Tab accepts the active completion instead (falling through to
       // indentWithTab when no completion is shown). This only works
       // because the autocompletion extension's own keymap is disabled

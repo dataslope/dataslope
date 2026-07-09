@@ -9,15 +9,15 @@
  * can show how much of the budget the window consumed.
  *
  * Window selection (all params optional, all UTC 'YYYY-MM-DD'):
- *   - `start` — inclusive lower bound. Omitted ⇒ all-time (the "Total" range).
- *   - `end`   — inclusive upper bound. Omitted ⇒ today (UTC).
- *   - `day`   — legacy single-day shorthand (start = end = day). Kept so an
+ *   - `start`, inclusive lower bound. Omitted ⇒ all-time (the "Total" range).
+ *   - `end`, inclusive upper bound. Omitted ⇒ today (UTC).
+ *   - `day`, legacy single-day shorthand (start = end = day). Kept so an
  *               older cached client keeps working through a deploy.
  * Invalid values are ignored (fall back to the defaults) and a start after
  * end is clamped, so the endpoint can never 400 on the picker's input.
  *
  * Authorization is enforced HERE (requireAdmin), matching the codebase's
- * "auth gates actions, not content" rule — the /admin pages stay statically
+ * "auth gates actions, not content" rule, the /admin pages stay statically
  * prerendered and non-admins just get a 403 from this endpoint. Any database
  * failure is logged and returned as a 500 with a message rather than a bare
  * unhandled throw, so the dashboard can surface "try again" instead of a
@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
 /** Default mirror of lib/ai/limits.ts DEFAULT_GLOBAL_CAP for display. */
 const DEFAULT_GLOBAL_CAP = 5_000_000;
 
-/** Cap on the per-day rows returned for the "daily totals" table — an
+/** Cap on the per-day rows returned for the "daily totals" table, an
  *  all-time window could otherwise return years of rows. The window's true
  *  totals (totalTok/peakDayTok/activeDays) are computed separately so they
  *  stay accurate even when this table is truncated. */

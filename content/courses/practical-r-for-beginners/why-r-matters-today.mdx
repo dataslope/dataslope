@@ -1,6 +1,6 @@
 ---
 title: "Deeper History: Why R Matters Today"
-description: In a world full of programming languages, what is the case for R in 2025? A look at why statisticians, scientists, journalists, and analysts keep choosing it — and where it sits in the modern data-science stack.
+description: In a world full of programming languages, what is the case for R in 2025? A look at why statisticians, scientists, journalists, and analysts keep choosing it, and where it sits in the modern data-science stack.
 ---
 
 If R was invented in 1991 and the world has since gained Python,
@@ -10,7 +10,7 @@ products, why does R still matter?
 The short answer is that R was *designed* for one specific job:
 helping a thoughtful person reason about data with statistical
 honesty. After 30 years of refinement, it is still one of the very
-best tools for that job — even though it was never the right tool
+best tools for that job, even though it was never the right tool
 for many *other* jobs.
 
 This page is about understanding that distinction.
@@ -18,7 +18,7 @@ This page is about understanding that distinction.
 <svg
   viewBox="0 0 640 240"
   role="img"
-  aria-label="Small colored package boxes ride two faint orbit rings around one solid central hub — a vast ecosystem of contributed packages circling the R core"
+  aria-label="Small colored package boxes ride two faint orbit rings around one solid central hub, a vast ecosystem of contributed packages circling the R core"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <path d="M320,120 m-78,0 a78,78 0 1,0 156,0 a78,78 0 1,0 -156,0 M320,120 m-70,0 a70,70 0 1,0 140,0 a70,70 0 1,0 -140,0" fillRule="evenodd" fill="currentColor" opacity="0.1" />
@@ -42,14 +42,14 @@ This page is about understanding that distinction.
 
 ## R vs. "general purpose" programming languages
 
-A general-purpose programming language — Python, JavaScript, Java,
-C++, Go — is a Swiss army knife. You can use it to build a website,
+A general-purpose programming language, Python, JavaScript, Java,
+C++, Go, is a Swiss army knife. You can use it to build a website,
 control a robot, render a 3D scene, train a neural network, or
 analyze data. Each of those things is one of many possible uses.
 
 R is more like a **specialized woodworking chisel**. Most of its
 shape, balance, and weight are tuned for one craft. You *can* use a
-chisel to open a paint can, but that is not why it was made — and
+chisel to open a paint can, but that is not why it was made, and
 better tools exist.
 
 Here is a rough split.
@@ -75,15 +75,15 @@ choice in any language.
 A few specific things, hard to find elsewhere:
 
 **1. A vocabulary built for statistical thinking.** When a
-statistician describes a model on a whiteboard — "regress y on x1
-and x2 controlling for cluster" — R lets them type something very
+statistician describes a model on a whiteboard, "regress y on x1
+and x2 controlling for cluster", R lets them type something very
 close to that as code. `lm(y ~ x1 + x2)` is *almost the same
 expression*. Most languages force a translation; R doesn't.
 
 **2. World-class plotting via `ggplot2`.** The `ggplot2` package
 implements Leland Wilkinson's *Grammar of Graphics*. It lets you
 describe a plot as a layered specification ("map mpg to x, weight
-to y, color by cylinder count, add a smooth line") — a much
+to y, color by cylinder count, add a smooth line"), a much
 cleaner mental model than the imperative "draw a rectangle here,
 draw a line there" approach.
 
@@ -119,8 +119,8 @@ probably reach for something else:
 - **Mobile, embedded, or systems programming.** Not what R is for.
 
 The key insight is this: **R is for thinking, not for shipping**.
-The output of an R analysis is almost always *understanding* — a
-report, a chart, a conclusion, a recommendation — not a running
+The output of an R analysis is almost always *understanding*, a
+report, a chart, a conclusion, a recommendation, not a running
 production service. If your job is to understand things from data,
 R is among the best tools that exist. If your job is to deploy
 things to millions of users, R is rarely the right pick.
@@ -130,13 +130,13 @@ things to millions of users, R is rarely the right pick.
 R turns up across a wide range of fields, which group roughly into
 four worlds:
 
-- **Academia and research** — academic statistics, biomedical and
+- **Academia and research**, academic statistics, biomedical and
   pharma research, genomics and bioinformatics, environmental
   science and climate.
-- **Government** — national statistical agencies, central banks and
+- **Government**, national statistical agencies, central banks and
   economic policy.
-- **Media** — data journalism.
-- **Business** — sports analytics, marketing analytics, insurance
+- **Media**, data journalism.
+- **Business**, sports analytics, marketing analytics, insurance
   and actuarial science.
 
 - The **US Bureau of Labor Statistics**, **Statistics Canada**, the
@@ -164,13 +164,13 @@ Python?" The most useful answer is: **probably both, eventually**,
 and the order depends on what you want to do.
 
 - If your day-to-day work is **statistics, study design,
-  visualization, reporting** — start with R. The path from
+  visualization, reporting**, start with R. The path from
   question to chart is shorter, and the surrounding ecosystem is
   built for you.
 - If your day-to-day work is **software engineering with some data
-  analysis on the side, or production machine learning** — start
+  analysis on the side, or production machine learning**, start
   with Python. The general-programming surface area is broader.
-- If your work is in between — you will end up using both. Many
+- If your work is in between, you will end up using both. Many
   data teams have an R-heavy "analysis" side and a Python-heavy
   "engineering" side, with tools (like `reticulate` and `arrow`)
   to move data between them.
@@ -276,7 +276,7 @@ it later.
 - You want to build a production-grade mobile app.
   > R is not suited to mobile development.
 - [o] You want to perform a careful statistical analysis and produce a reproducible report with charts.
-  > This is R's home turf — statistical analysis, visualization, and reproducible documents are exactly what R was designed for.
+  > This is R's home turf, statistical analysis, visualization, and reproducible documents are exactly what R was designed for.
 - You want to train a 10-billion-parameter language model.
   > That kind of work happens almost exclusively in Python + GPU kernels written in C++ or CUDA.
 - You want to build a high-frequency trading system.
@@ -286,7 +286,7 @@ it later.
 <MultipleChoice
   markdown={`Which of the following is **true** about R and Python in modern data science?
 
-- They are mutually exclusive — choosing one means abandoning the other.
+- They are mutually exclusive, choosing one means abandoning the other.
   > Many data teams and individual analysts use both R and Python together; tools like \`reticulate\` even let you call Python from within an R session.
 - Python has completely replaced R in academia.
   > Python has grown rapidly, but R remains dominant in many statistical fields, especially genomics, biostatistics, epidemiology, and parts of econometrics.
@@ -300,7 +300,7 @@ it later.
   markdown={`Why is R commonly described as a "language for statisticians, by statisticians"?
 
 - Because it can only be used in academia.
-  > R is heavily used in industry, government, and journalism — not just universities.
+  > R is heavily used in industry, government, and journalism, not just universities.
 - Because it does not support general programming constructs.
   > R supports functions, loops, conditionals, packages, and most general-purpose constructs.
 - [o] Because its syntax, conventions, and ecosystem were shaped around how statisticians actually think about and work with data.
@@ -311,5 +311,5 @@ it later.
 
 The final history chapter looks at the idea that ties everything
 together: **reproducible analysis**, the cultural shift R helped
-make mainstream — and the reason "trust me, I clicked the right
+make mainstream, and the reason "trust me, I clicked the right
 buttons" is no longer good enough.

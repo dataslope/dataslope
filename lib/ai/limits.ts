@@ -3,7 +3,7 @@
 // Two per-user daily caps (requests + tokens) and one global daily token
 // ceiling as the bounded-downside backstop. These bound spend even if an
 // attacker rotates accounts/IPs. Per-MINUTE limiting is intentionally not here
-// (D1 write budget) — a Durable Object / the Rate Limiting binding is the right
+// (D1 write budget), a Durable Object / the Rate Limiting binding is the right
 // tool and is tracked as a follow-up in the implementation report.
 import type { ResolvedModel } from "./models";
 
@@ -57,7 +57,7 @@ export async function checkBudget(
         ok: false,
         status: 429,
         message:
-          "You've reached today's Ask AI limit. It resets tomorrow — upgrade for a higher limit.",
+          "You've reached today's Ask AI limit. It resets tomorrow, upgrade for a higher limit.",
       };
     }
     if (usage.input_tok + usage.output_tok >= model.dailyTokenBudget) {
@@ -65,7 +65,7 @@ export async function checkBudget(
         ok: false,
         status: 429,
         message:
-          "You've used today's Ask AI budget. It resets tomorrow — upgrade for a higher limit.",
+          "You've used today's Ask AI budget. It resets tomorrow, upgrade for a higher limit.",
       };
     }
   }
@@ -77,7 +77,7 @@ export async function checkBudget(
  * Pre-flight check for one AI inline-completion request. Completions have
  * their own per-user daily counters (migration 0004) so a busy editor session
  * can't exhaust the member's Ask AI chat budget, but they share the global
- * daily token ceiling — that stays the single backstop on total spend.
+ * daily token ceiling, that stays the single backstop on total spend.
  */
 export async function checkCompletionBudget(
   env: CloudflareEnv,
@@ -133,7 +133,7 @@ export async function checkCompletionBudget(
  * Reserve one suggested-questions request. Suggestions have their own
  * per-user daily counters (migration 0006) so the panel fetching three
  * questions on open / after each answer never consumes the member's Ask AI
- * chat budget, but they share the global daily token ceiling — that stays
+ * chat budget, but they share the global daily token ceiling, that stays
  * the single backstop on total spend.
  *
  * The request slot is claimed with an atomic conditional increment rather
@@ -170,7 +170,7 @@ export async function reserveSuggestRequest(
     tokens &&
     tokens.suggest_in_tok + tokens.suggest_out_tok >= limits.dailyTokenBudget
   ) {
-    // Suggestions are a nicety — the client hides them on any error.
+    // Suggestions are a nicety, the client hides them on any error.
     return { ok: false, status: 429, message: "Suggestions are paused for today." };
   }
 

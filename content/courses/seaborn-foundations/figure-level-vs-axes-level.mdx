@@ -1,13 +1,13 @@
 ---
 title: Figure-Level vs. Axes-Level
-description: The one structural idea behind Seaborn's whole API — why some functions facet and return a grid while others draw on a single Axes — and how to choose.
+description: The one structural idea behind Seaborn's whole API, why some functions facet and return a grid while others draw on a single Axes, and how to choose.
 ---
 
 Seaborn has two kinds of plotting functions, and almost every "wait, why
 doesn't that work?" moment comes from mixing them up. Once you see the split
 clearly, the entire API organizes itself into a simple map.
 
-This is a foundational page. Spend the time here — it pays off on every
+This is a foundational page. Spend the time here, it pays off on every
 later chapter, because each chart type comes in *both* flavors.
 
 <svg
@@ -55,7 +55,7 @@ argument, draw on it, and return that Axes. Examples: `scatterplot`,
 **Figure-level** functions manage an **entire figure**. They create the
 figure *and* its axes for you, can split the data into a grid of panels
 (*facets*), and return a **grid object** (`FacetGrid`, `JointGrid`, or
-`PairGrid`) — not an Axes. Examples: `relplot`, `displot`, `catplot`,
+`PairGrid`), not an Axes. Examples: `relplot`, `displot`, `catplot`,
 `lmplot`, `jointplot`, `pairplot`.
 
 Here's the key relationship: **each figure-level function is a wrapper
@@ -78,16 +78,16 @@ functions (right) according to its `kind` argument:
 | `catplot` | `"violin"` | `violinplot` |
 | `catplot` | `"bar"` | `barplot` |
 | `catplot` | `"count"` | `countplot` |
-| `lmplot` | — | `regplot` |
+| `lmplot` |, | `regplot` |
 
 So `sns.relplot(..., kind="scatter")` ends up calling `scatterplot` under
 the hood, and `sns.catplot(..., kind="box")` calls `boxplot`. The
 figure-level function adds faceting, figure management, and a legend placed
-*outside* the plot — on top of the same drawing.
+*outside* the plot, on top of the same drawing.
 
 <Callout type="info" title="jointplot and pairplot are figure-level too">
 `jointplot` and `pairplot` are also figure-level (they return `JointGrid`
-and `PairGrid`), but they're not simple one-`kind` wrappers — they assemble
+and `PairGrid`), but they're not simple one-`kind` wrappers, they assemble
 *several* axes-level plots into a fixed layout (a center plot with margins;
 a matrix of pairwise panels). We give each its own chapter later.
 </Callout>
@@ -133,14 +133,14 @@ print(type(g))  # a seaborn FacetGrid
   ]}
 />
 
-That difference in return type is not a technicality — it determines what
+That difference in return type is not a technicality, it determines what
 you can *do* next.
 
 ## What axes-level gives you: composition
 
 Because axes-level functions accept an `ax=`, you can build your own
 matplotlib figure and place several different plots into it. Figure-level
-functions can't do this — they insist on owning the whole figure.
+functions can't do this, they insist on owning the whole figure.
 
 <CodeBlock
   adapter="python"
@@ -172,7 +172,7 @@ layout**, next to anything else.
 ## What figure-level gives you: faceting
 
 Figure-level functions own the figure so they can split it into a grid of
-panels — one per category — with `col` and `row`. This is *small multiples*,
+panels, one per category, with `col` and `row`. This is *small multiples*,
 and it's a single keyword:
 
 <CodeBlock
@@ -185,7 +185,7 @@ and it's a single keyword:
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
-# One panel per time of day — try changing col to "day".
+# One panel per time of day, try changing col to "day".
 sns.relplot(
     data=tips,
     x="total_bill",
@@ -209,9 +209,9 @@ Seaborn call with \`col=\`. Which kind of function do you need?
   > Axes-level functions draw on a single Axes and have no \`col\`/\`row\` faceting; you'd have to build the subplot grid yourself.
 - [o] A figure-level function like \`relplot\`.
   > Figure-level functions own the whole figure, which is exactly what lets them split the data into a grid of panels via \`col\` and \`row\`.
-- Either one — \`col\` works on both.
+- Either one, \`col\` works on both.
   > \`col\`/\`row\` are figure-level features; axes-level functions don't accept them.
-- Neither — Seaborn can't facet.
+- Neither, Seaborn can't facet.
   > Faceting is a core Seaborn feature; it lives on the figure-level functions.
 
 Faceting (\`col\`/\`row\`) requires control of the whole figure, so it's a
@@ -222,8 +222,8 @@ figure-level capability.`}
 
 | Question | Use figure-level | Use axes-level |
 | --- | --- | --- |
-| Do I want facets (`col`/`row`)? | Yes → `relplot`/`displot`/`catplot` | — |
-| Do I need to place this next to other plots on one figure? | — | Yes → `scatterplot`, `boxplot`, ... with `ax=` |
+| Do I want facets (`col`/`row`)? | Yes → `relplot`/`displot`/`catplot` |, |
+| Do I need to place this next to other plots on one figure? |, | Yes → `scatterplot`, `boxplot`, ... with `ax=` |
 | Do I want a clean legend placed outside automatically? | Figure-level does this | Legend goes inside the Axes |
 | How do I set the size? | `height` + `aspect` (per facet) | `figsize` via `plt.subplots` |
 
@@ -236,7 +236,7 @@ A simple rule of thumb:
 
 <Callout type="warn" title="Don't try to put a figure-level plot inside a subplot">
 A common mistake is `fig, ax = plt.subplots(); sns.relplot(..., ax=ax)`.
-Figure-level functions **don't take an `ax=`** — they make their own figure,
+Figure-level functions **don't take an `ax=`**, they make their own figure,
 so you'll get an error or a stray empty Axes. If you need it inside an
 existing layout, switch to the axes-level version (`scatterplot`).
 </Callout>
@@ -313,7 +313,7 @@ g = sns.relplot(
   > Axes-level functions draw onto a single Axes (the one you pass via \`ax=\`, or the current one) and hand that Axes back.
 - The DataFrame, with a new column added.
   > Seaborn never mutates or returns your data; it returns a plotting object.
-- Nothing — they only have side effects.
+- Nothing, they only have side effects.
   > They do return the Axes, which is what lets you keep customizing it with matplotlib.
 
 Axes-level → returns an \`Axes\`; figure-level → returns a grid object.`}
@@ -323,13 +323,13 @@ Axes-level → returns an \`Axes\`; figure-level → returns a grid object.`}
   markdown={`Which call will **fail or misbehave**?
 
 - \`sns.scatterplot(data=df, x="a", y="b", ax=my_ax)\`
-  > This is correct usage — axes-level functions accept \`ax=\`.
+  > This is correct usage, axes-level functions accept \`ax=\`.
 - \`sns.relplot(data=df, x="a", y="b", col="g")\`
-  > This is correct — \`relplot\` is figure-level and supports \`col\`.
+  > This is correct, \`relplot\` is figure-level and supports \`col\`.
 - [o] \`sns.relplot(data=df, x="a", y="b", ax=my_ax)\`
   > \`relplot\` is figure-level and creates its own figure, so it has no \`ax=\` parameter; passing one is an error.
 - \`sns.boxplot(data=df, x="g", y="a")\`
-  > This is fine — a standard axes-level call that draws on the current Axes.
+  > This is fine, a standard axes-level call that draws on the current Axes.
 
 Figure-level functions own their figure and therefore reject \`ax=\`; if you
 need an \`ax=\`, use the axes-level version.`}
@@ -370,5 +370,5 @@ Remember: figure-level → \`height\`/\`aspect\`; axes-level → \`figsize\`.`}
 
 You now hold the master key to Seaborn's API: every chart type appears as an
 axes-level drawer and a figure-level wrapper, and you know when to pick each.
-From here on we tour the chart families — starting with **relational** plots,
+From here on we tour the chart families, starting with **relational** plots,
 where two variables meet.

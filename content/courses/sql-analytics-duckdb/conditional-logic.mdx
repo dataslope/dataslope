@@ -1,12 +1,12 @@
 ---
 title: Conditional Logic
-description: CASE expressions for bucketing, labeling, and conditional aggregation — including the powerful FILTER clause and SUM(CASE ...) pattern that builds pivot-style summaries.
+description: CASE expressions for bucketing, labeling, and conditional aggregation, including the powerful FILTER clause and SUM(CASE ...) pattern that builds pivot-style summaries.
 ---
 
 Raw data rarely arrives in the categories your analysis needs. You have
 exact ages but want brackets; exact amounts but want "small / medium /
 large"; a `status` column but want separate counts of paid and refunded
-in one row. **Conditional logic** — the `CASE` expression and friends — is
+in one row. **Conditional logic**, the `CASE` expression and friends, is
 how analysts reshape values on the fly. This page also introduces
 **conditional aggregation**, one of the most useful patterns in all of
 analytical SQL.
@@ -14,7 +14,7 @@ analytical SQL.
 <svg
   viewBox="0 0 640 215"
   role="img"
-  aria-label="Gray values ride one line into a yellow CASE diamond that routes each along a solid branch line into a blue, green, or red bucket — the first test a value passes decides its category"
+  aria-label="Gray values ride one line into a yellow CASE diamond that routes each along a solid branch line into a blue, green, or red bucket, the first test a value passes decides its category"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">
@@ -83,13 +83,13 @@ ORDER BY
   amount;`}
 />
 
-The conditions are tested **top to bottom**, and the first match wins —
+The conditions are tested **top to bottom**, and the first match wins,
 so order them from most specific to most general. If nothing matches and
 there is no `ELSE`, the result is `NULL`.
 
 ## Group by a `CASE` bucket
 
-Because a `CASE` produces a value like any other, you can `GROUP BY` it —
+Because a `CASE` produces a value like any other, you can `GROUP BY` it,
 inventing a dimension that does not exist in the data and summarizing by
 it. This is the "derived bucket" idea from the grouping lesson, now in
 your toolkit for good.
@@ -130,8 +130,8 @@ ORDER BY
 
 Here is the pattern that feels like magic the first time you see it. By
 putting a `CASE` *inside* an aggregate, you can compute **several
-filtered totals in a single row** — paid vs. refunded, this year vs. last,
-mobile vs. desktop — all side by side.
+filtered totals in a single row**, paid vs. refunded, this year vs. last,
+mobile vs. desktop, all side by side.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -182,7 +182,7 @@ ORDER BY
 
 How it works: for each row, the inner `CASE` contributes the `amount` only
 when the condition holds (and `0` otherwise), so `SUM` adds up just the
-matching rows. You get one column per condition — effectively pivoting a
+matching rows. You get one column per condition, effectively pivoting a
 category into columns. The last column uses DuckDB's cleaner **`FILTER`**
 clause, which does the same thing more readably.
 
@@ -194,7 +194,7 @@ flowchart TD
     C2 --> Out
 ```
 
-## `FILTER` — the modern, readable alternative
+## `FILTER`, the modern, readable alternative
 
 DuckDB supports the SQL-standard `FILTER (WHERE ...)` clause on aggregates,
 which expresses conditional aggregation more clearly than `CASE` inside
@@ -249,9 +249,9 @@ way to build these side-by-side filtered metrics.
 
 Two small but constant companions of conditional logic:
 
-- **`COALESCE(a, b, ...)`** returns the first non-NULL argument — perfect
+- **`COALESCE(a, b, ...)`** returns the first non-NULL argument, perfect
   for filling in a default: `COALESCE(discount, 0)`.
-- **`NULLIF(a, b)`** returns `NULL` when `a = b` — most often used to
+- **`NULLIF(a, b)`** returns `NULL` when `a = b`, most often used to
   avoid divide-by-zero: `amount / NULLIF(quantity, 0)`.
 
 <svg
@@ -322,7 +322,7 @@ ORDER BY
 - [o] The first \`WHEN\` whose condition is true, evaluated top to bottom.
   > \`CASE\` tests conditions in order and stops at the first match, so branch order matters.
 - All matching branches, concatenated.
-  > Only one value is returned — that of the first matching branch.
+  > Only one value is returned, that of the first matching branch.
 - A random matching branch.
   > Evaluation is deterministic: the first true condition wins.
 
@@ -363,5 +363,5 @@ divide-by-zero.`}
 />
 
 You can now reshape values with conditions and build pivot-style filtered
-metrics. Next, a data type that has its own rules and rewards — **dates
+metrics. Next, a data type that has its own rules and rewards, **dates
 and time**.

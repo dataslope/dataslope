@@ -1,6 +1,6 @@
 ---
 title: The Compilation Pipeline
-description: How C++ source becomes a runnable program — preprocessing, compiling, assembling, and linking.
+description: How C++ source becomes a runnable program, preprocessing, compiling, assembling, and linking.
 ---
 
 You have already run a few C++ programs in your browser. But what
@@ -13,7 +13,7 @@ errors come from confusing one stage with another.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A shape descends through four canal locks, changing form at each yellow gate until it leaves as one solid green pill — source code stepping down through preprocessing, compiling, assembling, and linking"
+  aria-label="A shape descends through four canal locks, changing form at each yellow gate until it leaves as one solid green pill, source code stepping down through preprocessing, compiling, assembling, and linking"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -42,10 +42,10 @@ The traditional C++ toolchain takes your source code (`.cpp` + `.h`)
 and runs it through four steps to produce an executable (`a.out` /
 `.exe`):
 
-1. **Preprocess** — expand `#include`, `#define`, and `#ifdef`.
-2. **Compile** — parse, type-check, and generate assembly.
-3. **Assemble** — turn assembly into object code (`.o`).
-4. **Link** — combine the `.o` files and libraries into one
+1. **Preprocess**, expand `#include`, `#define`, and `#ifdef`.
+2. **Compile**, parse, type-check, and generate assembly.
+3. **Assemble**, turn assembly into object code (`.o`).
+4. **Link**, combine the `.o` files and libraries into one
    executable.
 
 Each step produces a real artifact you can sometimes inspect. Each
@@ -58,7 +58,7 @@ changes form at each stage:
 **Preprocess** → `your.cpp.i`
 
 Expand every `#include`, `#define`, and `#ifdef` by pure text
-substitution. Out comes one self-contained *translation unit* — often
+substitution. Out comes one self-contained *translation unit*, often
 tens of thousands of lines of C++.
 
 </Step>
@@ -130,13 +130,13 @@ The actual **compiler** takes one translation unit and turns it into
 CPU. Inside, the compiler runs many sub-passes over the translation
 unit, in order:
 
-1. **Lexer** — text to tokens.
-2. **Parser** — tokens to a syntax tree.
-3. **Semantic analysis** — type-check and look up names.
-4. **Intermediate representation (IR)** — a lower-level form the
+1. **Lexer**, text to tokens.
+2. **Parser**, tokens to a syntax tree.
+3. **Semantic analysis**, type-check and look up names.
+4. **Intermediate representation (IR)**, a lower-level form the
    compiler can reason about.
-5. **Optimizer** — fold constants, inline, vectorize.
-6. **Code generator** — IR to assembly.
+5. **Optimizer**, fold constants, inline, vectorize.
+6. **Code generator**, IR to assembly.
 
 The result is a `.s` assembly file.
 
@@ -147,7 +147,7 @@ If you write
 int x = "hello";
 ```
 
-it is the compiler — not the linker, not the OS — that complains:
+it is the compiler, not the linker, not the OS, that complains:
 *"cannot initialize a variable of type `int` with an lvalue of type
 `const char[6]`."*
 
@@ -269,7 +269,7 @@ Notice the split:
   "there exist functions called `add` and `mul` with these
   signatures." It does *not* say what they do.
 - `mathx.cpp` is the **implementation**. It provides the
-  **definitions** — the actual code.
+  **definitions**, the actual code.
 - `main.cpp` `#include`s the header so the compiler knows that
   `add` and `mul` exist. The **linker** later matches those calls
   to the definitions in `mathx.cpp`.
@@ -324,13 +324,13 @@ Knowing the stage instantly narrows the search.
 
 Try the multi-file challenge below. Read all three files first;
 they describe a tiny library and an entry point. Implement the
-missing function — and remember, the linker is what binds your
+missing function, and remember, the linker is what binds your
 implementation to the call from `main`.
 
 <ChallengeCard
   adapter="cpp"
   title="Implement greet() in a separate translation unit"
-  instructions={`Open \`greeter.cpp\` and implement \`greet(name)\` so the program prints \`Hello, <name>!\` (with a newline). The header and \`main.cpp\` are already wired up — your job is to provide the **definition** that satisfies the **declaration** in the header.`}
+  instructions={`Open \`greeter.cpp\` and implement \`greet(name)\` so the program prints \`Hello, <name>!\` (with a newline). The header and \`main.cpp\` are already wired up, your job is to provide the **definition** that satisfies the **declaration** in the header.`}
   entryFilename="main.cpp"
   files={[
     {

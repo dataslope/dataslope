@@ -2,7 +2,7 @@
 //
 // Title + description frontmatter become the SERP <title> and snippet, so this
 // flags pages that would index with a missing, duplicated, truncated, or thin
-// snippet. It does NOT rewrite anything — fixing copy is an editorial call.
+// snippet. It does NOT rewrite anything, fixing copy is an editorial call.
 //
 // Usage:
 //   node scripts/audit/seo-frontmatter.mjs            # summary + worst offenders
@@ -103,9 +103,9 @@ const section = (heading, items, render) => {
 section("Missing title", missingTitle, (r) => `\`${r}\``);
 section("Missing description", missingDesc, (r) => `\`${r}\``);
 section("Duplicate descriptions", dupDesc, ([, paths]) =>
-  `${paths.length}× — ${paths.map((p) => `\`${p}\``).join(", ")}`,
+  `${paths.length}×, ${paths.map((p) => `\`${p}\``).join(", ")}`,
 );
-section("Titles that truncate", longTitle, (it) => `\`${it.rel}\` (${it.len}) — "${it.title}"`);
+section("Titles that truncate", longTitle, (it) => `\`${it.rel}\` (${it.len}), "${it.title}"`);
 section("Descriptions over the snippet limit", longDesc, (it) => `\`${it.rel}\` (${it.len} chars)`);
 section("Descriptions that read thin", shortDesc, (it) => `\`${it.rel}\` (${it.len} chars)`);
 

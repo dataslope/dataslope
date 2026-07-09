@@ -2,14 +2,14 @@
 // `r2_buckets` / `d1_databases` / `vars` / `services` entries in wrangler.jsonc.
 //
 // Why this isn't the raw `wrangler types` output: `wrangler types` inlines the
-// ENTIRE workerd runtime type surface — including a global `Response`, `fetch`,
-// `Request`, etc. — which conflicts with this app's DOM lib. In particular it
+// ENTIRE workerd runtime type surface, including a global `Response`, `fetch`,
+// `Request`, etc., which conflicts with this app's DOM lib. In particular it
 // retypes `Response.json()` to `Promise<unknown>`, which breaks ordinary
 // browser `fetch(...).then((r) => r.json())` chains across the codebase (e.g.
 // app/svg-gallery/SvgGalleryClient.tsx). This is a Next.js/DOM app, not a bare
 // Worker, so we want the DOM globals to win. We therefore declare only the
 // bindings, sourcing their types from `@cloudflare/workers-types` via `import
-// type` — a module-scoped import that adds NO globals.
+// type`, a module-scoped import that adds NO globals.
 //
 // `npm run cf-typegen` regenerates the full runtime types into a scratch file
 // (.wrangler/, gitignored) for reference; do not point it back at this file.
@@ -20,7 +20,7 @@ declare global {
     // R2 bucket backing OpenNext's incremental cache.
     NEXT_INC_CACHE_R2_BUCKET: R2Bucket;
     // R2 bucket holding cloud-saved workspace bundles + shared playground
-    // snapshots (metadata lives in D1 — migrations/0005). Optional so the
+    // snapshots (metadata lives in D1, migrations/0005). Optional so the
     // /api/workspaces + /api/shares routes can degrade to 503 "not
     // configured" on deployments that haven't created the bucket yet.
     WORKSPACES_BUCKET?: R2Bucket;
@@ -41,7 +41,7 @@ declare global {
     TRUSTED_ORIGINS?: string;
 
     // --- "Ask AI" model config (vars; see lib/ai/models.ts) ---
-    // Base URL + model id per membership tier — no hardcoded fallback, so a
+    // Base URL + model id per membership tier, no hardcoded fallback, so a
     // tier needs its base URL, model id, AND API key (below) all set to be
     // usable. Both providers must speak the OpenAI /chat/completions
     // streaming API. Currently both tiers point at OpenRouter's DeepSeek V4
@@ -72,7 +72,7 @@ declare global {
     // Required (not optional): signs the OAuth `state` + session cookies, so it
     // must be a single stable value present on every isolate/deployment. If it
     // is ever missing, the signed state cookie can't be verified on the OAuth
-    // callback and sign-in fails with ?error=state_mismatch — so createAuth()
+    // callback and sign-in fails with ?error=state_mismatch, so createAuth()
     // (lib/auth/server.ts) hard-fails when it's unset rather than falling back
     // to Better Auth's built-in key.
     BETTER_AUTH_SECRET: string;

@@ -7,7 +7,7 @@ name: Cloudflare build PR comments
 #   • build skipped
 #
 # Every comment links to the Cloudflare build page for that exact commit.
-# All data comes from the check_run event payload that Cloudflare emits — no
+# All data comes from the check_run event payload that Cloudflare emits, no
 # Cloudflare API token or secret is required (GITHUB_TOKEN is enough).
 #
 # NOTE: check_run-triggered workflows always run from the DEFAULT branch's copy
@@ -42,7 +42,7 @@ jobs:
             const commitLink = `[\`${shortSha}\`](${commitUrl})`;
 
             // A build that is created already-completed (e.g. an instantly skipped
-            // build) also fires a 'completed' event — let that one handle it so we
+            // build) also fires a 'completed' event, let that one handle it so we
             // never emit a phantom "started" comment.
             if (action === 'created' && cr.status === 'completed') {
               core.info('Check run created already-completed; deferring to the completed event.');

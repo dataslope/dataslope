@@ -39,7 +39,7 @@ async function loadExampleByTitle(page: Page, title: string) {
     await danger.waitFor({ state: "visible", timeout: 2500 });
     await danger.click();
   } catch {
-    /* no dialog — editor already matched / was empty */
+    /* no dialog, editor already matched / was empty */
   }
 }
 

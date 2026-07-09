@@ -11,7 +11,7 @@ are four forms of another. If you are counting words or matching a search
 query, you usually want all forms of a word to collapse into one.
 
 There are two classic techniques for that collapse, and the difference
-between them — in mechanism, in output, and in when to use them — is one of
+between them, in mechanism, in output, and in when to use them, is one of
 the most clarifying things you can learn in NLP.
 
 <Figure
@@ -64,14 +64,14 @@ flowchart TB
 **Stemming** is crude and mechanical: it strips suffixes according to fixed
 rules. It is fast, needs no dictionary, and frequently produces fragments
 that are not real words ("studi", "happi"). **Lemmatization** is principled:
-it looks the word up in a vocabulary and returns its **lemma** — the proper
+it looks the word up in a vocabulary and returns its **lemma**, the proper
 dictionary headword ("study", "happy"). It is slower, needs a dictionary, and
 works best when you tell it the word's part of speech.
 
 ## Stemming: chopping with the Porter algorithm
 
 The most famous stemmer is the **Porter stemmer**, a set of suffix-stripping
-rules from 1980 that is still everywhere. Watch it work — and watch it
+rules from 1980 that is still everywhere. Watch it work, and watch it
 misbehave.
 
 <CodeBlock
@@ -112,11 +112,11 @@ for w in words:
   ]}
 />
 
-Read that output carefully — it teaches stemming's whole personality:
+Read that output carefully, it teaches stemming's whole personality:
 
 - **It works on regular forms.** "running" and "runs" both stem to "run".
   "studies" and "studying" both stem to "studi".
-- **It misses irregulars.** "ran" stays "ran" — the rules only chop suffixes,
+- **It misses irregulars.** "ran" stays "ran", the rules only chop suffixes,
   they do not know that "ran" is the past tense of "run".
 - **Its output is often not a real word.** "studies" → "studi", "happily" →
   "happili", "happiness" → "happi". These stems are fine as *internal keys*
@@ -127,15 +127,15 @@ Read that output carefully — it teaches stemming's whole personality:
 
 <Callout type="info" title="A stem is a key, not a word">
 The right mental model: a stem is an *opaque identifier* that groups related
-forms, not a meaningful word. "studi" is a perfectly good grouping key —
-every form of "study" maps to it consistently — but it is not English. As
+forms, not a meaningful word. "studi" is a perfectly good grouping key,
+every form of "study" maps to it consistently, but it is not English. As
 long as you only ever compare stems to other stems (does the query stem match
 the document stem?), the fact that they are not real words does not matter.
 </Callout>
 
 ## Lemmatization: looking up the dictionary form
 
-Lemmatization returns the **lemma** — the canonical dictionary form. NLTK's
+Lemmatization returns the **lemma**, the canonical dictionary form. NLTK's
 `WordNetLemmatizer` uses the WordNet lexical database to do it. The result is
 always a real word, but there is a catch you must understand.
 
@@ -189,7 +189,7 @@ print("  better (adjective) ->", lemmatizer.lemmatize("better", pos="a"))
   ]}
 />
 
-This is the most important — and most surprising — fact about
+This is the most important, and most surprising, fact about
 `WordNetLemmatizer`: **by default it assumes every word is a noun.** Because
 "running" can be a noun ("the running of the race"), `lemmatize("running")`
 returns "running" *unchanged*. Only when you pass `pos="v"` does it know to
@@ -197,13 +197,13 @@ treat it as a verb and return "run".
 
 With the right part of speech, look how good it is: "ran" → "run", "was" →
 "be", "better" → "good". A stemmer could never produce "be" from "was" or
-"good" from "better", because those are not suffix operations — they require
+"good" from "better", because those are not suffix operations, they require
 *knowing* the word.
 
 <Callout type="warn" title="The number-one lemmatization bug">
 `WordNetLemmatizer.lemmatize(word)` with no `pos` argument treats `word` as a
 noun, so most verbs and adjectives come back unchanged and beginners conclude
-"lemmatization doesn't do anything." It does — you just have to tell it the
+"lemmatization doesn't do anything." It does, you just have to tell it the
 part of speech. This is exactly why lemmatization and **part-of-speech
 tagging** (the next page but one) are natural partners: tag first to learn
 each word's POS, then lemmatize with that POS for accurate results.
@@ -269,7 +269,7 @@ can. Stemming is fast and approximate; lemmatization is slower and correct.
 unchanged, while \`lemmatize("running", pos="v")\` returns "run"?
 
 - Because "running" has no lemma
-  > "Running" does have a lemma — it is "run" as a verb — but the lemmatizer defaults to the noun part of speech, under which "running" is already a dictionary form and needs no reduction.
+  > "Running" does have a lemma, it is "run" as a verb, but the lemmatizer defaults to the noun part of speech, under which "running" is already a dictionary form and needs no reduction.
 - [o] The lemmatizer defaults to treating the word as a *noun*, and "running" is a valid noun, so it is left as-is; supplying \`pos="v"\` tells it to treat the word as a verb, whose lemma is "run"
   > Lemmatization is part-of-speech sensitive. With the default noun assumption, "running" (a gerund/noun) is already a lemma. Only by specifying the verb reading does it reduce to "run". This is why POS tagging pairs naturally with lemmatization.
 - It is a bug in NLTK
@@ -290,7 +290,7 @@ flowchart TB
 ```
 
 **Reach for stemming when** you are processing huge volumes and you only ever
-compare stems to stems — classically, a **search engine**. If a user searches
+compare stems to stems, classically, a **search engine**. If a user searches
 "running shoes", stemming both the query and the documents to "run" lets the
 search match "runs", "ran", and "running" alike. Nobody ever sees the stem
 "run" rendered on screen, so it does not matter that some stems are not words.
@@ -303,8 +303,8 @@ need for a dictionary (and, ideally, POS tags), but the output is principled.
 
 <Callout type="tip" title="The one-line summary">
 **Stemming** is fast, dictionary-free suffix-chopping that may produce
-non-words — great for search and recall at scale. **Lemmatization** is
-slower, dictionary-backed, POS-aware reduction to real words — better whenever
+non-words, great for search and recall at scale. **Lemmatization** is
+slower, dictionary-backed, POS-aware reduction to real words, better whenever
 meaning or readability matters. When in doubt for a semantic task, prefer
 lemmatization.
 </Callout>
@@ -313,12 +313,12 @@ lemmatization.
 
 - **"They are the same thing."** No. Different mechanism (rules vs. lookup),
   different output (fragments vs. real words), different cost.
-- **"Stems are real words."** Often not — "studi", "happi", "wa". A stem is a
+- **"Stems are real words."** Often not, "studi", "happi", "wa". A stem is a
   grouping key, not a vocabulary word.
-- **"Lemmatization always changes the word."** No — with the default noun POS,
+- **"Lemmatization always changes the word."** No, with the default noun POS,
   many words come back unchanged. You frequently need POS for it to do its
   job.
-- **"More aggressive reduction is always better."** No — over-stemming merges
+- **"More aggressive reduction is always better."** No, over-stemming merges
   unrelated words ("organ" and "organization"), which can hurt as much as it
   helps.
 
@@ -335,7 +335,7 @@ verb** and returns the list of lemmas. Use the provided \`lemmatizer\` and pass
 
 For example, \`verb_lemmas(["running", "ran", "studies"])\` should return
 \`["run", "run", "study"]\`. Notice the irregular "ran" correctly becomes
-"run" — something a stemmer cannot do.`}
+"run", something a stemmer cannot do.`}
   files={[
     {
       filename: "main.py",
@@ -423,11 +423,11 @@ assert isinstance(out, list) and len(out) == 3, "Got: " + repr(out)`,
 - [o] Stemming chops suffixes with fixed rules and may output non-words; lemmatization looks words up in a vocabulary and returns real dictionary forms (and benefits from knowing the part of speech)
   > That is the core distinction: rule-based chopping (fast, approximate, possibly non-words) versus dictionary lookup (slower, principled, real words, POS-aware). Reversing them is a common mix-up.
 - They are identical and interchangeable
-  > They differ in mechanism (rules vs. dictionary), output (possibly non-words vs. always real words), speed, and accuracy on irregular forms — choosing between them is a real design decision.
+  > They differ in mechanism (rules vs. dictionary), output (possibly non-words vs. always real words), speed, and accuracy on irregular forms, choosing between them is a real design decision.
 - Lemmatization is always faster than stemming
   > Stemming is generally faster because it only applies rule-based suffix stripping with no database lookup; lemmatization requires consulting a lexical resource like WordNet, making it slower.
 
-Mechanism, output, and cost all differ — and that difference drives the choice.`}
+Mechanism, output, and cost all differ, and that difference drives the choice.`}
 />
 
 <MultipleChoice
@@ -435,14 +435,14 @@ Mechanism, output, and cost all differ — and that difference drives the choice
 containing "ran" and "runs". Speed at massive scale matters; the reduced form
 is never shown to users. Which technique fits best?
 
-- [o] Stemming — fast, dictionary-free, and fine that the stem may not be a real word, since it is only ever compared to other stems
+- [o] Stemming, fast, dictionary-free, and fine that the stem may not be a real word, since it is only ever compared to other stems
   > Search/IR is the textbook case for stemming: huge volume, only stem-to-stem comparison, and no need for human-readable output. Lemmatization's accuracy is not worth its extra cost here.
 - Lemmatization, because real words are required for matching
   > Search matching only requires that the query and document forms reduce to the same key; the key never needs to be a real word, so the extra cost of lemmatization is not justified here.
 - Neither; search cannot use root reduction
   > Root reduction is a standard and effective technique in search engines, where stemming both the query and the indexed documents lets variant forms of a word match each other.
 - Both must always be applied together
-  > Stemming and lemmatization perform the same role — reducing words to a root — so applying both is redundant; the task calls for one or the other, not both.
+  > Stemming and lemmatization perform the same role, reducing words to a root, so applying both is redundant; the task calls for one or the other, not both.
 
 When the root is an internal key and scale matters, stemming is the pragmatic choice.`}
 />
@@ -453,7 +453,7 @@ When the root is an internal key and scale matters, stemming is the pragmatic ch
 - The stemmer is broken
   > The stemmer is working exactly as designed: it strips suffixes and "was" has no suffix to strip that would produce "be", so it correctly leaves "was" largely unchanged.
 - [o] "was" → "be" is an irregular mapping that requires *knowing* the word (a dictionary lookup), not stripping a suffix; stemmers only remove endings
-  > Lemmatization consults a lexical database that records irregular forms, so it can map "was/is/were/been" to "be" and "better" to "good". Stemming has no such knowledge — it only chops suffixes, which cannot transform "was" into "be".
+  > Lemmatization consults a lexical database that records irregular forms, so it can map "was/is/were/been" to "be" and "better" to "good". Stemming has no such knowledge, it only chops suffixes, which cannot transform "was" into "be".
 - Stemmers only work on nouns
   > Stemmers process words of any part of speech; the limitation is not which parts of speech they accept but that they can only apply suffix-stripping rules, which fail on irregular forms.
 - "was" and "be" are unrelated
@@ -478,7 +478,7 @@ Aggressive suffix stripping sometimes glues together words that should stay sepa
 />
 
 You now know how to collapse word forms to a root. Before we can lemmatize
-*accurately*, though, we need to know each word's part of speech — and that is
+*accurately*, though, we need to know each word's part of speech, and that is
 coming up. But first, let us put your clean tokens to work and actually
 **measure** a text: how many distinct words, which are most frequent, and how
 varied the vocabulary is.

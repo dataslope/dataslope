@@ -5,7 +5,7 @@
   // `wrangler deploy` ships the worker + static assets described here.
   //
   // This is the APP worker. The standalone CORS proxy worker has its own
-  // config under cloudflare-cors-proxy/wrangler.toml — don't conflate them.
+  // config under cloudflare-cors-proxy/wrangler.toml, don't conflate them.
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "dataslope",
@@ -13,7 +13,7 @@
   // `nodejs_compat` is required by OpenNext (Fumadocs/Orama search and the
   // build-time node:fs reads expect Node APIs). `global_fetch_strictly_public`
   // makes the worker's own fetch() calls go out over the public internet
-  // rather than looping back into the worker — the OpenNext-recommended flag.
+  // rather than looping back into the worker, the OpenNext-recommended flag.
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   // Prerendered pages and /_next/static/* are uploaded as free static assets
   // (unlimited bandwidth, no per-request meter) and served before the worker
@@ -34,13 +34,13 @@
     { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" },
     // Cloud-saved playground workspaces + shared playground snapshots (the
     // gzipped JSON bundles; see lib/workspaces/bundle.ts). D1 holds only the
-    // metadata rows (migrations/0005) — the payload bytes live here because
+    // metadata rows (migrations/0005), the payload bytes live here because
     // SQL dumps and file sets routinely exceed D1's 2 MB row cap, and R2
     // reads are egress-free. Create the bucket once with:
     // `npx wrangler r2 bucket create dataslope-workspaces`.
     { "binding": "WORKSPACES_BUCKET", "bucket_name": "dataslope-workspaces" }
   ],
-  // D1 (edge SQLite) backing user accounts and sessions for Better Auth — the
+  // D1 (edge SQLite) backing user accounts and sessions for Better Auth, the
   // accounts layer from agent-outputs/20260621-1733-…-auth-membership-….md (Q1).
   // The binding name `DB` is what lib/auth/server.ts reads via
   // getCloudflareContext().env.DB. The schema lives in migrations/ and is applied
@@ -56,26 +56,26 @@
     }
   ],
   // Non-secret auth config. The OAuth client secrets and BETTER_AUTH_SECRET are
-  // NOT here — set them with `npx wrangler secret put <NAME>` (see README).
+  // NOT here, set them with `npx wrangler secret put <NAME>` (see README).
   // BETTER_AUTH_URL must be the deployed origin so OAuth callbacks resolve; it
   // defaults to the request origin when unset, so it's only strictly needed if
   // that ever differs from the canonical site URL.
   "vars": {
     "BETTER_AUTH_URL": "https://dataslope.com",
     // From address for transactional auth email (must be a Resend-verified
-    // domain). The RESEND_API_KEY itself is a secret — set it with
+    // domain). The RESEND_API_KEY itself is a secret, set it with
     // `npx wrangler secret put RESEND_API_KEY` (see README). Email verification
     // and password reset stay off until that key is set.
     "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
     // "Ask AI" + AI inline completion model selection (non-secret). Both
     // tiers currently point at OpenRouter's DeepSeek V4 Flash model. There's
-    // no hardcoded fallback (see lib/ai/models.ts) — change the model ids
+    // no hardcoded fallback (see lib/ai/models.ts), change the model ids
     // here without a code change. The API key is a secret: set it with
     // `npx wrangler secret put AI_FREE_API_KEY` (one OpenRouter key covers
     // both tiers via resolveModel's fallback; add AI_PRO_API_KEY too if pro
     // should use a separate key later). Ask AI stays inert (503) until a
     // tier has its key + base URL + model all set. AI inline completion
-    // (app/api/ai/complete — pro members only) uses the pro-tier config.
+    // (app/api/ai/complete, pro members only) uses the pro-tier config.
     "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
     "AI_FREE_MODEL": "deepseek/deepseek-v4-flash",
     "AI_PRO_BASE_URL": "https://openrouter.ai/api/v1",

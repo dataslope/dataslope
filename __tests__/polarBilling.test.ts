@@ -1,7 +1,7 @@
 /**
  * Polar billing: plan derivation from a `customer.state_changed` snapshot.
  *
- * Pure function (no D1, no network) — same posture as aiModels.test.ts. The
+ * Pure function (no D1, no network), same posture as aiModels.test.ts. The
  * webhook route itself (signature verification → D1 plan write) is exercised
  * end-to-end against a dev server with a standardwebhooks-signed payload; see
  * the PR notes.

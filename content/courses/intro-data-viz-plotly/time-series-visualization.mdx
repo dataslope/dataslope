@@ -3,7 +3,7 @@ title: Time Series Visualization
 description: Special patterns and pitfalls for data with a time dimension
 ---
 
-Time-series data — anything indexed by date or timestamp — is the
+Time-series data, anything indexed by date or timestamp, is the
 most common kind of data in business and science. It deserves its
 own chapter because:
 
@@ -211,16 +211,16 @@ the noise. All three layered gives the whole story.
    date, the line wiggles backwards through time. Always
    `df.sort_values("date")` before plotting.
 2. **Inconsistent time gaps.** A daily chart that's missing
-   weekends becomes misleading — Plotly will *interpolate* across
+   weekends becomes misleading, Plotly will *interpolate* across
    the gap as if Saturday's value smoothly became Monday's.
 3. **Calendar vs business time.** For stock prices, you may want
-   to skip weekends and holidays — set
+   to skip weekends and holidays, set
    `fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])`.
 4. **Day-of-week effects.** Most business data has strong weekly
    seasonality. Don't compute a "trend" without considering it.
 5. **Axis truncation can be more justified.** For time series
    showing change, starting the y-axis at a non-zero value is
-   *sometimes* acceptable — but always label it clearly.
+   *sometimes* acceptable, but always label it clearly.
 
 ## Skipping non-trading days
 
@@ -284,7 +284,7 @@ fig.show()
   ]}
 />
 
-Facets are excellent for time series too — they let you see each
+Facets are excellent for time series too, they let you see each
 group's *shape* clearly, and shared axes ensure honest comparison.
 
 ## Check your understanding
@@ -326,7 +326,7 @@ Smoothing is *averaging*, not deleting. Outliers still affect a moving average; 
   > Negative y-values do not affect the direction of the x-axis; backward zigzags on the time axis are caused by row ordering, not by the values being plotted.
 - The dates are in the wrong time zone.
   > A timezone mismatch might shift data points earlier or later, but would not cause the line to visibly zigzag *backward* through time; unsorted rows are the typical culprit.
-- [o] The DataFrame is not sorted by date — Plotly draws lines in DataFrame row order, not date order.
+- [o] The DataFrame is not sorted by date, Plotly draws lines in DataFrame row order, not date order.
   > Plotly Express connects points in the *order they appear in the DataFrame*. If your rows aren't sorted by the x-column, the line walks through time in whatever order the rows arrived. The fix is one line: **df = df.sort_values("date")**.
 - The y-axis is on a log scale.
   > The y-axis scale affects vertical rendering, not the horizontal progression of time; a log y-axis would not cause lines to move backward along the date axis.
@@ -348,5 +348,5 @@ This is one of those bugs that confuses everyone exactly once. After that, you s
 
 Time-series charts have many small configuration options like this. Bookmark Plotly's time-series documentation.
 
-*Hint: this chapter showed the exact setting used to skip weekends — it operates on the x-axis, not on the data or the layout.*`}
+*Hint: this chapter showed the exact setting used to skip weekends, it operates on the x-axis, not on the data or the layout.*`}
 />

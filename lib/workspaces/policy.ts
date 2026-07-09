@@ -7,7 +7,7 @@
  * the quota, and guests can share (but not save) with a fixed link TTL.
  *
  * There is no cron: expiry is *evaluated at read time* (an expired row is
- * never listed or served) and enforced lazily — routes delete expired rows +
+ * never listed or served) and enforced lazily, routes delete expired rows +
  * R2 objects when they encounter them. This keeps the promise exact without a
  * scheduled worker; actual byte reclamation can additionally be backstopped
  * with an R2 lifecycle rule on the `share/` prefix (see README).
@@ -56,7 +56,7 @@ export const GUEST_SHARE_TTL_DAYS = 30;
 export const INACTIVITY_EXPIRY_DAYS = 30;
 
 /** Guest share-creation rate limits (per salted-IP hash + a global backstop,
- *  both per UTC day — the ai_usage_daily pattern from migration 0003). */
+ *  both per UTC day, the ai_usage_daily pattern from migration 0003). */
 export const GUEST_SHARES_PER_IP_PER_DAY = 10;
 export const GUEST_SHARES_GLOBAL_PER_DAY = 500;
 
@@ -138,7 +138,7 @@ export function newShareId(): string {
     crypto.getRandomValues(bytes);
     for (const b of bytes) {
       if (out.length >= SHARE_ID_LENGTH) break;
-      // 216 = 36 * 6 — the largest multiple of 36 below 256.
+      // 216 = 36 * 6, the largest multiple of 36 below 256.
       if (b < 216) out.push(SLUG_ALPHABET[b % 36]);
     }
   }

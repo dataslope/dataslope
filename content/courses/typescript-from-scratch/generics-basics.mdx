@@ -3,7 +3,7 @@ title: Generics Basics
 description: Write reusable code without losing type information
 ---
 
-Imagine you want to write a function that returns whatever you pass to it — an **identity** function. You could write:
+Imagine you want to write a function that returns whatever you pass to it, an **identity** function. You could write:
 
 ```ts
 function identity(x: any): any {
@@ -26,7 +26,7 @@ Now `identity(42)` returns `number`, `identity("hello")` returns `string`, and t
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A queue of shapes waits at a gray machine marked with angle brackets: the blue triangle that goes in comes out the other side exactly the same shape — one generic mechanism works for any type without forgetting which one it was given"
+  aria-label="A queue of shapes waits at a gray machine marked with angle brackets: the blue triangle that goes in comes out the other side exactly the same shape, one generic mechanism works for any type without forgetting which one it was given"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g
@@ -73,8 +73,8 @@ Now `identity(42)` returns `number`, `identity("hello")` returns `string`, and t
 
 Without generics, you face a painful trade-off:
 
-1. **Concrete types:** Write `identityNumber(x: number): number` and `identityString(x: string): string`. This is type-safe but not reusable — you need a separate function for every type.
-2. **`any` escape hatch:** Write `identity(x: any): any`. This is reusable but not type-safe — the compiler can't help you anymore.
+1. **Concrete types:** Write `identityNumber(x: number): number` and `identityString(x: string): string`. This is type-safe but not reusable, you need a separate function for every type.
+2. **`any` escape hatch:** Write `identity(x: any): any`. This is reusable but not type-safe, the compiler can't help you anymore.
 
 Generics give you the best of both worlds: one function, full type safety, and the compiler **infers** the type parameter based on what you pass in.
 
@@ -184,7 +184,7 @@ Usually, TypeScript infers type parameters from the arguments. But you can also 
   return [];
 }
 
-// Inference fails here — no arguments to infer from!
+// Inference fails here, no arguments to infer from!
 // const arr = createArray(); // ❌ Error: Type parameter 'T' has no default and cannot be inferred
 
 // Solution: provide the type argument explicitly
@@ -254,10 +254,10 @@ if (errResult.success) {
 
 The `Box<T>` interface is parameterized by `T`. When you create a `Box<number>`, `T` is `number`. When you create a `Box<string>`, `T` is `string`. The same interface works for any type.
 
-The `Result<T, E>` type alias is even more interesting: it's a discriminated union parameterized by *two* types — the success value type (`T`) and the error type (`E`). This is a common pattern for modeling operations that can succeed or fail.
+The `Result<T, E>` type alias is even more interesting: it's a discriminated union parameterized by *two* types, the success value type (`T`) and the error type (`E`). This is a common pattern for modeling operations that can succeed or fail.
 
 <Callout type="success" title="Reusable abstractions">
-Generic interfaces and type aliases let you define reusable abstractions — containers, results, events, state machines — that work with any payload type. You write the logic once and reuse it everywhere.
+Generic interfaces and type aliases let you define reusable abstractions, containers, results, events, state machines, that work with any payload type. You write the logic once and reuse it everywhere.
 </Callout>
 
 ## Generic classes
@@ -354,7 +354,7 @@ This is the power of generics: you write one function, and the compiler figures 
 <svg
   viewBox="0 0 640 180"
   role="img"
-  aria-label="Four blue circles pass through a translucent transformation band marked with a function symbol and emerge as four green squares in exactly the same order and count — map changes the element type while the shape of the array survives"
+  aria-label="Four blue circles pass through a translucent transformation band marked with a function symbol and emerge as four green squares in exactly the same order and count, map changes the element type while the shape of the array survives"
   style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
@@ -414,7 +414,7 @@ The type parameter `T` is inferred from the input array. If you pass `number[]`,
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="Two runs of the same gray capsule: a blue circle enters and a blue thread runs through to a blue circle on the far side, while a yellow square enters below and a yellow thread ties it to a yellow square — the type parameter threads the output type to the input type"
+  aria-label="Two runs of the same gray capsule: a blue circle enters and a blue thread runs through to a blue circle on the far side, while a yellow square enters below and a yellow thread ties it to a yellow square, the type parameter threads the output type to the input type"
   style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
 >
   <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
@@ -601,7 +601,7 @@ Don't use generics when:
 - You're only ever going to use it with one concrete type. (Though making it generic anyway can be fine for future-proofing.)
 
 <Callout type="info" title="Start concrete, refactor to generic">
-If you're unsure whether you need generics, start with a concrete type (e.g., `Box` that holds `number`). If you later need it for other types, refactor to `Box<T>`. Don't prematurely genericize — but don't be afraid to add type parameters when the need arises.
+If you're unsure whether you need generics, start with a concrete type (e.g., `Box` that holds `number`). If you later need it for other types, refactor to `Box<T>`. Don't prematurely genericize, but don't be afraid to add type parameters when the need arises.
 </Callout>
 
 ## Recap
@@ -612,11 +612,11 @@ Generics let you write reusable code that works with any type while preserving f
 
 - **Type parameters** (like `<T>`) are placeholders for "whatever type you pass in."
 - **Inference:** The compiler usually infers type parameters from the arguments you pass. You rarely need to write them explicitly.
-- **Generic functions:** `function identity<T>(x: T): T { return x; }` — the parameter and return type are both `T`.
-- **Generic interfaces and type aliases:** `interface Box<T> { value: T }` — parameterize data structures.
-- **Generic classes:** `class Stack<T> { /*...*/ }` — one class, many types.
-- **Multiple type parameters:** `function pair<A, B>(a: A, b: B): [A, B]` — relate different types.
+- **Generic functions:** `function identity<T>(x: T): T { return x; }`, the parameter and return type are both `T`.
+- **Generic interfaces and type aliases:** `interface Box<T> { value: T }`, parameterize data structures.
+- **Generic classes:** `class Stack<T> { /*...*/ }`, one class, many types.
+- **Multiple type parameters:** `function pair<A, B>(a: A, b: B): [A, B]`, relate different types.
 
 Generics are everywhere in TypeScript: `Array<T>`, `Promise<T>`, `Map<K, V>`, `Set<T>`, and countless libraries. Once you understand how they work, you'll start seeing opportunities to write more reusable, type-safe code everywhere.
 
-Next: [Generic Constraints](./generic-constraints), where we go beyond unconstrained type parameters and explore how to restrict `T` to types that have certain properties — unlocking even more powerful abstractions like `keyof`, `extends`, and conditional types.
+Next: [Generic Constraints](./generic-constraints), where we go beyond unconstrained type parameters and explore how to restrict `T` to types that have certain properties, unlocking even more powerful abstractions like `keyof`, `extends`, and conditional types.

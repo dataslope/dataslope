@@ -3,7 +3,7 @@ title: Debugging Visualizations
 description: When charts go wrong, the data is usually trying to tell you something.
 ---
 
-A blank chart, a jumbled line, an empty legend — these are the
+A blank chart, a jumbled line, an empty legend, these are the
 everyday frustrations of visualization. The good news: most
 visualization bugs fall into a small number of recognizable
 patterns. Learn the patterns and you'll stop being stuck.
@@ -11,7 +11,7 @@ patterns. Learn the patterns and you'll stop being stuck.
 <svg
   viewBox="0 0 640 230"
   role="img"
-  aria-label="A magnifying glass held over the gap in a dotted data series reveals two hollow red rings where points should be — the chart faithfully reporting missing data"
+  aria-label="A magnifying glass held over the gap in a dotted data series reveals two hollow red rings where points should be, the chart faithfully reporting missing data"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.25">
@@ -46,7 +46,7 @@ patterns. Learn the patterns and you'll stop being stuck.
 ## The mindset: "the chart is honest about the data"
 
 If your chart looks wrong, the chart is *probably* showing the
-data correctly — but the data isn't what you thought it was. The
+data correctly, but the data isn't what you thought it was. The
 first move is rarely "fix the chart code." It's usually
 **inspect the DataFrame**.
 
@@ -190,7 +190,7 @@ A single `NaN` in a line chart creates a gap. A single huge
 outlier compresses every other point against the floor. Two
 fixes:
 
-- `df.dropna(subset=["y"])` — drop missing rows for the columns
+- `df.dropna(subset=["y"])`, drop missing rows for the columns
   you're plotting.
 - Inspect the y-range with `df["y"].describe()` to spot outliers.
 
@@ -225,7 +225,7 @@ When a chart looks wrong:
    Datetime where you expect datetime?
 3. **Sort the data** if you're plotting a line.
 4. **Filter and re-inspect** before plotting.
-5. **Simplify the chart** — drop `color`, `facet`, `size` and see
+5. **Simplify the chart**, drop `color`, `facet`, `size` and see
    if the basic shape is right.
 6. **Add encodings back one at a time.**
 
@@ -266,7 +266,7 @@ fig = px.line(
     y="sales",
     markers=True,
     template="simple_white",
-    title="Sales over time — now correctly ordered",
+    title="Sales over time, now correctly ordered",
 )
 fig.show()
 `,
@@ -277,7 +277,7 @@ fig.show()
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Your line chart looks like a **scribble** — lines crossing back and forth instead of going left-to-right. The most likely cause is:
+  markdown={`Your line chart looks like a **scribble**, lines crossing back and forth instead of going left-to-right. The most likely cause is:
 
 - A bug in Plotly.
   > Plotly is faithfully connecting points in the order it receives them. The chart is working correctly; the problem lies in the unsorted data, not in the library.
@@ -310,13 +310,13 @@ Most "I can't get this chart to work" problems for beginners trace back to wide-
   markdown={`You add **log_y=True** to a scatter plot and suddenly some points disappear. Why?
 
 - Plotly randomly samples points on log axes.
-  > Plotly does not randomly sample points on any axis. Every point in the DataFrame is included unless it cannot be plotted — which on a log axis means it has a zero or negative value that is mathematically undefined on that scale.
+  > Plotly does not randomly sample points on any axis. Every point in the DataFrame is included unless it cannot be plotted, which on a log axis means it has a zero or negative value that is mathematically undefined on that scale.
 - [o] Log of zero or a negative number is undefined, so those points are silently dropped.
   > The log axis can only show positive values. If your data has zeros or negatives, those rows quietly disappear. Either filter them out explicitly (so you know what's gone) or use a linear axis.
 - Log axes only show 100 points.
   > There is no built-in limit of 100 points on a log axis. Plotly renders all points that have a positive y value; only zero and negative values are dropped because they cannot be represented on a logarithmic scale.
 - The **simple_white** template hides points.
-  > The **simple_white** template controls only visual styling — background color, gridlines, fonts. It does not hide or filter any data points.
+  > The **simple_white** template controls only visual styling, background color, gridlines, fonts. It does not hide or filter any data points.
 
 If a transform changes your data, do it explicitly so you stay in control.`}
 />
@@ -325,13 +325,13 @@ If a transform changes your data, do it explicitly so you stay in control.`}
   markdown={`When a chart looks wrong, the **first** debugging step should be:
 
 - Try a different chart type.
-  > Switching chart types before understanding the data is premature. A different chart type won't reveal whether columns have wrong dtypes, missing values, or are in the wrong shape — inspection of the DataFrame comes first.
+  > Switching chart types before understanding the data is premature. A different chart type won't reveal whether columns have wrong dtypes, missing values, or are in the wrong shape, inspection of the DataFrame comes first.
 - Try a different template.
   > Templates only affect visual styling and cannot fix data issues. If the chart looks wrong, changing the template will produce a differently-styled wrong chart, not the answer.
 - [o] Inspect the DataFrame: **head()**, **dtypes**, **shape**, **isna().sum()**. The chart is usually showing the data correctly; the data isn't what you think it is.
-  > The chart is honest about what's in the DataFrame. If the chart looks wrong, almost always the *data* is the surprise — wrong types, unsorted, missing values, or the wrong shape. Look at the data first.
+  > The chart is honest about what's in the DataFrame. If the chart looks wrong, almost always the *data* is the surprise, wrong types, unsorted, missing values, or the wrong shape. Look at the data first.
 - Restart the notebook.
-  > Restarting clears execution state and can resolve issues caused by stale variables, but it does not tell you *why* the chart is wrong. Inspecting the DataFrame first is more targeted — you'll learn whether the problem is a dtype, missing values, or the wrong shape.
+  > Restarting clears execution state and can resolve issues caused by stale variables, but it does not tell you *why* the chart is wrong. Inspecting the DataFrame first is more targeted, you'll learn whether the problem is a dtype, missing values, or the wrong shape.
 
-This single habit — inspect before adjusting — will save you hours.`}
+This single habit, inspect before adjusting, will save you hours.`}
 />
