@@ -10,7 +10,7 @@ import styles from "./authCard.module.css";
 // Applies the persisted light/dark choice before first paint (same contract
 // as the home and pricing pages) so a returning dark-mode visitor sees no
 // flash.
-const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
+const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
 export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
@@ -19,15 +19,19 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
       <div className={styles.page}>
         {/* Blue Dataslope logo, top-left of the page (not inside the card). */}
         <header className={styles.brandBar}>
-          <Link href="/" aria-label="Dataslope home" className={styles.brand}>
+          <Link
+            href="/"
+            aria-label="Dataslope home"
+            className={`${styles.brand} ds-logo-hover`}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/dataslope-logo-blue.svg"
               alt=""
               aria-hidden="true"
-              className={styles.brandLogo}
+              className={`${styles.brandLogo} ds-logo-mark`}
             />
-            <span className={styles.brandWord}>Dataslope</span>
+            <span className={`${styles.brandWord} ds-logo-word`}>Dataslope</span>
           </Link>
         </header>
 

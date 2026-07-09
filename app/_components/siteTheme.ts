@@ -51,6 +51,11 @@ export function applySiteThemeClass(theme: SiteTheme): void {
   const r = document.documentElement;
   r.classList.toggle("dark", theme === "dark");
   r.classList.toggle("light", theme === "light");
+  // Keep the UA color-scheme (scrollbars, form controls) in step with the
+  // toggle. next-themes on the Fumadocs routes writes an inline
+  // `color-scheme` onto <html>; without this a light toggle here would leave
+  // that stale dark value behind (dark scrollbar until refresh).
+  r.style.colorScheme = theme;
 }
 
 /** Persist + apply the site theme and notify listeners (this document and,

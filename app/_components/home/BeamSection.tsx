@@ -189,7 +189,7 @@ export function BeamSection() {
   const left2 = useRef<HTMLDivElement>(null);
   const left3 = useRef<HTMLDivElement>(null);
   const left4 = useRef<HTMLDivElement>(null);
-  // Right column (top → bottom): Java/C#, SQLite, Postgres, DuckDB.
+  // Right column (top → bottom): Java/C#, Postgres, SQLite/DuckDB, HTML/React.
   const right1 = useRef<HTMLDivElement>(null);
   const right2 = useRef<HTMLDivElement>(null);
   const right3 = useRef<HTMLDivElement>(null);
@@ -232,9 +232,9 @@ export function BeamSection() {
       {/* Right column, labels hug the left edge, beside the circle. */}
       <div className="flex flex-col items-start justify-center gap-6">
         <BeamNode ref={right1} active={rotationActive} side="right" label="Java and C#" delay={350} items={[{ id: "java", name: "Java" }, { id: "csharp", name: "C#" }]} />
-        <BeamNode ref={right2} active={rotationActive} side="right" label="SQLite" items={[{ id: "sqlite", name: "SQLite" }]} />
-        <BeamNode ref={right3} active={rotationActive} side="right" label="PostgreSQL" items={[{ id: "postgres", name: "PostgreSQL" }]} />
-        <BeamNode ref={right4} active={rotationActive} side="right" label="DuckDB" items={[{ id: "duckdb", name: "DuckDB" }]} />
+        <BeamNode ref={right2} active={rotationActive} side="right" label="PostgreSQL" items={[{ id: "postgres", name: "PostgreSQL" }]} />
+        <BeamNode ref={right3} active={rotationActive} side="right" label="SQLite and DuckDB" delay={1050} items={[{ id: "sqlite", name: "SQLite" }, { id: "duckdb", name: "DuckDB" }]} />
+        <BeamNode ref={right4} active={rotationActive} side="right" label="HTML and React" delay={1750} items={[{ id: "web", name: "HTML" }, { id: "react", name: "React" }]} />
       </div>
 
       {/* Every beam flows from a language node INTO the center. Right-side

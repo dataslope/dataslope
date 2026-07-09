@@ -192,7 +192,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
       <div className="mt-6 text-center">
         <Link
           href="/courses"
-          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-medium text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
+          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-medium tracking-tight text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
         >
           <GraduationCap size={18} aria-hidden="true" />
           Browse all {courses.length} courses

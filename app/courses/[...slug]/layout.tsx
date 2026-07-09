@@ -45,6 +45,7 @@ export default function CourseLessonLayout({
         nav={{
           title: (
             <span
+              className="ds-logo-hover"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -58,9 +59,10 @@ export default function CourseLessonLayout({
               <img
                 src="/dataslope-logo-blue.svg"
                 alt="Dataslope logo"
+                className="ds-logo-mark"
                 style={{ height: "10px", width: "auto" }}
               />
-              Dataslope
+              <span className="ds-logo-word">Dataslope</span>
             </span>
           ),
           url: "/",

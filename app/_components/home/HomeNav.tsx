@@ -87,7 +87,7 @@ function GitHubLink() {
       rel="noopener noreferrer"
       aria-label="View source on GitHub"
       title="GitHub"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
+      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06]"
     >
       <GitHubIcon size={18} />
     </a>
@@ -107,12 +107,12 @@ function PlaygroundMenu() {
         />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={8} align="center" className="z-50">
-          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+        <Menu.Positioner sideOffset={3} align="center" className="z-50">
+          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#121212] dark:shadow-black/40">
             {PLAYGROUNDS.map((p) => (
               <Menu.Item
                 key={p.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-white dark:data-[highlighted]:bg-white/[0.06] dark:data-[highlighted]:text-white"
                 render={<Link href={p.href} prefetch={false} />}
               >
                 <LangIcon

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, LogIn, Mail, UserPlus } from "lucide-react";
+import { ArrowLeft, KeyRound, LogIn, Mail, UserPlus } from "lucide-react";
 import { GitHubIcon } from "../_components/home/icons";
 import {
   requestPasswordReset,
@@ -468,6 +468,7 @@ export function SignInClient({
                   onClick={() => go("forgot")}
                   className={styles.link}
                 >
+                  <KeyRound size={14} aria-hidden="true" />
                   Forgot password?
                 </button>
               )}

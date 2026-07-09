@@ -153,7 +153,7 @@ export function PlaygroundShowcase() {
           href={playgroundHref(playgroundId)}
           onMouseEnter={() => setLinkHover(true)}
           onMouseLeave={() => setLinkHover(false)}
-          className="group mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
+          className="group mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-medium tracking-tight text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
           <SquareTerminal size={18} aria-hidden="true" />
           <span>Open the {name} playground</span>

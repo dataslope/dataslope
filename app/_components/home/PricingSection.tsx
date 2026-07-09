@@ -473,7 +473,7 @@ export function PricingSection({
                 type="button"
                 onClick={() => setBilling(option)}
                 aria-pressed={active}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                   active
                     ? "bg-[var(--ds-gray-900)] text-white dark:bg-white dark:text-[#121212]"
                     : "text-[var(--ds-gray-600)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:text-white"

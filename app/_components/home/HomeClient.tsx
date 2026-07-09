@@ -82,7 +82,17 @@ export function HomeClient({
                     Learn programming and prepare for coding interviews. Access
                     every course and coding playground for free,{" "}
                     <Highlighter action="underline" color="#20C621" isView>
-                      without creating an account
+                      {/* Match the underline colour (#20C621 = --ds-green),
+                          forced over the shimmer's clipped gradient fill via
+                          both color and -webkit-text-fill-color. */}
+                      <span
+                        style={{
+                          color: "#20C621",
+                          WebkitTextFillColor: "#20C621",
+                        }}
+                      >
+                        without creating an account
+                      </span>
                     </Highlighter>
                     .
                   </AnimatedShinyText>

@@ -26,7 +26,7 @@ const TRIGGER_CLASS =
  *  inverted to white-on-#121212 on dark. Shared with the mobile drawer's
  *  sign-in row so the two match. */
 export const SIGN_IN_BUTTON_CLASS =
-  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
+  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 py-1.5 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
 
 /** Circular avatar: the provider image when present, otherwise an initial. */
 function Avatar({ image, name }: { image?: string | null; name?: string | null }) {

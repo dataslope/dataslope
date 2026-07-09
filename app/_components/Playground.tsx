@@ -3720,9 +3720,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         <header className="playground-header">
           <div className="logo">
             {!embedded && (
-              <Link href="/" aria-label="Dataslope home">
+              <Link href="/" aria-label="Dataslope home" className="ds-logo-hover">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
+                <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo ds-logo-mark" />
               </Link>
             )}
             {/* Hidden when embedded (home page iframe): switching is done by
