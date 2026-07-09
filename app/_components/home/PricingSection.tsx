@@ -201,7 +201,7 @@ function FeatureText({ feature }: { feature: Feature }) {
   return (
     <>
       {feature.text.slice(0, at)}
-      <Highlighter action="underline" color="#20C621" padding={0} isView>
+      <Highlighter action="underline" color="#20C621" padding={-2} isView>
         <span className="font-semibold">{feature.highlight}</span>
       </Highlighter>
       {feature.text.slice(at + feature.highlight.length)}

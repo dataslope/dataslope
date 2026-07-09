@@ -22,6 +22,10 @@ const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 // title toward the brand blue, and a gentle darkening of the description.
 const HOVER_TEXT =
   "transition-colors group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
+// The glyph both recolours and nudges to the right on hover, so the whole row
+// feels responsive. `transition-[color,transform]` animates both at once.
+const HOVER_GLYPH =
+  "transition-[color,translate] duration-200 group-hover:translate-x-1 group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
 // The description shifts a shade darker on hover, subtle enough to read as a
 // whole-card affordance without competing with the title's blue.
 const HOVER_DESC =
@@ -103,7 +107,7 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
         slug={course.slug}
         tags={course.tags}
         size={22}
-        className={`mt-0.5 text-[var(--ds-gray-900)] dark:text-white ${HOVER_TEXT}`}
+        className={`mt-0.5 text-[var(--ds-gray-900)] dark:text-white ${HOVER_GLYPH}`}
       />
       <span className="flex min-w-0 flex-col gap-[5px]">
         <span
