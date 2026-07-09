@@ -18,7 +18,10 @@ import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseGlyph } from "./courseArt";
 
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
-const HOVER_BG = "hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.08]";
+// Hover affordance: no background fill, just a subtle shift of the glyph +
+// title toward the brand blue (the description stays put).
+const HOVER_TEXT =
+  "transition-colors group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
 
 /** Neutral database glyph for "sql", the shared language-icon registry only
  *  has per-engine marks (SQLite/PostgreSQL/DuckDB); path from the mockup. */
@@ -90,12 +93,17 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
       // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
-      className={`-mx-3 grid grid-cols-[44px_1fr] items-start gap-5 px-3 py-6 ${HOVER_BG}`}
+      className="group -mx-3 grid grid-cols-[30px_1fr] items-start gap-4 px-3 py-6"
     >
-      <CourseGlyph slug={course.slug} tags={course.tags} size={32} />
+      <CourseGlyph
+        slug={course.slug}
+        tags={course.tags}
+        size={22}
+        className={`mt-0.5 text-[var(--ds-gray-900)] dark:text-white ${HOVER_TEXT}`}
+      />
       <span className="flex min-w-0 flex-col gap-[5px]">
         <span
-          className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING}`}
+          className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING} ${HOVER_TEXT}`}
         >
           {course.title}
         </span>

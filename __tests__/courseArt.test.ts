@@ -1,15 +1,15 @@
 // Guards the "one icon per course" rule for the course-card glyphs
 // (app/courses/_components/courseArt.tsx): every root course under
 // content/courses must have a bespoke COURSE_MOTIFS entry, no two courses
-// may share a motif, and every assigned motif must actually draw something
-// (an unknown kind falls through motifShapes' switch to null).
+// may share a motif, and every assigned motif must map to a lucide icon
+// (an unknown kind returns null from motifIcon).
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
   COURSE_MOTIFS,
-  motifShapes,
+  motifIcon,
 } from "../app/courses/_components/courseArt";
 
 async function rootCourseSlugs(): Promise<string[]> {
@@ -54,11 +54,11 @@ describe("course glyph assignments", () => {
     }
   });
 
-  it("only assigns motifs that draw a shape", () => {
+  it("only assigns motifs that map to an icon", () => {
     for (const [slug, motif] of Object.entries(COURSE_MOTIFS)) {
       expect(
-        motifShapes(motif),
-        `motif "${motif}" (course "${slug}") renders nothing`,
+        motifIcon(motif),
+        `motif "${motif}" (course "${slug}") has no icon`,
       ).not.toBeNull();
     }
   });

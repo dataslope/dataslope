@@ -133,8 +133,11 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const [levels, setLevels] = useState<string[]>([]);
   const [sort, setSort] = useState<Sort>("popular");
 
-  const toggle = (arr: string[], v: string) =>
-    arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+  // Single-select per category: clicking the active row clears it, clicking
+  // another replaces the selection. Kept as a 0-or-1-element array so the
+  // filter logic (and the mobile dropdowns) stay unchanged.
+  const selectOne = (arr: string[], v: string) =>
+    arr[0] === v ? [] : [v];
 
   // Sidebar rows: fixed mockup order, restricted to languages that actually
   // occur; unknown future languages append alphabetically.
@@ -273,7 +276,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
             <SideRow
               key={l}
               active={langs.includes(l)}
-              onClick={() => setLangs(toggle(langs, l))}
+              onClick={() => setLangs(selectOne(langs, l))}
               glyph={<LangIcon id={l} size={16} />}
               label={formatTagLabel(l)}
               count={langCount(l)}
@@ -291,7 +294,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
             <SideRow
               key={l}
               active={levels.includes(l)}
-              onClick={() => setLevels(toggle(levels, l))}
+              onClick={() => setLevels(selectOne(levels, l))}
               glyph={<LevelBars level={l} />}
               label={l}
               count={levelCount(l)}

@@ -64,3 +64,48 @@ html.dark .skip-to-content {
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0, "clig" 0, "calt" 0, "dlig" 0;
 }
+
+/* ── Diagonal-striped hard-offset elevation ──────────────────────────────
+   The same "designed shadow" the challenge cards and code blocks use
+   (app/_components/ChallengeCard.module.css `.cardShell`), extracted here so
+   the home playground preview and the pricing table can share it for a
+   consistent outer border. The element it is applied to must be OPAQUE: it
+   sits on top of the z-index:-1 stripe layer and covers everything but the
+   down-right offset sliver. Set `--ds-shell-radius` to match the element's own
+   border-radius. */
+.ds-striped-shell {
+  position: relative;
+  isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
+  --ds-shell-offset: 6px;
+  --ds-shell-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
+  --ds-shell-stripe: 1px; /* painted band width */
+  --ds-shell-period: 4px; /* band + gap */
+  --ds-shell-border-color: var(--ds-gray-200);
+  --ds-shell-radius: 16px; /* match rounded-2xl */
+}
+.ds-striped-shell::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--ds-shell-offset) calc(-1 * var(--ds-shell-offset))
+    calc(-1 * var(--ds-shell-offset)) var(--ds-shell-offset);
+  border: 1px solid var(--ds-shell-border-color);
+  border-radius: var(--ds-shell-radius);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--ds-shell-color) 0,
+    var(--ds-shell-color) var(--ds-shell-stripe),
+    transparent var(--ds-shell-stripe),
+    transparent var(--ds-shell-period)
+  );
+  pointer-events: none;
+}
+html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
+  --ds-shell-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  --ds-shell-border-color: #2e2e2e;
+}
+@media (max-width: 768px) {
+  .ds-striped-shell {
+    --ds-shell-offset: 5px;
+  }
+}

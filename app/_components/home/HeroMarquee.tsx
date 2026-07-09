@@ -84,7 +84,7 @@ export function HeroMarquee() {
         className="py-1 text-5xl font-bold tracking-tight [--duration:30s] [--gap:0px] sm:text-6xl lg:text-7xl"
       >
         <span className="mx-8 text-[#CED7DB]">
-          Interactive, No sign-up, Free
+          Interactive ⚡ No sign-up 🔓 Free 💯
         </span>
       </Marquee>
 

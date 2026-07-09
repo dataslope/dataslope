@@ -193,7 +193,9 @@ export function EmbeddedPlayground({
       ref={ref}
       // Height tracks width (aspect-ratio), clamped so it stays usable on
       // phones and doesn't get unwieldy on very wide screens.
-      className="relative aspect-[16/10] max-h-[820px] min-h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] shadow-sm dark:border-white/10 dark:bg-white/5"
+      // Opaque surface (not a translucent tint) so the striped-shell
+      // elevation on the wrapper only shows in the offset sliver.
+      className="relative aspect-[16/10] max-h-[820px] min-h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] dark:border-white/10 dark:bg-[#1a1a1a]"
     >
       {active ? (
         // key on src so switching languages cleanly reloads the iframe.

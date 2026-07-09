@@ -69,7 +69,7 @@ const CARDS: CardEntry[] = [
   {
     id: "web",
     href: "/playground/web",
-    title: "HTML/CSS/JS",
+    title: "HTML",
     desc: "Build web pages with a live sandboxed preview, HTML, CSS, and JavaScript together.",
   },
   {

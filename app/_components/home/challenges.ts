@@ -283,101 +283,161 @@ export interface HomeWebBlock {
   tailwind?: boolean;
 }
 
-// A tiny, self-contained interactive page, the HTML/CSS/JS runs on native
-// browser primitives, so it renders instantly with no runtime download.
-const WEB_INDEX_HTML = `<!doctype html>
-<html>
-  <head>
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        display: grid;
-        place-items: center;
-        min-height: 90vh;
-        margin: 0;
-        background: #f8fafc;
-      }
-      .card {
-        background: #fff;
-        padding: 2rem 3rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        text-align: center;
-      }
-      h1 { color: #0f172a; margin: 0 0 0.5rem; }
-      button {
-        background: #2563eb;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1.25rem;
-        font-size: 1rem;
-        cursor: pointer;
-      }
-      button:hover { background: #1d4ed8; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Hello, web!</h1>
-      <p>Edit the HTML, CSS, or JS and press Run.</p>
-      <button id="go">Click me</button>
-    </div>
-    <script>
-      let clicks = 0;
-      const button = document.querySelector("#go");
-      button.addEventListener("click", () => {
-        clicks += 1;
-        button.textContent = "Clicked " + clicks + (clicks === 1 ? " time" : " times");
-        console.log("clicks:", clicks);
-      });
-    </script>
-  </body>
-</html>
+// A small interactive page split across the CodePen-style trio. The web
+// adapter auto-composes root-level .css/.js into the HTML, so index.html stays
+// a plain body fragment with no <link>/<script src> boilerplate.
+const WEB_INDEX_HTML = `<div class="card">
+  <h1>Hello, web!</h1>
+  <p>Edit the HTML, CSS, or JS and press Run.</p>
+  <button id="go">Click me</button>
+</div>
 `;
 
-// A React counter, esbuild-wasm bundles the TSX in a worker and the result
-// renders in the same sandboxed preview iframe the web block uses.
-const REACT_MAIN_TSX = `import { useState } from "react";
-import { createRoot } from "react-dom/client";
+const WEB_STYLES_CSS = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  margin: 0;
+  background: #f8fafc;
+}
 
-function Counter() {
+.card {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+`;
+
+const WEB_SCRIPT_JS = `let clicks = 0;
+const button = document.querySelector("#go");
+
+button.addEventListener("click", () => {
+  clicks += 1;
+  button.textContent = "Clicked " + clicks + (clicks === 1 ? " time" : " times");
+  console.log("clicks:", clicks);
+});
+`;
+
+// A React counter split into a mount file, the component, and a CSS import.
+// esbuild-wasm bundles the workspace in a worker and the result renders in the
+// same sandboxed preview iframe the web block uses.
+const REACT_MAIN_TSX = `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`;
+
+const REACT_APP_TSX = `import { useState } from "react";
+
+export function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <div style={{ fontFamily: "system-ui", display: "grid", placeItems: "center", minHeight: "90vh" }}>
+    <main className="card">
       <h1>You clicked {count} times</h1>
-      <button
-        style={{ fontSize: 16, padding: "8px 20px", cursor: "pointer" }}
-        onClick={() => setCount(count + 1)}
-      >
-        Click me
-      </button>
-    </div>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+      <p>
+        Edit <code>App.tsx</code> and press Run, imports between the panes
+        bundle right in your browser.
+      </p>
+    </main>
   );
 }
+`;
 
-createRoot(document.getElementById("root")!).render(<Counter />);
+const REACT_STYLES_CSS = `body {
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 90vh;
+  margin: 0;
+  background: #f8fafc;
+}
+
+.card {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 26rem;
+}
+
+h1 {
+  color: #0f172a;
+  margin: 0 0 1rem;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
 `;
 
 /**
  * The Web preview tab shows runnable code blocks (not graded challenge cards),
- * one per flavor. HTML/CSS/JS and React both render a live sandboxed preview.
+ * one per flavor. Each is a small multi-file workspace that renders a live
+ * sandboxed preview.
  */
 export const WEB_CODE_BLOCKS: HomeWebBlock[] = [
   {
     flavor: "web",
-    label: "HTML/CSS/JS",
+    label: "HTML",
     adapter: "web",
     entryFilename: "index.html",
-    files: [{ filename: "index.html", starterCode: WEB_INDEX_HTML }],
+    files: [
+      { filename: "index.html", starterCode: WEB_INDEX_HTML },
+      { filename: "styles.css", starterCode: WEB_STYLES_CSS },
+      { filename: "script.js", starterCode: WEB_SCRIPT_JS },
+    ],
   },
   {
     flavor: "react",
     label: "React",
     adapter: "react",
     entryFilename: "main.tsx",
-    files: [{ filename: "main.tsx", starterCode: REACT_MAIN_TSX }],
+    files: [
+      { filename: "main.tsx", starterCode: REACT_MAIN_TSX },
+      { filename: "App.tsx", starterCode: REACT_APP_TSX },
+      { filename: "styles.css", starterCode: REACT_STYLES_CSS },
+    ],
   },
 ];
 

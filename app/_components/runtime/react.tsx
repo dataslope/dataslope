@@ -574,7 +574,7 @@ export const reactAdapter: LanguageAdapter = {
   readyStatus: "React toolchain ready",
   runtimeInfo: {
     language: "React",
-    version: `React ${REACT_VERSION} · TypeScript JSX`,
+    version: REACT_VERSION,
     engine: "esbuild-wasm (in-browser bundler) + esm.sh modules",
     engineUrl: "https://esbuild.github.io/",
     notes:

@@ -453,11 +453,11 @@ export const webAdapter: LanguageAdapter = {
   id: "web",
   displayName: "Web Playground",
   logoText: "<>",
-  documentTitle: "HTML/CSS/JS Playground",
+  documentTitle: "HTML Playground",
   readyStatus: "Web preview ready",
   runtimeInfo: {
-    language: "HTML/CSS/JS",
-    version: "Living Standard",
+    language: "HTML",
+    version: "",
     engine: "Sandboxed iframe preview (native browser)",
     notes:
       "Pages render in a sandboxed iframe with a unique opaque origin, no runtime download at all. " +

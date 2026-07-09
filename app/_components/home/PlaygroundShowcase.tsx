@@ -121,7 +121,7 @@ export function PlaygroundShowcase() {
         <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
       </div>
 
-      <div className="mx-auto max-w-7xl">
+      <div className="ds-striped-shell mx-auto max-w-7xl">
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 

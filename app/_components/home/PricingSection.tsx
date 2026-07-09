@@ -456,20 +456,26 @@ export function PricingSection({
         </div>
       </div>
 
-      {/* Comparison: bordered (no fill), no gaps between plans, thin dividers
-          between them, and feature rows aligned via subgrid. */}
-      <div className="rounded-2xl border border-[var(--ds-gray-200)] dark:border-white/10">
-        <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
-          {PLANS.map((plan, i) => (
-            <PlanColumn
-              key={plan.name}
-              plan={plan}
-              annual={annual}
-              colClass={COL_START[i]}
-              guestFeatures={PLANS[0].features}
-              isGuest={i === 0}
-            />
-          ))}
+      {/* Comparison: bordered, no gaps between plans, thin dividers between
+          them, and feature rows aligned via subgrid. The striped-shell gives
+          it the same diagonal-offset elevation as the code blocks / challenge
+          cards. The stripe layer sits behind an OPAQUE inner surface (the
+          bordered card below), so it only shows in the down-right offset
+          sliver, not through the table body. */}
+      <div className="ds-striped-shell rounded-2xl">
+        <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
+          <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+            {PLANS.map((plan, i) => (
+              <PlanColumn
+                key={plan.name}
+                plan={plan}
+                annual={annual}
+                colClass={COL_START[i]}
+                guestFeatures={PLANS[0].features}
+                isGuest={i === 0}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
