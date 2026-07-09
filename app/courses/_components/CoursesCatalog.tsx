@@ -84,7 +84,7 @@ function SideRow({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-[color,translate] hover:translate-x-1 ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-[color,translate] hover:translate-x-0.5 ${
         active
           ? `font-semibold ${ACCENT}`
           : "text-[#121212] dark:text-white"

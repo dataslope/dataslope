@@ -418,7 +418,10 @@ export default function AskAiWidget({
           <div className={styles.signedOut}>
             <Sparkles size={22} />
             <p>Sign in to ask AI about this {subject}.</p>
-            <a className={styles.signInLink} href="/sign-in">
+            {/* target="_top" breaks out of the home page's embedded
+                playground iframe so sign-in loads in the top-level window,
+                not inside the preview. A no-op when not framed. */}
+            <a className={styles.signInLink} href="/sign-in" target="_top">
               <LogIn size={15} />
               Sign in
             </a>

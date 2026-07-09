@@ -25,7 +25,7 @@ const HOVER_TEXT =
 // The glyph both recolours and nudges to the right on hover, so the whole row
 // feels responsive. `transition-[color,transform]` animates both at once.
 const HOVER_GLYPH =
-  "transition-[color,translate] duration-200 group-hover:translate-x-1 group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
+  "transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
 // The description shifts a shade darker on hover, subtle enough to read as a
 // whole-card affordance without competing with the title's blue.
 const HOVER_DESC =

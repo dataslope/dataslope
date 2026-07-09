@@ -185,7 +185,7 @@ function MobileAuthSection() {
         render={<Link href="/sign-in" prefetch={false} />}
         className={`${SIGN_IN_BUTTON_CLASS} w-full justify-center`}
       >
-        <LogIn size={16} aria-hidden="true" />
+        <LogIn size={14} aria-hidden="true" />
         Sign in
       </Dialog.Close>
     );

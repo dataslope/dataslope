@@ -101,7 +101,7 @@ export function ResetPasswordClient() {
             // Deep-link straight into the "Reset your password" form,
             // landing on the sign-in tab would make the user rediscover
             // "Forgot password?" themselves.
-            router.push("/sign-in?mode=forgot");
+            router.push("/forgot-password");
             router.refresh();
           }}
           className={styles.primary}

@@ -78,7 +78,7 @@ export function AuthMenu() {
         href="/sign-in"
         className={SIGN_IN_BUTTON_CLASS}
       >
-        <LogIn size={16} aria-hidden="true" />
+        <LogIn size={14} aria-hidden="true" />
         Sign in
       </Link>
     );

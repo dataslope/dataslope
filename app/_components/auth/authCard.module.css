@@ -394,6 +394,10 @@
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  vertical-align: middle;
   padding: 0;
   border: none;
   background: none;

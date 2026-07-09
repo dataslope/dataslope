@@ -96,74 +96,9 @@
   padding: 14px 14px 14px 18px;
 }
 
-/* ─── Running overlay (sine-wave animation) ──────────────────────────
-   A bottom-anchored band that signals "code is running". Mirrors the
-   main playground's `.dataslope-run-overlay` but shorter so it fits the
-   compact code-block output area without overwhelming content. Uses
-   `--cb-accent` so the colour always tracks the block's theme token. */
-
-.runOverlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 36px;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.18s ease;
-  z-index: 0;
-  /* Vertical alpha mask: opaque at the bottom, transparent at the top
-     so the band blends into the action bar without a hard seam. */
-  -webkit-mask-image: linear-gradient(to top, var(--cb-black) 35%, transparent 100%);
-  mask-image: linear-gradient(to top, var(--cb-black) 35%, transparent 100%);
-}
-.runOverlay.runOverlayActive {
-  opacity: 1;
-}
-
-.runWaves {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
-}
-.runWaveBack {
-  fill: color-mix(in oklab, var(--cb-accent) 22%, transparent);
-  animation: ds-run-wave-back 2.4s linear infinite;
-}
-.runWaveFront {
-  fill: color-mix(in oklab, var(--cb-accent) 45%, transparent);
-  animation: ds-run-wave-front 1.4s linear infinite;
-}
-.runGlow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    120% 80% at 50% 110%,
-    color-mix(in oklab, var(--cb-accent) 40%, transparent) 0%,
-    transparent 70%
-  );
-  animation: ds-run-glow-pulse 0.9s ease-in-out infinite alternate;
-}
-.runStream {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 8px;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in oklab, var(--cb-accent) 80%, white 20%) 50%,
-    transparent 100%
-  );
-  filter: blur(0.5px);
-  transform: translateX(-100%);
-  animation: ds-run-stream 1.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-}
+/* The running state now shows a centered brand spinner instead of a
+   sine-wave band; the shared `.runSpinner` rule lives in
+   ChallengeCard.module.css and is applied here via `challengeStyles`. */
 
 /* ─── Toast (Base UI) ────────────────────────────────────────────────
    Matches the main playground's toast styles.  Because the toast is

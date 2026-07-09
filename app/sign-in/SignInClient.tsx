@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, LogIn, Mail, UserPlus } from "lucide-react";
 import { GitHubIcon } from "../_components/home/icons";
 import {
   requestPasswordReset,
@@ -74,12 +75,14 @@ const COPY: Record<
 > = {
   signin: {
     title: "Welcome back",
-    subtitle: "Sign in to continue to Dataslope.",
+    subtitle:
+      "Every course and playground is free to use without an account. Sign in only to save your playgrounds and use AI features.",
     cta: ["Sign in", "Signing in…"],
   },
   signup: {
     title: "Create your account",
-    subtitle: "Every course and playground is free, forever.",
+    subtitle:
+      "Every course and playground is free to use without an account. Sign up only to save your playgrounds and use AI features.",
     cta: ["Create account", "Creating account…"],
   },
   forgot: {
@@ -131,11 +134,18 @@ function GoogleGlyph() {
  * logins fill it from the provider profile), so for email sign-ups we derive a
  * name from the email's local-part rather than asking for it.
  */
-export function SignInClient() {
+export function SignInClient({
+  /** Which form to open on first render. The dedicated /sign-up and
+   *  /forgot-password routes pass "signup"/"forgot"; /sign-in defaults to
+   *  "signin". The `?mode=` deep link (below) can still override it. */
+  initialMode = "signin",
+}: {
+  initialMode?: Mode;
+} = {}) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -213,6 +223,9 @@ export function SignInClient() {
   const pwOk = password.length >= MIN_PASSWORD;
   const { title, subtitle, cta } = COPY[mode];
   const busy = submitting || socialPending !== null;
+  // Leading glyph for the primary button, matched to the action (same 14px
+  // size as the shared header's Sign in button).
+  const SubmitIcon = isForgot ? Mail : isSignup ? UserPlus : LogIn;
 
   function go(next: Mode) {
     setMode(next);
@@ -462,7 +475,10 @@ export function SignInClient() {
               {cta[1]}
             </span>
           ) : (
-            cta[0]
+            <span className={styles.btnBusy}>
+              <SubmitIcon size={14} aria-hidden="true" />
+              {cta[0]}
+            </span>
           )}
         </button>
       </form>
@@ -518,6 +534,7 @@ export function SignInClient() {
             onClick={() => go("signin")}
             className={styles.link}
           >
+            <ArrowLeft size={14} aria-hidden="true" />
             Back to sign in
           </button>
         ) : (
@@ -528,6 +545,11 @@ export function SignInClient() {
               onClick={() => go(isSignup ? "signin" : "signup")}
               className={styles.link}
             >
+              {isSignup ? (
+                <LogIn size={14} aria-hidden="true" />
+              ) : (
+                <UserPlus size={14} aria-hidden="true" />
+              )}
               {isSignup ? "Sign in" : "Create one"}
             </button>
           </>
