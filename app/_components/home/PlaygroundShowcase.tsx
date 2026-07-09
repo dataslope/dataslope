@@ -128,16 +128,17 @@ export function PlaygroundShowcase() {
 
       {/* Connector stemming from the playground's bottom center down to a dot
           above the link. It tracks the link's colour, and only while the link
-          itself is hovered the line shortens (reduces its length) to open up
-          more space between the dot and the link. State-driven so it reacts to
-          the link, not to hovering the connector; both revert on mouseout. */}
+          itself is hovered the line extends toward the link, a shorter reach
+          than before so the dot keeps more space from the link. State-driven so
+          it reacts to the link, not to hovering the connector; both revert on
+          mouseout. */}
       <div className="mt-2 flex flex-col items-center">
         <div className="flex h-24 flex-col items-center" aria-hidden="true">
           <span
             className={`w-px transition-[height,background-color] duration-200 ${
               linkHover
-                ? "h-10 bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
-                : "h-16 bg-[var(--ds-gray-800)] dark:bg-[var(--ds-gray-100)]"
+                ? "h-16 bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
+                : "h-12 bg-[var(--ds-gray-800)] dark:bg-[var(--ds-gray-100)]"
             }`}
           />
           <span

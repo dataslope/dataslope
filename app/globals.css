@@ -120,6 +120,13 @@ html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
   --ds-shell-color: color-mix(in srgb, var(--ds-blue-500) 32%, transparent);
   --ds-shell-border-color: var(--ds-blue-500);
 }
+/* Dark mode sets --ds-shell-color on the base `.ds-striped-shell` with higher
+   specificity than the hover rule above, so the blue tint wouldn't show. Re-
+   assert it (in a lighter blue) at matching specificity for the hover. */
+html:is(.dark, [data-theme="dark"]) .ds-striped-shell-blue-hover:hover {
+  --ds-shell-color: color-mix(in srgb, var(--ds-blue-400) 34%, transparent);
+  --ds-shell-border-color: var(--ds-blue-400);
+}
 
 /* Shared light/dark pill toggle (app/_components/ThemePillToggle.tsx). Plain
    CSS rather than Tailwind so it renders identically on every surface,

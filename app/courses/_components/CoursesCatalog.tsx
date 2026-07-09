@@ -338,7 +338,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.01em] ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase ${FAINT}`}
+            // Inline (not `tracking-*`) to beat the unlayered global
+            // `h1…h6 { letter-spacing: -0.02em }` in docs.css.
+            style={{ letterSpacing: "0.01em" }}
           >
             <Code2 size={13} aria-hidden="true" />
             Language
@@ -357,7 +360,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.01em] ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase ${FAINT}`}
+            // Inline (not `tracking-*`) to beat the unlayered global
+            // `h1…h6 { letter-spacing: -0.02em }` in docs.css.
+            style={{ letterSpacing: "0.01em" }}
           >
             <BarChart3 size={13} aria-hidden="true" />
             Level
