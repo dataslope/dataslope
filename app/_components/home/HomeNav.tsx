@@ -134,7 +134,7 @@ function BrandLogo() {
     <Link
       href="/"
       aria-label="Dataslope home"
-      className="flex items-center gap-2"
+      className="group flex items-center gap-2"
       // This nav only renders on "/", so a Link to "/" is a same-route no-op
       // and nothing appears to happen. Scroll back to the top instead, the
       // expected behaviour of clicking a site logo.
@@ -149,10 +149,10 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="relative top-px h-[13px] w-auto"
+        className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[15deg]"
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[#121212] dark:text-white">
+      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-1 dark:text-white">
         Dataslope
       </span>
     </Link>
@@ -168,7 +168,7 @@ function MobileAuthSection() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const rowClass =
-    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white";
+    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white";
 
   if (isPending) {
     return (
@@ -254,21 +254,21 @@ function MobileDrawer() {
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
             <Dialog.Close
               render={<Link href="/courses" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Courses
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/interview-prep" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Interview Prep
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/pricing" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Pricing
             </Dialog.Close>
@@ -280,7 +280,7 @@ function MobileDrawer() {
               <Dialog.Close
                 key={p.id}
                 render={<Link href={p.href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/10 dark:hover:text-white"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/[0.06] dark:hover:text-white"
               >
                 <LangIcon
                   id={p.id}
@@ -297,7 +297,7 @@ function MobileDrawer() {
               href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/[0.06]"
             >
               <GitHubIcon size={16} />
               GitHub

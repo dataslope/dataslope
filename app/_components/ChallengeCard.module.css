@@ -2444,6 +2444,9 @@
   justify-content: center;
   min-height: 132px;
   padding: 18px 16px;
+  /* Match the top hairline the table tabs carry, so the boot notice reads as a
+     bordered panel rather than floating loose under the editor. */
+  border-top: 1px solid var(--ch-border-light);
 }
 
 .skeletonRow {

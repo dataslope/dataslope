@@ -346,6 +346,10 @@ function PlanColumn({
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
   const PlanIcon = plan.icon;
+  // Guest / Free Member: match the title text colour. Pro: brand green.
+  const iconClass = plan.highlighted
+    ? "text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]"
+    : "text-[var(--ds-gray-900)] dark:text-white";
   return (
     // On desktop each plan is a row-subgrid spanning all FEATURE_COUNT + 3 rows
     // so its header / price / CTA / feature rows align with the other plans.
@@ -366,13 +370,10 @@ function PlanColumn({
             </span>
           )}
           <PlanIcon
-            className="ml-auto size-5 shrink-0 text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]"
+            className={`ml-auto size-5 shrink-0 ${iconClass}`}
             aria-hidden="true"
           />
         </div>
-        <p className="mt-1 text-[15px] text-[var(--ds-gray-400)]">
-          {plan.description}
-        </p>
       </div>
 
       <div>
