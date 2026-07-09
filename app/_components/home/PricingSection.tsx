@@ -5,6 +5,7 @@ import {
   Briefcase,
   Check,
   CloudUpload,
+  Crown,
   Database,
   GraduationCap,
   HardDrive,
@@ -12,6 +13,8 @@ import {
   Share2,
   Sparkles,
   SquareTerminal,
+  User,
+  UserCheck,
   WandSparkles,
   X,
   type LucideIcon,
@@ -42,6 +45,8 @@ type Feature = {
 
 interface Plan {
   name: string;
+  /** Tier glyph shown at the right end of the column's title line. */
+  icon: LucideIcon;
   description: string;
   /** Price + sub-line per billing period. The free tiers ignore the toggle
    *  (both periods are identical). */
@@ -66,11 +71,12 @@ const FEATURE_COUNT = 9;
 const PLANS: Plan[] = [
   {
     name: "Guest",
-    description: "Jump straight in, no account needed.",
+    icon: User,
+    description: "Jump straight in, sign-in optional.",
     priceMonthly: "$0",
     priceAnnual: "$0",
-    noteMonthly: "No sign-in required",
-    noteAnnual: "No sign-in required",
+    noteMonthly: "Sign-in optional",
+    noteAnnual: "Sign-in optional",
     features: [
       { icon: GraduationCap, text: "Full access to courses" },
       { icon: Briefcase, text: "Full access to interview prep" },
@@ -95,6 +101,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Free Member",
+    icon: UserCheck,
     description: "Register for free to save and share in the cloud.",
     priceMonthly: "$0",
     priceAnnual: "$0",
@@ -132,6 +139,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Pro",
+    icon: Crown,
     description: "For people who live in their playgrounds.",
     priceMonthly: "$4.99",
     priceAnnual: "$40",
@@ -337,6 +345,7 @@ function PlanColumn({
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
+  const PlanIcon = plan.icon;
   return (
     // On desktop each plan is a row-subgrid spanning all FEATURE_COUNT + 3 rows
     // so its header / price / CTA / feature rows align with the other plans.
@@ -356,6 +365,10 @@ function PlanColumn({
               {plan.badge}
             </span>
           )}
+          <PlanIcon
+            className="ml-auto size-5 shrink-0 text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]"
+            aria-hidden="true"
+          />
         </div>
         <p className="mt-1 text-[15px] text-[var(--ds-gray-400)]">
           {plan.description}

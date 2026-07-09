@@ -88,7 +88,7 @@ export default function PricingPage() {
               </h1>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
                 Every course, interview track, and playground is free to use,
-                no account required, and anyone can share a playground with a
+                sign-in optional, and anyone can share a playground with a
                 link. Create a free account for cloud saves, or go Pro for
                 storage that never expires. The detailed notes below the table
                 explain exactly what each row means.

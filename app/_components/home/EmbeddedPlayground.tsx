@@ -127,13 +127,17 @@ function PlaygroundFacade({
             className="gap-2.5 border-[color:var(--ds-gray-300)] px-6 py-3 text-sm font-semibold text-[var(--ds-gray-900)] shadow-sm transition-colors group-hover:border-[var(--ds-blue-600)] group-hover:text-[var(--ds-blue-700)] dark:border-white/15 dark:text-white dark:group-hover:border-[var(--ds-blue-400)] dark:group-hover:text-[var(--ds-blue-400)]"
           >
             <Play size={16} aria-hidden="true" />
-            Preview the {label} playground
+            {/* Short label on phones, full label from `sm` up. */}
+            <span className="sm:hidden">Preview playground</span>
+            <span className="hidden sm:inline">
+              Preview the {label} playground
+            </span>
           </ShimmerButton>
-          <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-blue-400)]">
-            {suspended
-              ? "Paused to free memory, relaunch to pick up where you left off."
-              : "Runs entirely in your browser, nothing downloads until you launch it."}
-          </span>
+          {suspended && (
+            <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-blue-400)]">
+              Paused to free memory, relaunch to pick up where you left off.
+            </span>
+          )}
         </div>
       </div>
     </div>

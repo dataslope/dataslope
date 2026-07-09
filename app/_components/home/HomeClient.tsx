@@ -78,12 +78,12 @@ export function HomeClient({
                   demo below. */}
               <BlurFade delay={0.12}>
                 <p className="mx-auto mt-14 max-w-xl text-center [text-wrap:pretty]">
-                  <AnimatedShinyText className="max-w-none text-[18px] tracking-tight">
+                  <AnimatedShinyText className="max-w-none text-[18px] tracking-tight text-neutral-700/90 dark:text-neutral-300/90">
                     Learn programming and prepare for coding interviews. Every
                     course and playground is 100% free, interactive, and runs
                     entirely in your browser,{" "}
                     <Highlighter action="underline" color="#20C621" isView>
-                      no sign-up required
+                      sign-in optional
                     </Highlighter>
                     .
                   </AnimatedShinyText>
@@ -114,7 +114,7 @@ export function HomeClient({
                   </Highlighter>
                   ,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>
-                    no sign-ins
+                    optional sign-in
                   </Highlighter>
                   ,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>

@@ -33,7 +33,7 @@ const RESOURCE_LINKS = [
 ];
 
 const linkClass =
-  "text-sm text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
+  "block py-1.5 text-sm text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
 function FooterLink({
   href,
@@ -97,7 +97,7 @@ export function HomeFooter() {
           </div>
 
           {/* Column 2, development pages. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Development
             </h3>
@@ -107,7 +107,7 @@ export function HomeFooter() {
           </div>
 
           {/* Column 3, resources. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Resources
             </h3>

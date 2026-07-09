@@ -49,7 +49,7 @@
 
 .title {
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.3;
   /* Cross-fade between stage messages instead of a hard swap. */
   animation: bn-fade-in 240ms ease;
