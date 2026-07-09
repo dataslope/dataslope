@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
-import { Highlighter } from "@/components/ui/highlighter";
 import { BorderBeam } from "@/components/ui/border-beam";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
@@ -63,12 +62,12 @@ function PlaygroundSwitcher({
         <Select.Icon className="text-[var(--ds-gray-400)]">
           <ChevronDown size={16} />
         </Select.Icon>
-        {/* Green border beam traveling around the selector's edge. */}
+        {/* Blue border beam traveling around the selector's edge. */}
         <BorderBeam
           size={40}
           duration={6}
-          colorFrom="var(--ds-green-400)"
-          colorTo="var(--ds-green-600)"
+          colorFrom="var(--ds-blue-400)"
+          colorTo="var(--ds-blue-600)"
         />
       </Select.Trigger>
       <Select.Portal>
@@ -124,7 +123,7 @@ export function PlaygroundShowcase() {
         <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
       </div>
 
-      <div className="group ds-striped-shell ds-striped-shell-green-hover mx-auto max-w-7xl">
+      <div className="group ds-striped-shell ds-striped-shell-blue-hover mx-auto max-w-7xl">
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
@@ -134,13 +133,7 @@ export function PlaygroundShowcase() {
           className="group inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
           <SquareTerminal size={16} aria-hidden="true" />
-          <span>
-            Open the{" "}
-            <Highlighter action="circle" color="#20C621" isView>
-              {name}
-            </Highlighter>{" "}
-            playground
-          </span>
+          <span>Open the {name} playground</span>
           <ArrowRight
             size={16}
             className="transition-transform group-hover:translate-x-1"

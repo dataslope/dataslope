@@ -128,7 +128,7 @@ const PLANS: Plan[] = [
       { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Sign up for free",
-    href: "/courses",
+    href: "/sign-in?mode=signup",
   },
   {
     name: "Pro",

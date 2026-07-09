@@ -68,6 +68,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   sqlite: SiSqlite,
   postgres: SiPostgresql,
   duckdb: SiDuckdb,
+  html: SiHtml5,
   web: SiHtml5,
   react: SiReact,
 };

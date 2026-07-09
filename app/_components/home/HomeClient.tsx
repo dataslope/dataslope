@@ -100,7 +100,7 @@ export function HomeClient({
           {/* ── Animated beam ── */}
           <section className="px-4 py-16 sm:px-6">
             <SectionHeading
-              title="12 playgrounds, one browser tab"
+              title="Everything runs in your browser"
               subtitle={
                 <>
                   Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,

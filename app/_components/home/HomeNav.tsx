@@ -6,6 +6,7 @@ import { Menu } from "@base-ui-components/react/menu";
 import { Dialog } from "@base-ui-components/react/dialog";
 import {
   ChevronDown,
+  LogIn,
   LogOut,
   Menu as Hamburger,
   User as UserIcon,
@@ -184,6 +185,7 @@ function MobileAuthSection() {
         render={<Link href="/sign-in" prefetch={false} />}
         className={`${SIGN_IN_BUTTON_CLASS} w-full justify-center`}
       >
+        <LogIn size={16} aria-hidden="true" />
         Sign in
       </Dialog.Close>
     );

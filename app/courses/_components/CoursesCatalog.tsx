@@ -84,7 +84,7 @@ function SideRow({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-colors ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-[color,translate] hover:translate-x-1 ${
         active
           ? `font-semibold ${ACCENT}`
           : "text-[#121212] dark:text-white"
@@ -338,7 +338,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.01em] ${FAINT}`}
           >
             <Code2 size={13} aria-hidden="true" />
             Language
@@ -357,7 +357,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.01em] ${FAINT}`}
           >
             <BarChart3 size={13} aria-hidden="true" />
             Level
