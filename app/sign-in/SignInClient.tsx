@@ -137,7 +137,7 @@ function GoogleGlyph() {
 export function SignInClient({
   /** Which form to open on first render. The dedicated /sign-up and
    *  /forgot-password routes pass "signup"/"forgot"; /sign-in defaults to
-   *  "signin". The `?mode=` deep link (below) can still override it. */
+   *  "signin". */
   initialMode = "signin",
 }: {
   initialMode?: Mode;
@@ -180,19 +180,6 @@ export function SignInClient({
     );
     // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
     setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
-  }, []);
-
-  // Deep-link support: /sign-in?mode=forgot (or signup) opens that form
-  // directly, the expired-reset-link page points here so users don't have
-  // to land on the sign-in tab and rediscover "Forgot password?". Same
-  // window.location pattern as the error effect above, for the same
-  // static-prerender reason.
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("mode");
-    if (requested === "forgot" || requested === "signup") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
-      setMode(requested);
-    }
   }, []);
 
   // A browser Back from the OAuth provider can restore this page from the

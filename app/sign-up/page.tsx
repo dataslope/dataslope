@@ -1,6 +1,5 @@
-// The registration route, its own unique URL rather than /sign-in?mode=signup.
-// Reuses the shared auth chrome and the same SignInClient card, opened straight
-// into its "Create account" mode.
+// The registration route. Reuses the shared auth chrome and the same
+// SignInClient card, opened straight into its "Create account" mode.
 import type { Metadata } from "next";
 import { SignInClient } from "../sign-in/SignInClient";
 import { AuthPageShell } from "../_components/auth/AuthPageShell";
