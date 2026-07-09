@@ -77,7 +77,7 @@ export function HomeClient({
                   immediately understands the product before the interactive
                   demo below. */}
               <BlurFade delay={0.12}>
-                <p className="mx-auto mt-8 max-w-xl text-center [text-wrap:pretty]">
+                <p className="mx-auto mt-14 max-w-xl text-center [text-wrap:pretty]">
                   <AnimatedShinyText className="max-w-none text-[18px] tracking-tight">
                     Learn programming and prepare for coding interviews. Every
                     course and playground is 100% free, interactive, and runs

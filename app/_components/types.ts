@@ -312,6 +312,11 @@ export interface LanguageAdapter {
    *  affordances (the tab strip's "+" and the split view's footer
    *  button) are hidden. Existing files can still be renamed or closed. */
   disableAddFile?: boolean;
+  /** Optional: show a bare "Run" label on the Run button instead of the
+   *  per-entry "Run <file>" chip. The web playground sets this, it runs
+   *  the composed preview (always index.html) rather than a named file,
+   *  so surfacing a filename would only be misleading. */
+  simpleRunLabel?: boolean;
   /** Optional: classify which workspace files contain entry points
    *  (i.e. `main()` / `Main()` / top-level statements). Used by the
    *  Run button to populate a split-button dropdown when multiple

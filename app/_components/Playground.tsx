@@ -272,6 +272,12 @@ function computeRunButtonState(
   const primary = primaryEntryFilename(adapter);
   const primaryFile = files.find((f) => f.filename === primary) ?? null;
 
+  // Preview adapters (the web playground) always run the composed entry
+  // document, so they show a bare "Run" with no per-file chip or dropdown.
+  if (adapter.simpleRunLabel) {
+    return { primaryLabel: "Run", primaryEntry: primary, dropdownItems: [] };
+  }
+
   // Multi-entry-point adapters (C, C++, Java, C#).
   if (adapter.findEntryFiles) {
     const inputs = files.map((f) => ({

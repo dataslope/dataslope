@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
 import { Highlighter } from "@/components/ui/highlighter";
+import { BorderBeam } from "@/components/ui/border-beam";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -54,7 +55,7 @@ function PlaygroundSwitcher({
     >
       <Select.Trigger
         aria-label="Switch playground"
-        className="inline-flex min-w-44 items-center gap-2 rounded-lg border border-[var(--ds-gray-300)] bg-white px-4 py-2 text-sm font-medium text-[var(--ds-gray-800)] shadow-sm transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]"
+        className="relative inline-flex min-w-44 items-center gap-2 rounded-lg border border-[var(--ds-gray-300)] bg-white px-4 py-2 text-sm font-medium text-[var(--ds-gray-800)] shadow-sm transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]"
       >
         {active && <PlaygroundGlyph id={active.id} />}
         <Select.Value className="flex-1 text-left">
@@ -63,6 +64,13 @@ function PlaygroundSwitcher({
         <Select.Icon className="text-[var(--ds-gray-400)]">
           <ChevronDown size={16} />
         </Select.Icon>
+        {/* Green border beam traveling around the selector's edge. */}
+        <BorderBeam
+          size={40}
+          duration={6}
+          colorFrom="var(--ds-green-400)"
+          colorTo="var(--ds-green-600)"
+        />
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner
@@ -121,7 +129,7 @@ export function PlaygroundShowcase() {
         <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
       </div>
 
-      <div className="ds-striped-shell mx-auto max-w-7xl">
+      <div className="group ds-striped-shell ds-striped-shell-green-hover mx-auto max-w-7xl">
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 

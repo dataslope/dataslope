@@ -61,7 +61,7 @@ export function Highlighter({
     } as const;
 
     // Only the FIRST draw animates; later repositions are instant (see below).
-    let annotation = annotate(element, { ...opts, animationDuration });
+    const annotation = annotate(element, { ...opts, animationDuration });
     annotation.show();
 
     // rough-notation draws the annotation to fit the element's current
@@ -97,12 +97,14 @@ export function Highlighter({
         const next = geometry();
         if (!moved(last, next)) return;
         last = next;
-        // Reposition WITHOUT replaying the draw animation: recreate the
-        // annotation with a zero-duration so a genuine reflow snaps the mark
-        // to its new box instead of re-animating it (which read as a flicker
-        // on every scroll).
-        annotation.remove();
-        annotation = annotate(element, { ...opts, animationDuration: 0 });
+        // Reposition by re-rendering the SAME annotation instance: calling
+        // show() on a mark that's already showing clears and redraws it,
+        // without animation, reusing rough-notation's per-instance random
+        // seed. So the hand-drawn shape is IDENTICAL and simply snaps to the
+        // element's new box. (Creating a fresh annotation, as we used to,
+        // rolls a NEW seed and visibly re-sketches the mark, which read as a
+        // flicker on every scroll once the sticky header's shrink-on-scroll
+        // started moving the text.)
         annotation.show();
       });
     };

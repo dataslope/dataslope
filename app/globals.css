@@ -109,6 +109,17 @@ html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
     --ds-shell-offset: 5px;
   }
 }
+/* Interactive variant (the home playground preview): on hover the offset
+   border and diagonal stripes shift to brand green, echoing the facade's own
+   green hover accents. Opt-in via this modifier so the pricing table (which
+   shares .ds-striped-shell) keeps its neutral elevation. */
+.ds-striped-shell-green-hover::after {
+  transition: border-color 0.2s ease;
+}
+.ds-striped-shell-green-hover:hover {
+  --ds-shell-color: color-mix(in srgb, var(--ds-green-500) 32%, transparent);
+  --ds-shell-border-color: var(--ds-green-500);
+}
 
 /* Shared light/dark pill toggle (app/_components/ThemePillToggle.tsx). Plain
    CSS rather than Tailwind so it renders identically on every surface,
@@ -133,7 +144,7 @@ html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
   appearance: none;
 }
 html.dark .ds-theme-pill {
-  background: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  background: color-mix(in srgb, var(--ds-white) 7%, transparent);
 }
 .ds-theme-pill-marker {
   position: absolute;

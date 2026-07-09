@@ -202,7 +202,7 @@ function FeatureText({ feature }: { feature: Feature }) {
     <>
       {feature.text.slice(0, at)}
       <Highlighter action="underline" color="#20C621" isView>
-        {feature.highlight}
+        <span className="font-semibold">{feature.highlight}</span>
       </Highlighter>
       {feature.text.slice(at + feature.highlight.length)}
     </>
@@ -237,7 +237,11 @@ function FeatureRow({
       >
         <Icon size={12} strokeWidth={2.5} className="text-white" />
       </span>
-      <span className="text-[15px] leading-snug text-[var(--ds-gray-900)] dark:text-white">
+      {/* leading-relaxed (not snug) so the Magic UI underline under a
+          highlighted word (Pro's "10 GB" / "Unlimited") clears the wrapped
+          continuation line instead of crowding it. Applied to every column's
+          rows so the three stay vertically consistent. */}
+      <span className="text-[15px] leading-relaxed text-[var(--ds-gray-900)] dark:text-white">
         <FeatureText feature={feature} />
         {feature.note && (
           <span className="mt-0.5 block text-[13px] text-[var(--ds-gray-400)]">
@@ -446,7 +450,7 @@ export function PricingSection({
 
       {/* Monthly / annual billing toggle, only the paid tier's price reacts. */}
       <div className="mb-10 flex items-center justify-center">
-        <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/10 dark:bg-white/5">
+        <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/15 dark:bg-[#121212]">
           {(["monthly", "annual"] as const).map((option) => {
             const active = billing === option;
             return (

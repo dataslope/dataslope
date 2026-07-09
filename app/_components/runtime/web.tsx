@@ -499,6 +499,9 @@ export const webAdapter: LanguageAdapter = {
   // script.js trio, hide the "+ New file" affordances so the workspace
   // stays the CodePen-style three-pane shape.
   disableAddFile: true,
+  // The Run button runs the composed preview (index.html), not a named
+  // file, so show a bare "Run" rather than "Run index".
+  simpleRunLabel: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (
     <>
