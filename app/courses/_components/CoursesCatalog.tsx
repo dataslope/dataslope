@@ -19,7 +19,7 @@ import {
   Code2,
   GraduationCap,
   Search,
-  Sparkles,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
@@ -51,7 +51,7 @@ const LEVEL_RANK: Record<string, number> = {
 type Sort = "popular" | "az" | "level";
 
 const SORT_OPTIONS: { value: Sort; label: string; icon: LucideIcon }[] = [
-  { value: "popular", label: "Recommended", icon: Sparkles },
+  { value: "popular", label: "Featured", icon: Star },
   { value: "az", label: "A to Z", icon: ArrowDownAZ },
   { value: "level", label: "By level", icon: BarChart3 },
 ];

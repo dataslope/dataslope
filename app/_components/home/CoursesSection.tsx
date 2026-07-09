@@ -9,7 +9,24 @@
  */
 import { useMemo, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
-import { ArrowRight, ChevronDown, GraduationCap } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Boxes,
+  Brain,
+  ChevronDown,
+  Code2,
+  Cpu,
+  Database,
+  Globe,
+  GraduationCap,
+  LineChart,
+  Network,
+  Sigma,
+  Star,
+  type LucideIcon,
+} from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import Link from "../Link";
 import { formatTagLabel } from "@/lib/tagLabels";
@@ -32,6 +49,25 @@ const DISPLAY_LIMIT = 4;
 const MIN_TOPIC_COURSES = 3;
 /** …and we show at most this many topic buttons. */
 const MAX_TOPICS = 6;
+
+/** Leading glyph for each option in the topic dropdown. Domains without a
+ *  dedicated icon fall back to a book. Sparkles is intentionally avoided,
+ *  it's reserved for AI features. */
+const DOMAIN_ICONS: Record<string, LucideIcon> = {
+  "programming-fundamentals": Code2,
+  "computational-thinking": Brain,
+  "data-visualization": BarChart3,
+  "data-analysis": LineChart,
+  "data-science": LineChart,
+  statistics: Sigma,
+  "object-oriented-programming": Boxes,
+  "systems-programming": Cpu,
+  "data-structures": Network,
+  databases: Database,
+  "web-development": Globe,
+  "machine-learning": Brain,
+};
+const DEFAULT_TOPIC_ICON = BookOpen;
 
 export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
   // null = the default "Recommended" view.
@@ -67,7 +103,7 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
 
   if (courses.length === 0) return null;
 
-  const activeTopicLabel = topic ? formatTagLabel(topic) : "Recommended";
+  const activeTopicLabel = topic ? formatTagLabel(topic) : "Featured";
 
   return (
     <section id="courses" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
@@ -116,17 +152,23 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
               className="z-50"
             >
               <Select.Popup className="max-h-[60vh] min-w-52 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
-                {[{ value: "", label: "Recommended" }, ...topics.map((d) => ({ value: d, label: formatTagLabel(d) }))].map(
-                  (o) => (
-                    <Select.Item
-                      key={o.value || "recommended"}
-                      value={o.value}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
-                    >
-                      <Select.ItemText>{o.label}</Select.ItemText>
-                    </Select.Item>
-                  ),
-                )}
+                {[
+                  { value: "", label: "Featured", Icon: Star },
+                  ...topics.map((d) => ({
+                    value: d,
+                    label: formatTagLabel(d),
+                    Icon: DOMAIN_ICONS[d] ?? DEFAULT_TOPIC_ICON,
+                  })),
+                ].map((o) => (
+                  <Select.Item
+                    key={o.value || "featured"}
+                    value={o.value}
+                    className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                  >
+                    <o.Icon size={16} aria-hidden="true" />
+                    <Select.ItemText>{o.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
               </Select.Popup>
             </Select.Positioner>
           </Select.Portal>

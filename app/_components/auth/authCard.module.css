@@ -386,8 +386,13 @@
 }
 
 /* ── Footer switch line + link buttons ───────────────────────────────────── */
+/* Text + link stacked on two centered lines (rather than crowded on one). */
 .switch {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   text-align: center;
   font-size: 13px;
   color: var(--sub);

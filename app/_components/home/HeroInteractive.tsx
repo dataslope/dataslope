@@ -381,8 +381,8 @@ export function HeroInteractive() {
               onClick={() => setTab(t.id)}
               className={
                 active
-                  ? "relative inline-flex items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] transition-[translate] hover:-translate-y-0.5 dark:text-white"
-                  : "relative inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-[color,translate] hover:-translate-y-0.5 hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
+                  ? "relative inline-flex cursor-pointer items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] transition-[translate] hover:-translate-y-0.5 dark:text-white"
+                  : "relative inline-flex cursor-pointer items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-[color,translate] hover:-translate-y-0.5 hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
               }
             >
               <Icon size={16} aria-hidden="true" />

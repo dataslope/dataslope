@@ -127,10 +127,18 @@ export function PlaygroundShowcase() {
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
-      <div className="mt-6 text-center">
+      {/* Connector stemming from the playground's bottom center down to a dot
+          above the link. On hover the line extends toward the link and both it
+          and the dot pick up the link's hover colour (matching the link's
+          non-hover text colour at rest). */}
+      <div className="group/link mt-2 flex flex-col items-center">
+        <div className="flex h-24 flex-col items-center" aria-hidden="true">
+          <span className="w-px h-12 bg-[var(--ds-gray-800)] transition-[height,background-color] duration-200 group-hover/link:h-20 group-hover/link:bg-[var(--ds-blue-700)] dark:bg-[var(--ds-gray-100)] dark:group-hover/link:bg-[var(--ds-blue-400)]" />
+          <span className="size-2 rounded-full bg-[var(--ds-gray-800)] transition-colors duration-200 group-hover/link:bg-[var(--ds-blue-700)] dark:bg-[var(--ds-gray-100)] dark:group-hover/link:bg-[var(--ds-blue-400)]" />
+        </div>
         <Link
           href={playgroundHref(playgroundId)}
-          className="group inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
+          className="group mt-3 inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
           <SquareTerminal size={16} aria-hidden="true" />
           <span>Open the {name} playground</span>

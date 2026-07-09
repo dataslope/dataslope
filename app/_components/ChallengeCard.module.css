@@ -1068,7 +1068,7 @@
 }
 
 :global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron:hover:not(:disabled) {
-  background: #111111;
+  background: #2e2e2e;
 }
 
 .runBtnChevron:disabled {
@@ -1085,7 +1085,7 @@
 }
 
 :global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron[data-popup-open] {
-  background: #111111;
+  background: #2e2e2e;
 }
 
 .runBtnChevron svg {
@@ -1137,7 +1137,7 @@
 
 .runMenuItem:hover,
 .runMenuItem[data-highlighted] {
-  background: #111111;
+  background: #2e2e2e;
 }
 
 .runMenuItem svg {

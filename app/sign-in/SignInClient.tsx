@@ -218,6 +218,21 @@ export function SignInClient({
     setMode(next);
     setError(null);
     setNotice(null);
+    // Keep the address bar in step with the visible form (the dedicated
+    // /sign-in, /sign-up and /forgot-password routes) without a full
+    // navigation, so a reload or shared link lands on the same screen while
+    // the typed email + password survive the switch.
+    const path =
+      next === "signup"
+        ? "/sign-up"
+        : next === "forgot"
+          ? "/forgot-password"
+          : "/sign-in";
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${path}${window.location.search}${window.location.hash}`,
+    );
   }
 
   async function startSocial(provider: string) {
