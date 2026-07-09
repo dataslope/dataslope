@@ -78,12 +78,21 @@ export function HomeClient({
                   demo below. */}
               <BlurFade delay={0.12}>
                 <p className="mx-auto mt-14 max-w-xl text-center [text-wrap:pretty]">
-                  <AnimatedShinyText className="max-w-none text-[18px] tracking-tight">
-                    Learn programming and prepare for coding interviews. Every
-                    course and playground is 100% free, interactive, and runs
-                    entirely in your browser,{" "}
+                  <AnimatedShinyText className="max-w-none text-[18px] tracking-tight text-neutral-700/90 dark:text-neutral-300/90">
+                    Learn programming and prepare for coding interviews. Access
+                    every course and coding playground for free,{" "}
                     <Highlighter action="underline" color="#20C621" isView>
-                      no sign-up required
+                      {/* Match the underline colour (#20C621 = --ds-green),
+                          forced over the shimmer's clipped gradient fill via
+                          both color and -webkit-text-fill-color. */}
+                      <span
+                        style={{
+                          color: "#20C621",
+                          WebkitTextFillColor: "#20C621",
+                        }}
+                      >
+                        without creating an account
+                      </span>
                     </Highlighter>
                     .
                   </AnimatedShinyText>
@@ -100,7 +109,7 @@ export function HomeClient({
           {/* ── Animated beam ── */}
           <section className="px-4 py-16 sm:px-6">
             <SectionHeading
-              title="12 playgrounds, one browser tab"
+              title="Everything runs in your browser"
               subtitle={
                 <>
                   Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,
@@ -114,7 +123,7 @@ export function HomeClient({
                   </Highlighter>
                   ,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>
-                    no sign-ins
+                    optional sign-in
                   </Highlighter>
                   ,{" "}
                   <Highlighter action="underline" color={underlineColor} isView>

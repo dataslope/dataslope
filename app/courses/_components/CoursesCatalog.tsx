@@ -19,7 +19,7 @@ import {
   Code2,
   GraduationCap,
   Search,
-  Sparkles,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
@@ -51,7 +51,7 @@ const LEVEL_RANK: Record<string, number> = {
 type Sort = "popular" | "az" | "level";
 
 const SORT_OPTIONS: { value: Sort; label: string; icon: LucideIcon }[] = [
-  { value: "popular", label: "Recommended", icon: Sparkles },
+  { value: "popular", label: "Featured", icon: Star },
   { value: "az", label: "A to Z", icon: ArrowDownAZ },
   { value: "level", label: "By level", icon: BarChart3 },
 ];
@@ -84,7 +84,7 @@ function SideRow({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-colors ${
+      className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-0.5 py-[7px] text-left text-[14px] transition-[color,translate] hover:translate-x-0.5 ${
         active
           ? `font-semibold ${ACCENT}`
           : "text-[#121212] dark:text-white"
@@ -338,7 +338,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase ${FAINT}`}
+            // Inline (not `tracking-*`) to beat the unlayered global
+            // `h1…h6 { letter-spacing: -0.02em }` in docs.css.
+            style={{ letterSpacing: "0.01em" }}
           >
             <Code2 size={13} aria-hidden="true" />
             Language
@@ -357,7 +360,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
 
         <div className="flex flex-col gap-px">
           <h3
-            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-normal ${FAINT}`}
+            className={`mb-2.5 flex items-center gap-1.5 text-[11.5px] font-semibold uppercase ${FAINT}`}
+            // Inline (not `tracking-*`) to beat the unlayered global
+            // `h1…h6 { letter-spacing: -0.02em }` in docs.css.
+            style={{ letterSpacing: "0.01em" }}
           >
             <BarChart3 size={13} aria-hidden="true" />
             Level

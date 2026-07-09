@@ -14,7 +14,7 @@
  */
 import { useState } from "react";
 import { Menu } from "@base-ui-components/react/menu";
-import { LogOut, Shield, User as UserIcon } from "lucide-react";
+import { LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "../Link";
 import { signOut, useSession } from "@/lib/auth/client";
@@ -22,10 +22,11 @@ import { signOut, useSession } from "@/lib/auth/client";
 const TRIGGER_CLASS =
   "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
-/** Solid, subtly filled "Sign in" button (light: --ds-gray-100 / #F3F4F6).
- *  Shared with the mobile drawer's sign-in row so the two match. */
+/** Solid "Sign in" button: near-black on light (#121212 fill, white text),
+ *  inverted to white-on-#121212 on dark. Shared with the mobile drawer's
+ *  sign-in row so the two match. */
 export const SIGN_IN_BUTTON_CLASS =
-  "inline-flex items-center rounded-lg bg-[var(--ds-gray-100)] px-3 py-1.5 text-sm font-medium text-[#121212] transition-colors hover:bg-[var(--ds-gray-200)] dark:bg-white/10 dark:text-white dark:hover:bg-white/15";
+  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 py-1.5 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
 
 /** Circular avatar: the provider image when present, otherwise an initial. */
 function Avatar({ image, name }: { image?: string | null; name?: string | null }) {
@@ -77,6 +78,7 @@ export function AuthMenu() {
         href="/sign-in"
         className={SIGN_IN_BUTTON_CLASS}
       >
+        <LogIn size={14} aria-hidden="true" />
         Sign in
       </Link>
     );

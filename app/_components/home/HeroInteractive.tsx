@@ -12,14 +12,20 @@ import {
   Loader2,
   type LucideIcon,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { Ripple } from "@/components/ui/ripple";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
+import {
+  HOME_SELECT_ITEM,
+  HOME_SELECT_POPUP,
+  HOME_SELECT_TRIGGER,
+  HomeSelectBeam,
+} from "./homeSelect";
 import {
   CODE_CHALLENGES,
   CONCEPT_QUESTIONS,
@@ -113,39 +119,32 @@ function PickerSelect({
             so they stay legible on either surface, with the blue shimmer as the
             accent edge. */}
         <Select.Trigger
-          render={(triggerProps) => (
-            <ShimmerButton
-              {...triggerProps}
-              background="var(--color-fd-background)"
-              shimmerColor="#148CFF"
-              shimmerSize="0.15em"
-              borderRadius="0.625rem"
-              className="min-w-40 justify-between gap-2 border-[color:var(--ds-gray-200)] px-3.5 py-1.5 text-sm font-medium text-[color:var(--ds-gray-900)] focus-visible:outline-none dark:border-white/10 dark:text-white"
-            >
-              {active && <OptionIcon id={active.iconId} />}
-              {/* Render the label explicitly, a bare <Select.Value/> shows the
-                  raw (lowercased) value instead of the option's label. */}
-              <Select.Value className="flex-1 truncate text-left">
-                {active?.label ?? value}
-              </Select.Value>
-              <Select.Icon className="text-[var(--ds-gray-500)] dark:text-white/70">
-                <ChevronDown size={14} />
-              </Select.Icon>
-            </ShimmerButton>
-          )}
-        />
+          aria-label={label}
+          className={`${HOME_SELECT_TRIGGER} min-w-40 justify-between`}
+        >
+          {active && <OptionIcon id={active.iconId} />}
+          {/* Render the label explicitly, a bare <Select.Value/> shows the
+              raw (lowercased) value instead of the option's label. */}
+          <Select.Value className="flex-1 truncate text-left">
+            {active?.label ?? value}
+          </Select.Value>
+          <Select.Icon className="text-[var(--ds-gray-500)] dark:text-white/70">
+            <ChevronDown size={14} />
+          </Select.Icon>
+          <HomeSelectBeam />
+        </Select.Trigger>
         <Select.Portal>
           <Select.Positioner
             sideOffset={6}
             alignItemWithTrigger={false}
             className="z-50"
           >
-            <Select.Popup className="max-h-[60vh] min-w-44 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+            <Select.Popup className={`${HOME_SELECT_POPUP} min-w-44`}>
               {options.map((o) => (
                 <Select.Item
                   key={o.value}
                   value={o.value}
-                  className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                  className={HOME_SELECT_ITEM}
                 >
                   <OptionIcon id={o.iconId} />
                   <Select.ItemText>{o.label}</Select.ItemText>
@@ -340,8 +339,8 @@ function McqPanel() {
                 onClick={() => setIndex(i)}
                 className={
                   active
-                    ? "relative z-10 inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-blue-500)] bg-[var(--ds-blue-500)] text-sm font-semibold text-white"
-                    : "inline-flex size-9 items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                    ? "relative z-10 inline-flex size-9 cursor-pointer items-center justify-center rounded-md border border-[var(--ds-blue-500)] bg-[var(--ds-blue-500)] text-sm font-semibold text-white transition-colors duration-200"
+                    : "inline-flex size-9 cursor-pointer items-center justify-center rounded-md border border-[var(--ds-gray-200)] bg-[var(--color-fd-background)] text-sm font-medium text-[var(--ds-gray-700)] transition-colors duration-200 hover:bg-[var(--ds-gray-100)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
                 }
               >
                 {i + 1}
@@ -370,7 +369,7 @@ export function HeroInteractive() {
           keeping the pickers close below; a roomier row gap keeps the tabs
           from crowding when they wrap onto multiple lines on narrow screens;
           and desktop gets wider horizontal spacing between items. */}
-      <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-5 sm:gap-x-12">
+      <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-1 gap-y-3 sm:gap-x-6">
         {TABS.map((t) => {
           const active = t.id === tab;
           const Icon = t.icon;
@@ -381,17 +380,22 @@ export function HeroInteractive() {
               onClick={() => setTab(t.id)}
               className={
                 active
-                  ? "relative inline-flex items-center gap-1.5 text-base font-semibold text-[var(--ds-gray-900)] dark:text-white"
-                  : "relative inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-500)] transition-colors hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
+                  ? "relative inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-base font-semibold text-[var(--ds-gray-900)] transition-[color,translate] hover:-translate-y-0.5 dark:text-white"
+                  : "relative inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-base font-medium text-[var(--ds-gray-500)] transition-[color,translate] hover:-translate-y-0.5 hover:text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-gray-100)]"
               }
             >
               <Icon size={16} aria-hidden="true" />
               {t.label}
               {/* Active-item underline (a short bar in the label's own
                   colour), desktop only (on mobile the bold, darker label
-                  already marks the active tab). */}
+                  already marks the active tab). The shared layoutId slides it
+                  between tabs when the selection changes. */}
               {active && (
-                <span className="absolute -bottom-2 left-1/2 hidden h-0.5 w-5 -translate-x-1/2 rounded-full bg-current sm:block" />
+                <motion.span
+                  layoutId="hero-tab-underline"
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  className="absolute inset-x-0 bottom-0 mx-auto hidden h-0.5 w-5 rounded-full bg-current sm:block"
+                />
               )}
             </button>
           );

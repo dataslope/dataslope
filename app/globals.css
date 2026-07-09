@@ -25,6 +25,31 @@ html.dark {
   background: #121212;
 }
 
+/* ── Brand-lockup hover ──────────────────────────────────────────────────
+   Shared so every Dataslope logo animates identically: on hover the mark
+   tilts and, when a wordmark is present, the wordmark nudges right. (The home
+   nav carries an equivalent inline Tailwind version.) Add `ds-logo-hover` to
+   the link/container, `ds-logo-mark` to the logo image, and `ds-logo-word` to
+   the wordmark. */
+.ds-logo-hover .ds-logo-mark {
+  transition: rotate 0.2s ease;
+}
+.ds-logo-hover:hover .ds-logo-mark {
+  rotate: 8deg;
+}
+.ds-logo-hover .ds-logo-word {
+  transition: translate 0.2s ease;
+}
+.ds-logo-hover:hover .ds-logo-word {
+  translate: 2px 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-logo-hover .ds-logo-mark,
+  .ds-logo-hover .ds-logo-word {
+    transition: none;
+  }
+}
+
 /* Skip-to-content link: the first tabbable element on every page (mounted in
    the root layout). Visually hidden until keyboard focus reaches it, the
    playground headers alone have ~10 tab stops before the editor. */
@@ -110,15 +135,22 @@ html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
   }
 }
 /* Interactive variant (the home playground preview): on hover the offset
-   border and diagonal stripes shift to brand green, echoing the facade's own
-   green hover accents. Opt-in via this modifier so the pricing table (which
+   border and diagonal stripes shift to brand blue, echoing the facade's own
+   blue hover accents. Opt-in via this modifier so the pricing table (which
    shares .ds-striped-shell) keeps its neutral elevation. */
-.ds-striped-shell-green-hover::after {
+.ds-striped-shell-blue-hover::after {
   transition: border-color 0.2s ease;
 }
-.ds-striped-shell-green-hover:hover {
-  --ds-shell-color: color-mix(in srgb, var(--ds-green-500) 32%, transparent);
-  --ds-shell-border-color: var(--ds-green-500);
+.ds-striped-shell-blue-hover:hover {
+  --ds-shell-color: color-mix(in srgb, var(--ds-blue-500) 32%, transparent);
+  --ds-shell-border-color: var(--ds-blue-500);
+}
+/* Dark mode sets --ds-shell-color on the base `.ds-striped-shell` with higher
+   specificity than the hover rule above, so the blue tint wouldn't show. Re-
+   assert it (in a lighter blue) at matching specificity for the hover. */
+html:is(.dark, [data-theme="dark"]) .ds-striped-shell-blue-hover:hover {
+  --ds-shell-color: color-mix(in srgb, var(--ds-blue-400) 34%, transparent);
+  --ds-shell-border-color: var(--ds-blue-400);
 }
 
 /* Shared light/dark pill toggle (app/_components/ThemePillToggle.tsx). Plain

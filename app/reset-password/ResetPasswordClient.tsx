@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "../_components/Link";
+import { ArrowLeft, KeyRound, LogIn, Mail } from "lucide-react";
 import { resetPassword } from "@/lib/auth/client";
 import { EyeIcon } from "../_components/auth/authIcons";
 import styles from "../_components/auth/authCard.module.css";
@@ -101,12 +102,15 @@ export function ResetPasswordClient() {
             // Deep-link straight into the "Reset your password" form,
             // landing on the sign-in tab would make the user rediscover
             // "Forgot password?" themselves.
-            router.push("/sign-in?mode=forgot");
+            router.push("/forgot-password");
             router.refresh();
           }}
           className={styles.primary}
         >
-          Request a new link
+          <span className={styles.btnBusy}>
+            <Mail size={14} aria-hidden="true" />
+            Request a new link
+          </span>
         </button>
       </div>
     );
@@ -129,7 +133,10 @@ export function ResetPasswordClient() {
           }}
           className={styles.primary}
         >
-          Sign in
+          <span className={styles.btnBusy}>
+            <LogIn size={14} aria-hidden="true" />
+            Sign in
+          </span>
         </button>
       </div>
     );
@@ -217,12 +224,20 @@ export function ResetPasswordClient() {
           disabled={submitting}
           className={styles.primary}
         >
-          {submitting ? "Updating…" : "Update password"}
+          {submitting ? (
+            "Updating…"
+          ) : (
+            <span className={styles.btnBusy}>
+              <KeyRound size={14} aria-hidden="true" />
+              Update password
+            </span>
+          )}
         </button>
       </form>
 
       <p className={styles.switch}>
         <Link href="/sign-in" className={styles.link}>
+          <ArrowLeft size={14} aria-hidden="true" />
           Back to sign in
         </Link>
       </p>

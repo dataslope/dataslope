@@ -80,6 +80,7 @@ const themeBootstrapScript = `
     var r = document.documentElement;
     r.classList.toggle("dark", dark);
     r.classList.toggle("light", !dark);
+    r.style.colorScheme = dark ? "dark" : "light";
     r.style.setProperty("--bg", p.bg);
     r.style.setProperty("--bg2", p.bg2);
     r.style.setProperty("--bg3", p.bg3);

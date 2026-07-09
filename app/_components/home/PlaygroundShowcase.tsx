@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
-import { Highlighter } from "@/components/ui/highlighter";
-import { BorderBeam } from "@/components/ui/border-beam";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -12,6 +10,12 @@ import {
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 import { EmbeddedPlayground } from "./EmbeddedPlayground";
+import {
+  HOME_SELECT_ITEM,
+  HOME_SELECT_POPUP,
+  HOME_SELECT_TRIGGER,
+  HomeSelectBeam,
+} from "./homeSelect";
 
 const SQL_IDS = new Set(["postgres", "sqlite", "duckdb"]);
 
@@ -54,7 +58,7 @@ function PlaygroundSwitcher({
     >
       <Select.Trigger
         aria-label="Switch playground"
-        className="relative inline-flex min-w-44 items-center gap-2 rounded-lg border border-[var(--ds-gray-300)] bg-white px-4 py-2 text-sm font-medium text-[var(--ds-gray-800)] shadow-sm transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]"
+        className={`${HOME_SELECT_TRIGGER} min-w-44`}
       >
         {active && <PlaygroundGlyph id={active.id} />}
         <Select.Value className="flex-1 text-left">
@@ -63,13 +67,7 @@ function PlaygroundSwitcher({
         <Select.Icon className="text-[var(--ds-gray-400)]">
           <ChevronDown size={16} />
         </Select.Icon>
-        {/* Green border beam traveling around the selector's edge. */}
-        <BorderBeam
-          size={40}
-          duration={6}
-          colorFrom="var(--ds-green-400)"
-          colorTo="var(--ds-green-600)"
-        />
+        <HomeSelectBeam />
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner
@@ -77,13 +75,9 @@ function PlaygroundSwitcher({
           alignItemWithTrigger={false}
           className="z-50"
         >
-          <Select.Popup className="max-h-[60vh] min-w-44 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+          <Select.Popup className={`${HOME_SELECT_POPUP} min-w-44`}>
             {PLAYGROUNDS.map((p) => (
-              <Select.Item
-                key={p.id}
-                value={p.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] data-[selected]:font-medium data-[selected]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
-              >
+              <Select.Item key={p.id} value={p.id} className={HOME_SELECT_ITEM}>
                 <PlaygroundGlyph id={p.id} />
                 <Select.ItemText>{p.label}</Select.ItemText>
               </Select.Item>
@@ -100,6 +94,10 @@ function PlaygroundSwitcher({
  *  a link to the full page. */
 export function PlaygroundShowcase() {
   const [playgroundId, setPlaygroundId] = useState("postgres");
+  // Drives the connector's hover state from the link itself (not from hovering
+  // the connector), so the line/dot only react to the "Open the … playground"
+  // link and both revert together on mouseout.
+  const [linkHover, setLinkHover] = useState(false);
   const name = languageName(playgroundId);
   const isSql = SQL_IDS.has(playgroundId);
 
@@ -124,25 +122,43 @@ export function PlaygroundShowcase() {
         <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
       </div>
 
-      <div className="group ds-striped-shell ds-striped-shell-green-hover mx-auto max-w-7xl">
+      <div className="group ds-striped-shell ds-striped-shell-blue-hover mx-auto max-w-7xl">
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
-      <div className="mt-6 text-center">
+      {/* Connector stemming from the playground's bottom center down to a dot
+          above the link. It tracks the link's colour, and only while the link
+          itself is hovered the line extends toward the link, a shorter reach
+          than before so the dot keeps more space from the link. State-driven so
+          it reacts to the link, not to hovering the connector; both revert on
+          mouseout. */}
+      <div className="mt-2 flex flex-col items-center">
+        <div className="flex h-24 flex-col items-center" aria-hidden="true">
+          <span
+            className={`w-px transition-[height,background-color] duration-200 ${
+              linkHover
+                ? "h-16 bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
+                : "h-12 bg-[var(--ds-gray-800)] dark:bg-[var(--ds-gray-100)]"
+            }`}
+          />
+          <span
+            className={`size-2 rounded-full transition-colors duration-200 ${
+              linkHover
+                ? "bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
+                : "bg-[var(--ds-gray-800)] dark:bg-[var(--ds-gray-100)]"
+            }`}
+          />
+        </div>
         <Link
           href={playgroundHref(playgroundId)}
-          className="group inline-flex items-center gap-1.5 text-base font-medium text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
+          onMouseEnter={() => setLinkHover(true)}
+          onMouseLeave={() => setLinkHover(false)}
+          className="group mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-medium tracking-tight text-[var(--ds-gray-800)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:text-[var(--ds-blue-400)]"
         >
-          <SquareTerminal size={16} aria-hidden="true" />
-          <span>
-            Open the{" "}
-            <Highlighter action="circle" color="#20C621" isView>
-              {name}
-            </Highlighter>{" "}
-            playground
-          </span>
+          <SquareTerminal size={18} aria-hidden="true" />
+          <span>Open the {name} playground</span>
           <ArrowRight
-            size={16}
+            size={18}
             className="transition-transform group-hover:translate-x-1"
             aria-hidden="true"
           />

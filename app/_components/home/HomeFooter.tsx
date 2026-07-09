@@ -33,7 +33,7 @@ const RESOURCE_LINKS = [
 ];
 
 const linkClass =
-  "text-sm text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
+  "block py-1.5 text-sm text-[#121212] transition-[color,translate] hover:translate-x-0.5 hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
 function FooterLink({
   href,
@@ -70,18 +70,22 @@ export function HomeFooter() {
         <div className="ds-footer-grid">
           {/* Column 1, logo (no wordmark) + GitHub at the bottom. */}
           <div className="flex flex-col justify-between gap-8">
-            <Link href="/" aria-label="Dataslope home" className="inline-flex">
+            <Link
+              href="/"
+              aria-label="Dataslope home"
+              className="ds-logo-hover inline-flex"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-files/SVG/dataslope-logo-black.svg"
                 alt="Dataslope"
-                className="block h-5 w-auto dark:hidden"
+                className="ds-logo-mark block h-5 w-auto dark:hidden"
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-files/SVG/dataslope-logo-white.svg"
                 alt="Dataslope"
-                className="hidden h-5 w-auto dark:block"
+                className="ds-logo-mark hidden h-5 w-auto dark:block"
               />
             </Link>
             <a
@@ -90,14 +94,14 @@ export function HomeFooter() {
               rel="noopener noreferrer"
               aria-label="View source on GitHub"
               title="GitHub"
-              className="inline-flex size-10 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
+              className="inline-flex size-10 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06]"
             >
               <GitHubIcon size={26} />
             </a>
           </div>
 
           {/* Column 2, development pages. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Development
             </h3>
@@ -107,7 +111,7 @@ export function HomeFooter() {
           </div>
 
           {/* Column 3, resources. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
               Resources
             </h3>

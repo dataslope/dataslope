@@ -90,6 +90,25 @@
   background: var(--card-bg);
   padding: 40px 38px;
   /* No box-shadow, no border, a deliberate flat treatment. */
+  /* Subtle entrance: fade + rise on load, shared by every auth screen. */
+  animation: authCardIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes authCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
 }
 
 .stack {
@@ -386,14 +405,23 @@
 }
 
 /* ── Footer switch line + link buttons ───────────────────────────────────── */
+/* Text + link stacked on two centered lines (rather than crowded on one). */
 .switch {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   text-align: center;
   font-size: 13px;
   color: var(--sub);
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  vertical-align: middle;
   padding: 0;
   border: none;
   background: none;

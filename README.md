@@ -8,7 +8,7 @@ DataSlope provides free learning materials and hands-on exercises built around i
 
 ### 🖥️ Free mini IDEs (browser playgrounds)
 
-Full-featured code editors that run language runtimes entirely in the browser via WebAssembly. No account required, no server round-trips. Available playgrounds include:
+Full-featured code editors that run language runtimes entirely in the browser via WebAssembly. Sign-in optional, no server round-trips. Available playgrounds include:
 
 | Language | Runtime |
 | --- | --- |

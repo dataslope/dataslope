@@ -23,6 +23,7 @@ import {
   useMidRunPreparing,
 } from "./challengeShared";
 import { RuntimeBootNotice } from "./RuntimeBootNotice";
+import { DiamondSpinner } from "./mdx/loadingAnimations";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -72,9 +73,6 @@ import {
   persistKey,
   savePersistedCode,
 } from "./codePersistence";
-// Global keyframes for the run overlay (shared with ChallengeCard and the
-// playgrounds), the module CSS references them by their global names.
-import "./runOverlayAnimations.css";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
@@ -328,36 +326,6 @@ function ToastList() {
 // snippet (a few-line JS expression that finishes in 20ms) doesn't
 // blink the wave animation in and back out within a single frame.
 const MIN_RUN_OVERLAY_MS = 300;
-
-// Sine-wave running overlay, anchored to the bottom of the code block
-// and shorter (28 px) than the full playground variant (44 px).
-function RunOverlay({ active }: { active: boolean }) {
-  return (
-    <div
-      className={`${styles.runOverlay}${active ? ` ${styles.runOverlayActive}` : ""}`}
-      aria-hidden="true"
-    >
-      <div className={styles.runGlow} />
-      <svg
-        className={styles.runWaves}
-        viewBox="0 0 240 28"
-        preserveAspectRatio="none"
-      >
-        {/* Two overlapping smooth sine-curves animated horizontally.
-            Each path is wider than the viewBox so it scrolls seamlessly. */}
-        <path
-          className={styles.runWaveBack}
-          d="M0 18 C 20 14, 40 14, 60 18 S 100 22, 120 18 S 160 14, 180 18 S 220 22, 240 18 S 280 14, 300 18 S 340 22, 360 18 S 400 14, 420 18 S 460 22, 480 18 L 480 28 L 0 28 Z"
-        />
-        <path
-          className={styles.runWaveFront}
-          d="M0 21 C 20 17, 40 17, 60 21 S 100 25, 120 21 S 160 17, 180 21 S 220 25, 240 21 S 280 17, 300 21 S 340 25, 360 21 S 400 17, 420 21 S 460 25, 480 21 L 480 28 L 0 28 Z"
-        />
-      </svg>
-      <div className={styles.runStream} />
-    </div>
-  );
-}
 
 // Public export, wraps the inner component with a Toast.Provider so
 // that Toast.useToastManager() works inside CodeBlockInner.
@@ -1674,9 +1642,14 @@ function CodeBlockInner({
               ))}
             </div>
           )}
-          {/* No "Running…" placeholder while output is empty, the blue
-              wave overlay already signals the run is in progress. */}
-          <RunOverlay active={isBusy} />
+          {/* No "Running…" placeholder while output is empty, a centered
+              spinner signals the run is in progress. Suppressed during the
+              boot notice, which carries its own loader. */}
+          {isBusy && !showBootNotice && (
+            <div className={challengeStyles.runSpinner} aria-hidden="true">
+              <DiamondSpinner size={28} label="Running…" />
+            </div>
+          )}
         </div>
       )}
     </div>

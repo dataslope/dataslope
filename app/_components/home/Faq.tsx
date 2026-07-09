@@ -43,7 +43,7 @@ export function Faq() {
             className="border-b border-[var(--ds-gray-200)] dark:border-white/10"
           >
             <Accordion.Header>
-              <Accordion.Trigger className="group flex w-full items-center justify-between gap-4 py-4 text-left text-base font-medium text-[var(--ds-gray-900)] outline-none dark:text-white">
+              <Accordion.Trigger className="group flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-base font-medium text-[var(--ds-gray-900)] outline-none dark:text-white">
                 {item.q}
                 <ChevronDown
                   size={18}

@@ -6,6 +6,7 @@ import { Menu } from "@base-ui-components/react/menu";
 import { Dialog } from "@base-ui-components/react/dialog";
 import {
   ChevronDown,
+  LogIn,
   LogOut,
   Menu as Hamburger,
   User as UserIcon,
@@ -86,7 +87,7 @@ function GitHubLink() {
       rel="noopener noreferrer"
       aria-label="View source on GitHub"
       title="GitHub"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
+      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06]"
     >
       <GitHubIcon size={18} />
     </a>
@@ -106,12 +107,12 @@ function PlaygroundMenu() {
         />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={8} align="center" className="z-50">
-          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
+        <Menu.Positioner sideOffset={3} align="center" className="z-50">
+          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#121212] dark:shadow-black/40">
             {PLAYGROUNDS.map((p) => (
               <Menu.Item
                 key={p.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-white dark:data-[highlighted]:bg-white/[0.06] dark:data-[highlighted]:text-white"
                 render={<Link href={p.href} prefetch={false} />}
               >
                 <LangIcon
@@ -133,7 +134,7 @@ function BrandLogo() {
     <Link
       href="/"
       aria-label="Dataslope home"
-      className="flex items-center gap-2"
+      className="group flex items-center gap-2"
       // This nav only renders on "/", so a Link to "/" is a same-route no-op
       // and nothing appears to happen. Scroll back to the top instead, the
       // expected behaviour of clicking a site logo.
@@ -148,10 +149,10 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="relative top-px h-[13px] w-auto"
+        className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[8deg]"
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[#121212] dark:text-white">
+      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white">
         Dataslope
       </span>
     </Link>
@@ -167,7 +168,7 @@ function MobileAuthSection() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const rowClass =
-    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white";
+    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white";
 
   if (isPending) {
     return (
@@ -184,6 +185,7 @@ function MobileAuthSection() {
         render={<Link href="/sign-in" prefetch={false} />}
         className={`${SIGN_IN_BUTTON_CLASS} w-full justify-center`}
       >
+        <LogIn size={14} aria-hidden="true" />
         Sign in
       </Dialog.Close>
     );
@@ -252,21 +254,21 @@ function MobileDrawer() {
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
             <Dialog.Close
               render={<Link href="/courses" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Courses
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/interview-prep" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Interview Prep
             </Dialog.Close>
 
             <Dialog.Close
               render={<Link href="/pricing" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               Pricing
             </Dialog.Close>
@@ -278,7 +280,7 @@ function MobileDrawer() {
               <Dialog.Close
                 key={p.id}
                 render={<Link href={p.href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/10 dark:hover:text-white"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/[0.06] dark:hover:text-white"
               >
                 <LangIcon
                   id={p.id}
@@ -295,7 +297,7 @@ function MobileDrawer() {
               href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/[0.06]"
             >
               <GitHubIcon size={16} />
               GitHub

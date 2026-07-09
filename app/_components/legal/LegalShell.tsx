@@ -28,16 +28,16 @@ export function LegalShell({
             <Link
               href="/"
               aria-label="Dataslope home"
-              className="flex items-center gap-2"
+              className="ds-logo-hover flex items-center gap-2"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/dataslope-logo-blue.svg"
                 alt=""
                 aria-hidden="true"
-                className="h-4 w-auto"
+                className="ds-logo-mark h-4 w-auto"
               />
-              <span className="text-base font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
+              <span className="ds-logo-word text-base font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
                 Dataslope
               </span>
             </Link>

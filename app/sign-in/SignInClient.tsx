@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, KeyRound, LogIn, Mail, UserPlus } from "lucide-react";
 import { GitHubIcon } from "../_components/home/icons";
 import {
   requestPasswordReset,
@@ -74,12 +75,14 @@ const COPY: Record<
 > = {
   signin: {
     title: "Welcome back",
-    subtitle: "Sign in to continue to Dataslope.",
+    subtitle:
+      "Every course and playground is free to use without an account. Sign in only to save your playgrounds and use AI features.",
     cta: ["Sign in", "Signing in…"],
   },
   signup: {
     title: "Create your account",
-    subtitle: "Every course and playground is free, forever.",
+    subtitle:
+      "Every course and playground is free to use without an account. Sign up only to save your playgrounds and use AI features.",
     cta: ["Create account", "Creating account…"],
   },
   forgot: {
@@ -87,6 +90,15 @@ const COPY: Record<
     subtitle: "We'll email you a secure reset link.",
     cta: ["Send reset link", "Sending…"],
   },
+};
+
+/** Browser-tab title per mode, mirroring the dedicated routes' metadata
+ *  (the root layout appends "· DataSlope"). Kept in step client-side because
+ *  switching modes doesn't navigate, so Next never re-runs the route metadata. */
+const DOC_TITLE: Record<Mode, string> = {
+  signin: "Sign in",
+  signup: "Create your account",
+  forgot: "Reset your password",
 };
 
 function GoogleGlyph() {
@@ -131,11 +143,18 @@ function GoogleGlyph() {
  * logins fill it from the provider profile), so for email sign-ups we derive a
  * name from the email's local-part rather than asking for it.
  */
-export function SignInClient() {
+export function SignInClient({
+  /** Which form to open on first render. The dedicated /sign-up and
+   *  /forgot-password routes pass "signup"/"forgot"; /sign-in defaults to
+   *  "signin". */
+  initialMode = "signin",
+}: {
+  initialMode?: Mode;
+} = {}) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -172,19 +191,6 @@ export function SignInClient() {
     setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
   }, []);
 
-  // Deep-link support: /sign-in?mode=forgot (or signup) opens that form
-  // directly, the expired-reset-link page points here so users don't have
-  // to land on the sign-in tab and rediscover "Forgot password?". Same
-  // window.location pattern as the error effect above, for the same
-  // static-prerender reason.
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("mode");
-    if (requested === "forgot" || requested === "signup") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- driven by the URL, which only exists client-side
-      setMode(requested);
-    }
-  }, []);
-
   // A browser Back from the OAuth provider can restore this page from the
   // bfcache with `socialPending`/`submitting` still set from before the
   // navigation, which would leave every control disabled with no request in
@@ -198,6 +204,13 @@ export function SignInClient() {
     window.addEventListener("pageshow", onPageShow);
     return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
+
+  // Keep the browser-tab title tracking the visible form. `go()` swaps the
+  // URL with replaceState (no navigation), so Next doesn't re-apply the
+  // route's metadata title, do it here.
+  useEffect(() => {
+    document.title = `${DOC_TITLE[mode]} · DataSlope`;
+  }, [mode]);
 
   if (!isPending && session) {
     return (
@@ -213,11 +226,29 @@ export function SignInClient() {
   const pwOk = password.length >= MIN_PASSWORD;
   const { title, subtitle, cta } = COPY[mode];
   const busy = submitting || socialPending !== null;
+  // Leading glyph for the primary button, matched to the action (same 14px
+  // size as the shared header's Sign in button).
+  const SubmitIcon = isForgot ? Mail : isSignup ? UserPlus : LogIn;
 
   function go(next: Mode) {
     setMode(next);
     setError(null);
     setNotice(null);
+    // Keep the address bar in step with the visible form (the dedicated
+    // /sign-in, /sign-up and /forgot-password routes) without a full
+    // navigation, so a reload or shared link lands on the same screen while
+    // the typed email + password survive the switch.
+    const path =
+      next === "signup"
+        ? "/sign-up"
+        : next === "forgot"
+          ? "/forgot-password"
+          : "/sign-in";
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${path}${window.location.search}${window.location.hash}`,
+    );
   }
 
   async function startSocial(provider: string) {
@@ -437,6 +468,7 @@ export function SignInClient() {
                   onClick={() => go("forgot")}
                   className={styles.link}
                 >
+                  <KeyRound size={14} aria-hidden="true" />
                   Forgot password?
                 </button>
               )}
@@ -462,7 +494,10 @@ export function SignInClient() {
               {cta[1]}
             </span>
           ) : (
-            cta[0]
+            <span className={styles.btnBusy}>
+              <SubmitIcon size={14} aria-hidden="true" />
+              {cta[0]}
+            </span>
           )}
         </button>
       </form>
@@ -518,6 +553,7 @@ export function SignInClient() {
             onClick={() => go("signin")}
             className={styles.link}
           >
+            <ArrowLeft size={14} aria-hidden="true" />
             Back to sign in
           </button>
         ) : (
@@ -528,6 +564,11 @@ export function SignInClient() {
               onClick={() => go(isSignup ? "signin" : "signup")}
               className={styles.link}
             >
+              {isSignup ? (
+                <LogIn size={14} aria-hidden="true" />
+              ) : (
+                <UserPlus size={14} aria-hidden="true" />
+              )}
               {isSignup ? "Sign in" : "Create one"}
             </button>
           </>
