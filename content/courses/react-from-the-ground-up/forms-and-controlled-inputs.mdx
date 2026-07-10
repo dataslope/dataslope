@@ -1,0 +1,191 @@
+---
+title: Forms and Controlled Inputs
+description: Binding inputs to state, the value + onChange pattern, handling submit, and building a form that adds to a list.
+---
+
+Forms are where state and events meet. React's approach is the
+**controlled input**: the input's value comes *from* state, and every
+keystroke updates that state. The state is the single source of truth,
+and the input just displays it.
+
+## The value + onChange pattern
+
+Two props make an input controlled:
+
+- **`value={text}`**, the input shows whatever's in state.
+- **`onChange={e => setText(e.target.value)}`**, every edit writes back
+  to state.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function NameEcho() {
+  const [text, setText] = useState("");
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Type here"
+      />
+      <p>You typed: {text || "(nothing yet)"}</p>
+      <p>Characters: {text.length}</p>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<NameEcho />);
+`,
+    },
+  ]}
+/>
+
+Because `value` is bound to state, the input can never show something
+your state doesn't know about. Want to clear the field? Set the state
+to `""`. Want to pre-fill it? Set the initial state. The UI follows the
+data, exactly as before.
+
+## Handling submit
+
+For a whole form, listen for `onSubmit` on the `<form>` and call
+`event.preventDefault()` to stop the browser's page reload. Here a
+form adds items to a list, controlled input plus immutable state
+update, the two ideas together:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function GroceryList() {
+  const [items, setItems] = useState<string[]>(["Milk"]);
+  const [draft, setDraft] = useState("");
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    const value = draft.trim();
+    if (value === "") return;
+    setItems([...items, value]); // new array, don't mutate
+    setDraft("");                // clear the input
+  }
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <form onSubmit={handleSubmit}>
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} />
+        <button type="submit">Add</button>
+      </form>
+      <ul>
+        {items.map((item, i) => (
+          <li key={i}>{item}</li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<GroceryList />);
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="Controlled vs. uncontrolled">
+An input driven by React state is **controlled**. You can instead let
+the DOM keep the value and read it only when needed (an **uncontrolled**
+input, via a ref), but controlled is the default you'll reach for:
+it keeps validation, formatting, and the displayed value all derived
+from one place.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Build a live character mirror"
+  instructions={`Make the input controlled so the heading mirrors it live.
+
+1. Bind the input's \`value\` to the \`message\` state.
+2. On \`onChange\`, update \`message\` with \`e.target.value\`.
+3. Show the current \`message\` inside the \`<h1>\` (it already reads \`{message}\`).`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Mirror() {
+  const [message, setMessage] = useState("");
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>{message}</h1>
+      {/* Make this input controlled by message */}
+      <input placeholder="Say something" />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Mirror />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Mirror() {
+  const [message, setMessage] = useState("");
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>{message}</h1>
+      <input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Say something"
+      />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Mirror />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "typing_mirrors",
+      name: "Typing updates the heading live",
+      code: `const input = document.querySelector("input");
+if (!input) throw new Error("Keep the <input>.");
+// Use the native value setter so React's onChange fires.
+const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+setter.call(input, "Hello React");
+input.dispatchEvent(new Event("input", { bubbles: true }));
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if ((h1.textContent || "").trim() !== "Hello React") {
+  throw new Error("The <h1> should mirror what you type. Got: " + h1.textContent);
+}`,
+    },
+    {
+      id: "controlled",
+      name: "The input is controlled (value comes from state)",
+      code: `const input = document.querySelector("input");
+if (input.value !== "Hello React") {
+  throw new Error("After typing, the input's value should reflect the state. Bind value={message}.");
+}`,
+    },
+  ]}
+/>
+
+You can now capture user input into state. Next we reach *outside* the
+component, to timers and the network:
+[Effects and data fetching](/courses/react-from-the-ground-up/effects-and-data-fetching).

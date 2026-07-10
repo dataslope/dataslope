@@ -1,0 +1,169 @@
+---
+title: State with useState
+description: Giving components memory, the useState hook, re-rendering, updater functions, and updating without mutating.
+---
+
+Props come *in* from a parent and never change from the inside. But
+components often need to remember something that changes over time: a
+counter, whether a menu is open, what's typed in a box. That
+remembered, changeable data is **state**, and `useState` is how a
+component gets some.
+
+## The `useState` hook
+
+`useState(initial)` returns a pair: the **current value** and a
+**setter** function. Calling the setter updates the value *and tells
+React to re-render* the component with the new value.
+
+```tsx
+const [count, setCount] = useState(0);
+//     ^value  ^setter          ^initial value
+```
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button onClick={() => setCount(count + 1)}>+1</button>{" "}
+      <button onClick={() => setCount(0)}>Reset</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+    },
+  ]}
+/>
+
+Each click calls `setCount`, React re-runs `Counter` with the new
+`count`, and the heading reflects it. You never touched the DOM;
+you changed *state*, and the UI followed.
+
+## Setting state triggers a re-render
+
+This is the key difference from a plain variable. A normal `let count`
+would change in memory but the screen would never update. State is the
+value React *watches*: change it through the setter and React redraws.
+
+<Callout type="warn" title="Never assign state directly">
+`count = count + 1` does nothing useful, React won't know and won't
+re-render. Always go through the setter: `setCount(count + 1)`.
+</Callout>
+
+## Updater functions
+
+When the next value depends on the previous one, and especially when
+updates might batch together, pass a **function** to the setter. React
+calls it with the latest value:
+
+```tsx
+setCount((prev) => prev + 1); // safest way to increment
+```
+
+## Updating objects and arrays without mutating
+
+State should be treated as **immutable**: create a *new* value rather
+than editing the old one, so React can detect the change. Use the
+spread syntax:
+
+```tsx
+const [user, setUser] = useState({ name: "Ada", age: 36 });
+setUser({ ...user, age: 37 });          // new object, one field changed
+
+const [items, setItems] = useState<string[]>([]);
+setItems([...items, "new item"]);        // new array with one more item
+```
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Build a show/hide toggle"
+  instructions={`Finish the \`Toggle\` component so the button shows and hides a secret.
+
+1. Add boolean state \`visible\` starting at \`false\` (use \`useState\`).
+2. The button's \`onClick\` should flip \`visible\` (set it to \`!visible\`).
+3. When \`visible\` is true, render a \`<p>\` containing the text **Surprise!**. When false, render nothing (or \`null\`).`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Toggle() {
+  // 1. const [visible, setVisible] = useState(false)
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      {/* 2. flip visible on click */}
+      <button>Toggle</button>
+      {/* 3. show <p>Surprise!</p> only when visible */}
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Toggle />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Toggle() {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <button onClick={() => setVisible(!visible)}>Toggle</button>
+      {visible ? <p>Surprise!</p> : null}
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Toggle />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "hidden_initially",
+      name: "The secret is hidden at first",
+      code: `if (/surprise!/i.test(document.body.textContent || "")) {
+  throw new Error("Before any click, 'Surprise!' should not be shown.");
+}`,
+    },
+    {
+      id: "click_shows",
+      name: "One click reveals the secret",
+      code: `const button = document.querySelector("button");
+if (!button) throw new Error("Keep the <button>.");
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+if (!/surprise!/i.test(document.body.textContent || "")) {
+  throw new Error("After one click, 'Surprise!' should appear.");
+}`,
+    },
+    {
+      id: "click_hides",
+      name: "A second click hides it again",
+      code: `const button = document.querySelector("button");
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+if (/surprise!/i.test(document.body.textContent || "")) {
+  throw new Error("Clicking twice should hide the secret again (toggle, not just show).");
+}`,
+    },
+  ]}
+/>
+
+State gives components memory. It's usually driven by user actions,
+so next we look closely at [Handling events](/courses/react-from-the-ground-up/handling-events).

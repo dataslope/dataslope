@@ -1,0 +1,199 @@
+---
+title: "CSS: Grid Layout"
+description: Two-dimensional layout with display grid, grid-template-columns, fr units, and gap.
+---
+
+Flexbox arranges items along **one** axis, a row or a column. **CSS
+Grid** arranges them in **two** at once: rows *and* columns. It's the
+tool for page layouts, image galleries, and any "grid of cards".
+
+One declaration turns an element into a grid, and one more defines its
+columns:
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;  /* three equal columns */
+  gap: 1rem;
+}
+```
+
+## The `fr` unit
+
+`fr` means "one fraction of the free space". `1fr 1fr 1fr` splits the
+row into three equal columns. `2fr 1fr` makes the first column twice
+as wide as the second. It's like `flex: 1`, but for the whole grid at
+once.
+
+The `repeat()` helper saves typing: `repeat(3, 1fr)` is exactly
+`1fr 1fr 1fr`.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="gallery">
+      <div class="cell">1</div>
+      <div class="cell">2</div>
+      <div class="cell">3</div>
+      <div class="cell">4</div>
+      <div class="cell">5</div>
+      <div class="cell">6</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.cell {
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  height: 80px;
+  border-radius: 10px;
+}
+`,
+    },
+  ]}
+/>
+
+Change `repeat(3, 1fr)` to `repeat(2, 1fr)` and Run: the same six
+cells reflow into two columns of three. That's the power of grid, the
+markup never changes, only the template.
+
+## Auto-fit: responsive with zero media queries
+
+This one line builds a gallery that fits as many columns as the width
+allows, wrapping automatically:
+
+```css
+grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+```
+
+"As many `1fr` columns as fit, each at least `150px` wide." Resize the
+preview and watch the column count change on its own.
+
+## Grid vs. Flexbox
+
+- **Flexbox**: content laid out in *one* direction, navbars, button
+  rows, a label next to a value.
+- **Grid**: layout defined in *two* directions, page scaffolding,
+  card galleries, anything that lines up in rows *and* columns.
+
+They compose happily: a grid of cards where each card is a flex
+column is completely normal.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Build a four-column stat grid"
+  entryFilename="index.html"
+  instructions={`Work in \`styles.css\` on the \`.stats\` element:
+
+1. Make it a grid with \`display: grid\`.
+2. Give it **four** equal columns (use \`repeat(4, 1fr)\`).
+3. Put \`16px\` of \`gap\` between the cells.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="stats">
+      <div class="stat">99%</div>
+      <div class="stat">4.8★</div>
+      <div class="stat">1.2k</div>
+      <div class="stat">24/7</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.stats {
+  /* 1. grid   2. four equal columns   3. 16px gap */
+}
+
+.stat {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 10px;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 10px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "grid",
+      name: ".stats is a grid container",
+      code: `const s = getComputedStyle(document.querySelector(".stats"));
+if (s.display !== "grid") {
+  throw new Error("Set display: grid on .stats, got display: " + s.display + ".");
+}`,
+    },
+    {
+      id: "four_cols",
+      name: ".stats has four columns",
+      code: `const s = getComputedStyle(document.querySelector(".stats"));
+const tracks = s.gridTemplateColumns.trim().split(/\\s+/).filter(Boolean);
+if (tracks.length !== 4) {
+  throw new Error("Expected 4 columns, the grid resolved to " + tracks.length + " (" + s.gridTemplateColumns + ").");
+}`,
+    },
+    {
+      id: "gap",
+      name: "16px gap between cells",
+      code: `const s = getComputedStyle(document.querySelector(".stats"));
+if (s.columnGap !== "16px") {
+  throw new Error("Expected gap: 16px, got " + s.columnGap + ".");
+}`,
+    },
+  ]}
+/>
+
+Two-dimensional layout, unlocked. Next, taking an element *out* of the
+normal flow: [Positioning](/courses/intro-web-development/css-positioning).

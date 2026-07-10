@@ -1,0 +1,239 @@
+---
+title: CSS Grid in Depth
+description: Template columns and rows, fr units, spanning cells, named areas, and responsive grids with auto-fit.
+---
+
+Grid is CSS's two-dimensional layout system: you define **columns and
+rows** on a container, and place children into the resulting cells.
+Where flexbox flows items along a line, grid gives you a coordinate
+system.
+
+## Defining tracks
+
+Two properties set up the grid, plus `gap` for the gutters:
+
+```css
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;  /* three columns */
+  grid-template-rows: auto 200px;      /* two rows */
+  gap: 1rem;
+}
+```
+
+The **`fr`** unit means "a fraction of the free space." `repeat(3, 1fr)`
+is shorthand for three equal columns; `2fr 1fr` makes the first twice
+the width of the second.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grid">
+      <div>1</div><div>2</div><div>3</div>
+      <div>4</div><div>5</div><div>6</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.grid > div {
+  background: #ede9fe;
+  color: #5b21b6;
+  font-weight: 700;
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 10px;
+}
+`,
+    },
+  ]}
+/>
+
+## Placing and spanning items
+
+By default items fill cells in order, but any item can span multiple
+tracks with `grid-column` / `grid-row`. `span 2` means "cover two
+columns"; `1 / -1` means "from the first line to the last", full width:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <header>Header (spans all columns)</header>
+      <aside>Sidebar</aside>
+      <main>Main content (spans two columns)</main>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.layout > * { padding: 1rem; border-radius: 10px; }
+
+header {
+  grid-column: 1 / -1;      /* first line to last: full width */
+  background: #1e293b; color: white;
+}
+aside  { background: #e2e8f0; }
+main   {
+  grid-column: span 2;      /* cover two columns */
+  background: #dbeafe;
+}
+`,
+    },
+  ]}
+/>
+
+## Named areas: layout as a picture
+
+For page-level layouts, `grid-template-areas` lets you *draw* the
+layout as text, then assign each element to a named area. It's the most
+readable way to express a classic header/sidebar/content/footer shell,
+and rearranging it in a media query is a one-line change.
+
+## Responsive with no media query
+
+The single most useful grid line for responsive galleries:
+
+```css
+grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+```
+
+"Fit as many columns as possible, each at least `180px`, sharing
+leftover space equally." Resize and the column count changes on its
+own. Reach for a media query only when the layout must *change shape*,
+not merely reflow.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Build a dashboard grid with a wide panel"
+  entryFilename="index.html"
+  instructions={`Finish \`styles.css\`:
+
+1. Make \`.dashboard\` a grid with **three equal columns** (\`repeat(3, 1fr)\`) and a \`16px\` \`gap\`.
+2. Make the \`.wide\` panel span **two columns** using \`grid-column: span 2\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="panel wide">Traffic (wide)</div>
+      <div class="panel">Signups</div>
+      <div class="panel">Revenue</div>
+      <div class="panel">Errors</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.dashboard {
+  /* 1. grid, three equal columns, 16px gap */
+}
+
+.panel {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.wide {
+  /* 2. span two columns */
+  background: #dbeafe;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.panel {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.wide {
+  grid-column: span 2;
+  background: #dbeafe;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "grid_three",
+      name: ".dashboard is a 3-column grid with a 16px gap",
+      code: `const s = getComputedStyle(document.querySelector(".dashboard"));
+if (s.display !== "grid") throw new Error("Set display: grid on .dashboard.");
+const cols = s.gridTemplateColumns.trim().split(/\\s+/).filter(Boolean);
+if (cols.length !== 3) throw new Error("Expected 3 columns, got " + cols.length + " (" + s.gridTemplateColumns + ").");
+if (s.columnGap !== "16px") throw new Error("Expected gap: 16px, got " + s.columnGap + ".");`,
+    },
+    {
+      id: "wide_spans",
+      name: ".wide is wider than a single panel",
+      code: `const wide = document.querySelector(".wide");
+const narrow = document.querySelector(".panel:not(.wide)");
+if (!wide || !narrow) throw new Error("Keep the panels.");
+if (wide.offsetWidth <= narrow.offsetWidth + 5) {
+  throw new Error("The .wide panel should span two columns, so it must be clearly wider than a single panel. Use grid-column: span 2.");
+}`,
+    },
+  ]}
+/>
+
+Two-dimensional layout, mastered. Next, breaking out of the flow
+entirely: [Positioning and stacking](/courses/modern-css-layout/positioning-and-stacking).

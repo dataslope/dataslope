@@ -1,0 +1,266 @@
+---
+title: "Project: Todo App"
+description: Bring it all together, components, props, state, events, and lists, in a working multi-file todo app.
+---
+
+Time to combine everything into one small but complete app. A todo
+list touches every idea in this course: **state** for the list,
+**events** for adding and toggling, **lists** for rendering, **props**
+to pass each item down, and **composition** to split it into files.
+
+## The finished app
+
+Here's the whole thing across four files. Read it top to bottom, then
+Run it and add, complete, and delete some todos:
+
+<CodeBlock
+  adapter="react"
+  entryFilename="main.tsx"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import "./styles.css";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "App.tsx",
+      starterCode: `import { useState } from "react";
+import { TodoItem } from "./TodoItem";
+
+export interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+let nextId = 3;
+
+export function App() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Learn useState", done: true },
+    { id: 2, text: "Build a todo app", done: false },
+  ]);
+  const [draft, setDraft] = useState("");
+
+  function addTodo(event: React.FormEvent) {
+    event.preventDefault();
+    const text = draft.trim();
+    if (!text) return;
+    setTodos([...todos, { id: nextId++, text, done: false }]);
+    setDraft("");
+  }
+
+  function toggleTodo(id: number) {
+    setTodos(todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  }
+
+  function deleteTodo(id: number) {
+    setTodos(todos.filter((t) => t.id !== id));
+  }
+
+  const remaining = todos.filter((t) => !t.done).length;
+
+  return (
+    <main className="app">
+      <h1>Todos</h1>
+      <form onSubmit={addTodo}>
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="What needs doing?"
+        />
+        <button type="submit">Add</button>
+      </form>
+      <ul>
+        {todos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onToggle={() => toggleTodo(todo.id)}
+            onDelete={() => deleteTodo(todo.id)}
+          />
+        ))}
+      </ul>
+      <p className="count">{remaining} remaining</p>
+    </main>
+  );
+}
+`,
+    },
+    {
+      filename: "TodoItem.tsx",
+      starterCode: `import type { Todo } from "./App";
+
+export function TodoItem({
+  todo,
+  onToggle,
+  onDelete,
+}: {
+  todo: Todo;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <li className={todo.done ? "todo done" : "todo"}>
+      <label>
+        <input type="checkbox" checked={todo.done} onChange={onToggle} />
+        {todo.text}
+      </label>
+      <button className="delete" onClick={onDelete}>
+        ✕
+      </button>
+    </li>
+  );
+}
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; }
+.app { max-width: 22rem; margin: 24px; }
+form { display: flex; gap: 8px; margin-bottom: 12px; }
+input[type="text"], form input { flex: 1; padding: 6px 8px; }
+ul { list-style: none; padding: 0; }
+.todo { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.todo label { display: flex; gap: 8px; align-items: center; }
+.todo.done label { text-decoration: line-through; color: #94a3b8; }
+.delete { border: none; background: none; cursor: pointer; color: #ef4444; }
+.count { color: #64748b; font-size: 14px; }
+`,
+    },
+  ]}
+/>
+
+Trace the data flow once and the whole course clicks into place:
+
+- **`App` owns the state** (`todos`, `draft`) and every function that
+  changes it.
+- **`TodoItem` is presentational**, it takes a `todo` prop and two
+  callbacks, and reports events *up* by calling them. It holds no
+  state of its own.
+- **Every update is immutable**: `addTodo` spreads a new array,
+  `toggleTodo` maps to a new array, `deleteTodo` filters a new array.
+  React sees a new value and re-renders.
+- **`remaining` is derived**, not stored. It's computed from `todos`
+  on every render, so it can never disagree with the list.
+
+## Your turn: add a "Clear completed" button
+
+<ChallengeCard
+  adapter="react"
+  title="Clear the completed todos"
+  entryFilename="main.tsx"
+  instructions={`This smaller todo app works, but the **Clear done** button does nothing. Finish it in \`App.tsx\`:
+
+1. Implement \`clearCompleted\` so it keeps only the todos that are **not** done (use \`todos.filter(...)\` and \`setTodos\`).
+2. The button's \`onClick\` is already wired to \`clearCompleted\`.
+
+After clearing, only unfinished todos should remain.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import { App } from "./App";
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "App.tsx",
+      starterCode: `import { useState } from "react";
+
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+export function App() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Done thing", done: true },
+    { id: 2, text: "Open thing", done: false },
+    { id: 3, text: "Another done", done: true },
+  ]);
+
+  function clearCompleted() {
+    // TODO: keep only the todos that are NOT done
+  }
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <ul>
+        {todos.map((t) => (
+          <li key={t.id}>{t.done ? "✅ " : "⬜ "}{t.text}</li>
+        ))}
+      </ul>
+      <button onClick={clearCompleted}>Clear done</button>
+    </main>
+  );
+}
+`,
+      solutionCode: `import { useState } from "react";
+
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+export function App() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Done thing", done: true },
+    { id: 2, text: "Open thing", done: false },
+    { id: 3, text: "Another done", done: true },
+  ]);
+
+  function clearCompleted() {
+    setTodos(todos.filter((t) => !t.done));
+  }
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <ul>
+        {todos.map((t) => (
+          <li key={t.id}>{t.done ? "✅ " : "⬜ "}{t.text}</li>
+        ))}
+      </ul>
+      <button onClick={clearCompleted}>Clear done</button>
+    </main>
+  );
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "starts_with_three",
+      name: "Starts with three todos",
+      code: `const items = document.querySelectorAll("li");
+if (items.length !== 3) {
+  throw new Error("Expected 3 todos initially, found " + items.length + ".");
+}`,
+    },
+    {
+      id: "clears_done",
+      name: "Clicking Clear done leaves only open todos",
+      code: `const button = document.querySelector("button");
+if (!button) throw new Error("Keep the Clear done button.");
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+const texts = Array.from(document.querySelectorAll("li")).map((li) => (li.textContent || "").trim());
+if (texts.length !== 1) {
+  throw new Error("After clearing, only the 1 open todo should remain. Found " + texts.length + ".");
+}
+if (!texts.some((t) => /open thing/i.test(t))) {
+  throw new Error("The remaining todo should be the open one ('Open thing').");
+}`,
+    },
+  ]}
+/>
+
+You just built a real, stateful app out of the pieces this course
+introduced. Take it further in the [wrap-up](/courses/react-from-the-ground-up/next-steps).

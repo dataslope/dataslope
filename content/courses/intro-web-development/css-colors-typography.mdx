@@ -1,0 +1,170 @@
+---
+title: "CSS: Colors and Typography"
+description: Color formats, web fonts, and the handful of text properties that make a page look designed.
+---
+
+Before layout, most of "looking good" is **color and type**. A page
+with sensible fonts, spacing, and a restrained palette reads as
+professional even with the simplest layout.
+
+## Colors, four ways to say the same thing
+
+CSS accepts color in several notations. These are all the same blue:
+
+| Notation | Example |
+| --- | --- |
+| Named | `royalblue` |
+| Hex | `#4169e1` |
+| RGB | `rgb(65, 105, 225)` |
+| HSL | `hsl(225, 73%, 57%)` |
+
+`rgb()` and `hsl()` can take a fourth value for **alpha**
+(transparency): `rgb(65 105 225 / 0.5)` is half-transparent.
+`hsl()` is the friendliest for tweaking by hand, nudge the first
+number to change the hue, the last to change lightness.
+
+## Typography properties worth knowing
+
+| Property | Controls |
+| --- | --- |
+| `font-family` | The typeface, with fallbacks |
+| `font-size` | Text size |
+| `font-weight` | `400` normal, `700` bold |
+| `line-height` | Vertical space between lines |
+| `letter-spacing` | Space between characters |
+| `text-align` | `left`, `center`, `right`, `justify` |
+
+The single highest-impact typography rule is a comfortable
+**`line-height`** (around `1.5` for body text) and a **readable
+measure** (line length), controlled by capping the container width.
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        color: #1f2937;
+        line-height: 1.6;
+        max-width: 42rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      h1 {
+        font-family: system-ui, sans-serif;
+        color: hsl(225, 73%, 45%);
+        letter-spacing: -0.02em;
+      }
+      .lead { font-size: 1.25rem; color: #4b5563; }
+    </style>
+  </head>
+  <body>
+    <h1>Typography sets the tone</h1>
+    <p class="lead">A larger, muted opening line pulls readers in.</p>
+    <p>
+      Body text with a 1.6 line-height and a capped width is easy on
+      the eyes. Change the colors and font-family above and Run again.
+    </p>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+## Web fonts
+
+The `font-family` list is a set of fallbacks: the browser uses the
+first one that's available. `system-ui` means "the operating system's
+own UI font", which loads instantly and looks native everywhere. For
+custom fonts you'd link a font file (e.g. from Google Fonts); the
+fallback list is what shows while it loads.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Style the article's type"
+  entryFilename="index.html"
+  instructions={`Work in \`styles.css\`:
+
+1. Give the \`body\` a \`line-height\` of \`1.6\`.
+2. Make the \`.title\` text color exactly \`rgb(37, 99, 235)\`.
+3. Center the \`.title\` with \`text-align: center\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1 class="title">The Daily Slope</h1>
+    <p>Reading is more pleasant with room to breathe between lines.</p>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  /* 1. set line-height */
+}
+
+.title {
+  /* 2. blue color   3. center it */
+}
+`,
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  line-height: 1.6;
+}
+
+.title {
+  color: rgb(37, 99, 235);
+  text-align: center;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "line_height",
+      name: "body has line-height 1.6",
+      code: `const s = getComputedStyle(document.body);
+const fs = parseFloat(s.fontSize);
+const lh = parseFloat(s.lineHeight);
+if (Math.abs(lh / fs - 1.6) > 0.02) {
+  throw new Error("Expected body line-height: 1.6, got a ratio of " + (lh / fs).toFixed(2) + ".");
+}`,
+    },
+    {
+      id: "title_color",
+      name: ".title is blue rgb(37, 99, 235)",
+      code: `const s = getComputedStyle(document.querySelector(".title"));
+if (s.color !== "rgb(37, 99, 235)") {
+  throw new Error("Expected .title color rgb(37, 99, 235), got " + s.color + ".");
+}`,
+    },
+    {
+      id: "title_center",
+      name: ".title is centered",
+      code: `const s = getComputedStyle(document.querySelector(".title"));
+if (s.textAlign !== "center") {
+  throw new Error("Expected .title text-align: center, got " + s.textAlign + ".");
+}`,
+    },
+  ]}
+/>
+
+Color and type sorted. Now the box that every element lives in:
+[The Box Model](/courses/intro-web-development/css-box-model).

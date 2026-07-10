@@ -1,0 +1,210 @@
+---
+title: Composition and Children
+description: The children prop, wrapper components, slots, and why React prefers composition over configuration.
+---
+
+As components grow, you need ways to combine them without turning each
+one into a pile of props. React's answer is **composition**: small
+components nested inside each other, with the special `children` prop
+doing most of the work.
+
+## The `children` prop
+
+Whatever you put *between* a component's tags arrives as its
+`children` prop. That lets you build **wrapper** components, a `Card`,
+a `Modal`, a `Panel`, that style or arrange whatever you place inside:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import type { ReactNode } from "react";
+
+function Card({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        border: "1px solid #e2e8f0",
+        borderRadius: 12,
+        padding: 16,
+        margin: 12,
+        fontFamily: "system-ui",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <main>
+      <Card>
+        <h2>Trailblazer Boots</h2>
+        <p>Waterproof and on sale.</p>
+      </Card>
+      <Card>
+        <h2>Camp Mug</h2>
+        <p>Holds 400ml.</p>
+      </Card>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+`Card` knows nothing about boots or mugs. It just draws a bordered box
+around *whatever* you hand it. That's composition: the wrapper owns the
+frame, the caller owns the content.
+
+## Composition over configuration
+
+You could instead give `Card` a `title` prop, a `body` prop, an
+`imageUrl` prop, a `footer` prop… and it would grow a new prop for
+every layout. Composition sidesteps that. Pass content as children (or
+as several named "slots" via props that hold JSX) and the component
+stays small no matter how varied its uses:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import type { ReactNode } from "react";
+
+// Two named slots, each is just JSX passed as a prop.
+function SplitPanel({ left, right }: { left: ReactNode; right: ReactNode }) {
+  return (
+    <div style={{ display: "flex", gap: 16, fontFamily: "system-ui", margin: 16 }}>
+      <div style={{ flex: 1 }}>{left}</div>
+      <div style={{ flex: 1 }}>{right}</div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <SplitPanel
+      left={<img src="https://picsum.photos/200/140" alt="A placeholder" />}
+      right={
+        <div>
+          <h2>Details</h2>
+          <p>Slots let a component accept whole chunks of UI.</p>
+        </div>
+      }
+    />
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="ReactNode is the type for 'any renderable thing'">
+`children` and slot props are typed `ReactNode`, elements, strings,
+numbers, arrays of them, or nothing. It's the catch-all type for
+anything React can render.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Build an Alert wrapper"
+  instructions={`Create a reusable \`Alert\` component that wraps its children.
+
+1. Give it a prop \`children\` typed as \`ReactNode\`.
+2. Return a \`<div className="alert">\` that renders \`{children}\` inside it.
+
+The \`App\` below already uses \`<Alert>\` with content inside, once \`Alert\` renders its children, both messages should appear inside \`.alert\` boxes.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import type { ReactNode } from "react";
+import "./styles.css";
+
+// TODO: accept children and render them inside <div className="alert">
+function Alert() {
+  return <div className="alert"></div>;
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Alert>Your changes were saved.</Alert>
+      <Alert>Careful, this cannot be undone.</Alert>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+      solutionCode: `import { createRoot } from "react-dom/client";
+import type { ReactNode } from "react";
+import "./styles.css";
+
+function Alert({ children }: { children: ReactNode }) {
+  return <div className="alert">{children}</div>;
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Alert>Your changes were saved.</Alert>
+      <Alert>Careful, this cannot be undone.</Alert>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `.alert {
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 8px 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "two_alerts",
+      name: "Two alert boxes render",
+      code: `const alerts = document.querySelectorAll(".alert");
+if (alerts.length !== 2) {
+  throw new Error("Expected 2 .alert boxes, found " + alerts.length + ".");
+}`,
+    },
+    {
+      id: "children_shown",
+      name: "Each alert shows its children content",
+      code: `const texts = Array.from(document.querySelectorAll(".alert")).map((a) => (a.textContent || "").trim());
+if (!texts.some((t) => /changes were saved/i.test(t))) {
+  throw new Error("The first alert should render its children ('Your changes were saved.').");
+}
+if (!texts.some((t) => /cannot be undone/i.test(t))) {
+  throw new Error("The second alert should render its children.");
+}`,
+    },
+  ]}
+/>
+
+Composition is how React apps stay readable at scale. The other half
+of reuse is sharing *logic*, which is exactly what
+[Custom hooks](/courses/react-from-the-ground-up/custom-hooks) are for.

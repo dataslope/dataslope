@@ -37,6 +37,10 @@ export const TAG_LABELS: Record<string, string> = {
   scipy: "SciPy",
   seaborn: "seaborn",
   statsmodels: "statsmodels",
+  // Skills with acronyms that plain title-casing would get wrong
+  "css-layout": "CSS Layout",
+  "semantic-html": "Semantic HTML",
+  "dom-manipulation": "DOM Manipulation",
 };
 
 /** Turn a tag slug into a badge label: a known proper name, or the slug

@@ -1,0 +1,196 @@
+---
+title: Rendering Lists
+description: Turning arrays into elements with map, the role of key, and rendering nothing gracefully.
+---
+
+Most UIs are lists: rows of products, messages, search results. In
+React you render a list by **mapping an array to elements**, ordinary
+JavaScript `array.map`, right inside your JSX.
+
+## `map` turns data into UI
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+const LANGUAGES = ["HTML", "CSS", "JavaScript", "TypeScript"];
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Languages I know</h1>
+      <ul>
+        {LANGUAGES.map((lang) => (
+          <li key={lang}>{lang}</li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+The `{...}` holds an array of `<li>` elements, and React renders each
+one. Change the array and the list changes, you never touch the DOM.
+
+## Why `key` matters
+
+Each element in a mapped list needs a **`key`**, a stable, unique
+identifier. React uses keys to tell items apart between renders, so
+when the list changes it can update, insert, or remove just the items
+that actually changed instead of rebuilding everything.
+
+<Callout type="warn" title="Don't use the array index as a key (usually)">
+It's tempting to write `key={index}`. That works only if the list
+never reorders, inserts, or removes items from the middle. As soon as
+it does, index keys make React associate the wrong DOM with the wrong
+data, causing subtle bugs in inputs and animations. Prefer a stable id
+from your data.
+</Callout>
+
+## Mapping objects and rendering nothing
+
+Real data is usually objects, and sometimes the list is empty. Handle
+both:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+interface Task {
+  id: number;
+  title: string;
+  done: boolean;
+}
+
+const TASKS: Task[] = [
+  { id: 1, title: "Learn map()", done: true },
+  { id: 2, title: "Add keys", done: true },
+  { id: 3, title: "Ship the list", done: false },
+];
+
+function TaskList({ tasks }: { tasks: Task[] }) {
+  if (tasks.length === 0) {
+    return <p>No tasks yet, nice work.</p>;
+  }
+  return (
+    <ul style={{ fontFamily: "system-ui" }}>
+      {tasks.map((task) => (
+        <li key={task.id}>
+          {task.done ? "✅" : "⬜"} {task.title}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<TaskList tasks={TASKS} />);
+`,
+    },
+  ]}
+/>
+
+That early `return` for the empty case is a common React idiom: guard
+the edge case first, then render the normal path.
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Render the product list"
+  instructions={`\`ProductList\` receives an array of products but renders none.
+
+1. Inside the \`<ul>\`, map over \`products\` and render one \`<li>\` per product showing its \`name\`.
+2. Use each product's \`id\` as the \`key\`.
+
+There are four products, so four \`<li>\`s should appear.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+interface Product {
+  id: string;
+  name: string;
+}
+
+const PRODUCTS: Product[] = [
+  { id: "a", name: "Backpack" },
+  { id: "b", name: "Tent" },
+  { id: "c", name: "Compass" },
+  { id: "d", name: "Lantern" },
+];
+
+function ProductList({ products }: { products: Product[] }) {
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {/* TODO: render one <li> per product */}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<ProductList products={PRODUCTS} />);
+`,
+      solutionCode: `import { createRoot } from "react-dom/client";
+
+interface Product {
+  id: string;
+  name: string;
+}
+
+const PRODUCTS: Product[] = [
+  { id: "a", name: "Backpack" },
+  { id: "b", name: "Tent" },
+  { id: "c", name: "Compass" },
+  { id: "d", name: "Lantern" },
+];
+
+function ProductList({ products }: { products: Product[] }) {
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {products.map((product) => (
+        <li key={product.id}>{product.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<ProductList products={PRODUCTS} />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "count",
+      name: "Renders four list items",
+      code: `const items = document.querySelectorAll("ul li");
+if (items.length !== 4) {
+  throw new Error("Expected 4 list items, found " + items.length + ".");
+}`,
+    },
+    {
+      id: "names",
+      name: "Each item shows its product name",
+      code: `const texts = Array.from(document.querySelectorAll("ul li")).map((li) => (li.textContent || "").trim());
+for (const expected of ["Backpack", "Tent", "Compass", "Lantern"]) {
+  if (!texts.includes(expected)) {
+    throw new Error("Missing product: '" + expected + "'. Got: " + texts.join(", "));
+  }
+}`,
+    },
+  ]}
+/>
+
+You can render any collection now. So far everything is static, next,
+we give components memory:
+[State with useState](/courses/react-from-the-ground-up/state-with-usestate).

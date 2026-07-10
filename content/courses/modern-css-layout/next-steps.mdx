@@ -1,0 +1,65 @@
+---
+title: Next Steps
+description: Where modern CSS goes from here, the playground, deeper topics, and companion courses.
+---
+
+You've gone from the cascade to a complete responsive landing page,
+and picked up the *systems* behind CSS along the way: how rules
+resolve, how boxes size, how flexbox and grid place things, and how
+custom properties and motion make a design feel finished.
+
+## Keep building in the playground
+
+Everything here also runs in the full-page
+[HTML/CSS/JS playground](/playground/web), with multi-file tabs and a
+live preview. Rebuild any lesson's example from scratch, or start
+something new.
+
+Project ideas that stretch these skills:
+
+1. **A pricing page**, three plan cards in a responsive grid, one
+   "featured" plan scaled up with `transform`, all colors from custom
+   properties.
+2. **A photo gallery**, `grid-template-columns: repeat(auto-fit,
+   minmax(...))` with a hover zoom, no media queries needed.
+3. **A dark-mode toggle**, define your palette as variables, then flip
+   them with a `data-theme` attribute and a few lines of JavaScript.
+
+## Go deeper on modern CSS
+
+The core is covered; here's what to explore next:
+
+- **`grid-template-areas`** for drawing whole page layouts as text.
+- **Container queries** (`@container`), styling a component by *its
+  own* width instead of the viewport's, the newest piece of the
+  responsive puzzle.
+- **Logical properties** (`margin-inline`, `padding-block`) that adapt
+  to writing direction.
+- **`:has()`**, the "parent selector", style an element based on what
+  it contains.
+- **Nesting**, native CSS nesting now works in every modern browser.
+
+## Companion courses
+
+- [React from the Ground Up](/courses/react-from-the-ground-up) pairs
+  naturally, CSS handles the look, React handles the behavior.
+- [Intro to Web Development](/courses/intro-web-development) covers the
+  HTML and JavaScript around your CSS if you want the full picture.
+
+## Reference worth bookmarking
+
+- **MDN Web Docs**, the definitive reference for every property.
+- **web.dev** and **CSS-Tricks**, guides and recipes for layout,
+  responsive patterns, and animation.
+- **caniuse.com**, check browser support before shipping a new
+  feature.
+
+## The habits that matter
+
+1. **Keep specificity low and even.** Lean on classes; you can always
+   override with one more.
+2. **`box-sizing: border-box` everywhere.** Then `width` means width.
+3. **Fluid first, breakpoints second.** Reach for a media query only
+   when the layout must change *shape*.
+
+Happy styling!

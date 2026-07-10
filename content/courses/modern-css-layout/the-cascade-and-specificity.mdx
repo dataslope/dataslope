@@ -1,0 +1,164 @@
+---
+title: The Cascade and Specificity
+description: Why one rule beats another, source order, specificity, inheritance, and the tools that decide the winner.
+---
+
+When two rules set the same property on the same element, CSS needs a
+tiebreaker. That tiebreaker is the **cascade**, and understanding it
+turns "why isn't my style applying?!" from a mystery into a lookup.
+
+## The three questions the cascade asks
+
+To pick a winner, the browser checks, in order:
+
+1. **Origin and importance**, author styles beat browser defaults;
+   `!important` overrides normal rules (avoid it, it's a sledgehammer).
+2. **Specificity**, how *specifically* the selector targets the
+   element. More specific wins.
+3. **Source order**, if specificity ties, the rule that appears
+   **last** wins.
+
+Most day-to-day conflicts come down to #2 and #3.
+
+## Specificity, counted
+
+Specificity is a score with three buckets. Count the selectors:
+
+| Bucket | Selectors | Weight |
+| --- | --- | --- |
+| IDs | `#header` | highest |
+| Classes | `.card`, `[type="text"]`, `:hover` | middle |
+| Elements | `div`, `p`, `::before` | lowest |
+
+Compare bucket by bucket, left to right. An ID beats *any* number of
+classes; a class beats any number of element selectors.
+
+```css
+p            { color: black; }   /* 0 ids, 0 classes, 1 element */
+.note        { color: blue;  }   /* 0 ids, 1 class,   0 elements → wins over p */
+#intro       { color: green; }   /* 1 id → wins over .note */
+```
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <p id="intro" class="note">Which color wins?</p>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; font-size: 1.5rem; }
+
+/* All three target the same paragraph. The most specific wins. */
+p      { color: crimson; }     /* element */
+.note  { color: darkorange; }  /* class */
+#intro { color: seagreen; }    /* id  ← this one wins */
+`,
+    },
+  ]}
+/>
+
+Delete the `#intro` rule and Run: the paragraph turns orange (the
+class wins). Delete `.note` too and it's crimson. You're watching
+specificity resolve in real time.
+
+## Source order and inheritance
+
+Two more forces you'll lean on constantly:
+
+- **Source order**: equally specific rules? The later one wins. This is
+  why the order of your stylesheet, and the order you link stylesheets,
+  matters.
+- **Inheritance**: some properties (color, font, `line-height`) pass
+  from parent to child automatically. Set `font-family` once on
+  `body` and the whole page inherits it. Layout properties (margin,
+  padding, border) do *not* inherit.
+
+<Callout type="info" title="Keep specificity low on purpose">
+Seasoned CSS leans on **classes** and shallow selectors, and avoids
+IDs and `!important` for styling. Low, even specificity means you can
+always override a rule with one more class, instead of escalating an
+arms race. When a style "won't apply," your first move is to compare
+the specificity of the competing selectors.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Win the specificity battle"
+  entryFilename="index.html"
+  instructions={`The paragraph is currently gray because of the \`.note\` rule. Without editing or deleting that rule, make the paragraph render **blue** (\`rgb(37, 99, 235)\`):
+
+1. Add a **new, more specific** rule targeting \`#alert\` (an ID selector).
+2. Set its \`color\` to \`rgb(37, 99, 235)\`.
+
+Because an ID beats a class, your rule will win.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <p id="alert" class="note">Read me</p>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.note { color: gray; }
+
+/* Add a more specific rule for #alert below */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.note { color: gray; }
+
+#alert { color: rgb(37, 99, 235); }
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "blue",
+      name: "The paragraph is blue",
+      code: `const s = getComputedStyle(document.querySelector("#alert"));
+if (s.color !== "rgb(37, 99, 235)") {
+  throw new Error("Expected #alert to be rgb(37, 99, 235). Got " + s.color + ". Add a rule for #alert.");
+}`,
+    },
+    {
+      id: "kept_note",
+      name: "The .note rule is still there",
+      code: `let hasNote = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if ((rule.selectorText || "") === ".note") hasNote = true;
+  }
+}
+if (!hasNote) throw new Error("Keep the .note rule, win by adding specificity, not by deleting.");`,
+    },
+  ]}
+/>
+
+You can now predict which rule wins. Next, the box that every rule
+paints into: [The box model and sizing](/courses/modern-css-layout/box-model-and-sizing).

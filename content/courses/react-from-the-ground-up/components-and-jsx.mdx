@@ -1,0 +1,171 @@
+---
+title: Components and JSX
+description: Functions that return markup, the rules of JSX, and how components compose.
+---
+
+A React app is a tree of **components**. A component is just a
+function that returns markup. That's the whole definition, everything
+else builds on it.
+
+```tsx
+function Welcome() {
+  return <h1>Hello from a component!</h1>;
+}
+```
+
+Use it like an HTML element, with a capitalized name:
+
+```tsx
+<Welcome />
+```
+
+<Callout type="info" title="Capitalization matters">
+Component names must start with a **capital letter**. `<Welcome />` is
+your component; `<welcome />` would be treated as an unknown HTML tag.
+This is how JSX tells components and DOM elements apart.
+</Callout>
+
+## JSX: markup inside JavaScript
+
+The `<h1>...</h1>` syntax is **JSX**. It looks like HTML but it's
+JavaScript, and it has a few rules HTML doesn't:
+
+- **`className`, not `class`** (`class` is a reserved word in JS).
+- **`{curly braces}`** embed any JavaScript expression:
+  `<p>{2 + 2}</p>` renders `4`.
+- **One root element** per return. Wrap siblings in a parent, or an
+  empty **fragment** `<>...</>`.
+- **Close every tag**, even void ones: `<img />`, `<br />`.
+- **`style` takes an object** with camelCased properties:
+  `style={{ fontSize: 20 }}`.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+function Greeting() {
+  const user = "Ada";
+  const hour = 9;
+  return (
+    <>
+      <h1 className="title">Good morning, {user}!</h1>
+      <p>It is {hour < 12 ? "before" : "after"} noon.</p>
+      <p style={{ color: "seagreen" }}>{2 + 2} equals four.</p>
+    </>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Greeting />);
+`,
+    },
+  ]}
+/>
+
+Notice everything inside `{}` is real JavaScript: a variable, a
+ternary, an arithmetic expression. That seam between markup and code is
+what makes JSX expressive.
+
+## Components compose
+
+The payoff is that components nest inside each other just like
+elements. A `Card` can render a `Title` and an `Avatar`; a `Page`
+renders many `Card`s. You build big UIs by combining small, named
+pieces, each one readable on its own.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+function Star() {
+  return <span>⭐</span>;
+}
+
+function Rating() {
+  return (
+    <div>
+      <Star />
+      <Star />
+      <Star />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Trailblazer Boots</h1>
+      <Rating />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Write your first component"
+  instructions={`Build a \`ProfileCard\` component and render it.
+
+1. Create a function component named \`ProfileCard\`.
+2. It should return an \`<h2>\` containing the text **Grace Hopper** and a \`<p>\` containing the word **admiral**.
+3. Render \`<ProfileCard />\` with \`createRoot\` (the root element is \`#root\`).`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+// 1. + 2. define ProfileCard here
+
+// 3. render it:
+createRoot(document.getElementById("root")!).render(/* <ProfileCard /> */ null);
+`,
+      solutionCode: `import { createRoot } from "react-dom/client";
+
+function ProfileCard() {
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h2>Grace Hopper</h2>
+      <p>A computer scientist and US Navy admiral.</p>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<ProfileCard />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "h2",
+      name: "Renders an <h2> with Grace Hopper",
+      code: `const h2 = document.querySelector("h2");
+if (!h2) throw new Error("Render an <h2> element.");
+if (!/grace hopper/i.test(h2.textContent || "")) {
+  throw new Error("The <h2> should contain 'Grace Hopper'. Got: " + h2.textContent);
+}`,
+    },
+    {
+      id: "p",
+      name: "A paragraph mentions 'admiral'",
+      code: `const ps = Array.from(document.querySelectorAll("p"));
+if (!ps.some((p) => /admiral/i.test(p.textContent || ""))) {
+  throw new Error("Add a <p> that mentions the word 'admiral'.");
+}`,
+    },
+  ]}
+/>
+
+You can build and compose components. Now let's make them reusable by
+feeding them data: [Props](/courses/react-from-the-ground-up/props).

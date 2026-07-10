@@ -1,0 +1,190 @@
+---
+title: "JavaScript: Forms and Validation"
+description: Reading input values, handling submit, preventing the default reload, and giving users feedback.
+---
+
+Forms are where a page stops being a document and starts being an
+*app*. In this lesson JavaScript reads what the user typed, checks it,
+and responds, all without leaving the page.
+
+## The submit event and `preventDefault`
+
+By default, submitting a form reloads the page (a holdover from the
+1990s, when the server did everything). In a modern app you almost
+always stop that and handle the data in JavaScript:
+
+```js
+form.addEventListener("submit", (event) => {
+  event.preventDefault(); // stop the reload
+  // ...read values and respond
+});
+```
+
+## Reading values
+
+Each control's current text is on its `.value`. Grab the input, read
+`.value`, and you have what the user typed.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <form id="signup">
+      <label for="name">Your name</label>
+      <input id="name" type="text" />
+      <button type="submit">Say hello</button>
+    </form>
+    <p id="msg"></p>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+form { display: grid; gap: 0.5rem; max-width: 18rem; }
+input, button { padding: 0.5rem; font-size: 1rem; }
+#msg { font-weight: 600; }
+.error { color: #dc2626; }
+.ok { color: #16a34a; }
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const form = document.querySelector("#signup");
+const name = document.querySelector("#name");
+const msg = document.querySelector("#msg");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = name.value.trim();
+  if (value === "") {
+    msg.textContent = "Please enter your name.";
+    msg.className = "error";
+  } else {
+    msg.textContent = "Hello, " + value + "!";
+    msg.className = "ok";
+  }
+});
+`,
+    },
+  ]}
+/>
+
+Type a name and submit: a greeting. Submit it empty: an error, and
+the page never reloads. That branch, *valid vs. invalid*, is the heart
+of form validation.
+
+## HTML gives you validation for free, too
+
+Attributes like `required`, `type="email"`, `minlength`, and `min`/`max`
+make the browser validate before your JavaScript even runs. Use them
+as the first line of defense, then layer JS on top for custom rules
+and friendlier messages.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Validate the age field"
+  entryFilename="index.html"
+  instructions={`Finish \`script.js\` so submitting the form checks the age:
+
+1. Call \`event.preventDefault()\` so the page doesn't reload.
+2. Read the number from \`#age\` (use \`Number(age.value)\`).
+3. If it's **18 or more**, set \`#msg\` text to **Welcome!**. Otherwise set it to **Too young**.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <form id="gate">
+      <input id="age" type="number" />
+      <button type="submit">Enter</button>
+    </form>
+    <p id="msg"></p>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const form = document.querySelector("#gate");
+const age = document.querySelector("#age");
+const msg = document.querySelector("#msg");
+
+form.addEventListener("submit", (event) => {
+  // 1. prevent the reload
+  // 2. read the number
+  // 3. set msg to "Welcome!" or "Too young"
+});
+`,
+      solutionCode: `const form = document.querySelector("#gate");
+const age = document.querySelector("#age");
+const msg = document.querySelector("#msg");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = Number(age.value);
+  if (value >= 18) {
+    msg.textContent = "Welcome!";
+  } else {
+    msg.textContent = "Too young";
+  }
+});
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "adult",
+      name: "Age 21 shows Welcome!",
+      code: `const age = document.querySelector("#age");
+const msg = document.querySelector("#msg");
+age.value = "21";
+document.querySelector("#gate").requestSubmit();
+await new Promise((r) => setTimeout(r, 30));
+if (!/welcome!/i.test(msg.textContent || "")) {
+  throw new Error("Submitting age 21 should set #msg to 'Welcome!'. Got: " + msg.textContent);
+}`,
+    },
+    {
+      id: "minor",
+      name: "Age 12 shows Too young",
+      code: `const age = document.querySelector("#age");
+const msg = document.querySelector("#msg");
+age.value = "12";
+document.querySelector("#gate").requestSubmit();
+await new Promise((r) => setTimeout(r, 30));
+if (!/too young/i.test(msg.textContent || "")) {
+  throw new Error("Submitting age 12 should set #msg to 'Too young'. Got: " + msg.textContent);
+}`,
+    },
+    {
+      id: "no_reload",
+      name: "The boundary value 18 is allowed",
+      code: `const age = document.querySelector("#age");
+const msg = document.querySelector("#msg");
+age.value = "18";
+document.querySelector("#gate").requestSubmit();
+await new Promise((r) => setTimeout(r, 30));
+if (!/welcome!/i.test(msg.textContent || "")) {
+  throw new Error("Age 18 should count as old enough (use >= 18). Got: " + msg.textContent);
+}`,
+    },
+  ]}
+/>
+
+Forms in hand. Next, pulling data into the page from elsewhere:
+[Fetching and showing data](/courses/intro-web-development/js-fetch-and-data).
