@@ -1,0 +1,99 @@
+/*
+ * Surface styling for the interview-prep catalog cards.
+ *
+ * These declarations live in a CSS module rather than Tailwind utilities on
+ * purpose: the card surface, the risograph "second print" shadow (a hatched
+ * ::after), and the glyph badge all need real gradients, multi-part
+ * box-shadows, and theme-flipped values that Tailwind's arbitrary-value
+ * utilities render unreliably here (opacity-on-CSS-variable, arbitrary
+ * box-shadow, and `after:[background:…]` all misfire, and light/dark
+ * background utilities tie on source order because the `.dark` variant is
+ * zero-specificity `:where()`). A module gives each rule ordinary class
+ * specificity and a deterministic `:global(.dark)` override, so the cards look
+ * right in both themes regardless of stylesheet order. Layout, spacing, and
+ * text colour stay in Tailwind on the component.
+ */
+
+/* ── Formats band: a strong hairline on top, a faint one on the bottom. ── */
+.formats {
+  border-top: 1px solid var(--ds-gray-900);
+  border-bottom: 1px solid var(--ds-gray-100);
+}
+:global(.dark) .formats {
+  border-top-color: rgba(255, 255, 255, 0.25);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Card wrapper carries the risograph offset shadow on ::after. ── */
+.cardWrap {
+  position: relative;
+  isolation: isolate;
+}
+.cardWrap::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 6px -6px -6px 6px;
+  border: 1px solid var(--ds-gray-200);
+  border-radius: 16px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.06) 0,
+    rgba(0, 0, 0, 0.06) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+:global(.dark) .cardWrap::after {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05) 0,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+/* ── The card surface itself. ── */
+.card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ds-gray-200);
+  border-radius: 16px;
+  background: #ffffff;
+  transition: border-color 0.15s ease;
+}
+.card:hover {
+  border-color: var(--ds-blue-500);
+}
+:global(.dark) .card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #1e1e1e;
+}
+:global(.dark) .card:hover {
+  border-color: var(--ds-blue-500);
+}
+
+/* ── Role glyph badge, straddling the banner's bottom edge with a ring in
+ *    the card colour so it reads as lifted. ── */
+.badge {
+  display: inline-flex;
+  height: 42px;
+  width: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--ds-blue-50);
+  color: var(--ds-blue-500);
+  box-shadow: 0 0 0 3px #ffffff;
+}
+:global(.dark) .badge {
+  background: rgba(20, 140, 255, 0.15);
+  box-shadow: 0 0 0 3px #1e1e1e;
+}
