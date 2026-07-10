@@ -1,12 +1,17 @@
 /**
- * Catch-all route for `/interview-prep`, renders an MDX page resolved from
- * the Fumadocs `interviewSource` loader (the `content/interview/` collection).
+ * Catch-all route for interview-prep role/topic pages, renders an MDX page
+ * resolved from the Fumadocs `interviewSource` loader (the
+ * `content/interview/` collection) at `/interview-prep/<role>[/<topic>]`.
  *
  * Mirrors `app/courses/[...slug]/page.tsx` (same `dynamic`-mode body load,
  * same prerendering via `generateStaticParams`, same canonical/OG metadata
  * and breadcrumb/Course JSON-LD), scoped to the interview collection. The
  * raw-Markdown action buttons are intentionally omitted, the `.md` mirror is
  * a courses/fumadocs-dev feature (see next.config.ts rewrites).
+ *
+ * The catch-all is REQUIRED (`[...slug]`, not `[[...slug]]`) because the bare
+ * `/interview-prep` URL is the custom catalog page (`app/interview-prep/
+ * page.tsx`), not a docs page.
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -30,7 +35,7 @@ import {
 } from "@/lib/structuredData";
 
 interface InterviewPageProps {
-  params: Promise<{ slug?: string[] }>;
+  params: Promise<{ slug: string[] }>;
 }
 
 export default async function InterviewPage(props: InterviewPageProps) {
@@ -43,10 +48,10 @@ export default async function InterviewPage(props: InterviewPageProps) {
   // --- JSON-LD: breadcrumb everywhere, Course on each role landing page. ---
   // The role folders are NOT Fumadocs roots (so the whole /interview-prep tree
   // is one navigable sidebar), so we derive position from the slug depth:
-  //   []                       → the /interview-prep landing page
   //   ["<role>"]               → a role landing page
   //   ["<role>", "<topic>"]    → a topic page
-  // The first segment's meta.json carries the human role name.
+  // The first segment's meta.json carries the human role name. (The bare
+  // /interview-prep index is the catalog page, handled elsewhere.)
   const slugs = page.slugs;
   const roleSlug = slugs[0];
   const roleMeta = roleSlug
