@@ -166,6 +166,15 @@ export function PlaygroundBootOverlay({
               <span className="playground-boot-pct">{pct}%</span>
             </div>
           )}
+          {error && (
+            <button
+              type="button"
+              className="playground-boot-retry"
+              onClick={() => window.location.reload()}
+            >
+              Reload and try again
+            </button>
+          )}
         </div>
       </div>
     </div>

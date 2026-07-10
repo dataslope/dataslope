@@ -13,6 +13,7 @@
  */
 import {
   AppWindow,
+  Atom,
   Binary,
   Blocks,
   Braces,
@@ -28,6 +29,7 @@ import {
   FunctionSquare,
   Hash,
   Layers,
+  LayoutGrid,
   MemoryStick,
   MessagesSquare,
   Network,
@@ -103,6 +105,8 @@ export const COURSE_MOTIFS: Record<string, string> = {
   "systems-programming-c": "memgrid",
   "csharp-linq-functional": "pipeline",
   "intro-web-development": "browser",
+  "modern-css-layout": "grid",
+  "react-from-the-ground-up": "atom",
 };
 
 /** Each motif kind maps to a distinct lucide icon, so every course still gets
@@ -136,6 +140,8 @@ const KIND_ICONS: Record<string, LucideIcon> = {
   memgrid: MemoryStick,
   pipeline: Waypoints,
   browser: AppWindow,
+  grid: LayoutGrid,
+  atom: Atom,
   stairs: TrendingUp,
 };
 

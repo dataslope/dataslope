@@ -648,6 +648,7 @@ export default function AskAiWidget({
               className={styles.textarea}
               rows={1}
               placeholder="Ask a question…"
+              aria-label="Ask a question"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKeyDown}

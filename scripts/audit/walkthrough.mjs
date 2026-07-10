@@ -62,7 +62,6 @@ async function visit(slug, label) {
 }
 
 const shot = (name) => page.screenshot({ path: `${OUT}/${name}.png` }).catch(() => {});
-const shotEl = (loc, name) => loc.screenshot({ path: `${OUT}/${name}.png` }).catch((e) => console.log("  shot fail", name, String(e).slice(0, 80)));
 
 // ════════════════════════════════════════════════════════════════════
 // STAGE 1, Structure + console sweep across a representative sample

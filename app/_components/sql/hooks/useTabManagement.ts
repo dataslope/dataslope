@@ -180,8 +180,15 @@ export function useTabManagement(
         activeTabIdRef.current = fallback.id;
         setActiveTabId(fallback.id);
       }
+      // Drop the closed tab's result set so large results don't
+      // accumulate in the store over a long session.
+      setResultsByTab((prev) => {
+        const { [id]: _deleted, ...rest } = prev;
+        void _deleted;
+        return rest;
+      });
     },
-    [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId],
+    [tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId, setResultsByTab],
   );
 
   const confirmCloseTab = useCallback(() => {
@@ -204,7 +211,14 @@ export function useTabManagement(
       activeTabIdRef.current = fallback.id;
       setActiveTabId(fallback.id);
     }
-  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId]);
+    // Drop the closed tab's result set so large results don't
+    // accumulate in the store over a long session.
+    setResultsByTab((prev) => {
+      const { [id]: _deleted, ...rest } = prev;
+      void _deleted;
+      return rest;
+    });
+  }, [confirmCloseTabId, tabsRef, activeTabIdRef, activeDbIdRef, tabHistoryRef, setTabs, setActiveTabId, setConfirmCloseTabId, setResultsByTab]);
 
   const renameTab = useCallback(
     (id: string, newTitle: string) => {
@@ -231,6 +245,9 @@ export function useTabManagement(
         id: newTabId(),
         title: `${source.title} Copy`,
         pristineCode: source.code,
+        // Special tabs (view-data / er-diagram / query-history) must stay
+        // unique; a duplicate becomes an ordinary editable query tab.
+        kind: undefined,
       };
       const next = [...currentTabs.slice(0, idx + 1), copy, ...currentTabs.slice(idx + 1)];
       tabsRef.current = next;

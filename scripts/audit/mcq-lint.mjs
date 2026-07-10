@@ -2,7 +2,6 @@
 // Extracts the markdown template literal from each block, parses choices,
 // and flags structural problems a learner would hit.
 import { readFileSync } from "node:fs";
-import { globSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 const files = execSync('grep -rl "<MultipleChoice" content/learn --include=*.mdx', {

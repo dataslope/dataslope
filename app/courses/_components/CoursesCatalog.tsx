@@ -120,7 +120,7 @@ function MobileFilterSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className={`w-full cursor-pointer appearance-none rounded-lg border bg-transparent py-2 pl-3 pr-8 text-[13px] font-medium text-[#121212] outline-none [color-scheme:light] dark:text-white dark:[color-scheme:dark] ${HAIRLINE}`}
+        className={`w-full cursor-pointer appearance-none rounded-lg border bg-transparent py-2 pl-3 pr-8 text-[13px] font-medium text-[#121212] outline-none focus-visible:border-[var(--ds-blue-400)] dark:focus-visible:border-[var(--ds-blue-500)] [color-scheme:light] dark:text-white dark:[color-scheme:dark] ${HAIRLINE}`}
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -157,7 +157,7 @@ function SortSelect({
     >
       <Select.Trigger
         aria-label="Sort courses"
-        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[var(--ds-gray-100)] px-3 py-1.5 text-[13px] font-medium text-[#121212] outline-none transition-colors hover:bg-[var(--ds-gray-200)] focus-visible:outline-none dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/10"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[var(--ds-gray-100)] px-3 py-1.5 text-[13px] font-medium text-[#121212] outline-none transition-colors hover:bg-[var(--ds-gray-200)] focus-visible:ring-2 focus-visible:ring-[var(--ds-blue-400)] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/10 dark:focus-visible:ring-[var(--ds-blue-500)]"
       >
         <ActiveIcon size={14} aria-hidden="true" />
         <Select.Value className="text-left">{active.label}</Select.Value>
@@ -274,13 +274,14 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
           background so scrolled rows never show through. */}
       <div className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]">
         <label
-          className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 ${HAIRLINE}`}
+          className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}
         >
           <Search size={15} className={FAINT} aria-hidden="true" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search courses…"
+            aria-label="Search courses"
             className="min-w-0 flex-1 border-none bg-transparent text-[13.5px] text-[#121212] outline-none placeholder:text-[var(--ds-gray-400)] dark:text-white dark:placeholder:text-[var(--ds-gray-500)]"
           />
         </label>
@@ -325,13 +326,14 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
         {/* ── Filter sidebar (desktop only) ── */}
         <aside className="hidden flex-col gap-7 pt-0.5 md:flex">
         <label
-          className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 ${HAIRLINE}`}
+          className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}
         >
           <Search size={15} className={FAINT} aria-hidden="true" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search courses…"
+            aria-label="Search courses"
             className="min-w-0 flex-1 border-none bg-transparent text-[13.5px] text-[#121212] outline-none placeholder:text-[var(--ds-gray-400)] dark:text-white dark:placeholder:text-[var(--ds-gray-500)]"
           />
         </label>
@@ -409,24 +411,34 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
           <CourseCard key={course.slug} course={course} />
         ))}
 
-        {courses.length > 0 && list.length === 0 && (
-          <div className="px-6 py-14 text-center">
-            <p className={`text-[15px] font-medium ${HEADING}`}>
-              No courses match
-            </p>
-            <p className={`mt-1.5 text-[13.5px] ${MUTED}`}>
-              Try a different search, or{" "}
-              <button
-                type="button"
-                onClick={reset}
-                className={`cursor-pointer text-[13.5px] font-medium ${ACCENT}`}
-              >
-                reset the filters
-              </button>
-              .
-            </p>
-          </div>
-        )}
+        {list.length === 0 &&
+          (courses.length > 0 ? (
+            <div className="px-6 py-14 text-center">
+              <p className={`text-[15px] font-medium ${HEADING}`}>
+                No courses match
+              </p>
+              <p className={`mt-1.5 text-[13.5px] ${MUTED}`}>
+                Try a different search, or{" "}
+                <button
+                  type="button"
+                  onClick={reset}
+                  className={`cursor-pointer text-[13.5px] font-medium ${ACCENT}`}
+                >
+                  reset the filters
+                </button>
+                .
+              </p>
+            </div>
+          ) : (
+            <div className="px-6 py-14 text-center">
+              <p className={`text-[15px] font-medium ${HEADING}`}>
+                No courses available yet
+              </p>
+              <p className={`mt-1.5 text-[13.5px] ${MUTED}`}>
+                Check back soon, new courses are on the way.
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </>

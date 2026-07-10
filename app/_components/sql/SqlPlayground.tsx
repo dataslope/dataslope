@@ -1409,7 +1409,15 @@ function SqlPlaygroundInner() {
           initialSampleId,
           workspaceId,
         );
-        if (cancelled) return;
+        if (cancelled) {
+          // Component unmounted while the engine was being created; dispose
+          // it immediately so the worker is terminated and its exclusive
+          // OPFS access handle is released. Without this, the abandoned
+          // worker keeps the workspace locked and the next mount's boot
+          // deadlocks at ~90%.
+          engine.dispose?.();
+          return;
+        }
         engineRef.current = engine;
         setEngineForRender(engine);
 

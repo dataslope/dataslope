@@ -57,14 +57,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Interview Prep collection (content/interview → /interview-prep).
+  // The interview-prep catalog index (app/interview-prep/page.tsx, not a
+  // source page, so it's added explicitly, mirroring /courses above).
+  entries.set(abs("/interview-prep"), {
+    url: abs("/interview-prep"),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  });
+
+  // Interview Prep collection (content/interview → /interview-prep/<role>/…).
   for (const page of interviewSource.getPages()) {
     const url = abs(page.url);
-    const isIndex = page.url === "/interview-prep";
     entries.set(url, {
       url,
       changeFrequency: "monthly",
-      priority: isIndex ? 0.9 : 0.7,
+      priority: 0.7,
     });
   }
 

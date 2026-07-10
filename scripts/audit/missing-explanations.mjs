@@ -8,7 +8,7 @@
 //   node scripts/audit/missing-explanations.mjs <files|dirs...> # scope to given paths
 //   node scripts/audit/missing-explanations.mjs --list <paths>  # list every gap with context
 //   node scripts/audit/missing-explanations.mjs --check <paths> # exit 1 if any gap remains
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { extractMcqBlocks, parseChoices, findMcqFiles } from "../check-mcq.mjs";
 

@@ -122,9 +122,6 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       const updateCanvasSize = () => {
         const newWidth = width || container.clientWidth;
         const newHeight = height || container.clientHeight;
-        // Runs synchronously on mount (and async on resize); the synchronous
-        // case is just sizing a canvas, which is safe.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCanvasSize({ width: newWidth, height: newHeight });
         gridParams = setupCanvas(canvas, newWidth, newHeight);
       };
