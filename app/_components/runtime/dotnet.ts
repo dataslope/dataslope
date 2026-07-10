@@ -107,9 +107,13 @@ export function loadDotnet(
     // dotnet.js is an ES module that exports a `dotnet` DotnetHostBuilder.
     // Dynamic import() lets the module's internal relative imports
     // (dotnet.runtime.js, dotnet.native.js) resolve against the jsDelivr
-    // CDN path.
+    // CDN path. BOTH ignore comments matter: without `turbopackIgnore`,
+    // Turbopack resolves the jsDelivr URL to the repo's local
+    // cdn-assets/_dotnet copy and bundles dotnet.js + the ~3 MB
+    // dotnet.native.wasm into the build (which alone cost ~1.2 MiB of the
+    // Worker's gzipped 10 MiB budget).
     const dotnetModule = (await import(
-      /* webpackIgnore: true */ BOOT_SCRIPT_URL
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ BOOT_SCRIPT_URL
     )) as DotnetModule;
     const dotnetBuilder = dotnetModule.dotnet;
     if (!dotnetBuilder) {

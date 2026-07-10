@@ -58,6 +58,7 @@ script-runner-src/__pycache__/
 # Pre-bundled almostnode JS/TS workers (rebuilt by
 # `scripts/build-almostnode-workers.mjs` on postinstall + build + dev).
 /public/_workers/
+/public/search-index.json
 
 # Static data behind /svg-gallery (rebuilt by
 # `scripts/build-svg-gallery-data.mjs` on build + dev).
