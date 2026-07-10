@@ -31,6 +31,38 @@ const nextConfig: NextConfig = {
   // `next dev`) it's unset, so we return null and Next falls back to its default
   // random build ID, no behavior change outside CI.
   generateBuildId: async () => process.env.WORKERS_CI_COMMIT_SHA || null,
+  // Resolve the bare `shiki` specifier to the slim registry in
+  // lib/shiki-slim.ts. Fumadocs boots its request-time MDX highlighter
+  // (dynamic-mode courses compile in the Worker) via `import("shiki")`,
+  // whose full bundle statically references all ~250 grammars in
+  // @shikijs/langs — ~1.3 MiB of the Worker's gzipped 10 MiB ceiling for
+  // languages the content never fences. Subpath imports (`shiki/core`,
+  // `shiki/wasm`) are untouched, only the bare specifier is aliased; see
+  // lib/shiki-slim.ts for what to do when content adds a new language.
+  turbopack: {
+    resolveAlias: {
+      shiki: "./lib/shiki-slim.ts",
+    },
+  },
+  // The llms routes read lessons with `path.join(process.cwd(), "content",
+  // …)`, which makes Next's output file tracing sweep broad repo globs into
+  // the server output. Most of that is only dead weight in .open-next, but
+  // cdn-assets/ is actively harmful: it contains the ~3 MB
+  // dotnet.native.wasm, and OpenNext's bundler turns any traced .wasm into
+  // an attached Worker module (~1.2 MiB of the gzipped 10 MiB budget). All
+  // of cdn-assets is served from jsDelivr at runtime (see
+  // app/_components/runtime/cdn.ts), never from the Worker, so exclude the
+  // whole tree (plus other never-read-at-request-time repo dirs the trace
+  // picks up).
+  outputFileTracingExcludes: {
+    "*": [
+      "./cdn-assets/**",
+      "./e2e/**",
+      "./scripts/**",
+      "./agent-outputs/**",
+      "./tools-jar/**",
+    ],
+  },
   // Tell Next.js to rewrite barrel imports from these icon packages
   // into deep specifier-level imports so we don't pull whole index
   // graphs into every page's chunk.

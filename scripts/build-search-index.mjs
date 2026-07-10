@@ -53,6 +53,11 @@ const SECTIONS = [
   { dir: join(ROOT, "content", "courses"), base: "/courses" },
 ];
 const OUT_FILE = join(ROOT, "lib", "generated", "search-index.js");
+// Same data as a static asset (gitignored, like public/_workers). The
+// search API route fetches this from the Workers assets binding at
+// runtime instead of bundling the multi-MB array into the Worker script,
+// which was costing ~1.4 MiB of the Worker's gzipped 10 MiB budget.
+const OUT_ASSET = join(ROOT, "public", "search-index.json");
 
 // Index prose nodes only; omit `mdxJsxFlowElement` (the self-closing
 // components) and code/svg/mermaid (never in this list to begin with).
@@ -167,8 +172,10 @@ for (const { dir, base } of SECTIONS) {
 mkdirSync(dirname(OUT_FILE), { recursive: true });
 const json = JSON.stringify(docs);
 writeFileSync(OUT_FILE, `export default ${json};\n`);
+writeFileSync(OUT_ASSET, json);
 
 console.log(
-  `[search-index] wrote lib/generated/search-index.js, ${docs.length} pages ` +
+  `[search-index] wrote lib/generated/search-index.js + public/search-index.json, ` +
+    `${docs.length} pages ` +
     `(${Math.round(json.length / 1024)} kB${fellBack ? `, ${fellBack} via text fallback` : ""})`,
 );
