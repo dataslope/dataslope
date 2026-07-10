@@ -28,7 +28,13 @@ export default function CourseLessonLayout({
   children: ReactNode;
 }) {
   return (
-    <RootProvider>
+    // Override next-themes' defaults (defaultTheme "system", enableSystem) to
+    // match the rest of the site: the non-Fumadocs pages' bootstrap scripts
+    // and the shared pill toggle (siteTheme.ts) treat the `theme` key as a
+    // binary "light" | "dark" with a light default, so without this a dark-OS
+    // visitor with no stored choice would get dark docs but light pages
+    // everywhere else.
+    <RootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
         tree={courseSource.pageTree}
         tabs={false}

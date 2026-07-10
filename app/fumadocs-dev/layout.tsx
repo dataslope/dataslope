@@ -25,7 +25,9 @@ export default function FumadocsDevLayout({
   children: ReactNode;
 }) {
   return (
-    <RootProvider>
+    // Match the site-wide binary light/dark contract (light default); see the
+    // note in app/courses/[...slug]/layout.tsx.
+    <RootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
         tree={devSource.pageTree}
         tabs={false}
