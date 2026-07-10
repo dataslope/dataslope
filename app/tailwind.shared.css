@@ -72,6 +72,13 @@
    lessons under courses/[...slug] render Fumadocs chrome with inline
    styles, so scanning them too is harmless). */
 @source "./courses/**/*.{ts,tsx}";
+/* The /interview-prep catalog index page + its components (the role/topic
+   pages under interview-prep/[...slug] render Fumadocs chrome with inline
+   styles, like courses, so scanning them too is harmless). Without this the
+   catalog card's utilities (px-[26px], min-h-[44px], text-[21px], …) never
+   generate under `source(none)`, so the cards render with collapsed spacing
+   in production even though dev's incremental crawl happened to emit them. */
+@source "./interview-prep/**/*.{ts,tsx}";
 /* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
    non-learn root needs these too, that is the point of the union: the home/
    admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so
