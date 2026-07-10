@@ -1,0 +1,230 @@
+---
+title: Flexbox in Depth
+description: Main and cross axes, grow/shrink/basis, alignment, wrapping, and the patterns flexbox nails.
+---
+
+Flexbox lays out items along **one axis**, a row or a column, and
+gives you precise control over how they share space and align. It's the
+right tool for navbars, toolbars, button groups, and anything
+"a few things in a line."
+
+## Two axes
+
+`display: flex` creates a flex container whose children are **flex
+items**. Everything flexbox does is described relative to two axes:
+
+- The **main axis**, the direction items flow (`flex-direction: row`
+  → horizontal; `column` → vertical).
+- The **cross axis**, perpendicular to it.
+
+`justify-content` aligns along the **main** axis; `align-items` aligns
+along the **cross** axis. Flip `flex-direction` and those two swap
+meaning, which is the single most common source of "why is my
+alignment on the wrong axis?"
+
+| Property | Axis | Common values |
+| --- | --- | --- |
+| `justify-content` | main | `flex-start`, `center`, `space-between`, `space-around` |
+| `align-items` | cross | `stretch`, `center`, `flex-start`, `baseline` |
+| `align-self` | cross | override `align-items` for one item |
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bar">
+      <span class="brand">Summit</span>
+      <a href="#">Docs</a>
+      <a href="#">Pricing</a>
+      <a href="#">Sign in</a>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 0; }
+
+.bar {
+  display: flex;
+  align-items: center;   /* vertical centering (cross axis) */
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: #0f172a;
+}
+
+.bar a { color: #cbd5e1; text-decoration: none; }
+
+.brand {
+  color: white;
+  font-weight: 700;
+  margin-right: auto;   /* eats free space → pushes links right */
+}
+`,
+    },
+  ]}
+/>
+
+That `margin-right: auto` trick is worth memorizing: an `auto` margin
+in a flex container absorbs all available space on that side, so one
+item can shove its siblings to the far end.
+
+## `flex`: grow, shrink, basis
+
+Each item's `flex` shorthand controls how it resizes:
+
+- **`flex-grow`**, how much of the *leftover* space this item takes
+  (0 = don't grow).
+- **`flex-shrink`**, how readily it shrinks when space is tight
+  (1 = allowed to shrink).
+- **`flex-basis`**, its starting size before grow/shrink.
+
+The two you'll write most:
+
+```css
+.item { flex: 1; }      /* grow to share space equally: 1 1 0 */
+.item { flex: none; }   /* don't grow or shrink: 0 0 auto */
+```
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="row">
+      <div class="sidebar">Fixed 120px</div>
+      <div class="main">I grow to fill the rest (flex: 1)</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.row { display: flex; gap: 12px; }
+
+.sidebar {
+  flex: none;          /* stays 120px */
+  width: 120px;
+  background: #e0e7ff;
+  padding: 1rem;
+}
+
+.main {
+  flex: 1;             /* takes all remaining width */
+  background: #dcfce7;
+  padding: 1rem;
+}
+`,
+    },
+  ]}
+/>
+
+## Wrapping
+
+By default flex items stay on one line and shrink. `flex-wrap: wrap`
+lets them flow onto new lines when they run out of room, the basis of
+a responsive card row that needs no media query.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Split a toolbar and let the search grow"
+  entryFilename="index.html"
+  instructions={`Finish \`styles.css\` for the toolbar:
+
+1. Make \`.toolbar\` a flex container (\`display: flex\`) and vertically center its items (\`align-items: center\`) with a \`gap\` of \`12px\`.
+2. Give \`.search\` \`flex: 1\` so the search box grows to fill the space between the label and the button.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="toolbar">
+      <strong>Files</strong>
+      <input class="search" placeholder="Search…" />
+      <button>New</button>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.toolbar {
+  /* 1. flex row, centered, 12px gap */
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.search {
+  /* 2. grow to fill */
+  padding: 6px 8px;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.search {
+  flex: 1;
+  padding: 6px 8px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "flex_row",
+      name: ".toolbar is a centered flex row with a gap",
+      code: `const s = getComputedStyle(document.querySelector(".toolbar"));
+if (s.display !== "flex") throw new Error("Set display: flex on .toolbar, got " + s.display + ".");
+if (s.alignItems !== "center") throw new Error("Set align-items: center, got " + s.alignItems + ".");
+if (s.columnGap !== "12px") throw new Error("Set gap: 12px, got " + s.columnGap + ".");`,
+    },
+    {
+      id: "search_grows",
+      name: ".search grows to fill the space",
+      code: `const s = getComputedStyle(document.querySelector(".search"));
+if (parseFloat(s.flexGrow) < 1) {
+  throw new Error("Give .search flex: 1 so it grows. flex-grow is " + s.flexGrow + ".");
+}`,
+    },
+  ]}
+/>
+
+Flexbox owns one dimension. For rows *and* columns together, you want
+[CSS Grid](/courses/modern-css-layout/css-grid).

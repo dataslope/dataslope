@@ -1,0 +1,208 @@
+---
+title: Props
+description: Passing data into components, typing props, default values, and why props are read-only.
+---
+
+A component that always renders the same thing isn't very useful.
+**Props** (short for "properties") are the inputs you pass to a
+component, like arguments to a function, so the same component can
+render different things.
+
+## Passing and receiving props
+
+You pass props as attributes, and receive them as a single object
+parameter. With TypeScript you describe that object's shape:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+function Greeting({ name }: { name: string }) {
+  return <p>Hello, {name}!</p>;
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Greeting name="Ada" />
+      <Greeting name="Grace" />
+      <Greeting name="Linus" />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+One component, three outputs, the difference is entirely in the props.
+The `{ name }: { name: string }` is **destructuring** the props object
+plus a TypeScript type saying "`name` is a string". Pass the wrong
+type and the compiler complains before you ever Run.
+
+## Props can be any type
+
+Strings use quotes; everything else, numbers, booleans, arrays,
+objects, functions, goes inside braces:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+
+interface ProductProps {
+  name: string;
+  price: number;
+  inStock: boolean;
+  tags: string[];
+}
+
+function Product({ name, price, inStock, tags }: ProductProps) {
+  return (
+    <div style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h2>{name}, {"$"}{price.toFixed(2)}</h2>
+      <p>{inStock ? "In stock" : "Sold out"}</p>
+      <p>Tags: {tags.join(", ")}</p>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <Product
+    name="Camp Mug"
+    price={12.5}
+    inStock={true}
+    tags={["kitchen", "outdoors"]}
+  />,
+);
+`,
+    },
+  ]}
+/>
+
+## Props are read-only
+
+A component must **never** modify its own props. Props flow *down* from
+the parent; a child that reassigned them would break React's one-way
+data flow (and React would ignore the change anyway). If a value needs
+to change over time, that's **state**, the next topic. Props are for
+data a component *receives*; state is for data a component *owns*.
+
+<Callout type="info" title="Default values">
+Give a prop a default with normal JavaScript defaults during
+destructuring: `function Badge({ tone = "info" }: { tone?: string })`.
+The `?` marks the prop optional in the type.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Make the Avatar reusable"
+  instructions={`\`Avatar\` is hard-coded. Make it render from props instead.
+
+1. Type its props as \`{ name: string; initials: string }\`.
+2. Render the \`initials\` inside the \`<div className="circle">\` and the \`name\` inside the \`<span>\`.
+
+The two \`<Avatar />\` usages at the bottom already pass the right props.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createRoot } from "react-dom/client";
+import "./styles.css";
+
+function Avatar(/* add typed props here */) {
+  return (
+    <div className="avatar">
+      <div className="circle">??</div>
+      <span>Name</span>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Avatar name="Ada Lovelace" initials="AL" />
+      <Avatar name="Grace Hopper" initials="GH" />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+      solutionCode: `import { createRoot } from "react-dom/client";
+import "./styles.css";
+
+function Avatar({ name, initials }: { name: string; initials: string }) {
+  return (
+    <div className="avatar">
+      <div className="circle">{initials}</div>
+      <span>{name}</span>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Avatar name="Ada Lovelace" initials="AL" />
+      <Avatar name="Grace Hopper" initials="GH" />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `.avatar { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+.circle {
+  width: 40px; height: 40px; border-radius: 999px;
+  background: #dbeafe; color: #1d4ed8; font-weight: 700;
+  display: grid; place-items: center;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "two_avatars",
+      name: "Both avatars render",
+      code: `const circles = document.querySelectorAll(".circle");
+if (circles.length !== 2) {
+  throw new Error("Expected 2 avatars, found " + circles.length + ".");
+}`,
+    },
+    {
+      id: "initials",
+      name: "Each circle shows the right initials",
+      code: `const initials = Array.from(document.querySelectorAll(".circle")).map((c) => (c.textContent || "").trim());
+for (const expected of ["AL", "GH"]) {
+  if (!initials.includes(expected)) {
+    throw new Error("Expected initials '" + expected + "'. Got: " + initials.join(", "));
+  }
+}`,
+    },
+    {
+      id: "names",
+      name: "Each avatar shows its name",
+      code: `const text = document.body.textContent || "";
+for (const name of ["Ada Lovelace", "Grace Hopper"]) {
+  if (!text.includes(name)) throw new Error("Missing name: '" + name + "'.");
+}`,
+    },
+  ]}
+/>
+
+Props let one component serve many cases. Next, the pattern for
+rendering *collections* of data:
+[Rendering lists](/courses/react-from-the-ground-up/rendering-lists).

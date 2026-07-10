@@ -1,0 +1,88 @@
+---
+title: Welcome
+description: A deep, hands-on tour of modern CSS, the cascade, box model, flexbox, grid, responsive design, custom properties, and animation.
+---
+
+Welcome to **Modern CSS: Layout & Responsive Design**. CSS has a
+reputation for being fiddly, mostly because people learn its
+properties without learning the *systems* behind them: how rules
+combine, how boxes size themselves, how layout engines place things.
+This course teaches those systems, and every rule you write renders
+instantly next to it.
+
+<Callout type="info" title="Who this course is for">
+You should know what an HTML element, a class, and a basic CSS rule
+are. If you've done the CSS lessons in
+[Intro to Web Development](/courses/intro-web-development), you're more
+than ready, this course goes deeper on the same foundations and adds
+grid, custom properties, and animation. If not, you'll still be fine;
+we build up from the cascade.
+</Callout>
+
+## How this course works
+
+Each lesson pairs an idea with a **live, editable preview**. The web
+code blocks below compose your HTML and CSS into a sandboxed page and
+render it right under the editor, the way a browser renders any page.
+Change a value, press **Run** (or Ctrl/Cmd + Enter), and see the
+layout react.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="hero">
+      <h1>CSS you can see</h1>
+      <p>Change a value in styles.css and press Run.</p>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { margin: 0; font-family: system-ui, sans-serif; }
+
+.hero {
+  display: grid;
+  place-items: center;
+  height: 60vh;
+  text-align: center;
+  color: white;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin: 0;
+}
+`,
+    },
+  ]}
+/>
+
+Try changing the two gradient colors, or the `135deg` angle, and Run.
+That single `clamp()` on the heading is already responsive, it scales
+with the viewport between a floor and a ceiling.
+
+## What you'll learn
+
+1. **The cascade and specificity**, why one rule wins over another.
+2. **The box model and `box-sizing`**, how every element sizes itself.
+3. **Flexbox**, one-dimensional layout, in depth.
+4. **CSS Grid**, two-dimensional layout, in depth.
+5. **Positioning and stacking**, taking elements out of the flow.
+6. **Responsive design**, fluid units, media queries, mobile-first.
+7. **Custom properties**, variables, theming, and dark mode.
+8. **Transitions and animations**, motion that feels intentional.
+9. **A responsive landing page** that puts it all together.
+
+Ready? Start with [The cascade and specificity](/courses/modern-css-layout/the-cascade-and-specificity).

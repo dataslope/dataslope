@@ -1,0 +1,204 @@
+---
+title: Transitions and Animations
+description: Smooth state changes with transition, keyframe animations with @keyframes, transforms, and respecting reduced motion.
+---
+
+Motion, used sparingly, makes an interface feel responsive and
+polished: buttons that ease on hover, panels that slide in, a badge
+that gently pulses. CSS gives you two tools, **transitions** for
+state changes and **animations** for scripted sequences.
+
+## Transitions: animate a change
+
+A `transition` tells the browser to *interpolate* a property instead of
+snapping to the new value. Put the transition on the element's normal
+state; it applies whenever the property changes (on `:hover`, on a
+class toggle, anything):
+
+```css
+.button {
+  background: #6366f1;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.button:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+```
+
+The shorthand is `transition: <property> <duration> <timing> <delay>`.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="cta">Hover me</button>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.cta {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  color: white;
+  background: #6366f1;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+}
+`,
+    },
+  ]}
+/>
+
+Hover the button in the preview: color, position, and shadow all ease
+in together. Remove the `transition` line and they snap, that's the
+difference it makes.
+
+## `transform`: move without disturbing layout
+
+`transform` (translate, scale, rotate, skew) is the property to
+animate for performance, it doesn't trigger layout, so it stays smooth:
+
+```css
+transform: translateX(20px);   /* move right */
+transform: scale(1.1);         /* grow to 110% */
+transform: rotate(15deg);      /* tilt */
+```
+
+## Animations: scripted, repeatable motion
+
+For motion that isn't tied to a state change, define keyframes and
+attach them with `animation`:
+
+```css
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.panel { animation: fade-in 0.4s ease-out; }
+```
+
+The `animation` shorthand is
+`<name> <duration> <timing> <delay> <iteration-count>`, e.g.
+`pulse 1s ease-in-out infinite`.
+
+<Callout type="warn" title="Respect reduced motion">
+Some people get motion sickness from animation. Honor their OS setting:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+```
+
+It's a small block that makes your site usable for more people.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make the live badge pulse"
+  entryFilename="index.html"
+  instructions={`Give the "LIVE" dot a looping pulse in \`styles.css\`:
+
+1. Define a \`@keyframes pulse\` that animates \`transform\` from \`scale(1)\` to \`scale(1.4)\` and back (use \`0%\`, \`50%\`, \`100%\`).
+2. Apply it to \`.live\` with \`animation: pulse 1s ease-in-out infinite\` (name **pulse**, duration **1s**, and it must repeat forever).`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <span class="live"></span> Streaming now
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.live {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ef4444;
+  /* 2. apply the pulse animation here */
+}
+
+/* 1. define @keyframes pulse below */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.live {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ef4444;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "animation_name",
+      name: ".live runs the pulse animation",
+      code: `const s = getComputedStyle(document.querySelector(".live"));
+if (s.animationName !== "pulse") {
+  throw new Error("Apply animation: pulse ... to .live. animation-name is '" + s.animationName + "'.");
+}`,
+    },
+    {
+      id: "duration",
+      name: "The animation lasts 1s",
+      code: `const s = getComputedStyle(document.querySelector(".live"));
+if (s.animationDuration !== "1s") {
+  throw new Error("Set the animation duration to 1s. Got " + s.animationDuration + ".");
+}`,
+    },
+    {
+      id: "loops",
+      name: "It repeats forever",
+      code: `const s = getComputedStyle(document.querySelector(".live"));
+if (s.animationIterationCount !== "infinite") {
+  throw new Error("The animation should loop with 'infinite'. Got " + s.animationIterationCount + ".");
+}`,
+    },
+  ]}
+/>
+
+You now have the whole modern CSS toolkit. Let's put every piece to
+work in one build: [a responsive landing page](/courses/modern-css-layout/project-responsive-landing-page).

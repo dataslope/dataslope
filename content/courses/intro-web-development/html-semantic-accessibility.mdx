@@ -1,0 +1,179 @@
+---
+title: "HTML: Semantics and Accessibility"
+description: Using the right element for the job, landmarks, headings, labels, so pages are meaningful to browsers, search engines, and assistive tech.
+---
+
+You could build an entire site out of `<div>` and `<span>`. Please
+don't. **Semantic HTML** means choosing elements for what the content
+*is*, and it pays off three times over: screen readers can navigate
+it, search engines understand it, and your own CSS gets simpler.
+
+## Landmarks: the page's skeleton
+
+These elements describe the major regions of a page. A screen-reader
+user can jump straight to any of them:
+
+| Element | Region |
+| --- | --- |
+| `<header>` | Top-of-page or top-of-section intro |
+| `<nav>` | A block of navigation links |
+| `<main>` | The primary content, one per page |
+| `<article>` | A self-contained piece (post, card, comment) |
+| `<section>` | A thematic grouping, usually with a heading |
+| `<aside>` | Tangential content (sidebar, callout) |
+| `<footer>` | Bottom-of-page or bottom-of-section info |
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; }
+      header, footer { background: #0f172a; color: white; padding: 1rem; }
+      nav a { color: #93c5fd; margin-right: 1rem; }
+      main { padding: 1.5rem; }
+      article { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>PixelPress</strong>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Blog</a>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h1>Semantic tags tell a story</h1>
+        <p>A screen reader can announce "main", "navigation", "article".</p>
+      </article>
+    </main>
+    <footer>© 2026 PixelPress</footer>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Visually this looks the same as `<div>`s with classes, but the
+*meaning* is now baked in.
+
+## Headings are an outline, not sizes
+
+`<h1>`–`<h6>` form the page's table of contents. Don't skip levels to
+get a smaller font (that's CSS's job) and don't use two `<h1>`s to
+mean two unrelated things. Assistive tech builds a navigable outline
+from these, so getting the order right is an accessibility feature,
+not a style choice.
+
+## Labels make forms usable
+
+Every form control needs a **label** tied to it. The reliable way:
+give the input an `id` and point a `<label for="...">` at it. Now
+clicking the label focuses the input, and screen readers announce the
+two together.
+
+```html
+<label for="email">Email</label>
+<input id="email" type="email" />
+```
+
+<Callout type="info" title="The one-line accessibility test">
+Try to use your page with the keyboard alone: `Tab` to move between
+links and controls, `Enter`/`Space` to activate them. If you can't
+reach something, neither can a lot of your users.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Give the page real structure"
+  instructions={`Rebuild this blog snippet with semantic landmarks:
+
+1. Wrap the nav links in a \`<nav>\` element.
+2. Put the post inside an \`<article>\` that lives inside a \`<main>\`.
+3. Give the search box a \`<label for="q">\` whose text is **Search** and make sure the input has \`id="q"\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <div class="links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </div>
+
+    <!-- Wrap this post in <main> and <article> -->
+    <h1>Hello world</h1>
+    <p>My first post.</p>
+
+    <!-- Add a <label for="q"> for this input -->
+    <input id="q" type="search" />
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <body>
+    <nav class="links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </nav>
+
+    <main>
+      <article>
+        <h1>Hello world</h1>
+        <p>My first post.</p>
+      </article>
+    </main>
+
+    <label for="q">Search</label>
+    <input id="q" type="search" />
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "nav",
+      name: "The links are inside a <nav>",
+      code: `const nav = document.querySelector("nav");
+if (!nav) throw new Error("Wrap the links in a <nav> element.");
+if (nav.querySelectorAll("a").length < 2) {
+  throw new Error("Both links should live inside the <nav>.");
+}`,
+    },
+    {
+      id: "main_article",
+      name: "The post is a <main> > <article>",
+      code: `const article = document.querySelector("main article");
+if (!article) throw new Error("Put the post inside <main> then <article>.");
+if (!article.querySelector("h1")) {
+  throw new Error("The <h1> should be inside the <article>.");
+}`,
+    },
+    {
+      id: "label",
+      name: "The search input has a linked <label>",
+      code: `const label = document.querySelector('label[for="q"]');
+if (!label) throw new Error('Add a <label for="q">.');
+if (!/search/i.test(label.textContent || "")) {
+  throw new Error("The label text should be 'Search'.");
+}
+const input = document.getElementById("q");
+if (!input) throw new Error('The input must keep id="q".');`,
+    },
+  ]}
+/>
+
+Your HTML now carries meaning. Time to make it beautiful, starting
+with [Getting Started with CSS](/courses/intro-web-development/css-getting-started).

@@ -1,0 +1,225 @@
+---
+title: Effects and Data Fetching
+description: useEffect for side effects, the dependency array, cleanup, and the load-data-on-mount pattern.
+---
+
+Rendering should be **pure**: given the same props and state, a
+component returns the same JSX and touches nothing else. But real apps
+need to reach *outside* the component too, fetch data, start a timer,
+subscribe to something. Those are **side effects**, and `useEffect` is
+where they belong.
+
+## useEffect basics
+
+`useEffect(fn, deps)` runs `fn` *after* the component renders. The
+**dependency array** controls how often:
+
+| Deps | Effect runs |
+| --- | --- |
+| `[]` (empty) | once, after the first render (on "mount") |
+| `[a, b]` | after mount, and whenever `a` or `b` changes |
+| *omitted* | after **every** render (rarely what you want) |
+
+This timer starts once on mount and cleans itself up, note the
+returned function, React calls it to tear the effect down:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+function Clock() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id); // cleanup on unmount
+  }, []); // [] → set up the interval once
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>{seconds}s elapsed</h1>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Clock />);
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="Cleanup prevents leaks">
+If your effect starts something ongoing, an interval, a subscription,
+an event listener, return a function that stops it. React runs that
+cleanup before re-running the effect and when the component unmounts.
+Forget it and you'll stack up duplicate timers and listeners.
+</Callout>
+
+## Fetching data on mount
+
+The classic use of `useEffect([])` is loading data when a component
+first appears. The shape is always the same: a `loading` flag, a
+`data` state, and an effect that fetches and fills them in.
+
+```tsx
+useEffect(() => {
+  let active = true;
+  fetch("/api/posts")
+    .then((res) => res.json())
+    .then((data) => { if (active) setPosts(data); });
+  return () => { active = false; }; // ignore a late response
+}, []);
+```
+
+The `active` flag is a common guard: if the component unmounts (or the
+inputs change) before the request finishes, you skip the now-stale
+`setState`. Below, a stand-in `loadPosts()` resolves local data so it
+runs offline, but the effect is identical to a real `fetch`:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+// Stand-in for a network request; resolves after a tick.
+function loadPosts(): Promise<string[]> {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(["Hello world", "React is fun", "Effects!"]), 300),
+  );
+}
+
+function Feed() {
+  const [posts, setPosts] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    loadPosts().then(setPosts);
+  }, []);
+
+  if (posts === null) return <p style={{ fontFamily: "system-ui" }}>Loading…</p>;
+
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {posts.map((p, i) => (
+        <li key={i}>{p}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Feed />);
+`,
+    },
+  ]}
+/>
+
+Run it: "Loading…" shows first, then the effect resolves and the list
+appears. That "null means loading, array means loaded" pattern covers
+most data-fetching UIs.
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Load the user list on mount"
+  instructions={`The \`Users\` component shows "Loading…" forever because its effect is empty. Fix it:
+
+1. In the \`useEffect\`, call \`loadUsers()\` and pass its result to \`setUsers\` (\`loadUsers().then(setUsers)\`).
+2. Keep the dependency array \`[]\` so it runs once.
+
+Once loaded, the three names should render as \`<li>\`s and "Loading…" should disappear.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+function loadUsers(): Promise<string[]> {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(["Ada", "Grace", "Linus"]), 200),
+  );
+}
+
+function Users() {
+  const [users, setUsers] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    // TODO: load the users and store them in state
+  }, []);
+
+  if (users === null) return <p>Loading…</p>;
+
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {users.map((u, i) => (
+        <li key={i}>{u}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Users />);
+`,
+      solutionCode: `import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+function loadUsers(): Promise<string[]> {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(["Ada", "Grace", "Linus"]), 200),
+  );
+}
+
+function Users() {
+  const [users, setUsers] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    loadUsers().then(setUsers);
+  }, []);
+
+  if (users === null) return <p>Loading…</p>;
+
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {users.map((u, i) => (
+        <li key={i}>{u}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Users />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "loads",
+      name: "The three users appear after loading",
+      code: `// Wait for the simulated request (200ms) plus React's render.
+await new Promise((r) => setTimeout(r, 500));
+const texts = Array.from(document.querySelectorAll("li")).map((li) => (li.textContent || "").trim());
+for (const expected of ["Ada", "Grace", "Linus"]) {
+  if (!texts.includes(expected)) {
+    throw new Error("Expected user '" + expected + "' after loading. Got: " + texts.join(", "));
+  }
+}`,
+    },
+    {
+      id: "loading_gone",
+      name: "The Loading… message is replaced",
+      code: `if (/loading/i.test(document.body.textContent || "")) {
+  throw new Error("Once data loads, 'Loading…' should no longer be shown, did you call setUsers?");
+}`,
+    },
+  ]}
+/>
+
+Effects connect React to the outside world. The last two ideas are
+about keeping code tidy as it grows, starting with
+[Composition and children](/courses/react-from-the-ground-up/composition-and-children).

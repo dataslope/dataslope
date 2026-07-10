@@ -1,0 +1,203 @@
+---
+title: The Box Model and Sizing
+description: Content, padding, border, margin, and why box-sizing border-box is the setting every project turns on.
+---
+
+Every element on a page is a rectangular **box**. Layout is the art of
+sizing and spacing those boxes, and it all starts with the four layers
+of the box model.
+
+## The four layers
+
+From the inside out:
+
+1. **Content**, the text or image itself.
+2. **Padding**, space *inside* the box, between content and border.
+   Shares the background.
+3. **Border**, a line around the padding.
+4. **Margin**, space *outside* the box, pushing other boxes away.
+   Always transparent.
+
+```text
+┌─────────── margin ───────────┐
+│  ┌──────── border ────────┐  │
+│  │  ┌───── padding ────┐  │  │
+│  │  │     content      │  │  │
+│  │  └──────────────────┘  │  │
+│  └────────────────────────┘  │
+└──────────────────────────────┘
+```
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="box">I have padding, a border, and margin.</div>
+    <div class="box">So do I, watch the space between us.</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.box {
+  padding: 20px;              /* space inside */
+  border: 3px solid #6366f1; /* the line */
+  margin: 16px;              /* space outside */
+  background: #eef2ff;
+}
+`,
+    },
+  ]}
+/>
+
+Change each of `padding`, `border`, and `margin` one at a time and
+watch which space grows, inside the tint, on the line, or between the
+boxes.
+
+## `box-sizing`: the one setting everyone changes
+
+By default (`box-sizing: content-box`), `width` sets the **content**
+width, and padding and border are *added on top*. So
+`width: 200px; padding: 20px; border: 2px` actually occupies **244px**.
+That surprises everyone and makes layouts hard to reason about.
+
+The fix is universal:
+
+```css
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+```
+
+Now `width` means the **total** width including padding and border. Set
+`width: 200px` and the box is 200px, full stop. Nearly every real
+project puts this rule at the top of its stylesheet.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="a">content-box: actually 240px wide</div>
+    <div class="b">border-box: exactly 200px wide</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.a, .b {
+  width: 200px;
+  padding: 20px;
+  border: 2px solid #333;
+  margin-bottom: 12px;
+  background: #f1f5f9;
+}
+
+.a { box-sizing: content-box; } /* width + padding + border = 244px */
+.b { box-sizing: border-box; }  /* total stays 200px */
+`,
+    },
+  ]}
+/>
+
+## Spacing gotchas
+
+- **Vertical margins collapse.** Two stacked boxes with `32px` and
+  `16px` vertical margins end up `32px` apart, not `48px`, the larger
+  one wins. This only happens vertically, and it's why many teams use
+  `gap` (flex/grid) or one-directional margins instead.
+- **`margin: 0 auto`** horizontally centers a block that has a set
+  width, the classic centered container.
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make width mean width"
+  entryFilename="index.html"
+  instructions={`The \`.card\` is set to \`width: 300px\` but renders wider because padding is added on top. Fix it in \`styles.css\`:
+
+1. Set \`box-sizing: border-box\` on \`.card\`.
+
+With that, the card's *total* rendered width should be exactly 300px, padding included.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="card">A card with padding.</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  width: 300px;
+  padding: 24px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  /* 1. add box-sizing here */
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  width: 300px;
+  padding: 24px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "border_box",
+      name: ".card uses border-box sizing",
+      code: `const s = getComputedStyle(document.querySelector(".card"));
+if (s.boxSizing !== "border-box") {
+  throw new Error("Set box-sizing: border-box on .card, got " + s.boxSizing + ".");
+}`,
+    },
+    {
+      id: "total_width",
+      name: "The card's total width is exactly 300px",
+      code: `const card = document.querySelector(".card");
+if (card.offsetWidth !== 300) {
+  throw new Error("With border-box, the card should be 300px wide including padding. Got " + card.offsetWidth + "px.");
+}`,
+    },
+  ]}
+/>
+
+Boxes sized and spaced. Now the engines that arrange them, starting
+with [Flexbox in depth](/courses/modern-css-layout/flexbox-deep-dive).

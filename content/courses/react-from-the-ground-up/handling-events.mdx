@@ -1,0 +1,189 @@
+---
+title: Handling Events
+description: onClick and friends, passing arguments to handlers, the event object, and lifting state up.
+---
+
+React elements accept event handlers as props: `onClick`,
+`onChange`, `onSubmit`, `onMouseEnter`, and so on. You hand them a
+**function**, and React calls it when the event fires.
+
+## Handlers are functions you pass, not call
+
+```tsx
+<button onClick={handleClick}>Go</button>   // ✅ pass the function
+<button onClick={handleClick()}>Go</button>  // ❌ calls it during render
+```
+
+The second line runs `handleClick` immediately while rendering and
+passes its *return value* as the handler, a very common early
+mistake. When you need to pass arguments, wrap it in an arrow function
+so the call is deferred until the click:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Palette() {
+  const [color, setColor] = useState("white");
+  const colors = ["tomato", "gold", "mediumseagreen", "cornflowerblue"];
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        {colors.map((c) => (
+          // arrow function defers the call until the click
+          <button key={c} onClick={() => setColor(c)}>
+            {c}
+          </button>
+        ))}
+      </div>
+      <div style={{ height: 80, borderRadius: 10, background: color }} />
+      <p>Selected: {color}</p>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Palette />);
+`,
+    },
+  ]}
+/>
+
+## The event object
+
+Handlers receive an **event** object with details about what happened,
+and methods like `preventDefault()`. For inputs, `event.target.value`
+is the current text:
+
+```tsx
+<input onChange={(event) => console.log(event.target.value)} />
+```
+
+We'll lean on that in the next lesson on forms.
+
+## Lifting state up
+
+When two components need to share state, put the state in their
+**closest common parent** and pass it down: the value as a prop, and a
+setter (or a callback) as another prop. The child reports events *up*
+by calling the callback; the parent owns the truth. This is the
+standard way sibling components stay in sync.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+// Child reports clicks up via the onVote callback prop.
+function VoteButton({ label, onVote }: { label: string; onVote: () => void }) {
+  return <button onClick={onVote}>{label}</button>;
+}
+
+// Parent owns the counts.
+function Poll() {
+  const [up, setUp] = useState(0);
+  const [down, setDown] = useState(0);
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>👍 {up} · 👎 {down}</h1>
+      <VoteButton label="Upvote" onVote={() => setUp(up + 1)} />{" "}
+      <VoteButton label="Downvote" onVote={() => setDown(down + 1)} />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Poll />);
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Wire up a stepper"
+  instructions={`The stepper has two buttons but neither works yet.
+
+1. The **+** button should increase \`count\` by 1.
+2. The **−** button should decrease \`count\` by 1.
+3. Keep the current \`count\` shown inside the \`<h1>\` (format: \`Count: 2\`).`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Stepper() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button id="dec">−</button>{" "}
+      <button id="inc">+</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Stepper />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Stepper() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button id="dec" onClick={() => setCount(count - 1)}>−</button>{" "}
+      <button id="inc" onClick={() => setCount(count + 1)}>+</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Stepper />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "increment",
+      name: "The + button increments",
+      code: `const inc = document.querySelector("#inc");
+if (!inc) throw new Error("Keep the #inc button.");
+inc.click();
+inc.click();
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if (!/count:\\s*2/i.test(h1.textContent || "")) {
+  throw new Error("Two clicks on + should reach 'Count: 2'. Got: " + h1.textContent);
+}`,
+    },
+    {
+      id: "decrement",
+      name: "The − button decrements",
+      code: `const dec = document.querySelector("#dec");
+if (!dec) throw new Error("Keep the #dec button.");
+dec.click();
+dec.click();
+dec.click();
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if (!/count:\\s*-1/i.test(h1.textContent || "")) {
+  throw new Error("From 2, three clicks on - should reach 'Count: -1'. Got: " + h1.textContent);
+}`,
+    },
+  ]}
+/>
+
+Events drive state changes. The richest source of events is form
+input, up next: [Forms and controlled inputs](/courses/react-from-the-ground-up/forms-and-controlled-inputs).

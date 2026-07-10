@@ -1,0 +1,172 @@
+---
+title: "HTML: Images and Media"
+description: Putting pictures, figures, and video on a page, and why every image needs alt text.
+---
+
+Text-only pages are rare. This lesson adds the media elements you'll
+reach for constantly: images, captioned figures, and embedded video.
+
+## The image element
+
+`<img>` is a **void element**, it has no closing tag and no content
+of its own. Two attributes matter most:
+
+- **`src`**, where the image lives (a URL or a file path).
+- **`alt`**, a text description read aloud by screen readers and shown
+  if the image fails to load.
+
+```html
+<img src="https://picsum.photos/240/160" alt="A random placeholder photo" />
+```
+
+<Callout type="warn" title="alt is not optional">
+Every content image needs an `alt`. Write what the image *shows*, not
+"image of…". For a purely decorative image, use an empty `alt=""` so
+screen readers skip it, that's a deliberate signal, not a missing
+attribute.
+</Callout>
+
+Try editing the `alt` text and the dimensions below, then Run:
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      img { border-radius: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>A photo</h1>
+    <img
+      src="https://picsum.photos/id/1025/320/200"
+      alt="A pug wrapped in a blanket"
+      width="320"
+      height="200"
+    />
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+Setting `width` and `height` (or the CSS equivalents) lets the browser
+reserve space before the image loads, so the page doesn't jump around
+as pictures arrive.
+
+## Figures and captions
+
+When an image needs a caption, wrap it in `<figure>` and add a
+`<figcaption>`. This ties the caption to the image *semantically*, not
+just visually:
+
+```html
+<figure>
+  <img src="chart.png" alt="Revenue rising each quarter" />
+  <figcaption>Quarterly revenue, 2024</figcaption>
+</figure>
+```
+
+## Audio and video
+
+`<audio>` and `<video>` embed media with built-in controls. Add the
+`controls` attribute so the browser draws a play button, scrubber, and
+volume slider:
+
+<CodeBlock
+  adapter="web"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      video { max-width: 100%; border-radius: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>An embedded video</h1>
+    <video
+      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+      controls
+      width="480"
+    ></video>
+    <p>The <code>controls</code> attribute draws the play/pause UI.</p>
+  </body>
+</html>
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Add an accessible figure"
+  instructions={`Build a captioned figure inside the \`<body>\`:
+
+1. Add a \`<figure>\` element.
+2. Inside it, add an \`<img>\` whose \`alt\` text is exactly **A sunlit mountain lake** (the \`src\` can be any URL).
+3. Also inside the figure, add a \`<figcaption>\` containing the word **Lake**.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <!-- Build the figure here -->
+  </body>
+</html>
+`,
+      solutionCode: `<!doctype html>
+<html>
+  <body>
+    <figure>
+      <img src="https://picsum.photos/320/200" alt="A sunlit mountain lake" />
+      <figcaption>Lake Louise at dawn</figcaption>
+    </figure>
+  </body>
+</html>
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "figure",
+      name: "There is a <figure> on the page",
+      code: `if (!document.querySelector("figure")) {
+  throw new Error("Add a <figure> element.");
+}`,
+    },
+    {
+      id: "img_alt",
+      name: "The figure contains an <img> with the right alt text",
+      code: `const img = document.querySelector("figure img");
+if (!img) throw new Error("Put an <img> inside the <figure>.");
+if ((img.getAttribute("alt") || "").trim() !== "A sunlit mountain lake") {
+  throw new Error("The img alt should be exactly 'A sunlit mountain lake'. Got: " + img.getAttribute("alt"));
+}`,
+    },
+    {
+      id: "figcaption",
+      name: "The figure has a <figcaption> mentioning Lake",
+      code: `const cap = document.querySelector("figure figcaption");
+if (!cap) throw new Error("Add a <figcaption> inside the <figure>.");
+if (!/lake/i.test(cap.textContent || "")) {
+  throw new Error("The <figcaption> should mention the word 'Lake'.");
+}`,
+    },
+  ]}
+/>
+
+Pages have structure and media now. Next, collecting input from
+visitors with [forms](/courses/intro-web-development/html-forms).

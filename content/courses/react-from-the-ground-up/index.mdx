@@ -1,0 +1,88 @@
+---
+title: Welcome
+description: Learn React one idea at a time, components, props, state, and hooks, with every lesson compiling live TSX in your browser.
+---
+
+Welcome to **React from the Ground Up**. React is the most widely used
+way to build user interfaces on the web, and underneath its reputation
+it's built on a handful of small, learnable ideas. This course
+introduces them one at a time, and every lesson runs.
+
+<Callout type="info" title="Who this course is for">
+You should be comfortable with JavaScript, variables, functions,
+arrays, objects, and `map`/`filter`. If those feel shaky, the
+[Beginner's Guide to JavaScript](/courses/beginners-javascript) is the
+place to start. Having seen the React teaser in
+[Intro to Web Development](/courses/intro-web-development) helps but
+isn't required. We use **TypeScript** (TSX) throughout; you'll pick up
+the small amount of type syntax as we go.
+</Callout>
+
+## The one idea React is built on
+
+Before React, building interactive pages meant *manually* keeping the
+screen in sync with your data: change a variable, then remember to
+find the right DOM node and update it too. Miss one and the display
+drifts from reality. React's core promise removes that whole class of
+bug:
+
+> **Describe what the UI should look like for any given state. When the
+> state changes, React re-renders it for you.**
+
+Your job becomes writing a function from *data* to *UI*. React handles
+the DOM.
+
+## Every lesson runs in your browser
+
+The code blocks below are live. Editing TSX and pressing **Run**
+compiles it with esbuild in a Web Worker and renders the result in a
+sandboxed preview, no build tools, no `npm install`. The first Run
+downloads the ~3&nbsp;MB compiler once.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function App() {
+  const [name, setName] = useState("world");
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Hello, {name}!</h1>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Type a name"
+      />
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+Type in the box. The heading updates on every keystroke, and you never
+wrote a single line to update the DOM. That's the whole course in
+miniature: **state changes, UI follows.**
+
+## What you'll learn
+
+1. **Thinking in React**, the mental model that makes everything else
+   click.
+2. **Components and JSX**, the building blocks and the syntax.
+3. **Props**, passing data into components.
+4. **Rendering lists**, turning arrays into UI, and the role of `key`.
+5. **State with `useState`**, giving components memory.
+6. **Handling events** and **controlled forms**, reading user input.
+7. **Effects and data fetching** with `useEffect`.
+8. **Composition** and **custom hooks**, the two ways React code scales.
+9. **A capstone todo app** tying it all together.
+
+Ready? Start with [Thinking in React](/courses/react-from-the-ground-up/thinking-in-react).

@@ -1,0 +1,200 @@
+---
+title: Positioning and Stacking
+description: static, relative, absolute, fixed, and sticky, plus z-index and stacking contexts.
+---
+
+Most elements sit in the **normal flow**, one after another. The
+`position` property lets you lift an element out of that flow, or nudge
+it within it, for overlays, badges, sticky headers, and tooltips.
+
+## The five positioning modes
+
+| Value | In flow? | Positioned relative to | Typical use |
+| --- | --- | --- | --- |
+| `static` | yes | nothing (default) | ordinary elements |
+| `relative` | yes | its own normal spot | nudging; anchoring children |
+| `absolute` | no | nearest *positioned* ancestor | badges, dropdowns |
+| `fixed` | no | the viewport | sticky nav, back-to-top |
+| `sticky` | yes, then pins | scroll container | section headers |
+
+## relative + absolute: the anchor pattern
+
+The workhorse combination: a parent set to `position: relative` becomes
+the **positioning context**, and an `absolute` child is placed inside
+it with `top`/`right`/`bottom`/`left`.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="avatar">
+      <img src="https://picsum.photos/80" alt="User" width="80" height="80" />
+      <span class="status"></span>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.avatar {
+  position: relative;    /* anchor for .status */
+  width: 80px;
+}
+.avatar img { border-radius: 999px; display: block; }
+
+.status {
+  position: absolute;    /* placed against .avatar */
+  bottom: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #22c55e;    /* online */
+  border: 2px solid white;
+}
+`,
+    },
+  ]}
+/>
+
+Remove `position: relative` from `.avatar` and the dot flies to the
+corner of the *page*, because the nearest positioned ancestor becomes
+the viewport. That anchor relationship is the entire trick.
+
+## `sticky`: in-flow until it isn't
+
+`position: sticky` is a hybrid: the element scrolls normally until it
+reaches a threshold (say `top: 0`), then it "sticks" there while the
+rest of the content scrolls past. It's how section headers and table
+headers stay visible with a single line of CSS, no JavaScript.
+
+```css
+.section-header { position: sticky; top: 0; background: white; }
+```
+
+## `z-index` and stacking
+
+When positioned elements overlap, **`z-index`** decides who's on top,
+higher numbers sit in front. Two things trip people up:
+
+- `z-index` only affects **positioned** elements (not `static` ones).
+- A positioned element with a `z-index` creates a **stacking context**:
+  its children's `z-index` values are compared only *within* it, not
+  against the rest of the page. A child's `z-index: 9999` can't escape
+  a parent that sits behind something else.
+
+<Callout type="info" title="When z-index 'doesn't work'">
+Nine times out of ten it's one of the two rules above: the element
+isn't positioned (add `position: relative`), or it's trapped in a
+parent stacking context. Check the ancestor chain before inflating the
+number.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Pin a notification badge above everything"
+  entryFilename="index.html"
+  instructions={`Finish \`styles.css\` for the bell icon and its count badge:
+
+1. Give \`.bell\` \`position: relative\` so it anchors the badge.
+2. Give \`.count\` \`position: absolute\`, pin it with \`top: -6px\` and \`right: -6px\`, and set \`z-index: 5\` so it sits above the icon.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bell">
+      🔔
+      <span class="count">3</span>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.bell {
+  /* 1. positioning context */
+  font-size: 2rem;
+  display: inline-block;
+}
+
+.count {
+  /* 2. absolute, top: -6px, right: -6px, z-index: 5 */
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.bell {
+  position: relative;
+  font-size: 2rem;
+  display: inline-block;
+}
+
+.count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 5;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "anchor",
+      name: ".bell is the positioning context",
+      code: `const s = getComputedStyle(document.querySelector(".bell"));
+if (s.position !== "relative") throw new Error("Set position: relative on .bell, got " + s.position + ".");`,
+    },
+    {
+      id: "badge_absolute",
+      name: ".count is absolutely pinned",
+      code: `const s = getComputedStyle(document.querySelector(".count"));
+if (s.position !== "absolute") throw new Error("Set position: absolute on .count, got " + s.position + ".");
+if (s.top !== "-6px" || s.right !== "-6px") {
+  throw new Error("Pin .count with top: -6px and right: -6px. Got top " + s.top + ", right " + s.right + ".");
+}`,
+    },
+    {
+      id: "on_top",
+      name: ".count has a z-index of 5",
+      code: `const s = getComputedStyle(document.querySelector(".count"));
+if (s.zIndex !== "5") throw new Error("Set z-index: 5 on .count, got " + s.zIndex + ".");`,
+    },
+  ]}
+/>
+
+You can place anything anywhere. Now let's make those layouts adapt to
+any screen: [Responsive design](/courses/modern-css-layout/responsive-design).

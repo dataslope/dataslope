@@ -1,0 +1,64 @@
+---
+title: Next Steps
+description: Where React goes from here, the playground, ecosystem, and deeper courses.
+---
+
+You've built React up from a single idea, *UI is a function of
+state*, to a working multi-file app. Every core concept you'll use
+daily is now in your toolkit: components, JSX, props, state, events,
+effects, composition, and custom hooks.
+
+## Keep building in the playground
+
+Everything here also exists as a full-page
+[React playground](/playground/react) with multi-file tabs and npm
+imports via esm.sh. Try pulling in a real package:
+
+```tsx
+import confetti from "canvas-confetti";
+// ...then call confetti() from a button's onClick
+```
+
+Weekend-sized projects to cement the ideas:
+
+1. **A tip calculator**, controlled inputs for bill and percentage,
+   derived total. Pure state and derivation.
+2. **A markdown note-taker**, a textarea in state, rendered preview
+   beside it. Add `useLocalStorage` so notes survive a refresh.
+3. **A GitHub user card**, fetch a username's public profile in a
+   `useEffect` and render it, loading and error states included.
+
+## What comes next in real React
+
+This course covered the timeless core. A few things you'll meet on a
+real project, each an extension of what you already know:
+
+- **`useReducer` and context**, for state that's too big or too shared
+  for scattered `useState` calls.
+- **A router** (like React Router), mapping URLs to components.
+- **A framework** (like **Next.js**), adding routing, data loading,
+  and server rendering around React. DataSlope itself is built on it.
+- **Data-fetching libraries** (TanStack Query), which turn the
+  load-on-mount pattern into caching, refetching, and more.
+
+## Strengthen the foundations
+
+- [TypeScript from Scratch](/courses/typescript-from-scratch) deepens
+  the typing you used for props and state throughout this course.
+- [Functional Programming with TypeScript](/courses/functional-programming-typescript)
+  explores the immutability and composition ideas React is built on.
+- [Modern CSS: Layout & Responsive Design](/courses/modern-css-layout)
+  pairs perfectly, React handles behavior, CSS handles the look.
+
+## The habits that matter
+
+Three things to carry into every component you write:
+
+1. **UI is a function of state.** Describe the result; let React sync
+   the DOM.
+2. **State flows down, events flow up.** Own state at the lowest
+   common parent and pass callbacks to children.
+3. **Never mutate state or props.** Create new values so React can see
+   the change.
+
+Happy building!

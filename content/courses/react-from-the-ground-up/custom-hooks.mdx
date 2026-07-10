@@ -1,0 +1,167 @@
+---
+title: Custom Hooks
+description: Extracting reusable stateful logic into your own use-prefixed functions.
+---
+
+Composition reuses *markup*. **Custom hooks** reuse *logic*, the
+`useState` and `useEffect` wiring that would otherwise be copy-pasted
+between components. A custom hook is just a function whose name starts
+with `use` and that calls other hooks.
+
+## From duplicated logic to a hook
+
+Say two components both track a boolean that flips, a menu, a modal,
+an accordion. Instead of repeating the `useState` + toggle in each,
+extract it:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+// A custom hook: reusable state + behavior, no markup.
+function useToggle(initial: boolean) {
+  const [on, setOn] = useState(initial);
+  const toggle = () => setOn((prev) => !prev);
+  return { on, toggle };
+}
+
+function App() {
+  const menu = useToggle(false);
+  const details = useToggle(true);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <button onClick={menu.toggle}>Menu is {menu.on ? "open" : "closed"}</button>
+      {menu.on && <p>🍔 Menu contents</p>}
+      <hr />
+      <button onClick={details.toggle}>
+        Details are {details.on ? "shown" : "hidden"}
+      </button>
+      {details.on && <p>📋 Extra details</p>}
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+Two independent toggles, one shared implementation. Each call to
+`useToggle` gets its *own* state, hooks are functions, not globals.
+The rules that make this work:
+
+- **Only call hooks at the top level** of a component or another hook,
+  never inside loops, conditions, or nested functions.
+- **Only call hooks from React functions**, components or custom
+  hooks, not plain helpers.
+- **Name them `useSomething`**, the `use` prefix is how React (and its
+  linter) recognizes a hook.
+
+## Hooks can use effects too
+
+A custom hook can bundle `useEffect` as well, which is how the
+ecosystem ships things like `useLocalStorage`, `useFetch`, or
+`useWindowSize`. The component that uses them stays clean:
+
+```tsx
+function useNow(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+// In a component: const now = useNow();
+```
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Write a useCounter hook"
+  instructions={`Extract counter logic into a custom hook.
+
+1. Implement \`useCounter\` so it holds a \`count\` state (start at \`0\`) and returns an object \`{ count, increment }\`.
+2. \`increment\` should raise \`count\` by 1.
+3. The \`Counter\` component already destructures \`{ count, increment }\` from \`useCounter()\` and wires them to the \`<h1>\` and \`<button>\`, so once the hook works, clicking counts up.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function useCounter() {
+  // TODO: hold count state and return { count, increment }
+  return { count: 0, increment: () => {} };
+}
+
+function Counter() {
+  const { count, increment } = useCounter();
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>+1</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function useCounter() {
+  const [count, setCount] = useState(0);
+  const increment = () => setCount((prev) => prev + 1);
+  return { count, increment };
+}
+
+function Counter() {
+  const { count, increment } = useCounter();
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>+1</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Counter />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "initial",
+      name: "Starts at Count: 0",
+      code: `const h1 = document.querySelector("h1");
+if (!/count:\\s*0/i.test(h1?.textContent || "")) {
+  throw new Error("Before clicking, the heading should read 'Count: 0'. Got: " + h1?.textContent);
+}`,
+    },
+    {
+      id: "increments",
+      name: "The hook's increment counts up",
+      code: `const button = document.querySelector("button");
+button.click();
+button.click();
+button.click();
+await new Promise((r) => setTimeout(r, 80));
+const h1 = document.querySelector("h1");
+if (!/count:\\s*3/i.test(h1?.textContent || "")) {
+  throw new Error("Three clicks should reach 'Count: 3' via the hook. Got: " + h1?.textContent);
+}`,
+    },
+  ]}
+/>
+
+That's the full toolkit, components, props, state, events, effects,
+composition, and hooks. Time to build something real:
+[a Todo app](/courses/react-from-the-ground-up/project-todo-app).

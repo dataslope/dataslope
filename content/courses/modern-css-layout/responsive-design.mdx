@@ -1,0 +1,224 @@
+---
+title: Responsive Design
+description: Fluid units, clamp(), media queries, and mobile-first thinking for layouts that fit any screen.
+---
+
+A responsive layout isn't a separate "mobile site", it's *one* layout
+that adapts. The craft has two halves: make things **fluid** by
+default, and **change the layout** at breakpoints where fluid alone
+isn't enough.
+
+## Fluid by default
+
+Before any media query, prefer units that flex with the viewport:
+
+- **`%` / `fr` / `auto`** so boxes share available space.
+- **`max-width`** to cap a container on big screens without forcing a
+  width on small ones: `width: 100%; max-width: 60rem;`.
+- **`rem`** for type, so everything scales from one root size.
+- **`min()`, `max()`, `clamp()`** for values that adapt within limits.
+
+`clamp(min, preferred, max)` is the star: a value that grows with the
+screen but never past a floor or ceiling. One line replaces several
+font-size media queries:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Fluid type scales with the viewport</h1>
+      <p>The container caps its width; the heading uses clamp().</p>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 0; }
+
+.wrap {
+  width: 100%;
+  max-width: 40rem;     /* never wider than 40rem */
+  margin: 0 auto;       /* centered */
+  padding: 2rem 1rem;
+}
+
+.wrap h1 {
+  /* grows between 1.5rem and 3rem as the screen widens */
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+`,
+    },
+  ]}
+/>
+
+Drag the preview wider and narrower: the heading resizes smoothly and
+the text column stays a comfortable width. No breakpoints yet.
+
+## Media queries: change the layout
+
+When a layout needs to *restructure*, not just resize, a **media
+query** applies rules only when a condition holds:
+
+```css
+@media (min-width: 640px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+```
+
+The width you switch at is a **breakpoint**. Choose breakpoints where
+*your content* breaks, not by chasing specific device sizes.
+
+## Mobile-first
+
+Write the **small-screen** layout as the base with no query, then add
+complexity for wider screens using `min-width`:
+
+```css
+.cards { grid-template-columns: 1fr; }          /* phones: one column */
+
+@media (min-width: 640px) {
+  .cards { grid-template-columns: 1fr 1fr; }     /* tablets: two */
+}
+@media (min-width: 960px) {
+  .cards { grid-template-columns: repeat(3, 1fr); } /* desktop: three */
+}
+```
+
+This tends to produce simpler CSS: the base case is the most
+constrained, and each query only *adds*. It also means the smallest,
+often slowest, devices get the least CSS to process.
+
+<Callout type="info" title="Don't forget the viewport meta tag">
+Responsive CSS does nothing without `<meta name="viewport"
+content="width=device-width, initial-scale=1" />` in the `<head>`.
+Without it, phones render the page at desktop width and shrink it,
+your media queries never trigger.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Go two-up on wider screens (mobile-first)"
+  entryFilename="index.html"
+  instructions={`The base layout is a single column (mobile-first). Add the wider-screen enhancement in \`styles.css\`:
+
+1. Add a \`@media (min-width: 600px)\` block.
+2. Inside it, set \`.features\` to **two columns** with \`grid-template-columns: 1fr 1fr\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="features">
+      <div class="feature">Fast</div>
+      <div class="feature">Secure</div>
+      <div class="feature">Simple</div>
+      <div class="feature">Open</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+/* Base (mobile-first): a single column */
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.feature {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 10px;
+}
+
+/* Add your min-width media query below */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+/* Base (mobile-first): a single column */
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.feature {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 10px;
+}
+
+@media (min-width: 600px) {
+  .features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "min_width_query",
+      name: "There is a min-width media query",
+      code: `let found = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type === 4 && /min-width/i.test(rule.conditionText || rule.media?.mediaText || "")) {
+      found = true;
+    }
+  }
+}
+if (!found) throw new Error("Add a @media (min-width: 600px) query.");`,
+    },
+    {
+      id: "two_columns",
+      name: "The query sets .features to two columns",
+      code: `let ok = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type !== 4) continue;
+    for (const inner of Array.from(rule.cssRules || [])) {
+      const css = inner.style?.cssText || inner.cssText || "";
+      if (/\\.features/.test(inner.selectorText || "") &&
+          /grid-template-columns:\\s*(1fr\\s+1fr|repeat\\(\\s*2)/.test(css)) {
+        ok = true;
+      }
+    }
+  }
+}
+if (!ok) throw new Error("Inside the media query, set .features { grid-template-columns: 1fr 1fr }.");`,
+    },
+  ]}
+/>
+
+One layout, every screen. Next, the modern way to keep a design
+system consistent: [Custom properties](/courses/modern-css-layout/custom-properties).

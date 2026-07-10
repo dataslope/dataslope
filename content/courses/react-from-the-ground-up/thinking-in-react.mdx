@@ -1,0 +1,102 @@
+---
+title: Thinking in React
+description: The mental model, UI as a function of state, declarative rendering, and one-way data flow.
+---
+
+React is less a set of features than a *way of thinking* about UIs.
+Get the mental model first and the API will feel obvious. Three ideas
+carry almost everything.
+
+## 1. UI is a function of state
+
+Picture your app as a function: give it the current data (**state**),
+and it returns what the screen should look like. Same state in, same
+screen out.
+
+```text
+UI = f(state)
+```
+
+You don't write "when the count increases, find the heading and change
+its text". You write "the heading shows the count", and let React
+figure out the DOM updates when the count changes.
+
+## 2. Declarative, not imperative
+
+Compare the two styles for a counter:
+
+```js
+// Imperative (vanilla JS): you list the steps to mutate the DOM
+count += 1;
+document.querySelector("#label").textContent = "Count: " + count;
+```
+
+```tsx
+// Declarative (React): you describe the result for a given state
+<h1>Count: {count}</h1>
+```
+
+In the imperative version, the variable and the display are two things
+you must keep in sync by hand. In React the display *is* an expression
+in `count`, so it can never fall out of sync.
+
+## 3. Data flows one way (down)
+
+Data moves **down** the component tree through props: a parent hands
+values to its children. Children never reach up and mutate a parent.
+When something needs to change, a child calls a function the parent
+gave it, and the parent updates its own state. State changes then flow
+back down as new props. This "one-way data flow" makes an app's
+behavior easy to trace: to understand what a component shows, you only
+need to know the props and state it received.
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+// A child that only displays what it's given (a prop).
+function Display({ count }: { count: number }) {
+  return <h1>Count: {count}</h1>;
+}
+
+// The parent owns the state and passes it down.
+function App() {
+  const [count, setCount] = useState(0);
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Display count={count} />
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+`App` owns the `count` state; `Display` just renders whatever `count`
+it's handed. State down, events up, that shape repeats at every scale
+of a React app.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In React, what does it mean that "the UI is a function of state"?
+
+- You must call a function every time you want to change the DOM.
+- [o] For a given state, React produces a predictable UI, and re-renders it whenever the state changes.
+  > The rendered output is determined by the current state, so you describe the result and let React sync the DOM.
+- State can only be changed by directly editing the DOM.
+- Components must avoid using functions.
+
+Because the output is derived from state, you never manually keep the DOM and your data in sync, changing state is enough.`}
+/>
+
+With the mental model in place, let's meet the building blocks:
+[Components and JSX](/courses/react-from-the-ground-up/components-and-jsx).

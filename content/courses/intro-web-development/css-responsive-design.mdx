@@ -1,0 +1,219 @@
+---
+title: "CSS: Responsive Design"
+description: Making one page work on phones and desktops with fluid units, media queries, and mobile-first thinking.
+---
+
+Your page is viewed on a 6-inch phone and a 27-inch monitor, often the
+same day. **Responsive design** is the craft of one layout that adapts
+to both, no separate "mobile site" required.
+
+## Start with fluid units
+
+Half of responsiveness is just *not* hard-coding pixel widths:
+
+- **`%`, `fr`, `auto`** let boxes share available space.
+- **`max-width`** caps a box on big screens without forcing a width on
+  small ones: `max-width: 60rem; width: 100%`.
+- **`rem`** sizes type relative to the root, so everything scales
+  together.
+- **`vw`/`vh`** are percentages of the viewport itself.
+
+And one line every responsive page needs, in the HTML `<head>`, so
+phones don't pretend to be desktops:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+## Media queries: different rules at different sizes
+
+A **media query** applies CSS only when a condition holds, most often
+a width threshold (a **breakpoint**):
+
+```css
+/* base styles apply everywhere */
+.grid { grid-template-columns: repeat(3, 1fr); }
+
+/* override only on narrow screens */
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
+```
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grid">
+      <div class="box">A</div>
+      <div class="box">B</div>
+      <div class="box">C</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.box {
+  background: #dbeafe;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+/* Drag the preview narrower than 600px to see one column: */
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
+`,
+    },
+  ]}
+/>
+
+Drag the edge of the preview panel narrow and the three columns
+collapse into one stacked column. That's a breakpoint doing its job.
+
+## Mobile-first
+
+The habit most teams follow: write the **small-screen** layout as the
+base (no media query), then *add* complexity for larger screens with
+`min-width` queries. It tends to produce simpler CSS, the base case is
+the constrained one, and enhancements pile on only where there's room.
+
+<Callout type="info" title="You already met a query-free responsive trick">
+`grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))` from the
+Grid lesson reflows columns to fit any width, no media query at all.
+Reach for media queries when a layout needs to *change shape*, not
+just *fit*.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make the cards stack on phones"
+  entryFilename="index.html"
+  instructions={`Work in \`styles.css\`. The two-column layout is written. Add a media query so it collapses on small screens:
+
+1. Add a \`@media (max-width: 500px)\` block.
+2. Inside it, set \`.cards\` to \`grid-template-columns: 1fr\` (a single column).`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="cards">
+      <div class="card">Left</div>
+      <div class="card">Right</div>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card {
+  background: #f1f5f9;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 10px;
+}
+
+/* Add your @media (max-width: 500px) block below */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card {
+  background: #f1f5f9;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 10px;
+}
+
+@media (max-width: 500px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "has_media",
+      name: "There is a max-width media query",
+      code: `let found = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type === 4 && /max-width/i.test(rule.conditionText || rule.media?.mediaText || "")) {
+      found = true;
+    }
+  }
+}
+if (!found) throw new Error("Add a @media (max-width: 500px) query.");`,
+    },
+    {
+      id: "single_column",
+      name: "The query sets .cards to one column",
+      code: `let ok = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type !== 4) continue;
+    for (const inner of Array.from(rule.cssRules || [])) {
+      if (/\\.cards/.test(inner.selectorText || "") &&
+          /grid-template-columns:\\s*1fr\\b/.test(inner.style?.cssText || inner.cssText || "")) {
+        ok = true;
+      }
+    }
+  }
+}
+if (!ok) throw new Error("Inside the media query, set .cards { grid-template-columns: 1fr }.");`,
+    },
+  ]}
+/>
+
+One layout, every screen. You've now covered the full CSS toolkit.
+Time to make the page *respond to the user*, starting with
+[JavaScript and the DOM](/courses/intro-web-development/js-dom-basics).

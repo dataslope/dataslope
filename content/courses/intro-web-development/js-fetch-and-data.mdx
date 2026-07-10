@@ -1,0 +1,151 @@
+---
+title: "JavaScript: Fetching and Showing Data"
+description: Async/await, working with JSON, and building DOM elements from a list of data.
+---
+
+Real apps show data that lives *somewhere else*, a weather service, a
+product catalog, your own backend. This lesson covers the round trip:
+ask for data, wait for it, and render it into the page.
+
+## `fetch` and `await`
+
+`fetch(url)` asks the network for something and returns a **promise**,
+a value that isn't ready yet. `await` pauses inside an `async`
+function until it arrives:
+
+```js
+async function loadUsers() {
+  const response = await fetch("https://api.example.com/users");
+  const users = await response.json(); // parse the JSON body
+  console.log(users);
+}
+```
+
+Two `await`s, because two things take time: the network reply, then
+reading its body as JSON. Wrap the pair in `try/catch` to handle a
+failed request gracefully.
+
+## JSON: the shape data travels in
+
+APIs almost always speak **JSON**, text that looks like JavaScript
+objects and arrays. `JSON.parse(text)` turns that text into real
+objects you can loop over. Below, the "data" is already on the page so
+it runs offline, but rendering it is identical whether it came from
+`JSON.parse` or `await response.json()`:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      li { margin: 0.25rem 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Team</h1>
+    <ul id="list"></ul>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const raw = '[{"name":"Ada","role":"Engineer"},{"name":"Grace","role":"Admiral"}]';
+const people = JSON.parse(raw);
+
+const list = document.querySelector("#list");
+for (const person of people) {
+  const li = document.createElement("li");
+  li.textContent = person.name + ", " + person.role;
+  list.appendChild(li);
+}
+`,
+    },
+  ]}
+/>
+
+The rendering loop is the pattern to internalize: **for each item,
+create an element, set its content, append it.** Swap the hard-coded
+`raw` string for `await response.json()` and the exact same loop
+displays live data from an API.
+
+<Callout type="info" title="createElement vs. innerHTML">
+Building elements with `createElement` and `textContent` is safe:
+user- or API-provided text can never be interpreted as HTML. Assigning
+untrusted strings to `innerHTML` is how cross-site scripting bugs get
+in. When in doubt, set `textContent`.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Render the product list"
+  entryFilename="index.html"
+  instructions={`Finish \`script.js\`. The JSON is already parsed into \`products\`.
+
+Loop over \`products\` and, for each one, create an \`<li>\` whose text is the product's \`name\`, then append it to the \`<ul id="menu">\`. There are three products, so three \`<li>\`s should appear.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <body>
+    <h1>Menu</h1>
+    <ul id="menu"></ul>
+    <script src="script.js"></script>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "script.js",
+      starterCode: `const raw = '[{"name":"Espresso"},{"name":"Latte"},{"name":"Mocha"}]';
+const products = JSON.parse(raw);
+const menu = document.querySelector("#menu");
+
+// For each product, create an <li> with its name and append it to #menu.
+`,
+      solutionCode: `const raw = '[{"name":"Espresso"},{"name":"Latte"},{"name":"Mocha"}]';
+const products = JSON.parse(raw);
+const menu = document.querySelector("#menu");
+
+for (const product of products) {
+  const li = document.createElement("li");
+  li.textContent = product.name;
+  menu.appendChild(li);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "count",
+      name: "Three list items are rendered",
+      code: `const items = document.querySelectorAll("#menu li");
+if (items.length !== 3) {
+  throw new Error("Expected 3 <li> items in #menu, found " + items.length + ".");
+}`,
+    },
+    {
+      id: "names",
+      name: "Each item shows its product name",
+      code: `const texts = Array.from(document.querySelectorAll("#menu li")).map((li) => (li.textContent || "").trim());
+for (const expected of ["Espresso", "Latte", "Mocha"]) {
+  if (!texts.includes(expected)) {
+    throw new Error("Missing menu item: '" + expected + "'. Got: " + texts.join(", "));
+  }
+}`,
+    },
+  ]}
+/>
+
+You can now bring data into a page and render it. Everything comes
+together next in the [Interactive Scoreboard project](/courses/intro-web-development/project-interactive-scoreboard).

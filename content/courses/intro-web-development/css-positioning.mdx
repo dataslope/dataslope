@@ -1,0 +1,188 @@
+---
+title: "CSS: Positioning"
+description: Taking elements out of the normal flow with position relative, absolute, fixed, and sticky.
+---
+
+Most elements sit in the **normal flow**, stacking top-to-bottom, one
+after another. The `position` property lets you break out of that flow
+for the cases where you need to: a badge pinned to a card's corner, a
+header that stays put as you scroll.
+
+## The four positioning modes
+
+| Value | Behavior |
+| --- | --- |
+| `static` | The default. In the flow, `top`/`left` ignored. |
+| `relative` | In the flow, but nudged by `top`/`left`/etc., **and** becomes a reference point for absolute children. |
+| `absolute` | Removed from the flow; placed relative to the nearest *positioned* ancestor. |
+| `fixed` | Removed from the flow; placed relative to the viewport (stays on scroll). |
+| `sticky` | In the flow until you scroll past it, then it sticks. |
+
+## The relative + absolute pairing
+
+The most common pattern: a parent set to `position: relative`, and a
+child set to `position: absolute`. The child is now positioned
+*within* the parent, so `top: 0; right: 0` pins it to the parent's
+top-right corner.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="card">
+      <span class="badge">NEW</span>
+      <h2>Trailblazer Boots</h2>
+      <p>Waterproof, and now on sale.</p>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  position: relative;         /* reference point for the badge */
+  width: 260px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.badge {
+  position: absolute;         /* placed against .card */
+  top: 10px;
+  right: 10px;
+  background: #dc2626;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+`,
+    },
+  ]}
+/>
+
+Delete `position: relative` from `.card` and Run: the badge jumps to
+the top-right of the *whole page* instead, because now the nearest
+positioned ancestor is the viewport. That relationship is the whole
+trick.
+
+## `z-index`: who's on top
+
+When positioned elements overlap, `z-index` decides the stacking
+order, higher numbers sit in front. It only affects positioned
+elements (anything that isn't `static`).
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Pin a discount badge"
+  entryFilename="index.html"
+  instructions={`Work in \`styles.css\`:
+
+1. Give \`.product\` \`position: relative\` so it anchors the badge.
+2. Give \`.sale\` \`position: absolute\`, then pin it to the top-right with \`top: 8px\` and \`right: 8px\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="product">
+      <span class="sale">-20%</span>
+      <h2>Camp Mug</h2>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.product {
+  /* 1. make this the positioning context */
+  width: 200px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.sale {
+  /* 2. absolutely position at top: 8px; right: 8px */
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.product {
+  position: relative;
+  width: 200px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.sale {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "relative",
+      name: ".product is position: relative",
+      code: `const s = getComputedStyle(document.querySelector(".product"));
+if (s.position !== "relative") {
+  throw new Error("Set position: relative on .product, got " + s.position + ".");
+}`,
+    },
+    {
+      id: "absolute",
+      name: ".sale is position: absolute",
+      code: `const s = getComputedStyle(document.querySelector(".sale"));
+if (s.position !== "absolute") {
+  throw new Error("Set position: absolute on .sale, got " + s.position + ".");
+}`,
+    },
+    {
+      id: "pinned",
+      name: ".sale is pinned to the top-right",
+      code: `const s = getComputedStyle(document.querySelector(".sale"));
+if (s.top !== "8px" || s.right !== "8px") {
+  throw new Error("Expected top: 8px and right: 8px, got top " + s.top + ", right " + s.right + ".");
+}`,
+    },
+  ]}
+/>
+
+You can now place elements anywhere. The last layout skill is making
+them adapt to any screen: [Responsive Design](/courses/intro-web-development/css-responsive-design).

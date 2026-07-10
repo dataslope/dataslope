@@ -1,0 +1,43 @@
+{
+    "title": "Modern CSS: Layout & Responsive Design",
+    "description": "Go deep on the CSS that decides how pages look and lay out, the cascade and specificity, box-sizing, flexbox, grid, positioning, responsive media queries, custom properties, and transitions, finishing with a responsive landing page. Every lesson renders live in your browser.",
+    "root": true,
+    "tags": {
+        "language": [
+            "css"
+        ],
+        "libraries": [],
+        "domain": [
+            "web-development"
+        ],
+        "skills": [
+            "css-layout",
+            "responsive-design",
+            "flexbox",
+            "css-grid",
+            "animation"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "the-cascade-and-specificity",
+        "box-model-and-sizing",
+        "---",
+        "flexbox-deep-dive",
+        "css-grid",
+        "positioning-and-stacking",
+        "---",
+        "responsive-design",
+        "custom-properties",
+        "transitions-and-animations",
+        "---",
+        "project-responsive-landing-page",
+        "---",
+        "next-steps"
+    ]
+}

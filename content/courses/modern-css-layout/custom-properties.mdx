@@ -1,0 +1,221 @@
+---
+title: Custom Properties
+description: CSS variables, defining and using them, scope and inheritance, theming, and dark mode.
+---
+
+**Custom properties** (CSS variables) let you name a value once and
+reuse it everywhere. Change the definition and every use updates, which
+is what makes design systems, theming, and dark mode practical in plain
+CSS.
+
+## Defining and using
+
+A custom property starts with `--` and is read with `var()`:
+
+```css
+:root {
+  --brand: #6366f1;
+  --space: 1rem;
+}
+
+.button {
+  background: var(--brand);
+  padding: var(--space);
+}
+```
+
+Defining them on **`:root`** (the `<html>` element) makes them
+available to the whole page, because custom properties **inherit**.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="btn primary">Primary</button>
+    <button class="btn">Default</button>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `:root {
+  --brand: #6366f1;
+  --radius: 8px;
+}
+
+body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.btn {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius);
+  background: white;
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.primary {
+  background: var(--brand);
+  color: white;
+}
+`,
+    },
+  ]}
+/>
+
+Change `--brand` once at the top and both buttons update, that's the
+whole appeal. Try setting it to `tomato` and Run.
+
+## Scope and fallbacks
+
+Custom properties follow normal inheritance, so you can **redefine**
+one on a subtree to re-theme just that part:
+
+```css
+.card { --brand: #16a34a; }  /* everything inside .card now uses green */
+```
+
+`var()` also takes a **fallback** for when a variable isn't set:
+`color: var(--accent, #333)` uses `#333` if `--accent` is undefined.
+
+## Theming and dark mode
+
+Because a variable can be redefined in a scope, theming is just
+swapping values. Toggle a class or attribute on the root, or respond to
+the OS setting with `prefers-color-scheme`, and the whole page
+re-themes:
+
+```css
+:root {
+  --bg: white;
+  --fg: #1e293b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #e2e8f0;
+  }
+}
+body { background: var(--bg); color: var(--fg); }
+```
+
+<Callout type="info" title="Variables can be updated by JavaScript">
+`element.style.setProperty('--brand', '#ec4899')` changes a custom
+property at runtime, and every rule using it updates instantly. It's
+how theme pickers and "accent color" settings are built.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Theme the card with a variable"
+  entryFilename="index.html"
+  instructions={`Wire up a custom property so one value drives the card's accent:
+
+1. On \`:root\`, define a custom property \`--accent\` set to \`rgb(219, 39, 119)\`.
+2. Use it for the card: set \`.card\` \`border-color\` to \`var(--accent)\` **and** the \`.tag\` \`background\` to \`var(--accent)\`.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="card">
+      <span class="tag">New</span>
+      <h2>Trailblazer Boots</h2>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `:root {
+  /* 1. define --accent: rgb(219, 39, 119) */
+}
+
+body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  border: 2px solid gray;   /* 2. use var(--accent) for the color */
+  border-radius: 12px;
+  padding: 1.25rem;
+  width: 220px;
+}
+
+.tag {
+  background: gray;          /* 2. use var(--accent) here too */
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+`,
+      solutionCode: `:root {
+  --accent: rgb(219, 39, 119);
+}
+
+body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.25rem;
+  width: 220px;
+}
+
+.tag {
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "defined",
+      name: "--accent is defined on :root",
+      code: `const v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+if (v.replace(/\\s+/g, "") !== "rgb(219,39,119)") {
+  throw new Error("Define --accent: rgb(219, 39, 119) on :root. Got: '" + v + "'.");
+}`,
+    },
+    {
+      id: "border_uses_var",
+      name: "The card border uses the accent",
+      code: `const s = getComputedStyle(document.querySelector(".card"));
+if (s.borderTopColor !== "rgb(219, 39, 119)") {
+  throw new Error("Set .card border-color to var(--accent). Got " + s.borderTopColor + ".");
+}`,
+    },
+    {
+      id: "tag_uses_var",
+      name: "The tag background uses the accent",
+      code: `const s = getComputedStyle(document.querySelector(".tag"));
+if (s.backgroundColor !== "rgb(219, 39, 119)") {
+  throw new Error("Set .tag background to var(--accent). Got " + s.backgroundColor + ".");
+}`,
+    },
+  ]}
+/>
+
+One value, many uses. The last piece of a polished UI is motion:
+[Transitions and animations](/courses/modern-css-layout/transitions-and-animations).

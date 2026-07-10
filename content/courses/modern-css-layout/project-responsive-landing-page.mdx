@@ -1,0 +1,242 @@
+---
+title: "Project: Responsive Landing Page"
+description: Combine the whole course, custom properties, flexbox, grid, responsive design, and motion, into one polished page.
+---
+
+Time to assemble everything: a real landing page with a sticky nav, a
+hero, a responsive feature grid, and hover motion, themed entirely
+through custom properties. Every technique in this course appears here.
+
+## The finished page
+
+Read the CSS top to bottom, note how each section maps to a lesson,
+then Run it and resize the preview to watch it respond:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <span class="brand">Summit</span>
+      <nav class="links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#" class="btn">Sign up</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Ship faster with Summit</h1>
+      <p>The toolkit that grows with your team.</p>
+      <a href="#" class="btn btn-lg">Get started</a>
+    </section>
+
+    <section class="features">
+      <article class="feature"><h3>Fast</h3><p>Instant everything.</p></article>
+      <article class="feature"><h3>Secure</h3><p>Encrypted by default.</p></article>
+      <article class="feature"><h3>Simple</h3><p>Zero config.</p></article>
+    </section>
+
+    <footer class="footer">© 2026 Summit</footer>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `/* Custom properties: one source of truth for the theme */
+:root {
+  --brand: #6366f1;
+  --brand-dark: #4f46e5;
+  --ink: #1e293b;
+  --muted: #64748b;
+  --radius: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }        /* box model lesson */
+body { margin: 0; font-family: system-ui, sans-serif; color: var(--ink); }
+
+/* Sticky nav: flexbox + position: sticky */
+.nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+.brand { font-weight: 800; margin-right: auto; }          /* auto margin trick */
+.links { display: flex; gap: 1rem; align-items: center; }
+.links a { color: var(--muted); text-decoration: none; }
+
+/* Buttons: custom props + transition */
+.btn {
+  background: var(--brand);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn:hover { background: var(--brand-dark); transform: translateY(-2px); }
+.btn-lg { padding: 0.8rem 1.6rem; font-size: 1.1rem; display: inline-block; }
+
+/* Hero: grid centering + fluid clamp() type */
+.hero {
+  display: grid;
+  place-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: clamp(3rem, 12vw, 8rem) 1rem;
+  background: linear-gradient(135deg, #eef2ff, #fce7f3);
+}
+.hero h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 0; }
+.hero p { color: var(--muted); font-size: 1.2rem; margin: 0; }
+
+/* Feature grid: responsive with auto-fit, no media query */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+}
+.feature {
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.feature:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+.feature h3 { margin: 0 0 0.4rem; }
+
+.footer { padding: 1.5rem; text-align: center; color: var(--muted); }
+`,
+    },
+  ]}
+/>
+
+Every lesson is in there: `box-sizing` at the top, custom properties
+for the theme, a flex nav with the `margin-right: auto` split and
+`position: sticky`, a grid-centered hero with `clamp()` type, an
+`auto-fit` feature grid that reflows with no media query, and hover
+transitions on the buttons and cards. Change `--brand` once and the
+whole page re-themes.
+
+## Your turn: make the nav collapse on phones
+
+<ChallengeCard
+  adapter="web"
+  title="Stack the header on small screens"
+  entryFilename="index.html"
+  instructions={`This mini header is a flex row. On narrow screens the brand and links get cramped. Add a mobile-first override in \`styles.css\`:
+
+1. Add a \`@media (max-width: 500px)\` block.
+2. Inside it, set \`.nav\` to \`flex-direction: column\` and \`align-items: flex-start\` so the brand sits above the links.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <span class="brand">Summit</span>
+      <nav class="links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+      </nav>
+    </header>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { margin: 0; font-family: system-ui, sans-serif; }
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #0f172a;
+  color: white;
+}
+.brand { font-weight: 800; margin-right: auto; }
+.links { display: flex; gap: 1rem; }
+.links a { color: #cbd5e1; text-decoration: none; }
+
+/* Add your @media (max-width: 500px) override below */
+`,
+      solutionCode: `body { margin: 0; font-family: system-ui, sans-serif; }
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #0f172a;
+  color: white;
+}
+.brand { font-weight: 800; margin-right: auto; }
+.links { display: flex; gap: 1rem; }
+.links a { color: #cbd5e1; text-decoration: none; }
+
+@media (max-width: 500px) {
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "has_query",
+      name: "There is a max-width media query",
+      code: `let found = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type === 4 && /max-width/i.test(rule.conditionText || rule.media?.mediaText || "")) found = true;
+  }
+}
+if (!found) throw new Error("Add a @media (max-width: 500px) query.");`,
+    },
+    {
+      id: "stacks",
+      name: "The query stacks the nav into a column",
+      code: `let ok = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    if (rule.type !== 4) continue;
+    for (const inner of Array.from(rule.cssRules || [])) {
+      const css = inner.style?.cssText || inner.cssText || "";
+      if (/\\.nav/.test(inner.selectorText || "") && /flex-direction:\\s*column/.test(css)) ok = true;
+    }
+  }
+}
+if (!ok) throw new Error("Inside the media query, set .nav { flex-direction: column }.");`,
+    },
+  ]}
+/>
+
+You've built a complete, responsive, themed page from scratch. Finish
+up with [where to go next](/courses/modern-css-layout/next-steps).
