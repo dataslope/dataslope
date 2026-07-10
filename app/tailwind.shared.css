@@ -79,6 +79,13 @@
    generate under `source(none)`, so the cards render with collapsed spacing
    in production even though dev's incremental crawl happened to emit them. */
 @source "./interview-prep/**/*.{ts,tsx}";
+/* The /playground catalog index page + its client workspaces island (the
+   per-language playground routes under playground/<id> render their own
+   plain-CSS chrome, so scanning them too is harmless). Without this the index
+   grid + workspace rows' utilities (lg:grid-cols-7, gap-x-6, size-[26px],
+   tracking-[0.08em], …) never generate under `source(none)`, collapsing the
+   layout, the same failure the courses/interview-prep globs above fix. */
+@source "./playground/**/*.{ts,tsx}";
 /* Custom-content surfaces: the /create builders, the /c and /quiz viewers,
    and the shared renderer/skeleton components, plus the /s share landing
    page (which was missing from the old lists; its classes happened to

@@ -15,6 +15,7 @@ import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../_components/languageIcons";
+import { PlaygroundWorkspaces } from "./PlaygroundWorkspaces";
 import { OG_IMAGE } from "@/lib/site";
 
 const PLAYGROUND_DESCRIPTION =
@@ -105,6 +106,11 @@ export default function PlaygroundIndexPage() {
               ))}
             </div>
           </section>
+
+          {/* Your workspaces, a client island (reads localStorage + the
+              signed-in user's cloud backups). Always rendered, empty and
+              signed-out states included. */}
+          <PlaygroundWorkspaces />
         </main>
 
         <HomeFooter />
