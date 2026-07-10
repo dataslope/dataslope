@@ -169,7 +169,11 @@ export function CloudStorageSection() {
       setCopiedId(share.id);
       setTimeout(() => setCopiedId(null), 1500);
     } catch {
-      /* clipboard unavailable */
+      // Clipboard unavailable (e.g. denied permission): surface it instead
+      // of letting the button appear to silently succeed.
+      setError(
+        "Couldn't copy the link, your browser blocked clipboard access.",
+      );
     }
   }, []);
 

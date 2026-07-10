@@ -60,6 +60,10 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
             // treat them as clean by mirroring `code` here.
             pristineCode:
               typeof t.pristineCode === "string" ? t.pristineCode : code,
+            // Preserve persisted "view-data" tabs so they reopen as data
+            // views instead of degrading to plain query tabs (transient
+            // kinds are filtered out by saveTabs and never round-trip).
+            kind: t.kind === "view-data" ? "view-data" : undefined,
           };
         });
       }

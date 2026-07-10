@@ -1937,9 +1937,6 @@ body.playground-active {
   .settings-tabs-close {
     margin-left: 4px;
   }
-  .theme-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Setting row */
@@ -2579,6 +2576,24 @@ input[type="range"].fs-slider:disabled {
 }
 .pyodide-loading.playground-boot-overlay.has-error .playground-boot-title {
   color: var(--red, #e57373);
+}
+
+/* Recovery affordance shown only in the error state, so a failed runtime
+   download isn't a dead end that requires a manual browser reload. */
+.playground-boot-retry {
+  margin-top: 16px;
+  padding: 8px 18px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border, currentColor);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.playground-boot-retry:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
 /* Resizer, draggable divider between editor and output panes. A persistent

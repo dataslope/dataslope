@@ -36,6 +36,8 @@ export default function robots(): MetadataRoute.Robots {
           // Auth surfaces: personalized or credential flows, no SEO value
           // (also marked `robots: { index: false }` in their metadata).
           "/sign-in",
+          "/sign-up",
+          "/forgot-password",
           "/account",
           "/admin",
           "/reset-password",

@@ -139,7 +139,9 @@ function ShareDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard unavailable, the input below stays selectable */
+      // Clipboard unavailable, the input below stays selectable; tell the
+      // user so the button doesn't appear to silently succeed.
+      setError("Couldn't copy, select the link below and copy it manually.");
     }
   }, [url]);
 

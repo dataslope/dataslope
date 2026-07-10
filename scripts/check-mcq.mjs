@@ -101,7 +101,7 @@ export function isSelectFalse(body) {
 // Rewrite an affirmative opener to a neutral statement, or return null if the
 // explanation needs no change (or can't be mechanically fixed, e.g. it is
 // ONLY the affirmation, or a True/False label in a select-the-false question).
-export function rewriteOpener(content, { selectFalse = false } = {}) {
+export function rewriteOpener(content) {
   const m = content.match(AFFIRM);
   if (!m) return null;
   const word = m[1].toLowerCase();

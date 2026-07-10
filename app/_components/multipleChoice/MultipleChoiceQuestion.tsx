@@ -209,11 +209,15 @@ export default function MultipleChoiceQuestion({
                   value={choice.id}
                   checked={isSelected}
                   disabled={submitted}
+                  aria-labelledby={`${groupName}-${choice.id}`}
                   onChange={() => select(choice.id)}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <div className={styles.choiceContent}>
-                  <div className={styles.choiceLabel}>
+                  <div
+                    id={`${groupName}-${choice.id}`}
+                    className={styles.choiceLabel}
+                  >
                     <MarkdownInline source={choice.text} />
                   </div>
                   {showExplanation ? (

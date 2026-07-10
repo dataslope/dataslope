@@ -118,6 +118,12 @@ export function clearThemePalette(): void {
     "--theme-primary",
     "--accent1",
     "--accent2",
+    // Font-size vars are set on <html> alongside the palette by every
+    // playground's mount effect; clear them here too (this function's only
+    // callers are those playgrounds' unmount cleanups) so they don't leak
+    // onto non-playground routes after client-side navigation.
+    "--cm-font-size",
+    "--output-font-size",
   ]) {
     root.style.removeProperty(name);
   }

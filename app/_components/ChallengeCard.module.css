@@ -1475,13 +1475,6 @@
   background: var(--ch-scrollbar-thumb-hover);
 }
 
-.outputEmpty {
-  padding: 4px 14px 14px 27px;
-  color: var(--ch-text-muted);
-  font-size: 13px;
-  font-style: italic;
-}
-
 .outCellStdout {}
 
 .outCellStderr {
@@ -2004,19 +1997,6 @@
    HTML-cell tables but rendered from a structured `QueryResult` rather
    than user-printed HTML, so it gets sticky headers, a row count, and
    styling that matches the light-paper / dark-paper card chrome. */
-.sqlResultPanel {
-  background: var(--ch-bg);
-  border-top: 1px solid var(--ch-border-light);
-  position: relative;
-}
-
-.sqlResultHeader {
-  display: flex;
-  align-items: center;
-  padding: 8px 14px 6px;
-  gap: 8px;
-}
-
 /* Full-bleed: no horizontal margin so the table spans the whole card
    width (up to the container). Top/bottom borders only, the card's own
    border supplies the left/right edges, so a boxed border + radius here
@@ -2319,33 +2299,6 @@
 
 :global(html:is(.dark, [data-theme="dark"])) .tableViewer {
   background: var(--ch-bg-muted);
-}
-
-/* Static label row, the panel is no longer collapsible, so this is a
-   plain header (not a button) showing the table count / loading state. */
-.tableViewerHeader {
-  display: flex;
-  align-items: center;
-  padding: 8px 14px;
-  gap: 10px;
-  width: 100%;
-  font-family: var(--ch-font-ui);
-  user-select: none;
-}
-
-.tableViewerLabel {
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ch-text-muted);
-}
-
-.tableViewerCount {
-  margin-left: auto;
-  font-family: var(--ch-font-mono);
-  font-size: 12.5px;
-  color: var(--ch-text-muted);
 }
 
 /* Table tabs are styled to match the non-SQL code block file tab bar

@@ -87,6 +87,19 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
     [],
   );
 
+  // Tracks the pending error→ready reset so a new run can cancel it;
+  // otherwise failing a run and re-running within 3s would let the stale
+  // timer flip the status to "ready" while the new run is still executing.
+  const errorResetTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+      }
+    },
+    [],
+  );
+
   const runSqlForTab = useCallback(
     (
       tabId: string,
@@ -103,6 +116,10 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       if (!trimmed) {
         showToast("Nothing to run, the query is empty.", "warn");
         return;
+      }
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+        errorResetTimerRef.current = null;
       }
       setStatusState("running");
       if (clearBeforeRun) setResultForTab(tabId, null);
@@ -248,7 +265,10 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           error: msg,
         });
         setStatusState("error");
-        window.setTimeout(() => setStatusState("ready"), 3000);
+        errorResetTimerRef.current = window.setTimeout(() => {
+          errorResetTimerRef.current = null;
+          setStatusState("ready");
+        }, 3000);
       }
       })();
     },

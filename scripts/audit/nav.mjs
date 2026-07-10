@@ -8,7 +8,6 @@ const page = await ctx.newPage();
 await page.goto(`${BASE}/learn`, { waitUntil: "domcontentloaded" });
 await page.waitForTimeout(1500);
 const sidebarLinks = await page.evaluate(() => {
-  const nav = document.querySelector('aside, nav[aria-label], [data-sidebar], #nd-sidebar') || document.body;
   return [...document.querySelectorAll('aside a, [class*="sidebar"] a, nav a')]
     .map((a) => a.getAttribute("href"))
     .filter((h) => h && h.startsWith("/learn"));

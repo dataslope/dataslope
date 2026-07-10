@@ -1889,11 +1889,6 @@
   margin-right: auto;
 }
 
-.sql-modify-drawer-entity-icon {
-  color: var(--accent1);
-  flex-shrink: 0;
-}
-
 .sql-modify-body {
   /* Body becomes the only scrolling region inside the drawer so the
      header and footer stay pinned. The drawer renders in a portal (outside

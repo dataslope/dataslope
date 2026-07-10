@@ -1255,6 +1255,18 @@ function DuckDbPlaygroundInner() {
   const tabHistoryRef = useRef<string[]>([]);
   const activeDbIdRef = useRef(activeDbId);
   const runningRef = useRef(false);
+  // Tracks the pending error→ready reset so a new run can cancel it;
+  // otherwise failing a run and re-running within 3s would let the stale
+  // timer flip the status to "ready" while the new run is still executing.
+  const errorResetTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+      }
+    },
+    [],
+  );
   const shellRef = useRef<HTMLDivElement | null>(null);
   const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
   const panesRef = useRef<HTMLElement | null>(null);
@@ -1576,6 +1588,10 @@ function DuckDbPlaygroundInner() {
         return;
       }
       runningRef.current = true;
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+        errorResetTimerRef.current = null;
+      }
       setStatusState("running");
       if (clearBeforeRun) {
         setResultsByTab((prev) => ({ ...prev, [tabId]: null }));
@@ -1680,7 +1696,10 @@ function DuckDbPlaygroundInner() {
           error: message,
         });
         setStatusState("error");
-        window.setTimeout(() => setStatusState("ready"), 3000);
+        errorResetTimerRef.current = window.setTimeout(() => {
+          errorResetTimerRef.current = null;
+          setStatusState("ready");
+        }, 3000);
       } finally {
         runningRef.current = false;
         drainPendingRun();
