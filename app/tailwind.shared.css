@@ -79,6 +79,17 @@
    generate under `source(none)`, so the cards render with collapsed spacing
    in production even though dev's incremental crawl happened to emit them. */
 @source "./interview-prep/**/*.{ts,tsx}";
+/* Custom-content surfaces: the /create builders, the /c and /quiz viewers,
+   and the shared renderer/skeleton components, plus the /s share landing
+   page (which was missing from the old lists; its classes happened to
+   overlap other sources). Classes unique to these files (the builders'
+   `sm:grid-cols-[1fr_200px]`, the skeleton's `min-h-[180px]`, …) never
+   generate without these globs. */
+@source "./create/**/*.{ts,tsx}";
+@source "./c/**/*.{ts,tsx}";
+@source "./quiz/**/*.{ts,tsx}";
+@source "./s/**/*.{ts,tsx}";
+@source "./_components/customContent/**/*.{ts,tsx}";
 /* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
    non-learn root needs these too, that is the point of the union: the home/
    admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so

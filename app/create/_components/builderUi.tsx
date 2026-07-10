@@ -1,21 +1,28 @@
 "use client";
 
 /**
- * Shared form primitives for the /create builders: labelled inputs and
- * textareas (SignInClient-style controlled fields, Tailwind-only), the
- * save bar, the minted-link panel, and the guest notice. Kept small and
- * dependency-free so every builder reads the same.
+ * Shared form primitives for the /create builders, composed from the
+ * repo's shadcn-style components/ui primitives (Button, Input, Textarea,
+ * Label, NativeSelect, Card, Badge) so the builders read like the rest
+ * of the shadcn surfaces (/admin). Field wrappers keep a small local API
+ * (label + value + onChange + hint) so builder code stays terse.
+ *
+ * The primary CTA keeps the site's brand green (the neutral `--ui-*`
+ * shadcn palette would render it near-black); everything else uses the
+ * stock token-driven variants.
  */
 
 import { useCallback, useId, useState } from "react";
 import { useSession } from "@/lib/auth/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
-const LABEL_CLS =
-  "block text-sm font-medium text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-200)]";
-const INPUT_CLS =
-  "mt-1.5 w-full rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors placeholder:text-[var(--ds-gray-400)] focus:border-[var(--ds-green-600)] dark:border-white/10 dark:bg-white/5 dark:text-[var(--ds-gray-100)] dark:focus:border-[var(--ds-green-400)]";
-const HINT_CLS =
-  "mt-1 text-xs leading-relaxed text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]";
+const HINT_CLS = "text-muted-foreground text-xs leading-relaxed";
 
 export function TextField({
   label,
@@ -34,18 +41,15 @@ export function TextField({
 }) {
   const id = useId();
   return (
-    <div>
-      <label htmlFor={id} className={LABEL_CLS}>
-        {label}
-      </label>
-      <input
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Input
         id={id}
         type="text"
         value={value}
         maxLength={maxLength}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className={INPUT_CLS}
       />
       {hint ? <p className={HINT_CLS}>{hint}</p> : null}
     </div>
@@ -71,20 +75,19 @@ export function TextAreaField({
 }) {
   const id = useId();
   return (
-    <div>
-      <label htmlFor={id} className={LABEL_CLS}>
-        {label}
-      </label>
-      <textarea
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea
         id={id}
         value={value}
         rows={rows}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         spellCheck={!mono}
-        className={`${INPUT_CLS} resize-y ${
-          mono ? "font-mono text-[13px] leading-relaxed" : ""
-        }`}
+        className={cn(
+          "field-sizing-fixed resize-y",
+          mono && "font-mono text-[13px] leading-relaxed md:text-[13px]",
+        )}
       />
       {hint ? <p className={HINT_CLS}>{hint}</p> : null}
     </div>
@@ -106,22 +109,19 @@ export function SelectField({
 }) {
   const id = useId();
   return (
-    <div>
-      <label htmlFor={id} className={LABEL_CLS}>
-        {label}
-      </label>
-      <select
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <NativeSelect
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={INPUT_CLS}
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
           </option>
         ))}
-      </select>
+      </NativeSelect>
       {hint ? <p className={HINT_CLS}>{hint}</p> : null}
     </div>
   );
@@ -138,15 +138,13 @@ export function Fieldset({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-[var(--ds-gray-200)] p-4 dark:border-white/10">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]">
-          {legend}
-        </h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>{legend}</CardTitle>
         {actions}
-      </div>
-      <div className="flex flex-col gap-4">{children}</div>
-    </section>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }
 
@@ -164,18 +162,20 @@ export function SmallButton({
   type?: "button" | "submit";
 }) {
   return (
-    <button
+    <Button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-        tone === "danger"
-          ? "border-red-200 text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10"
-          : "border-[var(--ds-gray-200)] text-[var(--ds-gray-600)] hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-300)] dark:hover:bg-white/5"
-      }`}
+      variant="outline"
+      size="sm"
+      className={cn(
+        "border-border h-7 px-2.5 text-xs font-medium",
+        tone === "danger" &&
+          "text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10",
+      )}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -191,14 +191,14 @@ export function PrimaryButton({
   type?: "button" | "submit";
 }) {
   return (
-    <button
+    <Button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)] disabled:cursor-not-allowed disabled:opacity-60"
+      className="bg-[var(--ds-green-600)] font-semibold text-white hover:bg-[var(--ds-green-700)]"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -212,14 +212,15 @@ export function SecondaryButton({
   disabled?: boolean;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
+      variant="outline"
+      className="border-border"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -228,7 +229,7 @@ export function ErrorNotice({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+      className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm dark:bg-destructive/15"
     >
       {message}
     </p>
@@ -242,7 +243,7 @@ export function GuestNotice() {
   const { data: session, isPending } = useSession();
   if (isPending || session) return null;
   return (
-    <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+    <p className="rounded-md border border-amber-300/60 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
       You&apos;re not signed in, you can still create and share, but the link
       expires after ~30 days and can&apos;t be edited later.{" "}
       <a href="/sign-in" className="font-medium underline underline-offset-2">
@@ -278,34 +279,38 @@ export function SharedLinkPanel({
 }) {
   const [copied, copy] = useCopyToClipboard();
   return (
-    <div
+    <Card
       role="status"
-      className="rounded-xl border border-[var(--ds-green-600)]/30 bg-[var(--ds-green-600)]/5 p-4"
+      className="border-[var(--ds-green-600)]/30 bg-[var(--ds-green-600)]/5 gap-2"
     >
-      <p className="text-sm font-semibold text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]">
-        Saved! Share this link:
-      </p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        <code className="min-w-0 flex-1 truncate rounded-md border border-[var(--ds-gray-200)] bg-white px-2.5 py-1.5 font-mono text-[13px] text-[var(--ds-gray-800)] dark:border-white/10 dark:bg-white/5 dark:text-[var(--ds-gray-200)]">
-          {url}
-        </code>
-        <SmallButton onClick={() => copy(url)}>
-          {copied ? "Copied!" : "Copy link"}
-        </SmallButton>
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center rounded-md border border-[var(--ds-gray-200)] px-2.5 py-1 text-xs font-medium text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-300)] dark:hover:bg-white/5"
-        >
-          Open
-        </a>
-      </div>
-      <p className="mt-2 text-xs text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-        {editable
-          ? "Saving again updates what this link shows."
-          : "Guest links are snapshots, saving again mints a fresh link."}
-      </p>
-    </div>
+      <CardHeader>
+        <CardTitle>Saved! Share this link:</CardTitle>
+      </CardHeader>
+      <CardContent className="gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <code className="border-input min-w-0 flex-1 truncate rounded-md border bg-background px-2.5 py-1.5 font-mono text-[13px] dark:bg-input/30">
+            {url}
+          </code>
+          <SmallButton onClick={() => copy(url)}>
+            {copied ? "Copied!" : "Copy link"}
+          </SmallButton>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="border-border h-7 px-2.5 text-xs font-medium"
+          >
+            <a href={url} target="_blank" rel="noreferrer">
+              Open
+            </a>
+          </Button>
+        </div>
+        <p className={HINT_CLS}>
+          {editable
+            ? "Saving again updates what this link shows."
+            : "Guest links are snapshots, saving again mints a fresh link."}
+        </p>
+      </CardContent>
+    </Card>
   );
 }

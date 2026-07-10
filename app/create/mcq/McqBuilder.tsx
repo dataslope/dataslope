@@ -192,7 +192,7 @@ export default function McqBuilder() {
       <div
         role="tablist"
         aria-label="Authoring mode"
-        className="flex w-fit items-center gap-1 rounded-lg border border-[var(--ds-gray-200)] p-1 dark:border-white/10"
+        className="bg-muted flex w-fit items-center gap-1 rounded-lg p-1"
       >
         {(["form", "markdown"] as const).map((m) => (
           <button
@@ -203,8 +203,8 @@ export default function McqBuilder() {
             onClick={() => switchMode(m)}
             className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
               mode === m
-                ? "bg-[var(--ds-green-600)] text-white"
-                : "text-[var(--ds-gray-600)] hover:bg-[var(--ds-gray-50)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/5"
+                ? "bg-background text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {m === "form" ? "Form" : "Markdown"}
@@ -256,10 +256,10 @@ export default function McqBuilder() {
           {choices.map((choice, i) => (
             <div
               key={i}
-              className="rounded-lg border border-[var(--ds-gray-200)] p-3 dark:border-white/10"
+              className="bg-muted/50 rounded-lg p-3"
             >
               <div className="flex items-center justify-between gap-3">
-                <label className="flex items-center gap-2 text-sm text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-200)]">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="radio"
                     name="correct-choice"
@@ -332,7 +332,7 @@ export default function McqBuilder() {
 
       {previewReady ? (
         <div>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
             Live preview
           </h2>
           {/* Remount on content change so a submitted preview resets. */}

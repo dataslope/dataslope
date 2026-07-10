@@ -361,10 +361,10 @@ export default function SqlChallengeBuilder() {
         {tests.map((test, i) => (
           <div
             key={i}
-            className="rounded-lg border border-[var(--ds-gray-200)] p-3 dark:border-white/10"
+            className="bg-muted/50 rounded-lg p-3"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
+              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                 Test {i + 1}
               </span>
               <SmallButton
@@ -402,7 +402,7 @@ export default function SqlChallengeBuilder() {
                 }
               />
               {test.assertion === "matchesSolution" ? (
-                <label className="flex items-center gap-2 text-sm text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-200)]">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={test.ordered}
@@ -458,7 +458,7 @@ export default function SqlChallengeBuilder() {
         {verifying ? (
           <span
             role="status"
-            className="text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]"
+            className="text-muted-foreground text-sm"
           >
             Running your solution against the tests below, the first run can
             take a moment while the database engine loads…
@@ -468,7 +468,7 @@ export default function SqlChallengeBuilder() {
 
       {preview ? (
         <div>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
             {verifying
               ? "Verifying, your solution is running in this card"
               : "Preview, exactly what visitors will see"}

@@ -11,6 +11,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { customItemShortLabel } from "@/lib/custom-content/labels";
 import type { CustomItemKind, CustomItemMeta } from "@/lib/custom-content/types";
 import {
@@ -226,7 +228,7 @@ export default function QuizSetBuilder() {
 
       <Fieldset legend={`Questions in this quiz (${picked.length})`}>
         {picked.length === 0 ? (
-          <p className="text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <p className="text-muted-foreground text-sm">
             Nothing here yet, add your own creations below or paste a /c/…
             link.
           </p>
@@ -235,17 +237,17 @@ export default function QuizSetBuilder() {
             {picked.map((item, i) => (
               <li
                 key={item.id}
-                className="flex items-center gap-3 rounded-lg border border-[var(--ds-gray-200)] px-3 py-2 dark:border-white/10"
+                className="bg-muted/50 flex items-center gap-3 rounded-lg px-3 py-2"
               >
-                <span className="w-6 shrink-0 text-right text-sm font-semibold text-[var(--ds-gray-400)]">
+                <span className="text-muted-foreground w-6 shrink-0 text-right text-sm font-semibold">
                   {i + 1}.
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]">
+                <span className="min-w-0 flex-1 truncate text-sm">
                   {item.title}
                 </span>
-                <span className="shrink-0 rounded-full border border-[var(--ds-gray-200)] px-2 py-0.5 text-[11px] font-medium text-[var(--ds-gray-500)] dark:border-white/10 dark:text-[var(--ds-gray-400)]">
+                <Badge variant="outline" className="text-muted-foreground shrink-0 rounded-full text-[11px]">
                   {customItemShortLabel(item.kind)}
-                </span>
+                </Badge>
                 <span className="flex shrink-0 gap-1">
                   <SmallButton onClick={() => move(i, -1)} disabled={i === 0}>
                     ↑
@@ -273,7 +275,7 @@ export default function QuizSetBuilder() {
 
       <Fieldset legend="Add by link or id">
         <div className="flex flex-wrap items-center gap-2">
-          <input
+          <Input
             type="text"
             value={linkInput}
             onChange={(e) => {
@@ -281,7 +283,7 @@ export default function QuizSetBuilder() {
               setFormError(null);
             }}
             placeholder="https://…/c/abcd1234efgh5678 or the 16-character id"
-            className="min-w-0 flex-1 rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-2 font-mono text-[13px] text-[var(--ds-gray-900)] outline-none transition-colors placeholder:text-[var(--ds-gray-400)] focus:border-[var(--ds-green-600)] dark:border-white/10 dark:bg-white/5 dark:text-[var(--ds-gray-100)] dark:focus:border-[var(--ds-green-400)]"
+            className="min-w-0 flex-1 font-mono text-[13px] md:text-[13px]"
           />
           <SmallButton onClick={onAddByLink} disabled={resolving || !linkInput.trim()}>
             {resolving ? "Looking up…" : "Add"}
@@ -292,11 +294,11 @@ export default function QuizSetBuilder() {
       {session ? (
         <Fieldset legend="Your creations">
           {mine === null ? (
-            <p className="text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+            <p className="text-muted-foreground text-sm">
               Loading…
             </p>
           ) : addable.length === 0 ? (
-            <p className="text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+            <p className="text-muted-foreground text-sm">
               {mine.length === 0
                 ? "You haven't created any challenges or questions yet."
                 : "All of your creations are already in this quiz."}
@@ -306,14 +308,14 @@ export default function QuizSetBuilder() {
               {addable.map((item) => (
                 <li
                   key={item.id}
-                  className="flex items-center gap-3 rounded-lg border border-[var(--ds-gray-200)] px-3 py-2 dark:border-white/10"
+                  className="bg-muted/50 flex items-center gap-3 rounded-lg px-3 py-2"
                 >
-                  <span className="min-w-0 flex-1 truncate text-sm text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]">
+                  <span className="min-w-0 flex-1 truncate text-sm">
                     {item.title}
                   </span>
-                  <span className="shrink-0 rounded-full border border-[var(--ds-gray-200)] px-2 py-0.5 text-[11px] font-medium text-[var(--ds-gray-500)] dark:border-white/10 dark:text-[var(--ds-gray-400)]">
+                  <Badge variant="outline" className="text-muted-foreground shrink-0 rounded-full text-[11px]">
                     {customItemShortLabel(item.kind)}
-                  </span>
+                  </Badge>
                   <SmallButton
                     onClick={() =>
                       addPicked({ id: item.id, title: item.title, kind: item.kind })

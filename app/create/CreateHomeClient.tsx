@@ -19,6 +19,8 @@ import {
   listItems,
   listSets,
 } from "./_components/api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SmallButton, useCopyToClipboard } from "./_components/builderUi";
 
 const BUILDERS = [
@@ -70,31 +72,23 @@ function CreationRow({
   const [copied, copy] = useCopyToClipboard();
   const [confirming, setConfirming] = useState(false);
   return (
-    <li className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-3 py-2 dark:border-white/10">
-      <span className="min-w-0 flex-1 truncate text-sm text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]">
-        {title}
-      </span>
-      <span className="shrink-0 rounded-full border border-[var(--ds-gray-200)] px-2 py-0.5 text-[11px] font-medium text-[var(--ds-gray-500)] dark:border-white/10 dark:text-[var(--ds-gray-400)]">
+    <li className="bg-muted/50 flex flex-wrap items-center gap-2 rounded-lg px-3 py-2">
+      <span className="min-w-0 flex-1 truncate text-sm">{title}</span>
+      <Badge variant="outline" className="text-muted-foreground shrink-0 rounded-full text-[11px]">
         {chip}
-      </span>
+      </Badge>
       <span className="flex shrink-0 flex-wrap gap-1">
-        <a
-          href={viewUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center rounded-md border border-[var(--ds-gray-200)] px-2.5 py-1 text-xs font-medium text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-300)] dark:hover:bg-white/5"
-        >
-          View
-        </a>
+        <Button asChild variant="outline" size="sm" className="border-border h-7 px-2.5 text-xs font-medium">
+          <a href={viewUrl} target="_blank" rel="noreferrer">
+            View
+          </a>
+        </Button>
         <SmallButton onClick={() => copy(`${window.location.origin}${viewUrl}`)}>
           {copied ? "Copied!" : "Copy link"}
         </SmallButton>
-        <Link
-          href={editUrl}
-          className="inline-flex items-center rounded-md border border-[var(--ds-gray-200)] px-2.5 py-1 text-xs font-medium text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-300)] dark:hover:bg-white/5"
-        >
-          Edit
-        </Link>
+        <Button asChild variant="outline" size="sm" className="border-border h-7 px-2.5 text-xs font-medium">
+          <Link href={editUrl}>Edit</Link>
+        </Button>
         {confirming ? (
           <>
             <SmallButton tone="danger" onClick={onDelete}>
@@ -157,12 +151,12 @@ export default function CreateHomeClient() {
           <Link
             key={b.href}
             href={b.href}
-            className="group rounded-xl border border-[var(--ds-gray-200)] p-5 transition-colors hover:border-[var(--ds-green-600)]/50 hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:hover:border-[var(--ds-green-400)]/40 dark:hover:bg-white/5"
+            className="group bg-card text-card-foreground border-border rounded-xl border p-5 shadow-xs transition-colors hover:border-[var(--ds-green-600)]/50 hover:bg-accent/50"
           >
-            <h2 className="text-base font-semibold text-[var(--ds-gray-900)] group-hover:text-[var(--ds-green-600)] dark:text-white dark:group-hover:text-[var(--ds-green-400)]">
+            <h2 className="text-base font-semibold group-hover:text-[var(--ds-green-600)] dark:group-hover:text-[var(--ds-green-400)]">
               {b.title} →
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
               {b.description}
             </p>
           </Link>
@@ -172,19 +166,19 @@ export default function CreateHomeClient() {
       {isPending ? null : session ? (
         <div className="flex flex-col gap-6">
           <div>
-            <h2 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
+            <h2 className="text-lg font-semibold">
               Your challenges &amp; questions
             </h2>
             {listError ? (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+              <p className="text-destructive mt-2 text-sm">
                 {listError}
               </p>
             ) : items === null ? (
-              <p className="mt-2 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <p className="text-muted-foreground mt-2 text-sm">
                 Loading…
               </p>
             ) : items.length === 0 ? (
-              <p className="mt-2 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <p className="text-muted-foreground mt-2 text-sm">
                 Nothing yet, pick a builder above to create your first one.
               </p>
             ) : (
@@ -204,15 +198,15 @@ export default function CreateHomeClient() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
+            <h2 className="text-lg font-semibold">
               Your quiz sets
             </h2>
             {sets === null ? (
-              <p className="mt-2 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <p className="text-muted-foreground mt-2 text-sm">
                 Loading…
               </p>
             ) : sets.length === 0 ? (
-              <p className="mt-2 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <p className="text-muted-foreground mt-2 text-sm">
                 No quiz sets yet, bundle your items into one shareable quiz.
               </p>
             ) : (
@@ -232,7 +226,7 @@ export default function CreateHomeClient() {
           </div>
         </div>
       ) : (
-        <p className="rounded-lg border border-[var(--ds-gray-200)] px-4 py-3 text-sm text-[var(--ds-gray-500)] dark:border-white/10 dark:text-[var(--ds-gray-400)]">
+        <p className="text-muted-foreground bg-muted/50 rounded-lg px-4 py-3 text-sm">
           You can create and share without an account (links last ~30 days).{" "}
           <a
             href="/sign-in"

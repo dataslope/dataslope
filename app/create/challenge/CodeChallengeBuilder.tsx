@@ -406,10 +406,10 @@ export default function CodeChallengeBuilder() {
         {files.map((file, i) => (
           <div
             key={i}
-            className="rounded-lg border border-[var(--ds-gray-200)] p-3 dark:border-white/10"
+            className="bg-muted/50 rounded-lg p-3"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
+              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                 File {i + 1}
                 {i === 0 ? " · entry file, tests run against it" : ""}
               </span>
@@ -481,10 +481,10 @@ export default function CodeChallengeBuilder() {
         {tests.map((test, i) => (
           <div
             key={i}
-            className="rounded-lg border border-[var(--ds-gray-200)] p-3 dark:border-white/10"
+            className="bg-muted/50 rounded-lg p-3"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
+              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                 Test {i + 1}
               </span>
               <SmallButton
@@ -550,7 +550,7 @@ export default function CodeChallengeBuilder() {
                     mono
                     placeholder="Hello, world!"
                   />
-                  <label className="flex items-center gap-2 text-sm text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-200)]">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={test.noStderr}
@@ -590,7 +590,7 @@ export default function CodeChallengeBuilder() {
         {verifying ? (
           <span
             role="status"
-            className="text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]"
+            className="text-muted-foreground text-sm"
           >
             Running your solution against the tests below, the first run can
             take a moment while the language runtime loads…
@@ -600,7 +600,7 @@ export default function CodeChallengeBuilder() {
 
       {preview ? (
         <div>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
             {verifying
               ? "Verifying, your solution is running in this card"
               : "Preview, exactly what visitors will see"}
