@@ -19,7 +19,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
 import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
-import CustomItemRenderer from "@/app/_components/customContent/CustomItemRenderer";
+import CustomItemRenderer from "@/app/_components/customContent/CustomItemRendererLazy";
 import { isValidCustomId } from "@/lib/custom-content/policy";
 import {
   getLiveItemRow,

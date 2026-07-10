@@ -9,7 +9,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import CustomItemRenderer from "@/app/_components/customContent/CustomItemRenderer";
+import CustomItemRenderer from "@/app/_components/customContent/CustomItemRendererLazy";
 import { serializeMcqMarkdown, mcqDraftFromMarkdown, type McqDraftChoice } from "@/lib/custom-content/mcq";
 import { validateItemPayload } from "@/lib/custom-content/schema";
 import type { McqPayload } from "@/lib/custom-content/types";

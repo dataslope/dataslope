@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import CustomItemRenderer from "@/app/_components/customContent/CustomItemRenderer";
+import CustomItemRenderer from "@/app/_components/customContent/CustomItemRendererLazy";
 import {
   NATIVE_TEST_ADAPTERS,
   validateItemPayload,
