@@ -93,7 +93,7 @@
    itself (loader, staged copy, progress bar) is the self-contained
    <RuntimeBootNotice> component; this wrapper only supplies the inset. */
 .bootNoticeWrap {
-  padding: 14px 14px 14px 18px;
+  padding: 14px 14px 14px 14px;
 }
 
 /* The running state now shows a centered brand spinner instead of a

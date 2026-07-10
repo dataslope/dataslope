@@ -1277,10 +1277,10 @@ body.playground-active {
   /* Modest bottom padding, the auto-scroll places the most recent output
      near the top of the viewport, so users no longer need huge slack
      below the last cell. */
-  padding: 16px 16px 32px 16px;
+  padding: 12px 12px 28px 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .out-cell {
   flex-shrink: 0;
@@ -1363,15 +1363,34 @@ body.playground-active {
 .out-cell-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: var(--bg2);
+  gap: 7px;
+  padding: 4px 8px 2px 10px;
+  background: transparent;
   font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-dim);
 }
+/* Small accent marker that replaces the old full-height colored left
+   border: green marks OUTPUT, red marks ERROR (see `.out-cell.stderr`
+   below). Sits inline in the header next to the label. */
+.out-cell-accent {
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.out-cell.stderr .out-cell-accent {
+  background: var(--red);
+}
 .out-cell-header .cell-type {
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.out-cell.stderr .cell-type {
+  color: var(--red);
 }
 .out-cell-header .cell-time {
   margin-left: auto;
@@ -1384,18 +1403,13 @@ body.playground-active {
   flex-shrink: 0;
 }
 
-/* One frame per run: stderr-only runs read as ERROR (red edge); runs with
-   any other output read as OUTPUT (green edge) and render stderr text red
-   inline via .out-seg-stderr. */
-.out-cell.stdout {
-  border-left: 3px solid var(--green);
-}
-.out-cell.stderr {
-  border-left: 3px solid var(--red);
-}
-
+/* One frame per run: stderr-only runs read as ERROR (red accent); runs
+   with any other output read as OUTPUT (green accent) via the small
+   `.out-cell-accent` marker in the header, and render stderr text red
+   inline via .out-seg-stderr. No colored left border or header fill, so
+   cells read as flat blocks separated by the output-body gap. */
 .out-cell-body {
-  padding: 12px;
+  padding: 4px 12px 12px;
 }
 
 .out-cell.stdout .out-cell-body {
@@ -2768,8 +2782,10 @@ input[type="range"].fs-slider:disabled {
   }
 
   /* The workspace badge + save menu move into the hamburger menu on mobile
-     so the header keeps just the logo, language switcher, and menu button. */
-  .workspace-badge,
+     so the header keeps just the logo, language switcher, and menu button.
+     Hiding the whole badge group also takes the inline-rename pencil with
+     it (rename stays available via the manager drawer on mobile). */
+  .workspace-badge-group,
   .workspace-save-btn {
     display: none;
   }
@@ -2895,6 +2911,69 @@ input[type="range"].fs-slider:disabled {
   background: var(--menu-item-hover);
   color: var(--text);
   outline: none;
+}
+
+/* ─── ⋯ More menu ───
+   Consolidates the header's secondary actions into one dropdown so the
+   top bar stays calm: Examples, Packages, Export, Runtime info, Settings
+   on the code playgrounds; Import, Export database, Query history, ER
+   diagram, Runtime info, Settings on SQL. Built on the same Base UI Menu
+   primitive as the other header dropdowns; list-style entries (Examples,
+   Export, Import, Runtime info) open as submenus reusing the
+   examples-dropdown / info-popover popups. */
+.bui-popup.more-menu {
+  width: 256px;
+  padding: 4px;
+}
+.more-menu-group + .more-menu-group {
+  margin-top: 2px;
+}
+.more-menu-label {
+  padding: 8px 10px 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.more-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+.more-menu-item[data-highlighted],
+.more-menu-item[data-popup-open],
+.more-menu-item:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+.more-menu-icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  display: inline-flex;
+}
+.more-menu-text {
+  flex: 1;
+  min-width: 0;
+}
+.more-menu-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.more-menu-chev {
+  color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 /* ─── Mobile consolidated menu (bottom-sheet drawer) ───
@@ -3996,6 +4075,59 @@ html[data-playground-theme="dark"] .welcome h3 {
 /* ───────────────────────────────────────────────────────────────────────
    Workspace badge + popover + manager drawer (Phase 6).
    ─────────────────────────────────────────────────────────────────────── */
+
+/* Groups the workspace badge pill with its inline-rename pencil so they
+   read as one control; while editing, the pill is swapped for a text
+   input in place. */
+.workspace-badge-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Pencil next to the name that enters inline-rename mode. */
+.workspace-rename-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex: none;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+.workspace-rename-btn:hover {
+  color: var(--text);
+  background: var(--menu-item-hover);
+}
+.workspace-rename-btn:focus-visible {
+  outline: none;
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+/* Text input shown in place of the badge while renaming. */
+.workspace-rename-input {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 3px 8px;
+  width: 180px;
+  max-width: 220px;
+  outline: none;
+}
 
 .workspace-badge {
   display: inline-flex;

@@ -107,6 +107,12 @@ export interface WorkspaceBadgeProps {
    *  The host promotes the draft to a saved workspace (see
    *  `saveDraftWorkspace`). */
   onSave?: (name: string) => void | Promise<void>;
+  /** Invoked with the new name when the user renames the active workspace
+   *  inline via the pencil next to the badge. The host is responsible for
+   *  updating the displayed name live (its own store/state) and, for saved
+   *  workspaces, persisting the change (`renameWorkspace`). When omitted,
+   *  the rename pencil is hidden. */
+  onRename?: (name: string) => void | Promise<void>;
   /** Serializes the CURRENT playground state into a bundle, the same
    *  builder the Share dialog uses. Powers "Back up" for the active
    *  workspace; when omitted, the backup action is hidden (cloud rows and
@@ -197,9 +203,27 @@ export function WorkspaceBadge({
   onManagerOpenChange,
   unsaved = false,
   onSave,
+  onRename,
   buildBundle,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  // Inline rename: the pencil next to the name swaps the badge for a text
+  // input. Commit persists via `onRename` (the host owns the live name).
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState("");
+  const startRename = useCallback(() => {
+    setDraftName(activeWorkspaceName || "");
+    setPopoverOpen(false);
+    setEditing(true);
+  }, [activeWorkspaceName]);
+  const cancelRename = useCallback(() => setEditing(false), []);
+  const commitRename = useCallback(() => {
+    setEditing(false);
+    const trimmed = draftName.trim();
+    if (trimmed && trimmed !== activeWorkspaceName) {
+      void onRename?.(trimmed);
+    }
+  }, [draftName, activeWorkspaceName, onRename]);
   // The Save menu's dialog: "local" names the draft; "both" also backs the
   // freshly-saved workspace up to the account afterwards.
   const [saveDialogMode, setSaveDialogMode] = useState<
@@ -384,6 +408,31 @@ export function WorkspaceBadge({
 
   return (
     <>
+      <span
+        className="workspace-badge-group"
+        data-editing={editing || undefined}
+      >
+      {editing ? (
+        <input
+          className="workspace-rename-input"
+          value={draftName}
+          autoFocus
+          maxLength={80}
+          aria-label="Rename workspace"
+          onChange={(e) => setDraftName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.currentTarget.blur();
+            } else if (e.key === "Escape") {
+              e.preventDefault();
+              cancelRename();
+            }
+          }}
+          onBlur={commitRename}
+        />
+      ) : (
+        <>
       <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
         <Popover.Trigger
           className="workspace-badge"
@@ -589,6 +638,20 @@ export function WorkspaceBadge({
           </Popover.Positioner>
         </Popover.Portal>
       </Popover.Root>
+          {onRename && (
+            <button
+              type="button"
+              className="workspace-rename-btn"
+              title="Rename workspace"
+              aria-label="Rename workspace"
+              onClick={startRename}
+            >
+              <Pencil size={12} aria-hidden="true" />
+            </button>
+          )}
+        </>
+      )}
+      </span>
 
       {onSave && (
         <Menu.Root>

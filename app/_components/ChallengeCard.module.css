@@ -1398,16 +1398,19 @@
 .outputHeader {
   display: flex;
   align-items: center;
-  padding: 16px 14px 8px 14px;
+  padding: 10px 14px 6px 14px;
   border-top: 1px solid var(--ch-border-light);
 }
 
+/* Slim accent marker next to the OUTPUT label. Deliberately small (3×11)
+   so the output panel reads as a flat block rather than a heavily framed
+   card; error state flips it red via `[data-error]`. */
 .accentBar {
-  width: 4px;
-  height: 20px;
+  width: 3px;
+  height: 11px;
   background: var(--ds-blue-500);
   border-radius: 2px;
-  margin-right: 10px;
+  margin-right: 8px;
   flex-shrink: 0;
 }
 
@@ -1442,7 +1445,7 @@
 }
 
 .outputBody {
-  padding: 10px 14px 14px 18px;
+  padding: 4px 14px 14px 14px;
   font-family: var(--ch-font-mono);
   font-size: 13.5px;
   line-height: 1.8;
@@ -1451,7 +1454,7 @@
   word-break: break-word;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   max-height: 360px;
   overflow-y: auto;
   scrollbar-width: thin;

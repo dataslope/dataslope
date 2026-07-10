@@ -84,6 +84,8 @@ import {
   Terminal,
   FolderTree,
   ChevronDown,
+  ChevronRight,
+  MoreHorizontal,
   X,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
@@ -142,7 +144,7 @@ import {
   markWorkspaceDirty,
   saveDraftWorkspace,
 } from "./opfs/activeWorkspace";
-import { acquireWorkspaceLock } from "./opfs/workspace";
+import { acquireWorkspaceLock, renameWorkspace } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import { applyEntryFocus } from "./playgroundEntryFocus";
@@ -842,6 +844,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
     },
     [adapter.id, setWorkspace],
+  );
+
+  // Inline rename from the header badge. Update the visible name right away
+  // (store), then persist to the registry — `renameWorkspace` no-ops on an
+  // unsaved draft, whose name still lives in the store until it's saved.
+  const handleRenameWorkspace = useCallback(
+    async (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed || !workspaceId) return;
+      setWorkspace(workspaceId, trimmed);
+      await renameWorkspace(workspaceId, trimmed);
+    },
+    [workspaceId, setWorkspace],
   );
 
   // ─── Cloud saves + sharing ──────────────────────────────────────────────
@@ -3811,74 +3826,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               onManagerOpenChange={setWorkspaceManagerOpen}
               unsaved={!workspaceSaved && workspaceDirty}
               onSave={handleSaveWorkspace}
+              onRename={handleRenameWorkspace}
               buildBundle={buildCloudBundle}
             />
           )}
 
           {/* Desktop action group, hidden on narrow viewports in favour
-              of the consolidated mobile menu below. */}
+              of the consolidated mobile menu below. Share stays a
+              first-class button; everything secondary folds into one ⋯
+              menu (Examples, Packages, Export, Runtime info, Settings). */}
           <div className="header-actions desktop-only">
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Examples"
-                aria-label="Examples"
-              >
-                <Library size={14} aria-hidden="true" />
-                <span className="btn-label">Examples</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown">
-                    {adapter.examples.map((ex) => (
-                      <Menu.Item
-                        key={ex.key}
-                        className="example-item"
-                        onClick={() => requestExample(ex)}
-                      >
-                        <div className="ex-title">{ex.title}</div>
-                        <div className="ex-desc">{ex.desc}</div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Export code"
-                aria-label="Export code"
-              >
-                <ArrowDownToLine size={14} aria-hidden="true" />
-                <span className="btn-label">Export</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    {adapter.exportFormats.map((fmt) => (
-                      <Menu.Item
-                        key={fmt.extension}
-                        className="example-item export-item"
-                        onClick={() => exportCode(fmt)}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            {fmt.label}
-                            <span className="ext-badge">.{fmt.extension}</span>
-                          </div>
-                          <div className="ex-desc">
-                            Download as .{fmt.extension}
-                          </div>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
             <ShareControls
               workspaceName={workspaceName}
               buildBundle={buildCloudBundle}
@@ -3886,47 +3843,128 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               onShareOpenChange={setShareDialogOpen}
             />
 
-            {adapter.packages.length > 0 && (
-              <button
-                type="button"
-                className="header-btn"
-                onClick={() => setPackagesOpen(true)}
-                title="Available packages"
-                aria-label="Available packages"
-              >
-                <Package size={14} aria-hidden="true" />
-                <span className="btn-label">Packages</span>
-              </button>
-            )}
-
-            <Popover.Root>
-              <Popover.Trigger
+            <Menu.Root>
+              <Menu.Trigger
                 className="header-btn icon-only"
-                title="Runtime info"
-                aria-label="Runtime info"
+                title="More"
+                aria-label="More"
               >
-                <FaInfo size={13} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end" className="playground-header-positioner">
-                  <Popover.Popup className="bui-popup info-popover">
-                    <RuntimeInfoContent info={adapter.runtimeInfo} />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
+                <MoreHorizontal size={16} aria-hidden="true" />
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner sideOffset={6} align="end" className="playground-header-positioner">
+                  <Menu.Popup className="bui-popup more-menu">
+                    <Menu.Group className="more-menu-group">
+                      <Menu.GroupLabel className="more-menu-label">
+                        Resources
+                      </Menu.GroupLabel>
+                      <Menu.SubmenuRoot>
+                        <Menu.SubmenuTrigger className="more-menu-item">
+                          <Library size={14} className="more-menu-icon" aria-hidden="true" />
+                          <span className="more-menu-text">Examples</span>
+                          <span className="more-menu-hint">
+                            {adapter.examples.length}
+                          </span>
+                          <ChevronRight size={13} className="more-menu-chev" aria-hidden="true" />
+                        </Menu.SubmenuTrigger>
+                        <Menu.Portal>
+                          <Menu.Positioner side="left" sideOffset={4} align="start" className="playground-header-positioner">
+                            <Menu.Popup className="bui-popup examples-dropdown">
+                              {adapter.examples.map((ex) => (
+                                <Menu.Item
+                                  key={ex.key}
+                                  className="example-item"
+                                  onClick={() => requestExample(ex)}
+                                >
+                                  <div className="ex-title">{ex.title}</div>
+                                  <div className="ex-desc">{ex.desc}</div>
+                                </Menu.Item>
+                              ))}
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.SubmenuRoot>
 
-            {/* Settings entry co-located with the other global controls in
-                the top-right cluster. */}
-            <button
-              type="button"
-              className="header-btn icon-only"
-              onClick={openSettingsTab}
-              title="Settings"
-              aria-label="Settings"
-            >
-              <Settings size={14} aria-hidden="true" />
-            </button>
+                      {adapter.packages.length > 0 && (
+                        <Menu.Item
+                          className="more-menu-item"
+                          onClick={() => setPackagesOpen(true)}
+                        >
+                          <Package size={14} className="more-menu-icon" aria-hidden="true" />
+                          <span className="more-menu-text">Packages</span>
+                          <span className="more-menu-hint">
+                            {adapter.packages.length}
+                          </span>
+                        </Menu.Item>
+                      )}
+                    </Menu.Group>
+
+                    <Menu.Group className="more-menu-group">
+                      <Menu.GroupLabel className="more-menu-label">
+                        Actions
+                      </Menu.GroupLabel>
+                      <Menu.SubmenuRoot>
+                        <Menu.SubmenuTrigger className="more-menu-item">
+                          <ArrowDownToLine size={14} className="more-menu-icon" aria-hidden="true" />
+                          <span className="more-menu-text">Export code</span>
+                          <ChevronRight size={13} className="more-menu-chev" aria-hidden="true" />
+                        </Menu.SubmenuTrigger>
+                        <Menu.Portal>
+                          <Menu.Positioner side="left" sideOffset={4} align="start" className="playground-header-positioner">
+                            <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
+                              {adapter.exportFormats.map((fmt) => (
+                                <Menu.Item
+                                  key={fmt.extension}
+                                  className="example-item export-item"
+                                  onClick={() => exportCode(fmt)}
+                                >
+                                  <div className="export-item-text">
+                                    <div className="ex-title">
+                                      {fmt.label}
+                                      <span className="ext-badge">.{fmt.extension}</span>
+                                    </div>
+                                    <div className="ex-desc">
+                                      Download as .{fmt.extension}
+                                    </div>
+                                  </div>
+                                </Menu.Item>
+                              ))}
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.SubmenuRoot>
+                    </Menu.Group>
+
+                    <Menu.Group className="more-menu-group">
+                      <Menu.GroupLabel className="more-menu-label">
+                        Playground
+                      </Menu.GroupLabel>
+                      <Menu.SubmenuRoot>
+                        <Menu.SubmenuTrigger className="more-menu-item">
+                          <FaInfo size={13} className="more-menu-icon" aria-hidden="true" />
+                          <span className="more-menu-text">Runtime info</span>
+                          <ChevronRight size={13} className="more-menu-chev" aria-hidden="true" />
+                        </Menu.SubmenuTrigger>
+                        <Menu.Portal>
+                          <Menu.Positioner side="left" sideOffset={4} align="start" className="playground-header-positioner">
+                            <Menu.Popup className="bui-popup info-popover more-menu-info">
+                              <RuntimeInfoContent info={adapter.runtimeInfo} />
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.SubmenuRoot>
+                      <Menu.Item
+                        className="more-menu-item"
+                        onClick={openSettingsTab}
+                      >
+                        <Settings size={14} className="more-menu-icon" aria-hidden="true" />
+                        <span className="more-menu-text">Settings</span>
+                      </Menu.Item>
+                    </Menu.Group>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
           </div>
 
           {/* Mobile-only consolidated menu, replaces the header buttons
@@ -5013,6 +5051,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       className={`out-cell ${onlyStderr ? "stderr" : "stdout"}`}
                     >
                       <div className="out-cell-header">
+                        <span className="out-cell-accent" aria-hidden="true" />
                         <span className="cell-type">
                           {onlyStderr ? "ERROR" : "OUTPUT"}
                         </span>
