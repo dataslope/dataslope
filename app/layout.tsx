@@ -60,18 +60,33 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before React hydrates. On /playground routes it applies the SITE
-// light/dark choice (the shared `theme` localStorage key + `.dark`/`.light`
-// class, the same one /learn and the home page use) to the playground's CSS
-// custom properties + `data-playground-theme`, so the chrome never paints in
-// the wrong palette before the React app (and usePlaygroundThemeSync) takes
-// over. The two GitHub palettes mirror THEME_PALETTES in playgroundTheme.ts.
+// Runs before React hydrates, on EVERY route.
+//
+// First it normalizes the shared `localStorage["theme"]` key to the site's
+// binary contract ("light" | "dark"): any other value (e.g. a legacy
+// "system" written by Fumadocs's default theme switch before it was replaced
+// by the shared pill toggle) is removed, so both the non-Fumadocs bootstrap
+// scripts (which treat non-"dark" as light) and next-themes on the Fumadocs
+// routes (configured with defaultTheme "light", enableSystem false) resolve
+// a missing value to the same light default instead of diverging.
+//
+// Then, on /playground routes only, it applies the site light/dark choice to
+// the playground's CSS custom properties + `data-playground-theme`, so the
+// chrome never paints in the wrong palette before the React app (and
+// usePlaygroundThemeSync) takes over. The two GitHub palettes mirror
+// THEME_PALETTES in playgroundTheme.ts.
 const themeBootstrapScript = `
 (function () {
   try {
-    if (location.pathname.indexOf("/playground") !== 0) return;
     var stored = null;
-    try { stored = localStorage.getItem("theme"); } catch (e) {}
+    try {
+      stored = localStorage.getItem("theme");
+      if (stored !== null && stored !== "dark" && stored !== "light") {
+        localStorage.removeItem("theme");
+        stored = null;
+      }
+    } catch (e) {}
+    if (location.pathname.indexOf("/playground") !== 0) return;
     var dark = stored === "dark" ||
       (stored !== "light" && document.documentElement.classList.contains("dark"));
     var p = dark
