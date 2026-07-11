@@ -39,7 +39,7 @@ import {
   Check,
   Cloud,
   CloudDownload,
-  CloudUpload,
+  CloudOff,
   Copy as CopyIcon,
   Download,
   Folder,
@@ -83,6 +83,10 @@ import {
   useCloudBackups,
   type CloudBackups,
 } from "./workspaceCloud";
+import {
+  useWorkspaceAutoSync,
+  type AutoSyncStatus,
+} from "./useWorkspaceAutoSync";
 
 const RECENT_LIMIT = 6;
 
@@ -162,6 +166,76 @@ function backupStatusText(
   if (!meta) return "Not backed up";
   const rel = formatRelative(Date.parse(meta.updatedAt));
   return stale ? `Backed up ${rel} · opened since` : `Backed up ${rel}`;
+}
+
+/** Passive cloud-sync indicator that replaces the old manual "Back up" button
+ *  for signed-in users. The transient phases (saving / offline / error) come
+ *  from the auto-sync engine; the resting state reflects the last known backup
+ *  of the active workspace. */
+function WorkspaceSyncStatus({
+  status,
+  activeMeta,
+  loaded,
+  className = "",
+}: {
+  status: AutoSyncStatus;
+  activeMeta: CloudWorkspaceMeta | undefined;
+  loaded: boolean;
+  className?: string;
+}) {
+  let icon: ReactNode;
+  let label: string;
+  let title: string | undefined;
+  let tone = "";
+  switch (status.phase) {
+    case "pending":
+    case "saving":
+      icon = <Loader2 size={12} aria-hidden="true" className="cloud-spin" />;
+      label = "Saving…";
+      break;
+    case "offline":
+      icon = <CloudOff size={12} aria-hidden="true" />;
+      label = "Offline";
+      tone = "warn";
+      title =
+        "You're offline. Your work is saved on this device and syncs when you reconnect.";
+      break;
+    case "error":
+      icon = <Info size={12} aria-hidden="true" />;
+      label = "Sync paused";
+      tone = "warn";
+      title = status.error ?? undefined;
+      break;
+    case "saved":
+      icon = <Cloud size={12} aria-hidden="true" />;
+      label = "Backed up";
+      title = "Backed up to your account.";
+      break;
+    default:
+      // Resting state: reflect the last known backup of this workspace.
+      icon = <Cloud size={12} aria-hidden="true" />;
+      if (!loaded) {
+        label = "Checking…";
+      } else if (activeMeta) {
+        label = `Backed up ${formatRelative(Date.parse(activeMeta.updatedAt))}`;
+        title = "Backed up to your account.";
+      } else {
+        label = "Saved on this device";
+        title =
+          "Saved on this device. It backs up to your account automatically.";
+      }
+  }
+  return (
+    <span
+      className={`workspace-sync-status${tone ? ` ${tone}` : ""}${
+        className ? ` ${className}` : ""
+      }`}
+      title={title}
+    >
+      {icon}
+      <span>{label}</span>
+    </span>
+  );
 }
 
 /** Inline "backed up Xm ago" marker appended to a local row's meta line. */
@@ -331,6 +405,26 @@ export function WorkspaceBadge({
       ? `, ${backupStatusText(activeMeta, activeStale).toLowerCase()}`
       : ""
   }`;
+
+  // Signed-in playgrounds back up to the cloud automatically, there is no
+  // manual "Back up" button. The first change to an unsaved draft promotes it
+  // (so the backup lands on a stable, listed workspace) and then syncs. OPFS
+  // stays the local source of truth, so an offline or failed sync never loses
+  // work; the hook retries when the connection returns.
+  const autoSync = useWorkspaceAutoSync({
+    enabled: showCloud,
+    activeWorkspaceId,
+    isDraft,
+    playgroundId,
+    buildBundle,
+    promoteDraft: onSave
+      ? () => onSave(activeWorkspaceName || "Workspace")
+      : undefined,
+    onSynced: () => {
+      void refreshCloud();
+      refreshRegistry();
+    },
+  });
 
   // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`
   // call is independent so we fire them in parallel and stream results
@@ -524,37 +618,17 @@ export function WorkspaceBadge({
                 ) : (
                   <div className="workspace-popover-cloud">
                     <div className="workspace-popover-cloud-row">
-                      {buildBundle && (
-                        <button
-                          type="button"
-                          className="workspace-popover-backup-btn"
-                          onClick={() => void handleBackUp()}
-                          disabled={backupBusy || !activeWorkspaceId}
-                          title={`Back up “${activeWorkspaceName || "this workspace"}” to your account`}
-                        >
-                          {backupBusy ? (
-                            <Loader2
-                              size={12}
-                              aria-hidden="true"
-                              className="cloud-spin"
-                            />
-                          ) : (
-                            <CloudUpload size={12} aria-hidden="true" />
-                          )}
-                          <span>{backupBusy ? "Backing up…" : "Back up"}</span>
-                        </button>
-                      )}
-                      <span
-                        className={`workspace-popover-backup-status${activeStale ? " stale" : ""}`}
-                      >
-                        {cloud.loaded
-                          ? backupStatusText(activeMeta, activeStale)
-                          : "Checking backups…"}
-                      </span>
+                      {/* Auto-sync, no manual "Back up" button. */}
+                      <WorkspaceSyncStatus
+                        status={autoSync}
+                        activeMeta={activeMeta}
+                        loaded={cloud.loaded}
+                        className="in-popover"
+                      />
                     </div>
-                    {(cloudError ?? cloud.error) && (
+                    {(autoSync.error ?? cloudError ?? cloud.error) && (
                       <p role="alert" className="workspace-popover-cloud-error">
-                        {cloudError ?? cloud.error}
+                        {autoSync.error ?? cloudError ?? cloud.error}
                       </p>
                     )}
                     {cloud.usage && (
@@ -590,11 +664,21 @@ export function WorkspaceBadge({
         </Popover.Portal>
       </Popover.Root>
 
-      {onSave && (
+      {/* Signed in: a passive auto-sync status replaces the manual Save/Back-up
+          control (the playground now backs up automatically). Guests keep the
+          Save menu to name a draft they want in their browser-saved list. */}
+      {showCloud && (
+        <WorkspaceSyncStatus
+          status={autoSync}
+          activeMeta={activeMeta}
+          loaded={cloud.loaded}
+        />
+      )}
+      {!showCloud && onSave && (
         <Menu.Root>
           <Menu.Trigger
             className={`workspace-save-btn${unsaved ? "" : " quiet"}`}
-            title="Save this workspace, locally, to your account, or both"
+            title="Save this workspace to your browser"
           >
             <Save size={12} aria-hidden="true" />
             <span>Save</span>
@@ -707,7 +791,6 @@ export function WorkspaceBadge({
         registry={registry}
         onRegistryChange={refreshRegistry}
         cloud={cloud}
-        buildBundle={buildBundle}
       />
     </>
   );
@@ -789,7 +872,6 @@ interface WorkspaceManagerDrawerProps {
   registry: WorkspaceEntry[];
   onRegistryChange: () => void;
   cloud: CloudBackups;
-  buildBundle?: () => Promise<WorkspaceBundle | null>;
 }
 
 function WorkspaceManagerDrawer({
@@ -800,7 +882,6 @@ function WorkspaceManagerDrawer({
   registry,
   onRegistryChange,
   cloud,
-  buildBundle,
 }: WorkspaceManagerDrawerProps) {
   const list = useMemo(
     () =>
@@ -840,26 +921,11 @@ function WorkspaceManagerDrawer({
   );
   const showCloud = cloud.available && !cloud.signedOut;
   const [cloudBusyId, setCloudBusyId] = useState<string | null>(null);
-  const [backupBusy, setBackupBusy] = useState(false);
   const [restoreTarget, setRestoreTarget] = useState<CloudWorkspaceMeta | null>(
     null,
   );
   const [cloudDeleteTarget, setCloudDeleteTarget] =
     useState<CloudWorkspaceMeta | null>(null);
-
-  const handleBackUp = useCallback(async () => {
-    if (!activeWorkspaceId || !buildBundle) return;
-    setBackupBusy(true);
-    setOperationError(null);
-    try {
-      await backUpWorkspace(activeWorkspaceId, buildBundle);
-      await refreshCloud();
-    } catch (err) {
-      setOperationError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBackupBusy(false);
-    }
-  }, [activeWorkspaceId, buildBundle, refreshCloud]);
 
   const handleOpenCloud = useCallback(
     async (meta: CloudWorkspaceMeta) => {
@@ -1131,24 +1197,8 @@ function WorkspaceManagerDrawer({
                           </div>
                         </div>
                         <div className="workspace-manager-item-actions">
-                          {showCloud && buildBundle && active && (
-                            <ActionButton
-                              label={backupBusy ? "Backing up…" : "Back up"}
-                              onClick={() => void handleBackUp()}
-                              icon={
-                                backupBusy ? (
-                                  <Loader2
-                                    size={12}
-                                    aria-hidden="true"
-                                    className="cloud-spin"
-                                  />
-                                ) : (
-                                  <CloudUpload size={12} aria-hidden="true" />
-                                )
-                              }
-                              disabled={backupBusy}
-                            />
-                          )}
+                          {/* No manual "Back up", the active workspace syncs
+                              automatically (useWorkspaceAutoSync). */}
                           {showCloud &&
                             cloudById.has(ws.id) &&
                             (isSqlPlayground(playgroundId) ? (

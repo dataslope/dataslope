@@ -52,18 +52,16 @@ function collectPlayground(segment: string): AskAiClientContext {
 
 export default function AskAi() {
   const pathname = usePathname() ?? "";
-  // Lesson surfaces: course lessons, interview-prep pages, and the dev
-  // component gallery. The bare `/courses` URL is the catalog page, no
-  // lesson to ask about there. Interview-prep has no raw-Markdown mirror,
-  // so its context comes entirely from the widget registry (the questions
-  // on screen), which is what matters there anyway.
+  // The widget only belongs on surfaces with actual content to ask about:
+  // course lessons, interview-prep pages, and a live playground. Catalog /
+  // index routes are excluded, the bare `/courses` and `/playground` URLs are
+  // just lists of links, nothing to ask about, so require a sub-path on both.
+  // Interview-prep has no raw-Markdown mirror, so its context comes entirely
+  // from the widget registry (the questions on screen), which is what matters
+  // there anyway.
   const onInterviewPrep = pathname.startsWith("/interview-prep/");
-  const onLesson =
-    pathname.startsWith("/courses/") ||
-    onInterviewPrep ||
-    pathname === "/fumadocs-dev" ||
-    pathname.startsWith("/fumadocs-dev/");
-  const onPlayground = pathname.startsWith("/playground");
+  const onLesson = pathname.startsWith("/courses/") || onInterviewPrep;
+  const onPlayground = pathname.startsWith("/playground/");
 
   const collectContext = useCallback((): AskAiClientContext => {
     const segments = pathname.split("/").filter(Boolean); // e.g. ["courses","a","b"]

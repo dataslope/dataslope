@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * "Your workspaces" — the unified workspace list on the /playground index.
+ * "Your workspaces": the unified workspace list on the /playground index.
  *
  * One list, deliberately: local (this-browser) workspaces and cloud backups
  * are merged by id into a single set of rows rather than the old
@@ -9,7 +9,7 @@
  * user's workspaces are cloud-backed by default and the plumbing that keeps
  * them synced is invisible here; a guest's workspaces live in this browser with
  * a standing "sign in to save them to the cloud" nudge. The section always
- * renders — empty and signed-out states included — so the page never looks
+ * renders (empty and signed-out states included) so the page never looks
  * broken before any workspace exists.
  *
  * The list is read-and-open only. Clicking a row opens that workspace in its
@@ -435,30 +435,29 @@ function WorkspacesSkeleton() {
   );
 }
 
-/** Section body when there are no workspaces yet. */
+/** Section body when there are no workspaces yet. No boxed borders, a single
+ *  top divider frames the zone (matching the populated list) and the sign-in
+ *  nudge sits under its own hairline. */
 function EmptyState({ signedOut }: { signedOut: boolean }) {
   return (
-    <div className="mt-5">
-      <div className="rounded-xl border border-dashed border-[var(--ds-gray-200)] px-6 py-10 text-center dark:border-white/10">
+    <div className="mt-5 border-t border-[var(--ds-gray-200)] dark:border-white/[0.08]">
+      <div className="px-2 py-10">
         <p className="text-sm text-[#121212] dark:text-white">
           No workspaces yet.
         </p>
-        <p className="mt-1.5 text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-          Pick a language under “Start something new” — your work is saved
+        <p className="mt-1.5 max-w-md text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          Pick a language under “Start something new” and your work is saved
           automatically{signedOut ? " in this browser" : " to your account"}.
         </p>
       </div>
-      {signedOut && (
-        <div className="mt-4">
-          <SignInNudge />
-        </div>
-      )}
+      {signedOut && <SignInNudge />}
     </div>
   );
 }
 
 /** "Sign in to save to the cloud" upsell for guests. `compact` renders the
- *  inline footer variant; otherwise a full-width row with a button. */
+ *  inline footer variant; otherwise a full-width row separated by a single top
+ *  hairline (no boxed border). */
 function SignInNudge({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
@@ -473,7 +472,7 @@ function SignInNudge({ compact = false }: { compact?: boolean }) {
     );
   }
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-[var(--ds-gray-200)] px-4 py-3.5 dark:border-white/10">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-[var(--ds-gray-200)] px-2 py-4 dark:border-white/[0.08]">
       <Cloud
         size={20}
         className="shrink-0 text-[var(--ds-blue-500)] dark:text-[var(--ds-blue-400)]"

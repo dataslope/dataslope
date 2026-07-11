@@ -4085,6 +4085,34 @@ html[data-playground-theme="dark"] .welcome h3 {
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
 }
 
+/* Passive cloud auto-sync status. For signed-in users this sits where the
+   manual Save/Back-up control used to; there is no button to press. Quiet by
+   default, `warn` when offline or a sync is paused. */
+.workspace-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.workspace-sync-status svg {
+  flex: none;
+  opacity: 0.8;
+}
+.workspace-sync-status.warn {
+  color: var(--yellow);
+}
+.workspace-sync-status.in-popover {
+  margin-left: 0;
+  padding: 0;
+  font-size: 11.5px;
+}
+
 /* Save destination menu (local / cloud / both). Items reuse the shared
    .example-item title + description treatment. */
 .workspace-save-menu {
