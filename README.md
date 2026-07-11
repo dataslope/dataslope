@@ -151,6 +151,10 @@ Key files:
 
    `BETTER_AUTH_URL` is set as a non-secret `var` in `wrangler.jsonc` (defaults to `https://dataslope.com`); change it if the deployed origin differs. A provider whose `*_CLIENT_ID`/`*_CLIENT_SECRET` pair is missing is simply not offered, so you can ship with just one provider configured.
 
+   You only ever register the **production** callback URL above — no per-preview URLs. `lib/auth/server.ts` handles the two hosts that aren't the pinned apex:
+   - **`www.dataslope.com`** (production also serves `www` with no redirect) is trusted for the CSRF origin check alongside the apex and any subdomain, so email/password sign-up/sign-in works there (previously it failed with "Invalid origin").
+   - **`*.workers.dev` preview deployments** trust their own origin for email/password, and Google/GitHub sign-in completes via Better Auth's `oAuthProxy` plugin: the provider still returns to the registered production callback, then the authenticated session is relayed back to the preview. The relay encrypts its payload with a secret shared across deployments — `BETTER_AUTH_SECRET` by default, or set a dedicated `OAUTH_PROXY_SECRET` (`npx wrangler secret put OAUTH_PROXY_SECRET`, identical value everywhere) to narrow the blast radius. The proxy is a no-op on production and `www`.
+
 ### Local development
 
 `npm run dev` reads bindings/vars from `wrangler.jsonc` via OpenNext's `initOpenNextCloudflareForDev()`. Put local secrets and any overrides in a `.dev.vars` file (gitignored), e.g.:

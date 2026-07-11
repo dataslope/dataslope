@@ -22,7 +22,7 @@
  */
 import { betterAuth } from "better-auth";
 import { createAuthMiddleware } from "better-auth/api";
-import { admin } from "better-auth/plugins";
+import { admin, oAuthProxy } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { promoteConfiguredAdmins } from "@/lib/auth/adminBootstrap";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
@@ -74,6 +74,115 @@ export function oauthStateCookieDomain(
   if (!hostname.includes(".") || hostname.startsWith("[")) return undefined;
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return undefined;
   return hostname;
+}
+
+/**
+ * Is `requestHost` the same site as the host of `baseURL` — that exact host or
+ * a subdomain of it? Used to widen the CSRF origin allow-list.
+ *
+ * Production serves this app on BOTH dataslope.com and www.dataslope.com with
+ * no canonical redirect (the very reason oauthStateCookieDomain exists). Better
+ * Auth trusts only `baseURL` (pinned to the apex, https://dataslope.com) plus
+ * whatever `trustedOrigins` adds, so an email/password sign-up POST issued from
+ * www.dataslope.com carried `Origin: https://www.dataslope.com`, which matched
+ * neither the apex baseURL nor a workers.dev preview, and Better Auth rejected
+ * it with "Invalid origin". Trusting the apex and its subdomains closes that
+ * gap without a per-host TRUSTED_ORIGINS entry.
+ *
+ * The subdomain test is anchored on a leading dot, so `dataslope.com` trusts
+ * `www.dataslope.com` but never a look-alike whose registrable domain differs:
+ * `dataslope.com.evil.com` ends with `.evil.com`, not `.dataslope.com`, and
+ * `notdataslope.com` isn't a suffix match either. This only ever adds the
+ * request's *own* host to the allow-list; Better Auth still compares the actual
+ * `Origin` header against it, so a cross-site POST (Origin: evil.com) arriving
+ * at www is still rejected — CSRF protection is intact.
+ */
+export function isSameSiteHost(
+  baseURL: string | undefined,
+  requestHost: string | undefined,
+): boolean {
+  if (!baseURL || !requestHost) return false;
+  let baseHost: string;
+  try {
+    baseHost = new URL(baseURL).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  const req = requestHost.toLowerCase();
+  return req === baseHost || req.endsWith(`.${baseHost}`);
+}
+
+/**
+ * The origin THIS deployment is actually served from: the request's own origin
+ * on a *.workers.dev preview, otherwise the pinned production URL (and the
+ * pinned value — possibly undefined — for request-less calls or local dev).
+ *
+ * It drives the two places that must distinguish "this is a throwaway preview"
+ * from "this is production":
+ *
+ *   - the OAuth `state` cookie's Domain (oauthStateCookieDomain): a preview
+ *     gets a host-valid Domain instead of Domain=dataslope.com, which the
+ *     browser would reject on a workers.dev host and drop the cookie.
+ *   - oAuthProxy's `currentURL`: the proxy engages only when currentURL differs
+ *     from productionURL, so pinning previews to their own origin and every
+ *     other host (apex, www) to the production URL confines the whole OAuth
+ *     relay to previews — apex and www keep their exact current flows.
+ *
+ * Only workers.dev floats; www.dataslope.com resolves to the pinned apex, so it
+ * is treated as production (its social login keeps completing via the
+ * domain-scoped state cookie, and email/password via the origin allow-list).
+ */
+export function deploymentOrigin(
+  pinned: string | undefined,
+  request?: Request,
+): string | undefined {
+  if (!request) return pinned;
+  try {
+    const { origin, hostname } = new URL(request.url);
+    if (hostname.endsWith(".workers.dev")) return origin;
+  } catch {
+    // Unparseable request URL → fall back to the pinned value.
+  }
+  return pinned;
+}
+
+/**
+ * The extra CSRF-trusted origins to merge on top of Better Auth's defaults
+ * (which already trust `baseURL`). Passed as the `trustedOrigins` callback, so
+ * Better Auth still compares the real `Origin`/`Referer` header against the
+ * merged list — this only ever contributes the request's OWN origin, plus the
+ * configured TRUSTED_ORIGINS. A cross-site POST (Origin: evil.example arriving
+ * at our host) is still rejected, and session cookies stay SameSite=Lax.
+ *
+ * Two dynamic additions, both scoped to the request's own host:
+ *   - the production site and its subdomains (isSameSiteHost), so
+ *     www.dataslope.com is trusted even though BETTER_AUTH_URL pins the apex —
+ *     this is the fix for "Invalid origin" on email sign-up from www.
+ *   - *.workers.dev preview deployments, so auth works on a preview URL.
+ *
+ * Note the origin check only runs in production: Better Auth skips it when
+ * NODE_ENV=test (see skipOriginCheck), which is why the endpoint tests force it
+ * back on with `advanced.disableOriginCheck: false`.
+ */
+export function extraTrustedOrigins(
+  env: CloudflareEnv,
+  request?: Request,
+): string[] {
+  const origins = parseList(env.TRUSTED_ORIGINS);
+  try {
+    if (request) {
+      const { origin, hostname } = new URL(request.url);
+      if (
+        hostname.endsWith(".workers.dev") ||
+        isSameSiteHost(env.BETTER_AUTH_URL, hostname)
+      ) {
+        origins.push(origin);
+      }
+    }
+  } catch {
+    // A request without a parseable URL contributes no extra origin.
+  }
+  return origins;
 }
 
 /**
@@ -175,7 +284,27 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
 
   const adminUserIdsResolved = await resolveAdminUserIds(env, request);
 
-  const stateCookieDomain = oauthStateCookieDomain(env.BETTER_AUTH_URL);
+  // Where THIS deployment is served from: its own origin on a *.workers.dev
+  // preview, else the pinned apex (production/www). Drives the state-cookie
+  // Domain and oAuthProxy's currentURL. See deploymentOrigin.
+  const thisOrigin = deploymentOrigin(env.BETTER_AUTH_URL, request);
+
+  // Scope the OAuth `state` cookie off THIS deployment's origin so a preview
+  // sets a host-valid Domain (its own workers.dev host) instead of
+  // Domain=dataslope.com, which the browser would reject on a workers.dev host
+  // and drop the cookie. On production/www this is the apex, so it's unchanged
+  // (Domain=dataslope.com, covering the apex + the www→apex callback).
+  const stateCookieDomain = oauthStateCookieDomain(thisOrigin);
+
+  // Turn on the OAuth-proxy relay only when there's a pinned production origin
+  // to proxy through AND at least one social provider to proxy. It's a no-op on
+  // the production origin itself (productionURL === currentURL), and on a
+  // preview it rewrites the provider redirect_uri to the production callback and
+  // relays the authenticated session back to the preview. Requires the same
+  // secret across deployments; BETTER_AUTH_SECRET already is (same Worker), so
+  // it's the default, with OAUTH_PROXY_SECRET as an optional dedicated key.
+  const oauthProxyEnabled =
+    Boolean(env.BETTER_AUTH_URL) && Object.keys(socialProviders).length > 0;
 
   return betterAuth({
     // D1 via the Kysely SQLite dialect, the most Cloudflare-native path, with
@@ -188,33 +317,31 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     secret: env.BETTER_AUTH_SECRET,
     // Canonical origin for OAuth callback URLs. Unset → inferred from the
     // request; set BETTER_AUTH_URL (wrangler `vars`, or `.dev.vars` locally)
-    // when the deployed origin must be pinned.
+    // when the deployed origin must be pinned. Stays pinned on every host,
+    // including previews: oAuthProxy (below) does the preview relay via its own
+    // `currentURL`, so the base URL never has to float.
     baseURL: env.BETTER_AUTH_URL,
-    // CSRF origin allow-list. Better Auth always trusts `baseURL` (pinned to
-    // https://dataslope.com so OAuth callbacks resolve). Preview deployments,
-    // though, are served from the account's *.workers.dev subdomain, which is
-    // therefore NOT trusted, so email/password sign-in and sign-up on a preview
-    // fail the origin check with "Invalid origin". Trust the request's own
-    // origin when it's a workers.dev host, so previews work without per-URL
-    // config, plus any explicit TRUSTED_ORIGINS extras (custom preview/staging
-    // domains). This function's result is merged with the defaults, so baseURL
-    // stays trusted. It's not a production CSRF hole: production runs on the
-    // custom domain (never the workers.dev branch), and session cookies are
-    // SameSite=Lax. NOTE: social login still can't *complete* on a preview,
-    // its OAuth redirect_uri is pinned to baseURL, so Google/GitHub return to
-    // production; use email/password to exercise auth on a preview URL.
-    trustedOrigins: (req) => {
-      const origins = parseList(env.TRUSTED_ORIGINS);
-      try {
-        if (req) {
-          const { origin, hostname } = new URL(req.url);
-          if (hostname.endsWith(".workers.dev")) origins.push(origin);
-        }
-      } catch {
-        // A request without a parseable URL contributes no extra origin.
-      }
-      return origins;
-    },
+    // CSRF origin allow-list. Better Auth always trusts `baseURL`. Two extra
+    // classes of origin get the request's own origin added:
+    //
+    //   - The production site itself: BETTER_AUTH_URL is pinned to the apex
+    //     (https://dataslope.com), but the app is ALSO served on
+    //     www.dataslope.com with no canonical redirect. An email/password
+    //     sign-up POST from www therefore carried Origin: https://www.dataslope.com,
+    //     which matched neither the apex baseURL nor a preview host, and Better
+    //     Auth rejected it with "Invalid origin". Trust the apex and any
+    //     subdomain of it (isSameSiteHost) so www — and any future *.dataslope.com
+    //     host — is accepted.
+    //   - Preview deployments on the account's *.workers.dev subdomain, which
+    //     are otherwise untrusted, so auth on a preview also failed the origin
+    //     check. (Social login additionally needs the oAuthProxy plugin below to
+    //     *complete* on a preview; email/password works from the origin trust
+    //     alone.)
+    //
+    // Plus any explicit TRUSTED_ORIGINS extras (custom preview/staging domains).
+    // See extraTrustedOrigins: the result is merged with the defaults (so
+    // baseURL stays trusted) and only ever adds the request's OWN host.
+    trustedOrigins: (req) => extraTrustedOrigins(env, req),
     // Where failed OAuth callbacks land. Without this, Better Auth bounces
     // them through its built-in /api/auth/error page, which in production
     // redirects to `/?error=<code>`, stranding codes like `state_mismatch`
@@ -360,12 +487,42 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // endpoints when configured, see lib/billing/polar.ts. Like every other
     // integration here it's fail-safe: with no POLAR_* config the plugin
     // simply isn't registered and auth runs exactly as before.
+    //
+    // oAuthProxy makes Google/GitHub sign-in *complete* on a *.workers.dev
+    // preview. Google requires an exact, pre-registered redirect_uri, so only
+    // the production callback (https://dataslope.com/api/auth/callback/*) is
+    // registered and previews can't be. The proxy rewrites the redirect_uri to
+    // that production callback, lets production exchange the code, then relays
+    // the authenticated session back to the preview's own origin (the session
+    // is created on the preview, not production). It no-ops on production
+    // itself, where `productionURL` equals `currentURL`, so the apex/www flow
+    // is unchanged. It needs one secret shared across deployments to encrypt the
+    // relayed profile; the Worker's BETTER_AUTH_SECRET already is, so it's the
+    // default (override with a dedicated OAUTH_PROXY_SECRET if desired).
     plugins: (() => {
       const adminPlugin = admin({
         adminUserIds: adminUserIdsResolved,
       });
       const billing = polarPlugin(env);
-      return billing ? [adminPlugin, billing] : [adminPlugin];
+      const proxy = oauthProxyEnabled
+        ? oAuthProxy({
+            productionURL: env.BETTER_AUTH_URL,
+            // Pin the proxy's notion of "current URL" to THIS deployment's
+            // origin. The plugin skips proxying when currentURL === productionURL
+            // and otherwise relays back to currentURL, so this confines the
+            // relay to workers.dev previews: apex and www both resolve to the
+            // apex here (=== productionURL) and are never proxied, while a
+            // preview resolves to its own origin and is. Without it the plugin
+            // falls back to the raw request host and would proxy www too.
+            currentURL: thisOrigin,
+            secret: env.OAUTH_PROXY_SECRET ?? env.BETTER_AUTH_SECRET,
+          })
+        : null;
+      return [
+        adminPlugin,
+        ...(billing ? [billing] : []),
+        ...(proxy ? [proxy] : []),
+      ];
     })(),
     session: {
       // Cache the session in a short-lived signed cookie so the common

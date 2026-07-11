@@ -35,9 +35,10 @@ declare global {
     BETTER_AUTH_URL: string;
     // From address for transactional email (must be on a Resend-verified domain).
     EMAIL_FROM?: string;
-    // Extra CSRF-trusted origins (comma-separated), on top of BETTER_AUTH_URL
-    // and the auto-trusted *.workers.dev preview origins. For custom preview or
-    // staging domains. See `trustedOrigins` in lib/auth/server.ts.
+    // Extra CSRF-trusted origins (comma-separated), on top of BETTER_AUTH_URL,
+    // the apex + its subdomains (so www.dataslope.com is trusted), and the
+    // auto-trusted *.workers.dev preview origins. For custom preview or staging
+    // domains. See `trustedOrigins` in lib/auth/server.ts.
     TRUSTED_ORIGINS?: string;
 
     // --- "Ask AI" model config (vars; see lib/ai/models.ts) ---
@@ -76,6 +77,13 @@ declare global {
     // (lib/auth/server.ts) hard-fails when it's unset rather than falling back
     // to Better Auth's built-in key.
     BETTER_AUTH_SECRET: string;
+    // Optional dedicated key for the oAuthProxy plugin (Google/GitHub sign-in
+    // on *.workers.dev preview deployments; see `oAuthProxy` in
+    // lib/auth/server.ts). It encrypts the profile relayed from the production
+    // callback back to the preview, so it must be identical across all
+    // deployments. Defaults to BETTER_AUTH_SECRET (already Worker-wide) when
+    // unset; set a distinct value to narrow the blast radius.
+    OAUTH_PROXY_SECRET?: string;
     GOOGLE_CLIENT_ID?: string;
     GOOGLE_CLIENT_SECRET?: string;
     GITHUB_CLIENT_ID?: string;
