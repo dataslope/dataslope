@@ -235,6 +235,41 @@ export async function deleteShares(
   await env.DB.batch(rows.map((r) => stmt.bind(r.id)));
 }
 
+/**
+ * Drop every R2 object a user owns, their cloud saves *and* their share links,
+ * used when the whole account is deleted (Better Auth `deleteUser.beforeDelete`
+ * in lib/auth/server.ts). The `cloud_workspaces` / `playground_shares` rows
+ * themselves cascade from the `user` row's deletion (ON DELETE CASCADE in
+ * migrations/0005), but their R2 payloads do not, so we remove those here
+ * *before* the user row goes.
+ *
+ * Deliberately best-effort, it never throws: orphaned bytes are a storage cost,
+ * not a reason to trap a user in an account they asked to delete. R2's
+ * multi-delete caps at 1000 keys per call, so keys are chunked.
+ */
+export async function deleteAllUserObjects(
+  env: CloudflareEnv,
+  userId: string,
+): Promise<void> {
+  const bucket = env.WORKSPACES_BUCKET;
+  if (!bucket) return;
+  try {
+    const [workspaces, shares] = await Promise.all([
+      listWorkspaceRows(env, userId),
+      listShareRows(env, userId),
+    ]);
+    const keys = [
+      ...workspaces.map((r) => r.r2_key),
+      ...shares.map((r) => r.r2_key),
+    ];
+    for (let i = 0; i < keys.length; i += 1000) {
+      await bucket.delete(keys.slice(i, i + 1000));
+    }
+  } catch {
+    // Best-effort; see doc comment. A cleanup hiccup must not block deletion.
+  }
+}
+
 /** Amortized cleanup of expired *guest* shares (nobody lists them, so nothing
  *  else would ever encounter the rows). Called opportunistically from the
  *  share-creation route via ctx.waitUntil; bounded so a single request never

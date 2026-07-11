@@ -13,6 +13,7 @@ import {
 } from "../_components/billing/proCheckout";
 import { CloudStorageSection } from "./CloudStorageSection";
 import { ConnectedAccountsSection } from "./ConnectedAccountsSection";
+import { DeleteAccountSection } from "./DeleteAccountSection";
 
 /**
  * The account area is the canonical example of the report's rule: auth gates
@@ -240,6 +241,11 @@ export function AccountClient() {
     {/* Cloud saves + share links (all playgrounds), the quota is
         account-wide, so this is where users see and free up everything. */}
     <CloudStorageSection />
+
+    {/* Irreversible account deletion, kept last. `plan === "pro"` (not the
+        admin-as-Pro case) is what carries a real Polar subscription to warn
+        about. */}
+    <DeleteAccountSection email={user.email} isPaidPro={plan === "pro"} />
     </>
   );
 }

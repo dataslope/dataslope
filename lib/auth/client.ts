@@ -35,4 +35,9 @@ export const {
   listAccounts,
   linkSocial,
   unlinkAccount,
+  // Self-service account deletion (the account page's danger zone). Hits Better
+  // Auth's /api/auth/delete-user; server-side (lib/auth/server.ts) this cleans
+  // up the user's R2 objects and, when a mailer is configured, requires an
+  // emailed confirmation link before the row is actually removed.
+  deleteUser,
 } = authClient;
