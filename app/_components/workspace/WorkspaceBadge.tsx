@@ -64,7 +64,10 @@ import {
   renameWorkspace,
   type WorkspaceEntry,
 } from "../opfs/workspace";
-import { switchActiveWorkspace } from "../opfs/activeWorkspace";
+import {
+  isWorkspaceDirty,
+  switchActiveWorkspace,
+} from "../opfs/activeWorkspace";
 import { estimateWorkspaceSize } from "../opfs/fileStorage";
 import {
   downloadWorkspaceZip,
@@ -411,6 +414,18 @@ export function WorkspaceBadge({
       : ""
   }`;
 
+  // Unsynced local work with the user now signed in: a saved workspace with no
+  // cloud backup, or a draft the user actually changed (the persisted dirty
+  // latch, so a pristine default never uploads). Makes signing in sufficient
+  // to get guest work backed up, no fresh edit required. A successful backup
+  // refreshes the cloud list, which flips this off.
+  const needsInitialBackup =
+    autoSyncActive &&
+    cloud.loaded &&
+    !!activeWorkspaceId &&
+    !activeMeta &&
+    (!isDraft || isWorkspaceDirty(activeWorkspaceId));
+
   // Signed-in playgrounds back up to the cloud automatically, there is no
   // manual "Back up" button. The first change to an unsaved draft promotes it
   // (so the backup lands on a stable, listed workspace) and then syncs. OPFS
@@ -429,6 +444,7 @@ export function WorkspaceBadge({
       void refreshCloud();
       refreshRegistry();
     },
+    needsInitialBackup,
   });
 
   // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`

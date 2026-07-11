@@ -9,7 +9,7 @@ const SETTLE = 1000;
 
 function makeEngine(
   overrides: Partial<{
-    sync: () => Promise<void>;
+    sync: () => Promise<boolean | void>;
     isOnline: () => boolean;
   }> = {},
 ) {
@@ -123,6 +123,35 @@ describe("WorkspaceSyncEngine", () => {
     engine.handleOnline();
     await vi.advanceTimersByTimeAsync(0);
     expect(sync).toHaveBeenCalledTimes(1);
+  });
+
+  it("requestSync bypasses the settle window but keeps the debounce", async () => {
+    const { engine, sync, states } = makeEngine();
+    engine.activate(); // settle window open
+    engine.requestSync();
+    expect(lastPhase(states)).toBe("pending");
+    await vi.advanceTimersByTimeAsync(DEBOUNCE - 10);
+    expect(sync).not.toHaveBeenCalled(); // still debouncing
+    await vi.advanceTimersByTimeAsync(10);
+    expect(sync).toHaveBeenCalledTimes(1);
+    expect(lastPhase(states)).toBe("saved");
+  });
+
+  it("retries after a debounce when sync reports not-ready (false)", async () => {
+    const sync = vi
+      .fn<() => Promise<boolean | void>>()
+      .mockResolvedValueOnce(false) // playground still booting
+      .mockResolvedValueOnce(undefined);
+    const { engine, states } = makeEngine({ sync });
+    engine.activate();
+    engine.requestSync();
+    await vi.advanceTimersByTimeAsync(DEBOUNCE);
+    expect(sync).toHaveBeenCalledTimes(1);
+    expect(lastPhase(states)).toBe("pending"); // held, not errored
+
+    await vi.advanceTimersByTimeAsync(DEBOUNCE);
+    expect(sync).toHaveBeenCalledTimes(2);
+    expect(lastPhase(states)).toBe("saved");
   });
 
   it("resets to idle and re-opens the settle window on activate", async () => {

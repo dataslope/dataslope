@@ -20,8 +20,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
 import { isSqlPlayground } from "@/lib/workspaces/types";
-import { CloudApiError } from "../cloud/cloudApi";
-import { backUpWorkspace } from "./workspaceCloud";
+import { CloudApiError, saveCloudWorkspace } from "../cloud/cloudApi";
 import { subscribeWorkspaceChanged } from "./workspaceChanges";
 import {
   WorkspaceSyncEngine,
@@ -51,6 +50,10 @@ export interface AutoSyncOptions {
   /** Run after a successful backup (refresh the cloud list + registry so the
    *  badge reflects the new backup). */
   onSynced?: () => void;
+  /** True when the host has verified there is local work with no cloud backup
+   *  (e.g. guest work found right after signing in). Triggers a sync without
+   *  waiting for a fresh edit, so signing in is enough to get backed up. */
+  needsInitialBackup?: boolean;
 }
 
 // Debounce from the last edit to the backup. SQL bundles carry a full database
@@ -93,11 +96,15 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
       sync: async () => {
         const o = optsRef.current;
         if (!o.enabled || !o.activeWorkspaceId || !o.buildBundle) return;
+        const bundle = await o.buildBundle();
+        // A null bundle means the playground hasn't finished booting; tell
+        // the engine to retry after another debounce instead of erroring.
+        if (!bundle) return false;
         if (o.isDraft && o.promoteDraft) {
           // Promote first so the backup lands on a registered workspace id.
           await o.promoteDraft();
         }
-        await backUpWorkspace(o.activeWorkspaceId, o.buildBundle);
+        await saveCloudWorkspace(o.activeWorkspaceId, bundle);
         o.onSynced?.();
       },
     });
@@ -128,6 +135,16 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
   useEffect(() => {
     engineRef.current?.activate();
   }, [opts.activeWorkspaceId]);
+
+  // Initial backup: when the host reports unsynced local work (guest work
+  // found after sign-in), sync without waiting for an edit. requestSync
+  // bypasses the settle window but keeps the debounce; a successful backup
+  // flips needsInitialBackup off via the host's cloud refresh, and a terminal
+  // failure leaves it true without re-running (deps unchanged), so no loop.
+  const needsInitialBackup = opts.enabled && !!opts.needsInitialBackup;
+  useEffect(() => {
+    if (needsInitialBackup) engineRef.current?.requestSync();
+  }, [needsInitialBackup, opts.activeWorkspaceId]);
 
   return status;
 }

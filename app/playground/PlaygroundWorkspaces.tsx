@@ -23,6 +23,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { ArrowRight, Cloud, LogIn, Loader2, Search } from "lucide-react";
@@ -49,11 +50,13 @@ import {
   fetchCloudWorkspaceBundle,
   isCloudSupported,
   listCloudWorkspaces,
+  saveCloudWorkspace,
 } from "../_components/cloud/cloudApi";
 import {
   materializeCodeWorkspace,
   setPendingBundleRef,
 } from "../_components/cloud/materialize";
+import { buildCodeBundleFromOpfs } from "../_components/cloud/backupFromOpfs";
 
 const PLAYGROUND_BY_ID: Record<string, { label: string; href: string }> =
   Object.fromEntries(PLAYGROUNDS.map((p) => [p.id, p]));
@@ -163,10 +166,20 @@ export function PlaygroundWorkspaces() {
   const [localEntries, setLocalEntries] = useState<WorkspaceEntry[]>([]);
   const [cloudMetas, setCloudMetas] = useState<CloudWorkspaceMeta[]>([]);
   const [cloudUsage, setCloudUsage] = useState<CloudUsage | null>(null);
+  // True once a cloud list fetch has succeeded, gates the post-sign-in bulk
+  // backup so it only runs against a real (possibly empty) cloud inventory.
+  const [cloudLoaded, setCloudLoaded] = useState(false);
   const [sizes, setSizes] = useState<Map<string, number>>(() => new Map());
   const [query, setQuery] = useState("");
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [openError, setOpenError] = useState<string | null>(null);
+  // Progress of the post-sign-in bulk backup, shown in the footer while the
+  // user's guest workspaces upload.
+  const [backingUp, setBackingUp] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
+  const bulkRanRef = useRef(false);
 
   useEffect(() => {
     // Read the localStorage registry only after mount: it's undefined on the
@@ -189,6 +202,7 @@ export function PlaygroundWorkspaces() {
         if (cancelled) return;
         setCloudMetas(res.workspaces);
         setCloudUsage(res.usage);
+        setCloudLoaded(true);
       } catch (err) {
         if (cancelled) return;
         if (!(err instanceof CloudApiError)) {
@@ -200,6 +214,65 @@ export function PlaygroundWorkspaces() {
       cancelled = true;
     };
   }, [session]);
+
+  // Post-sign-in bulk backup: guest work saved in this browser uploads to the
+  // account automatically, so signing in is all it takes. Code workspaces only,
+  // their bundles rebuild from the manifest + OPFS without a live playground;
+  // SQL workspaces need their engine for the dump and stay manual (backed up
+  // from inside the playground). Registry entries are deliberate saves, so no
+  // pristine defaults are uploaded. Runs once per page view.
+  useEffect(() => {
+    if (!session || !cloudLoaded || bulkRanRef.current) return;
+    const cloudIds = new Set(cloudMetas.map((m) => m.id));
+    const candidates = localEntries.filter(
+      (e) => !cloudIds.has(e.id) && !isSqlPlayground(e.playground),
+    );
+    if (candidates.length === 0) return;
+    bulkRanRef.current = true;
+    let cancelled = false;
+    void (async () => {
+      setBackingUp({ done: 0, total: candidates.length });
+      let done = 0;
+      for (const entry of candidates) {
+        try {
+          const bundle = await buildCodeBundleFromOpfs(
+            entry.playground,
+            entry.id,
+            entry.name,
+          );
+          // No manifest/files to rebuild from: skip silently rather than
+          // uploading an empty bundle.
+          if (bundle) await saveCloudWorkspace(entry.id, bundle);
+        } catch (err) {
+          if (!cancelled) {
+            setOpenError(
+              `Couldn't back up “${entry.name}”: ${
+                err instanceof Error ? err.message : String(err)
+              }`,
+            );
+          }
+          break;
+        }
+        done += 1;
+        if (cancelled) return;
+        setBackingUp({ done, total: candidates.length });
+      }
+      // Re-fetch so the freshly-backed-up rows render as synced.
+      try {
+        const res = await listCloudWorkspaces();
+        if (!cancelled) {
+          setCloudMetas(res.workspaces);
+          setCloudUsage(res.usage);
+        }
+      } catch {
+        // The rows still show local; the next visit reconciles.
+      }
+      if (!cancelled) setBackingUp(null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session, cloudLoaded, cloudMetas, localEntries]);
 
   // Estimate on-device sizes (parallel, streamed in). Backed-up rows already
   // carry an authoritative cloud size, so only the browser-only ones need it.
@@ -365,6 +438,21 @@ export function PlaygroundWorkspaces() {
                             {" · not on this device"}
                           </span>
                         )}
+                        {/* SQL backups are manual (the dump needs the live
+                            engine), so tell a signed-in user this one isn't
+                            in the cloud yet. Code rows sync automatically. */}
+                        {row.onDevice &&
+                          !row.backedUp &&
+                          !signedOut &&
+                          cloudLoaded &&
+                          isSqlPlayground(row.playground) && (
+                            <span
+                              className="text-[var(--ds-gray-400)]"
+                              title="Open this workspace and use “Back up” to save it to your account."
+                            >
+                              {" · not backed up"}
+                            </span>
+                          )}
                       </span>
                     </span>
                     <span className="hidden w-16 shrink-0 text-right text-[13px] text-[var(--ds-gray-500)] tabular-nums sm:block dark:text-[var(--ds-gray-400)]">
@@ -397,8 +485,19 @@ export function PlaygroundWorkspaces() {
 
           {/* Footer: count + (signed-in) cloud usage, or the sign-in nudge. */}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-2 text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-            <span>
+            <span className="inline-flex items-center gap-2">
               {rows.length} {rows.length === 1 ? "workspace" : "workspaces"}
+              {backingUp && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Loader2
+                    size={13}
+                    className="animate-spin"
+                    aria-hidden="true"
+                  />
+                  Backing up {Math.min(backingUp.done + 1, backingUp.total)} of{" "}
+                  {backingUp.total}…
+                </span>
+              )}
             </span>
             {cloudUsage ? (
               <span className="inline-flex items-center gap-2.5">

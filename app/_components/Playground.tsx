@@ -144,7 +144,6 @@ import {
 } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
-import { notifyWorkspaceChanged } from "./workspace/workspaceChanges";
 import { ShareControls } from "./cloud/ShareControls";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
@@ -1659,9 +1658,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             if (wsId) opfsWriteFile(wsId, fileId, content);
           }
           // A genuine user edit makes the workspace eligible to be saved.
+          // (The cloud auto-sync pulse fires from the store's
+          // updateDirtyBuffer above, the single source for all mutations.)
           markDirty();
-          // ...and drives the signed-in cloud auto-sync (debounced downstream).
-          notifyWorkspaceChanged();
         }
       });
 

@@ -25,8 +25,10 @@ export interface SyncEngineState {
 }
 
 export interface SyncEngineDeps {
-  /** Promote-if-needed + upload the current workspace. Rejects on failure. */
-  sync: () => Promise<void>;
+  /** Promote-if-needed + upload the current workspace. Rejects on failure.
+   *  Resolving `false` means "not ready yet, retry after another debounce"
+   *  (e.g. the playground is still booting and can't build a bundle). */
+  sync: () => Promise<boolean | void>;
   /** Whether the browser currently has connectivity. */
   isOnline: () => boolean;
   /** Classifies a rejection from `sync()` as a transient network failure
@@ -68,6 +70,15 @@ export class WorkspaceSyncEngine {
    *  marks work pending and (re)arms the debounce. */
   notifyChange(): void {
     if (this.now() - this.activeSince < this.deps.settleMs) return;
+    this.pending = true;
+    if (this.state.phase !== "saving") this.set({ phase: "pending" });
+    this.arm();
+  }
+
+  /** Explicitly request a sync, bypassing the settle window (still debounced).
+   *  Used for the initial backup after sign-in, where the host has already
+   *  verified there is unsynced local work, no change pulse required. */
+  requestSync(): void {
     this.pending = true;
     if (this.state.phase !== "saving") this.set({ phase: "pending" });
     this.arm();
@@ -122,7 +133,15 @@ export class WorkspaceSyncEngine {
     this.pending = false;
     this.set({ phase: "saving", error: null });
     try {
-      await this.deps.sync();
+      const result = await this.deps.sync();
+      if (result === false) {
+        // Not ready (playground still booting): keep the work pending and
+        // retry after another debounce interval.
+        this.pending = true;
+        this.set({ phase: "pending" });
+        this.arm();
+        return;
+      }
       this.set({ phase: "saved", lastSyncedAt: this.now(), error: null });
     } catch (err) {
       if (this.deps.isNetworkError(err)) {
