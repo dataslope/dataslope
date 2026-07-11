@@ -12,6 +12,7 @@ import {
   waitForProActivation,
 } from "../_components/billing/proCheckout";
 import { CloudStorageSection } from "./CloudStorageSection";
+import { ConnectedAccountsSection } from "./ConnectedAccountsSection";
 
 /**
  * The account area is the canonical example of the report's rule: auth gates
@@ -231,6 +232,10 @@ export function AccountClient() {
         {signingOut ? "Signing out…" : "Sign out"}
       </button>
     </div>
+
+    {/* Connected sign-in methods (Google / GitHub), plus the guard against
+        removing a user's only way back in. */}
+    <ConnectedAccountsSection />
 
     {/* Cloud saves + share links (all playgrounds), the quota is
         account-wide, so this is where users see and free up everything. */}

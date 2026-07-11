@@ -27,4 +27,12 @@ export const {
   useSession,
   requestPasswordReset,
   resetPassword,
+  // Connected sign-in methods, surfaced on the account page: list the user's
+  // linked providers, attach another (OAuth redirect), or detach one. These hit
+  // Better Auth's built-in /api/auth/{list-accounts,link-social,unlink-account}
+  // endpoints, already served by the catch-all handler, so no server code is
+  // added. Better Auth refuses to unlink a user's only account (lockout guard).
+  listAccounts,
+  linkSocial,
+  unlinkAccount,
 } = authClient;
