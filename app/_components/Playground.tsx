@@ -1658,6 +1658,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             if (wsId) opfsWriteFile(wsId, fileId, content);
           }
           // A genuine user edit makes the workspace eligible to be saved.
+          // (The cloud auto-sync pulse fires from the store's
+          // updateDirtyBuffer above, the single source for all mutations.)
           markDirty();
         }
       });

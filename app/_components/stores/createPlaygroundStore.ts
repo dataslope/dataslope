@@ -3,6 +3,7 @@
 import { create, type UseBoundStore, type StoreApi } from "zustand";
 import type { OutputCell } from "../types";
 import type { PlaygroundFile } from "../playgroundTabs";
+import { notifyWorkspaceChanged } from "../workspace/workspaceChanges";
 
 type StatusState = "loading" | "ready" | "running" | "error";
 
@@ -62,16 +63,31 @@ export function createPlaygroundStore(): PlaygroundStore {
 
     setWorkspace: (workspaceId, workspaceName) =>
       set({ workspaceId, workspaceName }),
-    setFiles: (files) => set({ files }),
+    // File-list changes (create / delete / rename / duplicate) alter what a
+    // backup would contain, so they pulse the cloud auto-sync alongside
+    // content edits. Bootstrap also lands here; the sync engine's settle
+    // window absorbs those.
+    setFiles: (files) => {
+      set({ files });
+      notifyWorkspaceChanged();
+    },
     setActiveTabId: (activeTabId) => set({ activeTabId }),
     setActiveFileId: (activeFileId) => set({ activeFileId }),
-    updateDirtyBuffer: (fileId, code) =>
+    updateDirtyBuffer: (fileId, code) => {
+      // Every content mutation funnels through here (editor keystrokes,
+      // example loads, AI-applied edits), making it the one change-pulse
+      // source for the cloud auto-sync. Pulse outside the updater so the
+      // reducer stays pure, and only when the content actually changed.
+      let changed = false;
       set((state) => {
         if (state.dirtyBuffers.get(fileId) === code) return state;
+        changed = true;
         const next = new Map(state.dirtyBuffers);
         next.set(fileId, code);
         return { dirtyBuffers: next };
-      }),
+      });
+      if (changed) notifyWorkspaceChanged();
+    },
     clearDirtyBuffer: (fileId) =>
       set((state) => {
         if (!state.dirtyBuffers.has(fileId)) return state;
