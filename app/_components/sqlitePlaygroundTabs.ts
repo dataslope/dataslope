@@ -1,7 +1,6 @@
 "use client";
 
 import type { QueryTabSeed } from "./runtime/sqliteSamples";
-import { notifyWorkspaceChanged } from "./workspace/workspaceChanges";
 
 const STORAGE_PREFIX = "playground_sqlite_";
 
@@ -88,9 +87,6 @@ export function saveTabs(dbId: string, tabs: QueryTab[]): void {
   } catch {
     // Quota exceeded / private mode, silently ignore.
   }
-  // Query edits + post-run tab state both flow through here, so this is the
-  // single sink that drives the signed-in cloud auto-sync for SQL playgrounds.
-  notifyWorkspaceChanged();
 }
 
 export function loadActiveTabId(dbId: string, tabs: QueryTab[]): string {

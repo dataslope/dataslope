@@ -2,7 +2,6 @@
 
 import { newTabId } from "../../sqlitePlaygroundTabs";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
-import { notifyWorkspaceChanged } from "../../workspace/workspaceChanges";
 
 export interface TabStorageUtils {
   dbScopedKey: (dbId: string, k: string) => string;
@@ -69,9 +68,6 @@ export function createTabStorage(storagePrefix: string): TabStorageUtils {
     } catch {
       // Ignore storage quota / private-mode errors.
     }
-    // Query edits + post-run tab state both flow through here, so this is the
-    // single sink that drives the signed-in cloud auto-sync (Postgres/DuckDB).
-    notifyWorkspaceChanged();
   }
 
   return { dbScopedKey, loadTabs, saveTabs };

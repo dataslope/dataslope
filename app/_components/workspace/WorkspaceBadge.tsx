@@ -40,6 +40,7 @@ import {
   Cloud,
   CloudDownload,
   CloudOff,
+  CloudUpload,
   Copy as CopyIcon,
   Download,
   Folder,
@@ -343,6 +344,10 @@ export function WorkspaceBadge({
     [cloud.metas, registry, activeWorkspaceId],
   );
   const showCloud = cloud.available && !cloud.signedOut;
+  // Auto-sync is code-playgrounds-only: a SQL backup is a full database dump,
+  // too heavy to push on every change (and sample-database loads would spam it),
+  // so SQL keeps the manual Save/Back-up controls instead of auto-syncing.
+  const autoSyncActive = showCloud && !isSqlPlayground(playgroundId);
 
   const [backupBusy, setBackupBusy] = useState(false);
   const [cloudBusyId, setCloudBusyId] = useState<string | null>(null);
@@ -412,7 +417,7 @@ export function WorkspaceBadge({
   // stays the local source of truth, so an offline or failed sync never loses
   // work; the hook retries when the connection returns.
   const autoSync = useWorkspaceAutoSync({
-    enabled: showCloud,
+    enabled: autoSyncActive,
     activeWorkspaceId,
     isDraft,
     playgroundId,
@@ -618,13 +623,48 @@ export function WorkspaceBadge({
                 ) : (
                   <div className="workspace-popover-cloud">
                     <div className="workspace-popover-cloud-row">
-                      {/* Auto-sync, no manual "Back up" button. */}
-                      <WorkspaceSyncStatus
-                        status={autoSync}
-                        activeMeta={activeMeta}
-                        loaded={cloud.loaded}
-                        className="in-popover"
-                      />
+                      {autoSyncActive ? (
+                        // Code playgrounds auto-sync, no manual "Back up".
+                        <WorkspaceSyncStatus
+                          status={autoSync}
+                          activeMeta={activeMeta}
+                          loaded={cloud.loaded}
+                          className="in-popover"
+                        />
+                      ) : (
+                        // SQL: back up on demand (dumps are too heavy to auto-sync).
+                        <>
+                          {buildBundle && (
+                            <button
+                              type="button"
+                              className="workspace-popover-backup-btn"
+                              onClick={() => void handleBackUp()}
+                              disabled={backupBusy || !activeWorkspaceId}
+                              title={`Back up “${activeWorkspaceName || "this workspace"}” to your account`}
+                            >
+                              {backupBusy ? (
+                                <Loader2
+                                  size={12}
+                                  aria-hidden="true"
+                                  className="cloud-spin"
+                                />
+                              ) : (
+                                <CloudUpload size={12} aria-hidden="true" />
+                              )}
+                              <span>
+                                {backupBusy ? "Backing up…" : "Back up"}
+                              </span>
+                            </button>
+                          )}
+                          <span
+                            className={`workspace-popover-backup-status${activeStale ? " stale" : ""}`}
+                          >
+                            {cloud.loaded
+                              ? backupStatusText(activeMeta, activeStale)
+                              : "Checking backups…"}
+                          </span>
+                        </>
+                      )}
                     </div>
                     {(autoSync.error ?? cloudError ?? cloud.error) && (
                       <p role="alert" className="workspace-popover-cloud-error">
@@ -664,21 +704,21 @@ export function WorkspaceBadge({
         </Popover.Portal>
       </Popover.Root>
 
-      {/* Signed in: a passive auto-sync status replaces the manual Save/Back-up
-          control (the playground now backs up automatically). Guests keep the
-          Save menu to name a draft they want in their browser-saved list. */}
-      {showCloud && (
+      {/* Code playgrounds auto-sync: a passive status replaces the manual
+          Save/Back-up control. SQL playgrounds and guests keep the Save menu
+          (guests to name a browser-saved draft; SQL to back up on demand). */}
+      {autoSyncActive && (
         <WorkspaceSyncStatus
           status={autoSync}
           activeMeta={activeMeta}
           loaded={cloud.loaded}
         />
       )}
-      {!showCloud && onSave && (
+      {!autoSyncActive && onSave && (
         <Menu.Root>
           <Menu.Trigger
             className={`workspace-save-btn${unsaved ? "" : " quiet"}`}
-            title="Save this workspace to your browser"
+            title="Save this workspace, locally, to your account, or both"
           >
             <Save size={12} aria-hidden="true" />
             <span>Save</span>
