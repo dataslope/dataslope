@@ -1,4 +1,5 @@
 {
+  "root": true,
   "title": "Data Analyst",
   "description": "Interview prep for Data Analyst roles: SQL, pandas, statistics, and communicating insight.",
   "pages": [
