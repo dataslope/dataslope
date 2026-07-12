@@ -4,6 +4,81 @@ Rules and patterns for AI coding agents working in this repository.
 
 ---
 
+## Brand colors
+
+Dataslope's brand color palette. Use the primary colors as the default palette
+for UI, illustrations, charts, and diagrams. Reach for the accent colors only
+sparingly, to highlight or differentiate.
+
+### Primary colors
+
+| Color  | Hex       |
+| ------ | --------- |
+| Blue   | `#148CFF` |
+| Green  | `#20C621` |
+| Red    | `#FF4F59` |
+| Yellow | `#FFDD6C` |
+
+### Accent colors (use sparingly)
+
+| Color  | Hex       |
+| ------ | --------- |
+| Teal   | `#00AEAA` |
+| Purple | `#AB77FA` |
+| Orange | `#E47600` |
+
+### Tonal shades (100–900)
+
+Each hue has a full tonal ramp exposed as CSS variables in `app/brand.css`
+(`--ds-<hue>-<step>`) and previewable at `/color-test`. **Prefer the `500`
+shade** (the primary/base color) — the other steps exist for when a lighter or
+darker tone is required (backgrounds, borders, hover states, AA-legible text on
+white, and telling chart/diagram series apart). `500` = the brand color; the
+`ink` text anchors that clear WCAG AA body text on white are noted per hue.
+
+**Primary hues**
+
+| Step    | Blue        | Green       | Red         | Yellow      |
+| ------- | ----------- | ----------- | ----------- | ----------- |
+| 100     | `#D1E6FF`   | `#D4F3D1`   | `#FFDCDA`   | `#FDF5D9`   |
+| 200     | `#AED3FF`   | `#B4EAAF`   | `#FFC2BF`   | `#FEF0C3`   |
+| 300     | `#8ABFFF`   | `#93E08E`   | `#FFA6A3`   | `#FEEBAC`   |
+| 400     | `#5BA7FF`   | `#66D361`   | `#FF807F`   | `#FFE48E`   |
+| **500** | **`#148CFF`** | **`#20C621`** | **`#FF4F59`** | **`#FFDD6C`** |
+| 600     | `#0878DD`   | `#0AA80F`   | `#DC3F49`   | `#D4B651`   |
+| 700     | `#0064BD` ⬅ | `#008B03`   | `#BA303A` ⬅ | `#AB9137`   |
+| 800     | `#00519C`   | `#006F01` ⬅ | `#99212C`   | `#836D1C` ⬅ |
+| 900     | `#00407F`   | `#005600`   | `#7C141F`   | `#624F00`   |
+
+⬅ = the `ink` shade for that hue (AA body text on white): Blue `700`,
+Green `800`, Red `700`, Yellow/Amber `800`.
+
+> Blue also has 50-unit half-steps (`--ds-blue-550/650/750/850/950`) plus a
+> `950` extension, for cases (e.g. Mermaid mindmaps) that need several distinct
+> white-text-legible blues.
+
+**Accent hues (non-semantic; use sparingly)**
+
+| Step    | Teal        | Purple      | Orange      |
+| ------- | ----------- | ----------- | ----------- |
+| 100     | `#CFEDEB`   | `#EAE0FD`   | `#FAE0D0`   |
+| 200     | `#AAE0DD`   | `#DBCAFC`   | `#F6CAAD`   |
+| 300     | `#80D3CF`   | `#CCB3FB`   | `#F1B288`   |
+| 400     | `#3BC4BF`   | `#BB96FA`   | `#EB9558`   |
+| **500** | **`#00AEAA`** | **`#AB77FA`** | **`#E47600`** |
+| 600     | `#009491`   | `#9263D7`   | `#C36400`   |
+| 700     | `#007B79` ⬅ | `#7A51B6` ⬅ | `#A35200` ⬅ |
+| 800     | `#006361`   | `#634094`   | `#844200`   |
+| 900     | `#004E4C`   | `#4E3177`   | `#693300`   |
+
+⬅ = the `ink` shade (AA body text on white) for each accent hue: `700`.
+
+Each hue also has a `50` step (lightest tint) in `brand.css` if an even lighter
+background is needed. In code, reference these via the CSS variables
+(`var(--ds-blue-500)`) rather than hard-coding hex values.
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.
