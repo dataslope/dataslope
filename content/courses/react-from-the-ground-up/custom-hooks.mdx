@@ -63,6 +63,33 @@ The rules that make this work:
 - **Name them `useSomething`**, the `use` prefix is how React (and its
   linter) recognizes a hook.
 
+The card below calls `useToggle` *twice*, once for dark mode, once for
+bold, and each call keeps its own independent state. That independence
+is the whole point: a hook is a function, not a shared global:
+
+<ReactPreview
+  code={`function useToggle(initial = false) {
+  const [on, setOn] = useState(initial);
+  const toggle = () => setOn((v) => !v);
+  return [on, toggle] as const;
+}
+
+function ThemeCard() {
+  const [dark, toggleDark] = useToggle(false);
+  const [bold, toggleBold] = useToggle(true);
+
+  return (
+    <div className={dark ? "dark" : "light"}>
+      <p style={{ fontWeight: bold ? 700 : 400 }}>One hook, reused twice.</p>
+      <button onClick={toggleDark}>{dark ? "Light" : "Dark"} mode</button>
+      <button onClick={toggleBold}>{bold ? "Un-bold" : "Bold"}</button>
+    </div>
+  );
+}`}
+>
+  <UseToggleDemo />
+</ReactPreview>
+
 ## Hooks can use effects too
 
 A custom hook can bundle `useEffect` as well, which is how the
@@ -80,6 +107,68 @@ function useNow(): Date {
 }
 // In a component: const now = useNow();
 ```
+
+Here's a `useInterval` hook powering a live stopwatch. The hook hides
+the interval bookkeeping (and the ref trick that keeps the callback
+fresh); the component just says "tick every 100ms while running":
+
+<ReactPreview
+  code={`function useInterval(callback: () => void, delay: number | null) {
+  const saved = useRef(callback);
+  useEffect(() => { saved.current = callback; }, [callback]);
+  useEffect(() => {
+    if (delay === null) return;                 // null pauses the timer
+    const id = setInterval(() => saved.current(), delay);
+    return () => clearInterval(id);
+  }, [delay]);
+}
+
+function Stopwatch() {
+  const [ms, setMs] = useState(0);
+  const [running, setRunning] = useState(false);
+  useInterval(() => setMs((t) => t + 100), running ? 100 : null);
+
+  return (
+    <div>
+      <span>{(ms / 1000).toFixed(1)}s</span>
+      <button onClick={() => setRunning((r) => !r)}>{running ? "Pause" : "Start"}</button>
+      <button onClick={() => { setRunning(false); setMs(0); }}>Reset</button>
+    </div>
+  );
+}`}
+>
+  <StopwatchDemo />
+</ReactPreview>
+
+Custom hooks really shine when they bundle a browser API. This
+`useLocalStorageState` behaves like `useState` but *persists*, type
+your name, reload the page, and it's still there:
+
+<ReactPreview
+  code={`function useLocalStorageState(key: string, initial: string) {
+  const [value, setValue] = useState(initial);
+  useEffect(() => {
+    const stored = window.localStorage.getItem(key);
+    if (stored !== null) setValue(stored);
+  }, [key]);
+  useEffect(() => {
+    window.localStorage.setItem(key, value);    // sync to storage on change
+  }, [key, value]);
+  return [value, setValue] as const;
+}
+
+function NameField() {
+  const [name, setName] = useLocalStorageState("demo-name", "");
+  return (
+    <div>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Type your name…" />
+      <p>{name ? "Hi " + name + "! " : ""}Reload, this input remembers itself.</p>
+    </div>
+  );
+}`}
+>
+  <UseLocalStorageDemo />
+</ReactPreview>
 
 ## Challenge
 
@@ -162,6 +251,6 @@ if (!/count:\\s*3/i.test(h1?.textContent || "")) {
   ]}
 />
 
-That's the full toolkit, components, props, state, events, effects,
-composition, and hooks. Time to build something real:
-[a Todo app](/courses/react-from-the-ground-up/project-todo-app).
+Custom hooks share *logic*. The last piece of the puzzle is sharing
+*state* across a whole tree without prop drilling:
+[Context for shared state](/courses/react-from-the-ground-up/context-for-shared-state).

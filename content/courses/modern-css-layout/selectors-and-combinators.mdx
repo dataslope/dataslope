@@ -1,0 +1,316 @@
+---
+title: Selectors and Combinators
+description: Target exactly the elements you want with type, class, id, and attribute selectors, then reach across the tree with the four combinators.
+---
+
+Before you can style anything, you have to **point at it**. Selectors are how
+you tell the browser *which* elements a rule applies to, and getting them right
+is the difference between a surgical style and one that leaks everywhere.
+
+## The basic selectors
+
+There are a handful of building blocks you'll reach for constantly:
+
+```css
+p            { }   /* type: every <p> element        */
+.card        { }   /* class: every class="card"      */
+#main        { }   /* id: the one id="main" element  */
+*            { }   /* universal: literally everything */
+h1, h2, h3   { }   /* grouping: apply to all three    */
+```
+
+A **class** is your workhorse, reusable across many elements. An **id** is
+unique per page and highly specific (use it sparingly). The **universal**
+selector `*` matches everything, handy for resets. And a comma lets you
+**group**: `h1, h2, h3` applies one rule to all three without repeating it.
+
+Below, the comma groups the three headings under a single serif rule, while the
+`.lead` class targets just one paragraph:
+
+<LivePreview
+  title="Grouping with commas vs. a single class"
+  background="#ffffff"
+  html={`<h1>Heading one</h1>
+<h2>Heading two</h2>
+<h3>Heading three</h3>
+<p>A normal paragraph.</p>
+<p class="lead">A lead paragraph, picked out by its class.</p>`}
+  css={`h1, h2, h3 {
+  font-family: Georgia, serif;
+  color: #1e293b;
+  margin: 4px 0;
+}
+.lead {
+  color: #7c3aed;
+  font-weight: 700;
+  font-size: 1.15rem;
+}`}
+/>
+
+## Attribute selectors
+
+You can also match on an element's **attributes**, not just its tag or class.
+Wrap the attribute in square brackets, and add an operator to match part of the
+value:
+
+- `[type="text"]` — exact match.
+- `[href^="https"]` — value **starts with** (`^`).
+- `[href$=".pdf"]` — value **ends with** (`$`).
+- `[class*="btn"]` — value **contains** (`*`).
+
+This is how you style all external links green, or flag every password field,
+without adding a single extra class:
+
+<LivePreview
+  title="Matching on attributes"
+  background="#ffffff"
+  html={`<p><a href="https://example.com">External link (https)</a></p>
+<p><a href="/docs">Internal link</a></p>
+<p><input type="text" placeholder="a text input" /></p>
+<p><input type="password" placeholder="a password" /></p>
+<p><button class="btn-primary">btn-primary</button>
+<button class="icon-btn">icon-btn</button></p>`}
+  css={`a[href^="https"] {
+  color: #059669;
+  font-weight: 700;
+}
+input[type="text"] {
+  border: 2px solid #6366f1;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+input[type="password"] {
+  border: 2px solid #dc2626;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+[class*="btn"] {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}`}
+/>
+
+## Combinators: reaching across the tree
+
+Combinators describe the **relationship** between two elements. There are four,
+and mixing them up is one of the most common CSS bugs:
+
+| Combinator | Symbol | Matches |
+| --- | --- | --- |
+| Descendant | space | any element nested inside, at any depth |
+| Child | `>` | a **direct** child only, one level down |
+| Next sibling | `+` | the **one** element immediately after |
+| Subsequent sibling | `~` | **every** later sibling |
+
+The descendant vs. child distinction is the one to burn in. `.menu li` reaches
+*every* list item in the subtree, however deep. `.menu > li` reaches only the
+**direct** children. Same markup, two different results:
+
+<LivePreview
+  title="Child combinator (top level) vs. descendant (all levels)"
+  background="#ffffff"
+  html={`<div class="col">
+  <p class="label">.menu li  — every item, nested included</p>
+  <ul class="menu descendant">
+    <li>Fruit
+      <ul>
+        <li>Apple</li>
+        <li>Pear</li>
+      </ul>
+    </li>
+    <li>Veg</li>
+  </ul>
+</div>
+<div class="col">
+  <p class="label">.menu &gt; li  — direct children only</p>
+  <ul class="menu child">
+    <li>Fruit
+      <ul>
+        <li>Apple</li>
+        <li>Pear</li>
+      </ul>
+    </li>
+    <li>Veg</li>
+  </ul>
+</div>`}
+  css={`.col { margin-bottom: 14px; }
+.label {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  color: #475569;
+  margin: 0 0 6px;
+}
+.menu, .menu ul { list-style: none; padding-left: 18px; margin: 0; }
+.menu li {
+  padding: 3px 8px;
+  margin: 3px 0;
+  border-radius: 6px;
+  font-family: system-ui, sans-serif;
+}
+.menu.descendant li { background: #fef3c7; }
+.menu.child > li { background: #dbeafe; }`}
+/>
+
+In the top list, the descendant selector paints all five items amber. In the
+bottom list, the child combinator tints only Fruit and Veg, the two direct
+children, leaving Apple and Pear untouched.
+
+The sibling combinators work sideways instead of down. `+` grabs the single
+next sibling; `~` grabs all following siblings:
+
+<LivePreview
+  title="Next sibling (+) vs. subsequent siblings (~)"
+  background="#ffffff"
+  html={`<h3>Section title</h3>
+<p>First paragraph, right after the heading.</p>
+<p>Second paragraph.</p>
+<p>Third paragraph.</p>`}
+  css={`h3 ~ p {
+  border-left: 3px solid #cbd5e1;
+  padding-left: 8px;
+}
+h3 + p {
+  font-weight: 700;
+  color: #be123c;
+}`}
+/>
+
+Every paragraph after the `h3` gets the gray rule (that's `~`), but only the
+**first** one turns bold red (that's `+`).
+
+<Callout type="info" title="A space and a > are not interchangeable">
+The descendant selector (a space) reaches any depth; the child combinator
+(`>`) reaches exactly one level. When a rule bleeds onto elements you never
+meant to touch, the fix is almost always swapping the space for a `>`, or the
+other way around.
+</Callout>
+
+Experiment with all four in the sandbox, change a `>` to a space, or `+` to
+`~`, and re-run to watch what shifts:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="menu">
+      <a href="/">Home</a>
+      <a href="/blog">Blog</a>
+      <a href="https://example.com">External</a>
+    </nav>
+    <section class="card">
+      <h2>Card title</h2>
+      <p>First line inside the card.</p>
+      <p>Second line inside the card.</p>
+    </section>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+/* Try each selector, then tweak the combinators and re-run. */
+
+.menu a { text-decoration: none; margin-right: 12px; }  /* descendant */
+a[href^="https"] { color: seagreen; }                   /* starts-with */
+.card > h2 { margin-top: 0; }                           /* direct child */
+.card h2 + p { font-weight: 700; }                      /* next sibling */
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Style only the direct children"
+  entryFilename="index.html"
+  instructions={`The \`.menu\` list has three direct items (Home, Products, About), and Products holds a nested sub-list. Using the **child combinator**, highlight only the top-level items:
+
+1. Write a rule for \`.menu > li\` (mind the \`>\`).
+2. Give it \`background: rgb(219, 234, 254)\`.
+
+If you reach for \`.menu li\` (a space) instead, the nested Shoes and Hats get styled too, and that's exactly what the tests forbid.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <ul class="menu">
+      <li>Home</li>
+      <li>Products
+        <ul>
+          <li>Shoes</li>
+          <li>Hats</li>
+        </ul>
+      </li>
+      <li>About</li>
+    </ul>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.menu, .menu ul { list-style: none; padding-left: 1rem; }
+.menu li { padding: 6px 10px; margin: 4px 0; border-radius: 6px; }
+
+/* Highlight ONLY the direct children of .menu, using the child combinator. */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.menu, .menu ul { list-style: none; padding-left: 1rem; }
+.menu li { padding: 6px 10px; margin: 4px 0; border-radius: 6px; }
+
+.menu > li { background: rgb(219, 234, 254); }
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "direct_styled",
+      name: "Direct children of .menu are highlighted",
+      code: `const items = document.querySelectorAll(".menu > li");
+if (items.length < 3) throw new Error("Expected the three direct li children of .menu.");
+for (const li of items) {
+  const bg = getComputedStyle(li).backgroundColor;
+  if (bg !== "rgb(219, 234, 254)") {
+    throw new Error("Each direct child of .menu should have background rgb(219, 234, 254). Got " + bg + ".");
+  }
+}`,
+    },
+    {
+      id: "nested_untouched",
+      name: "Nested items stay unstyled",
+      code: `const nested = document.querySelectorAll(".menu li li");
+if (nested.length < 2) throw new Error("The nested Shoes/Hats list should still exist.");
+for (const li of nested) {
+  const bg = getComputedStyle(li).backgroundColor;
+  if (bg !== "rgba(0, 0, 0, 0)") {
+    throw new Error("Nested items must stay transparent. One got " + bg + ". Use the child combinator > , not a descendant selector.");
+  }
+}`,
+    },
+  ]}
+/>
+
+You can now aim a rule at precisely the right elements. Next, the box each of
+those elements draws itself into: [The box model and sizing](/courses/modern-css-layout/box-model-and-sizing).

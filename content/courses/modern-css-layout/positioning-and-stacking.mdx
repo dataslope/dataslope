@@ -23,6 +23,41 @@ The workhorse combination: a parent set to `position: relative` becomes
 the **positioning context**, and an `absolute` child is placed inside
 it with `top`/`right`/`bottom`/`left`.
 
+Here the green "online" dot is an absolutely-positioned child pinned to
+the bottom-right corner of its `relative` avatar. The dot doesn't take
+up space in the flow, it floats over the corner:
+
+<LivePreview
+  title="A status dot anchored to an avatar"
+  background="#ffffff"
+  html={`<div class="avatar">
+  GH
+  <span class="status"></span>
+</div>`}
+  css={`.avatar {
+  position: relative;          /* the anchor for .status */
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: white;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-family: system-ui, sans-serif;
+}
+.status {
+  position: absolute;          /* placed against .avatar */
+  bottom: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 3px solid white;
+}`}
+/>
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -93,6 +128,36 @@ higher numbers sit in front. Two things trip people up:
   its children's `z-index` values are compared only *within* it, not
   against the rest of the page. A child's `z-index: 9999` can't escape
   a parent that sits behind something else.
+
+Three overlapping cards, each positioned with a different `z-index`.
+The one with the highest value sits in front regardless of source
+order, the middle card is declared last in the HTML but still loses to
+the higher `z-index`:
+
+<LivePreview
+  title="z-index decides who's on top"
+  background="#ffffff"
+  html={`<div class="stack">
+  <div class="card a">z-index: 1</div>
+  <div class="card b">z-index: 3</div>
+  <div class="card c">z-index: 2</div>
+</div>`}
+  css={`.stack { position: relative; height: 150px; font-family: system-ui, sans-serif; }
+.card {
+  position: absolute;
+  width: 130px;
+  height: 90px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.a { left: 0;    top: 0;   background: #ef4444; z-index: 1; }
+.b { left: 45px; top: 25px; background: #3b82f6; z-index: 3; }
+.c { left: 90px; top: 50px; background: #22c55e; z-index: 2; }`}
+/>
 
 <Callout type="info" title="When z-index 'doesn't work'">
 Nine times out of ten it's one of the two rules above: the element
@@ -196,5 +261,6 @@ if (s.zIndex !== "5") throw new Error("Set z-index: 5 on .count, got " + s.zInde
   ]}
 />
 
-You can place anything anywhere. Now let's make those layouts adapt to
-any screen: [Responsive design](/courses/modern-css-layout/responsive-design).
+You can place anything anywhere. Next, a change of pace, the properties
+that make things look *designed*:
+[Colors, gradients, and shadows](/courses/modern-css-layout/colors-gradients-shadows).

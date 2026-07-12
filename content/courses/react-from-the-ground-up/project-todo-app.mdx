@@ -10,8 +10,66 @@ to pass each item down, and **composition** to split it into files.
 
 ## The finished app
 
-Here's the whole thing across four files. Read it top to bottom, then
-Run it and add, complete, and delete some todos:
+Here it is, fully working and live, add a todo, check one off, delete
+one, or filter by status. Everything in this course is in play here:
+state holds the list, events add and toggle items, `map` renders them,
+and `useMemo` derives the filtered view:
+
+<ReactPreview
+  height={440}
+  code={`interface Todo { id: number; text: string; done: boolean }
+
+function TodoApp() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Learn components", done: true },
+    { id: 2, text: "Master state", done: true },
+    { id: 3, text: "Build a todo app", done: false },
+  ]);
+  const [draft, setDraft] = useState("");
+  const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const nextId = useRef(4);
+
+  const add = () => {
+    const text = draft.trim();
+    if (!text) return;
+    setTodos((prev) => [...prev, { id: nextId.current++, text, done: false }]);
+    setDraft("");
+  };
+  const toggle = (id: number) =>
+    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  const remove = (id: number) =>
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+
+  const visible = useMemo(
+    () => todos.filter((t) =>
+      filter === "all" ? true : filter === "done" ? t.done : !t.done),
+    [todos, filter],
+  );
+
+  return (
+    <div className="todo-app">
+      <input value={draft} onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && add()} placeholder="What needs doing?" />
+      <button onClick={add}>Add</button>
+      <ul>
+        {visible.map((t) => (
+          <li key={t.id}>
+            <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
+            <span>{t.text}</span>
+            <button onClick={() => remove(t.id)}>×</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}`}
+>
+  <TodoDemo />
+</ReactPreview>
+
+Below is the same app spread across four files, the shape a real
+project uses. Read it top to bottom, then Run it and add, complete, and
+delete some todos:
 
 <CodeBlock
   adapter="react"

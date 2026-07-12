@@ -20,6 +20,26 @@ const [count, setCount] = useState(0);
 //     ^value  ^setter          ^initial value
 ```
 
+Click the buttons below, they're live. Each click calls the setter,
+React re-renders the component, and the new `count` shows. You never
+touch the DOM:
+
+<ReactPreview
+  code={`function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <>
+      <button onClick={() => setCount(count - 1)}>−</button>
+      <span>{count}</span>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </>
+  );
+}`}
+>
+  <CounterDemo />
+</ReactPreview>
+
 <CodeBlock
   adapter="react"
   files={[
@@ -84,6 +104,28 @@ setUser({ ...user, age: 37 });          // new object, one field changed
 const [items, setItems] = useState<string[]>([]);
 setItems([...items, "new item"]);        // new array with one more item
 ```
+
+State can hold anything, and the UI just reflects it. Below, a single
+`color` string drives the preview swatch: clicking a chip sets the
+state, and everything that reads `color` updates at once:
+
+<ReactPreview
+  code={`function ColorPicker() {
+  const [color, setColor] = useState("#4f46e5");
+  const swatches = ["#4f46e5", "#0891b2", "#db2777", "#ea580c", "#16a34a"];
+
+  return (
+    <div>
+      <div className="preview" style={{ background: color }}>{color}</div>
+      {swatches.map((c) => (
+        <button key={c} style={{ background: c }} onClick={() => setColor(c)} />
+      ))}
+    </div>
+  );
+}`}
+>
+  <ColorPickerDemo />
+</ReactPreview>
 
 ## Challenge
 
@@ -165,5 +207,6 @@ if (/surprise!/i.test(document.body.textContent || "")) {
   ]}
 />
 
-State gives components memory. It's usually driven by user actions,
-so next we look closely at [Handling events](/courses/react-from-the-ground-up/handling-events).
+State gives components memory. Now that a component can hold state, you
+can show different UI for different state:
+[Conditional rendering](/courses/react-from-the-ground-up/conditional-rendering).

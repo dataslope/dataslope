@@ -24,6 +24,9 @@ import { IllustrationPrompt } from "@/app/_components/mdx/IllustrationPrompt";
 import { Figure } from "@/app/_components/mdx/Figure";
 import LoadingAnimationsGallery from "@/app/_components/mdx/loadingAnimations";
 import RuntimeLoadingStates from "@/app/_components/RuntimeBootNotice";
+import { LivePreview } from "@/app/_components/mdx/LivePreview";
+import { ReactPreview } from "@/app/_components/mdx/ReactPreview";
+import { reactDemoComponents } from "@/app/_components/mdx/reactDemoComponents";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -39,6 +42,14 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Figure,
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
+    // Live, no-Run lesson widgets: <LivePreview> renders HTML/CSS in a
+    // Shadow DOM inline (Modern CSS course); <ReactPreview> renders a real
+    // interactive component with its TSX shown below (React course). The
+    // React demo components are spread in so lessons can use e.g.
+    // <CounterDemo /> as <ReactPreview>'s child without an import.
+    LivePreview,
+    ReactPreview,
+    ...reactDemoComponents,
     // Fumadocs Steps/Step, a numbered vertical walkthrough. Registered
     // globally so lessons can drop `<Steps>…<Step>` in without an import,
     // matching the convention used by the components above.

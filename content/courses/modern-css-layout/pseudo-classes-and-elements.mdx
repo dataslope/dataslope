@@ -1,0 +1,312 @@
+---
+title: Pseudo-classes and Pseudo-elements
+description: Style elements by state and position with pseudo-classes, and inject decoration with pseudo-elements.
+---
+
+Some things you want to style don't exist as elements in your HTML: the
+*hovered* state of a button, the *even* rows of a table, the *first line* of a
+paragraph, a decorative bullet that isn't in the markup at all. Pseudo-classes
+and pseudo-elements let you reach all of them.
+
+## State pseudo-classes
+
+A pseudo-class targets an element in a particular **state**, written with a
+single colon. The ones you'll use daily:
+
+- `:hover` — the pointer is over it.
+- `:focus` — it's focused (via click or keyboard).
+- `:active` — it's being pressed.
+- `:disabled` — a disabled form control.
+- `:checked` — a checked checkbox or radio.
+
+These are live, so the demo below actually responds. Hover the first button,
+click into the input, and toggle the checkbox:
+
+<LivePreview
+  title="Interactive states, live"
+  background="#ffffff"
+  html={`<div class="row">
+  <button class="btn">Hover / focus me</button>
+  <button class="btn" disabled>Disabled</button>
+</div>
+<input class="field" placeholder="Click to focus me" />
+<label class="toggle">
+  <input type="checkbox" checked /> <span>Checked (try unchecking)</span>
+</label>`}
+  css={`.row { display: flex; gap: 10px; margin-bottom: 12px; }
+.btn {
+  font: inherit;
+  padding: 8px 16px;
+  border: 2px solid #6366f1;
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn:hover { background: #6366f1; color: #ffffff; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.field {
+  font: inherit;
+  display: block;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+}
+.field:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px #c7d2fe;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: system-ui, sans-serif;
+}
+.toggle input:checked + span { color: #059669; font-weight: 700; }`}
+/>
+
+That last rule, `input:checked + span`, is a combinator and a pseudo-class
+working together: when the box is checked, restyle the label text beside it.
+
+## Structural pseudo-classes
+
+Other pseudo-classes match an element by its **position among siblings**, no
+state or interaction involved:
+
+- `:first-child` / `:last-child` — the first or last of its siblings.
+- `:nth-child(even)` / `:nth-child(odd)` — alternating positions.
+- `:nth-child(3n)` — every third one (the formula accepts `an + b`).
+- `:not(...)` — anything **not** matching the inner selector.
+
+`:nth-child(even)` is the classic way to zebra-stripe a list for readability,
+and `:not(:last-child)` is a tidy way to add dividers between items but not
+after the final one:
+
+<LivePreview
+  title="Striping and edges with structural selectors"
+  background="#ffffff"
+  html={`<ul class="list">
+  <li>Item one</li>
+  <li>Item two</li>
+  <li>Item three</li>
+  <li>Item four</li>
+  <li>Item five</li>
+</ul>`}
+  css={`.list {
+  list-style: none;
+  padding: 0;
+  width: 260px;
+  font-family: system-ui, sans-serif;
+}
+.list li { padding: 8px 12px; }
+.list li:nth-child(even) { background: #eef2ff; }   /* zebra stripes */
+.list li:first-child { font-weight: 700; }          /* the first one */
+.list li:last-child { color: #94a3b8; }             /* the last one */
+.list li:not(:last-child) { border-bottom: 1px solid #e2e8f0; }`}
+/>
+
+## Pseudo-elements
+
+A pseudo-element styles a **part** of an element, or invents a brand-new sub-box
+that isn't in your HTML. These take **two** colons:
+
+- `::before` / `::after` — generated content, driven by the `content` property.
+- `::first-line` / `::first-letter` — the first line or letter of text.
+- `::placeholder` — an input's placeholder text.
+- `::selection` — the part the user has highlighted.
+
+The `content` property is what makes `::before` and `::after` appear, set it to
+a string (even an empty one) and the box exists. Here it stamps a "NEW" tag,
+draws checkmark bullets that live entirely in CSS, styles the placeholder, and
+restyles the first line and any selected text:
+
+<LivePreview
+  title="Generated content and styled fragments"
+  background="#ffffff"
+  html={`<p class="tagged">Fresh feature just landed</p>
+<ul class="checklist">
+  <li>Write the lesson</li>
+  <li>Add a demo</li>
+  <li>Ship it</li>
+</ul>
+<input class="search" placeholder="Search the docs..." />
+<p class="prose">The first line of this paragraph renders in small caps. Select any of this text to see the selection color change, too.</p>`}
+  css={`.tagged::before {
+  content: "NEW";
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+.checklist { list-style: none; padding: 0; }
+.checklist li::before {
+  content: "check ";
+  color: #059669;
+  font-weight: 700;
+}
+.search {
+  font: inherit;
+  padding: 8px 10px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+}
+.search::placeholder { color: #a855f7; font-style: italic; }
+.prose { max-width: 340px; }
+.prose::first-line { font-variant: small-caps; font-weight: 700; }
+.prose::selection { background: #fde68a; }`}
+/>
+
+<Callout type="info" title="One colon or two?">
+Pseudo-**classes** take one colon (`:hover`), pseudo-**elements** take two
+(`::before`). The four original pseudo-elements (`::before`, `::after`,
+`::first-line`, `::first-letter`) still accept a single colon for historical
+reasons, so you'll see `:before` in old code, but write `::` for every
+pseudo-element in new code, and reserve `:` for pseudo-classes. It keeps the
+two families visually distinct.
+</Callout>
+
+Experiment below, swap `:nth-child(odd)` for `even` or `3n`, or change the
+`::before` content:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="cta">Hover me</button>
+    <ul class="tasks">
+      <li>Alpha</li>
+      <li>Beta</li>
+      <li>Gamma</li>
+      <li>Delta</li>
+    </ul>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.cta {
+  font: inherit;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #6366f1;
+  color: white;
+  cursor: pointer;
+}
+.cta:hover { background: #4338ca; }   /* change the hover color */
+
+.tasks { list-style: none; padding: 0; width: 220px; }
+.tasks li { padding: 8px 12px; }
+.tasks li:nth-child(odd) { background: #f1f5f9; }   /* try even, or 3n */
+.tasks li::before { content: "> "; color: #6366f1; }
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Zebra-stripe the table rows"
+  entryFilename="index.html"
+  instructions={`The table below is readable but flat. **Zebra-stripe** it so every other body row has a soft background, a classic \`:nth-child\` job:
+
+1. Target the even rows of the table body with \`tbody tr:nth-child(even)\` (scope it as \`.data tbody tr:nth-child(even)\`).
+2. Give them \`background: rgb(241, 245, 249)\`.
+
+Leave the odd rows transparent, the contrast is what makes a long table scannable.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <table class="data">
+      <thead>
+        <tr><th>Name</th><th>Score</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Ana</td><td>92</td></tr>
+        <tr><td>Ben</td><td>85</td></tr>
+        <tr><td>Cara</td><td>78</td></tr>
+        <tr><td>Drew</td><td>88</td></tr>
+      </tbody>
+    </table>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.data { border-collapse: collapse; width: 260px; }
+.data th, .data td { text-align: left; padding: 8px 12px; }
+.data thead th { border-bottom: 2px solid #cbd5e1; }
+
+/* Stripe the even body rows below. */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.data { border-collapse: collapse; width: 260px; }
+.data th, .data td { text-align: left; padding: 8px 12px; }
+.data thead th { border-bottom: 2px solid #cbd5e1; }
+
+.data tbody tr:nth-child(even) { background: rgb(241, 245, 249); }
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "even_striped",
+      name: "Even body rows are striped",
+      code: `const rows = document.querySelectorAll(".data tbody tr");
+if (rows.length < 4) throw new Error("Expected the four data rows in tbody.");
+const even = document.querySelectorAll(".data tbody tr:nth-child(even)");
+if (even.length < 2) throw new Error("Expected two even rows in the tbody.");
+for (const tr of even) {
+  const bg = getComputedStyle(tr).backgroundColor;
+  if (bg !== "rgb(241, 245, 249)") {
+    throw new Error("Even rows should have background rgb(241, 245, 249). Got " + bg + ".");
+  }
+}`,
+    },
+    {
+      id: "odd_untouched",
+      name: "Odd body rows stay transparent",
+      code: `const odd = document.querySelectorAll(".data tbody tr:nth-child(odd)");
+if (odd.length < 2) throw new Error("Expected two odd rows in the tbody.");
+for (const tr of odd) {
+  const bg = getComputedStyle(tr).backgroundColor;
+  if (bg !== "rgba(0, 0, 0, 0)") {
+    throw new Error("Odd rows should stay transparent. One got " + bg + ". Target only :nth-child(even).");
+  }
+}`,
+    },
+  ]}
+/>
+
+You can now style elements the markup never named, by state, by position, and
+with generated content. Next, make it all adapt to any screen:
+[Responsive design](/courses/modern-css-layout/responsive-design).

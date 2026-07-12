@@ -28,6 +28,45 @@ alignment on the wrong axis?"
 | `align-items` | cross | `stretch`, `center`, `flex-start`, `baseline` |
 | `align-self` | cross | override `align-items` for one item |
 
+Each row below is the same three-item flex container with a different
+`justify-content`. Reading them top to bottom is the fastest way to
+build intuition for how the main-axis alignment spreads items:
+
+<LivePreview
+  title="justify-content, five ways"
+  html={`<div class="row" style="justify-content: flex-start">
+  <span>flex-start</span><span>A</span><span>B</span>
+</div>
+<div class="row" style="justify-content: center">
+  <span>center</span><span>A</span><span>B</span>
+</div>
+<div class="row" style="justify-content: space-between">
+  <span>space-between</span><span>A</span><span>B</span>
+</div>
+<div class="row" style="justify-content: space-around">
+  <span>space-around</span><span>A</span><span>B</span>
+</div>
+<div class="row" style="justify-content: space-evenly">
+  <span>space-evenly</span><span>A</span><span>B</span>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-family: system-ui, sans-serif;
+}
+.row span {
+  background: #6366f1;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}`}
+/>
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -143,6 +182,36 @@ The two you'll write most:
 By default flex items stay on one line and shrink. `flex-wrap: wrap`
 lets them flow onto new lines when they run out of room, the basis of
 a responsive card row that needs no media query.
+
+The row below wraps: each card has a `flex-basis` of `140px` and is
+allowed to grow, so they fill the line and spill onto the next when the
+container is too narrow. Resize your window and watch the rows reflow:
+
+<LivePreview
+  title="A self-wrapping card row, no media query"
+  html={`<div class="cards">
+  <div>Fast</div>
+  <div>Secure</div>
+  <div>Simple</div>
+  <div>Open</div>
+  <div>Scalable</div>
+</div>`}
+  css={`.cards {
+  display: flex;
+  flex-wrap: wrap;         /* let items flow onto new lines */
+  gap: 10px;
+}
+.cards > div {
+  flex: 1 1 140px;         /* grow, shrink, start at 140px */
+  padding: 20px;
+  text-align: center;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 10px;
+  font-family: system-ui, sans-serif;
+}`}
+/>
 
 ## Challenge
 

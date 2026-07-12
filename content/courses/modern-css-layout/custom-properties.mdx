@@ -27,6 +27,45 @@ A custom property starts with `--` and is read with `var()`:
 Defining them on **`:root`** (the `<html>` element) makes them
 available to the whole page, because custom properties **inherit**.
 
+One `--brand` value drives every button below, background, border, and
+text color all read from it. Because variables inherit and can be
+**redefined in a scope**, the second card overrides `--brand` locally
+and re-themes itself to green with a single line:
+
+<LivePreview
+  title="One variable, redefined in a scope"
+  html={`<div class="card">
+  <strong>Default theme</strong>
+  <button class="btn">Buy now</button>
+</div>
+<div class="card green">
+  <strong>Re-themed card (--brand redefined)</strong>
+  <button class="btn">Buy now</button>
+</div>`}
+  css={`:root { --brand: #6366f1; }
+
+.card {
+  --pad: 14px;
+  border: 2px solid var(--brand);   /* reads --brand */
+  border-radius: 10px;
+  padding: var(--pad);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: system-ui, sans-serif;
+}
+.green { --brand: #16a34a; }        /* redefine, everything inside follows */
+
+.btn {
+  background: var(--brand);          /* reads --brand */
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+}`}
+/>
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -217,5 +256,5 @@ if (s.backgroundColor !== "rgb(219, 39, 119)") {
   ]}
 />
 
-One value, many uses. The last piece of a polished UI is motion:
-[Transitions and animations](/courses/modern-css-layout/transitions-and-animations).
+One value, many uses. Before we animate anything, the property motion is
+built on: [Transforms](/courses/modern-css-layout/transforms).

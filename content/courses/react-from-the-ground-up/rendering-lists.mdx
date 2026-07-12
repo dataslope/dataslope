@@ -40,6 +40,33 @@ createRoot(document.getElementById("root")!).render(<App />);
 The `{...}` holds an array of `<li>` elements, and React renders each
 one. Change the array and the list changes, you never touch the DOM.
 
+Here an array of objects becomes a list of rows, live. Each row is one
+`.map` iteration returning JSX:
+
+<ReactPreview
+  code={`const LANGUAGES = [
+  { id: "ts", name: "TypeScript", year: 2012 },
+  { id: "rs", name: "Rust", year: 2010 },
+  { id: "go", name: "Go", year: 2009 },
+  { id: "py", name: "Python", year: 1991 },
+];
+
+function LanguageList() {
+  return (
+    <ul>
+      {LANGUAGES.map((lang) => (
+        <li key={lang.id}>
+          <span>{lang.name}</span>
+          <span>{lang.year}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}`}
+>
+  <ListDemo />
+</ReactPreview>
+
 ## Why `key` matters
 
 Each element in a mapped list needs a **`key`**, a stable, unique
@@ -102,6 +129,37 @@ createRoot(document.getElementById("root")!).render(<TaskList tasks={TASKS} />);
 
 That early `return` for the empty case is a common React idiom: guard
 the edge case first, then render the normal path.
+
+Lists get interesting when the array is *derived* from state. Type in
+the box below: the visible list is `fruits.filter(...)` recomputed on
+every render, and when nothing matches, the empty-state guard kicks in:
+
+<ReactPreview
+  code={`function FilterList() {
+  const [query, setQuery] = useState("");
+  const fruits = ["Apricot", "Blackberry", "Blueberry", "Cherry", "Fig", "Mango"];
+  const shown = fruits.filter((f) =>
+    f.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Filter fruit…"
+      />
+      {shown.length === 0 ? (
+        <p>No matches.</p>
+      ) : (
+        <ul>{shown.map((f) => <li key={f}>{f}</li>)}</ul>
+      )}
+    </div>
+  );
+}`}
+>
+  <FilterListDemo />
+</ReactPreview>
 
 ## Challenge
 
