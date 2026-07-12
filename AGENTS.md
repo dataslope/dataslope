@@ -4,6 +4,31 @@ Rules and patterns for AI coding agents working in this repository.
 
 ---
 
+## Brand colors
+
+Dataslope's brand color palette. Use the primary colors as the default palette
+for UI, illustrations, charts, and diagrams. Reach for the accent colors only
+sparingly, to highlight or differentiate.
+
+### Primary colors
+
+| Color  | Hex       |
+| ------ | --------- |
+| Blue   | `#148CFF` |
+| Green  | `#20C621` |
+| Red    | `#FF4F59` |
+| Yellow | `#FFDD6C` |
+
+### Accent colors (use sparingly)
+
+| Color  | Hex       |
+| ------ | --------- |
+| Teal   | `#00AEAA` |
+| Purple | `#AB77FA` |
+| Orange | `#E47600` |
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.
