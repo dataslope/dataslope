@@ -5,7 +5,12 @@
   "pages": [
     "index",
     "statistics",
+    "probability",
     "machine-learning",
-    "experimentation"
+    "deep-learning",
+    "experimentation",
+    "product-sense-and-metrics",
+    "python-and-pandas",
+    "sql"
   ]
 }

@@ -1,0 +1,240 @@
+---
+title: A/B Testing & Metrics
+description: Data Analyst interview questions on defining good metrics, funnels and conversion, guardrail metrics, p-values and significance, Simpson's paradox, and cohort analysis, with Q&A, concept checks, and a runnable SQL challenge.
+---
+
+Product analysts live in **metrics and experiments**: defining what to
+measure, reading an A/B test without overclaiming, and knowing when an
+aggregate number is lying to you. This page mixes Q&A, concept checks, and
+a **runnable** funnel query.
+
+## Q&A
+
+### What makes a good metric?
+
+A good metric is **specific, measurable, and tied to the outcome you
+care about**, and sensitive enough to move when the product changes.
+Prefer **rates** (conversion rate, retention rate) over raw counts,
+because counts confound the effect with traffic volume. It should also be
+hard to game: optimizing it shouldn't let you win the metric while losing
+the business.
+
+### What's the difference between a primary, guardrail, and vanity metric?
+
+- **Primary (success) metric**, the one the change is trying to move
+  (e.g., checkout conversion for a new checkout flow).
+- **Guardrail metric**, something that must **not** get worse as a side
+  effect (e.g., page latency, refund rate, unsubscribe rate).
+- **Vanity metric**, looks impressive but doesn't tie to a decision
+  (e.g., total registered users, raw pageviews).
+
+You commit to the primary and guardrails **before** running the test.
+
+### What is a north star metric?
+
+A single metric that best captures the long-term value your product
+delivers to users, and that teams align around, e.g., "weekly active
+teams" for collaboration software. It sits above the tactical metrics and
+keeps day-to-day optimization pointed at durable value rather than local
+wins.
+
+### What is a funnel, and how do you measure conversion at each step?
+
+A funnel is an ordered sequence of steps a user must complete (view →
+add-to-cart → checkout → purchase). Step conversion is the share of users
+who reach the next step; overall conversion is the share who finish the
+whole thing. Measuring per-step conversion pinpoints **where** users drop
+off.
+
+### How do you compute a conversion rate in SQL?
+
+Count the users who reach a stage, divide by the users at the reference
+stage. Watch two things: use `COUNT(DISTINCT user_id)` so repeat events
+don't inflate the numerator, and cast to float (`* 1.0`) so integer
+division doesn't truncate to 0.
+
+```sql
+SELECT
+  COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END) * 1.0
+  / COUNT(DISTINCT user_id) AS overall_conversion
+FROM events;
+```
+
+### What is a step-to-step conversion, and how does LAG help?
+
+Step conversion divides each stage's users by the **previous** stage's,
+revealing the single biggest drop-off. In SQL, `LAG(users)` over the
+funnel order gives the prior stage's count on the same row:
+
+```sql
+SELECT stage, users,
+  users * 1.0 / LAG(users) OVER (ORDER BY stage_order) AS step_conversion
+FROM funnel;
+```
+
+### What is the purpose of an A/B test?
+
+It's a **controlled experiment**: randomly assign users to control (A) and
+treatment (B), change one thing, and compare a metric. Randomization
+makes the groups comparable in expectation, so a difference in the metric
+can be attributed to the change rather than to a confounder, this is how
+you get **causation**, not just correlation.
+
+### What is a p-value, at an analyst's level?
+
+The probability of seeing a result **at least as extreme** as the one you
+observed **if there were truly no difference** (the null hypothesis). A
+small p-value (commonly < 0.05) means the data would be surprising under
+"no effect," so you have evidence of a real difference. It is **not** the
+probability that the null is true, nor the size or importance of the
+effect.
+
+### What's the difference between statistical and practical significance?
+
+**Statistical** significance says an effect is unlikely to be noise.
+**Practical** significance asks whether it's big enough to matter. With a
+huge sample, a 0.1% lift can be statistically significant yet worthless in
+practice. Always report the **effect size** (and its range) alongside the
+p-value.
+
+### How would you explain a confidence interval to a stakeholder?
+
+Give a plain-language range instead of a bare point estimate: "we're
+confident the true lift is between about **8% and 16%**." A 95% interval
+means that if we repeated the experiment many times, about 95% of such
+intervals would contain the true value. A **wide** interval signals you
+don't yet have enough data to be precise.
+
+### Why does sample size matter, and what is a minimum detectable effect?
+
+Bigger samples shrink the standard error, so smaller true effects become
+detectable. The **minimum detectable effect (MDE)** is the smallest lift
+you want to be able to catch; you pick it up front, along with power
+(often 80%) and significance (often 5%), to compute the required sample
+size **before** launching. Underpowered tests miss real wins.
+
+### What is "peeking," and why is it a problem?
+
+Peeking is repeatedly checking an A/B test and stopping the moment it
+looks significant. Because the metric fluctuates, early looks cross the
+0.05 line by chance far more than 5% of the time, inflating false
+positives. Fix it by fixing the sample size in advance, or use sequential
+testing methods designed for continuous monitoring.
+
+### What is a novelty (or primacy) effect?
+
+A temporary change in behavior just because something is **new**, users
+click a redesigned button out of curiosity, then revert. It can make an
+early A/B readout look better (or worse) than the steady state. Guard
+against it by running the test long enough and checking whether the effect
+persists for later-joining users.
+
+### What is Simpson's paradox?
+
+A trend that holds in aggregate can **reverse** within every subgroup, or
+vice versa, usually because of an unequal mix. A treatment can look worse
+overall yet be better in each segment if it was applied more to
+harder-to-serve users. The lesson: **segment before you conclude**, and
+watch for confounding in the group sizes.
+
+### What is a cohort analysis, and what does it reveal?
+
+A cohort analysis groups users by a shared start event (e.g., sign-up
+month) and tracks them over time. By holding the starting point fixed, it
+separates genuine behavior changes from shifts in user-base composition,
+making it the standard tool for **retention**, churn, and lifetime-value
+comparisons across acquisition cohorts.
+
+### What is a retention curve?
+
+For a cohort, the percentage still active in week 0, week 1, week 2, and
+so on. Healthy products show the curve **flattening** onto a stable
+plateau (a retained core), rather than decaying toward zero. Comparing
+curves across cohorts shows whether product changes actually improved
+stickiness.
+
+### How do you avoid a misleading ratio metric?
+
+Be deliberate about the **denominator** and its grain. A rising "revenue
+per session" can come from more revenue **or** fewer sessions, so watch
+numerator and denominator together. Averages of ratios differ from the
+ratio of totals; when in doubt, aggregate the numerator and denominator
+separately, then divide.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`An A/B test on 2 million users shows a **0.05%** lift in clicks with a p-value of \`0.001\`. What's the right read?
+
+- Ship it, a tiny p-value means a big, reliable win.
+  > A small p-value only says the effect is unlikely to be pure noise; it says nothing about the effect's *size*.
+- [o] It's statistically significant but likely not practically significant; weigh the 0.05% against costs.
+  > Huge samples make trivial effects significant. Report the effect size and decide whether 0.05% is worth shipping.
+- The test is broken because the lift is so small.
+  > A small effect isn't a bug; with enough data it can be measured precisely yet still be too small to matter.
+- A p-value of 0.001 means there's a 0.1% chance the null is true.
+  > The p-value is computed *assuming* the null; it isn't the probability that the null is true.`}
+/>
+
+<MultipleChoice
+  markdown={`Overall, treatment B has a lower conversion rate than A. But within **both** new users and returning users, B beats A. What's going on?
+
+- The data is contradictory and must be wrong.
+  > It's not a contradiction, it's a well-known statistical effect that arises from group mix.
+- [o] Simpson's paradox: an unequal mix of segments across A and B reverses the aggregate.
+  > If B has a larger share of the harder-to-convert segment, its blended rate can trail A even while winning every segment. Segment before concluding.
+- B is genuinely worse; the subgroup results are a coincidence.
+  > Winning in *every* subgroup isn't coincidence; the aggregate is misleading because of the differing segment proportions.
+- You must have peeked at the results early.
+  > Peeking inflates false positives over time; it doesn't explain a consistent sign reversal between aggregate and subgroups.`}
+/>
+
+<MultipleChoice
+  markdown={`A team ships a change to lift "add to cart" clicks, but "add to cart" is also their success metric. Refunds quietly rise. What was missing?
+
+- Nothing; more add-to-cart clicks is always good.
+  > Optimizing a single metric without protection let a harmful side effect (refunds) slip through.
+- [o] A guardrail metric like refund rate that must not degrade while the primary metric improves.
+  > Guardrails are defined up front to catch exactly this: a primary-metric win that damages the business elsewhere.
+- A larger sample size.
+  > More data wouldn't have surfaced the refund problem; watching the right *metric* would.
+- A different chart type.
+  > Visualization isn't the gap; the missing piece is a guardrail metric on the experiment.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Funnel conversion rate by stage"
+  instructions={`The table \`funnel\` has columns \`stage\`, \`stage_order\` (1 = top of funnel), and \`users\` (distinct users reaching that stage). Return one row per stage with columns \`stage\`, \`users\`, and \`conversion_rate\`: the fraction of **top-of-funnel** users who reached this stage (this stage's \`users\` divided by the first stage's \`users\`). Sort by \`stage_order\`. Remember to multiply by \`1.0\` to avoid integer division, and \`FIRST_VALUE(users) OVER (ORDER BY stage_order)\` gives the top-of-funnel count on every row.`}
+  initSql={`CREATE TABLE funnel AS
+SELECT * FROM (VALUES
+  ('Landing page', 1, 1000),
+  ('Add to cart',  2, 350),
+  ('Checkout',     3, 180),
+  ('Purchase',     4, 90)
+) AS t(stage, stage_order, users);`}
+  starterCode={`-- Each stage's users as a fraction of the top-of-funnel users.
+SELECT
+  stage,
+  users
+  -- , conversion_rate here
+FROM funnel
+-- order by the funnel sequence;`}
+  solutionSql={`SELECT
+  stage,
+  users,
+  users * 1.0 / FIRST_VALUE(users) OVER (ORDER BY stage_order) AS conversion_rate
+FROM funnel
+ORDER BY stage_order;`}
+  tests={[
+    { id: "row_count", name: "One row per stage", description: "Four funnel stages → four rows", expectedRowCount: 4 },
+    { id: "columns", name: "Has the required columns", description: "stage, users, conversion_rate", expectedColumnsInclude: ["stage", "users", "conversion_rate"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/courses/statistics-for-data-science-python)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)

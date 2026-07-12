@@ -1,0 +1,346 @@
+---
+title: Statistics & Probability
+description: Machine Learning Engineer interview questions on distributions, MLE, bias–variance, confidence intervals, hypothesis testing, and bootstrapping, with runnable simulations and a correlation challenge.
+---
+
+Statistics is where ML interviews check that you understand *why* a model
+works, not just how to call it: estimation, uncertainty, and the difference
+between signal and noise. Review the Q&A, run the simulations, then take
+the concept checks and the challenge.
+
+## Q&A
+
+### What is a random variable, and what's the difference between a PMF and a PDF?
+
+A random variable maps outcomes to numbers. A **discrete** random variable
+has a probability **mass** function (PMF) giving $P(X = x)$ for each value;
+a **continuous** one has a probability **density** function (PDF) where
+probability is the *area under* the curve over an interval, and $P(X = x) = 0$
+for any single point. Both integrate/sum to 1, and expectation is the
+probability-weighted average of the values.
+
+### Describe the distributions an ML engineer should know.
+
+**Bernoulli/Binomial** for binary outcomes and counts of successes;
+**Normal (Gaussian)** for symmetric continuous data and, via the CLT, for
+sample means; **Poisson** for counts of rare events at a constant rate
+($\text{mean} = \text{variance} = \lambda$); **Uniform** for equal-
+probability outcomes; **Exponential** for waiting times between Poisson
+events. Knowing each one's support, parameters, and mean/variance lets you
+pick a sensible likelihood or prior.
+
+### What is Maximum Likelihood Estimation (MLE)?
+
+MLE picks the parameters that make the observed data most probable under a
+chosen model. Because products of probabilities underflow, you maximize the
+**log-likelihood**:
+
+$$\hat{\theta}_{\text{MLE}} = \arg\max_\theta \prod_i p(x_i \mid \theta) = \arg\max_\theta \sum_i \log p(x_i \mid \theta)$$
+
+For a Gaussian, the MLE of the mean is just the sample mean; for logistic
+regression, maximizing the log-likelihood of the labels *is* the training
+objective. MLE is consistent and asymptotically efficient but can overfit
+small samples.
+
+### Explain the bias–variance decomposition.
+
+Expected test error splits into three parts:
+
+$$\mathbb{E}\big[(y - \hat{f}(x))^2\big] = \underbrace{\text{Bias}[\hat{f}(x)]^2}_{\text{underfitting}} + \underbrace{\text{Var}[\hat{f}(x)]}_{\text{overfitting}} + \underbrace{\sigma^2}_{\text{irreducible}}$$
+
+**Bias** is error from wrong assumptions (too simple a model); **variance**
+is sensitivity to the particular training sample; $\sigma^2$ is noise you
+can't remove. More capacity lowers bias but raises variance, tuning
+complexity and regularization minimizes their sum.
+
+### What is the difference between standard deviation and standard error?
+
+**Standard deviation** measures the spread of individual observations.
+**Standard error** measures the spread of a *statistic* (usually the mean)
+across hypothetical repeated samples:
+
+$$SE = \frac{\sigma}{\sqrt{n}}$$
+
+The SE shrinks as $n$ grows (you estimate the mean more precisely with more
+data); the standard deviation estimates a fixed population property and
+doesn't. Confusing the two is a classic interview slip.
+
+### What does the Central Limit Theorem say, and why does it matter?
+
+For a large enough sample, the distribution of the **sample mean** is
+approximately normal **regardless of the population's shape**, with standard
+deviation $\sigma/\sqrt{n}$. That's what justifies normal-based confidence
+intervals and z/t-tests for means even on skewed data. The simulation below
+draws thousands of sample means from a skewed exponential population and
+shows the simulated SE matching the formula:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+rng = np.random.default_rng(42)
+population = rng.exponential(scale=3.0, size=100_000)   # heavily skewed
+sample_means = np.array([rng.choice(population, 40).mean() for _ in range(3000)])
+
+print(f"population mean:        {population.mean():.3f}")
+print(f"mean of sample means:  {sample_means.mean():.3f}")
+print(f"SE (formula sigma/sqrt(n)): {population.std() / 40 ** 0.5:.3f}")
+print(f"SE (simulated):             {sample_means.std():.3f}")
+`,
+    },
+  ]}
+/>
+
+The mean of the sample means lands on the population mean, and the two SE
+figures nearly coincide, the CLT holding even though the raw data is far
+from normal.
+
+### What is the Law of Large Numbers, and how is it different from the CLT?
+
+The Law of Large Numbers says the sample mean converges to the population
+mean as $n$ grows, it tells you *where* the estimate ends up. The CLT tells
+you *what shape* the estimate's uncertainty takes (normal) along the way.
+Together they justify using large samples: the estimate homes in on the
+truth, and its error is normally distributed.
+
+### What is a confidence interval, really?
+
+It's a procedure, not a probability about one interval. A 95% confidence
+interval means: if you repeated the experiment many times and built an
+interval each time, about 95% of those intervals would contain the true
+parameter. For a mean it's
+
+$$\bar{x} \pm z^{*}\,\frac{s}{\sqrt{n}}$$
+
+with $z^{*} \approx 1.96$ for 95% (a t critical value for small samples).
+It is **not** "a 95% probability the parameter is in *this* interval", the
+parameter is fixed; the interval is what's random.
+
+### What is bootstrapping, and when do you use it?
+
+Bootstrapping estimates the sampling distribution of a statistic by
+resampling your data **with replacement** many times and recomputing the
+statistic each time. It needs no formula for the standard error, so it
+works for medians, ratios, or any statistic where the analytic SE is hard
+or unknown. The percentile method reads the confidence interval straight
+off the resampled distribution:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+rng = np.random.default_rng(0)
+data = rng.normal(loc=50, scale=10, size=200)
+
+boot_means = np.array([
+    rng.choice(data, size=len(data), replace=True).mean()   # resample w/ replacement
+    for _ in range(5000)
+])
+low, high = np.percentile(boot_means, [2.5, 97.5])
+print(f"sample mean:      {data.mean():.2f}")
+print(f"95% bootstrap CI: ({low:.2f}, {high:.2f})")
+`,
+    },
+  ]}
+/>
+
+Each resample is the same size as the original with replacement, so some
+rows repeat and others drop out; the 2.5th and 97.5th percentiles of the
+5,000 resampled means bracket the true mean with 95% coverage.
+
+### What exactly is a p-value?
+
+The probability of observing data **at least as extreme** as yours,
+**assuming the null hypothesis is true**. A small p-value means your data
+would be surprising under the null, so you reject it at your significance
+level $\alpha$. It is **not** the probability the null is true, nor the
+probability your result is a fluke, both are computed *given* the null.
+
+### What is hypothesis testing, and what are its steps?
+
+A formal procedure for deciding whether data provide enough evidence
+against a null hypothesis $H_0$. State $H_0$ and the alternative $H_1$;
+fix $\alpha$ and the sample size before collecting data; compute a test
+statistic and its p-value; reject $H_0$ if $p < \alpha$. Fixing the
+hypotheses and $\alpha$ in advance is what keeps the test honest.
+
+### What is a permutation test?
+
+A non-parametric test that builds the null distribution by shuffling group
+labels: if the groups were truly exchangeable (no effect), reassigning
+labels at random should produce differences as large as the observed one
+often. The p-value is the fraction of shuffles whose difference is at least
+as extreme. It assumes almost nothing about the distribution:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+rng = np.random.default_rng(1)
+control   = rng.normal(100, 15, size=50)
+treatment = rng.normal(107, 15, size=50)
+observed  = treatment.mean() - control.mean()
+
+pooled = np.concatenate([control, treatment])
+n = len(control)
+diffs = np.empty(10000)
+for i in range(10000):
+    perm = rng.permutation(pooled)
+    diffs[i] = perm[:n].mean() - perm[n:].mean()
+
+p_value = np.mean(np.abs(diffs) >= abs(observed))   # two-sided
+print(f"observed difference: {observed:.2f}")
+print(f"permutation p-value: {p_value:.4f}")
+`,
+    },
+  ]}
+/>
+
+### What are Type I and Type II errors, and what is power?
+
+A **Type I error** is a false positive (rejecting a true null); its rate is
+$\alpha$. A **Type II error** is a false negative (missing a real effect);
+its rate is $\beta$, and **power** $= 1 - \beta$ is the chance of detecting
+a true effect. Power rises with larger sample size, larger effect size,
+lower variance, and higher $\alpha$, lowering $\alpha$ trades fewer false
+positives for more false negatives.
+
+### What sampling methods should you know?
+
+**Simple random** gives every unit equal probability. **Stratified**
+samples within subgroups to guarantee representation (and reduce variance).
+**Cluster** samples whole groups to cut cost. **Reservoir** sampling draws
+a uniform sample from a stream of unknown length in one pass. The method
+shapes both bias and variance of every downstream estimate.
+
+### What is selection (sampling) bias?
+
+When the sample isn't representative of the population you want to
+generalize to, so estimates are systematically off no matter how much data
+you collect. Survivorship bias (only analyzing what survived) and
+non-response bias are common forms. In ML it shows up as training on a
+population that differs from serving traffic, which no amount of modeling
+fixes.
+
+### What is Bayes' theorem?
+
+It updates a prior belief with evidence:
+
+$$P(\theta \mid D) = \frac{P(D \mid \theta)\,P(\theta)}{P(D)}$$
+
+It underpins spam filters, medical diagnosis, and Bayesian inference (prior
+→ posterior after data). The classic trap: with a rare condition, even a
+very accurate test yields a low posterior probability of being positive,
+because base rates dominate.
+
+### Covariance vs correlation, what's the difference?
+
+Covariance measures whether two variables move together but its magnitude
+depends on their units, so it's hard to interpret. Correlation
+standardizes it to $[-1, 1]$:
+
+$$\rho_{X,Y} = \frac{\text{Cov}(X, Y)}{\sigma_X \, \sigma_Y}$$
+
+Correlation captures only **linear** association; a zero correlation can
+still hide a strong non-linear relationship (e.g., $y = x^2$).
+
+### Why does correlation not imply causation?
+
+Two variables can correlate because one causes the other, because a third
+**confounder** drives both, or by pure chance. Establishing causation needs
+a randomized controlled experiment or a causal-inference method
+(instrumental variables, difference-in-differences) that rules out
+confounders. Ice-cream sales and drownings correlate, but temperature
+causes both.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A test returns \`p = 0.03\` at \`α = 0.05\`. Which statement is correct?
+
+- There is a 3% probability the null hypothesis is true.
+  > A p-value is not the probability the null is true; it's computed *assuming* the null holds.
+- [o] If the null were true, there's a 3% chance of data this extreme or more, so at α = 0.05 you reject the null.
+  > That's the definition; since 0.03 < 0.05, you reject.
+- There's a 97% probability the effect is real and important.
+  > Significance isn't the probability the effect is real, and says nothing about effect size.
+- The result is guaranteed not to be a false positive.
+  > A small p reduces but never eliminates the Type I error rate.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a 95% confidence interval for a mean actually claim?
+
+- There's a 95% probability the true mean lies in this specific interval.
+  > The parameter is fixed, not random; probability describes the *procedure*, not this one interval.
+- [o] If you repeated the experiment many times, about 95% of the intervals built this way would contain the true mean.
+  > That's the frequentist definition: coverage is a property of the long-run procedure.
+- 95% of the data falls inside the interval.
+  > A CI is about the *mean's* uncertainty, not the spread of the raw data.
+- The interval is wrong 5% of the time for this dataset.
+  > "This dataset" gives one interval that either contains the mean or not; 95% refers to repeated sampling.`}
+/>
+
+<MultipleChoice
+  markdown={`Ice-cream sales and drowning deaths are strongly correlated across the year. What's the sound conclusion?
+
+- Buying ice cream causes drownings, so restrict sales.
+  > Correlation alone can't establish causation; acting on it here would be absurd.
+- [o] A confounder (hot weather) drives both; correlation doesn't imply causation.
+  > Temperature raises both ice-cream sales and swimming (hence drownings); it's a classic confounder.
+- The correlation must be a computational error.
+  > The correlation is real; the error would be inferring causation from it.
+- Drownings cause ice-cream sales.
+  > Reversing the arrow is just as unjustified; a lurking variable explains both.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Pearson correlation"
+  instructions={`Implement \`pearson_correlation(x, y)\` for two equal-length sequences (lists or NumPy arrays). Return Pearson's correlation coefficient as a float in \`[-1, 1]\`: the covariance of \`x\` and \`y\` divided by the product of their standard deviations. If either input has zero variance (all values equal), return \`0.0\`.
+
+Example: \`pearson_correlation([1, 2, 3, 4], [2, 4, 6, 8])\` → \`1.0\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def pearson_correlation(x, y):
+    # Covariance of x, y over the product of their standard deviations.
+    pass`,
+      solutionCode: `import numpy as np
+
+def pearson_correlation(x, y):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    xm = x - x.mean()
+    ym = y - y.mean()
+    denom = np.sqrt((xm ** 2).sum() * (ym ** 2).sum())
+    if denom == 0:
+        return 0.0
+    return float((xm * ym).sum() / denom)`,
+    },
+  ]}
+  tests={[
+    { id: "perfect_pos", name: "Perfect positive → 1.0", description: "y = 2x", code: `assert abs(pearson_correlation([1, 2, 3, 4], [2, 4, 6, 8]) - 1.0) < 1e-9` },
+    { id: "perfect_neg", name: "Perfect negative → -1.0", description: "y decreases with x", code: `assert abs(pearson_correlation([1, 2, 3, 4], [4, 3, 2, 1]) + 1.0) < 1e-9` },
+    { id: "known", name: "Known value 0.5", description: "computed by hand", code: `assert abs(pearson_correlation([1, 2, 3], [1, 3, 2]) - 0.5) < 1e-9` },
+    { id: "constant", name: "Zero variance → 0.0", description: "avoids divide-by-zero", code: `assert pearson_correlation([1, 2, 3], [5, 5, 5]) == 0.0` },
+  ]}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/courses/statistics-for-data-science-python)
+- [Scientific Computing with Python](/courses/scientific-computing-python)

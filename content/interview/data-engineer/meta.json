@@ -6,6 +6,11 @@
     "index",
     "sql",
     "data-modeling",
-    "pipelines"
+    "python",
+    "pipelines",
+    "distributed-processing",
+    "streaming",
+    "data-warehousing",
+    "orchestration-and-reliability"
   ]
 }

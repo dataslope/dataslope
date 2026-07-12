@@ -1,0 +1,240 @@
+---
+title: API Design
+description: Backend interview questions on REST principles, HTTP methods and status codes, idempotency, versioning, pagination, authentication, and REST vs GraphQL vs gRPC, with concept checks.
+---
+
+API design questions test whether you can design an interface other engineers
+will actually enjoy using: predictable, consistent, and hard to misuse. Expect
+to defend your choice of methods, status codes, and auth. This is a
+concept-heavy question bank, no runnable code, but plenty of HTTP.
+
+## Q&A
+
+### What makes an API RESTful?
+
+REST models your domain as **resources** identified by URLs, manipulated with
+standard **HTTP methods**. The hallmarks: **resource-oriented** nouns in
+paths (`/users/42`, not `/getUser`), **statelessness** (each request carries
+everything needed; the server keeps no client session), a **uniform
+interface**, and using HTTP **status codes** and verbs as intended. Done well,
+a REST API is predictable enough that a developer can guess the next endpoint.
+
+### How should you name REST resources?
+
+Use **plural nouns** for collections and IDs for members: `/orders` (the
+collection), `/orders/42` (one order), `/orders/42/items` (a sub-collection).
+Avoid verbs in paths, the HTTP method is the verb. Keep names consistent and
+hierarchical, and prefer lowercase, hyphenated segments. If an action does not
+map cleanly to CRUD (e.g. "publish"), model it as a sub-resource or a state
+change (`PATCH /articles/42 {"status": "published"}`).
+
+### Walk through the main HTTP methods and their semantics.
+
+- **GET**, read a resource; **safe** (no side effects) and **idempotent**.
+- **POST**, create a resource or trigger an action; **not** idempotent.
+- **PUT**, replace a resource wholesale; idempotent.
+- **PATCH**, partially update a resource; not necessarily idempotent.
+- **DELETE**, remove a resource; idempotent.
+
+"Safe" means no server state changes; "idempotent" means repeating the request
+has the same effect as making it once.
+
+### What do the HTTP status code classes mean?
+
+The first digit tells the story: **2xx** success (`200 OK`, `201 Created`,
+`204 No Content`), **3xx** redirection (`301`, `304 Not Modified`), **4xx**
+client error (`400 Bad Request`, `401 Unauthorized`, `403 Forbidden`,
+`404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`, `429 Too Many
+Requests`), and **5xx** server error (`500`, `503 Service Unavailable`).
+Returning the right code lets clients handle failures programmatically instead
+of parsing error strings.
+
+### 401 vs 403, what is the difference?
+
+**401 Unauthorized** means "I do not know who you are", authentication failed
+or is missing; the client should log in or send credentials. **403 Forbidden**
+means "I know who you are, but you may not do this", authentication succeeded
+but authorization failed. A common mistake is returning 401 for a permission
+problem, which wrongly signals the credentials are bad.
+
+### What is idempotency and why does it matter for APIs?
+
+An idempotent operation produces the same result whether called once or many
+times. It matters because networks are unreliable: a client that times out and
+**retries** must not create a duplicate order or double-charge a card.
+`GET`, `PUT`, and `DELETE` are idempotent by definition; `POST` is not. To
+make a `POST` safe to retry, accept an **idempotency key** (a client-generated
+unique ID) and deduplicate on it server-side:
+
+```text
+POST /payments HTTP/1.1
+Idempotency-Key: 9c1f2a7e-...-b3
+Content-Type: application/json
+
+{ "amount": 5000, "currency": "usd" }
+```
+
+### How do you version an API?
+
+Common strategies: a **URI prefix** (`/v1/orders`), a **header**
+(`Accept: application/vnd.api.v2+json`), or a query parameter (`?version=2`).
+URI versioning is the most visible and cache-friendly and is the pragmatic
+default. Whatever you choose, version to protect existing clients from
+**breaking changes** (removing a field, changing a type); additive changes
+(new optional fields) should not need a new version.
+
+### How do you paginate a large collection?
+
+Two main patterns. **Offset/limit** (`?limit=20&offset=40`) is simple and
+allows jumping to any page, but it is slow on large offsets and can skip or
+repeat rows when the underlying data changes. **Cursor** (keyset) pagination
+returns an opaque cursor pointing at the last item (`?limit=20&after=eyJ...`);
+it is stable under inserts and efficient at any depth, at the cost of no
+random page access. Prefer cursors for large or fast-changing datasets.
+
+```text
+GET /orders?limit=20&after=eyJpZCI6MTQwfQ HTTP/1.1
+
+200 OK
+{ "data": [ ... ], "next_cursor": "eyJpZCI6MTYwfQ" }
+```
+
+### Sessions vs JWT vs OAuth, how do they relate?
+
+They answer different questions. **Session cookies**: the server stores
+session state and hands the client an opaque ID in a cookie, easy to revoke,
+but stateful. **JWT** (JSON Web Token): a signed, **self-contained** token the
+client sends in an `Authorization: Bearer` header, stateless and scalable, but
+hard to revoke before expiry. **OAuth 2.0** is not a token format but a
+**delegated authorization framework**, "let app X access my data on service Y
+without sharing my password", and it often issues JWTs as access tokens.
+
+### When would you choose stateful sessions over stateless JWTs?
+
+Choose **sessions** when you need instant **revocation** (log out, ban a user
+immediately) and can afford a shared session store, the server controls
+validity. Choose **JWTs** when you want **stateless** verification across many
+services without a lookup, and can tolerate that a token stays valid until it
+expires. A common hybrid: short-lived access JWTs plus a revocable, longer-lived
+**refresh token**.
+
+### How should an API handle errors?
+
+Return the correct status code **and** a consistent, machine-readable body: a
+stable error `code`, a human `message`, and optionally field-level details.
+Never leak stack traces or internal identifiers. Consistency lets clients
+branch on `error.code` rather than fragile string matching.
+
+```text
+422 Unprocessable Entity
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "Email is invalid.",
+    "fields": { "email": "must be a valid address" }
+  }
+}
+```
+
+### How do you rate-limit an API, and how should clients learn their limits?
+
+Cap requests per client per window (commonly **token bucket** to allow short
+bursts). When a client exceeds the limit, return **429 Too Many Requests** and
+communicate state via headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`,
+`X-RateLimit-Reset`, and `Retry-After` so a well-behaved client can back off.
+Rate limiting protects the service from abuse and noisy neighbors and enforces
+fair usage across tenants.
+
+### REST vs GraphQL vs gRPC, when does each fit?
+
+- **REST**: resource-oriented over HTTP/JSON, universally understood,
+  cache-friendly, the safe default for public web APIs. Downsides: over- and
+  under-fetching, multiple round trips.
+- **GraphQL**: the client asks for exactly the fields it wants in one query,
+  eliminating over-fetching, great for rich, varied frontends. Costs: caching
+  and rate limiting are harder, and queries can be expensive.
+- **gRPC**: binary Protocol Buffers over HTTP/2, very fast, strongly typed,
+  streaming, ideal for **internal service-to-service** calls. Weaker browser
+  support and less human-readable.
+
+### What is HATEOAS, and is it required for REST?
+
+HATEOAS (Hypermedia As The Engine Of Application State) means responses
+include **links** to related actions, so a client discovers what it can do
+next without hardcoding URLs. It is the strictest level of REST maturity. In
+practice most "RESTful" APIs skip full HATEOAS, it is aspirational rather than
+required, though returning a few useful links (next page, related resources)
+is common and pragmatic.
+
+### How do you design a clean resource API for, say, a blog?
+
+Model the nouns and let HTTP verbs do the actions:
+
+```text
+GET    /articles              # list (paginated, filterable)
+POST   /articles              # create
+GET    /articles/42           # read one
+PATCH  /articles/42           # partial update
+DELETE /articles/42           # delete
+GET    /articles/42/comments  # sub-collection
+POST   /articles/42/comments  # add a comment
+```
+
+Filtering and sorting go in the query string (`?status=published&sort=-created_at`),
+not new endpoints. Return `201 Created` with a `Location` header on create, and
+use consistent field names across all resources.
+
+### What is content negotiation?
+
+Content negotiation lets the client and server agree on a representation. The
+client sends an `Accept` header (`Accept: application/json`) stating what
+formats it can handle, and the server responds with `Content-Type` describing
+what it sent. The same mechanism handles language (`Accept-Language`) and
+encoding (`Accept-Encoding: gzip`). It lets one URL serve multiple
+representations of a resource.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A payment client sends \`POST /payments\`, times out, and retries. What prevents a **double charge**?
+
+- Switching the method to \`GET\`, which is idempotent.
+  > \`GET\` must not create resources; you cannot make a payment with a safe read method.
+- [o] Accepting a client-supplied **idempotency key** and deduplicating retries server-side.
+  > The server records the key on first use and returns the original result on any retry, so repeated requests charge once.
+- Returning \`200 OK\` faster so the client never times out.
+  > You cannot guarantee timing over an unreliable network; correctness must not depend on it.
+- Making the endpoint \`PUT\` instead of \`POST\`.
+  > \`PUT\` is idempotent for *replacing a known resource* by ID, but creating a payment has no client-known ID; an idempotency key is the right tool.`}
+/>
+
+<MultipleChoice
+  markdown={`An authenticated user requests a resource they are **not permitted** to see. Which status code is correct?
+
+- \`401 Unauthorized\`
+  > 401 means the request lacks valid authentication; here the user *is* authenticated, so it is misleading.
+- [o] \`403 Forbidden\`
+  > 403 means "authenticated but not allowed", exactly the case where identity is known but permission is denied.
+- \`404 Not Found\`
+  > 404 can hide a resource's existence, but the semantically correct answer for a known-but-forbidden action is 403 (some APIs use 404 deliberately to avoid leaking existence).
+- \`400 Bad Request\`
+  > 400 signals a malformed request; a well-formed but unauthorized request is not a syntax problem.`}
+/>
+
+<MultipleChoice
+  markdown={`You are paginating a **large, frequently changing** feed. Why prefer **cursor** pagination over \`offset/limit\`?
+
+- Offset pagination cannot return JSON.
+  > Both return JSON; the difference is how they locate the next page.
+- [o] A cursor is stable under inserts and efficient at any depth, whereas large offsets are slow and can skip or repeat rows.
+  > Keyset/cursor pagination seeks from the last seen item, so new inserts do not shift the window and there is no growing offset scan.
+- Cursors let the client jump to any arbitrary page instantly.
+  > That is an advantage of *offset* pagination; cursors trade random access for stability and speed.
+- Offset pagination is not supported over HTTPS.
+  > Transport security is unrelated to the pagination strategy.`}
+/>
+
+## Go deeper
+
+- [Intro to Web Development](/courses/intro-web-development)
+- [TypeScript from Scratch](/courses/typescript-from-scratch)

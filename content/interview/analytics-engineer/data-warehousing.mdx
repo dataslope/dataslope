@@ -1,0 +1,318 @@
+---
+title: Data Warehousing
+description: Analytics Engineer interview questions on cloud warehouses, columnar storage, partitioning and clustering, materializations, cost, and idempotent incremental builds, with answers, runnable SQL, and concept checks.
+---
+
+Analytics Engineers live in the warehouse, so interviews probe how modern cloud
+warehouses store and bill for data, and how you keep rebuilds fast, cheap, and
+correct. Review the Q&A, run the examples, then take the concept checks.
+
+> **SQL dialect:** the runnable blocks execute in your browser on **DuckDB**, a columnar engine that mirrors how cloud warehouses behave. Warehouse-specific syntax (Snowflake `MERGE`, BigQuery partitioning) is shown as illustrative fenced code.
+
+## Q&A
+
+### What makes a modern cloud warehouse different from a traditional one?
+
+The defining shift is **separation of storage and compute**. Snowflake,
+BigQuery, and Databricks store data cheaply in object storage and spin up
+independent compute that reads it, so you scale query horsepower without moving
+data and run many isolated workloads over one copy. Traditional warehouses
+(on-prem Teradata, classic Redshift) couple the two, so storage and compute grow
+together whether you need it or not.
+
+### How do Snowflake, BigQuery, and Redshift differ architecturally?
+
+**Snowflake** decouples storage from user-defined compute clusters ("virtual
+warehouses") and auto-manages micro-partitions. **BigQuery** is fully
+serverless: no clusters to size, you pay per bytes scanned (or for reserved
+slots), and it partitions/clusters tables you declare. **Redshift** is
+cluster-based (provisioned nodes) with distribution and sort keys you choose,
+though Redshift Serverless and RA3 nodes have moved it toward decoupled storage.
+
+### What is columnar storage, and why does it matter for analytics?
+
+Columnar storage keeps each **column's values contiguous** on disk instead of
+each row's fields together. Analytical queries touch few columns over many rows,
+so reading only the needed columns slashes I/O, and same-type runs compress far
+better (dictionary, run-length). Row stores (OLTP databases) win when you read
+whole rows one at a time; column stores win for aggregations over billions of
+rows.
+
+### Why does `SELECT *` cost more in a columnar warehouse?
+
+Because scan cost scales with **columns read**. On a 200-column table, selecting
+3 columns reads roughly 3/200 of the data; `SELECT *` reads all of it, and in
+BigQuery you pay for every scanned byte. Selecting only needed columns is one of
+the cheapest, highest-leverage optimizations available. The block below
+aggregates one column out of several, exactly the access pattern columnar
+storage optimizes for:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
+  (1, DATE '2024-01-01', 'click',    120),
+  (2, DATE '2024-01-01', 'view',      45),
+  (3, DATE '2024-01-02', 'click',     90),
+  (4, DATE '2024-01-02', 'purchase', 300),
+  (5, DATE '2024-01-03', 'view',      10)
+) AS t(event_id, event_date, event_type, value_cents);`}
+  starterCode={`-- Analytical scan: read one measure column across many rows
+SELECT event_type, SUM(value_cents) AS total_cents
+FROM events
+GROUP BY event_type
+ORDER BY total_cents DESC;`}
+/>
+
+### What is partitioning, and how does partition pruning save money?
+
+Partitioning physically splits a table by a column (usually a date) into
+segments. When a query filters on that column, the engine reads only the
+matching partitions, **partition pruning**, and skips the rest. On a
+date-partitioned table, `WHERE event_date >= '2024-06-01'` might scan one month
+instead of five years, cutting cost and time proportionally.
+
+```sql
+-- BigQuery: partition a table by day
+CREATE TABLE analytics.events
+PARTITION BY DATE(event_ts) AS
+SELECT * FROM raw.events;
+-- A query filtering event_ts now prunes to the relevant day partitions.
+```
+
+### What is clustering, and how does it differ from partitioning?
+
+Clustering **sorts/co-locates** rows by one or more columns *within* storage so
+the engine can skip blocks that can't match a filter. Partitioning is coarse
+(distinct segments, often a hard limit on count); clustering is fine-grained and
+handles high-cardinality columns. Snowflake auto-clusters via micro-partitions
+and optional cluster keys; BigQuery lets you cluster within partitions. Rule of
+thumb: partition by date, cluster by frequently filtered high-cardinality keys.
+
+### Compare the materializations: view vs table vs incremental.
+
+- **View**, stores only the query; recomputed on every read. Cheapest to build, but pushes compute onto each query, and slow for expensive logic.
+- **Table**, fully rebuilt each run; fast reads, but recomputes everything even when little changed.
+- **Incremental**, processes only new/changed rows each run and appends/merges them. Essential when a full table rebuild is too slow or expensive.
+
+Choose by read frequency, compute cost, and data volume, not habit.
+
+### When do you choose incremental over a full table rebuild?
+
+When the table is **large and mostly append-only** (events, logs, page views)
+and full rebuilds are too slow or costly. The trade-off is complexity: you need
+a reliable watermark to find new rows, correct handling of late-arriving and
+updated rows, and periodic full refreshes to repair drift. If a table is small
+or changes broadly every run, a plain `table` is simpler and safer.
+
+### How does an incremental build filter to new rows?
+
+Track a **watermark**, the max timestamp or id already loaded, and select only
+source rows beyond it. The block below loads only `raw_events` newer than what
+the target already holds:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE fct_events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-02 00:00:00')
+) AS t(event_id, event_at);
+
+CREATE TABLE raw_events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-02 00:00:00'),
+  (3, TIMESTAMP '2024-01-03 00:00:00'),
+  (4, TIMESTAMP '2024-01-04 00:00:00')
+) AS t(event_id, event_at);`}
+  starterCode={`-- Only rows newer than the current high-water mark are loaded
+SELECT event_id, event_at
+FROM raw_events
+WHERE event_at > (SELECT MAX(event_at) FROM fct_events)
+ORDER BY event_id;`}
+/>
+
+### What is an idempotent rebuild, and why does it matter?
+
+Idempotent means **running the build again produces the same result**, no
+duplicates, no drift. It matters because pipelines retry: a job that crashes and
+reruns must not double-load. You get idempotency by rebuilding from source
+(`CREATE OR REPLACE TABLE ... AS SELECT`) or by upserting on a unique key
+(`MERGE`) rather than blind `INSERT`. The block below rebuilds a dimension from
+its event log; rerun it any number of times and the output is identical:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 00:00:00'),
+  (1, TIMESTAMP '2024-02-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-15 00:00:00')
+) AS t(customer_id, updated_at);`}
+  starterCode={`-- Deterministic rebuild: same input always yields the same table
+CREATE OR REPLACE TABLE dim_customer AS
+SELECT customer_id, MAX(updated_at) AS updated_at
+FROM customer_events
+GROUP BY customer_id;
+
+SELECT * FROM dim_customer ORDER BY customer_id;`}
+/>
+
+### How does a `MERGE` support idempotent upserts?
+
+`MERGE` matches source rows against a target on a key: matched rows `UPDATE`,
+unmatched rows `INSERT`. Because it keys on the unique id, rerunning the same
+batch overwrites in place instead of duplicating, which is what makes it
+idempotent. This is how dbt handles incremental models with a `unique_key`.
+
+```sql
+-- Snowflake / BigQuery style upsert
+MERGE INTO dim_customer t
+USING staged_customers s
+  ON t.customer_id = s.customer_id
+WHEN MATCHED THEN UPDATE SET name = s.name, updated_at = s.updated_at
+WHEN NOT MATCHED THEN INSERT (customer_id, name, updated_at)
+  VALUES (s.customer_id, s.name, s.updated_at);
+```
+
+### Why are periodic full refreshes still needed with incremental models?
+
+Incremental logic only sees new rows, so it can miss **hard deletes**, drift
+from late/updated rows that slipped past the watermark, and schema changes. A
+scheduled `--full-refresh` rebuilds from scratch to reconcile the table with the
+true source. Treat incremental as an optimization over a correct full rebuild,
+not a replacement for it.
+
+### What is the difference between OLTP and OLAP systems?
+
+**OLTP** (online transaction processing) serves many small, row-level
+reads/writes with strict consistency, an app's Postgres, row-stored. **OLAP**
+(online analytical processing) serves few large scans and aggregations, the
+warehouse, column-stored. You typically **EL** data out of OLTP sources into an
+OLAP warehouse, then **T**ransform there. Running heavy analytics on the OLTP
+database competes with the app and performs poorly.
+
+### What is a virtual warehouse / slot / compute cluster, and how does it drive cost?
+
+It is the **compute** that executes queries, sized independently of storage.
+Snowflake bills virtual-warehouse **credits per second** while running (so
+auto-suspend saves money); BigQuery bills **bytes scanned** on demand or
+reserved **slots**; Redshift bills provisioned nodes (or serverless RPUs).
+Knowing your billing model tells you which lever, less data scanned vs less
+compute time, actually reduces the bill.
+
+### How do you control warehouse cost in practice?
+
+Scan less and compute less: partition and cluster so filters prune data, select
+only needed columns, materialize expensive repeated logic as tables instead of
+rerunning views, and use incremental models for big append-only tables. On the
+compute side, right-size warehouses, enable auto-suspend, and separate ad-hoc
+from production workloads so a heavy query does not starve pipelines.
+
+### What is a result cache, and how does it help?
+
+Warehouses cache query results keyed by the exact query and underlying data
+state. An identical query over unchanged data returns instantly and often for
+**free** (Snowflake serves it without spinning compute). It rewards
+deterministic, parameter-stable queries; it is invalidated the moment the
+underlying tables change.
+
+### What are distribution and sort keys in Redshift?
+
+A **distribution key** decides how rows spread across nodes; choosing the join
+key as `DISTKEY` co-locates matching rows so joins avoid network shuffles. A
+**sort key** orders rows on disk so range filters skip blocks (like clustering).
+Poor distribution causes **skew**, one node holds most rows and becomes the
+bottleneck. Snowflake and BigQuery hide most of this, but Redshift makes it your
+job.
+
+### When can partitioning or clustering hurt more than help?
+
+Over-partitioning creates **many tiny partitions** (e.g. partitioning
+high-cardinality ids or by hour on low volume), adding metadata overhead and
+small-file problems that slow scans. Clustering on a column queries never filter
+buys nothing but costs maintenance. Partition and cluster on the columns filters
+actually use, and match granularity to data volume.
+
+### Why is a wide, denormalized "one big table" sometimes preferred in a warehouse?
+
+Columnar storage compresses redundant denormalized columns well, and skipping
+joins speeds queries and simplifies BI tools that struggle with multi-table
+models. The cost is storage redundancy and harder maintenance when an attribute
+changes. It suits performance-critical serving layers; keep normalized/star
+models upstream as the maintainable source.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A dashboard query filters a 5-year event table to the last 7 days but is slow and expensive. The table is not partitioned. Best first fix?
+
+- Switch the warehouse to a bigger compute size.
+  > More compute reads the same five years faster but still scans it all; you pay more, not less.
+- [o] Partition (or cluster) the table by event date so the filter prunes to recent segments.
+  > With date partitioning, a 7-day filter reads only those partitions instead of the entire history, cutting both time and cost.
+- Add more columns to the \`SELECT\`.
+  > Reading more columns increases scan cost in a columnar store; it never helps.
+- Convert the table to a view.
+  > A view recomputes on every read and still scans the full table; it doesn't prune anything.`}
+/>
+
+<MultipleChoice
+  markdown={`A pipeline retries a load after a mid-run crash and ends up with duplicate rows. Which design prevents this?
+
+- \`INSERT\` all source rows every run.
+  > Blind inserts on retry are exactly what creates duplicates.
+- [o] \`MERGE\` on a unique key (or \`CREATE OR REPLACE\` from source) so reruns are idempotent.
+  > Keying the load so matched rows update in place makes a rerun produce the same table, no duplicates.
+- Run the job less often.
+  > Frequency doesn't matter; a single retried non-idempotent load still duplicates.
+- Delete the target table's indexes.
+  > Indexes are unrelated to duplicate rows from re-inserts.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement about "separation of storage and compute" is correct?
+
+- It means data is stored twice for redundancy.
+  > That's replication, a different concept; separation is about decoupling the compute layer from storage.
+- [o] Compute clusters can scale independently and read the same stored data without moving it.
+  > Decoupling lets you resize or run multiple isolated compute engines over one storage copy.
+- It forces every query to rebuild the table first.
+  > Nothing about the architecture requires rebuilding tables per query.
+- It only applies to OLTP databases.
+  > It's a hallmark of modern OLAP cloud warehouses, not OLTP systems.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Idempotent dimension rebuild"
+  instructions={`Table \`customer_events\` (\`customer_id\`, \`updated_at\`) is an append-only log with **multiple rows per customer**. Build a \`SELECT\` for an idempotent dimension: exactly **one row per** \`customer_id\` holding that customer's **latest** \`updated_at\`. Rerunning it must always give the same result. Columns: \`customer_id\`, \`last_seen\`. Sort by \`customer_id\`.`}
+  initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 00:00:00'),
+  (1, TIMESTAMP '2024-02-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-15 00:00:00'),
+  (3, TIMESTAMP '2024-03-10 00:00:00'),
+  (3, TIMESTAMP '2024-03-01 00:00:00')
+) AS t(customer_id, updated_at);`}
+  starterCode={`-- One row per customer with their most recent event time
+SELECT
+  customer_id
+  -- , MAX(updated_at) AS last_seen
+FROM customer_events
+-- GROUP BY ...
+ORDER BY customer_id;`}
+  solutionSql={`SELECT
+  customer_id,
+  MAX(updated_at) AS last_seen
+FROM customer_events
+GROUP BY customer_id
+ORDER BY customer_id;`}
+  tests={[
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "cols", name: "Has the required columns", description: "customer_id and last_seen", expectedColumnsInclude: ["customer_id", "last_seen"] },
+  ]}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Database Design with PostgreSQL](/courses/database-design-postgresql)

@@ -1,0 +1,528 @@
+---
+title: Python for Data Engineering
+description: Data Engineer Python interview questions on generators, lazy iteration over large files, in-memory dedup and joins, batching, retries, and idempotent transforms, with runnable challenges.
+---
+
+Data Engineer Python screens are not language-trivia quizzes; they check
+that you can move and clean data **without blowing up memory** and write
+transforms that are safe to re-run. Review the Q&A, then run the
+challenges.
+
+## Q&A
+
+### Why prefer a generator over a list when processing large data?
+
+A list materializes **every** element in memory at once; a generator
+(`yield`, or a generator expression) produces items **lazily**, one at a
+time, so memory stays flat regardless of input size. This is the
+difference between $O(n)$ and $O(1)$ memory for a streaming transform.
+Below, `parse_rows` yields one `(name, qty)` tuple at a time while a
+`Counter` folds them into running totals, so the full input is never held
+at once.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import io
+from collections import Counter
+
+# io.StringIO stands in for a large file opened line-by-line.
+data = io.StringIO("apple,3\\nbanana,5\\napple,2\\ncherry,7\\n")
+
+def parse_rows(f):
+    for line in f:                      # reads one line at a time
+        name, qty = line.strip().split(",")
+        yield name, int(qty)            # lazily emits one record
+
+totals = Counter()
+for name, qty in parse_rows(data):
+    totals[name] += qty
+
+print(dict(totals))   # {'apple': 5, 'banana': 5, 'cherry': 7}`,
+    },
+  ]}
+/>
+
+### How do you process a file too big to fit in memory?
+
+Iterate it **line by line** (or in fixed-size chunks) instead of calling
+`.read()` or `.readlines()`, which load the whole file. A file object is
+already a lazy iterator of lines, so `for line in open(path):` streams it.
+Chain generators to build a pipeline where each stage pulls only what the
+next stage consumes:
+
+```python
+def read_lines(path):
+    with open(path) as f:
+        for line in f:
+            yield line.rstrip("\n")
+
+def parse(lines):
+    for line in lines:
+        yield line.split(",")
+
+def only_valid(rows):
+    for row in rows:
+        if len(row) == 3:
+            yield row
+
+# Nothing is read until you iterate the final generator.
+pipeline = only_valid(parse(read_lines("events.csv")))
+```
+
+### What's the difference between an iterable and an iterator?
+
+An **iterable** implements `__iter__` and can produce a fresh iterator
+(lists, dicts, files). An **iterator** implements `__next__` and is
+**consumed once**, it tracks position and raises `StopIteration` when
+exhausted. A generator is an iterator, so iterating it twice yields
+nothing the second time. If you need multiple passes, materialize to a
+list or re-create the generator.
+
+### How do you deduplicate records in memory?
+
+For hashable values, a `set` gives $O(1)$ membership tests, so
+deduplication is a single pass. When you must key on part of a record (and
+keep the first or latest seen), track seen keys in a `set` or map keys to
+records in a `dict`. Below, a `set` of `user_id`s keeps the **first**
+occurrence of each user while preserving order.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `records = [
+    {"user_id": 1, "action": "login"},
+    {"user_id": 2, "action": "login"},
+    {"user_id": 1, "action": "click"},   # duplicate user_id
+    {"user_id": 3, "action": "login"},
+]
+
+seen = set()
+deduped = []
+for r in records:
+    if r["user_id"] not in seen:   # O(1) membership test
+        seen.add(r["user_id"])
+        deduped.append(r)
+
+print([r["user_id"] for r in deduped])   # [1, 2, 3]`,
+    },
+  ]}
+/>
+
+### How do you join two datasets in memory without a database?
+
+Build a **hash map** from the smaller side keyed on the join column, then
+probe it while scanning the larger side. This is a $O(n + m)$ hash join,
+far better than the $O(n \times m)$ nested loop of comparing every pair.
+Below, `users` is indexed into `by_id`, then each order looks up its
+user's name in $O(1)$.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `users = [{"user_id": 1, "name": "Ada"}, {"user_id": 2, "name": "Lin"}]
+orders = [
+    {"order_id": 10, "user_id": 1, "amount": 40},
+    {"order_id": 11, "user_id": 1, "amount": 60},
+    {"order_id": 12, "user_id": 2, "amount": 25},
+]
+
+by_id = {u["user_id"]: u["name"] for u in users}   # build side
+
+joined = [
+    {"order_id": o["order_id"], "name": by_id[o["user_id"]], "amount": o["amount"]}
+    for o in orders                                # probe side
+]
+for row in joined:
+    print(row)`,
+    },
+  ]}
+/>
+
+### Why are dict and set lookups $O(1)$, and when does that matter?
+
+Both are backed by hash tables: hashing the key jumps straight to the
+bucket, so average get/set/membership is $O(1)$ versus $O(n)$ for scanning
+a list. It matters any time you check "have I seen this?" inside a loop,
+using a list there turns an $O(n)$ job into an accidental $O(n^2)$ one.
+Reach for a `set` for membership/dedup and a `dict` for keyed lookups and
+in-memory joins.
+
+### How do you split a large stream into fixed-size batches?
+
+Bulk operations (API writes, database inserts) are far cheaper per row
+when batched. Use `itertools.islice` to pull `n` items at a time from an
+iterator without materializing the whole sequence:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import itertools
+
+def batched(iterable, n):
+    it = iter(iterable)
+    while True:
+        chunk = list(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
+
+for batch in batched(range(7), 3):
+    print(batch)   # [0,1,2], [3,4,5], [6]`,
+    },
+  ]}
+/>
+
+Python 3.12+ ships `itertools.batched`, which does exactly this.
+
+### How do you make a network call resilient with retries and backoff?
+
+Wrap the call in a loop that catches **transient** errors, sleeps with
+**exponentially increasing** delay between attempts (often with random
+jitter to avoid thundering herds), and re-raises after a max number of
+tries. Only retry idempotent or safe-to-repeat operations. The pattern
+below doubles the delay each attempt (`base * 2 ** (attempt - 1)`).
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import time
+
+attempts = {"n": 0}
+def flaky():                       # succeeds on the 3rd try
+    attempts["n"] += 1
+    if attempts["n"] < 3:
+        raise ConnectionError("transient")
+    return "ok"
+
+def with_retries(fn, max_tries=5, base=0.01):
+    for attempt in range(1, max_tries + 1):
+        try:
+            return fn()
+        except ConnectionError as e:
+            if attempt == max_tries:
+                raise                          # give up
+            delay = base * (2 ** (attempt - 1))  # exponential backoff
+            print(f"attempt {attempt} failed ({e}); retry in {delay:.3f}s")
+            time.sleep(delay)
+
+print(with_retries(flaky))`,
+    },
+  ]}
+/>
+
+### What makes a transform idempotent, and how do you write one in Python?
+
+An idempotent transform produces the **same final state** no matter how
+many times it runs, which is what makes retries and backfills safe. In
+Python, prefer **keyed writes** (assign into a `dict`/upsert by key) over
+blind appends that duplicate on re-run. Below, `upsert` sets state by
+`id`, so running the same batch twice leaves the store unchanged.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `state = {}
+
+def upsert(events):
+    for e in events:
+        state[e["id"]] = e["status"]   # keyed write, not append
+
+batch = [{"id": 1, "status": "new"}, {"id": 2, "status": "new"}]
+upsert(batch)
+upsert(batch)          # re-run after a "failure"
+print(state)           # {1: 'new', 2: 'new'} - no duplicates`,
+    },
+  ]}
+/>
+
+### How do you aggregate a stream without holding every row?
+
+Fold each record into a running accumulator as it arrives, a `dict`,
+`collections.Counter`, or `defaultdict`, instead of collecting all rows and
+aggregating at the end. Memory stays proportional to the number of
+**groups**, not the number of rows.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import defaultdict
+
+stream = [("us", 3), ("eu", 5), ("us", 2), ("eu", 1), ("us", 4)]
+
+running = defaultdict(int)
+for region, n in stream:
+    running[region] += n     # O(groups) memory, not O(rows)
+
+print(dict(running))         # {'us': 9, 'eu': 6}`,
+    },
+  ]}
+/>
+
+### How do you clean messy delimited records defensively?
+
+Strip whitespace, validate field counts, and coerce types inside a
+`try`/skip (or route bad rows to a reject list) so one malformed line
+doesn't crash the job. Never assume the source is well-formed. Below,
+rows without exactly three fields are dropped, and an empty age becomes
+`None` rather than an error.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `raw = ["  1, Alice , 30 ", "2,Bob,", "3, Carol , 25", "bad row"]
+
+def clean(rows):
+    out = []
+    for row in rows:
+        parts = [p.strip() for p in row.split(",")]
+        if len(parts) != 3:            # skip malformed
+            continue
+        rid, name, age = parts
+        out.append({
+            "id": int(rid),
+            "name": name,
+            "age": int(age) if age else None,   # tolerate missing age
+        })
+    return out
+
+for rec in clean(raw):
+    print(rec)`,
+    },
+  ]}
+/>
+
+### When should you reach for pandas instead of plain Python?
+
+Use pandas when the data **fits in memory** and you want vectorized
+columnar operations, groupby/aggregation, joins, and time-series
+resampling with far less code than hand-written loops. Prefer plain-Python
+generators when data is **streaming or larger than memory**, when you need
+constant memory, or when the logic is row-at-a-time and doesn't vectorize.
+pandas trades memory (it loads everything) for expressiveness and speed on
+in-memory analytics.
+
+### How do you group and aggregate with pandas?
+
+`groupby` splits rows by key, applies an aggregation, and combines the
+results. Pass `as_index=False` to keep the group key as a normal column:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["us", "eu", "us", "eu"],
+    "amount": [100, 200, 50, 25],
+})
+
+agg = (df.groupby("region", as_index=False)["amount"]
+         .sum()
+         .sort_values("region"))
+print(agg)`,
+    },
+  ]}
+/>
+
+### How do you keep only the latest record per key in pandas?
+
+Sort by the recency column, then `drop_duplicates` on the key keeping the
+last row. This is the pandas equivalent of the SQL "row_number = 1"
+deduplication pattern:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "id":    [1, 1, 2],
+    "ts":    [10, 20, 5],
+    "value": ["a", "b", "c"],
+})
+
+latest = (df.sort_values("ts")
+            .drop_duplicates("id", keep="last")
+            .sort_values("id")
+            .reset_index(drop=True))
+print(latest)   # id 1 -> 'b' (ts 20), id 2 -> 'c'`,
+    },
+  ]}
+/>
+
+### How do you process a large CSV with pandas without loading it all?
+
+Pass `chunksize` to `read_csv`, which returns an iterator of DataFrames.
+Process and aggregate each chunk, then combine partial results, keeping
+peak memory to one chunk at a time:
+
+```python
+import pandas as pd
+from collections import Counter
+
+totals = Counter()
+for chunk in pd.read_csv("events.csv", chunksize=100_000):
+    part = chunk.groupby("region")["amount"].sum()
+    totals.update(part.to_dict())   # fold partial aggregate
+
+# totals now holds the full per-region sum without ever
+# holding the entire file in memory at once.
+```
+
+### What are common performance pitfalls in Python data code?
+
+The big ones: (1) membership checks against a `list` inside a loop (use a
+`set`); (2) string concatenation in a loop (build a list, `"".join` once);
+(3) `pandas.DataFrame.iterrows` / `.apply` over rows when a vectorized
+column operation exists (often 10-100x faster); (4) growing a DataFrame
+row by row with `concat` in a loop (collect rows, build once); (5) loading
+an entire file when you only need to stream it.
+
+### How do generator pipelines compare to building intermediate lists?
+
+Chaining generators (`filter(transform(read()))`) keeps memory flat
+because each stage pulls one item at a time, nothing between stages is
+fully materialized. Building intermediate lists is simpler to debug and
+allows multiple passes, but every stage holds a full copy in memory. For
+large or unbounded data, prefer the generator pipeline; for small data
+where you re-scan results, lists are fine.
+
+### How do you parse numbers or dates that might be malformed?
+
+Wrap the conversion in `try`/`except` and decide per row whether to skip,
+default, or route to a dead-letter list, never let one bad value abort a
+batch. For dates, `datetime.strptime` with an explicit format is stricter
+and clearer than loose parsing; catch `ValueError` for anything that
+doesn't match.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You need to process a 50 GB log file on a machine with 8 GB of RAM and count events per user. What's the right approach?
+
+- Call \`f.readlines()\` to load the file, then iterate the list.
+  > \`readlines()\` pulls the entire 50 GB into memory at once, which won't fit, this is exactly what you must avoid.
+- [o] Iterate the file line by line and fold counts into a \`dict\`/\`Counter\` as you go.
+  > Streaming one line at a time keeps memory proportional to the number of users (the groups), not the file size.
+- Load it into a single pandas DataFrame with \`read_csv\`.
+  > A plain \`read_csv\` also materializes the whole file; you'd need \`chunksize\`, and even then a streaming counter is simpler here.
+- Sort the whole file in memory first, then group.
+  > Sorting requires holding all rows in memory, the same problem, and grouping doesn't need a global sort.`}
+/>
+
+<MultipleChoice
+  markdown={`Inside a loop over millions of orders you check \`if order_id in seen\` to skip duplicates. \`seen\` is currently a \`list\`. Why is this slow?
+
+- \`list\` can't store integers.
+  > It can; the problem is lookup cost, not the element type.
+- [o] Membership in a \`list\` is $O(n)$, so the loop is $O(n^2)$ overall; a \`set\` makes each check $O(1)$.
+  > Each \`in\` scans the list linearly; switching \`seen\` to a \`set\` (hash table) makes membership average $O(1)$.
+- A \`list\` deduplicates automatically, so the check is redundant.
+  > Lists keep duplicates; nothing is automatic. The check is needed, it just belongs against a \`set\`.
+- The loop is fine; \`in\` on a list is $O(1)$.
+  > \`in\` on a list is $O(n)$. On a \`set\` or \`dict\` it's average $O(1)$.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Parse and aggregate log lines"
+  instructions={`Implement \`count_status(lines)\`. Each element of \`lines\` is an access-log line shaped like \`"<timestamp> <status> <method> <path>"\` (space-separated), e.g. \`"2024-06-01T10:00 200 GET /home"\`. Return a \`dict\` mapping each integer HTTP status code to the number of well-formed lines with that status. **Skip** any line that has fewer than 4 fields or whose status field is not an integer. \`count_status([])\` returns \`{}\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def count_status(lines):
+    # Parse each line, skip malformed ones, and tally by status code.
+    pass`,
+      solutionCode: `def count_status(lines):
+    counts = {}
+    for line in lines:
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        try:
+            status = int(parts[1])
+        except ValueError:
+            continue
+        counts[status] = counts.get(status, 0) + 1
+    return counts`,
+    },
+  ]}
+  tests={[
+    { id: "basic", name: "Aggregates by status", description: "Counts each status code", code: `assert count_status([
+    "2024-06-01T10:00 200 GET /home",
+    "2024-06-01T10:01 200 GET /about",
+    "2024-06-01T10:02 404 GET /missing",
+]) == {200: 2, 404: 1}` },
+    { id: "empty", name: "Empty input", description: "No lines yields empty dict", code: `assert count_status([]) == {}` },
+    { id: "skips_malformed", name: "Skips bad lines", description: "Too few fields or non-int status are ignored", code: `assert count_status(["garbage", "2024 x GET /a"]) == {}` },
+    { id: "single", name: "Single line", description: "One well-formed line", code: `assert count_status(["2024-06-01T10:03 500 POST /pay"]) == {500: 1}` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Deduplicate records keeping the latest"
+  instructions={`Implement \`dedup_latest(records)\`. \`records\` is a list of dicts, each with keys \`id\`, \`ts\` (an integer timestamp), and \`value\`. For each \`id\`, keep only the record with the **largest** \`ts\`. Return the kept records as a list **sorted by \`id\` ascending**. \`dedup_latest([])\` returns \`[]\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def dedup_latest(records):
+    # Keep the record with the max ts per id; return sorted by id.
+    pass`,
+      solutionCode: `def dedup_latest(records):
+    latest = {}
+    for r in records:
+        rid = r["id"]
+        if rid not in latest or r["ts"] > latest[rid]["ts"]:
+            latest[rid] = r
+    return [latest[k] for k in sorted(latest)]`,
+    },
+  ]}
+  tests={[
+    { id: "keeps_latest", name: "Keeps latest per id", description: "Highest ts wins per id", code: `assert dedup_latest([
+    {"id": 1, "ts": 10, "value": "a"},
+    {"id": 1, "ts": 20, "value": "b"},
+    {"id": 2, "ts": 5,  "value": "c"},
+    {"id": 2, "ts": 3,  "value": "d"},
+]) == [
+    {"id": 1, "ts": 20, "value": "b"},
+    {"id": 2, "ts": 5,  "value": "c"},
+]` },
+    { id: "sorted", name: "Sorted by id", description: "Output is ordered by id ascending", code: `assert [r["id"] for r in dedup_latest([
+    {"id": 3, "ts": 1, "value": "x"},
+    {"id": 1, "ts": 1, "value": "y"},
+    {"id": 2, "ts": 1, "value": "z"},
+])] == [1, 2, 3]` },
+    { id: "empty", name: "Empty input", description: "Empty list yields empty list", code: `assert dedup_latest([]) == []` },
+    { id: "single", name: "Single record", description: "One record is returned as-is", code: `assert dedup_latest([{"id": 9, "ts": 1, "value": "z"}]) == [{"id": 9, "ts": 1, "value": "z"}]` },
+  ]}
+/>
+
+## Go deeper
+
+- [Data Analysis with Python & pandas](/courses/data-analysis-python-pandas)
+- [Python Basics](/courses/python-basics)
+- [Scientific Computing with Python](/courses/scientific-computing-python)

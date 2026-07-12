@@ -1,0 +1,320 @@
+---
+title: Deep Learning
+description: Machine Learning Engineer interview questions on perceptrons, backpropagation, optimizers, regularization, CNNs, RNNs, and transformers, with math and concept checks.
+---
+
+The deep-learning round tests whether you understand what happens inside
+the network, not just which framework call to make. Expect questions on
+gradients, optimizers, normalization, and the CNN/RNN/transformer
+families. Review the Q&A, then take the concept checks.
+
+## Q&A
+
+### What is a perceptron?
+
+A perceptron computes a weighted sum of its inputs plus a bias, then
+applies an activation to produce an output: $\hat{y} = \phi(\mathbf{w} \cdot \mathbf{x} + b)$.
+A single-layer perceptron is a linear classifier and can only separate
+linearly separable data (famously, it can't learn XOR). Stacking layers
+with non-linear activations, a multilayer perceptron (MLP), is what lets a
+network approximate non-linear functions.
+
+### Why do we need non-linear activation functions?
+
+Without them, a stack of linear layers collapses into a single linear
+transformation, no matter how many layers you add, so the network could
+only represent linear functions. A non-linearity between layers is what
+gives a network its expressive power (the universal approximation
+property). The activation must be differentiable (almost everywhere) so
+gradients can flow during backpropagation.
+
+### Compare sigmoid, tanh, and ReLU.
+
+**Sigmoid** maps to $(0, 1)$ but saturates at both ends, killing gradients,
+and isn't zero-centered. **Tanh** maps to $(-1, 1)$ and is zero-centered
+but still saturates. **ReLU** (`max(0, x)`) doesn't saturate for positive
+inputs, is cheap, and is the default for hidden layers, but units can
+"die" (stay at zero) if they only ever see negative inputs. **Leaky ReLU**,
+**ELU**, and **GELU** address the dying-unit problem with a small negative
+slope or smooth curve. The runnable block below computes each activation
+and its derivative:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def sigmoid_deriv(z):
+    s = sigmoid(z)
+    return s * (1 - s)              # note the peak of 0.25 at z=0
+
+def relu(z):
+    return np.maximum(0, z)
+
+def relu_deriv(z):
+    return (z > 0).astype(float)
+
+z = np.array([-2.0, -0.5, 0.0, 0.5, 2.0])
+print("sigmoid: ", sigmoid(z).round(3))
+print("sigmoid':", sigmoid_deriv(z).round(3))
+print("relu:    ", relu(z).round(3))
+print("relu':   ", relu_deriv(z).round(3))
+`,
+    },
+  ]}
+/>
+
+Notice `sigmoid'` peaks at only 0.25 and shrinks toward the tails, exactly
+the saturation that starves early layers of gradient, while `relu'` is a
+clean 0 or 1.
+
+### Explain backpropagation and the chain rule.
+
+Backpropagation computes the gradient of the loss with respect to every
+weight by applying the chain rule backward through the network. The
+forward pass caches intermediate activations; the backward pass propagates
+$\frac{\partial L}{\partial \cdot}$ from the output layer to the input,
+reusing each layer's local derivative:
+
+$$\frac{\partial L}{\partial w^{(l)}} = \frac{\partial L}{\partial a^{(l)}} \cdot \frac{\partial a^{(l)}}{\partial z^{(l)}} \cdot \frac{\partial z^{(l)}}{\partial w^{(l)}}$$
+
+It's just the chain rule applied systematically, and it costs about the
+same as one forward pass, which is why training deep nets is feasible.
+
+### What is the difference between SGD, Momentum, RMSProp, and Adam?
+
+**SGD** steps directly against the gradient of a mini-batch. **Momentum**
+accumulates an exponentially decaying average of past gradients to
+accelerate through ravines and damp oscillation. **RMSProp** scales each
+parameter's step by a running average of squared gradients, adapting the
+learning rate per parameter. **Adam** combines both, a first-moment
+(momentum) and second-moment (RMSProp) estimate with bias correction:
+
+$$m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$$
+
+$$\theta_t = \theta_{t-1} - \eta \, \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+
+Adam is the common default; well-tuned SGD with momentum often generalizes
+slightly better on vision tasks.
+
+### How do you choose and schedule the learning rate?
+
+Too large diverges; too small crawls. Standard practice: a short
+**warmup** (ramp up over the first few hundred steps to avoid early
+instability) followed by **decay** (step, cosine, or linear) toward zero.
+A learning-rate range test, sweeping the rate and watching the loss, finds
+a good starting magnitude. Adaptive optimizers reduce but don't eliminate
+the need to tune the base rate.
+
+### Explain dropout, L2, and early stopping as regularizers.
+
+**Dropout** randomly zeros a fraction $p$ of units each training step so
+the network can't co-adapt, at inference it's disabled and activations are
+scaled by $(1 - p)$. **L2 (weight decay)** adds $\lambda \lVert \mathbf{w} \rVert^2$
+to the loss, shrinking weights toward zero and favoring smoother
+functions. **Early stopping** halts training when validation loss stops
+improving and restores the best-epoch weights. All three curb overfitting
+by limiting effective capacity.
+
+### What causes vanishing and exploding gradients, and how do you fix them?
+
+Backprop multiplies many local derivatives; if they're consistently below
+1 the gradient **vanishes** (early layers barely learn), if above 1 it
+**explodes** (updates blow up to `nan`). Saturating activations (sigmoid,
+tanh) and deep stacks make vanishing worse. Fixes: ReLU-family
+activations, careful initialization (He for ReLU, Xavier for tanh),
+residual/skip connections, normalization layers, and **gradient clipping**
+to cap the norm for the exploding case.
+
+### Why does weight initialization matter? Xavier vs He.
+
+Poor initialization makes activations (and gradients) either shrink or
+blow up as they propagate through layers. **Xavier/Glorot** sets the
+variance to keep signal magnitude stable through **tanh/sigmoid** layers;
+**He** initialization uses a larger variance suited to **ReLU**, which
+zeros half its inputs. Initializing all weights to the same constant is
+fatal, every neuron in a layer would compute the same thing and receive
+the same gradient (the symmetry problem).
+
+### What is batch normalization, and how does layer norm differ?
+
+**Batch norm** normalizes each feature across the examples in a mini-batch
+to zero mean and unit variance, then applies a learned scale and shift. It
+stabilizes and speeds training and adds mild regularization, but depends
+on batch statistics (awkward for tiny batches or at inference, where it
+uses running averages). **Layer norm** normalizes across the features of a
+**single** example instead, so it's batch-size-independent, which is why
+transformers use it.
+
+$$\hat{x} = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}}, \qquad y = \gamma \hat{x} + \beta$$
+
+### How does a convolutional neural network (CNN) work?
+
+A CNN slides small learnable filters over the input, computing local
+weighted sums (convolutions) that detect patterns like edges or textures.
+Three ideas make it efficient for images: **local connectivity** (each
+output depends on a small receptive field), **parameter sharing** (the
+same filter scans the whole image, so far fewer weights than a dense
+layer), and **translation equivariance** (a feature is detected wherever
+it appears). **Pooling** downsamples to add invariance and shrink spatial
+size. Below is illustrative PyTorch (not runnable here):
+
+```python
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Conv2d(3, 16, kernel_size=3, padding=1),  # 3 input channels → 16 maps
+    nn.ReLU(),
+    nn.MaxPool2d(2),                             # halve spatial dims
+    nn.Conv2d(16, 32, kernel_size=3, padding=1),
+    nn.ReLU(),
+    nn.AdaptiveAvgPool2d(1),
+    nn.Flatten(),
+    nn.Linear(32, 10),                           # 10-class head
+)
+```
+
+### Why are CNNs well suited to images compared to a fully-connected net?
+
+A dense layer on a 224×224×3 image would need hundreds of millions of
+weights for the first layer alone and would treat each pixel position as
+unrelated. Convolutions exploit the spatial structure: local receptive
+fields capture nearby correlations, weight sharing slashes parameter count
+and provides translation equivariance, and stacked layers build a
+hierarchy from edges to object parts. That inductive bias means far less
+data and compute for the same accuracy.
+
+### What is an RNN, and why does it struggle with long sequences?
+
+A recurrent neural network processes a sequence step by step, maintaining
+a hidden state that summarizes everything seen so far. Because the same
+weights are applied at every step, gradients backpropagated through many
+steps repeatedly multiply, so they vanish (long-range dependencies are
+forgotten) or explode. Plain RNNs therefore learn only short-range
+patterns in practice.
+
+### How do LSTMs and GRUs address that?
+
+An **LSTM** adds a cell state and gates (input, forget, output) that let it
+add or remove information with mostly additive updates, so gradients can
+flow across many steps without vanishing, enabling long-range memory. A
+**GRU** is a lighter variant with two gates (reset, update) and no separate
+cell state, similar performance with fewer parameters. Both largely fixed
+the long-dependency problem, until attention did it better.
+
+### What is self-attention?
+
+Self-attention lets every position in a sequence attend to every other
+position directly. Each token is projected into a query, key, and value;
+the attention weight between two tokens is the scaled dot product of their
+query and key, softmax-normalized, and the output is the weighted sum of
+values:
+
+$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+
+The $\sqrt{d_k}$ scaling keeps the dot products from growing large and
+pushing softmax into saturation. Unlike an RNN, every pair of positions is
+one hop apart, so long-range dependencies are easy, at $O(n^2)$ cost in
+sequence length.
+
+```python
+# Illustrative scaled dot-product attention (PyTorch), not runnable here
+import torch
+import torch.nn.functional as F
+
+def attention(Q, K, V):
+    d_k = Q.size(-1)
+    scores = Q @ K.transpose(-2, -1) / d_k ** 0.5
+    weights = F.softmax(scores, dim=-1)
+    return weights @ V
+```
+
+### What is multi-head attention, and why use multiple heads?
+
+Instead of one attention function over the full dimension, multi-head
+attention splits the representation into h subspaces, runs attention in
+each in parallel, and concatenates the results. Different heads can
+specialize, one on syntax, another on coreference, giving the model
+multiple "views" of the relationships. It costs about the same as
+single-head attention because each head works in a smaller dimension.
+
+### Describe the transformer architecture.
+
+A transformer stacks blocks of **multi-head self-attention** and a
+position-wise **feed-forward network**, each wrapped with a **residual
+connection** and **layer normalization**. Because attention is
+order-agnostic, **positional encodings** (sinusoidal or learned) inject
+sequence order. Encoder-only models (BERT) use bidirectional attention for
+understanding; decoder-only models (GPT) use causal (masked) attention for
+generation; encoder-decoder models (T5) do both for sequence-to-sequence
+tasks. Removing recurrence makes training fully parallel across positions.
+
+### What is transfer learning / fine-tuning in deep learning?
+
+Rather than training from scratch, you start from a model pretrained on a
+large dataset and adapt it to your task. Options range from using the
+pretrained network as a fixed **feature extractor** (freeze the backbone,
+train a new head) to **fine-tuning** some or all layers on your data. It
+dramatically cuts the data and compute needed and is standard practice in
+both vision (ImageNet backbones) and NLP (pretrained transformers).
+
+### Why is cross-entropy paired with softmax for classification?
+
+Softmax turns raw logits into a probability distribution over classes;
+cross-entropy measures how far that distribution is from the one-hot
+truth. Their gradient simplifies beautifully to `(prediction − target)`,
+which is large when the model is confidently wrong and gives a clean,
+well-scaled signal, unlike squared error on top of a saturating output,
+whose gradient can vanish. Combined libraries fuse the two
+(`cross_entropy` on logits) for numerical stability.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A deep network with sigmoid activations trains extremely slowly, its early layers barely change. What's the most likely cause and a standard fix?
+
+- The learning rate is too high; lower it.
+  > A too-high rate causes divergence or oscillation, not layers that barely move; the symptom points elsewhere.
+- [o] Vanishing gradients from saturating sigmoids; switch to ReLU-family activations (and add residual connections / normalization).
+  > Sigmoid derivatives max out at 0.25 and shrink at the tails, so gradients decay through depth; ReLU and skip connections keep them flowing.
+- The model has too few parameters; add layers.
+  > Adding more sigmoid layers deepens the product of small derivatives and makes vanishing worse.
+- The dataset is too large; subsample it.
+  > Data size doesn't explain early layers failing to learn; the gradient signal is the issue.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do transformers use layer normalization rather than batch normalization?
+
+- Layer norm is always more accurate than batch norm.
+  > Neither is universally better; the choice is about what statistics each normalizes over.
+- [o] Layer norm normalizes across features within a single example, so it's independent of batch size and sequence position.
+  > Batch norm's per-batch statistics are unstable for variable-length sequences and small batches; layer norm sidesteps that.
+- Batch norm cannot be implemented on a GPU.
+  > Batch norm runs fine on GPUs; it's used heavily in CNNs. The issue is batch-dependence, not hardware.
+- Layer norm removes the need for residual connections.
+  > Transformers use both; normalization and residual connections solve different problems.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the \`1/sqrt(d_k)\` scaling factor do in scaled dot-product attention?
+
+- It normalizes the attention weights so they sum to 1.
+  > The softmax is what makes the weights sum to 1; the scaling happens before softmax.
+- [o] It keeps the dot products from growing large with dimension, preventing softmax from saturating into near-one-hot weights with tiny gradients.
+  > Large dot products push softmax into flat regions where gradients vanish; dividing by sqrt(d_k) keeps them well-scaled.
+- It reduces the number of attention heads.
+  > Head count is a separate architectural choice, unrelated to this scalar.
+- It converts the queries and keys into probabilities.
+  > Q and K stay as vectors; only the post-softmax weights are a distribution.`}
+/>
+
+## Go deeper
+
+- [Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)
+- [Scientific Computing with Python](/courses/scientific-computing-python)

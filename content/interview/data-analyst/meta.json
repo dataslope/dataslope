@@ -6,6 +6,10 @@
     "index",
     "sql",
     "pandas",
-    "statistics-and-communication"
+    "statistics-and-communication",
+    "advanced-sql",
+    "excel-and-spreadsheets",
+    "data-visualization",
+    "ab-testing-and-metrics"
   ]
 }
