@@ -1,7 +1,52 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import type { PreviewKey } from "./samples";
+
+/*
+ * This dev page styles its chrome with inline styles rather than Tailwind
+ * utility classes. The route is force-static and, under the project's CSS
+ * chunking, the served stylesheet can omit common box-model utilities
+ * (padding, radius, border-width) for this page — leaving the controls
+ * unstyled. Inline styles don't depend on Tailwind generating or shipping a
+ * class, so they render identically in dev, `next start`, and the deploy.
+ * Colors reference the brand tokens from app/brand.css (loaded app-wide).
+ */
+const SUBTLE_BORDER = "1px solid var(--ds-gray-200)"; // #e5e7eb, very subtle
+const CARD_BG = "var(--ds-gray-50)"; // #f9fafb
+const BRAND_BLUE = "var(--ds-blue-700)"; // #0064bd
+const MUTED = "var(--ds-gray-500)";
+
+const cardStyle: CSSProperties = {
+  border: SUBTLE_BORDER,
+  background: CARD_BG,
+  borderRadius: 12,
+  padding: 16,
+};
+const rowStyle: CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: 12,
+};
+const selectStyle: CSSProperties = {
+  border: SUBTLE_BORDER,
+  borderRadius: 8,
+  background: "#fff",
+  padding: "6px 10px",
+  fontSize: 14,
+  color: "#121212",
+};
+const buttonStyle: CSSProperties = {
+  backgroundColor: BRAND_BLUE,
+  color: "#ffffff",
+  border: "none",
+  borderRadius: 8,
+  padding: "7px 16px",
+  fontSize: 14,
+  fontWeight: 600,
+  cursor: "pointer",
+};
 
 /**
  * Renders one email's HTML in an isolated <iframe srcDoc> and auto-sizes the
@@ -24,8 +69,13 @@ export function PreviewFrame({ title, html }: { title: string; html: string }) {
       title={title}
       srcDoc={html}
       onLoad={fit}
-      style={{ height }}
-      className="w-full rounded-xl border border-[var(--ds-gray-200,#d0d7de)] bg-white"
+      style={{
+        height,
+        width: "100%",
+        border: SUBTLE_BORDER,
+        borderRadius: 12,
+        background: "#fff",
+      }}
     />
   );
 }
@@ -79,16 +129,19 @@ export function SendTestEmail({ templates }: { templates: TemplateChoice[] }) {
   const sending = status.type === "sending";
 
   return (
-    <div className="rounded-xl border border-[var(--ds-gray-200,#d0d7de)] bg-[var(--ds-gray-50,#f6f8fa)] p-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-[#121212] dark:text-white">
+    <div style={cardStyle}>
+      <div style={rowStyle}>
+        <label
+          style={{ fontSize: 14, fontWeight: 500, color: "#121212" }}
+          className="dark:text-white"
+        >
           Send a live test to your inbox:
         </label>
         <select
           value={key}
           onChange={(e) => setKey(e.target.value as PreviewKey)}
           disabled={sending}
-          className="rounded-lg border border-[var(--ds-gray-200,#d0d7de)] bg-white px-3 py-1.5 text-sm text-[#121212] disabled:opacity-60 dark:bg-[#1a1a1a] dark:text-white"
+          style={{ ...selectStyle, opacity: sending ? 0.6 : 1 }}
         >
           {templates.map((t) => (
             <option key={t.key} value={t.key}>
@@ -100,22 +153,22 @@ export function SendTestEmail({ templates }: { templates: TemplateChoice[] }) {
           type="button"
           onClick={send}
           disabled={sending}
-          className="rounded-lg bg-[var(--ds-blue-700,#0064bd)] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          style={{ ...buttonStyle, opacity: sending ? 0.6 : 1 }}
         >
           {sending ? "Sending…" : "Send test email"}
         </button>
       </div>
       {status.type === "ok" && (
-        <p className="mt-3 text-sm text-[var(--ds-green-700,#008b03)]">
+        <p style={{ marginTop: 12, fontSize: 14, color: "var(--ds-green-700)" }}>
           {status.msg}
         </p>
       )}
       {status.type === "error" && (
-        <p className="mt-3 text-sm text-[var(--ds-red-700,#ba303a)]">
+        <p style={{ marginTop: 12, fontSize: 14, color: "var(--ds-red-700)" }}>
           {status.msg}
         </p>
       )}
-      <p className="mt-3 text-xs text-[var(--ds-gray-500,#6b7280)]">
+      <p style={{ marginTop: 12, fontSize: 12, color: MUTED }}>
         Admin-only. The email is sent to your own account address using a sample
         (non-functional) link.
       </p>
