@@ -27,4 +27,17 @@ export const {
   useSession,
   requestPasswordReset,
   resetPassword,
+  // Connected sign-in methods, surfaced on the account page: list the user's
+  // linked providers, attach another (OAuth redirect), or detach one. These hit
+  // Better Auth's built-in /api/auth/{list-accounts,link-social,unlink-account}
+  // endpoints, already served by the catch-all handler, so no server code is
+  // added. Better Auth refuses to unlink a user's only account (lockout guard).
+  listAccounts,
+  linkSocial,
+  unlinkAccount,
+  // Self-service account deletion (the account page's danger zone). Hits Better
+  // Auth's /api/auth/delete-user; server-side (lib/auth/server.ts) this cleans
+  // up the user's R2 objects and, when a mailer is configured, requires an
+  // emailed confirmation link before the row is actually removed.
+  deleteUser,
 } = authClient;

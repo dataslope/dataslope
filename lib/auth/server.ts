@@ -25,8 +25,14 @@ import { createAuthMiddleware } from "better-auth/api";
 import { admin, oAuthProxy } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { promoteConfiguredAdmins } from "@/lib/auth/adminBootstrap";
-import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
+import {
+  deleteAccountEmail,
+  resetPasswordEmail,
+  sendEmail,
+  verifyEmail,
+} from "@/lib/auth/email";
 import { polarPlugin } from "@/lib/billing/polar";
+import { deleteAllUserObjects } from "@/lib/workspaces/store";
 
 /** Split a comma-separated secret into a trimmed, non-empty list. Exported
  *  for the custom admin API routes' authorization check (lib/auth/admin.ts). */
@@ -423,6 +429,47 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
           defaultValue: "free",
           input: false,
         },
+      },
+      // Let a user delete their own account from /account. The `user` row's
+      // deletion cascades to their `session` + `account` rows and their
+      // cloud_workspaces / playground_shares rows (ON DELETE CASCADE,
+      // migrations/0001 + 0005), but the *R2 payloads* behind those saves and
+      // shares don't cascade, so beforeDelete drops them first. It's
+      // best-effort (never throws) so a storage hiccup can't trap a user in an
+      // account they asked to delete.
+      //
+      // Confirmation model mirrors the rest of the email surface, gated on a
+      // configured sender: with RESEND set, deletion always requires clicking a
+      // link we email (Better Auth sends it and holds off deleting until the
+      // callback), which is safe for social-only users regardless of session
+      // age. With no sender, Better Auth falls back to requiring a *fresh*
+      // session (or the account password); the account page surfaces that.
+      //
+      // NOTE: this does not cancel a Pro user's Polar subscription (billing is
+      // Polar's own record, keyed by customer, not deleted with our user row).
+      // The account page warns paying users to cancel via the billing portal
+      // first; wiring an automatic Polar cancel here is a possible follow-up.
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (user) => {
+          await deleteAllUserObjects(env, user.id);
+        },
+        ...(emailConfigured
+          ? {
+              sendDeleteAccountVerification: async ({
+                user,
+                url,
+              }: {
+                user: { email: string };
+                url: string;
+              }) => {
+                await sendEmail(env, {
+                  to: user.email,
+                  ...deleteAccountEmail(url),
+                });
+              },
+            }
+          : {}),
       },
     },
     // Complete the ADMIN_EMAILS / ADMIN_USER_IDS bootstrap: config-listed
