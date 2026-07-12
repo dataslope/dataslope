@@ -21,6 +21,26 @@ You don't write "when the count increases, find the heading and change
 its text". You write "the heading shows the count", and let React
 figure out the DOM updates when the count changes.
 
+Click below. The only thing your code changes is the `count` *state*,
+the displayed number is just `{count}` in the markup, so it can never
+drift out of sync with the value:
+
+<ReactPreview
+  code={`function Counter() {
+  const [count, setCount] = useState(0);
+  // The UI is a function of state: {count} always mirrors the value.
+  return (
+    <>
+      <button onClick={() => setCount(count - 1)}>−</button>
+      <span>{count}</span>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </>
+  );
+}`}
+>
+  <CounterDemo />
+</ReactPreview>
+
 ## 2. Declarative, not imperative
 
 Compare the two styles for a counter:

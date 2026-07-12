@@ -1,0 +1,353 @@
+---
+title: SQL for Data Science
+description: Data Scientist SQL interview questions, joins, aggregation, window functions, cohort retention, safe rate math, and sessionization, with runnable DuckDB queries and two graded challenges.
+---
+
+Data Scientists write SQL to pull cohorts, compute rates, and reconstruct
+sessions long before any modeling happens. This page is a question bank
+with **runnable** queries that execute in your browser on DuckDB, plus two
+graded challenges.
+
+> **Dialect:** the runnable blocks target **DuckDB**, which is close to
+> standard SQL. Most queries run unchanged on Postgres, BigQuery, or
+> Snowflake; engine-specific syntax is called out where it matters.
+
+## Q&A
+
+### INNER vs. LEFT JOIN, and which does a retention query need?
+
+An **INNER JOIN** keeps only rows matched in both tables; a **LEFT JOIN**
+keeps every left row, filling `NULL` where the right has no match.
+Retention and funnel queries almost always want a **LEFT JOIN** (or a
+`LEFT JOIN ... WHERE right IS NULL` anti-join) because the interesting
+population is often the users who *didn't* come back, and an INNER JOIN
+would silently drop them.
+
+### When does an aggregate belong in `WHERE` vs. `HAVING`?
+
+`WHERE` filters rows **before** grouping; `HAVING` filters groups **after**
+aggregation. An aggregate condition like `COUNT(*) > 5` must go in `HAVING`
+because the aggregate does not exist yet when `WHERE` runs.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
+  (1, 'North', 120.0), (2, 'South', 80.0), (3, 'North', 60.0),
+  (4, 'East', 200.0), (5, 'South', 90.0), (6, 'North', 75.0)
+) AS t(id, region, amount);`}
+  starterCode={`SELECT region, COUNT(*) AS n, SUM(amount) AS revenue
+FROM events
+WHERE amount > 0          -- row filter, before grouping
+GROUP BY region
+HAVING COUNT(*) >= 2      -- group filter, after aggregation
+ORDER BY revenue DESC;`}
+/>
+
+### How do window functions differ from `GROUP BY`?
+
+`GROUP BY` collapses each group to one row; a **window function** computes a
+value for **every** row while looking across a related set (the window)
+defined by `OVER (PARTITION BY ... ORDER BY ...)`. The original row count is
+preserved, which is what you want when you need per-row context like a rank
+or a running total.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES
+  ('North', 'Ava', 100), ('North', 'Ben', 140), ('North', 'Cy', 120),
+  ('South', 'Di', 90),   ('South', 'Ed', 130)
+) AS t(region, rep, amount);`}
+  starterCode={`SELECT
+  region, rep, amount,
+  SUM(amount) OVER (PARTITION BY region)                    AS region_total,
+  RANK() OVER (PARTITION BY region ORDER BY amount DESC)    AS rank_in_region,
+  ROUND(amount * 1.0 / SUM(amount) OVER (PARTITION BY region), 3) AS share
+FROM sales
+ORDER BY region, rank_in_region;`}
+/>
+
+### How do `ROW_NUMBER`, `RANK`, and `DENSE_RANK` differ?
+
+All number rows within an ordered window, but ties differ:
+`ROW_NUMBER` is always unique (arbitrary among ties); `RANK` gives ties the
+same rank then **skips** (1, 2, 2, 4); `DENSE_RANK` gives ties the same rank
+without skipping (1, 2, 2, 3). Use `ROW_NUMBER` to deduplicate or grab "one
+row per group."
+
+### How do you compute a rate safely without dividing by zero?
+
+Wrap the denominator in `NULLIF(denominator, 0)`: it turns a zero into
+`NULL`, so the division yields `NULL` (a clean "undefined") instead of an
+error or `Infinity`. Multiply by `1.0` (or cast) to force floating-point
+division rather than integer truncation.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE funnel AS SELECT * FROM (VALUES
+  ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0)
+) AS t(variant, sessions, conversions);`}
+  starterCode={`SELECT
+  variant,
+  sessions,
+  conversions,
+  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS conversion_rate
+FROM funnel
+ORDER BY variant;
+-- Variant C has 0 sessions -> rate is NULL, not a divide-by-zero error.`}
+/>
+
+### How do you write a cohort retention query?
+
+Assign each user to a cohort by their first-activity period, then count how
+many are still active in later periods. The skeleton: a CTE for each user's
+cohort month, a join to their activity, and a `COUNT(DISTINCT user_id)` by
+cohort and period offset.
+
+```sql
+WITH first_seen AS (
+  SELECT user_id, DATE_TRUNC('month', MIN(event_date)) AS cohort
+  FROM activity
+  GROUP BY user_id
+),
+labeled AS (
+  SELECT a.user_id, f.cohort,
+    DATE_DIFF('month', f.cohort, DATE_TRUNC('month', a.event_date)) AS month_offset
+  FROM activity a
+  JOIN first_seen f USING (user_id)
+)
+SELECT cohort, month_offset, COUNT(DISTINCT user_id) AS retained
+FROM labeled
+GROUP BY cohort, month_offset
+ORDER BY cohort, month_offset;
+```
+
+Dividing each `retained` count by the cohort's `month_offset = 0` size
+turns the counts into retention **rates**.
+
+### What is sessionization, and how do you do it in SQL?
+
+Sessionization groups a user's events into sessions, starting a new session
+whenever the gap since their previous event exceeds a threshold (commonly 30
+minutes). Use `LAG` to fetch the previous timestamp, flag each gap that
+opens a new session, then take a running `SUM` of those flags as the session
+id.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE hits AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 09:00:00'),
+  (1, TIMESTAMP '2024-01-01 09:10:00'),
+  (1, TIMESTAMP '2024-01-01 11:00:00'),
+  (2, TIMESTAMP '2024-01-01 09:05:00'),
+  (2, TIMESTAMP '2024-01-01 09:20:00')
+) AS t(user_id, ts);`}
+  starterCode={`WITH gaps AS (
+  SELECT user_id, ts,
+    CASE
+      WHEN ts - LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) > INTERVAL '30 minutes'
+        OR LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) IS NULL
+      THEN 1 ELSE 0
+    END AS is_new_session
+  FROM hits
+)
+SELECT user_id, ts,
+  SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY ts) AS session_id
+FROM gaps
+ORDER BY user_id, ts;`}
+/>
+
+### How do you compute a day-over-day change?
+
+Use `LAG(metric) OVER (ORDER BY day)` to pull the prior day's value onto the
+current row, then subtract, no self-join required.
+
+```sql
+SELECT
+  day,
+  revenue,
+  revenue - LAG(revenue) OVER (ORDER BY day) AS dod_change
+FROM daily_revenue
+ORDER BY day;
+```
+
+### How do you return the top N rows per group?
+
+Rank inside a CTE with `ROW_NUMBER()` partitioned by the group, then filter
+in the outer query.
+
+```sql
+WITH ranked AS (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) AS rn
+  FROM products
+)
+SELECT * FROM ranked WHERE rn <= 3;
+```
+
+### How do you compute a running total?
+
+`SUM(x) OVER (ORDER BY day)`; the default frame is `ROWS BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW`, which accumulates from the start.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE txns AS SELECT * FROM (VALUES
+  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),
+  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180)
+) AS t(day, amount);`}
+  starterCode={`SELECT
+  day,
+  amount,
+  SUM(amount) OVER (ORDER BY day) AS running_total
+FROM txns
+ORDER BY day;`}
+/>
+
+### How do you deduplicate rows, keeping the most recent per key?
+
+Partition by the key, order by the recency column, and keep `ROW_NUMBER = 1`.
+
+```sql
+WITH ranked AS (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) AS rn
+  FROM snapshots
+)
+SELECT * FROM ranked WHERE rn = 1;
+```
+
+### How do you compute a median or percentile in SQL?
+
+Use ordered-set aggregates: `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)`
+for a continuous (interpolated) median, or `PERCENTILE_DISC` for an actual
+data value. DuckDB also offers `MEDIAN(x)` and `QUANTILE_CONT(x, 0.9)`.
+Averages hide skew; report a median or the p90 for latency-style metrics.
+
+### How do you pivot rows into columns?
+
+Standard SQL uses conditional aggregation, `SUM(CASE WHEN ... THEN ... END)`
+one column per category. DuckDB, BigQuery, and SQL Server also offer a
+native `PIVOT`.
+
+```sql
+SELECT
+  region,
+  SUM(CASE WHEN device = 'mobile' THEN sessions ELSE 0 END) AS mobile,
+  SUM(CASE WHEN device = 'desktop' THEN sessions ELSE 0 END) AS desktop
+FROM traffic
+GROUP BY region;
+```
+
+### What does `COUNT(*)` count versus `COUNT(col)` and `COUNT(DISTINCT col)`?
+
+`COUNT(*)` counts every row; `COUNT(col)` counts only rows where `col` is
+**not NULL**; `COUNT(DISTINCT col)` counts distinct non-NULL values. The
+distinction matters constantly in DS work, distinct users versus event
+rows is the difference between reach and volume.
+
+### How do you find users active in one period but not the next (churn)?
+
+An anti-join: `LEFT JOIN` this period's actives to next period's, keeping
+rows where the next-period key is `NULL`, or the equivalent `NOT EXISTS`.
+
+```sql
+SELECT a.user_id
+FROM active_jan a
+LEFT JOIN active_feb b ON b.user_id = a.user_id
+WHERE b.user_id IS NULL;   -- active in Jan, gone in Feb
+```
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You compute \`conversions / sessions\` and some rows have \`sessions = 0\`. What is the safest fix?
+
+- Filter out the zero-session rows in \`WHERE\` before dividing.
+  > That silently drops groups you may want to report as "no data" rather than omit, and it is easy to forget.
+- [o] Divide by \`NULLIF(sessions, 0)\` so a zero denominator yields \`NULL\`.
+  > \`NULLIF\` turns the zero into \`NULL\`, making the rate cleanly undefined instead of erroring or returning infinity.
+- Wrap the whole thing in \`COALESCE(..., 0)\`.
+  > That would report a *rate of 0* for zero-session groups, which is misleading, they have no rate at all, not a rate of zero.
+- Cast \`sessions\` to a float first.
+  > Casting fixes integer truncation but does nothing about dividing by zero.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a window function, not \`GROUP BY\`, the right tool for "rank each rep within their region"?
+
+- \`GROUP BY\` cannot sort rows.
+  > \`GROUP BY\` can order its output; the real issue is that it collapses rows.
+- [o] You need a value on every original row, and \`GROUP BY\` collapses each group to a single row.
+  > A window function keeps all rows while computing per-partition ranks; \`GROUP BY\` would leave one row per region.
+- Window functions run before \`WHERE\`.
+  > They actually run after \`WHERE\` and \`GROUP BY\`, in the \`SELECT\` stage; that timing is unrelated to why you pick them here.
+- \`RANK\` is only available inside \`GROUP BY\`.
+  > \`RANK\` is a window function and requires an \`OVER\` clause, not \`GROUP BY\`.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Conversion rate per variant"
+  instructions={`Table \`events\` has columns \`user_id\`, \`variant\`, and \`converted\` (\`1\` if the user converted, else \`0\`). Return one row per \`variant\` with columns \`variant\` and \`rate\`, where \`rate\` is conversions divided by the number of users in that variant. Use \`NULLIF\` to guard the denominator. Order by \`variant\`.`}
+  initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
+  (1, 'A', 1), (2, 'A', 0), (3, 'A', 0), (7, 'A', 0),
+  (4, 'B', 1), (5, 'B', 1), (6, 'B', 0), (8, 'B', 1)
+) AS t(user_id, variant, converted);`}
+  starterCode={`-- One row per variant: variant, rate = conversions / users.
+SELECT
+  variant
+  -- , rate here (guard the denominator with NULLIF)
+FROM events
+-- group + order;`}
+  solutionSql={`SELECT
+  variant,
+  SUM(converted) * 1.0 / NULLIF(COUNT(*), 0) AS rate
+FROM events
+GROUP BY variant
+ORDER BY variant;`}
+  tests={[
+    { id: "rows", name: "One row per variant", description: "Variants A and B", expectedRowCount: 2 },
+    { id: "cols", name: "Has the required columns", description: "variant and rate", expectedColumnsInclude: ["variant", "rate"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Each customer's first order"
+  instructions={`Table \`orders\` has columns \`id\`, \`customer_id\`, \`order_date\`, and \`amount\`. Return **one row per customer**, their **earliest** order, with columns \`customer_id\`, \`order_date\`, and \`amount\`. Use a window function (\`ROW_NUMBER\`) in a CTE. Order by \`customer_id\`.`}
+  initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
+  (1, 10, DATE '2024-01-05', 120.0),
+  (2, 10, DATE '2024-02-01', 60.0),
+  (3, 20, DATE '2024-01-20', 80.0),
+  (4, 30, DATE '2024-01-02', 45.0),
+  (5, 30, DATE '2024-03-10', 90.0),
+  (6, 20, DATE '2024-04-01', 30.0)
+) AS t(id, customer_id, order_date, amount);`}
+  starterCode={`-- Keep only each customer's earliest order.
+WITH ranked AS (
+  SELECT *,
+    -- ROW_NUMBER() OVER (...) AS rn
+  FROM orders
+)
+SELECT customer_id, order_date, amount
+FROM ranked
+-- WHERE ... ORDER BY customer_id;`}
+  solutionSql={`WITH ranked AS (
+  SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS rn
+  FROM orders
+)
+SELECT customer_id, order_date, amount
+FROM ranked
+WHERE rn = 1
+ORDER BY customer_id;`}
+  tests={[
+    { id: "rows", name: "One row per customer", description: "Three distinct customers", expectedRowCount: 3 },
+    { id: "cols", name: "Has the required columns", description: "customer_id, order_date, amount", expectedColumnsInclude: ["customer_id", "order_date", "amount"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Intro to SQL with Postgres](/courses/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)

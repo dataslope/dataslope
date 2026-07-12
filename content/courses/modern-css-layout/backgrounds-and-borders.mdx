@@ -1,0 +1,345 @@
+---
+title: Backgrounds and Borders
+description: Borders and border-radius, background color and image, sizing and positioning, and how outline differs from border.
+---
+
+The edge and surface of a box do a lot of the visual work: a border to
+define it, a rounded corner to soften it, a background to fill it. This
+lesson covers all three, plus `outline`, the border's layout-free cousin.
+
+## Borders
+
+The `border` shorthand takes a **width**, a **style**, and a **color**:
+
+```css
+border: 2px solid #6366f1;
+```
+
+The **style** is required, without it there is no border to see.
+`border-radius` rounds the corners; two special values come up
+constantly: **`50%`** turns a square into a circle, and a large value
+like **`999px`** makes a **pill**.
+
+<LivePreview
+  title="Rounded card, circle, and pill"
+  html={`<div class="row">
+  <div class="card rounded">rounded card</div>
+  <div class="avatar">AB</div>
+  <div class="pill">pill button</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.rounded {
+  padding: 18px;
+  border: 2px solid #6366f1;
+  border-radius: 14px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;             /* square to circle */
+  background: linear-gradient(135deg, #f472b6, #8b5cf6);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pill {
+  padding: 8px 20px;
+  border-radius: 999px;           /* fully rounded ends */
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+}`}
+/>
+
+You can set each side on its own with `border-top`, `border-right`,
+`border-bottom`, `border-left`, and switch the **style** between
+`solid`, `dashed`, and `dotted`:
+
+<LivePreview
+  title="Styles and per-side borders"
+  background="#ffffff"
+  html={`<div class="row">
+  <div class="b solid">solid</div>
+  <div class="b dashed">dashed</div>
+  <div class="b dotted">dotted</div>
+  <div class="b sides">per-side</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.b {
+  padding: 16px;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+}
+.solid  { border: 3px solid #6366f1; }
+.dashed { border: 3px dashed #6366f1; }
+.dotted { border: 3px dotted #6366f1; }
+.sides  {
+  border-left: 5px solid #ef4444;
+  border-bottom: 2px solid #cbd5e1;
+}`}
+/>
+
+## Backgrounds
+
+`background-color` fills the box. `background-image` layers an image on
+top, and a **gradient counts as an image**, so it lives here too.
+
+Four properties control how that image sits:
+
+- **`background-size`** sizes the image. `cover` fills the box (cropping
+  as needed), `contain` fits the whole image inside, or give explicit
+  lengths like `40px 40px`.
+- **`background-position`** places it, e.g. `center` or `top right`.
+- **`background-repeat`** tiles it; the default is `repeat`, or turn it
+  off with `no-repeat`.
+- The **`background` shorthand** packs them into one line.
+
+Both tiles below use the same dot gradient; only `background-size`
+differs, so the same pattern renders small on the left and large on the
+right:
+
+<LivePreview
+  title="Same pattern, different background-size"
+  html={`<div class="row">
+  <div class="tile small">size: 20px</div>
+  <div class="tile big">size: 40px</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.tile {
+  flex: 1;
+  min-width: 150px;
+  height: 130px;
+  border-radius: 12px;
+  padding: 10px;
+  color: #1e1b4b;
+  font-weight: 600;
+  background-color: #eef2ff;
+  background-image: radial-gradient(circle, #6366f1 28%, transparent 30%);
+}
+.small { background-size: 20px 20px; }
+.big   { background-size: 40px 40px; }`}
+/>
+
+The shorthand can carry the image, repeat, position, and size at once.
+Here it is combining a gradient with `no-repeat center / cover`:
+
+<LivePreview
+  title="The background shorthand"
+  html={`<div class="hero">background: gradient no-repeat center / cover</div>`}
+  css={`.hero {
+  height: 130px;
+  border-radius: 14px;
+  color: white;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #0ea5e9, #7c3aed) no-repeat center / cover;
+}`}
+/>
+
+## `outline` vs `border`
+
+`outline` looks like a border but has one crucial difference: it does
+**not take up space**. A border is part of the box and pushes
+everything around it; an outline is drawn on top, so adding or removing
+it never shifts the layout. That is exactly why browsers use it for
+focus rings.
+
+Notice how the **border** button below is visibly taller than its
+neighbors (its 4px border grows the box), while the **outline** buttons
+stay the same size as the plain one. `outline-offset` pushes the
+outline away from the edge:
+
+<LivePreview
+  title="border grows the box, outline does not"
+  background="#ffffff"
+  html={`<div class="row">
+  <button class="btn">plain</button>
+  <button class="btn bordered">border</button>
+  <button class="btn outlined">outline</button>
+  <button class="btn offset">outline-offset</button>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  font-size: 14px;
+}
+.bordered { border: 4px solid #f59e0b; }
+.outlined { outline: 4px solid #f59e0b; }
+.offset   { outline: 4px solid #f59e0b; outline-offset: 6px; }`}
+/>
+
+Build a badge in the sandbox, change the `border-radius`, swap the
+`border-style`, tweak the `background`, and Run:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <span class="badge">Sale</span>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  color: white;
+  font-weight: 700;
+  background: #ef4444;      /* try a gradient */
+  border: 2px solid #b91c1c;/* try dashed, or a different color */
+  border-radius: 999px;     /* try 6px, or 50% */
+}
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="border-radius takes two radii">
+A value like `border-radius: 40px / 20px` gives an ellipse per corner
+(horizontal radius before the slash, vertical after). And you can round
+just one corner with `border-top-left-radius`.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make the avatar a circle with a ring"
+  entryFilename="index.html"
+  instructions={`Turn the square \`.avatar\` into a circular avatar with a ring around it:
+
+1. Set \`border-radius: 50%\` on \`.avatar\` so the square becomes a circle.
+2. Give it a ring with \`border: 4px solid #6366f1\`.
+
+The result is the classic circular avatar with an accent ring.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="avatar">AB</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(135deg, #f472b6, #8b5cf6);
+  color: white;
+  font-weight: 700;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 1. make it a circle with border-radius */
+  /* 2. add a 4px solid ring */
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(135deg, #f472b6, #8b5cf6);
+  color: white;
+  font-weight: 700;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 4px solid #6366f1;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_circle",
+      name: ".avatar is a circle (border-radius: 50%)",
+      code: `const el = document.querySelector(".avatar");
+const r = getComputedStyle(el).borderTopLeftRadius;
+let ok = false;
+if (r.indexOf("%") !== -1) {
+  ok = parseFloat(r) >= 49;
+} else {
+  const px = parseFloat(r);
+  ok = px > 0 && Math.abs(px - el.offsetWidth / 2) <= 4;
+}
+if (!ok) {
+  throw new Error("Set border-radius: 50% on .avatar to make it a circle. Got " + r + ".");
+}`,
+    },
+    {
+      id: "has_ring",
+      name: ".avatar has a solid border ring",
+      code: `const s = getComputedStyle(document.querySelector(".avatar"));
+if (s.borderTopStyle !== "solid") {
+  throw new Error("Give .avatar a solid border. Got style " + s.borderTopStyle + ".");
+}
+if (parseFloat(s.borderTopWidth) < 3) {
+  throw new Error("Make the ring at least 3px wide. Got width " + s.borderTopWidth + ".");
+}`,
+    },
+  ]}
+/>
+
+Surfaces and edges done. Next, styling elements by state and position:
+[Pseudo-classes and pseudo-elements](/courses/modern-css-layout/pseudo-classes-and-elements).

@@ -1,0 +1,410 @@
+---
+title: Python & Pandas
+description: Data Scientist Python and pandas interview questions, vectorization, groupby, merges, reshaping, and missing data, with runnable examples and two graded challenges.
+---
+
+The coding screen for a Data Scientist is usually pandas: reshape a messy
+frame, aggregate by group, join two sources, and do it without a Python
+loop. Review the Q&A, run the examples, then solve the two challenges in
+your browser.
+
+## Q&A
+
+### Why is vectorization preferred over Python loops in pandas?
+
+Vectorized operations dispatch to compiled C (NumPy) and process a whole
+array in one call, typically 10-100x faster than a Python-level loop or a
+`.apply` with a lambda. Loops also pay per-element interpreter overhead and
+lose type homogeneity. Reach for a loop only when no vectorized or built-in
+equivalent exists.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({"price": np.arange(1, 6), "qty": np.arange(5, 0, -1)})`,
+      starterCode: `# Vectorized: one expression, no Python loop.
+df["revenue"] = df["price"] * df["qty"]
+print(df)`,
+    },
+  ]}
+/>
+
+### What is the split-apply-combine pattern, and what does `groupby` return?
+
+`groupby` **splits** rows into groups by key, lets you **apply** a function
+per group, then **combines** the results. Aggregating a single column
+returns a **Series** indexed by the group keys; aggregating several columns
+(or naming outputs with `.agg`) returns a **DataFrame**. The group keys
+become the index unless you call `.reset_index()`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `summary = df.groupby("region").agg(
+    total=("amount", "sum"),
+    n=("amount", "size"),
+    avg=("amount", "mean"),
+)
+print(summary)`,
+    },
+  ]}
+/>
+
+### When do you use `agg` vs. `transform` vs. `apply` on a groupby?
+
+- **`agg`** reduces each group to a scalar (fewer rows out).
+- **`transform`** returns a result the **same length** as the input,
+  broadcasting each group's value back to every row, ideal for group-level
+  features like a share-of-total.
+- **`apply`** is the flexible, slower fallback that can return a scalar,
+  Series, or DataFrame per group; use it only when `agg`/`transform` can't
+  express what you need.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "North", "South", "South", "East"],
+    "amount": [100, 60, 80, 120, 50],
+})`,
+      starterCode: `# transform broadcasts the group total back to each row.
+df["region_total"] = df.groupby("region")["amount"].transform("sum")
+df["share"] = df["amount"] / df["region_total"]
+print(df)`,
+    },
+  ]}
+/>
+
+### When do you use `merge` vs. `join` vs. `concat`?
+
+- **`merge`**, SQL-style joins on one or more **key columns**
+  (`how="inner"|"left"|"right"|"outer"`).
+- **`join`**, a convenience wrapper that merges on the **index**.
+- **`concat`**, stacks frames vertically (more rows) or horizontally (more
+  columns), aligning on the index rather than a key.
+
+Use `merge` for "combine on a key," `concat` for "stack these together."
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+orders = pd.DataFrame({"customer_id": [1, 2, 2, 3], "amount": [100, 80, 30, 55]})
+customers = pd.DataFrame({"customer_id": [1, 2, 3, 4], "name": ["Ava", "Ben", "Cy", "Di"]})`,
+      starterCode: `merged = orders.merge(customers, on="customer_id", how="left")
+print(merged)`,
+    },
+  ]}
+/>
+
+### How can a merge silently blow up your row count?
+
+If the join key is **not unique** on the right side, each left row matches
+multiple right rows and gets duplicated, inflating counts and sums. Guard
+against it by checking key uniqueness first, or by passing
+`validate="many_to_one"` (or `"one_to_one"`) so pandas raises instead of
+silently fanning out. After a merge, sanity-check `len(result)` against
+your expectation.
+
+### What is the difference between `map`, `apply`, and `DataFrame.map`?
+
+- `Series.map(func_or_dict)`, element-wise on **one** Series; great for
+  value lookups and substitutions.
+- `DataFrame.apply(func, axis=0|1)`, applies along an axis (per column or
+  per row).
+- `DataFrame.map(func)` (pandas 2.1+, formerly `applymap`), element-wise
+  across **every** cell.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"region": ["North", "South", "East"], "amount": [100, 80, 50]})`,
+      starterCode: `# Series.map for a lookup:
+df["code"] = df["region"].map({"North": "N", "South": "S", "East": "E"})
+# DataFrame.apply row-wise:
+df["label"] = df.apply(lambda r: f"{r['code']}:{r['amount']}", axis=1)
+print(df)`,
+    },
+  ]}
+/>
+
+### How do you reshape between wide and long formats?
+
+`melt` goes **wide to long**, unpivoting value columns into a
+variable/value pair. `pivot` (or `pivot_table`, which aggregates) goes
+**long to wide**. `pivot` requires unique index/column combinations;
+`pivot_table` handles duplicates with an aggregation function.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+wide = pd.DataFrame({
+    "user": ["a", "b"],
+    "q1": [10, 20],
+    "q2": [15, 25],
+})`,
+      starterCode: `long = wide.melt(id_vars="user", var_name="quarter", value_name="sales")
+print(long)
+print()
+print(long.pivot(index="user", columns="quarter", values="sales"))`,
+    },
+  ]}
+/>
+
+### How do you detect and handle missing data?
+
+Detect with `isna()`/`notna()` (never `== NaN`, since `NaN != NaN`). Then
+either **drop** (`dropna`) or **fill** (`fillna`, `ffill`, `bfill`),
+depending on why the value is missing and how much is gone. Dropping a few
+rows is fine; imputing or dropping a 60%-null column is a modeling
+decision, not a mechanical one.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({"region": ["N", "S", None, "E"], "amount": [100.0, np.nan, 80.0, np.nan]})`,
+      starterCode: `print(df.isna().sum())              # NaNs per column
+df["amount"] = df["amount"].fillna(df["amount"].mean())
+print(df)`,
+    },
+  ]}
+/>
+
+### What is method chaining, and why do data scientists like it?
+
+Method chaining expresses a whole transformation as one top-to-bottom
+pipeline, avoiding throwaway intermediate variables and making the intent
+readable. `assign` (add columns), `query` (filter), `pipe` (call a custom
+function), and `groupby` compose cleanly inside parentheses.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South"],
+    "amount": [100, -20, 80, 50, 70],
+})`,
+      starterCode: `result = (
+    df
+    .query("amount > 0")
+    .assign(tax=lambda d: d["amount"] * 0.08)
+    .groupby("region", as_index=False)["tax"].sum()
+)
+print(result)`,
+    },
+  ]}
+/>
+
+### What is a vectorized alternative to a `CASE` statement?
+
+Use `numpy.where` for a single condition or `numpy.select` for several,
+both run in C and avoid a per-row lambda.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`,
+      starterCode: `conditions = [df["amount"] >= 500, df["amount"] >= 100]
+choices = ["Large", "Medium"]
+df["size"] = np.select(conditions, choices, default="Small")
+print(df)`,
+    },
+  ]}
+/>
+
+### What is the `SettingWithCopyWarning`, and how do you avoid it?
+
+It warns that you may be writing to a **view** (a slice) rather than the
+original frame, so the assignment might not stick. Avoid it by writing
+through a single `.loc` on the original, or by taking an explicit `.copy()`
+when you deliberately want an independent subset.
+
+```python
+df.loc[df["region"] == "North", "amount"] = 0   # unambiguous, in place
+subset = df[df["region"] == "North"].copy()      # independent copy
+```
+
+### How do you compute a percentage of total within each group?
+
+Broadcast the group total back with `transform`, then divide, no merge
+needed.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "North", "South", "South", "East"],
+    "amount": [100, 60, 80, 120, 50],
+})`,
+      starterCode: `df["pct_of_region"] = (
+    df["amount"] / df.groupby("region")["amount"].transform("sum") * 100
+)
+print(df.round(1))`,
+    },
+  ]}
+/>
+
+### Why prefer `category` dtype for low-cardinality strings?
+
+It stores integer codes plus a lookup table instead of repeated strings,
+cutting memory and speeding up `groupby`, sorting, and joins. Convert with
+`df["col"].astype("category")`. Ordered categoricals also enable meaningful
+comparisons like `low < medium < high`.
+
+### How do you work with datetimes in pandas?
+
+Parse with `pd.to_datetime`, reach into components via the `.dt` accessor
+(`.dt.year`, `.dt.dayofweek`), and use `resample` (the time-series
+`groupby`) to bin a `DatetimeIndex` into periods like `"D"`, `"W"`, or
+`"ME"`.
+
+```python
+df["date"] = pd.to_datetime(df["date"])
+weekly = df.set_index("date")["amount"].resample("W").sum()
+```
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You call \`df.groupby("region")["amount"].transform("sum")\`. What is the length of the result?
+
+- One value per region (the number of distinct groups).
+  > That describes \`agg\`/\`sum\`, which reduces each group to a scalar. \`transform\` does not collapse rows.
+- [o] The same length as \`df\` (one value per original row).
+  > \`transform\` broadcasts each group's aggregate back to every member row, preserving the original index.
+- Always a single scalar.
+  > A scalar is what a plain \`.sum()\` on a Series returns, not a grouped \`transform\`.
+- It raises, because \`sum\` is not a valid transform.
+  > \`sum\` is a perfectly valid transform function; it returns the group total repeated across the group.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`merge\` on \`customer_id\` returns **more** rows than the left frame. What is the most likely cause?
+
+- The join dropped unmatched rows.
+  > Dropping rows would make the result *smaller*, not larger.
+- [o] The key is not unique on the right side, so left rows fan out across multiple matches.
+  > A one-to-many key duplicates each left row per match; \`validate="many_to_one"\` would have caught it.
+- \`how="left"\` always duplicates rows.
+  > \`how="left"\` keeps every left row once *per match*; duplication comes from non-unique keys, not the join type itself.
+- Pandas merges never change row counts.
+  > Row counts routinely change with joins; that is exactly why you sanity-check them.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Summarize by category"
+  instructions={`A DataFrame \`df\` with columns \`category\` and \`amount\` is provided. Build a DataFrame named **\`summary\`** with **one row per category** and three columns: \`category\`, \`total\` (sum of \`amount\`), and \`n\` (row count). \`category\` must be a regular column, not the index. Order does not matter.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "category": ["A", "B", "A", "C", "B", "A"],
+    "amount": [10, 20, 30, 40, 50, 60],
+})`,
+      starterCode: `# Build a per-category summary with columns: category, total, n
+summary = None
+print(summary)`,
+      solutionCode: `summary = (
+    df.groupby("category")
+      .agg(total=("amount", "sum"), n=("amount", "size"))
+      .reset_index()
+)
+print(summary)`,
+    },
+  ]}
+  tests={[
+    { id: "is_frame", name: "summary is a DataFrame", description: "Not a Series", code: `import pandas as pd
+assert isinstance(summary, pd.DataFrame)` },
+    { id: "cols", name: "Has the required columns", description: "category, total, n", code: `assert set(["category", "total", "n"]).issubset(summary.columns)` },
+    { id: "rows", name: "One row per category", description: "Three categories", code: `assert len(summary) == 3` },
+    { id: "values", name: "Totals and counts correct", description: "A: total 100 n 3; B: total 70 n 2; C: total 40 n 1", code: `s = summary.set_index("category")
+assert int(s.loc["A", "total"]) == 100 and int(s.loc["A", "n"]) == 3
+assert int(s.loc["B", "total"]) == 70 and int(s.loc["B", "n"]) == 2
+assert int(s.loc["C", "total"]) == 40 and int(s.loc["C", "n"]) == 1` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Share of group total"
+  instructions={`A DataFrame \`df\` with columns \`region\` and \`amount\` is provided. Add a new column **\`share\`** giving each row's \`amount\` as a **fraction of its region's total** (so the shares within any region sum to 1.0). Assign it back onto \`df\`. Do it without a Python loop.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "North", "South", "East", "South"],
+    "amount": [100, 60, 80, 50, 120],
+})`,
+      starterCode: `# Add a 'share' column: amount divided by the region total.
+df["share"] = None
+print(df)`,
+      solutionCode: `df["share"] = df["amount"] / df.groupby("region")["amount"].transform("sum")
+print(df)`,
+    },
+  ]}
+  tests={[
+    { id: "has_col", name: "share column exists", description: "df has a 'share' column", code: `assert "share" in df.columns` },
+    { id: "sums_to_groups", name: "Shares sum to one per region", description: "Total across all rows equals the number of regions (3)", code: `assert abs(df["share"].sum() - 3.0) < 1e-9` },
+    { id: "east_is_one", name: "Solo region has share 1.0", description: "East has a single row", code: `assert abs(float(df.loc[df["region"] == "East", "share"].iloc[0]) - 1.0) < 1e-9` },
+    { id: "north_split", name: "North shares are 100/160 and 60/160", description: "Row shares within North", code: `north = sorted(df.loc[df["region"] == "North", "share"].tolist())
+assert abs(north[0] - 60/160) < 1e-9 and abs(north[1] - 100/160) < 1e-9` },
+  ]}
+/>
+
+## Go deeper
+
+- [Data Analysis with Python & Pandas](/courses/data-analysis-python-pandas)
+- [Scientific Computing with Python](/courses/scientific-computing-python)

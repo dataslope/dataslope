@@ -1,0 +1,186 @@
+---
+title: Context for Shared State
+description: Passing data to a whole subtree without prop drilling, using createContext, a Provider, and useContext.
+---
+
+You've seen data flow **down** through props. That works beautifully
+until a value, the current theme, the logged-in user, the language,
+is needed by many components at many depths. Passing it hand-to-hand
+through every layer in between is **prop drilling**, and it's tedious
+and noisy. **Context** lets a value skip the middle and reach any
+descendant directly.
+
+## The prop-drilling problem
+
+Imagine `theme` living at the top but only used by a deeply nested
+button. Without context, every component in between has to accept and
+forward a `theme` prop it doesn't care about:
+
+```tsx
+<App theme={theme}>
+  <Layout theme={theme}>        {/* just passing it through */}
+    <Toolbar theme={theme}>     {/* still just passing it through */}
+      <Button theme={theme} />  {/* finally, the one that needs it */}
+```
+
+Context removes those pass-through props.
+
+## Three pieces: create, provide, consume
+
+1. **Create** a context with a default: `createContext(defaultValue)`.
+2. **Provide** a value at the top: `<ThemeContext.Provider value={...}>`.
+3. **Consume** it anywhere below: `const value = useContext(ThemeContext)`.
+
+In the live demo, the panel and the button both read the theme from
+context. Notice no `theme` prop is passed to either, the nested button
+still flips the whole thing:
+
+<ReactPreview
+  code={`import { createContext, useContext, useState } from "react";
+
+interface ThemeValue { dark: boolean; toggle: () => void; }
+const ThemeContext = createContext<ThemeValue>({ dark: false, toggle: () => {} });
+
+// Deeply nested, reads context directly, no props threaded in.
+function ThemedButton() {
+  const { dark, toggle } = useContext(ThemeContext);
+  return <button onClick={toggle}>{dark ? "Switch to light" : "Switch to dark"}</button>;
+}
+
+function ThemedPanel() {
+  const { dark } = useContext(ThemeContext);
+  return (
+    <div className={dark ? "dark" : "light"}>
+      <p>This panel and its button both read the theme from context.</p>
+      <ThemedButton />
+    </div>
+  );
+}
+
+function App() {
+  const [dark, setDark] = useState(false);
+  return (
+    <ThemeContext.Provider value={{ dark, toggle: () => setDark((d) => !d) }}>
+      <ThemedPanel />
+    </ThemeContext.Provider>
+  );
+}`}
+>
+  <ThemeContextDemo />
+</ReactPreview>
+
+Everything inside the `Provider` sees the `value`. When that value
+changes (here, on toggle), every consumer re-renders with the new
+value, no prop plumbing required.
+
+## Context holds state, not just constants
+
+Notice the value above is an **object bundling state and a setter**:
+`{ dark, toggle }`. That's the common pattern, the provider owns the
+state with `useState`, and shares both the current value and the way to
+change it. Any descendant can read *and* update the shared state.
+
+<Callout type="info" title="Context isn't a state manager">
+Context solves *distribution*, getting a value to where it's needed. It
+doesn't add caching, batching, or optimized updates. For most apps,
+`useState` (or `useReducer`) in a provider is plenty. Reach for a
+dedicated library only when you feel real pain: heavy cross-cutting
+state, or re-render performance that context alone can't tame.
+</Callout>
+
+<Callout type="warn" title="Don't overuse it">
+Context is for *broadly* shared, slowly-changing values (theme, auth,
+locale). For a value only one or two nearby components need, plain props
+are simpler and clearer. Every consumer re-renders when the context
+value changes, so a very hot value in a very large tree can cost you.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Read a value from context"
+  instructions={`A \`UserContext\` is already created and provided with the name **"Ada"**. Finish the \`Greeting\` component so it reads and shows that name.
+
+1. Inside \`Greeting\`, call \`useContext(UserContext)\` to get the name.
+2. Render it inside the \`<h1>\`, so it reads **Hello, Ada!**.
+
+You should not add any props to \`Greeting\`.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { createContext, useContext } from "react";
+import { createRoot } from "react-dom/client";
+
+const UserContext = createContext("Guest");
+
+function Greeting() {
+  // 1. read the name from UserContext
+  return (
+    <h1 style={{ fontFamily: "system-ui" }}>Hello, ?!</h1>
+  );
+}
+
+function App() {
+  return (
+    <UserContext.Provider value="Ada">
+      <div style={{ margin: 24 }}>
+        <Greeting />
+      </div>
+    </UserContext.Provider>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+      solutionCode: `import { createContext, useContext } from "react";
+import { createRoot } from "react-dom/client";
+
+const UserContext = createContext("Guest");
+
+function Greeting() {
+  const name = useContext(UserContext);
+  return (
+    <h1 style={{ fontFamily: "system-ui" }}>Hello, {name}!</h1>
+  );
+}
+
+function App() {
+  return (
+    <UserContext.Provider value="Ada">
+      <div style={{ margin: 24 }}>
+        <Greeting />
+      </div>
+    </UserContext.Provider>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "reads_context",
+      name: "The greeting reads 'Ada' from context",
+      code: `const h1 = document.querySelector("h1");
+if (!h1) throw new Error("Keep the <h1>.");
+const text = (h1.textContent || "").trim();
+if (!/hello,\\s*ada!?/i.test(text)) {
+  throw new Error("The heading should read 'Hello, Ada!' by reading the name from context. Got: " + text);
+}`,
+    },
+    {
+      id: "not_guest",
+      name: "It uses the provided value, not the default",
+      code: `const text = (document.querySelector("h1").textContent || "");
+if (/guest/i.test(text)) {
+  throw new Error("The provider supplies 'Ada', so 'Guest' (the default) should not appear. Read the value with useContext.");
+}`,
+    },
+  ]}
+/>
+
+Context, composition, and custom hooks are the tools that keep large
+React apps organized. You've now got the whole toolkit, time to build
+the capstone: [the todo app](/courses/react-from-the-ground-up/project-todo-app).

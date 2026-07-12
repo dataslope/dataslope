@@ -63,6 +63,42 @@ createRoot(document.getElementById("root")!).render(<App />);
 around *whatever* you hand it. That's composition: the wrapper owns the
 frame, the caller owns the content.
 
+The two panels below share one `Panel` wrapper. It owns the header bar
+and padding; each caller supplies completely different `children`, a
+paragraph in one, a bullet list in the other:
+
+<ReactPreview
+  code={`function Panel({ title, children }: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="panel">
+      <header>{title}</header>
+      <div className="body">{children}</div>
+    </section>
+  );
+}
+
+function Panels() {
+  return (
+    <>
+      <Panel title="Getting started">
+        <p>Anything you nest between the tags arrives as children.</p>
+      </Panel>
+      <Panel title="Pro tip">
+        <ul>
+          <li>Composition beats configuration.</li>
+          <li>Slots keep components flexible.</li>
+        </ul>
+      </Panel>
+    </>
+  );
+}`}
+>
+  <PanelDemo />
+</ReactPreview>
+
 ## Composition over configuration
 
 You could instead give `Card` a `title` prop, a `body` prop, an
@@ -114,6 +150,68 @@ createRoot(document.getElementById("root")!).render(<App />);
 numbers, arrays of them, or nothing. It's the catch-all type for
 anything React can render.
 </Callout>
+
+`children` isn't opaque, React's `Children` helpers let a wrapper
+*inspect* what it was given. The toolbar below counts its children and
+renders them in a row:
+
+<ReactPreview
+  code={`import { Children, isValidElement, type ReactNode } from "react";
+
+function Toolbar({ children }: { children: ReactNode }) {
+  const count = Children.count(children);
+  return (
+    <div>
+      <small>This toolbar has {count} buttons:</small>
+      <div className="row">
+        {Children.map(children, (child) =>
+          isValidElement(child) ? child : null,
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Toolbar>
+      <button>Cut</button>
+      <button>Copy</button>
+      <button>Paste</button>
+    </Toolbar>
+  );
+}`}
+>
+  <ChildrenCountDemo />
+</ReactPreview>
+
+Composition also builds *interactive* widgets. These tabs are one
+component holding an `active` index in state and swapping the body,
+click between them:
+
+<ReactPreview
+  code={`function Tabs({ tabs }: { tabs: { label: string; body: string }[] }) {
+  const [active, setActive] = useState(0);
+  return (
+    <div>
+      <div className="tabstrip">
+        {tabs.map((t, i) => (
+          <button
+            key={t.label}
+            aria-selected={active === i}
+            onClick={() => setActive(i)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="tabbody">{tabs[active].body}</div>
+    </div>
+  );
+}`}
+>
+  <TabsDemo />
+</ReactPreview>
 
 ## Challenge
 

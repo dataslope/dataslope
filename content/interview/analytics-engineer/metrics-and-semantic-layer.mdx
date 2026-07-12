@@ -1,0 +1,248 @@
+---
+title: Metrics & the Semantic Layer
+description: Analytics Engineer interview questions on the semantic layer, metric definitions, fan-out and chasm join traps, additive vs non-additive metrics, governance, and metric drift, with answers, a runnable demo, and concept checks.
+---
+
+Analytics Engineers own the definitions behind the numbers, so interviews probe
+the semantic layer, additive vs non-additive metrics, join traps that silently
+inflate totals, and how you stop two dashboards from disagreeing. Concept-heavy
+Q&A with a runnable trap demo and concept-check MCQs.
+
+> **Context:** the semantic layer generates warehouse SQL from metric definitions at query time. The runnable block uses **DuckDB** to make one classic join trap concrete.
+
+## Q&A
+
+### What is a semantic layer (metrics layer)?
+
+A semantic layer is a **governed, central definition of metrics and dimensions**
+that sits between raw models and BI tools. You define a metric once ("revenue is
+`SUM(amount)` where `status = 'completed'`") and every tool queries it through
+the layer, which generates the correct SQL, joins, and aggregations on demand.
+It decouples *what a metric means* from *how each dashboard computes it*.
+
+### Why does a single source of truth for metrics matter?
+
+Because without it, every dashboard, notebook, and analyst re-implements
+"revenue" slightly differently, and the numbers diverge. A single definition
+means one place to change the logic, consistent results everywhere, and no
+executive meeting derailed by "whose revenue number is right?" It converts
+metric definitions from tribal knowledge into governed, versioned code.
+
+### What is metric drift, and how do you prevent it?
+
+Metric drift is the slow divergence of a metric's meaning as copies of its logic
+spread and mutate across dashboards and queries. You prevent it by defining
+metrics **once** in a semantic layer (or a shared dbt metrics/mart model),
+putting those definitions under version control and review, and pointing all
+consumers at them instead of hand-rolled SQL. Centralize the definition and
+drift has nowhere to start.
+
+### What is the dbt Semantic Layer / MetricFlow?
+
+It lets you define **semantic models** (entities, dimensions, measures) and
+**metrics** in YAML alongside your dbt project; MetricFlow then compiles a
+requested metric-by-dimension query into correct warehouse SQL at run time,
+handling joins and aggregation. BI tools query the layer via an API and all get
+identical, governed results, so the metric lives in one versioned place.
+
+```yaml
+metrics:
+  - name: completed_revenue
+    type: simple
+    label: Completed Revenue
+    type_params:
+      measure: order_amount   # SUM defined on the semantic model, filtered to completed
+```
+
+### What is LookML, and how does Looker's semantic layer work?
+
+LookML is Looker's modeling language: you declare **dimensions** and
+**measures** in `view` files and how models join in `explore` files, and Looker
+generates SQL from user selections. It was an early, influential semantic layer,
+centralizing metric logic so every Look and dashboard derives from the same
+governed definitions rather than ad-hoc SQL.
+
+### What is a fan-out join (fan trap), and why is it dangerous?
+
+A fan trap happens when you join a table to a **one-to-many** detail table and
+then aggregate a measure from the "one" side, the join **duplicates** those rows
+once per child, so summing inflates the total. Joining `orders` to
+`order_items` and summing `orders.amount` counts each order's amount once per
+item. The block below shows real revenue of 150 balloon to 350:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
+  (1, 100.00),
+  (2,  50.00)
+) AS t(order_id, amount);
+
+CREATE TABLE order_items AS SELECT * FROM (VALUES
+  (1, 'A', 1),
+  (1, 'B', 2),
+  (1, 'C', 1),
+  (2, 'D', 1)
+) AS t(order_id, item, qty);`}
+  starterCode={`-- FAN TRAP: order 1's amount is counted once per item -> inflated
+SELECT SUM(o.amount) AS inflated_revenue
+FROM orders o
+JOIN order_items i ON i.order_id = o.order_id;
+-- True revenue is 100 + 50 = 150, but this returns 350.`}
+/>
+
+### How do you avoid double counting from a fan-out?
+
+Aggregate each grain **before** joining, or aggregate at the correct level. Sum
+order amounts from `orders` alone, sum item quantities from `order_items` alone,
+then join the two pre-aggregated results, or use `COUNT(DISTINCT order_id)` and
+`SUM` only measures native to the joined grain. The semantic layer prevents this
+automatically by knowing each measure's grain and aggregating before it fans
+out.
+
+```sql
+-- Aggregate each grain independently, then join the summaries
+WITH order_rev AS (
+  SELECT SUM(amount) AS revenue FROM orders
+),
+item_qty AS (
+  SELECT SUM(qty) AS units FROM order_items
+)
+SELECT revenue, units FROM order_rev, item_qty;
+```
+
+### What is a chasm trap, and how does it differ from a fan trap?
+
+A chasm trap arises when **two independent one-to-many** tables join to a shared
+dimension (e.g. `payments` and `refunds` both to `customer`). Joining all three
+at once produces a **Cartesian explosion**, every payment pairs with every
+refund, so both measures inflate. A fan trap is one-to-many inflating one
+measure; a chasm trap is two many-sides multiplying together. The fix is the
+same: aggregate each branch separately, then combine.
+
+### What is the difference between a measure and a metric?
+
+A **measure** is a raw aggregatable quantity defined on one table
+(`SUM(amount)`, `COUNT(*)`). A **metric** is a business-meaningful number built
+from one or more measures, possibly with filters, ratios, and time logic
+("completed revenue," "7-day conversion rate"). Measures are the building
+blocks; metrics are what stakeholders actually ask for.
+
+### What does a metric definition contain?
+
+Typically a **measure/aggregation** (what to compute), the **entity/grain** it
+lives on, allowed **dimensions** to slice by, **filters** (e.g. `status =
+'completed'`), and any **time grain** or windowing. Ratio metrics add a
+numerator and denominator. Capturing all of this in one definition is what lets
+the semantic layer generate correct SQL for any slice.
+
+### What is the difference between additive, semi-additive, and non-additive metrics?
+
+**Additive** metrics (revenue, quantity) sum correctly across every dimension.
+**Semi-additive** metrics (account balance, inventory on hand) sum across some
+dimensions but **not time**, adding month-end balances is meaningless; you take
+the latest or an average instead. **Non-additive** metrics (ratios, percentages,
+distinct counts) cannot be summed across any dimension and must be recomputed
+from base rows.
+
+### Why can't you pre-aggregate a distinct count or a ratio?
+
+Because they are non-additive. `COUNT(DISTINCT user_id)` per day cannot be summed
+into a monthly figure, a user active on two days would be counted twice, so you
+must recompute over the whole month. A ratio like conversion rate must be
+computed as `SUM(numerator) / SUM(denominator)` at the reporting grain, never by
+averaging daily ratios. The semantic layer stores the components and divides at
+query time.
+
+### How does a semantic layer handle a ratio metric correctly?
+
+It defines the **numerator and denominator as separate measures** and computes
+the division **at query time** for whatever grain is requested, so
+`revenue / orders` is always summed then divided at the reporting level, never
+pre-divided. This guarantees the ratio is correct at every slice and avoids the
+"average of averages" error.
+
+### What causes two dashboards to report different numbers for the same metric?
+
+Divergent, hand-rolled definitions: different filters (does "revenue" include
+refunds, tax, canceled orders?), different grains, different date logic
+(order date vs ship date), or one dashboard hitting a fan trap. The cure is a
+shared definition in a semantic layer or a certified mart, so both dashboards
+derive from identical SQL instead of two analysts' interpretations.
+
+### What is governance in the metrics context?
+
+Governance is the process that keeps definitions trustworthy: clear **ownership**
+per metric, **code review** on definition changes, **certification** of
+blessed metrics (so consumers know which to trust), documentation of meaning and
+lineage, and access controls. It turns metrics from ungoverned SQL scattered
+across tools into a managed, auditable asset.
+
+### What are entities, dimensions, and measures in a semantic model?
+
+**Entities** are the join keys/grains (an `order`, a `customer`), **dimensions**
+are the attributes you group and filter by (region, status, date), and
+**measures** are the aggregatable quantities (amount, count). Declaring these
+lets the semantic layer know how tables relate and how to aggregate, so it can
+safely assemble any metric-by-dimension query, joining without fan traps.
+
+### What is a cumulative or time-window metric, and why define it centrally?
+
+A cumulative metric aggregates over a trailing window (rolling 28-day active
+users, month-to-date revenue) rather than a single period. The windowing logic
+is easy to implement inconsistently by hand, so defining it once in the semantic
+layer, with an explicit grain and window, keeps "monthly active users" identical
+everywhere it appears.
+
+### When is a wide, pre-joined mart preferable to querying through a semantic layer?
+
+When you need a **fixed, denormalized serving table** for a heavy BI workload or
+a tool that struggles with dynamic joins, a pre-joined mart gives fast,
+predictable reads. The trade-off is less flexibility and duplicated storage, and
+you must still source its metric logic from the governed definitions so the mart
+does not become another drift point.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You join \`orders\` to its one-to-many \`order_items\` and \`SUM(orders.amount)\`. The total is far too high. Why?
+
+- The \`amount\` column has duplicate values stored in it.
+  > The stored data is fine; the join is what duplicates it.
+- [o] The join fans out: each order's row repeats once per item, so its amount is summed multiple times.
+  > This is the classic fan trap, aggregating a "one"-side measure across a "many"-side join double counts it.
+- \`SUM\` can't be used with a \`JOIN\`.
+  > \`SUM\` works over joins; the problem is the inflated row count, not the function.
+- The tables need an index.
+  > Indexes affect speed, not the arithmetic inflation from a one-to-many join.`}
+/>
+
+<MultipleChoice
+  markdown={`Which metric is **non-additive** across time?
+
+- Total revenue (\`SUM(amount)\`).
+  > Revenue sums correctly across days, months, and any dimension; it's additive.
+- Units sold (\`SUM(quantity)\`).
+  > Counts of units add up across periods; additive.
+- [o] Monthly active users (\`COUNT(DISTINCT user_id)\`).
+  > Distinct counts can't be summed across periods, a user active in two months would be double counted, so they must be recomputed per grain.
+- Number of orders (\`COUNT(*)\`).
+  > A plain row count is additive across time.`}
+/>
+
+<MultipleChoice
+  markdown={`Two dashboards show different "revenue" numbers. What best prevents this going forward?
+
+- Give each team its own copy of the revenue SQL to maintain.
+  > Independent copies are exactly how definitions drift apart; this makes it worse.
+- [o] Define revenue once in a semantic layer / certified mart and have both dashboards query that definition.
+  > A single governed definition means both tools compute revenue identically, eliminating drift.
+- Round both numbers to the nearest thousand.
+  > Rounding hides small gaps but not real definitional differences, and misleads.
+- Refresh the dashboards more often.
+  > Frequency doesn't reconcile two different definitions; they'll still disagree.`}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Database Design with PostgreSQL](/courses/database-design-postgresql)

@@ -1,0 +1,275 @@
+---
+title: Data Warehousing & Storage
+description: Data Engineer interview questions on OLTP vs OLAP, columnar storage, partitioning and clustering, Parquet/Avro/ORC, compression, ELT vs ETL, and cost/performance tradeoffs, with runnable queries and a challenge.
+---
+
+Warehousing questions probe how analytical storage is **physically laid
+out** and why that layout makes scans fast and cheap. The runnable queries
+below execute in your browser on **DuckDB**, a columnar engine, so you can
+see columnar-friendly patterns directly.
+
+## Q&A
+
+### What is OLTP vs OLAP, and how does storage differ?
+
+**OLTP (Online Transaction Processing)** serves many small, concurrent
+read/write transactions, normalized, **row-oriented** storage so a single
+record's columns sit together for fast point writes and lookups. **OLAP
+(Online Analytical Processing)** serves large analytical scans and
+aggregations, denormalized, **column-oriented** storage so a query reads
+only the columns it needs across many rows. OLTP optimizes for row-at-a-time
+writes; OLAP for column-at-a-time reads.
+
+### Why is columnar storage faster for analytics?
+
+Analytical queries touch **few columns** but **many rows**. Storing each
+column contiguously means the engine reads only the referenced columns
+(**projection/column pruning**), skipping the rest entirely. Contiguous
+same-type values also **compress** far better and enable vectorized
+execution. Row storage would force reading every column of every row even
+for a two-column aggregate. The query below sums two columns of a wider
+table, only `amount` and `units` need to be scanned.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE sales (
+  sale_id   INTEGER,
+  sale_date DATE,
+  region    VARCHAR,
+  category  VARCHAR,
+  units     INTEGER,
+  amount    DECIMAL(10,2)
+);
+INSERT INTO sales VALUES
+  (1, DATE '2024-01-01', 'North', 'Electronics', 2, 200.00),
+  (2, DATE '2024-01-01', 'South', 'Electronics', 1, 150.00),
+  (3, DATE '2024-01-02', 'North', 'Books',       5,  60.00),
+  (4, DATE '2024-01-02', 'South', 'Books',       3,  36.00),
+  (5, DATE '2024-01-03', 'North', 'Home',        1,  75.00),
+  (6, DATE '2024-01-03', 'South', 'Electronics', 4, 480.00);`}
+  starterCode={`-- A columnar engine reads only the columns referenced here
+-- (category, amount, units), not the whole row.
+SELECT category,
+       SUM(amount) AS revenue,
+       SUM(units)  AS units_sold
+FROM sales
+GROUP BY category
+ORDER BY revenue DESC;`}
+/>
+
+### What is partitioning, and what makes a good partition key?
+
+**Partitioning** physically splits a table into separate files/directories
+by a column's value (usually a date). When a query filters on that key, the
+engine **prunes** partitions that can't match and scans only the relevant
+ones, turning a full scan into a fraction of the work. A good key is one
+queries **filter on often**, with reasonably even, not-too-small
+partitions. Over-partitioning creates the **small files problem** (metadata
+overhead dominates). Applying a function to the partition column in the
+filter (e.g. `YEAR(event_date)`) usually defeats pruning.
+
+### What is clustering (or sorting) within a partition?
+
+**Clustering** physically orders rows within a file/partition by one or
+more columns so that values are co-located. Columnar formats keep **min/max
+statistics** (zone maps) per row group, so a filter or range scan on a
+clustered column lets the engine skip row groups whose min-max range can't
+match, without a separate index. The query below scans a date range and
+computes per-region stats; on a date-clustered table only the matching row
+groups are read.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE sales (
+  sale_id   INTEGER,
+  sale_date DATE,
+  region    VARCHAR,
+  amount    DECIMAL(10,2)
+);
+INSERT INTO sales VALUES
+  (1, DATE '2024-01-01', 'North', 200.00),
+  (2, DATE '2024-01-01', 'South', 150.00),
+  (3, DATE '2024-01-02', 'North',  60.00),
+  (4, DATE '2024-01-02', 'South',  36.00),
+  (5, DATE '2024-01-03', 'North',  75.00),
+  (6, DATE '2024-01-03', 'South', 480.00);`}
+  starterCode={`-- Range filter on a clustered/sorted column: min-max stats let the
+-- engine skip row groups outside the range before reading them.
+SELECT region,
+       COUNT(*)    AS n_sales,
+       MIN(amount) AS min_amt,
+       MAX(amount) AS max_amt,
+       AVG(amount) AS avg_amt
+FROM sales
+WHERE sale_date >= DATE '2024-01-02'
+GROUP BY region
+ORDER BY region;`}
+/>
+
+### Compare Parquet, ORC, and Avro.
+
+- **Parquet**, columnar, compressed, schema + per-column statistics for
+  predicate pushdown. The default for analytical batch reads; broadest
+  ecosystem support (Spark, pandas, DuckDB, BigQuery, Snowflake).
+- **ORC**, also columnar with strong compression and pushdown; originated
+  in the Hive/Hadoop world, historically strong there.
+- **Avro**, **row-based**, schema-embedded binary format. Best for
+  streaming/serialization (self-describing records, formal schema
+  evolution via a registry), the standard for Kafka messages.
+
+Rule of thumb: **columnar (Parquet/ORC) for analytics, Avro (row) for
+streaming and record-at-a-time writes**.
+
+### Why is compression more effective in columnar formats?
+
+A column holds values of the **same type and often similar magnitude**, so
+lightweight encodings pay off: **dictionary encoding** for low-cardinality
+strings, **run-length encoding** for repeated/sorted values, **delta
+encoding** for sequential numbers, and **bit-packing** for small integers.
+Row formats interleave different types, defeating these. Better compression
+means less I/O, and since analytical queries are I/O-bound, that directly
+speeds up scans, not just saves storage. Sorting/clustering data before
+writing further boosts run-length and delta encoding.
+
+### What is the tradeoff between file size and the small files problem?
+
+Files that are **too small** (one per minute) create huge metadata and
+listing overhead, the engine spends more time opening files than reading
+data, and loses per-file parallelism efficiency. Files that are **too
+large** hurt parallelism and pruning granularity. The usual target is
+**~128 MB to 1 GB** per file. Fix small files with periodic **compaction**
+jobs, or use table formats (Delta Lake, Iceberg, Hudi) that manage file
+manifests and compaction for you.
+
+### What is ETL vs ELT, and why did ELT become the default?
+
+**ETL (Extract, Transform, Load)** transforms data **before** loading,
+common when the target has limited compute or a strict schema. **ELT
+(Extract, Load, Transform)** loads raw data first, then transforms it
+**inside the warehouse** with SQL (dbt). ELT is the modern default because
+cloud warehouses have cheap, elastic compute, so in-place SQL transforms
+are fast, and keeping raw data means you can **re-transform without
+re-extracting** when logic changes.
+
+### How do slowly changing dimensions preserve history? (recap)
+
+A **Slowly Changing Dimension (SCD)** decides what happens when a dimension
+attribute changes. **Type 1** overwrites (no history). **Type 2** inserts a
+new versioned row with `valid_from` / `valid_to` and an `is_current` flag,
+so facts join to the version current at event time (full point-in-time
+history). **Type 3** keeps a "previous value" column (limited history).
+Type 2 on a **surrogate key** is the standard when point-in-time accuracy
+matters. In warehouse storage this is just append-only rows plus a
+range/flag filter.
+
+### What is a star schema, and why is it warehouse-friendly?
+
+A **star schema** has a central **fact** table (measures + foreign keys)
+joined to **denormalized dimension** tables. Fewer joins and wide,
+scan-friendly tables suit columnar OLAP engines: filters hit small
+dimensions, the big fact table is scanned columnarly, and BI tools map onto
+it cleanly. A **snowflake** further normalizes dimensions (more joins, less
+redundancy); stars are the default for query simplicity and speed.
+
+### What drives cost in a cloud data warehouse, and how do you control it?
+
+Most warehouses bill on **data scanned** (BigQuery) or **compute time**
+(Snowflake/Redshift). Levers: (1) **partition + cluster** so queries prune
+and scan less; (2) **columnar compressed formats** and `SELECT` only needed
+columns; (3) **incremental** models instead of full refreshes; (4)
+**materialize** expensive repeated aggregations; (5) right-size / auto-suspend
+warehouses and use result caching; (6) tier cold data to cheaper storage.
+The theme is the same, **read less data, compute less often**.
+
+### What is a materialized view, and when is it worth it?
+
+A **materialized view** stores the pre-computed result of a query on disk,
+so reads are fast, at the cost of **staleness** and refresh work when base
+data changes. Use it for expensive aggregations queried frequently where
+some latency is acceptable. It trades storage + refresh cost for query
+speed, essentially a managed, auto-refreshing cache of a query result.
+
+### What is a data lake vs a warehouse vs a lakehouse?
+
+A **warehouse** stores structured, processed data in a query-optimized
+(often proprietary) format. A **data lake** stores raw data in open formats
+(Parquet/Avro/ORC) on cheap object storage, flexible but with no
+transactions or schema enforcement. A **lakehouse** adds a transactional
+metadata layer (Delta Lake, Iceberg, Hudi) over lake storage, giving ACID
+transactions, schema enforcement, time travel, and efficient upserts,
+warehouse reliability on lake-cost open storage.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A 5 TB table has 60 columns. A dashboard query reads just 3 of them and aggregates. Why is a columnar format like Parquet so much cheaper here than CSV?
+
+- Parquet stores fewer rows than CSV.
+  > It stores the same rows; the win is which **columns** get read, not the row count.
+- [o] Columnar storage reads only the 3 referenced columns and skips the other 57, and compresses them better.
+  > Column pruning plus per-column compression means the query scans a tiny fraction of the bytes CSV would.
+- CSV can't store 60 columns.
+  > CSV handles any number of columns; it's just row-oriented and untyped, so it must scan everything.
+- Parquet keeps the whole table in memory.
+  > Neither format requires that; the advantage is reduced I/O from columnar reads, not caching.`}
+/>
+
+<MultipleChoice
+  markdown={`Your team streams messages through Kafka and also runs nightly analytical scans over the archived data. Which storage choice fits each?
+
+- Parquet for the Kafka messages, Avro for the analytics.
+  > Backwards: row-based Avro suits streaming records, columnar Parquet suits analytical scans.
+- [o] Avro (row-based) for the Kafka messages, Parquet (columnar) for the analytical scans.
+  > Avro's self-describing rows and schema evolution fit streaming; Parquet's columnar layout fits large scans.
+- CSV for both, for simplicity.
+  > CSV is untyped, uncompressed, and row-oriented, poor for both high-throughput streaming and analytical scans.
+- ORC for the Kafka messages, CSV for the analytics.
+  > ORC is columnar (wrong for per-record streaming) and CSV is a poor analytical format.`}
+/>
+
+<MultipleChoice
+  markdown={`A table is partitioned by \`event_date\`, but queries filtering \`WHERE YEAR(event_date) = 2024\` still scan every partition. Why?
+
+- Partition pruning only works on integer columns.
+  > Date partition keys prune fine; the problem is how the filter is written.
+- [o] Wrapping the partition column in a function (\`YEAR(...)\`) prevents the engine from matching the filter to partitions.
+  > The optimizer can't map \`YEAR(event_date)\` back to raw partition values, so it can't prune; filter on the raw column with a range instead.
+- The table has too few partitions to prune.
+  > Pruning works regardless of count; the function on the column is what defeats it.
+- \`YEAR()\` is not a valid SQL function.
+  > It's valid; the issue is that applying it to the partition key blocks pruning.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Revenue per category"
+  instructions={`The table \`sales\` has columns \`id\`, \`category\`, and \`amount\`. Return one row per \`category\` with its total revenue as a column named \`revenue\`. Sort by \`revenue\` descending. This is the kind of columnar-friendly aggregate a warehouse serves cheaply, only \`category\` and \`amount\` are scanned.`}
+  initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES
+  (1, 'Electronics', 100.00),
+  (2, 'Electronics', 250.00),
+  (3, 'Books', 30.00),
+  (4, 'Books', 20.00),
+  (5, 'Home', 75.00)
+) AS t(id, category, amount);`}
+  starterCode={`-- Aggregate amount by category, largest revenue first.
+SELECT
+  category
+  -- , <aggregate> AS revenue
+FROM sales
+-- GROUP BY ... ORDER BY ...;`}
+  solutionSql={`SELECT category, SUM(amount) AS revenue
+FROM sales
+GROUP BY category
+ORDER BY revenue DESC;`}
+  tests={[
+    { id: "rows", name: "One row per category", description: "Three categories yield three rows", expectedRowCount: 3 },
+    { id: "cols", name: "Has the required columns", description: "category and revenue", expectedColumnsInclude: ["category", "revenue"] },
+  ]}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb), columnar scans and querying Parquet directly.
+- [Database Design with PostgreSQL](/courses/database-design-postgresql), the OLTP side of the OLTP/OLAP divide.

@@ -1,0 +1,215 @@
+---
+title: Conditional Rendering
+description: Showing different UI for different state, with if, the ternary, and the && operator, plus rendering nothing.
+---
+
+A component often needs to show **different things** depending on its
+state: logged in or out, loading or loaded, empty or full. Because JSX
+is just JavaScript, you render conditionally with the same tools you
+already use to choose values, `if`, the ternary `?:`, and `&&`.
+
+## Choosing between two things: the ternary
+
+Inside JSX you can't write an `if` statement (statements aren't
+expressions), but you *can* use the ternary operator, which **is** an
+expression. This is the workhorse for "show A or B":
+
+<ReactPreview
+  code={`function Account() {
+  const [user, setUser] = useState<string | null>(null);
+
+  return (
+    <div>
+      {user ? (
+        <>
+          <strong>Welcome back, {user} 👋</strong>
+          <button onClick={() => setUser(null)}>Log out</button>
+        </>
+      ) : (
+        <>
+          <span>You are signed out.</span>
+          <button onClick={() => setUser("Ada")}>Log in</button>
+        </>
+      )}
+    </div>
+  );
+}`}
+>
+  <AuthToggleDemo />
+</ReactPreview>
+
+The whole `{user ? (...) : (...)}` is one expression that evaluates to
+one of two JSX trees. Click the button and the state flips, so the
+branch flips.
+
+## Showing something or nothing: `&&`
+
+When you want to render something **only when a condition is true** (and
+nothing otherwise), reach for `&&`. In JavaScript, `cond && value`
+evaluates to `value` when `cond` is truthy and to `cond` (a falsy value
+React skips) otherwise:
+
+<ReactPreview
+  code={`function Cart() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <span className="cart">
+        🛒
+        {count > 0 && <span className="badge">{count}</span>}
+      </span>
+      <button onClick={() => setCount((c) => Math.max(0, c - 1))}>−</button>
+      <button onClick={() => setCount((c) => c + 1)}>Add to cart</button>
+    </div>
+  );
+}`}
+>
+  <CartBadgeDemo />
+</ReactPreview>
+
+The badge appears only once `count > 0`. Add items and it shows; remove
+them all and it vanishes.
+
+<Callout type="warn" title="The && number gotcha">
+`&&` returns the *left* value when it's falsy, and React renders some
+falsy values. `{count && <Badge />}` renders a literal **`0`** when
+`count` is `0`, because `0` is falsy but still a renderable number. Guard
+with a real boolean instead: `{count > 0 && <Badge />}`. The same trap
+bites empty strings. Ternaries (`cond ? <X/> : null`) sidestep it
+entirely.
+</Callout>
+
+## Pulling logic out with variables and early returns
+
+For anything beyond a simple choice, compute the JSX in a variable
+before the `return`, or **return early** for an edge case. Both keep the
+returned markup readable:
+
+<CodeBlock
+  adapter="react"
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+type Status = "loading" | "error" | "ready";
+
+function Panel({ status }: { status: Status }) {
+  // Early return handles the edge cases first…
+  if (status === "loading") return <p>⏳ Loading…</p>;
+  if (status === "error") return <p>⚠️ Something went wrong.</p>;
+
+  // …so the main path stays clean.
+  return <p>✅ Everything is ready.</p>;
+}
+
+function App() {
+  const [status, setStatus] = useState<Status>("loading");
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <Panel status={status} />
+      <button onClick={() => setStatus("loading")}>Loading</button>{" "}
+      <button onClick={() => setStatus("error")}>Error</button>{" "}
+      <button onClick={() => setStatus("ready")}>Ready</button>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+/>
+
+That "guard the edge cases, then render the happy path" shape is
+everywhere in React, especially in data fetching, where `loading` and
+`error` states return early before the data renders.
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Toggle a message on and off"
+  instructions={`Finish \`Notice\` so the button reveals and hides a message.
+
+1. Add boolean state \`open\` starting at \`false\`.
+2. The button flips \`open\` on click, and its label reads **Hide** when open, **Show** when closed.
+3. When \`open\` is true, render a \`<p>\` containing the text **Saved!**; when false, render nothing.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Notice() {
+  // 1. const [open, setOpen] = useState(false)
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      {/* 2. flip open on click; label = Hide/Show */}
+      <button>Show</button>
+      {/* 3. show <p>Saved!</p> only when open */}
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Notice />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+function Notice() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <main style={{ fontFamily: "system-ui", margin: 24 }}>
+      <button onClick={() => setOpen(!open)}>{open ? "Hide" : "Show"}</button>
+      {open && <p>Saved!</p>}
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<Notice />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "hidden_first",
+      name: "The message is hidden at first",
+      code: `if (/saved!/i.test(document.body.textContent || "")) {
+  throw new Error("Before any click, 'Saved!' should not be shown.");
+}`,
+    },
+    {
+      id: "shows",
+      name: "Clicking reveals the message and relabels the button",
+      code: `const btn = document.querySelector("button");
+if (!btn) throw new Error("Keep the <button>.");
+btn.click();
+await new Promise((r) => setTimeout(r, 80));
+if (!/saved!/i.test(document.body.textContent || "")) {
+  throw new Error("After one click, 'Saved!' should appear.");
+}
+if (!/hide/i.test(btn.textContent || "")) {
+  throw new Error("When open, the button label should read 'Hide'.");
+}`,
+    },
+    {
+      id: "hides_again",
+      name: "Clicking again hides it",
+      code: `const btn = document.querySelector("button");
+btn.click();
+await new Promise((r) => setTimeout(r, 80));
+if (/saved!/i.test(document.body.textContent || "")) {
+  throw new Error("A second click should hide the message again.");
+}`,
+    },
+  ]}
+/>
+
+You can now branch your UI on state. Next, a closer look at *changing*
+that state safely when it holds objects and arrays:
+[State and immutability](/courses/react-from-the-ground-up/state-and-immutability).

@@ -1,0 +1,202 @@
+/* Shared chrome for the two "renders instantly, no Run button" lesson
+   widgets, <LivePreview> (CSS course, HTML/CSS rendered in a Shadow DOM)
+   and <ReactPreview> (React course, a live React component). Both show a
+   rendered result on top and the source that produced it below, so the
+   learner sees cause and effect at a glance without touching an editor.
+
+   The token subset mirrors ChallengeCard.module.css so these widgets sit
+   in the same visual family as the executable code blocks and challenge
+   cards on the learning pages. Light values reference the global --ds-*
+   ramp (available at :root via app/brand.css); the html.dark / data-theme
+   override below supplies the dark palette. */
+
+.preview {
+  --lp-bg: var(--ds-white);
+  --lp-bg-muted: var(--ds-gray-50);
+  --lp-bg-header: var(--ds-gray-50);
+  --lp-border: var(--ds-gray-200);
+  --lp-border-light: var(--ds-gray-100);
+  --lp-text: var(--ds-gray-900);
+  --lp-text-secondary: var(--ds-gray-500);
+  --lp-text-muted: var(--ds-gray-400);
+  --lp-accent: var(--ds-blue-600);
+  --lp-code-bg: var(--ds-gray-50);
+  --lp-code-text: var(--ds-gray-800);
+  --lp-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
+  --lp-font-mono: var(--font-mono, ui-monospace, "SFMono-Regular", monospace);
+  --lp-radius: 10px;
+
+  margin: 1.5rem 0;
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-radius);
+  background: var(--lp-bg);
+  overflow: hidden;
+  font-family: var(--lp-font-ui);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .preview {
+  --lp-bg: var(--color-fd-background, #121212);
+  --lp-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 82%, #000);
+  --lp-bg-header: color-mix(in srgb, var(--color-fd-background, #121212) 88%, #000);
+  --lp-border: #2e2e2e;
+  --lp-border-light: #232323;
+  --lp-text: #e6e6e6;
+  --lp-text-secondary: #b0b0b0;
+  --lp-text-muted: #808080;
+  --lp-accent: var(--ds-blue-400);
+  --lp-code-bg: #0f0f0f;
+  --lp-code-text: #d6d6d6;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--lp-bg-header);
+  border-bottom: 1px solid var(--lp-border-light);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--lp-accent);
+}
+
+.badgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ds-green-500, #22c55e);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-green-500, #22c55e) 22%, transparent);
+}
+
+.title {
+  font-size: 12px;
+  color: var(--lp-text-secondary);
+  font-weight: 500;
+}
+
+/* ── Rendered result ─────────────────────────────────────────────── */
+.stage {
+  padding: 20px;
+  background: var(--lp-bg);
+  overflow: auto;
+}
+
+/* Subtle canvas look so demos whose own background is transparent still
+   read as a distinct "rendered output" surface. Overridable per-demo via
+   the `background` prop, which sets an inline style on this element. */
+.stageCanvas {
+  background:
+    linear-gradient(var(--lp-bg-muted), var(--lp-bg-muted)) padding-box,
+    repeating-linear-gradient(
+        45deg,
+        transparent 0 6px,
+        color-mix(in srgb, var(--lp-text-muted) 8%, transparent) 6px 7px
+      )
+      padding-box;
+}
+
+/* The Shadow DOM host (CSS demos). display:block so it fills the stage;
+   the demo's own markup lives inside its shadow root. */
+.shadowHost {
+  display: block;
+}
+
+/* React demo mount point, isolated font so page styles don't bleed in. */
+.reactStage {
+  font-family: var(--lp-font-ui);
+  color: var(--lp-text);
+}
+
+/* ── Source code ─────────────────────────────────────────────────── */
+.codeSection {
+  border-top: 1px solid var(--lp-border-light);
+}
+
+.codeSection + .codeSection {
+  border-top: 1px solid var(--lp-border-light);
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--lp-bg-header);
+  border-bottom: 1px solid var(--lp-border-light);
+}
+
+.lang {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lp-text-muted);
+  font-family: var(--lp-font-mono);
+}
+
+.copyBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  color: var(--lp-text-muted);
+  font-size: 11px;
+  font-family: var(--lp-font-ui);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 5px;
+  transition: color 0.15s, background 0.15s;
+}
+.copyBtn:hover {
+  color: var(--lp-text);
+  background: color-mix(in srgb, var(--lp-text-muted) 14%, transparent);
+}
+.copyBtn:focus-visible {
+  outline: 2px solid var(--lp-accent);
+  outline-offset: 1px;
+}
+
+.code {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  background: var(--lp-code-bg);
+  color: var(--lp-code-text);
+  font-family: var(--lp-font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.code code {
+  font-family: inherit;
+  background: none;
+  padding: 0;
+  border: none;
+  white-space: pre;
+}
+
+/* ── Optional caption under the whole widget ─────────────────────── */
+.note {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--lp-text-secondary);
+  background: var(--lp-bg-muted);
+  border-top: 1px solid var(--lp-border-light);
+}
+.note strong {
+  color: var(--lp-text);
+  font-weight: 600;
+}

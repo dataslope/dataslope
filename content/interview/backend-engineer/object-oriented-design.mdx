@@ -1,0 +1,375 @@
+---
+title: Object-Oriented Design
+description: Backend interview questions on encapsulation, inheritance, polymorphism, composition over inheritance, SOLID, and design patterns, with runnable Python and a graded challenge.
+---
+
+Object-oriented design questions test whether you can structure code that
+stays changeable: clear responsibilities, loose coupling, and the right amount
+of abstraction. Expect to explain the pillars, SOLID, and a pattern or two,
+and to know when a pattern is over-engineering. Includes **runnable** Python
+and one graded **challenge**.
+
+## Q&A
+
+### What are the four pillars of OOP?
+
+**Encapsulation**, bundling data with the methods that operate on it and
+hiding internal state behind a public interface. **Inheritance**, deriving a
+class from another to reuse and specialize behavior. **Polymorphism**, calling
+the same method on different types and getting type-appropriate behavior.
+**Abstraction**, exposing *what* an object does while hiding *how*. Together
+they let you model a domain and change internals without breaking callers.
+
+### What is encapsulation, concretely?
+
+Encapsulation keeps an object's invariants valid by controlling access to its
+state. Instead of exposing a raw attribute, you guard mutation behind methods
+or properties that validate. Below, `BankAccount` hides `_balance` and rejects
+invalid operations, so no caller can push it negative:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class BankAccount:
+    def __init__(self, balance=0):
+        self._balance = balance          # "internal", not to be poked directly
+
+    def withdraw(self, amount):
+        if amount > self._balance:
+            raise ValueError("insufficient funds")
+        self._balance -= amount
+
+    @property
+    def balance(self):                   # read-only view of internal state
+        return self._balance
+
+acct = BankAccount(100)
+acct.withdraw(30)
+print(acct.balance)   # 70`,
+    },
+  ]}
+/>
+
+### Explain polymorphism with an example.
+
+Polymorphism lets you write code against an interface and have each type
+supply its own behavior, no `if isinstance(...)` ladder. Below, `total_area`
+does not know or care which shape it holds; each class implements `area()`,
+and Python dispatches to the right one at call time:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
+
+class Circle:
+    def __init__(self, r):
+        self.r = r
+    def area(self):
+        return math.pi * self.r ** 2
+
+class Square:
+    def __init__(self, s):
+        self.s = s
+    def area(self):
+        return self.s ** 2
+
+def total_area(shapes):
+    return sum(shape.area() for shape in shapes)   # duck typing
+
+print(round(total_area([Circle(1), Square(2)]), 2))   # 7.14`,
+    },
+  ]}
+/>
+
+### Why favor composition over inheritance?
+
+Inheritance couples a subclass tightly to its parent's implementation, a
+change upstream can break subclasses (the "fragile base class" problem), and
+deep hierarchies model "is-a" relationships that often turn out to be "has-a".
+**Composition** builds behavior by holding other objects ("has-a") and
+delegating to them, which is more flexible: you can swap the collaborator at
+runtime and combine behaviors freely. Prefer inheritance only for genuine
+subtype relationships; reach for composition otherwise.
+
+### What is the Liskov Substitution Principle in plain terms?
+
+A subclass must be usable **anywhere its parent is expected**, without
+surprising the caller. If `Rectangle` has `set_width`/`set_height` and you
+subclass `Square` (forcing width == height), code that widens a rectangle and
+expects the height unchanged breaks, so `Square` is *not* a valid subtype of
+`Rectangle` here. LSP says: do not weaken guarantees or strengthen
+preconditions in a subclass.
+
+### Walk through the SOLID principles.
+
+- **S**ingle Responsibility, a class should have one reason to change.
+- **O**pen/Closed, open for extension, closed for modification (add behavior
+  via new code, not by editing existing classes).
+- **L**iskov Substitution, subtypes must be substitutable for their base type.
+- **I**nterface Segregation, prefer many small, focused interfaces over one
+  fat one, so clients depend only on what they use.
+- **D**ependency Inversion, depend on abstractions, not concretions; inject
+  dependencies rather than hardcoding them.
+
+They are guidelines for **low coupling and high cohesion**, not laws.
+
+### What is the Dependency Inversion Principle, with an example?
+
+High-level code should depend on an **abstraction**, and the concrete
+implementation is passed in (dependency injection). This decouples policy from
+detail and makes testing trivial, you inject a fake. Below, `Report` depends
+on any object with a `send` method, not on a specific emailer:
+
+```python
+class Report:
+    def __init__(self, sender):        # depends on an abstraction
+        self.sender = sender
+    def deliver(self, text):
+        self.sender.send(text)
+
+# Production passes a real EmailSender; a test passes a stub with .send().
+```
+
+### What is the Strategy pattern?
+
+Strategy encapsulates interchangeable algorithms behind a common interface and
+lets the caller pick one at runtime, replacing a sprawling `if/elif` on
+"which behavior." The context holds a strategy and delegates to it. Below, the
+shipping cost varies by injected strategy, adding a new one means adding a
+class, not editing existing code (open/closed):
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class FlatRate:
+    def cost(self, weight):
+        return 5.0
+
+class ByWeight:
+    def cost(self, weight):
+        return weight * 2.0
+
+class Shipment:
+    def __init__(self, weight, strategy):
+        self.weight = weight
+        self.strategy = strategy         # inject the algorithm
+    def price(self):
+        return self.strategy.cost(self.weight)
+
+print(Shipment(3, FlatRate()).price())   # 5.0
+print(Shipment(3, ByWeight()).price())   # 6.0`,
+    },
+  ]}
+/>
+
+### What is the Factory pattern, and when is it useful?
+
+A factory centralizes object creation behind a method or function, so callers
+ask for *what* they want, not *how* to build it. It is useful when the concrete
+class depends on runtime input, when construction is complex, or to keep
+`new`/constructor calls out of business logic. It supports the open/closed
+principle: add a new product type by extending the factory, not by editing
+every call site.
+
+```python
+def make_parser(kind):
+    parsers = {"json": JsonParser, "csv": CsvParser}
+    try:
+        return parsers[kind]()      # caller doesn't know the concrete class
+    except KeyError:
+        raise ValueError(f"unknown parser: {kind}")
+```
+
+### What is the Observer pattern?
+
+Observer defines a one-to-many dependency: when a **subject** changes state, it
+notifies all registered **observers** automatically. It decouples the thing
+that changes from the things that react, publishers do not know their
+subscribers' concrete types. It underpins event systems, UI data binding, and
+pub/sub. The cost is indirection: the flow of control becomes harder to trace.
+
+### What is the Singleton pattern, and why is it controversial?
+
+A singleton ensures a class has exactly **one** instance with a global access
+point, used for shared resources like a config or connection pool. It is
+controversial because it introduces **global mutable state**, which hides
+dependencies (any code can reach it), complicates testing (state leaks between
+tests), and can cause issues in concurrent code. Often a plain module-level
+value or explicit dependency injection is cleaner.
+
+### When does a design pattern become over-engineering?
+
+When it adds indirection without a corresponding need. A factory for a class
+that will only ever have one implementation, a strategy interface with a single
+strategy, or an observer for a component with one hardcoded listener, each adds
+abstraction you must read through for no flexibility gained. Patterns solve
+*anticipated* variation; applying them speculatively ("YAGNI", you aren't gonna
+need it) makes simple code harder to follow. Reach for a pattern when the
+duplication or change pressure is real.
+
+### What is the difference between an abstract class and an interface?
+
+An **interface** (in Python, an abstract base class with only abstract methods,
+or a `Protocol`) declares *what* methods a type must provide, no
+implementation. An **abstract class** can also provide **shared
+implementation** and state that subclasses inherit, while still forcing
+subclasses to implement the abstract parts. Use an interface for a pure
+contract; an abstract base class when subclasses share common code.
+
+### What are cohesion and coupling?
+
+**Cohesion** is how focused a class is, high cohesion means its methods and
+data all serve one clear purpose. **Coupling** is how dependent modules are on
+each other, low coupling means a change in one rarely forces changes in
+others. Good OOD maximizes cohesion and minimizes coupling; most SOLID
+principles push in that direction. A "god class" that does everything is the
+low-cohesion, high-coupling anti-pattern.
+
+### What is the "is-a" vs "has-a" distinction?
+
+"Is-a" signals **inheritance** (a `Car` **is a** `Vehicle`); "has-a" signals
+**composition** (a `Car` **has an** `Engine`). Misusing inheritance for a
+"has-a" relationship, say making `Car` extend `Engine`, produces a brittle
+hierarchy and leaks the parent's interface. Ask "is-a or has-a?" before
+choosing inheritance.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Which situation is the clearest reason to prefer **composition** over inheritance?
+
+- Two classes share a few utility methods.
+  > Shared helpers can live in a mixin or module; that alone does not decide inheritance vs composition.
+- [o] You want to swap a collaborator's behavior at runtime and combine behaviors freely.
+  > Composition holds an object and delegates to it, so you can inject or replace the collaborator dynamically, which a fixed inheritance hierarchy cannot.
+- The subclass is a genuine subtype that never violates the parent's contract.
+  > That is exactly the case where inheritance is appropriate, not a reason to avoid it.
+- You need to call the parent's constructor.
+  > Needing the parent's setup is a sign of an is-a relationship, which suits inheritance.`}
+/>
+
+<MultipleChoice
+  markdown={`The **Open/Closed Principle** says software should be open for extension but closed for modification. Which change follows it?
+
+- Editing an existing \`if/elif\` block each time a new payment type is added.
+  > Modifying working code for every new case is exactly what OCP tries to avoid.
+- [o] Adding a new strategy class that implements the existing interface, with no change to the context.
+  > New behavior arrives as new code implementing the established contract; existing, tested classes stay untouched.
+- Adding a field to the base class that every subclass must now set.
+  > Forcing all subclasses to change is a modification that ripples through the hierarchy.
+- Rewriting the base class to special-case the new subtype.
+  > Editing the base to know about a subtype both breaks OCP and inverts the dependency direction.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is the **Singleton** pattern often criticized?
+
+- It uses too much memory by keeping one instance alive.
+  > One instance is minimal memory; that is not the objection.
+- [o] It introduces global mutable state, hiding dependencies and making tests leak state between each other.
+  > Any code can reach a singleton, so dependencies become implicit and its state persists across tests unless carefully reset.
+- It cannot be implemented in most languages.
+  > Singletons are easy to implement almost anywhere; the concern is design, not feasibility.
+- It forces you to use inheritance.
+  > A singleton is about instance count, not about inheritance.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Encapsulated BankAccount"
+  instructions={`Implement a \`BankAccount\` class demonstrating encapsulation.
+
+- The constructor takes an optional starting \`balance\` (default \`0\`).
+- \`deposit(amount)\` increases the balance; a non-positive \`amount\` raises \`ValueError\`.
+- \`withdraw(amount)\` decreases the balance; a non-positive \`amount\` **or** an \`amount\` greater than the current balance raises \`ValueError\`.
+- A read-only \`balance\` property returns the current balance.
+
+Example: after \`a = BankAccount(100)\`, \`a.withdraw(30)\` leaves \`a.balance\` at \`70\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class BankAccount:
+    def __init__(self, balance=0):
+        # store the starting balance privately
+        pass
+
+    def deposit(self, amount):
+        pass
+
+    def withdraw(self, amount):
+        pass
+
+    # add a read-only balance property`,
+      solutionCode: `class BankAccount:
+    def __init__(self, balance=0):
+        self._balance = balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        self._balance += amount
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        if amount > self._balance:
+            raise ValueError("insufficient funds")
+        self._balance -= amount
+
+    @property
+    def balance(self):
+        return self._balance`,
+    },
+  ]}
+  tests={[
+    { id: "start", name: "Starting balance", description: "Defaults to 0, accepts an initial value", code: `assert BankAccount().balance == 0
+assert BankAccount(100).balance == 100` },
+    { id: "deposit", name: "Deposit increases balance", description: "deposit adds to balance", code: `a = BankAccount(100)
+a.deposit(50)
+assert a.balance == 150` },
+    { id: "withdraw", name: "Withdraw decreases balance", description: "withdraw subtracts", code: `a = BankAccount(100)
+a.withdraw(30)
+assert a.balance == 70` },
+    { id: "overdraw", name: "Overdraft is rejected", description: "withdrawing more than balance raises ValueError", code: `a = BankAccount(50)
+raised = False
+try:
+    a.withdraw(80)
+except ValueError:
+    raised = True
+assert raised, "expected ValueError on overdraft"
+assert a.balance == 50, "balance must be unchanged after a rejected withdrawal"` },
+    { id: "positive", name: "Amounts must be positive", description: "non-positive deposit/withdraw raise ValueError", code: `a = BankAccount(50)
+for bad in (0, -5):
+    try:
+        a.deposit(bad)
+        assert False, "expected ValueError"
+    except ValueError:
+        pass
+    try:
+        a.withdraw(bad)
+        assert False, "expected ValueError"
+    except ValueError:
+        pass
+assert a.balance == 50` },
+    { id: "readonly", name: "balance is read-only", description: "assigning to balance raises AttributeError", code: `a = BankAccount(10)
+try:
+    a.balance = 999
+    assert False, "balance should be read-only"
+except AttributeError:
+    pass` },
+  ]}
+/>
+
+## Go deeper
+
+- [The OOP Blueprint in Java](/courses/oop-blueprint-java)
+- [Python Basics](/courses/python-basics)

@@ -28,6 +28,24 @@ From the inside out:
 └──────────────────────────────┘
 ```
 
+The same four layers, rendered for real. The tinted area is padding
+(it shares the box's background), the solid line is the border, and
+the space *between* the two boxes is margin:
+
+<LivePreview
+  title="Content, padding, border, margin"
+  background="#f8fafc"
+  html={`<div class="box">First box, padded and bordered.</div>
+<div class="box">Second box, watch the margin gap above me.</div>`}
+  css={`.box {
+  padding: 18px;                 /* space INSIDE, shares the background */
+  border: 4px solid #6366f1;     /* the line around the padding */
+  margin: 20px;                  /* space OUTSIDE, pushes boxes apart */
+  background: #eef2ff;
+  font-family: system-ui, sans-serif;
+}`}
+/>
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -83,6 +101,36 @@ The fix is universal:
 Now `width` means the **total** width including padding and border. Set
 `width: 200px` and the box is 200px, full stop. Nearly every real
 project puts this rule at the top of its stylesheet.
+
+Both boxes below ask for `width: 220px` and add `24px` of padding. The
+first uses `content-box` (the default) and overflows to 268px; the
+second uses `border-box` and stays exactly 220px. The gridlines are
+`20px` apart so you can measure the difference:
+
+<LivePreview
+  title="content-box vs border-box, same width declared"
+  html={`<div class="ruler">
+  <div class="box content">content-box → 268px wide</div>
+  <div class="box border">border-box → 220px wide</div>
+</div>`}
+  css={`.ruler {
+  background: repeating-linear-gradient(
+    to right, #e2e8f0 0 1px, transparent 1px 20px
+  );
+  padding: 8px 0;
+  font-family: system-ui, sans-serif;
+}
+.box {
+  width: 220px;                 /* both ask for the same width */
+  padding: 24px;
+  border: 2px solid #334155;
+  margin: 8px 0;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.content { box-sizing: content-box; }   /* width + padding + border = 268px */
+.border  { box-sizing: border-box; }    /* total stays 220px */`}
+/>
 
 <CodeBlock
   adapter="web"
@@ -199,5 +247,6 @@ if (card.offsetWidth !== 300) {
   ]}
 />
 
-Boxes sized and spaced. Now the engines that arrange them, starting
-with [Flexbox in depth](/courses/modern-css-layout/flexbox-deep-dive).
+Boxes sized and spaced. Before the layout engines, one more foundation,
+how boxes lay themselves out by default:
+[Display and document flow](/courses/modern-css-layout/display-and-flow).

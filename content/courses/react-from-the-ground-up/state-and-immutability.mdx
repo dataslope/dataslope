@@ -1,0 +1,216 @@
+---
+title: State and Immutability
+description: Updating arrays and objects the React way, by replacing them, not mutating them, with spread, map, and filter.
+---
+
+State often holds an **array** (a todo list, search results) or an
+**object** (a form, a settings panel). React only re-renders when it
+sees that the state *value changed*, and it checks by identity: is this
+a **different** object than last time? So the rule is simple and
+absolute: **never mutate state, replace it.**
+
+## Why mutation doesn't work
+
+`items.push("new")` changes the existing array in place. Its identity is
+unchanged, so React compares "same array === same array", sees no
+difference, and skips the re-render. Your data changed but the screen
+didn't. The fix is to build a **new** value and pass it to the setter.
+
+## Arrays: add, remove, update by copying
+
+Three patterns cover almost everything, all of them produce a new array:
+
+```tsx
+setItems([...items, newItem]);                       // add to the end
+setItems(items.filter((it) => it.id !== id));        // remove by id
+setItems(items.map((it) =>                            // update one item
+  it.id === id ? { ...it, done: true } : it));
+```
+
+Add and remove items in the live list below. "Add" spreads a new array;
+the **×** removes with `filter`, again a new array. The old one is never
+touched:
+
+<ReactPreview
+  code={`function ShoppingList() {
+  const [items, setItems] = useState(["Milk", "Eggs"]);
+  const [draft, setDraft] = useState("");
+
+  const add = () => {
+    if (!draft.trim()) return;
+    setItems((prev) => [...prev, draft.trim()]);       // new array
+    setDraft("");
+  };
+  const remove = (index: number) =>
+    setItems((prev) => prev.filter((_, i) => i !== index)); // new array
+
+  return (
+    <div>
+      <input value={draft} onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && add()} placeholder="Add an item…" />
+      <button onClick={add}>Add</button>
+      <ul>
+        {items.map((it, i) => (
+          <li key={i}>{it} <button onClick={() => remove(i)}>×</button></li>
+        ))}
+      </ul>
+    </div>
+  );
+}`}
+>
+  <ImmutableListDemo />
+</ReactPreview>
+
+<Callout type="info" title="Prefer the updater form for these">
+When the next value is built from the previous one, pass a function:
+`setItems((prev) => [...prev, item])`. React always calls it with the
+latest state, so rapid or batched updates never work from a stale copy.
+</Callout>
+
+## Objects: copy, then override
+
+For objects, spread the old one and override the field you're changing.
+The `[key]: value` computed-key syntax lets one handler update any field:
+
+<ReactPreview
+  code={`function Settings() {
+  const [settings, setSettings] = useState({
+    wifi: true, bluetooth: false, dnd: false,
+  });
+
+  const toggle = (key: keyof typeof settings) =>
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] })); // new object
+
+  return (
+    <div>
+      {Object.keys(settings).map((key) => (
+        <label key={key}>
+          {key}
+          <input type="checkbox"
+            checked={settings[key]}
+            onChange={() => toggle(key)} />
+        </label>
+      ))}
+      <pre>{JSON.stringify(settings)}</pre>
+    </div>
+  );
+}`}
+>
+  <SettingsObjectDemo />
+</ReactPreview>
+
+Each toggle builds a brand-new object with one field flipped. The JSON
+readout proves the state updates, and because it's a *new* object every
+time, React re-renders reliably.
+
+<Callout type="warn" title="Nested updates copy at each level">
+Spread is shallow. To change `user.address.city`, you must copy every
+level down to the change:
+`setUser({ ...user, address: { ...user.address, city } })`. Deeply
+nested state is a smell, keep state flat where you can, or reach for a
+reducer (a later topic) when it gets hairy.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="react"
+  title="Mark a todo done without mutating"
+  instructions={`\`toggle\` should flip a single todo's \`done\` flag by producing a **new** array.
+
+1. In \`toggle\`, call \`setTodos\` with \`todos.map(...)\`.
+2. For the todo whose \`id\` matches, return a **copy** with \`done\` flipped: \`{ ...t, done: !t.done }\`. Return every other todo unchanged.
+
+Clicking a checkbox should toggle only that row.`}
+  files={[
+    {
+      filename: "main.tsx",
+      starterCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+interface Todo { id: number; text: string; done: boolean; }
+
+function App() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Learn map()", done: false },
+    { id: 2, text: "Avoid mutation", done: false },
+  ]);
+
+  function toggle(id: number) {
+    // TODO: setTodos with a NEW array where the matching todo's done is flipped
+  }
+
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {todos.map((t) => (
+        <li key={t.id}>
+          <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
+          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+      solutionCode: `import { useState } from "react";
+import { createRoot } from "react-dom/client";
+
+interface Todo { id: number; text: string; done: boolean; }
+
+function App() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Learn map()", done: false },
+    { id: 2, text: "Avoid mutation", done: false },
+  ]);
+
+  function toggle(id: number) {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  }
+
+  return (
+    <ul style={{ fontFamily: "system-ui", margin: 24 }}>
+      {todos.map((t) => (
+        <li key={t.id}>
+          <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
+          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "toggle_one",
+      name: "Checking a box marks only that todo done",
+      code: `const boxes = document.querySelectorAll("input[type=checkbox]");
+if (boxes.length !== 2) throw new Error("Expected 2 checkboxes.");
+boxes[0].click();
+await new Promise((r) => setTimeout(r, 80));
+const after = document.querySelectorAll("input[type=checkbox]");
+if (!after[0].checked) throw new Error("The first todo should become checked after clicking it.");
+if (after[1].checked) throw new Error("Only the clicked todo should toggle, not the others.");`,
+    },
+    {
+      id: "toggle_back",
+      name: "Clicking again unchecks it",
+      code: `const box = document.querySelectorAll("input[type=checkbox]")[0];
+box.click();
+await new Promise((r) => setTimeout(r, 80));
+if (document.querySelectorAll("input[type=checkbox]")[0].checked) {
+  throw new Error("Clicking a second time should uncheck the todo (it must truly toggle).");
+}`,
+    },
+  ]}
+/>
+
+Immutable updates keep React in sync with your data. Next, the events
+that trigger most of those updates:
+[Handling events](/courses/react-from-the-ground-up/handling-events).

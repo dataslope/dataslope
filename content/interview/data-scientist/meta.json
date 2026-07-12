@@ -1,10 +1,16 @@
 {
+  "root": true,
   "title": "Data Scientist",
   "description": "Interview prep for Data Scientist roles: statistics, machine learning, and experimentation.",
   "pages": [
     "index",
     "statistics",
+    "probability",
     "machine-learning",
-    "experimentation"
+    "deep-learning",
+    "experimentation",
+    "product-sense-and-metrics",
+    "python-and-pandas",
+    "sql"
   ]
 }

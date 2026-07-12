@@ -39,6 +39,23 @@ p            { color: black; }   /* 0 ids, 0 classes, 1 element */
 #intro       { color: green; }   /* 1 id → wins over .note */
 ```
 
+Here are all three rules targeting the same paragraph, rendered live.
+Every rule below sets `color` on the same element, and the browser
+picks the most specific, the ID:
+
+<LivePreview
+  title="One element, three competing rules"
+  background="#ffffff"
+  html={`<p id="intro" class="note">The ID rule wins, so I am green.</p>`}
+  css={`p      { color: black; font-size: 1.4rem; }   /* element  (weakest) */
+.note  { color: blue; }                       /* class    (beats element) */
+#intro { color: green; }                       /* id       (beats class) → wins */`}
+/>
+
+Nothing to press, the result is right there. The paragraph is green
+because `#intro` outranks `.note`, which outranks `p`. In the editable
+version below, delete the `#intro` rule and Run: it turns blue.
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -84,6 +101,26 @@ Two more forces you'll lean on constantly:
   from parent to child automatically. Set `font-family` once on
   `body` and the whole page inherits it. Layout properties (margin,
   padding, border) do *not* inherit.
+
+The `.parent` below sets `color` and `font-family` once; the nested
+elements pick them up for free. But the border set on `.parent` stays
+on the parent alone, layout properties don't inherit:
+
+<LivePreview
+  title="Color and font inherit; borders don't"
+  background="#ffffff"
+  html={`<div class="parent">
+  I am the parent.
+  <p>I am a nested paragraph, and I inherited the color and font.</p>
+  <em>So did I.</em>
+</div>`}
+  css={`.parent {
+  color: rebeccapurple;                 /* inherits down to children */
+  font-family: Georgia, serif;          /* inherits down to children */
+  border: 2px dashed rebeccapurple;     /* stays on .parent only */
+  padding: 12px;
+}`}
+/>
 
 <Callout type="info" title="Keep specificity low on purpose">
 Seasoned CSS leans on **classes** and shallow selectors, and avoids
@@ -160,5 +197,6 @@ if (!hasNote) throw new Error("Keep the .note rule, win by adding specificity, n
   ]}
 />
 
-You can now predict which rule wins. Next, the box that every rule
-paints into: [The box model and sizing](/courses/modern-css-layout/box-model-and-sizing).
+You can now predict which rule wins. Next, the full vocabulary for
+*targeting* elements in the first place:
+[Selectors and combinators](/courses/modern-css-layout/selectors-and-combinators).

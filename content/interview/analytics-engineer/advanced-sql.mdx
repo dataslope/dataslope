@@ -1,0 +1,356 @@
+---
+title: Advanced SQL
+description: Analytics Engineer interview questions on window functions, CTEs, deduplication, date spines, pivoting, and safe division, with answers, concept checks, and runnable SQL challenges.
+---
+
+Analytics Engineer interviews lean hard on SQL that goes past `GROUP BY`:
+window functions, deduplication, date spines, and safe arithmetic. Review the
+Q&A, then solve the challenges.
+
+> **SQL dialect:** the runnable blocks on this page execute in your browser on **DuckDB**, so the SQL targets DuckDB. It is standard SQL except where noted (`QUALIFY`, `generate_series`, native `PIVOT`).
+
+## Q&A
+
+### What is a window function, and how does it differ from `GROUP BY`?
+
+A window function computes a value **across a set of rows related to the current
+row** without collapsing them. `GROUP BY` returns one row per group; a window
+function returns every input row and *adds* a computed column. That lets you
+put a running total, rank, or per-group total next to each detail row in the
+same result set.
+
+### What are the three parts of an `OVER` clause?
+
+`PARTITION BY` splits rows into independent groups, `ORDER BY` sequences rows
+inside each partition, and the **frame** (`ROWS`/`RANGE BETWEEN ...`) bounds
+which rows feed the calculation. Omit `PARTITION BY` and the whole result is one
+partition; omit the frame and ranking functions still work, but running
+aggregates default to the partition-so-far.
+
+### Explain `ROW_NUMBER` vs `RANK` vs `DENSE_RANK`.
+
+All three assign a position within an ordered partition. `ROW_NUMBER` is always
+unique (1, 2, 3, 4 even on ties). `RANK` gives ties the same number then
+**skips** the next (1, 1, 3). `DENSE_RANK` gives ties the same number and
+**does not skip** (1, 1, 2). Use `ROW_NUMBER` to pick exactly one row per key;
+use `RANK`/`DENSE_RANK` for leaderboards.
+
+### How do you deduplicate to the latest record per key?
+
+Number rows within each key by a recency `ORDER BY`, then keep row 1. The
+cleanest form uses `QUALIFY`, which filters on a window function without a
+subquery. The block below keeps only the most recent row per `customer_id`:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE customer_updates AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),
+  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
+  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),
+  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),
+  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com')
+) AS t(customer_id, updated_at, email);`}
+  starterCode={`-- One row per customer: the latest update wins
+SELECT customer_id, updated_at, email
+FROM customer_updates
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY customer_id
+  ORDER BY updated_at DESC
+) = 1
+ORDER BY customer_id;`}
+/>
+
+### What does `QUALIFY` do, and how does it relate to `WHERE` and `HAVING`?
+
+`QUALIFY` filters on the result of a **window function**, the way `WHERE`
+filters raw rows and `HAVING` filters aggregated groups. Logical order is
+`WHERE` → `GROUP BY`/`HAVING` → window functions → `QUALIFY`. Without it you must
+wrap the window function in a subquery or CTE and filter in an outer query.
+
+### What is a CTE, and when do you prefer it over a subquery?
+
+A Common Table Expression (`WITH name AS (...)`) is a named, inline result set
+you reference later in the same statement. Prefer CTEs when logic is reused,
+deeply nested, or benefits from being read top-to-bottom as named steps. A
+scalar or one-off filter is often clearer as a plain subquery. CTEs improve
+readability; they do not guarantee materialization or a performance change.
+
+### What is a recursive CTE, and when do you need one?
+
+A recursive CTE references itself: an **anchor** query seeds the result, and a
+**recursive** query repeatedly `UNION ALL`s rows derived from the previous
+iteration until it returns none. Use it to walk hierarchies (org charts,
+category trees, bill-of-materials) or generate sequences. Below it generates
+integers 1 through 5:
+
+```sql
+WITH RECURSIVE nums(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM nums WHERE n < 5
+)
+SELECT * FROM nums;
+```
+
+### How do you compute a running total, and what does the frame control?
+
+A running total is `SUM(...) OVER (ORDER BY ... ROWS BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW)`. The frame says "all rows from the start of the
+partition through this one." Change the frame to get a moving window, e.g.
+`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW` for a 7-row trailing average.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE daily AS SELECT * FROM (VALUES
+  (DATE '2024-01-01', 10),
+  (DATE '2024-01-02', 20),
+  (DATE '2024-01-03', 5),
+  (DATE '2024-01-04', 15)
+) AS t(day, amt);`}
+  starterCode={`SELECT
+  day,
+  amt,
+  SUM(amt) OVER (
+    ORDER BY day
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total
+FROM daily
+ORDER BY day;`}
+/>
+
+### What is the difference between `ROWS` and `RANGE` frames?
+
+`ROWS` counts **physical rows** (2 preceding means the two rows above).
+`RANGE` counts **logical values** of the `ORDER BY` expression, so ties are
+grouped together and `RANGE BETWEEN INTERVAL '7' DAY PRECEDING ...` bounds by
+value, not row count. `ROWS` is what you usually want; `RANGE` matters when ties
+or value-based windows are involved.
+
+### How do you compute a period-over-period change?
+
+Use `LAG` (previous row) or `LEAD` (next row) to pull the comparison value onto
+the current row, then subtract. Below, month-over-month change is
+`revenue - LAG(revenue) OVER (ORDER BY month)`; the first month is `NULL`
+because there is no prior row:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE monthly AS SELECT * FROM (VALUES
+  (DATE '2024-01-01', 100),
+  (DATE '2024-02-01', 130),
+  (DATE '2024-03-01', 120)
+) AS t(month, revenue);`}
+  starterCode={`SELECT
+  month,
+  revenue,
+  revenue - LAG(revenue) OVER (ORDER BY month) AS mom_change
+FROM monthly
+ORDER BY month;`}
+/>
+
+### How do you select new rows since the last load (incremental filtering)?
+
+Keep a **watermark**, the maximum timestamp or id already loaded, and filter
+the source to rows past it: `WHERE event_at > (SELECT MAX(event_at) FROM
+target)`. This is the core of an incremental model. Use `>=` plus deduplication
+if events can share the boundary timestamp, so you never drop rows that tie the
+watermark.
+
+### What is a date spine, and why generate one?
+
+A date spine is a table with **one row per calendar date** over a range,
+independent of your data. You `LEFT JOIN` metrics onto it so days with no
+activity still appear (as zero) instead of vanishing. Without a spine, a chart
+of daily signups silently skips days that had none, distorting trends and
+moving averages.
+
+### How do you generate a series of dates in DuckDB?
+
+`generate_series(start, stop, INTERVAL 1 DAY)` produces every date in the range;
+cast to `DATE` if you seeded from `DATE` bounds. Below it fills the spine from
+the data's own min and max:
+
+```sql
+WITH bounds AS (SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins)
+SELECT CAST(g AS DATE) AS day
+FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL 1 DAY) AS gs(g);
+```
+
+### How do you pivot rows into columns?
+
+Portably, aggregate with `CASE WHEN` per target column: `SUM(CASE WHEN
+quarter = 'Q1' THEN amt END) AS q1`. DuckDB also has a native `PIVOT`
+statement (`PIVOT sales ON quarter USING SUM(amt) GROUP BY region`). The
+`CASE WHEN` form works everywhere and makes the output columns explicit, which
+matters when downstream consumers expect a fixed schema.
+
+### How do you unpivot columns into rows?
+
+Reverse the pivot: turn wide columns into `(key, value)` pairs. Portably that is
+a `UNION ALL` per column; DuckDB has a native `UNPIVOT wide ON q1, q2 INTO NAME
+quarter VALUE amt`. Unpivoting is common when a source arrives wide (one column
+per month) but your model wants a long, tidy grain.
+
+### How do you avoid a divide-by-zero error?
+
+Wrap the denominator in `NULLIF(denominator, 0)`. When the denominator is 0,
+`NULLIF` returns `NULL`, the division yields `NULL` instead of erroring, and you
+can `COALESCE` that to 0 if a numeric default is wanted. `amount /
+NULLIF(count, 0)` is the safe-division idiom every analytics engineer reaches
+for.
+
+```sql
+SELECT
+  gross_revenue,
+  order_count,
+  gross_revenue / NULLIF(order_count, 0) AS avg_order_value
+FROM daily_summary;
+```
+
+### Why compute ratios from summed components instead of averaging per-row ratios?
+
+Averaging ratios weights every row equally regardless of size, so a $1$-order
+day and a $10{,}000$-order day count the same, which is almost never what you
+want. Sum the numerator and denominator separately, then divide:
+`SUM(revenue) / NULLIF(SUM(orders), 0)`. Ratios are non-additive; you must
+recompute them from additive parts at the grain you report.
+
+### What is the difference between a window function and an aggregate in one query?
+
+An aggregate with `GROUP BY` collapses rows; a window function keeps them. You
+can even mix both: `SUM(amt)` grouped by region gives per-region totals, while
+`SUM(amt) OVER ()` on the same rows gives the grand total on every row. Window
+functions run **after** `GROUP BY`, so you can window over aggregated results.
+
+### How do you find the top-N rows per group?
+
+Rank within each group and filter: `QUALIFY ROW_NUMBER() OVER (PARTITION BY
+group_col ORDER BY metric DESC) <= 3`. Swap `ROW_NUMBER` for `RANK` if you want
+ties to share a slot and possibly return more than N rows. This "top-N per
+group" pattern is one of the most common window-function interview asks.
+
+### When is `COUNT(DISTINCT ...)` a problem, and what do you do about it?
+
+`COUNT(DISTINCT ...)` is **non-additive**, you cannot sum daily distinct counts
+to get a monthly distinct count, and it is expensive at scale because it must
+track every unique value. For large approximate needs, warehouses offer
+`APPROX_COUNT_DISTINCT` (HyperLogLog). When exactness across grains matters,
+recompute from the base grain rather than rolling up.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You need the single most recent row per \`user_id\` from an event log. Which is the most direct?
+
+- \`GROUP BY user_id\` and \`MAX(updated_at)\`, then select the other columns.
+  > \`MAX(updated_at)\` gives the latest timestamp but drops the rest of that row; you'd need another join to recover \`email\` etc.
+- [o] \`QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) = 1\`.
+  > Numbering per user by recency and keeping row 1 returns exactly one complete row per key in a single pass.
+- \`SELECT DISTINCT user_id\`.
+  > \`DISTINCT\` dedupes identical rows; it can't pick the latest record when other columns differ.
+- \`WHERE updated_at = MAX(updated_at)\`.
+  > You can't use a bare aggregate in \`WHERE\`, and a global max wouldn't be per-user anyway.`}
+/>
+
+<MultipleChoice
+  markdown={`Why \`LEFT JOIN\` a metric onto a generated date spine?
+
+- To make the query run faster.
+  > A spine adds a join; it doesn't speed anything up. Its purpose is completeness.
+- [o] So dates with zero activity still appear as rows instead of being missing.
+  > The spine supplies every calendar date; the \`LEFT JOIN\` keeps days with no matching data, which then show as zero.
+- To deduplicate the metric table.
+  > A date spine has nothing to do with deduplication.
+- To convert timestamps to dates automatically.
+  > Casting is separate; the spine's job is filling gaps in the date range.`}
+/>
+
+<MultipleChoice
+  markdown={`\`revenue / order_count\` occasionally errors on days with no orders. Best fix?
+
+- Add \`WHERE order_count > 0\`.
+  > That silently drops zero-order days from the report, changing the result set rather than handling the division.
+- [o] Use \`revenue / NULLIF(order_count, 0)\`.
+  > \`NULLIF\` turns a 0 denominator into \`NULL\`, so the row survives and the ratio is \`NULL\` instead of erroring.
+- Cast both columns to \`FLOAT\`.
+  > Float division by zero still errors or yields infinity; casting doesn't address the zero denominator.
+- Wrap it in \`COALESCE(revenue, 0)\`.
+  > That guards the numerator, not the zero denominator that causes the error.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Deduplicate to the latest record per key"
+  instructions={`Table \`customer_updates\` (\`customer_id\`, \`updated_at\`, \`email\`) has **multiple rows per customer**. Return exactly **one row per** \`customer_id\`: the row with the most recent \`updated_at\`. Keep columns \`customer_id\`, \`updated_at\`, \`email\`. Sort by \`customer_id\`. Hint: number rows per customer by \`updated_at\` descending and keep the first with \`QUALIFY\`.`}
+  initSql={`CREATE TABLE customer_updates AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 10:00:00', 'a@x.com'),
+  (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
+  (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),
+  (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),
+  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com')
+) AS t(customer_id, updated_at, email);`}
+  starterCode={`-- Keep only the newest row per customer_id
+SELECT customer_id, updated_at, email
+FROM customer_updates
+-- QUALIFY ROW_NUMBER() OVER (...) = 1
+ORDER BY customer_id;`}
+  solutionSql={`SELECT customer_id, updated_at, email
+FROM customer_updates
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY customer_id
+  ORDER BY updated_at DESC
+) = 1
+ORDER BY customer_id;`}
+  tests={[
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "cols", name: "Has the required columns", description: "customer_id, updated_at, email", expectedColumnsInclude: ["customer_id", "updated_at", "email"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Daily active users with a date spine"
+  instructions={`Table \`logins\` (\`user_id\`, \`login_date\`) records logins over several days, but some days have **no logins at all**. Produce a **complete daily series**: one row for every calendar day from the earliest to the latest \`login_date\`, with the count of **distinct** active users that day (0 for empty days). Columns: \`day\`, \`active_users\`. Sort by \`day\`. Hint: build a spine with \`generate_series(..., INTERVAL 1 DAY)\` and \`LEFT JOIN\`.`}
+  initSql={`CREATE TABLE logins AS SELECT * FROM (VALUES
+  (101, DATE '2024-05-01'),
+  (102, DATE '2024-05-01'),
+  (101, DATE '2024-05-01'),
+  (103, DATE '2024-05-03'),
+  (101, DATE '2024-05-04')
+) AS t(user_id, login_date);`}
+  starterCode={`-- Build a per-day spine, then LEFT JOIN logins and count distinct users
+WITH bounds AS (
+  SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins
+)
+SELECT
+  -- day, active_users
+FROM bounds
+-- generate_series + LEFT JOIN logins
+ORDER BY day;`}
+  solutionSql={`WITH bounds AS (
+  SELECT MIN(login_date) AS lo, MAX(login_date) AS hi FROM logins
+),
+spine AS (
+  SELECT CAST(g AS DATE) AS day
+  FROM bounds, generate_series(bounds.lo, bounds.hi, INTERVAL 1 DAY) AS gs(g)
+)
+SELECT
+  s.day,
+  COUNT(DISTINCT l.user_id) AS active_users
+FROM spine s
+LEFT JOIN logins l ON l.login_date = s.day
+GROUP BY s.day
+ORDER BY s.day;`}
+  tests={[
+    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 4 },
+    { id: "cols", name: "Has the required columns", description: "day and active_users", expectedColumnsInclude: ["day", "active_users"] },
+  ]}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Intro to SQL with Postgres](/courses/intro-sql-postgres)
+- [Database Design with PostgreSQL](/courses/database-design-postgresql)

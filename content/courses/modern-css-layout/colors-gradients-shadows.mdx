@@ -1,0 +1,338 @@
+---
+title: Colors, Gradients, and Shadows
+description: The ways CSS names a color, builds gradients, and casts shadows to give a flat page depth and warmth.
+---
+
+Color is the fastest way to make a page feel intentional. This lesson
+covers the notations CSS gives you for naming a color, the gradients
+that blend between colors, and the shadows that lift elements off the
+page.
+
+## Naming a color
+
+CSS accepts the same color in several notations. These four all produce
+the **exact same blue**:
+
+```css
+color: royalblue;          /* named    */
+color: #4169e1;            /* hex      */
+color: rgb(65 105 225);    /* rgb()    */
+color: hsl(225 73% 57%);   /* hsl()    */
+```
+
+- **Named** colors (`tomato`, `rebeccapurple`) are handy but fixed.
+- **Hex** is `#rrggbb`, two hex digits each for red, green, blue. The
+  short `#rgb` form doubles each digit, so `#4af` means `#44aaff`.
+- **`rgb()`** takes the channels as numbers, 0 to 255.
+- **`hsl()`** is **hue** (0–360 around the color wheel), **saturation**,
+  and **lightness**. It is the friendliest to tweak by hand: nudge the
+  lightness for a hover state, or spin the hue to re-theme, without
+  guessing at hex digits.
+
+<LivePreview
+  title="One blue, four notations"
+  html={`<div class="row">
+  <div class="sw named">named<br><code>royalblue</code></div>
+  <div class="sw hex">hex<br><code>#4169e1</code></div>
+  <div class="sw rgb">rgb()<br><code>rgb(65 105 225)</code></div>
+  <div class="sw hsl">hsl()<br><code>hsl(225 73% 57%)</code></div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.sw {
+  flex: 1;
+  min-width: 120px;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.sw code { color: rgb(255 255 255 / 0.85); }
+.named { background: royalblue; }
+.hex   { background: #4169e1; }
+.rgb   { background: rgb(65 105 225); }
+.hsl   { background: hsl(225 73% 57%); }`}
+/>
+
+### Alpha: making a color translucent
+
+Add an alpha channel to let the background show through. The modern
+syntax puts the alpha after a slash: `rgb(59 130 246 / 0.5)` or
+`hsl(225 73% 57% / 0.5)` is half-transparent. Hex has a four-digit
+`#rgba` short form and an eight-digit `#rrggbbaa` form too.
+
+Where translucent circles overlap, their colors mix and the shared area
+darkens, that is the alpha at work:
+
+<LivePreview
+  title="Translucent circles overlapping"
+  background="#ffffff"
+  html={`<div class="stage">
+  <span class="dot red"></span>
+  <span class="dot green"></span>
+  <span class="dot blue"></span>
+</div>`}
+  css={`.stage { position: relative; height: 190px; }
+.dot {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+.red   { left: 40px;  top: 20px; background: rgb(239 68 68 / 0.55); }
+.green { left: 105px; top: 20px; background: rgb(34 197 94 / 0.55); }
+.blue  { left: 72px;  top: 70px; background: rgb(59 130 246 / 0.55); }`}
+/>
+
+## Gradients
+
+A gradient is an **image** you build from color stops, so it goes
+wherever an image can, most often `background`.
+
+- **`linear-gradient(135deg, a, b)`** blends along a line. The angle
+  points the line: `0deg` is up, `90deg` is right, `135deg` runs to the
+  bottom-right.
+- Add more stops for a **multi-stop** blend, and pin a stop to a
+  position: `linear-gradient(90deg, green, gold 50%, red)`.
+- **`radial-gradient(...)`** blends outward from a point in rings.
+
+<LivePreview
+  title="Linear, multi-stop, and radial"
+  html={`<div class="grid">
+  <div class="panel linear">linear 135deg</div>
+  <div class="panel multi">multi-stop</div>
+  <div class="panel radial">radial</div>
+</div>`}
+  css={`.grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+}
+.panel {
+  flex: 1;
+  min-width: 130px;
+  height: 120px;
+  border-radius: 12px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+}
+.linear { background: linear-gradient(135deg, #6366f1, #ec4899); }
+.multi  { background: linear-gradient(90deg, #22c55e, #eab308 50%, #ef4444); }
+.radial { background: radial-gradient(circle at 30% 30%, #38bdf8, #1e3a8a); }`}
+/>
+
+## Shadows
+
+`box-shadow` casts a shadow shaped like the element's box. The values,
+in order, are **x-offset**, **y-offset**, **blur**, **spread**, and
+**color**:
+
+```css
+box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+```
+
+- Larger **blur** makes a softer, more diffuse shadow; **spread** grows
+  or shrinks its size.
+- The `inset` keyword draws the shadow **inside** the box, for a pressed
+  or recessed look.
+- Comma-separate several shadows to **layer** them. A stack of faint
+  shadows reads as far more realistic depth than one heavy shadow.
+
+<LivePreview
+  title="Soft, hard, inset, and layered"
+  background="#f8fafc"
+  html={`<div class="row">
+  <div class="card soft">soft</div>
+  <div class="card hard">hard offset</div>
+  <div class="card inset">inset</div>
+  <div class="card layered">layered</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+}
+.card {
+  width: 120px;
+  height: 90px;
+  border-radius: 12px;
+  background: white;
+  color: #334155;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.soft  { box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18); }
+.hard  { box-shadow: 8px 8px 0 #6366f1; }
+.inset { box-shadow: inset 0 4px 12px rgba(15, 23, 42, 0.25); }
+.layered {
+  box-shadow:
+    0 1px 1px rgba(15, 23, 42, 0.12),
+    0 4px 8px rgba(15, 23, 42, 0.12),
+    0 16px 32px rgba(15, 23, 42, 0.12);
+}`}
+/>
+
+### `text-shadow`
+
+Text gets its own shadow property with the same x, y, blur, color
+values, no spread. A subtle offset adds depth; a blurred copy in the
+text color reads as a glow:
+
+<LivePreview
+  title="text-shadow"
+  background="#ffffff"
+  html={`<h2 class="title">Depth in one line</h2>`}
+  css={`.title {
+  font-family: system-ui, sans-serif;
+  font-size: 34px;
+  color: #6d28d9;
+  text-shadow: 2px 3px 0 rgba(109, 40, 217, 0.25);
+}`}
+/>
+
+Mix a color, a gradient, and a shadow in this sandbox and Run:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="card">Tweak me</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  width: 220px;
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  color: white;
+  font-weight: 600;
+  /* try a gradient background */
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  /* try a soft shadow */
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+}
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="HSL makes states easy">
+Because lightness is its own number, a hover color is often just the
+same `hsl()` with the lightness dropped a few points, no new hex to
+pick. That is why design systems lean on HSL for tints and shades.
+</Callout>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Give the card depth"
+  entryFilename="index.html"
+  instructions={`Make the plain \`.card\` feel lifted and warm:
+
+1. Give \`.card\` a soft \`box-shadow\`, for example \`0 12px 28px rgba(15, 23, 42, 0.18)\`.
+2. Set its \`background\` to the HSL color \`hsl(265 70% 96%)\`.
+
+A soft shadow plus a tinted HSL background is the whole recipe for a card that reads as raised.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h2>Trailblazer Boots</h2>
+      <p>Built for long miles.</p>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  width: 260px;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: white;      /* 2. set to hsl(265 70% 96%) */
+  /* 1. add a soft box-shadow */
+}
+
+.card h2 { margin: 0 0 0.25rem; }
+.card p  { margin: 0; color: #475569; }
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.card {
+  width: 260px;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: hsl(265 70% 96%);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+}
+
+.card h2 { margin: 0 0 0.25rem; }
+.card p  { margin: 0; color: #475569; }
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "has_shadow",
+      name: ".card has a box-shadow",
+      code: `const s = getComputedStyle(document.querySelector(".card"));
+if (!s.boxShadow || s.boxShadow === "none") {
+  throw new Error("Give .card a box-shadow. Got none.");
+}`,
+    },
+    {
+      id: "hsl_background",
+      name: ".card background is hsl(265 70% 96%)",
+      code: `const s = getComputedStyle(document.querySelector(".card"));
+const m = s.backgroundColor.match(/\\d+/g);
+if (!m || m.length < 3) {
+  throw new Error("Give .card an HSL background. Got " + s.backgroundColor + ".");
+}
+const want = [244, 238, 252];
+const off = Math.abs(m[0] - want[0]) + Math.abs(m[1] - want[1]) + Math.abs(m[2] - want[2]);
+if (off > 12) {
+  throw new Error("Set .card background to hsl(265 70% 96%). Got " + s.backgroundColor + ".");
+}`,
+    },
+  ]}
+/>
+
+Color and shadow give a page depth. Next, the surfaces those colors sit
+on: [Backgrounds and borders](/courses/modern-css-layout/backgrounds-and-borders).

@@ -1,0 +1,296 @@
+---
+title: Testing & Data Quality
+description: Analytics Engineer interview questions on dbt tests, generic vs singular tests, source freshness, data contracts, CI for analytics, and handling failures, with answers, YAML/SQL examples, and concept checks.
+---
+
+Analytics Engineers are the last line of defense before bad data reaches a
+dashboard, so interviews probe how you assert correctness with dbt tests,
+contracts, freshness, and CI. This page is concept-heavy Q&A with worked
+YAML/SQL, one runnable check, and concept-check MCQs.
+
+> **Context:** dbt tests compile to SQL that runs in your warehouse. The one runnable block below uses **DuckDB** to show what a failing uniqueness test actually surfaces.
+
+## Q&A
+
+### What does it mean that a dbt test "asserts"?
+
+A test encodes an assumption as a query and **fails the run when the assumption
+is violated**; it never modifies data. A generic test compiles to a query that
+should return **zero rows**, any rows returned are the failing records. The
+value is that bad data fails loudly in the pipeline instead of silently
+reaching a dashboard.
+
+### What are dbt's four built-in generic tests?
+
+- `unique`, every value in the column is distinct (no duplicates).
+- `not_null`, no `NULL` values in the column.
+- `accepted_values`, every value is in a declared allowed list.
+- `relationships`, every value has a matching row in a referenced model (referential integrity).
+
+Together, `unique` + `not_null` on a key assert a valid primary key, the most
+common test pairing.
+
+```yaml
+# models/schema.yml
+models:
+  - name: fct_orders
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'delivered', 'cancelled']
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_id
+```
+
+### Generic vs singular tests, what is the difference?
+
+**Generic tests** are parameterized, reusable, and attached to columns in YAML
+(`unique`, `not_null`, or custom ones you define as macros). **Singular tests**
+are standalone `.sql` files that return rows when the assertion fails, used for
+one-off, business-specific logic that does not generalize. Reach for generic
+tests for reusable rules and singular tests for bespoke checks.
+
+```sql
+-- tests/assert_no_negative_amounts.sql (singular: returns rows on failure)
+SELECT order_id, amount
+FROM {{ ref('fct_orders') }}
+WHERE amount < 0
+```
+
+### What does a failing uniqueness test actually surface?
+
+The rows that break the assumption, the duplicated keys. A `unique` test on
+`order_id` compiles to roughly the query below, which returns any id appearing
+more than once. An empty result passes; the returned rows are what you fix:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE fct_orders AS SELECT * FROM (VALUES
+  (1, 100.00),
+  (2,  50.00),
+  (2,  50.00),
+  (3,  75.00)
+) AS t(order_id, amount);`}
+  starterCode={`-- What a dbt 'unique' test on order_id checks: return duplicate keys
+SELECT order_id, COUNT(*) AS n
+FROM fct_orders
+GROUP BY order_id
+HAVING COUNT(*) > 1;`}
+/>
+
+### What is the difference between a source test and a model test?
+
+A **source test** validates raw data as it lands (declared under `sources:`),
+catching upstream problems before transformation. A **model test** validates the
+output of a transformation you built. Testing at the source fails fast and
+pinpoints ingestion issues; testing at the model guards your own logic. Good
+projects do both.
+
+### What is source freshness, and how is it different from a test?
+
+Source freshness checks whether raw data **arrived recently enough**, a
+pre-transformation timeliness check, whereas a test checks the **content** of
+data (nulls, uniqueness, ranges). You declare a `loaded_at_field` and
+`warn_after`/`error_after` thresholds, then run `dbt source freshness`. It warns
+you an upstream pipeline is late before stale data silently flows downstream.
+
+```yaml
+sources:
+  - name: raw
+    tables:
+      - name: orders
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 6, period: hour}
+          error_after: {count: 12, period: hour}
+```
+
+### What is a data contract in dbt?
+
+A contract enforces that a model's output **schema**, column names, data types,
+and constraints, matches a declared spec; if the SQL produces a different shape,
+the run fails **at build time**. It gives downstream consumers a stable
+interface and turns accidental breaking changes into loud failures. Set
+`contract: {enforced: true}` and declare `data_type` per column.
+
+```yaml
+models:
+  - name: fct_orders
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: order_id
+        data_type: bigint
+        constraints:
+          - type: not_null
+      - name: amount_usd
+        data_type: numeric
+```
+
+### What is test severity, and when do you use `warn` vs `error`?
+
+Every test has a `severity`: `error` (default) fails the run and blocks the
+build; `warn` logs a warning but lets the pipeline continue. Use `error` for
+invariants that must hold (primary key uniqueness); use `warn` for
+soft-quality signals you want visibility on without halting production. You can
+also set `error_if`/`warn_if` thresholds (e.g. warn at 1 failure, error at 100).
+
+```yaml
+- name: customer_email
+  tests:
+    - not_null:
+        config:
+          severity: warn
+```
+
+### How do you test the uniqueness of a compound key?
+
+A single-column `unique` test does not cover a key made of several columns. Use
+`dbt_utils.unique_combination_of_columns`, or a singular test that groups by the
+column set and returns rows with a count above 1. This guards grains like "one
+row per (order_id, line_number)."
+
+```yaml
+- name: fct_order_lines
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns: [order_id, line_number]
+```
+
+### What extra tests do `dbt_utils` and `dbt_expectations` add?
+
+They extend the four built-ins with reusable checks: `dbt_utils`'
+`accepted_range`, `expression_is_true`, `not_null_proportion`, and
+`unique_combination_of_columns`; `dbt_expectations` ports Great Expectations
+assertions like value-set membership, row-count bounds, and distributional
+checks. They cover the "is this value in a sane range / does this expression
+hold" gap the built-ins leave.
+
+### What are dbt unit tests, and how do they differ from data tests?
+
+Unit tests (dbt 1.8+) validate a model's **transformation logic** against
+**mocked inputs and expected outputs**, like a software unit test, so they run
+in CI without real data. Data tests validate **actual data** in the warehouse.
+Use unit tests to lock down tricky SQL (a `CASE` expression, a window function)
+and data tests to catch bad values in production.
+
+### What is `store_failures`, and why enable it?
+
+`store_failures: true` writes failing rows to a table instead of discarding
+them, so you can inspect exactly which records broke a test rather than just
+seeing a count. It turns a red check into a debuggable dataset and is invaluable
+for triaging recurring quality issues.
+
+### How does CI for analytics typically work?
+
+On a pull request, CI runs `dbt build --select state:modified+`, building and
+testing only changed models plus their downstream dependents, using **state
+comparison** against the production manifest. This "slim CI" catches breakage on
+the PR without rebuilding every model, keeping feedback fast while blocking
+merges that fail tests.
+
+```bash
+# Slim CI: build + test only what changed and its children
+dbt build --select state:modified+ --state ./prod-artifacts
+```
+
+### How do you respond to a failing test in CI vs in production?
+
+In **CI**, a failing test blocks the merge, fix the model or the test before
+shipping. In **production**, decide by severity: an `error` should halt
+downstream builds and page the owner; a `warn` is triaged asynchronously.
+Inspect stored failures, confirm whether it is a real data issue or a stale
+assumption, and fix the root cause rather than loosening the test to make it
+pass.
+
+### Where should tests live, at staging or in marts?
+
+Both, with different intent. **Staging/source** tests catch upstream and
+ingestion problems early (nulls, unexpected values, freshness). **Mart** tests
+guard business grain and metric correctness (primary-key uniqueness, referential
+integrity, accepted ranges). Concentrating tests only at the end lets a bug
+travel far before it is caught; testing early localizes the failure.
+
+### How do you avoid alert fatigue from noisy tests?
+
+Set severities deliberately, `error` for true invariants, `warn` for soft
+signals, use `error_if`/`warn_if` thresholds so tiny, tolerable violations do
+not page anyone, and delete or fix tests that fail for known, accepted reasons.
+A test suite that cries wolf gets ignored; every red check should be actionable.
+
+### What is the difference between testing and data observability?
+
+Testing asserts **known** rules you write in advance (this column is unique).
+Observability **monitors** metrics, volume, freshness, schema, and distribution,
+to surface **unknown** anomalies you did not think to encode (a table's row
+count suddenly halves). They are complementary: tests catch expected violations;
+observability catches surprises. Tools like Monte Carlo or Elementary add the
+observability layer.
+
+### How do you test that a metric is correct, not just non-null?
+
+Assert its **properties**, not just its type: bound it to a plausible range
+(`accepted_range`), reconcile it against an independent source of truth
+(a singular test comparing your revenue total to the finance system within a
+tolerance), and unit-test the calculation on known inputs. "Not null" proves the
+column exists; range and reconciliation checks prove the number is believable.
+
+### Why prefer fixing data upstream over patching it in a downstream model?
+
+Patching downstream (a `COALESCE` here, a filter there) hides the defect,
+duplicates the fix across every consumer, and lets the bad data poison anything
+that reads the source directly. Fixing at the source, or failing a source test
+so the producer corrects it, resolves the problem once for everyone. Tests exist
+to push fixes upstream, not to normalize working around bad data.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A dbt \`unique\` test on \`order_id\` fails. What has dbt done?
+
+- It removed the duplicate rows so the model is now clean.
+  > dbt tests assert; they never modify data. The duplicates remain until you fix the source.
+- [o] It returned the offending rows and failed the run so the pipeline stops on bad data.
+  > A generic test compiles to a query expected to return zero rows; the duplicate keys it returns are the failure, and the run fails.
+- It added a unique index on \`order_id\`.
+  > Tests don't alter physical storage or add indexes.
+- It converted \`order_id\` to a primary key column.
+  > Tests validate assumptions; they don't change the schema.`}
+/>
+
+<MultipleChoice
+  markdown={`Upstream data sometimes lands hours late, and stale numbers reach dashboards before anyone notices. Which dbt feature addresses this directly?
+
+- A \`not_null\` test on the timestamp column.
+  > That checks the column has values, not whether the data arrived on time.
+- [o] \`dbt source freshness\` with \`warn_after\`/\`error_after\` thresholds.
+  > Freshness measures the lag on a \`loaded_at_field\` and alerts when raw data is too old, before transformation runs.
+- An \`accepted_values\` test.
+  > That constrains which values are allowed, not timeliness.
+- A larger warehouse.
+  > Compute size doesn't detect or prevent late-arriving source data.`}
+/>
+
+<MultipleChoice
+  markdown={`Your key is a combination of \`order_id\` and \`line_number\`. Which test guards that grain?
+
+- A \`unique\` test on \`order_id\` alone.
+  > An order with several lines legitimately repeats \`order_id\`; this test would falsely fail.
+- A \`not_null\` test on both columns.
+  > That only ensures neither is null; two identical (order_id, line_number) pairs still slip through.
+- [o] \`dbt_utils.unique_combination_of_columns\` on \`[order_id, line_number]\`.
+  > This asserts the pair is unique together, which is exactly the compound-key grain.
+- An \`accepted_values\` test on \`line_number\`.
+  > That restricts allowed values, not the uniqueness of the pair.`}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Database Design with PostgreSQL](/courses/database-design-postgresql)

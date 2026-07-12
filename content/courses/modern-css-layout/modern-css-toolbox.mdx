@@ -1,0 +1,317 @@
+---
+title: The Modern CSS Toolbox
+description: A tour of high-leverage modern CSS, aspect-ratio, native nesting, :has(), logical properties, and clamp() for fluid sizing.
+---
+
+CSS has quietly grown a set of features that delete whole categories of
+old workarounds. Here are five worth reaching for today. Each one is
+small on its own; together they change how you write layouts.
+
+## aspect-ratio: size a box proportionally
+
+`aspect-ratio` gives an element a shape. Set the width and the height
+follows the ratio automatically, no padding-hack, no fixed pixel
+height. Perfect for video frames, thumbnails, and map tiles:
+
+<LivePreview
+  title="aspect-ratio derives height from width"
+  background="#f8fafc"
+  html={`<div class="row">
+  <div class="ratio wide">16 / 9</div>
+  <div class="ratio square">1 / 1</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 12px;
+  font-family: system-ui, sans-serif;
+}
+.ratio {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 700;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+.wide { aspect-ratio: 16 / 9; }
+.square { aspect-ratio: 1 / 1; }`}
+/>
+
+Both boxes only declare a ratio. Their width comes from the flex layout,
+and the height is computed to match. Change one column's width and its
+height keeps the shape.
+
+## Native CSS nesting
+
+You can now nest selectors directly in CSS, no preprocessor. Inside a
+rule, `&` stands for the parent selector, so a component's styles live
+together in one block instead of being scattered as flat selectors:
+
+<LivePreview
+  title="Nesting keeps a component's rules in one block"
+  background="#f8fafc"
+  html={`<div class="card">
+  <h3 class="title">Nested styles</h3>
+  <p class="text">My title and link rules live inside my own block.</p>
+  <a class="link" href="#">Learn more</a>
+</div>`}
+  css={`.card {
+  max-width: 320px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-family: system-ui, sans-serif;
+
+  & .title { margin: 0 0 6px; color: #0f172a; }
+  & .text { margin: 0 0 12px; color: #475569; }
+  & .link { color: #6366f1; font-weight: 600; text-decoration: none; }
+  & .link:hover { text-decoration: underline; }
+}`}
+/>
+
+That renders identically to writing `.card .title`, `.card .text`, and
+`.card .link` as separate top-level rules, it is the same cascade, just
+grouped by component. Nesting also shines for state and queries: a
+`&:hover` or a nested `@media` sits right next to the base rule.
+
+## :has(): the parent selector
+
+For years CSS could only style down the tree. `:has()` finally lets an
+element react to what it *contains*. `.card:has(img)` matches a card
+that holds an image; `.field:has(input:invalid)` matches a field wrapping
+an invalid input. It is fully live, no JavaScript.
+
+Toggle the checkboxes below. Each label restyles itself the instant its
+own checkbox is checked, using `.option:has(input:checked)`:
+
+<LivePreview
+  title="A label that restyles when the checkbox inside it is checked"
+  background="#f8fafc"
+  html={`<label class="option">
+  <input type="checkbox" />
+  <span>Click my checkbox on and off</span>
+</label>
+<label class="option">
+  <input type="checkbox" checked />
+  <span>I start checked</span>
+</label>`}
+  css={`.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.option:has(input:checked) {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 600;
+}`}
+/>
+
+<Callout type="info" title=":has() styles upward and sideways">
+This is genuinely new power. Before `:has()`, a parent could never
+depend on its children, and a sibling could not react to an earlier
+sibling. Now `label:has(input:checked)`, `.gallery:has(:hover)`, and
+`h2:has(+ p)` all work. Keep the selectors simple, though, deeply
+chained `:has()` can get expensive on very large pages.
+</Callout>
+
+## Logical properties
+
+Physical properties like `margin-left` assume left-to-right, top-to-bottom
+text. **Logical properties** describe the *flow* instead: `inline` is the
+text-direction axis, `block` is the stacking axis. They flip
+automatically for right-to-left or vertical writing:
+
+- `margin-inline` / `padding-inline`, start and end along the text axis.
+- `margin-block` / `padding-block`, before and after down the page.
+- `inset`, the logical shorthand for `top`/`right`/`bottom`/`left`.
+
+Both boxes below share one rule. The second sets `dir="rtl"`, and the
+`inline-start` accent border jumps to the other side on its own:
+
+<LivePreview
+  title="Logical properties adapt to writing direction"
+  background="#f8fafc"
+  html={`<div class="note">margin-inline: auto centers me; the accent sits at inline-start.</div>
+<div class="note" dir="rtl">In RTL, inline-start flips to the right, no extra CSS.</div>`}
+  css={`.note {
+  max-width: 340px;
+  margin-inline: auto;         /* left + right, so it centers */
+  margin-block: 10px;          /* top + bottom */
+  padding-block: 12px;
+  padding-inline: 16px;
+  border-inline-start: 4px solid #6366f1;  /* start edge follows dir */
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #3730a3;
+  font-family: system-ui, sans-serif;
+}`}
+/>
+
+Reach for logical properties by default. They cost nothing in the common
+case and make internationalization almost free.
+
+## clamp(): one line of fluid sizing
+
+You met `clamp(min, preferred, max)` in the responsive lesson, it is
+still the cleanest way to size type and spacing that grows with the
+screen but stays within limits:
+
+```css
+h1 { font-size: clamp(1.5rem, 5vw, 3rem); }
+section { padding: clamp(1rem, 5vw, 3rem); }
+```
+
+One declaration, no breakpoints. See
+[Responsive design](/courses/modern-css-layout/responsive-design) for the
+full treatment.
+
+Mix nesting and `aspect-ratio` in the sandbox below, try changing the
+thumbnail ratio to `1 / 1`:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <article class="card">
+      <div class="thumb">16 / 9</div>
+      <div class="body">
+        <h3>Toolbox card</h3>
+        <p>Nested rules, plus an aspect-ratio thumbnail.</p>
+      </div>
+    </article>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.card {
+  max-width: 320px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+
+  & .thumb {
+    aspect-ratio: 16 / 9;   /* try 1 / 1 */
+    display: grid;
+    place-items: center;
+    color: white;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+  }
+
+  & .body { padding: 12px 14px; }
+  & .body h3 { margin: 0 0 4px; }
+  & .body p { margin: 0; color: #475569; font-size: 0.9rem; }
+}
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Give the video box a 16/9 aspect-ratio"
+  entryFilename="index.html"
+  instructions={`The \`.video\` box has a width but no height, so it collapses. Give it a shape without hard-coding a height. In \`styles.css\`, add \`aspect-ratio: 16 / 9\` to \`.video\` so its height is derived from its width.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="video">16 : 9 player</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.video {
+  width: 100%;
+  max-width: 480px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0f172a, #334155);
+  border-radius: 12px;
+  /* Add aspect-ratio: 16 / 9 so the height follows the width */
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.video {
+  width: 100%;
+  max-width: 480px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0f172a, #334155);
+  border-radius: 12px;
+  aspect-ratio: 16 / 9;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "aspect_ratio_set",
+      name: ".video declares aspect-ratio: 16 / 9",
+      code: `const box = document.querySelector(".video");
+if (!box) throw new Error("Keep the .video element.");
+const ar = getComputedStyle(box).aspectRatio.replace(/\\s+/g, "");
+if (ar !== "16/9") throw new Error("Set aspect-ratio: 16 / 9 on .video (got: " + ar + ").");`,
+    },
+    {
+      id: "renders_16_9",
+      name: "The box actually renders about 16:9",
+      code: `const box = document.querySelector(".video");
+if (!box) throw new Error("Keep the .video element.");
+// The box lays out (real width, aspect-ratio height) a frame after styles
+// apply; poll until both dimensions have settled.
+let w = box.offsetWidth, h = box.offsetHeight;
+for (let i = 0; i < 20 && (w === 0 || h === 0); i++) {
+  await new Promise((r) => setTimeout(r, 25));
+  w = box.offsetWidth;
+  h = box.offsetHeight;
+}
+if (h === 0) throw new Error("The box has no height. aspect-ratio should give it one from its width.");
+if (Math.abs(w / h - 16 / 9) > 0.2) throw new Error("The rendered box should be roughly 16:9. Got " + w + "x" + h + ". Do not set an explicit height.");`,
+    },
+  ]}
+/>
+
+Five features, five deleted workarounds. You now have a modern layout
+kit, fluid units, flexbox, grid, container queries, and these
+sharpeners. Time to put it all together:
+[Project, responsive landing page](/courses/modern-css-layout/project-responsive-landing-page).

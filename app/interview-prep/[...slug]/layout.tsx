@@ -4,8 +4,9 @@
  *
  * Wraps every role/topic page in Fumadocs's `RootProvider` + `DocsLayout`,
  * with the sidebar tree generated from `content/interview/` via
- * `interviewSource`. The interview roles are NOT Fumadocs roots, so the whole
- * tree is one navigable sidebar.
+ * `interviewSource`. Each role folder's meta.json sets `root: true`, so the
+ * sidebar scopes itself to the single role being read (isolating the tracks
+ * from one another), exactly like each course under `/courses`.
  *
  * This layout lives inside the required `[...slug]` catch-all (not at
  * `app/interview-prep/`) so the `/interview-prep` index, the custom catalog

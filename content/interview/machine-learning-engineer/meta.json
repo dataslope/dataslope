@@ -1,9 +1,15 @@
 {
+  "root": true,
   "title": "Machine Learning Engineer",
   "description": "Interview prep for ML Engineer roles: ML fundamentals and ML system design.",
   "pages": [
     "index",
     "ml-fundamentals",
-    "ml-system-design"
+    "coding",
+    "statistics-and-probability",
+    "deep-learning",
+    "nlp-and-llms",
+    "ml-system-design",
+    "mlops"
   ]
 }

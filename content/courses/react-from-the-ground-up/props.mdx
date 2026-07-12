@@ -45,6 +45,31 @@ The `{ name }: { name: string }` is **destructuring** the props object
 plus a TypeScript type saying "`name` is a string". Pass the wrong
 type and the compiler complains before you ever Run.
 
+Same idea, rendered live: one `Avatar` component, three different
+`name` / `color` props, three different circles:
+
+<ReactPreview
+  code={`function Avatar({ name, color }: { name: string; color: string }) {
+  return (
+    <div className="avatar" style={{ background: color }}>
+      {name.charAt(0)}
+    </div>
+  );
+}
+
+function Row() {
+  return (
+    <>
+      <Avatar name="Grace" color="#4f46e5" />
+      <Avatar name="Linus" color="#0891b2" />
+      <Avatar name="Ada" color="#db2777" />
+    </>
+  );
+}`}
+>
+  <AvatarDemo />
+</ReactPreview>
+
 ## Props can be any type
 
 Strings use quotes; everything else, numbers, booleans, arrays,
@@ -100,6 +125,36 @@ Give a prop a default with normal JavaScript defaults during
 destructuring: `function Badge({ tone = "info" }: { tone?: string })`.
 The `?` marks the prop optional in the type.
 </Callout>
+
+The `Badge` below takes an optional `tone` prop. The first badge passes
+nothing and falls back to the default; the others pass a tone to pick
+their color, all from one small, reusable component:
+
+<ReactPreview
+  code={`function Badge({ children, tone = "indigo" }: {
+  children: React.ReactNode;
+  tone?: "indigo" | "green" | "amber" | "rose";
+}) {
+  const colors = {
+    indigo: "#eef2ff", green: "#dcfce7",
+    amber: "#fef3c7", rose: "#ffe4e6",
+  };
+  return <span style={{ background: colors[tone] }}>{children}</span>;
+}
+
+function Badges() {
+  return (
+    <>
+      <Badge>Default</Badge>
+      <Badge tone="green">Shipped</Badge>
+      <Badge tone="amber">Pending</Badge>
+      <Badge tone="rose">Blocked</Badge>
+    </>
+  );
+}`}
+>
+  <BadgeDemo />
+</ReactPreview>
 
 ## Challenge
 

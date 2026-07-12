@@ -1,0 +1,246 @@
+---
+title: Excel & Spreadsheets
+description: Data Analyst interview questions on pivot tables, VLOOKUP vs INDEX/MATCH vs XLOOKUP, cell references, SUMIF/COUNTIFS, data cleaning, and when to use a spreadsheet instead of SQL, with Q&A and concept checks.
+---
+
+Nearly every Data Analyst interview includes a spreadsheet round, because
+spreadsheets are where quick, ad-hoc analysis still lives. Expect
+questions on **pivot tables**, **lookups**, **references**, and knowing
+**when a spreadsheet is the wrong tool**. This is a pure-concept page:
+Q&A plus concept checks, with formulas shown for reference.
+
+## Q&A
+
+### What is a pivot table and when do you use one?
+
+A pivot table summarizes a flat table by grouping rows into categories
+and aggregating values, the spreadsheet equivalent of SQL `GROUP BY`. You
+drag fields into four areas: **Rows** and **Columns** (the grouping
+dimensions), **Values** (the aggregation, sum/count/average), and
+**Filters**. Reach for one to explore and cross-tab data in seconds
+without writing a formula.
+
+### How would you build a "revenue by region and month" cross-tab?
+
+Put `region` in Rows, `month` in Columns, and `revenue` in Values with
+the aggregation set to **Sum**. The result is a matrix of regions by
+months, exactly what conditional aggregation (`SUM(CASE WHEN ...)`)
+produces in SQL. Change the Values summary to **Average** or **Count** to
+reframe the same data.
+
+### What is VLOOKUP and what are its limitations?
+
+`VLOOKUP` searches for a key in the **first column** of a range and
+returns a value from a column to its right, addressed by number.
+
+```text
+=VLOOKUP(lookup_value, table_array, col_index_num, FALSE)
+```
+
+Its weaknesses: it only looks **left-to-right** (the key must be the
+leftmost column), the hard-coded `col_index_num` **breaks when you insert
+or reorder columns**, and it's slower than alternatives on large sheets.
+The final `FALSE` forces an exact match, forgetting it is a classic bug.
+
+### How does INDEX/MATCH work and why is it more robust than VLOOKUP?
+
+`MATCH` finds the **position** of a value in a row or column; `INDEX`
+returns the value at a given position in a range. Combined, they look up
+in **any direction** and don't depend on a fixed column offset.
+
+```text
+=INDEX(return_range, MATCH(lookup_value, lookup_range, 0))
+```
+
+Because it references ranges by name rather than a column number,
+inserting columns doesn't break it, and it can return values to the
+**left** of the key, which `VLOOKUP` cannot.
+
+### What does XLOOKUP improve over both?
+
+`XLOOKUP` (Excel 365 / 2021+) takes separate lookup and return arrays, so
+it searches any direction, defaults to exact match, and has a built-in
+`if_not_found` argument, no more wrapping in `IFERROR`.
+
+```text
+=XLOOKUP(lookup_value, lookup_array, return_array, "Not found")
+```
+
+It's the modern default: as readable as INDEX/MATCH but in one function.
+
+### What's the difference between exact and approximate match?
+
+Exact match (`FALSE`/`0` in VLOOKUP/MATCH, the default in XLOOKUP)
+returns only a precise hit. Approximate match (`TRUE`/`1`) assumes the
+lookup column is **sorted ascending** and returns the largest value not
+exceeding the key, useful for bucketing into tiers or grade bands, but a
+silent source of wrong answers if the data isn't sorted.
+
+### Explain absolute, relative, and mixed cell references.
+
+A **relative** reference (`A1`) shifts when you copy the formula
+elsewhere. An **absolute** reference (`$A$1`) stays fixed. **Mixed**
+references lock only the row (`A$1`) or only the column (`$A1`). Use
+absolute references for constants, a tax rate in one cell, or a lookup
+table, so they don't drift when you drag the formula down a column.
+
+```text
+=B2 * $F$1     ' B2 moves as you fill down; $F$1 (the rate) stays put
+```
+
+### What do SUMIF and SUMIFS do?
+
+`SUMIF` sums cells that meet one condition; `SUMIFS` sums on **multiple**
+conditions (and is the more general form). They're the formula-based
+alternative to a pivot table when you want a single number in a specific
+cell, say, on a dashboard.
+
+```text
+=SUMIF(region_range, "North", amount_range)
+=SUMIFS(amount_range, region_range, "North", month_range, "2024-03")
+```
+
+### What about COUNTIF and COUNTIFS?
+
+`COUNTIF`/`COUNTIFS` count cells meeting one or several conditions,
+`AVERAGEIF`/`AVERAGEIFS` do the same for means. They're the counting and
+averaging cousins of `SUMIFS` and cover most "how many rows match X and
+Y?" questions.
+
+```text
+=COUNTIFS(status_range, "active", plan_range, "pro")
+```
+
+### What does IFERROR do, and when should you avoid it?
+
+`IFERROR(formula, fallback)` returns the fallback when a formula errors
+(e.g., a lookup miss or divide-by-zero), keeping reports clean.
+
+```text
+=IFERROR(VLOOKUP(id, table, 2, FALSE), "Unknown")
+```
+
+Use it deliberately, not as a blanket wrapper: hiding **all** errors can
+mask real problems like a broken reference or a bad join key. Fix the
+cause first; suppress only the errors you expect.
+
+### How do you clean messy text data in a spreadsheet?
+
+Common tools: `TRIM` (strip extra spaces), `CLEAN` (remove non-printing
+characters), `UPPER`/`LOWER`/`PROPER` (normalize case), and
+**Find & Replace** for bulk fixes. `TEXT TO COLUMNS` splits a column on a
+delimiter, and **Remove Duplicates** dedupes. Standardizing case and
+whitespace first is what makes lookups and pivots match reliably.
+
+```text
+=PROPER(TRIM(A2))      ' "  aVA smith " -> "Ava Smith"
+```
+
+### How do you split and combine text?
+
+Split with **Text to Columns** or `LEFT`/`RIGHT`/`MID` (plus `FIND` to
+locate a delimiter). Combine with `TEXTJOIN` (delimiter-aware, skips
+blanks), `CONCAT`, or the `&` operator.
+
+```text
+=LEFT(A2, FIND("@", A2) - 1)          ' username from an email
+=TEXTJOIN(" ", TRUE, first, last)      ' "Ava" + "Smith" -> "Ava Smith"
+```
+
+### How are dates stored and manipulated in spreadsheets?
+
+Dates are stored as **serial numbers** (days since an epoch), which is
+why you can subtract two dates to get a day count. Functions like `YEAR`,
+`MONTH`, `EOMONTH`, `DATEDIF`, and `TEXT` extract parts or format them. A
+frequent gotcha: values that *look* like dates but are stored as text
+won't sort or compute correctly, convert them with `DATEVALUE`.
+
+### What is conditional formatting and how is it useful for analysis?
+
+Conditional formatting colors cells by rule, highlight values above a
+threshold, add data bars or color scales, or flag duplicates. In analysis
+it's a fast visual scan for outliers and patterns before you commit to a
+chart, not a substitute for one.
+
+### What are named ranges and why use them?
+
+A named range assigns a human-readable label to a cell or range (e.g.,
+`TaxRate` instead of `$F$1`). Formulas become self-documenting and less
+error-prone, and the name stays valid if rows shift. They're especially
+useful for constants and lookup tables referenced across many formulas.
+
+### When should you use a spreadsheet, and when SQL or a database instead?
+
+Spreadsheets win for quick exploration, one-off analysis, small data, and
+sharing a visual artifact with stakeholders. Move to **SQL / a database**
+when data outgrows memory (spreadsheets bog down well before a million
+rows), when the work must be **reproducible and auditable**, when
+multiple people or a schedule need the same query, or when you need
+reliable joins across several tables. Rule of thumb: if you're copying
+the same manual steps every week, it belongs in SQL.
+
+### What are the main risks of doing analysis in a spreadsheet?
+
+Manual steps aren't reproducible or version-controlled; formulas can
+silently break when rows or columns move; there's no enforced schema or
+type safety, so a stray text value corrupts a column; and large files are
+slow and easy to crash. These are exactly the failure modes a database
+plus SQL avoids, which is why production reporting migrates off
+spreadsheets.
+
+### How do you find and remove duplicate rows?
+
+Use **Remove Duplicates** (choose which columns define a duplicate) for a
+one-shot cleanup, or `COUNTIF`/`COUNTIFS` to **flag** duplicates
+non-destructively before deciding what to drop.
+
+```text
+=COUNTIF(email_range, A2) > 1     ' TRUE marks a repeated email
+```
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A colleague's report uses \`=VLOOKUP(id, A:D, 3, FALSE)\`. Someone inserts a new column between B and C, and the results silently go wrong. What's the most robust fix?
+
+- Wrap the whole thing in \`IFERROR\`.
+  > \`IFERROR\` only hides errors; here the formula returns the *wrong* value, not an error, so it stays hidden and wrong.
+- [o] Use \`INDEX/MATCH\` (or \`XLOOKUP\`), which reference ranges by name instead of a fixed column number.
+  > Because they don't hard-code \`col_index_num\`, inserting or moving columns doesn't shift what they return.
+- Change the last argument to \`TRUE\`.
+  > \`TRUE\` switches to approximate match on sorted data, unrelated to the column-shift bug and likely to introduce new errors.
+- Sort the table by \`id\`.
+  > Sorting doesn't fix a hard-coded column offset; the third column is still the wrong one after the insert.`}
+/>
+
+<MultipleChoice
+  markdown={`Cell \`F1\` holds a tax rate. You write \`=B2*F1\` in \`C2\` and fill it down the column. The first row is right; lower rows are wrong. Why?
+
+- Excel can't multiply a column by a single cell.
+  > It can; the issue is how the reference to \`F1\` changes as you fill down.
+- [o] \`F1\` is a relative reference, so filling down shifts it to \`F2\`, \`F3\`, … (empty cells). It should be \`$F$1\`.
+  > Absolute-anchoring the rate with \`$F$1\` keeps every row pointing at the tax rate.
+- \`B2\` should be absolute instead.
+  > \`B2\` *should* move with each row, that part is correct; it's the rate cell that must stay fixed.
+- You need to format the cells as currency.
+  > Formatting changes display, not the computed value; the wrong numbers come from the drifting reference.`}
+/>
+
+<MultipleChoice
+  markdown={`Your weekly revenue report is a 900,000-row spreadsheet that takes 15 manual steps to refresh and keeps crashing. What's the best move?
+
+- Split it across several spreadsheet tabs.
+  > That adds complexity and fragility without fixing the manual, non-reproducible, memory-bound workflow.
+- [o] Move the data and transformations into SQL / a database and schedule the query.
+  > SQL handles the scale, makes the steps reproducible and auditable, and removes the manual refresh, exactly the spreadsheet-to-database threshold.
+- Buy a machine with more RAM.
+  > It might delay crashes but leaves the manual, error-prone, unversioned process intact.
+- Delete older rows to shrink the file.
+  > Discarding data to fit a tool is backwards; the tool should fit the data.`}
+/>
+
+## Go deeper
+
+- [Intro to SQL with Postgres](/courses/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [Data Analysis with Python & Pandas](/courses/data-analysis-python-pandas)

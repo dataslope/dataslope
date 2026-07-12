@@ -52,12 +52,51 @@ createRoot(document.getElementById("root")!).render(<Clock />);
   ]}
 />
 
+The clock below is live and ticking right now. Its effect starts one
+`setInterval` on mount and returns a cleanup that clears it, exactly the
+shape above:
+
+<ReactPreview
+  code={`function Clock() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);   // cleanup on unmount
+  }, []);
+
+  return <time>{now.toLocaleTimeString()}</time>;
+}`}
+>
+  <ClockDemo />
+</ReactPreview>
+
 <Callout type="warn" title="Cleanup prevents leaks">
 If your effect starts something ongoing, an interval, a subscription,
 an event listener, return a function that stops it. React runs that
 cleanup before re-running the effect and when the component unmounts.
 Forget it and you'll stack up duplicate timers and listeners.
 </Callout>
+
+Effects also let you *subscribe* to the browser. This one adds a
+`resize` listener on mount and removes it in cleanup, resize your
+window and the number tracks it live:
+
+<ReactPreview
+  code={`function WindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return <div>{width}px</div>;
+}`}
+>
+  <WindowWidthDemo />
+</ReactPreview>
 
 ## Fetching data on mount
 
@@ -122,6 +161,36 @@ createRoot(document.getElementById("root")!).render(<Feed />);
 Run it: "Loading…" shows first, then the effect resolves and the list
 appears. That "null means loading, array means loaded" pattern covers
 most data-fetching UIs.
+
+The live version below makes the loading state visible: click "Another
+fact" and watch it flip to "Loading…" and back as the effect refetches.
+Changing `index` is what re-runs the effect (it's in the dependency
+array):
+
+<ReactPreview
+  code={`function RandomFact() {
+  const [index, setIndex] = useState(0);
+  const [fact, setFact] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    setFact(null);                       // show "Loading…" while we fetch
+    fetchFact(index).then((f) => { if (active) setFact(f); });
+    return () => { active = false; };    // ignore a stale response
+  }, [index]);                            // re-run whenever index changes
+
+  return (
+    <div>
+      <p>{fact === null ? "Loading…" : "💡 " + fact}</p>
+      <button onClick={() => setIndex((i) => i + 1)} disabled={fact === null}>
+        Another fact
+      </button>
+    </div>
+  );
+}`}
+>
+  <DataFetchDemo />
+</ReactPreview>
 
 ## Challenge
 
@@ -220,6 +289,6 @@ for (const expected of ["Ada", "Grace", "Linus"]) {
   ]}
 />
 
-Effects connect React to the outside world. The last two ideas are
-about keeping code tidy as it grows, starting with
-[Composition and children](/courses/react-from-the-ground-up/composition-and-children).
+Effects connect React to the outside world. Sometimes you need to reach
+that world more directly, to a real DOM node:
+[Refs and the DOM](/courses/react-from-the-ground-up/refs-and-the-dom).

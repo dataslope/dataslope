@@ -1,0 +1,261 @@
+---
+title: Display and Document Flow
+description: How normal flow lays out block and inline boxes, and what the display property changes with block, inline, inline-block, and none.
+---
+
+Before you reach for flexbox or grid, it pays to understand the layout
+you already have for free: **normal flow**. Every element is a box, and
+the `display` property decides how that box behaves in the flow, whether
+it stacks, sits in a line, or steps out entirely.
+
+## Normal flow: block vs inline
+
+By default, boxes come in two flavors. A **block** box (like `<div>`,
+`<p>`, `<h1>`) starts on a new line and fills the full width available,
+so blocks stack vertically. An **inline** box (like `<span>`, `<a>`,
+`<strong>`) sits in the running text and takes only the width of its
+content, so inline boxes flow left to right and wrap like words.
+
+The two `<div>`s below each grab a full line; the three `<span>`s share
+one:
+
+<LivePreview
+  title="Blocks stack and fill width; inline boxes share a line"
+  background="#ffffff"
+  html={`<div class="block">block A (fills the width)</div>
+<div class="block">block B (fills the width)</div>
+<span class="chip">inline</span>
+<span class="chip">inline</span>
+<span class="chip">inline</span>`}
+  css={`.block {
+  background: #dbeafe;
+  border: 1px solid #60a5fa;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-family: system-ui, sans-serif;
+}
+.chip {
+  background: #fce7f3;
+  border: 1px solid #f472b6;
+  padding: 4px 8px;
+  font-family: system-ui, sans-serif;
+}`}
+/>
+
+## The display property
+
+`display` lets you change a box's flow behavior. The four classic
+values:
+
+- `block` — starts a new line, fills the width.
+- `inline` — flows in a line, sizes to content. **Width and height are
+  ignored, and top/bottom padding and margin do not push the surrounding
+  lines apart.**
+- `inline-block` — the best of both: it sits in a line like inline text,
+  but it respects `width`, `height`, and padding like a block.
+- `none` — removes the box from the flow entirely, as if it were never
+  in the document.
+
+### inline vs inline-block
+
+Both spans below ask for `width: 140px` and `padding: 14px`. The plain
+`inline` one ignores the width and lets its vertical padding overlap
+neighbors instead of reserving space. The `inline-block` one honors
+every value:
+
+<LivePreview
+  title="inline ignores width and vertical spacing; inline-block respects both"
+  background="#ffffff"
+  html={`<span class="tag as-inline">inline</span>
+<span class="tag as-inline-block">inline-block</span>`}
+  css={`.tag {
+  width: 140px;
+  padding: 14px;
+  background: #e9d5ff;
+  border: 1px solid #a855f7;
+  font-family: system-ui, sans-serif;
+}
+.as-inline { display: inline; }
+.as-inline-block { display: inline-block; }`}
+/>
+
+### none vs visibility: hidden
+
+`display: none` pulls the element out of the flow, so the space it
+occupied collapses. That is different from `visibility: hidden`, which
+hides the element but **keeps its space reserved**. Watch what happens
+to box 2 in each row:
+
+<LivePreview
+  title="display:none collapses the gap; visibility:hidden keeps it"
+  background="#ffffff"
+  html={`<div class="row">
+  <div class="box">1</div>
+  <div class="box gone">2</div>
+  <div class="box">3</div>
+</div>
+<div class="row">
+  <div class="box">1</div>
+  <div class="box invisible">2</div>
+  <div class="box">3</div>
+</div>`}
+  css={`.row { margin-bottom: 12px; }
+.box {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  margin-right: 8px;
+  background: #14b8a6;
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  line-height: 44px;
+  font-family: system-ui, sans-serif;
+}
+.gone { display: none; }
+.invisible { visibility: hidden; }`}
+/>
+
+In the first row, box 3 slides left to fill the gap. In the second, the
+hidden box still holds its place.
+
+## flex and grid are display values too
+
+The layout engines you will meet next are also `display` values. Setting
+`display: flex` or `display: grid` on a container switches its children
+into a whole new flow model:
+
+```css
+.toolbar { display: flex; }   /* lay children out in a flexible row */
+.gallery { display: grid; }   /* place children on a grid */
+```
+
+Those get full lessons of their own, but it is worth seeing that they
+sit on the same property you have been using all along.
+
+<Callout type="info" title="display: none hides from assistive tech too">
+Because `display: none` removes the box from the document, screen
+readers skip it entirely. That is usually what you want for truly
+inactive content, but if you only mean to hide something visually while
+keeping it announced, reach for other techniques instead of `none`.
+</Callout>
+
+## Play with it
+
+Change the `display` value on `.item` and watch the layout shift.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <span class="item">one</span>
+    <span class="item">two</span>
+    <span class="item">three</span>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.item {
+  /* try: inline, inline-block, block */
+  display: inline;
+  width: 100px;
+  padding: 12px;
+  margin: 4px;
+  background: #fde68a;
+  border: 1px solid #f59e0b;
+}
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make the nav links inline-block with padding that applies"
+  entryFilename="index.html"
+  instructions={`The nav links are plain inline elements, so the \`padding\` you set barely reserves any vertical space. Fix it in \`styles.css\`:
+
+1. Give \`.nav-link\` \`display: inline-block\` so it honors box sizing while staying in a row.
+2. Keep the \`padding: 12px 18px\` so each link becomes a comfortable, tappable target.
+
+When it works, each link should be clearly taller than a bare line of text.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="nav-link" href="#">Home</a>
+      <a class="nav-link" href="#">Docs</a>
+      <a class="nav-link" href="#">Pricing</a>
+    </nav>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.nav-link {
+  /* 1. make it inline-block */
+  padding: 12px 18px;
+  background: #6366f1;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+
+.nav-link {
+  display: inline-block;
+  padding: 12px 18px;
+  background: #6366f1;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_inline_block",
+      name: ".nav-link uses display: inline-block",
+      code: `const s = getComputedStyle(document.querySelector(".nav-link"));
+if (s.display !== "inline-block") {
+  throw new Error("Set display: inline-block on .nav-link, got " + s.display + ".");
+}`,
+    },
+    {
+      id: "padding_applies",
+      name: "The vertical padding actually reserves space",
+      code: `const link = document.querySelector(".nav-link");
+if (link.offsetHeight < 34) {
+  throw new Error("The link is only " + link.offsetHeight + "px tall. With inline-block the 12px top and bottom padding should make it well over 34px.");
+}`,
+    },
+  ]}
+/>
+
+You now command the default flow. Next, learn the layout engine built on
+top of it: [Flexbox deep dive](/courses/modern-css-layout/flexbox-deep-dive).

@@ -72,6 +72,25 @@ Type in the box. The heading updates on every keystroke, and you never
 wrote a single line to update the DOM. That's the whole course in
 miniature: **state changes, UI follows.**
 
+Alongside those editable blocks, most lessons also embed **live
+component previews**: a real, interactive component rendered inline with
+its TSX shown right beneath it, no Run needed. Here's one, click it:
+
+<ReactPreview
+  code={`function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <button onClick={() => setCount(count - 1)}>−</button>
+      <span>{count}</span>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </>
+  );
+}`}
+>
+  <CounterDemo />
+</ReactPreview>
+
 ## What you'll learn
 
 1. **Thinking in React**, the mental model that makes everything else

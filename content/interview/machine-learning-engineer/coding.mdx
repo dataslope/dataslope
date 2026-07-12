@@ -1,0 +1,399 @@
+---
+title: Coding & Algorithms for ML
+description: Machine Learning Engineer coding-round questions on hash maps, heaps, NumPy vectorization, and metrics from scratch, with runnable examples and challenges (accuracy, cosine similarity, top-k).
+---
+
+The ML coding round is a normal data-structures interview pointed at
+ML-adjacent tasks: rank the top-k scores, count labels, compute a metric,
+vectorize a loop. Review the Q&A, take the concept checks, then solve the
+challenges, they run against a test suite in your browser.
+
+## Q&A
+
+### Why does NumPy vectorization beat a Python `for` loop?
+
+A Python loop executes interpreted bytecode per element; a NumPy
+expression dispatches one call into precompiled C that runs over a
+contiguous, typed buffer, so it avoids per-element interpreter overhead
+and uses SIMD and cache locality. The practical rule: push element-wise
+work into array operations (`+`, `*`, `np.dot`, `np.exp`) and reserve
+Python loops for the handful of steps that can't be expressed as array
+math. Expect one to two orders of magnitude speedup on numeric work.
+
+### What is broadcasting, and why is it useful?
+
+Broadcasting lets NumPy operate on arrays of different shapes by virtually
+stretching the smaller one along size-1 dimensions, without copying data.
+It's how you subtract a per-column mean from a matrix (`X - X.mean(0)`) or
+compute all pairwise differences between rows in one expression. It keeps
+code vectorized and memory-efficient.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+X = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+# Standardize each column: (x - mean) / std, all via broadcasting
+Z = (X - X.mean(axis=0)) / X.std(axis=0)
+print(Z.round(3))
+print("col means ~0:", Z.mean(axis=0).round(3))
+`,
+    },
+  ]}
+/>
+
+`X.mean(axis=0)` is a length-2 row that broadcasts across all three rows,
+so the subtraction and division standardize every column in a single
+vectorized pass.
+
+### How do you find the top-k scores efficiently?
+
+Sorting the whole array is $O(n \log n)$; when you only need the k largest
+you can do better. `np.argpartition` runs in $O(n)$ and places the k
+largest indices at the end (unordered), then you sort just those k. For
+plain Python, `heapq.nlargest(k, iterable)` maintains a size-k heap in
+$O(n \log k)$.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+scores = np.array([0.1, 0.9, 0.4, 0.7, 0.2])
+k = 2
+part = np.argpartition(scores, -k)[-k:]        # k largest indices, O(n)
+top = part[np.argsort(scores[part])[::-1]]     # order those k by score
+print("indices:", top, "scores:", scores[top])
+`,
+    },
+  ]}
+/>
+
+`np.argpartition(scores, -k)[-k:]` cheaply isolates the two highest indices
+without a full sort, and the follow-up `argsort` orders just those two.
+
+### When do you reach for a hash map in an ML coding task?
+
+Whenever you need $O(1)$ average counting, grouping, or "have I seen this?"
+membership: tallying class frequencies for a baseline, deduplicating a
+feature set, building a token-to-id vocabulary, or grouping predictions by
+key. `collections.Counter` counts labels in one pass, and a `dict`
+mapping value to index is the core trick that turns many $O(n^2)$
+comparisons into a single $O(n)$ scan.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import Counter
+
+labels = ["cat", "dog", "cat", "bird", "dog", "cat"]
+counts = Counter(labels)
+print(counts.most_common())          # majority-class baseline
+print("majority class:", counts.most_common(1)[0][0])
+`,
+    },
+  ]}
+/>
+
+### How do you compute cosine similarity in NumPy?
+
+Cosine similarity is the dot product of two vectors divided by the product
+of their norms, so it measures angle and ignores magnitude:
+
+$$\cos(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\lVert \mathbf{a} \rVert \, \lVert \mathbf{b} \rVert}$$
+
+For a whole matrix, L2-normalize the rows once, then a single matrix
+multiply gives every pairwise similarity, the backbone of nearest-neighbor
+retrieval over embeddings.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def cosine_sim_matrix(X):
+    norms = np.linalg.norm(X, axis=1, keepdims=True)
+    Xn = X / norms                    # L2-normalize each row
+    return Xn @ Xn.T                  # all pairwise cosine sims
+
+X = np.array([[1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+print(cosine_sim_matrix(X).round(3))
+`,
+    },
+  ]}
+/>
+
+Normalizing the rows to unit length turns the matrix product `Xn @ Xn.T`
+into a full cosine-similarity matrix in one vectorized operation.
+
+### How do you implement mini-batching for training?
+
+Shuffle the row indices once per epoch, then slice fixed-size chunks and
+index the data with them. Shuffling by index (not by copying rows) keeps
+features and labels aligned and avoids materializing shuffled copies. A
+generator yields batches lazily so you never hold more than one batch of
+extra state.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def iterate_minibatches(X, y, batch_size, seed=0):
+    rng = np.random.default_rng(seed)
+    idx = rng.permutation(len(X))               # shuffle once per epoch
+    for start in range(0, len(X), batch_size):
+        batch = idx[start:start + batch_size]
+        yield X[batch], y[batch]
+
+X = np.arange(10).reshape(10, 1)
+y = np.arange(10)
+for xb, yb in iterate_minibatches(X, y, batch_size=4):
+    print("batch labels:", yb.tolist())
+`,
+    },
+  ]}
+/>
+
+Indexing both `X` and `y` with the same shuffled `batch` keeps every
+example paired with its label, and the final short batch (size 2 here) is
+handled naturally by `range`.
+
+### Why subtract the max before exponentiating in softmax?
+
+`np.exp` overflows to `inf` for large inputs (`exp(1000)` is beyond
+float64), which poisons the whole vector with `nan`. Subtracting the row
+maximum before exponentiating shifts the largest value to 0 without
+changing the result (softmax is invariant to a constant shift), keeping
+every exponent in a safe range. This is the standard numerically stable
+softmax.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def softmax(z):
+    z = z - np.max(z)                 # shift for numerical stability
+    e = np.exp(z)
+    return e / e.sum()
+
+print(softmax(np.array([1000.0, 1001.0, 1002.0])).round(4))
+# Without the shift, exp(1002) overflows to inf → nan
+`,
+    },
+  ]}
+/>
+
+### How would you compute accuracy, precision, and recall from scratch?
+
+All three come from comparing predictions to labels element-wise.
+**Accuracy** is `(y_pred == y_true).mean()`. For binary labels,
+**precision** is `TP / (TP + FP)` and **recall** is `TP / (TP + FN)`,
+where each count is a boolean-mask sum: `TP = ((y_pred == 1) & (y_true == 1)).sum()`.
+Vectorizing the masks keeps it $O(n)$ with no Python loop.
+
+### How do you decode class predictions from a probability matrix?
+
+For an `(n_samples, n_classes)` matrix of probabilities, `np.argmax(P, axis=1)`
+returns the predicted class index per row in $O(nk)$. `np.max(P, axis=1)`
+gives the confidence. For top-k accuracy you'd use `np.argsort` (or
+`argpartition`) along `axis=1` and check whether the true label appears
+among the top k indices.
+
+### How do you deduplicate a list while preserving order?
+
+Use a `set` for $O(1)$ membership and a list for order: iterate, skip
+anything already in the set, otherwise append and record it. `dict.fromkeys(items)`
+does the same in one line because dicts preserve insertion order. Both are
+$O(n)$; sorting-based dedup is $O(n \log n)$ and loses the original order.
+
+### What is reservoir sampling and when is it useful?
+
+Reservoir sampling draws a uniform sample of k items from a stream of
+unknown length in a single pass with $O(k)$ memory. Keep the first k
+items; for the i-th item (i > k), replace a random reservoir slot with
+probability $k / i$. It's the go-to when you can't fit the data in memory
+or don't know its size, e.g., sampling log lines or streaming events for a
+training set.
+
+### Why do float32 vs float64 matter for ML data?
+
+`float32` halves memory and bandwidth versus `float64` and is what GPUs
+and most deep-learning frameworks use, so large feature matrices and model
+weights are typically `float32`. The cost is precision: accumulating many
+`float32` values can lose accuracy, so reductions (sums, means over large
+arrays) are sometimes done in `float64`. Interviewers probe whether you
+know the memory/precision trade-off.
+
+### How do you compute pairwise Euclidean distances between rows?
+
+Broadcasting gives all pairwise differences: `X[:, None, :] - X[None, :, :]`
+produces an `(n, n, d)` array, and squaring, summing over the last axis,
+and taking the square root yields the distance matrix. For large n this is
+memory-heavy, so the identity $\lVert a - b \rVert^2 = \lVert a \rVert^2 + \lVert b \rVert^2 - 2 a \cdot b$
+computes the same result from a single matrix multiply plus norm vectors.
+
+### What's the complexity of building a k-NN prediction naively vs with a heap?
+
+Naively you compute all n distances ($O(nd)$) and fully sort them
+($O(n \log n)$) to take the k nearest. A size-k heap avoids the full sort:
+scan the distances keeping only the k smallest, $O(n \log k)$. For
+repeated queries you'd instead build a spatial index (KD-tree, ball tree,
+or an approximate index like HNSW) to amortize the cost.
+
+### How do you shuffle features and labels together correctly?
+
+Never shuffle `X` and `y` independently, that destroys the pairing.
+Generate one permutation of indices and apply it to both:
+`idx = rng.permutation(len(X)); X, y = X[idx], y[idx]`. This guarantees
+each row stays matched with its label, the same discipline the mini-batch
+generator above relies on.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You need the 5 highest-scoring items out of 10 million. Which approach is best?
+
+- Sort all 10 million scores descending, then take the first 5.
+  > A full sort is O(n log n) and wasteful when you only need 5 items.
+- [o] Use \`heapq.nlargest(5, scores)\` or \`np.argpartition\`, which find the top-k without a full sort.
+  > A size-k heap is O(n log k) and argpartition is O(n); both beat a full O(n log n) sort for small k.
+- Loop and track the single max, repeating 5 times.
+  > That's O(5n) passes and awkward to implement; a heap or argpartition does it in one pass.
+- It doesn't matter; all approaches are equally fast.
+  > Complexity differs sharply at 10 million elements; the algorithm you pick determines whether it's fast.`}
+/>
+
+<MultipleChoice
+  markdown={`Why subtract the row maximum before calling \`np.exp\` in a softmax?
+
+- It makes the probabilities sum to something other than 1.
+  > Softmax still sums to 1; subtracting a constant leaves the output unchanged.
+- [o] It prevents \`exp\` from overflowing to \`inf\` on large inputs, softmax is invariant to a constant shift.
+  > Shifting by the max keeps exponents in a safe range and gives identical, well-defined probabilities.
+- It speeds up the exponential function.
+  > The benefit is numerical stability, not speed.
+- It converts the scores to log-probabilities.
+  > It doesn't; you'd apply \`log\` for that. The shift only guards against overflow.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Classification accuracy"
+  instructions={`Implement \`accuracy(y_true, y_pred)\`. Both are equal-length sequences of labels (lists or NumPy arrays). Return the fraction of positions where they match, as a float in \`[0, 1]\`. For two empty inputs, return \`0.0\`.
+
+Example: \`accuracy([1, 0, 1, 1], [1, 0, 0, 1])\` → \`0.75\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def accuracy(y_true, y_pred):
+    # Fraction of matching positions.
+    pass`,
+      solutionCode: `import numpy as np
+
+def accuracy(y_true, y_pred):
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    if y_true.size == 0:
+        return 0.0
+    return float((y_true == y_pred).mean())`,
+    },
+  ]}
+  tests={[
+    { id: "basic", name: "Three of four correct", description: "→ 0.75", code: `assert accuracy([1, 0, 1, 1], [1, 0, 0, 1]) == 0.75` },
+    { id: "perfect", name: "All correct", description: "→ 1.0", code: `assert accuracy([1, 1, 1], [1, 1, 1]) == 1.0` },
+    { id: "none", name: "All wrong", description: "→ 0.0", code: `assert accuracy([0, 0], [1, 1]) == 0.0` },
+    { id: "empty", name: "Empty inputs", description: "→ 0.0", code: `assert accuracy([], []) == 0.0` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Cosine similarity"
+  instructions={`Implement \`cosine_similarity(a, b)\` for two equal-length vectors (lists or NumPy arrays). Return the cosine of the angle between them as a float: their dot product divided by the product of their L2 norms. If either vector is all zeros, return \`0.0\`.
+
+Example: \`cosine_similarity([1, 0], [0, 1])\` → \`0.0\` (orthogonal).`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def cosine_similarity(a, b):
+    # dot(a, b) / (||a|| * ||b||)
+    pass`,
+      solutionCode: `import numpy as np
+
+def cosine_similarity(a, b):
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    denom = np.linalg.norm(a) * np.linalg.norm(b)
+    if denom == 0:
+        return 0.0
+    return float(np.dot(a, b) / denom)`,
+    },
+  ]}
+  tests={[
+    { id: "identical", name: "Identical vectors → 1.0", description: "same direction", code: `assert abs(cosine_similarity([1, 2, 3], [1, 2, 3]) - 1.0) < 1e-9` },
+    { id: "orthogonal", name: "Orthogonal → 0.0", description: "perpendicular", code: `assert abs(cosine_similarity([1, 0], [0, 1])) < 1e-9` },
+    { id: "opposite", name: "Opposite → -1.0", description: "reversed direction", code: `assert abs(cosine_similarity([1, 0], [-1, 0]) + 1.0) < 1e-9` },
+    { id: "scale", name: "Scale invariant", description: "magnitude ignored", code: `assert abs(cosine_similarity([1, 2, 3], [2, 4, 6]) - 1.0) < 1e-9` },
+    { id: "zero", name: "Zero vector → 0.0", description: "avoids divide-by-zero", code: `assert cosine_similarity([0, 0], [1, 1]) == 0.0` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Top-k indices"
+  instructions={`Implement \`top_k_indices(scores, k)\`. Return the indices of the \`k\` largest values in \`scores\`, ordered from highest score to lowest, as a list of ints. If \`k\` is larger than the input, return all indices (still sorted by score). Assume scores are distinct.
+
+Example: \`top_k_indices([1, 5, 3, 9, 2], 2)\` → \`[3, 1]\` (9 is at index 3, 5 at index 1).`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def top_k_indices(scores, k):
+    # Indices of the k largest scores, highest first.
+    pass`,
+      solutionCode: `import numpy as np
+
+def top_k_indices(scores, k):
+    arr = np.asarray(scores, dtype=float)
+    if k <= 0:
+        return []
+    k = min(k, len(arr))
+    order = np.argsort(arr)[::-1]       # all indices, descending by score
+    return [int(i) for i in order[:k]]`,
+    },
+  ]}
+  tests={[
+    { id: "basic", name: "Top 2", description: "→ [3, 1]", code: `assert top_k_indices([1, 5, 3, 9, 2], 2) == [3, 1]` },
+    { id: "single", name: "Top 1", description: "→ [2]", code: `assert top_k_indices([10, 20, 30], 1) == [2]` },
+    { id: "ordered", name: "Ordered by score", description: "→ [1, 3, 2]", code: `assert top_k_indices([0.1, 0.9, 0.4, 0.7], 3) == [1, 3, 2]` },
+    { id: "k_too_big", name: "k exceeds length", description: "returns all indices by score", code: `assert top_k_indices([3, 1], 5) == [0, 1]` },
+  ]}
+/>
+
+## Go deeper
+
+- [Scientific Computing with Python](/courses/scientific-computing-python)
+- [Python Basics](/courses/python-basics)
+- [Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)

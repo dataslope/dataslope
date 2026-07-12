@@ -1,9 +1,14 @@
 {
+  "root": true,
   "title": "Analytics Engineer",
   "description": "Interview prep for Analytics Engineer roles: dimensional modeling and dbt.",
   "pages": [
     "index",
     "dimensional-modeling",
-    "dbt"
+    "dbt",
+    "advanced-sql",
+    "data-warehousing",
+    "testing-and-data-quality",
+    "metrics-and-semantic-layer"
   ]
 }

@@ -1,0 +1,370 @@
+---
+title: Container Queries
+description: Style a component by the width of its own container, so the same card adapts whether it sits in a wide column or a narrow sidebar.
+---
+
+A media query asks about the *viewport*. A **container query** asks about
+the *element a component lives in*. That difference is the whole point:
+a card shouldn't care how wide the window is, it should care how much
+room it was actually given.
+
+## The idea: style by container width
+
+Two steps. First, mark an ancestor as a **query container** with
+`container-type: inline-size` (the browser will now track that element's
+inline width). Then write `@container` rules that respond to it:
+
+```css
+.column {
+  container-type: inline-size;   /* this element is a query container */
+}
+
+@container (min-width: 380px) {
+  .card { display: flex; }        /* applies when the CONTAINER is >= 380px */
+}
+```
+
+`inline-size` means "watch the width" (the inline axis in horizontal
+writing). The `@container` block then styles the container's
+*descendants*, exactly like a media query, but keyed to local space
+instead of the screen.
+
+## One component, two contexts
+
+Here is why this matters. Below is the **same card markup and the same
+CSS**, dropped into two wrapper columns, one `260px` wide, one `460px`
+wide. Each wrapper is a container. The card stacks in the narrow column
+and becomes a row in the wide one, at the same time, on the same page:
+
+<LivePreview
+  title="One card, two container widths, side by side"
+  background="#f8fafc"
+  html={`<div class="cols">
+  <div class="col" style="width: 260px">
+    <article class="card">
+      <div class="thumb">IMG</div>
+      <div class="body">
+        <h3>Narrow (260px)</h3>
+        <p>My container is under 380px, so I stack.</p>
+      </div>
+    </article>
+  </div>
+  <div class="col" style="width: 460px">
+    <article class="card">
+      <div class="thumb">IMG</div>
+      <div class="body">
+        <h3>Wide (460px)</h3>
+        <p>My container passed 380px, so I go horizontal.</p>
+      </div>
+    </article>
+  </div>
+</div>`}
+  css={`.cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  font-family: system-ui, sans-serif;
+}
+.col {
+  flex: 0 0 auto;             /* keep each wrapper's width fixed */
+  container-type: inline-size; /* each wrapper is a query container */
+}
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+.thumb {
+  display: grid;
+  place-items: center;
+  height: 90px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  color: white;
+  font-weight: 700;
+}
+.body { padding: 12px 14px; }
+.body h3 { margin: 0 0 4px; font-size: 1rem; color: #0f172a; }
+.body p { margin: 0; color: #475569; font-size: 0.85rem; }
+
+@container (min-width: 380px) {
+  .card { display: flex; }
+  .thumb { width: 40%; height: auto; }
+  .body { flex: 1; }
+}`}
+/>
+
+With a media query this is impossible: both cards live on the same
+screen, so any viewport rule fires for both. The container query lets a
+single, reusable component respond to *where it was placed*. Build the
+card once, and it does the right thing in a main column, a sidebar, or a
+tight grid cell.
+
+## Naming containers
+
+When containers nest, name them so a query targets the right one.
+`container-name` labels a container, and you query it by name:
+
+```css
+.sidebar { container-type: inline-size; container-name: rail; }
+
+@container rail (min-width: 300px) {
+  .widget { font-size: 1.1rem; }
+}
+```
+
+The shorthand `container: rail / inline-size` sets both at once. Without
+a name, `@container` matches the *nearest* ancestor container, which is
+usually what you want anyway.
+
+## Container query units
+
+Container queries bring their own relative units, sized against the
+query container instead of the viewport:
+
+- **`cqi`** is 1% of the container's inline size (its width, usually).
+- **`cqw`** is 1% of the container's width specifically.
+
+So `font-size: 10cqi` is "one tenth of my container's width." Same rule,
+two containers, two sizes:
+
+<LivePreview
+  title="cqi units scale text to the container, not the window"
+  background="#f8fafc"
+  html={`<div class="wrap">
+  <div class="box" style="width: 220px">
+    <div class="banner"><h2>220px</h2></div>
+  </div>
+  <div class="box" style="width: 420px">
+    <div class="banner"><h2>420px</h2></div>
+  </div>
+</div>`}
+  css={`.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  font-family: system-ui, sans-serif;
+}
+.box { flex: 0 0 auto; container-type: inline-size; }
+.banner {
+  background: #0f172a;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+}
+.banner h2 {
+  margin: 0;
+  font-size: 10cqi;   /* 10% of this container's width */
+}`}
+/>
+
+The `220px` container renders `22px` text; the `420px` one renders
+`42px`, from one declaration. It is `clamp()`'s viewport trick, scoped
+to a component.
+
+<Callout type="info" title="You query the descendants, not the container itself">
+An `@container` rule styles elements *inside* the query container, never
+the container element you set `container-type` on. So wrap your
+component in a container element, then style the component. Setting
+`container-type` also establishes size and layout containment on that
+element, which is why the container needs a definite width to measure.
+</Callout>
+
+Edit the panel width below and watch the card flip between stacked and
+row, no media query, no window resizing:
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <p>Change the panel width in styles.css (try 300px vs 500px).</p>
+    <div class="panel">
+      <article class="card">
+        <div class="thumb">IMG</div>
+        <div class="body">
+          <h3>Reusable card</h3>
+          <p>I adapt to my container, not the window.</p>
+        </div>
+      </article>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.panel {
+  container-type: inline-size;   /* the query container */
+  width: 300px;                  /* try changing to 500px */
+  border: 2px dashed #cbd5e1;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.thumb {
+  display: grid;
+  place-items: center;
+  height: 80px;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+.body { padding: 12px 14px; }
+.body h3 { margin: 0 0 4px; }
+.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+
+@container (min-width: 380px) {
+  .card { display: flex; }
+  .thumb { width: 40%; height: auto; }
+  .body { flex: 1; }
+}
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Make the card a row when its container is at least 400px"
+  entryFilename="index.html"
+  instructions={`The \`.frame\` wrapper holds a stacked card. Turn \`.frame\` into a query container and reflow the card based on its width, in \`styles.css\`:
+
+1. Add \`container-type: inline-size\` to \`.frame\`.
+2. Add an \`@container (min-width: 400px)\` block that sets \`.card\` to \`display: flex\` (also give \`.thumb\` a \`width: 40%\` and \`.body\` \`flex: 1\` so it reads as a row).`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="frame">
+      <article class="card">
+        <div class="thumb">IMG</div>
+        <div class="body">
+          <h3>Product card</h3>
+          <p>Stack me when tight, lay me out as a row when there is room.</p>
+        </div>
+      </article>
+    </div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.frame {
+  width: 100%;
+  max-width: 480px;
+  /* 1. Make this a query container (container-type: inline-size) */
+}
+
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.thumb {
+  display: grid;
+  place-items: center;
+  height: 90px;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+.body { padding: 12px 14px; }
+.body h3 { margin: 0 0 4px; }
+.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+
+/* 2. Add an @container (min-width: 400px) block below */
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+
+.frame {
+  width: 100%;
+  max-width: 480px;
+  container-type: inline-size;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.thumb {
+  display: grid;
+  place-items: center;
+  height: 90px;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+.body { padding: 12px 14px; }
+.body h3 { margin: 0 0 4px; }
+.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+
+@container (min-width: 400px) {
+  .card { display: flex; }
+  .thumb { width: 40%; height: auto; }
+  .body { flex: 1; }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "frame_is_container",
+      name: ".frame is a query container (container-type: inline-size)",
+      code: `const frame = document.querySelector(".frame");
+if (!frame) throw new Error("Keep the .frame wrapper.");
+const ct = getComputedStyle(frame).containerType;
+if (ct !== "inline-size") throw new Error("Set container-type: inline-size on .frame (got: " + ct + ").");`,
+    },
+    {
+      id: "container_query_rule",
+      name: "An @container query flexes the card at a min-width",
+      code: `let ok = false;
+for (const sheet of Array.from(document.styleSheets)) {
+  let rules;
+  try { rules = sheet.cssRules; } catch (e) { continue; }
+  for (const rule of Array.from(rules || [])) {
+    const text = rule.cssText || "";
+    if (/^@container/i.test(text) && /min-width/i.test(text) && /display\\s*:\\s*flex/i.test(text)) {
+      ok = true;
+    }
+  }
+}
+if (!ok) throw new Error("Add @container (min-width: 400px) { .card { display: flex } } (with a min-width condition).");`,
+    },
+  ]}
+/>
+
+One component that reads its own space is the natural partner to design
+tokens you can reuse everywhere. Next:
+[Custom properties](/courses/modern-css-layout/custom-properties).

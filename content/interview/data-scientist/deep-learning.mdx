@@ -1,0 +1,286 @@
+---
+title: Deep Learning
+description: Data Scientist deep-learning interview questions, neurons and layers, activations, backpropagation, gradient descent, regularization, and CNN/RNN/transformer intuition, with math and concept checks.
+---
+
+Deep-learning rounds for a Data Scientist stay at the level of
+*understanding*: what a neuron computes, why non-linearity matters, how
+gradients flow, and when you would reach for a CNN, an RNN, or a
+transformer. You rarely write training code, but you must explain the
+machinery. Illustrative snippets below are PyTorch-style pseudocode (not
+runnable here); the one runnable block uses only NumPy.
+
+## Q&A
+
+### What does a single artificial neuron compute?
+
+A weighted sum of its inputs plus a bias, passed through a non-linear
+activation:
+
+$$a = f\!\left(\sum_i w_i x_i + b\right) = f(\mathbf{w}^\top \mathbf{x} + b)$$
+
+Without the activation $f$, the neuron is just linear regression. Stacking
+neurons into layers and layers into a network is what buys expressive power.
+
+### Why do neural networks need non-linear activation functions?
+
+Because a composition of linear maps is still linear: without a non-linear
+$f$, a 10-layer network collapses to a single linear transformation and
+can't model anything a one-layer linear model can't. Non-linearities let the
+network carve the input space into complex regions, which is what makes deep
+networks universal function approximators.
+
+### Compare the common activation functions.
+
+- **Sigmoid**, $\sigma(z) = \frac{1}{1 + e^{-z}}$, squashes to $(0, 1)$;
+  saturates and kills gradients at the tails.
+- **Tanh**, zero-centered version squashing to $(-1, 1)$; still saturates.
+- **ReLU**, $\max(0, z)$, cheap, non-saturating for positive inputs, and the
+  default for hidden layers; can "die" if inputs stay negative.
+- **Leaky ReLU / GELU**, variants that fix the dying-ReLU problem with a
+  small negative slope or a smooth curve.
+- **Softmax**, turns a vector of logits into a probability distribution for
+  multiclass outputs.
+
+### What is backpropagation, intuitively?
+
+Backpropagation is the **chain rule applied efficiently** across the network.
+A forward pass computes the loss; the backward pass propagates the gradient
+of the loss with respect to each parameter *backward* through the layers,
+reusing each layer's local derivative so nothing is recomputed. It answers
+"how should I nudge each weight to reduce the loss?" for millions of weights
+in one sweep, in time proportional to the forward pass.
+
+### What is gradient descent, and how does the learning rate affect it?
+
+Gradient descent iteratively steps parameters opposite the loss gradient:
+
+$$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
+
+The **learning rate** $\eta$ sets the step size: too large and training
+oscillates or diverges; too small and it crawls or stalls in a plateau.
+Learning-rate schedules (warmup, decay) and adaptive optimizers ease the
+tuning.
+
+### Compare SGD, momentum, RMSProp, and Adam.
+
+- **Batch GD** uses the whole dataset per step, accurate but slow.
+- **SGD (mini-batch)** uses a small batch, noisy but fast and the noise can
+  help escape sharp minima.
+- **Momentum** accumulates a velocity of past gradients to push through
+  ravines and damp oscillation.
+- **RMSProp** scales each parameter's step by a running average of squared
+  gradients.
+- **Adam** combines momentum and RMSProp-style scaling; it is the common
+  default, robust to a wide range of learning rates.
+
+### What causes vanishing and exploding gradients?
+
+In a deep network, backprop multiplies many layer Jacobians together. If
+those factors are consistently below 1, the gradient **shrinks
+exponentially** toward the early layers (vanishing) and they stop learning;
+if consistently above 1, it **blows up** (exploding). Saturating activations
+like sigmoid worsen vanishing. Fixes: ReLU-family activations, careful
+initialization (He/Xavier), residual/skip connections, batch or layer
+normalization, and gradient clipping for the exploding case.
+
+### How does overfitting show up in a neural network, and how do you fight it?
+
+It shows as training loss that keeps falling while validation loss
+plateaus and then rises, the network is memorizing. Countermeasures:
+
+- **More data** (or augmentation).
+- **Dropout**, randomly zeroing a fraction of activations each step so the
+  network can't rely on any single unit.
+- **Weight decay (L2)**, penalizing large weights.
+- **Early stopping** at the validation-loss minimum.
+- **Reducing capacity** (fewer/smaller layers).
+
+### What does dropout do, and why does it help?
+
+During training it randomly sets a fraction $p$ of activations to zero on
+each forward pass, forcing the network to spread representation across units
+rather than co-adapting on a few. It approximates training an ensemble of
+sub-networks. At inference dropout is turned off and activations are scaled
+so expected magnitudes match.
+
+```python
+# PyTorch-style: dropout is active in train() mode, off in eval().
+import torch.nn as nn
+
+block = nn.Sequential(
+    nn.Linear(256, 256),
+    nn.ReLU(),
+    nn.Dropout(p=0.5),   # zeroes half the activations each training step
+)
+```
+
+### What is weight decay, and how does it relate to L2 regularization?
+
+Weight decay shrinks weights toward zero each step; for plain SGD it is
+equivalent to adding an **L2 penalty** $\frac{\lambda}{2}\lVert \theta
+\rVert^2$ to the loss, whose gradient is $\lambda \theta$. Smaller weights
+mean a smoother function that generalizes better. It is one of the most
+reliable regularizers and is a standard optimizer argument.
+
+### What is batch normalization, and why does it help training?
+
+Batch norm normalizes each layer's pre-activations to roughly zero mean and
+unit variance **per mini-batch**, then rescales with learned parameters
+$\gamma$ and $\beta$. It stabilizes and smooths the optimization landscape,
+allows higher learning rates, reduces sensitivity to initialization, and
+adds a mild regularizing noise. At inference it uses running-average
+statistics instead of the batch. Layer norm (normalizing across features per
+example) is preferred in transformers and RNNs.
+
+### At a high level, when do you use a CNN vs. an RNN vs. a transformer?
+
+- **CNN**, grid-structured data with local spatial patterns: images, audio
+  spectrograms. Convolutions share weights and exploit **translation
+  invariance**, learning local features that compose into global ones.
+- **RNN/LSTM/GRU**, sequential data processed step by step with a hidden
+  state carrying context. Good for streaming or strictly ordered signals,
+  but slow (sequential) and prone to forgetting long-range context.
+- **Transformer**, sequences (and increasingly images) where
+  **self-attention** relates every position to every other in parallel.
+  Captures long-range dependencies well and trains efficiently on modern
+  hardware; it is the backbone of modern language and vision models.
+
+### What is self-attention, in one paragraph?
+
+Each token produces a **query**, **key**, and **value**. Attention scores
+every pair via query-key similarity, softmaxes them into weights, and mixes
+the values accordingly, so each position's new representation is a weighted
+blend of the whole sequence:
+
+$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+
+The $\sqrt{d_k}$ scaling keeps the softmax from saturating. Unlike an RNN, it
+has no sequential bottleneck, every position is computed in parallel.
+
+### Which loss functions go with which output layer?
+
+For **classification**, pair a softmax (or sigmoid, for binary) output with
+**cross-entropy** loss, which heavily penalizes confident wrong predictions
+and drives calibrated probabilities. For **regression**, use MSE (or MAE /
+Huber for robustness to outliers). Using MSE on a sigmoid output for
+classification gives near-flat gradients when the unit saturates, so
+learning stalls, cross-entropy is the correct match.
+
+### Why does weight initialization matter?
+
+Start all weights equal and every neuron in a layer computes the same thing
+forever (the symmetry never breaks). Start them too large or too small and
+signals explode or vanish as they propagate. Schemes like **Xavier/Glorot**
+(for tanh) and **He** (for ReLU) set the initial variance to keep activation
+and gradient magnitudes stable across depth.
+
+### Define epoch, batch, and iteration.
+
+An **epoch** is one full pass over the training set. A **batch** is the group
+of examples processed before one weight update. An **iteration** is a single
+update (one batch). So one epoch contains
+$\lceil \text{dataset size} / \text{batch size} \rceil$ iterations.
+
+### The runnable check below: sigmoid and its derivative.
+
+The sigmoid's derivative is $\sigma'(z) = \sigma(z)\,(1 - \sigma(z))$, which
+peaks at $0.25$ (at $z = 0$) and vanishes in the tails, exactly why deep
+sigmoid stacks suffer vanishing gradients. The NumPy block confirms the
+identity numerically against a finite-difference estimate.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+def sigmoid_deriv(z):
+    s = sigmoid(z)
+    return s * (1.0 - s)
+
+z = np.array([-2.0, 0.0, 2.0])
+# Finite-difference check of the analytic derivative.
+eps = 1e-6
+numeric = (sigmoid(z + eps) - sigmoid(z - eps)) / (2 * eps)
+print("analytic:", sigmoid_deriv(z).round(5))
+print("numeric: ", numeric.round(5))
+print("max slope at z=0:", sigmoid_deriv(np.array([0.0]))[0])
+`,
+    },
+  ]}
+/>
+
+For contrast, here is the same forward idea sketched in PyTorch-style code
+(not runnable in this sandbox):
+
+```python
+import torch
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Dropout(0.2),
+    nn.Linear(128, 10),          # logits; softmax folded into the loss
+)
+loss_fn = nn.CrossEntropyLoss()  # applies log-softmax internally
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+
+# One training step:
+logits = model(x_batch)
+loss = loss_fn(logits, y_batch)
+optimizer.zero_grad()
+loss.backward()                  # backprop: chain rule through the graph
+optimizer.step()                 # gradient-descent update
+```
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Why can't you build a deeper, more powerful model by stacking linear layers **without** activation functions?
+
+- Because it would train too slowly.
+  > Speed is not the issue; the model's *expressiveness* is fundamentally limited.
+- [o] A composition of linear maps is itself linear, so the whole stack collapses to a single linear layer.
+  > Without a non-linearity between them, N linear layers equal one linear layer and can only model linear relationships.
+- Because gradients would always explode.
+  > Gradient issues are separate; the core problem is that no non-linearity means no added expressive power.
+- It would work fine and is common practice.
+  > It is not, precisely because the network would have no more capacity than linear regression.`}
+/>
+
+<MultipleChoice
+  markdown={`Sigmoid activations in a deep network contribute to which classic training problem?
+
+- Exploding gradients, because sigmoid outputs are unbounded.
+  > Sigmoid outputs are bounded in (0, 1); it is associated with the opposite problem.
+- [o] Vanishing gradients, because the sigmoid saturates and its derivative shrinks toward zero in the tails.
+  > The sigmoid derivative peaks at 0.25 and approaches 0 at the tails, so gradients shrink multiplicatively through deep stacks.
+- Overfitting, because sigmoids memorize the training set.
+  > Overfitting is about capacity and regularization, not the activation's saturation behavior.
+- Nothing; sigmoid is the preferred hidden activation for deep nets.
+  > ReLU-family activations are preferred for hidden layers precisely to avoid sigmoid's vanishing gradients.`}
+/>
+
+<MultipleChoice
+  markdown={`You are choosing an architecture to model long-range dependencies in text and want efficient parallel training. Which fits best?
+
+- A plain RNN, because it processes sequences.
+  > RNNs are sequential (hard to parallelize) and struggle to retain long-range context.
+- A CNN, because convolutions are fast.
+  > CNNs excel at local grid patterns; their receptive field for long-range text dependencies is limited without many layers.
+- [o] A transformer, because self-attention relates all positions in parallel and captures long-range dependencies.
+  > Self-attention computes pairwise interactions across the whole sequence at once, ideal for long-range context and parallel hardware.
+- Logistic regression, because it is simplest.
+  > A linear model cannot capture the sequential, contextual structure of language at all.`}
+/>
+
+## Go deeper
+
+- [Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)
+- [Natural Language Processing with Python](/courses/natural-language-processing-python)

@@ -1,0 +1,288 @@
+---
+title: Transforms
+description: 2D transforms with translate, scale, rotate, and skew, plus transform-origin, combining them, and a live hover interaction.
+---
+
+The `transform` property lets you move, resize, rotate, and slant an
+element visually, without touching the document flow. A transformed
+element paints in its new position, but its neighbors act as if it never
+moved. That makes transforms both flexible and fast: the browser can
+hand them to the GPU, so they stay smooth even during animation.
+
+## The 2D transform functions
+
+Four functions cover most day-to-day needs:
+
+```css
+transform: translate(20px, 8px);  /* move right 20, down 8 */
+transform: translateX(20px);      /* just the X axis */
+transform: scale(1.25);           /* grow to 125% */
+transform: rotate(15deg);         /* tilt clockwise */
+transform: skew(-12deg);          /* slant */
+```
+
+Each box below carries a different transform. Notice the spacing: even
+the scaled box overlaps its footprint without shoving its siblings,
+because transforms never disturb layout:
+
+<LivePreview
+  title="translate, scale, rotate, skew — layout stays put"
+  background="#ffffff"
+  html={`<div class="row">
+  <div class="box t">translate</div>
+  <div class="box s">scale</div>
+  <div class="box r">rotate</div>
+  <div class="box k">skew</div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 28px;
+  padding: 24px 12px;
+  font-family: system-ui, sans-serif;
+}
+.box {
+  width: 72px;
+  height: 72px;
+  background: #6366f1;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+}
+.t { transform: translateY(-14px); }
+.s { transform: scale(1.3); }
+.r { transform: rotate(18deg); }
+.k { transform: skew(-14deg); }`}
+/>
+
+## Combining transforms and transform-origin
+
+You can list several functions in one `transform`, separated by spaces.
+**Order matters** — the browser applies them right to left, so
+`rotate(45deg) translateX(40px)` rotates first and then moves along the
+already-tilted axis, which is not the same as translating and then
+rotating.
+
+By default every transform pivots around the element's center. The
+`transform-origin` property moves that pivot. The three squares below
+all rotate `40deg`; only their origin differs. The dashed outline marks
+where each box sat before rotating:
+
+<LivePreview
+  title="Same rotation, three different origins"
+  background="#ffffff"
+  html={`<div class="row">
+  <div class="cell"><div class="box o1">center</div></div>
+  <div class="cell"><div class="box o2">top left</div></div>
+  <div class="cell"><div class="box o3">bot right</div></div>
+</div>`}
+  css={`.row {
+  display: flex;
+  gap: 48px;
+  padding: 40px 24px;
+  font-family: system-ui, sans-serif;
+}
+.cell {
+  width: 76px;
+  height: 76px;
+  border: 2px dashed #cbd5e1;
+}
+.box {
+  width: 76px;
+  height: 76px;
+  background: #ec4899;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.o1 { transform: rotate(40deg); }
+.o2 { transform: rotate(40deg); transform-origin: top left; }
+.o3 { transform: rotate(40deg); transform-origin: bottom right; }`}
+/>
+
+## A hover interaction
+
+Transforms shine on hover, because moving a card with `translate` and
+`scale` never nudges the layout around it. Pair the transform with a
+`transition` and the change eases instead of snapping. Hover the card
+below (it's live) to watch it lift and grow:
+
+<LivePreview
+  title="Hover to lift and scale — combined transform + transition"
+  background="#ffffff"
+  html={`<div class="card">
+  <strong>Pro plan</strong>
+  <span>Hover me</span>
+</div>`}
+  css={`.card {
+  width: 200px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: grid;
+  gap: 6px;
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card span { color: #64748b; font-size: 14px; }
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 18px 34px rgba(0,0,0,0.16);
+}`}
+/>
+
+The `transition` here just smooths the transform; animating transforms
+in depth (timing curves, keyframes, reduced motion) is the subject of
+the transitions lesson.
+
+<Callout type="info" title="Why transforms feel smooth">
+Changing `top` or `margin` forces the browser to recompute layout for
+the page. A `transform` does not — it only repaints the one element,
+and the compositor can offload it to the GPU. That is why transform and
+opacity are the two properties to lean on for silky hover and animation
+effects.
+</Callout>
+
+Reaching into the third dimension is a small step further: `rotateX`,
+`rotateY`, `translateZ`, and a `perspective` on the parent turn flat
+boxes into cards you can flip. It's the same idea with a depth axis
+added, and worth exploring once the 2D functions feel natural.
+
+## Play with it
+
+Stack your own transforms on `.thing` and tweak `transform-origin`.
+
+<CodeBlock
+  adapter="web"
+  entryFilename="index.html"
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="thing">transform me</div>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.thing {
+  width: 120px;
+  height: 120px;
+  background: #14b8a6;
+  color: white;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  /* try combining: rotate, scale, translate */
+  transform: rotate(10deg) scale(1.1);
+  transform-origin: center;
+}
+`,
+    },
+  ]}
+/>
+
+## Challenge
+
+<ChallengeCard
+  adapter="web"
+  title="Tilt and enlarge the badge"
+  entryFilename="index.html"
+  instructions={`Give the sale badge a jaunty transform in \`styles.css\`:
+
+1. Rotate \`.badge\` by \`15deg\`.
+2. Scale it up to \`1.2\`.
+
+Put both in a single \`transform\` declaration, e.g. \`transform: rotate(15deg) scale(1.2)\`. The badge should look tilted and slightly larger without pushing the heading around it.`}
+  files={[
+    {
+      filename: "index.html",
+      starterCode: `<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Summer sale <span class="badge">-20%</span></h1>
+  </body>
+</html>
+`,
+    },
+    {
+      filename: "styles.css",
+      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f97316;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 999px;
+  /* add your transform here */
+}
+`,
+      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f97316;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 999px;
+  transform: rotate(15deg) scale(1.2);
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "has_transform",
+      name: ".badge is actually transformed",
+      code: `const badge = document.querySelector(".badge");
+// The transform resolves a frame after the stylesheet applies; poll briefly.
+let s = getComputedStyle(badge);
+for (let i = 0; i < 12 && (!s.transform || s.transform === "none"); i++) {
+  await new Promise((r) => setTimeout(r, 25));
+  s = getComputedStyle(badge);
+}
+if (!s.transform || s.transform === "none") {
+  throw new Error("Add a transform to .badge — its computed transform is still 'none'.");
+}`,
+    },
+    {
+      id: "is_matrix",
+      name: "The transform resolves to a matrix",
+      code: `const badge = document.querySelector(".badge");
+let s = getComputedStyle(badge);
+for (let i = 0; i < 12 && s.transform.indexOf("matrix") === -1; i++) {
+  await new Promise((r) => setTimeout(r, 25));
+  s = getComputedStyle(badge);
+}
+if (s.transform.indexOf("matrix") === -1) {
+  throw new Error("A rotate + scale should serialize to a matrix(...) value. Got '" + s.transform + "'.");
+}`,
+    },
+  ]}
+/>
+
+Transforms give you the raw motion. To make it move over time, ease, and
+loop: [Transitions and animations](/courses/modern-css-layout/transitions-and-animations).

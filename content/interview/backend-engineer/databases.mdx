@@ -1,0 +1,306 @@
+---
+title: Databases
+description: Backend interview questions on SQL vs NoSQL, indexing, query plans, ACID and isolation levels, normalization, joins, and deadlocks, with runnable SQL and graded challenges.
+---
+
+Backend roles expect more than writing a `SELECT`, you should reason about
+indexes, transactions, isolation, and why a query is slow. This page is a
+question bank with **runnable SQL** (DuckDB in your browser) and graded
+**challenges**.
+
+> **SQL dialect:** the runnable blocks execute on **DuckDB**. The syntax here
+> is standard SQL; most of it runs unchanged on Postgres or MySQL.
+
+## Q&A
+
+### SQL vs NoSQL, when do you pick each?
+
+Pick a **relational (SQL)** database when data is structured, relationships
+matter, and you need joins, multi-row **transactions**, and strong
+consistency, the safe default for most applications. Pick **NoSQL** when you
+need to scale writes horizontally, have a flexible or evolving schema
+(document stores), or a simple, known access pattern at massive volume
+(key-value, wide-column), accepting weaker consistency and limited joins.
+
+### What is a database index and how does it speed up queries?
+
+An index is an auxiliary data structure that maps column values to the rows
+containing them, so the engine can find matches without scanning the whole
+table. The common type is a **B-tree**, a balanced, sorted tree giving
+$O(\log n)$ lookups and efficient **range scans** (`WHERE age BETWEEN ...`).
+Without an index, a filter or join on a column requires a full table scan,
+$O(n)$.
+
+### When does an index help, and when does it hurt?
+
+An index helps **selective** reads: equality lookups, range scans, joins, and
+`ORDER BY` on the indexed column. It hurts **writes**, every `INSERT`,
+`UPDATE`, and `DELETE` must maintain each index, and it consumes storage. It
+also does nothing for **low-selectivity** filters (a boolean column that is
+half `true`), where a scan is cheaper than jumping through the index. Rule of
+thumb: index columns you filter and join on, not every column.
+
+### What is a composite index and why does column order matter?
+
+A composite index covers multiple columns in a defined order, say
+`(last_name, first_name)`. It serves queries that filter on a **left prefix**:
+`last_name` alone, or `last_name` **and** `first_name`, but not `first_name`
+alone. This is the **leftmost-prefix rule**. Order the columns by how you
+query them, most-selective and always-present columns first.
+
+### How do you read a query plan?
+
+`EXPLAIN` shows how the engine will execute a query, the join order, and
+whether it uses an **index scan** (good, selective) or a **sequential/full
+scan** (reads everything). Watch for scans on large tables, expensive nested
+loops on unindexed joins, and row-count **estimates** that differ wildly from
+reality (stale statistics). The fix is usually adding an index, rewriting the
+predicate to be sargable, or updating table statistics.
+
+### What does ACID stand for?
+
+The four guarantees of a reliable transaction: **Atomicity** (all steps
+commit or none do), **Consistency** (a transaction moves the DB from one
+valid state to another, respecting constraints), **Isolation** (concurrent
+transactions do not corrupt each other), and **Durability** (once committed,
+data survives a crash). ACID is the property that lets you move money between
+two accounts without ever losing or duplicating it.
+
+### What are the SQL isolation levels?
+
+From weakest to strongest: **Read Uncommitted**, **Read Committed** (the
+common default), **Repeatable Read**, and **Serializable**. Each stronger
+level prevents more anomalies at the cost of concurrency. Serializable behaves
+as if transactions ran one at a time; Read Committed only guarantees you never
+read uncommitted ("dirty") data.
+
+### What anomalies do isolation levels prevent?
+
+Three classic read anomalies, each blocked at a higher level:
+
+- **Dirty read**, reading another transaction's **uncommitted** change (that
+  may roll back). Prevented by Read Committed and above.
+- **Non-repeatable read**, re-reading the same **row** gives a different value
+  because another transaction committed an update between reads. Prevented by
+  Repeatable Read.
+- **Phantom read**, re-running the same **query** returns new rows because
+  another transaction inserted matching rows. Prevented by Serializable.
+
+### What is a transaction, and how do you use one?
+
+A transaction groups statements so they succeed or fail as a unit. You
+`BEGIN`, run the statements, then `COMMIT` to persist or `ROLLBACK` to undo.
+The canonical example is a transfer: debiting one account and crediting
+another must both happen or neither.
+
+```sql
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;   -- atomicity: if the second UPDATE fails, ROLLBACK undoes the first
+```
+
+### Normalization vs denormalization, what is the trade-off?
+
+**Normalization** splits data into related tables so each fact is stored
+once (third normal form), which prevents update anomalies and is ideal for
+write-heavy OLTP systems. **Denormalization** deliberately repeats data to
+avoid joins, trading storage and update complexity for **read speed**, common
+in analytics and read-heavy paths. Normalize first; denormalize only where
+profiling proves joins are the bottleneck.
+
+### Walk through the join types.
+
+All joins combine rows from two tables on a condition; they differ in which
+**unmatched** rows survive. `INNER` keeps only matched rows; `LEFT` keeps all
+left rows (NULLs where the right has no match); `RIGHT` keeps all right rows;
+`FULL` keeps both sides' unmatched rows. The block below builds two tiny
+tables inline and shows a `LEFT JOIN` keeping a customer who never ordered:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cy')
+) AS t(id, name);
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0)
+) AS t(order_id, customer_id, amount);`}
+  starterCode={`SELECT c.name, o.order_id, o.amount
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+ORDER BY c.name, o.order_id;
+-- Cy has no orders, so their row shows NULLs for order columns.`}
+/>
+
+### Why can a join inflate a SUM, and how do you fix it?
+
+Joining to a one-to-many table duplicates the left row once per match, so
+summing a left-side column double-counts. Aggregate the many-side to the
+right grain **first** (in a subquery or CTE), then join. The runnable block
+demonstrates the correct pattern:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava'), (2, 'Ben')
+) AS t(id, name);
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0)
+) AS t(order_id, customer_id, amount);`}
+  starterCode={`WITH order_totals AS (
+  SELECT customer_id, SUM(amount) AS total
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT c.name, t.total
+FROM customers c
+JOIN order_totals t ON t.customer_id = c.id
+ORDER BY c.name;`}
+/>
+
+### What is a deadlock, and how do you avoid it?
+
+A deadlock is a cycle of transactions each holding a lock the other needs:
+transaction A locks row 1 and waits for row 2, while B locks row 2 and waits
+for row 1. Neither proceeds. Databases detect the cycle and **abort one**
+transaction (the victim), which the app should retry. Prevent deadlocks by
+acquiring locks in a **consistent global order**, keeping transactions short,
+and using the lowest isolation level that is correct.
+
+### What is an optimistic vs pessimistic locking strategy?
+
+**Pessimistic** locking takes a lock up front (`SELECT ... FOR UPDATE`),
+blocking others until you commit, safe under high contention but reduces
+concurrency. **Optimistic** locking takes no lock; it reads a **version**
+number and, on write, checks the version has not changed (compare-and-set),
+retrying on conflict. Optimistic wins when conflicts are rare; pessimistic
+when they are frequent.
+
+### What is a primary key vs a foreign key?
+
+A **primary key** uniquely identifies each row and is automatically indexed;
+it cannot be NULL or duplicated. A **foreign key** references a primary key in
+another table, enforcing **referential integrity**, you cannot insert an
+order for a customer that does not exist, and (with cascade rules) deletes can
+propagate. Foreign keys are how the relational model encodes relationships.
+
+### What is a covering index?
+
+A covering index includes every column a query needs (in the key or as
+included columns), so the engine answers the query **from the index alone**
+without touching the table (an "index-only scan"). It is a powerful
+optimization for hot read paths, at the cost of a wider index to maintain.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A transaction reads a row, and a **second** transaction commits an update to that same row before the first transaction reads it **again**, seeing a different value. Which anomaly is this?
+
+- A dirty read.
+  > A dirty read is seeing another transaction's *uncommitted* change; here the other transaction committed.
+- [o] A non-repeatable read.
+  > Re-reading the same row yields a different committed value, which Repeatable Read isolation prevents.
+- A phantom read.
+  > A phantom is *new rows* appearing on re-running a query, not a changed value in an existing row.
+- A lost update.
+  > A lost update is two writes clobbering each other; here the first transaction only reads.`}
+/>
+
+<MultipleChoice
+  markdown={`You have a composite index on \`(last_name, first_name)\`. Which query can use it efficiently?
+
+- \`WHERE first_name = 'Ada'\`
+  > The index is ordered by \`last_name\` first, so a filter on \`first_name\` alone cannot use it (leftmost-prefix rule).
+- [o] \`WHERE last_name = 'Lovelace' AND first_name = 'Ada'\`
+  > This matches the full index prefix in order, so the B-tree narrows on both columns.
+- \`WHERE email = 'ada@example.com'\`
+  > \`email\` is not in the index at all, so this needs a separate index or a scan.
+- Any query on the table, since the table is now indexed.
+  > An index helps only queries whose predicates match its leading columns; it is not a blanket speedup.`}
+/>
+
+<MultipleChoice
+  markdown={`Why might adding an index **slow down** an application overall?
+
+- Indexes make \`SELECT\` queries slower by adding a lookup step.
+  > A well-matched index speeds selective reads; it does not slow them.
+- [o] Every \`INSERT\`, \`UPDATE\`, and \`DELETE\` must also update the index, adding write cost and storage.
+  > On write-heavy tables the maintenance cost of many indexes can outweigh the read benefit.
+- Indexes prevent the database from using transactions.
+  > Indexing is orthogonal to transactions; both coexist fine.
+- The database can only have one index, so adding one removes another.
+  > A table can have many indexes; the real cost is maintaining each on writes.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Customers with no orders (anti-join)"
+  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`). Return the \`id\` and \`name\` of every customer who has placed **no** orders. Use a \`LEFT JOIN\` with an \`IS NULL\` filter (or \`NOT EXISTS\`).`}
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava'),
+  (2, 'Ben'),
+  (3, 'Cy'),
+  (4, 'Di')
+) AS t(id, name);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00),
+  (102, 1,  40.00),
+  (103, 3,  80.00)
+) AS t(order_id, customer_id, amount);`}
+  starterCode={`-- Return customers (id, name) with no matching orders.
+SELECT c.id, c.name
+FROM customers c
+-- LEFT JOIN orders and keep only the unmatched rows;`}
+  solutionSql={`SELECT c.id, c.name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.customer_id IS NULL
+ORDER BY c.id;`}
+  tests={[
+    { id: "rows", name: "Two customers never ordered", description: "Ben and Di → two rows", expectedRowCount: 2 },
+    { id: "cols", name: "Has the required columns", description: "id and name", expectedColumnsInclude: ["id", "name"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Revenue per customer without double-counting"
+  instructions={`Tables \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`) are loaded. Return one row per customer who has ordered, with columns \`name\` and \`revenue\` (their total \`amount\`), sorted by \`revenue\` descending. Aggregate so no customer is double-counted.`}
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava'),
+  (2, 'Ben'),
+  (3, 'Cy')
+) AS t(id, name);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00),
+  (102, 1,  40.00),
+  (103, 2,  80.00),
+  (104, 2,  20.00),
+  (105, 3,  55.00)
+) AS t(order_id, customer_id, amount);`}
+  starterCode={`-- One row per customer, summed amount as revenue, highest first.
+SELECT c.name
+  -- , total revenue here
+FROM customers c
+JOIN orders o ON o.customer_id = c.id
+-- group + order;`}
+  solutionSql={`SELECT c.name, SUM(o.amount) AS revenue
+FROM customers c
+JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name
+ORDER BY revenue DESC;`}
+  tests={[
+    { id: "rows", name: "One row per ordering customer", description: "Three customers ordered → three rows", expectedRowCount: 3 },
+    { id: "cols", name: "Has the required columns", description: "name and revenue", expectedColumnsInclude: ["name", "revenue"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Database Design with PostgreSQL](/courses/database-design-postgresql)
+- [Intro to SQL with Postgres](/courses/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)

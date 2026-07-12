@@ -51,6 +51,56 @@ your state doesn't know about. Want to clear the field? Set the state
 to `""`. Want to pre-fill it? Set the initial state. The UI follows the
 data, exactly as before.
 
+Type in the live input below: the heading, the echo, and the character
+counter all read the *same* `text` state, so they can never disagree:
+
+<ReactPreview
+  code={`function TextMirror() {
+  const [text, setText] = useState("");
+
+  return (
+    <div>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Type a message…"
+        maxLength={60}
+      />
+      <p>{text ? <>You typed: <strong>{text}</strong></> : "The input drives this text."}</p>
+      <p>{60 - text.length} characters left</p>
+    </div>
+  );
+}`}
+>
+  <TextMirrorDemo />
+</ReactPreview>
+
+Because the value lives in state, you can also *derive* other values
+from it during render. This slider stores only Celsius; Fahrenheit and
+the label are computed on every render, never stored:
+
+<ReactPreview
+  code={`function Temperature() {
+  const [celsius, setCelsius] = useState(20);
+  const fahrenheit = (celsius * 9) / 5 + 32;   // derived, not stored
+
+  return (
+    <div>
+      <label>{celsius}°C = {fahrenheit.toFixed(1)}°F</label>
+      <input
+        type="range"
+        min={-20}
+        max={40}
+        value={celsius}
+        onChange={(e) => setCelsius(Number(e.target.value))}
+      />
+    </div>
+  );
+}`}
+>
+  <TemperatureDemo />
+</ReactPreview>
+
 ## Handling submit
 
 For a whole form, listen for `onSubmit` on the `<form>` and call
@@ -106,6 +156,40 @@ input, via a ref), but controlled is the default you'll reach for:
 it keeps validation, formatting, and the displayed value all derived
 from one place.
 </Callout>
+
+Controlled state makes **validation** trivial, because you can check
+the values during render. The live form below keeps its submit button
+disabled until the email looks valid and the box is checked, all
+derived from the same two pieces of state:
+
+<ReactPreview
+  code={`function SignupForm() {
+  const [email, setEmail] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [submitted, setSubmitted] = useState<string | null>(null);
+  const valid = /.+@.+\\..+/.test(email) && agree;   // derived each render
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); setSubmitted(email); }}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+      />
+      <label>
+        <input type="checkbox" checked={agree}
+          onChange={(e) => setAgree(e.target.checked)} />
+        I agree to the terms
+      </label>
+      <button disabled={!valid}>Sign up</button>
+      {submitted && <p>Welcome aboard, {submitted}!</p>}
+    </form>
+  );
+}`}
+>
+  <SignupFormDemo />
+</ReactPreview>
 
 ## Challenge
 

@@ -1,0 +1,269 @@
+---
+title: Concurrency & Parallelism
+description: Backend interview questions on processes vs threads, the GIL, race conditions, locks and semaphores, deadlock, and async/await, with deterministic runnable Python and concept checks.
+---
+
+Concurrency questions separate engineers who have shipped multi-threaded code
+from those who have only read about it. Expect to explain the GIL, race
+conditions, and when threads, processes, or async each win. This page is a
+question bank with a few **runnable** (and deterministic) Python examples.
+
+## Q&A
+
+### Concurrency vs parallelism, what is the difference?
+
+**Concurrency** is *dealing with* many tasks at once, structuring a program so
+tasks make progress by interleaving (one core switching between them).
+**Parallelism** is *doing* many tasks at literally the same instant, requiring
+multiple cores. Async on a single thread is concurrent but not parallel;
+multiprocessing across cores is both.
+
+### Processes vs threads, how do they differ?
+
+**Threads** live inside one process and **share** its memory, so they
+communicate cheaply but can corrupt shared state (race conditions) and, in
+CPython, are serialized by the GIL. **Processes** each have their own memory
+space, so they are isolated (a crash in one does not corrupt another) and
+achieve true parallelism, but communicating between them requires
+serialization (pipes, queues) and costs more memory.
+
+### What is the GIL and why does it exist?
+
+CPython's **Global Interpreter Lock** is a mutex that lets only **one thread
+execute Python bytecode at a time**. It exists to make memory management
+(reference counting) thread-safe without fine-grained locking. The
+consequence: threads give **no speedup for CPU-bound** Python code, they take
+turns. They still help **I/O-bound** work, because a thread releases the GIL
+while waiting on the network or disk.
+
+### What is a race condition?
+
+A race condition is when the result depends on the **timing** of concurrent
+operations on shared state. The classic case: two threads read a counter,
+both see `5`, both increment to `6`, and one update is lost, `+= 1` is not
+atomic (read, add, write). The fix is to make the critical section mutually
+exclusive with a lock. Below, joining the threads makes the run deterministic,
+and the lock guarantees the total is exactly 200000:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import threading
+
+counter = 0
+lock = threading.Lock()
+
+def worker():
+    global counter
+    for _ in range(100000):
+        with lock:          # critical section: only one thread at a time
+            counter += 1
+
+threads = [threading.Thread(target=worker) for _ in range(2)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()               # wait for both → deterministic result
+
+print(counter)             # exactly 200000, no lost updates`,
+    },
+  ]}
+/>
+
+### What are locks, mutexes, and semaphores?
+
+A **mutex** (mutual-exclusion lock) allows exactly **one** holder at a time,
+protecting a critical section. In Python, `threading.Lock` is a mutex. A
+**semaphore** allows up to **N** concurrent holders, useful to cap
+concurrency (e.g. at most 5 simultaneous downloads). A **reentrant lock**
+(`RLock`) can be re-acquired by the thread that already holds it, avoiding
+self-deadlock in recursive code.
+
+### What is a deadlock, and what four conditions cause it?
+
+A deadlock is a set of threads each waiting forever for a resource another
+holds. Coffman's **four conditions** must all hold for a deadlock:
+
+1. **Mutual exclusion**, a resource is held by one thread at a time.
+2. **Hold and wait**, a thread holds one resource while waiting for another.
+3. **No preemption**, resources cannot be forcibly taken away.
+4. **Circular wait**, a cycle of threads each waiting on the next.
+
+Break any one to prevent deadlock. The usual fix targets **circular wait** by
+acquiring locks in a **consistent global order**.
+
+### How do you prevent deadlocks in practice?
+
+Impose a **lock ordering**: every thread acquires locks in the same fixed
+order, which eliminates circular wait. Use **timeouts** (`lock.acquire(timeout=...)`)
+so a thread gives up rather than blocks forever. Keep critical sections short,
+and prefer a single coarse lock or lock-free structures (queues) over many
+fine-grained locks when contention allows.
+
+### What is a livelock, and how does it differ from a deadlock?
+
+In a **deadlock**, threads are blocked and idle. In a **livelock**, threads
+are **actively running** but making no progress, they keep responding to each
+other and retrying (like two people stepping aside in the same direction
+repeatedly). Both halt progress; livelock is harder to spot because CPU
+appears busy. Randomized backoff usually breaks a livelock.
+
+### What is starvation?
+
+Starvation is when a thread is perpetually denied a resource because others
+keep getting priority, for example, a low-priority thread that never acquires
+a lock because higher-priority threads always jump ahead. Fair locks and
+avoiding priority-based scheduling for shared resources mitigate it.
+
+### What is async/await, and how does the event loop work?
+
+`async`/`await` is **cooperative** single-threaded concurrency. Coroutines
+run on an **event loop**; when a coroutine `await`s an I/O operation, it
+**yields** control back to the loop, which runs another ready coroutine
+instead of blocking. There is no preemption, a coroutine that never awaits
+(e.g. a tight CPU loop) starves all others. It shines for high-concurrency
+I/O: thousands of sockets on one thread. Below, `gather` runs both coroutines
+concurrently and returns their results **in order**:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import asyncio
+
+async def fetch(name, delay):
+    await asyncio.sleep(delay)   # simulates non-blocking I/O
+    return f"{name} done"
+
+async def main():
+    results = await asyncio.gather(
+        fetch("a", 0.02),
+        fetch("b", 0.01),
+    )
+    print(results)   # ['a done', 'b done'] — gather preserves argument order
+
+asyncio.run(main())`,
+    },
+  ]}
+/>
+
+### Why can't you just call a blocking function inside a coroutine?
+
+Because the event loop runs on **one thread**. A blocking call (a synchronous
+`requests.get`, a `time.sleep`, a heavy CPU loop) does not yield, so the loop
+cannot run any other coroutine, all concurrency stalls until it returns. Use
+async-native libraries, or offload blocking work with
+`loop.run_in_executor` (a thread or process pool).
+
+### What is a thread pool, and why use one?
+
+A thread pool keeps a fixed set of reusable worker threads and a queue of
+tasks, so you avoid the cost of creating and destroying a thread per task and
+**bound** the number of concurrent threads. `concurrent.futures.ThreadPoolExecutor`
+provides this. Its `map` returns results in **input order**, which keeps the
+example below deterministic even though tasks run concurrently:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from concurrent.futures import ThreadPoolExecutor
+
+def square(n):
+    return n * n
+
+with ThreadPoolExecutor(max_workers=4) as pool:
+    results = list(pool.map(square, range(6)))
+
+print(results)   # [0, 1, 4, 9, 16, 25] — map preserves input order`,
+    },
+  ]}
+/>
+
+### When do you choose threads vs multiprocessing vs async?
+
+Match the tool to the bottleneck:
+
+- **I/O-bound, many connections** → **async** (one thread, lowest overhead).
+- **I/O-bound, blocking libraries** → **threads** (they release the GIL while
+  waiting; a thread pool caps concurrency).
+- **CPU-bound** → **multiprocessing** (separate processes sidestep the GIL for
+  true parallelism).
+
+The deciding question is always: is the program waiting on I/O, or burning
+CPU?
+
+### What is a future or promise?
+
+A **future** is a placeholder for a result that is not ready yet. You submit
+work and immediately get a future; later you call `.result()` (blocking) or
+`await` it to retrieve the value once computed. Futures decouple *starting*
+work from *collecting* it, letting you launch many tasks, then gather results.
+Both `concurrent.futures` and `asyncio` expose futures.
+
+### What is thread-safety, and how do you achieve it?
+
+Code is thread-safe if it behaves correctly when called from multiple threads
+concurrently. Achieve it by (a) avoiding shared mutable state (pass immutable
+data, use per-thread locals), (b) protecting shared state with **locks**, or
+(c) confining mutation to one thread and communicating via a **thread-safe
+queue** (`queue.Queue`), which is the recommended pattern, share by
+communicating, not by sharing memory.
+
+### What is an atomic operation?
+
+An atomic operation completes in a single, indivisible step, no other thread
+can observe it half-done. `counter += 1` is **not** atomic (it is
+read-modify-write). Atomicity is provided by hardware instructions,
+compare-and-swap primitives, or, at the language level, by holding a lock
+around the whole operation so it appears atomic to other threads.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You have a **CPU-bound** function and want it to run faster on a multi-core machine using Python. What should you reach for?
+
+- \`threading\` with one thread per core.
+  > CPython's GIL serializes bytecode execution, so threads give no parallel speedup for CPU-bound work.
+- [o] \`multiprocessing\`, one process per core.
+  > Separate processes each have their own interpreter and GIL, so they run Python bytecode truly in parallel across cores.
+- \`asyncio\` with many coroutines.
+  > Async is single-threaded cooperative concurrency for I/O; a CPU-bound coroutine just blocks the event loop.
+- A larger thread pool.
+  > More threads do not bypass the GIL; the CPU work is still serialized.`}
+/>
+
+<MultipleChoice
+  markdown={`Two threads run \`counter += 1\` a million times each without any lock, and the final value is less than two million. Why?
+
+- Python integers overflow at one million.
+  > Python ints are arbitrary precision; there is no overflow. The loss is a concurrency bug.
+- [o] \`+= 1\` is read-modify-write, not atomic, so interleaving causes lost updates (a race condition).
+  > Both threads can read the same value, increment, and write back, discarding one increment. A lock around the update fixes it.
+- The GIL guarantees only one increment ever runs.
+  > The GIL serializes *bytecode*, but a single \`+=\` spans multiple bytecodes, so a thread switch mid-operation still loses updates.
+- Threads silently drop iterations under load.
+  > The iterations all run; the increments collide on shared state without mutual exclusion.`}
+/>
+
+<MultipleChoice
+  markdown={`Which change is the standard way to **prevent** a deadlock caused by two threads acquiring locks A and B in opposite orders?
+
+- Give each thread its own copy of both locks.
+  > Separate locks would not protect the shared resource they guard; the point of a lock is to be shared.
+- [o] Make every thread acquire the locks in the same global order (always A before B).
+  > A consistent lock ordering eliminates the circular-wait condition, one of Coffman's four necessary conditions for deadlock.
+- Increase the thread pool size so more threads are available.
+  > More threads worsen contention; they do not remove the circular wait.
+- Remove all locks so nothing can block.
+  > That reintroduces race conditions on the shared state the locks were protecting.`}
+/>
+
+## Go deeper
+
+- [Python Basics](/courses/python-basics)
+- [Systems Programming in C](/courses/systems-programming-c)

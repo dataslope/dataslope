@@ -53,6 +53,29 @@ createRoot(document.getElementById("root")!).render(<Palette />);
   ]}
 />
 
+A single handler can do several things. The like button below flips a
+boolean *and* adjusts a count on each click, all inside one `onClick`:
+
+<ReactPreview
+  code={`function LikeButton() {
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+
+  function toggle() {
+    setLiked(!liked);
+    setLikes((n) => n + (liked ? -1 : 1));
+  }
+
+  return (
+    <button onClick={toggle}>
+      {liked ? "♥" : "♡"} {likes} {likes === 1 ? "like" : "likes"}
+    </button>
+  );
+}`}
+>
+  <LikeButtonDemo />
+</ReactPreview>
+
 ## The event object
 
 Handlers receive an **event** object with details about what happened,
@@ -63,7 +86,33 @@ is the current text:
 <input onChange={(event) => console.log(event.target.value)} />
 ```
 
-We'll lean on that in the next lesson on forms.
+The `onKeyDown` handler below reads `event.key` off the event object on
+every keystroke, type in the box and watch it report the last key and a
+running count:
+
+<ReactPreview
+  code={`function KeyWatcher() {
+  const [last, setLast] = useState("—");
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <input
+        placeholder="Type here…"
+        onKeyDown={(event) => {
+          setLast(event.key);
+          setCount((n) => n + 1);
+        }}
+      />
+      <p>Last key: <strong>{last}</strong> · {count} keystrokes</p>
+    </div>
+  );
+}`}
+>
+  <KeyPressDemo />
+</ReactPreview>
+
+We'll lean on `event.target.value` in the next lesson on forms.
 
 ## Lifting state up
 

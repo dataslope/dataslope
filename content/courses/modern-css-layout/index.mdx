@@ -21,11 +21,32 @@ we build up from the cascade.
 
 ## How this course works
 
-Each lesson pairs an idea with a **live, editable preview**. The web
-code blocks below compose your HTML and CSS into a sandboxed page and
-render it right under the editor, the way a browser renders any page.
-Change a value, press **Run** (or Ctrl/Cmd + Enter), and see the
-layout react.
+Each lesson mixes two kinds of hands-on:
+
+1. **Live previews** that render the moment the page loads, no button
+   to press. The rendered result sits on top and the exact HTML and CSS
+   that produced it sit right below, so you can read cause and effect at
+   a glance. Here's one now:
+
+<LivePreview
+  title="A live preview, rendered with no Run button"
+  background="#ffffff"
+  html={`<div class="chip">CSS you can see</div>`}
+  css={`.chip {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}`}
+/>
+
+2. **Editable code blocks** you run yourself. These compose your HTML
+   and CSS into a sandboxed page and render it under the editor. Change
+   a value, press **Run** (or Ctrl/Cmd + Enter), and see the layout
+   react.
 
 <CodeBlock
   adapter="web"
