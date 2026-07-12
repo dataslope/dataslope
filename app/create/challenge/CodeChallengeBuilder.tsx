@@ -40,6 +40,8 @@ import {
   TextField,
 } from "../_components/builderUi";
 import { useSaveItem } from "../_components/useSaveItem";
+import { useRegisterBuilderDraft } from "../_studio/StudioAiContext";
+import type { DraftResult } from "@/lib/ai/draft";
 
 const ADAPTER_OPTIONS = [
   "python",
@@ -219,6 +221,43 @@ export default function CodeChallengeBuilder() {
       cancelled = true;
     };
   }, [editId, beginEdit]);
+
+  // "Fill with AI": map a drafted code challenge onto the form fields, reusing
+  // the same representation the edit path hydrates from. The drafted solution
+  // is still verified against the drafted tests when the user saves, so a wrong
+  // draft fails at publish rather than shipping silently.
+  useRegisterBuilderDraft("code", (draft: DraftResult) => {
+    if (draft.kind !== "code") return;
+    saveState.clearError();
+    setFormError(null);
+    const nativeOk = NATIVE_TEST_ADAPTERS.includes(draft.language);
+    setTitle(draft.title);
+    setAdapter(draft.language);
+    setInstructions(draft.instructions);
+    setFiles(
+      draft.files.length > 0
+        ? draft.files.map((f) => ({
+            filename: f.filename || (DEFAULT_FILENAMES[draft.language] ?? "main.txt"),
+            initCode: f.setup,
+            starterCode: f.starter,
+            solutionCode: f.solution,
+          }))
+        : [newFile(draft.language)],
+    );
+    setTests(
+      draft.tests.length > 0
+        ? draft.tests.map((t) => ({
+            ...NEW_TEST,
+            name: t.name,
+            // Compiled languages can't run per-test code; those check printed output.
+            mode: t.mode === "stdout" || !nativeOk ? "stdout" : "code",
+            code: t.code,
+            stdoutKind: "stdoutEquals" as StdoutCheckKind,
+            stdoutValue: t.expectedStdout,
+          }))
+        : [{ ...NEW_TEST }],
+    );
+  });
 
   const onAdapterChange = (next: string) => {
     saveState.clearError();

@@ -33,6 +33,8 @@ import {
   TextAreaField,
   TextField,
 } from "../_components/builderUi";
+import { useRegisterBuilderDraft } from "../_studio/StudioAiContext";
+import type { DraftResult } from "@/lib/ai/draft";
 
 interface PickedItem {
   id: string;
@@ -119,6 +121,15 @@ export default function QuizSetBuilder() {
       cancelled = true;
     };
   }, [editId]);
+
+  // "Fill with AI": a quiz set references existing items, so AI only drafts the
+  // title + description; the user adds the questions themselves below.
+  useRegisterBuilderDraft("quiz", (draft: DraftResult) => {
+    if (draft.kind !== "quiz") return;
+    setFormError(null);
+    setTitle(draft.title);
+    setDescription(draft.description);
+  });
 
   const addPicked = useCallback((item: PickedItem) => {
     setFormError(null);

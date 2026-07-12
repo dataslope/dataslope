@@ -35,6 +35,8 @@ import {
   TextField,
 } from "../_components/builderUi";
 import { useSaveItem } from "../_components/useSaveItem";
+import { useRegisterBuilderDraft } from "../_studio/StudioAiContext";
+import type { DraftResult } from "@/lib/ai/draft";
 
 type SqlAssertionKind =
   | "matchesSolution"
@@ -187,6 +189,30 @@ export default function SqlChallengeBuilder() {
       cancelled = true;
     };
   }, [editId, beginEdit]);
+
+  // "Fill with AI": map a drafted SQL challenge onto the form. The drafted
+  // solution query is verified against the drafted checks on save.
+  useRegisterBuilderDraft("sql", (draft: DraftResult) => {
+    if (draft.kind !== "sql") return;
+    saveState.clearError();
+    setFormError(null);
+    setTitle(draft.title);
+    setDialect(draft.dialect);
+    setInstructions(draft.instructions);
+    setInitSql(draft.setupSql);
+    setStarterCode(draft.starterSql);
+    setSolutionSql(draft.solutionSql);
+    setTests(
+      draft.tests.length > 0
+        ? draft.tests.map((t) => ({
+            ...NEW_TEST,
+            name: t.name,
+            assertion: t.check,
+            value: t.value,
+          }))
+        : [{ ...NEW_TEST }],
+    );
+  });
 
   const buildPayload = (): SqlChallengePayload | string => {
     const builtTests: CustomSqlTest[] = [];

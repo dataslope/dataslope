@@ -1,0 +1,143 @@
+/*
+ * Semantic color tokens for the /create "Studio" dashboard shell.
+ *
+ * Ported from the Create Studio design handoff (its applyVars() light/dark
+ * maps, classic sidebar variant). The tokens live on `.ds-studio` and flip
+ * with the site's `.dark` class on <html> (set pre-hydration by
+ * THEME_BOOTSTRAP), so the shell renders in the right theme on first paint
+ * with no flash. The shell markup reads these as `var(--ink)`, `var(--muted)`,
+ * etc. — keeping the many one-off design colors out of the component while
+ * still resolving against the site theme.
+ *
+ * These intentionally shadow a few brand hues with the design's exact values
+ * (e.g. --green-text #008B03 = brand green-700); the shell is a self-contained
+ * surface, so matching the mockup pixel-for-pixel wins over reusing tokens.
+ */
+
+.ds-studio {
+  --page-bg: #ffffff;
+  --main-bg: #ffffff;
+  --side-bg: #f6f6f7;
+  --side-bg2: #ffffff;
+  --panel: #f6f6f7;
+  --panel-hover: #ededee;
+  --input: #ffffff;
+  --side-active: rgba(17, 24, 39, 0.045);
+  --chip-bg: rgba(17, 24, 39, 0.05);
+  --chip-hover: rgba(17, 24, 39, 0.05);
+  --ink: #111827;
+  --text: #374151;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --green-btn: #0aa80f;
+  --green-btn-hover: #008b03;
+  --green-text: #008b03;
+  --green-soft: rgba(10, 168, 15, 0.09);
+  --danger: #ba303a;
+  --danger-soft: rgba(255, 79, 89, 0.1);
+  --danger-hover: rgba(255, 79, 89, 0.08);
+  --field: #f4f4f5;
+  --divider: rgba(17, 24, 39, 0.08);
+  --rail-group: rgba(17, 24, 39, 0.025);
+  --label-icon: #0064bd;
+  --ai: #7a51b6;
+  --ai-soft: #f4effe;
+  --ai-text: #634094;
+  --ai-btn-fg: #ffffff;
+
+  color: var(--text);
+  background: var(--page-bg);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+}
+
+:where(.dark) .ds-studio {
+  --page-bg: #161616;
+  --main-bg: #161616;
+  --side-bg: #1d1d1d;
+  --side-bg2: #1d1d1d;
+  --panel: #242424;
+  --panel-hover: #2e2e2e;
+  --input: #161616;
+  --side-active: rgba(255, 255, 255, 0.07);
+  --chip-bg: rgba(255, 255, 255, 0.07);
+  --chip-hover: rgba(255, 255, 255, 0.07);
+  --ink: #fafafa;
+  --text: #d4d4d8;
+  --muted: #a1a1aa;
+  --faint: #71717a;
+  --green-btn: #0aa80f;
+  --green-btn-hover: #008b03;
+  --green-text: #66d361;
+  --green-soft: rgba(32, 198, 33, 0.13);
+  --danger: #ff807f;
+  --danger-soft: rgba(255, 79, 89, 0.15);
+  --danger-hover: rgba(255, 79, 89, 0.12);
+  --field: #232323;
+  --divider: rgba(255, 255, 255, 0.09);
+  --rail-group: rgba(255, 255, 255, 0.035);
+  --label-icon: #5ba7ff;
+  --ai: #bb96fa;
+  --ai-soft: rgba(171, 119, 250, 0.16);
+  --ai-text: #ccb3fb;
+  --ai-btn-fg: #121212;
+}
+
+/* Slim, unobtrusive scrollbars inside the shell, matching the mockup. */
+.ds-studio ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.ds-studio ::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 128, 0.25);
+  border-radius: 5px;
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
+.ds-studio ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* AI-draft input placeholder tint (the "Fill with AI" bar). */
+.ds-studio .ds-ai-input::placeholder {
+  color: var(--ai-text);
+  opacity: 0.6;
+}
+
+/* Icon-rail hover tooltip. */
+.ds-rail-item {
+  position: relative;
+}
+.ds-rail-tip {
+  position: absolute;
+  left: 52px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+  z-index: 60;
+  background: var(--ink);
+  color: var(--main-bg);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 7px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.ds-rail-item:hover .ds-rail-tip {
+  opacity: 1;
+}
+
+@keyframes ds-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.ds-pulse {
+  animation: ds-pulse 1.4s ease-in-out infinite;
+}

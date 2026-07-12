@@ -1,10 +1,10 @@
-// The /create hub: pick a builder (code challenge, SQL challenge, MCQ,
-// quiz set) and manage your existing creations. Static shell + client
-// session read, the app/account pattern.
+// The /create hub ("My Creations"): the signed-in member's challenges,
+// questions, and quiz sets. Chrome (sidebar + top bar) comes from the /create
+// layout; this page renders the hub content. Static shell + client session
+// read, the app/account pattern.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
-import { CreatePageShell } from "./_components/CreatePageShell";
 import CreateHomeClient from "./CreateHomeClient";
 
 export const metadata: Metadata = {
@@ -14,13 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreatePage() {
-  return (
-    <CreatePageShell
-      eyebrow="Create"
-      title="Build your own challenges & quizzes"
-      lede="Create interactive coding challenges, SQL exercises, and multiple-choice questions, share each one with a link, or bundle them into a quiz set. Everything runs in the recipient's browser."
-    >
-      <CreateHomeClient />
-    </CreatePageShell>
-  );
+  return <CreateHomeClient />;
 }

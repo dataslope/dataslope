@@ -1,14 +1,15 @@
 // Builder page for a custom code challenge. The builder itself is a
 // client component (form state + on-demand preview of the real
 // <ChallengeCard>); useSearchParams (?edit=<id>) requires the Suspense
-// boundary.
+// boundary. Chrome (sidebar + top bar + AI assist) comes from the /create
+// layout; this page renders the heading + form.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CreatePageShell } from "../_components/CreatePageShell";
+import { BuilderHeader } from "../_studio/BuilderHeader";
 import CodeChallengeBuilder from "./CodeChallengeBuilder";
 
 export const metadata: Metadata = {
@@ -19,14 +20,15 @@ export const metadata: Metadata = {
 
 export default function CreateChallengePage() {
   return (
-    <CreatePageShell
-      eyebrow="Create · Code challenge"
-      title="New code challenge"
-      lede="Write the instructions, starter code, and tests. Recipients solve it right in their browser, no setup, no server."
-    >
+    <div className="mx-auto max-w-3xl">
+      <BuilderHeader
+        title="New code challenge"
+        lede="Write the instructions, starter code, and tests. Recipients solve it right in their browser, no setup, no server."
+        aiPlaceholder="Describe the challenge and AI fills every field below"
+      />
       <Suspense fallback={null}>
         <CodeChallengeBuilder />
       </Suspense>
-    </CreatePageShell>
+    </div>
   );
 }

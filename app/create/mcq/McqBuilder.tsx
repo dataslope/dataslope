@@ -25,6 +25,8 @@ import {
   TextField,
 } from "../_components/builderUi";
 import { useSaveItem } from "../_components/useSaveItem";
+import { useRegisterBuilderDraft } from "../_studio/StudioAiContext";
+import type { DraftResult } from "@/lib/ai/draft";
 
 const EMPTY_CHOICE: McqDraftChoice = { text: "", correct: false, explanation: "" };
 
@@ -96,6 +98,27 @@ export default function McqBuilder() {
       cancelled = true;
     };
   }, [editId, beginEdit]);
+
+  // "Fill with AI": drop a drafted question into the structured form fields
+  // (form mode, so the choices/explanations are editable straight away).
+  useRegisterBuilderDraft("mcq", (draft: DraftResult) => {
+    if (draft.kind !== "mcq") return;
+    saveState.clearError();
+    setFormError(null);
+    setMode("form");
+    setTitle(draft.title);
+    setQuestion(draft.question);
+    setChoices(
+      draft.choices.length >= 2
+        ? draft.choices.map((c) => ({
+            text: c.text,
+            correct: c.correct,
+            explanation: c.explanation,
+          }))
+        : [{ ...EMPTY_CHOICE, correct: true }, { ...EMPTY_CHOICE }],
+    );
+    setExplanation(draft.explanation);
+  });
 
   const markdown = useMemo(
     () =>
