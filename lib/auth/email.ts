@@ -117,11 +117,11 @@ function layout(opts: { heading: string; body: string; cta: string; url: string 
             <a href="${SITE_URL}" style="text-decoration:none;color:inherit;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td valign="middle" style="vertical-align:middle;padding-right:9px;">
-                    <img src="${LOGO_URL}" width="35" height="22" alt="" style="display:block;width:35px;height:22px;border:0;outline:none;text-decoration:none;" />
+                  <td valign="middle" style="vertical-align:middle;padding-right:8px;">
+                    <img src="${LOGO_URL}" width="21" height="13" alt="" style="display:block;width:21px;height:13px;border:0;outline:none;text-decoration:none;" />
                   </td>
                   <td valign="middle" style="vertical-align:middle;">
-                    <span style="font-family:${FONT_STACK};font-size:20px;font-weight:600;letter-spacing:-0.02em;color:#1f2328;">Dataslope</span>
+                    <span style="font-family:${FONT_STACK};font-size:18px;font-weight:600;letter-spacing:-0.025em;color:#121212;">Dataslope</span>
                   </td>
                 </tr>
               </table>
