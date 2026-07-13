@@ -7,7 +7,7 @@ import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BuilderHeader } from "../_studio/BuilderHeader";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
 import SqlChallengeBuilder from "./SqlChallengeBuilder";
 
 export const metadata: Metadata = {

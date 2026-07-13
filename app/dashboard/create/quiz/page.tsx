@@ -5,7 +5,7 @@ import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BuilderHeader } from "../_studio/BuilderHeader";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
 import QuizSetBuilder from "./QuizSetBuilder";
 
 export const metadata: Metadata = {

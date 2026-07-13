@@ -31,18 +31,18 @@ export interface StudioNavItem {
 
 /** The "Create" group: the hub plus the four builders. */
 export const CREATE_ITEMS: StudioNavItem[] = [
-  { key: "hub", label: "My Creations", href: "/create", icon: LayoutGrid },
-  { key: "code", label: "Code Challenge", href: "/create/challenge", icon: Code2 },
-  { key: "sql", label: "SQL Challenge", href: "/create/sql", icon: Database },
-  { key: "mcq", label: "Multiple Choice", href: "/create/mcq", icon: CircleHelp },
-  { key: "quiz", label: "Quiz Set", href: "/create/quiz", icon: Layers },
+  { key: "hub", label: "My Creations", href: "/dashboard/create", icon: LayoutGrid },
+  { key: "code", label: "Code Challenge", href: "/dashboard/create/challenge", icon: Code2 },
+  { key: "sql", label: "SQL Challenge", href: "/dashboard/create/sql", icon: Database },
+  { key: "mcq", label: "Multiple Choice", href: "/dashboard/create/mcq", icon: CircleHelp },
+  { key: "quiz", label: "Quiz Set", href: "/dashboard/create/quiz", icon: Layers },
 ];
 
-/** Standalone pages linked below the Create group. Admin is filtered to admins
- *  by the shell. */
+/** Standalone dashboard pages linked below the Create group. Admin is filtered
+ *  to admins by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
-  { key: "account", label: "Account", href: "/account", icon: User },
-  { key: "admin", label: "Admin", href: "/admin", icon: Shield },
+  { key: "account", label: "Account", href: "/dashboard/account", icon: User },
+  { key: "admin", label: "Admin", href: "/dashboard/admin", icon: Shield },
 ];
 
 const ALL_ITEMS = [...CREATE_ITEMS, ...PAGE_ITEMS];
@@ -62,12 +62,12 @@ export const BUILDER_KEYS: StudioRouteKey[] = ["code", "sql", "mcq", "quiz"];
  */
 export function activeKeyForPath(pathname: string): StudioRouteKey {
   const path = pathname.replace(/\/+$/, "") || "/";
-  if (path === "/create") return "hub";
-  if (path.startsWith("/create/challenge")) return "code";
-  if (path.startsWith("/create/sql")) return "sql";
-  if (path.startsWith("/create/mcq")) return "mcq";
-  if (path.startsWith("/create/quiz")) return "quiz";
-  if (path.startsWith("/account")) return "account";
-  if (path.startsWith("/admin")) return "admin";
+  if (path === "/dashboard/create") return "hub";
+  if (path.startsWith("/dashboard/create/challenge")) return "code";
+  if (path.startsWith("/dashboard/create/sql")) return "sql";
+  if (path.startsWith("/dashboard/create/mcq")) return "mcq";
+  if (path.startsWith("/dashboard/create/quiz")) return "quiz";
+  if (path.startsWith("/dashboard/account")) return "account";
+  if (path.startsWith("/dashboard/admin")) return "admin";
   return "hub";
 }

@@ -34,7 +34,7 @@ import { useIsDesktop } from "./useIsDesktop";
 import { StudioAiPanel } from "./StudioAiPanel";
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? "/create";
+  const pathname = usePathname() ?? "/dashboard/create";
   const active = activeKeyForPath(pathname);
   const isDesktop = useIsDesktop();
   const { data: session } = useSession();
@@ -150,7 +150,7 @@ function FullSidebar({
       }}
     >
       <Link
-        href="/create"
+        href="/dashboard/create"
         onClick={onNavigate}
         className="flex items-center gap-2 px-2.5 pt-1"
       >
@@ -270,7 +270,7 @@ function RailSidebar({
       className="flex w-16 flex-shrink-0 flex-col items-center gap-1 pb-3 pt-4"
     >
       <Link
-        href="/create"
+        href="/dashboard/create"
         title="Dataslope"
         className="mb-3.5 flex h-10 w-10 items-center justify-center"
       >

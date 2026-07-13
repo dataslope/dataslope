@@ -124,7 +124,7 @@ export function AuthMenu() {
             </div>
             <Menu.Item
               className="mt-1 flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
-              render={<Link href="/account" />}
+              render={<Link href="/dashboard/account" />}
             >
               <UserIcon size={16} />
               Account
@@ -132,7 +132,7 @@ export function AuthMenu() {
             {isAdmin && (
               <Menu.Item
                 className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
-                render={<Link href="/admin" />}
+                render={<Link href="/dashboard/admin" />}
               >
                 <Shield size={16} />
                 Admin

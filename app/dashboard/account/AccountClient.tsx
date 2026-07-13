@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "../_components/Link";
+import Link from "@/app/_components/Link";
 import { signOut, useSession } from "@/lib/auth/client";
 import {
   type CheckoutPeriod,
@@ -10,7 +10,7 @@ import {
   startProCheckout,
   takeCheckoutPeriod,
   waitForProActivation,
-} from "../_components/billing/proCheckout";
+} from "@/app/_components/billing/proCheckout";
 import { CloudStorageSection } from "./CloudStorageSection";
 import { ConnectedAccountsSection } from "./ConnectedAccountsSection";
 import { DeleteAccountSection } from "./DeleteAccountSection";
@@ -62,7 +62,7 @@ export function AccountClient() {
       if (cancelled) return;
       if (activated) {
         // Session cookie now carries the new plan, reload with a clean URL.
-        window.location.replace("/account");
+        window.location.replace("/dashboard/account");
       } else {
         setActivation("slow");
       }
@@ -134,7 +134,7 @@ export function AccountClient() {
 
   return (
     <>
-    <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white p-6 dark:border-white/10 dark:bg-white/5">
+    <div className="rounded-2xl p-6" style={{ background: "var(--panel)" }}>
       <div className="flex items-center gap-4">
         {user.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -163,7 +163,10 @@ export function AccountClient() {
         </div>
       </div>
 
-      <dl className="mt-6 grid grid-cols-1 gap-3 border-t border-[var(--ds-gray-200)] pt-6 text-sm dark:border-white/10">
+      <dl
+        className="mt-6 grid grid-cols-1 gap-3 pt-6 text-sm"
+        style={{ borderTop: "1px solid var(--divider)" }}
+      >
         <div className="flex justify-between gap-4">
           <dt className="text-[var(--ds-gray-500)]">Plan</dt>
           <dd className="font-medium text-[var(--ds-gray-900)] dark:text-white">

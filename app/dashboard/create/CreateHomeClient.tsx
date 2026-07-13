@@ -37,7 +37,7 @@ const PAGE_SIZE = 6;
 
 function editHref(kind: CustomItemKind, id: string): string {
   const path = kind === "code" ? "challenge" : kind === "sql" ? "sql" : "mcq";
-  return `/create/${path}?edit=${id}`;
+  return `/dashboard/create/${path}?edit=${id}`;
 }
 
 interface Row {
@@ -120,7 +120,7 @@ export default function CreateHomeClient() {
         title: set.title,
         chip: `Quiz · ${set.itemCount} ${set.itemCount === 1 ? "item" : "items"}`,
         viewUrl: `/quiz/${set.id}`,
-        editUrl: `/create/quiz?edit=${set.id}`,
+        editUrl: `/dashboard/create/quiz?edit=${set.id}`,
         onDelete: () => onDeleteSet(set.id),
       })),
     [sets],

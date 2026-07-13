@@ -40,7 +40,7 @@ import {
   TextField,
 } from "../_components/builderUi";
 import { useSaveItem } from "../_components/useSaveItem";
-import { useRegisterBuilderDraft } from "../_studio/StudioAiContext";
+import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
 
 const ADAPTER_OPTIONS = [

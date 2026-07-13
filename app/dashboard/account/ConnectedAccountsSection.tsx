@@ -87,7 +87,7 @@ export function ConnectedAccountsSection() {
     try {
       const { error: apiError } = await linkSocial({
         provider: id,
-        callbackURL: "/account",
+        callbackURL: "/dashboard/account",
       });
       if (apiError) {
         setError(apiError.message ?? `Couldn't connect ${label}.`);

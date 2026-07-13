@@ -20,7 +20,7 @@
  */
 import { useState } from "react";
 import { CircleAlert, Loader2, LogOut } from "lucide-react";
-import Link from "../../_components/Link";
+import Link from "@/app/_components/Link";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
