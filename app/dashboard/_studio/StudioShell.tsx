@@ -18,9 +18,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ChevronRight, Menu, PanelLeft, Plus } from "lucide-react";
-import { useSession } from "@/lib/auth/client";
+import { usePathname, useRouter } from "next/navigation";
+import { ChevronRight, LogOut, Menu, PanelLeft, Plus } from "lucide-react";
+import { signOut, useSession } from "@/lib/auth/client";
 import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import {
   activeKeyForPath,
@@ -150,7 +150,7 @@ function FullSidebar({
       }}
     >
       <Link
-        href="/dashboard/create"
+        href="/"
         onClick={onNavigate}
         className="flex items-center gap-2 px-2.5 pt-1"
       >
@@ -270,7 +270,7 @@ function RailSidebar({
       className="flex w-16 flex-shrink-0 flex-col items-center gap-1 pb-3 pt-4"
     >
       <Link
-        href="/dashboard/create"
+        href="/"
         title="Dataslope"
         className="mb-3.5 flex h-10 w-10 items-center justify-center"
       >
@@ -314,11 +314,26 @@ function RailLink({ item, active }: { item: StudioNavItem; active: boolean }) {
 }
 
 function UserFooter({ session }: { session: SessionData }) {
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
   const user = session?.user;
   if (!user) return null;
   const initial = (user.name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase();
   const rawPlan = (user as { plan?: string }).plan ?? "";
   const plan = rawPlan.toLowerCase() === "pro" ? "Pro plan" : "Free plan";
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+      // Re-render anything reading the session; the footer collapses to null.
+      router.refresh();
+    } catch {
+      // Network failure: leave the session as-is; the button re-enables.
+    }
+    setSigningOut(false);
+  };
+
   return (
     <div className="mt-1 flex items-center gap-2.5 rounded-xl px-2.5 py-2">
       <span
@@ -327,7 +342,7 @@ function UserFooter({ session }: { session: SessionData }) {
       >
         {initial}
       </span>
-      <span className="flex min-w-0 flex-col gap-0.5">
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span
           className="truncate text-[13px] font-semibold"
           style={{ color: "var(--ink)" }}
@@ -338,6 +353,17 @@ function UserFooter({ session }: { session: SessionData }) {
           {plan}
         </span>
       </span>
+      <button
+        type="button"
+        onClick={handleSignOut}
+        disabled={signingOut}
+        aria-label="Sign out"
+        title="Sign out"
+        className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--chip-hover)] disabled:opacity-50"
+        style={{ color: "var(--muted)" }}
+      >
+        <LogOut size={16} />
+      </button>
     </div>
   );
 }
