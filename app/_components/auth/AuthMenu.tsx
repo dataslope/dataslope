@@ -14,7 +14,7 @@
  */
 import { useState } from "react";
 import { Menu } from "@base-ui-components/react/menu";
-import { LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "../Link";
 import { signOut, useSession } from "@/lib/auth/client";
@@ -124,6 +124,13 @@ export function AuthMenu() {
             </div>
             <Menu.Item
               className="mt-1 flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
+              render={<Link href="/dashboard/create" />}
+            >
+              <LayoutDashboard size={16} />
+              Dashboard
+            </Menu.Item>
+            <Menu.Item
+              className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
               render={<Link href="/dashboard/account" />}
             >
               <UserIcon size={16} />
