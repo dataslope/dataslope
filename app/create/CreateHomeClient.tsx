@@ -24,7 +24,13 @@ import {
 import { useSession } from "@/lib/auth/client";
 import { customItemShortLabel } from "@/lib/custom-content/labels";
 import type { CustomItemKind, CustomItemMeta, CustomSetMeta } from "@/lib/custom-content/types";
-import { deleteItem, deleteSet, listItems, listSets } from "./_components/api";
+import {
+  CustomApiError,
+  deleteItem,
+  deleteSet,
+  listItems,
+  listSets,
+} from "./_components/api";
 import { useCopyToClipboard } from "./_components/builderUi";
 
 const PAGE_SIZE = 6;
@@ -48,6 +54,7 @@ export default function CreateHomeClient() {
   const [items, setItems] = useState<CustomItemMeta[] | null>(null);
   const [sets, setSets] = useState<CustomSetMeta[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [page, setPage] = useState(1);
 
   const refresh = useCallback(() => {
@@ -56,8 +63,19 @@ export default function CreateHomeClient() {
         setItems(i);
         setSets(s);
         setListError(null);
+        setUnauthorized(false);
       })
-      .catch(() => setListError("Couldn't load your creations, try reloading."));
+      .catch((err) => {
+        // A cached client session can outlive the server cookie (e.g. on a
+        // preview domain), so the API 401s even though useSession() reports a
+        // user. Treat that as signed-out and show the sign-in prompt rather
+        // than a hard error stuck next to a perpetual "Loading…".
+        if (err instanceof CustomApiError && err.status === 401) {
+          setUnauthorized(true);
+        } else {
+          setListError("Couldn't load your creations, try reloading.");
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -118,16 +136,31 @@ export default function CreateHomeClient() {
         Create menu.
       </p>
 
-      {listError ? (
-        <p className="mt-4 text-sm" style={{ color: "var(--danger)" }}>
-          {listError}
-        </p>
-      ) : null}
-
-      {isPending ? null : !session ? (
+      {isPending ? null : !session || unauthorized ? (
         <SignInNotice />
+      ) : listError && items === null ? (
+        // Initial load failed (no data yet): offer a reload instead of tables.
+        <div className="mt-8 flex items-center gap-3">
+          <p className="text-sm" style={{ color: "var(--danger)" }}>
+            {listError}
+          </p>
+          <button
+            type="button"
+            onClick={refresh}
+            className="inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium"
+            style={{ border: "1px solid var(--divider)", color: "var(--ink)" }}
+          >
+            Reload
+          </button>
+        </div>
       ) : (
         <>
+          {/* Transient error (e.g. a failed delete): non-blocking, keeps the lists. */}
+          {listError ? (
+            <p className="mt-4 text-sm" style={{ color: "var(--danger)" }}>
+              {listError}
+            </p>
+          ) : null}
           <Section icon={<ListChecks size={17} />} title="Your challenges & questions">
             <CreationsTable
               rows={itemRows}
