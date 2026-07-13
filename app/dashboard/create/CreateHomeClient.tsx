@@ -128,9 +128,7 @@ export default function CreateHomeClient() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--ink)" }}>
-        My Creations
-      </h1>
+      <h1 className="ds-h1">My Creations</h1>
       <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "var(--muted)" }}>
         Everything you have built, in one place. Start something new from the
         Create menu.
@@ -144,12 +142,7 @@ export default function CreateHomeClient() {
           <p className="text-sm" style={{ color: "var(--danger)" }}>
             {listError}
           </p>
-          <button
-            type="button"
-            onClick={refresh}
-            className="inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium"
-            style={{ border: "1px solid var(--divider)", color: "var(--ink)" }}
-          >
+          <button type="button" onClick={refresh} className="ds-page-btn">
             Reload
           </button>
         </div>
@@ -285,11 +278,8 @@ function CreationsTable({
                 key={i}
                 type="button"
                 onClick={() => onPageChange?.(i + 1)}
-                className="inline-flex h-8 min-w-8 items-center justify-center rounded-md px-1 text-[13px] font-medium"
-                style={{
-                  background: current === i + 1 ? "var(--panel)" : "transparent",
-                  color: current === i + 1 ? "var(--ink)" : "var(--muted)",
-                }}
+                data-active={current === i + 1 || undefined}
+                className="ds-page-num"
               >
                 {i + 1}
               </button>
@@ -435,9 +425,7 @@ function IconAction({
   danger?: boolean;
   children: React.ReactNode;
 }) {
-  const cls =
-    "inline-flex h-[30px] w-[30px] items-center justify-center rounded-md";
-  const color = danger ? "var(--danger)" : "var(--muted)";
+  const cls = danger ? "ds-icon-btn ds-icon-btn-danger" : "ds-icon-btn";
   if (href) {
     return (
       <Link
@@ -448,7 +436,6 @@ function IconAction({
         aria-label={label}
         onClick={onClick}
         className={cls}
-        style={{ color }}
       >
         {children}
       </Link>
@@ -461,7 +448,6 @@ function IconAction({
       aria-label={label}
       onClick={onClick}
       className={cls}
-      style={{ color }}
     >
       {children}
     </button>
@@ -482,8 +468,7 @@ function PageNavButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium disabled:opacity-40"
-      style={{ border: "1px solid var(--divider)", color: "var(--ink)" }}
+      className="ds-page-btn"
     >
       {children}
     </button>

@@ -57,6 +57,13 @@
    classes (e.g. the avatar's `size-*`) are never generated, so the avatar
    image falls back to its intrinsic ~96px size. */
 @source "./_components/auth/**/*.{ts,tsx}";
+/* The standalone auth routes (shadcn auth-block layout). Their shared chrome
+   lives in _components/auth (sourced above); these globs cover the route
+   clients themselves (SignInClient, ResetPasswordClient). */
+@source "./sign-in/**/*.{ts,tsx}";
+@source "./sign-up/**/*.{ts,tsx}";
+@source "./forgot-password/**/*.{ts,tsx}";
+@source "./reset-password/**/*.{ts,tsx}";
 @source "./_components/legal/**/*.{ts,tsx}";
 @source "./magicui-demo/**/*.{ts,tsx}";
 /* Thin route pages that author Tailwind classes directly. These were missing

@@ -23,17 +23,36 @@ import {
   verifySolutionViaCard,
 } from "../_components/solutionVerify";
 import {
+  BuilderSplit,
+  CheckboxField,
   ErrorNotice,
-  Fieldset,
   GuestNotice,
+  ItemHeader,
+  PreviewPlaceholder,
   PrimaryButton,
   SecondaryButton,
+  Section,
   SelectField,
   SharedLinkPanel,
   SmallButton,
   TextAreaField,
   TextField,
 } from "../_components/builderUi";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
+import {
+  AlignLeft,
+  CircleCheck,
+  Code,
+  Database,
+  Eye,
+  FlaskConical,
+  Lightbulb,
+  Plus,
+  Tag,
+  Type,
+  WholeWord,
+  Wrench,
+} from "lucide-react";
 import { useSaveItem } from "../_components/useSaveItem";
 import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
@@ -302,108 +321,125 @@ export default function SqlChallengeBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
+  // The live-preview column: the real learner-facing card once Preview (or a
+  // verifying save) has mounted it, a pulsing placeholder until then. Keyed
+  // remount: the SQL engine re-seeds with the new setup SQL.
+  const previewColumn = preview ? (
+    <div key={preview.version}>
+      <CustomItemRenderer title={preview.title} payload={preview.payload} />
+    </div>
+  ) : (
+    <PreviewPlaceholder note="The learner-facing SQL challenge renders here. Click Preview to load it with your fields." />
+  );
+
   return (
-    <div className="flex flex-col gap-6">
+    <BuilderSplit preview={previewColumn}>
+      <BuilderHeader
+        title="New SQL challenge"
+        lede="Define the tables and seed data, write the task, and pick the checks. Recipients query a real database in their browser."
+        aiPlaceholder="Describe the exercise and AI fills every field below"
+      />
       <GuestNotice />
 
-      <div className="grid gap-6 sm:grid-cols-[1fr_200px]">
-        <TextField
-          label="Title"
-          value={title}
+      <div className="ds-section flex flex-col gap-7">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
+          <TextField
+            label="Title"
+            icon={Type}
+            value={title}
+            onChange={(v) => {
+              setTitle(v);
+              saveState.clearError();
+            }}
+            placeholder="e.g. Top customers by revenue"
+            maxLength={120}
+          />
+          <SelectField
+            label="Dialect"
+            icon={Database}
+            value={dialect}
+            onChange={(v) => setDialect(v as CustomSqlDialect)}
+            options={(["sqlite", "duckdb", "postgres"] as const).map((d) => ({
+              value: d,
+              label: sqlDialectLabel(d),
+            }))}
+          />
+        </div>
+
+        <TextAreaField
+          label="Instructions"
+          icon={AlignLeft}
+          value={instructions}
           onChange={(v) => {
-            setTitle(v);
+            setInstructions(v);
             saveState.clearError();
+            setFormError(null);
           }}
-          placeholder="e.g. Top customers by revenue"
-          maxLength={120}
-        />
-        <SelectField
-          label="Dialect"
-          value={dialect}
-          onChange={(v) => setDialect(v as CustomSqlDialect)}
-          options={(["sqlite", "duckdb", "postgres"] as const).map((d) => ({
-            value: d,
-            label: sqlDialectLabel(d),
-          }))}
+          rows={3}
+          placeholder="What should the learner's query return? Markdown supported."
+          hint="Markdown supported: paragraphs, bullet lists, **bold**, and `inline code`."
         />
       </div>
 
-      <TextAreaField
-        label="Instructions"
-        value={instructions}
-        onChange={(v) => {
-          setInstructions(v);
-          saveState.clearError();
-          setFormError(null);
-        }}
-        rows={4}
-        placeholder="What should the learner's query return? Markdown supported."
-        hint="Markdown supported: paragraphs, bullet lists, **bold**, and `inline code`."
-      />
+      <Section icon={Database} title="Database & solution">
+        <TextAreaField
+          label="Setup SQL"
+          note="runs once, create tables and seed data"
+          icon={Wrench}
+          value={initSql}
+          onChange={(v) => setInitSql(v)}
+          rows={6}
+          mono
+          placeholder={"CREATE TABLE orders (id INTEGER, amount REAL);\nINSERT INTO orders VALUES (1, 19.99), (2, 5.00);"}
+        />
+        <TextAreaField
+          label="Starter SQL"
+          note="optional, pre-filled in the learner's editor"
+          icon={Code}
+          value={starterCode}
+          onChange={(v) => setStarterCode(v)}
+          rows={2}
+          mono
+          placeholder={"-- Write a query that…\nSELECT "}
+        />
+        <TextAreaField
+          label="Solution SQL"
+          icon={Lightbulb}
+          value={solutionSql}
+          onChange={(v) => setSolutionSql(v)}
+          rows={3}
+          mono
+          placeholder="SELECT customer, SUM(amount) AS total FROM orders GROUP BY customer ORDER BY total DESC;"
+          hint={
+            'Required. Saving runs this solution against your tests, the challenge only publishes when it passes. Also enables the "Show Solution" button and the "matches the solution" check.'
+          }
+        />
+      </Section>
 
-      <TextAreaField
-        label="Setup SQL (optional)"
-        value={initSql}
-        onChange={(v) => setInitSql(v)}
-        rows={8}
-        mono
-        placeholder={"CREATE TABLE orders (id INTEGER, amount REAL);\nINSERT INTO orders VALUES (1, 19.99), (2, 5.00);"}
-        hint="Runs once before the learner's first query, create tables and seed data here."
-      />
-
-      <TextAreaField
-        label="Starter SQL (optional)"
-        value={starterCode}
-        onChange={(v) => setStarterCode(v)}
-        rows={3}
-        mono
-        placeholder={"-- Write a query that…\nSELECT "}
-        hint="Pre-filled in the learner's editor."
-      />
-
-      <TextAreaField
-        label="Solution SQL"
-        value={solutionSql}
-        onChange={(v) => setSolutionSql(v)}
-        rows={4}
-        mono
-        placeholder="SELECT customer, SUM(amount) AS total FROM orders GROUP BY customer ORDER BY total DESC;"
-        hint={
-          'Required. Saving runs this solution against your tests, the challenge only publishes when it passes. Also enables the "Show Solution" button and the "matches the solution" check.'
-        }
-      />
-
-      <Fieldset
-        legend="Tests"
+      <Section
+        icon={FlaskConical}
+        title="Tests"
         actions={
           <SmallButton
             onClick={() => setTests((prev) => [...prev, { ...NEW_TEST }])}
             disabled={tests.length >= 20}
           >
-            + Add test
+            <Plus size={12} />
+            Add test
           </SmallButton>
         }
       >
         {tests.map((test, i) => (
-          <div
-            key={i}
-            className="bg-muted/50 rounded-lg p-3"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                Test {i + 1}
-              </span>
-              <SmallButton
-                tone="danger"
-                onClick={() => setTests((prev) => prev.filter((_, j) => j !== i))}
-                disabled={tests.length <= 1}
-              >
-                Remove
-              </SmallButton>
-            </div>
-            <div className="mt-3 flex flex-col gap-3">
+          <div key={i} className="flex flex-col gap-[22px]">
+            <ItemHeader
+              label={`Test ${i + 1}`}
+              onRemove={() => setTests((prev) => prev.filter((_, j) => j !== i))}
+              removeDisabled={tests.length <= 1}
+            />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
               <TextField
                 label="Name"
+                icon={Tag}
                 value={test.name}
                 onChange={(v) => updateTest(i, { name: v })}
                 placeholder={`e.g. Returns one row per customer`}
@@ -411,6 +447,7 @@ export default function SqlChallengeBuilder() {
               />
               <SelectField
                 label="Check"
+                icon={CircleCheck}
                 value={test.assertion}
                 onChange={(v) =>
                   updateTest(i, {
@@ -427,84 +464,72 @@ export default function SqlChallengeBuilder() {
                     : undefined
                 }
               />
-              {test.assertion === "matchesSolution" ? (
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={test.ordered}
-                    onChange={(e) => updateTest(i, { ordered: e.target.checked })}
-                    className="accent-[var(--ds-green-600)]"
-                  />
-                  Row order must match too
-                </label>
-              ) : (
-                <TextField
-                  label={
-                    test.assertion === "expectedRowCount" ||
-                    test.assertion === "rowCountAtLeast"
-                      ? "Row count"
-                      : "Column names (comma-separated)"
-                  }
-                  value={test.value}
-                  onChange={(v) => updateTest(i, { value: v })}
-                  placeholder={
-                    test.assertion === "expectedRowCount" ||
-                    test.assertion === "rowCountAtLeast"
-                      ? "e.g. 5"
-                      : "e.g. customer, total"
-                  }
-                />
-              )}
             </div>
+            {test.assertion === "matchesSolution" ? (
+              <CheckboxField
+                label="Row order must match too"
+                checked={test.ordered}
+                onChange={(v) => updateTest(i, { ordered: v })}
+              />
+            ) : (
+              <TextField
+                label={
+                  test.assertion === "expectedRowCount" ||
+                  test.assertion === "rowCountAtLeast"
+                    ? "Row count"
+                    : "Column names (comma-separated)"
+                }
+                icon={WholeWord}
+                value={test.value}
+                onChange={(v) => updateTest(i, { value: v })}
+                placeholder={
+                  test.assertion === "expectedRowCount" ||
+                  test.assertion === "rowCountAtLeast"
+                    ? "e.g. 5"
+                    : "e.g. customer, total"
+                }
+              />
+            )}
           </div>
         ))}
-      </Fieldset>
+      </Section>
 
-      <ErrorNotice message={formError ?? saveState.error} />
-      {saveState.savedUrl ? (
-        <SharedLinkPanel
-          url={saveState.savedUrl}
-          editable={saveState.editingId !== null}
-        />
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-3">
-        <PrimaryButton onClick={onSave} disabled={saveState.saving || verifying}>
-          {verifying
-            ? "Verifying solution…"
-            : saveState.saving
-              ? "Saving…"
-              : saveState.editingId
-                ? "Verify & save changes"
-                : "Verify & get link"}
-        </PrimaryButton>
-        <SecondaryButton onClick={onPreview} disabled={verifying}>
-          {preview ? "Refresh preview" : "Preview"}
-        </SecondaryButton>
-        {verifying ? (
-          <span
-            role="status"
-            className="text-muted-foreground text-sm"
-          >
-            Running your solution against the tests below, the first run can
-            take a moment while the database engine loads…
-          </span>
+      <div className="mt-7 flex flex-col gap-5">
+        <ErrorNotice message={formError ?? saveState.error} />
+        {saveState.savedUrl ? (
+          <SharedLinkPanel
+            url={saveState.savedUrl}
+            editable={saveState.editingId !== null}
+          />
         ) : null}
-      </div>
 
-      {preview ? (
-        <div>
-          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <PrimaryButton onClick={onSave} disabled={saveState.saving || verifying}>
+            <CircleCheck size={14} />
             {verifying
-              ? "Verifying, your solution is running in this card"
-              : "Preview, exactly what visitors will see"}
-          </h2>
-          {/* Keyed remount: the SQL engine re-seeds with the new setup SQL. */}
-          <div key={preview.version}>
-            <CustomItemRenderer title={preview.title} payload={preview.payload} />
-          </div>
+              ? "Verifying solution…"
+              : saveState.saving
+                ? "Saving…"
+                : saveState.editingId
+                  ? "Verify & save changes"
+                  : "Verify & get link"}
+          </PrimaryButton>
+          <SecondaryButton onClick={onPreview} disabled={verifying}>
+            <Eye size={14} />
+            {preview ? "Refresh preview" : "Preview"}
+          </SecondaryButton>
+          {verifying ? (
+            <span
+              role="status"
+              className="ds-pulse text-[13px]"
+              style={{ color: "var(--muted)" }}
+            >
+              Running your solution against the tests, the first run can take a
+              moment while the database engine loads…
+            </span>
+          ) : null}
         </div>
-      ) : null}
-    </div>
+      </div>
+    </BuilderSplit>
   );
 }

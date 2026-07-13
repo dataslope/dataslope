@@ -9,6 +9,21 @@ html, body {
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
 }
 
+/* Actionable controls get a pointer cursor everywhere. Tailwind v4's
+   Preflight (and the browser default) leaves buttons on `cursor: default`,
+   which made every button across the app — most visibly the dashboard's —
+   read as inert. Unlayered on purpose so it also wins over utility classes;
+   disabled controls keep the default cursor. */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
 /* Pre-paint document background, keyed off the explicit `.dark` class that
    every route applies to <html> before first paint (the per-route
    THEME_BOOTSTRAP scripts, the /playground bootstrap in app/layout.tsx, and

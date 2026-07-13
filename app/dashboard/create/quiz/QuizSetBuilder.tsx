@@ -11,8 +11,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { customItemShortLabel } from "@/lib/custom-content/labels";
 import type { CustomItemKind, CustomItemMeta } from "@/lib/custom-content/types";
 import {
@@ -24,15 +22,30 @@ import {
   updateSet,
 } from "../_components/api";
 import {
+  BuilderSplit,
   ErrorNotice,
-  Fieldset,
   GuestNotice,
+  PreviewPlaceholder,
   PrimaryButton,
+  Section,
   SharedLinkPanel,
   SmallButton,
   TextAreaField,
   TextField,
 } from "../_components/builderUi";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
+import {
+  AlignLeft,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  LayoutGrid,
+  Link2,
+  Plus,
+  Save,
+  Trash2,
+  Type,
+} from "lucide-react";
 import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
 
@@ -214,79 +227,131 @@ export default function QuizSetBuilder() {
   const pickedIds = new Set(picked.map((p) => p.id));
   const addable = (mine ?? []).filter((m) => !pickedIds.has(m.id));
 
+  const chipCls =
+    "flex-shrink-0 rounded-full px-[9px] py-[3px] text-[11px] font-semibold";
+  const chipStyle = { background: "var(--chip-bg)", color: "var(--muted)" };
+
   return (
-    <div className="flex flex-col gap-6">
+    <BuilderSplit
+      preview={
+        <PreviewPlaceholder note="The quiz set share page renders here. Save to get the shareable link." />
+      }
+    >
+      <BuilderHeader
+        title="New quiz set"
+        lede="Pick the challenges and questions, put them in order, and share one link to the whole quiz."
+        aiPlaceholder="Describe the quiz and AI drafts a title and description"
+      />
       <GuestNotice />
 
-      <TextField
-        label="Title"
-        value={title}
-        onChange={(v) => {
-          setTitle(v);
-          setFormError(null);
-        }}
-        placeholder="e.g. SQL joins practice set"
-        maxLength={120}
-      />
+      <div className="ds-section flex flex-col gap-7">
+        <TextField
+          label="Title"
+          icon={Type}
+          value={title}
+          onChange={(v) => {
+            setTitle(v);
+            setFormError(null);
+          }}
+          placeholder="e.g. SQL joins practice set"
+          maxLength={120}
+        />
 
-      <TextAreaField
-        label="Description (optional)"
-        value={description}
-        onChange={(v) => setDescription(v)}
-        rows={2}
-        placeholder="Shown under the quiz title on the share page."
-      />
+        <TextAreaField
+          label="Description"
+          note="optional"
+          icon={AlignLeft}
+          value={description}
+          onChange={(v) => setDescription(v)}
+          rows={2}
+          placeholder="Shown under the quiz title on the share page."
+        />
+      </div>
 
-      <Fieldset legend={`Questions in this quiz (${picked.length})`}>
+      <Section
+        icon={Layers}
+        title="Questions in this quiz"
+        actions={
+          <span
+            className="inline-flex h-5 min-w-[22px] items-center justify-center rounded-full px-[7px] text-[11px] font-bold"
+            style={chipStyle}
+          >
+            {picked.length}
+          </span>
+        }
+      >
         {picked.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            Nothing here yet, add your own creations below or paste a /c/…
-            link.
+          <p className="text-[13px]" style={{ color: "var(--muted)" }}>
+            Nothing here yet, add your own creations below or paste a /c/… link.
           </p>
         ) : (
-          <ol className="flex flex-col gap-2">
+          <ol className="m-0 flex list-none flex-col p-0">
             {picked.map((item, i) => (
               <li
                 key={item.id}
-                className="bg-muted/50 flex items-center gap-3 rounded-lg px-3 py-2"
+                className="flex items-center gap-2.5 px-0.5 py-2.5"
+                style={{ borderTop: "1px solid var(--divider)" }}
               >
-                <span className="text-muted-foreground w-6 shrink-0 text-right text-sm font-semibold">
+                <span
+                  className="w-5 flex-shrink-0 text-right text-[13px] font-semibold"
+                  style={{ color: "var(--faint)" }}
+                >
                   {i + 1}.
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm">
+                <span
+                  className="ds-mono w-[84px] flex-shrink-0 truncate text-xs"
+                  style={{ color: "var(--faint)" }}
+                >
+                  {item.id}
+                </span>
+                <span
+                  className="min-w-0 flex-1 truncate text-sm font-medium"
+                  style={{ color: "var(--ink)" }}
+                >
                   {item.title}
                 </span>
-                <Badge variant="outline" className="text-muted-foreground shrink-0 rounded-full text-[11px]">
+                <span className={chipCls} style={chipStyle}>
                   {customItemShortLabel(item.kind)}
-                </Badge>
-                <span className="flex shrink-0 gap-1">
-                  <SmallButton onClick={() => move(i, -1)} disabled={i === 0}>
-                    ↑
-                  </SmallButton>
-                  <SmallButton
+                </span>
+                <span className="flex flex-shrink-0 gap-0.5">
+                  <button
+                    type="button"
+                    aria-label="Move up"
+                    onClick={() => move(i, -1)}
+                    disabled={i === 0}
+                    className="ds-icon-btn disabled:opacity-40"
+                  >
+                    <ChevronUp size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move down"
                     onClick={() => move(i, 1)}
                     disabled={i === picked.length - 1}
+                    className="ds-icon-btn disabled:opacity-40"
                   >
-                    ↓
-                  </SmallButton>
-                  <SmallButton
-                    tone="danger"
+                    <ChevronDown size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Remove"
                     onClick={() =>
                       setPicked((prev) => prev.filter((p) => p.id !== item.id))
                     }
+                    className="ds-icon-btn ds-icon-btn-danger"
                   >
-                    Remove
-                  </SmallButton>
+                    <Trash2 size={14} />
+                  </button>
                 </span>
               </li>
             ))}
           </ol>
         )}
-      </Fieldset>
+      </Section>
 
-      <Fieldset legend="Add by link or id">
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
+      <Section icon={Link2} title="Add by link or id">
+        <div className="flex gap-2">
+          <input
             type="text"
             value={linkInput}
             onChange={(e) => {
@@ -294,63 +359,84 @@ export default function QuizSetBuilder() {
               setFormError(null);
             }}
             placeholder="https://…/c/abcd1234efgh5678 or the 16-character id"
-            className="min-w-0 flex-1 font-mono text-[13px] md:text-[13px]"
+            className="ds-input ds-mono flex-1"
           />
-          <SmallButton onClick={onAddByLink} disabled={resolving || !linkInput.trim()}>
+          <button
+            type="button"
+            onClick={onAddByLink}
+            disabled={resolving || !linkInput.trim()}
+            className="flex h-[38px] flex-shrink-0 items-center gap-1.5 rounded-[7px] border-none px-3.5 text-[13px] font-semibold transition-colors hover:bg-[var(--chip-hover)] disabled:opacity-50"
+            style={{ background: "var(--chip-bg)", color: "var(--ink)" }}
+          >
+            <Plus size={12} />
             {resolving ? "Looking up…" : "Add"}
-          </SmallButton>
+          </button>
         </div>
-      </Fieldset>
+      </Section>
 
       {session ? (
-        <Fieldset legend="Your creations">
+        <Section icon={LayoutGrid} title="Your creations">
           {mine === null ? (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-[13px]" style={{ color: "var(--muted)" }}>
               Loading…
             </p>
           ) : addable.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-[13px]" style={{ color: "var(--muted)" }}>
               {mine.length === 0
                 ? "You haven't created any challenges or questions yet."
                 : "All of your creations are already in this quiz."}
             </p>
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="m-0 flex list-none flex-col p-0">
               {addable.map((item) => (
                 <li
                   key={item.id}
-                  className="bg-muted/50 flex items-center gap-3 rounded-lg px-3 py-2"
+                  className="flex items-center gap-2.5 px-0.5 py-2.5"
+                  style={{ borderTop: "1px solid var(--divider)" }}
                 >
-                  <span className="min-w-0 flex-1 truncate text-sm">
+                  <span
+                    className="ds-mono w-[84px] flex-shrink-0 truncate text-xs"
+                    style={{ color: "var(--faint)" }}
+                  >
+                    {item.id}
+                  </span>
+                  <span
+                    className="min-w-0 flex-1 truncate text-sm"
+                    style={{ color: "var(--ink)" }}
+                  >
                     {item.title}
                   </span>
-                  <Badge variant="outline" className="text-muted-foreground shrink-0 rounded-full text-[11px]">
+                  <span className={chipCls} style={chipStyle}>
                     {customItemShortLabel(item.kind)}
-                  </Badge>
+                  </span>
                   <SmallButton
                     onClick={() =>
                       addPicked({ id: item.id, title: item.title, kind: item.kind })
                     }
                   >
+                    <Plus size={12} />
                     Add
                   </SmallButton>
                 </li>
               ))}
             </ul>
           )}
-        </Fieldset>
+        </Section>
       ) : null}
 
-      <ErrorNotice message={formError} />
-      {savedUrl ? (
-        <SharedLinkPanel url={savedUrl} editable={editingId !== null} />
-      ) : null}
+      <div className="mt-7 flex flex-col gap-5">
+        <ErrorNotice message={formError} />
+        {savedUrl ? (
+          <SharedLinkPanel url={savedUrl} editable={editingId !== null} />
+        ) : null}
 
-      <div className="flex items-center gap-3">
-        <PrimaryButton onClick={onSave} disabled={saving}>
-          {saving ? "Saving…" : editingId ? "Save changes" : "Save & get link"}
-        </PrimaryButton>
+        <div className="flex items-center gap-2.5">
+          <PrimaryButton onClick={onSave} disabled={saving}>
+            <Save size={14} />
+            {saving ? "Saving…" : editingId ? "Save changes" : "Save & get link"}
+          </PrimaryButton>
+        </div>
       </div>
-    </div>
+    </BuilderSplit>
   );
 }

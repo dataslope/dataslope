@@ -8,6 +8,7 @@ import {
   CircleHelp,
   Layers,
   LayoutGrid,
+  SquareTerminal,
   User,
   Shield,
   type LucideIcon,
@@ -19,6 +20,7 @@ export type StudioRouteKey =
   | "sql"
   | "mcq"
   | "quiz"
+  | "playground"
   | "account"
   | "admin";
 
@@ -41,6 +43,12 @@ export const CREATE_ITEMS: StudioNavItem[] = [
 /** Standalone dashboard pages linked below the Create group. Admin is filtered
  *  to admins by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
+  {
+    key: "playground",
+    label: "Playground",
+    href: "/dashboard/playground",
+    icon: SquareTerminal,
+  },
   { key: "account", label: "Account", href: "/dashboard/account", icon: User },
   { key: "admin", label: "Admin", href: "/dashboard/admin", icon: Shield },
 ];
@@ -67,6 +75,7 @@ export function activeKeyForPath(pathname: string): StudioRouteKey {
   if (path.startsWith("/dashboard/create/sql")) return "sql";
   if (path.startsWith("/dashboard/create/mcq")) return "mcq";
   if (path.startsWith("/dashboard/create/quiz")) return "quiz";
+  if (path.startsWith("/dashboard/playground")) return "playground";
   if (path.startsWith("/dashboard/account")) return "account";
   if (path.startsWith("/dashboard/admin")) return "admin";
   return "hub";

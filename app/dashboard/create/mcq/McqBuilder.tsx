@@ -15,15 +15,19 @@ import { validateItemPayload } from "@/lib/custom-content/schema";
 import type { McqPayload } from "@/lib/custom-content/types";
 import { getItem } from "../_components/api";
 import {
+  BuilderSplit,
   ErrorNotice,
-  Fieldset,
   GuestNotice,
+  PreviewPlaceholder,
   PrimaryButton,
+  Section,
   SharedLinkPanel,
   SmallButton,
   TextAreaField,
   TextField,
 } from "../_components/builderUi";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
+import { CircleHelp, Info, List, Plus, Save, Type } from "lucide-react";
 import { useSaveItem } from "../_components/useSaveItem";
 import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
@@ -196,177 +200,229 @@ export default function McqBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
+  // The live-preview column renders the real question card and updates as you
+  // type (markdown serialization is cheap). Remount on content change so a
+  // submitted preview resets.
+  const previewColumn = previewReady ? (
+    <div key={markdown}>
+      <CustomItemRenderer
+        title={title || "Untitled question"}
+        payload={{ kind: "mcq", markdown }}
+      />
+    </div>
+  ) : (
+    <PreviewPlaceholder note="The learner-facing question renders here as you type. Add a question and at least two choices." />
+  );
+
   return (
-    <div className="flex flex-col gap-6">
+    <BuilderSplit preview={previewColumn}>
+      <BuilderHeader
+        title="New multiple-choice question"
+        lede="Write the question and choices, mark the correct answer, and add feedback."
+        aiPlaceholder="Describe the question and AI fills every field below"
+      />
       <GuestNotice />
 
-      <TextField
-        label="Title"
-        value={title}
-        onChange={(v) => {
-          setTitle(v);
-          saveState.clearError();
-        }}
-        placeholder="e.g. Pandas groupby basics"
-        maxLength={120}
-        hint="Shown on the share page and in quiz sets."
-      />
-
-      <div
-        role="tablist"
-        aria-label="Authoring mode"
-        className="bg-muted flex w-fit items-center gap-1 rounded-lg p-1"
-      >
-        {(["form", "markdown"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="tab"
-            aria-selected={mode === m}
-            onClick={() => switchMode(m)}
-            className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-              mode === m
-                ? "bg-background text-foreground shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {m === "form" ? "Form" : "Markdown"}
-          </button>
-        ))}
-      </div>
-
-      {mode === "markdown" ? (
-        <TextAreaField
-          label="Question source"
-          value={markdownDraft}
+      <div className="ds-section flex flex-col gap-7">
+        <TextField
+          label="Title"
+          note="shown on the share page and in quiz sets"
+          icon={Type}
+          value={title}
           onChange={(v) => {
-            setMarkdownDraft(v);
-            saveState.clearError();
-            setFormError(null);
-          }}
-          rows={14}
-          mono
-          placeholder={MARKDOWN_PLACEHOLDER}
-          hint={
-            "The site's MCQ syntax: question body first, then one choice per `- ` line with `[o]` marking the correct one, indented `>` lines as per-choice explanations, and anything after the choices as the overall explanation. Markdown, fenced code, and KaTeX math all work."
-          }
-        />
-      ) : (
-        <>
-        <TextAreaField
-          label="Question"
-          value={question}
-          onChange={(v) => {
-            setQuestion(v);
+            setTitle(v);
             saveState.clearError();
           }}
-          rows={4}
-          placeholder={"Which tool is commonly used for dashboards?\n\nMarkdown, `code`, and $math$ all work here."}
-          hint="Markdown supported: paragraphs, lists, fenced code blocks, and KaTeX math."
+          placeholder="e.g. Pandas groupby basics"
+          maxLength={120}
         />
-  
-        <Fieldset
-          legend="Choices"
-          actions={
-            <SmallButton
-              onClick={() => setChoices((prev) => [...prev, { ...EMPTY_CHOICE }])}
-              disabled={choices.length >= 8}
-            >
-              + Add choice
-            </SmallButton>
-          }
+
+        <div
+          role="tablist"
+          aria-label="Authoring mode"
+          className="flex w-fit items-center gap-1 rounded-lg p-1"
+          style={{ background: "var(--panel)" }}
         >
-          {choices.map((choice, i) => (
-            <div
-              key={i}
-              className="bg-muted/50 rounded-lg p-3"
+          {(["form", "markdown"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="tab"
+              aria-selected={mode === m}
+              onClick={() => switchMode(m)}
+              className="rounded-md px-3 py-1 text-xs font-semibold transition-colors"
+              style={
+                mode === m
+                  ? {
+                      background: "var(--input)",
+                      color: "var(--ink)",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
+                    }
+                  : { color: "var(--muted)" }
+              }
             >
-              <div className="flex items-center justify-between gap-3">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="correct-choice"
-                    checked={choice.correct}
-                    onChange={() => markCorrect(i)}
-                    className="accent-[var(--ds-green-600)]"
-                  />
-                  Correct answer
-                </label>
-                <SmallButton
-                  tone="danger"
-                  onClick={() =>
-                    setChoices((prev) => prev.filter((_, j) => j !== i))
-                  }
-                  disabled={choices.length <= 2}
-                >
-                  Remove
-                </SmallButton>
-              </div>
-              <div className="mt-3 flex flex-col gap-3">
-                <TextAreaField
-                  label={`Choice ${i + 1}`}
-                  value={choice.text}
-                  onChange={(v) => updateChoice(i, { text: v })}
-                  rows={2}
-                  placeholder="Choice text (Markdown works)"
-                />
-                <TextAreaField
-                  label="Explanation (optional)"
-                  value={choice.explanation}
-                  onChange={(v) => updateChoice(i, { explanation: v })}
-                  rows={2}
-                  placeholder="Shown after submitting. Write a neutral statement, it's shown to everyone."
-                />
-              </div>
-            </div>
+              {m === "form" ? "Form" : "Markdown"}
+            </button>
           ))}
-        </Fieldset>
-  
-        <TextAreaField
-          label="Overall explanation (optional)"
-          value={explanation}
-          onChange={(v) => {
-            setExplanation(v);
-            saveState.clearError();
-          }}
-          rows={3}
-          placeholder="Shown under the question after any answer is submitted."
-        />
-        </>
-      )}
+        </div>
 
-      <ErrorNotice message={formError ?? saveState.error} />
-      {saveState.savedUrl ? (
-        <SharedLinkPanel
-          url={saveState.savedUrl}
-          editable={saveState.editingId !== null}
-        />
-      ) : null}
-
-      <div className="flex items-center gap-3">
-        <PrimaryButton onClick={onSave} disabled={saveState.saving}>
-          {saveState.saving
-            ? "Saving…"
-            : saveState.editingId
-              ? "Save changes"
-              : "Save & get link"}
-        </PrimaryButton>
+        {mode === "markdown" ? (
+          <TextAreaField
+            label="Question source"
+            icon={CircleHelp}
+            value={markdownDraft}
+            onChange={(v) => {
+              setMarkdownDraft(v);
+              saveState.clearError();
+              setFormError(null);
+            }}
+            rows={14}
+            mono
+            placeholder={MARKDOWN_PLACEHOLDER}
+            hint={
+              "The site's MCQ syntax: question body first, then one choice per `- ` line with `[o]` marking the correct one, indented `>` lines as per-choice explanations, and anything after the choices as the overall explanation. Markdown, fenced code, and KaTeX math all work."
+            }
+          />
+        ) : (
+          <TextAreaField
+            label="Question"
+            icon={CircleHelp}
+            value={question}
+            onChange={(v) => {
+              setQuestion(v);
+              saveState.clearError();
+            }}
+            rows={3}
+            placeholder={"Which tool is commonly used for dashboards?\n\nMarkdown, `code`, and $math$ all work here."}
+            hint="Markdown supported: paragraphs, lists, fenced code blocks, and KaTeX math."
+          />
+        )}
       </div>
 
-      {previewReady ? (
-        <div>
-          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
-            Live preview
-          </h2>
-          {/* Remount on content change so a submitted preview resets. */}
-          <div key={markdown}>
-            <CustomItemRenderer
-              title={title || "Untitled question"}
-              payload={{ kind: "mcq", markdown }}
+      {mode === "form" ? (
+        <>
+          <Section
+            icon={List}
+            title="Choices"
+            actions={
+              <SmallButton
+                onClick={() => setChoices((prev) => [...prev, { ...EMPTY_CHOICE }])}
+                disabled={choices.length >= 8}
+              >
+                <Plus size={12} />
+                Add choice
+              </SmallButton>
+            }
+          >
+            {choices.map((choice, i) => (
+              <div key={i} className="flex flex-col gap-3.5">
+                <div className="flex items-center gap-2">
+                  <label
+                    role="radio"
+                    aria-checked={choice.correct}
+                    onClick={() => markCorrect(i)}
+                    className="flex cursor-pointer items-center gap-[7px] text-[13px] font-medium"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <span
+                      className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                      style={{
+                        background: choice.correct
+                          ? "var(--green-btn)"
+                          : "var(--chip-bg)",
+                      }}
+                    >
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{
+                          background: choice.correct ? "#ffffff" : "transparent",
+                        }}
+                      />
+                    </span>
+                    Choice {i + 1}
+                    {choice.correct ? (
+                      <span
+                        className="rounded-full px-[7px] py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                        style={{
+                          color: "var(--green-text)",
+                          background: "var(--green-soft)",
+                        }}
+                      >
+                        Correct
+                      </span>
+                    ) : null}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChoices((prev) => prev.filter((_, j) => j !== i))
+                    }
+                    disabled={choices.length <= 2}
+                    className="ds-btn-danger-chip ml-auto"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <textarea
+                  rows={1}
+                  value={choice.text}
+                  onChange={(e) => updateChoice(i, { text: e.target.value })}
+                  placeholder="Choice text (Markdown works)"
+                  className="ds-textarea"
+                  style={{ minHeight: 40 }}
+                />
+                <textarea
+                  rows={1}
+                  value={choice.explanation}
+                  onChange={(e) => updateChoice(i, { explanation: e.target.value })}
+                  placeholder="Explanation (optional), shown after submitting"
+                  className="ds-textarea"
+                  style={{ minHeight: 40, fontSize: 13, color: "var(--muted)" }}
+                />
+              </div>
+            ))}
+          </Section>
+
+          <Section
+            icon={Info}
+            title="Overall explanation"
+            note="optional, shown after any answer"
+          >
+            <textarea
+              rows={2}
+              value={explanation}
+              onChange={(e) => {
+                setExplanation(e.target.value);
+                saveState.clearError();
+              }}
+              placeholder="Shown under the question after any answer is submitted."
+              className="ds-textarea"
+              style={{ minHeight: 56 }}
             />
-          </div>
-        </div>
+          </Section>
+        </>
       ) : null}
-    </div>
+
+      <div className="mt-7 flex flex-col gap-5">
+        <ErrorNotice message={formError ?? saveState.error} />
+        {saveState.savedUrl ? (
+          <SharedLinkPanel
+            url={saveState.savedUrl}
+            editable={saveState.editingId !== null}
+          />
+        ) : null}
+
+        <div className="flex items-center gap-2.5">
+          <PrimaryButton onClick={onSave} disabled={saveState.saving}>
+            <Save size={14} />
+            {saveState.saving
+              ? "Saving…"
+              : saveState.editingId
+                ? "Save changes"
+                : "Save & get link"}
+          </PrimaryButton>
+        </div>
+      </div>
+    </BuilderSplit>
   );
 }

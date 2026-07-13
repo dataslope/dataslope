@@ -2,11 +2,21 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import Link from "../_components/Link";
 import { ArrowLeft, KeyRound, LogIn, Mail } from "lucide-react";
 import { resetPassword } from "@/lib/auth/client";
-import { EyeIcon } from "../_components/auth/authIcons";
-import styles from "../_components/auth/authCard.module.css";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  AUTH_LINK_CLS,
+  AuthCard,
+  PasswordInput,
+  Spinner,
+} from "../_components/auth/authBlocks";
+import Link from "../_components/Link";
+
+/** Brand-blue primary button (matches the sign-in card's CTA). */
+const SUBMIT_CLS =
+  "w-full bg-[var(--ds-blue-500)] text-white hover:bg-[var(--ds-blue-550)]";
 
 /** Minimum password length, mirrors Better Auth's default (`minPasswordLength`). */
 const MIN_PASSWORD = 8;
@@ -28,7 +38,7 @@ function useLocationSearch(): string | null {
  *  `/reset-password?token=…` (or `?error=…` for an expired/invalid token). We
  *  read those from the URL on the client (no `useSearchParams`, so the route
  *  stays a simple static shell), collect a new password, and submit it. The
- *  card matches the flat "2a" sign-in design (shared auth CSS module). */
+ *  card matches the shadcn auth block used by /sign-in. */
 export function ResetPasswordClient() {
   const router = useRouter();
   const search = useLocationSearch();
@@ -42,7 +52,6 @@ export function ResetPasswordClient() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [confirmTouched, setConfirmTouched] = useState(false);
-  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -84,20 +93,20 @@ export function ResetPasswordClient() {
   }
 
   if (!ready) {
-    return <p className={styles.redirecting}>Loading…</p>;
+    return (
+      <p className="text-muted-foreground text-center text-sm">Loading…</p>
+    );
   }
 
   if (linkError) {
     return (
-      <div className={styles.stack}>
-        <div>
-          <h1 className={styles.title}>Link expired</h1>
-          <p className={styles.subtitle}>
-            This reset link is invalid or has expired.
-          </p>
-        </div>
-        <button
+      <AuthCard
+        title="Link expired"
+        description="This reset link is invalid or has expired"
+      >
+        <Button
           type="button"
+          className={SUBMIT_CLS}
           onClick={() => {
             // Deep-link straight into the "Reset your password" form,
             // landing on the sign-in tab would make the user rediscover
@@ -105,142 +114,114 @@ export function ResetPasswordClient() {
             router.push("/forgot-password");
             router.refresh();
           }}
-          className={styles.primary}
         >
-          <span className={styles.btnBusy}>
-            <Mail size={14} aria-hidden="true" />
-            Request a new link
-          </span>
-        </button>
-      </div>
+          <Mail size={14} aria-hidden="true" />
+          Request a new link
+        </Button>
+      </AuthCard>
     );
   }
 
   if (done) {
     return (
-      <div className={styles.stack}>
-        <div>
-          <h1 className={styles.title}>Password updated</h1>
-          <p className={styles.subtitle}>
-            You can now sign in with your new password.
-          </p>
-        </div>
-        <button
+      <AuthCard
+        title="Password updated"
+        description="You can now sign in with your new password"
+      >
+        <Button
           type="button"
+          className={SUBMIT_CLS}
           onClick={() => {
             router.push("/sign-in");
             router.refresh();
           }}
-          className={styles.primary}
         >
-          <span className={styles.btnBusy}>
-            <LogIn size={14} aria-hidden="true" />
-            Sign in
-          </span>
-        </button>
-      </div>
+          <LogIn size={14} aria-hidden="true" />
+          Sign in
+        </Button>
+      </AuthCard>
     );
   }
 
   return (
-    <div className={styles.stack}>
-      <div>
-        <h1 className={styles.title}>Reset your password</h1>
-        <p className={styles.subtitle}>Choose a new password for your account.</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div>
-          <div className={styles.field}>
-            <input
+    <AuthCard
+      title="Reset your password"
+      description="Choose a new password for your account"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="grid gap-6">
+          <div className="grid gap-3">
+            <Label htmlFor="reset-password">New password</Label>
+            <PasswordInput
               id="reset-password"
-              type={showPw ? "text" : "password"}
               required
               minLength={MIN_PASSWORD}
               autoComplete="new-password"
-              placeholder=" "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={submitting}
               aria-describedby="reset-password-hint"
-              className={`${styles.input} ${styles.inputPw}`}
             />
-            <label htmlFor="reset-password" className={styles.label}>
-              New password
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowPw((s) => !s)}
-              aria-label={showPw ? "Hide password" : "Show password"}
-              className={styles.eyeBtn}
-            >
-              <EyeIcon />
-            </button>
-          </div>
-          <div className={styles.pwRow}>
-            <span
+            <p
               id="reset-password-hint"
-              className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
+              className={`text-sm ${pwOk ? "text-[var(--ds-green-700,#008b03)]" : "text-muted-foreground"}`}
             >
               {pwOk ? "Strong enough, looks good." : "At least 8 characters."}
-            </span>
+            </p>
           </div>
-        </div>
 
-        <div className={`${styles.field} ${mismatch ? styles.fieldError : ""}`}>
-          <input
-            id="reset-confirm"
-            type={showPw ? "text" : "password"}
-            required
-            minLength={MIN_PASSWORD}
-            autoComplete="new-password"
-            placeholder=" "
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            onBlur={() => setConfirmTouched(true)}
-            disabled={submitting}
-            aria-invalid={mismatch || undefined}
-            aria-describedby={mismatch ? "reset-confirm-error" : undefined}
-            className={styles.input}
-          />
-          <label htmlFor="reset-confirm" className={styles.label}>
-            Confirm new password
-          </label>
-          {mismatch && (
-            <p id="reset-confirm-error" className={styles.errorText}>
-              Passwords don&apos;t match
+          <div className="grid gap-3">
+            <Label htmlFor="reset-confirm">Confirm new password</Label>
+            <PasswordInput
+              id="reset-confirm"
+              required
+              minLength={MIN_PASSWORD}
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              onBlur={() => setConfirmTouched(true)}
+              disabled={submitting}
+              aria-invalid={mismatch || undefined}
+              aria-describedby={mismatch ? "reset-confirm-error" : undefined}
+            />
+            {mismatch && (
+              <p id="reset-confirm-error" className="text-destructive text-sm">
+                Passwords don&apos;t match
+              </p>
+            )}
+          </div>
+
+          {error && (
+            <p
+              role="alert"
+              className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm"
+            >
+              {error}
             </p>
           )}
+
+          <Button type="submit" className={SUBMIT_CLS} disabled={submitting}>
+            {submitting ? (
+              <>
+                <Spinner />
+                Updating…
+              </>
+            ) : (
+              <>
+                <KeyRound size={14} aria-hidden="true" />
+                Update password
+              </>
+            )}
+          </Button>
+
+          <div className="text-center text-sm">
+            <Link href="/sign-in" className={AUTH_LINK_CLS}>
+              <ArrowLeft size={14} aria-hidden="true" />
+              Back to sign in
+            </Link>
+          </div>
         </div>
-
-        {error && (
-          <p role="alert" className={styles.formError}>
-            {error}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className={styles.primary}
-        >
-          {submitting ? (
-            "Updating…"
-          ) : (
-            <span className={styles.btnBusy}>
-              <KeyRound size={14} aria-hidden="true" />
-              Update password
-            </span>
-          )}
-        </button>
       </form>
-
-      <p className={styles.switch}>
-        <Link href="/sign-in" className={styles.link}>
-          <ArrowLeft size={14} aria-hidden="true" />
-          Back to sign in
-        </Link>
-      </p>
-    </div>
+    </AuthCard>
   );
 }

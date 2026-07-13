@@ -8,7 +8,6 @@ import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
 import McqBuilder from "./McqBuilder";
 
 export const metadata: Metadata = {
@@ -19,15 +18,8 @@ export const metadata: Metadata = {
 
 export default function CreateMcqPage() {
   return (
-    <div className="mx-auto max-w-3xl">
-      <BuilderHeader
-        title="New multiple-choice question"
-        lede="Write the question and choices, mark the correct answer, and add feedback. The preview below updates as you type."
-        aiPlaceholder="Describe the question and AI fills every field below"
-      />
-      <Suspense fallback={null}>
-        <McqBuilder />
-      </Suspense>
-    </div>
+    <Suspense fallback={null}>
+      <McqBuilder />
+    </Suspense>
   );
 }
