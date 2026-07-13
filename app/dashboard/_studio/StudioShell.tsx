@@ -27,6 +27,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
   Eye,
+  LogIn,
   LogOut,
   Maximize,
   Menu,
@@ -339,7 +340,17 @@ function RailSidebar({
         >
           {initial}
         </span>
-      ) : null}
+      ) : (
+        <Link
+          href="/sign-in"
+          aria-label="Sign in"
+          className="ds-rail-item mt-1.5 flex h-[38px] w-[38px] items-center justify-center rounded-[11px]"
+          style={{ color: "var(--muted)" }}
+        >
+          <LogIn size={17} />
+          <span className="ds-rail-tip">Sign in</span>
+        </Link>
+      )}
     </aside>
   );
 }
@@ -365,9 +376,21 @@ function RailLink({ item, active }: { item: StudioNavItem; active: boolean }) {
 
 function UserFooter({ session }: { session: SessionData }) {
   const router = useRouter();
+  const { isPending } = useSession();
   const [signingOut, setSigningOut] = useState(false);
   const user = session?.user;
-  if (!user) return null;
+  // Signed out: a quiet sign-in row where the account card would sit. Nothing
+  // while the first session read is in flight, so a signed-in visitor doing a
+  // full-page load doesn't see "Sign in" flash before their account appears.
+  if (!user) {
+    if (isPending) return null;
+    return (
+      <Link href="/sign-in" className="ds-nav-item mt-1">
+        <LogIn size={17} style={{ color: "var(--muted)" }} />
+        Sign in
+      </Link>
+    );
+  }
   const initial = (user.name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase();
   const rawPlan = (user as { plan?: string }).plan ?? "";
   const plan = rawPlan.toLowerCase() === "pro" ? "Pro plan" : "Free plan";

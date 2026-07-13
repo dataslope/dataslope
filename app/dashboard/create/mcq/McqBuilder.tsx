@@ -27,7 +27,7 @@ import {
   TextField,
 } from "../_components/builderUi";
 import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
-import { CircleHelp, Info, List, Plus, Save, Type } from "lucide-react";
+import { CircleHelp, Info, List, Plus, Save, Trash2, Type } from "lucide-react";
 import { useSaveItem } from "../_components/useSaveItem";
 import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
@@ -360,6 +360,7 @@ export default function McqBuilder() {
                     disabled={choices.length <= 2}
                     className="ds-btn-danger-chip ml-auto"
                   >
+                    <Trash2 size={12} />
                     Remove
                   </button>
                 </div>

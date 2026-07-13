@@ -15,7 +15,7 @@
  */
 
 import { useCallback, useId, useState } from "react";
-import { ChevronDown, Eye, type LucideIcon } from "lucide-react";
+import { ChevronDown, Eye, Trash2, type LucideIcon } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
 import { useStudioPreview } from "@/app/dashboard/_studio/StudioPreviewContext";
 import { cn } from "@/lib/utils";
@@ -272,6 +272,7 @@ export function ItemHeader({
           disabled={removeDisabled}
           className="ds-btn-danger-chip ml-auto"
         >
+          <Trash2 size={12} />
           Remove
         </button>
       ) : null}

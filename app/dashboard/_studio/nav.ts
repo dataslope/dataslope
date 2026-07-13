@@ -5,9 +5,9 @@
 import {
   Code2,
   Database,
-  CircleHelp,
   Layers,
   LayoutGrid,
+  ListTodo,
   SquareTerminal,
   User,
   Shield,
@@ -36,7 +36,7 @@ export const CREATE_ITEMS: StudioNavItem[] = [
   { key: "hub", label: "My Creations", href: "/dashboard/create", icon: LayoutGrid },
   { key: "code", label: "Code Challenge", href: "/dashboard/create/challenge", icon: Code2 },
   { key: "sql", label: "SQL Challenge", href: "/dashboard/create/sql", icon: Database },
-  { key: "mcq", label: "Multiple Choice", href: "/dashboard/create/mcq", icon: CircleHelp },
+  { key: "mcq", label: "Multiple Choice", href: "/dashboard/create/mcq", icon: ListTodo },
   { key: "quiz", label: "Quiz Set", href: "/dashboard/create/quiz", icon: Layers },
 ];
 
