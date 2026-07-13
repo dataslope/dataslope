@@ -68,6 +68,12 @@
 @source "./account/**/*.{ts,tsx}";
 @source "./privacy/**/*.{ts,tsx}";
 @source "./terms/**/*.{ts,tsx}";
+/* The dev-only /email-preview page + its client island. Without this glob its
+   utilities (the send-control card's `p-4`/`rounded-xl`, the CTA's
+   `bg-[var(--ds-blue-700)]`, the subtle `border-[var(--ds-gray-200)]`) never
+   generate under `source(none)`, so the button loses its background and the
+   borders fall back to `currentColor` — the same collapse the globs above fix. */
+@source "./email-preview/**/*.{ts,tsx}";
 /* The /courses catalog index page + its client components (the course
    lessons under courses/[...slug] render Fumadocs chrome with inline
    styles, so scanning them too is harmless). */
