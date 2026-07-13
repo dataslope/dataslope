@@ -1375,7 +1375,7 @@ function WorkspaceManagerDrawer({
                         </>
                       )}
                       Manage backups and share links on your{" "}
-                      <a href="/account">account page</a>.
+                      <a href="/dashboard/account">account page</a>.
                       {cloud.usage?.plan === "free" && (
                         <>
                           {" "}

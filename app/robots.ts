@@ -39,8 +39,8 @@ export default function robots(): MetadataRoute.Robots {
           "/sign-in",
           "/sign-up",
           "/forgot-password",
-          "/account",
-          "/admin",
+          "/dashboard/account",
+          "/dashboard/admin",
           "/reset-password",
           // Shared-playground links (/s/<id>), custom challenges (/c/<id>),
           // and quiz sets (/quiz/<id>) are user content behind unguessable

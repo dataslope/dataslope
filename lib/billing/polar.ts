@@ -51,7 +51,7 @@ export const PRO_ANNUAL_PRODUCT_SLUG = "pro-annual";
 /** Where Polar sends the buyer after a completed checkout. The account page
  *  sees `?checkout=success` and polls the session (cookie-cache bypassed)
  *  until the webhook has landed the plan flip. */
-export const CHECKOUT_SUCCESS_URL = "/account?checkout=success";
+export const CHECKOUT_SUCCESS_URL = "/dashboard/account?checkout=success";
 
 /** The slice of Polar's CustomerState that plan derivation reads. The SDK's
  *  parsed CustomerState is structurally assignable to this. */

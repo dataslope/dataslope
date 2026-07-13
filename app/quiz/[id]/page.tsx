@@ -169,7 +169,7 @@ export default async function QuizSetPage({
                 your browser, no server executes your code. Want to make your
                 own?{" "}
                 <a
-                  href="/create"
+                  href="/dashboard/create"
                   className="font-medium text-[var(--ds-green-600)] underline underline-offset-2 dark:text-[var(--ds-green-400)]"
                 >
                   Create a quiz

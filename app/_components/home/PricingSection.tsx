@@ -297,11 +297,11 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
       // ?next= pins that destination: sign-in otherwise returns the user to
       // the page they came from (see app/_components/auth/returnTo.ts).
       stashCheckoutPeriod(annual ? "annual" : "monthly");
-      router.push("/sign-in?next=/account");
+      router.push("/sign-in?next=/dashboard/account");
       return;
     }
     if (isPro) {
-      router.push("/account");
+      router.push("/dashboard/account");
       return;
     }
     setBusy(true);

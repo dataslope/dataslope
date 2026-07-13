@@ -100,6 +100,13 @@ const nextConfig: NextConfig = {
   // The bare `/fumadocs-dev.md` entry covers that section's index page
   // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page, its
   // index is the course-catalog page, so there is no bare `/courses.md`.
+  // `/dashboard` (the shell segment root) has no page of its own; land it on
+  // the create hub. The create/account/admin sections now live under
+  // /dashboard and internal links point there directly; the project is
+  // pre-launch, so no redirects from the old top-level paths are kept.
+  redirects: async () => [
+    { source: "/dashboard", destination: "/dashboard/create", permanent: false },
+  ],
   rewrites: async () => ({
     beforeFiles: [
       { source: "/courses/:path*.md", destination: "/llms/courses/:path*" },

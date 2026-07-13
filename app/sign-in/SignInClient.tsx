@@ -18,7 +18,7 @@ import styles from "../_components/auth/authCard.module.css";
  *  the visitor came from (direct /sign-in loads, private mode). The
  *  usual case resolves to the page they were on instead, see
  *  `resolveCallbackUrl` below and _components/auth/returnTo.ts. */
-const FALLBACK_CALLBACK_URL = "/account";
+const FALLBACK_CALLBACK_URL = "/dashboard/account";
 
 /**
  * The post-sign-in destination: an explicit, validated `?next=` param

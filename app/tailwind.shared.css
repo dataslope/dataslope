@@ -58,14 +58,12 @@
    image falls back to its intrinsic ~96px size. */
 @source "./_components/auth/**/*.{ts,tsx}";
 @source "./_components/legal/**/*.{ts,tsx}";
-@source "./admin/**/*.{ts,tsx}";
 @source "./magicui-demo/**/*.{ts,tsx}";
 /* Thin route pages that author Tailwind classes directly. These were missing
    from the old per-root lists, so classes used only there (e.g. /pricing's
    `scroll-mt-20`, `sm:pt-16`; /account's `max-w-md`) silently never
    generated. */
 @source "./pricing/**/*.{ts,tsx}";
-@source "./account/**/*.{ts,tsx}";
 @source "./privacy/**/*.{ts,tsx}";
 @source "./terms/**/*.{ts,tsx}";
 /* The dev-only /email-preview page + its client island. Without this glob its
@@ -92,13 +90,15 @@
    tracking-[0.08em], …) never generate under `source(none)`, collapsing the
    layout, the same failure the courses/interview-prep globs above fix. */
 @source "./playground/**/*.{ts,tsx}";
-/* Custom-content surfaces: the /create builders, the /c and /quiz viewers,
-   and the shared renderer/skeleton components, plus the /s share landing
-   page (which was missing from the old lists; its classes happened to
-   overlap other sources). Classes unique to these files (the builders'
-   `sm:grid-cols-[1fr_200px]`, the skeleton's `min-h-[180px]`, …) never
-   generate without these globs. */
-@source "./create/**/*.{ts,tsx}";
+/* The /dashboard shell + everything under it: the Studio sidebar/top-bar
+   chrome (_studio), the create builders + hub, and the account and admin
+   sections (all moved here from /create, /account, /admin). Classes unique
+   to these files, especially the shell's arbitrary values (`w-[264px]`,
+   `text-[13px]`, `rounded-[10px]`, `max-w-[1280px]`, …) never generate
+   without this glob, so the production build purges them and the dashboard
+   layout collapses even though dev's incremental crawl emits them. Also
+   covers the /c and /quiz viewers and the /s share landing page. */
+@source "./dashboard/**/*.{ts,tsx}";
 @source "./c/**/*.{ts,tsx}";
 @source "./quiz/**/*.{ts,tsx}";
 @source "./s/**/*.{ts,tsx}";

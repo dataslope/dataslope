@@ -134,7 +134,7 @@ function MobileAuthSection() {
         </span>
       </div>
       <Dialog.Close
-        render={<Link href="/account" prefetch={false} />}
+        render={<Link href="/dashboard/account" prefetch={false} />}
         className={rowClass}
       >
         <UserIcon size={16} />
