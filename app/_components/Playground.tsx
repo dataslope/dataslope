@@ -192,6 +192,11 @@ import {
 import { PLOTLY_CDN } from "./runtime/cdn";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
+
+/** The code playgrounds append runs to one scrolling history ("when runs
+ *  stack up"), so clear-before-run is opt-in here; the SQL playgrounds
+ *  keep DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun. */
+const CODE_CLEAR_BEFORE_RUN_DEFAULT = false;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
 // transition can complete and be clearly visible to the user.
 const MIN_ANIMATION_MS = 300;
@@ -1192,14 +1197,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
-    // Default to D.clearBeforeRun when unset (only an explicit stored value
-    // overrides it), so the shared default drives first-run behaviour.
+    // Default to appending runs (only an explicit stored value overrides
+    // it): the stacked run history keeps every run visible until the user
+    // dismisses or clears, so auto-clearing is opt-in via the setting.
+    // The SQL playgrounds keep the shared default.
     const storedClearBeforeRun = localStorage.getItem(
       storageKey("clearbeforerun"),
     );
     const savedClearBeforeRun =
       storedClearBeforeRun === null
-        ? D.clearBeforeRun
+        ? CODE_CLEAR_BEFORE_RUN_DEFAULT
         : storedClearBeforeRun === "true";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
@@ -1998,7 +2005,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setOutputFontSizeEnabled(D.outputFontSizeEnabled);
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
-    setClearBeforeRun(D.clearBeforeRun);
+    setClearBeforeRun(CODE_CLEAR_BEFORE_RUN_DEFAULT);
     showToast("Default settings restored.");
   }, [
     setFontSize,
