@@ -4676,43 +4676,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </span>
               <div className="pane-bar-sep" />
               <div className="pane-editor-btn-group">
-                {hasPreview && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className={`icon-btn${autoRun ? " active" : ""}`}
-                          aria-label={
-                            autoRun
-                              ? "Turn off auto-run on edit"
-                              : "Turn on auto-run on edit"
-                          }
-                          aria-pressed={autoRun}
-                          onClick={() => setAutoRun(!autoRun)}
-                        >
-                          {autoRun ? (
-                            <Zap size={14} aria-hidden="true" />
-                          ) : (
-                            <ZapOff size={14} aria-hidden="true" />
-                          )}
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          {autoRun ? "Auto-run on edit: on" : "Auto-run on edit: off"}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
-                {(hasPreview || splitAvailable) && (
+                {/* Preview adapters: auto-run ⚡ and the view menu live on
+                    the PREVIEW bar (controls live where they act); the
+                    editor bar keeps only ⌘+Enter and Run. Non-preview
+                    split-capable adapters keep the layout menu here. */}
+                {!hasPreview && splitAvailable && (
                   <Popover.Root>
                     <Popover.Trigger
                       openOnHover
@@ -5072,26 +5040,209 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 screen-reader user could notice, polite live announcements
                 mirror what sighted users see appear in the pane. */}
             <div
-              className={`output-body${hasPreview ? "" : " run-history"}`}
+              className={`output-body${hasPreview ? " web-preview-body" : " run-history"}`}
               ref={outputBodyRef}
               role="log"
               aria-live="polite"
               aria-label="Program output"
             >
-              {hasPreview && (
-                // Live page preview for the web/react adapters. Always
-                // mounted so the slot element exists before the first
-                // run; the runtime swaps a sandboxed iframe into the
-                // slot on every run, and CSS renders a placeholder
-                // while the slot is still empty.
-                <div className="web-preview-panel" data-testid="web-preview">
-                  <div className="web-preview-header">
-                    <span className="web-preview-label">Preview</span>
+              {hasPreview ? (
+                <>
+                  {/* Live page preview for the web/react adapters. Always
+                      mounted so the slot element exists before the first
+                      run; the runtime swaps a sandboxed iframe into the
+                      slot on every run, and CSS renders a placeholder
+                      while the slot is still empty. The preview owns its
+                      controls — auto-run ⚡ and the view menu moved here
+                      from the editor bar (handoff 2a: controls live where
+                      they act). */}
+                  <div className="web-preview-panel" data-testid="web-preview">
+                    <div className="web-preview-header">
+                      <span className="web-preview-label">Preview</span>
+                      <div className="pane-bar-sep" />
+                      <Popover.Root>
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className={`pv-icon-btn${autoRun ? " active" : ""}`}
+                              aria-label={
+                                autoRun
+                                  ? "Turn off auto-run on edit"
+                                  : "Turn on auto-run on edit"
+                              }
+                              aria-pressed={autoRun}
+                              onClick={() => setAutoRun(!autoRun)}
+                            >
+                              {autoRun ? (
+                                <Zap size={13} aria-hidden="true" />
+                              ) : (
+                                <ZapOff size={13} aria-hidden="true" />
+                              )}
+                            </button>
+                          )}
+                        />
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="center"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup pane-btn-popover">
+                              {autoRun
+                                ? "Auto-run on edit: on"
+                                : "Auto-run on edit: off"}
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                      <Popover.Root>
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className="pv-icon-btn"
+                              aria-label="Change view"
+                            >
+                              {effectiveEditorPosition === "right" ? (
+                                <PanelRight size={13} aria-hidden="true" />
+                              ) : effectiveEditorPosition === "top" ? (
+                                <PanelTop size={13} aria-hidden="true" />
+                              ) : (
+                                <PanelLeft size={13} aria-hidden="true" />
+                              )}
+                            </button>
+                          )}
+                        />
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="end"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup change-view-menu">
+                              <div className="change-view-title">
+                                Change View
+                              </div>
+                              {(
+                                [
+                                  { pos: "left", label: "Editors left", Icon: PanelLeft },
+                                  { pos: "top", label: "Editors top", Icon: PanelTop },
+                                  { pos: "right", label: "Editors right", Icon: PanelRight },
+                                ] as const
+                              ).map(({ pos, label, Icon }) => (
+                                <button
+                                  key={pos}
+                                  type="button"
+                                  className={`change-view-item${
+                                    effectiveEditorPosition === pos
+                                      ? " selected"
+                                      : ""
+                                  }`}
+                                  disabled={editorPinnedLeft}
+                                  onClick={() => setEditorPosition(pos)}
+                                >
+                                  <Icon size={14} aria-hidden="true" />
+                                  <span>{label}</span>
+                                </button>
+                              ))}
+                              {editorPinnedLeft && (
+                                <div className="change-view-hint">
+                                  The tabbed editor keeps the editor on the
+                                  left.
+                                </div>
+                              )}
+                              {splitAvailable && (
+                                <>
+                                  <div
+                                    className="change-view-sep"
+                                    role="separator"
+                                  />
+                                  <div className="change-view-title">
+                                    Editor Layout
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className={`change-view-item${splitActive ? " selected" : ""}`}
+                                    aria-pressed={splitActive}
+                                    onClick={() => setSplitView(true)}
+                                  >
+                                    <Rows3 size={14} aria-hidden="true" />
+                                    <span>Split editors (CodePen-style)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={`change-view-item${!splitActive ? " selected" : ""}`}
+                                    aria-pressed={!splitActive}
+                                    onClick={() => setSplitView(false)}
+                                  >
+                                    <FileCode size={14} aria-hidden="true" />
+                                    <span>Tabbed editor (manage files)</span>
+                                  </button>
+                                </>
+                              )}
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                    </div>
+                    <div className="web-preview-slot" ref={previewHostRef} />
                   </div>
-                  <div className="web-preview-slot" ref={previewHostRef} />
-                </div>
-              )}
-              {outputs.length === 0 && statusState !== "running" && !hasPreview ? (
+                  {/* Quiet console strip pinned under the preview: accent
+                      bar + OUTPUT + duration, latest run's text; errors
+                      turn the strip red (handoff 2a error state). */}
+                  {(() => {
+                    const latest = outputGroups[outputGroups.length - 1];
+                    const consoleError =
+                      !!latest && latest.every((c) => c.type === "stderr");
+                    const textSegs = latest?.filter(
+                      (c) => c.type === "stdout" || c.type === "stderr",
+                    );
+                    return (
+                      <div className={`web-console${consoleError ? " error" : ""}`}>
+                        <div className="web-console-bar">
+                          <span className="web-console-accent" aria-hidden="true" />
+                          <span className="web-console-label">Output</span>
+                          <div className="pane-bar-sep" />
+                          {latest && (
+                            <span className="web-console-ms">
+                              {latest[latest.length - 1].elapsed}
+                            </span>
+                          )}
+                        </div>
+                        <div className="web-console-content">
+                          {textSegs && textSegs.length > 0 ? (
+                            textSegs.map((cell) => (
+                              <div
+                                key={cell.id}
+                                className={
+                                  cell.type === "stderr"
+                                    ? "out-seg-stderr"
+                                    : undefined
+                                }
+                              >
+                                {cell.content}
+                              </div>
+                            ))
+                          ) : (
+                            <span className="web-console-ready">
+                              Ready — console output lands here.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>
+              ) : outputs.length === 0 && statusState !== "running" ? (
                 outputCleared ? (
                   <div className="run-history-empty">
                     Output cleared — press Run to start a new history.

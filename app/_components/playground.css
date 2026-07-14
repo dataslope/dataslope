@@ -5498,3 +5498,113 @@ html[data-playground-theme="dark"] {
   gap: 8px;
   flex: none;
 }
+
+/* ─── Preview-first output pane (web / react adapters, handoff 2a) ───
+   The preview fills the pane with its own slim control bar (auto-run ⚡ +
+   view menu moved off the editor bar); a quiet console strip pins to the
+   bottom — accent bar + OUTPUT + duration, red in the error state. */
+.output-body.web-preview-body {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.web-preview-body .web-preview-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--bg);
+}
+.web-preview-body .web-preview-header {
+  height: 32px;
+  padding: 0 10px 0 12px;
+  gap: 8px;
+  flex: none;
+  background: var(--bg);
+}
+.web-preview-body .web-preview-slot {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+  resize: none;
+}
+.web-preview-body .web-preview-slot:empty {
+  height: auto;
+}
+.pv-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+}
+.pv-icon-btn:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+.pv-icon-btn.active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+.web-console {
+  flex: none;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.web-console-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 12px;
+}
+.web-console-accent {
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--primary);
+  flex: none;
+}
+.web-console.error .web-console-accent {
+  background: var(--red);
+}
+.web-console-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.web-console.error .web-console-label {
+  color: var(--red);
+}
+.web-console-ms {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.web-console-content {
+  padding: 2px 12px 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.web-console.error .web-console-content {
+  color: var(--red);
+}
+.web-console-ready {
+  color: var(--text-dim);
+}
