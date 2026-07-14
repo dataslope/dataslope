@@ -37,18 +37,18 @@ const NAV_SECTIONS: {
   { href: "/pricing", label: "Pricing", icon: Tag },
 ];
 
-/** Desktop primary-menu link. The item for the section being viewed renders
- *  in the brand accent (matching the courses-page mockup), derived from the
- *  current pathname, so `/courses/python-basics` still lights up "Courses". */
+/** Desktop primary-menu link (text-only; the icons in NAV_SECTIONS are for
+ *  the mobile drawer). Idle items sit in a muted neutral with a subtle darken
+ *  on hover; the item for the section being viewed renders in the brand
+ *  accent (matching the courses-page mockup), derived from the current
+ *  pathname, so `/courses/python-basics` still lights up "Courses". */
 function NavLink({
   href,
   prefetch,
-  icon: Icon,
   children,
 }: {
   href: string;
   prefetch?: boolean;
-  icon: LucideIcon;
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
@@ -58,13 +58,12 @@ function NavLink({
       href={href}
       prefetch={prefetch}
       aria-current={active ? "page" : undefined}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
         active
           ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
-          : "text-[#121212] hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
+          : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
       }`}
     >
-      <Icon size={15} aria-hidden="true" />
       {children}
     </Link>
   );
@@ -282,9 +281,9 @@ export function HomeNav() {
         {/* Center: primary menu (desktop only, visibility handled by the
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
-        <div className="ds-nav-menu items-center justify-center gap-1">
-          {NAV_SECTIONS.map(({ href, label, icon, prefetch }) => (
-            <NavLink key={href} href={href} prefetch={prefetch} icon={icon}>
+        <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
+          {NAV_SECTIONS.map(({ href, label, prefetch }) => (
+            <NavLink key={href} href={href} prefetch={prefetch}>
               {label}
             </NavLink>
           ))}
