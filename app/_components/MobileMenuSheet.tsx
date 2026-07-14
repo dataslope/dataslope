@@ -25,6 +25,7 @@ import {
   type ReactNode,
 } from "react";
 import { Drawer } from "@base-ui/react/drawer";
+import type { LucideIcon } from "lucide-react";
 
 interface MobileMenuContextValue {
   /** Closes the whole menu (root sheet + any open sub-sheet). */
@@ -142,9 +143,36 @@ export function MobileMenuSheet({
   );
 }
 
+/** Uppercase group label, the drawer counterpart of the desktop ⋯ menu's
+ *  section labels. */
+export function MobileMenuLabel({ children }: { children: ReactNode }) {
+  return <div className="mobile-menu-label">{children}</div>;
+}
+
+/** Close-the-whole-menu callback for custom content rendered inside a
+ *  MobileMenuSheet (e.g. shared menu panels that dismiss on selection). */
+export function useMobileMenuClose() {
+  return useContext(MobileMenuContext).closeRoot;
+}
+
+/** Leading icon + label cluster shared by action rows and sub-sheet rows. */
+function RowMain({ icon: Icon, label }: { icon?: LucideIcon; label: ReactNode }) {
+  return (
+    <span className="mobile-menu-main">
+      {Icon && <Icon size={15} strokeWidth={1.8} aria-hidden="true" />}
+      <span>{label}</span>
+    </span>
+  );
+}
+
 export interface MobileMenuActionProps {
   label: ReactNode;
   onClick: () => void;
+  /** Leading icon, mirroring the desktop ⋯ menu rows. */
+  icon?: LucideIcon;
+  /** Small trailing count/status chip (e.g. example counts, "Saved"). */
+  hint?: ReactNode;
+  disabled?: boolean;
   /** Show a trailing chevron (use when the action opens another surface,
    *  e.g. a tab/dialog). */
   chevron?: boolean;
@@ -156,6 +184,9 @@ export interface MobileMenuActionProps {
 export function MobileMenuAction({
   label,
   onClick,
+  icon,
+  hint,
+  disabled,
   chevron,
   keepOpen,
 }: MobileMenuActionProps) {
@@ -164,23 +195,33 @@ export function MobileMenuAction({
     <button
       type="button"
       className="mobile-menu-action"
+      disabled={disabled}
       onClick={() => {
         onClick();
         if (!keepOpen) closeRoot();
       }}
     >
-      <span>{label}</span>
-      {chevron && (
-        <span className="mobile-menu-chev" aria-hidden="true">
-          ›
-        </span>
-      )}
+      <RowMain icon={icon} label={label} />
+      <span className="mobile-menu-trailing">
+        {hint !== undefined && (
+          <span className="mobile-menu-hint">{hint}</span>
+        )}
+        {chevron && (
+          <span className="mobile-menu-chev" aria-hidden="true">
+            ›
+          </span>
+        )}
+      </span>
     </button>
   );
 }
 
 export interface MobileMenuSubSheetProps {
   label: ReactNode;
+  /** Leading icon, mirroring the desktop ⋯ menu rows. */
+  icon?: LucideIcon;
+  /** Small trailing count chip shown before the chevron. */
+  hint?: ReactNode;
   /** Sheet header title; defaults to `label`. */
   title?: ReactNode;
   /** Accessible label for the nested sheet; defaults to a string `label`. */
@@ -199,6 +240,8 @@ export interface MobileMenuSubSheetProps {
  *  menu via the shared context. */
 export function MobileMenuSubSheet({
   label,
+  icon,
+  hint,
   title,
   ariaLabel,
   bodyClassName,
@@ -214,9 +257,14 @@ export function MobileMenuSubSheet({
       swipeDirection="down"
     >
       <Drawer.Trigger className="mobile-menu-action">
-        <span>{label}</span>
-        <span className="mobile-menu-chev" aria-hidden="true">
-          ›
+        <RowMain icon={icon} label={label} />
+        <span className="mobile-menu-trailing">
+          {hint !== undefined && (
+            <span className="mobile-menu-hint">{hint}</span>
+          )}
+          <span className="mobile-menu-chev" aria-hidden="true">
+            ›
+          </span>
         </span>
       </Drawer.Trigger>
       <Drawer.Portal>

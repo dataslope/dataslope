@@ -24,6 +24,7 @@
  */
 
 import {
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -50,6 +51,12 @@ import {
   isBackupStale,
   useCloudBackups,
 } from "./workspace/workspaceCloud";
+import {
+  MobileMenuAction,
+  MobileMenuLabel,
+  MobileMenuSubSheet,
+  useMobileMenuClose,
+} from "./MobileMenuSheet";
 
 /** The 9px chevron used by the switcher, save menu and badge in the mock. */
 export function HeaderChevron({ size = 9 }: { size?: number }) {
@@ -508,5 +515,52 @@ export function MoreMenu({ sections }: { sections: MoreMenuSection[] }) {
         </Popover.Positioner>
       </Popover.Portal>
     </Popover.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Mobile drawer mirror of the ⋯ menu
+// ---------------------------------------------------------------------------
+
+/** Renders the same `MoreMenuSection[]` data the desktop ⋯ menu uses as
+ *  bottom-sheet rows for the mobile drawer: labelled groups whose panel
+ *  items open a nested sheet (the drawer counterpart of the desktop
+ *  slide-in sub-panels). Must render inside a `MobileMenuSheet`. */
+export function MobileMoreSections({
+  sections,
+}: {
+  sections: MoreMenuSection[];
+}) {
+  const closeMenu = useMobileMenuClose();
+  return (
+    <>
+      {sections.map((section) => (
+        <Fragment key={section.label}>
+          <MobileMenuLabel>{section.label}</MobileMenuLabel>
+          {section.items.map((item) =>
+            item.panel ? (
+              <MobileMenuSubSheet
+                key={item.key}
+                id={item.key}
+                icon={item.icon}
+                label={item.label}
+                hint={item.hint}
+                title={item.panel.title}
+              >
+                {item.panel.render(closeMenu)}
+              </MobileMenuSubSheet>
+            ) : (
+              <MobileMenuAction
+                key={item.key}
+                icon={item.icon}
+                label={item.label}
+                hint={item.hint}
+                onClick={() => item.onSelect?.()}
+              />
+            ),
+          )}
+        </Fragment>
+      ))}
+    </>
   );
 }

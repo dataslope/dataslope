@@ -34,6 +34,9 @@ import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
+  Share2,
+  CloudUpload,
+  Cloud,
   ArrowUpFromLine,
   FolderOpen,
   Info,
@@ -123,9 +126,11 @@ import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
 import {
   HeaderDivider,
+  MobileMoreSections,
   MoreMenu,
   SaveControl,
   WorkspaceNameControl,
+  type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
@@ -134,7 +139,7 @@ import {
   takePendingBundleRef,
 } from "../cloud/materialize";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
-import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
+import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
@@ -3673,70 +3678,9 @@ function PostgresPlaygroundInner() {
     />
   );
 
-  return (
-    <SqlPlaygroundShell
-      playgroundId={PLAYGROUND_ID}
-      playgroundTitle="PostgreSQL Playground"
-      loaded={loaded}
-      statusState={statusState}
-      loadingCaption={loadingMessage}
-      workspaceConflict={workspaceConflict}
-      onOpenNewWorkspace={handleConflictNewWorkspace}
-      headerName={
-        activeWorkspace ? (
-          <>
-            <HeaderDivider />
-            <WorkspaceNameControl
-              workspaceId={activeWorkspace.id}
-              name={activeWorkspace.name}
-              onRenamed={(name) =>
-                setActiveWorkspace({ id: activeWorkspace.id, name })
-              }
-            />
-          </>
-        ) : null
-      }
-      headerActions={
-        <>
-          {activeWorkspace && (
-            <WorkspaceBadge
-              playgroundId={PLAYGROUND_ID}
-              activeWorkspaceId={activeWorkspace.id}
-              activeWorkspaceName={activeWorkspace.name}
-              managerOpen={workspaceManagerOpen}
-              onManagerOpenChange={setWorkspaceManagerOpen}
-              unsaved={
-                !workspaceSaved &&
-                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
-              }
-              onSave={handleSaveWorkspace}
-              buildBundle={buildCloudBundle}
-              hideBadge
-            />
-          )}
-          <div className="ph-actions desktop-only">
-            {activeWorkspace && (
-              <SaveControl
-                playgroundId={PLAYGROUND_ID}
-                workspaceId={activeWorkspace.id}
-                workspaceName={activeWorkspace.name}
-                unsaved={
-                  !workspaceSaved &&
-                  tabs.some((t) => !t.kind && t.code !== t.pristineCode)
-                }
-                onSave={handleSaveWorkspace}
-                buildBundle={buildCloudBundle}
-                onNotify={showToast}
-              />
-            )}
-            <ShareControls
-              workspaceName={activeWorkspace?.name ?? ""}
-              buildBundle={buildCloudBundle}
-              shareOpen={shareDialogOpen}
-              onShareOpenChange={setShareDialogOpen}
-            />
-            <MoreMenu
-              sections={[
+  // One definition drives both the desktop ⋯ menu and the mobile
+  // drawer's sectioned rows.
+  const moreSections: MoreMenuSection[] = [
                 {
                   label: "Data",
                   items: [
@@ -3910,81 +3854,106 @@ function PostgresPlaygroundInner() {
                     },
                   ],
                 },
-              ]}
+              ];
+
+  return (
+    <SqlPlaygroundShell
+      playgroundId={PLAYGROUND_ID}
+      playgroundTitle="PostgreSQL Playground"
+      loaded={loaded}
+      statusState={statusState}
+      loadingCaption={loadingMessage}
+      workspaceConflict={workspaceConflict}
+      onOpenNewWorkspace={handleConflictNewWorkspace}
+      headerName={
+        activeWorkspace ? (
+          <>
+            <HeaderDivider />
+            <WorkspaceNameControl
+              workspaceId={activeWorkspace.id}
+              name={activeWorkspace.name}
+              onRenamed={(name) =>
+                setActiveWorkspace({ id: activeWorkspace.id, name })
+              }
             />
+          </>
+        ) : null
+      }
+      headerActions={
+        <>
+          {activeWorkspace && (
+            <WorkspaceBadge
+              playgroundId={PLAYGROUND_ID}
+              activeWorkspaceId={activeWorkspace.id}
+              activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
+              hideBadge
+            />
+          )}
+          <div className="ph-actions desktop-only">
+            {activeWorkspace && (
+              <SaveControl
+                playgroundId={PLAYGROUND_ID}
+                workspaceId={activeWorkspace.id}
+                workspaceName={activeWorkspace.name}
+                unsaved={
+                  !workspaceSaved &&
+                  tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+                }
+                onSave={handleSaveWorkspace}
+                buildBundle={buildCloudBundle}
+                onNotify={showToast}
+              />
+            )}
+            <ShareControls
+              workspaceName={activeWorkspace?.name ?? ""}
+              buildBundle={buildCloudBundle}
+              shareOpen={shareDialogOpen}
+              onShareOpenChange={setShareDialogOpen}
+            />
+            <MoreMenu sections={moreSections} />
           </div>
         </>
       }
       mobileMenu={
         <>
           <div className="mobile-menu-db-selector">{databaseSelector}</div>
+          <MobileMenuLabel>Workspace</MobileMenuLabel>
+          {activeWorkspace &&
+            (!workspaceSaved &&
+            tabs.some((t) => !t.kind && t.code !== t.pristineCode) ? (
+              <MobileMenuAction
+                icon={CloudUpload}
+                label="Save"
+                onClick={() => {
+                  void handleSaveWorkspace(
+                    activeWorkspace.name || "Workspace",
+                  );
+                  showToast("Workspace saved");
+                }}
+              />
+            ) : (
+              <MobileMenuAction
+                icon={Cloud}
+                label="Saved"
+                disabled
+                onClick={() => {}}
+              />
+            ))}
           <MobileMenuAction
-            label="Workspace"
-            chevron
-            onClick={() => setWorkspaceManagerOpen(true)}
-          />
-          <MobileMenuAction
+            icon={Share2}
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
           />
-          <MobileMenuSubSheet label="Import">
-            <MobileMenuAction
-              label="From SQL dump"
-              onClick={() => setImportSqlDumpOpen(true)}
-            />
-            <MobileMenuAction
-              label="From CSV"
-              onClick={() => {
-                setImportCsvState(null);
-                setImportCsvOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From JSON"
-              onClick={() => {
-                setImportJsonState(null);
-                setImportJsonOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From Parquet"
-              onClick={() => {
-                setImportParquetState(null);
-                setImportParquetOpen(true);
-              }}
-            />
-          </MobileMenuSubSheet>
-          {tables.length > 0 && (
-            <MobileMenuSubSheet label="Export DB">
-              <MobileMenuAction
-                label="SQL dump (.sql)"
-                onClick={() => void exportPostgresDatabase()}
-              />
-              <MobileMenuAction
-                label="Excel workbook (.xlsx)"
-                onClick={() => void exportPostgresDatabaseToXlsx()}
-              />
-            </MobileMenuSubSheet>
-          )}
-          <MobileMenuAction
-            label="Query history"
-            chevron
-            onClick={openQueryHistoryTab}
-          />
-          <MobileMenuAction
-            label="ER diagram"
-            chevron
-            onClick={openErDiagramTab}
-          />
-          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
-            <RuntimeInfoContent info={RUNTIME_INFO} />
-          </MobileMenuSubSheet>
-          <MobileMenuAction
-            label="Settings"
-            chevron
-            onClick={openSettingsTab}
-          />
+          <MobileMoreSections sections={moreSections} />
         </>
       }
     >

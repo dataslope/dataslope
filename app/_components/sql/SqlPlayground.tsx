@@ -43,6 +43,9 @@ import { Tabs } from "@base-ui-components/react/tabs";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
+  Share2,
+  CloudUpload,
+  Cloud,
   ArrowUpFromLine,
   CircleHelp,
   FolderOpen,
@@ -104,6 +107,7 @@ import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
 import {
   HeaderDivider,
+  MobileMoreSections,
   MoreMenu,
   SaveControl,
   WorkspaceNameControl,
@@ -116,7 +120,7 @@ import {
   takePendingBundleRef,
 } from "../cloud/materialize";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
-import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
+import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
   type ForeignKeyInfo,
@@ -2309,77 +2313,35 @@ function SqlPlaygroundInner() {
       mobileMenu={
         <>
           <div className="mobile-menu-db-selector">{databaseSelector}</div>
+          <MobileMenuLabel>Workspace</MobileMenuLabel>
+          {activeWorkspace &&
+            (!workspaceSaved &&
+            tabs.some((t) => !t.kind && t.code !== t.pristineCode) ? (
+              <MobileMenuAction
+                icon={CloudUpload}
+                label="Save"
+                onClick={() => {
+                  void handleSaveWorkspace(
+                    activeWorkspace.name || "Workspace",
+                  );
+                  showToast("Workspace saved");
+                }}
+              />
+            ) : (
+              <MobileMenuAction
+                icon={Cloud}
+                label="Saved"
+                disabled
+                onClick={() => {}}
+              />
+            ))}
           <MobileMenuAction
-            label="Workspace"
-            chevron
-            onClick={() => setWorkspaceManagerOpen(true)}
-          />
-          <MobileMenuAction
+            icon={Share2}
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
           />
-          <MobileMenuSubSheet label="Import">
-            <MobileMenuAction
-              label="From file (.sql / .db / .sqlite)"
-              onClick={() => setImportSqliteOpen(true)}
-            />
-            <MobileMenuAction
-              label="From CSV"
-              onClick={() => {
-                setImportCsvState(null);
-                setImportCsvOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From JSON"
-              onClick={() => {
-                setImportJsonState(null);
-                setImportJsonOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From Parquet"
-              onClick={() => {
-                setImportParquetOpen(true);
-                setImportParquetDragging(false);
-              }}
-            />
-          </MobileMenuSubSheet>
-          {tables.length > 0 && (
-            <MobileMenuSubSheet label="Export DB">
-              <MobileMenuAction
-                label="SQLite file (.sqlite)"
-                onClick={exportDatabase}
-              />
-              <MobileMenuAction
-                label="SQL dump (.sql)"
-                onClick={exportDatabaseAsSqlDump}
-              />
-              <MobileMenuAction
-                label="Excel workbook (.xlsx)"
-                onClick={exportDatabaseToXlsx}
-              />
-            </MobileMenuSubSheet>
-          )}
-          <MobileMenuAction
-            label="Query history"
-            chevron
-            onClick={openQueryHistoryTab}
-          />
-          <MobileMenuAction
-            label="ER diagram"
-            chevron
-            onClick={openErDiagramTab}
-          />
-          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
-            <RuntimeInfoContent info={RUNTIME_INFO} />
-          </MobileMenuSubSheet>
-          <MobileMenuAction
-            label="Settings"
-            chevron
-            onClick={openSettingsTab}
-          />
+          <MobileMoreSections sections={sqlMoreSections} />
         </>
       }
     >

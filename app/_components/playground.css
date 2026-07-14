@@ -3057,6 +3057,47 @@ input[type="range"].fs-slider:disabled {
   transition: transform 0.15s ease;
 }
 
+/* Sectioned drawer rows mirroring the desktop ⋯ menu: uppercase group
+   labels, dim leading icons and mono count chips (MobileMoreSections). */
+.mobile-menu-label {
+  padding: 12px 12px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--menu-label, var(--text-dim));
+  user-select: none;
+}
+.mobile-menu-label:first-child {
+  padding-top: 6px;
+}
+.mobile-menu-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.mobile-menu-main > svg {
+  color: var(--menu-icon, var(--text-dim));
+  flex: none;
+}
+.mobile-menu-trailing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mobile-menu-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.mobile-menu-action:disabled {
+  cursor: default;
+}
+.mobile-menu-action:disabled:hover {
+  background: transparent;
+}
+
 /* Database selector surfaced at the top of the SQL playgrounds' mobile
    drawer menu (an experiment alongside the sidebar copy). The trigger is
    borderless by default and the drawer is now var(--bg), so give it a

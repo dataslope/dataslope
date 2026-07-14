@@ -74,7 +74,10 @@ import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,
   ArrowDownToLine,
+  Cloud,
+  CloudUpload,
   Package,
+  Share2,
   Eraser,
   Play,
   FileCode,
@@ -147,11 +150,18 @@ import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import {
   HeaderDivider,
+  MobileMoreSections,
   MoreMenu,
   SaveControl,
   WorkspaceNameControl,
   type MoreMenuSection,
 } from "./PlaygroundHeaderControls";
+import {
+  MobileMenuAction,
+  MobileMenuLabel,
+  MobileMenuSheet,
+  MobileMenuSubSheet,
+} from "./MobileMenuSheet";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import {
@@ -679,26 +689,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // so the user can drag it anywhere. Infinity = append at the end (default).
   // Resets to Infinity when settings is closed so it starts fresh on re-open.
   const [settingsTabIndex, setSettingsTabIndex] = useState<number>(Infinity);
-  // Mobile consolidated-menu drawer. We render this as a Dialog (bottom
-  // sheet) instead of a Menu so its inline sub-sections (Examples,
-  // Information, …) can't be cut off the side of a narrow viewport.
+  // Mobile consolidated-menu drawer (bottom sheet, so its nested sections
+  // can't be cut off the side of a narrow viewport). Sub-sheet exclusivity
+  // lives inside MobileMenuSheet.
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Full workspace-manager drawer, opened from the mobile hamburger menu
   // (the header badge that normally opens it is hidden on mobile).
   const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
-  // Mutually-exclusive mobile menu sub-sheets (Files / Examples / Export /
-  // Information): opening one closes any other, so selecting a different
-  // item never leaves a stale sub-sheet open behind it.
-  const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(
-    null,
-  );
-  // Forget the open sub-sheet whenever the whole menu closes, so a flat
-  // action that dismisses the menu doesn't leave a nested sheet orphaned
-  // (and it reopens from the top next time).
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!mobileMenuOpen) setActiveMobileSubmenu(null);
-  }, [mobileMenuOpen]);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -4032,340 +4029,48 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           )}
 
           {/* Mobile-only consolidated menu, replaces the header buttons
-              on narrow viewports. Base UI Drawer keeps the main menu and
-              nested sections as bottom sheets so they stay within the
-              viewport on narrow phones. */}
-          <Drawer.Root
-            open={mobileMenuOpen}
-            onOpenChange={setMobileMenuOpen}
-            swipeDirection="down"
-          >
-            <Drawer.Trigger
-              className="header-btn icon-only mobile-only mobile-menu-btn"
-              title="Menu"
-              aria-label="Open menu"
-            >
-              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="4" y1="7" x2="20" y2="7" />
-                <line x1="4" y1="12" x2="20" y2="12" />
-                <line x1="4" y1="17" x2="20" y2="17" />
-              </svg>
-            </Drawer.Trigger>
-            <Drawer.Portal>
-              <Drawer.Backdrop className="pkg-overlay mobile-menu-backdrop" />
-              <Drawer.Viewport className="mobile-drawer-viewport">
-                <Drawer.Popup
-                  className="mobile-menu-drawer"
-                  aria-label="Menu"
-                >
-                  <Drawer.Content>
-                    <div className="mobile-menu-handle" aria-hidden="true" />
-                    <div className="mobile-menu-drawer-header">
-                      <Drawer.Title className="mobile-menu-drawer-title">
-                        Menu
-                      </Drawer.Title>
-                      <Drawer.Close
-                        className="settings-close"
-                        aria-label="Close menu"
-                      >
-                        ✕
-                      </Drawer.Close>
-                    </div>
-                    <div className="mobile-menu-drawer-body">
-                      {/* Workspace, the header badge is hidden on mobile,
-                          so open the full workspace manager from here. */}
-                      {workspaceReady && (
-                        <button
-                          type="button"
-                          className="mobile-menu-action"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            setWorkspaceManagerOpen(true);
-                          }}
-                        >
-                          <span>Workspace</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </button>
-                      )}
-                      {/* Share, the header button that owns this dialog is
-                          desktop-only, so mirror it here (the dialog portals
-                          above the drawer). Cloud backups live inside the
-                          workspace manager, reached via "Workspace" above. */}
-                      <button
-                        type="button"
-                        className="mobile-menu-action"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setShareDialogOpen(true);
-                        }}
-                      >
-                        <span>Share</span>
-                        <span className="mobile-menu-chev" aria-hidden="true">
-                          ›
-                        </span>
-                      </button>
-                      {/* Files, the desktop icon rail (which toggles the
-                          file panel) is hidden on mobile, so surface file
-                          management here as a bottom-sheet instead.
-                          Adapters that hide the Files pane skip it here
-                          too. */}
-                      {!adapter.hideFilesPane && (
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "files"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "files" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Files</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Files"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Files
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close files"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body mobile-files-drawer-body">
-                                  <FilesPanel {...filesPanelProps} />
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-                      )}
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "examples"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "examples" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Examples</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Examples"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Examples
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close examples"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body">
-                                  {adapter.examples.map((ex) => (
-                                    <button
-                                      type="button"
-                                      key={ex.key}
-                                      className="example-item"
-                                      onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        requestExample(ex);
-                                      }}
-                                    >
-                                      <div className="ex-title">{ex.title}</div>
-                                      <div className="ex-desc">{ex.desc}</div>
-                                    </button>
-                                  ))}
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "export"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "export" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Export</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Export"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Export
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close export"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body">
-                                  {adapter.exportFormats.map((fmt) => (
-                                    <button
-                                      type="button"
-                                      key={fmt.extension}
-                                      className="example-item export-item"
-                                      onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        exportCode(fmt);
-                                      }}
-                                    >
-                                      <div className="export-item-text">
-                                        <div className="ex-title">
-                                          {fmt.label}
-                                          <span className="ext-badge">.{fmt.extension}</span>
-                                        </div>
-                                        <div className="ex-desc">
-                                          Download as .{fmt.extension}
-                                        </div>
-                                      </div>
-                                    </button>
-                                  ))}
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      {adapter.packages.length > 0 && (
-                        <button
-                          type="button"
-                          className="mobile-menu-action"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            setPackagesOpen(true);
-                          }}
-                        >
-                          <span>Packages</span>
-                        </button>
-                      )}
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "information"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "information" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Information</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Information"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Information
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close information"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body info-popover">
-                                  <RuntimeInfoContent info={adapter.runtimeInfo} />
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      <button
-                        type="button"
-                        className="mobile-menu-action"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          openSettingsTab();
-                        }}
-                      >
-                        <span>Settings</span>
-                      </button>
-                    </div>
-                    {/* While a sub-sheet is open the parent menu acts as a
-                        backdrop: a tap anywhere on it just closes the open
-                        sub-sheet rather than opening the tapped item. */}
-                    {activeMobileSubmenu !== null && (
-                      <button
-                        type="button"
-                        className="mobile-menu-dismiss-catch"
-                        aria-label="Close submenu"
-                        onClick={() => setActiveMobileSubmenu(null)}
-                      />
-                    )}
-                  </Drawer.Content>
-                </Drawer.Popup>
-              </Drawer.Viewport>
-            </Drawer.Portal>
-          </Drawer.Root>
+              on narrow viewports: Save / Share / Files up top, then the
+              same sections the desktop ⋯ menu shows. */}
+          <MobileMenuSheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <MobileMenuLabel>Workspace</MobileMenuLabel>
+            {workspaceReady &&
+              (!workspaceSaved && workspaceDirty ? (
+                <MobileMenuAction
+                  icon={CloudUpload}
+                  label="Save"
+                  onClick={() => {
+                    void handleSaveWorkspace(workspaceName || "Workspace");
+                    showToast("Workspace saved");
+                  }}
+                />
+              ) : (
+                <MobileMenuAction
+                  icon={Cloud}
+                  label="Saved"
+                  disabled
+                  onClick={() => {}}
+                />
+              ))}
+            <MobileMenuAction
+              icon={Share2}
+              label="Share"
+              chevron
+              onClick={() => setShareDialogOpen(true)}
+            />
+            {/* The desktop icon rail (which toggles the file panel) is
+                hidden on mobile, so surface file management here as a
+                bottom sheet. Adapters that hide the Files pane skip it. */}
+            {!adapter.hideFilesPane && (
+              <MobileMenuSubSheet
+                icon={FolderTree}
+                label="Files"
+                bodyClassName="mobile-files-drawer-body"
+              >
+                <FilesPanel {...filesPanelProps} />
+              </MobileMenuSubSheet>
+            )}
+            <MobileMoreSections sections={moreMenuSections} />
+          </MobileMenuSheet>
         </header>
 
         <PackagesDrawer
