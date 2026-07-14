@@ -75,10 +75,11 @@ import {
   Library,
   ArrowDownToLine,
   Package,
-  Timer,
   Eraser,
   Play,
   FileCode,
+  FolderOpen,
+  Info,
   Wand2,
   Code2,
   Terminal,
@@ -86,7 +87,6 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
-import { FaInfo } from "react-icons/fa";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
@@ -145,6 +145,13 @@ import {
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
+import {
+  HeaderDivider,
+  MoreMenu,
+  SaveControl,
+  WorkspaceNameControl,
+  type MoreMenuSection,
+} from "./PlaygroundHeaderControls";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import {
@@ -2257,6 +2264,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       await rt.run(code, (cell) => collected.push(cell), runOptions);
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      const finishedAt = Date.now();
       const merged = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
         ...prev,
@@ -2265,6 +2273,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           id: ++outputCounter.current,
           elapsed,
           runId,
+          finishedAt,
         })),
       ]);
       if (collected.length === 0 && !hasPreview) {
@@ -2282,6 +2291,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // it in the Files pane even though the run ultimately errored.
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      const finishedAt = Date.now();
       const msg = err instanceof Error ? err.message : String(err);
       const mergedOnErr = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
@@ -2291,6 +2301,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           id: ++outputCounter.current,
           elapsed,
           runId,
+          finishedAt,
         })),
         {
           id: ++outputCounter.current,
@@ -2298,6 +2309,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           content: msg,
           elapsed,
           runId,
+          finishedAt,
         },
       ]);
       setStatusState("error");
@@ -3554,6 +3566,166 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     return groups;
   }, [outputs]);
 
+  // ─── Stacked run history (handoff 3a) ────────────────────────────────
+  // Each run renders as one slim cell headed "Run N · finish time · Done in
+  // Xs". Numbers stay stable while runs are dismissed individually and
+  // restart from 1 after Clear: rank a group's runId among every runId seen
+  // since the last clear (visible ∪ dismissed).
+  const [dismissedRuns, setDismissedRuns] = useState<ReadonlySet<number>>(
+    () => new Set<number>(),
+  );
+  const [outputCleared, setOutputCleared] = useState(false);
+  // A fresh run after a clear retires the "cleared" note. Adjusted during
+  // render (the React "adjust state when a prop changes" pattern) rather
+  // than in an effect.
+  if (outputCleared && outputs.length > 0) setOutputCleared(false);
+  const runNumbers = useMemo(() => {
+    const ids = new Set<number>(dismissedRuns);
+    for (const group of outputGroups) {
+      if (group[0].runId !== undefined) ids.add(group[0].runId);
+    }
+    const sorted = [...ids].sort((a, b) => a - b);
+    const map = new Map<number, number>();
+    sorted.forEach((id, i) => map.set(id, i + 1));
+    return map;
+  }, [outputGroups, dismissedRuns]);
+  const dismissRun = useCallback(
+    (runId: number | undefined, firstCellId: number) => {
+      const fileId = outputFileId;
+      if (!fileId) return;
+      setOutputsForFile(fileId, (prev) =>
+        prev.filter((c) =>
+          runId !== undefined ? c.runId !== runId : c.id !== firstCellId,
+        ),
+      );
+      if (runId !== undefined) {
+        setDismissedRuns((prev) => new Set(prev).add(runId));
+      }
+    },
+    [outputFileId, setOutputsForFile],
+  );
+  const clearRunHistory = useCallback(() => {
+    clearOutput();
+    setDismissedRuns(new Set());
+    setOutputCleared(true);
+  }, [clearOutput]);
+
+  // ⋯ menu: everything secondary folds into one place — labelled sections
+  // whose items either act (Packages dialog, Settings tab, Workspaces
+  // manager) or slide to a sub-panel (Examples, Export, Runtime info).
+  const moreMenuSections = useMemo<MoreMenuSection[]>(
+    () => [
+      {
+        label: "Resources",
+        items: [
+          {
+            key: "examples",
+            label: "Examples",
+            icon: Library,
+            hint: adapter.examples.length,
+            panel: {
+              title: "Examples",
+              render: (close: () => void) => (
+                <>
+                  {adapter.examples.map((ex) => (
+                    <button
+                      type="button"
+                      key={ex.key}
+                      className="example-item"
+                      onClick={() => {
+                        close();
+                        requestExample(ex);
+                      }}
+                    >
+                      <div className="ex-title">{ex.title}</div>
+                      <div className="ex-desc">{ex.desc}</div>
+                    </button>
+                  ))}
+                </>
+              ),
+            },
+          },
+          ...(adapter.packages.length > 0
+            ? [
+                {
+                  key: "packages",
+                  label: "Packages",
+                  icon: Package,
+                  hint: adapter.packages.length,
+                  onSelect: () => setPackagesOpen(true),
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        label: "Actions",
+        items: [
+          {
+            key: "export",
+            label: "Export code",
+            icon: ArrowDownToLine,
+            panel: {
+              title: "Export code",
+              render: (close: () => void) => (
+                <>
+                  {adapter.exportFormats.map((fmt) => (
+                    <button
+                      type="button"
+                      key={fmt.extension}
+                      className="example-item"
+                      onClick={() => {
+                        close();
+                        exportCode(fmt);
+                      }}
+                    >
+                      <div className="ex-title">
+                        {fmt.label}
+                        <span className="ext-badge">.{fmt.extension}</span>
+                      </div>
+                      <div className="ex-desc">Download as .{fmt.extension}</div>
+                    </button>
+                  ))}
+                </>
+              ),
+            },
+          },
+        ],
+      },
+      {
+        label: "Playground",
+        items: [
+          {
+            key: "info",
+            label: "Runtime info",
+            icon: Info,
+            panel: {
+              title: "Runtime info",
+              render: () => (
+                <div className="ph-more-info">
+                  <RuntimeInfoContent info={adapter.runtimeInfo} />
+                </div>
+              ),
+            },
+          },
+          {
+            key: "workspaces",
+            label: "Workspaces",
+            icon: FolderOpen,
+            onSelect: () => setWorkspaceManagerOpen(true),
+          },
+          {
+            key: "settings",
+            label: "Settings",
+            icon: Settings,
+            onSelect: openSettingsTab,
+          },
+        ],
+      },
+    ],
+    [adapter, requestExample, exportCode, openSettingsTab],
+  );
+
   // Rotate through the witty loading messages while the runtime is
   // still initialising. The cadence is intentionally a touch slower than
   // the moving-text animation so the text isn't constantly twitching.
@@ -3799,11 +3971,52 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </Select.Root>
             )}
           </div>
+          {/* Workspace name docked after a hairline; the pencil renames it
+              inline. Workspace switching & management moved to the
+              /dashboard/playground index (and the ⋯ menu's Workspaces). */}
+          {workspaceReady && !embedded && (
+            <>
+              <HeaderDivider />
+              <WorkspaceNameControl
+                workspaceId={workspaceId}
+                name={workspaceName}
+                onRenamed={(name) => {
+                  if (workspaceId) setWorkspace(workspaceId, name);
+                }}
+              />
+            </>
+          )}
+
           <div className="header-sep" />
 
-          {/* Workspace badge: visible on every breakpoint. Clicking opens
-              a popover with this playground's recent workspaces and a
-              "Manage" entry into the full workspace drawer. */}
+          {/* Right cluster: Save ▾ · Share · ⋯ — everything secondary folds
+              into the one ⋯ menu (handoff option 1a, quiet toolbar). */}
+          <div className="ph-actions desktop-only">
+            {workspaceReady && (
+              <SaveControl
+                playgroundId={adapter.id}
+                workspaceId={workspaceId}
+                workspaceName={workspaceName}
+                unsaved={!workspaceSaved && workspaceDirty}
+                onSave={handleSaveWorkspace}
+                buildBundle={buildCloudBundle}
+                onNotify={showToast}
+              />
+            )}
+
+            <ShareControls
+              workspaceName={workspaceName}
+              buildBundle={buildCloudBundle}
+              shareOpen={shareDialogOpen}
+              onShareOpenChange={setShareDialogOpen}
+            />
+
+            <MoreMenu sections={moreMenuSections} />
+          </div>
+
+          {/* Keeps the workspace manager drawer + auto-sync engine mounted
+              (reached from the ⋯ menu's "Workspaces" and the mobile menu);
+              the old header badge itself no longer renders. */}
           {workspaceReady && (
             <WorkspaceBadge
               playgroundId={adapter.id}
@@ -3814,122 +4027,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               unsaved={!workspaceSaved && workspaceDirty}
               onSave={handleSaveWorkspace}
               buildBundle={buildCloudBundle}
+              hideBadge
             />
           )}
-
-          {/* Desktop action group, hidden on narrow viewports in favour
-              of the consolidated mobile menu below. */}
-          <div className="header-actions desktop-only">
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Examples"
-                aria-label="Examples"
-              >
-                <Library size={14} aria-hidden="true" />
-                <span className="btn-label">Examples</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown">
-                    {adapter.examples.map((ex) => (
-                      <Menu.Item
-                        key={ex.key}
-                        className="example-item"
-                        onClick={() => requestExample(ex)}
-                      >
-                        <div className="ex-title">{ex.title}</div>
-                        <div className="ex-desc">{ex.desc}</div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Export code"
-                aria-label="Export code"
-              >
-                <ArrowDownToLine size={14} aria-hidden="true" />
-                <span className="btn-label">Export</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    {adapter.exportFormats.map((fmt) => (
-                      <Menu.Item
-                        key={fmt.extension}
-                        className="example-item export-item"
-                        onClick={() => exportCode(fmt)}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            {fmt.label}
-                            <span className="ext-badge">.{fmt.extension}</span>
-                          </div>
-                          <div className="ex-desc">
-                            Download as .{fmt.extension}
-                          </div>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
-            <ShareControls
-              workspaceName={workspaceName}
-              buildBundle={buildCloudBundle}
-              shareOpen={shareDialogOpen}
-              onShareOpenChange={setShareDialogOpen}
-            />
-
-            {adapter.packages.length > 0 && (
-              <button
-                type="button"
-                className="header-btn"
-                onClick={() => setPackagesOpen(true)}
-                title="Available packages"
-                aria-label="Available packages"
-              >
-                <Package size={14} aria-hidden="true" />
-                <span className="btn-label">Packages</span>
-              </button>
-            )}
-
-            <Popover.Root>
-              <Popover.Trigger
-                className="header-btn icon-only"
-                title="Runtime info"
-                aria-label="Runtime info"
-              >
-                <FaInfo size={13} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end" className="playground-header-positioner">
-                  <Popover.Popup className="bui-popup info-popover">
-                    <RuntimeInfoContent info={adapter.runtimeInfo} />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-
-            {/* Settings entry co-located with the other global controls in
-                the top-right cluster. */}
-            <button
-              type="button"
-              className="header-btn icon-only"
-              onClick={openSettingsTab}
-              title="Settings"
-              aria-label="Settings"
-            >
-              <Settings size={14} aria-hidden="true" />
-            </button>
-          </div>
 
           {/* Mobile-only consolidated menu, replaces the header buttons
               on narrow viewports. Base UI Drawer keeps the main menu and
@@ -4955,22 +5055,24 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   : `${outputGroups.length} ${outputGroups.length === 1 ? "Output" : "Outputs"}`}
               </span>
               <div className="pane-bar-sep" />
-              <button
-                type="button"
-                className="clear-btn"
-                onClick={clearOutput}
-                title="Clear output"
-                aria-label="Clear output"
-              >
-                <Eraser size={13} aria-hidden="true" />
-                <span>Clear</span>
-              </button>
+              {outputGroups.length > 0 && (
+                <button
+                  type="button"
+                  className="clear-btn"
+                  onClick={clearRunHistory}
+                  title="Clear all output"
+                  aria-label="Clear all output"
+                >
+                  <Eraser size={13} aria-hidden="true" />
+                  <span>Clear</span>
+                </button>
+              )}
             </div>
             {/* role="log": run results land here with no other cue a
                 screen-reader user could notice, polite live announcements
                 mirror what sighted users see appear in the pane. */}
             <div
-              className="output-body"
+              className={`output-body${hasPreview ? "" : " run-history"}`}
               ref={outputBodyRef}
               role="log"
               aria-live="polite"
@@ -4990,18 +5092,30 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </div>
               )}
               {outputs.length === 0 && statusState !== "running" && !hasPreview ? (
-                <div className="welcome">
-                  <div className="welcome-icon">
-                    <DiamondMark size={40} />
+                outputCleared ? (
+                  <div className="run-history-empty">
+                    Output cleared — press Run to start a new history.
                   </div>
-                  <h3>Run your code to see output</h3>
-                  {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
-                </div>
+                ) : (
+                  <div className="welcome">
+                    <div className="welcome-icon">
+                      <DiamondMark size={40} />
+                    </div>
+                    <h3>Run your code to see output</h3>
+                    {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
+                  </div>
+                )
               ) : (
-                outputGroups.map((group) => {
-                  // One frame per run: stderr-only runs read as ERROR;
-                  // stderr mixed into other output renders red inline.
+                outputGroups.map((group, groupIndex) => {
+                  // One slim cell per run: "Run N · finish time · duration".
+                  // stderr-only runs read red; stderr mixed into other
+                  // output renders red inline. Older runs dim, the newest
+                  // stays full color.
                   const onlyStderr = group.every((c) => c.type === "stderr");
+                  const runId = group[0].runId;
+                  const runNumber =
+                    runId !== undefined ? runNumbers.get(runId) : undefined;
+                  const fresh = groupIndex === outputGroups.length - 1;
                   const copyText = group
                     .filter(
                       (c) => c.type === "stdout" || c.type === "stderr",
@@ -5012,22 +5126,36 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <div
                       key={group[0].id}
                       data-cell-id={group[0].id}
-                      className={`out-cell ${onlyStderr ? "stderr" : "stdout"}`}
+                      className={`run-cell${onlyStderr ? " error" : ""}${
+                        fresh ? "" : " old"
+                      }`}
                     >
-                      <div className="out-cell-header">
-                        <span className="cell-type">
-                          {onlyStderr ? "ERROR" : "OUTPUT"}
+                      <div className="run-cell-header">
+                        <span className="run-cell-bar" aria-hidden="true" />
+                        <span className="run-cell-label">
+                          {runNumber !== undefined
+                            ? `Run ${runNumber}`
+                            : onlyStderr
+                              ? "Error"
+                              : "Output"}
                         </span>
-                        <span className="cell-time">
-                          <Timer size={12} aria-hidden="true" />
-                          <span>Done in {group[group.length - 1].elapsed}</span>
+                        {group[0].finishedAt !== undefined && (
+                          <span className="run-cell-time">
+                            {new Date(group[0].finishedAt).toLocaleTimeString(
+                              [],
+                              { hour12: false },
+                            )}
+                          </span>
+                        )}
+                        <span className="run-cell-ms">
+                          Done in {group[group.length - 1].elapsed}
                         </span>
                         {copyText.length > 0 && (
                           <button
                             type="button"
-                            className="icon-btn out-cell-copy"
-                            title="Copy output to clipboard"
-                            aria-label="Copy output to clipboard"
+                            className="run-cell-action"
+                            title="Copy this output"
+                            aria-label="Copy this output"
                             onClick={() =>
                               void copyToClipboard(
                                 copyText,
@@ -5038,8 +5166,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                             <CopyIcon />
                           </button>
                         )}
+                        <button
+                          type="button"
+                          className="run-cell-action"
+                          title="Dismiss this run"
+                          aria-label="Dismiss this run"
+                          onClick={() => dismissRun(runId, group[0].id)}
+                        >
+                          <X size={11} aria-hidden="true" />
+                        </button>
                       </div>
-                      <div className="out-cell-body">
+                      <div className="run-cell-content">
                         {group.map((cell) =>
                           cell.type === "image" ? (
                             <div

@@ -66,11 +66,11 @@ export function ShareControls({
       {renderTrigger && (
         <button
           type="button"
-          className="header-btn"
+          className="ph-ghost-btn"
           onClick={() => setShareOpen(true)}
-          title="Share this playground, anyone with the link can open a copy"
+          title="Share a snapshot link, anyone with the link can open a copy"
         >
-          <Share2 size={14} aria-hidden="true" />
+          <Share2 size={11} aria-hidden="true" />
           <span>Share</span>
         </button>
       )}

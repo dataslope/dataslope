@@ -16,6 +16,9 @@ export interface OutputCell {
    *  single OUTPUT cell, notebook-style). Surfaces that clear outputs
    *  on every run can omit it. */
   runId?: number;
+  /** Wall-clock ms when the run that produced this cell finished; the
+   *  stacked run history renders it as the cell's "finish time". */
+  finishedAt?: number;
 }
 
 export interface PlotlyFigure {
