@@ -31,7 +31,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal, Timer } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -2197,10 +2197,7 @@ export default function ChallengeCard({
                 Output
               </span>
               {elapsed && (
-                <span className={styles.outputTime}>
-                  <Timer size={12} aria-hidden="true" />
-                  {elapsed}
-                </span>
+                <span className={styles.outputTime}>{elapsed}</span>
               )}
             </div>
           )}

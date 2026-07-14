@@ -1395,19 +1395,24 @@
   padding-bottom: 48px;
 }
 
+/* Output bar per the header-simplification handoff: a quiet 26px strip —
+   slim primary accent chip, 10px uppercase muted label (the accent bar
+   alone carries the blue), plain mono duration on the right. Shared with
+   <CodeBlock>. */
 .outputHeader {
   display: flex;
   align-items: center;
-  padding: 16px 14px 8px 14px;
+  gap: 7px;
+  height: 26px;
+  padding: 0 14px;
   border-top: 1px solid var(--ch-border-light);
 }
 
 .accentBar {
-  width: 4px;
-  height: 20px;
+  width: 3px;
+  height: 11px;
   background: var(--ds-blue-500);
   border-radius: 2px;
-  margin-right: 10px;
   flex-shrink: 0;
 }
 
@@ -1416,11 +1421,11 @@
 }
 
 .outputLabel {
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ds-blue-500);
+  color: var(--ch-text-muted);
 }
 
 .outputLabel[data-error="true"] {
@@ -1429,23 +1434,18 @@
 
 .outputTime {
   margin-left: auto;
-  font-size: 11.5px;
+  font-size: 10px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-.outputTime svg {
-  flex-shrink: 0;
 }
 
 .outputBody {
-  padding: 10px 14px 14px 18px;
+  padding: 2px 14px 12px;
   font-family: var(--ch-font-mono);
-  font-size: 13.5px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--ch-text);
   white-space: pre-wrap;
   word-break: break-word;
@@ -2642,18 +2642,21 @@
   background: var(--ch-bg);
 }
 
+/* Preview bar per the header-simplification handoff: 32px strip with a
+   10px uppercase muted label, matching the output bar below it. */
 .previewHeader {
   display: flex;
   align-items: center;
-  padding: 12px 14px 8px 14px;
+  height: 32px;
+  padding: 0 14px;
 }
 
 .previewLabel {
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ds-gray-500, #6b7280);
+  color: var(--ch-text-muted);
 }
 
 .previewSlot {

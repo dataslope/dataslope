@@ -10,7 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw, Timer } from "lucide-react";
+import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import {
   LANGUAGE_ICONS,
@@ -1607,7 +1607,6 @@ function CodeBlockInner({
               <span className={styles.outputHeaderRight}>
                 {outputElapsed && (
                   <span className={challengeStyles.outputTime}>
-                    <Timer size={12} aria-hidden="true" />
                     {outputElapsed}
                   </span>
                 )}
