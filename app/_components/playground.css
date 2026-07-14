@@ -3057,6 +3057,47 @@ input[type="range"].fs-slider:disabled {
   transition: transform 0.15s ease;
 }
 
+/* Sectioned drawer rows mirroring the desktop ⋯ menu: uppercase group
+   labels, dim leading icons and mono count chips (MobileMoreSections). */
+.mobile-menu-label {
+  padding: 12px 12px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--menu-label, var(--text-dim));
+  user-select: none;
+}
+.mobile-menu-label:first-child {
+  padding-top: 6px;
+}
+.mobile-menu-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.mobile-menu-main > svg {
+  color: var(--menu-icon, var(--text-dim));
+  flex: none;
+}
+.mobile-menu-trailing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mobile-menu-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.mobile-menu-action:disabled {
+  cursor: default;
+}
+.mobile-menu-action:disabled:hover {
+  background: transparent;
+}
+
 /* Database selector surfaced at the top of the SQL playgrounds' mobile
    drawer menu (an experiment alongside the sidebar copy). The trigger is
    borderless by default and the drawer is now var(--bg), so give it a
@@ -5001,5 +5042,610 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 .split-editor-footer-hint {
   font-size: 10.5px;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Simplified header + stacked run history — "Playground Header Redesign"
+   handoff (option 1a). Everything below is new chrome: the ph-* header
+   controls (name + rename, Save split, ghost buttons, ⋯ menu) and the
+   run-cell output history that replaces the old OUTPUT-framed cells.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Menu palette from the handoff (slate-tinted neutrals for the ⋯ menu's
+   labels, icon boxes and separators), themed off the playground palette
+   attribute the theme bootstrap stamps on <html>. */
+:root {
+  --menu-sep: #f1f5f9;
+  --menu-label: #94a3b8;
+  --menu-icon-bg: #f1f5f9;
+  --menu-icon: #64748b;
+  --menu-chev: #94a3b8;
+}
+html[data-playground-theme="dark"] {
+  --menu-sep: rgba(148, 163, 184, 0.1);
+  --menu-label: #64748b;
+  --menu-icon-bg: rgba(148, 163, 184, 0.08);
+  --menu-icon: #94a3b8;
+  --menu-chev: #64748b;
+}
+
+/* ─── Header: divider · workspace name · inline rename ─── */
+.ph-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  flex: none;
+}
+.ph-name-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.ph-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.ph-rename-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+}
+.ph-rename-btn:hover {
+  color: var(--text);
+  background: var(--menu-item-hover);
+}
+.ph-rename-input {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 3px 8px;
+  width: 200px;
+  outline: none;
+}
+
+/* ─── Header: quiet ghost buttons (Save · Share) ─── */
+.ph-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ph-ghost-btn:hover {
+  background: var(--menu-item-hover);
+}
+.ph-save-split {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  position: relative;
+}
+.ph-save-main {
+  gap: 5px;
+  padding: 4px 4px 4px 8px;
+}
+.ph-save-main.ph-saved {
+  cursor: default;
+}
+.ph-save-main.ph-saved:hover {
+  background: transparent;
+}
+.ph-saved-cloud {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+.ph-saved-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 1px solid var(--bg);
+}
+.ph-save-chev {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 5px 4px 2px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.ph-save-chev:hover,
+.ph-save-chev[data-popup-open] {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+
+/* Save dropdown */
+.ph-save-menu {
+  width: 272px;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+}
+.ph-save-menu-note {
+  padding: 9px 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ph-save-menu-note svg {
+  color: var(--green);
+  flex: none;
+}
+.ph-save-menu-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  color: var(--text);
+  text-decoration: none;
+}
+.ph-save-menu-item + .ph-save-menu-item {
+  border-top: 1px solid var(--border);
+}
+.ph-save-menu-item:hover,
+.ph-save-menu-item[data-highlighted] {
+  background: var(--menu-item-hover);
+}
+.ph-save-menu-item[data-disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+.ph-save-menu-item > svg {
+  color: var(--text-dim);
+  margin-top: 1px;
+  flex: none;
+}
+.ph-save-menu-text {
+  min-width: 0;
+}
+.ph-save-menu-title {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.ph-save-menu-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ─── Header: ⋯ menu ─── */
+.ph-more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+}
+.ph-more-btn:hover,
+.ph-more-btn[data-popup-open] {
+  background: var(--menu-item-hover);
+}
+.ph-more-menu {
+  width: 276px;
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+}
+.ph-more-root {
+  padding: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.ph-more-sep {
+  height: 1px;
+  background: var(--menu-sep);
+  margin: 6px -6px;
+}
+.ph-more-label {
+  padding: 6px 10px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--menu-label);
+}
+.ph-more-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 8px 5px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+}
+.ph-more-item:hover {
+  background: var(--menu-item-hover);
+}
+.ph-more-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--menu-icon-bg);
+  color: var(--menu-icon);
+  flex: none;
+}
+.ph-more-item-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.ph-more-item-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--menu-icon);
+  background: var(--menu-icon-bg);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.ph-more-item-chev {
+  color: var(--menu-chev);
+  flex: none;
+}
+.ph-more-back {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+.ph-more-back:hover {
+  background: var(--menu-item-hover);
+}
+.ph-more-back > span:first-child {
+  color: var(--text-dim);
+}
+.ph-more-panel-body {
+  max-height: 280px;
+  overflow-y: auto;
+}
+/* Sub-panel list rows reuse the examples-dropdown metrics from the mock:
+   9px 14px rows separated by hairlines, 12.5px/500 titles, 11px dim descs. */
+.ph-more-panel-body .example-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.ph-more-panel-body .example-item:last-child {
+  border-bottom: none;
+}
+.ph-more-panel-body .example-item:hover {
+  background: var(--menu-item-hover);
+}
+.ph-more-panel-body .example-item .ex-title {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.ph-more-panel-body .example-item .ex-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.ph-more-info {
+  padding: 12px 14px;
+}
+.ph-more-info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ph-more-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  width: 60px;
+  flex: none;
+}
+.ph-more-info-value {
+  font-size: 12.5px;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+.ph-more-info-value.accent {
+  color: var(--primary);
+}
+.ph-more-info-notes {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Output pane: stacked run history ─── */
+.output-body.run-history {
+  padding: 0;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+}
+.run-cell {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+  animation: playground-fadeSlide 0.2s ease;
+}
+.run-cell-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 6px 0 14px;
+  height: 28px;
+  flex: none;
+}
+.run-cell-bar {
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  flex: none;
+  background: var(--primary);
+}
+.run-cell.error .run-cell-bar {
+  background: var(--red);
+}
+.run-cell.old .run-cell-bar {
+  opacity: 0.45;
+}
+.run-cell-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.run-cell.error .run-cell-label {
+  color: var(--red);
+}
+.run-cell.old .run-cell-label {
+  color: var(--text-dim);
+}
+.run-cell-time,
+.run-cell-ms {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.run-cell-ms {
+  margin-left: auto;
+}
+.run-cell-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+}
+.run-cell-action:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+.run-cell-content {
+  padding: 2px 14px 10px;
+  font-family: var(--font-mono);
+  font-size: var(--output-font-size, 13px);
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.run-cell.error .run-cell-content {
+  color: var(--red);
+}
+.run-cell.old .run-cell-content {
+  color: var(--text-dim);
+}
+.run-cell-content .out-seg-stderr {
+  color: var(--red);
+}
+.run-history-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* Right-side header cluster (Save ▾ · Share · ⋯). */
+.ph-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+/* ─── Preview-first output pane (web / react adapters, handoff 2a) ───
+   The preview fills the pane with its own slim control bar (auto-run ⚡ +
+   view menu moved off the editor bar); a quiet console strip pins to the
+   bottom — accent bar + OUTPUT + duration, red in the error state. */
+.output-body.web-preview-body {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.web-preview-body .web-preview-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--bg);
+}
+.web-preview-body .web-preview-header {
+  height: 32px;
+  padding: 0 10px 0 12px;
+  gap: 8px;
+  flex: none;
+  background: var(--bg);
+}
+.web-preview-body .web-preview-slot {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+  resize: none;
+}
+.web-preview-body .web-preview-slot:empty {
+  height: auto;
+}
+.pv-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+}
+.pv-icon-btn:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+.pv-icon-btn.active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+.web-console {
+  flex: none;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.web-console-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 12px;
+}
+.web-console-accent {
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--primary);
+  flex: none;
+}
+.web-console.error .web-console-accent {
+  background: var(--red);
+}
+.web-console-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.web-console.error .web-console-label {
+  color: var(--red);
+}
+.web-console-ms {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.web-console-content {
+  padding: 2px 12px 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.web-console.error .web-console-content {
+  color: var(--red);
+}
+.web-console-ready {
   color: var(--text-dim);
 }

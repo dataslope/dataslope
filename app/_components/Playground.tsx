@@ -74,11 +74,15 @@ import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,
   ArrowDownToLine,
+  Cloud,
+  CloudUpload,
   Package,
-  Timer,
+  Share2,
   Eraser,
   Play,
   FileCode,
+  FolderOpen,
+  Info,
   Wand2,
   Code2,
   Terminal,
@@ -86,7 +90,6 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
-import { FaInfo } from "react-icons/fa";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
@@ -145,6 +148,20 @@ import {
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
+import {
+  HeaderDivider,
+  MobileMoreSections,
+  MoreMenu,
+  SaveControl,
+  WorkspaceNameControl,
+  type MoreMenuSection,
+} from "./PlaygroundHeaderControls";
+import {
+  MobileMenuAction,
+  MobileMenuLabel,
+  MobileMenuSheet,
+  MobileMenuSubSheet,
+} from "./MobileMenuSheet";
 import { applyEntryFocus } from "./playgroundEntryFocus";
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
 import {
@@ -175,6 +192,11 @@ import {
 import { PLOTLY_CDN } from "./runtime/cdn";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
+
+/** The code playgrounds append runs to one scrolling history ("when runs
+ *  stack up"), so clear-before-run is opt-in here; the SQL playgrounds
+ *  keep DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun. */
+const CODE_CLEAR_BEFORE_RUN_DEFAULT = false;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
 // transition can complete and be clearly visible to the user.
 const MIN_ANIMATION_MS = 300;
@@ -672,26 +694,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // so the user can drag it anywhere. Infinity = append at the end (default).
   // Resets to Infinity when settings is closed so it starts fresh on re-open.
   const [settingsTabIndex, setSettingsTabIndex] = useState<number>(Infinity);
-  // Mobile consolidated-menu drawer. We render this as a Dialog (bottom
-  // sheet) instead of a Menu so its inline sub-sections (Examples,
-  // Information, …) can't be cut off the side of a narrow viewport.
+  // Mobile consolidated-menu drawer (bottom sheet, so its nested sections
+  // can't be cut off the side of a narrow viewport). Sub-sheet exclusivity
+  // lives inside MobileMenuSheet.
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Full workspace-manager drawer, opened from the mobile hamburger menu
   // (the header badge that normally opens it is hidden on mobile).
   const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
-  // Mutually-exclusive mobile menu sub-sheets (Files / Examples / Export /
-  // Information): opening one closes any other, so selecting a different
-  // item never leaves a stale sub-sheet open behind it.
-  const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(
-    null,
-  );
-  // Forget the open sub-sheet whenever the whole menu closes, so a flat
-  // action that dismisses the menu doesn't leave a nested sheet orphaned
-  // (and it reopens from the top next time).
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!mobileMenuOpen) setActiveMobileSubmenu(null);
-  }, [mobileMenuOpen]);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -1188,14 +1197,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
-    // Default to D.clearBeforeRun when unset (only an explicit stored value
-    // overrides it), so the shared default drives first-run behaviour.
+    // Default to appending runs (only an explicit stored value overrides
+    // it): the stacked run history keeps every run visible until the user
+    // dismisses or clears, so auto-clearing is opt-in via the setting.
+    // The SQL playgrounds keep the shared default.
     const storedClearBeforeRun = localStorage.getItem(
       storageKey("clearbeforerun"),
     );
     const savedClearBeforeRun =
       storedClearBeforeRun === null
-        ? D.clearBeforeRun
+        ? CODE_CLEAR_BEFORE_RUN_DEFAULT
         : storedClearBeforeRun === "true";
 
     /* Hydrate persisted settings from localStorage. We can't use lazy
@@ -1994,7 +2005,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setOutputFontSizeEnabled(D.outputFontSizeEnabled);
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
-    setClearBeforeRun(D.clearBeforeRun);
+    setClearBeforeRun(CODE_CLEAR_BEFORE_RUN_DEFAULT);
     showToast("Default settings restored.");
   }, [
     setFontSize,
@@ -2257,6 +2268,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       await rt.run(code, (cell) => collected.push(cell), runOptions);
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      const finishedAt = Date.now();
       const merged = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
         ...prev,
@@ -2265,6 +2277,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           id: ++outputCounter.current,
           elapsed,
           runId,
+          finishedAt,
         })),
       ]);
       if (collected.length === 0 && !hasPreview) {
@@ -2282,6 +2295,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // it in the Files pane even though the run ultimately errored.
       await syncCreatedFiles();
       const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      const finishedAt = Date.now();
       const msg = err instanceof Error ? err.message : String(err);
       const mergedOnErr = mergeConsecutiveStdout(collected);
       setOutputsForFile(targetFileId, (prev) => [
@@ -2291,6 +2305,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           id: ++outputCounter.current,
           elapsed,
           runId,
+          finishedAt,
         })),
         {
           id: ++outputCounter.current,
@@ -2298,6 +2313,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           content: msg,
           elapsed,
           runId,
+          finishedAt,
         },
       ]);
       setStatusState("error");
@@ -3554,6 +3570,166 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     return groups;
   }, [outputs]);
 
+  // ─── Stacked run history (handoff 3a) ────────────────────────────────
+  // Each run renders as one slim cell headed "Run N · finish time · Done in
+  // Xs". Numbers stay stable while runs are dismissed individually and
+  // restart from 1 after Clear: rank a group's runId among every runId seen
+  // since the last clear (visible ∪ dismissed).
+  const [dismissedRuns, setDismissedRuns] = useState<ReadonlySet<number>>(
+    () => new Set<number>(),
+  );
+  const [outputCleared, setOutputCleared] = useState(false);
+  // A fresh run after a clear retires the "cleared" note. Adjusted during
+  // render (the React "adjust state when a prop changes" pattern) rather
+  // than in an effect.
+  if (outputCleared && outputs.length > 0) setOutputCleared(false);
+  const runNumbers = useMemo(() => {
+    const ids = new Set<number>(dismissedRuns);
+    for (const group of outputGroups) {
+      if (group[0].runId !== undefined) ids.add(group[0].runId);
+    }
+    const sorted = [...ids].sort((a, b) => a - b);
+    const map = new Map<number, number>();
+    sorted.forEach((id, i) => map.set(id, i + 1));
+    return map;
+  }, [outputGroups, dismissedRuns]);
+  const dismissRun = useCallback(
+    (runId: number | undefined, firstCellId: number) => {
+      const fileId = outputFileId;
+      if (!fileId) return;
+      setOutputsForFile(fileId, (prev) =>
+        prev.filter((c) =>
+          runId !== undefined ? c.runId !== runId : c.id !== firstCellId,
+        ),
+      );
+      if (runId !== undefined) {
+        setDismissedRuns((prev) => new Set(prev).add(runId));
+      }
+    },
+    [outputFileId, setOutputsForFile],
+  );
+  const clearRunHistory = useCallback(() => {
+    clearOutput();
+    setDismissedRuns(new Set());
+    setOutputCleared(true);
+  }, [clearOutput]);
+
+  // ⋯ menu: everything secondary folds into one place — labelled sections
+  // whose items either act (Packages dialog, Settings tab, Workspaces
+  // manager) or slide to a sub-panel (Examples, Export, Runtime info).
+  const moreMenuSections = useMemo<MoreMenuSection[]>(
+    () => [
+      {
+        label: "Resources",
+        items: [
+          {
+            key: "examples",
+            label: "Examples",
+            icon: Library,
+            hint: adapter.examples.length,
+            panel: {
+              title: "Examples",
+              render: (close: () => void) => (
+                <>
+                  {adapter.examples.map((ex) => (
+                    <button
+                      type="button"
+                      key={ex.key}
+                      className="example-item"
+                      onClick={() => {
+                        close();
+                        requestExample(ex);
+                      }}
+                    >
+                      <div className="ex-title">{ex.title}</div>
+                      <div className="ex-desc">{ex.desc}</div>
+                    </button>
+                  ))}
+                </>
+              ),
+            },
+          },
+          ...(adapter.packages.length > 0
+            ? [
+                {
+                  key: "packages",
+                  label: "Packages",
+                  icon: Package,
+                  hint: adapter.packages.length,
+                  onSelect: () => setPackagesOpen(true),
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        label: "Actions",
+        items: [
+          {
+            key: "export",
+            label: "Export code",
+            icon: ArrowDownToLine,
+            panel: {
+              title: "Export code",
+              render: (close: () => void) => (
+                <>
+                  {adapter.exportFormats.map((fmt) => (
+                    <button
+                      type="button"
+                      key={fmt.extension}
+                      className="example-item"
+                      onClick={() => {
+                        close();
+                        exportCode(fmt);
+                      }}
+                    >
+                      <div className="ex-title">
+                        {fmt.label}
+                        <span className="ext-badge">.{fmt.extension}</span>
+                      </div>
+                      <div className="ex-desc">Download as .{fmt.extension}</div>
+                    </button>
+                  ))}
+                </>
+              ),
+            },
+          },
+        ],
+      },
+      {
+        label: "Playground",
+        items: [
+          {
+            key: "info",
+            label: "Runtime info",
+            icon: Info,
+            panel: {
+              title: "Runtime info",
+              render: () => (
+                <div className="ph-more-info">
+                  <RuntimeInfoContent info={adapter.runtimeInfo} />
+                </div>
+              ),
+            },
+          },
+          {
+            key: "workspaces",
+            label: "Workspaces",
+            icon: FolderOpen,
+            onSelect: () => setWorkspaceManagerOpen(true),
+          },
+          {
+            key: "settings",
+            label: "Settings",
+            icon: Settings,
+            onSelect: openSettingsTab,
+          },
+        ],
+      },
+    ],
+    [adapter, requestExample, exportCode, openSettingsTab],
+  );
+
   // Rotate through the witty loading messages while the runtime is
   // still initialising. The cadence is intentionally a touch slower than
   // the moving-text animation so the text isn't constantly twitching.
@@ -3799,11 +3975,52 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </Select.Root>
             )}
           </div>
+          {/* Workspace name docked after a hairline; the pencil renames it
+              inline. Workspace switching & management moved to the
+              /dashboard/playground index (and the ⋯ menu's Workspaces). */}
+          {workspaceReady && !embedded && (
+            <>
+              <HeaderDivider />
+              <WorkspaceNameControl
+                workspaceId={workspaceId}
+                name={workspaceName}
+                onRenamed={(name) => {
+                  if (workspaceId) setWorkspace(workspaceId, name);
+                }}
+              />
+            </>
+          )}
+
           <div className="header-sep" />
 
-          {/* Workspace badge: visible on every breakpoint. Clicking opens
-              a popover with this playground's recent workspaces and a
-              "Manage" entry into the full workspace drawer. */}
+          {/* Right cluster: Save ▾ · Share · ⋯ — everything secondary folds
+              into the one ⋯ menu (handoff option 1a, quiet toolbar). */}
+          <div className="ph-actions desktop-only">
+            {workspaceReady && (
+              <SaveControl
+                playgroundId={adapter.id}
+                workspaceId={workspaceId}
+                workspaceName={workspaceName}
+                unsaved={!workspaceSaved && workspaceDirty}
+                onSave={handleSaveWorkspace}
+                buildBundle={buildCloudBundle}
+                onNotify={showToast}
+              />
+            )}
+
+            <ShareControls
+              workspaceName={workspaceName}
+              buildBundle={buildCloudBundle}
+              shareOpen={shareDialogOpen}
+              onShareOpenChange={setShareDialogOpen}
+            />
+
+            <MoreMenu sections={moreMenuSections} />
+          </div>
+
+          {/* Keeps the workspace manager drawer + auto-sync engine mounted
+              (reached from the ⋯ menu's "Workspaces" and the mobile menu);
+              the old header badge itself no longer renders. */}
           {workspaceReady && (
             <WorkspaceBadge
               playgroundId={adapter.id}
@@ -3814,458 +4031,53 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               unsaved={!workspaceSaved && workspaceDirty}
               onSave={handleSaveWorkspace}
               buildBundle={buildCloudBundle}
+              hideBadge
             />
           )}
 
-          {/* Desktop action group, hidden on narrow viewports in favour
-              of the consolidated mobile menu below. */}
-          <div className="header-actions desktop-only">
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Examples"
-                aria-label="Examples"
-              >
-                <Library size={14} aria-hidden="true" />
-                <span className="btn-label">Examples</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown">
-                    {adapter.examples.map((ex) => (
-                      <Menu.Item
-                        key={ex.key}
-                        className="example-item"
-                        onClick={() => requestExample(ex)}
-                      >
-                        <div className="ex-title">{ex.title}</div>
-                        <div className="ex-desc">{ex.desc}</div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Export code"
-                aria-label="Export code"
-              >
-                <ArrowDownToLine size={14} aria-hidden="true" />
-                <span className="btn-label">Export</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start" className="playground-header-positioner">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    {adapter.exportFormats.map((fmt) => (
-                      <Menu.Item
-                        key={fmt.extension}
-                        className="example-item export-item"
-                        onClick={() => exportCode(fmt)}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            {fmt.label}
-                            <span className="ext-badge">.{fmt.extension}</span>
-                          </div>
-                          <div className="ex-desc">
-                            Download as .{fmt.extension}
-                          </div>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-
-            <ShareControls
-              workspaceName={workspaceName}
-              buildBundle={buildCloudBundle}
-              shareOpen={shareDialogOpen}
-              onShareOpenChange={setShareDialogOpen}
-            />
-
-            {adapter.packages.length > 0 && (
-              <button
-                type="button"
-                className="header-btn"
-                onClick={() => setPackagesOpen(true)}
-                title="Available packages"
-                aria-label="Available packages"
-              >
-                <Package size={14} aria-hidden="true" />
-                <span className="btn-label">Packages</span>
-              </button>
-            )}
-
-            <Popover.Root>
-              <Popover.Trigger
-                className="header-btn icon-only"
-                title="Runtime info"
-                aria-label="Runtime info"
-              >
-                <FaInfo size={13} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end" className="playground-header-positioner">
-                  <Popover.Popup className="bui-popup info-popover">
-                    <RuntimeInfoContent info={adapter.runtimeInfo} />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-
-            {/* Settings entry co-located with the other global controls in
-                the top-right cluster. */}
-            <button
-              type="button"
-              className="header-btn icon-only"
-              onClick={openSettingsTab}
-              title="Settings"
-              aria-label="Settings"
-            >
-              <Settings size={14} aria-hidden="true" />
-            </button>
-          </div>
-
           {/* Mobile-only consolidated menu, replaces the header buttons
-              on narrow viewports. Base UI Drawer keeps the main menu and
-              nested sections as bottom sheets so they stay within the
-              viewport on narrow phones. */}
-          <Drawer.Root
-            open={mobileMenuOpen}
-            onOpenChange={setMobileMenuOpen}
-            swipeDirection="down"
-          >
-            <Drawer.Trigger
-              className="header-btn icon-only mobile-only mobile-menu-btn"
-              title="Menu"
-              aria-label="Open menu"
-            >
-              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="4" y1="7" x2="20" y2="7" />
-                <line x1="4" y1="12" x2="20" y2="12" />
-                <line x1="4" y1="17" x2="20" y2="17" />
-              </svg>
-            </Drawer.Trigger>
-            <Drawer.Portal>
-              <Drawer.Backdrop className="pkg-overlay mobile-menu-backdrop" />
-              <Drawer.Viewport className="mobile-drawer-viewport">
-                <Drawer.Popup
-                  className="mobile-menu-drawer"
-                  aria-label="Menu"
-                >
-                  <Drawer.Content>
-                    <div className="mobile-menu-handle" aria-hidden="true" />
-                    <div className="mobile-menu-drawer-header">
-                      <Drawer.Title className="mobile-menu-drawer-title">
-                        Menu
-                      </Drawer.Title>
-                      <Drawer.Close
-                        className="settings-close"
-                        aria-label="Close menu"
-                      >
-                        ✕
-                      </Drawer.Close>
-                    </div>
-                    <div className="mobile-menu-drawer-body">
-                      {/* Workspace, the header badge is hidden on mobile,
-                          so open the full workspace manager from here. */}
-                      {workspaceReady && (
-                        <button
-                          type="button"
-                          className="mobile-menu-action"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            setWorkspaceManagerOpen(true);
-                          }}
-                        >
-                          <span>Workspace</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </button>
-                      )}
-                      {/* Share, the header button that owns this dialog is
-                          desktop-only, so mirror it here (the dialog portals
-                          above the drawer). Cloud backups live inside the
-                          workspace manager, reached via "Workspace" above. */}
-                      <button
-                        type="button"
-                        className="mobile-menu-action"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setShareDialogOpen(true);
-                        }}
-                      >
-                        <span>Share</span>
-                        <span className="mobile-menu-chev" aria-hidden="true">
-                          ›
-                        </span>
-                      </button>
-                      {/* Files, the desktop icon rail (which toggles the
-                          file panel) is hidden on mobile, so surface file
-                          management here as a bottom-sheet instead.
-                          Adapters that hide the Files pane skip it here
-                          too. */}
-                      {!adapter.hideFilesPane && (
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "files"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "files" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Files</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Files"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Files
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close files"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body mobile-files-drawer-body">
-                                  <FilesPanel {...filesPanelProps} />
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-                      )}
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "examples"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "examples" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Examples</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Examples"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Examples
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close examples"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body">
-                                  {adapter.examples.map((ex) => (
-                                    <button
-                                      type="button"
-                                      key={ex.key}
-                                      className="example-item"
-                                      onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        requestExample(ex);
-                                      }}
-                                    >
-                                      <div className="ex-title">{ex.title}</div>
-                                      <div className="ex-desc">{ex.desc}</div>
-                                    </button>
-                                  ))}
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "export"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "export" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Export</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Export"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Export
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close export"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body">
-                                  {adapter.exportFormats.map((fmt) => (
-                                    <button
-                                      type="button"
-                                      key={fmt.extension}
-                                      className="example-item export-item"
-                                      onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        exportCode(fmt);
-                                      }}
-                                    >
-                                      <div className="export-item-text">
-                                        <div className="ex-title">
-                                          {fmt.label}
-                                          <span className="ext-badge">.{fmt.extension}</span>
-                                        </div>
-                                        <div className="ex-desc">
-                                          Download as .{fmt.extension}
-                                        </div>
-                                      </div>
-                                    </button>
-                                  ))}
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      {adapter.packages.length > 0 && (
-                        <button
-                          type="button"
-                          className="mobile-menu-action"
-                          onClick={() => {
-                            setMobileMenuOpen(false);
-                            setPackagesOpen(true);
-                          }}
-                        >
-                          <span>Packages</span>
-                        </button>
-                      )}
-
-                      <Drawer.Root
-                        swipeDirection="down"
-                        open={activeMobileSubmenu === "information"}
-                        onOpenChange={(o) =>
-                          setActiveMobileSubmenu(o ? "information" : null)
-                        }
-                      >
-                        <Drawer.Trigger className="mobile-menu-action">
-                          <span>Information</span>
-                          <span className="mobile-menu-chev" aria-hidden="true">
-                            ›
-                          </span>
-                        </Drawer.Trigger>
-                        <Drawer.Portal>
-                          <Drawer.Backdrop
-                            className="pkg-overlay mobile-menu-backdrop"
-                            forceRender
-                          />
-                          <Drawer.Viewport className="mobile-drawer-viewport">
-                            <Drawer.Popup
-                              className="mobile-menu-drawer mobile-menu-nested-drawer"
-                              aria-label="Information"
-                            >
-                              <Drawer.Content>
-                                <div className="mobile-menu-handle" aria-hidden="true" />
-                                <div className="mobile-menu-drawer-header">
-                                  <Drawer.Title className="mobile-menu-drawer-title">
-                                    Information
-                                  </Drawer.Title>
-                                  <Drawer.Close
-                                    className="settings-close"
-                                    aria-label="Close information"
-                                  >
-                                    ✕
-                                  </Drawer.Close>
-                                </div>
-                                <div className="mobile-menu-drawer-body info-popover">
-                                  <RuntimeInfoContent info={adapter.runtimeInfo} />
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Popup>
-                          </Drawer.Viewport>
-                        </Drawer.Portal>
-                      </Drawer.Root>
-
-                      <button
-                        type="button"
-                        className="mobile-menu-action"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          openSettingsTab();
-                        }}
-                      >
-                        <span>Settings</span>
-                      </button>
-                    </div>
-                    {/* While a sub-sheet is open the parent menu acts as a
-                        backdrop: a tap anywhere on it just closes the open
-                        sub-sheet rather than opening the tapped item. */}
-                    {activeMobileSubmenu !== null && (
-                      <button
-                        type="button"
-                        className="mobile-menu-dismiss-catch"
-                        aria-label="Close submenu"
-                        onClick={() => setActiveMobileSubmenu(null)}
-                      />
-                    )}
-                  </Drawer.Content>
-                </Drawer.Popup>
-              </Drawer.Viewport>
-            </Drawer.Portal>
-          </Drawer.Root>
+              on narrow viewports: Save / Share / Files up top, then the
+              same sections the desktop ⋯ menu shows. */}
+          <MobileMenuSheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <MobileMenuLabel>Workspace</MobileMenuLabel>
+            {workspaceReady &&
+              (!workspaceSaved && workspaceDirty ? (
+                <MobileMenuAction
+                  icon={CloudUpload}
+                  label="Save"
+                  onClick={() => {
+                    void handleSaveWorkspace(workspaceName || "Workspace");
+                    showToast("Workspace saved");
+                  }}
+                />
+              ) : (
+                <MobileMenuAction
+                  icon={Cloud}
+                  label="Saved"
+                  disabled
+                  onClick={() => {}}
+                />
+              ))}
+            <MobileMenuAction
+              icon={Share2}
+              label="Share"
+              chevron
+              onClick={() => setShareDialogOpen(true)}
+            />
+            {/* The desktop icon rail (which toggles the file panel) is
+                hidden on mobile, so surface file management here as a
+                bottom sheet. Adapters that hide the Files pane skip it. */}
+            {!adapter.hideFilesPane && (
+              <MobileMenuSubSheet
+                icon={FolderTree}
+                label="Files"
+                bodyClassName="mobile-files-drawer-body"
+              >
+                <FilesPanel {...filesPanelProps} />
+              </MobileMenuSubSheet>
+            )}
+            <MobileMoreSections sections={moreMenuSections} />
+          </MobileMenuSheet>
         </header>
 
         <PackagesDrawer
@@ -4576,43 +4388,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </span>
               <div className="pane-bar-sep" />
               <div className="pane-editor-btn-group">
-                {hasPreview && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className={`icon-btn${autoRun ? " active" : ""}`}
-                          aria-label={
-                            autoRun
-                              ? "Turn off auto-run on edit"
-                              : "Turn on auto-run on edit"
-                          }
-                          aria-pressed={autoRun}
-                          onClick={() => setAutoRun(!autoRun)}
-                        >
-                          {autoRun ? (
-                            <Zap size={14} aria-hidden="true" />
-                          ) : (
-                            <ZapOff size={14} aria-hidden="true" />
-                          )}
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          {autoRun ? "Auto-run on edit: on" : "Auto-run on edit: off"}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
-                {(hasPreview || splitAvailable) && (
+                {/* Preview adapters: auto-run ⚡ and the view menu live on
+                    the PREVIEW bar (controls live where they act); the
+                    editor bar keeps only ⌘+Enter and Run. Non-preview
+                    split-capable adapters keep the layout menu here. */}
+                {!hasPreview && splitAvailable && (
                   <Popover.Root>
                     <Popover.Trigger
                       openOnHover
@@ -4955,53 +4735,250 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   : `${outputGroups.length} ${outputGroups.length === 1 ? "Output" : "Outputs"}`}
               </span>
               <div className="pane-bar-sep" />
-              <button
-                type="button"
-                className="clear-btn"
-                onClick={clearOutput}
-                title="Clear output"
-                aria-label="Clear output"
-              >
-                <Eraser size={13} aria-hidden="true" />
-                <span>Clear</span>
-              </button>
+              {outputGroups.length > 0 && (
+                <button
+                  type="button"
+                  className="clear-btn"
+                  onClick={clearRunHistory}
+                  title="Clear all output"
+                  aria-label="Clear all output"
+                >
+                  <Eraser size={13} aria-hidden="true" />
+                  <span>Clear</span>
+                </button>
+              )}
             </div>
             {/* role="log": run results land here with no other cue a
                 screen-reader user could notice, polite live announcements
                 mirror what sighted users see appear in the pane. */}
             <div
-              className="output-body"
+              className={`output-body${hasPreview ? " web-preview-body" : " run-history"}`}
               ref={outputBodyRef}
               role="log"
               aria-live="polite"
               aria-label="Program output"
             >
-              {hasPreview && (
-                // Live page preview for the web/react adapters. Always
-                // mounted so the slot element exists before the first
-                // run; the runtime swaps a sandboxed iframe into the
-                // slot on every run, and CSS renders a placeholder
-                // while the slot is still empty.
-                <div className="web-preview-panel" data-testid="web-preview">
-                  <div className="web-preview-header">
-                    <span className="web-preview-label">Preview</span>
+              {hasPreview ? (
+                <>
+                  {/* Live page preview for the web/react adapters. Always
+                      mounted so the slot element exists before the first
+                      run; the runtime swaps a sandboxed iframe into the
+                      slot on every run, and CSS renders a placeholder
+                      while the slot is still empty. The preview owns its
+                      controls — auto-run ⚡ and the view menu moved here
+                      from the editor bar (handoff 2a: controls live where
+                      they act). */}
+                  <div className="web-preview-panel" data-testid="web-preview">
+                    <div className="web-preview-header">
+                      <span className="web-preview-label">Preview</span>
+                      <div className="pane-bar-sep" />
+                      <Popover.Root>
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className={`pv-icon-btn${autoRun ? " active" : ""}`}
+                              aria-label={
+                                autoRun
+                                  ? "Turn off auto-run on edit"
+                                  : "Turn on auto-run on edit"
+                              }
+                              aria-pressed={autoRun}
+                              onClick={() => setAutoRun(!autoRun)}
+                            >
+                              {autoRun ? (
+                                <Zap size={13} aria-hidden="true" />
+                              ) : (
+                                <ZapOff size={13} aria-hidden="true" />
+                              )}
+                            </button>
+                          )}
+                        />
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="center"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup pane-btn-popover">
+                              {autoRun
+                                ? "Auto-run on edit: on"
+                                : "Auto-run on edit: off"}
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                      <Popover.Root>
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className="pv-icon-btn"
+                              aria-label="Change view"
+                            >
+                              {effectiveEditorPosition === "right" ? (
+                                <PanelRight size={13} aria-hidden="true" />
+                              ) : effectiveEditorPosition === "top" ? (
+                                <PanelTop size={13} aria-hidden="true" />
+                              ) : (
+                                <PanelLeft size={13} aria-hidden="true" />
+                              )}
+                            </button>
+                          )}
+                        />
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="end"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup change-view-menu">
+                              <div className="change-view-title">
+                                Change View
+                              </div>
+                              {(
+                                [
+                                  { pos: "left", label: "Editors left", Icon: PanelLeft },
+                                  { pos: "top", label: "Editors top", Icon: PanelTop },
+                                  { pos: "right", label: "Editors right", Icon: PanelRight },
+                                ] as const
+                              ).map(({ pos, label, Icon }) => (
+                                <button
+                                  key={pos}
+                                  type="button"
+                                  className={`change-view-item${
+                                    effectiveEditorPosition === pos
+                                      ? " selected"
+                                      : ""
+                                  }`}
+                                  disabled={editorPinnedLeft}
+                                  onClick={() => setEditorPosition(pos)}
+                                >
+                                  <Icon size={14} aria-hidden="true" />
+                                  <span>{label}</span>
+                                </button>
+                              ))}
+                              {editorPinnedLeft && (
+                                <div className="change-view-hint">
+                                  The tabbed editor keeps the editor on the
+                                  left.
+                                </div>
+                              )}
+                              {splitAvailable && (
+                                <>
+                                  <div
+                                    className="change-view-sep"
+                                    role="separator"
+                                  />
+                                  <div className="change-view-title">
+                                    Editor Layout
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className={`change-view-item${splitActive ? " selected" : ""}`}
+                                    aria-pressed={splitActive}
+                                    onClick={() => setSplitView(true)}
+                                  >
+                                    <Rows3 size={14} aria-hidden="true" />
+                                    <span>Split editors (CodePen-style)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={`change-view-item${!splitActive ? " selected" : ""}`}
+                                    aria-pressed={!splitActive}
+                                    onClick={() => setSplitView(false)}
+                                  >
+                                    <FileCode size={14} aria-hidden="true" />
+                                    <span>Tabbed editor (manage files)</span>
+                                  </button>
+                                </>
+                              )}
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                    </div>
+                    <div className="web-preview-slot" ref={previewHostRef} />
                   </div>
-                  <div className="web-preview-slot" ref={previewHostRef} />
-                </div>
-              )}
-              {outputs.length === 0 && statusState !== "running" && !hasPreview ? (
-                <div className="welcome">
-                  <div className="welcome-icon">
-                    <DiamondMark size={40} />
+                  {/* Quiet console strip pinned under the preview: accent
+                      bar + OUTPUT + duration, latest run's text; errors
+                      turn the strip red (handoff 2a error state). */}
+                  {(() => {
+                    const latest = outputGroups[outputGroups.length - 1];
+                    const consoleError =
+                      !!latest && latest.every((c) => c.type === "stderr");
+                    const textSegs = latest?.filter(
+                      (c) => c.type === "stdout" || c.type === "stderr",
+                    );
+                    return (
+                      <div className={`web-console${consoleError ? " error" : ""}`}>
+                        <div className="web-console-bar">
+                          <span className="web-console-accent" aria-hidden="true" />
+                          <span className="web-console-label">Output</span>
+                          <div className="pane-bar-sep" />
+                          {latest && (
+                            <span className="web-console-ms">
+                              {latest[latest.length - 1].elapsed}
+                            </span>
+                          )}
+                        </div>
+                        <div className="web-console-content">
+                          {textSegs && textSegs.length > 0 ? (
+                            textSegs.map((cell) => (
+                              <div
+                                key={cell.id}
+                                className={
+                                  cell.type === "stderr"
+                                    ? "out-seg-stderr"
+                                    : undefined
+                                }
+                              >
+                                {cell.content}
+                              </div>
+                            ))
+                          ) : (
+                            <span className="web-console-ready">
+                              Ready — console output lands here.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>
+              ) : outputs.length === 0 && statusState !== "running" ? (
+                outputCleared ? (
+                  <div className="run-history-empty">
+                    Output cleared — press Run to start a new history.
                   </div>
-                  <h3>Run your code to see output</h3>
-                  {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
-                </div>
+                ) : (
+                  <div className="welcome">
+                    <div className="welcome-icon">
+                      <DiamondMark size={40} />
+                    </div>
+                    <h3>Run your code to see output</h3>
+                    {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
+                  </div>
+                )
               ) : (
-                outputGroups.map((group) => {
-                  // One frame per run: stderr-only runs read as ERROR;
-                  // stderr mixed into other output renders red inline.
+                outputGroups.map((group, groupIndex) => {
+                  // One slim cell per run: "Run N · finish time · duration".
+                  // stderr-only runs read red; stderr mixed into other
+                  // output renders red inline. Older runs dim, the newest
+                  // stays full color.
                   const onlyStderr = group.every((c) => c.type === "stderr");
+                  const runId = group[0].runId;
+                  const runNumber =
+                    runId !== undefined ? runNumbers.get(runId) : undefined;
+                  const fresh = groupIndex === outputGroups.length - 1;
                   const copyText = group
                     .filter(
                       (c) => c.type === "stdout" || c.type === "stderr",
@@ -5012,22 +4989,36 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <div
                       key={group[0].id}
                       data-cell-id={group[0].id}
-                      className={`out-cell ${onlyStderr ? "stderr" : "stdout"}`}
+                      className={`run-cell${onlyStderr ? " error" : ""}${
+                        fresh ? "" : " old"
+                      }`}
                     >
-                      <div className="out-cell-header">
-                        <span className="cell-type">
-                          {onlyStderr ? "ERROR" : "OUTPUT"}
+                      <div className="run-cell-header">
+                        <span className="run-cell-bar" aria-hidden="true" />
+                        <span className="run-cell-label">
+                          {runNumber !== undefined
+                            ? `Run ${runNumber}`
+                            : onlyStderr
+                              ? "Error"
+                              : "Output"}
                         </span>
-                        <span className="cell-time">
-                          <Timer size={12} aria-hidden="true" />
-                          <span>Done in {group[group.length - 1].elapsed}</span>
+                        {group[0].finishedAt !== undefined && (
+                          <span className="run-cell-time">
+                            {new Date(group[0].finishedAt).toLocaleTimeString(
+                              [],
+                              { hour12: false },
+                            )}
+                          </span>
+                        )}
+                        <span className="run-cell-ms">
+                          Done in {group[group.length - 1].elapsed}
                         </span>
                         {copyText.length > 0 && (
                           <button
                             type="button"
-                            className="icon-btn out-cell-copy"
-                            title="Copy output to clipboard"
-                            aria-label="Copy output to clipboard"
+                            className="run-cell-action"
+                            title="Copy this output"
+                            aria-label="Copy this output"
                             onClick={() =>
                               void copyToClipboard(
                                 copyText,
@@ -5038,8 +5029,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                             <CopyIcon />
                           </button>
                         )}
+                        <button
+                          type="button"
+                          className="run-cell-action"
+                          title="Dismiss this run"
+                          aria-label="Dismiss this run"
+                          onClick={() => dismissRun(runId, group[0].id)}
+                        >
+                          <X size={11} aria-hidden="true" />
+                        </button>
                       </div>
-                      <div className="out-cell-body">
+                      <div className="run-cell-content">
                         {group.map((cell) =>
                           cell.type === "image" ? (
                             <div

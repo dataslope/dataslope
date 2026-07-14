@@ -28,17 +28,36 @@ import {
   verifySolutionViaCard,
 } from "../_components/solutionVerify";
 import {
+  BuilderSplit,
+  CheckboxField,
   ErrorNotice,
-  Fieldset,
   GuestNotice,
+  ItemHeader,
+  PreviewPlaceholder,
   PrimaryButton,
   SecondaryButton,
+  Section,
   SelectField,
   SharedLinkPanel,
   SmallButton,
   TextAreaField,
   TextField,
 } from "../_components/builderUi";
+import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
+import {
+  AlignLeft,
+  CircleCheck,
+  Code,
+  Eye,
+  FileText,
+  FlaskConical,
+  Lightbulb,
+  Plus,
+  Tag,
+  Terminal,
+  Type,
+  Wrench,
+} from "lucide-react";
 import { useSaveItem } from "../_components/useSaveItem";
 import { useRegisterBuilderDraft } from "@/app/dashboard/_studio/StudioAiContext";
 import type { DraftResult } from "@/lib/ai/draft";
@@ -387,47 +406,70 @@ export default function CodeChallengeBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
+  // The live-preview column: the real learner-facing card once Preview (or a
+  // verifying save) has mounted it, a pulsing placeholder until then. Keyed
+  // remount so the card re-reads the edited files/tests (booting the language
+  // runtime again on Refresh).
+  const previewColumn = preview ? (
+    <div key={preview.version}>
+      <CustomItemRenderer title={preview.title} payload={preview.payload} />
+    </div>
+  ) : (
+    <PreviewPlaceholder note="The learner-facing code challenge renders here. Click Preview to load it with your fields." />
+  );
+
   return (
-    <div className="flex flex-col gap-6">
+    <BuilderSplit preview={previewColumn}>
+      <BuilderHeader
+        title="New code challenge"
+        lede="Write the instructions, starter code, and tests. Recipients solve it right in their browser, no setup, no server."
+        aiPlaceholder="Describe the challenge and AI fills every field below"
+      />
       <GuestNotice />
 
-      <div className="grid gap-6 sm:grid-cols-[1fr_200px]">
-        <TextField
-          label="Title"
-          value={title}
+      <div className="ds-section flex flex-col gap-7">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
+          <TextField
+            label="Title"
+            icon={Type}
+            value={title}
+            onChange={(v) => {
+              setTitle(v);
+              saveState.clearError();
+            }}
+            placeholder="e.g. Summarize sales by category"
+            maxLength={120}
+          />
+          <SelectField
+            label="Language"
+            icon={Code}
+            value={adapter}
+            onChange={onAdapterChange}
+            options={ADAPTER_OPTIONS.map((a) => ({
+              value: a,
+              label: adapterLabel(a),
+            }))}
+          />
+        </div>
+
+        <TextAreaField
+          label="Instructions"
+          icon={AlignLeft}
+          value={instructions}
           onChange={(v) => {
-            setTitle(v);
+            setInstructions(v);
             saveState.clearError();
+            setFormError(null);
           }}
-          placeholder="e.g. Summarize sales by category"
-          maxLength={120}
-        />
-        <SelectField
-          label="Language"
-          value={adapter}
-          onChange={onAdapterChange}
-          options={ADAPTER_OPTIONS.map((a) => ({
-            value: a,
-            label: adapterLabel(a),
-          }))}
+          rows={4}
+          placeholder="What should the learner implement? Markdown supported."
+          hint="Markdown supported: paragraphs, bullet lists, **bold**, and `inline code`."
         />
       </div>
 
-      <TextAreaField
-        label="Instructions"
-        value={instructions}
-        onChange={(v) => {
-          setInstructions(v);
-          saveState.clearError();
-          setFormError(null);
-        }}
-        rows={4}
-        placeholder="What should the learner implement? Markdown supported."
-        hint="Markdown supported: paragraphs, bullet lists, **bold**, and `inline code`."
-      />
-
-      <Fieldset
-        legend="Files"
+      <Section
+        icon={FileText}
+        title="Files"
         actions={
           <SmallButton
             onClick={() =>
@@ -438,71 +480,71 @@ export default function CodeChallengeBuilder() {
             }
             disabled={files.length >= 8}
           >
-            + Add file
+            <Plus size={12} />
+            Add file
           </SmallButton>
         }
       >
         {files.map((file, i) => (
-          <div
-            key={i}
-            className="bg-muted/50 rounded-lg p-3"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                File {i + 1}
-                {i === 0 ? " · entry file, tests run against it" : ""}
-              </span>
-              <SmallButton
-                tone="danger"
-                onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
-                disabled={files.length <= 1}
-              >
-                Remove
-              </SmallButton>
-            </div>
-            <div className="mt-3 flex flex-col gap-3">
-              <TextField
-                label="Filename"
-                value={file.filename}
-                onChange={(v) => updateFile(i, { filename: v })}
-                placeholder={DEFAULT_FILENAMES[adapter] ?? "main.txt"}
-              />
-              <TextAreaField
-                label="Setup code (optional, read-only for the learner)"
-                value={file.initCode}
-                onChange={(v) => updateFile(i, { initCode: v })}
-                rows={4}
-                mono
-                placeholder={"# Runs before the learner's code on every run\nimport pandas as pd"}
-              />
-              <TextAreaField
-                label="Starter code"
-                value={file.starterCode}
-                onChange={(v) => updateFile(i, { starterCode: v })}
-                rows={6}
-                mono
-                placeholder="# Pre-filled in the learner's editor"
-              />
-              <TextAreaField
-                label={i === 0 ? "Solution code" : "Solution code (optional)"}
-                value={file.solutionCode}
-                onChange={(v) => updateFile(i, { solutionCode: v })}
-                rows={6}
-                mono
-                placeholder={'# Enables the "Show Solution" button'}
-                hint={
-                  i === 0
-                    ? "Required. Saving runs this solution against your tests, the challenge only publishes when it passes."
-                    : undefined
-                }
-              />
-            </div>
+          <div key={i} className="flex flex-col gap-[22px]">
+            <ItemHeader
+              label={
+                i === 0
+                  ? `File ${i + 1} · entry file, tests run against it`
+                  : `File ${i + 1}`
+              }
+              onRemove={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
+              removeDisabled={files.length <= 1}
+            />
+            <TextField
+              label="Filename"
+              icon={FileText}
+              value={file.filename}
+              onChange={(v) => updateFile(i, { filename: v })}
+              placeholder={DEFAULT_FILENAMES[adapter] ?? "main.txt"}
+              mono
+            />
+            <TextAreaField
+              label="Setup code"
+              note="optional, read-only for the learner"
+              icon={Wrench}
+              value={file.initCode}
+              onChange={(v) => updateFile(i, { initCode: v })}
+              rows={3}
+              mono
+              placeholder={"# Runs before the learner's code on every run\nimport pandas as pd"}
+            />
+            <TextAreaField
+              label="Starter code"
+              icon={Code}
+              value={file.starterCode}
+              onChange={(v) => updateFile(i, { starterCode: v })}
+              rows={4}
+              mono
+              placeholder="# Pre-filled in the learner's editor"
+            />
+            <TextAreaField
+              label={i === 0 ? "Solution code" : "Solution code (optional)"}
+              icon={Lightbulb}
+              value={file.solutionCode}
+              onChange={(v) => updateFile(i, { solutionCode: v })}
+              rows={4}
+              mono
+              placeholder={'# Enables the "Show Solution" button'}
+              hint={
+                i === 0
+                  ? "Required. Saving runs this solution against your tests, the challenge only publishes when it passes."
+                  : undefined
+              }
+            />
           </div>
         ))}
-      </Fieldset>
+      </Section>
 
-      <Fieldset
-        legend="Tests (run on Check Answer)"
+      <Section
+        icon={FlaskConical}
+        title="Tests"
+        note="run on Check Answer"
         actions={
           <SmallButton
             onClick={() =>
@@ -513,30 +555,22 @@ export default function CodeChallengeBuilder() {
             }
             disabled={tests.length >= 20}
           >
-            + Add test
+            <Plus size={12} />
+            Add test
           </SmallButton>
         }
       >
         {tests.map((test, i) => (
-          <div
-            key={i}
-            className="bg-muted/50 rounded-lg p-3"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                Test {i + 1}
-              </span>
-              <SmallButton
-                tone="danger"
-                onClick={() => setTests((prev) => prev.filter((_, j) => j !== i))}
-                disabled={tests.length <= 1}
-              >
-                Remove
-              </SmallButton>
-            </div>
-            <div className="mt-3 flex flex-col gap-3">
+          <div key={i} className="flex flex-col gap-[22px]">
+            <ItemHeader
+              label={`Test ${i + 1}`}
+              onRemove={() => setTests((prev) => prev.filter((_, j) => j !== i))}
+              removeDisabled={tests.length <= 1}
+            />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
               <TextField
                 label="Name"
+                icon={Tag}
                 value={test.name}
                 onChange={(v) => updateTest(i, { name: v })}
                 placeholder="e.g. `summary` has one row per category"
@@ -544,6 +578,7 @@ export default function CodeChallengeBuilder() {
               />
               <SelectField
                 label="Check type"
+                icon={CircleCheck}
                 value={test.mode}
                 onChange={(v) => updateTest(i, { mode: v as "code" | "stdout" })}
                 options={[
@@ -558,99 +593,88 @@ export default function CodeChallengeBuilder() {
                     : `${adapterLabel(adapter)} challenges check the program's printed output.`
                 }
               />
-              {test.mode === "code" ? (
-                <TextAreaField
-                  label="Check code"
-                  value={test.code}
-                  onChange={(v) => updateTest(i, { code: v })}
-                  rows={4}
-                  mono
-                  placeholder={"# Runs after the learner's code.\n# assert/throw on failure, stay silent on success.\nassert summary is not None"}
-                />
-              ) : (
-                <>
-                  <SelectField
-                    label="Output check"
-                    value={test.stdoutKind}
-                    onChange={(v) =>
-                      updateTest(i, { stdoutKind: v as StdoutCheckKind })
-                    }
-                    options={[
-                      { value: "stdoutContains", label: "Output contains…" },
-                      { value: "stdoutEquals", label: "Output equals exactly…" },
-                      { value: "stdoutMatches", label: "Output matches regex…" },
-                    ]}
-                  />
-                  <TextAreaField
-                    label="Expected output"
-                    value={test.stdoutValue}
-                    onChange={(v) => updateTest(i, { stdoutValue: v })}
-                    rows={3}
-                    mono
-                    placeholder="Hello, world!"
-                  />
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={test.noStderr}
-                      onChange={(e) => updateTest(i, { noStderr: e.target.checked })}
-                      className="accent-[var(--ds-green-600)]"
-                    />
-                    Also require empty stderr (no warnings or errors)
-                  </label>
-                </>
-              )}
             </div>
+            {test.mode === "code" ? (
+              <TextAreaField
+                label="Check code"
+                icon={Terminal}
+                value={test.code}
+                onChange={(v) => updateTest(i, { code: v })}
+                rows={3}
+                mono
+                placeholder={"# Runs after the learner's code.\n# assert/throw on failure, stay silent on success.\nassert summary is not None"}
+              />
+            ) : (
+              <>
+                <SelectField
+                  label="Output check"
+                  icon={CircleCheck}
+                  value={test.stdoutKind}
+                  onChange={(v) =>
+                    updateTest(i, { stdoutKind: v as StdoutCheckKind })
+                  }
+                  options={[
+                    { value: "stdoutContains", label: "Output contains…" },
+                    { value: "stdoutEquals", label: "Output equals exactly…" },
+                    { value: "stdoutMatches", label: "Output matches regex…" },
+                  ]}
+                />
+                <TextAreaField
+                  label="Expected output"
+                  icon={Terminal}
+                  value={test.stdoutValue}
+                  onChange={(v) => updateTest(i, { stdoutValue: v })}
+                  rows={3}
+                  mono
+                  placeholder="Hello, world!"
+                />
+                <CheckboxField
+                  label="Also require empty stderr (no warnings or errors)"
+                  checked={test.noStderr}
+                  onChange={(v) => updateTest(i, { noStderr: v })}
+                />
+              </>
+            )}
           </div>
         ))}
-      </Fieldset>
+      </Section>
 
-      <ErrorNotice message={formError ?? saveState.error} />
-      {saveState.savedUrl ? (
-        <SharedLinkPanel
-          url={saveState.savedUrl}
-          editable={saveState.editingId !== null}
-        />
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-3">
-        <PrimaryButton onClick={onSave} disabled={saveState.saving || verifying}>
-          {verifying
-            ? "Verifying solution…"
-            : saveState.saving
-              ? "Saving…"
-              : saveState.editingId
-                ? "Verify & save changes"
-                : "Verify & get link"}
-        </PrimaryButton>
-        <SecondaryButton onClick={onPreview} disabled={verifying}>
-          {preview ? "Refresh preview" : "Preview"}
-        </SecondaryButton>
-        {verifying ? (
-          <span
-            role="status"
-            className="text-muted-foreground text-sm"
-          >
-            Running your solution against the tests below, the first run can
-            take a moment while the language runtime loads…
-          </span>
+      <div className="mt-7 flex flex-col gap-5">
+        <ErrorNotice message={formError ?? saveState.error} />
+        {saveState.savedUrl ? (
+          <SharedLinkPanel
+            url={saveState.savedUrl}
+            editable={saveState.editingId !== null}
+          />
         ) : null}
-      </div>
 
-      {preview ? (
-        <div>
-          <h2 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <PrimaryButton onClick={onSave} disabled={saveState.saving || verifying}>
+            <CircleCheck size={14} />
             {verifying
-              ? "Verifying, your solution is running in this card"
-              : "Preview, exactly what visitors will see"}
-          </h2>
-          {/* Keyed remount so the card re-reads the edited files/tests
-              (booting the language runtime again on Refresh). */}
-          <div key={preview.version}>
-            <CustomItemRenderer title={preview.title} payload={preview.payload} />
-          </div>
+              ? "Verifying solution…"
+              : saveState.saving
+                ? "Saving…"
+                : saveState.editingId
+                  ? "Verify & save changes"
+                  : "Verify & get link"}
+          </PrimaryButton>
+          <SecondaryButton onClick={onPreview} disabled={verifying}>
+            <Eye size={14} />
+            {preview ? "Refresh preview" : "Preview"}
+          </SecondaryButton>
+          {verifying ? (
+            <span
+              role="status"
+              className="ds-pulse text-[13px]"
+              style={{ color: "var(--muted)" }}
+            >
+              Running your solution against the tests, the first run can take a
+              moment while the language runtime loads…
+            </span>
+          ) : null}
         </div>
-      ) : null}
-    </div>
+      </div>
+    </BuilderSplit>
   );
 }

@@ -59,8 +59,12 @@ export interface SqlPlaygroundShellProps {
   /** Number of times the title is repeated in the hero scroll strip.
    *  Postgres/DuckDB use 3, SQLite uses 4. */
   loadingHeroRepeat?: number;
-  /** Right-of-logo header actions (Import, Export, Examples, …). The
-   *  shell renders them directly inside `<header className="playground-header">`
+  /** Left-docked header content rendered right after the playground
+   *  switcher, before the flexible separator — the workspace name +
+   *  inline rename control in the simplified header. */
+  headerName?: ReactNode;
+  /** Right-of-logo header actions (Save, Share, ⋯). The shell renders
+   *  them directly inside `<header className="playground-header">`
    *  after the logo + separator. */
   headerActions?: ReactNode;
   /** Contents of the mobile "hamburger" menu (rendered only below the
@@ -109,6 +113,7 @@ export function SqlPlaygroundShell({
   loaded,
   statusState,
   loadingCaption,
+  headerName,
   headerActions,
   mobileMenu,
   bootFraction,
@@ -353,6 +358,7 @@ export function SqlPlaygroundShell({
       <div className="playground-app">
         <header className="playground-header">
           <SqlPlaygroundSwitcher playgroundId={playgroundId} />
+          {headerName}
           <div className="header-sep" />
           {headerActions}
           {mobileMenu && (

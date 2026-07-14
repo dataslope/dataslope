@@ -9,7 +9,6 @@ import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
 import CodeChallengeBuilder from "./CodeChallengeBuilder";
 
 export const metadata: Metadata = {
@@ -20,15 +19,8 @@ export const metadata: Metadata = {
 
 export default function CreateChallengePage() {
   return (
-    <div className="mx-auto max-w-3xl">
-      <BuilderHeader
-        title="New code challenge"
-        lede="Write the instructions, starter code, and tests. Recipients solve it right in their browser, no setup, no server."
-        aiPlaceholder="Describe the challenge and AI fills every field below"
-      />
-      <Suspense fallback={null}>
-        <CodeChallengeBuilder />
-      </Suspense>
-    </div>
+    <Suspense fallback={null}>
+      <CodeChallengeBuilder />
+    </Suspense>
   );
 }

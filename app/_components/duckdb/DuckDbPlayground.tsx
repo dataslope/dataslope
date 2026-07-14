@@ -34,7 +34,12 @@ import { Switch } from "@base-ui-components/react/switch";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
+  Share2,
+  CloudUpload,
+  Cloud,
   ArrowUpFromLine,
+  FolderOpen,
+  Info,
   ChevronDown,
   Columns3,
   Database,
@@ -55,7 +60,6 @@ import {
   X,
   FolderTree,
 } from "lucide-react";
-import { FaInfo } from "react-icons/fa";
 import React, {
   Fragment,
   useCallback,
@@ -126,6 +130,14 @@ import {
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
+import {
+  HeaderDivider,
+  MobileMoreSections,
+  MoreMenu,
+  SaveControl,
+  WorkspaceNameControl,
+  type MoreMenuSection,
+} from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
 import {
   bundleTabSeeds,
@@ -133,7 +145,7 @@ import {
   takePendingBundleRef,
 } from "../cloud/materialize";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
-import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
+import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { useCreepingBootFraction } from "../challengeShared";
 import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
 
@@ -4128,6 +4140,184 @@ function DuckDbPlaygroundInner() {
     />
   );
 
+  // One definition drives both the desktop ⋯ menu and the mobile
+  // drawer's sectioned rows.
+  const moreSections: MoreMenuSection[] = [
+                {
+                  label: "Data",
+                  items: [
+                    {
+                      key: "import",
+                      label: "Import…",
+                      icon: ArrowUpFromLine,
+                      panel: {
+                        title: "Import data",
+                        render: (close: () => void) => (
+                          <>
+                            <button
+                              type="button"
+                              className="example-item"
+                              onClick={() => {
+                                close();
+                                setImportSqlDumpOpen(true);
+                              }}
+                            >
+                              <div className="ex-title">
+                                from SQL dump
+                                <span className="ext-badge">.sql</span>
+                              </div>
+                              <div className="ex-desc">
+                                Load database from a SQL dump file
+                              </div>
+                            </button>
+                            <button
+                              type="button"
+                              className="example-item"
+                              onClick={() => {
+                                close();
+                                setImportCsvState(null);
+                                setImportCsvOpen(true);
+                              }}
+                            >
+                              <div className="ex-title">
+                                from CSV
+                                <span className="ext-badge">.csv</span>
+                              </div>
+                              <div className="ex-desc">Add table from CSV file</div>
+                            </button>
+                            <button
+                              type="button"
+                              className="example-item"
+                              onClick={() => {
+                                close();
+                                setImportJsonState(null);
+                                setImportJsonOpen(true);
+                              }}
+                            >
+                              <div className="ex-title">
+                                from JSON
+                                <span className="ext-badge">.json</span>
+                              </div>
+                              <div className="ex-desc">Add table from JSON array</div>
+                            </button>
+                            <button
+                              type="button"
+                              className="example-item"
+                              onClick={() => {
+                                close();
+                                setImportParquetState(null);
+                                setImportParquetOpen(true);
+                              }}
+                            >
+                              <div className="ex-title">
+                                from Parquet
+                                <span className="ext-badge">.parquet</span>
+                              </div>
+                              <div className="ex-desc">Add table from Parquet file</div>
+                            </button>
+                          </>
+                        ),
+                      },
+                    },
+                    {
+                      key: "export",
+                      label: "Export database",
+                      icon: ArrowDownToLine,
+                      panel: {
+                        title: "Export database",
+                        render: (close: () => void) =>
+                          tables.length === 0 ? (
+                            <div
+                              className="ph-more-info-notes"
+                              style={{ padding: 14 }}
+                            >
+                              Create a table to export the database.
+                            </div>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                className="example-item"
+                                onClick={() => {
+                                  close();
+                                  void exportDuckDbDatabase();
+                                }}
+                              >
+                                <div className="ex-title">
+                                  SQL Dump
+                                  <span className="ext-badge">.sql</span>
+                                </div>
+                                <div className="ex-desc">CREATE + INSERT statements</div>
+                              </button>
+                              <button
+                                type="button"
+                                className="example-item"
+                                onClick={() => {
+                                  close();
+                                  void exportDuckDbDatabaseToXlsx();
+                                }}
+                              >
+                                <div className="ex-title">
+                                  Excel Workbook
+                                  <span className="ext-badge">.xlsx</span>
+                                </div>
+                                <div className="ex-desc">One sheet per table</div>
+                              </button>
+                            </>
+                          ),
+                      },
+                    },
+                  ],
+                },
+                {
+                  label: "Tools",
+                  items: [
+                    {
+                      key: "history",
+                      label: "Query history",
+                      icon: History,
+                      onSelect: openQueryHistoryTab,
+                    },
+                    {
+                      key: "er",
+                      label: "ER diagram",
+                      icon: Network,
+                      onSelect: openErDiagramTab,
+                    },
+                  ],
+                },
+                {
+                  label: "Playground",
+                  items: [
+                    {
+                      key: "info",
+                      label: "Runtime info",
+                      icon: Info,
+                      panel: {
+                        title: "Runtime info",
+                        render: () => (
+                          <div className="ph-more-info">
+                            <RuntimeInfoContent info={RUNTIME_INFO} />
+                          </div>
+                        ),
+                      },
+                    },
+                    {
+                      key: "workspaces",
+                      label: "Workspaces",
+                      icon: FolderOpen,
+                      onSelect: () => setWorkspaceManagerOpen(true),
+                    },
+                    {
+                      key: "settings",
+                      label: "Settings",
+                      icon: SettingsIcon,
+                      onSelect: openSettingsTab,
+                    },
+                  ],
+                },
+              ];
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -4136,6 +4326,20 @@ function DuckDbPlaygroundInner() {
       bootFraction={bootDisplayFraction}
       statusState={statusState}
       loadingCaption={loadingMessage}
+      headerName={
+        activeWorkspace ? (
+          <>
+            <HeaderDivider />
+            <WorkspaceNameControl
+              workspaceId={activeWorkspace.id}
+              name={activeWorkspace.name}
+              onRenamed={(name) =>
+                setActiveWorkspace({ id: activeWorkspace.id, name })
+              }
+            />
+          </>
+        ) : null
+      }
       headerActions={
         <>
           {activeWorkspace && (
@@ -4151,330 +4355,66 @@ function DuckDbPlaygroundInner() {
               }
               onSave={handleSaveWorkspace}
               buildBundle={buildCloudBundle}
+              hideBadge
             />
           )}
-          <div className="header-actions desktop-only">
+          <div className="ph-actions desktop-only">
+            {activeWorkspace && (
+              <SaveControl
+                playgroundId={PLAYGROUND_ID}
+                workspaceId={activeWorkspace.id}
+                workspaceName={activeWorkspace.name}
+                unsaved={
+                  !workspaceSaved &&
+                  tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+                }
+                onSave={handleSaveWorkspace}
+                buildBundle={buildCloudBundle}
+                onNotify={showToast}
+              />
+            )}
             <ShareControls
               workspaceName={activeWorkspace?.name ?? ""}
               buildBundle={buildCloudBundle}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
             />
-            <Menu.Root>
-              <Menu.Trigger
-                className="header-btn"
-                title="Import data"
-                aria-label="Import"
-                disabled={!loaded}
-              >
-                <ArrowUpFromLine size={14} aria-hidden="true" />
-                <span className="btn-label">Import</span>
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner sideOffset={6} align="start">
-                  <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                    <div className="import-section-label">Database</div>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => setImportSqlDumpOpen(true)}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from SQL dump
-                          <span className="ext-badge">.sql</span>
-                        </div>
-                        <div className="ex-desc">
-                          Load database from a SQL dump file
-                        </div>
-                      </div>
-                    </Menu.Item>
-                    <div className="import-section-label">Tables</div>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => {
-                        setImportCsvState(null);
-                        setImportCsvOpen(true);
-                      }}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from CSV
-                          <span className="ext-badge">.csv</span>
-                        </div>
-                        <div className="ex-desc">Add table from CSV file</div>
-                      </div>
-                    </Menu.Item>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => {
-                        setImportJsonState(null);
-                        setImportJsonOpen(true);
-                      }}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from JSON
-                          <span className="ext-badge">.json</span>
-                        </div>
-                        <div className="ex-desc">Add table from JSON array</div>
-                      </div>
-                    </Menu.Item>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => {
-                        setImportParquetState(null);
-                        setImportParquetOpen(true);
-                      }}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from Parquet
-                          <span className="ext-badge">.parquet</span>
-                        </div>
-                        <div className="ex-desc">
-                          Add table from Parquet file
-                        </div>
-                      </div>
-                    </Menu.Item>
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-            {tables.length === 0 && loaded ? (
-              <Popover.Root
-                open={exportNoTabsHover}
-                onOpenChange={setExportNoTabsHover}
-              >
-                <div
-                  style={{ cursor: "not-allowed" }}
-                  onMouseEnter={() => setExportNoTabsHover(true)}
-                  onMouseLeave={() => setExportNoTabsHover(false)}
-                  onFocus={() => setExportNoTabsHover(true)}
-                  onBlur={() => setExportNoTabsHover(false)}
-                  tabIndex={0}
-                  role="button"
-                  aria-disabled="true"
-                  aria-label="Export (create a table to enable)"
-                >
-                  <Popover.Trigger
-                    className="header-btn"
-                    disabled
-                    style={{ pointerEvents: "none" }}
-                    title="Export database"
-                    aria-label="Export"
-                  >
-                    <ArrowDownToLine size={14} aria-hidden="true" />
-                    <span className="btn-label">Export DB</span>
-                  </Popover.Trigger>
-                </div>
-                <Popover.Portal>
-                  <Popover.Positioner
-                    sideOffset={6}
-                    align="start"
-                    className="sql-export-disabled-positioner"
-                  >
-                    <Popover.Popup className="bui-popup sql-export-disabled-popup">
-                      Create a table to export the database
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-            ) : (
-              <Menu.Root>
-                <Menu.Trigger
-                  className="header-btn"
-                  title="Export database"
-                  aria-label="Export"
-                  disabled={!loaded}
-                >
-                  <ArrowDownToLine size={14} aria-hidden="true" />
-                  <span className="btn-label">Export DB</span>
-                </Menu.Trigger>
-                <Menu.Portal>
-                  <Menu.Positioner sideOffset={6} align="start">
-                    <Menu.Popup className="bui-popup examples-dropdown export-dropdown">
-                      <div className="sql-result-export-group-label">
-                        DuckDB Database
-                      </div>
-                      <Menu.Item
-                        className="example-item export-item"
-                        onClick={() => void exportDuckDbDatabase()}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            SQL Dump
-                            <span className="ext-badge">.sql</span>
-                          </div>
-                          <div className="ex-desc">
-                            CREATE + INSERT statements
-                          </div>
-                        </div>
-                      </Menu.Item>
-                      <Menu.Item
-                        className="example-item export-item"
-                        onClick={() => void exportDuckDbDatabaseToXlsx()}
-                      >
-                        <div className="export-item-text">
-                          <div className="ex-title">
-                            Excel Workbook
-                            <span className="ext-badge">.xlsx</span>
-                          </div>
-                          <div className="ex-desc">One sheet per table</div>
-                        </div>
-                      </Menu.Item>
-                    </Menu.Popup>
-                  </Menu.Positioner>
-                </Menu.Portal>
-              </Menu.Root>
-            )}
-            <Popover.Root>
-              <Popover.Trigger
-                className="header-btn icon-only"
-                title="Query history"
-                aria-label="Query history"
-                onClick={openQueryHistoryTab}
-              >
-                <History size={14} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end">
-                  <Popover.Popup className="bui-popup pane-btn-popover">
-                    History
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-            <Popover.Root>
-              <Popover.Trigger
-                className="header-btn icon-only"
-                title="ER diagram"
-                aria-label="ER diagram"
-                onClick={openErDiagramTab}
-              >
-                <Network size={14} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end">
-                  <Popover.Popup className="bui-popup pane-btn-popover">
-                    ER Diagram
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-            <Popover.Root>
-              <Popover.Trigger
-                className="header-btn icon-only"
-                title="Runtime info"
-                aria-label="Runtime info"
-              >
-                <FaInfo size={13} aria-hidden="true" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end">
-                  <Popover.Popup className="bui-popup info-popover">
-                    <RuntimeInfoContent info={RUNTIME_INFO} />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-            <Popover.Root>
-              <Popover.Trigger
-                openOnHover
-                delay={150}
-                closeDelay={400}
-                render={(triggerProps) => (
-                  <button
-                    {...triggerProps}
-                    type="button"
-                    className="header-btn icon-only"
-                    aria-label="Settings"
-                    onClick={openSettingsTab}
-                  >
-                    <SettingsIcon size={14} aria-hidden="true" />
-                  </button>
-                )}
-              />
-              <Popover.Portal>
-                <Popover.Positioner sideOffset={6} align="end">
-                  <Popover.Popup className="bui-popup pane-btn-popover">
-                    Settings
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
+            <MoreMenu sections={moreSections} />
           </div>
         </>
       }
       mobileMenu={
         <>
           <div className="mobile-menu-db-selector">{databaseSelector}</div>
+          <MobileMenuLabel>Workspace</MobileMenuLabel>
+          {activeWorkspace &&
+            (!workspaceSaved &&
+            tabs.some((t) => !t.kind && t.code !== t.pristineCode) ? (
+              <MobileMenuAction
+                icon={CloudUpload}
+                label="Save"
+                onClick={() => {
+                  void handleSaveWorkspace(
+                    activeWorkspace.name || "Workspace",
+                  );
+                  showToast("Workspace saved");
+                }}
+              />
+            ) : (
+              <MobileMenuAction
+                icon={Cloud}
+                label="Saved"
+                disabled
+                onClick={() => {}}
+              />
+            ))}
           <MobileMenuAction
-            label="Workspace"
-            chevron
-            onClick={() => setWorkspaceManagerOpen(true)}
-          />
-          <MobileMenuAction
+            icon={Share2}
             label="Share"
             chevron
             onClick={() => setShareDialogOpen(true)}
           />
-          <MobileMenuSubSheet label="Import">
-            <MobileMenuAction
-              label="From SQL dump"
-              onClick={() => setImportSqlDumpOpen(true)}
-            />
-            <MobileMenuAction
-              label="From CSV"
-              onClick={() => {
-                setImportCsvState(null);
-                setImportCsvOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From JSON"
-              onClick={() => {
-                setImportJsonState(null);
-                setImportJsonOpen(true);
-              }}
-            />
-            <MobileMenuAction
-              label="From Parquet"
-              onClick={() => {
-                setImportParquetState(null);
-                setImportParquetOpen(true);
-              }}
-            />
-          </MobileMenuSubSheet>
-          {tables.length > 0 && (
-            <MobileMenuSubSheet label="Export DB">
-              <MobileMenuAction
-                label="SQL dump (.sql)"
-                onClick={() => void exportDuckDbDatabase()}
-              />
-              <MobileMenuAction
-                label="Excel workbook (.xlsx)"
-                onClick={() => void exportDuckDbDatabaseToXlsx()}
-              />
-            </MobileMenuSubSheet>
-          )}
-          <MobileMenuAction
-            label="Query history"
-            chevron
-            onClick={openQueryHistoryTab}
-          />
-          <MobileMenuAction
-            label="ER diagram"
-            chevron
-            onClick={openErDiagramTab}
-          />
-          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
-            <RuntimeInfoContent info={RUNTIME_INFO} />
-          </MobileMenuSubSheet>
-          <MobileMenuAction
-            label="Settings"
-            chevron
-            onClick={openSettingsTab}
-          />
+          <MobileMoreSections sections={moreSections} />
         </>
       }
     >

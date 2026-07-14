@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Dialog } from "@base-ui-components/react/dialog";
 import {
+  BriefcaseBusiness,
+  GraduationCap,
   LogIn,
   LogOut,
   Menu as Hamburger,
+  SquareTerminal,
+  Tag,
   User as UserIcon,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth/client";
 import Link from "../Link";
@@ -18,9 +23,25 @@ import { ThemePillToggle } from "../ThemePillToggle";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
-/** Desktop primary-menu link. The item for the section being viewed renders
- *  in the brand accent (matching the courses-page mockup), derived from the
- *  current pathname, so `/courses/python-basics` still lights up "Courses". */
+/** The primary sections the header links to, with their lucide glyphs (shared
+ *  by the desktop menu and the mobile drawer). */
+const NAV_SECTIONS: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  prefetch?: boolean;
+}[] = [
+  { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
+  { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
+  { href: "/playground", label: "Playground", icon: SquareTerminal },
+  { href: "/pricing", label: "Pricing", icon: Tag },
+];
+
+/** Desktop primary-menu link (text-only; the icons in NAV_SECTIONS are for
+ *  the mobile drawer). Idle items sit in a muted neutral with a subtle darken
+ *  on hover; the item for the section being viewed renders in the brand
+ *  accent (matching the courses-page mockup), derived from the current
+ *  pathname, so `/courses/python-basics` still lights up "Courses". */
 function NavLink({
   href,
   prefetch,
@@ -40,7 +61,7 @@ function NavLink({
       className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
         active
           ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
-          : "text-[#121212] hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
+          : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
       }`}
     >
       {children}
@@ -186,33 +207,16 @@ function MobileDrawer() {
               scrollbar on just the playground list). The header above and the
               footer below stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-            <Dialog.Close
-              render={<Link href="/courses" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
-            >
-              Courses
-            </Dialog.Close>
-
-            <Dialog.Close
-              render={<Link href="/interview-prep" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
-            >
-              Interview Prep
-            </Dialog.Close>
-
-            <Dialog.Close
-              render={<Link href="/playground" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
-            >
-              Playground
-            </Dialog.Close>
-
-            <Dialog.Close
-              render={<Link href="/pricing" prefetch={false} />}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
-            >
-              Pricing
-            </Dialog.Close>
+            {NAV_SECTIONS.map(({ href, label, icon: Icon }) => (
+              <Dialog.Close
+                key={href}
+                render={<Link href={href} prefetch={false} />}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
+              >
+                <Icon size={16} aria-hidden="true" />
+                {label}
+              </Dialog.Close>
+            ))}
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
@@ -277,13 +281,12 @@ export function HomeNav() {
         {/* Center: primary menu (desktop only, visibility handled by the
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
-        <div className="ds-nav-menu items-center justify-center gap-1">
-          <NavLink href="/courses" prefetch>
-            Courses
-          </NavLink>
-          <NavLink href="/interview-prep">Interview Prep</NavLink>
-          <NavLink href="/playground">Playground</NavLink>
-          <NavLink href="/pricing">Pricing</NavLink>
+        <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
+          {NAV_SECTIONS.map(({ href, label, prefetch }) => (
+            <NavLink key={href} href={href} prefetch={prefetch}>
+              {label}
+            </NavLink>
+          ))}
         </div>
 
         {/* Right: theme + GitHub + (mobile) hamburger */}
@@ -302,6 +305,16 @@ export function HomeNav() {
           <MobileDrawer />
         </div>
       </nav>
+      {/* Short fade below the compacted header so its solid background melts
+          into the page instead of slicing through content scrolling under it
+          (most visible against the hero marquee). Hidden while the page is at
+          the top, where the header sits in normal flow above the content. */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-white to-transparent transition-opacity duration-200 dark:from-[#121212] ${
+          scrolled ? "opacity-100" : "opacity-0"
+        }`}
+      />
     </header>
   );
 }

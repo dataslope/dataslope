@@ -1,7 +1,9 @@
 "use client";
 
 /**
- * "Your workspaces": the unified workspace list on the /playground index.
+ * "Your workspaces": the unified workspace list on /dashboard/playground
+ * (moved from the old standalone /playground index and restyled with the
+ * Studio shell's tokens).
  *
  * One list, deliberately: local (this-browser) workspaces and cloud backups
  * are merged by id into a single set of rows rather than the old
@@ -12,11 +14,12 @@
  * renders (empty and signed-out states included) so the page never looks
  * broken before any workspace exists.
  *
- * The list is read-and-open only. Clicking a row opens that workspace in its
- * playground (rename / duplicate / delete / back-up stay in the playground's
- * own workspace manager). On-device rows just set the active workspace and
- * navigate; cloud-only rows (backed up from another device) materialize first
- * via the same helpers the in-playground manager uses.
+ * The list is read-and-open only, and paginated (PAGE_SIZE rows per page, the
+ * same pagination chrome as the hub tables). Clicking a row opens that
+ * workspace in its playground (rename / duplicate / delete / back-up stay in
+ * the playground's own workspace manager). On-device rows just set the active
+ * workspace and navigate; cloud-only rows (backed up from another device)
+ * materialize first via the same helpers the in-playground manager uses.
  */
 
 import {
@@ -26,37 +29,46 @@ import {
   useRef,
   useState,
 } from "react";
-import { ArrowRight, Cloud, LogIn, Loader2, Search } from "lucide-react";
+import {
+  ArrowRight,
+  Cloud,
+  FolderOpen,
+  LogIn,
+  Loader2,
+  Search,
+} from "lucide-react";
 import { useSession } from "@/lib/auth/client";
 import {
   isSqlPlayground,
   type CloudUsage,
   type CloudWorkspaceMeta,
 } from "@/lib/workspaces/types";
-import Link from "../_components/Link";
-import { PLAYGROUNDS } from "../_components/playgrounds";
+import Link from "@/app/_components/Link";
+import { PLAYGROUNDS } from "@/app/_components/playgrounds";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
-} from "../_components/languageIcons";
+} from "@/app/_components/languageIcons";
 import {
   getWorkspaceRegistry,
   type WorkspaceEntry,
-} from "../_components/opfs/workspace";
-import { estimateWorkspaceSize } from "../_components/opfs/fileStorage";
-import { setActiveWorkspaceId } from "../_components/opfs/activeWorkspace";
+} from "@/app/_components/opfs/workspace";
+import { estimateWorkspaceSize } from "@/app/_components/opfs/fileStorage";
+import { setActiveWorkspaceId } from "@/app/_components/opfs/activeWorkspace";
 import {
   CloudApiError,
   fetchCloudWorkspaceBundle,
   isCloudSupported,
   listCloudWorkspaces,
   saveCloudWorkspace,
-} from "../_components/cloud/cloudApi";
+} from "@/app/_components/cloud/cloudApi";
 import {
   materializeCodeWorkspace,
   setPendingBundleRef,
-} from "../_components/cloud/materialize";
-import { buildCodeBundleFromOpfs } from "../_components/cloud/backupFromOpfs";
+} from "@/app/_components/cloud/materialize";
+import { buildCodeBundleFromOpfs } from "@/app/_components/cloud/backupFromOpfs";
+
+const PAGE_SIZE = 8;
 
 const PLAYGROUND_BY_ID: Record<string, { label: string; href: string }> =
   Object.fromEntries(PLAYGROUNDS.map((p) => [p.id, p]));
@@ -139,7 +151,7 @@ function UsageDonut({ fraction }: { fraction: number }) {
         cy="10"
         r={r}
         fill="none"
-        className="stroke-[var(--ds-gray-200)] dark:stroke-white/15"
+        stroke="var(--chip-bg)"
         strokeWidth="3.5"
       />
       <circle
@@ -171,6 +183,7 @@ export function PlaygroundWorkspaces() {
   const [cloudLoaded, setCloudLoaded] = useState(false);
   const [sizes, setSizes] = useState<Map<string, number>>(() => new Map());
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [openError, setOpenError] = useState<string | null>(null);
   // Progress of the post-sign-in bulk backup, shown in the footer while the
@@ -338,6 +351,16 @@ export function PlaygroundWorkspaces() {
     return rows.filter((r) => r.name.toLowerCase().includes(q));
   }, [rows, query]);
 
+  // Pagination over the filtered rows (the search box resets to page 1).
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const visible = filtered.slice(
+    (current - 1) * PAGE_SIZE,
+    current * PAGE_SIZE,
+  );
+  const first = filtered.length === 0 ? 0 : (current - 1) * PAGE_SIZE + 1;
+  const last = Math.min(current * PAGE_SIZE, filtered.length);
+
   const openRow = useCallback(async (row: WorkspaceRow) => {
     setOpenError(null);
     if (row.onDevice) {
@@ -370,8 +393,14 @@ export function PlaygroundWorkspaces() {
       : 0;
 
   return (
-    <section className="mt-20">
-      <h2 className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--ds-gray-400)]">
+    <section className="mt-12">
+      <h2
+        className="flex items-center gap-2.5 text-[17px] font-semibold"
+        style={{ color: "var(--ink)" }}
+      >
+        <span style={{ color: "var(--green-text)" }}>
+          <FolderOpen size={17} />
+        </span>
         Your workspaces
       </h2>
 
@@ -382,35 +411,44 @@ export function PlaygroundWorkspaces() {
       ) : (
         <>
           {/* Name filter. */}
-          <div className="mt-5 flex items-center gap-2.5 rounded-lg bg-[var(--ds-gray-100)] px-3 dark:bg-white/[0.06]">
+          <div
+            className="mt-5 flex items-center gap-2.5 rounded-lg px-3"
+            style={{ background: "var(--field)" }}
+          >
             <Search
               size={15}
-              className="shrink-0 text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]"
+              className="shrink-0"
+              style={{ color: "var(--faint)" }}
               aria-hidden="true"
             />
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
               placeholder="Search workspaces…"
               aria-label="Search workspaces"
-              className="h-10 w-full min-w-0 border-0 bg-transparent text-sm text-[#121212] outline-none placeholder:text-[var(--ds-gray-500)] dark:text-white dark:placeholder:text-[var(--ds-gray-400)]"
+              className="h-10 w-full min-w-0 border-0 bg-transparent text-sm outline-none"
+              style={{ color: "var(--ink)" }}
             />
           </div>
 
           {openError && (
             <p
               role="alert"
-              className="mt-3 rounded-lg bg-[var(--ds-red-500)]/10 px-3 py-2 text-[13px] text-[var(--ds-red-600)] dark:text-[var(--ds-red-400)]"
+              className="mt-3 rounded-lg px-3 py-2 text-[13px]"
+              style={{ background: "var(--danger-soft)", color: "var(--danger)" }}
             >
               {openError}
             </p>
           )}
 
-          <div className="mt-4 h-px bg-[var(--ds-gray-200)] dark:bg-white/[0.08]" />
+          <div className="mt-4 h-px" style={{ background: "var(--divider)" }} />
 
           <ul className="flex flex-col">
-            {filtered.map((row) => {
+            {visible.map((row) => {
               const meta = PLAYGROUND_BY_ID[row.playground];
               const busy = openingId === row.id;
               return (
@@ -422,19 +460,25 @@ export function PlaygroundWorkspaces() {
                     title={`Open “${row.name}” in the ${playgroundLabel(
                       row.playground,
                     )} playground`}
-                    className="group flex w-full items-center gap-3 rounded-lg px-2 py-3.5 text-left transition-colors hover:bg-[var(--ds-gray-100)] disabled:opacity-60 dark:hover:bg-white/[0.05]"
+                    className="group flex w-full items-center gap-3 rounded-[10px] border-none bg-transparent px-2 py-3.5 text-left transition-colors hover:bg-[var(--rail-group)] disabled:opacity-60"
                   >
-                    <span className="shrink-0 text-[#121212] dark:text-white">
+                    <span className="shrink-0" style={{ color: "var(--ink)" }}>
                       <RowIcon id={row.playground} />
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-sm font-medium text-[#121212] dark:text-white">
+                      <span
+                        className="truncate text-sm font-medium"
+                        style={{ color: "var(--ink)" }}
+                      >
                         {row.name}
                       </span>
-                      <span className="truncate text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+                      <span
+                        className="truncate text-[13px]"
+                        style={{ color: "var(--muted)" }}
+                      >
                         {meta?.label ?? row.playground}
                         {!row.onDevice && (
-                          <span className="text-[var(--ds-gray-400)]">
+                          <span style={{ color: "var(--faint)" }}>
                             {" · not on this device"}
                           </span>
                         )}
@@ -447,7 +491,7 @@ export function PlaygroundWorkspaces() {
                           cloudLoaded &&
                           isSqlPlayground(row.playground) && (
                             <span
-                              className="text-[var(--ds-gray-400)]"
+                              style={{ color: "var(--faint)" }}
                               title="Open this workspace and use “Back up” to save it to your account."
                             >
                               {" · not backed up"}
@@ -455,13 +499,22 @@ export function PlaygroundWorkspaces() {
                           )}
                       </span>
                     </span>
-                    <span className="hidden w-16 shrink-0 text-right text-[13px] text-[var(--ds-gray-500)] tabular-nums sm:block dark:text-[var(--ds-gray-400)]">
+                    <span
+                      className="hidden w-16 shrink-0 text-right text-[13px] tabular-nums sm:block"
+                      style={{ color: "var(--muted)" }}
+                    >
                       {row.sizeBytes != null ? formatBytes(row.sizeBytes) : ""}
                     </span>
-                    <span className="hidden w-24 shrink-0 text-right text-[13px] text-[var(--ds-gray-500)] sm:block dark:text-[var(--ds-gray-400)]">
+                    <span
+                      className="hidden w-24 shrink-0 text-right text-[13px] sm:block"
+                      style={{ color: "var(--muted)" }}
+                    >
                       {formatRelative(row.when)}
                     </span>
-                    <span className="flex w-5 shrink-0 justify-end text-[var(--ds-gray-400)]">
+                    <span
+                      className="flex w-5 shrink-0 justify-end"
+                      style={{ color: "var(--faint)" }}
+                    >
                       {busy ? (
                         <Loader2 size={15} className="animate-spin" aria-hidden="true" />
                       ) : (
@@ -477,14 +530,58 @@ export function PlaygroundWorkspaces() {
               );
             })}
             {filtered.length === 0 && (
-              <li className="px-2 py-6 text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <li
+                className="px-2 py-6 text-[13px]"
+                style={{ color: "var(--muted)" }}
+              >
                 No workspaces match “{query}”.
               </li>
             )}
           </ul>
 
+          {/* Pagination, same chrome as the hub tables. */}
+          {pageCount > 1 && (
+            <div className="mt-3.5 flex items-center gap-1.5 px-1">
+              <span className="text-[13px]" style={{ color: "var(--muted)" }}>
+                {first}–{last} of {filtered.length}
+              </span>
+              <div className="ml-auto flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={current <= 1}
+                  onClick={() => setPage(Math.max(1, current - 1))}
+                  className="ds-page-btn"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: pageCount }, (_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setPage(i + 1)}
+                    data-active={current === i + 1 || undefined}
+                    className="ds-page-num"
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={current >= pageCount}
+                  onClick={() => setPage(Math.min(pageCount, current + 1))}
+                  className="ds-page-btn"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Footer: count + (signed-in) cloud usage, or the sign-in nudge. */}
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-2 text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <div
+            className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-2 text-[13px]"
+            style={{ color: "var(--muted)" }}
+          >
             <span className="inline-flex items-center gap-2">
               {rows.length} {rows.length === 1 ? "workspace" : "workspaces"}
               {backingUp && (
@@ -520,13 +617,22 @@ export function PlaygroundWorkspaces() {
 function WorkspacesSkeleton() {
   return (
     <div className="mt-5" aria-hidden="true">
-      <div className="h-10 w-full animate-pulse rounded-lg bg-[var(--ds-gray-100)] dark:bg-white/[0.06]" />
-      <div className="mt-4 h-px bg-[var(--ds-gray-200)] dark:bg-white/[0.08]" />
+      <div
+        className="ds-pulse h-10 w-full rounded-lg"
+        style={{ background: "var(--field)" }}
+      />
+      <div className="mt-4 h-px" style={{ background: "var(--divider)" }} />
       <div className="flex flex-col gap-1 py-2">
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex items-center gap-3 px-2 py-3.5">
-            <div className="size-[26px] shrink-0 animate-pulse rounded bg-[var(--ds-gray-100)] dark:bg-white/[0.06]" />
-            <div className="h-4 w-40 animate-pulse rounded bg-[var(--ds-gray-100)] dark:bg-white/[0.06]" />
+            <div
+              className="ds-pulse size-[26px] shrink-0 rounded"
+              style={{ background: "var(--chip-bg)" }}
+            />
+            <div
+              className="ds-pulse h-4 w-40 rounded"
+              style={{ background: "var(--chip-bg)" }}
+            />
           </div>
         ))}
       </div>
@@ -539,12 +645,15 @@ function WorkspacesSkeleton() {
  *  nudge sits under its own hairline. */
 function EmptyState({ signedOut }: { signedOut: boolean }) {
   return (
-    <div className="mt-5 border-t border-[var(--ds-gray-200)] dark:border-white/[0.08]">
+    <div className="mt-5" style={{ borderTop: "1px solid var(--divider)" }}>
       <div className="px-2 py-10">
-        <p className="text-sm text-[#121212] dark:text-white">
+        <p className="text-sm" style={{ color: "var(--ink)" }}>
           No workspaces yet.
         </p>
-        <p className="mt-1.5 max-w-md text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <p
+          className="mt-1.5 max-w-md text-[13px]"
+          style={{ color: "var(--muted)" }}
+        >
           Pick a language under “Start something new” and your work is saved
           automatically{signedOut ? " in this browser" : " to your account"}.
         </p>
@@ -563,7 +672,7 @@ function SignInNudge({ compact = false }: { compact?: boolean }) {
       <Link
         href="/sign-in"
         prefetch={false}
-        className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--ds-blue-700)] transition-colors hover:text-[var(--ds-blue-500)] dark:text-[var(--ds-blue-400)]"
+        className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--ds-blue-500)] transition-colors hover:text-[var(--ds-blue-400)]"
       >
         <Cloud size={14} aria-hidden="true" />
         Sign in to save to the cloud
@@ -571,17 +680,20 @@ function SignInNudge({ compact = false }: { compact?: boolean }) {
     );
   }
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-[var(--ds-gray-200)] px-2 py-4 dark:border-white/[0.08]">
+    <div
+      className="flex flex-wrap items-center gap-x-4 gap-y-3 px-2 py-4"
+      style={{ borderTop: "1px solid var(--divider)" }}
+    >
       <Cloud
         size={20}
-        className="shrink-0 text-[var(--ds-blue-500)] dark:text-[var(--ds-blue-400)]"
+        className="shrink-0 text-[var(--ds-blue-500)]"
         aria-hidden="true"
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="text-sm font-medium text-[#121212] dark:text-white">
+        <span className="text-sm font-medium" style={{ color: "var(--ink)" }}>
           Save to the cloud
         </span>
-        <span className="text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <span className="text-[13px]" style={{ color: "var(--muted)" }}>
           Sign in to keep your workspaces safe and open them on any device.
         </span>
       </div>

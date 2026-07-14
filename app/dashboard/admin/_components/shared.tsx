@@ -137,9 +137,7 @@ export function AdminPageHeader({
 }) {
   return (
     <header className="mb-6 sm:mb-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-3xl dark:text-white">
-        {title}
-      </h1>
+      <h1 className="ds-h1">{title}</h1>
       <p className="mt-1.5 text-[15px] text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
         {description}
       </p>

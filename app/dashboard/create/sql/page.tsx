@@ -7,7 +7,6 @@ import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BuilderHeader } from "@/app/dashboard/_studio/BuilderHeader";
 import SqlChallengeBuilder from "./SqlChallengeBuilder";
 
 export const metadata: Metadata = {
@@ -18,15 +17,8 @@ export const metadata: Metadata = {
 
 export default function CreateSqlChallengePage() {
   return (
-    <div className="mx-auto max-w-3xl">
-      <BuilderHeader
-        title="New SQL challenge"
-        lede="Define the tables and seed data, write the task, and pick the checks. Recipients query a real database in their browser."
-        aiPlaceholder="Describe the exercise and AI fills every field below"
-      />
-      <Suspense fallback={null}>
-        <SqlChallengeBuilder />
-      </Suspense>
-    </div>
+    <Suspense fallback={null}>
+      <SqlChallengeBuilder />
+    </Suspense>
   );
 }

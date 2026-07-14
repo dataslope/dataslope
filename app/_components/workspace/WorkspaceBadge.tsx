@@ -120,6 +120,11 @@ export interface WorkspaceBadgeProps {
    *  workspace; when omitted, the backup action is hidden (cloud rows and
    *  statuses still render). */
   buildBundle?: () => Promise<WorkspaceBundle | null>;
+  /** Render no header UI (badge pill, sync status, save menu) — keep only
+   *  the auto-sync engine and the workspace-manager drawer mounted. The
+   *  simplified header (PlaygroundHeaderControls) owns the visible
+   *  save/rename controls and opens the manager through `managerOpen`. */
+  hideBadge?: boolean;
 }
 
 function formatBytes(bytes: number): string {
@@ -276,6 +281,7 @@ export function WorkspaceBadge({
   unsaved = false,
   onSave,
   buildBundle,
+  hideBadge = false,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   // The Save menu's dialog: "local" names the draft; "both" also backs the
@@ -499,6 +505,7 @@ export function WorkspaceBadge({
 
   return (
     <>
+      {!hideBadge && (
       <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
         <Popover.Trigger
           className="workspace-badge"
@@ -719,18 +726,19 @@ export function WorkspaceBadge({
           </Popover.Positioner>
         </Popover.Portal>
       </Popover.Root>
+      )}
 
       {/* Code playgrounds auto-sync: a passive status replaces the manual
           Save/Back-up control. SQL playgrounds and guests keep the Save menu
           (guests to name a browser-saved draft; SQL to back up on demand). */}
-      {autoSyncActive && (
+      {!hideBadge && autoSyncActive && (
         <WorkspaceSyncStatus
           status={autoSync}
           activeMeta={activeMeta}
           loaded={cloud.loaded}
         />
       )}
-      {!autoSyncActive && onSave && (
+      {!hideBadge && !autoSyncActive && onSave && (
         <Menu.Root>
           <Menu.Trigger
             className={`workspace-save-btn${unsaved ? "" : " quiet"}`}

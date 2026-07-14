@@ -10,9 +10,18 @@ import {
   signUp,
   useSession,
 } from "@/lib/auth/client";
-import { EyeIcon } from "../_components/auth/authIcons";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AuthCard,
+  AuthLinkButton,
+  AuthSeparator,
+  PasswordInput,
+  Spinner,
+  TermsNote,
+} from "../_components/auth/authBlocks";
 import { isSafeReturnPath, readReturnTo } from "../_components/auth/returnTo";
-import styles from "../_components/auth/authCard.module.css";
 
 /** Where to land after a successful sign-in when we don't know where
  *  the visitor came from (direct /sign-in loads, private mode). The
@@ -75,19 +84,17 @@ const COPY: Record<
 > = {
   signin: {
     title: "Welcome back",
-    subtitle:
-      "Every course and playground is free to use without an account. Sign in only to save your playgrounds and use AI features.",
+    subtitle: "Sign in with your Google or GitHub account",
     cta: ["Sign in", "Signing in…"],
   },
   signup: {
     title: "Create your account",
-    subtitle:
-      "Every course and playground is free to use without an account. Sign up only to save your playgrounds and use AI features.",
+    subtitle: "Sign up with your Google or GitHub account",
     cta: ["Create account", "Creating account…"],
   },
   forgot: {
     title: "Reset your password",
-    subtitle: "We'll email you a secure reset link.",
+    subtitle: "We'll email you a secure reset link",
     cta: ["Send reset link", "Sending…"],
   },
 };
@@ -103,7 +110,8 @@ const DOC_TITLE: Record<Mode, string> = {
 
 /**
  * Auth card spanning three modes, sign in, create account, and request a
- * password reset, as a single flat, borderless component (design option "2a").
+ * password reset, styled on the shadcn UI login block (social buttons up
+ * top, an "Or continue with" divider, then email + password).
  *
  * Success paths (destination = resolveCallbackUrl(): the page the user
  * came from, else /account):
@@ -133,7 +141,6 @@ export function SignInClient({
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPw, setShowPw] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -190,7 +197,9 @@ export function SignInClient({
 
   if (!isPending && session) {
     return (
-      <p className={styles.redirecting}>You&apos;re signed in, redirecting…</p>
+      <p className="text-muted-foreground text-center text-sm">
+        You&apos;re signed in, redirecting…
+      </p>
     );
   }
 
@@ -371,208 +380,185 @@ export function SignInClient({
     router.refresh();
   }
 
+  const socialVerb = isSignup ? "Sign up" : "Login";
+
   return (
-    <div className={styles.stack}>
-      <div>
-        <h1 className={styles.title}>{title}</h1>
-        <p className={styles.subtitle}>{subtitle}</p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <AuthCard title={title} description={subtitle}>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-6">
+            {!isForgot && (
+              <>
+                <div className="flex flex-col gap-4">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="border-border w-full"
+                    disabled={busy}
+                    onClick={() => void startSocial("google")}
+                  >
+                    {socialPending === "google" ? (
+                      <>
+                        <Spinner />
+                        Redirecting…
+                      </>
+                    ) : (
+                      <>
+                        <GoogleIcon size={16} />
+                        {socialVerb} with Google
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="border-border w-full"
+                    disabled={busy}
+                    onClick={() => void startSocial("github")}
+                  >
+                    {socialPending === "github" ? (
+                      <>
+                        <Spinner />
+                        Redirecting…
+                      </>
+                    ) : (
+                      <>
+                        <GitHubIcon size={16} />
+                        {socialVerb} with GitHub
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <AuthSeparator>Or continue with</AuthSeparator>
+              </>
+            )}
 
-      {!isForgot && (
-        <div className={styles.tabs}>
-          <button
-            type="button"
-            onClick={() => go("signin")}
-            aria-pressed={isSignin}
-            className={`${styles.tab} ${isSignin ? styles.tabActive : ""}`}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            onClick={() => go("signup")}
-            aria-pressed={isSignup}
-            className={`${styles.tab} ${isSignup ? styles.tabActive : ""}`}
-          >
-            Create account
-          </button>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={`${styles.field} ${emailError ? styles.fieldError : ""}`}>
-          <input
-            id="auth-email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder=" "
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => setEmailTouched(true)}
-            disabled={busy}
-            aria-invalid={emailError || undefined}
-            aria-describedby={emailError ? "auth-email-error" : undefined}
-            className={styles.input}
-          />
-          <label htmlFor="auth-email" className={styles.label}>
-            Email address
-          </label>
-          {emailError && (
-            <p id="auth-email-error" className={styles.errorText}>
-              Enter a valid email address
-            </p>
-          )}
-        </div>
-
-        {!isForgot && (
-          <div>
-            <div className={styles.field}>
-              <input
-                id="auth-password"
-                type={showPw ? "text" : "password"}
+            <div className="grid gap-3">
+              <Label htmlFor="auth-email">Email</Label>
+              <Input
+                id="auth-email"
+                type="email"
                 required
-                minLength={MIN_PASSWORD}
-                autoComplete={isSignup ? "new-password" : "current-password"}
-                placeholder=" "
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
                 disabled={busy}
-                aria-describedby={isSignup ? "auth-password-hint" : undefined}
-                className={`${styles.input} ${styles.inputPw}`}
+                aria-invalid={emailError || undefined}
+                aria-describedby={emailError ? "auth-email-error" : undefined}
               />
-              <label htmlFor="auth-password" className={styles.label}>
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPw((s) => !s)}
-                aria-label={showPw ? "Hide password" : "Show password"}
-                className={styles.eyeBtn}
+              {emailError && (
+                <p id="auth-email-error" className="text-destructive text-sm">
+                  Enter a valid email address
+                </p>
+              )}
+            </div>
+
+            {!isForgot && (
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="auth-password">Password</Label>
+                  {isSignin && (
+                    <button
+                      type="button"
+                      onClick={() => go("forgot")}
+                      className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-[var(--ds-blue-500)] underline-offset-4 hover:underline"
+                    >
+                      <KeyRound size={14} aria-hidden="true" />
+                      Forgot your password?
+                    </button>
+                  )}
+                </div>
+                <PasswordInput
+                  id="auth-password"
+                  required
+                  minLength={MIN_PASSWORD}
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={busy}
+                  aria-describedby={isSignup ? "auth-password-hint" : undefined}
+                />
+                {isSignup && (
+                  <p
+                    id="auth-password-hint"
+                    className={`text-sm ${pwOk ? "text-[var(--ds-green-700,#008b03)]" : "text-muted-foreground"}`}
+                  >
+                    {pwOk ? "Strong enough, looks good." : "At least 8 characters."}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {error && (
+              <p
+                role="alert"
+                className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm"
               >
-                <EyeIcon />
-              </button>
-            </div>
-            <div className={styles.pwRow}>
-              {isSignup ? (
-                <span
-                  id="auth-password-hint"
-                  className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}
-                >
-                  {pwOk ? "Strong enough, looks good." : "At least 8 characters."}
-                </span>
+                {error}
+              </p>
+            )}
+            {notice && (
+              <p
+                role="status"
+                className="bg-muted text-foreground rounded-md px-3 py-2 text-sm"
+              >
+                {notice}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-[var(--ds-blue-500)] text-white hover:bg-[var(--ds-blue-550)]"
+              disabled={busy}
+            >
+              {submitting ? (
+                <>
+                  <Spinner />
+                  {cta[1]}
+                </>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => go("forgot")}
-                  className={styles.link}
+                <>
+                  <SubmitIcon size={14} aria-hidden="true" />
+                  {cta[0]}
+                </>
+              )}
+            </Button>
+
+            <div className="text-center text-sm">
+              {isForgot ? (
+                <AuthLinkButton
+                  onClick={() => go("signin")}
+                  icon={<ArrowLeft size={14} aria-hidden="true" />}
                 >
-                  <KeyRound size={14} aria-hidden="true" />
-                  Forgot password?
-                </button>
+                  Back to sign in
+                </AuthLinkButton>
+              ) : (
+                <>
+                  {isSignup
+                    ? "Already have an account? "
+                    : "Don't have an account? "}
+                  <AuthLinkButton
+                    onClick={() => go(isSignup ? "signin" : "signup")}
+                    icon={
+                      isSignup ? (
+                        <LogIn size={14} aria-hidden="true" />
+                      ) : (
+                        <UserPlus size={14} aria-hidden="true" />
+                      )
+                    }
+                  >
+                    {isSignup ? "Sign in" : "Sign up"}
+                  </AuthLinkButton>
+                </>
               )}
             </div>
           </div>
-        )}
+        </form>
+      </AuthCard>
 
-        {error && (
-          <p role="alert" className={styles.formError}>
-            {error}
-          </p>
-        )}
-        {notice && (
-          <p role="status" className={styles.formNotice}>
-            {notice}
-          </p>
-        )}
-
-        <button type="submit" disabled={busy} className={styles.primary}>
-          {submitting ? (
-            <span className={styles.btnBusy}>
-              <span className={styles.spinner} aria-hidden="true" />
-              {cta[1]}
-            </span>
-          ) : (
-            <span className={styles.btnBusy}>
-              <SubmitIcon size={14} aria-hidden="true" />
-              {cta[0]}
-            </span>
-          )}
-        </button>
-      </form>
-
-      {!isForgot && (
-        <div className={styles.social}>
-          <p className={styles.orText}>or continue with</p>
-          <div className={styles.socialGrid}>
-            <button
-              type="button"
-              onClick={() => void startSocial("google")}
-              disabled={busy}
-              className={styles.socialBtn}
-            >
-              {socialPending === "google" ? (
-                <>
-                  <span className={styles.spinner} aria-hidden="true" />
-                  Redirecting…
-                </>
-              ) : (
-                <>
-                  <GoogleIcon size={16} />
-                  Google
-                </>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => void startSocial("github")}
-              disabled={busy}
-              className={styles.socialBtn}
-            >
-              {socialPending === "github" ? (
-                <>
-                  <span className={styles.spinner} aria-hidden="true" />
-                  Redirecting…
-                </>
-              ) : (
-                <>
-                  <GitHubIcon size={16} />
-                  GitHub
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <p className={styles.switch}>
-        {isForgot ? (
-          <button
-            type="button"
-            onClick={() => go("signin")}
-            className={styles.link}
-          >
-            <ArrowLeft size={14} aria-hidden="true" />
-            Back to sign in
-          </button>
-        ) : (
-          <>
-            {isSignup ? "Already have an account? " : "New to Dataslope? "}
-            <button
-              type="button"
-              onClick={() => go(isSignup ? "signin" : "signup")}
-              className={styles.link}
-            >
-              {isSignup ? (
-                <LogIn size={14} aria-hidden="true" />
-              ) : (
-                <UserPlus size={14} aria-hidden="true" />
-              )}
-              {isSignup ? "Sign in" : "Create one"}
-            </button>
-          </>
-        )}
-      </p>
+      {!isForgot && <TermsNote />}
     </div>
   );
 }

@@ -1,11 +1,12 @@
 // Shared chrome for the standalone auth routes (/sign-in, /sign-up,
-// /forgot-password, /reset-password): the pre-paint theme bootstrap, a
-// top-left brand lockup, and a single centered card. Self-contained
-// styling via the shared auth CSS module, no tailwind.css / HomeNav /
-// HomeFooter (global resets come from app/globals.css in the root layout).
+// /forgot-password, /reset-password), rebuilt on the shadcn UI auth block
+// layout: a centered column on a muted page background with the brand
+// lockup above a single card. Pulls in the shared Tailwind root (scoped by
+// Next.js to the routes that import this component); the pre-paint theme
+// bootstrap keeps the same contract as the rest of the site.
+import "@/app/tailwind.css";
 import type { ReactNode } from "react";
 import Link from "../Link";
-import styles from "./authCard.module.css";
 
 // Applies the persisted light/dark choice before first paint (same contract
 // as the home and pricing pages) so a returning dark-mode visitor sees no
@@ -16,28 +17,27 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      <div className={styles.page}>
-        {/* Blue Dataslope logo, top-left of the page (not inside the card). */}
-        <header className={styles.brandBar}>
+      <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <div className="flex w-full max-w-md flex-col gap-6">
+          {/* Brand lockup, same style as the home page's shared header. */}
           <Link
             href="/"
             aria-label="Dataslope home"
-            className={`${styles.brand} ds-logo-hover`}
+            className="group flex items-center justify-center gap-2 self-center"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/dataslope-logo-blue.svg"
               alt=""
               aria-hidden="true"
-              className={`${styles.brandLogo} ds-logo-mark`}
+              className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[8deg]"
             />
-            <span className={`${styles.brandWord} ds-logo-word`}>Dataslope</span>
+            <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white">
+              Dataslope
+            </span>
           </Link>
-        </header>
-
-        <main className={styles.main}>
-          <div className={styles.card}>{children}</div>
-        </main>
+          {children}
+        </div>
       </div>
     </>
   );

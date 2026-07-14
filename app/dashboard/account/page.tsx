@@ -15,12 +15,7 @@ export const metadata: Metadata = {
 export default function AccountPage() {
   return (
     <div className="mx-auto max-w-2xl">
-      <h1
-        className="text-2xl font-semibold tracking-tight"
-        style={{ color: "var(--ink)" }}
-      >
-        Account
-      </h1>
+      <h1 className="ds-h1">Account</h1>
       <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "var(--muted)" }}>
         Your sign-in details, membership, and saved work.
       </p>
