@@ -267,15 +267,13 @@ export function HomeNav() {
     };
   }, []);
   return (
-    // `transform-gpu` (translateZ(0)) promotes the sticky header to its own
-    // compositing layer. The hero marquee below runs a continuous transform
-    // animation, so the browser composites it onto its own GPU layer; without
-    // a layer of its own the header paints on the root layer, and a
-    // hover-triggered partial repaint (a nav link's colour transition, the
-    // logo's group-hover transform) re-exposes the marquee scrolling under the
-    // header in just the invalidated band, bleeding a slice of marquee text
-    // through the opaque background. Its own layer makes the header composite
-    // as a whole over the marquee, eliminating the bleed-through.
+    // `transform-gpu` (translateZ(0)) keeps the sticky header on its own
+    // compositing layer, so hover repaints inside it (nav-link colour
+    // transitions, the logo's group-hover transform) stay isolated from the
+    // continuously-animating hero marquee below. Defense-in-depth: the
+    // marquee-ghosting-through-the-header bug this originally targeted was
+    // actually caused by BlurFade's residual `filter: blur(0px)` around the
+    // marquee (fixed in components/ui/blur-fade.tsx).
     <header className="sticky top-0 z-40 transform-gpu bg-white dark:bg-[#121212]">
       <nav
         className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${

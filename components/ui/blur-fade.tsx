@@ -58,6 +58,15 @@ export function BlurFade({
       [direction === "left" || direction === "right" ? "x" : "y"]: 0,
       opacity: 1,
       filter: `blur(0px)`,
+      // Once the entrance settles, drop the filter entirely. Motion keeps the
+      // last keyframe as an inline style, so without this the wrapper carries
+      // `filter: blur(0px)` forever — and any filter, even an identity blur,
+      // routes the subtree through a compositor effect node backed by a cached
+      // texture. With an infinite composited animation inside (the hero
+      // marquee), Chromium can redraw that texture stale and misplaced during
+      // unrelated partial repaints (e.g. hovering the sticky header),
+      // ghosting a slice of marquee text elsewhere on the page.
+      transitionEnd: { filter: "none" },
     },
   }
   const combinedVariants = variant ?? defaultVariants
