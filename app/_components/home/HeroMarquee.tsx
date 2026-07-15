@@ -70,8 +70,12 @@ function RosterSegment() {
 }
 
 export function HeroMarquee() {
+  // [contain:paint] hard-clips the infinitely-animating marquee rows at the
+  // compositor level (a plain overflow clip hasn't stopped Chromium from
+  // ghosting stale slices of the composited rows over other parts of the
+  // page during unrelated repaints, e.g. hovering the sticky header).
   return (
-    <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2">
+    <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2 [contain:paint]">
       {/* Both lines share one font-size scale so they read as a matched pair. */}
       {/* Line 1, the language roster, scrolling left. */}
       <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:42s] [--gap:0px] sm:text-6xl lg:text-7xl">

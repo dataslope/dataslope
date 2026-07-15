@@ -47,17 +47,35 @@ export function BlurFade({
   const ref = useRef(null)
   const inViewResult = useInView(ref, { once: true, margin: inViewMargin })
   const isInView = !inView || inViewResult
+  // Axis props are built as plain objects (not a computed `[x|y]:` key inside
+  // the variant literal): a computed key collapses the variant's type to a
+  // string index signature, which can't hold the nested `transitionEnd`
+  // object below.
+  const offsetAxis =
+    direction === "left" || direction === "right"
+      ? { x: direction === "right" ? -offset : offset }
+      : { y: direction === "down" ? -offset : offset }
+  const restAxis =
+    direction === "left" || direction === "right" ? { x: 0 } : { y: 0 }
   const defaultVariants: Variants = {
     hidden: {
-      [direction === "left" || direction === "right" ? "x" : "y"]:
-        direction === "right" || direction === "down" ? -offset : offset,
+      ...offsetAxis,
       opacity: 0,
       filter: `blur(${blur})`,
     },
     visible: {
-      [direction === "left" || direction === "right" ? "x" : "y"]: 0,
+      ...restAxis,
       opacity: 1,
       filter: `blur(0px)`,
+      // Once the entrance settles, drop the filter entirely. Motion keeps the
+      // last keyframe as an inline style, so without this the wrapper carries
+      // `filter: blur(0px)` forever — and any filter, even an identity blur,
+      // routes the subtree through a compositor effect node backed by a cached
+      // texture. With an infinite composited animation inside (the hero
+      // marquee), Chromium can redraw that texture stale and misplaced during
+      // unrelated partial repaints (e.g. hovering the sticky header),
+      // ghosting a slice of marquee text elsewhere on the page.
+      transitionEnd: { filter: "none" },
     },
   }
   const combinedVariants = variant ?? defaultVariants
