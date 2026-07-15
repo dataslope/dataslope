@@ -342,24 +342,30 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     return overriddenFilename ?? sample.filename ?? sample.id ?? "database";
   }, [activeDbId, customFilenames, engineRef]);
 
+  /** Serializes the active database to a SQLite file image (the raw bytes a
+   *  `.sqlite` download would contain), the binary payload of a cloud/share
+   *  bundle. Returns null while the engine is still booting. */
+  const buildDatabaseImage = useCallback(async (): Promise<Uint8Array | null> => {
+    const engine = engineRef.current;
+    if (!engine) return null;
+    return engine.exportDatabase();
+  }, [engineRef]);
+
   /**
-   * Replays a cloud/share bundle into a fresh session database: blank DB →
-   * execute the dump → swap it in → replace the tabs with the bundle's
-   * queries. The same shape as performImportSqlDump, except the tabs come
-   * from the bundle instead of the blank database's stored/default tabs.
+   * Loads a cloud/share bundle into a fresh session database: open the
+   * bundle's SQLite image → swap it in → replace the tabs with the bundle's
+   * queries. The same shape as performImportSqlite, except the tabs come
+   * from the bundle instead of the imported database's stored/default tabs.
    */
   const applySqlBundle = useCallback(
-    async (dump: string, tabSeeds: { title: string; code: string }[]) => {
+    async (
+      image: Uint8Array,
+      label: string,
+      tabSeeds: { title: string; code: string }[],
+    ) => {
       const engine = engineRef.current;
       if (!engine) throw new Error("The SQL engine isn't ready yet.");
-      const sample = await engine.loadBlankDatabase();
-      setCustomFilenames((prev) => {
-        if (!(sample.id in prev)) return prev;
-        const next = { ...prev };
-        delete next[sample.id];
-        return next;
-      });
-      if (dump.trim()) await engine.execAll(dump);
+      const sample = await engine.loadFromBytes(image, label);
       await applyDbLoad(sample);
       const newTabs = tabSeeds.map((seed) => ({
         title: seed.title,
@@ -382,7 +388,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       editorRef,
       tabsRef,
       activeTabIdRef,
-      setCustomFilenames,
       setTabs,
       setActiveTabId,
       setResultsByTab,
@@ -805,6 +810,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     applyDbLoad,
     applySqlBundle,
     activeDatabaseLabel,
+    buildDatabaseImage,
     buildSqlDumpText,
     performDbSwitch,
     performImportDatabaseFile,

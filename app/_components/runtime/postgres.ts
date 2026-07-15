@@ -277,10 +277,22 @@ export interface PostgresEngine {
    *  executes cleanly, swap the engine over to it. If it throws, the
    *  sandbox is discarded and the existing database stays intact. */
   importSqlDump: (sql: string) => Promise<PostgresSampleDatabase>;
+  /** Uncompressed tarball of the live PGDATA (PGlite's `dumpDataDir`),
+   *  full-fidelity including sequences and non-table objects. Deliberately
+   *  uncompressed: the cloud bundle codec gzips the whole container once. */
+  dumpDataDir: () => Promise<Blob>;
+  /** Try to boot a fresh sandbox worker from a PGDATA tarball (the binary
+   *  section of a cloud/share bundle). If it comes up healthy, swap the
+   *  engine over to it; otherwise the existing database stays intact.
+   *  Same sandbox semantics as importSqlDump: the restored database runs
+   *  in-memory for this session. */
+  importDataDir: (tarball: Blob) => Promise<PostgresSampleDatabase>;
   close: () => Promise<void>;
 }
 
-async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlite> {
+async function createFreshWorker(
+  opts: { dataDir?: string; loadDataDir?: Blob } = {},
+): Promise<PGlite> {
   // Pass a unique `id` so this PGliteWorker instance gets its own leader-
   // election lock and BroadcastChannel. Without a unique id every instance
   // with the same worker URL shares the same lock, meaning an unclosed
@@ -292,12 +304,18 @@ async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlit
   // to the worker's `init` callback which passes it to `new PGlite(opts)`.
   // PGlite recognises the `opfs-ahp://` scheme and uses the OPFS Access
   // Handle Pool VFS to persist data across reloads.
+  //
+  // When `loadDataDir` is provided (cloud/share bundle restore), the worker
+  // boots from that PGDATA tarball instead of running initdb. Blobs are
+  // structured-cloneable, so the option survives the postMessage hop into
+  // the worker's init callback.
   const { PGliteWorker } = await loadPGliteWorkerModule();
   return new PGliteWorker(
     new Worker(new URL("./postgres-worker.ts", import.meta.url)),
     {
       id: `pglite-${crypto.randomUUID()}`,
       ...(opts.dataDir ? { dataDir: opts.dataDir } : {}),
+      ...(opts.loadDataDir ? { loadDataDir: opts.loadDataDir } : {}),
     },
   ) as unknown as PGlite;
 }
@@ -1000,6 +1018,36 @@ export async function createPostgresEngine(
         // `\connect` / CREATE DATABASE lines that can never run in
         // PGlite, strip them instead of failing the whole import.
         await next.exec(preparePostgresScriptForPglite(sql));
+      } catch (err) {
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      }
+      try {
+        await db.close();
+      } catch {
+        /* ignore */
+      }
+      db = next;
+      sample = POSTGRES_BLANK_DATABASE;
+      return sample;
+    },
+
+    async dumpDataDir() {
+      return db.dumpDataDir("none");
+    },
+
+    async importDataDir(tarball) {
+      const next = await createFreshWorker({ loadDataDir: tarball });
+      try {
+        await next.waitReady;
+        // Probe the restored cluster before adopting it: a corrupted or
+        // version-mismatched tarball surfaces here, not on the user's
+        // next query.
+        await next.query("SELECT 1");
       } catch (err) {
         try {
           await next.close();

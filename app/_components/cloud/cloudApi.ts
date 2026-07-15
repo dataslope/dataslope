@@ -2,9 +2,10 @@
 
 /**
  * Browser client for the cloud-save + share endpoints (/api/workspaces,
- * /api/shares). A workspace travels as a **bundle**: the JSON document
- * defined in lib/workspaces/types.ts, gzipped with CompressionStream and
- * uploaded as multipart form data next to a small `meta` JSON field.
+ * /api/shares). A workspace travels as a **bundle**: the gzipped binary
+ * container defined in lib/workspaces/bundleCodec.ts (JSON header + raw
+ * database image), uploaded as multipart form data next to a small `meta`
+ * JSON field.
  *
  * Every helper throws `CloudApiError` (with the HTTP status) on failure so
  * dialogs can branch on 401 (sign-in CTA) / 403 (quota) / 429 (guest limit)
@@ -12,8 +13,13 @@
  */
 
 import {
+  BundleCodecError,
+  bundleContentHash,
+  decodeBundle,
+  encodeBundle,
+} from "@/lib/workspaces/bundleCodec";
+import {
   manifestForBundle,
-  validateBundle,
   type CloudWorkspaceList,
   type CloudWorkspaceMeta,
   type CreateShareResponse,
@@ -40,60 +46,19 @@ export function isCloudSupported(): boolean {
   );
 }
 
-export async function gzipBundle(bundle: WorkspaceBundle): Promise<Blob> {
-  const bytes = new TextEncoder().encode(JSON.stringify(bundle));
-  const stream = new Blob([bytes])
-    .stream()
-    .pipeThrough(new CompressionStream("gzip"));
-  return new Response(stream).blob();
-}
-
-/** Upper bound on a bundle's decompressed size. Real bundles are JSON that
- *  compresses a few-to-20×, so this is far above anything legitimate; the
- *  server only validates the *compressed* size, and a hostile share could
- *  otherwise expand a few MB of gzip into multiple GB in the recipient's tab. */
-const MAX_DECOMPRESSED_BYTES = 200 * 1024 * 1024;
-
-export async function gunzipBundle(
-  data: Blob,
-  maxBytes: number = MAX_DECOMPRESSED_BYTES,
-): Promise<WorkspaceBundle> {
-  const reader = data
-    .stream()
-    .pipeThrough(new DecompressionStream("gzip"))
-    .getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
+/** decodeBundle with codec failures rewritten to CloudApiError so callers
+ *  keep one error type for the whole download path. */
+async function decodeBundleOrThrow(data: Blob): Promise<WorkspaceBundle> {
   try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
-        void reader.cancel().catch(() => {});
-        throw new CloudApiError("This bundle is too large to open.", 0);
-      }
-      chunks.push(value);
-    }
+    return await decodeBundle(data);
   } catch (err) {
-    if (err instanceof CloudApiError) throw err;
-    throw new CloudApiError("This bundle is corrupted.", 0);
+    throw new CloudApiError(
+      err instanceof BundleCodecError
+        ? err.message
+        : "This bundle is corrupted.",
+      0,
+    );
   }
-  let doc: unknown;
-  try {
-    const bytes = new Uint8Array(total);
-    let offset = 0;
-    for (const chunk of chunks) {
-      bytes.set(chunk, offset);
-      offset += chunk.byteLength;
-    }
-    doc = JSON.parse(new TextDecoder().decode(bytes));
-  } catch {
-    throw new CloudApiError("This bundle is corrupted.", 0);
-  }
-  const bundle = validateBundle(doc);
-  if (!bundle) throw new CloudApiError("This bundle is not supported.", 0);
-  return bundle;
 }
 
 /** fetch() that rewrites network-level failures (the browser's raw
@@ -148,17 +113,29 @@ export async function listCloudWorkspaces(): Promise<CloudWorkspaceList> {
   return (await res.json()) as CloudWorkspaceList;
 }
 
+/** Last successful upload per workspace, keyed by content hash, so saving
+ *  an unchanged workspace is a no-op instead of a full re-upload. Session-
+ *  scoped on purpose: it only ever *skips* re-sending bytes this tab already
+ *  sent, so a stale entry can't lose data (worst case another device
+ *  overwrote the backup and this tab's identical re-save is skipped, which
+ *  is the same last-writer-wins outcome as uploading it again). */
+const lastUploads = new Map<string, { hash: string; meta: CloudWorkspaceMeta }>();
+
 export async function saveCloudWorkspace(
   workspaceId: string,
   bundle: WorkspaceBundle,
 ): Promise<CloudWorkspaceMeta> {
-  const blob = await gzipBundle(bundle);
+  const hash = await bundleContentHash(bundle);
+  const prev = lastUploads.get(workspaceId);
+  if (prev && prev.hash === hash) return prev.meta;
+  const blob = await encodeBundle(bundle);
   const res = await apiFetch(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
     method: "PUT",
     body: bundleForm(blob, bundle),
   });
   if (!res.ok) return throwResponseError(res);
   const body = (await res.json()) as { workspace: CloudWorkspaceMeta };
+  lastUploads.set(workspaceId, { hash, meta: body.workspace });
   return body.workspace;
 }
 
@@ -169,7 +146,7 @@ export async function fetchCloudWorkspaceBundle(
     `/api/workspaces/${encodeURIComponent(workspaceId)}/bundle`,
   );
   if (!res.ok) return throwResponseError(res);
-  return gunzipBundle(await res.blob());
+  return decodeBundleOrThrow(await res.blob());
 }
 
 export async function deleteCloudWorkspace(workspaceId: string): Promise<void> {
@@ -177,6 +154,8 @@ export async function deleteCloudWorkspace(workspaceId: string): Promise<void> {
     method: "DELETE",
   });
   if (!res.ok) return throwResponseError(res);
+  // The backup is gone; the next save must upload even if unchanged.
+  lastUploads.delete(workspaceId);
 }
 
 // ---------------------------------------------------------------------------
@@ -186,7 +165,7 @@ export async function deleteCloudWorkspace(workspaceId: string): Promise<void> {
 export async function createShare(
   bundle: WorkspaceBundle,
 ): Promise<CreateShareResponse> {
-  const blob = await gzipBundle(bundle);
+  const blob = await encodeBundle(bundle);
   const res = await apiFetch("/api/shares", {
     method: "POST",
     body: bundleForm(blob, bundle),
@@ -211,7 +190,7 @@ export async function fetchShareBundle(
     `/api/shares/${encodeURIComponent(shareId)}/bundle`,
   );
   if (!res.ok) return throwResponseError(res);
-  return gunzipBundle(await res.blob());
+  return decodeBundleOrThrow(await res.blob());
 }
 
 export async function revokeShare(shareId: string): Promise<void> {

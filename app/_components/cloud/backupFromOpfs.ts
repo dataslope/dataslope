@@ -6,9 +6,9 @@
  * involved. This is what lets the /playground index back up a guest's saved
  * workspaces right after sign-in, without opening each one.
  *
- * SQL workspaces can't be built this way (their bundle carries a database dump
- * that only the engine can produce), which is fine: SQL backups are manual by
- * design, from inside the playground.
+ * SQL workspaces can't be built this way (their bundle carries a database
+ * image that only the engine can produce), which is fine: SQL backups are
+ * manual by design, from inside the playground.
  */
 
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
@@ -37,7 +37,7 @@ export async function buildCodeBundleFromOpfs(
 
   const active = manifest.files.find((f) => f.id === manifest.activeFileId);
   return {
-    version: 1,
+    version: 2,
     kind: "code",
     playground: playgroundId,
     name,

@@ -353,9 +353,12 @@ export function WorkspaceBadge({
     [cloud.metas, registry, activeWorkspaceId],
   );
   const showCloud = cloud.available && !cloud.signedOut;
-  // Auto-sync is code-playgrounds-only: a SQL backup is a full database dump,
-  // too heavy to push on every change (and sample-database loads would spam it),
-  // so SQL keeps the manual Save/Back-up controls instead of auto-syncing.
+  // Auto-sync is code-playgrounds-only: a SQL backup carries a full binary
+  // database image, too heavy to push on every change (and sample-database
+  // loads would spam it), so SQL keeps the manual Save/Back-up controls
+  // instead of auto-syncing. (Local OPFS persistence is separate and stays
+  // automatic; identical re-uploads are also skipped via content hash in
+  // saveCloudWorkspace.)
   const autoSyncActive = showCloud && !isSqlPlayground(playgroundId);
 
   const [backupBusy, setBackupBusy] = useState(false);

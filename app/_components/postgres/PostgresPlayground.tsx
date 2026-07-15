@@ -2323,6 +2323,58 @@ function PostgresPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
+  // Same flow as performImportSqlDump, but boots from a PGDATA tarball (the
+  // binary section of a cloud/share bundle) instead of replaying SQL.
+  const performImportPgDataDir = useCallback(
+    async (image: Uint8Array, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setStatusState("loading");
+      try {
+        await engine.importDataDir(new Blob([image as BlobPart]));
+        setActiveDbId(POSTGRES_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), POSTGRES_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(
+          POSTGRES_BLANK_DATABASE.id,
+          POSTGRES_BLANK_DATABASE.defaultTabs,
+        );
+        persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
+        let nextActive = nextTabs[0]?.id ?? "";
+        try {
+          const savedActive = localStorage.getItem(
+            dbScopedKey(POSTGRES_BLANK_DATABASE.id, "active_tab"),
+          );
+          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
+            nextActive = savedActive;
+          }
+        } catch {
+          /* ignore */
+        }
+        tabHistoryRef.current = [];
+        setActiveTabId(nextActive);
+        setResultsByTab({});
+        selectedSchemaRef.current = "public";
+        setSelectedSchema("public");
+        setExpandedEntities(new Set());
+        await Promise.all([refreshSchema(), refreshSchemas()]);
+        setStatusState("ready");
+        showToast(`Loaded "${filename}".`);
+      } catch (err) {
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
+  );
+
   const {
     addTab,
     openTabAndRun,
@@ -3313,32 +3365,38 @@ function PostgresPlaygroundInner() {
   }, [tables, buildPostgresDumpSql, displayFilename, showToast]);
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs, the database binary itself never leaves the browser.
+  // A SQL bundle carries the active database as a PGDATA tarball (PGlite's
+  // dumpDataDir; the codec gzips it) plus the query tabs. Full fidelity —
+  // sequences, functions, and other non-table objects a handwritten dump
+  // would miss — and reopening boots straight from the tarball.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
-      const dump = await buildPostgresDumpSql();
-      if (dump === null) return null;
+      const engine = engineRef.current;
+      if (!engine) return null;
+      const tarball = await engine.dumpDataDir();
+      const image = new Uint8Array(await tarball.arrayBuffer());
       const queryTabs = tabsRef.current.filter((t) => !t.kind);
       const activeIdx = queryTabs.findIndex(
         (t) => t.id === activeTabIdRef.current,
       );
       return {
-        version: 1,
+        version: 2,
         kind: "sql",
         playground: PLAYGROUND_ID,
         name: activeWorkspace?.name ?? "Postgres Workspace",
         exportedAt: Date.now(),
         sql: {
           dialect: "postgres",
-          dump,
+          dbFormat: "pgdata-tar",
+          dbBytes: image.byteLength,
           tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
           activeTabIndex: Math.max(0, activeIdx),
           databaseLabel: displayFilename,
         },
+        database: image,
       };
-    }, [buildPostgresDumpSql, activeWorkspace?.name, displayFilename]);
+    }, [activeWorkspace?.name, displayFilename]);
 
   // Apply a pending share/cloud bundle once the engine is up. The bundle's
   // queries are pre-seeded into the blank database's stored tabs because
@@ -3355,7 +3413,8 @@ function PostgresPlaygroundInner() {
         if (
           bundle.kind !== "sql" ||
           bundle.playground !== PLAYGROUND_ID ||
-          !bundle.sql
+          !bundle.sql ||
+          !bundle.database
         ) {
           throw new Error("This link isn't a PostgreSQL playground.");
         }
@@ -3377,8 +3436,8 @@ function PostgresPlaygroundInner() {
         } catch {
           /* ignore */
         }
-        await performImportSqlDump(
-          bundle.sql.dump,
+        await performImportPgDataDir(
+          bundle.database,
           bundle.sql.databaseLabel ?? bundle.name,
         );
       } catch (err) {
@@ -3388,7 +3447,7 @@ function PostgresPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, performImportSqlDump, showToast]);
+  }, [loaded, performImportPgDataDir, showToast]);
 
   const exportPostgresDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;

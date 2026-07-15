@@ -872,7 +872,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
       const active = fileList.find((f) => f.id === activeFileIdRef.current);
       return {
-        version: 1,
+        version: 2,
         kind: "code",
         playground: adapter.id,
         name: workspaceName || "Workspace",

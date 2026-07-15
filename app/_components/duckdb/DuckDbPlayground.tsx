@@ -2708,6 +2708,73 @@ function DuckDbPlaygroundInner() {
     [persistTabs, refreshSchema, showToast],
   );
 
+  // Same flow as performImportSqlDump, but loads a binary .duckdb image
+  // (the binary section of a cloud/share bundle) instead of replaying SQL.
+  const performImportDuckDbImage = useCallback(
+    async (image: Uint8Array, filename: string) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      setStatusState("loading");
+      try {
+        // importBinaryImage bootstraps a blank catalog, copies the image's
+        // contents in, and restores the previous sample on failure so the
+        // user is never stranded on a wiped database.
+        await engine.importBinaryImage(image);
+        setTables([]);
+        setViews([]);
+        setIndexes([]);
+        setTriggers([]);
+        setColumnsByEntity({});
+        setForeignKeysByEntity({});
+        setRowCountByTable({});
+        setExpandedEntities(new Set());
+        setActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(
+          DUCKDB_BLANK_DATABASE.id,
+          DUCKDB_BLANK_DATABASE.defaultTabs,
+        );
+        persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
+        let nextActive = nextTabs[0]?.id ?? "";
+        try {
+          const savedActive = localStorage.getItem(
+            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
+          );
+          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
+            nextActive = savedActive;
+          }
+        } catch {
+          /* ignore */
+        }
+        tabHistoryRef.current = [];
+        setActiveTabId(nextActive);
+        setResultsByTab({});
+        await refreshSchema();
+        setStatusState("ready");
+        showToast(`Loaded "${filename}".`);
+      } catch (err) {
+        // importBinaryImage restored the previous sample on failure; re-read
+        // the schema so the sidebar reflects the restored state.
+        try {
+          await refreshSchema();
+        } catch {
+          /* ignore */
+        }
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, showToast],
+  );
+
   const {
     addTab,
     openTabAndRun,
@@ -3765,32 +3832,36 @@ function DuckDbPlaygroundInner() {
   }, [tables, buildDuckDbDumpSql, displayFilename, showToast]);
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs, the database binary itself never leaves the browser.
+  // A SQL bundle carries the active database as its native .duckdb image
+  // (the same bytes the OPFS snapshot persists; the codec gzips them) plus
+  // the query tabs; reopening loads the image instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
-      const dump = await buildDuckDbDumpSql();
-      if (dump === null) return null;
+      const engine = engineRef.current;
+      if (!engine) return null;
+      const image = await engine.exportBinaryImage();
       const queryTabs = tabsRef.current.filter((t) => !t.kind);
       const activeIdx = queryTabs.findIndex(
         (t) => t.id === activeTabIdRef.current,
       );
       return {
-        version: 1,
+        version: 2,
         kind: "sql",
         playground: PLAYGROUND_ID,
         name: activeWorkspace?.name ?? "DuckDB Workspace",
         exportedAt: Date.now(),
         sql: {
           dialect: "duckdb",
-          dump,
+          dbFormat: "duckdb-image",
+          dbBytes: image.byteLength,
           tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
           activeTabIndex: Math.max(0, activeIdx),
           databaseLabel: displayFilename,
         },
+        database: image,
       };
-    }, [buildDuckDbDumpSql, activeWorkspace?.name, displayFilename]);
+    }, [activeWorkspace?.name, displayFilename]);
 
   // Apply a pending share/cloud bundle once the engine is up. The bundle's
   // queries are pre-seeded into the blank database's stored tabs because
@@ -3807,7 +3878,8 @@ function DuckDbPlaygroundInner() {
         if (
           bundle.kind !== "sql" ||
           bundle.playground !== PLAYGROUND_ID ||
-          !bundle.sql
+          !bundle.sql ||
+          !bundle.database
         ) {
           throw new Error("This link isn't a DuckDB playground.");
         }
@@ -3829,8 +3901,8 @@ function DuckDbPlaygroundInner() {
         } catch {
           /* ignore */
         }
-        await performImportSqlDump(
-          bundle.sql.dump,
+        await performImportDuckDbImage(
+          bundle.database,
           bundle.sql.databaseLabel ?? bundle.name,
         );
       } catch (err) {
@@ -3840,7 +3912,7 @@ function DuckDbPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, performImportSqlDump, showToast]);
+  }, [loaded, performImportDuckDbImage, showToast]);
 
   const exportDuckDbDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;
