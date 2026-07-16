@@ -333,12 +333,15 @@ export default function AskAiWidget({
     hasAiEditHandler(collectContext().adapterId);
 
   // ── Suggested questions ────────────────────────────────────────────
-  // Three context-grounded questions on the empty panel and after each
-  // answer. Free for the member (tracked on suggestion-specific counters
+  // Three context-grounded follow-up questions after each answer. Deliberately
+  // NOT shown on the empty panel (the `messages.length > 0` gate), so the first
+  // thing the user sees is their own blank slate rather than pre-filled
+  // prompts, suggestions only appear once there's a conversation to follow up
+  // on. Free for the member (tracked on suggestion-specific counters
   // server-side); failures just hide the section.
   const { suggestions, suggestLoading, clearSuggestions } =
     useSuggestedQuestions({
-      active: open && signedIn && !streaming,
+      active: open && signedIn && !streaming && messages.length > 0,
       turnKey: messages.length,
       buildContext,
       history: messages,
@@ -398,9 +401,9 @@ export default function AskAiWidget({
           className={styles.launcherTab}
           onClick={() => setOpen(true)}
           aria-label="Ask AI"
+          title="Ask AI"
         >
-          <Sparkles size={15} />
-          <span className={styles.launcherTabLabel}>Ask AI</span>
+          <Sparkles size={18} />
         </button>
       );
     }
@@ -513,6 +516,10 @@ export default function AskAiWidget({
             </a>
           </div>
         ) : messages.length === 0 ? (
+          // Empty panel: no suggested questions here by design, they only
+          // appear as follow-ups after an answer (see the SuggestionList below
+          // the conversation, and the `messages.length > 0` gate on
+          // useSuggestedQuestions).
           <div className={styles.emptyWrap}>
             <div className={styles.empty}>
               Ask about the{" "}
@@ -525,11 +532,6 @@ export default function AskAiWidget({
               page to ask about it, or pin a card below to reference it
               directly.
             </div>
-            <SuggestionList
-              suggestions={suggestions}
-              loading={suggestLoading}
-              onPick={sendQuestion}
-            />
           </div>
         ) : (
           <>

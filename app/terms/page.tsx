@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalShell title="Terms of Service" updated="June 19, 2026">
+    <LegalShell title="Terms of Service" updated="July 16, 2026">
       <p>
         These terms govern your use of Dataslope (the &ldquo;Service&rdquo;). By
         using the Service, you agree to them. If you don&apos;t agree, please
@@ -19,7 +19,40 @@ export default function TermsPage() {
       <p>
         Dataslope is provided free of charge for personal, educational, and
         non-commercial learning. You don&apos;t need an account, and you may use
-        the courses, playgrounds, and quizzes as they are made available.
+        the courses, playgrounds, and quizzes as they are made available. All
+        memberships are currently free, there is no paid plan.
+      </p>
+
+      <h2>Accounts</h2>
+      <p>
+        Creating an account is optional and free. You can sign up with Google or
+        GitHub, or with an email address and password. You&apos;re responsible
+        for keeping your login credentials secure and for activity that happens
+        under your account, and you agree to provide accurate information (for
+        example, a real email address you control). You can delete your account
+        at any time from your account page. We may suspend or terminate an
+        account that violates these terms or is used abusively.
+      </p>
+
+      <h2>Your content, cloud saves, and sharing</h2>
+      <p>
+        Code you write in the playgrounds is yours. If you save a workspace to
+        the cloud or create a share link, you grant us permission to store and
+        serve that content only as needed to provide those features to you and
+        to anyone you share a link with. You&apos;re responsible for the content
+        you upload or share, don&apos;t save or share anything unlawful or that
+        infringes others&apos; rights, and remember that anyone with a share
+        link can view a copy of what you shared. You can delete your cloud saves
+        and revoke share links at any time.
+      </p>
+
+      <h2>Ask AI</h2>
+      <p>
+        The optional &ldquo;Ask AI&rdquo; assistant sends your question and
+        relevant page context to a third-party AI provider to generate a
+        response. AI responses may be inaccurate or incomplete, don&apos;t rely
+        on them as professional advice, and always verify important answers.
+        Please don&apos;t submit sensitive personal information in your prompts.
       </p>
 
       <h2>Acceptable use</h2>
@@ -31,7 +64,8 @@ export default function TermsPage() {
         </li>
         <li>
           attempt to disrupt, overload, or compromise the Service, its hosting,
-          or the third-party services it relies on;
+          or the third-party services it relies on, including abusing the AI
+          assistant with automated or bulk requests;
         </li>
         <li>
           misrepresent the Service or remove or obscure any notices it displays.
