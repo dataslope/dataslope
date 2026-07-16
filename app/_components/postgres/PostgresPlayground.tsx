@@ -3485,7 +3485,7 @@ function PostgresPlaygroundInner() {
       }
       const bytes = workbook.saveToBufferSync();
       triggerDownload(
-        new Blob([bytes], {
+        new Blob([bytes as BlobPart], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         }),
         filename,

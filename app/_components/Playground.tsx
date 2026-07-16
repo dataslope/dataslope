@@ -1482,7 +1482,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             showToast(`Could not read "${path}".`, "warn");
             return;
           }
-          const blob = new Blob([bytes]);
+          const blob = new Blob([bytes as BlobPart]);
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;

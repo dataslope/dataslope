@@ -5,7 +5,7 @@
 //
 // The version is pinned to match the installed npm package so the JS
 // and WASM builds always stay in sync, update both together.
-export const CLANG_FORMAT_VERSION = "22.1.4";
+export const CLANG_FORMAT_VERSION = "22.1.8";
 
 let clangFormatInitPromise: Promise<{
   format: (src: string, fname: string, style?: string) => string;

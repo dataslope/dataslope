@@ -4,9 +4,11 @@
 //   1. The bundler (Turbopack in Next.js 16) never sees Pyodide's internal
 //      `await import(e)` calls, those would otherwise fail with
 //      "Cannot find module as expression is too dynamic". We sidestep
-//      Turbopack entirely by loading `pyodide.js` from the CDN with
-//      `importScripts`, which is a worker-only API and is not analysed by
-//      the bundler.
+//      Turbopack by loading `pyodide.mjs` from the CDN with a dynamic
+//      `import()` carrying webpackIgnore/turbopackIgnore comments, the
+//      same pattern postgres-worker.ts uses for PGlite. (Pyodide 314
+//      dropped the classic-script `pyodide.js` + global `loadPyodide`
+//      entry point that importScripts used to load.)
 //   2. Heavy Python execution (numpy, pandas, plot rendering, …) doesn't
 //      block the main thread, so the UI stays responsive while user code
 //      is running.
@@ -16,20 +18,23 @@
 
 import type { PyodideInterface } from "pyodide";
 
-// Dedicated workers expose `self` as a `DedicatedWorkerGlobalScope`. We
-// also rely on the global `loadPyodide` that `pyodide.js` adds when it's
-// loaded via `importScripts`.
-declare const self: DedicatedWorkerGlobalScope & {
-  loadPyodide: (opts: { indexURL: string }) => Promise<PyodideInterface>;
-};
+declare const self: DedicatedWorkerGlobalScope;
 
-const PYODIDE_VERSION = "v0.29.4";
+const PYODIDE_VERSION = "v314.0.2";
 const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
 
-// Load the Pyodide JS loader synchronously into the worker scope. This is
-// the call that would explode if attempted on the main thread under
-// Turbopack, `importScripts` is unprocessed by the bundler.
-self.importScripts(PYODIDE_INDEX_URL + "pyodide.js");
+/** Load Pyodide's ES-module entry point from the CDN, outside the
+ *  bundler's sight. Called once from initPyodide. */
+function loadPyodideModule(): Promise<{
+  loadPyodide: (opts: { indexURL: string }) => Promise<PyodideInterface>;
+}> {
+  return import(
+    /* webpackIgnore: true */ /* turbopackIgnore: true */
+    `${PYODIDE_INDEX_URL}pyodide.mjs`
+  ) as Promise<{
+    loadPyodide: (opts: { indexURL: string }) => Promise<PyodideInterface>;
+  }>;
+}
 
 // ─── Output cell shape (mirrors `OutputCell` minus the bookkeeping the
 //     main thread fills in) ───────────────────────────────────────────────
@@ -186,7 +191,8 @@ function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
 
 async function initPyodide(): Promise<void> {
   post({ kind: "loading", message: "Loading Python runtime…", fraction: 0.06 });
-  pyodide = await self.loadPyodide({ indexURL: PYODIDE_INDEX_URL });
+  const { loadPyodide } = await loadPyodideModule();
+  pyodide = await loadPyodide({ indexURL: PYODIDE_INDEX_URL });
 
   post({
     kind: "loading",

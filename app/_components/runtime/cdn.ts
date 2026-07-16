@@ -65,7 +65,7 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 // completion. The lib.*.d.ts standard-library declarations come from the
 // same pinned package. Keep TYPESCRIPT_VERSION in sync with the
 // `typescript` version pinned in package.json.
-export const TYPESCRIPT_VERSION = "5.7.3";
+export const TYPESCRIPT_VERSION = "5.9.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
 
 // esbuild-wasm powers the React/TSX playground's transform + bundle step

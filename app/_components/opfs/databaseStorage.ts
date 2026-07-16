@@ -74,7 +74,7 @@ async function flush(): Promise<void> {
       const dbDir = await wDir.getDirectoryHandle("db", { create: true });
       const fh = await dbDir.getFileHandle(w.name, { create: true });
       const writable = await fh.createWritable();
-      await writable.write(w.data);
+      await writable.write(w.data as unknown as ArrayBufferView<ArrayBuffer>);
       await writable.close();
     } catch {
       // OPFS write failed; the in-memory copy is still intact in the engine.

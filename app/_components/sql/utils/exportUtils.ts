@@ -154,7 +154,7 @@ export async function exportResultToParquet(
   const wasmTable = WasmParquetTable.fromIPCStream(ipcBytes);
   const parquetBytes = writeParquet(wasmTable);
   triggerDownload(
-    new Blob([parquetBytes], { type: "application/octet-stream" }),
+    new Blob([parquetBytes as BlobPart], { type: "application/octet-stream" }),
     filename,
   );
 }
@@ -177,7 +177,7 @@ export async function exportResultToXlsx(
   }
   const bytes = workbook.saveToBufferSync();
   triggerDownload(
-    new Blob([bytes], {
+    new Blob([bytes as BlobPart], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     }),
     filename,

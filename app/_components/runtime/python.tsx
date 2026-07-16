@@ -880,9 +880,9 @@ export const pythonAdapter: LanguageAdapter = {
     setLoadingMessage("Starting Python runtime…", 0.02);
     // Standard Web Worker construction pattern that Next.js / Turbopack
     // recognises: it bundles the worker as a separate chunk. The worker
-    // itself avoids the bundler's dynamic-import handling by loading
-    // Pyodide via `importScripts` from the CDN, this requires a classic
-    // (non-module) worker, so we deliberately omit `{ type: "module" }`.
+    // itself loads Pyodide's `pyodide.mjs` from the CDN via a dynamic
+    // `import()` the bundler is told to ignore (same pattern as the
+    // PGlite worker), so no `{ type: "module" }` is required here.
     const worker = new Worker(
       new URL("./pyodide-worker.ts", import.meta.url),
     );
