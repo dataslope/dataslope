@@ -14,22 +14,31 @@ user's browser at runtime** and are not redistributed in this repository.
 > get your own legal review before relying on any of this — especially if you
 > monetize the site (for example, with advertising).
 
-## ⚠️ CheerpJ (Java runtime) — read this first
+## CheerpJ (Java runtime)
 
 The Java playground uses **CheerpJ** by **Leaning Technologies**
 (<https://cheerpj.com>), loaded at runtime from Leaning Technologies' CDN
 (`cjrtnc.leaningtech.com`).
 
-CheerpJ is **not** open source under an OSI-approved license. It is distributed
-under Leaning Technologies' own license terms, which are free for some uses but
-**may require a separate commercial license for others**. The MIT license on
-Dataslope's code grants you **no** rights to CheerpJ.
+CheerpJ is proprietary (not OSI-approved open source) and the MIT license on
+Dataslope's code grants no rights to it. It is used here under the **CheerpJ
+Core Community Edition**, which is free and **allows commercial use for
+individuals and one-person companies** — so a solo developer running this site
+(including ad-supported) is covered.
 
-**Action required:** review CheerpJ's current licensing and Leaning
-Technologies' terms, and obtain any commercial license your use may need —
-particularly commercial/for-profit operation of the site, including running
-advertising against it. CheerpJ executes OpenJDK, which is licensed under the
-**GPLv2 with the Classpath Exception**.
+Two Community Edition restrictions to stay within, both of which this project's
+setup already satisfies:
+
+- **No self-hosting.** CheerpJ must be loaded from Leaning Technologies' CDN,
+  which is exactly how it's integrated here (`cjrtnc.leaningtech.com`). Don't
+  vendor or self-host the CheerpJ runtime files.
+- **No OEM/redistribution.** This repository doesn't bundle or redistribute
+  CheerpJ; it only references the CDN loader at runtime.
+
+Re-check CheerpJ's current terms if your situation changes — for example if the
+operation grows beyond a one-person company, or if you change how CheerpJ is
+loaded — since a paid CheerpJ license may then be required. CheerpJ executes
+OpenJDK, which is licensed under the **GPLv2 with the Classpath Exception**.
 
 ## Language runtimes (loaded at runtime)
 

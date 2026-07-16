@@ -302,6 +302,8 @@ Dataslope is available under more than one license:
 
 Third-party software and language runtimes retain their own licenses; see
 [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md). In particular, the Java
-runtime **CheerpJ** (Leaning Technologies) is under its own, non-MIT terms and
-may require a separate commercial license for some uses — review it before
-relying on the Java playground commercially.
+runtime **CheerpJ** (Leaning Technologies) is proprietary, used here under its
+free **Community Edition** — which allows commercial use for individuals and
+one-person companies, and is loaded from Leaning Technologies' CDN (self-hosting
+and redistribution aren't permitted). Re-check its terms if you grow beyond a
+solo operation.
