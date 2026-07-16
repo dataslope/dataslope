@@ -100,14 +100,20 @@ function BrandLogo() {
         window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
       }}
     >
+      {/* Both hover transforms carry `will-change-transform` so these two
+          elements keep permanent (tiny) compositor layers. Without it, each
+          hover starts an accelerated transform transition that promotes and
+          then drops a layer inside the sticky header — layer churn that has
+          coincided with stale marquee raster ghosting through the band under
+          the header (the original "hover a nav control" repro). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="relative top-px h-[13px] w-auto transition-transform duration-200 group-hover:rotate-[8deg]"
+        className="relative top-px h-[13px] w-auto transition-transform duration-200 will-change-transform group-hover:rotate-[8deg]"
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white">
+      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white">
         Dataslope
       </span>
     </Link>
@@ -238,16 +244,22 @@ function MobileDrawer() {
 }
 
 export function HomeNav() {
-  // Shrink-on-scroll: the header is taller at the top of the page and
-  // compacts to its sticky height once scrolled. The background stays a
-  // solid white/#121212 (no backdrop blur, shadow, or opacity).
+  // Shrink-on-scroll: the nav bar is taller at the top of the page and
+  // compacts once scrolled. The background stays a solid white/#121212 (no
+  // backdrop blur, shadow, or opacity).
   //
-  // Two thresholds (hysteresis) with a gap wider than the header's shrink
-  // delta (≤16px). A single threshold caused an infinite bounce near the top:
-  // toggling the header height changes the in-flow document height, and the
-  // browser's scroll-anchoring nudges scrollY to compensate, which flips the
-  // threshold back, resizing the header again, ad infinitum. The gap keeps that
-  // compensation from ever crossing the opposite threshold.
+  // Only the inner <nav> changes height; the <header> box itself is a fixed
+  // h-14/16. That keeps the shrink out of document flow (crossing a threshold
+  // no longer reflows the page, the cause of an earlier scroll-anchoring
+  // bounce) and, just as deliberately, keeps the header's composited layer a
+  // constant size: this header sits over the hero marquee's continuously
+  // animating composited rows, and resizing the sticky layer mid-scroll has
+  // produced stale "ghost" slices of marquee raster in the strip it vacates
+  // (GPU-only; not reproducible under software rasterization). Don't move the
+  // height transition back onto the <header> box.
+  //
+  // Two thresholds (hysteresis) so small scroll jitter around a single
+  // threshold can't flap the shrink transition back and forth.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () =>
@@ -270,11 +282,10 @@ export function HomeNav() {
     // `transform-gpu` (translateZ(0)) keeps the sticky header on its own
     // compositing layer, so hover repaints inside it (nav-link colour
     // transitions, the logo's group-hover transform) stay isolated from the
-    // continuously-animating hero marquee below. Defense-in-depth: the
-    // marquee-ghosting-through-the-header bug this originally targeted was
-    // actually caused by BlurFade's residual `filter: blur(0px)` around the
-    // marquee (fixed in components/ui/blur-fade.tsx).
-    <header className="sticky top-0 z-40 transform-gpu bg-white dark:bg-[#121212]">
+    // continuously-animating hero marquee below. Combined with the fixed
+    // h-14/16 box (see above), it makes the header a constant-size opaque
+    // occluder over the marquee.
+    <header className="sticky top-0 z-40 h-14 transform-gpu bg-white md:h-16 dark:bg-[#121212]">
       <nav
         className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
           scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
@@ -315,10 +326,14 @@ export function HomeNav() {
       {/* Short fade below the compacted header so its solid background melts
           into the page instead of slicing through content scrolling under it
           (most visible against the hero marquee). Hidden while the page is at
-          the top, where the header sits in normal flow above the content. */}
+          the top, where the header sits in normal flow above the content.
+          `will-change-[opacity]` keeps this strip permanently on its own
+          compositor layer: without it, the opacity transition creates and
+          destroys a layer on every scroll-threshold crossing, right at the
+          band under the header where stale marquee raster has ghosted. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-white to-transparent transition-opacity duration-200 dark:from-[#121212] ${
+        className={`pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-white to-transparent transition-opacity duration-200 will-change-[opacity] dark:from-[#121212] ${
           scrolled ? "opacity-100" : "opacity-0"
         }`}
       />

@@ -74,8 +74,13 @@ export function HeroMarquee() {
   // compositor level (a plain overflow clip hasn't stopped Chromium from
   // ghosting stale slices of the composited rows over other parts of the
   // page during unrelated repaints, e.g. hovering the sticky header).
+  // `will-change-transform` keeps this container permanently promoted so the
+  // rows' compositing subtree (and its clip) never restructures — without it,
+  // the BlurFade entrance around this component promotes the wrapper while
+  // its transform/filter animate and drops it when they settle, a hand-off
+  // during which Chromium has left stale row raster behind.
   return (
-    <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2 [contain:paint]">
+    <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2 will-change-transform [contain:paint]">
       {/* Both lines share one font-size scale so they read as a matched pair. */}
       {/* Line 1, the language roster, scrolling left. */}
       <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:42s] [--gap:0px] sm:text-6xl lg:text-7xl">
