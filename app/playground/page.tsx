@@ -22,6 +22,7 @@ import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { JsonLd } from "../_components/JsonLd";
+import { LineShadowText } from "@/components/ui/line-shadow-text";
 import { PLAYGROUNDS } from "../_components/playgrounds";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { absUrl, breadcrumbLd } from "@/lib/structuredData";
@@ -91,8 +92,14 @@ export default function PlaygroundPage() {
           {/* Centered heading, matching the /courses + /interview-prep title
               block. */}
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
-              Playground
+            {/* Magic UI line-shadow effect on the title. `--title-shadow`
+                (defined here, inherited into LineShadowText's `::after`) tracks
+                the heading colour so the shadow adapts to light/dark — a bare
+                `currentColor` would resolve against the transparent pseudo. */}
+            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] [--title-shadow:#111827] sm:text-5xl dark:text-white dark:[--title-shadow:#ffffff]">
+              <LineShadowText shadowColor="var(--title-shadow)">
+                Playground
+              </LineShadowText>
             </h1>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Full code editors that run entirely in your browser. Fourteen
