@@ -46,7 +46,7 @@ a width threshold (a **breakpoint**):
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -64,7 +64,10 @@ a width threshold (a **breakpoint**):
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .grid {
   display: grid;
@@ -82,7 +85,9 @@ a width threshold (a **breakpoint**):
 
 /* Drag the preview narrower than 600px to see one column: */
 @media (max-width: 600px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 `,
     },
@@ -119,7 +124,7 @@ just *fit*.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -136,7 +141,10 @@ just *fit*.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .cards {
   display: grid;
@@ -153,7 +161,10 @@ just *fit*.
 
 /* Add your @media (max-width: 500px) block below */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .cards {
   display: grid;

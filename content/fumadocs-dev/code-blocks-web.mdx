@@ -17,19 +17,24 @@ output and uncaught errors stream back into the output panel through a
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      h1 { color: #2563eb; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+    h1 {
+      color: #2563eb;
+    }
     </style>
   </head>
   <body>
     <h1>Hello, web block!</h1>
     <p>Edit the markup and press Run to re-render the preview.</p>
     <script>
-      console.log("Scripts run too:", 6 * 7);
+    console.log("Scripts run too:", 6 * 7);
     </script>
   </body>
 </html>
@@ -133,7 +138,7 @@ second time.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -206,7 +211,7 @@ setup.
   </p>
   <button
     class="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white"
-    onclick="console.log('clicked')"
+    onclick='console.log("clicked")'
   >
     A styled button
   </button>
@@ -237,9 +242,9 @@ exceptions and `console.error` arrive as error cells the same way.
       filename: "index.html",
       starterCode: `<h1>Console demo</h1>
 <script>
-  console.log("plain string");
-  console.log("objects too:", { language: "HTML", year: 1993 });
-  console.log("arrays:", [1, 2, 3]);
+console.log("plain string");
+console.log("objects too:", { language: "HTML", year: 1993 });
+console.log("arrays:", [1, 2, 3]);
 </script>
 `,
     },

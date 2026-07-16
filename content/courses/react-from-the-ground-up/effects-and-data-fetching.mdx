@@ -141,7 +141,8 @@ function Feed() {
     loadPosts().then(setPosts);
   }, []);
 
-  if (posts === null) return <p style={{ fontFamily: "system-ui" }}>Loading…</p>;
+  if (posts === null)
+    return <p style={{ fontFamily: "system-ui" }}>Loading…</p>;
 
   return (
     <ul style={{ fontFamily: "system-ui", margin: 24 }}>

@@ -34,7 +34,7 @@ The `repeat()` helper saves typing: `repeat(3, 1fr)` is exactly
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -54,7 +54,10 @@ The `repeat()` helper saves typing: `repeat(3, 1fr)` is exactly
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .gallery {
   display: grid;
@@ -116,7 +119,7 @@ column is completely normal.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -134,7 +137,10 @@ column is completely normal.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .stats {
   /* 1. grid   2. four equal columns   3. 16px gap */
@@ -148,7 +154,10 @@ column is completely normal.
   border-radius: 10px;
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .stats {
   display: grid;

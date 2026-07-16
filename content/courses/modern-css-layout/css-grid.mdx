@@ -58,15 +58,19 @@ can predict every column width:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="grid">
-      <div>1</div><div>2</div><div>3</div>
-      <div>4</div><div>5</div><div>6</div>
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+      <div>5</div>
+      <div>6</div>
     </div>
   </body>
 </html>
@@ -74,7 +78,10 @@ can predict every column width:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .grid {
   display: grid;
@@ -107,7 +114,7 @@ columns"; `1 / -1` means "from the first line to the last", full width:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -124,7 +131,10 @@ columns"; `1 / -1` means "from the first line to the last", full width:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .layout {
   display: grid;
@@ -132,15 +142,21 @@ columns"; `1 / -1` means "from the first line to the last", full width:
   gap: 12px;
 }
 
-.layout > * { padding: 1rem; border-radius: 10px; }
+.layout > * {
+  padding: 1rem;
+  border-radius: 10px;
+}
 
 header {
-  grid-column: 1 / -1;      /* first line to last: full width */
-  background: #1e293b; color: white;
+  grid-column: 1 / -1; /* first line to last: full width */
+  background: #1e293b;
+  color: white;
 }
-aside  { background: #e2e8f0; }
-main   {
-  grid-column: span 2;      /* cover two columns */
+aside {
+  background: #e2e8f0;
+}
+main {
+  grid-column: span 2; /* cover two columns */
   background: #dbeafe;
 }
 `,
@@ -209,7 +225,7 @@ with no breakpoints anywhere in the CSS:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -227,7 +243,10 @@ with no breakpoints anywhere in the CSS:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .dashboard {
   /* 1. grid, three equal columns, 16px gap */
@@ -245,7 +264,10 @@ with no breakpoints anywhere in the CSS:
   background: #dbeafe;
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .dashboard {
   display: grid;

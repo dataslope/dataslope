@@ -181,7 +181,7 @@ row, no media query, no window resizing:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -203,11 +203,14 @@ row, no media query, no window resizing:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .panel {
-  container-type: inline-size;   /* the query container */
-  width: 300px;                  /* try changing to 500px */
+  container-type: inline-size; /* the query container */
+  width: 300px; /* try changing to 500px */
   border: 2px dashed #cbd5e1;
   padding: 12px;
   border-radius: 12px;
@@ -227,14 +230,29 @@ row, no media query, no window resizing:
   font-weight: 700;
   background: linear-gradient(135deg, #6366f1, #ec4899);
 }
-.body { padding: 12px 14px; }
-.body h3 { margin: 0 0 4px; }
-.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+.body {
+  padding: 12px 14px;
+}
+.body h3 {
+  margin: 0 0 4px;
+}
+.body p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
 
 @container (min-width: 380px) {
-  .card { display: flex; }
-  .thumb { width: 40%; height: auto; }
-  .body { flex: 1; }
+  .card {
+    display: flex;
+  }
+  .thumb {
+    width: 40%;
+    height: auto;
+  }
+  .body {
+    flex: 1;
+  }
 }
 `,
     },
@@ -254,7 +272,7 @@ row, no media query, no window resizing:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -275,7 +293,10 @@ row, no media query, no window resizing:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .frame {
   width: 100%;
@@ -297,13 +318,24 @@ row, no media query, no window resizing:
   font-weight: 700;
   background: linear-gradient(135deg, #6366f1, #ec4899);
 }
-.body { padding: 12px 14px; }
-.body h3 { margin: 0 0 4px; }
-.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+.body {
+  padding: 12px 14px;
+}
+.body h3 {
+  margin: 0 0 4px;
+}
+.body p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
 
 /* 2. Add an @container (min-width: 400px) block below */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .frame {
   width: 100%;
@@ -325,14 +357,29 @@ row, no media query, no window resizing:
   font-weight: 700;
   background: linear-gradient(135deg, #6366f1, #ec4899);
 }
-.body { padding: 12px 14px; }
-.body h3 { margin: 0 0 4px; }
-.body p { margin: 0; color: #475569; font-size: 0.9rem; }
+.body {
+  padding: 12px 14px;
+}
+.body h3 {
+  margin: 0 0 4px;
+}
+.body p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
 
 @container (min-width: 400px) {
-  .card { display: flex; }
-  .thumb { width: 40%; height: auto; }
-  .body { flex: 1; }
+  .card {
+    display: flex;
+  }
+  .thumb {
+    width: 40%;
+    height: auto;
+  }
+  .body {
+    flex: 1;
+  }
 }
 `,
     },

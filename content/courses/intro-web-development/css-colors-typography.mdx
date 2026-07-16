@@ -43,32 +43,35 @@ measure** (line length), controlled by capping the container width.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body {
-        font-family: Georgia, "Times New Roman", serif;
-        color: #1f2937;
-        line-height: 1.6;
-        max-width: 42rem;
-        margin: 2rem auto;
-        padding: 0 1rem;
-      }
-      h1 {
-        font-family: system-ui, sans-serif;
-        color: hsl(225, 73%, 45%);
-        letter-spacing: -0.02em;
-      }
-      .lead { font-size: 1.25rem; color: #4b5563; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      color: #1f2937;
+      line-height: 1.6;
+      max-width: 42rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h1 {
+      font-family: system-ui, sans-serif;
+      color: hsl(225, 73%, 45%);
+      letter-spacing: -0.02em;
+    }
+    .lead {
+      font-size: 1.25rem;
+      color: #4b5563;
+    }
     </style>
   </head>
   <body>
     <h1>Typography sets the tone</h1>
     <p class="lead">A larger, muted opening line pulls readers in.</p>
     <p>
-      Body text with a 1.6 line-height and a capped width is easy on
-      the eyes. Change the colors and font-family above and Run again.
+      Body text with a 1.6 line-height and a capped width is easy on the eyes.
+      Change the colors and font-family above and Run again.
     </p>
   </body>
 </html>
@@ -99,7 +102,7 @@ fallback list is what shows while it loads.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />

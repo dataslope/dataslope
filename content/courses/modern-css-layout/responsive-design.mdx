@@ -46,7 +46,7 @@ p { margin: 0; color: #475569; }
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -63,12 +63,15 @@ p { margin: 0; color: #475569; }
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 0; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
 
 .wrap {
   width: 100%;
-  max-width: 40rem;     /* never wider than 40rem */
-  margin: 0 auto;       /* centered */
+  max-width: 40rem; /* never wider than 40rem */
+  margin: 0 auto; /* centered */
   padding: 2rem 1rem;
 }
 
@@ -138,7 +141,7 @@ your media queries never trigger.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -157,7 +160,10 @@ your media queries never trigger.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 /* Base (mobile-first): a single column */
 .features {
@@ -175,7 +181,10 @@ your media queries never trigger.
 
 /* Add your min-width media query below */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 /* Base (mobile-first): a single column */
 .features {

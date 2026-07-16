@@ -31,7 +31,7 @@ top-right corner.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -48,10 +48,13 @@ top-right corner.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
-  position: relative;         /* reference point for the badge */
+  position: relative; /* reference point for the badge */
   width: 260px;
   padding: 1.25rem;
   border: 1px solid #e2e8f0;
@@ -59,7 +62,7 @@ top-right corner.
 }
 
 .badge {
-  position: absolute;         /* placed against .card */
+  position: absolute; /* placed against .card */
   top: 10px;
   right: 10px;
   background: #dc2626;
@@ -98,7 +101,7 @@ elements (anything that isn't `static`).
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -114,7 +117,10 @@ elements (anything that isn't `static`).
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .product {
   /* 1. make this the positioning context */
@@ -133,7 +139,10 @@ elements (anything that isn't `static`).
   border-radius: 999px;
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .product {
   position: relative;

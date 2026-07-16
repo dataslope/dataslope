@@ -28,15 +28,31 @@ user can jump straight to any of them:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 0; }
-      header, footer { background: #0f172a; color: white; padding: 1rem; }
-      nav a { color: #93c5fd; margin-right: 1rem; }
-      main { padding: 1.5rem; }
-      article { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+    }
+    header, footer {
+      background: #0f172a;
+      color: white;
+      padding: 1rem;
+    }
+    nav a {
+      color: #93c5fd;
+      margin-right: 1rem;
+    }
+    main {
+      padding: 1.5rem;
+    }
+    article {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1rem;
+    }
     </style>
   </head>
   <body>
@@ -103,7 +119,7 @@ reach something, neither can a lot of your users.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <body>
     <div class="links">
@@ -120,7 +136,7 @@ reach something, neither can a lot of your users.
   </body>
 </html>
 `,
-      solutionCode: `<!doctype html>
+      solutionCode: `<!DOCTYPE html>
 <html>
   <body>
     <nav class="links">

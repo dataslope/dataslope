@@ -185,7 +185,7 @@ thumbnail ratio to `1 / 1`:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -204,7 +204,10 @@ thumbnail ratio to `1 / 1`:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .card {
   max-width: 320px;
@@ -213,7 +216,7 @@ thumbnail ratio to `1 / 1`:
   overflow: hidden;
 
   & .thumb {
-    aspect-ratio: 16 / 9;   /* try 1 / 1 */
+    aspect-ratio: 16 / 9; /* try 1 / 1 */
     display: grid;
     place-items: center;
     color: white;
@@ -221,9 +224,17 @@ thumbnail ratio to `1 / 1`:
     background: linear-gradient(135deg, #6366f1, #ec4899);
   }
 
-  & .body { padding: 12px 14px; }
-  & .body h3 { margin: 0 0 4px; }
-  & .body p { margin: 0; color: #475569; font-size: 0.9rem; }
+  & .body {
+    padding: 12px 14px;
+  }
+  & .body h3 {
+    margin: 0 0 4px;
+  }
+  & .body p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+  }
 }
 `,
     },
@@ -240,7 +251,7 @@ thumbnail ratio to `1 / 1`:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -253,7 +264,10 @@ thumbnail ratio to `1 / 1`:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .video {
   width: 100%;
@@ -267,7 +281,10 @@ thumbnail ratio to `1 / 1`:
   /* Add aspect-ratio: 16 / 9 so the height follows the width */
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .video {
   width: 100%;

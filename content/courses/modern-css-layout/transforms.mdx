@@ -165,7 +165,7 @@ Stack your own transforms on `.thing` and tweak `transform-origin`.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -178,7 +178,10 @@ Stack your own transforms on `.thing` and tweak `transform-origin`.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .thing {
   width: 120px;
@@ -212,7 +215,7 @@ Put both in a single \`transform\` declaration, e.g. \`transform: rotate(15deg) 
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -225,7 +228,10 @@ Put both in a single \`transform\` declaration, e.g. \`transform: rotate(15deg) 
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .badge {
   display: inline-block;
@@ -238,7 +244,10 @@ Put both in a single \`transform\` declaration, e.g. \`transform: rotate(15deg) 
   /* add your transform here */
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .badge {
   display: inline-block;

@@ -213,7 +213,7 @@ Build a badge in the sandbox, change the `border-radius`, swap the
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -226,16 +226,19 @@ Build a badge in the sandbox, change the `border-radius`, swap the
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .badge {
   display: inline-block;
   padding: 6px 16px;
   color: white;
   font-weight: 700;
-  background: #ef4444;      /* try a gradient */
-  border: 2px solid #b91c1c;/* try dashed, or a different color */
-  border-radius: 999px;     /* try 6px, or 50% */
+  background: #ef4444; /* try a gradient */
+  border: 2px solid #b91c1c; /* try dashed, or a different color */
+  border-radius: 999px; /* try 6px, or 50% */
 }
 `,
     },
@@ -263,7 +266,7 @@ The result is the classic circular avatar with an accent ring.`}
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -276,7 +279,10 @@ The result is the classic circular avatar with an accent ring.`}
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .avatar {
   width: 96px;
@@ -292,7 +298,10 @@ The result is the classic circular avatar with an accent ring.`}
   /* 2. add a 4px solid ring */
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .avatar {
   width: 96px;

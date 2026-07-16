@@ -52,7 +52,7 @@ the space *between* the two boxes is margin:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -66,12 +66,15 @@ the space *between* the two boxes is margin:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .box {
-  padding: 20px;              /* space inside */
+  padding: 20px; /* space inside */
   border: 3px solid #6366f1; /* the line */
-  margin: 16px;              /* space outside */
+  margin: 16px; /* space outside */
   background: #eef2ff;
 }
 `,
@@ -138,7 +141,7 @@ second uses `border-box` and stays exactly 220px. The gridlines are
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -152,7 +155,10 @@ second uses `border-box` and stays exactly 220px. The gridlines are
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .a, .b {
   width: 200px;
@@ -162,8 +168,12 @@ second uses `border-box` and stays exactly 220px. The gridlines are
   background: #f1f5f9;
 }
 
-.a { box-sizing: content-box; } /* width + padding + border = 244px */
-.b { box-sizing: border-box; }  /* total stays 200px */
+.a {
+  box-sizing: content-box;
+} /* width + padding + border = 244px */
+.b {
+  box-sizing: border-box;
+} /* total stays 200px */
 `,
     },
   ]}
@@ -192,7 +202,7 @@ With that, the card's *total* rendered width should be exactly 300px, padding in
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -205,7 +215,10 @@ With that, the card's *total* rendered width should be exactly 300px, padding in
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
   width: 300px;
@@ -215,7 +228,10 @@ With that, the card's *total* rendered width should be exactly 300px, padding in
   /* 1. add box-sizing here */
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
   width: 300px;

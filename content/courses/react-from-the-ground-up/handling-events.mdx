@@ -141,7 +141,9 @@ function Poll() {
   const [down, setDown] = useState(0);
   return (
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
-      <h1>👍 {up} · 👎 {down}</h1>
+      <h1>
+        👍 {up} · 👎 {down}
+      </h1>
       <VoteButton label="Upvote" onVote={() => setUp(up + 1)} />{" "}
       <VoteButton label="Downvote" onVote={() => setDown(down + 1)} />
     </main>
@@ -176,8 +178,7 @@ function Stepper() {
   return (
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
       <h1>Count: {count}</h1>
-      <button id="dec">−</button>{" "}
-      <button id="inc">+</button>
+      <button id="dec">−</button> <button id="inc">+</button>
     </main>
   );
 }
@@ -193,8 +194,12 @@ function Stepper() {
   return (
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
       <h1>Count: {count}</h1>
-      <button id="dec" onClick={() => setCount(count - 1)}>−</button>{" "}
-      <button id="inc" onClick={() => setCount(count + 1)}>+</button>
+      <button id="dec" onClick={() => setCount(count - 1)}>
+        −
+      </button>{" "}
+      <button id="inc" onClick={() => setCount(count + 1)}>
+        +
+      </button>
     </main>
   );
 }

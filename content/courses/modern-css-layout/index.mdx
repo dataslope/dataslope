@@ -54,7 +54,7 @@ Each lesson mixes two kinds of hands-on:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -70,7 +70,10 @@ Each lesson mixes two kinds of hands-on:
     },
     {
       filename: "styles.css",
-      starterCode: `body { margin: 0; font-family: system-ui, sans-serif; }
+      starterCode: `body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
 
 .hero {
   display: grid;

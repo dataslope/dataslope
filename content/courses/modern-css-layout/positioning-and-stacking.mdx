@@ -64,7 +64,7 @@ up space in the flow, it floats over the corner:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -80,22 +80,28 @@ up space in the flow, it floats over the corner:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .avatar {
-  position: relative;    /* anchor for .status */
+  position: relative; /* anchor for .status */
   width: 80px;
 }
-.avatar img { border-radius: 999px; display: block; }
+.avatar img {
+  border-radius: 999px;
+  display: block;
+}
 
 .status {
-  position: absolute;    /* placed against .avatar */
+  position: absolute; /* placed against .avatar */
   bottom: 4px;
   right: 4px;
   width: 16px;
   height: 16px;
   border-radius: 999px;
-  background: #22c55e;    /* online */
+  background: #22c55e; /* online */
   border: 2px solid white;
 }
 `,
@@ -179,7 +185,7 @@ number.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -195,7 +201,10 @@ number.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .bell {
   /* 1. positioning context */
@@ -213,7 +222,10 @@ number.
   border-radius: 999px;
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .bell {
   position: relative;

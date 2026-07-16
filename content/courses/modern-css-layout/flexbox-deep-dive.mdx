@@ -73,7 +73,7 @@ build intuition for how the main-axis alignment spreads items:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -91,22 +91,28 @@ build intuition for how the main-axis alignment spreads items:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 0; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
 
 .bar {
   display: flex;
-  align-items: center;   /* vertical centering (cross axis) */
+  align-items: center; /* vertical centering (cross axis) */
   gap: 1rem;
   padding: 0.75rem 1.25rem;
   background: #0f172a;
 }
 
-.bar a { color: #cbd5e1; text-decoration: none; }
+.bar a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
 
 .brand {
   color: white;
   font-weight: 700;
-  margin-right: auto;   /* eats free space → pushes links right */
+  margin-right: auto; /* eats free space → pushes links right */
 }
 `,
     },
@@ -140,7 +146,7 @@ The two you'll write most:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -156,19 +162,25 @@ The two you'll write most:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
-.row { display: flex; gap: 12px; }
+.row {
+  display: flex;
+  gap: 12px;
+}
 
 .sidebar {
-  flex: none;          /* stays 120px */
+  flex: none; /* stays 120px */
   width: 120px;
   background: #e0e7ff;
   padding: 1rem;
 }
 
 .main {
-  flex: 1;             /* takes all remaining width */
+  flex: 1; /* takes all remaining width */
   background: #dcfce7;
   padding: 1rem;
 }
@@ -226,7 +238,7 @@ container is too narrow. Resize your window and watch the rows reflow:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -243,7 +255,10 @@ container is too narrow. Resize your window and watch the rows reflow:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .toolbar {
   /* 1. flex row, centered, 12px gap */
@@ -257,7 +272,10 @@ container is too narrow. Resize your window and watch the rows reflow:
   padding: 6px 8px;
 }
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .toolbar {
   display: flex;

@@ -31,7 +31,7 @@ Each control's current text is on its `.value`. Grab the input, read
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -50,12 +50,28 @@ Each control's current text is on its `.value`. Grab the input, read
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
-form { display: grid; gap: 0.5rem; max-width: 18rem; }
-input, button { padding: 0.5rem; font-size: 1rem; }
-#msg { font-weight: 600; }
-.error { color: #dc2626; }
-.ok { color: #16a34a; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 18rem;
+}
+input, button {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+#msg {
+  font-weight: 600;
+}
+.error {
+  color: #dc2626;
+}
+.ok {
+  color: #16a34a;
+}
 `,
     },
     {
@@ -105,7 +121,7 @@ and friendlier messages.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <body>
     <form id="gate">
