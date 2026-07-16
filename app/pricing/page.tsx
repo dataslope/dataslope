@@ -8,6 +8,7 @@ import Link from "../_components/Link";
 import { HomeNav } from "../_components/home/HomeNav";
 import { PricingSection } from "../_components/home/PricingSection";
 import { HomeFooter } from "../_components/home/HomeFooter";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
 const PAGE_TITLE = "Pricing, Dataslope";
@@ -83,9 +84,12 @@ export default function PricingPage() {
           {/* ── Page heading ── */}
           <section className="px-4 pb-4 pt-12 sm:px-6 sm:pt-16">
             <div className="mx-auto max-w-2xl text-center">
-              <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+              <SparklesText
+                as="h1"
+                className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
+              >
                 Pricing
-              </h1>
+              </SparklesText>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
                 Every course, interview track, and playground is free to use,
                 sign-in optional, and anyone can share a playground with a

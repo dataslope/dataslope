@@ -72,7 +72,8 @@ interface SparklesTextProps {
 export function SparklesText({
   as = "span",
   children,
-  colors = { first: "#9E7AFF", second: "#FE8BBB" },
+  // Default to the Dataslope brand palette (yellow + blue).
+  colors = { first: "#FFDD6C", second: "#148CFF" },
   className,
   sparklesCount = 10,
 }: SparklesTextProps) {
@@ -126,7 +127,10 @@ export function SparklesText({
         {sparkles.map((sparkle) => (
           <SparkleGlyph key={sparkle.id} {...sparkle} />
         ))}
-        <strong className="font-[inherit]">{children}</strong>
+        {/* `<strong>` defaults to `font-weight: bolder`, which would render the
+            title heavier than the heading's own weight, force it to inherit so
+            e.g. a `font-semibold` heading stays 600. */}
+        <strong className="[font-weight:inherit]">{children}</strong>
       </span>
     </Tag>
   );

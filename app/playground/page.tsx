@@ -92,10 +92,9 @@ export default function PlaygroundPage() {
           {/* Centered heading, matching the /courses + /interview-prep title
               block. */}
           <div className="mx-auto max-w-2xl text-center">
-            {/* Magic UI sparkles on the title, in brand yellow + blue. */}
+            {/* Magic UI sparkles on the title, in the brand palette. */}
             <SparklesText
               as="h1"
-              colors={{ first: "#FFDD6C", second: "#148CFF" }}
               sparklesCount={8}
               className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
             >
