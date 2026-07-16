@@ -46,6 +46,23 @@ export default function TermsPage() {
         and revoke share links at any time.
       </p>
 
+      <h2>Saved work and learning progress</h2>
+      <p>
+        Cloud saves, share links, and learning-progress tracking are provided
+        on a best-effort, <strong>&ldquo;as available&rdquo;</strong>{" "}basis, and
+        we can&apos;t guarantee that any saved work or progress will always be
+        retained or remain accessible. In particular, a saved workspace or your
+        progress may be removed or become unusable for reasons including
+        inactivity cleanup, reaching a storage limit, scheduled maintenance, and
+        updates to the language runtimes, databases, or platform that make a
+        previously saved workspace incompatible, which can result in its{" "}
+        <strong>automatic deletion</strong>. To the fullest extent permitted by
+        law, we are not liable for any loss of, or inability to access, your
+        saved workspaces, files, databases, or learning progress. Please keep
+        your own copies of anything important, you can download or export your
+        work from the playground at any time.
+      </p>
+
       <h2>Ask AI</h2>
       <p>
         The optional &ldquo;Ask AI&rdquo; assistant sends your question and
@@ -99,7 +116,7 @@ export default function TermsPage() {
       <h2>Disclaimer of warranties</h2>
       <p>
         The Service is provided <strong>&ldquo;as is&rdquo;</strong> and
-        <strong> &ldquo;as available,&rdquo;</strong> without warranties of any
+        <strong> &ldquo;as available,&rdquo;</strong>{" "}without warranties of any
         kind. We don&apos;t guarantee that it will be uninterrupted,
         error-free, or that any code output is correct or fit for a particular
         purpose.

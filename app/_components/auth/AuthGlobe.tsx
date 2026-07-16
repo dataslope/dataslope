@@ -88,10 +88,10 @@ const DARK_CONFIG: COBEOptions = {
   dark: 1,
   diffuse: 1.1,
   // Near-black oceans that melt into #121212 (baseColor × 0.1 ≈ #0D0F12), with
-  // continent dots kept only *subtly* brighter than that background: a low
+  // continent dots kept only *very* subtly brighter than that background: a low
   // mapBrightness is the knob for how much the dots stand out. Raise it for
   // more prominent continents, lower it for an even fainter globe.
-  mapBrightness: 1.8,
+  mapBrightness: 0.6,
   baseColor: [0.4, 0.5, 0.72],
   glowColor: [0.07, 0.18, 0.45],
 };
@@ -106,8 +106,9 @@ const LIGHT_CONFIG: COBEOptions = {
   // into grey specks. (cobe renders `dark: 0` continents *darker* than the
   // ocean, so true white-on-white dots aren't possible; this keeps the whole
   // sphere a soft, near-white backdrop.) baseColor / mapBrightness are the
-  // knobs to fine-tune on a real GPU.
-  mapBrightness: 2,
+  // knobs to fine-tune on a real GPU; keep mapBrightness low for very subtle
+  // continents.
+  mapBrightness: 1.1,
   baseColor: [1, 1, 1],
   glowColor: [1, 1, 1],
 };

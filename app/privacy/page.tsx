@@ -4,7 +4,7 @@ import { LegalShell } from "../_components/legal/LegalShell";
 export const metadata = {
   title: "Privacy Policy, Dataslope",
   description:
-    "How Dataslope handles your data: optional accounts, no ad tracking, and code that runs entirely in your browser.",
+    "How Dataslope handles your data: optional accounts, code that runs entirely in your browser, and clear choices about your data.",
 };
 
 export default function PrivacyPage() {
@@ -13,9 +13,9 @@ export default function PrivacyPage() {
       <p>
         Dataslope is a free, browser-based platform for learning programming and
         data skills. We built it to need as little of your data as possible. You
-        can use almost everything without an account, the code you write runs
-        entirely on your own device, and we don&apos;t run advertising or
-        cross-site tracking. This policy explains what we do collect, and when.
+        can use almost everything without an account, and the code you write runs
+        entirely on your own device. This policy explains what we collect, when,
+        and the choices you have.
       </p>
 
       <h2>Using Dataslope without an account</h2>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
       <h2>Data stored on your device</h2>
       <p>
         To make the product usable, your browser&apos;s <strong>local
-        storage</strong> keeps things like your theme preference and the code,
+        storage</strong>{" "}keeps things like your theme preference and the code,
         queries, and progress in your playgrounds and lessons. This stays on
         your device and in your browser, and clearing your browser&apos;s site
         data removes it. Local saves are separate from cloud saves, they are not
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>
-          <strong>Content delivery networks</strong> (for example jsDelivr,
+          <strong>Content delivery networks</strong>{" "}(for example jsDelivr,
           unpkg, and GitHub) serve language runtimes and sample datasets on
           demand; your browser&apos;s requests expose standard information such
           as your IP address to them.
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
           emails described above.
         </li>
         <li>
-          <strong>An AI provider</strong> generates &ldquo;Ask AI&rdquo;
+          <strong>An AI provider</strong>{" "}generates &ldquo;Ask AI&rdquo;
           responses from the context described above.
         </li>
         <li>
@@ -114,12 +114,10 @@ export default function PrivacyPage() {
         </li>
       </ul>
 
-      <h2>Cookies and tracking</h2>
+      <h2>Cookies</h2>
       <p>
         We use essential cookies to keep you signed in and to remember a few
-        preferences. We do <strong>not</strong> use advertising or cross-site
-        tracking cookies, we don&apos;t run third-party analytics or product
-        telemetry, and we don&apos;t sell or share your personal data.
+        preferences, such as your light or dark theme.
       </p>
 
       <h2>Your choices</h2>

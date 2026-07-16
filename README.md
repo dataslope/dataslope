@@ -289,3 +289,19 @@ The second case is the default whenever email verification is off (no `RESEND_AP
 
 If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
 
+
+## License
+
+Dataslope is available under more than one license:
+
+- **Source code** — [MIT License](./LICENSE). Attribution via the copyright
+  notice, and no warranty/liability.
+- **Learning content** (everything under [`content/`](./content)) — [Creative
+  Commons Attribution 4.0 International (CC BY 4.0)](./LICENSE-CONTENT).
+  Attribution required, no warranty/liability.
+
+Third-party software and language runtimes retain their own licenses; see
+[`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md). In particular, the Java
+runtime **CheerpJ** (Leaning Technologies) is under its own, non-MIT terms and
+may require a separate commercial license for some uses — review it before
+relying on the Java playground commercially.

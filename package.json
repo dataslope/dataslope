@@ -2,6 +2,7 @@
   "name": "dataslope",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && node scripts/build-search-index.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next dev",
     "build": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && node scripts/build-search-index.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next build",

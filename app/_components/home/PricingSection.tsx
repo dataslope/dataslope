@@ -396,6 +396,11 @@ function PlanColumn({
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
         </span>
+        {/* Billing-period suffix so the monthly/annual toggle visibly changes
+            the table even though every plan is $0. */}
+        <span className="ml-1 text-base font-normal text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          {annual ? "/ year" : "/ month"}
+        </span>
         <p className="mt-1 text-[15px] text-[var(--ds-gray-900)] dark:text-white">
           {note}
         </p>
@@ -507,7 +512,7 @@ export function PricingSection({
                         : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] dark:bg-[var(--ds-green-500)]/15 dark:text-[var(--ds-green-300)]"
                     }`}
                   >
-                    Save 33%
+                    Best value
                   </span>
                 )}
               </button>
