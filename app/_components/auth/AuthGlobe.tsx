@@ -1,19 +1,21 @@
 "use client";
 
 // Decorative background for the auth shell: the Magic UI / cobe globe parked
-// low behind the card, with brand-coloured term labels pinned to points on the
+// low behind the card, with Dataslope emoji "stickers" pinned to points on the
 // sphere that orbit with the rotation (à la https://cobe.vercel.app).
 //
 // This embeds cobe directly (rather than the generic components/ui/globe.tsx)
-// because the labels have to be projected from the *live* rotation each frame:
-// the render callback advances `phi`, then positions each label's DOM node from
-// its lat/long, hiding the ones that rotate to the back. Positions are written
-// straight to the label refs (no React re-render) so it stays cheap.
+// because the stickers have to be projected from the *live* rotation each
+// frame: the render callback advances `phi`, then positions each sticker's DOM
+// node from its lat/long, hiding the ones that rotate to the back. Positions
+// are written straight to the refs (no React re-render) so it stays cheap.
 //
 // Shown in both themes with a theme-appropriate config (light: pale sphere;
-// dark: near-black sphere that melts into #121212). `useIsDark` tracks the
-// live `.dark` class the shared toggle flips; cobe bakes colours in at
-// creation, so a theme change tears down and rebuilds the globe.
+// dark: near-black sphere that melts into #121212). The dotted continents are
+// kept faint via a low canvas opacity so the globe reads as a soft backdrop;
+// the emoji stickers stay fully opaque on top. `useIsDark` tracks the live
+// `.dark` class the shared toggle flips; cobe bakes colours in at creation, so
+// a theme change tears down and rebuilds the globe.
 //
 // Non-interactive (pointer-events off, aria-hidden): a pure backdrop.
 
@@ -22,31 +24,23 @@ import createGlobe, { type COBEOptions } from "cobe";
 
 const DEG = Math.PI / 180;
 
-interface GlobeLabel {
+interface GlobePin {
   location: [number, number]; // [lat, long]
-  text: string;
-  bg: string;
-  fg: string;
+  emoji: string;
 }
 
-// Data / programming terms, spread around the globe so several sit on the
-// front face at any moment. Brand palette: blue/green/red use white text,
-// yellow uses near-black.
-const BLUE = "#148CFF";
-const GREEN = "#20C621";
-const RED = "#FF4F59";
-const YELLOW = "#FFDD6C";
-const INK = "#121212";
-
-const LABELS: GlobeLabel[] = [
-  { location: [37.7749, -122.4194], text: "pandas", bg: BLUE, fg: "#fff" },
-  { location: [51.5074, -0.1278], text: "GROUP BY", bg: GREEN, fg: "#fff" },
-  { location: [35.6762, 139.6503], text: "recursion", bg: RED, fg: "#fff" },
-  { location: [1.3521, 103.8198], text: "async / await", bg: YELLOW, fg: INK },
-  { location: [-23.5505, -46.6333], text: "gradient descent", bg: BLUE, fg: "#fff" },
-  { location: [40.7128, -74.006], text: "vectorize", bg: GREEN, fg: "#fff" },
-  { location: [52.52, 13.405], text: "O(n log n)", bg: RED, fg: "#fff" },
-  { location: [-33.8688, 151.2093], text: "JOIN", bg: YELLOW, fg: INK },
+// Dataslope-flavoured stickers, languages, data, challenges, and a little fun,
+// spread around the globe so several sit on the front face at any moment.
+const PINS: GlobePin[] = [
+  { location: [37.7749, -122.4194], emoji: "🐍" }, // Python
+  { location: [51.5074, -0.1278], emoji: "📊" }, // data / analytics
+  { location: [35.6762, 139.6503], emoji: "🏆" }, // challenges
+  { location: [1.3521, 103.8198], emoji: "🚀" }, // ship it
+  { location: [-23.5505, -46.6333], emoji: "🧠" }, // learning
+  { location: [40.7128, -74.006], emoji: "🐘" }, // Postgres
+  { location: [52.52, 13.405], emoji: "🦆" }, // DuckDB
+  { location: [-33.8688, 151.2093], emoji: "⚡" }, // WebAssembly speed
+  { location: [28.6139, 77.209], emoji: "🔥" }, // streak
 ];
 
 const SHARED: Omit<
@@ -61,30 +55,32 @@ const SHARED: Omit<
   theta: 0.24,
   mapSamples: 16000,
   markerColor: [0.078, 0.549, 1],
-  // A small anchor dot under each label.
-  markers: LABELS.map((l) => ({ location: l.location, size: 0.045 })),
+  // No cobe markers, the emoji stickers are the points of interest.
+  markers: [],
 };
 
 const DARK_CONFIG: COBEOptions = {
   ...SHARED,
   dark: 1,
-  diffuse: 1.15,
-  mapBrightness: 7.5,
-  // Light blue-grey continents on near-black oceans that melt into #121212;
-  // a soft (not harsh) blue atmosphere.
-  baseColor: [0.44, 0.55, 0.78],
-  glowColor: [0.08, 0.2, 0.5],
+  diffuse: 1.1,
+  // Faint continents on near-black oceans that melt into #121212.
+  mapBrightness: 5,
+  baseColor: [0.4, 0.5, 0.72],
+  glowColor: [0.07, 0.18, 0.45],
 };
 
 const LIGHT_CONFIG: COBEOptions = {
   ...SHARED,
   dark: 0,
   diffuse: 1.2,
-  mapBrightness: 5.5,
-  // Pale sphere with soft grey-blue continents for the light page.
-  baseColor: [0.88, 0.91, 0.97],
-  glowColor: [0.9, 0.94, 1],
+  mapBrightness: 4.5,
+  baseColor: [0.9, 0.92, 0.97],
+  glowColor: [0.92, 0.95, 1],
 };
+
+// Target opacity of the dotted sphere, low so the continents stay subtle (the
+// stickers ride on top at full opacity).
+const CANVAS_OPACITY = { dark: 0.6, light: 0.42 };
 
 function useIsDark(): boolean {
   const [dark, setDark] = useState(false);
@@ -103,7 +99,7 @@ export function AuthGlobe() {
   const dark = useIsDark();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const labelRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const pinRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const phiRef = useRef(0);
 
   useEffect(() => {
@@ -122,6 +118,7 @@ export function AuthGlobe() {
     const theta = config.theta ?? 0.24;
     const cosT = Math.cos(theta);
     const sinT = Math.sin(theta);
+    const targetOpacity = dark ? CANVAS_OPACITY.dark : CANVAS_OPACITY.light;
 
     const globe = createGlobe(canvas, {
       ...config,
@@ -133,38 +130,41 @@ export function AuthGlobe() {
         state.width = width * 2;
         state.height = width * 2;
 
-        // Project each label onto the sphere from the live rotation.
+        // Project each sticker onto the sphere from the live rotation.
         const r = width * 0.455; // sphere radius in CSS px (tuned to the fill)
         const c = width / 2;
-        for (let i = 0; i < LABELS.length; i++) {
-          const el = labelRefs.current[i];
+        for (let i = 0; i < PINS.length; i++) {
+          const el = pinRefs.current[i];
           if (!el) continue;
-          const latR = LABELS[i].location[0] * DEG;
-          const lonR = LABELS[i].location[1] * DEG;
+          const latR = PINS[i].location[0] * DEG;
+          const lonR = PINS[i].location[1] * DEG;
           const x = Math.cos(latR) * Math.sin(lonR + phiRef.current);
           const y0 = Math.sin(latR);
           const z0 = Math.cos(latR) * Math.cos(lonR + phiRef.current);
-          // Tilt by theta so the labels follow cobe's northward lean.
+          // Tilt by theta so the stickers follow cobe's northward lean.
           const y = y0 * cosT - z0 * sinT;
           const z = y0 * sinT + z0 * cosT;
           if (z <= 0.02) {
             el.style.opacity = "0";
             continue;
           }
-          // Fade in as a point clears the limb; dim slightly by depth.
+          // Fade in as a point clears the limb; grow slightly toward the front.
           const edge = Math.min(1, (z - 0.02) / 0.22);
-          el.style.opacity = String(0.35 + 0.65 * edge);
+          const scale = 0.82 + 0.18 * z;
+          el.style.opacity = String(0.25 + 0.75 * edge);
           el.style.transform = `translate(-50%,-50%) translate(${(
             c +
             x * r
-          ).toFixed(1)}px, ${(c - y * r).toFixed(1)}px)`;
+          ).toFixed(1)}px, ${(c - y * r).toFixed(1)}px) scale(${scale.toFixed(
+            3,
+          )})`;
           el.style.zIndex = z > 0.5 ? "2" : "1";
         }
       },
     });
 
     const raf = requestAnimationFrame(() => {
-      if (canvasRef.current) canvasRef.current.style.opacity = "1";
+      if (canvasRef.current) canvasRef.current.style.opacity = String(targetOpacity);
     });
     return () => {
       cancelAnimationFrame(raf);
@@ -192,16 +192,15 @@ export function AuthGlobe() {
               "radial-gradient(circle at 50% 50%, #000 58%, transparent 74%)",
           }}
         />
-        {LABELS.map((label, i) => (
+        {PINS.map((pin, i) => (
           <span
-            key={label.text}
+            key={pin.emoji}
             ref={(el) => {
-              labelRefs.current[i] = el;
+              pinRefs.current[i] = el;
             }}
-            className="absolute left-0 top-0 whitespace-nowrap rounded-md px-2.5 py-1 text-[13px] font-semibold opacity-0 shadow-[0_4px_14px_rgba(0,0,0,0.28)] will-change-transform"
-            style={{ background: label.bg, color: label.fg }}
+            className="absolute left-0 top-0 flex size-9 items-center justify-center rounded-full bg-white text-[19px] leading-none opacity-0 shadow-[0_4px_12px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.06] will-change-transform"
           >
-            {label.text}
+            {pin.emoji}
           </span>
         ))}
       </div>

@@ -75,7 +75,8 @@ export function SparklesText({
   // Default to the Dataslope brand palette (yellow + blue).
   colors = { first: "#FFDD6C", second: "#148CFF" },
   className,
-  sparklesCount = 10,
+  // Kept low so the effect stays subtle on headings.
+  sparklesCount = 4,
 }: SparklesTextProps) {
   const Tag = tagElements[as];
   const reducedMotion = useReducedMotion();

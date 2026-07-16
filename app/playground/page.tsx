@@ -95,7 +95,6 @@ export default function PlaygroundPage() {
             {/* Magic UI sparkles on the title, in the brand palette. */}
             <SparklesText
               as="h1"
-              sparklesCount={8}
               className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
             >
               Playground
