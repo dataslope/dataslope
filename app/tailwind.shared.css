@@ -216,7 +216,6 @@
   --animate-ripple: ripple var(--duration, 2s) ease infinite;
   --animate-blink-cursor: blink-cursor 1s step-end infinite;
   --animate-shiny-text: shiny-text 8s infinite;
-  --animate-line-shadow: line-shadow 15s linear infinite;
 }
 
 /* Keyframes for the Magic UI animations declared above. Each Magic UI
@@ -287,14 +286,6 @@
     background-position: calc(100% + var(--shiny-width)) 0;
   }
 }
-@keyframes line-shadow {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 100% -100%;
-  }
-}
 
 /* The Magic UI animations above are all infinite and purely decorative,
  * disable them outright for users who prefer reduced motion. (The JS-driven
@@ -306,8 +297,7 @@
   .animate-spin-around,
   .animate-ripple,
   .animate-blink-cursor,
-  .animate-shiny-text,
-  .animate-line-shadow {
+  .animate-shiny-text {
     animation: none !important;
   }
 }

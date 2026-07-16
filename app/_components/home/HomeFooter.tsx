@@ -33,8 +33,10 @@ const RESOURCE_LINKS = [
   },
 ];
 
+// `inline-block w-fit` so each link shrinks to its text: as a stretched flex
+// item (`block`) the trailing whitespace across the column was clickable too.
 const linkClass =
-  "block py-1.5 text-sm text-[#121212] transition-[color,translate] hover:translate-x-0.5 hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
+  "inline-block w-fit py-1.5 text-sm text-[#121212] transition-[color,translate] hover:translate-x-0.5 hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
 function FooterLink({
   href,
