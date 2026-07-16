@@ -137,9 +137,22 @@ export function Highlighter({
     multiline,
   ]);
 
+  // The annotated element is the INNER span; rough-notation inserts its
+  // absolutely-positioned <svg> overlay as a sibling of the annotated element
+  // (with top:0/left:0), so the sibling lands inside the OUTER span, whose
+  // `relative` makes it the svg's containing block. That anchors the drawing
+  // to the text itself. Annotating the outer span instead (as this component
+  // originally did) puts the svg outside it, anchored to whatever ancestor
+  // happens to be a containing block — and that ancestor can change out from
+  // under the finished drawing: while a BlurFade entrance animates, the
+  // motion wrapper's inline transform/filter make it the containing block,
+  // and when motion clears them on settle the svg re-anchors to the document
+  // origin, snapping the drawing hundreds of pixels away from the text (seen
+  // on mobile as the hero tagline's underline jumping up into the marquee).
+  // The geometry watcher above can't catch that: the text never moves.
   return (
-    <span ref={elementRef} className="relative inline-block bg-transparent">
-      {children}
+    <span className="relative inline-block bg-transparent">
+      <span ref={elementRef}>{children}</span>
     </span>
   );
 }
