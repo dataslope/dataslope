@@ -17,12 +17,13 @@ Full-featured code editors that run language runtimes entirely in the browser vi
 | JavaScript | Native browser engine |
 | TypeScript | In-browser transpilation |
 | PHP | php-wasm (WASM) |
-| C | Clang → WASM (Wasmer) |
-| C++ | Clang → WASM (Wasmer) |
+| C | browsercc (Clang → WASM) |
+| C++ | browsercc (Clang → WASM) |
 | Java | CheerpJ / OpenJDK (WASM) |
 | C# | Roslyn on .NET WebAssembly (Mono) |
-| SQLite | sql.js (WASM) |
-| PostgreSQL | Remote connection shell |
+| SQLite | SQLite (official WASM build) |
+| PostgreSQL | PGlite (WASM) |
+| DuckDB | DuckDB-Wasm (WASM) |
 
 ### 📚 Free learning materials
 
@@ -151,9 +152,9 @@ Key files:
 
    `BETTER_AUTH_URL` is set as a non-secret `var` in `wrangler.jsonc` (defaults to `https://dataslope.com`); change it if the deployed origin differs. A provider whose `*_CLIENT_ID`/`*_CLIENT_SECRET` pair is missing is simply not offered, so you can ship with just one provider configured.
 
-   You only ever register the **production** callback URL above — no per-preview URLs. `lib/auth/server.ts` handles the two hosts that aren't the pinned apex:
+   You only ever register the **production** callback URL above; there are no per-preview URLs. `lib/auth/server.ts` handles the two hosts that aren't the pinned apex:
    - **`www.dataslope.com`** (production also serves `www` with no redirect) is trusted for the CSRF origin check alongside the apex and any subdomain, so email/password sign-up/sign-in works there (previously it failed with "Invalid origin").
-   - **`*.workers.dev` preview deployments** trust their own origin for email/password, and Google/GitHub sign-in completes via Better Auth's `oAuthProxy` plugin: the provider still returns to the registered production callback, then the authenticated session is relayed back to the preview. The relay encrypts its payload with a secret shared across deployments — `BETTER_AUTH_SECRET` by default, or set a dedicated `OAUTH_PROXY_SECRET` (`npx wrangler secret put OAUTH_PROXY_SECRET`, identical value everywhere) to narrow the blast radius. The proxy is a no-op on production and `www`.
+   - **`*.workers.dev` preview deployments** trust their own origin for email/password, and Google/GitHub sign-in completes via Better Auth's `oAuthProxy` plugin: the provider still returns to the registered production callback, then the authenticated session is relayed back to the preview. The relay encrypts its payload with a secret shared across deployments: `BETTER_AUTH_SECRET` by default, or set a dedicated `OAUTH_PROXY_SECRET` (`npx wrangler secret put OAUTH_PROXY_SECRET`, identical value everywhere) to narrow the blast radius. The proxy is a no-op on production and `www`.
 
 ### Local development
 
@@ -294,16 +295,16 @@ If you enable additional Better Auth features (e.g. 2FA, organizations), regener
 
 Dataslope is available under more than one license:
 
-- **Source code** — [MIT License](./LICENSE). Attribution via the copyright
+- **Source code**: [MIT License](./LICENSE). Attribution via the copyright
   notice, and no warranty/liability.
-- **Learning content** (everything under [`content/`](./content)) — [Creative
+- **Learning content** (everything under [`content/`](./content)): [Creative
   Commons Attribution 4.0 International (CC BY 4.0)](./LICENSE-CONTENT).
   Attribution required, no warranty/liability.
 
 Third-party software and language runtimes retain their own licenses; see
 [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md). In particular, the Java
 runtime **CheerpJ** (Leaning Technologies) is proprietary, used here under its
-free **Community Edition** — which allows commercial use for individuals and
+free **Community Edition**, which allows commercial use for individuals and
 one-person companies, and is loaded from Leaning Technologies' CDN (self-hosting
 and redistribution aren't permitted). Re-check its terms if you grow beyond a
 solo operation.

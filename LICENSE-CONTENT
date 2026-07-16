@@ -1,29 +1,29 @@
 Dataslope Learning Content License
 ==================================
 
-The learning content in this repository — the courses, lessons, exercises,
+The learning content in this repository, i.e. the courses, lessons, exercises,
 quizzes, and other written or illustrative teaching materials in the `content/`
-directory (the "Content") — is licensed under the
+directory (the "Content"), is licensed under the
 
     Creative Commons Attribution 4.0 International License (CC BY 4.0).
 
 (This is separate from Dataslope's source code, which is licensed under the MIT
-License; see LICENSE. It also does not cover third-party material — see
+License; see LICENSE. It also does not cover third-party material; see
 THIRD-PARTY-NOTICES.md.)
 
 You are free to:
 
-  - Share — copy and redistribute the Content in any medium or format.
-  - Adapt — remix, transform, and build upon the Content for any purpose, even
+  - Share: copy and redistribute the Content in any medium or format.
+  - Adapt: remix, transform, and build upon the Content for any purpose, even
     commercially.
 
 Under the following terms:
 
-  - Attribution — You must give appropriate credit to Dataslope
+  - Attribution: You must give appropriate credit to Dataslope
     (https://dataslope.com), provide a link to this license, and indicate if
     changes were made. You may do so in any reasonable manner, but not in any
     way that suggests Dataslope endorses you or your use.
-  - No additional restrictions — You may not apply legal terms or technological
+  - No additional restrictions: You may not apply legal terms or technological
     measures that legally restrict others from doing anything the license
     permits.
 
