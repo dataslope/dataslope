@@ -294,83 +294,13 @@ function TrackCard({ track }: { track: InterviewTrack }) {
   );
 }
 
-/** One cell of the "how the questions run" band: an outline glyph and a line
- *  of copy with its lead word emphasised. */
-function Format({ glyph, children }: { glyph: ReactNode; children: ReactNode }) {
-  return (
-    <div className="flex items-center gap-3 py-4">
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className="shrink-0 text-[var(--ds-gray-900)] dark:text-white"
-      >
-        {glyph}
-      </svg>
-      <span className="text-[14px] text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
-        {children}
-      </span>
-    </div>
-  );
-}
-
-const Strong = ({ children }: { children: ReactNode }) => (
-  <strong className="font-semibold text-[var(--ds-gray-900)] dark:text-white">
-    {children}
-  </strong>
-);
-
 export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
   const topicCount = tracks.reduce((n, t) => n + t.topics.length, 0);
 
   return (
     <>
-      {/* ── Formats band: how the three question types actually run ── */}
-      <div className={`mt-12 grid gap-x-8 sm:mt-14 sm:grid-cols-3 ${styles.formats}`}>
-        <Format
-          glyph={
-            <>
-              <ellipse cx="12" cy="5" rx="9" ry="3" />
-              <path d="M3 5V19A9 3 0 0 0 21 19V5" />
-              <path d="M3 12A9 3 0 0 0 21 12" />
-            </>
-          }
-        >
-          <Strong>SQL</Strong> executes on a real in-browser database
-        </Format>
-        <Format
-          glyph={
-            <>
-              <polyline points="4 17 10 11 4 5" />
-              <line x1="12" x2="20" y1="19" y2="19" />
-            </>
-          }
-        >
-          <Strong>Code</Strong> is graded by a live test suite
-        </Format>
-        <Format
-          glyph={
-            <>
-              <path d="m3 17 2 2 4-4" />
-              <path d="m3 7 2 2 4-4" />
-              <path d="M13 6h8" />
-              <path d="M13 12h8" />
-              <path d="M13 18h8" />
-            </>
-          }
-        >
-          <Strong>Concepts</Strong> explain every option, right or wrong
-        </Format>
-      </div>
-
       {/* ── Track cards ── */}
-      <div className="mt-8 grid grid-cols-1 items-stretch gap-8 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3">
+      <div className="mt-12 grid grid-cols-1 items-stretch gap-8 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
         {tracks.map((track) => (
           <TrackCard key={track.slug} track={track} />
         ))}

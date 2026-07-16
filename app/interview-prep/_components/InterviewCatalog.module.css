@@ -14,16 +14,6 @@
  * text colour stay in Tailwind on the component.
  */
 
-/* ── Formats band: a strong hairline on top, a faint one on the bottom. ── */
-.formats {
-  border-top: 1px solid var(--ds-gray-900);
-  border-bottom: 1px solid var(--ds-gray-100);
-}
-:global(.dark) .formats {
-  border-top-color: rgba(255, 255, 255, 0.25);
-  border-bottom-color: rgba(255, 255, 255, 0.07);
-}
-
 /* ── Card wrapper carries the risograph offset shadow on ::after. ── */
 .cardWrap {
   position: relative;
@@ -72,9 +62,12 @@
 .card:hover {
   border-color: var(--ds-blue-500);
 }
+/* Card surface matches the page background (app/interview-prep uses
+ * bg-white / dark #121212), so the card reads via its border + riso shadow
+ * rather than a raised fill. */
 :global(.dark) .card {
   border-color: rgba(255, 255, 255, 0.1);
-  background: #1e1e1e;
+  background: #121212;
 }
 :global(.dark) .card:hover {
   border-color: var(--ds-blue-500);
@@ -95,5 +88,5 @@
 }
 :global(.dark) .badge {
   background: rgba(20, 140, 255, 0.15);
-  box-shadow: 0 0 0 3px #1e1e1e;
+  box-shadow: 0 0 0 3px #121212;
 }

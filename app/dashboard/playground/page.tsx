@@ -20,7 +20,9 @@ const PLAYGROUND_DESCRIPTION =
 export const metadata: Metadata = {
   title: "Playground",
   description: PLAYGROUND_DESCRIPTION,
-  alternates: { canonical: "/dashboard/playground" },
+  // The public `/playground` landing page is the canonical, indexable surface;
+  // this personalized dashboard view points at it to consolidate signals.
+  alternates: { canonical: "/playground" },
 };
 
 /** Monochrome language glyph for the "Start something new" grid. Renders in

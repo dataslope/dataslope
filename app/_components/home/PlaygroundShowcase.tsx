@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui-components/react/select";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -108,9 +109,12 @@ export function PlaygroundShowcase() {
   return (
     <div className="px-4 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+        <SparklesText
+          as="h2"
+          className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
+        >
           Try the playground
-        </h2>
+        </SparklesText>
         <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
           {subtitle}
         </p>

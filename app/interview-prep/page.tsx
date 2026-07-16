@@ -16,6 +16,7 @@ import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import { JsonLd } from "../_components/JsonLd";
 import { getInterviewTracks } from "@/lib/interviewCatalog";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
@@ -86,9 +87,12 @@ export default async function InterviewPrepPage() {
         <main className="mx-auto w-full max-w-[1120px] px-4 pt-12 sm:px-6 sm:pt-16">
           {/* Centered heading, matching the /courses + /pricing title block. */}
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+            <SparklesText
+              as="h1"
+              className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
+            >
               Interview Prep
-            </h1>
+            </SparklesText>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Six role tracks where every question executes. Free, in your
               browser, no sign-up. Stop recognizing answers and start producing

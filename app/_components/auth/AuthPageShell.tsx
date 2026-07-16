@@ -4,9 +4,15 @@
 // lockup above a single card. Pulls in the shared Tailwind root (scoped by
 // Next.js to the routes that import this component); the pre-paint theme
 // bootstrap keeps the same contract as the rest of the site.
+//
+// Dark mode paints the page and the card the same near-black (#121212) and
+// floats a decorative globe (AuthGlobe) at the bottom, behind the card. The
+// shared light/dark toggle sits top-right, mirroring the site header.
 import "@/app/tailwind.css";
 import type { ReactNode } from "react";
 import Link from "../Link";
+import { ThemePillToggle } from "../ThemePillToggle";
+import { AuthGlobe } from "./AuthGlobe";
 
 // Applies the persisted light/dark choice before first paint (same contract
 // as the home and pricing pages) so a returning dark-mode visitor sees no
@@ -17,8 +23,19 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-        <div className="flex w-full max-w-md flex-col gap-6">
+      {/* `dark:[--ui-card:#121212]` repaints every `bg-card` descendant (the
+          card body + the "or continue with" separator) so they match the page,
+          keeping the dark surface seamless. */}
+      <div className="relative isolate flex min-h-svh flex-col items-center justify-center gap-6 overflow-hidden bg-muted p-6 md:p-10 dark:bg-[#121212] dark:[--ui-card:#121212]">
+        {/* Shared light/dark toggle, same control as the site header. */}
+        <div className="absolute right-4 top-4 z-20">
+          <ThemePillToggle />
+        </div>
+
+        {/* Decorative globe backdrop, bottom-centre, behind the card. */}
+        <AuthGlobe />
+
+        <div className="relative z-10 flex w-full max-w-md flex-col gap-6">
           {/* Brand lockup, same style as the home page's shared header. */}
           <Link
             href="/"

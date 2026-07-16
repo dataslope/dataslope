@@ -1,6 +1,7 @@
 "use client";
 
 import { BlurFade } from "@/components/ui/blur-fade";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { Highlighter } from "@/components/ui/highlighter";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
@@ -26,9 +27,12 @@ function SectionHeading({
 }) {
   return (
     <div className="mx-auto mb-10 max-w-2xl text-center">
-      <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+      <SparklesText
+        as="h2"
+        className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
+      >
         {title}
-      </h2>
+      </SparklesText>
       <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
         {subtitle}
       </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import {
   Briefcase,
   Check,
@@ -451,9 +452,12 @@ export function PricingSection({
     <section id="pricing" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
       {showHeading && (
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+          <SparklesText
+            as="h2"
+            className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
+          >
             Pricing
-          </h2>
+          </SparklesText>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
             Every course, interview track, and playground is free to use, and
             anyone can share a playground with a link. Create a free account
