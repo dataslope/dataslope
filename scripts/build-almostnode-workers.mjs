@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Pre-bundle the almostnode-backed JS/TS playground workers as
- * standalone ES module files served from `/public/_workers/`.
+ * Pre-bundle the playground workers that must run as genuine module
+ * workers (the almostnode-backed JS/TS workers and the Pyodide worker)
+ * as standalone ES module files served from `/public/_workers/`.
  *
  * Why this exists:
  *
@@ -33,6 +34,12 @@
  *
  * which Turbopack treats as a regular URL string (no static analysis,
  * no bundling).
+ *
+ * The Pyodide worker is bundled here for consequence 1 alone: Pyodide
+ * 314's environment detection throws "Classic web workers are not
+ * supported" at import time when `importScripts` works (i.e. in a
+ * classic worker scope), so the worker MUST be spawned with a real
+ * `{ type: "module" }` — which Turbopack-bundled workers can never be.
  *
  * Idempotent. Safe to run from `postinstall`, `prebuild`, and `predev`.
  */
@@ -111,6 +118,16 @@ const targets = [
   {
     entry: join(SRC_DIR, "typescript-worker.ts"),
     out: join(OUT_DIR, "typescript-worker.js"),
+  },
+  {
+    // Pyodide 314 refuses to boot in classic workers, and Turbopack
+    // strips `{ type: "module" }` from workers it bundles itself, so
+    // this worker is pre-bundled and spawned from a static URL (see
+    // the docblock above). Its only imports are a type-only `pyodide`
+    // import (erased) and a bundler-opaque dynamic `import()` of
+    // pyodide.mjs from the CDN, so the bundle is tiny.
+    entry: join(SRC_DIR, "pyodide-worker.ts"),
+    out: join(OUT_DIR, "pyodide-worker.js"),
   },
 ];
 

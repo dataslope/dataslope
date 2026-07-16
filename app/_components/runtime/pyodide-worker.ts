@@ -8,7 +8,9 @@
 //      `import()` carrying webpackIgnore/turbopackIgnore comments, the
 //      same pattern postgres-worker.ts uses for PGlite. (Pyodide 314
 //      dropped the classic-script `pyodide.js` + global `loadPyodide`
-//      entry point that importScripts used to load.)
+//      entry point that importScripts used to load. It also refuses to
+//      boot in a classic worker scope entirely, so python.tsx must
+//      spawn this worker with `{ type: "module" }`.)
 //   2. Heavy Python execution (numpy, pandas, plot rendering, …) doesn't
 //      block the main thread, so the UI stays responsive while user code
 //      is running.

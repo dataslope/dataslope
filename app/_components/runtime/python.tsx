@@ -12,13 +12,13 @@ import type {
 } from "../types";
 import { getRuffFmt } from "./ruffFmt";
 
-// Pyodide is loaded inside a dedicated Web Worker (see
-// `runtime/pyodide-worker.ts`). The worker pulls `pyodide.js` from the
-// CDN via `importScripts`, which keeps the Next.js / Turbopack bundler
-// from ever touching Pyodide's internal `await import(e)` (which would
-// otherwise fail with "Cannot find module as expression is too dynamic")
-// AND keeps Python execution off the main thread so the UI stays
-// responsive while user code runs.
+// Pyodide is loaded inside a dedicated module Web Worker (see
+// `runtime/pyodide-worker.ts`). The worker pulls `pyodide.mjs` from the
+// CDN via a bundler-ignored dynamic `import()`, which keeps the
+// Next.js / Turbopack bundler from ever touching Pyodide's internal
+// `await import(e)` (which would otherwise fail with "Cannot find
+// module as expression is too dynamic") AND keeps Python execution off
+// the main thread so the UI stays responsive while user code runs.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -878,14 +878,17 @@ export const pythonAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting Python runtime…", 0.02);
-    // Standard Web Worker construction pattern that Next.js / Turbopack
-    // recognises: it bundles the worker as a separate chunk. The worker
-    // itself loads Pyodide's `pyodide.mjs` from the CDN via a dynamic
-    // `import()` the bundler is told to ignore (same pattern as the
-    // PGlite worker), so no `{ type: "module" }` is required here.
-    const worker = new Worker(
-      new URL("./pyodide-worker.ts", import.meta.url),
-    );
+    // Pre-bundled by `scripts/build-almostnode-workers.mjs` and served
+    // as a static asset, the same pattern as the JS/TS workers. Pyodide
+    // 314's environment detection throws "Classic web workers are not
+    // supported" when `importScripts` works (i.e. in a classic worker
+    // scope), so this worker MUST run with a real `{ type: "module" }`
+    // — and Turbopack strips the `type` option from workers it bundles
+    // itself (`new Worker(new URL(...), ...)`), which is why the
+    // bundler-analyzed construction can't be used here.
+    const worker = new Worker("/_workers/pyodide-worker.js", {
+      type: "module",
+    });
 
     return new Promise<LanguageRuntime>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
