@@ -3,11 +3,16 @@
    /learn pages and the plain-CSS /playground pages, without depending on either
    surface's tokens. `:global(html.dark)` follows the site's dark-mode class. */
 
-.launcher {
+/* The launcher lives inside a fixed wrapper so the pill/icon button and its
+   minimize handle share one positioning context in the bottom-right corner. */
+.launcherWrap {
   position: fixed;
   right: 20px;
   bottom: 20px;
   z-index: 60;
+}
+
+.launcher {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -26,6 +31,54 @@
 .launcher:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
+}
+
+/* Collapsed: an icon-only circle that stays out of the content's way. */
+.launcherCollapsed {
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+}
+
+/* Minimize / expand handle, a small badge pinned to the launcher's top-right.
+   Always faintly visible (so it's discoverable and works without hover, e.g.
+   touch), and fully opaque on hover/focus of the launcher. */
+.collapseToggle {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #e2e5e9;
+  border-radius: 9999px;
+  background: #fff;
+  color: #4b5563;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  opacity: 0.82;
+  transition: opacity 0.12s ease, transform 0.12s ease, color 0.12s ease;
+}
+.launcherWrap:hover .collapseToggle,
+.launcherWrap:focus-within .collapseToggle {
+  opacity: 1;
+}
+.collapseToggle:hover {
+  color: #111827;
+  transform: scale(1.08);
+}
+:global(html.dark) .collapseToggle {
+  background: #2c2c2c;
+  border-color: #3a3a3a;
+  color: #cbd0d6;
+}
+:global(html.dark) .collapseToggle:hover {
+  color: #fff;
 }
 
 .panel {

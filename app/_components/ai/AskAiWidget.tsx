@@ -38,6 +38,8 @@ import {
   FileCode,
   FileDiff,
   Info,
+  Minus,
+  Maximize2,
 } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
 import type {
@@ -63,6 +65,9 @@ import {
   type AskAiSourceKind,
 } from "./contextRegistry";
 import styles from "./AskAiPanel.module.css";
+
+/** localStorage flag for the icon-only (collapsed) launcher preference. */
+const LAUNCHER_COLLAPSED_KEY = "dataslope:ask-ai-collapsed";
 
 interface Props {
   surface: AskAiSurface;
@@ -160,6 +165,29 @@ export default function AskAiWidget({
     subjectNoun ?? (surface === "learn" ? "lesson" : "playground");
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  // When collapsed, the launcher shrinks to an icon-only circle in the corner
+  // so it stops covering page content. The choice persists across pages/reloads
+  // (this widget is client-only, so reading localStorage in the initializer is
+  // SSR-safe).
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.localStorage.getItem(LAUNCHER_COLLAPSED_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(LAUNCHER_COLLAPSED_KEY, next ? "1" : "0");
+      } catch {
+        /* private mode, preference just won't persist */
+      }
+      return next;
+    });
+  }, []);
   const { data: session, isPending } = useSession();
 
   // ── Context sources ────────────────────────────────────────────────
@@ -359,15 +387,29 @@ export default function AskAiWidget({
 
   if (!open) {
     return (
-      <button
-        type="button"
-        className={styles.launcher}
-        onClick={() => setOpen(true)}
-        aria-label="Ask AI"
-      >
-        <Sparkles size={16} />
-        Ask AI
-      </button>
+      <div className={styles.launcherWrap}>
+        <button
+          type="button"
+          className={`${styles.launcher} ${
+            collapsed ? styles.launcherCollapsed : ""
+          }`}
+          onClick={() => setOpen(true)}
+          aria-label="Ask AI"
+          title={collapsed ? "Ask AI" : undefined}
+        >
+          <Sparkles size={collapsed ? 22 : 16} />
+          {!collapsed && "Ask AI"}
+        </button>
+        <button
+          type="button"
+          className={styles.collapseToggle}
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? "Expand Ask AI button" : "Minimize Ask AI button"}
+          title={collapsed ? "Expand" : "Minimize"}
+        >
+          {collapsed ? <Maximize2 size={12} /> : <Minus size={13} />}
+        </button>
+      </div>
     );
   }
 
