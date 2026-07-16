@@ -3,16 +3,11 @@
    /learn pages and the plain-CSS /playground pages, without depending on either
    surface's tokens. `:global(html.dark)` follows the site's dark-mode class. */
 
-/* The launcher lives inside a fixed wrapper so the pill/icon button and its
-   minimize handle share one positioning context in the bottom-right corner. */
-.launcherWrap {
+.launcher {
   position: fixed;
   right: 20px;
   bottom: 20px;
   z-index: 60;
-}
-
-.launcher {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -33,52 +28,90 @@
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
 }
 
-/* Collapsed: an icon-only circle that stays out of the content's way. */
-.launcherCollapsed {
-  width: 52px;
-  height: 52px;
-  padding: 0;
-  gap: 0;
-  justify-content: center;
+/* "Sidebar tab" placement: a slim vertical rectangle flush with the right
+   viewport edge (the classic "Feedback" tab), chosen from the panel's
+   settings so the launcher stops covering page content. */
+.launcherTab {
+  position: fixed;
+  right: 0;
+  bottom: 96px;
+  z-index: 60;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 7px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  background: var(--ds-blue-600, #1f6feb);
+  color: #fff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  cursor: pointer;
+  box-shadow: -2px 3px 12px rgba(0, 0, 0, 0.18);
+  transition: padding 0.12s ease, box-shadow 0.12s ease;
+}
+.launcherTab:hover {
+  padding-right: 10px;
+  box-shadow: -3px 4px 16px rgba(0, 0, 0, 0.24);
+}
+.launcherTabLabel {
+  writing-mode: vertical-rl;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
 
-/* Minimize / expand handle, a small badge pinned to the launcher's top-right.
-   Always faintly visible (so it's discoverable and works without hover, e.g.
-   touch), and fully opaque on hover/focus of the launcher. */
-.collapseToggle {
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 1px solid #e2e5e9;
-  border-radius: 9999px;
-  background: #fff;
-  color: #4b5563;
+/* ── Settings (inline section under the panel header) ────────────── */
+.settings {
+  padding: 10px 14px 12px;
+  border-bottom: 1px solid #eceef1;
+  background: #f8f9fa;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+:global(html.dark) .settings {
+  border-bottom-color: #2c2c2c;
+  background: #191919;
+}
+.settingsLabel {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+:global(html.dark) .settingsLabel {
+  color: #9aa0a6;
+}
+.settingsOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 6px 2px;
+  font-size: 13px;
+  color: #1a1a1a;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  opacity: 0.82;
-  transition: opacity 0.12s ease, transform 0.12s ease, color 0.12s ease;
 }
-.launcherWrap:hover .collapseToggle,
-.launcherWrap:focus-within .collapseToggle {
-  opacity: 1;
+:global(html.dark) .settingsOption {
+  color: #e6e6e6;
 }
-.collapseToggle:hover {
-  color: #111827;
-  transform: scale(1.08);
+.settingsOption input {
+  margin-top: 2px;
+  accent-color: var(--ds-blue-600, #1f6feb);
+  cursor: pointer;
 }
-:global(html.dark) .collapseToggle {
-  background: #2c2c2c;
-  border-color: #3a3a3a;
-  color: #cbd0d6;
+.settingsOption span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
-:global(html.dark) .collapseToggle:hover {
-  color: #fff;
+.settingsOption small {
+  font-size: 11.5px;
+  color: #6b7280;
+}
+:global(html.dark) .settingsOption small {
+  color: #9aa0a6;
 }
 
 .panel {
