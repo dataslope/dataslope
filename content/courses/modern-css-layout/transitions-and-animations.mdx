@@ -60,7 +60,7 @@ state and applies to whatever `:hover` changes:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -73,7 +73,10 @@ state and applies to whatever `:hover` changes:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .cta {
   padding: 0.7rem 1.4rem;
@@ -185,7 +188,7 @@ It's a small block that makes your site usable for more people.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -198,7 +201,10 @@ It's a small block that makes your site usable for more people.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .live {
   display: inline-block;
@@ -211,7 +217,10 @@ It's a small block that makes your site usable for more people.
 
 /* 1. define @keyframes pulse below */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 3rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 3rem;
+}
 
 .live {
   display: inline-block;
@@ -223,9 +232,15 @@ It's a small block that makes your site usable for more people.
 }
 
 @keyframes pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.4); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 `,
     },

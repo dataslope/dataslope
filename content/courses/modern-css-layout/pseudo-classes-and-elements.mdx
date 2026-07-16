@@ -180,7 +180,7 @@ Experiment below, swap `:nth-child(odd)` for `even` or `3n`, or change the
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -199,7 +199,10 @@ Experiment below, swap `:nth-child(odd)` for `even` or `3n`, or change the
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 .cta {
   font: inherit;
@@ -210,12 +213,25 @@ Experiment below, swap `:nth-child(odd)` for `even` or `3n`, or change the
   color: white;
   cursor: pointer;
 }
-.cta:hover { background: #4338ca; }   /* change the hover color */
+.cta:hover {
+  background: #4338ca;
+} /* change the hover color */
 
-.tasks { list-style: none; padding: 0; width: 220px; }
-.tasks li { padding: 8px 12px; }
-.tasks li:nth-child(odd) { background: #f1f5f9; }   /* try even, or 3n */
-.tasks li::before { content: "> "; color: #6366f1; }
+.tasks {
+  list-style: none;
+  padding: 0;
+  width: 220px;
+}
+.tasks li {
+  padding: 8px 12px;
+}
+.tasks li:nth-child(odd) {
+  background: #f1f5f9;
+} /* try even, or 3n */
+.tasks li::before {
+  content: "> ";
+  color: #6366f1;
+}
 `,
     },
   ]}
@@ -236,7 +252,7 @@ Leave the odd rows transparent, the contrast is what makes a long table scannabl
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -244,13 +260,28 @@ Leave the odd rows transparent, the contrast is what makes a long table scannabl
   <body>
     <table class="data">
       <thead>
-        <tr><th>Name</th><th>Score</th></tr>
+        <tr>
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Ana</td><td>92</td></tr>
-        <tr><td>Ben</td><td>85</td></tr>
-        <tr><td>Cara</td><td>78</td></tr>
-        <tr><td>Drew</td><td>88</td></tr>
+        <tr>
+          <td>Ana</td>
+          <td>92</td>
+        </tr>
+        <tr>
+          <td>Ben</td>
+          <td>85</td>
+        </tr>
+        <tr>
+          <td>Cara</td>
+          <td>78</td>
+        </tr>
+        <tr>
+          <td>Drew</td>
+          <td>88</td>
+        </tr>
       </tbody>
     </table>
   </body>
@@ -259,21 +290,45 @@ Leave the odd rows transparent, the contrast is what makes a long table scannabl
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
-.data { border-collapse: collapse; width: 260px; }
-.data th, .data td { text-align: left; padding: 8px 12px; }
-.data thead th { border-bottom: 2px solid #cbd5e1; }
+.data {
+  border-collapse: collapse;
+  width: 260px;
+}
+.data th, .data td {
+  text-align: left;
+  padding: 8px 12px;
+}
+.data thead th {
+  border-bottom: 2px solid #cbd5e1;
+}
 
 /* Stripe the even body rows below. */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
-.data { border-collapse: collapse; width: 260px; }
-.data th, .data td { text-align: left; padding: 8px 12px; }
-.data thead th { border-bottom: 2px solid #cbd5e1; }
+.data {
+  border-collapse: collapse;
+  width: 260px;
+}
+.data th, .data td {
+  text-align: left;
+  padding: 8px 12px;
+}
+.data thead th {
+  border-bottom: 2px solid #cbd5e1;
+}
 
-.data tbody tr:nth-child(even) { background: rgb(241, 245, 249); }
+.data tbody tr:nth-child(even) {
+  background: rgb(241, 245, 249);
+}
 `,
     },
   ]}

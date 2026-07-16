@@ -178,16 +178,51 @@ export function TodoItem({
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; }
-.app { max-width: 22rem; margin: 24px; }
-form { display: flex; gap: 8px; margin-bottom: 12px; }
-input[type="text"], form input { flex: 1; padding: 6px 8px; }
-ul { list-style: none; padding: 0; }
-.todo { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
-.todo label { display: flex; gap: 8px; align-items: center; }
-.todo.done label { text-decoration: line-through; color: #94a3b8; }
-.delete { border: none; background: none; cursor: pointer; color: #ef4444; }
-.count { color: #64748b; font-size: 14px; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+}
+.app {
+  max-width: 22rem;
+  margin: 24px;
+}
+form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+input[type="text"], form input {
+  flex: 1;
+  padding: 6px 8px;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+.todo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.todo label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.todo.done label {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+.delete {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #ef4444;
+}
+.count {
+  color: #64748b;
+  font-size: 14px;
+}
 `,
     },
   ]}
@@ -252,7 +287,10 @@ export function App() {
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
       <ul>
         {todos.map((t) => (
-          <li key={t.id}>{t.done ? "✅ " : "⬜ "}{t.text}</li>
+          <li key={t.id}>
+            {t.done ? "✅ " : "⬜ "}
+            {t.text}
+          </li>
         ))}
       </ul>
       <button onClick={clearCompleted}>Clear done</button>
@@ -283,7 +321,10 @@ export function App() {
     <main style={{ fontFamily: "system-ui", margin: 24 }}>
       <ul>
         {todos.map((t) => (
-          <li key={t.id}>{t.done ? "✅ " : "⬜ "}{t.text}</li>
+          <li key={t.id}>
+            {t.done ? "✅ " : "⬜ "}
+            {t.text}
+          </li>
         ))}
       </ul>
       <button onClick={clearCompleted}>Clear done</button>

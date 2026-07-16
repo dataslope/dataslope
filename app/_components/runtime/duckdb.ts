@@ -678,6 +678,14 @@ export interface DuckDbEngine {
    *  user's database is never left in a half-populated state. Throws the
    *  underlying SQL error after a successful restore. */
   importSqlDump: (sql: string) => Promise<DuckDbSampleDatabase>;
+  /** Binary .duckdb image of the whole catalog (ATTACH + COPY FROM
+   *  DATABASE), the same bytes the OPFS snapshot persists. Used as the
+   *  binary payload of cloud/share bundles. */
+  exportBinaryImage: () => Promise<Uint8Array>;
+  /** Replace the catalog with the contents of a .duckdb image (cloud/share
+   *  bundle restore). On failure the previously active sample is restored,
+   *  mirroring importSqlDump. */
+  importBinaryImage: (bytes: Uint8Array) => Promise<DuckDbSampleDatabase>;
   /** Whole-database export as a portable multi-statement SQL script
    *  (CREATE TABLE / INSERT statements) that round-trips through any
    *  DuckDB instance. */
@@ -1152,6 +1160,68 @@ export async function createDuckDbEngine(
       }
       conn = next;
       sample = DUCKDB_BLANK_DATABASE;
+      return sample;
+    },
+
+    async exportBinaryImage() {
+      return exportAsBinaryInternal();
+    },
+
+    async importBinaryImage(bytes) {
+      // Same sandboxing caveat as importSqlDump: DuckDB-Wasm shares one
+      // instance across connections, so bootstrap a blank catalog, copy the
+      // image's contents into it, and restore the previous sample if
+      // anything fails.
+      const previousSample = sample;
+      const importFile = "_playground_bundle_import_tmp.duckdb";
+      const alias = "_playground_bundle_import_alias";
+      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE, db);
+      try {
+        await db.registerFileBuffer(importFile, bytes);
+        try {
+          await next.query(
+            `ATTACH '${importFile}' AS ${quoteIdent(alias)} (READ_ONLY)`,
+          );
+          await next.query(`COPY FROM DATABASE ${quoteIdent(alias)} TO memory`);
+          await next.query(`DETACH ${quoteIdent(alias)}`);
+        } finally {
+          try {
+            await next.query(`DETACH ${quoteIdent(alias)}`);
+          } catch {
+            /* already detached */
+          }
+          try {
+            await db.dropFile?.(importFile);
+          } catch {
+            /* ignore */
+          }
+        }
+      } catch (err) {
+        try {
+          await next.close();
+        } catch {
+          /* ignore */
+        }
+        const restored = await bootstrapDatabase(previousSample, db);
+        try {
+          await conn.close();
+        } catch {
+          /* ignore */
+        }
+        conn = restored;
+        sample = previousSample;
+        throw err;
+      }
+      try {
+        await conn.close();
+      } catch {
+        /* ignore */
+      }
+      conn = next;
+      sample = DUCKDB_BLANK_DATABASE;
+      // Persist the restored catalog right away so a reload doesn't
+      // resurrect the pre-restore OPFS snapshot.
+      scheduleSnapshot(0);
       return sample;
     },
 

@@ -116,9 +116,7 @@ const UserContext = createContext("Guest");
 
 function Greeting() {
   // 1. read the name from UserContext
-  return (
-    <h1 style={{ fontFamily: "system-ui" }}>Hello, ?!</h1>
-  );
+  return <h1 style={{ fontFamily: "system-ui" }}>Hello, ?!</h1>;
 }
 
 function App() {
@@ -140,9 +138,7 @@ const UserContext = createContext("Guest");
 
 function Greeting() {
   const name = useContext(UserContext);
-  return (
-    <h1 style={{ fontFamily: "system-ui" }}>Hello, {name}!</h1>
-  );
+  return <h1 style={{ fontFamily: "system-ui" }}>Hello, {name}!</h1>;
 }
 
 function App() {

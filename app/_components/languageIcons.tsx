@@ -22,6 +22,7 @@ import {
   SiPostgresql,
   SiDuckdb,
   SiHtml5,
+  SiCss,
   SiReact,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
@@ -69,6 +70,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   postgres: SiPostgresql,
   duckdb: SiDuckdb,
   html: SiHtml5,
+  css: SiCss,
   web: SiHtml5,
   react: SiReact,
 };

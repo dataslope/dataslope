@@ -196,7 +196,7 @@ Experiment with all four in the sandbox, change a `>` to a space, or `+` to
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -218,14 +218,26 @@ Experiment with all four in the sandbox, change a `>` to a space, or `+` to
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
 /* Try each selector, then tweak the combinators and re-run. */
 
-.menu a { text-decoration: none; margin-right: 12px; }  /* descendant */
-a[href^="https"] { color: seagreen; }                   /* starts-with */
-.card > h2 { margin-top: 0; }                           /* direct child */
-.card h2 + p { font-weight: 700; }                      /* next sibling */
+.menu a {
+  text-decoration: none;
+  margin-right: 12px;
+} /* descendant */
+a[href^="https"] {
+  color: seagreen;
+} /* starts-with */
+.card > h2 {
+  margin-top: 0;
+} /* direct child */
+.card h2 + p {
+  font-weight: 700;
+} /* next sibling */
 `,
     },
   ]}
@@ -246,7 +258,7 @@ If you reach for \`.menu li\` (a space) instead, the nested Shoes and Hats get s
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -254,7 +266,8 @@ If you reach for \`.menu li\` (a space) instead, the nested Shoes and Hats get s
   <body>
     <ul class="menu">
       <li>Home</li>
-      <li>Products
+      <li>
+        Products
         <ul>
           <li>Shoes</li>
           <li>Hats</li>
@@ -268,19 +281,41 @@ If you reach for \`.menu li\` (a space) instead, the nested Shoes and Hats get s
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
-.menu, .menu ul { list-style: none; padding-left: 1rem; }
-.menu li { padding: 6px 10px; margin: 4px 0; border-radius: 6px; }
+.menu, .menu ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+.menu li {
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 6px;
+}
 
 /* Highlight ONLY the direct children of .menu, using the child combinator. */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1.5rem;
+}
 
-.menu, .menu ul { list-style: none; padding-left: 1rem; }
-.menu li { padding: 6px 10px; margin: 4px 0; border-radius: 6px; }
+.menu, .menu ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+.menu li {
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 6px;
+}
 
-.menu > li { background: rgb(219, 234, 254); }
+.menu > li {
+  background: rgb(219, 234, 254);
+}
 `,
     },
   ]}

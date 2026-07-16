@@ -22,6 +22,16 @@
   --lp-accent: var(--ds-blue-600);
   --lp-code-bg: var(--ds-gray-50);
   --lp-code-text: var(--ds-gray-800);
+  /* Syntax token colours (GitHub Light), applied to the `tok-*` classes the
+     client highlighter emits (see staticHighlight.ts). */
+  --tok-keyword: #cf222e;
+  --tok-string: #0a3069;
+  --tok-comment: #6e7781;
+  --tok-number: #0550ae;
+  --tok-property: #0550ae;
+  --tok-type: #116329;
+  --tok-selector: #953800;
+  --tok-def: #8250df;
   --lp-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
   --lp-font-mono: var(--font-mono, ui-monospace, "SFMono-Regular", monospace);
   --lp-radius: 10px;
@@ -46,6 +56,15 @@
   --lp-accent: var(--ds-blue-400);
   --lp-code-bg: #0f0f0f;
   --lp-code-text: #d6d6d6;
+  /* Syntax token colours (GitHub Dark). */
+  --tok-keyword: #ff7b72;
+  --tok-string: #a5d6ff;
+  --tok-comment: #8b949e;
+  --tok-number: #79c0ff;
+  --tok-property: #79c0ff;
+  --tok-type: #7ee787;
+  --tok-selector: #ffa657;
+  --tok-def: #d2a8ff;
 }
 
 /* ── Header ──────────────────────────────────────────────────────── */
@@ -185,6 +204,61 @@
   padding: 0;
   border: none;
   white-space: pre;
+}
+
+/* Syntax tokens emitted by the client highlighter (staticHighlight.ts).
+   classHighlighter uses `tok-<tag>` names; a few tags arrive combined
+   (e.g. `tok-variableName tok-definition` for a function/const name), so
+   `.tok-definition` is listed last to win on equal specificity. Classes are
+   global (not CSS-module-scoped), hence `:global`. Anything unlisted inherits
+   the panel's default `--lp-code-text`. */
+.code :global(.tok-keyword),
+.code :global(.tok-modifier),
+.code :global(.tok-operatorKeyword),
+.code :global(.tok-controlKeyword) {
+  color: var(--tok-keyword);
+}
+.code :global(.tok-string),
+.code :global(.tok-string2),
+.code :global(.tok-regexp),
+.code :global(.tok-attributeValue) {
+  color: var(--tok-string);
+}
+.code :global(.tok-comment),
+.code :global(.tok-lineComment),
+.code :global(.tok-blockComment) {
+  color: var(--tok-comment);
+  font-style: italic;
+}
+.code :global(.tok-number),
+.code :global(.tok-integer),
+.code :global(.tok-float),
+.code :global(.tok-bool),
+.code :global(.tok-atom),
+.code :global(.tok-literal),
+.code :global(.tok-unit),
+.code :global(.tok-color) {
+  color: var(--tok-number);
+}
+/* CSS/JS property names and HTML attribute names. */
+.code :global(.tok-propertyName),
+.code :global(.tok-attributeName) {
+  color: var(--tok-property);
+}
+/* HTML tag names and type references both surface as typeName. */
+.code :global(.tok-typeName),
+.code :global(.tok-tagName),
+.code :global(.tok-namespace) {
+  color: var(--tok-type);
+}
+/* CSS selectors / class names. */
+.code :global(.tok-className) {
+  color: var(--tok-selector);
+}
+/* Function and other definition names (e.g. `function Counter`). */
+.code :global(.tok-function),
+.code :global(.tok-definition) {
+  color: var(--tok-def);
 }
 
 /* ── Optional caption under the whole widget ─────────────────────── */

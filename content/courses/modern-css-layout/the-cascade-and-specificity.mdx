@@ -62,7 +62,7 @@ version below, delete the `#intro` rule and Run: it turns blue.
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -75,12 +75,22 @@ version below, delete the `#intro` rule and Run: it turns blue.
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; font-size: 1.5rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+  font-size: 1.5rem;
+}
 
 /* All three target the same paragraph. The most specific wins. */
-p      { color: crimson; }     /* element */
-.note  { color: darkorange; }  /* class */
-#intro { color: seagreen; }    /* id  ← this one wins */
+p {
+  color: crimson;
+} /* element */
+.note {
+  color: darkorange;
+} /* class */
+#intro {
+  color: seagreen;
+} /* id  ← this one wins */
 `,
     },
   ]}
@@ -145,7 +155,7 @@ Because an ID beats a class, your rule will win.`}
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -158,17 +168,29 @@ Because an ID beats a class, your rule will win.`}
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
-.note { color: gray; }
+.note {
+  color: gray;
+}
 
 /* Add a more specific rule for #alert below */
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
-.note { color: gray; }
+.note {
+  color: gray;
+}
 
-#alert { color: rgb(37, 99, 235); }
+#alert {
+  color: rgb(37, 99, 235);
+}
 `,
     },
   ]}

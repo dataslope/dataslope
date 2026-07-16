@@ -38,6 +38,7 @@ import {
   FileCode,
   FileDiff,
   Info,
+  Settings,
 } from "lucide-react";
 import { useSession } from "@/lib/auth/client";
 import type {
@@ -63,6 +64,13 @@ import {
   type AskAiSourceKind,
 } from "./contextRegistry";
 import styles from "./AskAiPanel.module.css";
+
+/** Where the closed-state launcher sits, user-configurable from the panel's
+ *  settings: the floating pill in the bottom-right corner (default), or a
+ *  slim vertical tab hugging the right viewport edge that stays out of the
+ *  content's way. Persisted in localStorage. */
+type LauncherPlacement = "floating" | "tab";
+const LAUNCHER_PLACEMENT_KEY = "dataslope:ask-ai-placement";
 
 interface Props {
   surface: AskAiSurface;
@@ -160,6 +168,28 @@ export default function AskAiWidget({
     subjectNoun ?? (surface === "learn" ? "lesson" : "playground");
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  // Launcher placement, set from the panel's settings. Persists across
+  // pages/reloads (this widget is client-only, so reading localStorage in the
+  // initializer is SSR-safe).
+  const [placement, setPlacement] = useState<LauncherPlacement>(() => {
+    if (typeof window === "undefined") return "floating";
+    try {
+      return window.localStorage.getItem(LAUNCHER_PLACEMENT_KEY) === "tab"
+        ? "tab"
+        : "floating";
+    } catch {
+      return "floating";
+    }
+  });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const choosePlacement = useCallback((next: LauncherPlacement) => {
+    setPlacement(next);
+    try {
+      window.localStorage.setItem(LAUNCHER_PLACEMENT_KEY, next);
+    } catch {
+      /* private mode, preference just won't persist */
+    }
+  }, []);
   const { data: session, isPending } = useSession();
 
   // ── Context sources ────────────────────────────────────────────────
@@ -358,6 +388,22 @@ export default function AskAiWidget({
   };
 
   if (!open) {
+    if (placement === "tab") {
+      // Slim vertical tab hugging the right viewport edge (the classic
+      // "Feedback" tab pattern), for users who found the pill covered
+      // page content.
+      return (
+        <button
+          type="button"
+          className={styles.launcherTab}
+          onClick={() => setOpen(true)}
+          aria-label="Ask AI"
+        >
+          <Sparkles size={15} />
+          <span className={styles.launcherTabLabel}>Ask AI</span>
+        </button>
+      );
+    }
     return (
       <button
         type="button"
@@ -405,6 +451,16 @@ export default function AskAiWidget({
         <button
           type="button"
           className={styles.iconButton}
+          onClick={() => setSettingsOpen((v) => !v)}
+          aria-label="Ask AI settings"
+          aria-expanded={settingsOpen}
+          title="Settings"
+        >
+          <Settings size={16} />
+        </button>
+        <button
+          type="button"
+          className={styles.iconButton}
           onClick={() => setOpen(false)}
           aria-label="Close"
           title="Close"
@@ -412,6 +468,36 @@ export default function AskAiWidget({
           <X size={18} />
         </button>
       </div>
+
+      {settingsOpen && (
+        <div className={styles.settings} role="group" aria-label="Ask AI settings">
+          <div className={styles.settingsLabel}>Ask AI button position</div>
+          <label className={styles.settingsOption}>
+            <input
+              type="radio"
+              name="askai-placement"
+              checked={placement === "floating"}
+              onChange={() => choosePlacement("floating")}
+            />
+            <span>
+              Floating button
+              <small>Round button in the bottom-right corner</small>
+            </span>
+          </label>
+          <label className={styles.settingsOption}>
+            <input
+              type="radio"
+              name="askai-placement"
+              checked={placement === "tab"}
+              onChange={() => choosePlacement("tab")}
+            />
+            <span>
+              Sidebar tab
+              <small>Slim tab pinned to the right edge, out of the way</small>
+            </span>
+          </label>
+        </div>
+      )}
 
       <div className={styles.messages} ref={listRef}>
         {!signedIn ? (

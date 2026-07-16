@@ -12,6 +12,7 @@ export const TAG_LABELS: Record<string, string> = {
   c: "C",
   cpp: "C++",
   csharp: "C#",
+  css: "CSS",
   html: "HTML",
   java: "Java",
   javascript: "JavaScript",

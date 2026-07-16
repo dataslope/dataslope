@@ -197,7 +197,9 @@ function ProductList({ products }: { products: Product[] }) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<ProductList products={PRODUCTS} />);
+createRoot(document.getElementById("root")!).render(
+  <ProductList products={PRODUCTS} />,
+);
 `,
       solutionCode: `import { createRoot } from "react-dom/client";
 
@@ -223,7 +225,9 @@ function ProductList({ products }: { products: Product[] }) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<ProductList products={PRODUCTS} />);
+createRoot(document.getElementById("root")!).render(
+  <ProductList products={PRODUCTS} />,
+);
 `,
     },
   ]}

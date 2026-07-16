@@ -212,7 +212,7 @@ Mix a color, a gradient, and a shadow in this sandbox and Run:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -225,7 +225,10 @@ Mix a color, a gradient, and a shadow in this sandbox and Run:
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
   width: 220px;
@@ -264,7 +267,7 @@ A soft shadow plus a tinted HSL background is the whole recipe for a card that r
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="styles.css" />
@@ -280,20 +283,31 @@ A soft shadow plus a tinted HSL background is the whole recipe for a card that r
     },
     {
       filename: "styles.css",
-      starterCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      starterCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
   width: 260px;
   padding: 1.25rem 1.5rem;
   border-radius: 14px;
-  background: white;      /* 2. set to hsl(265 70% 96%) */
+  background: white; /* 2. set to hsl(265 70% 96%) */
   /* 1. add a soft box-shadow */
 }
 
-.card h2 { margin: 0 0 0.25rem; }
-.card p  { margin: 0; color: #475569; }
+.card h2 {
+  margin: 0 0 0.25rem;
+}
+.card p {
+  margin: 0;
+  color: #475569;
+}
 `,
-      solutionCode: `body { font-family: system-ui, sans-serif; margin: 2rem; }
+      solutionCode: `body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
 
 .card {
   width: 260px;
@@ -303,8 +317,13 @@ A soft shadow plus a tinted HSL background is the whole recipe for a card that r
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
 }
 
-.card h2 { margin: 0 0 0.25rem; }
-.card p  { margin: 0; color: #475569; }
+.card h2 {
+  margin: 0 0 0.25rem;
+}
+.card p {
+  margin: 0;
+  color: #475569;
+}
 `,
     },
   ]}

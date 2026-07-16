@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useRef, type ReactNode } from "react";
 import type { IconType } from "react-icons";
-import { Marquee } from "@/components/ui/marquee";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -51,7 +51,7 @@ function HeroGlyph({ id, color }: { id: string; color: string }) {
   );
 }
 
-/** One full "Learn 🐍 Python …" segment. The Marquee duplicates it, so
+/** One full "Learn 🐍 Python …" segment. The row duplicates it, so
  *  "Learn" recurs as a natural refrain between roster loops. */
 function RosterSegment() {
   return (
@@ -69,33 +69,135 @@ function RosterSegment() {
   );
 }
 
+/**
+ * A marquee row scrolled by a requestAnimationFrame loop writing 2D
+ * `translateX` styles, deliberately NOT a CSS `animation`.
+ *
+ * Why not the shared <Marquee> (CSS keyframes): an actively-animating CSS
+ * transform promotes each row to its own compositor layer, and at text-7xl
+ * those layers are thousands of pixels wide, clipped only at composite time.
+ * Chromium has repeatedly drawn stale tiles of those layers with the clip
+ * missing (giant marquee glyphs "bleeding" across the page around the sticky
+ * header — see PRs #599/#602, which tried to pin the layer tree down with
+ * compositor hints and didn't hold). JS per-frame style writes are not a
+ * compositing trigger, so these rows paint inside the clipped wrapper on the
+ * main thread and the unclipped pixels never exist in any GPU buffer.
+ *
+ * The loop advances by wall-clock delta (capped so a background-tab resume
+ * doesn't jump), wraps at one segment width for a seamless loop, pauses
+ * while the hero is offscreen, and leaves the row static under
+ * prefers-reduced-motion.
+ */
+function JsMarquee({
+  children,
+  secondsPerLoop,
+  reverse = false,
+  className = "",
+}: {
+  children: ReactNode;
+  /** Seconds for one full segment length to scroll past. */
+  secondsPerLoop: number;
+  reverse?: boolean;
+  className?: string;
+}) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const segmentRef = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const segment = segmentRef.current;
+    if (!track || !segment) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      return; // static row; the roster is still readable
+    }
+
+    let raf = 0;
+    let last = 0;
+    let offset = 0;
+    let running = false;
+    // Re-read on every wrap; cheap, and it tracks font-load reflows without
+    // a ResizeObserver.
+    let segmentWidth = segment.offsetWidth || 1;
+
+    const step = (now: number) => {
+      const dt = Math.min(now - last, 100); // clamp background-tab gaps
+      last = now;
+      offset += (segmentWidth / (secondsPerLoop * 1000)) * dt;
+      if (offset >= segmentWidth) {
+        segmentWidth = segment.offsetWidth || 1;
+        offset %= segmentWidth;
+      }
+      track.style.transform = `translateX(${reverse ? offset - segmentWidth : -offset}px)`;
+      raf = requestAnimationFrame(step);
+    };
+    const start = () => {
+      if (running) return;
+      running = true;
+      last = performance.now();
+      raf = requestAnimationFrame(step);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    // Only animate while the hero is actually on screen.
+    const io = new IntersectionObserver(
+      (entries) => (entries.some((e) => e.isIntersecting) ? start() : stop()),
+      { rootMargin: "64px" },
+    );
+    io.observe(track);
+    return () => {
+      io.disconnect();
+      stop();
+    };
+  }, [secondsPerLoop, reverse]);
+
+  // Two copies of the segment give the seamless loop; each segment is wider
+  // than the clipped container, so two always cover it. The reverse row is
+  // pre-shifted one segment left (see `step`) so it scrolls the other way
+  // without ever exposing its trailing edge.
+  return (
+    <div className={`overflow-hidden ${className}`}>
+      <div ref={trackRef} className="flex w-max">
+        <span ref={segmentRef} className="flex shrink-0">
+          {children}
+        </span>
+        <span className="flex shrink-0" aria-hidden="true">
+          {children}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function HeroMarquee() {
-  // [contain:paint] hard-clips the infinitely-animating marquee rows at the
-  // compositor level (a plain overflow clip hasn't stopped Chromium from
-  // ghosting stale slices of the composited rows over other parts of the
-  // page during unrelated repaints, e.g. hovering the sticky header).
-  // `will-change-transform` keeps this container permanently promoted so the
-  // rows' compositing subtree (and its clip) never restructures — without it,
-  // the BlurFade entrance around this component promotes the wrapper while
-  // its transform/filter animate and drops it when they settle, a hand-off
-  // during which Chromium has left stale row raster behind.
+  // [contain:paint] clips this wrapper's painting as a unit, and
+  // `will-change-transform` keeps it on one stable layer through the BlurFade
+  // entrance hand-off. With the rows now painted (not composited — see
+  // JsMarquee), any stale raster is at worst a correctly-clipped copy of
+  // this 768px-wide box, never an unclipped row.
   return (
     <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2 will-change-transform [contain:paint]">
       {/* Both lines share one font-size scale so they read as a matched pair. */}
       {/* Line 1, the language roster, scrolling left. */}
-      <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:42s] [--gap:0px] sm:text-6xl lg:text-7xl">
+      <JsMarquee
+        secondsPerLoop={42}
+        className="py-1 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+      >
         <RosterSegment />
-      </Marquee>
+      </JsMarquee>
 
       {/* Line 2, the tagline, scrolling the other way, in blue-gray-100. */}
-      <Marquee
+      <JsMarquee
+        secondsPerLoop={30}
         reverse
-        className="py-1 text-5xl font-bold tracking-tight [--duration:30s] [--gap:0px] sm:text-6xl lg:text-7xl"
+        className="py-1 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
       >
         <span className="mx-8 text-[#CED7DB]">
           Interactive ⚡ No sign-up 🔓 Free 💯
         </span>
-      </Marquee>
+      </JsMarquee>
 
       {/* Soft edge fades so the scroll dissolves into the page background
           (kept in sync with HomeClient's bg: white / #121212). */}

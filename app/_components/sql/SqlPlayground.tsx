@@ -1009,7 +1009,7 @@ function SqlPlaygroundInner() {
     exportDatabaseAsSqlDump,
     applySqlBundle,
     activeDatabaseLabel,
-    buildSqlDumpText,
+    buildDatabaseImage,
     handleCsvFile,
     submitCsvImport,
     handleJsonFile,
@@ -1019,33 +1019,36 @@ function SqlPlaygroundInner() {
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
 
   // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as a replayable SQL dump plus
-  // the query tabs, the database binary itself never leaves the browser.
+  // A SQL bundle carries the active database as its native SQLite file image
+  // (the codec gzips it) plus the query tabs; reopening loads the image
+  // directly instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
-      const dump = await buildSqlDumpText();
-      if (dump === null) return null;
+      const image = await buildDatabaseImage();
+      if (image === null) return null;
       const label = await activeDatabaseLabel();
       const queryTabs = tabsRef.current.filter((t) => !t.kind);
       const activeIdx = queryTabs.findIndex(
         (t) => t.id === activeTabIdRef.current,
       );
       return {
-        version: 1,
+        version: 2,
         kind: "sql",
         playground: PLAYGROUND_ID,
         name: activeWorkspace?.name ?? "SQLite Workspace",
         exportedAt: Date.now(),
         sql: {
           dialect: "sqlite",
-          dump,
+          dbFormat: "sqlite-image",
+          dbBytes: image.byteLength,
           tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
           activeTabIndex: Math.max(0, activeIdx),
           databaseLabel: label,
         },
+        database: image,
       };
-    }, [activeDatabaseLabel, buildSqlDumpText, activeWorkspace?.name]);
+    }, [activeDatabaseLabel, buildDatabaseImage, activeWorkspace?.name]);
 
   // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
   // page and the Cloud dialog leave a ref in sessionStorage and navigate
@@ -1063,11 +1066,16 @@ function SqlPlaygroundInner() {
         if (
           bundle.kind !== "sql" ||
           bundle.playground !== PLAYGROUND_ID ||
-          !bundle.sql
+          !bundle.sql ||
+          !bundle.database
         ) {
           throw new Error("This link isn't a SQLite playground.");
         }
-        await applySqlBundle(bundle.sql.dump, bundleTabSeeds(bundle));
+        await applySqlBundle(
+          bundle.database,
+          bundle.sql.databaseLabel ?? bundle.name,
+          bundleTabSeeds(bundle),
+        );
         showToast(
           pendingRef.source === "share"
             ? `Opened a copy of “${bundle.name}”.`

@@ -124,9 +124,7 @@ function TodoList({ todos }: { todos: Todo[] }) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <TodoList todos={TODOS} />,
-);
+createRoot(document.getElementById("root")!).render(<TodoList todos={TODOS} />);
 `,
       solutionCode: `import { createRoot } from "react-dom/client";
 
@@ -151,9 +149,7 @@ function TodoList({ todos }: { todos: Todo[] }) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <TodoList todos={TODOS} />,
-);
+createRoot(document.getElementById("root")!).render(<TodoList todos={TODOS} />);
 `,
     },
   ]}

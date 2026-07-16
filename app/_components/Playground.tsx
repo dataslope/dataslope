@@ -872,7 +872,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
       const active = fileList.find((f) => f.id === activeFileIdRef.current);
       return {
-        version: 1,
+        version: 2,
         kind: "code",
         playground: adapter.id,
         name: workspaceName || "Workspace",
@@ -1482,7 +1482,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             showToast(`Could not read "${path}".`, "warn");
             return;
           }
-          const blob = new Blob([bytes]);
+          const blob = new Blob([bytes as BlobPart]);
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;

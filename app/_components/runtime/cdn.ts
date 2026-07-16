@@ -22,7 +22,7 @@ export const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/dataslope/dataslope@${C
 // version pinned in package.json. The npm install only ships the TypeScript
 // declarations; the actual runtime is fetched from jsDelivr at runtime by
 // both postgres.ts (main thread) and postgres-worker.ts (web worker).
-export const PGLITE_VERSION = "0.4.5";
+export const PGLITE_VERSION = "0.5.4";
 export const PGLITE_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/index.js`;
 export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
 
@@ -48,14 +48,14 @@ export const TOOLS_JAR_CDN = `https://unpkg.com/dataslope-tools-jar@${TOOLS_JAR_
 // then the user already has a warm jsDelivr connection from the runtime that
 // produced the figure. Keep PLOTLY_VERSION in sync with the plotly.js-dist-min
 // version in package.json.
-export const PLOTLY_VERSION = "2.35.3";
+export const PLOTLY_VERSION = "3.7.0";
 export const PLOTLY_CDN = `https://cdn.jsdelivr.net/npm/plotly.js-dist-min@${PLOTLY_VERSION}/+esm`;
 
 // Mermaid (diagram rendering) is likewise loaded from jsDelivr on demand (see
 // MermaidContent in app/_components/mdx/mermaid.tsx) so it stays out of the
 // bundle / Worker. Mermaid lazy-loads its per-diagram chunks from the same
 // CDN base at runtime. Keep MERMAID_VERSION in sync with package.json.
-export const MERMAID_VERSION = "11.15.0";
+export const MERMAID_VERSION = "11.16.0";
 export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/+esm`;
 
 // The TypeScript compiler (~2 MB gz) powers JS/TS intellisense inside a
@@ -65,7 +65,7 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 // completion. The lib.*.d.ts standard-library declarations come from the
 // same pinned package. Keep TYPESCRIPT_VERSION in sync with the
 // `typescript` version pinned in package.json.
-export const TYPESCRIPT_VERSION = "5.7.3";
+export const TYPESCRIPT_VERSION = "5.9.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
 
 // esbuild-wasm powers the React/TSX playground's transform + bundle step

@@ -1,11 +1,18 @@
 // Pure-helper tests for playground cloud saves + sharing: the bundle/manifest
-// validators (lib/workspaces/types.ts) and the retention/quota policy
+// validators (lib/workspaces/types.ts), the binary container codec
+// (lib/workspaces/bundleCodec.ts) and the retention/quota policy
 // (lib/workspaces/policy.ts). Route handlers stay thin wrappers over these,
 // the same convention as adminPromotion.test.ts / polarBilling.test.ts.
 import { readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
+import {
+  BundleCodecError,
+  bundleContentHash,
+  decodeBundle,
+  encodeBundle,
+} from "../lib/workspaces/bundleCodec";
 import {
   BUNDLE_FILENAME_MAX,
   BUNDLE_MAX_FILES,
@@ -32,9 +39,12 @@ import {
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NOW = Date.UTC(2026, 6, 2, 12, 0, 0);
 
+// A stand-in database image; the codec treats it as opaque bytes.
+const DB_IMAGE = new Uint8Array([0x53, 0x51, 0x4c, 0x69, 0x74, 0x65, 0, 255]);
+
 function codeBundle(overrides: Partial<WorkspaceBundle> = {}): WorkspaceBundle {
   return {
-    version: 1,
+    version: 2,
     kind: "code",
     playground: "python",
     name: "My workspace",
@@ -47,18 +57,20 @@ function codeBundle(overrides: Partial<WorkspaceBundle> = {}): WorkspaceBundle {
 
 function sqlBundle(overrides: Partial<WorkspaceBundle> = {}): WorkspaceBundle {
   return {
-    version: 1,
+    version: 2,
     kind: "sql",
     playground: "sqlite",
     name: "Chinook explorations",
     exportedAt: NOW,
     sql: {
       dialect: "sqlite",
-      dump: "CREATE TABLE t(a); INSERT INTO t VALUES (1);",
+      dbFormat: "sqlite-image",
+      dbBytes: DB_IMAGE.byteLength,
       tabs: [{ title: "Query 1", code: "SELECT * FROM t;" }],
       activeTabIndex: 0,
       databaseLabel: "chinook.sqlite",
     },
+    database: DB_IMAGE,
     ...overrides,
   };
 }
@@ -100,7 +112,7 @@ describe("validateBundle", () => {
   });
 
   it("rejects unknown versions and playgrounds", () => {
-    expect(validateBundle({ ...codeBundle(), version: 2 })).toBeNull();
+    expect(validateBundle({ ...codeBundle(), version: 1 })).toBeNull();
     expect(validateBundle(codeBundle({ playground: "cobol" }))).toBeNull();
   });
 
@@ -112,7 +124,7 @@ describe("validateBundle", () => {
     ).toBeNull();
   });
 
-  it("rejects code bundles without files and sql bundles without a dump", () => {
+  it("rejects code bundles without files and sql bundles without sql state", () => {
     expect(validateBundle(codeBundle({ files: [] }))).toBeNull();
     const bad = sqlBundle();
     delete (bad as unknown as Record<string, unknown>).sql;
@@ -123,6 +135,20 @@ describe("validateBundle", () => {
     const b = sqlBundle();
     b.sql = { ...b.sql!, dialect: "duckdb" };
     expect(validateBundle(b)).toBeNull();
+  });
+
+  it("rejects a db format that disagrees with the dialect", () => {
+    const b = sqlBundle();
+    b.sql = { ...b.sql!, dbFormat: "pgdata-tar" };
+    expect(validateBundle(b)).toBeNull();
+  });
+
+  it("rejects malformed db byte lengths", () => {
+    for (const dbBytes of [-1, 1.5, "8" as unknown as number]) {
+      const b = sqlBundle();
+      b.sql = { ...b.sql!, dbBytes };
+      expect(validateBundle(b), `dbBytes ${String(dbBytes)}`).toBeNull();
+    }
   });
 
   it("rejects bundles with excessive file counts or filename lengths", () => {
@@ -146,6 +172,76 @@ describe("validateBundle", () => {
         }),
       ),
     ).not.toBeNull();
+  });
+});
+
+describe("bundle codec", () => {
+  it("round-trips a sql bundle, database image included", async () => {
+    const encoded = await encodeBundle(sqlBundle());
+    // The wire format must look like gzip: the upload endpoint checks the
+    // magic bytes before accepting the payload.
+    const head = new Uint8Array((await encoded.arrayBuffer()).slice(0, 2));
+    expect([head[0], head[1]]).toEqual([0x1f, 0x8b]);
+
+    const decoded = await decodeBundle(encoded);
+    expect(decoded.name).toBe("Chinook explorations");
+    expect(decoded.sql?.tabs).toEqual([
+      { title: "Query 1", code: "SELECT * FROM t;" },
+    ]);
+    expect(decoded.database).toEqual(DB_IMAGE);
+  });
+
+  it("round-trips a code bundle with no binary section", async () => {
+    const decoded = await decodeBundle(await encodeBundle(codeBundle()));
+    expect(decoded.files).toEqual([
+      { filename: "main.py", content: "print('hi')" },
+    ]);
+    expect(decoded.database).toBeUndefined();
+  });
+
+  it("rejects non-gzip data, bad magic, and truncated images", async () => {
+    await expect(
+      decodeBundle(new Blob(["plain text, not gzip"])),
+    ).rejects.toBeInstanceOf(BundleCodecError);
+
+    // Valid gzip, but the container inside is not a bundle.
+    const gzipped = await new Response(
+      new Blob(["{}"]).stream().pipeThrough(new CompressionStream("gzip")),
+    ).blob();
+    await expect(decodeBundle(gzipped)).rejects.toBeInstanceOf(
+      BundleCodecError,
+    );
+
+    // Declared image length disagrees with the binary section.
+    const lying = sqlBundle();
+    lying.sql = { ...lying.sql!, dbBytes: DB_IMAGE.byteLength + 1 };
+    await expect(
+      decodeBundle(await encodeBundle(lying)),
+    ).rejects.toBeInstanceOf(BundleCodecError);
+  });
+
+  it("enforces the decompressed-size ceiling", async () => {
+    const big = sqlBundle();
+    await expect(
+      decodeBundle(await encodeBundle(big), 16),
+    ).rejects.toThrow("too large");
+  });
+
+  it("hashes content, not the save timestamp", async () => {
+    const a = await bundleContentHash(sqlBundle());
+    const b = await bundleContentHash(sqlBundle({ exportedAt: NOW + 60_000 }));
+    expect(a).toBe(b);
+
+    const changedDb = sqlBundle({ database: new Uint8Array([1, 2, 3]) });
+    changedDb.sql = { ...changedDb.sql!, dbBytes: 3 };
+    expect(await bundleContentHash(changedDb)).not.toBe(a);
+
+    const changedTabs = sqlBundle();
+    changedTabs.sql = {
+      ...changedTabs.sql!,
+      tabs: [{ title: "Query 1", code: "SELECT 2;" }],
+    };
+    expect(await bundleContentHash(changedTabs)).not.toBe(a);
   });
 });
 

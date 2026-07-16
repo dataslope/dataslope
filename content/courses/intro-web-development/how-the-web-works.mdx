@@ -38,14 +38,24 @@ lessons unpack all of it. Run it, then poke at it:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <!-- CSS: what things LOOK like -->
     <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      button { padding: 0.4rem 1rem; font-size: 1rem; cursor: pointer; }
-      .visits { color: #16a34a; font-weight: bold; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+    button {
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .visits {
+      color: #16a34a;
+      font-weight: bold;
+    }
     </style>
   </head>
   <body>
@@ -56,15 +66,15 @@ lessons unpack all of it. Run it, then poke at it:
 
     <!-- JavaScript: what things DO -->
     <script>
-      var count = 0;
-      var button = document.querySelector("#btn");
-      var display = document.querySelector("#count");
+    var count = 0;
+    var button = document.querySelector("#btn");
+    var display = document.querySelector("#count");
 
-      button.addEventListener("click", function () {
-        count = count + 1;
-        display.textContent = count;
-        console.log("clicked! count is now", count);
-      });
+    button.addEventListener("click", function () {
+      count = count + 1;
+      display.textContent = count;
+      console.log("clicked! count is now", count);
+    });
     </script>
   </body>
 </html>

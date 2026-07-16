@@ -128,7 +128,11 @@ Clicking a checkbox should toggle only that row.`}
       starterCode: `import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-interface Todo { id: number; text: string; done: boolean; }
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([
@@ -144,8 +148,14 @@ function App() {
     <ul style={{ fontFamily: "system-ui", margin: 24 }}>
       {todos.map((t) => (
         <li key={t.id}>
-          <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
-          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+          <input
+            type="checkbox"
+            checked={t.done}
+            onChange={() => toggle(t.id)}
+          />
+          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>
+            {t.text}
+          </span>
         </li>
       ))}
     </ul>
@@ -157,7 +167,11 @@ createRoot(document.getElementById("root")!).render(<App />);
       solutionCode: `import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-interface Todo { id: number; text: string; done: boolean; }
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([
@@ -167,15 +181,22 @@ function App() {
 
   function toggle(id: number) {
     setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
   }
 
   return (
     <ul style={{ fontFamily: "system-ui", margin: 24 }}>
       {todos.map((t) => (
         <li key={t.id}>
-          <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
-          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+          <input
+            type="checkbox"
+            checked={t.done}
+            onChange={() => toggle(t.id)}
+          />
+          <span style={{ textDecoration: t.done ? "line-through" : "none" }}>
+            {t.text}
+          </span>
         </li>
       ))}
     </ul>

@@ -39,12 +39,17 @@ it runs offline, but rendering it is identical whether it came from
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      li { margin: 0.25rem 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+    li {
+      margin: 0.25rem 0;
+    }
     </style>
   </head>
   <body>
@@ -57,7 +62,8 @@ it runs offline, but rendering it is identical whether it came from
     },
     {
       filename: "script.js",
-      starterCode: `const raw = '[{"name":"Ada","role":"Engineer"},{"name":"Grace","role":"Admiral"}]';
+      starterCode: `const raw =
+  '[{"name":"Ada","role":"Engineer"},{"name":"Grace","role":"Admiral"}]';
 const people = JSON.parse(raw);
 
 const list = document.querySelector("#list");
@@ -95,7 +101,7 @@ Loop over \`products\` and, for each one, create an \`<li>\` whose text is the p
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <body>
     <h1>Menu</h1>

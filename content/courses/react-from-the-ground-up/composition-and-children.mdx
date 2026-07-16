@@ -118,7 +118,9 @@ import type { ReactNode } from "react";
 // Two named slots, each is just JSX passed as a prop.
 function SplitPanel({ left, right }: { left: ReactNode; right: ReactNode }) {
   return (
-    <div style={{ display: "flex", gap: 16, fontFamily: "system-ui", margin: 16 }}>
+    <div
+      style={{ display: "flex", gap: 16, fontFamily: "system-ui", margin: 16 }}
+    >
       <div style={{ flex: 1 }}>{left}</div>
       <div style={{ flex: 1 }}>{right}</div>
     </div>

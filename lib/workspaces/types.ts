@@ -1,12 +1,14 @@
 /**
  * Shared types for playground cloud saves + sharing.
  *
- * The unit of persistence is a **bundle**: a gzipped JSON document holding a
- * self-contained snapshot of a playground workspace. Code playgrounds carry
- * their files verbatim; SQL playgrounds carry a SQL dump (DDL + data) plus the
- * query tabs, and are rebuilt on open by replaying the dump through the
- * in-browser engine, the database binary itself is never uploaded (it is
- * derived state, and dumps compress far better than engine images).
+ * The unit of persistence is a **bundle**: a self-contained snapshot of a
+ * playground workspace, encoded by lib/workspaces/bundleCodec.ts as a gzipped
+ * binary container (JSON header + raw database image). Code playgrounds carry
+ * their files verbatim in the header; SQL playgrounds carry the engine's
+ * native database image (SQLite file image / PGlite data-dir tarball / DuckDB
+ * database file) in the binary section plus the query tabs in the header, and
+ * are reopened by loading the image straight into the in-browser engine, no
+ * dump replay.
  *
  * The bundle bytes live in R2; D1 keeps a metadata row whose `manifest` column
  * is a small display-only summary (file names / tab titles) so lists and the
@@ -17,7 +19,7 @@
  * validators directly.
  */
 
-export const BUNDLE_VERSION = 1;
+export const BUNDLE_VERSION = 2;
 
 /** Gzipped-bundle media type used for uploads and R2 `httpMetadata`. */
 export const BUNDLE_CONTENT_TYPE = "application/gzip";
@@ -26,12 +28,25 @@ export type BundleKind = "code" | "sql";
 
 export type SqlDialect = "sqlite" | "postgres" | "duckdb";
 
-/** SQL playgrounds rebuild from a dump; everything else ships files. */
+/** SQL playgrounds reopen from a binary database image; everything else
+ *  ships files. */
 export const SQL_PLAYGROUND_IDS: readonly SqlDialect[] = [
   "sqlite",
   "postgres",
   "duckdb",
 ];
+
+/** Per-dialect format of the binary image in a SQL bundle. One valid value
+ *  per dialect today; a named format (rather than inferring from the dialect)
+ *  keeps room for alternates (e.g. a Parquet export for DuckDB) without
+ *  another container change. */
+export type SqlDbFormat = "sqlite-image" | "pgdata-tar" | "duckdb-image";
+
+export const SQL_DB_FORMATS: Record<SqlDialect, SqlDbFormat> = {
+  sqlite: "sqlite-image",
+  postgres: "pgdata-tar",
+  duckdb: "duckdb-image",
+};
 
 /** Code playgrounds (one per `app/playground/<id>` route). Kept as a literal
  *  list, the Worker cannot enumerate the route tree at request time.
@@ -84,8 +99,11 @@ export interface BundleSqlTab {
 
 export interface BundleSqlState {
   dialect: SqlDialect;
-  /** Full SQL dump (DDL + data) of the active database. Replayed on open. */
-  dump: string;
+  /** Format of the binary database image in the container's binary section. */
+  dbFormat: SqlDbFormat;
+  /** Byte length of the binary image. Redundant with the section length in
+   *  the container, so decode can use it as an integrity check. */
+  dbBytes: number;
   tabs: BundleSqlTab[];
   activeTabIndex?: number;
   /** Display label of the source database, e.g. "chinook.sqlite". */
@@ -104,6 +122,10 @@ export interface WorkspaceBundle {
   activeFilename?: string;
   /** kind === "sql" */
   sql?: BundleSqlState;
+  /** kind === "sql": the raw database image. Never part of the JSON header;
+   *  the codec appends it as the container's binary section and re-attaches
+   *  it here on decode. */
+  database?: Uint8Array;
 }
 
 /** Caps on a bundle's file/tab list. Legit workspaces are far below both;
@@ -112,8 +134,9 @@ export interface WorkspaceBundle {
 export const BUNDLE_MAX_FILES = 200;
 export const BUNDLE_FILENAME_MAX = 512;
 
-/** Structural validation of a decompressed bundle document. Returns `null`
- *  rather than throwing so callers can surface one friendly message. */
+/** Structural validation of a decoded bundle header (the JSON document in
+ *  the container; `database` is attached separately by the codec). Returns
+ *  `null` rather than throwing so callers can surface one friendly message. */
 export function validateBundle(value: unknown): WorkspaceBundle | null {
   if (!value || typeof value !== "object") return null;
   const b = value as Record<string, unknown>;
@@ -147,7 +170,14 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
   const sql = b.sql as Record<string, unknown> | undefined;
   if (!sql || typeof sql !== "object") return null;
   if (sql.dialect !== b.playground) return null;
-  if (typeof sql.dump !== "string") return null;
+  if (sql.dbFormat !== SQL_DB_FORMATS[sql.dialect as SqlDialect]) return null;
+  if (
+    typeof sql.dbBytes !== "number" ||
+    !Number.isInteger(sql.dbBytes) ||
+    sql.dbBytes < 0
+  ) {
+    return null;
+  }
   if (!Array.isArray(sql.tabs) || sql.tabs.length > BUNDLE_MAX_FILES) {
     return null;
   }

@@ -33,12 +33,17 @@ Try editing the `alt` text and the dimensions below, then Run:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      img { border-radius: 12px; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+    img {
+      border-radius: 12px;
+    }
     </style>
   </head>
   <body>
@@ -84,12 +89,18 @@ volume slider:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <head>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      video { max-width: 100%; border-radius: 12px; }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+    video {
+      max-width: 100%;
+      border-radius: 12px;
+    }
     </style>
   </head>
   <body>
@@ -98,7 +109,8 @@ volume slider:
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
       controls
       width="480"
-    ></video>
+    >
+    </video>
     <p>The <code>controls</code> attribute draws the play/pause UI.</p>
   </body>
 </html>
@@ -120,14 +132,14 @@ volume slider:
   files={[
     {
       filename: "index.html",
-      starterCode: `<!doctype html>
+      starterCode: `<!DOCTYPE html>
 <html>
   <body>
     <!-- Build the figure here -->
   </body>
 </html>
 `,
-      solutionCode: `<!doctype html>
+      solutionCode: `<!DOCTYPE html>
 <html>
   <body>
     <figure>

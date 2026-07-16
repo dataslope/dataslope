@@ -19,7 +19,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
-import { isSqlPlayground } from "@/lib/workspaces/types";
 import { CloudApiError, saveCloudWorkspace } from "../cloud/cloudApi";
 import { subscribeWorkspaceChanged } from "./workspaceChanges";
 import {
@@ -56,10 +55,10 @@ export interface AutoSyncOptions {
   needsInitialBackup?: boolean;
 }
 
-// Debounce from the last edit to the backup. SQL bundles carry a full database
-// dump, so they wait longer to coalesce a burst of edits/runs into one upload.
+// Debounce from the last edit to the backup. Auto-sync is code-playgrounds-
+// only (WorkspaceBadge gates it): SQL bundles carry a full database image and
+// save to the cloud only when the user explicitly backs up.
 const CODE_DEBOUNCE_MS = 2000;
-const SQL_DEBOUNCE_MS = 4000;
 // Ignore change pulses for a beat after a workspace becomes active: bootstrap
 // (loading persisted tabs, seeding a sample DB) emits through the same sinks,
 // and we don't want to back up an untouched default the instant it loads.
@@ -85,9 +84,7 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
   // access off the render path.
   useEffect(() => {
     const engine = new WorkspaceSyncEngine({
-      debounceMs: isSqlPlayground(optsRef.current.playgroundId)
-        ? SQL_DEBOUNCE_MS
-        : CODE_DEBOUNCE_MS,
+      debounceMs: CODE_DEBOUNCE_MS,
       settleMs: SETTLE_MS,
       isOnline: () =>
         typeof navigator === "undefined" || navigator.onLine !== false,
