@@ -478,7 +478,7 @@ _PG_PROTECTED_NAMES |= {
 async function loadHeavyPackages(): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
-  // Pyodide 0.29's package loader writes its progress messages
+  // Pyodide's package loader writes its progress messages
   // ("Loading numpy, …", "pandas already loaded from default channel",
   // "No new packages to load", …) through Python's `sys.stdout`. Once
   // `runCode()` installs a `setStdout({ batched })` capture, those

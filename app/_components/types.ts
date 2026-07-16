@@ -252,7 +252,7 @@ export interface LanguageAdapter {
   /** Status text shown after init succeeds. */
   readyStatus: string;
   /** Human-readable runtime details shown by the header's info popup
-   *  (e.g. "Python 3.13 via Pyodide", "R 4.4 via WebR"). */
+   *  (e.g. "Python 3.14 via Pyodide", "R 4.4 via WebR"). */
   runtimeInfo: RuntimeInfo;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
