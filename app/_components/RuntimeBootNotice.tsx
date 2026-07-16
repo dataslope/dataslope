@@ -314,7 +314,7 @@ function SimulatedCodeBlock() {
   return (
     <CodeBlockLoadingPreview
       language="Python"
-      version="3.13.2"
+      version="3.14.2"
       langId="python"
       code={SAMPLE_CODE}
       statusMessage={message}
@@ -352,7 +352,7 @@ function codeBlockItems(): ShowcaseItem[] {
         "Exactly what a learner sees on a first Run, the full code-block card frozen in its loading state: a disabled Run button, the staged status beside it, and the boot notice in the output panel. The loader and bar are animating; the rest is a static preview (no runtime).",
       jsx: `<CodeBlockLoadingPreview
   language="Python"
-  version="3.13.2"
+  version="3.14.2"
   code={pandasSnippet}
   statusMessage="Loading Python runtime…"
   cold
@@ -367,7 +367,7 @@ function codeBlockItems(): ShowcaseItem[] {
         "A fresh page: the worker has started and the runtime is downloading. The output panel hosts the same notice the live block renders.",
       jsx: `<CodeBlockLoadingPreview
   language="Python"
-  version="3.13.2"
+  version="3.14.2"
   code={pandasSnippet}
   statusMessage="Starting Python runtime…"
   cold
@@ -377,7 +377,7 @@ function codeBlockItems(): ShowcaseItem[] {
       node: (
         <CodeBlockLoadingPreview
           language="Python"
-          version="3.13.2"
+          version="3.14.2"
           langId="python"
           code={SAMPLE_CODE}
           statusMessage="Starting Python runtime…"
@@ -393,7 +393,7 @@ function codeBlockItems(): ShowcaseItem[] {
         "Two-phase Pyodide: a stdlib-only block runs immediately, but the first block that imports pandas pauses here while the data stack finishes downloading.",
       jsx: `<CodeBlockLoadingPreview
   language="Python"
-  version="3.13.2"
+  version="3.14.2"
   code={pandasSnippet}
   statusMessage="Installing data packages, first run only…"
   cold
@@ -402,7 +402,7 @@ function codeBlockItems(): ShowcaseItem[] {
       node: (
         <CodeBlockLoadingPreview
           language="Python"
-          version="3.13.2"
+          version="3.14.2"
           langId="python"
           code={SAMPLE_CODE}
           statusMessage="Installing data packages, first run only…"
