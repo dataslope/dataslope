@@ -13,7 +13,7 @@
     "build:images": "node scripts/build-images.mjs",
     "build:og-image": "node scripts/build-og-image.mjs",
     "publish:tools-jar": "npm publish ./tools-jar",
-    "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs && node scripts/build-almostnode-workers.mjs && node scripts/build-search-index.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs",
+    "postinstall": "node scripts/patch-almostnode.mjs && node scripts/postinstall-generate.mjs",
     "start": "next start",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
