@@ -44,16 +44,20 @@ const nextConfig: NextConfig = {
       shiki: "./lib/shiki-slim.ts",
     },
   },
-  // The llms routes read lessons with `path.join(process.cwd(), "content",
-  // …)`, which makes Next's output file tracing sweep broad repo globs into
-  // the server output. Most of that is only dead weight in .open-next, but
-  // cdn-assets/ is actively harmful: it contains the ~3 MB
-  // dotnet.native.wasm, and OpenNext's bundler turns any traced .wasm into
-  // an attached Worker module (~1.2 MiB of the gzipped 10 MiB budget). All
-  // of cdn-assets is served from jsDelivr at runtime (see
-  // app/_components/runtime/cdn.ts), never from the Worker, so exclude the
-  // whole tree (plus other never-read-at-request-time repo dirs the trace
-  // picks up).
+  // The llms/fumadocs-dev route (and the dynamic-mode docs source) read
+  // lessons with `path.join(process.cwd(), "content", …)`, which makes
+  // Next's output file tracing sweep broad repo globs into the server
+  // output. Most of that is only dead weight in .open-next, but cdn-assets/
+  // is actively harmful: it contains the ~3 MB dotnet.native.wasm, and
+  // OpenNext's bundler turns any traced .wasm into an attached Worker
+  // module (~1.2 MiB of the gzipped 10 MiB budget). All of cdn-assets is
+  // served from jsDelivr at runtime (see app/_components/runtime/cdn.ts),
+  // never from the Worker, so exclude the whole tree (plus other
+  // never-read-at-request-time repo dirs the trace picks up: raster image
+  // sources consumed only by build-images.mjs, logo source files, tests,
+  // and wrangler-applied D1 migrations). content/ stays traced on purpose:
+  // it is read at prerender time and by a Node `next start`, and excluding
+  // it saves little compared to the risk.
   outputFileTracingExcludes: {
     "*": [
       "./cdn-assets/**",
@@ -61,6 +65,10 @@ const nextConfig: NextConfig = {
       "./scripts/**",
       "./agent-outputs/**",
       "./tools-jar/**",
+      "./assets/**",
+      "./brand-assets/**",
+      "./__tests__/**",
+      "./migrations/**",
     ],
   },
   // Tell Next.js to rewrite barrel imports from these icon packages
