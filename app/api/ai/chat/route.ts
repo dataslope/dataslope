@@ -20,10 +20,30 @@ import {
   estimateTokens,
   fetchLessonMarkdown,
 } from "@/lib/ai/context";
+import { systemPrompt } from "@/lib/ai/prompt";
 import { checkBudget, recordUsage, utcDay } from "@/lib/ai/limits";
 import { streamChat } from "@/lib/ai/provider";
 import { isSameOrigin } from "@/lib/workspaces/server";
-import type { AskAiRequest, AskAiStreamEvent } from "@/lib/ai/types";
+import type {
+  AskAiAnswerLength,
+  AskAiRequest,
+  AskAiStreamEvent,
+} from "@/lib/ai/types";
+
+/** Output-token multiplier per answer-length preference. Never exceeds the
+ *  tier's own `maxTokens` cap (that stays the cost ceiling); "concise" just
+ *  spends less. */
+const ANSWER_LENGTH_SCALE: Record<AskAiAnswerLength, number> = {
+  concise: 0.55,
+  balanced: 1,
+  detailed: 1,
+};
+
+function resolveAnswerLength(value: unknown): AskAiAnswerLength {
+  return value === "concise" || value === "detailed" || value === "balanced"
+    ? value
+    : "balanced";
+}
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +87,7 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "That question is too long." }, 400);
   }
   const context = body.context ?? { surface: "learn" };
+  const answerLength = resolveAnswerLength(body.answerLength);
 
   // --- Tier → model/provider. ---
   const tier = resolveTier(user, env);
@@ -83,18 +104,33 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // --- Context assembly. ---
+  // Lesson text is opt-in: fetch it only when the user's context mode asked
+  // for it (Full page / a Custom "Lesson text" toggle). "Auto" sends only
+  // what's on screen, so we skip the fetch entirely, saving latency + tokens.
+  // The redesigned client ALWAYS sends includeLessonText explicitly
+  // (true/false); an absent field means a pre-redesign bundle still open in a
+  // tab, which expected the lesson to be attached unconditionally — honor
+  // that (now under the 4k hard cap) rather than silently dropping context
+  // across the deploy.
+  const surface = context.surface === "playground" ? "playground" : "learn";
+  const includeLessonText = context.includeLessonText ?? true;
   const lessonMarkdown =
-    context.surface === "learn"
+    surface === "learn" && includeLessonText
       ? await fetchLessonMarkdown(context.slug, request.url)
       : null;
   const { messages, approxInputTokens } = buildMessages({
-    surface: context.surface === "playground" ? "playground" : "learn",
+    surface,
     question,
     lessonMarkdown,
     context,
     history: Array.isArray(body.history) ? body.history : [],
     contextBudget: model.contextBudget,
+    system: systemPrompt(surface, answerLength),
   });
+  const maxTokens = Math.max(
+    1,
+    Math.round(model.maxTokens * ANSWER_LENGTH_SCALE[answerLength]),
+  );
 
   // --- Call the provider. `upstreamAbort` lets us stop paying for tokens the
   // moment the client disconnects (Stop button / navigation), see cancel(). ---
@@ -105,7 +141,7 @@ export async function POST(request: Request): Promise<Response> {
       {
         messages,
         model: model.model,
-        maxTokens: model.maxTokens,
+        maxTokens,
         signal: upstreamAbort.signal,
       },
       { baseUrl: model.baseUrl, apiKey: model.apiKey },

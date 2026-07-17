@@ -6,6 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 import {
+  collectAskAiLiveSources,
   collectAskAiWidgets,
   getAskAiSources,
   registerAskAiSource,
@@ -115,6 +116,59 @@ describe("contextRegistry", () => {
     } finally {
       unVisible();
       unPinned();
+    }
+  });
+
+  it("collects live sources with their registry id and schema", () => {
+    const unBlock = registerAskAiSource({
+      kind: "code-block",
+      label: "main.py",
+      getSnapshot: () => ({ content: "print(1)" }),
+    });
+    const unSql = registerAskAiSource({
+      kind: "sql-playground",
+      label: "SQLite playground",
+      getSnapshot: () => ({ content: "SELECT 1", schema: "Table t (id)" }),
+    });
+    try {
+      const live = collectAskAiLiveSources();
+      const ids = getAskAiSources().map((s) => s.id);
+      expect(live.map((s) => s.label)).toEqual(["main.py", "SQLite playground"]);
+      expect(live.map((s) => s.id)).toEqual(ids);
+      expect(live.find((s) => s.label === "SQLite playground")?.schema).toBe(
+        "Table t (id)",
+      );
+      expect(live.find((s) => s.label === "main.py")?.schema).toBeUndefined();
+    } finally {
+      unBlock();
+      unSql();
+    }
+  });
+
+  it("skips empty and throwing snapshots when collecting live sources", () => {
+    const unEmpty = registerAskAiSource({
+      kind: "mcq",
+      label: "Empty",
+      getSnapshot: () => ({ content: "   " }),
+    });
+    const unThrows = registerAskAiSource({
+      kind: "mcq",
+      label: "Throws",
+      getSnapshot: () => {
+        throw new Error("boom");
+      },
+    });
+    const unOk = registerAskAiSource({
+      kind: "code-block",
+      label: "Ok",
+      getSnapshot: () => ({ content: "fine" }),
+    });
+    try {
+      expect(collectAskAiLiveSources().map((s) => s.label)).toEqual(["Ok"]);
+    } finally {
+      unEmpty();
+      unThrows();
+      unOk();
     }
   });
 

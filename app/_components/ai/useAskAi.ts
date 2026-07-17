@@ -9,6 +9,7 @@
  */
 import { useCallback, useRef, useState } from "react";
 import type {
+  AskAiAnswerLength,
   AskAiClientContext,
   AskAiStreamEvent,
   AskAiTurn,
@@ -28,12 +29,19 @@ export interface UseAskAi {
   tier: MemberTier | null;
   /** Set when the server returns 401, the caller should show a sign-in CTA. */
   needsSignIn: boolean;
-  send: (question: string) => void;
+  /** Resolves true once the server ACCEPTED the request (2xx, stream opened),
+   *  i.e. the moment a prompt is actually consumed; false on any failure or
+   *  no-op. Callers use this to keep their local quota display accurate. */
+  send: (question: string) => Promise<boolean>;
   stop: () => void;
   reset: () => void;
 }
 
-export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
+export function useAskAi(
+  collectContext: () => AskAiClientContext,
+  /** Read at send time so the latest Settings choice rides with each request. */
+  getAnswerLength?: () => AskAiAnswerLength,
+): UseAskAi {
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,9 +61,9 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
   }, []);
 
   const send = useCallback(
-    async (question: string) => {
+    async (question: string): Promise<boolean> => {
       const q = question.trim();
-      if (!q || streaming) return;
+      if (!q || streaming) return false;
       setError(null);
       setNeedsSignIn(false);
 
@@ -85,6 +93,7 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
           return next;
         });
 
+      let accepted = false;
       try {
         const res = await fetch("/api/ai/chat", {
           method: "POST",
@@ -93,6 +102,7 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
             question: q,
             context: collectContext(),
             history,
+            ...(getAnswerLength ? { answerLength: getAnswerLength() } : {}),
           }),
           signal: ac.signal,
         });
@@ -109,8 +119,13 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
           setError(message);
           // Drop the empty assistant placeholder we optimistically added.
           setMessages((prev) => prev.slice(0, -1));
-          return;
+          return false;
         }
+
+        // From here the server has accepted the request and the prompt is
+        // consumed (usage is recorded as the answer streams), even if the
+        // user stops or the connection drops mid-stream.
+        accepted = true;
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -144,8 +159,9 @@ export function useAskAi(collectContext: () => AskAiClientContext): UseAskAi {
         setStreaming(false);
         abortRef.current = null;
       }
+      return accepted;
     },
-    [messages, streaming, collectContext],
+    [messages, streaming, collectContext, getAnswerLength],
   );
 
   return { messages, streaming, error, tier, needsSignIn, send, stop, reset };

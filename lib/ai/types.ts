@@ -8,6 +8,13 @@ export type MemberTier = "free" | "pro";
 /** Which surface the question was asked from. */
 export type AskAiSurface = "learn" | "playground";
 
+/**
+ * How long the assistant's answers should be. Set from the panel's Settings
+ * ("Answer length") and remembered as a user preference; steers the system
+ * prompt and the output-token cap. Defaults to "balanced".
+ */
+export type AskAiAnswerLength = "concise" | "balanced" | "detailed";
+
 /** A single attached file's live contents (a code-block file or playground tab). */
 export interface AskAiFile {
   filename: string;
@@ -49,6 +56,14 @@ export interface AskAiClientContext {
    * asset), and never trusts client-supplied page text.
    */
   slug?: string[];
+  /**
+   * Whether the server should fetch and include this lesson's full Markdown.
+   * Off by default (the "Auto" context mode sends only what's on screen); the
+   * user opts in via the panel's context sheet ("Full page", or a Custom
+   * "Lesson text" toggle). Even when true the server hard-caps the lesson
+   * text to a few thousand tokens. Ignored off the learn surface.
+   */
+  includeLessonText?: boolean;
   /** Language / SQL-dialect id, e.g. "python", "duckdb". */
   adapterId?: string;
   /** Open / active files the user is looking at. */
@@ -82,6 +97,8 @@ export interface AskAiRequest {
   question: string;
   context: AskAiClientContext;
   history?: AskAiTurn[];
+  /** Preferred answer length (panel Settings). Defaults to "balanced". */
+  answerLength?: AskAiAnswerLength;
 }
 
 /**
