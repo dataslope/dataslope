@@ -11,7 +11,7 @@
  * catalog (not the filtered list), matching the mockup.
  */
 import { useMemo, useState } from "react";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import {
   ArrowDownAZ,
   BarChart3,

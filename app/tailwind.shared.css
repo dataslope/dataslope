@@ -53,6 +53,11 @@
    under home/) because the playground and Fumadocs surfaces render it too;
    scan it explicitly so its utilities generate for BOTH Tailwind roots. */
 @source "./_components/ThemePillToggle.tsx";
+/* Shared segment-level error/loading surfaces (used by quiz/[id], c/[id],
+   s/[shareId], and the dashboard shell). They live at the _components root,
+   which is otherwise unscanned, so list them explicitly. */
+@source "./_components/SegmentError.tsx";
+@source "./_components/SegmentLoading.tsx";
 /* The header's account control lives here; without this glob its Tailwind
    classes (e.g. the avatar's `size-*`) are never generated, so the avatar
    image falls back to its intrinsic ~96px size. */
@@ -65,7 +70,6 @@
 @source "./forgot-password/**/*.{ts,tsx}";
 @source "./reset-password/**/*.{ts,tsx}";
 @source "./_components/legal/**/*.{ts,tsx}";
-@source "./magicui-demo/**/*.{ts,tsx}";
 /* Thin route pages that author Tailwind classes directly. These were missing
    from the old per-root lists, so classes used only there (e.g. /pricing's
    `scroll-mt-20`, `sm:pt-16`; /account's `max-w-md`) silently never

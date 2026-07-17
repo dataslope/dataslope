@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Popover } from "@base-ui-components/react/popover";
+import { Popover } from "@base-ui/react/popover";
 import { CircleHelp, RotateCcw } from "lucide-react";
 import {
   DEFAULT_PRAGMA_SETTINGS,

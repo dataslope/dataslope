@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 
 export interface SqlSettingsConfirmDialogsProps {
   dialectDisplayName: string;

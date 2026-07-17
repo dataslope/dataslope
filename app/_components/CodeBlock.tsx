@@ -4,7 +4,6 @@ import {
   startTransition,
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -13,14 +12,16 @@ import {
 import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import {
-  LANGUAGE_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR,
-} from "./languageIcons";
-import {
   FormatIcon,
   PlayIcon,
   useCreepingBootFraction,
   useMidRunPreparing,
+  type Status,
+  detectIsMac,
+  MIN_RUN_OVERLAY_MS,
+  lineNumbersWithOffset,
+  LanguageGlyph,
+  useBlockId,
 } from "./challengeShared";
 import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { DiamondSpinner } from "./mdx/loadingAnimations";
@@ -75,8 +76,6 @@ import {
 } from "./codePersistence";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
-
-type Status = "idle" | "loading" | "ready" | "running" | "error";
 
 /** One file in a multi-file `<CodeBlock>` workspace. Mirrors the
  *  `ChallengeFile` shape from `ChallengeCard` so authors can use the
@@ -152,14 +151,6 @@ interface CodeBlockProps {
   tailwind?: boolean;
 }
 
-// Match the convention of the existing playground for shortcut hints.
-function detectIsMac(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const platform = navigator.platform || "";
-  const ua = navigator.userAgent || "";
-  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
-}
-
 // Detect the active colour scheme on `<html>`. Fumadocs uses next-themes
 // with `attribute: "class"`, so light/dark is reflected as the `dark`
 // class (or absence thereof) on the document root. We fall back to the
@@ -213,17 +204,6 @@ function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "github-dark" : "github-light";
 }
 
-// Build a line-numbers extension whose gutter starts after `offset`
-// lines, so the editable region's numbering continues from where a
-// file's read-only init code left off. Stored in a compartment so the
-// offset can be reconfigured when the active file (hence its init)
-// changes, without remounting the editor.
-function lineNumbersWithOffset(offset: number) {
-  return lineNumbersExt({
-    formatNumber: offset ? (n) => String(n + offset) : undefined,
-  });
-}
-
 // Small clipboard / "copy to clipboard" glyph reused by the action bar
 // and the output-cell headers. Stroke-only so it inherits the current
 // text colour and reads as part of the surrounding chrome.
@@ -247,47 +227,6 @@ function CopyIcon() {
 }
 
 // Glyph for the adapter's language. Uses the shared `languageIcons`
-// registry so the embedded code blocks render the same icons as the
-// rest of the app. The colour is intentionally NOT the brand colour
-// here: code blocks share the challenge card's `.headerRuntimeLabel`
-// chrome, so the glyph inherits that label's two-tone (light/dark)
-// icon colour to stay visually consistent with the challenge cards.
-// Falls back to the adapter's two-character monogram so future
-// adapters render reasonably without having to update the registry first.
-function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
-  const Icon = LANGUAGE_ICONS[adapter.id];
-  const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
-  if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
-  return (
-    <Icon
-      style={{
-        width: `${Math.round(14 * factor)}px`,
-        height: `${Math.round(14 * factor)}px`,
-      }}
-      aria-hidden
-    />
-  );
-}
-
-// Stable short id derived from React's useId so the SSR markup
-// matches the client. We squash the colon-separated id down to a
-// short hex-like suffix and prefix it with the adapter logo text
-// (e.g. "PyBlock-49b7").
-function useBlockId(adapter: LanguageAdapter): string {
-  const reactId = useId();
-  return useMemo(() => {
-    let h = 0;
-    for (let i = 0; i < reactId.length; i++) {
-      h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
-    }
-    const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
-    const prefix =
-      adapter.logoText.charAt(0).toUpperCase() +
-      adapter.logoText.slice(1).toLowerCase();
-    return `${prefix}Block-${suffix}`;
-  }, [reactId, adapter.logoText]);
-}
-
 // ToastList renders all active toasts into the viewport.  It must be
 // rendered inside a Toast.Provider context (supplied by the CodeBlock
 // wrapper below) so that Toast.useToastManager() works.
@@ -320,12 +259,6 @@ function ToastList() {
     </Toast.Root>
   ));
 }
-
-// Minimum time (ms) the "running" overlay is held visible after a run
-// completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
-// snippet (a few-line JS expression that finishes in 20ms) doesn't
-// blink the wave animation in and back out within a single frame.
-const MIN_RUN_OVERLAY_MS = 300;
 
 // Public export, wraps the inner component with a Toast.Provider so
 // that Toast.useToastManager() works inside CodeBlockInner.

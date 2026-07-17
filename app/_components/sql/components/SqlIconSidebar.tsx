@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, type ReactNode } from "react";
-import { Popover } from "@base-ui-components/react/popover";
+import { Popover } from "@base-ui/react/popover";
 
 export interface SqlIconSidebarButton {
   icon: ReactNode;

@@ -11,9 +11,9 @@
  * high-intent landing pages ("online Python playground", "online SQL editor"),
  * so they're now allowed and listed in the sitemap (see app/sitemap.ts).
  *
- * The `*.md` patterns cover the raw-Markdown mirrors exposed by the
- * `/courses/:path*.md` rewrite (see next.config.ts); `/llms/` covers the
- * route handler those rewrites point at. `/fumadocs-dev` is the
+ * The `*.md` patterns cover the raw-Markdown mirrors (static assets emitted
+ * into public/courses/ by scripts/build-course-md.mjs); `/llms/` covers the
+ * fumadocs-dev raw-Markdown route handler. `/fumadocs-dev` is the
  * development-only component gallery (the old `/learn` demo pages), its
  * pages also set `robots: { index: false }` in their metadata.
  */
@@ -32,7 +32,6 @@ export default function robots(): MetadataRoute.Robots {
           "/color-test",
           "/svg-gallery",
           "/illustration-prompts",
-          "/magicui-demo",
           "/email-preview",
           // Auth surfaces: personalized or credential flows, no SEO value
           // (also marked `robots: { index: false }` in their metadata).

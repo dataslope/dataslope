@@ -28,7 +28,7 @@ import { history, defaultKeymap, historyKeymap, indentWithTab } from "@codemirro
 import { indentOnInput, bracketMatching, indentUnit } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { Popover } from "@base-ui-components/react/popover";
+import { Popover } from "@base-ui/react/popover";
 import { Wand2 } from "lucide-react";
 
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";

@@ -24,7 +24,6 @@
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -32,7 +31,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
-import { Menu } from "@base-ui-components/react/menu";
+import { Menu } from "@base-ui/react/menu";
 import {
   CopyIcon,
   PlayIcon,
@@ -45,6 +44,14 @@ import {
   useIsDark,
   cmThemeNameFor,
   TestResultsRail,
+  type Status,
+  type TestState,
+  type DisplayedTest,
+  detectIsMac,
+  MIN_RUN_OVERLAY_MS,
+  lineNumbersWithOffset,
+  LanguageGlyph,
+  useBlockId,
 } from "./challengeShared";
 import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { DiamondSpinner } from "./mdx/loadingAnimations";
@@ -70,10 +77,6 @@ import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { useAskAiSource } from "./ai/contextRegistry";
 import { describeChallenge } from "./ai/widgetSnapshots";
 import { languageCompletion } from "./completion/languageCompletion";
-import {
-  LANGUAGE_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR,
-} from "./languageIcons";
 import type {
   LanguageAdapter,
   LanguageRuntime,
@@ -113,17 +116,6 @@ import styles from "./ChallengeCard.module.css";
 // Boot-notice styles are shared with `<CodeBlock>` (which already
 // shares this card's styles for its chrome, the reuse runs both ways).
 import codeBlockStyles from "./CodeBlock.module.css";
-
-type Status = "idle" | "loading" | "ready" | "running" | "error";
-type TestState = "pending" | "pass" | "fail";
-
-interface DisplayedTest {
-  id: string;
-  name: string;
-  description?: string;
-  state: TestState;
-  detail: string | null;
-}
 
 /** One file in a challenge workspace. Every challenge passes at least
  *  one file (single-file authors pass a one-element `files` array). A
@@ -245,13 +237,6 @@ export interface ChallengeCardProps {
   tailwind?: boolean;
 }
 
-function detectIsMac(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const platform = navigator.platform || "";
-  const ua = navigator.userAgent || "";
-  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
-}
-
 // Pick a line-comment prefix for the language. Used only to prepend a
 // human-readable "init code runs first" notice at the top of solution
 // files, the comment must parse as a no-op in the target language so
@@ -268,57 +253,10 @@ function lineCommentFor(codeMirrorMode: string): string {
   }
 }
 
-// Build a line-numbers extension whose gutter starts after `offset`
-// lines, so the editable region's numbering continues from where a
-// file's read-only init code left off. Stored in a compartment so the
-// offset can be reconfigured when the active file (hence its init)
-// changes, without remounting the editor.
-function lineNumbersWithOffset(offset: number) {
-  return lineNumbersExt({
-    formatNumber: offset ? (n) => String(n + offset) : undefined,
-  });
-}
-
 // The challenge card adapts its CodeMirror theme to the surrounding
 // docs: dark docs → material-darker, light docs → IntelliJ IDEA.
 // The active theme name is derived from `useIsDark()` at render time
 // and reconfigured via compartments whenever the docs theme toggles.
-
-// Minimum time (ms) the "running" overlay is held visible after a run
-// completes. Matches the playground's MIN_ANIMATION_MS so a fast run
-// (e.g. a few-line JS challenge that finishes in 20ms) doesn't blink
-// the wave animation in and back out within a single frame.
-const MIN_RUN_OVERLAY_MS = 300;
-
-function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
-  const Icon = LANGUAGE_ICONS[adapter.id];
-  const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
-  if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
-  return (
-    <Icon
-      style={{
-        width: `${Math.round(14 * factor)}px`,
-        height: `${Math.round(14 * factor)}px`,
-      }}
-      aria-hidden
-    />
-  );
-}
-
-function useBlockId(adapter: LanguageAdapter): string {
-  const reactId = useId();
-  return useMemo(() => {
-    let h = 0;
-    for (let i = 0; i < reactId.length; i++) {
-      h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
-    }
-    const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
-    const prefix =
-      adapter.logoText.charAt(0).toUpperCase() +
-      adapter.logoText.slice(1).toLowerCase();
-    return `${prefix}Block-${suffix}`;
-  }, [reactId, adapter.logoText]);
-}
 
 // Stable empty list so cards without a `datasets` prop don't re-create
 // hook dependencies on every render.

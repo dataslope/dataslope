@@ -16,6 +16,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -341,7 +342,7 @@ export function useShortId(prefix: string): string {
 // exact error message live in a click-popover so the list stays clean.
 
 import { Info } from "lucide-react";
-import { Popover } from "@base-ui-components/react/popover";
+import { Popover } from "@base-ui/react/popover";
 import railStyles from "./ChallengeCard.module.css";
 
 export interface TestRailEntry {
@@ -445,4 +446,84 @@ export function TestResultsRail({
       ))}
     </div>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Run-state primitives + editor helpers shared by the executable-block family
+// (ChallengeCard, SqlChallengeCard, CodeBlock, SqlCodeBlock). Each of those
+// files used to carry a byte-identical private copy of everything below.
+
+import { lineNumbers as lineNumbersExt } from "@codemirror/view";
+import type { LanguageAdapter } from "./types";
+import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "./languageIcons";
+
+/** Lifecycle of an executable block's runtime. */
+export type Status = "idle" | "loading" | "ready" | "running" | "error";
+/** Lifecycle of a single challenge test row. */
+export type TestState = "pending" | "pass" | "fail";
+
+/** One row in the test-results rail, as rendered (name resolved, state
+ *  computed, failure detail attached). */
+export interface DisplayedTest {
+  id: string;
+  name: string;
+  description?: string;
+  state: TestState;
+  detail: string | null;
+}
+
+export function detectIsMac(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const platform = navigator.platform || "";
+  const ua = navigator.userAgent || "";
+  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
+}
+
+// Minimum time (ms) the "running" overlay is held visible after a run
+// completes. Matches the playground's MIN_ANIMATION_MS so a fast run
+// (e.g. a few-line JS challenge that finishes in 20ms) doesn't blink
+// the wave animation in and back out within a single frame.
+export const MIN_RUN_OVERLAY_MS = 300;
+
+// Build a line-numbers extension whose gutter starts after `offset`
+// lines, so the editable region's numbering continues from where a
+// file's read-only init code left off. Stored in a compartment so the
+// offset can be reconfigured when the active file (hence its init)
+// changes, without remounting the editor.
+export function lineNumbersWithOffset(offset: number) {
+  return lineNumbersExt({
+    formatNumber: offset ? (n) => String(n + offset) : undefined,
+  });
+}
+
+export function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
+  const Icon = LANGUAGE_ICONS[adapter.id];
+  const factor = LANGUAGE_ICON_SIZE_FACTOR[adapter.id] ?? 1;
+  if (!Icon) return <span aria-hidden>{adapter.logoText}</span>;
+  return (
+    <Icon
+      style={{
+        width: `${Math.round(14 * factor)}px`,
+        height: `${Math.round(14 * factor)}px`,
+      }}
+      aria-hidden
+    />
+  );
+}
+
+/** Short, stable, human-readable block id ("PythonBlock-3f2a") derived from
+ *  React's useId, used to label runtimes/workspaces in the registry. */
+export function useBlockId(adapter: LanguageAdapter): string {
+  const reactId = useId();
+  return useMemo(() => {
+    let h = 0;
+    for (let i = 0; i < reactId.length; i++) {
+      h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
+    }
+    const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
+    const prefix =
+      adapter.logoText.charAt(0).toUpperCase() +
+      adapter.logoText.slice(1).toLowerCase();
+    return `${prefix}Block-${suffix}`;
+  }, [reactId, adapter.logoText]);
 }

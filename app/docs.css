@@ -485,7 +485,7 @@ code.hljs {
    - [data-testid="challenge-card"]   non-SQL challenge cards
    - [data-testid="code-block"]       non-SQL code blocks (dataframe tables!)
    - [aria-label="Multiple choice question"]  quiz components
-   - .nd-codeblock, pre, code         code blocks
+   - pre, code                        code blocks
    - [data-rehype-pretty-code-figure] Fumadocs syntax-highlighted code
    - [data-callout], .callout         legacy callout selectors (kept for safety)
    - svg *                            Mermaid renders labels as <p> inside
@@ -503,7 +503,7 @@ code.hljs {
   :where([data-testid="challenge-card"] *),
   :where([data-testid="code-block"] *),
   :where([aria-label="Multiple choice question"] *),
-  :where(.nd-codeblock *, pre *, [data-rehype-pretty-code-figure] *),
+  :where(pre *, [data-rehype-pretty-code-figure] *),
   :where([data-callout] *, .callout *),
   :where(svg *)
 ) {

@@ -19,13 +19,13 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { Popover } from "@base-ui-components/react/popover";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Menu } from "@base-ui-components/react/menu";
-import { Select } from "@base-ui-components/react/select";
-import { Checkbox } from "@base-ui-components/react/checkbox";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
+import { Popover } from "@base-ui/react/popover";
+import { ContextMenu } from "@base-ui/react/context-menu";
+import { Menu } from "@base-ui/react/menu";
+import { Select } from "@base-ui/react/select";
+import { Checkbox } from "@base-ui/react/checkbox";
 import { Toast } from "@base-ui/react/toast";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";

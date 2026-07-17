@@ -10,7 +10,7 @@
 // per dialect, the rename copy varies, etc.) and the component renders
 // the Base UI Select markup all three were duplicating identically.
 
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import { Database } from "lucide-react";
 import type { ReactNode } from "react";
 

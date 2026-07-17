@@ -8,7 +8,7 @@
  * in up to four courses per topic, and a browse-all link into the catalog.
  */
 import { useMemo, useState } from "react";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import {
   ArrowRight,
   BarChart3,

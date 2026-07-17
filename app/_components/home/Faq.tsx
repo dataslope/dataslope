@@ -1,6 +1,6 @@
 "use client";
 
-import { Accordion } from "@base-ui-components/react/accordion";
+import { Accordion } from "@base-ui/react/accordion";
 import { ChevronDown } from "lucide-react";
 import { SparklesText } from "@/components/ui/sparkles-text";
 

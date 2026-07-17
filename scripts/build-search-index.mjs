@@ -34,14 +34,23 @@
  * tsc to deep-infer the multi-MB literal). Runs from `dev`, `build`, and
  * `postinstall`, so the file always exists before typecheck/lint/build.
  *
- * Idempotent. The index reflects content at the time it ran, so restart
- * `next dev` (or run `npm run build:search-index`) to pick up edits.
+ * Idempotent, and cached: when no file under the indexed content dirs (and
+ * not this script) changed since the last run, the remark parse is skipped
+ * entirely (see scripts/lib/build-cache.mjs). The index reflects content at
+ * the time it ran, so restart `next dev` (or run `npm run
+ * build:search-index`) to pick up edits.
  */
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { structure } from "fumadocs-core/mdx-plugins";
 import remarkMdx from "remark-mdx";
+import {
+  collectFiles,
+  hashInputs,
+  isFresh,
+  writeManifest,
+} from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 // Indexed sections: content directory → URL base. Courses only: the
@@ -132,6 +141,19 @@ function plainTextFallback(body) {
     .trim();
 }
 
+// Skip the whole remark parse when nothing that feeds the index changed:
+// every file under the indexed content dirs (lessons + meta.json titles)
+// plus this script itself. See scripts/lib/build-cache.mjs.
+const CACHE_NAME = "search-index";
+const inputsHash = hashInputs(ROOT, [
+  fileURLToPath(import.meta.url),
+  ...SECTIONS.flatMap(({ dir }) => collectFiles(dir)),
+]);
+if (isFresh(ROOT, CACHE_NAME, inputsHash, [OUT_FILE, OUT_ASSET])) {
+  console.log("[search-index] up to date (inputs unchanged), skipping");
+  process.exit(0);
+}
+
 const docs = [];
 let fellBack = 0;
 
@@ -173,6 +195,7 @@ mkdirSync(dirname(OUT_FILE), { recursive: true });
 const json = JSON.stringify(docs);
 writeFileSync(OUT_FILE, `export default ${json};\n`);
 writeFileSync(OUT_ASSET, json);
+writeManifest(ROOT, CACHE_NAME, inputsHash);
 
 console.log(
   `[search-index] wrote lib/generated/search-index.js + public/search-index.json, ` +

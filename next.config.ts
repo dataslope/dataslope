@@ -44,16 +44,20 @@ const nextConfig: NextConfig = {
       shiki: "./lib/shiki-slim.ts",
     },
   },
-  // The llms routes read lessons with `path.join(process.cwd(), "content",
-  // …)`, which makes Next's output file tracing sweep broad repo globs into
-  // the server output. Most of that is only dead weight in .open-next, but
-  // cdn-assets/ is actively harmful: it contains the ~3 MB
-  // dotnet.native.wasm, and OpenNext's bundler turns any traced .wasm into
-  // an attached Worker module (~1.2 MiB of the gzipped 10 MiB budget). All
-  // of cdn-assets is served from jsDelivr at runtime (see
-  // app/_components/runtime/cdn.ts), never from the Worker, so exclude the
-  // whole tree (plus other never-read-at-request-time repo dirs the trace
-  // picks up).
+  // The llms/fumadocs-dev route (and the dynamic-mode docs source) read
+  // lessons with `path.join(process.cwd(), "content", …)`, which makes
+  // Next's output file tracing sweep broad repo globs into the server
+  // output. Most of that is only dead weight in .open-next, but cdn-assets/
+  // is actively harmful: it contains the ~3 MB dotnet.native.wasm, and
+  // OpenNext's bundler turns any traced .wasm into an attached Worker
+  // module (~1.2 MiB of the gzipped 10 MiB budget). All of cdn-assets is
+  // served from jsDelivr at runtime (see app/_components/runtime/cdn.ts),
+  // never from the Worker, so exclude the whole tree (plus other
+  // never-read-at-request-time repo dirs the trace picks up: raster image
+  // sources consumed only by build-images.mjs, logo source files, tests,
+  // and wrangler-applied D1 migrations). content/ stays traced on purpose:
+  // it is read at prerender time and by a Node `next start`, and excluding
+  // it saves little compared to the risk.
   outputFileTracingExcludes: {
     "*": [
       "./cdn-assets/**",
@@ -61,6 +65,10 @@ const nextConfig: NextConfig = {
       "./scripts/**",
       "./agent-outputs/**",
       "./tools-jar/**",
+      "./assets/**",
+      "./brand-assets/**",
+      "./__tests__/**",
+      "./migrations/**",
     ],
   },
   // Tell Next.js to rewrite barrel imports from these icon packages
@@ -92,14 +100,18 @@ const nextConfig: NextConfig = {
       static: 1800,
     },
   },
-  // Expose every `/courses` lesson (and `/fumadocs-dev` demo page) as raw
-  // Markdown at `${page.url}.md`, served by the route handlers under
-  // `app/llms/`. The page-action buttons (Copy Markdown / View as Markdown)
-  // point at these URLs. Using `beforeFiles` guarantees the `.md` suffix is
-  // intercepted before the catch-all page routes get a chance to match it.
-  // The bare `/fumadocs-dev.md` entry covers that section's index page
-  // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page, its
-  // index is the course-catalog page, so there is no bare `/courses.md`.
+  // Expose every `/fumadocs-dev` demo page as raw Markdown at
+  // `${page.url}.md`, served by the route handler under `app/llms/`. The
+  // `/courses` lessons' raw-Markdown mirrors are NOT rewrites: they are
+  // emitted as plain static assets into `public/courses/` at build time by
+  // scripts/build-course-md.mjs (the assets layer serves them before any
+  // route matching), which keeps ~780 route-handler prerenders out of
+  // `next build` and out of the per-deploy R2 cache populate. The
+  // page-action buttons (Copy Markdown / View as Markdown) point at these
+  // `.md` URLs either way. Using `beforeFiles` guarantees the `.md` suffix
+  // is intercepted before the catch-all page routes get a chance to match
+  // it. The bare `/fumadocs-dev.md` entry covers that section's index page
+  // (content/fumadocs-dev/index.mdx).
   // `/dashboard` (the shell segment root) has no page of its own; land it on
   // the create hub. The create/account/admin sections now live under
   // /dashboard and internal links point there directly; the project is
@@ -109,7 +121,6 @@ const nextConfig: NextConfig = {
   ],
   rewrites: async () => ({
     beforeFiles: [
-      { source: "/courses/:path*.md", destination: "/llms/courses/:path*" },
       { source: "/fumadocs-dev.md", destination: "/llms/fumadocs-dev" },
       {
         source: "/fumadocs-dev/:path*.md",

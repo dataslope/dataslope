@@ -23,9 +23,10 @@ const MAX_WIDGETS = 8;
 /**
  * Fetch a lesson's raw markdown from our own prerendered `${slug}.md` asset.
  *
- * On Cloudflare the Worker has NO filesystem at request time, so we cannot read
- * the MDX from disk here (that only works in the build-time-static `.md` route).
- * Instead we fetch the already-prerendered asset over HTTP; `global_fetch_strictly_public`
+ * On Cloudflare the Worker has NO filesystem at request time, so we cannot
+ * read the MDX from disk here (that only works at build time, when
+ * scripts/build-course-md.mjs emits the `.md` mirrors as static assets).
+ * Instead we fetch the asset over HTTP; `global_fetch_strictly_public`
  * (wrangler.jsonc) routes this to the public origin / edge cache. Returns null
  * on any problem, context is best-effort and must never break the request.
  */

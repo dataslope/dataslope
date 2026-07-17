@@ -65,11 +65,11 @@ import Link from "./Link";
 // Base UI primitives, used for menus, popovers, dialogs, and toasts so
 // that the playground gets consistent positioning, focus management,
 // and natural enter/exit animations out of the box.
-import { Menu } from "@base-ui-components/react/menu";
-import { Popover } from "@base-ui-components/react/popover";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Menu } from "@base-ui/react/menu";
+import { Popover } from "@base-ui/react/popover";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Toast } from "@base-ui/react/toast";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,
@@ -4375,11 +4375,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
         <div
           className="panes"
+          role="main"
           data-mobile-tab={mobileTab}
           data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
           data-editor-position={hasPreview ? effectiveEditorPosition : undefined}
           ref={panesRef}
         >
+          <h1 className="playground-sr-title">
+            {`${PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ?? adapter.id} playground`}
+          </h1>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">

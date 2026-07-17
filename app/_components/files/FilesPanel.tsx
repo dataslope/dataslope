@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState, useRef, useCallback } from "react";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Dialog } from "@base-ui-components/react/dialog";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { ContextMenu } from "@base-ui/react/context-menu";
+import { Dialog } from "@base-ui/react/dialog";
 import {
   Upload,
   Download,

@@ -8,8 +8,8 @@
 // duplicating them.
 
 import { useCallback, useState, type ReactNode } from "react";
-import { Switch } from "@base-ui-components/react/switch";
-import { Tabs } from "@base-ui-components/react/tabs";
+import { Switch } from "@base-ui/react/switch";
+import { Tabs } from "@base-ui/react/tabs";
 import {
   ALargeSmall,
   Eraser,

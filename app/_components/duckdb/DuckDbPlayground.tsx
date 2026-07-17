@@ -25,12 +25,12 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "../sql/shared/editorSetup";
-import { Combobox } from "@base-ui-components/react/combobox";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { Menu } from "@base-ui-components/react/menu";
-import { Popover } from "@base-ui-components/react/popover";
-import { Select } from "@base-ui-components/react/select";
-import { Switch } from "@base-ui-components/react/switch";
+import { Combobox } from "@base-ui/react/combobox";
+import { Dialog } from "@base-ui/react/dialog";
+import { Menu } from "@base-ui/react/menu";
+import { Popover } from "@base-ui/react/popover";
+import { Select } from "@base-ui/react/select";
+import { Switch } from "@base-ui/react/switch";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
@@ -205,6 +205,7 @@ import {
   statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import { IMPORT_COL_STATUS_LABEL } from "../sql/constants";
 import {
   ensurePersistUnloadFlush,
   persistAsync,
@@ -217,7 +218,6 @@ import type {
   AddRowDialogState,
   ColumnKeyHints,
   CsvImportState,
-  ImportColComparison,
   JsonImportState,
   ParquetImportState,
   QueryRunResult,
@@ -900,13 +900,6 @@ const RUNTIME_INFO: RuntimeInfo = {
   engineUrl: "https://duckdb.org/docs/api/wasm/overview",
   notes:
     "Pure-WASM build of DuckDB that runs entirely in your browser. Each sample database is rebuilt in memory on every page load. DuckDB does not support triggers or VIRTUAL generated columns; STORED generated columns are supported.",
-};
-
-const IMPORT_COL_STATUS_LABEL: Record<ImportColComparison["status"], string> = {
-  matched: "✓ Matched",
-  extra: "⚠ Not in table",
-  optional: "○ Optional",
-  required: "✗ Required",
 };
 
 function quoteIdent(name: string): string {
@@ -5478,6 +5471,7 @@ function DuckDbPlaygroundInner() {
             ref={panesRef}
             className={`sql-panes duckdb-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
           >
+            <h1 className="playground-sr-title">DuckDB playground</h1>
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}

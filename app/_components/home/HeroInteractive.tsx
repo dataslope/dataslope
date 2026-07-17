@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import {
   ChevronDown,
   Code2,

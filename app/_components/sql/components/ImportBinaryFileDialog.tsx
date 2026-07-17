@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@base-ui-components/react/dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import { TriangleAlert, Upload } from "lucide-react";
 import type { ReactNode } from "react";
 
