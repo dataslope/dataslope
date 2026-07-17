@@ -29,14 +29,41 @@
  */
 
 import { build } from "esbuild";
+import { readdirSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  collectFiles,
+  hashInputs,
+  isFresh,
+  writeManifest,
+} from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const BUNDLE = join(ROOT, "node_modules", ".cache", "svg-gallery", "svgGallery.mjs");
 const OUT_DIR = join(ROOT, "public", "svg-gallery");
 const OUT_FILE = join(OUT_DIR, "data.json");
+
+// Skip the esbuild + full content walk when nothing that feeds the gallery
+// changed: the walked content sections (lib/svgGallery.ts SECTIONS), the
+// top-level lib/*.ts modules the bundle is built from, and this script.
+// See scripts/lib/build-cache.mjs.
+const CACHE_NAME = "svg-gallery";
+const inputsHash = hashInputs(ROOT, [
+  fileURLToPath(import.meta.url),
+  ...collectFiles(join(ROOT, "content", "courses")),
+  ...collectFiles(join(ROOT, "content", "fumadocs-dev")),
+  // Top-level lib/*.ts only: that's where svgGallery.ts and the modules it
+  // bundles (extractSvgGraphics, jsxSvgToHtml, …) live.
+  ...readdirSync(join(ROOT, "lib"))
+    .filter((name) => name.endsWith(".ts"))
+    .map((name) => join(ROOT, "lib", name)),
+]);
+if (isFresh(ROOT, CACHE_NAME, inputsHash, [OUT_FILE])) {
+  console.log("[svg-gallery] up to date (inputs unchanged), skipping");
+  process.exit(0);
+}
 
 await mkdir(dirname(BUNDLE), { recursive: true });
 await build({
@@ -58,6 +85,7 @@ await rm(OUT_DIR, { recursive: true, force: true });
 await mkdir(OUT_DIR, { recursive: true });
 const json = JSON.stringify(courses);
 await writeFile(OUT_FILE, json);
+writeManifest(ROOT, CACHE_NAME, inputsHash);
 
 console.log(
   `[svg-gallery] wrote public/svg-gallery/data.json, ${total} graphics in ` +
