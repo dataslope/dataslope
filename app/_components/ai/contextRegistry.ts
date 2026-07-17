@@ -218,6 +218,56 @@ export function collectAskAiWidgets(pinnedIds: ReadonlySet<string>): {
   return { widgets, schema };
 }
 
+/** One on-screen source, snapshotted with its registry id retained. */
+export interface AskAiLiveSource {
+  id: string;
+  kind: AskAiSourceKind;
+  label: string;
+  /** Packed plain-text state at snapshot time (already length-capped). */
+  content: string;
+  /** Database-schema summary (SQL sources only). */
+  schema?: string;
+}
+
+/**
+ * Snapshot the currently-visible sources, keeping each one's registry `id`.
+ *
+ * Unlike {@link collectAskAiWidgets} (the old pin-aware packer), this drives
+ * the redesigned context sheet: the panel lists one row per returned source,
+ * estimates its tokens from `content`, and — in "Custom" mode — lets the user
+ * toggle individual sources off, filtering by `id` before sending. Only
+ * on-screen sources are included ("Auto sends only what's on your screen");
+ * ordered by document position and capped like the widget packer. A source
+ * whose snapshot is empty/throws is skipped so a broken widget never breaks
+ * the panel.
+ */
+export function collectAskAiLiveSources(): AskAiLiveSource[] {
+  const ordered = [...sources.values()]
+    .filter((s) => s.visibility > 0)
+    .sort(byDocumentOrder);
+  const out: AskAiLiveSource[] = [];
+  for (const rec of ordered) {
+    if (out.length >= MAX_WIDGETS) break;
+    let snap: AskAiSourceSnapshot | null = null;
+    try {
+      snap = rec.getSnapshot();
+    } catch {
+      // A widget that fails to snapshot must never break the panel.
+    }
+    if (!snap) continue;
+    const content = snap.content.trim();
+    if (!content && !snap.schema) continue;
+    out.push({
+      id: rec.id,
+      kind: rec.kind,
+      label: rec.label.slice(0, MAX_LABEL_CHARS),
+      content: content.slice(0, MAX_WIDGET_CHARS),
+      ...(snap.schema ? { schema: snap.schema } : {}),
+    });
+  }
+  return out;
+}
+
 /**
  * React helper: register a source for the lifetime of the component.
  * `getSnapshot` is read through a ref so its identity may change freely;

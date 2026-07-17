@@ -94,8 +94,11 @@ export async function POST(request: Request): Promise<Response> {
   // --- Context assembly: same pipeline as chat, smaller budget, and the
   // suggestion instruction takes the place of the user's question. ---
   const surface = context.surface === "playground" ? "playground" : "learn";
+  // Mirror the chat route: only pull the lesson Markdown when the user opted
+  // into it (Full page / Custom). Suggestions are grounded in whatever's on
+  // screen otherwise, and stay cheap in the default "Auto" mode.
   const lessonMarkdown =
-    surface === "learn"
+    surface === "learn" && context.includeLessonText
       ? await fetchLessonMarkdown(context.slug, request.url)
       : null;
   const { messages, approxInputTokens } = buildMessages({

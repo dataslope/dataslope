@@ -1,8 +1,13 @@
-/* Self-contained styles for the "Ask AI" widget. Uses plain CSS (a CSS module)
-   with explicit light/dark values so it renders identically on the Tailwind-based
-   /learn pages and the plain-CSS /playground pages, without depending on either
-   surface's tokens. `:global(html.dark)` follows the site's dark-mode class. */
+/* Self-contained styles for the redesigned "Ask AI" widget. Plain CSS module
+   with explicit light/dark values so it renders identically on the Tailwind
+   /learn pages and the plain-CSS /playground pages, without depending on
+   either surface's tokens. `:global(html.dark)` follows the site's dark class.
 
+   Design rules (see the handoff): NO borders anywhere — separation comes from
+   fills, spacing, and shadow only. Brand blue #0878DD (hover #046ECD); dark
+   accent #5BA7FF / #8ABFFF. Reds are the Dataslope brand reds. */
+
+/* ── Closed launcher ──────────────────────────────────────────────── */
 .launcher {
   position: fixed;
   right: 20px;
@@ -14,24 +19,23 @@
   padding: 10px 16px;
   border: none;
   border-radius: 9999px;
-  background: var(--ds-blue-600, #1f6feb);
+  background: #0878dd;
   color: #fff;
-  font-family: var(--font-sans, system-ui, sans-serif);
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 6px 20px rgba(8, 120, 221, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 .launcher:hover {
+  background: #046ecd;
   transform: translateY(-1px);
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 8px 26px rgba(8, 120, 221, 0.36);
 }
 
-/* "Sidebar tab" placement: a compact square icon button flush with the right
-   viewport edge, chosen from the panel's settings so the launcher stops
-   covering page content. Icon-only (no label) with a small corner radius,
-   since a big pill radius looks out of place on a button this small. */
+/* Edge-tab placement: a slim button docked flush with the right viewport
+   edge, out of the content's way (the square marker in Settings' preview). */
 .launcherTab {
   position: fixed;
   right: 0;
@@ -40,72 +44,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 44px;
   border: none;
-  border-radius: 6px 0 0 6px;
-  background: var(--ds-blue-600, #1f6feb);
+  border-radius: 8px 0 0 8px;
+  background: #0878dd;
   color: #fff;
   cursor: pointer;
-  box-shadow: -2px 3px 12px rgba(0, 0, 0, 0.18);
+  box-shadow: -2px 3px 14px rgba(8, 120, 221, 0.3);
   transition: box-shadow 0.12s ease, background 0.12s ease;
 }
 .launcherTab:hover {
-  box-shadow: -3px 4px 16px rgba(0, 0, 0, 0.24);
+  background: #046ecd;
+  box-shadow: -3px 4px 18px rgba(8, 120, 221, 0.38);
 }
 
-/* ── Settings (inline section under the panel header) ────────────── */
-.settings {
-  padding: 10px 14px 12px;
-  border-bottom: 1px solid #eceef1;
-  background: #f8f9fa;
-  font-family: var(--font-sans, system-ui, sans-serif);
-}
-:global(html.dark) .settings {
-  border-bottom-color: #2c2c2c;
-  background: #191919;
-}
-.settingsLabel {
-  margin-bottom: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-:global(html.dark) .settingsLabel {
-  color: #9aa0a6;
-}
-.settingsOption {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  padding: 6px 2px;
-  font-size: 13px;
-  color: #1a1a1a;
-  cursor: pointer;
-}
-:global(html.dark) .settingsOption {
-  color: #e6e6e6;
-}
-.settingsOption input {
-  margin-top: 2px;
-  accent-color: var(--ds-blue-600, #1f6feb);
-  cursor: pointer;
-}
-.settingsOption span {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.settingsOption small {
-  font-size: 11.5px;
-  color: #6b7280;
-}
-:global(html.dark) .settingsOption small {
-  color: #9aa0a6;
-}
-
+/* ── Panel shell ──────────────────────────────────────────────────── */
 .panel {
   position: fixed;
   right: 20px;
@@ -116,37 +70,50 @@
   width: min(400px, calc(100vw - 32px));
   height: min(620px, calc(100vh - 40px));
   background: #fff;
-  color: #1a1a1a;
-  border: 1px solid #e2e5e9;
-  border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
-  font-family: var(--font-sans, system-ui, sans-serif);
+  color: #111827;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(17, 24, 39, 0.16), 0 2px 8px rgba(17, 24, 39, 0.05);
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
   overflow: hidden;
 }
 :global(html.dark) .panel {
-  background: #1a1a1a;
+  background: #121212;
   color: #e8eaed;
-  border-color: #2c2c2c;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
 }
 
+.chatArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s ease;
+}
+/* Content behind the open context sheet dims and stops taking clicks. */
+.dimmed {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
 .header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border-bottom: 1px solid #eceef1;
+  gap: 10px;
+  padding: 14px 14px 10px 18px;
 }
-:global(html.dark) .header {
-  border-bottom-color: #2c2c2c;
+.sparkle {
+  flex: 0 0 auto;
+  color: #0878dd;
+}
+:global(html.dark) .sparkle {
+  color: #5ba7ff;
 }
 .title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
 }
-.badge {
+.tierBadge {
   margin-left: 2px;
   padding: 1px 7px;
   border-radius: 9999px;
@@ -157,186 +124,254 @@
   background: #eef2f7;
   color: #55606e;
 }
-:global(html.dark) .badge {
-  background: #26303c;
+:global(html.dark) .tierBadge {
+  background: rgba(255, 255, 255, 0.08);
   color: #9fb4cc;
 }
-.badgePro {
+.tierBadgePro {
   background: #ecfdf3;
   color: #1a7f47;
 }
-:global(html.dark) .badgePro {
-  background: #10281a;
+:global(html.dark) .tierBadgePro {
+  background: rgba(74, 222, 128, 0.14);
   color: #4ade80;
 }
 .headerSpacer {
   flex: 1;
 }
-.iconButton {
+.iconBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  flex: 0 0 auto;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   background: transparent;
-  color: inherit;
+  color: #6b7280;
   cursor: pointer;
-  opacity: 0.7;
+  transition: background 0.12s ease, color 0.12s ease;
 }
-.iconButton:hover {
-  opacity: 1;
-  background: rgba(127, 127, 127, 0.12);
+.iconBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+:global(html.dark) .iconBtn {
+  color: #9aa0a8;
+}
+:global(html.dark) .iconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8eaed;
+}
+/* Consecutive header buttons overlap slightly (tightened spacing). */
+.iconBtnTight {
+  margin-left: -6px;
 }
 
+/* Settings header variant. */
+.headerSettings {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px 6px 10px;
+}
+.settingsTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+/* ── Messages / body ──────────────────────────────────────────────── */
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.emptyWrap {
+/* Empty + signed-out + out-of-prompts share the centered-column layout. */
+.emptyWrap,
+.signedOut {
   margin: auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
-  width: 100%;
-  max-width: 300px;
-}
-.empty {
-  margin: 0 auto;
+  align-items: center;
+  gap: 14px;
+  max-width: 270px;
   text-align: center;
-  max-width: 260px;
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.5;
 }
-
-/* Suggested questions: a column of clickable pills (empty state and after
-   each answer), with pulsing placeholders while they generate. */
-.suggestList {
+.outWrap {
+  margin: auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  max-width: 280px;
+  text-align: center;
 }
-.suggestButton {
+.emptyBadge {
   display: flex;
-  align-items: flex-start;
-  gap: 7px;
-  padding: 8px 12px;
-  border: 1px solid #d7dbe0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: #e8f2ff;
+  color: #0878dd;
+}
+:global(html.dark) .emptyBadge {
+  background: rgba(91, 167, 255, 0.16);
+  color: #5ba7ff;
+}
+.outBadge {
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
-  background: #f7f8fa;
-  color: #374151;
-  font-family: inherit;
+  background: #ffedec;
+  color: #ba303a;
+}
+:global(html.dark) .outBadge {
+  background: rgba(255, 79, 89, 0.14);
+  color: #ff807f;
+}
+.emptyText {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.emptyTitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #111827;
+}
+:global(html.dark) .emptyTitle {
+  color: #e8eaed;
+}
+.emptyBody {
   font-size: 12.5px;
-  line-height: 1.4;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  line-height: 1.6;
+  color: #6b7280;
 }
-.suggestButton:hover {
-  border-color: var(--ds-blue-500, #3b82f6);
-  background: #f0f6ff;
+:global(html.dark) .emptyBody {
+  color: #9aa0a8;
 }
-.suggestButton > svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  color: var(--ds-blue-600, #1f6feb);
+.outResets {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #9ca3af;
 }
-:global(html.dark) .suggestButton {
-  border-color: #333;
-  background: #202225;
-  color: #cdd3da;
-}
-:global(html.dark) .suggestButton:hover {
-  border-color: var(--ds-blue-500, #3b82f6);
-  background: #1b2536;
-}
-.suggestSkeleton {
-  height: 32px;
-  border-radius: 12px;
-  background: rgba(127, 127, 127, 0.12);
-  animation: suggestPulse 1.2s ease-in-out infinite;
-}
-.suggestSkeleton:nth-child(2) {
-  animation-delay: 0.15s;
-}
-.suggestSkeleton:nth-child(3) {
-  animation-delay: 0.3s;
-}
-@keyframes suggestPulse {
-  50% {
-    opacity: 0.45;
-  }
+:global(html.dark) .outResets {
+  color: #6b7076;
 }
 
-.msg {
-  max-width: 100%;
-  font-size: 13.5px;
-  line-height: 1.55;
-  word-wrap: break-word;
+.signedOut {
+  color: #6b7280;
+  font-size: 12.5px;
+  line-height: 1.6;
 }
-.user {
+:global(html.dark) .signedOut {
+  color: #9aa0a8;
+}
+.signInLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: #0878dd;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.signInLink:hover {
+  background: #046ecd;
+}
+
+/* ── User bubble + assistant answer ───────────────────────────────── */
+.msgUser {
   align-self: flex-end;
   max-width: 85%;
-  padding: 8px 12px;
-  border-radius: 14px 14px 4px 14px;
-  background: var(--ds-blue-600, #1f6feb);
+  padding: 8px 13px;
+  border-radius: 12px 12px 4px 12px;
+  background: #0878dd;
   color: #fff;
+  font-size: 13.5px;
+  line-height: 1.5;
   white-space: pre-wrap;
+  word-wrap: break-word;
 }
-.assistant {
+.answerBlock {
   align-self: flex-start;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
 }
-/* Markdown niceties inside an assistant message. */
-.assistant :where(p) {
+.answer {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #374151;
+  word-wrap: break-word;
+}
+:global(html.dark) .answer {
+  color: #d3d7dc;
+}
+.answer :where(p) {
   margin: 0 0 8px;
 }
-.assistant :where(p):last-child {
+.answer :where(p):last-child {
   margin-bottom: 0;
 }
-.assistant :where(pre) {
+.answer :where(pre) {
   margin: 8px 0;
   padding: 10px 12px;
   border-radius: 8px;
   background: #f4f6f8;
+  color: #24292f;
   overflow-x: auto;
   font-size: 12.5px;
+  line-height: 1.6;
 }
-:global(html.dark) .assistant :where(pre) {
-  background: #0f1216;
+:global(html.dark) .answer :where(pre) {
+  background: #101215;
+  color: #c9d1d9;
 }
-.assistant :where(code) {
+.answer :where(code) {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.92em;
 }
-.assistant :where(:not(pre) > code) {
+.answer :where(:not(pre) > code) {
   padding: 1px 5px;
   border-radius: 5px;
-  background: rgba(127, 127, 127, 0.16);
+  background: #eef0f3;
 }
-.assistant :where(ul, ol) {
+:global(html.dark) .answer :where(:not(pre) > code) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.answer :where(ul, ol) {
   margin: 0 0 8px;
   padding-left: 20px;
 }
-.assistant :where(a) {
-  color: var(--ds-blue-600, #1f6feb);
+.answer :where(a) {
+  color: #0064bd;
   text-decoration: underline;
+}
+:global(html.dark) .answer :where(a) {
+  color: #8abfff;
 }
 
 .caret {
   display: inline-block;
   width: 7px;
   height: 14px;
-  margin-left: 1px;
+  margin-left: 2px;
   vertical-align: text-bottom;
   background: currentColor;
   opacity: 0.6;
@@ -345,6 +380,152 @@
 @keyframes blink {
   50% {
     opacity: 0;
+  }
+}
+
+/* Typing indicator (pre-stream "sending" state). */
+.typing {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 13px 16px;
+  border-radius: 12px 12px 12px 4px;
+  background: #f3f4f6;
+}
+:global(html.dark) .typing {
+  background: rgba(255, 255, 255, 0.07);
+}
+.typingDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #9ca3af;
+  animation: typingPulse 1.1s ease-in-out infinite;
+}
+.typingDot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.typingDot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+@keyframes typingPulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.readingStatus {
+  margin: 6px 0 0 4px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+:global(html.dark) .readingStatus {
+  color: #7c828a;
+}
+
+/* Message action row (copy / thumbs). */
+.answerActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.actionBtn:hover,
+.actionBtnOn {
+  background: #f3f4f6;
+  color: #374151;
+}
+:global(html.dark) .actionBtn {
+  color: #8b9096;
+}
+:global(html.dark) .actionBtn:hover,
+:global(html.dark) .actionBtnOn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c8cdd3;
+}
+
+/* "Keep going" follow-up suggestions. */
+.keepGoing {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+.keepGoingLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+  padding: 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0064bd;
+}
+:global(html.dark) .keepGoingLabel {
+  color: #8abfff;
+}
+.followupBtn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #f0f7ff;
+  color: #0064bd;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.followupBtn:hover {
+  background: #e8f2ff;
+}
+.followupBtn > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #0878dd;
+}
+:global(html.dark) .followupBtn {
+  background: rgba(91, 167, 255, 0.1);
+  color: #8abfff;
+}
+:global(html.dark) .followupBtn:hover {
+  background: rgba(91, 167, 255, 0.14);
+}
+:global(html.dark) .followupBtn > svg {
+  color: #5ba7ff;
+}
+.followupSkeleton {
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(127, 127, 127, 0.12);
+  animation: followPulse 1.2s ease-in-out infinite;
+}
+.followupSkeleton:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.followupSkeleton:nth-child(4) {
+  animation-delay: 0.3s;
+}
+@keyframes followPulse {
+  50% {
+    opacity: 0.45;
   }
 }
 
@@ -357,254 +538,11 @@
   font-size: 12.5px;
 }
 :global(html.dark) .error {
-  background: #2a1414;
-  color: #f4a3a3;
+  background: rgba(255, 79, 89, 0.12);
+  color: #ff807f;
 }
 
-.footer {
-  border-top: 1px solid #eceef1;
-  padding: 10px;
-}
-:global(html.dark) .footer {
-  border-top-color: #2c2c2c;
-}
-/* "What AI can see" panel: an honest, expandable listing of the exact
-   context payload the next question will carry, toggled by the Context chip. */
-.contextPanel {
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  border: 1px solid #e2e5e9;
-  border-radius: 12px;
-  background: #f7f8fa;
-  max-height: 180px;
-  overflow-y: auto;
-}
-:global(html.dark) .contextPanel {
-  border-color: #2c2c2c;
-  background: #202225;
-}
-.contextPanelTitle {
-  margin-bottom: 6px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #9199a3;
-}
-.contextList {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.contextItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: #4b5563;
-  overflow-wrap: anywhere;
-}
-:global(html.dark) .contextItem {
-  color: #b6bcc4;
-}
-.contextItem > svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  opacity: 0.75;
-}
-.contextState {
-  font-style: normal;
-  color: #9199a3;
-}
-.contextQuote {
-  display: block;
-  margin-top: 2px;
-  padding: 4px 8px;
-  border-left: 2px solid #d7dbe0;
-  border-radius: 0 6px 6px 0;
-  background: rgba(127, 127, 127, 0.08);
-  font-style: italic;
-  color: #6b7280;
-}
-:global(html.dark) .contextQuote {
-  border-left-color: #444;
-  color: #9aa1ab;
-}
-
-/* Context chips: the highlighted-text chip plus one chip per on-screen /
-   pinned widget, rendered above the input. Scrolls horizontally when a page
-   has many widgets in view rather than growing the footer. */
-.contextRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-bottom: 8px;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  flex: 0 0 auto;
-  max-width: 220px;
-  padding: 3px 8px;
-  border: 1px solid #d7dbe0;
-  border-radius: 9999px;
-  background: #f7f8fa;
-  color: #4b5563;
-  font-family: inherit;
-  font-size: 11.5px;
-  line-height: 1.4;
-}
-:global(html.dark) .chip {
-  border-color: #333;
-  background: #202225;
-  color: #b6bcc4;
-}
-.chipLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.chipButton {
-  cursor: pointer;
-}
-.chipButton:hover {
-  border-color: var(--ds-blue-500, #3b82f6);
-  color: inherit;
-}
-.chipPinned {
-  border-color: var(--ds-blue-600, #1f6feb);
-  background: #eaf1fd;
-  color: #1d4ed8;
-}
-:global(html.dark) .chipPinned {
-  border-color: var(--ds-blue-500, #3b82f6);
-  background: #172742;
-  color: #93b4f5;
-}
-.chipSelection {
-  border-style: dashed;
-}
-.chipDismiss {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: -2px -4px -2px 0;
-  padding: 2px;
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.7;
-}
-.chipDismiss:hover {
-  opacity: 1;
-  background: rgba(127, 127, 127, 0.18);
-}
-
-.inputRow {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
-.textarea {
-  flex: 1;
-  resize: none;
-  max-height: 120px;
-  padding: 8px 10px;
-  border: 1px solid #d7dbe0;
-  border-radius: 10px;
-  background: #fff;
-  color: inherit;
-  font-family: inherit;
-  font-size: 13.5px;
-  line-height: 1.4;
-  outline: none;
-}
-.textarea:focus {
-  border-color: var(--ds-blue-500, #3b82f6);
-}
-:global(html.dark) .textarea {
-  background: #121212;
-  border-color: #333;
-}
-.sendButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 auto;
-  border: none;
-  border-radius: 10px;
-  background: var(--ds-blue-600, #1f6feb);
-  color: #fff;
-  cursor: pointer;
-}
-.sendButton:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-.hintRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.hint {
-  margin: 6px 2px 0;
-  font-size: 11px;
-  color: #9199a3;
-}
-
-/* Daily prompt quota (free members): a small counter whose hover popover
-   explains the limit and the pro upgrade. */
-.quota {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 6px;
-  padding: 0 2px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: 11px;
-  color: #9199a3;
-  white-space: nowrap;
-  cursor: default;
-}
-.quotaLow {
-  color: #d97706;
-  font-weight: 600;
-}
-.quotaPopover {
-  max-width: 250px;
-  padding: 10px 12px;
-  border: 1px solid #e2e5e9;
-  border-radius: 10px;
-  background: #fff;
-  color: #374151;
-  font-family: var(--font-sans, system-ui, sans-serif);
-  font-size: 12px;
-  line-height: 1.5;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-  z-index: 62;
-}
-:global(html.dark) .quotaPopover {
-  background: #222;
-  color: #d5d9de;
-  border-color: #333;
-}
-
-/* "Review changes in the editor" actions under an answer that proposed a
-   file edit (playground surface only, see editSuggestions.ts). */
+/* "Review changes in the editor" actions (playground surface only). */
 .editActions {
   display: flex;
   flex-wrap: wrap;
@@ -612,68 +550,756 @@
   gap: 6px;
   margin-top: 8px;
 }
-.editActionButton {
+.editActionBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid #d4dbe4;
+  padding: 6px 11px;
+  border: none;
   border-radius: 8px;
-  background: #f4f7fa;
-  color: #1f2937;
+  background: #f0f7ff;
+  color: #0064bd;
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.12s ease;
 }
-.editActionButton:hover {
-  background: #e9eef5;
+.editActionBtn:hover {
+  background: #e8f2ff;
 }
-.editActionButton code {
-  font-family: var(--font-mono, ui-monospace, monospace);
+.editActionBtn code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
 }
-:global(html.dark) .editActionButton {
-  background: #242a31;
-  border-color: #3a424c;
-  color: #dbe1e8;
+:global(html.dark) .editActionBtn {
+  background: rgba(91, 167, 255, 0.1);
+  color: #8abfff;
 }
-:global(html.dark) .editActionButton:hover {
-  background: #2b323b;
+:global(html.dark) .editActionBtn:hover {
+  background: rgba(91, 167, 255, 0.14);
 }
 .editStatus {
   flex-basis: 100%;
   font-size: 11.5px;
-  color: #55606e;
+  color: #6b7280;
 }
 :global(html.dark) .editStatus {
-  color: #9fb4cc;
+  color: #9aa0a8;
 }
 
-/* Signed-out state. */
-.signedOut {
-  margin: auto;
-  text-align: center;
-  max-width: 260px;
+/* ── Composer ─────────────────────────────────────────────────────── */
+.composer {
+  padding: 10px 14px 12px;
+}
+/* When the context sheet is open, it sits directly above the composer, drop
+   the composer's top padding so the two hug (per the mock). */
+.sheet + .composer {
+  padding-top: 0;
+}
+.chipRow {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: #4b5563;
-  font-size: 13px;
-  line-height: 1.5;
-}
-:global(html.dark) .signedOut {
-  color: #b6bcc4;
-}
-.signInLink {
-  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding-bottom: 8px;
+}
+.contextChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: none;
   border-radius: 9999px;
-  background: var(--ds-blue-600, #1f6feb);
-  color: #fff;
+  background: #e8f2ff;
+  color: #0064bd;
+  font-family: inherit;
+  font-size: 11.5px;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.contextChip:hover {
+  background: #d9e9fc;
+}
+:global(html.dark) .contextChip {
+  background: rgba(91, 167, 255, 0.15);
+  color: #8abfff;
+}
+:global(html.dark) .contextChip:hover {
+  background: rgba(91, 167, 255, 0.24);
+}
+.chipLabel {
+  white-space: nowrap;
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 11px;
+  background: #f3f4f6;
+}
+:global(html.dark) .inputRow {
+  background: rgba(255, 255, 255, 0.07);
+}
+.inputRowDisabled {
+  opacity: 0.5;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  max-height: 120px;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+  outline: none;
+}
+.input::placeholder {
+  color: #9ca3af;
+}
+:global(html.dark) .input::placeholder {
+  color: #7c828a;
+}
+.sendBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 9px;
+  background: #0878dd;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.sendBtn:hover:not(:disabled) {
+  background: #046ecd;
+}
+.sendBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.footerLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 10px 4px 0;
+}
+.disclaimer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: 11px;
+  color: #9ca3af;
+}
+:global(html.dark) .disclaimer {
+  color: #7c828a;
+}
+.quota {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  cursor: default;
+}
+:global(html.dark) .quota {
+  color: #7c828a;
+}
+.quotaOut {
+  color: #ba303a;
+  font-weight: 600;
+}
+:global(html.dark) .quotaOut {
+  color: #ff807f;
+}
+
+/* Quota ring. */
+.ring {
+  flex: 0 0 auto;
+}
+.ringTrack {
+  stroke: #e2e6ea;
+}
+:global(html.dark) .ringTrack {
+  stroke: rgba(255, 255, 255, 0.14);
+}
+.ringProgress {
+  stroke: #0878dd;
+}
+:global(html.dark) .ringProgress {
+  stroke: #5ba7ff;
+}
+.ringOut .ringTrack {
+  stroke: #ffdcda;
+}
+:global(html.dark) .ringOut .ringTrack {
+  stroke: rgba(255, 79, 89, 0.25);
+}
+.ringOut .ringProgress {
+  stroke: #ba303a;
+}
+:global(html.dark) .ringOut .ringProgress {
+  stroke: #ff807f;
+}
+
+.quotaPopover {
+  max-width: 250px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
+  color: #374151;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.16);
+  z-index: 62;
+}
+:global(html.dark) .quotaPopover {
+  background: #1e1e1e;
+  color: #d3d7dc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Context sheet ────────────────────────────────────────────────── */
+.sheet {
+  margin: 0 12px 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f7f8fa;
+  box-shadow: 0 -8px 24px rgba(17, 24, 39, 0.06);
+  animation: sheetUp 0.15s ease-out;
+}
+:global(html.dark) .sheet {
+  background: #1e1e1e;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+}
+@keyframes sheetUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sheetTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #374151;
+}
+:global(html.dark) .sheetTitle {
+  color: #c8cdd3;
+}
+.sheetClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.sheetClose:hover {
+  background: #eceef1;
+  color: #374151;
+}
+:global(html.dark) .sheetClose {
+  color: #8b9096;
+}
+:global(html.dark) .sheetClose:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c8cdd3;
+}
+
+/* Segmented control — shared by the sheet preset and Settings answer-length.
+   Base sizing = Settings; the sheet variant tightens it. */
+.segmented,
+.segmentedSheet {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+:global(html.dark) .segmented,
+:global(html.dark) .segmentedSheet {
+  background: rgba(255, 255, 255, 0.06);
+}
+.segmentedSheet {
+  border-radius: 8px;
+  background: #e8eaee;
+  margin-bottom: 8px;
+}
+:global(html.dark) .segmentedSheet {
+  background: rgba(255, 255, 255, 0.06);
+}
+.segment {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.segment:hover {
+  color: #111827;
+}
+:global(html.dark) .segment {
+  color: #9aa0a8;
+}
+:global(html.dark) .segment:hover {
+  color: #e8eaed;
+}
+.segmentedSheet .segment {
+  padding: 5px 0;
+  border-radius: 6px;
+}
+.segmentActive,
+.segmentActive:hover {
+  background: #fff;
+  color: #111827;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.1);
+}
+:global(html.dark) .segmentActive,
+:global(html.dark) .segmentActive:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e8eaed;
+  box-shadow: none;
+}
+
+.sheetCaption {
+  margin: 0 2px 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #9ca3af;
+}
+:global(html.dark) .sheetCaption {
+  color: #8b9096;
+}
+
+.sourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sourceEmpty {
+  padding: 6px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9ca3af;
+}
+:global(html.dark) .sourceEmpty {
+  color: #8b9096;
+}
+.sourceRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 4px;
+}
+.sourceIcon {
+  flex: 0 0 auto;
+  color: #9ca3af;
+}
+:global(html.dark) .sourceIcon {
+  color: #6b7076;
+}
+.sourceIconOn {
+  color: #0878dd;
+}
+:global(html.dark) .sourceIconOn {
+  color: #5ba7ff;
+}
+.sourceText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sourceTitle {
+  font-size: 13px;
+  line-height: 1.2;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:global(html.dark) .sourceTitle {
+  color: #9aa0a8;
+}
+.sourceTitleOn {
+  color: #111827;
+  font-weight: 500;
+}
+:global(html.dark) .sourceTitleOn {
+  color: #e8eaed;
+}
+.sourceSub {
+  font-size: 11px;
+  line-height: 1.2;
+  color: #9ca3af;
+}
+:global(html.dark) .sourceSub {
+  color: #8b9096;
+}
+.sourceSubOff {
+  color: #b3b9c2;
+}
+:global(html.dark) .sourceSubOff {
+  color: #6b7076;
+}
+
+/* Pill switch. */
+.switch {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 9999px;
+  background: #d5d9df;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.switch:hover {
+  background: #c4cad1;
+}
+:global(html.dark) .switch {
+  background: #3a3d42;
+}
+:global(html.dark) .switch:hover {
+  background: #484c52;
+}
+.switchKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.14s ease;
+}
+:global(html.dark) .switchKnob {
+  background: #8b9096;
+}
+.switchOn {
+  background: #0878dd;
+}
+.switchOn:hover {
+  background: #046ecd;
+}
+:global(html.dark) .switchOn {
+  background: #0878dd;
+}
+:global(html.dark) .switchOn:hover {
+  background: #046ecd;
+}
+.switchOn .switchKnob {
+  transform: translateX(14px);
+  background: #fff;
+}
+
+.sheetFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.sheetEstimate {
+  font-size: 11px;
+  color: #9ca3af;
+}
+:global(html.dark) .sheetEstimate {
+  color: #8b9096;
+}
+.resetLink {
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0878dd;
+  cursor: pointer;
+}
+.resetLink:hover {
+  color: #0064bd;
+  text-decoration: underline;
+}
+:global(html.dark) .resetLink {
+  color: #8abfff;
+}
+:global(html.dark) .resetLink:hover {
+  color: #b5d4ff;
+}
+
+/* ── Settings view ────────────────────────────────────────────────── */
+.settingsBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sectionTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827;
+}
+:global(html.dark) .sectionTitle {
+  color: #e8eaed;
+}
+.sectionSub {
+  font-size: 11.5px;
+  color: #9ca3af;
+}
+:global(html.dark) .sectionSub {
+  color: #8b9096;
+}
+
+.launcherCards {
+  display: flex;
+  gap: 10px;
+}
+.launcherCard {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+  border: none;
+  border-radius: 11px;
+  background: #f7f8fa;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.launcherCard:hover {
+  background: #eef0f3;
+}
+:global(html.dark) .launcherCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+:global(html.dark) .launcherCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.launcherCardSelected,
+.launcherCardSelected:hover {
+  background: #e8f2ff;
+}
+.launcherCardSelected:hover {
+  background: #dcebfd;
+}
+:global(html.dark) .launcherCardSelected,
+:global(html.dark) .launcherCardSelected:hover {
+  background: rgba(91, 167, 255, 0.16);
+}
+:global(html.dark) .launcherCardSelected:hover {
+  background: rgba(91, 167, 255, 0.22);
+}
+.launcherCheck {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0878dd;
+  color: #fff;
+}
+:global(html.dark) .launcherCheck {
+  background: #5ba7ff;
+  color: #121212;
+}
+.launcherPreview {
+  position: relative;
+  height: 58px;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+:global(html.dark) .launcherPreview {
+  background: rgba(255, 255, 255, 0.08);
+}
+.previewLine {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 32px;
+  height: 5px;
+  border-radius: 9999px;
+  background: #e2e6ea;
+}
+:global(html.dark) .previewLine {
+  background: rgba(255, 255, 255, 0.14);
+}
+.previewLine2 {
+  top: 22px;
+  right: 52px;
+}
+.previewPill {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 26px;
+  height: 11px;
+  border-radius: 9999px;
+  background: #0878dd;
+}
+:global(html.dark) .previewPill {
+  background: #5ba7ff;
+}
+.previewTab {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px 0 0 2px;
+  background: #9ca3af;
+}
+:global(html.dark) .previewTab {
+  background: #8b9096;
+}
+.launcherCardLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.launcherCardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+:global(html.dark) .launcherCardTitle {
+  color: #c8cdd3;
+}
+.launcherCardSelected .launcherCardTitle {
+  color: #0064bd;
+}
+:global(html.dark) .launcherCardSelected .launcherCardTitle {
+  color: #cfe3ff;
+}
+.launcherCardSub {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #9ca3af;
+}
+:global(html.dark) .launcherCardSub {
+  color: #8b9096;
+}
+.launcherCardSelected .launcherCardSub {
+  color: #5a86ac;
+}
+:global(html.dark) .launcherCardSelected .launcherCardSub {
+  color: #9db8dd;
+}
+
+.infoCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #f7f8fa;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+.infoCard > svg {
+  flex: 0 0 auto;
+  color: #0878dd;
+}
+:global(html.dark) .infoCard {
+  background: rgba(255, 255, 255, 0.05);
+  color: #9aa0a8;
+}
+:global(html.dark) .infoCard > svg {
+  color: #5ba7ff;
+}
+
+.quotaCard {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #f7f8fa;
+}
+:global(html.dark) .quotaCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+.quotaCardTitle {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #111827;
+}
+:global(html.dark) .quotaCardTitle {
+  color: #e8eaed;
+}
+.quotaCardSub {
+  font-size: 11px;
+  color: #9ca3af;
+}
+:global(html.dark) .quotaCardSub {
+  color: #8b9096;
+}
+.prefsNote {
+  font-size: 11px;
+  text-align: center;
+  color: #b3b9c2;
+}
+:global(html.dark) .prefsNote {
+  color: #6b7076;
 }
