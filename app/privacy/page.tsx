@@ -112,6 +112,12 @@ export default function PrivacyPage() {
           standard server logs (for example request times and IP addresses) for
           security and reliability.
         </li>
+        <li>
+          <strong>Cloudflare Web Analytics</strong> gives us privacy-first,
+          aggregate traffic statistics (such as page views, referrers, and
+          countries). It is cookieless, sets no data on your device, and does
+          not track you across sites or use your data to identify you.
+        </li>
       </ul>
 
       <h2>Cookies</h2>
