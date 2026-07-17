@@ -8,7 +8,6 @@ const DEV_LINKS = [
   { href: "/color-test", label: "Color Theme Test", external: false },
   { href: "/svg-gallery", label: "SVG Gallery", external: false },
   { href: "/illustration-prompts", label: "Illustration Prompts", external: false },
-  { href: "/magicui-demo", label: "Magic UI Demo", external: false },
   { href: "/fumadocs-dev", label: "Fumadocs Dev", external: false },
   { href: "/email-preview", label: "Email Preview", external: false },
 ];
