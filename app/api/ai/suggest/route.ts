@@ -96,9 +96,10 @@ export async function POST(request: Request): Promise<Response> {
   const surface = context.surface === "playground" ? "playground" : "learn";
   // Mirror the chat route: only pull the lesson Markdown when the user opted
   // into it (Full page / Custom). Suggestions are grounded in whatever's on
-  // screen otherwise, and stay cheap in the default "Auto" mode.
+  // screen otherwise, and stay cheap in the default "Auto" mode. An absent
+  // field means a pre-redesign client — keep its old always-include behavior.
   const lessonMarkdown =
-    surface === "learn" && context.includeLessonText
+    surface === "learn" && (context.includeLessonText ?? true)
       ? await fetchLessonMarkdown(context.slug, request.url)
       : null;
   const { messages, approxInputTokens } = buildMessages({

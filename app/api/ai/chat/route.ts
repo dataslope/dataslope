@@ -107,9 +107,15 @@ export async function POST(request: Request): Promise<Response> {
   // Lesson text is opt-in: fetch it only when the user's context mode asked
   // for it (Full page / a Custom "Lesson text" toggle). "Auto" sends only
   // what's on screen, so we skip the fetch entirely, saving latency + tokens.
+  // The redesigned client ALWAYS sends includeLessonText explicitly
+  // (true/false); an absent field means a pre-redesign bundle still open in a
+  // tab, which expected the lesson to be attached unconditionally — honor
+  // that (now under the 4k hard cap) rather than silently dropping context
+  // across the deploy.
   const surface = context.surface === "playground" ? "playground" : "learn";
+  const includeLessonText = context.includeLessonText ?? true;
   const lessonMarkdown =
-    surface === "learn" && context.includeLessonText
+    surface === "learn" && includeLessonText
       ? await fetchLessonMarkdown(context.slug, request.url)
       : null;
   const { messages, approxInputTokens } = buildMessages({

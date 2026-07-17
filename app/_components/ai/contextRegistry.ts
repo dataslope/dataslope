@@ -223,23 +223,32 @@ export interface AskAiLiveSource {
   id: string;
   kind: AskAiSourceKind;
   label: string;
+  /** Latest visibility ratio (0..1), for ranking when the send cap bites. */
+  visibility: number;
   /** Packed plain-text state at snapshot time (already length-capped). */
   content: string;
   /** Database-schema summary (SQL sources only). */
   schema?: string;
 }
 
+/** Max widget sources actually PACKED into one question (mirrors the old
+ *  collectAskAiWidgets cap). Enumeration below is deliberately uncapped so
+ *  the context sheet can show every real candidate; the send path applies
+ *  this cap AFTER the user's per-source toggles, ranked by visibility, so
+ *  disabling sources frees slots for later ones. */
+export const MAX_ASKAI_WIDGETS = MAX_WIDGETS;
+
 /**
  * Snapshot the currently-visible sources, keeping each one's registry `id`.
  *
  * Unlike {@link collectAskAiWidgets} (the old pin-aware packer), this drives
- * the redesigned context sheet: the panel lists one row per returned source,
- * estimates its tokens from `content`, and — in "Custom" mode — lets the user
- * toggle individual sources off, filtering by `id` before sending. Only
- * on-screen sources are included ("Auto sends only what's on your screen");
- * ordered by document position and capped like the widget packer. A source
- * whose snapshot is empty/throws is skipped so a broken widget never breaks
- * the panel.
+ * the redesigned context sheet AND the send path: the panel lists one row per
+ * returned source, estimates its tokens from `content`, and — in "Custom"
+ * mode — filters by the user's toggles before capping and sending, so the
+ * rows shown are exactly the candidates that can be sent. Only on-screen
+ * sources are included ("Auto sends only what's on your screen"), in document
+ * order. A source whose snapshot is empty/throws is skipped so a broken
+ * widget never breaks the panel.
  */
 export function collectAskAiLiveSources(): AskAiLiveSource[] {
   const ordered = [...sources.values()]
@@ -247,7 +256,6 @@ export function collectAskAiLiveSources(): AskAiLiveSource[] {
     .sort(byDocumentOrder);
   const out: AskAiLiveSource[] = [];
   for (const rec of ordered) {
-    if (out.length >= MAX_WIDGETS) break;
     let snap: AskAiSourceSnapshot | null = null;
     try {
       snap = rec.getSnapshot();
@@ -261,6 +269,7 @@ export function collectAskAiLiveSources(): AskAiLiveSource[] {
       id: rec.id,
       kind: rec.kind,
       label: rec.label.slice(0, MAX_LABEL_CHARS),
+      visibility: rec.visibility,
       content: content.slice(0, MAX_WIDGET_CHARS),
       ...(snap.schema ? { schema: snap.schema } : {}),
     });

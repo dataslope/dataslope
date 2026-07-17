@@ -13,6 +13,11 @@
  * screen; lesson text is opt-in and hard-capped server-side. The chosen preset
  * is a remembered global preference; the Custom per-source toggles reset per
  * page. Answer length lives in Settings and is also remembered.
+ *
+ * The sheet's rows, the chip count, and the send payload are all derived from
+ * the same enumeration (`collectPanelSources` + `sourceEnabled`), so what the
+ * user sees is what is sent: the widget cap is applied AFTER the per-source
+ * toggles, ranked by visibility.
  */
 import {
   useCallback,
@@ -59,6 +64,12 @@ import type {
   AskAiSurface,
   AskAiUsageResponse,
 } from "@/lib/ai/types";
+import {
+  estimateTokens,
+  estimateTokensForChars,
+  LESSON_BASES,
+  LESSON_TEXT_MAX_TOKENS,
+} from "@/lib/ai/context";
 import { useAskAi } from "./useAskAi";
 import { useSuggestedQuestions } from "./useSuggestedQuestions";
 import {
@@ -67,6 +78,8 @@ import {
   getAskAiSources,
   getAskAiSourcesServer,
   subscribeAskAiSources,
+  MAX_ASKAI_WIDGETS,
+  type AskAiLiveSource,
   type AskAiSourceKind,
 } from "./contextRegistry";
 import {
@@ -117,27 +130,25 @@ interface CapturedSelection {
   sourceLabel?: string;
 }
 
-// Lesson bases that have a raw-Markdown mirror the server can fetch (mirrors
-// LESSON_BASES in lib/ai/context.ts), used to know whether "Lesson text" is a
-// real, offerable source on this route.
-const LESSON_MD_BASES = new Set(["courses", "fumadocs-dev"]);
-
-// Hard cap on lesson-text tokens, mirrors LESSON_TEXT_MAX_TOKENS in
-// lib/ai/context.ts. Shown to the user and used as the lesson estimate.
-const LESSON_TEXT_CAP_TOKENS = 4000;
-
 const ANSWER_LENGTHS: { id: AskAiAnswerLength; label: string }[] = [
   { id: "concise", label: "Concise" },
   { id: "balanced", label: "Balanced" },
   { id: "detailed", label: "Detailed" },
 ];
 
+const MODE_LABELS: Record<ContextMode, string> = {
+  auto: "Auto",
+  full: "Full page",
+  custom: "Custom",
+};
+
 /** A source group, drives its icon, default toggle, and where it maps in the
  *  request payload. */
 type SourceGroup = "lesson" | "code" | "output" | "selection";
 
 /** One on-screen context source as shown in the sheet + counted by the chip.
- *  `id` is stable across renders so Custom toggles can key off it. */
+ *  `id` is a STABLE key (group name, `file:<name>`, or `w:<kind>:<label>` for
+ *  registry widgets), so Custom toggles survive widget remounts. */
 interface PanelSource {
   id: string;
   group: SourceGroup;
@@ -148,20 +159,42 @@ interface PanelSource {
   chars?: number;
 }
 
-const estimateTokens = (chars: number): number => Math.ceil(chars / 4);
-/** "0.6k", "1.1k" — matches the mock's compact token labels. */
-const fmtK = (tokens: number): string => `${(tokens / 1000).toFixed(1)}k`;
+/** Stable override key for a registry widget. Registry ids (`s{n}`) are
+ *  reminted on every re-registration, so keying user toggles on them would
+ *  silently drop an explicit OFF when the widget remounts. */
+const widgetKey = (kind: string, label: string): string => `w:${kind}:${label}`;
+
+/** Group default: everything on screen is in by default; lesson text is the
+ *  one opt-in source. Single source of truth for the sheet UI, the payload
+ *  filter, and Custom-override seeding. */
+const defaultSourceOn = (group: SourceGroup): boolean => group !== "lesson";
+
+function sourceEnabled(
+  id: string,
+  group: SourceGroup,
+  mode: ContextMode,
+  overrides: Record<string, boolean>,
+): boolean {
+  if (mode === "full") return true;
+  if (mode === "auto") return defaultSourceOn(group);
+  return overrides[id] ?? defaultSourceOn(group);
+}
+
+/** "0.6k", "1.1k" — the mock's compact token labels, floored at 0.1k so tiny
+ *  real sources never read as an empty "0.0k". */
+const fmtK = (tokens: number): string =>
+  `${(Math.max(tokens, 100) / 1000).toFixed(1)}k`;
 
 /** Tokens a source contributes to the estimate (its content, or the lesson cap). */
 function sourceTokens(s: PanelSource): number {
-  if (s.group === "lesson") return LESSON_TEXT_CAP_TOKENS;
-  return estimateTokens(s.chars ?? 0);
+  if (s.group === "lesson") return LESSON_TEXT_MAX_TOKENS;
+  return estimateTokensForChars(s.chars ?? 0);
 }
 
 function sourceSubline(s: PanelSource): string {
   switch (s.group) {
     case "lesson":
-      return "Trimmed to fit · up to 4k tokens";
+      return `Trimmed to fit · up to ${Math.round(LESSON_TEXT_MAX_TOKENS / 1000)}k tokens`;
     case "output":
       return `Last run · ${fmtK(sourceTokens(s))} tokens`;
     case "selection":
@@ -176,6 +209,22 @@ function sourceIconFor(s: PanelSource): typeof CodeXml {
   if (s.group === "output") return Terminal;
   if (s.group === "selection") return TextSelect;
   return s.kind ? (KIND_ICONS[s.kind] ?? CodeXml) : CodeXml;
+}
+
+/** "Reading main.py and your last output…" — status line for an in-flight
+ *  question, built from the sources attached to THAT question. */
+function readingStatusFor(list: PanelSource[]): string {
+  const names = list
+    .filter((s) => s.group !== "lesson")
+    .map((s) =>
+      s.group === "output"
+        ? "your last output"
+        : s.group === "selection"
+          ? "your highlight"
+          : s.label,
+    );
+  if (names.length === 0) return "Thinking…";
+  return `Reading ${names.slice(0, 2).join(" and ")}…`;
 }
 
 /** Circular quota ring (mirrors the mock's 12px, r=6, circumference 37.7 SVG).
@@ -303,24 +352,25 @@ export default function AskAiWidget({
     const v = readStored(ANSWER_LENGTH_KEY);
     return v === "concise" || v === "detailed" ? v : "balanced";
   });
-  const choosePlacement = useCallback((next: LauncherPlacement) => {
+  const choosePlacement = (next: LauncherPlacement) => {
     setPlacement(next);
     writeStored(LAUNCHER_PLACEMENT_KEY, next);
-  }, []);
-  const chooseAnswerLength = useCallback((next: AskAiAnswerLength) => {
+  };
+  const chooseAnswerLength = (next: AskAiAnswerLength) => {
     setAnswerLength(next);
     writeStored(ANSWER_LENGTH_KEY, next);
-  }, []);
+  };
+  const chooseContextMode = (next: ContextMode) => {
+    setContextMode(next);
+    writeStored(CONTEXT_MODE_KEY, next);
+  };
 
-  // Custom per-source overrides (id → on/off). NOT persisted: they reset per
-  // page (see the pathname effect below). Absent id ⇒ the group default.
+  // Custom per-source overrides (stable source id → on/off). NOT persisted:
+  // they reset per page (see the route-change adjustment below). Absent id ⇒
+  // the group default.
   const [customOverrides, setCustomOverrides] = useState<
     Record<string, boolean>
   >({});
-  const chooseContextMode = useCallback((next: ContextMode) => {
-    setContextMode(next);
-    writeStored(CONTEXT_MODE_KEY, next);
-  }, []);
 
   const { data: session, isPending } = useSession();
 
@@ -358,202 +408,89 @@ export default function AskAiWidget({
       document.removeEventListener("selectionchange", onSelectionChange);
   }, []);
 
-  // Whether this route has lesson text the server can actually fetch.
-  const routeHasLessonText = useMemo(() => {
+  // A stable key for the current page, plus whether the server can actually
+  // fetch lesson text for it (mirrors the LESSON_BASES allowlist, imported
+  // from lib/ai/context so the two can't drift).
+  const routeMeta = useMemo(() => {
     const base = collectContext();
-    return (
-      base.surface === "learn" && LESSON_MD_BASES.has(base.slug?.[0] ?? "")
-    );
+    const hasLessonText =
+      base.surface === "learn" && LESSON_BASES.has(base.slug?.[0] ?? "");
+    const key =
+      base.surface === "learn"
+        ? `learn:${base.slug?.join("/") ?? ""}`
+        : `pg:${base.adapterId ?? ""}`;
+    return { key, hasLessonText };
   }, [collectContext]);
 
-  // A stable key for the current page. When it changes we reset the per-page
-  // Custom toggles (the preset itself is a global preference, left alone) using
-  // React's endorsed "adjust state during render" pattern rather than an effect.
-  const routeKey = useMemo(() => {
-    const base = collectContext();
-    return base.surface === "learn"
-      ? `learn:${base.slug?.join("/") ?? ""}`
-      : `pg:${base.adapterId ?? ""}`;
-  }, [collectContext]);
-  const [prevRouteKey, setPrevRouteKey] = useState(routeKey);
-  if (routeKey !== prevRouteKey) {
-    setPrevRouteKey(routeKey);
+  // Route changed: reset the per-page Custom toggles AND drop any captured
+  // highlight — a selection from the previous page must not ride along
+  // invisibly. (React's "adjust state during render" pattern.)
+  const [prevRouteKey, setPrevRouteKey] = useState(routeMeta.key);
+  if (routeMeta.key !== prevRouteKey) {
+    setPrevRouteKey(routeMeta.key);
     setCustomOverrides({});
+    setSelection(null);
   }
 
-  // ── On-screen sources (for the sheet + the chip count) ──────────────
-  // Cheap enumeration (no widget snapshotting): registry sources that are
-  // visible, plus the playground's open files, outputs, lesson text, and any
-  // captured selection. Widget token estimates are filled in lazily when the
-  // sheet is open (see `widgetChars`).
-  const panelSources = useMemo<PanelSource[]>(() => {
-    const base = collectContext();
-    const list: PanelSource[] = [];
-    if (routeHasLessonText) {
-      list.push({ id: "lesson", group: "lesson", label: "Lesson text" });
-    }
-    for (const f of base.files ?? []) {
-      if (!f.content.trim()) continue;
-      list.push({
-        id: `file:${f.filename}`,
-        group: "code",
-        kind: "code-block",
-        label: f.filename,
-        chars: f.content.length,
-      });
-    }
-    for (const s of sources) {
-      if (s.visibility > 0) {
-        list.push({ id: s.id, group: "code", kind: s.kind, label: s.label });
-      }
-    }
-    if ((base.outputs?.length ?? 0) > 0) {
-      list.push({
-        id: "outputs",
-        group: "output",
-        label: "Recent output",
-        chars: (base.outputs ?? []).join("\n").length,
-      });
-    }
-    if (selection) {
-      list.push({
-        id: "selection",
-        group: "selection",
-        label: "Highlighted text",
-        chars: selection.text.length,
-      });
-    }
-    return list;
-  }, [collectContext, sources, selection, routeHasLessonText]);
-
-  // Snapshot widget content lengths only while the sheet is open (so per-widget
-  // token estimates are live without snapshotting on every scroll/keystroke).
-  const widgetChars = useMemo<Map<string, number>>(() => {
-    if (!contextSheetOpen) return new Map();
-    const map = new Map<string, number>();
-    for (const s of collectAskAiLiveSources()) map.set(s.id, s.content.length);
-    return map;
-    // `sources` re-snapshots when the visible set changes, not just on open.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contextSheetOpen, sources]);
-
-  const withWidgetChars = useCallback(
-    (s: PanelSource): PanelSource =>
-      s.group === "code" && s.chars === undefined
-        ? { ...s, chars: widgetChars.get(s.id) ?? 0 }
-        : s,
-    [widgetChars],
-  );
-
-  // Is a source on for the current preset? Auto: everything but lesson text.
-  // Full: everything. Custom: the override, else the group default.
-  const isSourceEnabled = useCallback(
-    (s: PanelSource): boolean => {
-      if (contextMode === "full") return true;
-      if (contextMode === "auto") return s.group !== "lesson";
-      const def = s.group !== "lesson";
-      return customOverrides[s.id] ?? def;
-    },
-    [contextMode, customOverrides],
-  );
-
-  // Flipping any switch drops into Custom and records the override.
-  const toggleSource = useCallback(
-    (s: PanelSource, next: boolean) => {
-      setCustomOverrides((prev) => {
-        // Seed overrides from the *effective* set so switching Auto→Custom
-        // keeps every other source where it visibly was.
-        const seeded: Record<string, boolean> = { ...prev };
-        for (const src of panelSources) {
-          if (!(src.id in seeded)) {
-            seeded[src.id] =
-              contextMode === "full"
-                ? true
-                : contextMode === "auto"
-                  ? src.group !== "lesson"
-                  : (prev[src.id] ?? src.group !== "lesson");
-          }
-        }
-        seeded[s.id] = next;
-        return seeded;
-      });
-      if (contextMode !== "custom") chooseContextMode("custom");
-    },
-    [contextMode, panelSources, chooseContextMode],
-  );
-
-  const resetCustom = useCallback(() => {
-    setCustomOverrides({});
-    chooseContextMode("auto");
-  }, [chooseContextMode]);
-
-  const enabledSources = panelSources.filter(isSourceEnabled);
-  const enabledCount = enabledSources.length;
-  // "Reading main.py and your last output…" — a short, honest status shown
-  // while the request is in flight, built from the sources actually attached.
-  const readingStatus = useMemo(() => {
-    const names = enabledSources
-      .filter((s) => s.group !== "lesson")
-      .map((s) =>
-        s.group === "output"
-          ? "your last output"
-          : s.group === "selection"
-            ? "your highlight"
-            : s.label,
-      );
-    if (names.length === 0) return "Thinking…";
-    return `Reading ${names.slice(0, 2).join(" and ")}…`;
-  }, [enabledSources]);
-  const estimateTokensTotal =
-    enabledSources.reduce((n, s) => n + sourceTokens(withWidgetChars(s)), 0) +
-    estimateTokens((draft.trim() || "your question").length);
-
-  // Final per-question context: filter the live payload by the enabled set.
+  // Final per-question context: the SAME enumeration/enablement rules as the
+  // sheet, applied to fresh snapshots at send time. The widget cap is applied
+  // after the user's toggles, ranked by visibility (most-visible survive),
+  // so disabling sources frees slots and the model sees what the user sees.
   const buildContext = useCallback((): AskAiClientContext => {
-    const base = collectContext();
-    const live = collectAskAiLiveSources();
-    const enabled = (id: string, group: SourceGroup): boolean => {
-      if (contextMode === "full") return true;
-      if (contextMode === "auto") return group !== "lesson";
-      const def = group !== "lesson";
-      return customOverrides[id] ?? def;
-    };
+      const base = collectContext();
+      const on = (id: string, group: SourceGroup) =>
+        sourceEnabled(id, group, contextMode, customOverrides);
 
-    const widgets: NonNullable<AskAiClientContext["widgets"]> = [];
-    let schema: string | undefined;
-    for (const s of live) {
-      if (!enabled(s.id, "code")) continue;
-      widgets.push({ kind: s.kind, label: s.label, content: s.content });
-      if (s.schema && !schema) schema = s.schema;
-    }
-    const files = (base.files ?? []).filter((f) =>
-      enabled(`file:${f.filename}`, "code"),
-    );
-    const outputsOn =
-      (base.outputs?.length ?? 0) > 0 && enabled("outputs", "output");
-    const selectionOn = selection && enabled("selection", "selection");
-    const lessonOn =
-      base.surface === "learn" &&
-      LESSON_MD_BASES.has(base.slug?.[0] ?? "") &&
-      enabled("lesson", "lesson");
+      const live = collectAskAiLiveSources();
+      const enabledLive = live.filter((s) =>
+        on(widgetKey(s.kind, s.label), "code"),
+      );
+      const capped: AskAiLiveSource[] =
+        enabledLive.length > MAX_ASKAI_WIDGETS
+          ? enabledLive
+              .map((s, i) => ({ s, i }))
+              .sort((a, b) => b.s.visibility - a.s.visibility)
+              .slice(0, MAX_ASKAI_WIDGETS)
+              .sort((a, b) => a.i - b.i)
+              .map(({ s }) => s)
+          : enabledLive;
 
-    return {
-      surface: base.surface,
-      ...(base.slug ? { slug: base.slug } : {}),
-      ...(base.adapterId ? { adapterId: base.adapterId } : {}),
-      includeLessonText: lessonOn,
-      ...(files.length ? { files } : {}),
-      ...(outputsOn ? { outputs: base.outputs } : {}),
-      ...(widgets.length ? { widgets } : {}),
-      ...(schema ? { schema } : {}),
-      ...(selectionOn && selection
-        ? { selection: selection.text, selectionLabel: selection.sourceLabel }
-        : {}),
-    };
+      const widgets: NonNullable<AskAiClientContext["widgets"]> = [];
+      let schema: string | undefined;
+      for (const s of capped) {
+        widgets.push({ kind: s.kind, label: s.label, content: s.content });
+        if (s.schema && !schema) schema = s.schema;
+      }
+      const files = (base.files ?? []).filter(
+        (f) => f.content.trim() && on(`file:${f.filename}`, "code"),
+      );
+      const outputsOn =
+        (base.outputs?.length ?? 0) > 0 && on("outputs", "output");
+      const selectionOn = selection && on("selection", "selection");
+      const lessonOn =
+        base.surface === "learn" &&
+        LESSON_BASES.has(base.slug?.[0] ?? "") &&
+        on("lesson", "lesson");
+
+      return {
+        surface: base.surface,
+        ...(base.slug ? { slug: base.slug } : {}),
+        ...(base.adapterId ? { adapterId: base.adapterId } : {}),
+        includeLessonText: lessonOn,
+        ...(files.length ? { files } : {}),
+        ...(outputsOn ? { outputs: base.outputs } : {}),
+        ...(widgets.length ? { widgets } : {}),
+        ...(schema ? { schema } : {}),
+        ...(selectionOn && selection
+          ? { selection: selection.text, selectionLabel: selection.sourceLabel }
+          : {}),
+      };
   }, [collectContext, contextMode, customOverrides, selection]);
 
+  const getAnswerLength = useCallback(() => answerLength, [answerLength]);
+
   const { messages, streaming, error, tier, needsSignIn, send, stop, reset } =
-    useAskAi(buildContext);
+    useAskAi(buildContext, getAnswerLength);
 
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -561,10 +498,114 @@ export default function AskAiWidget({
   }, [messages]);
 
   const signedIn = Boolean(session) && !isPending && !needsSignIn;
+  const sheetOpen = contextSheetOpen && signedIn;
+
+  // ── On-screen sources (sheet rows + chip count) ────────────────────
+  // Display snapshot of the registry widgets. Recomputed on registration /
+  // visibility changes; the send path re-snapshots fresh in buildContext.
+  const liveSources = useMemo(
+    () => (open && signedIn ? collectAskAiLiveSources() : []),
+    // `sources` re-snapshots when the visible set changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [open, signedIn, sources],
+  );
+
+  // Built fresh each render while the panel is open, so playground file edits
+  // and new outputs show up immediately (the old memo went stale — the store
+  // has no change signal the widget can subscribe to).
+  const panelSources: PanelSource[] = [];
+  if (open && signedIn) {
+    const seen = new Set<string>();
+    const push = (s: PanelSource) => {
+      if (!seen.has(s.id)) {
+        seen.add(s.id);
+        panelSources.push(s);
+      }
+    };
+    const base = collectContext();
+    if (routeMeta.hasLessonText) {
+      push({ id: "lesson", group: "lesson", label: "Lesson text" });
+    }
+    for (const f of base.files ?? []) {
+      if (!f.content.trim()) continue;
+      push({
+        id: `file:${f.filename}`,
+        group: "code",
+        kind: "code-block",
+        label: f.filename,
+        chars: f.content.length,
+      });
+    }
+    for (const s of liveSources) {
+      push({
+        id: widgetKey(s.kind, s.label),
+        group: "code",
+        kind: s.kind,
+        label: s.label,
+        chars: s.content.length,
+      });
+    }
+    if ((base.outputs?.length ?? 0) > 0) {
+      push({
+        id: "outputs",
+        group: "output",
+        label: "Recent output",
+        chars: (base.outputs ?? []).join("\n").length,
+      });
+    }
+    if (selection) {
+      push({
+        id: "selection",
+        group: "selection",
+        label: "Highlighted text",
+        chars: selection.text.length,
+      });
+    }
+  }
+
+  const isSourceEnabled = (s: PanelSource): boolean =>
+    sourceEnabled(s.id, s.group, contextMode, customOverrides);
+
+  const enabledSources = panelSources.filter(isSourceEnabled);
+  const enabledCount = enabledSources.length;
+  const sheetTokens =
+    enabledSources.reduce((n, s) => n + sourceTokens(s), 0) +
+    estimateTokens(draft.trim() || "your question");
+
+  // Flipping a switch drops into Custom and records the override — except the
+  // highlight, where "off" means dismiss the capture (the old ✕ semantics): a
+  // future highlight should re-attach rather than being silently excluded.
+  const toggleSource = (s: PanelSource, next: boolean) => {
+    if (s.group === "selection" && !next) {
+      setSelection(null);
+      return;
+    }
+    setCustomOverrides((prev) => {
+      // Seed overrides from the *effective* set so switching Auto/Full→Custom
+      // keeps every other source where it visibly was.
+      const seeded: Record<string, boolean> = { ...prev };
+      for (const src of panelSources) {
+        if (!(src.id in seeded)) {
+          seeded[src.id] = sourceEnabled(src.id, src.group, contextMode, prev);
+        }
+      }
+      seeded[s.id] = next;
+      return seeded;
+    });
+    if (contextMode !== "custom") chooseContextMode("custom");
+  };
+
+  const resetCustom = () => {
+    setCustomOverrides({});
+    chooseContextMode("auto");
+  };
 
   // ── Daily prompt quota ─────────────────────────────────────────────
   const [usage, setUsage] = useState<AskAiUsageResponse | null>(null);
   const [sentSinceUsageFetch, setSentSinceUsageFetch] = useState(0);
+  // Bumped when UTC midnight passes while the panel is open, so the quota
+  // (and any out-of-prompts lockout) refreshes without a close/reopen.
+  const [usageEpoch, setUsageEpoch] = useState(0);
   useEffect(() => {
     if (!open || !signedIn) return;
     let cancelled = false;
@@ -584,7 +625,7 @@ export default function AskAiWidget({
     return () => {
       cancelled = true;
     };
-  }, [open, signedIn]);
+  }, [open, signedIn, usageEpoch]);
   const promptsLeft = usage
     ? Math.max(0, usage.requestsRemaining - sentSinceUsageFetch)
     : null;
@@ -592,12 +633,20 @@ export default function AskAiWidget({
   const outOfPrompts = isFreeTier && promptsLeft === 0 && usage !== null;
 
   // Live "resets in H h M m" countdown to the next UTC midnight (only shown in
-  // the out-of-prompts state). Refreshed on open and once a minute; the clock
-  // read happens in scheduled callbacks, never synchronously during render.
+  // the out-of-prompts state). Refreshed on open and once a minute; when the
+  // remaining time WRAPS (midnight passed), the day's quota reset server-side,
+  // so bump usageEpoch to refetch and release any lockout.
   const [resetsInMs, setResetsInMs] = useState<number | null>(null);
+  const prevResetsMsRef = useRef<number | null>(null);
   useEffect(() => {
     if (!open) return;
-    const tick = () => setResetsInMs(msToUtcMidnight(Date.now()));
+    const tick = () => {
+      const next = msToUtcMidnight(Date.now());
+      const prev = prevResetsMsRef.current;
+      prevResetsMsRef.current = next;
+      setResetsInMs(next);
+      if (prev !== null && next > prev) setUsageEpoch((e) => e + 1);
+    };
     const first = setTimeout(tick, 0);
     const iv = setInterval(tick, 60000);
     return () => {
@@ -608,23 +657,20 @@ export default function AskAiWidget({
 
   // ── AI edit suggestions → the playground editor ────────────────────
   const [editStatus, setEditStatus] = useState<string | null>(null);
-  const handleReviewEdit = useCallback(
-    (s: AiEditSuggestion) => {
-      const res = requestAiEdit(collectContext().adapterId, s);
-      if (res.ok) {
-        setEditStatus(
-          `Review the ${s.filename} diff in the editor, accept or reject the changes there.`,
-        );
-      } else if (res.reason === "unchanged") {
-        setEditStatus(`${s.filename} already matches this suggestion.`);
-      } else if (res.reason === "busy") {
-        setEditStatus("Finish the diff review already open in the editor first.");
-      } else {
-        setEditStatus("The editor isn't available to apply changes right now.");
-      }
-    },
-    [collectContext],
-  );
+  const handleReviewEdit = (s: AiEditSuggestion) => {
+    const res = requestAiEdit(collectContext().adapterId, s);
+    if (res.ok) {
+      setEditStatus(
+        `Review the ${s.filename} diff in the editor, accept or reject the changes there.`,
+      );
+    } else if (res.reason === "unchanged") {
+      setEditStatus(`${s.filename} already matches this suggestion.`);
+    } else if (res.reason === "busy") {
+      setEditStatus("Finish the diff review already open in the editor first.");
+    } else {
+      setEditStatus("The editor isn't available to apply changes right now.");
+    }
+  };
   const canApplyEdits =
     surface === "playground" &&
     !streaming &&
@@ -640,60 +686,89 @@ export default function AskAiWidget({
       history: messages,
     });
 
-  const sendQuestion = useCallback(
-    (q: string) => {
-      send(q);
-      clearSuggestions();
-      setSentSinceUsageFetch((n) => n + 1);
-      setEditStatus(null);
-      setContextSheetOpen(false);
-      // The highlighted text answered this question; don't let it leak into
-      // unrelated follow-ups. Re-selecting re-captures it.
-      setSelection(null);
-    },
-    [send, clearSuggestions],
-  );
-
-  const submit = useCallback(() => {
-    const q = draft.trim();
-    if (!q) return;
-    sendQuestion(q);
-    setDraft("");
-  }, [draft, sendQuestion]);
+  // Status line for the in-flight question, frozen at send time (the live
+  // enabled set changes the moment the selection is cleared below).
+  const [sendingStatus, setSendingStatus] = useState("Thinking…");
 
   // ── Message actions (copy + reactions) ─────────────────────────────
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [reactions, setReactions] = useState<Record<number, "up" | "down">>({});
-  const copyAnswer = useCallback((idx: number, text: string) => {
-    try {
-      void navigator.clipboard?.writeText(text);
-      setCopiedIdx(idx);
-      setTimeout(() => setCopiedIdx((c) => (c === idx ? null : c)), 1500);
-    } catch {
-      /* clipboard blocked, no-op */
-    }
-  }, []);
-  const react = useCallback((idx: number, kind: "up" | "down") => {
+
+  const sendQuestion = (q: string) => {
+    setSendingStatus(readingStatusFor(enabledSources));
+    // Count the prompt only once the server ACCEPTS it — failed sends are
+    // never billed, and decrementing on them would falsely lock the composer.
+    void send(q).then((ok) => {
+      if (ok) setSentSinceUsageFetch((n) => n + 1);
+    });
+    clearSuggestions();
+    setEditStatus(null);
+    setContextSheetOpen(false);
+    // The highlighted text answered this question; don't let it leak into
+    // unrelated follow-ups. Re-selecting re-captures it.
+    setSelection(null);
+  };
+
+  const submit = () => {
+    const q = draft.trim();
+    if (!q) return;
+    sendQuestion(q);
+    setDraft("");
+  };
+
+  const newConversation = () => {
+    reset();
+    setReactions({});
+    setCopiedIdx(null);
+    setEditStatus(null);
+  };
+
+  const copyAnswer = (idx: number, text: string) => {
+    // Show the checkmark only once the write actually succeeded; a rejected
+    // promise (permission denied, unfocused document) keeps the button as-is.
+    navigator.clipboard?.writeText(text).then(
+      () => {
+        setCopiedIdx(idx);
+        window.setTimeout(() => setCopiedIdx((c) => (c === idx ? null : c)), 1500);
+      },
+      () => {
+        /* copy failed, no feedback to fake */
+      },
+    );
+  };
+  const react = (idx: number, kind: "up" | "down") => {
     setReactions((prev) => {
       const next = { ...prev };
       if (next[idx] === kind) delete next[idx];
       else next[idx] = kind;
       return next;
     });
-  }, []);
+  };
 
-  // Close the context sheet on outside click / Esc.
+  // ── Context-sheet interactions ─────────────────────────────────────
+  // Outside click / Esc close it. The composer is EXCLUDED from outside-close:
+  // closing on mousedown would shift Send/Stop before mouseup and swallow the
+  // click (mousedown and mouseup landing on different elements fires no click).
   const sheetRef = useRef<HTMLDivElement>(null);
   const chipRef = useRef<HTMLButtonElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!contextSheetOpen) return;
+    if (!sheetOpen) return;
     const onDown = (e: MouseEvent) => {
       const t = e.target as Node;
-      if (sheetRef.current?.contains(t) || chipRef.current?.contains(t)) return;
+      if (
+        sheetRef.current?.contains(t) ||
+        composerRef.current?.contains(t)
+      ) {
+        return;
+      }
       setContextSheetOpen(false);
     };
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") setContextSheetOpen(false);
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      // Claim the keypress so overlays underneath don't also close.
+      e.preventDefault();
+      setContextSheetOpen(false);
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -701,7 +776,23 @@ export default function AskAiWidget({
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [contextSheetOpen]);
+  }, [sheetOpen]);
+
+  // Dialog-style focus management: the chip unmounts while the sheet is open
+  // (per the design), so move focus into the sheet on open and hand it back
+  // to the chip on close.
+  useEffect(() => {
+    if (!sheetOpen) return;
+    sheetRef.current?.focus();
+    return () => {
+      // Deliberately read at CLEANUP time: the chip is unmounted while the
+      // sheet is open (ref is null during setup) and remounts in the same
+      // commit that closes it — cleanup runs after that DOM update, which is
+      // exactly when the chip exists to receive focus back.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      chipRef.current?.focus();
+    };
+  }, [sheetOpen]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -741,159 +832,10 @@ export default function AskAiWidget({
   const userTurns = messages.filter((m) => m.role === "user").length;
   const disclaimer =
     userTurns % 2 === 0 ? "AI can make mistakes." : "Verify important answers.";
-  const modeLabel =
-    contextMode === "full" ? "Full page" : contextMode === "custom" ? "Custom" : "Auto";
 
-  // ── Settings view (replaces the chat) ──────────────────────────────
-  if (settingsOpen) {
-    return (
-      <div className={styles.panel} role="dialog" aria-label="Ask AI settings" ref={panelRef}>
-        <div className={styles.headerSettings}>
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={() => setSettingsOpen(false)}
-            aria-label="Back"
-            title="Back"
-          >
-            <ChevronLeft size={17} />
-          </button>
-          <span className={styles.settingsTitle}>
-            <Settings size={13} />
-            Settings
-          </span>
-          <span className={styles.headerSpacer} />
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={() => setOpen(false)}
-            aria-label="Close"
-            title="Close"
-          >
-            <X size={17} />
-          </button>
-        </div>
-        <div className={styles.settingsBody}>
-          <section className={styles.section}>
-            <div className={styles.sectionHead}>
-              <span className={styles.sectionTitle}>Where the button lives</span>
-              <span className={styles.sectionSub}>
-                How Ask AI appears when it&apos;s closed
-              </span>
-            </div>
-            <div className={styles.launcherCards}>
-              <button
-                type="button"
-                className={`${styles.launcherCard} ${
-                  placement === "floating" ? styles.launcherCardSelected : ""
-                }`}
-                onClick={() => choosePlacement("floating")}
-                aria-pressed={placement === "floating"}
-              >
-                {placement === "floating" && (
-                  <span className={styles.launcherCheck}>
-                    <Check size={10} strokeWidth={3.5} />
-                  </span>
-                )}
-                <span className={styles.launcherPreview}>
-                  <span className={styles.previewLine} />
-                  <span className={`${styles.previewLine} ${styles.previewLine2}`} />
-                  <span className={styles.previewPill} />
-                </span>
-                <span className={styles.launcherCardLabel}>
-                  <span className={styles.launcherCardTitle}>Floating button</span>
-                  <span className={styles.launcherCardSub}>
-                    Bottom corner of the page
-                  </span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.launcherCard} ${
-                  placement === "tab" ? styles.launcherCardSelected : ""
-                }`}
-                onClick={() => choosePlacement("tab")}
-                aria-pressed={placement === "tab"}
-              >
-                {placement === "tab" && (
-                  <span className={styles.launcherCheck}>
-                    <Check size={10} strokeWidth={3.5} />
-                  </span>
-                )}
-                <span className={styles.launcherPreview}>
-                  <span className={styles.previewLine} />
-                  <span className={`${styles.previewLine} ${styles.previewLine2}`} />
-                  <span className={styles.previewTab} />
-                </span>
-                <span className={styles.launcherCardLabel}>
-                  <span className={styles.launcherCardTitle}>Edge tab</span>
-                  <span className={styles.launcherCardSub}>
-                    Docked to the side, out of the way
-                  </span>
-                </span>
-              </button>
-            </div>
-          </section>
-
-          <section className={styles.section}>
-            <div className={styles.sectionHead}>
-              <span className={styles.sectionTitle}>Context</span>
-              <span className={styles.sectionSub}>
-                What&apos;s sent with your questions
-              </span>
-            </div>
-            <div className={styles.infoCard}>
-              <Eye size={14} aria-hidden />
-              <span>
-                Pick Auto, Full page, or Custom from the Context chip next to the
-                message box. Your last choice is remembered.
-              </span>
-            </div>
-          </section>
-
-          <section className={styles.section}>
-            <span className={styles.sectionTitle}>Answer length</span>
-            <div className={styles.segmented}>
-              {ANSWER_LENGTHS.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  className={`${styles.segment} ${
-                    answerLength === l.id ? styles.segmentActive : ""
-                  }`}
-                  onClick={() => chooseAnswerLength(l.id)}
-                  aria-pressed={answerLength === l.id}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {usage && (
-            <div className={styles.quotaCard}>
-              <span className={styles.quotaCardTitle}>
-                {isFreeTier
-                  ? `${promptsLeft ?? usage.requestsRemaining} of ${usage.requestsLimit} prompts left today`
-                  : "Unlimited prompts"}
-              </span>
-              <span className={styles.quotaCardSub}>
-                {isFreeTier ? "Free plan" : "Pro plan"} · resets at midnight UTC
-              </span>
-            </div>
-          )}
-          <span className={styles.prefsNote}>Preferences save automatically</span>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Main chat view ─────────────────────────────────────────────────
   return (
     <div className={styles.panel} role="dialog" aria-label="Ask AI" ref={panelRef}>
-      <div
-        className={`${styles.chatArea} ${contextSheetOpen ? styles.dimmed : ""}`}
-      >
+      <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
         <div className={styles.header}>
           <Sparkles className={styles.sparkle} size={17} />
           <span className={styles.title}>Ask AI</span>
@@ -909,7 +851,7 @@ export default function AskAiWidget({
             <button
               type="button"
               className={styles.iconBtn}
-              onClick={reset}
+              onClick={newConversation}
               aria-label="New conversation"
               title="New conversation"
             >
@@ -950,7 +892,7 @@ export default function AskAiWidget({
                 Sign in
               </a>
             </div>
-          ) : outOfPrompts && messages.length === 0 ? (
+          ) : usage && outOfPrompts && messages.length === 0 ? (
             <div className={styles.outWrap}>
               <span className={`${styles.emptyBadge} ${styles.outBadge}`}>
                 <Hourglass size={21} />
@@ -960,8 +902,8 @@ export default function AskAiWidget({
                   That&apos;s all your prompts for today
                 </span>
                 <span className={styles.emptyBody}>
-                  Your {usage?.requestsLimit ?? 20} free prompts reset at
-                  midnight UTC. Come back tomorrow to keep asking.
+                  Your {usage.requestsLimit} free prompts reset at midnight
+                  UTC. Come back tomorrow to keep asking.
                 </span>
               </div>
               {resetsInMs !== null && (
@@ -1012,7 +954,7 @@ export default function AskAiWidget({
                           <span className={styles.typingDot} />
                         </div>
                         <span className={styles.readingStatus}>
-                          {readingStatus}
+                          {sendingStatus}
                         </span>
                       </>
                     ) : (
@@ -1087,7 +1029,10 @@ export default function AskAiWidget({
                   </div>
                 );
               })}
+              {/* Follow-ups: hidden once the quota is spent — clicking one
+                  could only produce a guaranteed 429. */}
               {!streaming &&
+                !outOfPrompts &&
                 messages[messages.length - 1]?.role === "assistant" &&
                 messages[messages.length - 1].content &&
                 (suggestLoading || suggestions.length > 0) && (
@@ -1120,8 +1065,14 @@ export default function AskAiWidget({
       </div>
 
       {/* Context sheet (bottom sheet inside the panel). */}
-      {signedIn && contextSheetOpen && (
-        <div className={styles.sheet} ref={sheetRef} aria-label="Question context">
+      {sheetOpen && (
+        <div
+          className={styles.sheet}
+          ref={sheetRef}
+          role="dialog"
+          aria-label="Question context"
+          tabIndex={-1}
+        >
           <div className={styles.sheetHeader}>
             <span className={styles.sheetTitle}>Sent with your next question</span>
             <span className={styles.headerSpacer} />
@@ -1146,7 +1097,7 @@ export default function AskAiWidget({
                 onClick={() => chooseContextMode(mode)}
                 aria-pressed={contextMode === mode}
               >
-                {mode === "auto" ? "Auto" : mode === "full" ? "Full page" : "Custom"}
+                {MODE_LABELS[mode]}
               </button>
             ))}
           </div>
@@ -1160,8 +1111,7 @@ export default function AskAiWidget({
                 Nothing on screen to attach yet, just your question is sent.
               </div>
             )}
-            {panelSources.map((raw) => {
-              const s = withWidgetChars(raw);
+            {panelSources.map((s) => {
               const Icon = sourceIconFor(s);
               const on = isSourceEnabled(s);
               return (
@@ -1194,7 +1144,7 @@ export default function AskAiWidget({
           </div>
           <div className={styles.sheetFooter}>
             <span className={styles.sheetEstimate}>
-              ≈ {fmtK(estimateTokensTotal)} tokens with your question
+              ≈ {fmtK(sheetTokens)} tokens with your question
             </span>
             <button
               type="button"
@@ -1209,20 +1159,21 @@ export default function AskAiWidget({
 
       {/* Composer. */}
       {signedIn && (
-        <div className={styles.composer}>
-          {!contextSheetOpen && (
+        <div className={styles.composer} ref={composerRef}>
+          {!sheetOpen && (
             <div className={styles.chipRow}>
               <button
                 type="button"
                 ref={chipRef}
                 className={styles.contextChip}
                 onClick={() => setContextSheetOpen(true)}
-                aria-expanded={contextSheetOpen}
+                aria-haspopup="dialog"
                 title="Choose what's sent with your question"
               >
                 <Eye size={12} aria-hidden />
                 <span className={styles.chipLabel}>
-                  {modeLabel} · {enabledCount} source{enabledCount === 1 ? "" : "s"}
+                  {MODE_LABELS[contextMode]} · {enabledCount} source
+                  {enabledCount === 1 ? "" : "s"}
                 </span>
                 <ChevronDown size={11} aria-hidden />
               </button>
@@ -1266,10 +1217,12 @@ export default function AskAiWidget({
               </button>
             )}
           </div>
-          {!contextSheetOpen && (
+          {!sheetOpen && (
             <div className={styles.footerLine}>
               <span className={styles.disclaimer}>
-                {outOfPrompts ? "Your conversation is saved." : disclaimer}
+                {outOfPrompts && messages.length > 0
+                  ? "Your conversation is saved."
+                  : disclaimer}
               </span>
               {usage && isFreeTier && promptsLeft !== null && (
                 <Popover.Root>
@@ -1305,6 +1258,155 @@ export default function AskAiWidget({
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Settings: an overlay INSIDE the panel, so the chat (and any
+          in-flight stream, plus the list's scroll position) stays mounted
+          underneath instead of being torn down and reset. */}
+      {settingsOpen && (
+        <div
+          className={styles.settingsOverlay}
+          role="dialog"
+          aria-label="Ask AI settings"
+        >
+          <div className={styles.headerSettings}>
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={() => setSettingsOpen(false)}
+              aria-label="Back"
+              title="Back"
+            >
+              <ChevronLeft size={17} />
+            </button>
+            <span className={styles.settingsTitle}>
+              <Settings size={13} />
+              Settings
+            </span>
+            <span className={styles.headerSpacer} />
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              title="Close"
+            >
+              <X size={17} />
+            </button>
+          </div>
+          <div className={styles.settingsBody}>
+            <section className={styles.section}>
+              <div className={styles.sectionHead}>
+                <span className={styles.sectionTitle}>Where the button lives</span>
+                <span className={styles.sectionSub}>
+                  How Ask AI appears when it&apos;s closed
+                </span>
+              </div>
+              <div className={styles.launcherCards}>
+                <button
+                  type="button"
+                  className={`${styles.launcherCard} ${
+                    placement === "floating" ? styles.launcherCardSelected : ""
+                  }`}
+                  onClick={() => choosePlacement("floating")}
+                  aria-pressed={placement === "floating"}
+                >
+                  {placement === "floating" && (
+                    <span className={styles.launcherCheck}>
+                      <Check size={10} strokeWidth={3.5} />
+                    </span>
+                  )}
+                  <span className={styles.launcherPreview}>
+                    <span className={styles.previewLine} />
+                    <span className={`${styles.previewLine} ${styles.previewLine2}`} />
+                    <span className={styles.previewPill} />
+                  </span>
+                  <span className={styles.launcherCardLabel}>
+                    <span className={styles.launcherCardTitle}>Floating button</span>
+                    <span className={styles.launcherCardSub}>
+                      Bottom corner of the page
+                    </span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.launcherCard} ${
+                    placement === "tab" ? styles.launcherCardSelected : ""
+                  }`}
+                  onClick={() => choosePlacement("tab")}
+                  aria-pressed={placement === "tab"}
+                >
+                  {placement === "tab" && (
+                    <span className={styles.launcherCheck}>
+                      <Check size={10} strokeWidth={3.5} />
+                    </span>
+                  )}
+                  <span className={styles.launcherPreview}>
+                    <span className={styles.previewLine} />
+                    <span className={`${styles.previewLine} ${styles.previewLine2}`} />
+                    <span className={styles.previewTab} />
+                  </span>
+                  <span className={styles.launcherCardLabel}>
+                    <span className={styles.launcherCardTitle}>Edge tab</span>
+                    <span className={styles.launcherCardSub}>
+                      Docked to the side, out of the way
+                    </span>
+                  </span>
+                </button>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionHead}>
+                <span className={styles.sectionTitle}>Context</span>
+                <span className={styles.sectionSub}>
+                  What&apos;s sent with your questions
+                </span>
+              </div>
+              <div className={styles.infoCard}>
+                <Eye size={14} aria-hidden />
+                <span>
+                  Pick Auto, Full page, or Custom from the Context chip next to
+                  the message box. Your last choice is remembered.
+                </span>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <span className={styles.sectionTitle}>Answer length</span>
+              <div className={styles.segmented}>
+                {ANSWER_LENGTHS.map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    className={`${styles.segment} ${
+                      answerLength === l.id ? styles.segmentActive : ""
+                    }`}
+                    onClick={() => chooseAnswerLength(l.id)}
+                    aria-pressed={answerLength === l.id}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {usage && (
+              <div className={styles.quotaCard}>
+                <span className={styles.quotaCardTitle}>
+                  {isFreeTier
+                    ? `${promptsLeft ?? usage.requestsRemaining} of ${usage.requestsLimit} prompts left today`
+                    : "Unlimited prompts"}
+                </span>
+                <span className={styles.quotaCardSub}>
+                  {isFreeTier ? "Free plan" : "Pro plan"} · resets at midnight
+                  UTC
+                </span>
+              </div>
+            )}
+            <span className={styles.prefsNote}>Preferences save automatically</span>
+          </div>
         </div>
       )}
     </div>

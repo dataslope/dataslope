@@ -19,7 +19,7 @@
   padding: 10px 16px;
   border: none;
   border-radius: 9999px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
   font-size: 14px;
@@ -29,7 +29,7 @@
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 .launcher:hover {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
   transform: translateY(-1px);
   box-shadow: 0 8px 26px rgba(8, 120, 221, 0.36);
 }
@@ -48,14 +48,14 @@
   height: 44px;
   border: none;
   border-radius: 8px 0 0 8px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
   cursor: pointer;
   box-shadow: -2px 3px 14px rgba(8, 120, 221, 0.3);
   transition: box-shadow 0.12s ease, background 0.12s ease;
 }
 .launcherTab:hover {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
   box-shadow: -3px 4px 18px rgba(8, 120, 221, 0.38);
 }
 
@@ -104,10 +104,10 @@
 }
 .sparkle {
   flex: 0 0 auto;
-  color: #0878dd;
+  color: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .sparkle {
-  color: #5ba7ff;
+  color: var(--ds-blue-400, #5ba7ff);
 }
 .title {
   font-size: 14.5px;
@@ -222,23 +222,23 @@
   width: 44px;
   height: 44px;
   border-radius: 11px;
-  background: #e8f2ff;
-  color: #0878dd;
+  background: var(--ds-blue-50, #e8f2ff);
+  color: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .emptyBadge {
   background: rgba(91, 167, 255, 0.16);
-  color: #5ba7ff;
+  color: var(--ds-blue-400, #5ba7ff);
 }
 .outBadge {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #ffedec;
-  color: #ba303a;
+  background: var(--ds-red-50, #ffedec);
+  color: var(--ds-red-700, #ba303a);
 }
 :global(html.dark) .outBadge {
   background: rgba(255, 79, 89, 0.14);
-  color: #ff807f;
+  color: var(--ds-red-400, #ff807f);
 }
 .emptyText {
   display: flex;
@@ -286,13 +286,13 @@
   gap: 6px;
   padding: 8px 16px;
   border-radius: 9999px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
   font-weight: 600;
   text-decoration: none;
 }
 .signInLink:hover {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
 }
 
 /* ── User bubble + assistant answer ───────────────────────────────── */
@@ -301,7 +301,7 @@
   max-width: 85%;
   padding: 8px 13px;
   border-radius: 12px 12px 4px 12px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
   font-size: 13.5px;
   line-height: 1.5;
@@ -360,11 +360,11 @@
   padding-left: 20px;
 }
 .answer :where(a) {
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
   text-decoration: underline;
 }
 :global(html.dark) .answer :where(a) {
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 
 .caret {
@@ -472,10 +472,10 @@
   padding: 0 2px;
   font-size: 11px;
   font-weight: 600;
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
 }
 :global(html.dark) .keepGoingLabel {
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 .followupBtn {
   display: flex;
@@ -485,7 +485,7 @@
   border: none;
   border-radius: 10px;
   background: #f0f7ff;
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
   font-family: inherit;
   font-size: 12.5px;
   line-height: 1.4;
@@ -494,22 +494,22 @@
   transition: background 0.12s ease;
 }
 .followupBtn:hover {
-  background: #e8f2ff;
+  background: var(--ds-blue-50, #e8f2ff);
 }
 .followupBtn > svg {
   flex: 0 0 auto;
   margin-top: 2px;
-  color: #0878dd;
+  color: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .followupBtn {
   background: rgba(91, 167, 255, 0.1);
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 :global(html.dark) .followupBtn:hover {
   background: rgba(91, 167, 255, 0.14);
 }
 :global(html.dark) .followupBtn > svg {
-  color: #5ba7ff;
+  color: var(--ds-blue-400, #5ba7ff);
 }
 .followupSkeleton {
   height: 34px;
@@ -539,7 +539,7 @@
 }
 :global(html.dark) .error {
   background: rgba(255, 79, 89, 0.12);
-  color: #ff807f;
+  color: var(--ds-red-400, #ff807f);
 }
 
 /* "Review changes in the editor" actions (playground surface only). */
@@ -558,7 +558,7 @@
   border: none;
   border-radius: 8px;
   background: #f0f7ff;
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -566,7 +566,7 @@
   transition: background 0.12s ease;
 }
 .editActionBtn:hover {
-  background: #e8f2ff;
+  background: var(--ds-blue-50, #e8f2ff);
 }
 .editActionBtn code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -574,7 +574,7 @@
 }
 :global(html.dark) .editActionBtn {
   background: rgba(91, 167, 255, 0.1);
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 :global(html.dark) .editActionBtn:hover {
   background: rgba(91, 167, 255, 0.14);
@@ -610,8 +610,8 @@
   padding: 4px 10px;
   border: none;
   border-radius: 9999px;
-  background: #e8f2ff;
-  color: #0064bd;
+  background: var(--ds-blue-50, #e8f2ff);
+  color: var(--ds-blue-700, #0064bd);
   font-family: inherit;
   font-size: 11.5px;
   font-weight: 600;
@@ -623,7 +623,7 @@
 }
 :global(html.dark) .contextChip {
   background: rgba(91, 167, 255, 0.15);
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 :global(html.dark) .contextChip:hover {
   background: rgba(91, 167, 255, 0.24);
@@ -675,13 +675,13 @@
   flex: 0 0 auto;
   border: none;
   border-radius: 9px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
   cursor: pointer;
   transition: background 0.12s ease;
 }
 .sendBtn:hover:not(:disabled) {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
 }
 .sendBtn:disabled {
   opacity: 0.45;
@@ -724,11 +724,11 @@
   color: #7c828a;
 }
 .quotaOut {
-  color: #ba303a;
+  color: var(--ds-red-700, #ba303a);
   font-weight: 600;
 }
 :global(html.dark) .quotaOut {
-  color: #ff807f;
+  color: var(--ds-red-400, #ff807f);
 }
 
 /* Quota ring. */
@@ -742,22 +742,22 @@
   stroke: rgba(255, 255, 255, 0.14);
 }
 .ringProgress {
-  stroke: #0878dd;
+  stroke: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .ringProgress {
-  stroke: #5ba7ff;
+  stroke: var(--ds-blue-400, #5ba7ff);
 }
 .ringOut .ringTrack {
-  stroke: #ffdcda;
+  stroke: var(--ds-red-100, #ffdcda);
 }
 :global(html.dark) .ringOut .ringTrack {
   stroke: rgba(255, 79, 89, 0.25);
 }
 .ringOut .ringProgress {
-  stroke: #ba303a;
+  stroke: var(--ds-red-700, #ba303a);
 }
 :global(html.dark) .ringOut .ringProgress {
-  stroke: #ff807f;
+  stroke: var(--ds-red-400, #ff807f);
 }
 
 .quotaPopover {
@@ -780,12 +780,21 @@
 
 /* ── Context sheet ────────────────────────────────────────────────── */
 .sheet {
+  display: flex;
+  flex-direction: column;
+  /* Shrinkable inside the fixed-height panel: without min-height:0 a long
+     source list would push the sheet footer and the composer past the
+     panel's clipped edge instead of scrolling (see .sourceList). */
+  min-height: 0;
   margin: 0 12px 8px;
   padding: 16px;
   border-radius: 12px;
   background: #f7f8fa;
   box-shadow: 0 -8px 24px rgba(17, 24, 39, 0.06);
   animation: sheetUp 0.15s ease-out;
+  /* Programmatically focused on open (dialog pattern); the panel's own
+     silhouette is the focus cue, no ring needed. */
+  outline: none;
 }
 :global(html.dark) .sheet {
   background: #1e1e1e;
@@ -837,24 +846,23 @@
 }
 
 /* Segmented control — shared by the sheet preset and Settings answer-length.
-   Base sizing = Settings; the sheet variant tightens it. */
+   The shared block is layout-only; each variant owns its fill/radius. */
 .segmented,
 .segmentedSheet {
   display: flex;
   gap: 3px;
   padding: 3px;
+}
+.segmented {
   border-radius: 10px;
   background: #f3f4f6;
-}
-:global(html.dark) .segmented,
-:global(html.dark) .segmentedSheet {
-  background: rgba(255, 255, 255, 0.06);
 }
 .segmentedSheet {
   border-radius: 8px;
   background: #e8eaee;
   margin-bottom: 8px;
 }
+:global(html.dark) .segmented,
 :global(html.dark) .segmentedSheet {
   background: rgba(255, 255, 255, 0.06);
 }
@@ -912,6 +920,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* Many visible sources scroll here rather than growing the sheet past the
+     panel bounds. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 .sourceEmpty {
   padding: 6px 4px;
@@ -936,10 +950,10 @@
   color: #6b7076;
 }
 .sourceIconOn {
-  color: #0878dd;
+  color: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .sourceIconOn {
-  color: #5ba7ff;
+  color: var(--ds-blue-400, #5ba7ff);
 }
 .sourceText {
   flex: 1;
@@ -1017,16 +1031,16 @@
   background: #8b9096;
 }
 .switchOn {
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
 }
 .switchOn:hover {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
 }
 :global(html.dark) .switchOn {
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .switchOn:hover {
-  background: #046ecd;
+  background: var(--ds-blue-650, #046ecd);
 }
 .switchOn .switchKnob {
   transform: translateX(14px);
@@ -1053,21 +1067,35 @@
   font-family: inherit;
   font-size: 11px;
   font-weight: 600;
-  color: #0878dd;
+  color: var(--ds-blue-600, #0878dd);
   cursor: pointer;
 }
 .resetLink:hover {
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
   text-decoration: underline;
 }
 :global(html.dark) .resetLink {
-  color: #8abfff;
+  color: var(--ds-blue-300, #8abfff);
 }
 :global(html.dark) .resetLink:hover {
   color: #b5d4ff;
 }
 
 /* ── Settings view ────────────────────────────────────────────────── */
+/* An overlay INSIDE the panel (not a replacement view), so the chat — its
+   scroll position and any in-flight stream — stays mounted underneath. */
+.settingsOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+}
+:global(html.dark) .settingsOverlay {
+  background: #121212;
+}
 .settingsBody {
   flex: 1;
   overflow-y: auto;
@@ -1130,15 +1158,14 @@
 :global(html.dark) .launcherCard:hover {
   background: rgba(255, 255, 255, 0.08);
 }
-.launcherCardSelected,
-.launcherCardSelected:hover {
-  background: #e8f2ff;
+/* Selected beats .launcherCard:hover via the dedicated :hover rules below. */
+.launcherCardSelected {
+  background: var(--ds-blue-50, #e8f2ff);
 }
 .launcherCardSelected:hover {
   background: #dcebfd;
 }
-:global(html.dark) .launcherCardSelected,
-:global(html.dark) .launcherCardSelected:hover {
+:global(html.dark) .launcherCardSelected {
   background: rgba(91, 167, 255, 0.16);
 }
 :global(html.dark) .launcherCardSelected:hover {
@@ -1154,11 +1181,11 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
   color: #fff;
 }
 :global(html.dark) .launcherCheck {
-  background: #5ba7ff;
+  background: var(--ds-blue-400, #5ba7ff);
   color: #121212;
 }
 .launcherPreview {
@@ -1194,10 +1221,10 @@
   width: 26px;
   height: 11px;
   border-radius: 9999px;
-  background: #0878dd;
+  background: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .previewPill {
-  background: #5ba7ff;
+  background: var(--ds-blue-400, #5ba7ff);
 }
 .previewTab {
   position: absolute;
@@ -1225,7 +1252,7 @@
   color: #c8cdd3;
 }
 .launcherCardSelected .launcherCardTitle {
-  color: #0064bd;
+  color: var(--ds-blue-700, #0064bd);
 }
 :global(html.dark) .launcherCardSelected .launcherCardTitle {
   color: #cfe3ff;
@@ -1258,14 +1285,14 @@
 }
 .infoCard > svg {
   flex: 0 0 auto;
-  color: #0878dd;
+  color: var(--ds-blue-600, #0878dd);
 }
 :global(html.dark) .infoCard {
   background: rgba(255, 255, 255, 0.05);
   color: #9aa0a8;
 }
 :global(html.dark) .infoCard > svg {
-  color: #5ba7ff;
+  color: var(--ds-blue-400, #5ba7ff);
 }
 
 .quotaCard {

@@ -14,8 +14,10 @@ const SLUG_SEGMENT = /^[a-z0-9][a-z0-9-]*$/;
 
 // The client sends the full path segments (base included); only the docs
 // sections with a raw-Markdown mirror may be fetched (see next.config.ts
-// rewrites), anything else from a tampered client is rejected.
-const LESSON_BASES = new Set(["courses", "fumadocs-dev"]);
+// rewrites), anything else from a tampered client is rejected. Exported so
+// the Ask AI panel offers the "Lesson text" source from the same allowlist
+// instead of a hand-copied mirror.
+export const LESSON_BASES = new Set(["courses", "fumadocs-dev"]);
 
 /** Hard cap on client-supplied widget blocks (the client sends ≤6). */
 const MAX_WIDGETS = 8;
@@ -59,9 +61,15 @@ export async function fetchLessonMarkdown(
   }
 }
 
+/** Rough char/4 token estimate from a char count (the client widget already
+ *  has lengths, not the strings themselves). */
+export function estimateTokensForChars(chars: number): number {
+  return Math.ceil(chars / 4);
+}
+
 /** Rough char/4 token estimate, good enough for packing decisions. */
 export function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
+  return estimateTokensForChars(text.length);
 }
 
 /** Clip to ~maxTokens, keeping head + tail with an in-band elision marker so
