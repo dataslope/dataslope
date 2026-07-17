@@ -23,14 +23,8 @@
      module uses. */
 
   /* Local neutral palette (Tailwind) */
-  --ch-slate-50: #f8fafc;
-  --ch-slate-100: #f1f5f9;
   --ch-slate-200: #e2e8f0;
   --ch-slate-900: #0f172a;
-  --ch-violet-50: #f5f3ff;
-  --ch-violet-100: #ede9fe;
-  --ch-violet-500: #8b5cf6;
-  --ch-violet-600: #7c3aed;
 
   /* Semantic aliases */
   --ch-bg: var(--ds-white);
@@ -47,9 +41,7 @@
   --ch-accent-disabled: var(--ds-blue-300);
   --ch-green: var(--ds-green-600);
   --ch-green-dot: var(--ds-green-500);
-  --ch-green-bg: var(--ds-green-50);
   --ch-red: var(--ds-red-600);
-  --ch-red-bg: var(--ds-red-50);
   --ch-badge-color: var(--ch-accent);
   --ch-scrollbar-thumb: var(--ds-gray-300);
   --ch-scrollbar-thumb-hover: var(--ds-gray-400);
@@ -2121,13 +2113,6 @@
    surrounding learn-page chrome (falling back to a neutral dark when those
    Fumadocs vars aren't present, e.g. on the home page). */
 :global(html:is(.dark, [data-theme="dark"])) .card {
-  /* Dark-theme additions to the Tailwind palette (the light tokens
-     above are still available). All values come from the Tailwind
-     palette so a future colour audit only has to look at these
-     palette aliases. */
-  --ch-violet-300: #c4b5fd;
-  --ch-violet-500: #8b5cf6;
-
   /* Semantic aliases re-pointed at the Fumadocs background so the
      card surface matches the surrounding learn-page chrome exactly.
      The `var(--color-fd-background, …)` fallback keeps the component
@@ -2137,8 +2122,6 @@
      to <body>, outside the .ds-home scope that supplies --color-fd-background.
      Avoids the blue-slate --ch-slate-900 tint the surrounding chrome dropped. */
   --ch-bg: var(--color-fd-background, #121212);
-  --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
-  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --ch-bg-hover: #222222;
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
@@ -2154,9 +2137,7 @@
   --ch-accent-disabled: var(--ds-blue-700);
   --ch-green: var(--ds-green-400);
   --ch-green-dot: var(--ds-green-500);
-  --ch-green-bg: color-mix(in srgb, var(--ds-green-500) 12%, transparent);
   --ch-red: var(--ds-red-400);
-  --ch-red-bg: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
   /* Badge inherits the dark-mode accent (the var() declared above
      auto-tracks --ch-accent), but bg/border need explicit dark tints. */
   --ch-overlay: color-mix(in srgb, var(--ds-black) 65%, transparent);

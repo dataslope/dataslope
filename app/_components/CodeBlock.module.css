@@ -26,19 +26,10 @@
   --cb-gray-800: var(--ds-gray-800);
   --cb-neutral-100: var(--ch-bg-subtle);
   --cb-neutral-300: var(--ch-border);
-  --cb-bg: var(--ch-bg);
-  --cb-bg2: var(--ch-bg-muted);
   --cb-bg3: var(--ch-bg-hover);
-  --cb-border: var(--ch-border-light);
   --cb-text: var(--ch-text);
   --cb-text-dim: var(--ch-text-muted);
-  --cb-text-muted: var(--ch-text-secondary);
   --cb-accent: var(--ch-accent);
-  --cb-green: var(--ch-green);
-  --cb-red: var(--ch-red);
-  --cb-yellow: var(--ds-yellow-500);
-  --cb-font-mono: var(--ch-font-mono);
-  --cb-radius: var(--ch-radius);
   position: relative;
 }
 

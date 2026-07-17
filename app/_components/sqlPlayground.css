@@ -115,10 +115,6 @@
   z-index: 500;
 }
 
-.sql-export-disabled-positioner {
-  z-index: 500;
-}
-
 .sql-db-popup {
   min-width: 260px;
   z-index: 500;
@@ -2753,13 +2749,6 @@
 .sql-import-mode-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-/* Disabled-Export "create a table" popover, add comfortable padding. */
-.sql-export-disabled-popup {
-  padding: 10px 12px;
-  font-size: 13px;
-  color: var(--text-dim);
 }
 
 /* Column-comparison table shown in the import dialog when targeting an
