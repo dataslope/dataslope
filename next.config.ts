@@ -92,14 +92,18 @@ const nextConfig: NextConfig = {
       static: 1800,
     },
   },
-  // Expose every `/courses` lesson (and `/fumadocs-dev` demo page) as raw
-  // Markdown at `${page.url}.md`, served by the route handlers under
-  // `app/llms/`. The page-action buttons (Copy Markdown / View as Markdown)
-  // point at these URLs. Using `beforeFiles` guarantees the `.md` suffix is
-  // intercepted before the catch-all page routes get a chance to match it.
-  // The bare `/fumadocs-dev.md` entry covers that section's index page
-  // (content/fumadocs-dev/index.mdx); `/courses` has no root MDX page, its
-  // index is the course-catalog page, so there is no bare `/courses.md`.
+  // Expose every `/fumadocs-dev` demo page as raw Markdown at
+  // `${page.url}.md`, served by the route handler under `app/llms/`. The
+  // `/courses` lessons' raw-Markdown mirrors are NOT rewrites: they are
+  // emitted as plain static assets into `public/courses/` at build time by
+  // scripts/build-course-md.mjs (the assets layer serves them before any
+  // route matching), which keeps ~780 route-handler prerenders out of
+  // `next build` and out of the per-deploy R2 cache populate. The
+  // page-action buttons (Copy Markdown / View as Markdown) point at these
+  // `.md` URLs either way. Using `beforeFiles` guarantees the `.md` suffix
+  // is intercepted before the catch-all page routes get a chance to match
+  // it. The bare `/fumadocs-dev.md` entry covers that section's index page
+  // (content/fumadocs-dev/index.mdx).
   // `/dashboard` (the shell segment root) has no page of its own; land it on
   // the create hub. The create/account/admin sections now live under
   // /dashboard and internal links point there directly; the project is
@@ -109,7 +113,6 @@ const nextConfig: NextConfig = {
   ],
   rewrites: async () => ({
     beforeFiles: [
-      { source: "/courses/:path*.md", destination: "/llms/courses/:path*" },
       { source: "/fumadocs-dev.md", destination: "/llms/fumadocs-dev" },
       {
         source: "/fumadocs-dev/:path*.md",

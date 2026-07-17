@@ -1,11 +1,15 @@
 /**
  * Raw Markdown endpoint for `/fumadocs-dev` pages.
  *
- * Mirrors `app/llms/courses/[[...slug]]/route.ts` for the development-only
- * component-gallery collection, so the page-action buttons (Copy Markdown /
- * View as Markdown) and the Ask AI lesson-context fetch keep working on the
- * dev pages. Reached via the `/fumadocs-dev.md` and `/fumadocs-dev/:path*.md`
- * rewrites in `next.config.ts`.
+ * Serves the unprocessed `.mdx` source of the development-only
+ * component-gallery pages as `text/markdown`, so the page-action buttons
+ * (Copy Markdown / View as Markdown) and the Ask AI lesson-context fetch
+ * keep working on the dev pages. Reached via the `/fumadocs-dev.md` and
+ * `/fumadocs-dev/:path*.md` rewrites in `next.config.ts`. (The `/courses`
+ * lessons' equivalents are NOT a route: they are emitted as static assets
+ * into `public/courses/` by `scripts/build-course-md.mjs`, which keeps ~780
+ * prerenders out of `next build`; this dev-only collection is 34 pages, not
+ * worth its own generator.)
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";

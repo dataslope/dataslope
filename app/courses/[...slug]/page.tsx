@@ -55,11 +55,12 @@ export default async function CoursePage(props: CoursePageProps) {
   // remain available directly on `page.data`.
   const { body: MDX, toc } = await page.data.load();
 
-  // `markdownUrl` is rewritten to the raw-Markdown route handler (see
-  // `next.config.ts` and `app/llms/courses/[[...slug]]/route.ts`). The
-  // `MarkdownCopyButton` fetches it for the clipboard; `ViewOptionsPopover`
-  // links to it ("View as Markdown") and builds the "Open in ChatGPT/Claude"
-  // shortcuts, alongside the GitHub source link.
+  // `markdownUrl` resolves to the lesson's raw-Markdown mirror, a static
+  // asset emitted into `public/courses/` at build time by
+  // `scripts/build-course-md.mjs`. The `MarkdownCopyButton` fetches it for
+  // the clipboard; `ViewOptionsPopover` links to it ("View as Markdown") and
+  // builds the "Open in ChatGPT/Claude" shortcuts, alongside the GitHub
+  // source link.
   const markdownUrl = `${page.url}.md`;
   const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
 
