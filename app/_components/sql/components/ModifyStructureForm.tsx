@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS as DndCSS } from "@dnd-kit/utilities";
 import React from "react";
-import { Checkbox } from "@base-ui-components/react/checkbox";
+import { Checkbox } from "@base-ui/react/checkbox";
 import {
   ChevronDown,
   ChevronRight,

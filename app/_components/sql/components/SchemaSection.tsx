@@ -1,8 +1,8 @@
 "use client";
 
 import { memo, type ReactNode } from "react";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Popover } from "@base-ui-components/react/popover";
+import { ContextMenu } from "@base-ui/react/context-menu";
+import { Popover } from "@base-ui/react/popover";
 import {
   ChevronDown,
   ChevronRight,

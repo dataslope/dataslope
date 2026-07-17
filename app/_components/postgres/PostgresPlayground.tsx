@@ -25,12 +25,12 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "../sql/shared/editorSetup";
-import { Combobox } from "@base-ui-components/react/combobox";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { Menu } from "@base-ui-components/react/menu";
-import { Popover } from "@base-ui-components/react/popover";
-import { Select } from "@base-ui-components/react/select";
-import { Switch } from "@base-ui-components/react/switch";
+import { Combobox } from "@base-ui/react/combobox";
+import { Dialog } from "@base-ui/react/dialog";
+import { Menu } from "@base-ui/react/menu";
+import { Popover } from "@base-ui/react/popover";
+import { Select } from "@base-ui/react/select";
+import { Switch } from "@base-ui/react/switch";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,

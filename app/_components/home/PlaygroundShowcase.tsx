@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";

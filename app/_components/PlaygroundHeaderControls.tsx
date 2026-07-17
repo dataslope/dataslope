@@ -32,8 +32,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Menu } from "@base-ui-components/react/menu";
-import { Popover } from "@base-ui-components/react/popover";
+import { Menu } from "@base-ui/react/menu";
+import { Popover } from "@base-ui/react/popover";
 import {
   Check,
   Cloud,

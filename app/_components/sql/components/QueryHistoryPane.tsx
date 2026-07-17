@@ -16,7 +16,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import { Popover } from "@base-ui-components/react/popover";
+import { Popover } from "@base-ui/react/popover";
 import { themeFor } from "../../cmExtensions";
 import type { QueryHistoryEntry } from "../types";
 import { useSavedQueries } from "../hooks/useSavedQueries";

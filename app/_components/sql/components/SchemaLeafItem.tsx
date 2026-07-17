@@ -1,8 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { Popover } from "@base-ui-components/react/popover";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
+import { Popover } from "@base-ui/react/popover";
+import { ContextMenu } from "@base-ui/react/context-menu";
 import { Hash, Zap } from "lucide-react";
 
 // ────────────────────────────────────────────────────────────────────────

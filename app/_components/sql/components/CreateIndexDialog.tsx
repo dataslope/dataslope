@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Dialog } from "@base-ui-components/react/dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
 import { buildCreateIndexSql, suggestIndexName } from "../utils/ddl";
 

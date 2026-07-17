@@ -1,9 +1,9 @@
 "use client";
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
-import { Popover } from "@base-ui-components/react/popover";
+import { Dialog } from "@base-ui/react/dialog";
+import { ContextMenu } from "@base-ui/react/context-menu";
+import { Popover } from "@base-ui/react/popover";
 import {
   DndContext,
   DragOverlay,

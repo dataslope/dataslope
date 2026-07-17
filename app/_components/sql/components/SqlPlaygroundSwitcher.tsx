@@ -2,7 +2,7 @@
 
 import Link from "../../Link";
 import { useRouter } from "next/navigation";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import { ChevronDown } from "lucide-react";
 import {
   LANGUAGE_ICONS as PLAYGROUND_ICONS,

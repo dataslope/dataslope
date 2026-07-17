@@ -30,10 +30,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Popover } from "@base-ui-components/react/popover";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
-import { Menu } from "@base-ui-components/react/menu";
+import { Popover } from "@base-ui/react/popover";
+import { Dialog } from "@base-ui/react/dialog";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Menu } from "@base-ui/react/menu";
 import { Drawer } from "@base-ui/react/drawer";
 import {
   Check,

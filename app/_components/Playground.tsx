@@ -65,11 +65,11 @@ import Link from "./Link";
 // Base UI primitives, used for menus, popovers, dialogs, and toasts so
 // that the playground gets consistent positioning, focus management,
 // and natural enter/exit animations out of the box.
-import { Menu } from "@base-ui-components/react/menu";
-import { Popover } from "@base-ui-components/react/popover";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
+import { Menu } from "@base-ui/react/menu";
+import { Popover } from "@base-ui/react/popover";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Toast } from "@base-ui/react/toast";
-import { Select } from "@base-ui-components/react/select";
+import { Select } from "@base-ui/react/select";
 import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,

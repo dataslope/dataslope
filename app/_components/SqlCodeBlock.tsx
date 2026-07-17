@@ -33,6 +33,9 @@ import {
   ChallengeToastViewport,
   useIsDark,
   cmThemeNameFor,
+  type Status,
+  detectIsMac,
+  MIN_RUN_OVERLAY_MS,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -111,19 +114,7 @@ export interface SqlCodeBlockProps {
   tableRowLimit?: number;
 }
 
-type Status = "idle" | "loading" | "ready" | "running" | "error";
-
-// Minimum time (ms) the "running" overlay stays visible so a fast query
-// doesn't blink the wave animation in and back out within a frame.
-const MIN_RUN_OVERLAY_MS = 300;
 const MIN_FORMAT_MS = 300;
-
-function detectIsMac(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const platform = navigator.platform || "";
-  const ua = navigator.userAgent || "";
-  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
-}
 
 export default function SqlCodeBlock({
   dialect,

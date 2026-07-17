@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "@base-ui-components/react/menu";
+import { Menu } from "@base-ui/react/menu";
 import { ChevronDown, ListTree, Play } from "lucide-react";
 
 export interface SqlEditorToolbarProps {

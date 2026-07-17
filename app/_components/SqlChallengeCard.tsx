@@ -37,7 +37,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, Eye, Play, Database, Table, List, FileInput } from "lucide-react";
-import { Menu } from "@base-ui-components/react/menu";
+import { Menu } from "@base-ui/react/menu";
 import {
   createColumnHelper,
   flexRender,
@@ -59,6 +59,11 @@ import {
   useIsDark,
   cmThemeNameFor,
   TestResultsRail,
+  type Status,
+  type TestState,
+  type DisplayedTest,
+  detectIsMac,
+  MIN_RUN_OVERLAY_MS,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -766,32 +771,6 @@ function fail(detail: string) {
 }
 
 // ─── Component ────────────────────────────────────────────────────────
-
-type Status = "idle" | "loading" | "ready" | "running" | "error";
-type TestState = "pending" | "pass" | "fail";
-
-interface DisplayedTest {
-  id: string;
-  name: string;
-  description?: string;
-  state: TestState;
-  detail: string | null;
-}
-
-function detectIsMac(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const platform = navigator.platform || "";
-  const ua = navigator.userAgent || "";
-  return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
-}
-
-
-
-// Minimum time (ms) the "running" overlay is held visible after a run
-// completes. Mirrors the playground's MIN_ANIMATION_MS so a fast
-// query doesn't blink the wave animation in and back out within a
-// single frame.
-const MIN_RUN_OVERLAY_MS = 300;
 
 /** Map a SQL dialect to the corresponding key in the shared
  *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label

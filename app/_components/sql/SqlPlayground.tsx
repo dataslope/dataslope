@@ -36,10 +36,10 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "./shared/editorSetup";
-import { Popover } from "@base-ui-components/react/popover";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
-import { Dialog } from "@base-ui-components/react/dialog";
-import { Tabs } from "@base-ui-components/react/tabs";
+import { Popover } from "@base-ui/react/popover";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
+import { Tabs } from "@base-ui/react/tabs";
 import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,

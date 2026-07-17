@@ -13,7 +13,7 @@
  * flash before the avatar resolves.
  */
 import { useState } from "react";
-import { Menu } from "@base-ui-components/react/menu";
+import { Menu } from "@base-ui/react/menu";
 import { LayoutDashboard, LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "../Link";
