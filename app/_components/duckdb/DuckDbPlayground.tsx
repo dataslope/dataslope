@@ -5478,6 +5478,7 @@ function DuckDbPlaygroundInner() {
             ref={panesRef}
             className={`sql-panes duckdb-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
           >
+            <h1 className="playground-sr-title">DuckDB playground</h1>
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}

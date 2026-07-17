@@ -3744,8 +3744,10 @@ function SqlPlaygroundInner() {
 
           <div
             className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
+            role="main"
             ref={panesRef}
           >
+            <h1 className="playground-sr-title">SQLite playground</h1>
             <SqlTabBar
               tabs={tabs}
               activeTabId={activeTabId}

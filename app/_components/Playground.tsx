@@ -4375,11 +4375,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
         <div
           className="panes"
+          role="main"
           data-mobile-tab={mobileTab}
           data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
           data-editor-position={hasPreview ? effectiveEditorPosition : undefined}
           ref={panesRef}
         >
+          <h1 className="playground-sr-title">
+            {`${PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ?? adapter.id} playground`}
+          </h1>
           <div className="editor-pane" ref={editorPaneRef}>
             <div className="pane-bar">
               <span className="pane-label">
