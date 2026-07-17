@@ -197,6 +197,7 @@ import {
   statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import { IMPORT_COL_STATUS_LABEL } from "../sql/constants";
 import {
   ensurePersistUnloadFlush,
   persistAsync,
@@ -209,7 +210,6 @@ import type {
   AddRowDialogState,
   ColumnKeyHints,
   CsvImportState,
-  ImportColComparison,
   JsonImportState,
   ParquetImportState,
   QueryRunResult,
@@ -866,13 +866,6 @@ const RUNTIME_INFO: RuntimeInfo = {
   engineUrl: "https://pglite.dev/",
   notes:
     "Pure-WASM build of PostgreSQL that runs entirely in your browser. Each sample database is rebuilt in memory on every page load.",
-};
-
-const IMPORT_COL_STATUS_LABEL: Record<ImportColComparison["status"], string> = {
-  matched: "✓ Matched",
-  extra: "⚠ Not in table",
-  optional: "○ Optional",
-  required: "✗ Required",
 };
 
 function quoteIdent(name: string): string {

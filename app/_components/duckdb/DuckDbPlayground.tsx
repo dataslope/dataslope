@@ -205,6 +205,7 @@ import {
   statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
+import { IMPORT_COL_STATUS_LABEL } from "../sql/constants";
 import {
   ensurePersistUnloadFlush,
   persistAsync,
@@ -217,7 +218,6 @@ import type {
   AddRowDialogState,
   ColumnKeyHints,
   CsvImportState,
-  ImportColComparison,
   JsonImportState,
   ParquetImportState,
   QueryRunResult,
@@ -900,13 +900,6 @@ const RUNTIME_INFO: RuntimeInfo = {
   engineUrl: "https://duckdb.org/docs/api/wasm/overview",
   notes:
     "Pure-WASM build of DuckDB that runs entirely in your browser. Each sample database is rebuilt in memory on every page load. DuckDB does not support triggers or VIRTUAL generated columns; STORED generated columns are supported.",
-};
-
-const IMPORT_COL_STATUS_LABEL: Record<ImportColComparison["status"], string> = {
-  matched: "✓ Matched",
-  extra: "⚠ Not in table",
-  optional: "○ Optional",
-  required: "✗ Required",
 };
 
 function quoteIdent(name: string): string {
