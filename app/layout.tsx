@@ -117,13 +117,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Cloudflare Web Analytics beacon token. Public (it ships in the page HTML),
-  // so it's a build-time NEXT_PUBLIC_ var: get it from the Cloudflare dashboard
-  // (Web Analytics → your site → the JS snippet) and set it as a build variable.
-  // When unset (local dev, unconfigured builds) the beacon isn't rendered, so
-  // nothing is loaded or reported. Cloudflare Web Analytics is cookieless and
-  // sets no client-side state, so it needs no cookie-consent banner.
-  const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
   return (
     <html
       lang="en"
@@ -145,12 +138,6 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://cjrtnc.leaningtech.com" />
         <link rel="dns-prefetch" href="https://esm.sh" />
         <link rel="dns-prefetch" href="https://unpkg.com" />
-        {cfBeaconToken && (
-          <link
-            rel="dns-prefetch"
-            href="https://static.cloudflareinsights.com"
-          />
-        )}
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>
@@ -168,18 +155,6 @@ export default function RootLayout({
         {/* Records the last non-auth page per tab so /sign-in can send
             the user back where they came from after authenticating. */}
         <ReturnToTracker />
-        {/* Cloudflare Web Analytics: privacy-first, cookieless page-view /
-            visitor stats. Rendered only when the beacon token is configured
-            (see NEXT_PUBLIC_CF_BEACON_TOKEN above), so it's a no-op locally and
-            until it's set up. No cookies / client-side state, so no consent
-            banner is required. */}
-        {cfBeaconToken && (
-          <script
-            defer
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
-          />
-        )}
       </body>
     </html>
   );
