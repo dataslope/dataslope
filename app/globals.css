@@ -7,6 +7,22 @@ html, body {
   /* Apply Inter as the default sans-serif font for all non-monospace text.
      The --font-sans CSS variable is injected by Next.js next/font/google. */
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  /* Slightly tighten the default letter-spacing for Inter/sans body text
+     sitewide, for a more polished feel (matches the lessons surface,
+     app/docs.css, which already sets -0.011em). This is a *default*: any
+     element that sets its own letter-spacing, e.g. Tailwind's `tracking-*`
+     utilities or an explicit negative value, overrides it via the cascade, so
+     already-tracked text is left untouched. Monospace/code is reset back to
+     `normal` just below (and the playground IDE opts out in playground.css). */
+  letter-spacing: -0.011em;
+}
+
+/* Keep monospace/code at normal letter-spacing: the tightening above is for
+   Inter/sans text only. Code that sets its own letter-spacing (several code
+   blocks use a slight -0.01em) keeps it, since a class selector outranks these
+   bare element selectors. */
+code, kbd, samp, pre, .font-mono {
+  letter-spacing: normal;
 }
 
 /* Actionable controls get a pointer cursor everywhere. Tailwind v4's

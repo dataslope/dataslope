@@ -13,7 +13,7 @@ import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
 const PAGE_TITLE = "Pricing, Dataslope";
 const PAGE_DESCRIPTION =
-  "Dataslope pricing in detail. Every course, interview track, and playground is free. Compare the Guest, Free Member, and Pro plans, with footnotes covering cloud storage, sharing, AI usage, and billing.";
+  "Dataslope pricing in detail. Every course, interview track, and playground is free. Compare the Guest and Free Member plans, with footnotes covering cloud storage, sharing, AI usage, and billing.";
 
 export const metadata: Metadata = {
   // A bare string here lets the root layout's "%s · DataSlope" template render
@@ -93,9 +93,9 @@ export default function PricingPage() {
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
                 Every course, interview track, and playground is free to use,
                 sign-in optional, and anyone can share a playground with a
-                link. Create a free account for cloud saves, or go Pro for
-                storage that never expires. The detailed notes below the table
-                explain exactly what each row means.
+                link. Create a free account to save and share your work in the
+                cloud. The detailed notes below the table explain exactly what
+                each row means.
               </p>
             </div>
           </section>
@@ -116,13 +116,20 @@ export default function PricingPage() {
                 there are no surprises about what&apos;s included at each tier.
               </p>
 
+              {/* NOTE: The paid "Pro" tier is currently hidden from the table
+                  (see SHOW_PRO_PLAN in PricingSection). These footnotes have
+                  been trimmed to describe only the Guest and Free Member plans,
+                  everything is free today. When Pro is restored, re-add the
+                  Pro-specific notes (unlimited Ask AI fair-use, autocomplete,
+                  monthly/annual billing, cancelling a plan) and the 10 GB /
+                  "Upgrade to Pro" clauses removed below. */}
               <ol className="mt-8 space-y-6">
                 <Footnote n={1} lead="Free to learn, always.">
                   Courses, interview prep, and the playgrounds, including
                   unlimited code executions across all 11 languages, are
                   completely free on every tier, including as a guest with no
-                  sign-in. A paid plan only adds cloud storage, sharing, and
-                  more AI chat; it never puts learning content behind a paywall.
+                  sign-in. Creating a free account only adds cloud storage and
+                  sharing; it never puts learning content behind a paywall.
                 </Footnote>
 
                 <Footnote n={2} lead="“Save workspaces locally.”">
@@ -137,8 +144,7 @@ export default function PricingPage() {
                 <Footnote n={3} lead="“Save workspaces locally and in the cloud.”">
                   Cloud saves sync your workspaces to your account so you can
                   pick them up on any device you sign in to. Free Members get
-                  cloud saves with a retention limit (see note 4); Pro keeps them
-                  for as long as your membership is active.
+                  cloud saves with a retention limit (see note 4).
                 </Footnote>
 
                 <Footnote
@@ -149,17 +155,16 @@ export default function PricingPage() {
                   opened or edited for about 30 days. After that it may be
                   removed from the cloud to free up space, your local copy, if
                   you have one, is untouched. Opening or editing a workspace
-                  resets its clock. Upgrading to Pro removes this limit entirely:
-                  Pro cloud saves are kept for as long as you&apos;re subscribed.
+                  resets its clock.
                 </Footnote>
 
-                <Footnote n={5} lead="“100 MB / 10 GB of cloud storage.”">
+                <Footnote n={5} lead="“100 MB of cloud storage.”">
                   Your quota is the combined size of everything you keep in the
                   cloud, saved workspaces, databases, and any files you upload,
                   totaled across all playgrounds, not measured per playground. If
                   you reach the limit you can still open and export existing
-                  work; you&apos;ll just need to free up space (or upgrade)
-                  before saving more.
+                  work; you&apos;ll just need to free up space before saving
+                  more.
                 </Footnote>
 
                 <Footnote n={6} lead="“Share playgrounds.”">
@@ -173,58 +178,18 @@ export default function PricingPage() {
                   account: guest links simply expire 30 days after they&apos;re
                   created and can&apos;t be managed afterwards. Links created
                   while signed in can be copied or revoked anytime from your
-                  account page; on the Free Member plan they follow the same
-                  one-month inactivity cleanup as your other cloud saves (see
-                  note 4) and count toward your storage quota (note 5), while
-                  on Pro they stay live for as long as you&apos;re subscribed.
+                  account page, and they follow the same one-month inactivity
+                  cleanup as your other cloud saves (see note 4) and count
+                  toward your storage quota (note 5).
                 </Footnote>
 
                 <Footnote n={7} lead="“Ask AI” messages.">
                   “Ask AI” is the in-app assistant available inside playgrounds,
                   challenges, code blocks, and lessons. Your limit is counted
                   across all of those surfaces on a rolling 24-hour window,
-                  Guests get 3, Free Members up to 10, and Pro is unlimited. A
-                  rolling window means each message frees up again 24 hours after
-                  you send it, rather than all resetting at a fixed time of day.
-                </Footnote>
-
-                <Footnote
-                  n={8}
-                  lead="“Unlimited ‘Ask AI’, fair use policy applies” (Pro)."
-                >
-                  Unlimited covers normal interactive use. To keep the assistant
-                  fast and available for everyone, we may rate-limit usage that
-                  looks automated or abusive (for example, scripted bulk
-                  requests). Ordinary day-to-day use is never throttled.
-                </Footnote>
-
-                <Footnote
-                  n={9}
-                  lead="“Unlimited AI-suggested autocomplete” (Pro)."
-                >
-                  As you type in any playground, Pro offers inline,
-                  context-aware code completions you can accept with a keystroke
-, like an AI pair programmer suggesting the next line. It&apos;s
-                  unlimited under the same fair-use policy as Ask AI (see note 8),
-                  and it&apos;s a Pro-only feature: the Guest and Free Member
-                  tiers don&apos;t include autocomplete suggestions.
-                </Footnote>
-
-                <Footnote n={10} lead="Monthly vs. annual billing.">
-                  The toggle above the table switches the Pro price between
-                  monthly ($4.99/mo) and annual ($40/yr, about $3.33/mo, a 33%
-                  saving). Annual is a single up-front payment covering twelve
-                  months. Prices are in US dollars and may be subject to tax
-                  depending on where you are.
-                </Footnote>
-
-                <Footnote n={11} lead="Changing or cancelling your plan.">
-                  You can cancel Pro at any time and keep Pro features until the
-                  end of the period you&apos;ve already paid for. After that your
-                  account returns to the Free Member tier and your cloud data
-                  becomes subject to the Free limits again, the 100 MB quota and
-                  the one-month inactivity cleanup, so export anything you want
-                  to keep beyond those limits before you downgrade.
+                  Guests get 3 and Free Members up to 10. A rolling window means
+                  each message frees up again 24 hours after you send it, rather
+                  than all resetting at a fixed time of day.
                 </Footnote>
               </ol>
 

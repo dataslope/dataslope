@@ -16,7 +16,6 @@ import {
   SquareTerminal,
   User,
   UserCheck,
-  WandSparkles,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -67,7 +66,11 @@ interface Plan {
   checkout?: boolean;
 }
 
-const FEATURE_COUNT = 9;
+// Number of feature rows every plan lists, in the same order, so the subgrid
+// can line the rows up across columns. If you change this, also update the
+// hardcoded subgrid row counts in the render below (they are FEATURE_COUNT + 3
+// header/price/CTA rows) since Tailwind needs the literal class strings.
+const FEATURE_COUNT = 8;
 
 const PLANS: Plan[] = [
   {
@@ -95,7 +98,6 @@ const PLANS: Plan[] = [
         note: "Share links expire 30 days after creation",
       },
       { text: "No “Ask AI” messages", included: false },
-      { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
     href: "/courses",
@@ -133,11 +135,25 @@ const PLANS: Plan[] = [
         text: "Up to 10 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
-      { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Sign up for free",
     href: "/sign-up",
+    // Promoted tier: green CTA, green icon, and a "Recommended" badge.
+    highlighted: true,
+    badge: "Recommended",
   },
+  // ── Pro plan: temporarily hidden ──────────────────────────────────────────
+  // The paid "Pro" column is intentionally kept OUT of the rendered table for
+  // now (see SHOW_PRO_PLAN below). The goal right now is to attract as many
+  // users as possible, and surfacing a paid tier can read as an upsell even
+  // though every course, playground, and challenge is free on all tiers. The
+  // plan object and all of its billing wiring (ProCheckoutCta, startProCheckout,
+  // stashCheckoutPeriod, the Polar checkout, the `checkout`/`plan` fields) are
+  // deliberately LEFT IN PLACE so Pro can be brought back by flipping
+  // SHOW_PRO_PLAN to `true` — do not delete them. When restoring, also:
+  //   • re-add the "AI-suggested autocomplete" feature rows (removed across all
+  //     plans) and bump FEATURE_COUNT back up accordingly, and
+  //   • widen the grid again (see the grid-cols / subgrid-row comments below).
   {
     name: "Pro",
     icon: Crown,
@@ -173,12 +189,6 @@ const PLANS: Plan[] = [
         note: "Fair use policy applies",
         highlight: "Unlimited",
       },
-      {
-        icon: WandSparkles,
-        text: "Unlimited AI-suggested autocomplete",
-        note: "Inline, context-aware code completions in every playground",
-        highlight: "Unlimited",
-      },
     ],
     cta: "Go Pro",
     href: "/courses",
@@ -187,6 +197,11 @@ const PLANS: Plan[] = [
     checkout: true,
   },
 ];
+
+// Toggle the paid "Pro" column on/off. Flip to `true` to restore the tier
+// (see the "Pro plan: temporarily hidden" note above for the full checklist).
+const SHOW_PRO_PLAN = false;
+const VISIBLE_PLANS = PLANS.filter((p) => SHOW_PRO_PLAN || p.name !== "Pro");
 
 // Explicit column placement keeps each plan in its own column while spanning
 // all of the subgrid's rows.
@@ -358,7 +373,7 @@ function PlanColumn({
     // shared row tracks); top/bottom breathing room is added to the header and
     // last feature instead.
     <div
-      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-12 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
+      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
       <div className="lg:pt-8">
         <div className="flex items-center gap-2.5">
@@ -380,6 +395,11 @@ function PlanColumn({
       <div>
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
+        </span>
+        {/* Billing-period suffix so the monthly/annual toggle visibly changes
+            the table even though every plan is $0. */}
+        <span className="ml-1 text-base font-normal text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          {annual ? "/ year" : "/ month"}
         </span>
         <p className="mt-1 text-[15px] text-[var(--ds-gray-900)] dark:text-white">
           {note}
@@ -460,8 +480,8 @@ export function PricingSection({
           </SparklesText>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
             Every course, interview track, and playground is free to use, and
-            anyone can share a playground with a link. Create a free account
-            for cloud saves, or go Pro for storage that never expires.
+            anyone can share a playground with a link. Create a free account to
+            save and share your work in the cloud.
           </p>
         </div>
       )}
@@ -492,7 +512,7 @@ export function PricingSection({
                         : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] dark:bg-[var(--ds-green-500)]/15 dark:text-[var(--ds-green-300)]"
                     }`}
                   >
-                    Save 33%
+                    Best value
                   </span>
                 )}
               </button>
@@ -509,14 +529,22 @@ export function PricingSection({
           sliver, not through the table body. */}
       <div className="ds-striped-shell rounded-2xl">
         <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
-          <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
-            {PLANS.map((plan, i) => (
+          {/* Column count tracks the number of visible plans; the subgrid row
+              count is FEATURE_COUNT + 3 (header/price/CTA). Both are literal
+              class strings so Tailwind's JIT can see them, when restoring Pro,
+              switch `lg:grid-cols-2` back to `lg:grid-cols-3`. */}
+          <div
+            className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
+              SHOW_PRO_PLAN ? "lg:grid-cols-3" : "lg:grid-cols-2"
+            }`}
+          >
+            {VISIBLE_PLANS.map((plan, i) => (
               <PlanColumn
                 key={plan.name}
                 plan={plan}
                 annual={annual}
                 colClass={COL_START[i]}
-                prevPlan={i > 0 ? PLANS[i - 1] : undefined}
+                prevPlan={i > 0 ? VISIBLE_PLANS[i - 1] : undefined}
               />
             ))}
           </div>

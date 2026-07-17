@@ -12,7 +12,7 @@ ship `tools.jar`, so the playground supplies its own copy of `javac` and loads
 it into CheerpJ's filesystem at runtime.
 
 Hosting the ~18 MB jar on a CDN instead of the app's own origin keeps it off
-the Vercel bandwidth bill. We use **unpkg** specifically because:
+the app's own bandwidth bill. We use **unpkg** specifically because:
 
 - **jsDelivr** refuses `.jar` files (returns HTTP 403).
 - **GitHub release assets** send no `Access-Control-Allow-Origin` header, so a
@@ -21,7 +21,7 @@ the Vercel bandwidth bill. We use **unpkg** specifically because:
   version is pinned, an immutable 1-year cache.
 
 The app fetches it from `https://unpkg.com/dataslope-tools-jar@<version>/tools.jar`
-— see `TOOLS_JAR_CDN` in `app/_components/runtime/cdn.ts`.
+(see `TOOLS_JAR_CDN` in `app/_components/runtime/cdn.ts`).
 
 ## Provenance & license
 
@@ -44,6 +44,6 @@ The corresponding source is OpenJDK 8 (https://openjdk.org/).
    yields the immutable 1-year CDN cache.
 
 > **Deploy ordering:** publish the npm package *before* deploying an app build
-> that points `TOOLS_JAR_VERSION` at it — the playground fetches the jar from
-> unpkg at runtime, so the version must already exist on npm or Java will fail
-> to start.
+> that points `TOOLS_JAR_VERSION` at it, because the playground fetches the jar
+> from unpkg at runtime, so the version must already exist on npm or Java will
+> fail to start.

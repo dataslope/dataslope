@@ -31,7 +31,7 @@ sparingly, to highlight or differentiate.
 
 Each hue has a full tonal ramp exposed as CSS variables in `app/brand.css`
 (`--ds-<hue>-<step>`) and previewable at `/color-test`. **Prefer the `500`
-shade** (the primary/base color) — the other steps exist for when a lighter or
+shade** (the primary/base color); the other steps exist for when a lighter or
 darker tone is required (backgrounds, borders, hover states, AA-legible text on
 white, and telling chart/diagram series apart). `500` = the brand color; the
 `ink` text anchors that clear WCAG AA body text on white are noted per hue.

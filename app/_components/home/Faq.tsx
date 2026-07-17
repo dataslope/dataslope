@@ -7,11 +7,19 @@ import { SparklesText } from "@/components/ui/sparkles-text";
 const FAQS: { q: string; a: string }[] = [
   {
     q: "Do I need to sign up or install anything?",
-    a: "No. Everything runs in your browser, no account, no sign-in, and nothing to install beyond the one-time language runtime that downloads automatically on your first run.",
+    a: "No. Everything runs in your browser, no sign-in, and nothing to install beyond the one-time language runtime that downloads automatically on your first run. Creating a free account is optional; it lets you save and share your work in the cloud across devices.",
   },
   {
     q: "Is it really free?",
-    a: "Yes, all the courses, playgrounds, and quizzes are completely free and fully accessible, with no paywall on any of the content.",
+    a: "Yes, all the courses, playgrounds, and quizzes are completely free and fully accessible, with no paywall on any of the content. Accounts are free too, Dataslope only offers free memberships.",
+  },
+  {
+    q: "What does a free account add?",
+    a: "No learning content is ever gated behind it, but a free account lets you save your workspaces to the cloud, pick them up on another device, and manage your share links. You can sign up with Google, GitHub, or an email address.",
+  },
+  {
+    q: "What if I want to use more prompts?",
+    a: "Ask AI has a daily allowance that refreshes on a rolling 24-hour basis, so prompts you use free up again over the following day. For now Dataslope only offers free memberships, so there's no paid upgrade for extra prompts, everyone gets the same free allowance. We may add more options in the future.",
   },
   {
     q: "How does code run without a server?",
@@ -23,7 +31,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Is my work saved?",
-    a: "Your editor contents are kept in your browser's local storage, so refreshing the page or returning later restores your progress on the same device and browser.",
+    a: "Your editor contents are kept in your browser's local storage, so refreshing the page or returning later restores your progress on the same device and browser. With a free account you can also save workspaces to the cloud and open them on another device.",
   },
   {
     q: "Can I use it on mobile?",

@@ -92,6 +92,15 @@ html[data-playground-theme="light"] .pyodide-loading {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
+
+/* The sitewide default body letter-spacing (app/globals.css: -0.011em, for
+   Inter/sans text) would also tighten every monospace surface in this IDE, the
+   editor, terminal, output cells and gutters, whose columns should keep their
+   natural spacing. Default the whole playground back to `normal`; the chrome's
+   own explicit letter-spacing rules still win via the cascade. */
+.playground-root {
+  letter-spacing: normal;
+}
 .playground-root ::-webkit-scrollbar,
 .playground-root::-webkit-scrollbar {
   width: 8px;
