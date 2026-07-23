@@ -423,7 +423,6 @@ export default function CodeChallengeBuilder() {
       <BuilderHeader
         title="New code challenge"
         lede="Write the instructions, starter code, and tests. Recipients solve it right in their browser, no setup, no server."
-        aiPlaceholder="Describe the challenge and AI fills every field below"
       />
       <GuestNotice />
 

@@ -4,12 +4,13 @@
  * Shared state for the Studio "Fill with AI" feature.
  *
  * A builder registers its kind + an `applyDraft` handler (the function that
- * writes a drafted item into that builder's form). The AI assist panel and the
- * in-form "Fill with AI" bar both call `draft(prompt)`, which POSTs to
- * /api/ai/draft and, on success, hands the validated draft to whatever builder
- * is currently registered. Keeping this at the shell level lets the assist
- * panel live in the chrome (full-height, beside the content) while still
- * driving the form the user is looking at.
+ * writes a drafted item into that builder's form). The in-form "Fill with AI"
+ * bar just opens the AI Assist panel; the panel's composer calls `draft(prompt)`
+ * once the user submits a description, which POSTs to /api/ai/draft and, on
+ * success, hands the validated draft to whatever builder is currently
+ * registered. Keeping this at the shell level lets the assist panel live in the
+ * chrome (full-height, beside the content) while still driving the form the
+ * user is looking at.
  */
 
 import {
@@ -40,8 +41,11 @@ interface StudioAiValue {
   messages: ChatMessage[];
   /** The builder currently able to receive a draft, or null on non-builder routes. */
   activeKind: DraftKind | null;
-  /** Draft the active builder's item from a free-text description. */
-  draft: (prompt: string) => Promise<void>;
+  /** Draft the active builder's item from a free-text description. Resolves to
+   *  `true` when the request was billed against the daily Ask AI budget (the
+   *  provider was actually invoked), so callers can optimistically decrement a
+   *  quota display. */
+  draft: (prompt: string) => Promise<boolean>;
   /** Builders call this (in an effect) to register themselves. */
   register: (kind: DraftKind, apply: ApplyDraft) => void;
   unregister: (kind: DraftKind) => void;
@@ -82,15 +86,21 @@ export function StudioAiProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const draft = useCallback(async (prompt: string) => {
+  const draft = useCallback(async (prompt: string): Promise<boolean> => {
     const active = applyRef.current;
-    if (!active) return;
+    if (!active) return false;
+    // Generation only starts once the user actually enters a message. An empty
+    // prompt (e.g. opening the panel) must never spend a provider request, so
+    // it can't surface a spurious "assistant is unavailable" error before the
+    // user has asked for anything.
+    const trimmed = prompt.trim();
+    if (!trimmed) {
+      setOpen(true);
+      return false;
+    }
     setOpen(true);
     setBusy(true);
-    const trimmed = prompt.trim();
-    if (trimmed) {
-      setMessages((m) => [...m, { who: "user", text: trimmed }]);
-    }
+    setMessages((m) => [...m, { who: "user", text: trimmed }]);
     try {
       const res = await fetch("/api/ai/draft", {
         method: "POST",
@@ -100,13 +110,17 @@ export function StudioAiProvider({ children }: { children: React.ReactNode }) {
       const body = (await res.json().catch(() => null)) as
         | (AiDraftResponse & { error?: string })
         | null;
+      // The server bills the daily Ask AI budget whenever it actually reached
+      // the provider — a drafted 200 or an unparseable 422. Pre-provider
+      // rejections (429 over-budget, 401/403, 502 provider-down) are not billed.
+      const counted = res.ok || res.status === 422;
       if (!res.ok || !body?.draft) {
         const message =
           body && typeof body.error === "string"
             ? body.error
             : "Couldn't draft that, try again.";
         setMessages((m) => [...m, { who: "ai", text: message }]);
-        return;
+        return counted;
       }
       // Only apply if the same builder is still mounted (the user may have
       // navigated away mid-request).
@@ -114,11 +128,13 @@ export function StudioAiProvider({ children }: { children: React.ReactNode }) {
         applyRef.current.apply(body.draft);
         setMessages((m) => [...m, { who: "ai", text: DONE_MESSAGE[active.kind] }]);
       }
+      return counted;
     } catch {
       setMessages((m) => [
         ...m,
         { who: "ai", text: "Network error reaching the assistant, try again." },
       ]);
+      return false;
     } finally {
       setBusy(false);
     }

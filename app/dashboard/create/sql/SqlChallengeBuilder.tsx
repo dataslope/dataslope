@@ -337,7 +337,6 @@ export default function SqlChallengeBuilder() {
       <BuilderHeader
         title="New SQL challenge"
         lede="Define the tables and seed data, write the task, and pick the checks. Recipients query a real database in their browser."
-        aiPlaceholder="Describe the exercise and AI fills every field below"
       />
       <GuestNotice />
 

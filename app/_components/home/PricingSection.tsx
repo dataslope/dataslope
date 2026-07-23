@@ -12,7 +12,7 @@ import {
   HardDrive,
   Play,
   Share2,
-  Sparkles,
+  Sparkle,
   SquareTerminal,
   User,
   UserCheck,
@@ -131,7 +131,7 @@ const PLANS: Plan[] = [
         note: "Shared playgrounds deleted after a month of inactivity",
       },
       {
-        icon: Sparkles,
+        icon: Sparkle,
         text: "Up to 10 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
@@ -184,7 +184,7 @@ const PLANS: Plan[] = [
         note: "Shared playgrounds never deleted while subscribed",
       },
       {
-        icon: Sparkles,
+        icon: Sparkle,
         text: "Unlimited “Ask AI” messages",
         note: "Fair use policy applies",
         highlight: "Unlimited",
