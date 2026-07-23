@@ -138,6 +138,24 @@ async function getWorkspaceDir(
   return wsDir.getDirectoryHandle(workspaceId, { create });
 }
 
+/**
+ * True when a workspace's OPFS directory still exists (i.e. its content is
+ * available to reopen). Used by the sign-in resume path to confirm a stashed
+ * draft's work is really there before re-adopting it, rather than pointing the
+ * playground at an id whose files were since evicted. Returns false when OPFS
+ * is unavailable (no persisted content to recover in that case).
+ */
+export async function workspaceExistsInOpfs(id: string): Promise<boolean> {
+  if (!isOpfsSupported()) return false;
+  try {
+    const wsDir = await getWorkspacesDir();
+    await wsDir.getDirectoryHandle(id, { create: false });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Workspace CRUD
 // ---------------------------------------------------------------------------

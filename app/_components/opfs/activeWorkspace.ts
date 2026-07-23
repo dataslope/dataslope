@@ -26,8 +26,10 @@ import {
   getWorkspaceRegistry,
   openWorkspace,
   registerWorkspace,
+  workspaceExistsInOpfs,
   type WorkspaceEntry,
 } from "./workspace";
+import { isOpfsSupported } from "./featureDetect";
 
 const SESSION_KEY_PREFIX = "playground_active_ws_";
 // Per-tab store for a *draft* (unsaved) workspace, one that has OPFS backing
@@ -171,6 +173,179 @@ function clearDraftWorkspace(playgroundId: string): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Sign-in resume handoff
+// ---------------------------------------------------------------------------
+// The active-workspace pointer lives in per-tab `sessionStorage`, and a guest's
+// auto-created workspace is an unregistered draft (kept out of the localStorage
+// registry until Save). Signing in navigates the whole tab away (the Ask AI CTA
+// uses `target="_top"` to escape the home page's playground iframe) and can
+// return in a context where that per-tab pointer is gone — a fresh tab, a
+// dropped session, or the home page re-mounting its embed — at which point
+// `ensureActiveWorkspace` would spin up a blank default and the guest's work
+// (still sitting in OPFS) looks lost.
+//
+// The fix is a durable, single-use handoff written to `localStorage` (which,
+// unlike sessionStorage, survives the round trip and is visible across
+// contexts) right before we leave for the auth flow. On the first bootstrap
+// after returning, `ensureActiveWorkspace` consumes it and re-points the tab at
+// the same workspace, so the work resumes.
+
+const RESUME_STASH_KEY = "playground_signin_resume";
+// A stash older than this is treated as abandoned (the user walked away without
+// completing sign-in) and ignored, so it can't hijack an unrelated later visit.
+const RESUME_STASH_TTL_MS = 24 * 60 * 60 * 1000;
+
+interface ResumeStash {
+  playground: string;
+  id: string;
+  name: string;
+  createdAt: number;
+  /** When the stash was written, for TTL expiry. */
+  ts: number;
+}
+
+function writeResumeStash(stash: ResumeStash): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(RESUME_STASH_KEY, JSON.stringify(stash));
+  } catch {
+    /* storage unavailable (private mode / quota); resume just won't happen. */
+  }
+}
+
+function readResumeStash(): ResumeStash | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(RESUME_STASH_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ResumeStash;
+    if (
+      parsed &&
+      typeof parsed.playground === "string" &&
+      typeof parsed.id === "string"
+    ) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function clearResumeStash(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(RESUME_STASH_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** True when localStorage can be written (false in private mode / when blocked),
+ *  a precondition for recording the resume handoff. */
+function canWriteLocalStorage(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const probe = "__ds_persist_probe__";
+    window.localStorage.setItem(probe, "1");
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Whether the current active workspace's content can survive a sign-in round
+ * trip: OPFS must hold the content, and localStorage must be writable so the
+ * resume handoff (and the workspace registry) can be recorded.
+ */
+export function canPersistGuestWork(): boolean {
+  return isOpfsSupported() && canWriteLocalStorage();
+}
+
+/**
+ * True when signing in right now would lose the guest's current playground work
+ * because this browser can't persist it across the auth navigation. Callers use
+ * it to show a confirmation before leaving the page. Returns false when there is
+ * no active workspace (nothing to lose).
+ */
+export function guestWorkNeedsSignInWarning(playgroundId: string): boolean {
+  if (!playgroundId) return false;
+  if (getActiveWorkspaceId(playgroundId) == null) return false;
+  return !canPersistGuestWork();
+}
+
+/**
+ * Record a durable, single-use pointer to the playground's active workspace so
+ * it can be resumed after the sign-in / sign-up flow. Call this right before
+ * navigating to the auth pages. No-op when there is no active workspace, or when
+ * OPFS can't hold the content to return to (in which case there is nothing to
+ * resume — the caller warns the user instead).
+ */
+export function stashActiveWorkspaceForResume(playgroundId: string): void {
+  if (!playgroundId || typeof window === "undefined") return;
+  const activeId = getActiveWorkspaceId(playgroundId);
+  if (!activeId) return;
+  if (!isOpfsSupported()) return;
+  const saved = getWorkspaceRegistry().find((e) => e.id === activeId);
+  const draft = getDraftWorkspace(playgroundId);
+  const source = saved ?? (draft && draft.id === activeId ? draft : null);
+  const name =
+    source?.name ?? DEFAULT_NAMES[playgroundId] ?? `Default ${playgroundId}`;
+  const createdAt = source?.createdAt ?? Date.now();
+  writeResumeStash({
+    playground: playgroundId,
+    id: activeId,
+    name,
+    createdAt,
+    ts: Date.now(),
+  });
+}
+
+/**
+ * Consume a pending sign-in resume handoff for this playground, if any, and
+ * re-adopt the stashed workspace as active. Single-use: the stash is cleared up
+ * front so it can never hijack a later fresh-tab open. Returns the resumed
+ * workspace, or null when there's no (valid, unexpired) stash or its content is
+ * gone.
+ */
+async function consumeResumeStash(
+  playgroundId: string,
+): Promise<ActiveWorkspace | null> {
+  const stash = readResumeStash();
+  if (!stash || stash.playground !== playgroundId) return null;
+  clearResumeStash();
+  if (Date.now() - (stash.ts ?? 0) > RESUME_STASH_TTL_MS) return null;
+
+  // A saved (registry) workspace: re-point this tab at it and reuse.
+  const saved = getWorkspaceRegistry().find(
+    (e) => e.id === stash.id && e.playground === playgroundId,
+  );
+  if (saved) {
+    setActiveWorkspaceId(playgroundId, saved.id);
+    const opened = await openWorkspace(saved.id);
+    return { ...(opened ?? saved), saved: true };
+  }
+
+  // Otherwise an unsaved draft: resumable only while its OPFS content is still
+  // present (that's where the guest's work lives).
+  if (await workspaceExistsInOpfs(stash.id)) {
+    const entry: WorkspaceEntry = {
+      id: stash.id,
+      name: stash.name,
+      playground: playgroundId,
+      createdAt: stash.createdAt,
+      lastUsedAt: Date.now(),
+    };
+    setActiveWorkspaceId(playgroundId, entry.id);
+    setDraftWorkspace(playgroundId, entry);
+    return { ...entry, saved: false };
+  }
+  return null;
+}
+
 /**
  * Resolve (or create) the active workspace for a playground.
  *
@@ -183,6 +358,11 @@ function clearDraftWorkspace(playgroundId: string): void {
 export async function ensureActiveWorkspace(
   playgroundId: string,
 ): Promise<ActiveWorkspace> {
+  // A guest who just signed in / signed up resumes the workspace they left,
+  // even if this tab's sessionStorage pointer didn't survive the round trip.
+  const resumed = await consumeResumeStash(playgroundId);
+  if (resumed) return resumed;
+
   const storedId = getActiveWorkspaceId(playgroundId);
   if (storedId) {
     const registry = getWorkspaceRegistry();
