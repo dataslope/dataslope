@@ -186,16 +186,21 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono, ui-monospace, monospace);
 }
 
-.badgePhoto {
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-}
-
-.badgeNoPhoto {
+.badgeMuted {
   background: var(--badge-muted-bg);
   color: var(--badge-muted-fg);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
 }
 
 .prompt {
@@ -206,26 +211,6 @@
   color: var(--muted);
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.refLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.refLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--link);
-  font-size: 0.78rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.refLink:hover {
-  text-decoration: underline;
 }
 
 .cardBottom {

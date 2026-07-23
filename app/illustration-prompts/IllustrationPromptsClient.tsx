@@ -2,14 +2,13 @@
 
 /**
  * Interactive shell for the `/illustration-prompts` gallery. The entry data is
- * collected at build time by the server component (see `page.tsx` and
- * `lib/illustrationPromptsGallery.ts`) and passed in as a prop, the payload is
- * small (~80 short prompts), so unlike the SVG gallery there is no static JSON
- * asset or client fetch. Everything here, the light/dark toggle and the
- * per-card copy buttons, is client-side.
+ * built from `data/illustration-prompts.json` by the server component (see
+ * `page.tsx` and `lib/illustrationPromptsGallery.ts`) and passed in as a prop.
+ * Everything here, the light/dark toggle and the per-card copy buttons, is
+ * client-side.
  */
-import { useCallback, useState, useSyncExternalStore } from "react";
-import { Check, Copy, Moon, Search, Sun } from "lucide-react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { Check, Copy, Moon, Sun } from "lucide-react";
 import type {
   IllustrationPromptEntry,
   IllustrationPromptsData,
@@ -57,10 +56,10 @@ function PromptCard({
   copiedKey: string | null;
   onCopy: (key: string, text: string) => void;
 }) {
-  const fileKey = `${entry.slug}:file`;
-  const promptKey = `${entry.slug}:prompt`;
+  const fileKey = `${entry.id}:file`;
+  const promptKey = `${entry.id}:prompt`;
   return (
-    <figure id={entry.slug} className={styles.card}>
+    <figure id={entry.id} className={styles.card}>
       <div className={styles.cardTop}>
         <span className={styles.fileWrap}>
           <code className={styles.file}>{entry.file}</code>
@@ -74,40 +73,19 @@ function PromptCard({
             {copiedKey === fileKey ? <Check size={13} /> : <Copy size={13} />}
           </button>
         </span>
-        <span
-          className={`${styles.badge} ${entry.photo ? styles.badgePhoto : styles.badgeNoPhoto}`}
-        >
-          {entry.photo ? "photo attached" : "no reference"}
-        </span>
+        <span className={`${styles.badge} ${styles.badgeMuted}`}>{entry.size}</span>
       </div>
 
+      <p className={styles.cardTitle}>{entry.title}</p>
       <p className={styles.prompt}>{entry.prompt}</p>
-
-      {entry.photo && entry.imageSearchUrl ? (
-        <div className={styles.refLinks}>
-          <a
-            className={styles.refLink}
-            href={entry.imageSearchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Search size={13} aria-hidden="true" />
-            Google Images
-          </a>
-        </div>
-      ) : null}
 
       <div className={styles.cardBottom}>
         <div className={styles.usages}>
-          <span className={styles.usagesLabel}>
-            Used on {entry.usages.length} page{entry.usages.length === 1 ? "" : "s"}
-          </span>
-          {entry.usages.map((u) => (
-            <a key={u.href} className={styles.usage} href={u.href}>
-              <span className={styles.usageCourse}>{u.courseTitle}</span> ·{" "}
-              {u.route} →
-            </a>
-          ))}
+          <span className={styles.usagesLabel}>Used on</span>
+          <a className={styles.usage} href={entry.href}>
+            <span className={styles.usageCourse}>{entry.courseTitle}</span> ·{" "}
+            {entry.route} →
+          </a>
         </div>
         <button
           type="button"
@@ -146,33 +124,16 @@ export function IllustrationPromptsClient({
       });
   }, []);
 
-  const people = data.entries.filter((e) => e.photo);
-  const objects = data.entries.filter((e) => !e.photo);
-
-  const section = (
-    title: string,
-    entries: IllustrationPromptEntry[],
-  ) =>
-    entries.length === 0 ? null : (
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>
-          {title}
-          <span className={styles.sectionCount}>
-            {entries.length} illustration{entries.length === 1 ? "" : "s"}
-          </span>
-        </h2>
-        <div className={styles.list}>
-          {entries.map((entry) => (
-            <PromptCard
-              key={entry.slug}
-              entry={entry}
-              copiedKey={copiedKey}
-              onCopy={onCopy}
-            />
-          ))}
-        </div>
-      </section>
-    );
+  // Group entries by category label, preserving the pre-sorted order.
+  const groups = useMemo(() => {
+    const byLabel = new Map<string, IllustrationPromptEntry[]>();
+    for (const entry of data.entries) {
+      const list = byLabel.get(entry.categoryLabel);
+      if (list) list.push(entry);
+      else byLabel.set(entry.categoryLabel, [entry]);
+    }
+    return [...byLabel.entries()];
+  }, [data.entries]);
 
   return (
     <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
@@ -192,23 +153,41 @@ export function IllustrationPromptsClient({
             </button>
           </div>
           <p className={styles.subtitle}>
-            Placeholder prompts for the custom line-art illustrations across the{" "}
-            <code>/learn</code> and <code>/interview</code> pages,{" "}
+            GPT Image 2 prompts for the custom risograph illustrations across the
+            Dataslope courses and interview prep, rendered in the four brand
+            colors.{" "}
             <span className={styles.count}>{data.totalIllustrations}</span>{" "}
-            illustration{data.totalIllustrations === 1 ? "" : "s"} to draw,
-            placed in <span className={styles.count}>{data.totalLessons}</span>{" "}
-            lesson{data.totalLessons === 1 ? "" : "s"}. Each card carries its
-            target file name and the exact generation prompt.
+            illustration{data.totalIllustrations === 1 ? "" : "s"} to draw across{" "}
+            <span className={styles.count}>{data.totalCourses}</span> course
+            {data.totalCourses === 1 ? "" : "s"}. Each card carries its target
+            file name and the exact generation prompt. Batch-generate them with{" "}
+            <code>scripts/generate-illustrations.mjs</code>.
           </p>
         </header>
 
         {data.totalIllustrations === 0 ? (
           <p className={styles.empty}>No illustration prompts found.</p>
         ) : (
-          <>
-            {section("People (portraits)", people)}
-            {section("Objects & scenes", objects)}
-          </>
+          groups.map(([label, entries]) => (
+            <section key={label} className={styles.section}>
+              <h2 className={styles.sectionHeading}>
+                {label}
+                <span className={styles.sectionCount}>
+                  {entries.length} illustration{entries.length === 1 ? "" : "s"}
+                </span>
+              </h2>
+              <div className={styles.list}>
+                {entries.map((entry) => (
+                  <PromptCard
+                    key={entry.id}
+                    entry={entry}
+                    copiedKey={copiedKey}
+                    onCopy={onCopy}
+                  />
+                ))}
+              </div>
+            </section>
+          ))
         )}
       </div>
     </div>

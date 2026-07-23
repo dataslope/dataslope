@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "model": "gpt-image-2",
+    "defaultStyle": "risograph",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "course-thumbnail": "1536x1024",
+      "course-illustration": "1024x1024",
+      "interview-thumbnail": "1536x1024",
+      "interview-illustration": "1024x1024"
+    }
+  },
+  "prompts": [
+    {
+      "id": "python-basics-thumbnail",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "index",
+      "category": "course-thumbnail",
+      "title": "Python Basics — course thumbnail",
+      "style": "risograph",
+      "subject": "a friendly python snake gently coiled into a smooth loop around a glowing computer monitor, with floating rounded code blocks, a steaming coffee mug, and small sparkles orbiting the scene",
+      "noText": true
+    },
+    {
+      "id": "python-basics-hello-world",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "hello-world",
+      "category": "course-illustration",
+      "title": "Hello, World",
+      "style": "risograph",
+      "subject": "a cheerful retro desktop computer monitor displaying a single glowing speech bubble as if greeting the world for the first time, with a small blinking cursor",
+      "noText": true
+    },
+    {
+      "id": "python-basics-variables",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "variables",
+      "category": "course-illustration",
+      "title": "Variables",
+      "style": "risograph",
+      "subject": "a tidy row of labeled storage jars and boxes on a wooden shelf, each container holding a different simple geometric object, with paper name tags tied to them",
+      "noText": true
+    },
+    {
+      "id": "python-basics-strings",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "strings",
+      "category": "course-illustration",
+      "title": "Strings",
+      "style": "risograph",
+      "subject": "a long ribbon of individual letter beads threaded on a string, curling gracefully across the frame like a necklace of characters",
+      "noText": true
+    },
+    {
+      "id": "python-basics-lists",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "lists",
+      "category": "course-illustration",
+      "title": "Lists",
+      "style": "risograph",
+      "subject": "a little train of connected open boxcars on a track seen from the side, each numbered car carrying a different small parcel in sequence",
+      "noText": true
+    },
+    {
+      "id": "python-basics-dictionaries",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "dictionaries",
+      "category": "course-illustration",
+      "title": "Dictionaries",
+      "style": "risograph",
+      "subject": "a wall of small labeled mailboxes, each with a numbered key hanging in its lock and a few boxes open to reveal a rolled letter inside, evoking keys mapping to values",
+      "noText": true
+    },
+    {
+      "id": "python-basics-loops",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "loops",
+      "category": "course-illustration",
+      "title": "Loops",
+      "style": "risograph",
+      "subject": "a looping roller-coaster track shaped like a smooth circular arrow with a single cart riding repeatedly around the same curve, motion lines trailing behind it",
+      "noText": true
+    },
+    {
+      "id": "python-basics-functions",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "functions",
+      "category": "course-illustration",
+      "title": "Functions",
+      "style": "risograph",
+      "subject": "a whimsical factory machine with an input funnel on top and an output chute below, gears turning inside as plain shapes go in one side and finished shapes come out the other",
+      "noText": true
+    },
+    {
+      "id": "python-basics-classes",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "classes",
+      "category": "course-illustration",
+      "title": "Classes",
+      "style": "risograph",
+      "subject": "an architect's blueprint scroll unrolled on a table showing the outline of a small robot, with a finished toy robot standing beside it, evoking a blueprint and the object built from it",
+      "noText": true
+    },
+    {
+      "id": "python-basics-history",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "python-history",
+      "category": "course-illustration",
+      "title": "The story of Python",
+      "style": "risograph",
+      "subject": "a cozy Dutch canal house in winter at dusk with warm light glowing in one window that reveals a tiny desk holding an early personal computer, snow gently falling, evoking a holiday coding project in the Netherlands",
+      "noText": true
+    }
+  ]
+}
