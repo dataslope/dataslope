@@ -80,6 +80,12 @@ export default function AskAi() {
 
   if (!onLesson && !onPlayground) return null;
 
+  // The active playground id (e.g. "sqlite"), so the widget's sign-in CTA can
+  // preserve the guest's unsaved workspace across the auth round trip.
+  const playgroundId = onPlayground
+    ? (pathname.split("/").filter(Boolean)[1] ?? "")
+    : undefined;
+
   return (
     <AskAiWidget
       surface={onLesson ? "learn" : "playground"}
@@ -88,6 +94,7 @@ export default function AskAi() {
       subjectNoun={
         onInterviewPrep ? "question set" : onLesson ? "lesson" : "playground"
       }
+      playgroundId={playgroundId}
       collectContext={collectContext}
     />
   );

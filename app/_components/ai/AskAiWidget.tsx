@@ -27,10 +27,16 @@ import {
   useState,
   useSyncExternalStore,
   type KeyboardEvent,
+  type MouseEvent,
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Popover } from "@base-ui/react/popover";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import {
+  guestWorkNeedsSignInWarning,
+  stashActiveWorkspaceForResume,
+} from "../opfs/activeWorkspace";
 import {
   Sparkle,
   X,
@@ -108,6 +114,9 @@ interface Props {
    *  pages, "question set" on interview-prep (which mounts as surface
    *  "learn" but isn't a lesson), "playground" elsewhere. */
   subjectNoun?: string;
+  /** Active playground id (e.g. "sqlite") when on a playground surface, so the
+   *  sign-in CTA can preserve the guest's unsaved workspace across auth. */
+  playgroundId?: string;
   collectContext: () => AskAiClientContext;
 }
 
@@ -331,6 +340,7 @@ function formatResetsIn(ms: number): string {
 export default function AskAiWidget({
   surface,
   subjectNoun,
+  playgroundId,
   collectContext,
 }: Props) {
   const subject =
@@ -339,6 +349,41 @@ export default function AskAiWidget({
   const [draft, setDraft] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [contextSheetOpen, setContextSheetOpen] = useState(false);
+  // Confirmation shown when signing in would discard guest work this browser
+  // can't persist (no OPFS / storage blocked).
+  const [signInConfirmOpen, setSignInConfirmOpen] = useState(false);
+
+  // Navigate to sign-in. `target="_top"` semantics: break out of the home
+  // page's embedded playground iframe so auth loads in the top-level window.
+  const goToSignIn = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      (window.top ?? window).location.href = "/sign-in";
+    } catch {
+      window.location.href = "/sign-in";
+    }
+  }, []);
+
+  // Intercept the sign-in CTA on playground surfaces: stash the active
+  // workspace so it resumes after auth, or, when it can't be persisted, confirm
+  // before leaving. Learn surfaces (no workspace) fall through to the plain
+  // link, as do modified clicks (open-in-new-tab, etc.).
+  const handleSignInClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      if (!playgroundId) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+        return;
+      }
+      e.preventDefault();
+      if (guestWorkNeedsSignInWarning(playgroundId)) {
+        setSignInConfirmOpen(true);
+        return;
+      }
+      stashActiveWorkspaceForResume(playgroundId);
+      goToSignIn();
+    },
+    [playgroundId, goToSignIn],
+  );
 
   // ── Remembered preferences (global) ────────────────────────────────
   const [placement, setPlacement] = useState<LauncherPlacement>(() =>
@@ -754,7 +799,7 @@ export default function AskAiWidget({
   const composerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!sheetOpen) return;
-    const onDown = (e: MouseEvent) => {
+    const onDown = (e: globalThis.MouseEvent) => {
       const t = e.target as Node;
       if (
         sheetRef.current?.contains(t) ||
@@ -886,8 +931,15 @@ export default function AskAiWidget({
               </span>
               <p>Sign in to ask AI about this {subject}.</p>
               {/* target="_top" breaks out of the home page's embedded
-                  playground iframe so sign-in loads in the top-level window. */}
-              <a className={styles.signInLink} href="/sign-in" target="_top">
+                  playground iframe so sign-in loads in the top-level window.
+                  On playground surfaces, onClick first preserves the guest's
+                  workspace (or confirms, when it can't be persisted). */}
+              <a
+                className={styles.signInLink}
+                href="/sign-in"
+                target="_top"
+                onClick={handleSignInClick}
+              >
                 <LogIn size={15} />
                 Sign in
               </a>
@@ -1409,6 +1461,40 @@ export default function AskAiWidget({
           </div>
         </div>
       )}
+
+      {/* Confirm before signing in when this browser can't persist the guest's
+          work (no OPFS / storage blocked), so it isn't lost without warning.
+          When it *can* be persisted, the CTA stashes + navigates directly and
+          this never opens. Uses the shared confirm-dialog styles from
+          playground.css (loaded on every playground route). */}
+      <AlertDialog.Root
+        open={signInConfirmOpen}
+        onOpenChange={setSignInConfirmOpen}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="confirm-backdrop" />
+          <AlertDialog.Popup className="confirm-popup">
+            <AlertDialog.Title className="confirm-title">
+              Sign in without saving your work?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirm-desc">
+              This browser can&apos;t save your {subject} work, so it will be
+              lost when you sign in. Continue anyway?
+            </AlertDialog.Description>
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Keep working
+              </AlertDialog.Close>
+              <AlertDialog.Close
+                className="confirm-btn confirm-btn-danger"
+                onClick={goToSignIn}
+              >
+                Sign in anyway
+              </AlertDialog.Close>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }
