@@ -8,11 +8,9 @@ import { AiDraftBar } from "./AiDraftBar";
 export function BuilderHeader({
   title,
   lede,
-  aiPlaceholder,
 }: {
   title: string;
   lede: string;
-  aiPlaceholder: string;
 }) {
   return (
     <div className="mb-6">
@@ -20,7 +18,7 @@ export function BuilderHeader({
       <p className="mt-2.5 text-[15px] leading-relaxed" style={{ color: "var(--muted)" }}>
         {lede}
       </p>
-      <AiDraftBar placeholder={aiPlaceholder} />
+      <AiDraftBar />
     </div>
   );
 }

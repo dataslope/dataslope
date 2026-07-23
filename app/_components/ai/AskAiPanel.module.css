@@ -34,8 +34,9 @@
   box-shadow: 0 8px 26px rgba(8, 120, 221, 0.36);
 }
 
-/* Edge-tab placement: a slim button docked flush with the right viewport
-   edge, out of the content's way (the square marker in Settings' preview). */
+/* Edge-tab placement: a compact square button docked flush with the right
+   viewport edge, out of the content's way (the square marker in Settings'
+   preview). Square shape with just a slight rounding on the inner corners. */
 .launcherTab {
   position: fixed;
   right: 0;
@@ -44,10 +45,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border: none;
-  border-radius: 8px 0 0 8px;
+  border-radius: 6px 0 0 6px;
   background: var(--ds-blue-600, #0878dd);
   color: #fff;
   cursor: pointer;

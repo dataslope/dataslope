@@ -6,13 +6,13 @@
 // shell's semantic tokens so it matches the rest of the dashboard in both
 // themes.
 import { usePathname } from "next/navigation";
-import { FlaskConical, Sparkles, Users, type LucideIcon } from "lucide-react";
+import { FlaskConical, Sparkle, Users, type LucideIcon } from "lucide-react";
 import Link from "@/app/_components/Link";
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/dashboard/admin", label: "Users", icon: Users },
   { href: "/dashboard/admin/test-users", label: "Test users", icon: FlaskConical },
-  { href: "/dashboard/admin/ai-usage", label: "AI usage", icon: Sparkles },
+  { href: "/dashboard/admin/ai-usage", label: "AI usage", icon: Sparkle },
 ];
 
 export function AdminTabs() {

@@ -32,7 +32,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Popover } from "@base-ui/react/popover";
 import {
-  Sparkles,
+  Sparkle,
   X,
   Send,
   RotateCcw,
@@ -91,8 +91,8 @@ import {
 import styles from "./AskAiPanel.module.css";
 
 /** Where the closed-state launcher sits, chosen from Settings → "Where the
- *  button lives": the floating pill in the bottom-right corner (default), or a
- *  slim tab docked to the right viewport edge. Persisted in localStorage. */
+ *  button lives": a slim square tab docked to the right viewport edge (default),
+ *  or the floating pill in the bottom-right corner. Persisted in localStorage. */
 type LauncherPlacement = "floating" | "tab";
 const LAUNCHER_PLACEMENT_KEY = "dataslope:ask-ai-placement";
 
@@ -342,7 +342,7 @@ export default function AskAiWidget({
 
   // ── Remembered preferences (global) ────────────────────────────────
   const [placement, setPlacement] = useState<LauncherPlacement>(() =>
-    readStored(LAUNCHER_PLACEMENT_KEY) === "tab" ? "tab" : "floating",
+    readStored(LAUNCHER_PLACEMENT_KEY) === "floating" ? "floating" : "tab",
   );
   const [contextMode, setContextMode] = useState<ContextMode>(() => {
     const v = readStored(CONTEXT_MODE_KEY);
@@ -812,7 +812,7 @@ export default function AskAiWidget({
           aria-label="Ask AI"
           title="Ask AI"
         >
-          <Sparkles size={18} />
+          <Sparkle size={18} />
         </button>
       );
     }
@@ -823,7 +823,7 @@ export default function AskAiWidget({
         onClick={() => setOpen(true)}
         aria-label="Ask AI"
       >
-        <Sparkles size={16} />
+        <Sparkle size={16} />
         Ask AI
       </button>
     );
@@ -837,7 +837,7 @@ export default function AskAiWidget({
     <div className={styles.panel} role="dialog" aria-label="Ask AI" ref={panelRef}>
       <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
         <div className={styles.header}>
-          <Sparkles className={styles.sparkle} size={17} />
+          <Sparkle className={styles.sparkle} size={17} />
           <span className={styles.title}>Ask AI</span>
           {tier && (
             <span
@@ -882,7 +882,7 @@ export default function AskAiWidget({
           {!signedIn ? (
             <div className={styles.signedOut}>
               <span className={styles.emptyBadge}>
-                <Sparkles size={20} />
+                <Sparkle size={20} />
               </span>
               <p>Sign in to ask AI about this {subject}.</p>
               {/* target="_top" breaks out of the home page's embedded
@@ -916,7 +916,7 @@ export default function AskAiWidget({
           ) : messages.length === 0 ? (
             <div className={styles.emptyWrap}>
               <span className={styles.emptyBadge}>
-                <Sparkles size={20} />
+                <Sparkle size={20} />
               </span>
               <div className={styles.emptyText}>
                 <span className={styles.emptyTitle}>
@@ -1052,7 +1052,7 @@ export default function AskAiWidget({
                             className={styles.followupBtn}
                             onClick={() => sendQuestion(q)}
                           >
-                            <Sparkles size={12} aria-hidden />
+                            <Sparkle size={12} aria-hidden />
                             <span>{q}</span>
                           </button>
                         ))}

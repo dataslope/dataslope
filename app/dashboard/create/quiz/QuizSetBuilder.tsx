@@ -240,7 +240,6 @@ export default function QuizSetBuilder() {
       <BuilderHeader
         title="New quiz set"
         lede="Pick the challenges and questions, put them in order, and share one link to the whole quiz."
-        aiPlaceholder="Describe the quiz and AI drafts a title and description"
       />
       <GuestNotice />
 

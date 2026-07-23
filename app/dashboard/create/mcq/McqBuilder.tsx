@@ -219,7 +219,6 @@ export default function McqBuilder() {
       <BuilderHeader
         title="New multiple-choice question"
         lede="Write the question and choices, mark the correct answer, and add feedback."
-        aiPlaceholder="Describe the question and AI fills every field below"
       />
       <GuestNotice />
 
