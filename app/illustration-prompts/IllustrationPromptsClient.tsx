@@ -58,6 +58,8 @@ function PromptCard({
 }) {
   const fileKey = `${entry.id}:file`;
   const promptKey = `${entry.id}:prompt`;
+  // Trim the generic tail ("… illustration"/"… schematic") for a tidy badge.
+  const styleLabel = entry.style.replace(/ (illustration|schematic)$/i, "");
   return (
     <figure id={entry.id} className={styles.card}>
       <div className={styles.cardTop}>
@@ -73,7 +75,13 @@ function PromptCard({
             {copiedKey === fileKey ? <Check size={13} /> : <Copy size={13} />}
           </button>
         </span>
-        <span className={`${styles.badge} ${styles.badgeMuted}`}>{entry.size}</span>
+        <span className={styles.badges}>
+          <span className={`${styles.badge} ${styles.badgeAccent}`}>{styleLabel}</span>
+          {entry.mascot ? (
+            <span className={`${styles.badge} ${styles.badgeMuted}`}>marmot</span>
+          ) : null}
+          <span className={`${styles.badge} ${styles.badgeMuted}`}>{entry.size}</span>
+        </span>
       </div>
 
       <p className={styles.cardTitle}>{entry.title}</p>
@@ -153,9 +161,9 @@ export function IllustrationPromptsClient({
             </button>
           </div>
           <p className={styles.subtitle}>
-            GPT Image 2 prompts for the custom risograph illustrations across the
-            Dataslope courses and interview prep, rendered in the four brand
-            colors.{" "}
+            GPT Image 2 prompts for the custom illustrations across the Dataslope
+            courses and interview prep, a mix of styles (risograph, flat vector,
+            line art, isometric, blueprint) rendered in the four brand colors.{" "}
             <span className={styles.count}>{data.totalIllustrations}</span>{" "}
             illustration{data.totalIllustrations === 1 ? "" : "s"} to draw across{" "}
             <span className={styles.count}>{data.totalCourses}</span> course

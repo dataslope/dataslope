@@ -61,13 +61,15 @@ interface RawPrompt {
   title: string;
   style?: string;
   subject: string;
-  noText?: boolean;
+  /** Whether the illustration features the Dataslope marmot mascot. */
+  mascot?: boolean;
 }
 
 interface PromptsFile {
   meta: {
     model: string;
     defaultStyle: string;
+    mascot?: string;
     brandColors: BrandColors;
     sizes: Record<string, string>;
   };
@@ -85,8 +87,10 @@ export interface IllustrationPromptEntry {
   title: string;
   /** The subject phrase (what is drawn). */
   subject: string;
-  /** Illustration style, e.g. "risograph". */
+  /** Illustration style, e.g. "risograph" or "isometric illustration". */
   style: string;
+  /** Whether the illustration features the marmot mascot. */
+  mascot: boolean;
   /** Asset category. */
   category: Category;
   /** Human-readable category label. */
@@ -134,10 +138,11 @@ function buildEntry(p: RawPrompt): IllustrationPromptEntry {
     title: p.title,
     subject: p.subject,
     style: p.style ?? data.meta.defaultStyle,
+    mascot: p.mascot ?? false,
     category: p.category,
     categoryLabel: CATEGORY_LABEL[p.category] ?? p.category,
     prompt: buildIllustrationPrompt(
-      { subject: p.subject, style: p.style, noText: p.noText },
+      { subject: p.subject, style: p.style },
       data.meta.brandColors,
     ),
     size: data.meta.sizes[p.category] ?? "1024x1024",

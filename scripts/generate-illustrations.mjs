@@ -127,9 +127,9 @@ function printHelp() {
 // ── Prompt building (mirror of lib/illustrationPrompt.ts) ────────────────────
 function buildPrompt(spec, colors) {
   const style = (spec.style && spec.style.trim()) || "risograph";
-  const abstract = spec.noText ? " No text. Just an abstract art." : "";
+  const article = /^[aeiou]/i.test(style) ? "An" : "A";
   return (
-    `A ${style} of ${spec.subject}.${abstract}\n\n` +
+    `${article} ${style} of ${spec.subject}. No text.\n\n` +
     `Blue: ${colors.blue}\n` +
     `Green: ${colors.green}\n` +
     `Red: ${colors.red}\n` +

@@ -1,6 +1,7 @@
 /**
- * `/illustration-prompts`, a build-time review page for the custom risograph
- * illustrations authored across the courses and interview prep.
+ * `/illustration-prompts`, a build-time review page for the custom illustrations
+ * (a mix of styles: risograph, flat vector, line art, isometric, blueprint)
+ * authored across the courses and interview prep.
  *
  * The prompt definitions live in `data/illustration-prompts.json`; each one
  * gets a card here with its target PNG file name (e.g.
@@ -22,7 +23,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Illustration prompts",
   description:
-    "GPT Image 2 prompts for the custom risograph illustrations across the Dataslope courses and interview prep.",
+    "GPT Image 2 prompts for the custom illustrations across the Dataslope courses and interview prep.",
   robots: { index: false, follow: false },
 };
 

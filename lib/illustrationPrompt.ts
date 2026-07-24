@@ -42,33 +42,39 @@ export const DEFAULT_STYLE = "risograph";
 /** The minimal shape needed to build a generation prompt. */
 export interface IllustrationSpec {
   /** What to illustrate, phrased to read naturally after "A risograph of "
-   *  (e.g. "a friendly python snake coiled around a monitor"). */
+   *  (e.g. "the Dataslope marmot mascot waving beside a monitor"). */
   subject: string;
-  /** Illustration style, e.g. "risograph" (default) or "line art". */
+  /** Illustration style descriptor, inserted after the article, e.g.
+   *  "risograph" (default), "flat geometric vector illustration",
+   *  "line art illustration", "isometric illustration", "blueprint schematic". */
   style?: string;
-  /** When set, appends "No text. Just an abstract art." so the model avoids
-   *  baking in (usually garbled) lettering. */
-  noText?: boolean;
+}
+
+/** "An" before a vowel-initial style ("isometric"), "A" otherwise. */
+function article(style: string): string {
+  return /^[aeiou]/i.test(style) ? "An" : "A";
 }
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
  *
- *   A risograph of a programmer duck. No text. Just an abstract art.
+ *   A risograph of the Dataslope marmot mascot waving beside a monitor. No text.
  *
  *   Blue: #148cff
  *   Green: #20c621
  *   Red: #ff4f59
  *   Yellow: #ffdd6c
+ *
+ * "No text." is always appended: none of the illustrations should carry
+ * lettering (the model tends to bake in garbled text otherwise).
  */
 export function buildIllustrationPrompt(
   spec: IllustrationSpec,
   colors: BrandColors = BRAND_COLORS,
 ): string {
   const style = spec.style?.trim() || DEFAULT_STYLE;
-  const abstract = spec.noText ? " No text. Just an abstract art." : "";
   return (
-    `A ${style} of ${spec.subject}.${abstract}\n\n` +
+    `${article(style)} ${style} of ${spec.subject}. No text.\n\n` +
     `Blue: ${colors.blue}\n` +
     `Green: ${colors.green}\n` +
     `Red: ${colors.red}\n` +
