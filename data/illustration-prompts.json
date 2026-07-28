@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "model": "gpt-image-2",
+    "defaultStyle": "risograph",
+    "mascot": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "course-thumbnail": "1536x1024",
+      "course-illustration": "1024x1024",
+      "interview-thumbnail": "1536x1024",
+      "interview-illustration": "1024x1024"
+    }
+  },
+  "prompts": [
+    {
+      "id": "python-basics-thumbnail",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "index",
+      "category": "course-thumbnail",
+      "title": "Python Basics — course thumbnail",
+      "style": "risograph",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly and small rounded ears, sitting cross-legged with a laptop on a grassy hillside, playful rounded code shapes and a rising sun behind it"
+    },
+    {
+      "id": "python-basics-hello-world",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "hello-world",
+      "category": "course-illustration",
+      "title": "Your first program",
+      "style": "flat geometric vector illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot cheerfully waving beside a retro computer monitor that shows a single glowing speech bubble, standing on a small green hill"
+    },
+    {
+      "id": "python-basics-syntax",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "syntax-and-indentation",
+      "category": "course-illustration",
+      "title": "Syntax & indentation",
+      "style": "blueprint schematic",
+      "mascot": false,
+      "subject": "neatly nested indented blocks stepping inward like an architectural floor plan, thin guide lines marking each indentation level of a code structure"
+    },
+    {
+      "id": "python-basics-variables",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "variables",
+      "category": "course-illustration",
+      "title": "Variables",
+      "style": "isometric illustration",
+      "mascot": false,
+      "subject": "a tidy isometric shelf of storage boxes and jars, each holding a different simple geometric object, small blank paper tags tied to them"
+    },
+    {
+      "id": "python-basics-data-types",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "data-types",
+      "category": "course-illustration",
+      "title": "Data types",
+      "style": "flat geometric vector illustration",
+      "mascot": false,
+      "subject": "an assortment of distinct objects grouped by kind, a stack of coins, a ribbon, a toggle switch, and a bundle of boxes, each standing for a different category of value"
+    },
+    {
+      "id": "python-basics-numbers",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "numbers",
+      "category": "course-illustration",
+      "title": "Numbers",
+      "style": "line art illustration",
+      "mascot": false,
+      "subject": "a wooden abacus beside a smooth number line arrow, a few counting beads sliding along a rod"
+    },
+    {
+      "id": "python-basics-strings",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "strings",
+      "category": "course-illustration",
+      "title": "Strings",
+      "style": "risograph",
+      "mascot": false,
+      "subject": "a long ribbon threaded with small blank rounded tiles like a bead necklace, curling gracefully across the frame"
+    },
+    {
+      "id": "python-basics-booleans",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "booleans",
+      "category": "course-illustration",
+      "title": "Booleans",
+      "style": "flat geometric vector illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot flipping a large two-position toggle switch, one side glowing on and the other dim off"
+    },
+    {
+      "id": "python-basics-lists",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "lists",
+      "category": "course-illustration",
+      "title": "Lists",
+      "style": "isometric illustration",
+      "mascot": false,
+      "subject": "an isometric train of connected open boxcars on a curved track, each car carrying a different small coloured parcel in sequence"
+    },
+    {
+      "id": "python-basics-tuples",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "tuples",
+      "category": "course-illustration",
+      "title": "Tuples",
+      "style": "line art illustration",
+      "mascot": false,
+      "subject": "two small padlocked rings linked together as an unbreakable fixed pair, a sealed wax stamp resting beside them"
+    },
+    {
+      "id": "python-basics-dictionaries",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "dictionaries",
+      "category": "course-illustration",
+      "title": "Dictionaries",
+      "style": "risograph",
+      "mascot": false,
+      "subject": "a wall of small mailbox doors, each with a little key in its lock and a couple of doors ajar to reveal a rolled scroll inside, evoking keys mapping to values"
+    },
+    {
+      "id": "python-basics-sets",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "sets",
+      "category": "course-illustration",
+      "title": "Sets",
+      "style": "flat geometric vector illustration",
+      "mascot": false,
+      "subject": "three overlapping translucent circles forming a Venn diagram, distinct little shapes sorted into the unique and shared regions"
+    },
+    {
+      "id": "python-basics-control-flow",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "control-flow",
+      "category": "course-illustration",
+      "title": "Control flow",
+      "style": "blueprint schematic",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot standing at a railway switch lever, choosing between two diverging tracks under a signal light"
+    },
+    {
+      "id": "python-basics-loops",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "loops",
+      "category": "course-illustration",
+      "title": "Loops",
+      "style": "isometric illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot happily riding a small cart around a looping isometric roller-coaster track, motion lines trailing behind"
+    },
+    {
+      "id": "python-basics-functions",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "functions",
+      "category": "course-illustration",
+      "title": "Functions",
+      "style": "flat geometric vector illustration",
+      "mascot": false,
+      "subject": "a whimsical machine with an input funnel on top and an output chute below, plain shapes going in one side and finished shapes coming out the other"
+    },
+    {
+      "id": "python-basics-modules",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "modules",
+      "category": "course-illustration",
+      "title": "Modules",
+      "style": "line art illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot slotting plain modular crates together into a neat interlocking shelf"
+    },
+    {
+      "id": "python-basics-exceptions",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "exceptions",
+      "category": "course-illustration",
+      "title": "Exceptions",
+      "style": "risograph",
+      "mascot": false,
+      "subject": "a safety net stretched out catching a falling tumbling object mid-air, a soft burst where it lands safely"
+    },
+    {
+      "id": "python-basics-classes",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "classes",
+      "category": "course-illustration",
+      "title": "Classes",
+      "style": "blueprint schematic",
+      "mascot": false,
+      "subject": "an architect's blueprint of a small robot pinned on a drafting board, with a finished toy robot standing beside it"
+    },
+    {
+      "id": "python-basics-decorators",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "decorators",
+      "category": "course-illustration",
+      "title": "Decorators",
+      "style": "cut-paper collage",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot tying a ribbon and bow around a plain gift box that contains a smaller box, layered cut-paper shapes"
+    },
+    {
+      "id": "python-basics-history",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "python-history",
+      "category": "course-illustration",
+      "title": "The story of Python",
+      "style": "risograph",
+      "mascot": false,
+      "subject": "a cozy Dutch canal house in winter at dusk, warm light glowing in one window that reveals a tiny desk holding an early personal computer, snow gently falling"
+    }
+  ]
+}

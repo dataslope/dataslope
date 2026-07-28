@@ -50,8 +50,6 @@ This chapter is that lineage, three languages, one continuous idea.
 
 ## FORTRAN: scientists' first compiler
 
-<IllustrationPrompt subject="John Backus" photo />
-
 A team led by **John Backus** at IBM started work on FORTRAN, the
 **FOR**mula **TRAN**slator, in 1954 and released the first compiler
 in 1957 for the IBM 704. The goal was radical for its time: a
@@ -100,8 +98,6 @@ as the primary data type**, **fast numerical inner loops**, and
 the workhorses inside SciPy).
 
 ## MATLAB: a calculator that thought in matrices
-
-<IllustrationPrompt subject="Cleve Moler" photo />
 
 In the late 1970s, **Cleve Moler** was teaching numerical analysis at
 the University of New Mexico. He wanted students to use the new
@@ -158,8 +154,6 @@ support for strings, file formats, plotting, or the gluework that
 surrounds real science.
 
 ## Why Python won
-
-<IllustrationPrompt subject="Travis Oliphant" photo />
 
 In 1995, scientific Python did not exist. By 2015 it was the most
 widely used language in computational research. The transformation
@@ -260,10 +254,8 @@ noisy = clean + 0.5 * np.sin(2 * np.pi * 20 * t) + 0.4 * rng.standard_normal(t.s
 sos = signal.butter(N=4, Wn=5, btype="low", fs=400, output="sos")
 filtered = signal.sosfiltfilt(sos, noisy)
 
-
 def snr(x, ref):
     return 10 * np.log10(np.var(ref) / np.var(x - ref))
-
 
 print(pd.Series({"noisy_SNR_dB": snr(noisy, clean),
                  "filtered_SNR_dB": snr(filtered, clean)}).round(2))

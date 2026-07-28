@@ -1,83 +1,89 @@
 /**
- * Shared, dependency-free helpers for the `<IllustrationPrompt>` MDX component
- * (app/_components/mdx/IllustrationPrompt.tsx) and the `/illustration-prompts`
- * gallery collector (lib/illustrationPromptsGallery.ts).
+ * Shared, dependency-free helpers for the illustration-prompt system:
  *
- * Keeping the prompt template AND the semantic-filename logic here means the
- * lesson card, the gallery card, and the deep-link anchor all agree on the
- * exact prompt text and the exact file slug for a given subject, there is one
- * source of truth, and no per-instance `name` prop has to be authored into the
- * 100+ MDX call sites.
+ *   - the in-lesson `<IllustrationPrompt>` MDX card
+ *     (app/_components/mdx/IllustrationPrompt.tsx),
+ *   - the `/illustration-prompts` review gallery
+ *     (lib/illustrationPromptsGallery.ts), and
+ *   - the batch image generator (scripts/generate-illustrations.mjs).
+ *
+ * All three read the same prompt definitions from `data/illustration-prompts.json`
+ * and build the exact generation prompt through `buildIllustrationPrompt` here,
+ * so the card, the gallery, and the generated PNG all agree on the prompt text
+ * and the target file name. One source of truth, no per-call-site duplication.
+ *
+ * The prompts target OpenAI's GPT Image 2 and follow the Dataslope house style:
+ * a risograph illustration of a subject, rendered in the four brand colors. See
+ * `data/illustration-prompts.json` `meta.brandColors`.
  *
  * Pure (no Node/DOM APIs) so it can be imported from a client component, a
- * server component, and the esbuild-bundled gallery collector alike.
+ * server component, and a plain Node build script alike.
  */
 
-/** Build the exact image-generation prompt for a subject. A specific named
- *  real person gets "(photo attached)" via `photo`; objects/animals/scenes
- *  do not. */
-export function buildIllustrationPrompt(subject: string, photo: boolean): string {
-  const reference = photo ? " (photo attached)" : "";
-  return (
-    `Create a line art-styled illustration of ${subject}${reference}. ` +
-    `Use Recraft Vector V4.1. Use a transparent background. ` +
-    `The illustration should work well in both light (#ffffff) and dark backgrounds (#121212).`
-  );
+/** The four Dataslope brand colors, as named in every generation prompt. */
+export interface BrandColors {
+  blue: string;
+  green: string;
+  red: string;
+  yellow: string;
+}
+
+/** Default Dataslope brand palette (see app/brand.css `--ds-*-500` tokens). */
+export const BRAND_COLORS: BrandColors = {
+  blue: "#148cff",
+  green: "#20c621",
+  red: "#ff4f59",
+  yellow: "#ffdd6c",
+};
+
+/** The house illustration style when a prompt does not name its own. */
+export const DEFAULT_STYLE = "risograph";
+
+/** The minimal shape needed to build a generation prompt. */
+export interface IllustrationSpec {
+  /** What to illustrate, phrased to read naturally after "A risograph of "
+   *  (e.g. "the Dataslope marmot mascot waving beside a monitor"). */
+  subject: string;
+  /** Illustration style descriptor, inserted after the article, e.g.
+   *  "risograph" (default), "flat geometric vector illustration",
+   *  "line art illustration", "isometric illustration", "blueprint schematic". */
+  style?: string;
+}
+
+/** "An" before a vowel-initial style ("isometric"), "A" otherwise. */
+function article(style: string): string {
+  return /^[aeiou]/i.test(style) ? "An" : "A";
 }
 
 /**
- * Curated slugs for the concrete-object/scene subjects (the ones without a
- * `photo` reference). Their authored subjects are long descriptive phrases, so
- * a naive slug would be unwieldy; these give each a short, stable filename.
- * Two Datasaurus phrasings intentionally map to the same file (one drawing).
+ * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
+ *
+ *   A risograph of the Dataslope marmot mascot waving beside a monitor. No text.
+ *
+ *   Blue: #148cff
+ *   Green: #20c621
+ *   Red: #ff4f59
+ *   Yellow: #ffdd6c
+ *
+ * "No text." is always appended: none of the illustrations should carry
+ * lettering (the model tends to bake in garbled text otherwise).
  */
-const OBJECT_SLUGS: Record<string, string> = {
-  "Charles Babbage's Analytical Engine, a Victorian-era mechanical computer of brass gears and cylinders":
-    "analytical-engine",
-  "Napoleon's 1812 march flow-map": "napoleon-1812-march-map",
-  "a Gentoo penguin standing on Antarctic ice": "gentoo-penguin",
-  "a PDP-11 minicomputer, an early 1970s refrigerator-sized machine with switches and blinking lights":
-    "pdp-11-minicomputer",
-  "a Palmer penguin": "palmer-penguin",
-  "a Therac-25 radiation therapy machine, a 1980s hospital medical linear accelerator with a patient couch":
-    "therac-25",
-  "a captured tank marked with a serial number (the German tank problem)":
-    "german-tank-problem",
-  "a cup of tea for Fisher's Lady Tasting Tea experiment": "lady-tasting-tea",
-  "a duck (the DuckDB mascot) perched on a stack of database disks":
-    "duckdb-duck-mascot",
-  "a jar of green jelly beans (the xkcd #882 significance comic)":
-    "xkcd-jelly-beans",
-  "a prize ox at a country fair weight-guessing contest (Galton's wisdom of crowds)":
-    "galton-ox-weight-guessing",
-  "a scatter of points forming a cartoon dinosaur (the Datasaurus)": "datasaurus",
-  "a whale surfacing beside the City of London skyline": "london-whale",
-  "the 1947 Harvard Mark II logbook page with the first computer bug, an actual moth, taped onto it":
-    "first-computer-bug-moth",
-  "the Ariane 5 rocket": "ariane-5-rocket",
-  "the Datasaurus dinosaur-shaped scatter plot": "datasaurus",
-  "the Ishango bone, an ancient notched tally bone": "ishango-bone",
-  "the Mars Climate Orbiter spacecraft approaching Mars": "mars-climate-orbiter",
-  "the Mauna Loa Observatory atmospheric monitoring station on a Hawaiian volcano summit":
-    "mauna-loa-observatory",
-  "the Monty Python foot, nodding to Python's name": "monty-python-foot",
-  "the three doors of the Monty Hall problem, one ajar with a goat behind it":
-    "monty-hall-doors",
-};
-
-/** Display name for a person subject: drops a trailing descriptor after a
- *  comma/colon (so "Fred Brooks, author of …" → "Fred Brooks") and a leading
- *  "the " (so "the Gang of Four: …" → "Gang of Four"). Shared by the file-slug
- *  logic and the gallery's reference-photo links. */
-function personDisplayName(subject: string): string {
-  return subject
-    .split(/[,:(]/)[0]
-    .trim()
-    .replace(/^the\s+/i, "");
+export function buildIllustrationPrompt(
+  spec: IllustrationSpec,
+  colors: BrandColors = BRAND_COLORS,
+): string {
+  const style = spec.style?.trim() || DEFAULT_STYLE;
+  return (
+    `${article(style)} ${style} of ${spec.subject}. No text.\n\n` +
+    `Blue: ${colors.blue}\n` +
+    `Green: ${colors.green}\n` +
+    `Red: ${colors.red}\n` +
+    `Yellow: ${colors.yellow}`
+  );
 }
 
 /** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug. */
-function slugify(value: string): string {
+export function slugify(value: string): string {
   return value
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -87,32 +93,14 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/**
- * Semantic file-name stem (no extension) for a subject, e.g.
- * "Leland Wilkinson" → "leland-wilkinson-portrait",
- * "a duck (the DuckDB mascot)…" → "duckdb-duck-mascot".
- *
- * People (`photo`) become "<name>-portrait", dropping any trailing descriptor
- * after a comma/colon (so "Fred Brooks, author of …" → "fred-brooks-portrait")
- * and a leading "the " (so "the Gang of Four: …" → "gang-of-four-portrait").
- * Objects use the curated map above, with a truncated slug as a fallback.
- */
-export function illustrationFileSlug(subject: string, photo: boolean): string {
-  if (!photo) {
-    const mapped = OBJECT_SLUGS[subject];
-    if (mapped) return mapped;
-    return slugify(subject).split("-").slice(0, 5).join("-");
-  }
-  return `${slugify(personDisplayName(subject))}-portrait`;
+/** Stable file stem (no extension) for a prompt id, e.g.
+ *  "python-basics-thumbnail". Ids are authored slug-like already; this just
+ *  normalises any stray casing/spacing. */
+export function illustrationFileSlug(id: string): string {
+  return slugify(id);
 }
 
-/** Full file name (with `.svg`) for a subject. */
-export function illustrationFileName(subject: string, photo: boolean): string {
-  return `${illustrationFileSlug(subject, photo)}.svg`;
-}
-
-/** Google Images search link for a person subject. */
-export function personImageSearchUrl(subject: string): string {
-  const query = encodeURIComponent(personDisplayName(subject));
-  return `https://www.google.com/search?q=${query}&tbm=isch`;
+/** Target asset file name. GPT Image 2 returns raster PNGs. */
+export function illustrationFileName(id: string): string {
+  return `${illustrationFileSlug(id)}.png`;
 }
