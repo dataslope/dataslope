@@ -101,3 +101,30 @@ describe("getIllustrationPrompts", () => {
     expect(loops?.prompt).toContain("Blue: #148cff");
   });
 });
+
+// The batch generator is a plain .mjs script and cannot import the TypeScript
+// helper, so it carries its own copy of the prompt template. That copy is the
+// one that actually reaches the API, so pin the two together here: if the house
+// style changes in lib/illustrationPrompt.ts but not in the script (or vice
+// versa), the gallery would advertise a prompt the generator never sends.
+describe("generator / library prompt parity", () => {
+  it("builds byte-identical prompts for every authored prompt", async () => {
+    const { buildPrompt } = await import("../scripts/generate-illustrations.mjs");
+    const data = getIllustrationPrompts();
+    expect(data.entries.length).toBeGreaterThan(0);
+    for (const entry of data.entries) {
+      expect(buildPrompt({ subject: entry.subject, style: entry.style }, BRAND_COLORS)).toBe(
+        buildIllustrationPrompt({ subject: entry.subject, style: entry.style }, BRAND_COLORS),
+      );
+    }
+  });
+
+  it("agrees on the default style and article handling", async () => {
+    const { buildPrompt } = await import("../scripts/generate-illustrations.mjs");
+    for (const style of [undefined, "risograph", "isometric illustration", "cut-paper collage"]) {
+      expect(buildPrompt({ subject: "a marmot", style }, BRAND_COLORS)).toBe(
+        buildIllustrationPrompt({ subject: "a marmot", style }, BRAND_COLORS),
+      );
+    }
+  });
+});

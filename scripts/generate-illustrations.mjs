@@ -10,42 +10,62 @@
  * and writes one PNG per prompt named `<id>.png`.
  *
  * By default it uses the OpenAI **Batch API** (~50% cheaper, async, up to a 24h
- * completion window): it packs every prompt into one JSONL job against the
- * `/v1/images/generations` endpoint, uploads it, and creates a single batch.
- * A `sync` mode is available for quick one-off runs.
+ * completion window) at **low** quality, packing the prompts into JSONL jobs
+ * against the `/v1/images/generations` endpoint. A `sync` mode is available for
+ * quick one-off runs.
+ *
+ * Why low quality is the default: image output tokens dominate the bill, and
+ * the tiers are far apart. Measured on gpt-image-2 (see COST_TOKENS below),
+ * one 1024x1024 image is 196 output tokens at `low` but 1372 at `medium` and
+ * 5488 at `high` — so at Batch pricing ($15 / 1M output tokens) a 1000-image
+ * run is ~$2.94 low vs ~$82 high. `low` is more than good enough for flat
+ * vector / risograph art; override with `--quality` for a hero image.
+ *
+ * Why the work is split across several batches: every image comes back as
+ * inline base64 inside the batch's output JSONL, and one 1024x1024 PNG is
+ * ~2.6 MB (~3.6 MB base64). A single 1000-image batch would therefore produce
+ * a ~3.6 GB output file, which cannot be read into one JS string (V8 caps
+ * strings at ~512 MB). So prompts are chunked into `--batch-size` jobs and
+ * every output file is parsed as a stream, never buffered whole.
  *
  * Usage:
  *   OPENAI_API_KEY=sk-... node scripts/generate-illustrations.mjs <command> [options]
  *
  * Commands:
- *   run        submit a batch, poll until it finishes, then download the PNGs
- *   submit     build + upload the JSONL batch and create it; prints the batch id
- *   status     show a batch's status (--batch <id>, or the last one submitted)
- *   download   download a completed batch's images into --out
+ *   run        submit the batches, poll them, and download images as they finish
+ *   submit     build + upload the JSONL batches and create them; prints the ids
+ *   status     show batch status (--batch <id>, or every batch last submitted)
+ *   download   download completed batches' images into --out
  *   sync       generate immediately, one request per prompt (bounded concurrency)
- *   dry-run    print the prompts and targets; make no API calls
+ *   dry-run    print the prompts, targets, and projected cost; make no API calls
  *
  * Options:
  *   --out <dir>          Output directory (default: ./generated-illustrations)
  *   --only <id[,id...]>  Only these prompt ids
  *   --category <cat>     Only this category (course-thumbnail | course-illustration | ...)
  *   --size <WxH|auto>    Override the per-category size for every prompt
- *   --quality <q>        auto | low | medium | high (default: auto)
+ *   --quality <q>        auto | low | medium | high (default: low — see above)
  *   --background <mode>  auto | opaque (default: auto)
- *                        gpt-image-2 has no transparent background; for cut-outs
- *                        post-process with a background-removal service.
+ *                        gpt-image-2 has no transparent background. To get
+ *                        cut-outs, author the subject "isolated on a plain solid
+ *                        white background" and key the white out afterwards.
+ *   --output-format <f>  png | webp | jpeg (default: png). webp is ~10x smaller
+ *                        on disk, which matters over thousands of images.
  *   --model <name>       Override the model (default: JSON meta.model)
  *   --completion-window  Batch window: 24h (default)
+ *   --batch-size <n>     Prompts per batch job (default: 100)
+ *   --max-in-flight <n>  Batches submitted at once during `run` (default: 4)
  *   --batch <id>         Target batch id for `status` / `download`
  *   --poll-interval <s>  `run` poll seconds (default: 30)
  *   --concurrency <n>    `sync` parallel requests (default: 3)
- *   --force              Overwrite existing PNGs (default: skip present)
+ *   --force              Overwrite existing images (default: skip present)
  *   -h, --help           Show this help
  *
  * Notes:
- *   - GPT Image 2 returns base64 PNG data (no URL); it is decoded and written.
+ *   - GPT Image 2 returns base64 image data (no URL); it is decoded and written.
  *   - The prompt text is built the same way as lib/illustrationPrompt.ts
- *     (buildIllustrationPrompt); keep the two in sync if the house style changes.
+ *     (buildIllustrationPrompt). `__tests__/illustrationPrompt.test.ts` asserts
+ *     the two agree, so the house style cannot drift between them.
  */
 import {
   readFileSync,
@@ -54,7 +74,7 @@ import {
   existsSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
@@ -78,10 +98,15 @@ function parseArgs(argv) {
     only: null,
     category: null,
     size: null,
-    quality: "auto",
+    // Low is the default on purpose: it is ~7x cheaper than medium and ~28x
+    // cheaper than high, and holds up for flat vector / risograph art.
+    quality: "low",
     background: "auto",
+    outputFormat: "png",
     model: null,
     completionWindow: "24h",
+    batchSize: 100,
+    maxInFlight: 4,
     batch: null,
     pollInterval: 30,
     concurrency: 3,
@@ -98,8 +123,11 @@ function parseArgs(argv) {
       case "--size": opts.size = next(); break;
       case "--quality": opts.quality = next(); break;
       case "--background": opts.background = next(); break;
+      case "--output-format": opts.outputFormat = next(); break;
       case "--model": opts.model = next(); break;
       case "--completion-window": opts.completionWindow = next(); break;
+      case "--batch-size": opts.batchSize = Math.max(1, Number(next()) || 100); break;
+      case "--max-in-flight": opts.maxInFlight = Math.max(1, Number(next()) || 4); break;
       case "--batch": opts.batch = next(); break;
       case "--poll-interval": opts.pollInterval = Math.max(5, Number(next()) || 30); break;
       case "--concurrency": opts.concurrency = Math.max(1, Number(next()) || 1); break;
@@ -125,7 +153,9 @@ function printHelp() {
 }
 
 // ── Prompt building (mirror of lib/illustrationPrompt.ts) ────────────────────
-function buildPrompt(spec, colors) {
+/** Exported so `__tests__/illustrationPrompt.test.ts` can assert this stays
+ *  byte-identical to the TypeScript `buildIllustrationPrompt`. */
+export function buildPrompt(spec, colors) {
   const style = (spec.style && spec.style.trim()) || "risograph";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
   return (
@@ -135,6 +165,46 @@ function buildPrompt(spec, colors) {
     `Red: ${colors.red}\n` +
     `Yellow: ${colors.yellow}`
   );
+}
+
+// ── Cost estimation ──────────────────────────────────────────────────────────
+// Image output tokens per request, measured against gpt-image-2 on 2026-07-28.
+// Keyed "<size>/<quality>". `auto` is not listed because the model picks a tier
+// per prompt, so its cost is not predictable up front.
+const COST_TOKENS = {
+  "1024x1024/low": 196,
+  "1024x1024/medium": 1372,
+  "1024x1024/high": 5488,
+  "1536x1024/low": 158,
+  "1536x1024/medium": 1372,
+  "1536x1024/high": 5488,
+};
+// USD per 1M image output tokens (https://developers.openai.com/api/docs/pricing).
+const USD_PER_MTOK = { batch: 15, sync: 30 };
+
+/** Projected USD for a set of entries, or null when the tier is unpredictable. */
+function estimateCost(entries, opts, mode) {
+  let tokens = 0;
+  for (const e of entries) {
+    const key = `${opts.size || e.size}/${opts.quality}`;
+    const t = COST_TOKENS[key];
+    if (t === undefined) return null;
+    tokens += t;
+  }
+  return (tokens * USD_PER_MTOK[mode]) / 1e6;
+}
+
+function describeCost(entries, opts, mode) {
+  const usd = estimateCost(entries, opts, mode);
+  if (usd === null) {
+    return `cost not estimable at quality "${opts.quality}" (use low/medium/high)`;
+  }
+  return `~$${usd.toFixed(2)} projected (${mode} pricing, image output tokens)`;
+}
+
+/** File extension for the configured output format. */
+function outputExt(opts) {
+  return opts.outputFormat === "jpeg" ? "jpg" : opts.outputFormat;
 }
 
 /** The request body sent to /v1/images/generations for one prompt. */
@@ -147,6 +217,9 @@ function requestBody(entry, opts, model) {
   };
   if (opts.quality && opts.quality !== "auto") body.quality = opts.quality;
   if (opts.background && opts.background !== "auto") body.background = opts.background;
+  if (opts.outputFormat && opts.outputFormat !== "png") {
+    body.output_format = opts.outputFormat;
+  }
   return body;
 }
 
@@ -190,13 +263,22 @@ function selectEntries(data, opts) {
     console.error("No prompts matched the given filters.");
     process.exit(1);
   }
+  const ext = outputExt(opts);
   return prompts.map((p) => ({
     id: p.id,
     category: p.category,
     size: (meta.sizes && meta.sizes[p.category]) || "1024x1024",
     prompt: buildPrompt(p, meta.brandColors),
-    outPath: join(opts.out, `${p.id}.png`),
+    outPath: join(opts.out, `${p.id}.${ext}`),
   }));
+}
+
+/** Split entries into `--batch-size` chunks so no single batch produces an
+ *  output file too large to stream comfortably. */
+function chunk(entries, size) {
+  const out = [];
+  for (let i = 0; i < entries.length; i += size) out.push(entries.slice(i, i + size));
+  return out;
 }
 
 /** Decode a base64 image payload from an images response body and write it. */
@@ -208,15 +290,22 @@ function writeImage(outPath, respBody) {
 
 // ── Commands ─────────────────────────────────────────────────────────────────
 async function cmdDryRun(entries, opts) {
-  console.log(`[dry-run] ${entries.length} prompt(s) · background ${opts.background} · quality ${opts.quality}\n`);
+  const ext = outputExt(opts);
+  const batches = chunk(entries, opts.batchSize).length;
+  console.log(
+    `[dry-run] ${entries.length} prompt(s) · background ${opts.background} · ` +
+      `quality ${opts.quality} · ${ext} · ${batches} batch job(s)\n` +
+      `          ${describeCost(entries, opts, "batch")}\n`,
+  );
   for (const e of entries) {
-    console.log(`── ${e.id}.png  (${opts.size || e.size})`);
+    console.log(`── ${e.id}.${ext}  (${opts.size || e.size})`);
     console.log(e.prompt.replace(/^/gm, "   "));
     console.log();
   }
 }
 
-async function cmdSubmit(entries, opts, model, key) {
+/** Upload one JSONL chunk and create its batch. */
+async function submitChunk(entries, opts, model, key, label) {
   const jsonl = entries
     .map((e) =>
       JSON.stringify({
@@ -228,7 +317,6 @@ async function cmdSubmit(entries, opts, model, key) {
     )
     .join("\n");
 
-  // 1. Upload the JSONL as a batch input file.
   const form = new FormData();
   form.append("purpose", "batch");
   form.append(
@@ -238,9 +326,7 @@ async function cmdSubmit(entries, opts, model, key) {
   );
   const fileRes = await api("/files", { method: "POST", key, form });
   const file = await fileRes.json();
-  console.log(`Uploaded ${entries.length}-request input file ${file.id}`);
 
-  // 2. Create the batch.
   const batchRes = await api("/batches", {
     method: "POST",
     key,
@@ -251,22 +337,49 @@ async function cmdSubmit(entries, opts, model, key) {
     },
   });
   const batch = await batchRes.json();
-
-  mkdirSync(opts.out, { recursive: true });
-  writeFileSync(
-    BATCH_STATE_FILE(opts.out),
-    JSON.stringify({ batchId: batch.id, model, count: entries.length }, null, 2),
-  );
-  console.log(`Created batch ${batch.id} (status: ${batch.status}).`);
-  console.log(`Track it with:  node scripts/generate-illustrations.mjs status --out ${opts.out}`);
+  console.log(`  ${label} → batch ${batch.id} (${entries.length} requests, ${batch.status})`);
   return batch;
 }
 
-function resolveBatchId(opts) {
-  if (opts.batch) return opts.batch;
+/** Record every batch id so `status` / `download` can pick them all up later. */
+function saveBatchState(opts, model, batches, total) {
+  mkdirSync(opts.out, { recursive: true });
+  writeFileSync(
+    BATCH_STATE_FILE(opts.out),
+    JSON.stringify(
+      {
+        model,
+        count: total,
+        outputFormat: opts.outputFormat,
+        batchIds: batches.map((b) => b.id),
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdSubmit(entries, opts, model, key) {
+  const chunks = chunk(entries, opts.batchSize);
+  console.log(`Submitting ${entries.length} prompt(s) across ${chunks.length} batch job(s)…`);
+  const batches = [];
+  for (const [i, c] of chunks.entries()) {
+    batches.push(await submitChunk(c, opts, model, key, `[${i + 1}/${chunks.length}]`));
+  }
+  saveBatchState(opts, model, batches, entries.length);
+  console.log(`\nTrack them with:  node scripts/generate-illustrations.mjs status --out ${opts.out}`);
+  return batches;
+}
+
+/** Every batch id this run should act on: explicit --batch, else the state file. */
+function resolveBatchIds(opts) {
+  if (opts.batch) return [opts.batch];
   const stateFile = BATCH_STATE_FILE(opts.out);
   if (existsSync(stateFile)) {
-    return JSON.parse(readFileSync(stateFile, "utf8")).batchId;
+    const state = JSON.parse(readFileSync(stateFile, "utf8"));
+    // `batchId` is the pre-chunking single-batch shape; still accepted.
+    const ids = state.batchIds || (state.batchId ? [state.batchId] : []);
+    if (ids.length) return ids;
   }
   console.error("No --batch id given and no last-batch.json in --out.");
   process.exit(1);
@@ -278,28 +391,54 @@ async function retrieveBatch(id, key) {
 }
 
 async function cmdStatus(opts, key) {
-  const id = resolveBatchId(opts);
-  const batch = await retrieveBatch(id, key);
-  const c = batch.request_counts || {};
-  console.log(
-    `Batch ${batch.id}: ${batch.status} · ${c.completed ?? 0}/${c.total ?? "?"} done, ${c.failed ?? 0} failed`,
-  );
-  return batch;
+  const ids = resolveBatchIds(opts);
+  const batches = [];
+  for (const id of ids) {
+    const batch = await retrieveBatch(id, key);
+    const c = batch.request_counts || {};
+    console.log(
+      `Batch ${batch.id}: ${batch.status} · ${c.completed ?? 0}/${c.total ?? "?"} done, ${c.failed ?? 0} failed`,
+    );
+    batches.push(batch);
+  }
+  return batches;
 }
 
-async function downloadFileText(fileId, key) {
+/**
+ * Yield an output file's JSONL rows one line at a time.
+ *
+ * Batch image output embeds each PNG as base64 in its row, so these files run to
+ * gigabytes; `res.text()` would exceed V8's ~512 MB max string length. Reading
+ * the body as a stream keeps only one row (~3.6 MB) in memory at a time.
+ */
+async function* streamFileLines(fileId, key) {
   const res = await api(`/files/${fileId}/content`, { key });
-  return res.text();
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let nl;
+    while ((nl = buf.indexOf("\n")) !== -1) {
+      const line = buf.slice(0, nl);
+      buf = buf.slice(nl + 1);
+      if (line.trim()) yield line;
+    }
+  }
+  buf += decoder.decode();
+  if (buf.trim()) yield buf;
 }
 
-/** Parse a batch output JSONL and write every successful image. */
-function writeBatchOutputs(text, opts) {
+/** Stream one batch's output file, writing every successful image as it arrives. */
+async function writeBatchOutputs(fileId, opts, key) {
+  const ext = outputExt(opts);
   let ok = 0;
   let failed = 0;
-  for (const line of text.split("\n")) {
-    if (!line.trim()) continue;
+  for await (const line of streamFileLines(fileId, key)) {
     const row = JSON.parse(line);
-    const outPath = join(opts.out, `${row.custom_id}.png`);
+    const outPath = join(opts.out, `${row.custom_id}.${ext}`);
     if (row.error || row.response?.status_code !== 200) {
       failed++;
       const msg = row.error?.message || row.response?.body?.error?.message || "unknown error";
@@ -313,7 +452,7 @@ function writeBatchOutputs(text, opts) {
     try {
       writeImage(outPath, row.response.body);
       ok++;
-      console.log(`  ✓ ${row.custom_id}.png`);
+      console.log(`  ✓ ${row.custom_id}.${ext}`);
     } catch (err) {
       failed++;
       console.error(`  ✗ ${row.custom_id}: ${err.message}`);
@@ -322,47 +461,98 @@ function writeBatchOutputs(text, opts) {
   return { ok, failed };
 }
 
-async function cmdDownload(opts, key, batch) {
-  const b = batch || (await retrieveBatch(resolveBatchId(opts), key));
+/** Download one completed batch. Returns per-batch counts. */
+async function downloadBatch(b, opts, key) {
   if (b.status !== "completed") {
-    console.error(`Batch ${b.id} is ${b.status}, not completed. Try again later.`);
-    process.exit(1);
+    console.error(`  ! batch ${b.id} is ${b.status}, skipping`);
+    return { ok: 0, failed: 0 };
   }
-  mkdirSync(opts.out, { recursive: true });
   if (b.error_file_id) {
-    const errText = await downloadFileText(b.error_file_id, key);
-    for (const line of errText.split("\n")) {
-      if (!line.trim()) continue;
+    for await (const line of streamFileLines(b.error_file_id, key)) {
       const row = JSON.parse(line);
       console.error(`  ! ${row.custom_id}: ${row.response?.body?.error?.message || "request errored"}`);
     }
   }
   if (!b.output_file_id) {
-    console.error("Batch completed but has no output file.");
-    process.exit(1);
+    console.error(`  ! batch ${b.id} completed but has no output file`);
+    return { ok: 0, failed: 0 };
   }
-  const text = await downloadFileText(b.output_file_id, key);
-  const { ok, failed } = writeBatchOutputs(text, opts);
+  return writeBatchOutputs(b.output_file_id, opts, key);
+}
+
+async function cmdDownload(opts, key, batches) {
+  mkdirSync(opts.out, { recursive: true });
+  const list =
+    batches ||
+    (await Promise.all(resolveBatchIds(opts).map((id) => retrieveBatch(id, key))));
+  let ok = 0;
+  let failed = 0;
+  for (const b of list) {
+    const r = await downloadBatch(b, opts, key);
+    ok += r.ok;
+    failed += r.failed;
+  }
   console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${opts.out}`);
   if (failed > 0) process.exitCode = 1;
 }
 
 const TERMINAL = new Set(["completed", "failed", "expired", "cancelled"]);
 
-async function cmdRun(entries, opts, model, key) {
-  const submitted = await cmdSubmit(entries, opts, model, key);
-  let batch = submitted;
-  while (!TERMINAL.has(batch.status)) {
+/** Poll one batch to a terminal state, reporting progress under `label`. */
+async function pollBatch(batch, opts, key, label) {
+  let b = batch;
+  while (!TERMINAL.has(b.status)) {
     await sleep(opts.pollInterval * 1000);
-    batch = await retrieveBatch(batch.id, key);
-    const c = batch.request_counts || {};
-    console.log(`  … ${batch.status} (${c.completed ?? 0}/${c.total ?? "?"})`);
+    b = await retrieveBatch(b.id, key);
+    const c = b.request_counts || {};
+    console.log(`  … ${label} ${b.status} (${c.completed ?? 0}/${c.total ?? "?"})`);
   }
-  if (batch.status !== "completed") {
-    console.error(`Batch ended as ${batch.status}.`);
-    process.exit(1);
+  return b;
+}
+
+/**
+ * Submit every chunk, keeping at most `--max-in-flight` batches live at a time,
+ * and download each one's images as soon as it completes. Bounding the window
+ * keeps a thousands-of-images run inside the account's queued-batch limits and
+ * means disk fills incrementally rather than all at the end.
+ */
+async function cmdRun(entries, opts, model, key) {
+  const chunks = chunk(entries, opts.batchSize);
+  console.log(
+    `Submitting ${entries.length} prompt(s) across ${chunks.length} batch job(s), ` +
+      `max ${opts.maxInFlight} in flight.\n`,
+  );
+  mkdirSync(opts.out, { recursive: true });
+
+  const submitted = [];
+  let ok = 0;
+  let failed = 0;
+  let next = 0;
+
+  async function worker() {
+    while (next < chunks.length) {
+      const i = next++;
+      const label = `[${i + 1}/${chunks.length}]`;
+      const batch = await submitChunk(chunks[i], opts, model, key, label);
+      submitted.push(batch);
+      saveBatchState(opts, model, submitted, entries.length);
+      const done = await pollBatch(batch, opts, key, label);
+      if (done.status !== "completed") {
+        console.error(`  ✗ ${label} ended as ${done.status}`);
+        failed += chunks[i].length;
+        continue;
+      }
+      const r = await downloadBatch(done, opts, key);
+      ok += r.ok;
+      failed += r.failed;
+    }
   }
-  await cmdDownload(opts, key, batch);
+
+  await Promise.all(
+    Array.from({ length: Math.min(opts.maxInFlight, chunks.length) }, worker),
+  );
+  console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${opts.out}`);
+  if (failed > 0) process.exitCode = 1;
 }
 
 async function cmdSync(entries, opts, model, key) {
@@ -411,9 +601,19 @@ async function main() {
 
   if (opts.background === "transparent") {
     console.error(
-      "gpt-image-2 does not support transparent backgrounds. Generate opaque\n" +
-        "art and remove the background afterwards with a background-removal service.",
+      "gpt-image-2 does not support transparent backgrounds (the API rejects\n" +
+        'background="transparent", and asking for one in the prompt makes the model\n' +
+        "paint a fake checkerboard). Author the subject as \"isolated on a plain solid\n" +
+        "white background\" instead, then key the white out after generating.",
     );
+    process.exit(1);
+  }
+  if (!["png", "webp", "jpeg"].includes(opts.outputFormat)) {
+    console.error(`Unsupported --output-format "${opts.outputFormat}". Use png, webp, or jpeg.`);
+    process.exit(1);
+  }
+  if (!["auto", "low", "medium", "high"].includes(opts.quality)) {
+    console.error(`Unsupported --quality "${opts.quality}". Use auto, low, medium, or high.`);
     process.exit(1);
   }
 
@@ -428,9 +628,11 @@ async function main() {
 
   if (opts.command === "dry-run") return cmdDryRun(entries, opts);
 
+  const mode = opts.command === "sync" ? "sync" : "batch";
   console.log(
     `${entries.length} prompt(s) · model ${model} · background ${opts.background} · ` +
-      `quality ${opts.quality} · out ${opts.out}\n`,
+      `quality ${opts.quality} · ${outputExt(opts)} · out ${opts.out}\n` +
+      `${describeCost(entries, opts, mode)}\n`,
   );
   const key = requireKey();
   if (opts.command === "sync") return cmdSync(entries, opts, model, key);
@@ -438,7 +640,15 @@ async function main() {
   if (opts.command === "run") return cmdRun(entries, opts, model, key);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Only drive the CLI when executed directly. The vitest suite imports
+// `buildPrompt` from here to assert it matches lib/illustrationPrompt.ts, and
+// that import must not kick off a run.
+const invokedDirectly =
+  process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
