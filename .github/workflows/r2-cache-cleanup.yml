@@ -54,7 +54,7 @@ name: R2 incremental-cache cleanup
 # manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
-#   CF_ACCOUNT_ID         Cloudflare account ID (the R2 S3 endpoint host)
+#   CLOUDFLARE_ACCOUNT_ID Cloudflare account ID (the R2 S3 endpoint host)
 #   R2_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
 #   R2_SECRET_ACCESS_KEY  R2 API token secret access key
 
@@ -124,13 +124,26 @@ jobs:
       # retry loop (see delete_folder) even has to intervene.
       AWS_RETRY_MODE: standard
       AWS_MAX_ATTEMPTS: "10"
-      ENDPOINT: https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
     steps:
       - name: Prune stale build folders
         shell: bash
         run: |
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
+
+          # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
+          #    "https://.r2.cloudflarestorage.com": every aws call then fails,
+          #    and the `|| true` on the listing in step 3 turns that into an
+          #    empty folder list, i.e. a green run that silently stopped pruning
+          #    and lets the bucket grow unbounded. Fail loudly instead. (Worth
+          #    guarding because this secret was named CF_ACCOUNT_ID until
+          #    Cloudflare deprecated the CF_* prefix, so an older repo may still
+          #    hold it under the old name.)
+          if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
+            echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID). Aborting without deleting."
+            exit 1
+          fi
 
           # Delete a folder, tolerating R2's intermittent 500 InternalError on
           # DeleteObject. `aws s3 rm --recursive` re-lists the folder on every

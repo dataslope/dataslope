@@ -77,7 +77,7 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 
 | Secret | Value |
 | --- | --- |
-| `CF_ACCOUNT_ID` | Cloudflare account ID (the R2 S3 endpoint host) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (the R2 S3 endpoint host) |
 | `R2_ACCESS_KEY_ID` | R2 API token access key ID |
 | `R2_SECRET_ACCESS_KEY` | R2 API token secret access key |
 
