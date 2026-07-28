@@ -8,12 +8,58 @@
  * client-side.
  */
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { Check, Copy, Moon, Sun } from "lucide-react";
+import { Check, Copy, ImageIcon, Moon, Sun } from "lucide-react";
+import imageManifest from "@/lib/generated/images";
 import type {
   IllustrationPromptEntry,
   IllustrationPromptsData,
 } from "@/lib/illustrationPromptsGallery";
 import styles from "./illustration-prompts.module.css";
+
+// Output extension → MIME type, mirroring app/_components/mdx/Figure.tsx.
+const IMAGE_MIME: Record<string, string> = {
+  webp: "image/webp",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  avif: "image/avif",
+};
+
+/**
+ * The generated artwork for a card, rendered above its prompt so the prompt
+ * reads as the caption for the image it produced — that pairing is the whole
+ * point of the gallery once the art exists. Falls back to a "not generated yet"
+ * slot so a prompt can be reviewed before its image has been rendered.
+ */
+function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
+  const manifestEntry = imageManifest[entry.id];
+  if (!manifestEntry) {
+    return (
+      <div className={styles.imagePending}>
+        <ImageIcon size={15} aria-hidden="true" />
+        <span>Not generated yet</span>
+      </div>
+    );
+  }
+  const fallback = manifestEntry.formats[manifestEntry.formats.length - 1];
+  const sources = manifestEntry.formats.slice(0, -1);
+  return (
+    <picture>
+      {sources.map((ext) => (
+        <source key={ext} srcSet={`/images/${entry.id}.${ext}`} type={IMAGE_MIME[ext]} />
+      ))}
+      <img
+        src={`/images/${entry.id}.${fallback}`}
+        width={manifestEntry.width}
+        height={manifestEntry.height}
+        alt={entry.title}
+        className={styles.image}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
+}
 
 const THEME_KEY = "illustration_prompts_theme";
 type Theme = "light" | "dark";
@@ -83,6 +129,8 @@ function PromptCard({
           <span className={`${styles.badge} ${styles.badgeMuted}`}>{entry.size}</span>
         </span>
       </div>
+
+      <PromptImage entry={entry} />
 
       <p className={styles.cardTitle}>{entry.title}</p>
       <p className={styles.prompt}>{entry.prompt}</p>

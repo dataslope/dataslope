@@ -208,6 +208,29 @@
   color: var(--badge-muted-fg);
 }
 
+/* The generated artwork, shown above its prompt. No background is painted
+   behind it: the card shows through, so a cut-out with real transparency can be
+   judged against both themes with the toggle. */
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-soft);
+}
+
+.imagePending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 .cardTitle {
   margin: 0;
   font-size: 0.95rem;
