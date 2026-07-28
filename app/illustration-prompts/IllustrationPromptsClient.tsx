@@ -4,11 +4,18 @@
  * Interactive shell for the `/illustration-prompts` gallery. The entry data is
  * built from `data/illustration-prompts.json` by the server component (see
  * `page.tsx` and `lib/illustrationPromptsGallery.ts`) and passed in as a prop.
- * Everything here, the light/dark toggle and the per-card copy buttons, is
- * client-side.
+ * The per-card copy buttons are the only local state.
+ *
+ * Theme is the shared site one (ThemePillToggle → siteTheme.ts → `.dark` on
+ * <html>), not a page-local toggle: the root layout's bootstrap script applies
+ * the class before paint, so the palette here matches every other surface and
+ * survives a reload. The pill is docked so it stays reachable at any scroll
+ * position — this page is a long scroll of artwork and the whole point is
+ * flipping the background under it.
  */
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { Check, Copy, ImageIcon, Moon, Sun } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { Check, Copy, ImageIcon } from "lucide-react";
+import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import imageManifest from "@/lib/generated/images";
 import type {
   IllustrationPromptEntry,
@@ -25,35 +32,34 @@ const IMAGE_MIME: Record<string, string> = {
   avif: "image/avif",
 };
 
-/**
- * The generated artwork for a card, rendered above its prompt so the prompt
- * reads as the caption for the image it produced — that pairing is the whole
- * point of the gallery once the art exists. Falls back to a "not generated yet"
- * slot so a prompt can be reviewed before its image has been rendered.
- */
-function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
-  const manifestEntry = imageManifest[entry.id];
-  if (!manifestEntry) {
-    return (
-      <div className={styles.imagePending}>
-        <ImageIcon size={15} aria-hidden="true" />
-        <span>Not generated yet</span>
-      </div>
-    );
-  }
-  const fallback = manifestEntry.formats[manifestEntry.formats.length - 1];
-  const sources = manifestEntry.formats.slice(0, -1);
+/** Suffix on the background-removed variant's slug (assets/images/<id>-cutout.png). */
+const CUTOUT_SUFFIX = "-cutout";
+
+/** One image from the build manifest, or null when that slug has no artwork. */
+function ManifestImage({
+  slug,
+  alt,
+  className,
+}: {
+  slug: string;
+  alt: string;
+  className: string;
+}) {
+  const entry = imageManifest[slug];
+  if (!entry) return null;
+  const fallback = entry.formats[entry.formats.length - 1];
+  const sources = entry.formats.slice(0, -1);
   return (
     <picture>
       {sources.map((ext) => (
-        <source key={ext} srcSet={`/images/${entry.id}.${ext}`} type={IMAGE_MIME[ext]} />
+        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={IMAGE_MIME[ext]} />
       ))}
       <img
-        src={`/images/${entry.id}.${fallback}`}
-        width={manifestEntry.width}
-        height={manifestEntry.height}
-        alt={entry.title}
-        className={styles.image}
+        src={`/images/${slug}.${fallback}`}
+        width={entry.width}
+        height={entry.height}
+        alt={alt}
+        className={className}
         loading="lazy"
         decoding="async"
       />
@@ -61,36 +67,51 @@ function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
   );
 }
 
-const THEME_KEY = "illustration_prompts_theme";
-type Theme = "light" | "dark";
+/**
+ * The generated artwork for a card, rendered above its prompt so the prompt
+ * reads as the caption for the image it produced — that pairing is the whole
+ * point of the gallery once the art exists.
+ *
+ * When a background-removed variant exists it is stacked directly underneath
+ * the original for comparison. The cut-out is deliberately given no backdrop of
+ * its own, so the page background shows through its alpha and the theme toggle
+ * doubles as the judgement tool: a cut-out that only works on one background is
+ * exactly what needs catching here.
+ */
+function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
+  const hasOriginal = Boolean(imageManifest[entry.id]);
+  const cutoutSlug = `${entry.id}${CUTOUT_SUFFIX}`;
+  const hasCutout = Boolean(imageManifest[cutoutSlug]);
 
-// Theme comes from localStorage (falling back to the OS preference) via an
-// external store, mirroring /svg-gallery: reading it needs no effect and the
-// server snapshot stays a stable "light", avoiding any hydration mismatch.
-const themeListeners = new Set<() => void>();
+  if (!hasOriginal) {
+    return (
+      <div className={styles.imagePending}>
+        <ImageIcon size={15} aria-hidden="true" />
+        <span>Not generated yet</span>
+      </div>
+    );
+  }
 
-function readTheme(): Theme {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function useTheme(): [Theme, () => void] {
-  const theme = useSyncExternalStore<Theme>(
-    (cb) => {
-      themeListeners.add(cb);
-      return () => themeListeners.delete(cb);
-    },
-    readTheme,
-    () => "light",
+  return (
+    <div className={styles.imageStack}>
+      <div className={styles.imagePane}>
+        <ManifestImage slug={entry.id} alt={entry.title} className={styles.image} />
+        <span className={styles.imageLabel}>Original</span>
+      </div>
+      {hasCutout ? (
+        <div className={styles.imagePane}>
+          <ManifestImage
+            slug={cutoutSlug}
+            alt={`${entry.title}, background removed`}
+            className={styles.imageCutout}
+          />
+          <span className={styles.imageLabel}>
+            Background removed · Replicate 851-labs/background-remover
+          </span>
+        </div>
+      ) : null}
+    </div>
   );
-  const toggle = useCallback(() => {
-    localStorage.setItem(THEME_KEY, theme === "light" ? "dark" : "light");
-    themeListeners.forEach((l) => l());
-  }, [theme]);
-  return [theme, toggle];
 }
 
 function PromptCard({
@@ -162,7 +183,6 @@ export function IllustrationPromptsClient({
 }: {
   data: IllustrationPromptsData;
 }) {
-  const [theme, toggleTheme] = useTheme();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const onCopy = useCallback((key: string, text: string) => {
@@ -192,21 +212,17 @@ export function IllustrationPromptsClient({
   }, [data.entries]);
 
   return (
-    <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
+    <div className={styles.page}>
+      {/* Docked rather than inline in the header: the page is a long scroll of
+          artwork, and flipping the background under it is the point, so the
+          pill has to stay reachable wherever the reader has got to. */}
+      <div className={styles.themeDock}>
+        <ThemePillToggle />
+      </div>
       <div className={styles.inner}>
         <header className={styles.header}>
           <div className={styles.headerRow}>
             <h1 className={styles.title}>Illustration prompts</h1>
-            <button
-              type="button"
-              className={styles.themeToggle}
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            >
-              {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-              <span>{theme === "light" ? "Dark" : "Light"}</span>
-            </button>
           </div>
           <p className={styles.subtitle}>
             GPT Image 2 prompts for the custom illustrations across the Dataslope

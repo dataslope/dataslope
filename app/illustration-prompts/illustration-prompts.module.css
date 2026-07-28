@@ -1,7 +1,11 @@
-/* Theme tokens mirror /svg-gallery: light is the default; `.dark` (toggled on
-   the root) swaps in the dark palette. Page background is pure white (#ffffff)
-   in light and #121212 in dark, the two backgrounds the illustrations must
-   read well on, and the ones named in every prompt. */
+/* Theme tokens: light is the default; the dark palette is selected by the
+   site-wide `.dark` class on <html>, which the root layout's bootstrap script
+   applies before paint and ThemePillToggle flips. Keying off <html> (rather
+   than a page-local class as this page used to) is what lets the shared pill
+   drive it and keeps the choice in step with the rest of the site.
+   Page background is pure white (#ffffff) in light and #121212 in dark, the
+   two backgrounds the illustrations must read well on, and the ones named in
+   every prompt. */
 .page {
   --bg: #ffffff;
   --fg: #111827;
@@ -25,7 +29,7 @@
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
-.page.dark {
+:global(html.dark) .page {
   --bg: #121212;
   --fg: #e6e6e6;
   --muted: #a3a3a3;
@@ -88,23 +92,29 @@
   color: var(--fg);
 }
 
-.themeToggle {
-  display: inline-flex;
+/* Docked theme pill: pinned to the viewport so it stays reachable through the
+   whole scroll. The translucent backing keeps it legible when a bright
+   illustration scrolls underneath. */
+.themeDock {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
-  padding: 0.4rem 0.7rem;
+  padding: 0.3rem;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--btn-bg);
-  color: var(--fg);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
 }
 
-.themeToggle:hover {
-  background: var(--btn-hover);
+@media (max-width: 720px) {
+  .themeDock {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
 }
 
 /* ── Sections (People / Objects & scenes) ───────────────────────────────── */
@@ -208,15 +218,45 @@
   color: var(--badge-muted-fg);
 }
 
-/* The generated artwork, shown above its prompt. No background is painted
-   behind it: the card shows through, so a cut-out with real transparency can be
-   judged against both themes with the toggle. */
+/* The generated artwork, shown above its prompt, with the background-removed
+   variant stacked underneath for comparison. */
+.imageStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.imagePane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
 .image {
   display: block;
   width: 100%;
   height: auto;
   border-radius: 0.5rem;
   border: 1px solid var(--border-soft);
+}
+
+/* The cut-out gets no backdrop of its own — the page colour shows through its
+   alpha, so the theme toggle is what reveals a halo or a background that never
+   actually came off. */
+.imageCutout {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--border);
+  background: transparent;
+}
+
+.imageLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 .imagePending {
