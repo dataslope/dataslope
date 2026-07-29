@@ -53,8 +53,8 @@
  *   --quality <q>        auto | low | medium | high (default: low — see above)
  *   --background <mode>  auto | opaque (default: auto)
  *                        gpt-image-2 has no transparent background. To get
- *                        cut-outs, author the subject "isolated on a plain solid
- *                        white background" and key the white out afterwards.
+ *                        cut-outs, run scripts/remove-background-kie.mjs over
+ *                        the generated candidates afterwards.
  *   --output-format <f>  png | webp | jpeg (default: png). webp is ~10x smaller
  *                        on disk, which matters over thousands of images.
  *   --model <name>       Override the model (default: JSON meta.model)
@@ -655,8 +655,8 @@ async function main() {
     console.error(
       "gpt-image-2 does not support transparent backgrounds (the API rejects\n" +
         'background="transparent", and asking for one in the prompt makes the model\n' +
-        "paint a fake checkerboard). Author the subject as \"isolated on a plain solid\n" +
-        "white background\" instead, then key the white out after generating.",
+        "paint a fake checkerboard). Generate opaque, then remove the background\n" +
+        "afterwards with: node scripts/remove-background-kie.mjs",
     );
     process.exit(1);
   }
