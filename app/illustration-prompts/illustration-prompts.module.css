@@ -371,3 +371,53 @@
   margin-top: 2rem;
   color: var(--muted);
 }
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+/* Every card carries two full-width 1536x1024 images, so the full set is both a
+   very long scroll and a lot of bytes; the list is paged rather than infinite so
+   a reader can hold a position and come back to it. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.pagerBtn {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pagerBtn:hover:not(:disabled) {
+  background: var(--btn-hover);
+}
+
+.pagerBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerStatus {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.pagerRange {
+  color: var(--faint);
+}
+
+@media (max-width: 560px) {
+  .pagerRange {
+    display: none;
+  }
+}

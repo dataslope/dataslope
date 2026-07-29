@@ -6,7 +6,7 @@
 // `Request`, etc., which conflicts with this app's DOM lib. In particular it
 // retypes `Response.json()` to `Promise<unknown>`, which breaks ordinary
 // browser `fetch(...).then((r) => r.json())` chains across the codebase (e.g.
-// app/svg-gallery/SvgGalleryClient.tsx). This is a Next.js/DOM app, not a bare
+// a client component). This is a Next.js/DOM app, not a bare
 // Worker, so we want the DOM globals to win. We therefore declare only the
 // bindings, sourcing their types from `@cloudflare/workers-types` via `import
 // type`, a module-scoped import that adds NO globals.

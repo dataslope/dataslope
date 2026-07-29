@@ -5,27 +5,10 @@ description: Where to go after you have the basics down
 
 You now know enough Python to write real programs: variables and collections, control flow, functions and modules, files, classes, and the iterator/generator/decorator trio that powers a lot of idiomatic code. That's a solid foundation. Here's a map of the next layer.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="An abstract arrangement of brand shapes, a pale blue disc, a bold green ring overlapping it, a solid yellow circle, a small blue dot, and a tilted yellow bar, closing the course on a playful, open-ended note"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="250" cy="110" r="85" fillOpacity="0.12" />
-  </g>
-  <circle cx="350" cy="110" r="60" fill="none" stroke="var(--ds-green-500)" strokeWidth="10" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="452" cy="66" r="24" />
-    <rect x="120" y="160" width="140" height="10" rx="5" transform="rotate(-18 190 165)" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="438" cy="152" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="175" cy="56" r="8" />
-  </g>
-</svg>
+<Figure
+  slug="python-basics-next-steps-cutout"
+  alt="The Dataslope marmot at a signpost on a hill, three arrows pointing toward distant platforms"
+/>
 
 <Callout type="success" title="You are ready">
 After this course, you can read most Python codebases, contribute to open-source projects, build CLI tools, automate tasks, write tests, and start learning frameworks. The fundamentals you've learned here will serve you for years. Now it's time to specialize.
@@ -44,11 +27,9 @@ Type hints are optional but increasingly standard in professional Python. They c
       filename: "main.py",
       starterCode: `from typing import Iterable
 
-
 def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
     """Compute total with tax."""
     return sum(prices) * (1 + tax_rate)
-
 
 print(total([10.0, 20.0, 30.0]))
 `,
@@ -80,10 +61,8 @@ Built-in `unittest` works, but most Python projects use [**pytest**](https://doc
 def total(prices, tax_rate=0.07):
     return sum(prices) * (1 + tax_rate)
 
-
 def test_total_without_tax():
     assert total([10, 20], tax_rate=0) == 30
-
 
 def test_total_with_tax():
     result = total([100], tax_rate=0.1)
@@ -113,11 +92,9 @@ pytest
       filename: "main.py",
       starterCode: `import asyncio
 
-
 async def fetch(url):
     await asyncio.sleep(0.1)  # simulate network delay
     return f"Data from {url}"
-
 
 async def main():
     results = await asyncio.gather(
@@ -127,7 +104,6 @@ async def main():
     )
     for r in results:
         print(r)
-
 
 asyncio.run(main())
 `,
@@ -158,16 +134,13 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"message": "Hello, world!"}
 
-
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
-
 
 # Run with: uvicorn main:app --reload
 ```

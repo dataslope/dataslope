@@ -12,28 +12,6 @@ Every decision in software is a conditional. From "should I cache this result?" 
 
 Every snippet on this page runs in your browser, no setup required.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A blue dot at the top fans out toward three branch cards, but only the green line is solid and only its card holds a landed dot, an if, elif, else chain runs exactly one branch"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5" fill="none">
-    <line x1="312" y1="42" x2="176" y2="102" />
-    <line x1="320" y1="46" x2="320" y2="102" />
-  </g>
-  <line x1="328" y1="42" x2="464" y2="102" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="34" r="11" />
-  </g>
-  <rect x="100" y="108" width="140" height="60" rx="12" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="6 5" />
-  <rect x="250" y="108" width="140" height="60" rx="12" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="6 5" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="400" y="108" width="140" height="60" rx="12" fillOpacity="0.15" />
-    <circle cx="470" cy="138" r="10" />
-  </g>
-</svg>
-
 ## Real-world impact
 
 Conditionals are not just syntax, they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.
@@ -177,7 +155,6 @@ There can be any number of `elif` branches; `else` is optional. Each branch need
         return "D"
     else:
         return "F"
-
 
 for s in [95, 82, 73, 60, 50]:
     print(s, "->", classify(s))
@@ -330,7 +307,6 @@ if a < b < c:
         case _:
             return "not a point"
 
-
 for p in [(0, 0), (0, 5), (3, 0), (4, 4), (2, 7), "nope"]:
     print(p, "->", describe(p))
 `,
@@ -355,7 +331,6 @@ Patterns can also match class instances, dict shapes, and sequences of varying l
             return "Server Error"
         case _:
             return "Unknown"
-
 
 for c in [200, 404, 500, 999]:
     print(c, "->", http_status(c))
@@ -384,7 +359,6 @@ For simple value-to-value mappings, a dict is often clearer than `if`/`elif` or 
         404: "Not Found",
         500: "Server Error",
     }.get(code, "Unknown")
-
 
 print(http_label(200))
 print(http_label(404))

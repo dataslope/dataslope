@@ -5,6 +5,11 @@ description: How Python looks up names (LEGB) and the global / nonlocal keywords
 
 When you write `print(x)`, Python has to find the binding for `x`. It does so by walking through four nested namespaces in order, known by the acronym **LEGB**:
 
+<Figure
+  slug="python-basics-scope-cutout"
+  alt="Nested open-topped glass boxes with a single glowing token resting inside the innermost one"
+/>
+
 | Letter | Scope |
 | --- | --- |
 | **L** | Local (inside the current function) |
@@ -13,24 +18,6 @@ When you write `print(x)`, Python has to find the binding for `x`. It does so by
 | **B** | Built-in (`len`, `print`, etc.) |
 
 The first name found wins. If nothing matches, Python raises `NameError`.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Four nested translucent panels shrink toward the innermost local box, where a blue dot starts looking; its green match sits one layer out, Python searches local, enclosing, global, then built-in, and the first name found wins"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="20" width="480" height="180" rx="18" fillOpacity="0.06" />
-    <rect x="130" y="45" width="380" height="130" rx="16" fillOpacity="0.1" />
-    <rect x="180" y="70" width="280" height="80" rx="14" fillOpacity="0.15" />
-    <rect x="230" y="90" width="150" height="40" rx="12" fillOpacity="0.22" />
-    <circle cx="280" cy="110" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="422" cy="110" r="9" />
-  </g>
-</svg>
 
 ## Why scope matters: real-world impact
 
@@ -64,11 +51,9 @@ flowchart TD
       filename: "main.py",
       starterCode: `x = "global x"
 
-
 def show():
     x = "local x"
     print("inside:", x)
-
 
 show()
 print("outside:", x)
@@ -94,10 +79,8 @@ This is the key gotcha: **reading** a name searches LEGB, but **assigning** a na
       filename: "main.py",
       starterCode: `counter = 0
 
-
 def bump_bad():
     counter += 1  # UnboundLocalError: assigning makes it local
-
 
 try:
     bump_bad()
@@ -119,11 +102,9 @@ To rebind the **global** from inside a function, use the `global` keyword:
       filename: "main.py",
       starterCode: `counter = 0
 
-
 def bump():
     global counter
     counter += 1
-
 
 bump()
 bump()
@@ -156,7 +137,6 @@ When you nest functions, the inner one can **read** names from the outer one (cl
         return count
 
     return step
-
 
 c = make_counter()
 print(c(), c(), c())
@@ -231,7 +211,6 @@ A **closure** is a function that remembers variables from its enclosing scope, e
 
     return inner
 
-
 double = multiplier(2)
 triple = multiplier(3)
 print(double(7), triple(7))
@@ -286,7 +265,6 @@ This is a classic interview question:
         adders.append(lambda x: x + i)
     return adders
 
-
 a, b, c = make_adders()
 print(a(10), b(10), c(10))  # all print 12, not 10/11/12!
 `,
@@ -312,7 +290,6 @@ Closures capture variables by **reference**, not by **value**. If the variable c
     for i in range(3):
         adders.append(lambda x, i=i: x + i)  # default argument captures value
     return adders
-
 
 a, b, c = make_adders()
 print(a(10), b(10), c(10))  # 10, 11, 12

@@ -35,6 +35,10 @@ const IMAGE_MIME: Record<string, string> = {
 /** Suffix on the background-removed variant's slug (assets/images/<id>-cutout.png). */
 const CUTOUT_SUFFIX = "-cutout";
 
+/** Entries per page. Each card renders two 1536x1024 images, so this is chosen
+ *  for bytes-per-page as much as for scroll length. */
+const PAGE_SIZE = 12;
+
 /** One image from the build manifest, or null when that slug has no artwork. */
 function ManifestImage({
   slug,
@@ -200,16 +204,31 @@ export function IllustrationPromptsClient({
       });
   }, []);
 
-  // Group entries by category label, preserving the pre-sorted order.
+  // Each card now carries two full-width images (the original and its cut-out),
+  // so a page of every entry is a very long scroll and a lot of image bytes.
+  // Paginate over the flat, pre-sorted list and re-group whatever lands on the
+  // current page, so category headings still appear but only for what is shown.
+  const [page, setPage] = useState(0);
+  const pageCount = Math.max(1, Math.ceil(data.entries.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount - 1);
+
   const groups = useMemo(() => {
+    const slice = data.entries.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
     const byLabel = new Map<string, IllustrationPromptEntry[]>();
-    for (const entry of data.entries) {
+    for (const entry of slice) {
       const list = byLabel.get(entry.categoryLabel);
       if (list) list.push(entry);
       else byLabel.set(entry.categoryLabel, [entry]);
     }
     return [...byLabel.entries()];
-  }, [data.entries]);
+  }, [data.entries, current]);
+
+  const goTo = useCallback((next: number) => {
+    setPage(next);
+    // Jumping pages mid-scroll would otherwise land the reader in the middle of
+    // the new page's cards with no context.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -261,6 +280,36 @@ export function IllustrationPromptsClient({
             </section>
           ))
         )}
+
+        {pageCount > 1 ? (
+          <nav className={styles.pager} aria-label="Illustration pages">
+            <button
+              type="button"
+              className={styles.pagerBtn}
+              onClick={() => goTo(current - 1)}
+              disabled={current === 0}
+            >
+              ← Previous
+            </button>
+            <span className={styles.pagerStatus}>
+              Page {current + 1} of {pageCount}
+              <span className={styles.pagerRange}>
+                {" "}
+                · {current * PAGE_SIZE + 1}–
+                {Math.min((current + 1) * PAGE_SIZE, data.entries.length)} of{" "}
+                {data.entries.length}
+              </span>
+            </span>
+            <button
+              type="button"
+              className={styles.pagerBtn}
+              onClick={() => goTo(current + 1)}
+              disabled={current >= pageCount - 1}
+            >
+              Next →
+            </button>
+          </nav>
+        ) : null}
       </div>
     </div>
   );

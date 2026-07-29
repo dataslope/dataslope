@@ -91,7 +91,7 @@ export function extractSvgGraphics(
     tree = processor.runSync(processor.parse(file), file) as unknown as AnyNode;
   } catch (err) {
     console.warn(
-      `[svg-gallery] skipping ${absPath}: failed to parse (${
+      `[svg] skipping ${absPath}: failed to parse (${
         (err as Error)?.message ?? err
       })`,
     );

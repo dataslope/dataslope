@@ -10,35 +10,6 @@ Functions package code so it can be reused, named, and tested. Every program is 
   alt="A machine with an input funnel on top and an output chute below, plain shapes going in and finished shapes coming out"
 />
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A blue caller dot sends a small yellow argument along a thin arrow into a named function card, and a green result dot rides the lower arrow back, call a function, get a value back"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="110" cy="100" r="14" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="140" y="76.5" width="180" height="3" rx="1.5" />
-    <polygon points="318,72.5 329,78 318,83.5" />
-    <rect x="160" y="123" width="180" height="3" rx="1.5" />
-    <polygon points="162,119 162,130 151,124.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="230" cy="58" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="250" cy="144" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="350" y="45" width="150" height="110" rx="16" fillOpacity="0.15" />
-    <rect x="372" y="68" width="106" height="16" rx="8" />
-    <rect x="372" y="98" width="80" height="9" rx="4.5" fillOpacity="0.45" />
-    <rect x="372" y="115" width="58" height="9" rx="4.5" fillOpacity="0.45" />
-  </g>
-</svg>
-
 ## Where are functions used?
 
 Functions are **the** fundamental building block of modern programs:
@@ -97,7 +68,6 @@ A function is **defined once** with `def`, then **called many times**. Each call
     """Return a friendly greeting."""
     return f"Hello, {name}!"
 
-
 print(greet("Ada"))
 `,
     },
@@ -113,7 +83,6 @@ A function that does not explicitly `return` returns `None`.
       filename: "main.py",
       starterCode: `def say_hello():
     print("Hello!")
-
 
 result = say_hello()
 print("returned:", result)
@@ -137,7 +106,6 @@ Python distinguishes between **positional** and **keyword** arguments.
       filename: "main.py",
       starterCode: `def deposit(account, amount, currency="USD"):
     return f"Deposited {amount} {currency} into {account}"
-
 
 # positional
 print(deposit("acct-1", 100))
@@ -170,7 +138,6 @@ def add_item_bad(item, items=[]):
     items.append(item)
     return items
 
-
 print(add_item_bad("a"))
 print(add_item_bad("b"))  # surprise: ["a", "b"]
 print(add_item_bad("c"))  # surprise: ["a", "b", "c"]
@@ -195,7 +162,6 @@ def add_item(item, items=None):
     items.append(item)
     return items
 
-
 print(add_item("a"))
 print(add_item("b"))  # ["b"]
 print(add_item("c"))  # ["c"]
@@ -218,7 +184,6 @@ print(add_item("c"))  # ["c"]
     print("tags:", tags)  # tuple
     print("metadata:", metadata)  # dict
 
-
 log_event("login", "web", "production", user_id=42, latency_ms=120)
 `,
     },
@@ -234,7 +199,6 @@ When **calling** a function, `*` and `**` **unpack** iterables/dicts back into a
       filename: "main.py",
       starterCode: `def add3(a, b, c):
     return a + b + c
-
 
 nums = [1, 2, 3]
 print(add3(*nums))  # unpacks list into a=1, b=2, c=3
@@ -274,7 +238,6 @@ def func(pos_only, /, pos_or_kw, *, kw_only):
     result = a / b
     return round(result) if rounded else result
 
-
 print(divide(7, 2))
 print(divide(7, 2, rounded=True))
 
@@ -305,7 +268,6 @@ A `return` statement exits the function immediately and sends a value back to th
         return -x
     return x
 
-
 print(absolute(-5))
 print(absolute(3))
 `,
@@ -324,7 +286,6 @@ You can return **multiple values** by separating them with commas. Python packs 
     quotient = a // b
     remainder = a % b
     return quotient, remainder
-
 
 q, r = divmod_custom(17, 5)
 print(f"17 = 5 * {q} + {r}")
@@ -347,7 +308,6 @@ Use **early return** to avoid deep nesting:
         return "negative"
     # main logic here
     return f"processed {value}"
-
 
 print(process(None))
 print(process(-5))
@@ -393,7 +353,6 @@ Type hints (PEP 484+) are **optional annotations**. Python itself does not enfor
     """Compute total price including tax."""
     return sum(prices) * (1 + tax_rate)
 
-
 print(total([10.0, 20.0, 30.0]))
 `,
     },
@@ -424,10 +383,8 @@ In Python, functions are **first-class objects**: you can pass them as arguments
       starterCode: `def apply_twice(func, x):
     return func(func(x))
 
-
 def add_one(n):
     return n + 1
-
 
 print(apply_twice(add_one, 3))  # 5
 

@@ -30,7 +30,6 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/llms/",
           "/color-test",
-          "/svg-gallery",
           "/illustration-prompts",
           "/email-preview",
           // Auth surfaces: personalized or credential flows, no SEO value

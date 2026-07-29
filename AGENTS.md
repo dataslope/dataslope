@@ -188,23 +188,15 @@ Default to it — it is also the literal default (`DEFAULT_STYLE` in
 `lib/illustrationPrompt.ts` and `meta.defaultStyle` in the JSON), so a prompt
 that omits `style` gets it automatically.
 
-**Risograph is the occasional exception**, and only for a *simple* subject —
-typically a mascot moment. Of the risographs tried, only `strings` (a ribbon of
-tiles) worked; `dictionaries`, `exceptions`, and `history` were all too busy.
-The marmot-in-the-mountains thumbnail looks great as a standalone image but did
-not survive background removal.
+**Every other style is retired.** Risograph, flat geometric vector, line art,
+blueprint schematic and cut-paper collage were all tried and dropped: the
+monochrome ones (line art, blueprint) only read against one page background
+once the background is removed, and the busy ones (risograph scenes) have no
+isolable subject to cut out. Hand-authored inline `<svg>` graphics are retired
+in the same move — the `/svg-gallery` page that catalogued them is gone.
 
-**Avoid** flat geometric vector, line art, blueprint schematic, and cut-paper
-collage.
-
-| Style | Use |
-| --- | --- |
-| isometric illustration | ✅ default |
-| risograph | ⚠️ occasionally, simple subjects / mascot only |
-| flat geometric vector | ❌ |
-| line art illustration | ❌ |
-| blueprint schematic | ❌ |
-| cut-paper collage | ❌ |
+Do not reintroduce a second style "just for this one". A mixed set is what
+made the first pass unusable.
 
 **Always render in the brand palette** (the four primaries above). This is not
 only aesthetic: see the transparency constraint below.

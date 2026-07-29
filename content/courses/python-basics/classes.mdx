@@ -10,42 +10,6 @@ A **class** bundles data and behavior. Every value in Python is an instance of s
   alt="An architect's blueprint of a small robot pinned to a drafting board, with a finished toy robot standing beside it"
 />
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A faint master disc presses three records below it, identical grooves, each finished with a white center label, a class is the master, and every instance is pressed from it"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.12">
-    <circle cx="320" cy="64" r="46" />
-  </g>
-  <g fill="currentColor" opacity="0.1">
-    <circle cx="320" cy="64" r="33" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <circle cx="320" cy="64" r="20" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="320" cy="64" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="170" r="34" fillOpacity="0.3" />
-    <circle cx="150" cy="170" r="25" fillOpacity="0.3" />
-    <circle cx="150" cy="170" r="16" fillOpacity="0.3" />
-    <circle cx="320" cy="170" r="34" fillOpacity="0.3" />
-    <circle cx="320" cy="170" r="25" fillOpacity="0.3" />
-    <circle cx="320" cy="170" r="16" fillOpacity="0.3" />
-    <circle cx="490" cy="170" r="34" fillOpacity="0.3" />
-    <circle cx="490" cy="170" r="25" fillOpacity="0.3" />
-    <circle cx="490" cy="170" r="16" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="150" cy="170" r="9" fillOpacity="0.9" />
-    <circle cx="320" cy="170" r="9" fillOpacity="0.9" />
-    <circle cx="490" cy="170" r="9" fillOpacity="0.9" />
-  </g>
-</svg>
-
 ## Why classes matter: the real world
 
 Classes are how you model **entities** in your domain:
@@ -74,7 +38,6 @@ The word "class" comes from **classification**, the practice of grouping things 
 
     pass
 
-
 d = Dog()
 print(d)
 print(type(d))
@@ -99,7 +62,6 @@ print(isinstance(d, Dog))
     def __init__(self, name, age):
         self.name = name
         self.age = age
-
 
 d = Dog("Rex", 4)
 print(d.name)
@@ -144,7 +106,6 @@ An **instance attribute** belongs to a single object. A **class attribute** is s
 
     def __init__(self, name):
         self.name = name  # instance attribute
-
 
 a = Dog("Rex")
 b = Dog("Luna")
@@ -201,7 +162,6 @@ A **method** is a function defined inside a class. The first parameter is always
     def bark(self):
         return f"{self.name} says woof!"
 
-
 d = Dog("Rex")
 print(d.bark())
 `,
@@ -223,7 +183,6 @@ When you write `d.bark()`, Python translates it to `Dog.bark(d)`, the instance i
     def increment(self, step=1):
         self.value += step
         return self.value
-
 
 c = Counter()
 c.increment()
@@ -257,7 +216,6 @@ Sometimes you want a method that operates on the **class** itself, or a utility 
     def is_freezing(celsius):
         """Utility function."""
         return celsius <= 0
-
 
 t = Temperature.from_fahrenheit(32)
 print(t.celsius)
@@ -294,7 +252,6 @@ Use `@property` to define a method that looks like an attribute.
     @property
     def diameter(self):
         return self.radius * 2
-
 
 c = Circle(5)
 print(c.area)  # looks like an attribute, runs a method
@@ -349,7 +306,6 @@ Methods with double underscores ("dunder") define how instances interact with Py
             raise ValueError("currency mismatch")
         return Money(self.amount + other.amount, self.currency)
 
-
 a = Money(10)
 b = Money(2.5)
 print(a)  # uses __str__
@@ -383,12 +339,10 @@ Writing `__init__`, `__repr__`, and `__eq__` for every data-holding class is ted
       filename: "main.py",
       starterCode: `from dataclasses import dataclass
 
-
 @dataclass
 class Point:
     x: float
     y: float
-
 
 p = Point(3, 4)
 q = Point(3, 4)
@@ -413,12 +367,10 @@ print(p.x, p.y)
       filename: "main.py",
       starterCode: `from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
-
 
 p = Point(3, 4)
 # p.x = 5  # would raise FrozenInstanceError
@@ -672,7 +624,6 @@ print("Equal?", p == q)
 # Define Point here
 `,
       solutionCode: `from dataclasses import dataclass
-
 
 @dataclass
 class Point:

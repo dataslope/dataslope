@@ -138,17 +138,42 @@ export function buildSignedRequest(
   };
 }
 
-/** Sign and send one S3 request against R2. */
+// Transient conditions worth retrying. R2 (and whatever proxy sits in front of
+// it) intermittently answers with a gateway status or a DNS failure under a
+// burst of concurrent requests; a 45-image run hit "503 DNS resolution failure"
+// on 43 of them. Every operation here is idempotent — PUT overwrites the same
+// key, GET and DELETE are naturally so — which is what makes blanket retry safe.
+const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+const MAX_ATTEMPTS = 6;
+
+const nap = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Sign and send one S3 request against R2, retrying transient failures. */
 async function signedFetch(creds, req) {
-  const { url, headers } = buildSignedRequest(creds, req);
-  const res = await fetch(url, { method: req.method, headers, body: req.body });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(
-      `R2 ${req.method} ${req.key || req.bucket} failed: ${res.status} ${detail.slice(0, 400)}`,
-    );
+  let lastDetail = "";
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    // Re-sign per attempt: the signature covers x-amz-date, so a retry reusing
+    // the first attempt's headers would eventually fail the 15-minute skew
+    // check rather than succeeding.
+    const { url, headers } = buildSignedRequest(creds, req);
+    let res;
+    let networkErr;
+    try {
+      res = await fetch(url, { method: req.method, headers, body: req.body });
+    } catch (err) {
+      networkErr = err;
+    }
+    if (res?.ok) return res;
+
+    const transient = networkErr !== undefined || RETRY_STATUS.has(res?.status);
+    lastDetail = networkErr
+      ? networkErr.message
+      : `${res.status} ${(await res.text().catch(() => "")).slice(0, 400)}`;
+    if (!transient || attempt === MAX_ATTEMPTS - 1) break;
+
+    await nap(Math.min(16_000, 500 * 2 ** attempt));
   }
-  return res;
+  throw new Error(`R2 ${req.method} ${req.key || req.bucket} failed: ${lastDetail}`);
 }
 
 export function createR2Client(creds = credentialsFromEnv(), bucket = creds.bucket) {

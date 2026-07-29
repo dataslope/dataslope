@@ -19,23 +19,6 @@ Guido van Rossum made this divisive choice, and the legendary tabs-versus-spaces
 war it touched off, waits for you in *The Story of Python* near the end of the
 course.)
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three code bars each hover over their own terrace of a descending staircase while one red bar tilts off the edge between levels, in Python the indentation is the structure, and a misaligned line has nowhere to stand"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="70,200 70,60 220,60 220,105 370,105 370,150 520,150 520,200" fillOpacity="0.12" />
-    <rect x="90" y="38" width="110" height="12" rx="6" fillOpacity="0.85" />
-    <rect x="240" y="83" width="110" height="12" rx="6" fillOpacity="0.85" />
-    <rect x="390" y="128" width="110" height="12" rx="6" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="380" y="112" width="90" height="12" rx="6" fillOpacity="0.85" transform="rotate(-7 425 118)" />
-  </g>
-</svg>
-
 ## Why Python chose significant whitespace
 
 Most languages in the 1980s and 1990s used braces (`{ ... }`) or
@@ -70,7 +53,6 @@ in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
         return message.upper() + "!"
     return ""
 
-
 print(shout("hello"))
 print(shout(""))
 `,
@@ -103,7 +85,6 @@ silently broken program (in older Python 2 codebases).
 # then run again to see the IndentationError.
 def square(x):
     return x * x
-
 
 print(square(5))
 `,
@@ -279,7 +260,6 @@ print(average([1, 2, 3, 4]))
     total = sum(numbers)
     return total / len(numbers)
 
-
 print(average([1, 2, 3, 4]))
 `,
     },
@@ -317,7 +297,6 @@ Do not change the function's behavior, just improve its style.`}
         + e
     return result
 
-
 print(long_sum(1, 2, 3, 4, 5))
 `,
       solutionCode: `def long_sum(a, b, c, d, e):
@@ -325,7 +304,6 @@ print(long_sum(1, 2, 3, 4, 5))
         a + b + c + d + e
     )
     return result
-
 
 print(long_sum(1, 2, 3, 4, 5))
 `,
