@@ -247,7 +247,21 @@ function requireKey() {
   return key;
 }
 
-async function api(path, { method = "GET", key, json, form } = {}) {
+// Statuses worth retrying: gateway/proxy hiccups and rate limits. A batch's
+// output file is hundreds of MB, and fetching it through a proxy is exactly
+// where a 504 shows up — losing the whole run at the last step, after the
+// images have already been generated and paid for.
+const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+/**
+ * One OpenAI API call.
+ *
+ * `retries` defaults to 0 and is opted into per call site, deliberately: this
+ * helper also creates batches and submits image generations, and silently
+ * re-sending one of those would duplicate work and double the bill. Only
+ * idempotent GETs pass a retry count.
+ */
+async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) {
   const headers = { Authorization: `Bearer ${key}` };
   let body;
   if (json !== undefined) {
@@ -256,13 +270,39 @@ async function api(path, { method = "GET", key, json, form } = {}) {
   } else if (form !== undefined) {
     body = form; // fetch sets the multipart boundary itself
   }
-  const res = await fetch(`${API_BASE}${path}`, { method, headers, body });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status} ${res.statusText}${detail ? ` - ${detail}` : ""}`);
+
+  for (let attempt = 0; ; attempt++) {
+    let res;
+    let networkErr;
+    try {
+      res = await fetch(`${API_BASE}${path}`, { method, headers, body });
+    } catch (err) {
+      networkErr = err; // DNS, TLS, socket reset — retryable like a 5xx
+    }
+    if (res?.ok) return res;
+
+    const transient = networkErr !== undefined || RETRY_STATUS.has(res?.status);
+    if (!transient || attempt >= retries) {
+      if (networkErr) throw networkErr;
+      const detail = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status} ${res.statusText}${detail ? ` - ${detail}` : ""}`);
+    }
+
+    // 2s, 4s, 8s, 16s, 32s (capped): long enough to outlast a proxy blip
+    // without stalling a run that is genuinely broken.
+    const waitMs = Math.min(32_000, 2_000 * 2 ** attempt);
+    const reason = networkErr ? networkErr.message : `HTTP ${res.status}`;
+    console.error(
+      `  … ${method} ${path} failed (${reason}); retry ${attempt + 1}/${retries} in ${waitMs / 1000}s`,
+    );
+    await sleep(waitMs);
   }
-  return res;
 }
+
+/** Internals exposed for `__tests__/generateIllustrationsRetry.test.ts`, which
+ *  pins both halves of the retry contract: transient failures are retried where
+ *  a caller opts in, and never retried where they are not. */
+export const __testing = { api };
 
 const BATCH_STATE_FILE = (out) => join(out, "last-batch.json");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -438,7 +478,8 @@ function resolveBatchIds(opts) {
 }
 
 async function retrieveBatch(id, key) {
-  const res = await api(`/batches/${id}`, { key });
+  // Polled in a loop for the life of a run; one transient 5xx should not end it.
+  const res = await api(`/batches/${id}`, { key, retries: 5 });
   return res.json();
 }
 
@@ -464,7 +505,12 @@ async function cmdStatus(opts, key) {
  * the body as a stream keeps only one row (~3.6 MB) in memory at a time.
  */
 async function* streamFileLines(fileId, key) {
-  const res = await api(`/files/${fileId}/content`, { key });
+  // The call that actually bit: a several-hundred-MB output file fetched
+  // through a proxy returns 504 often enough to matter, and by this point the
+  // images are already generated and billed. Retries cover establishing the
+  // request; if the socket dies mid-stream the generator still throws, and the
+  // fix there is to re-run `download --batch <id>`, which starts the file over.
+  const res = await api(`/files/${fileId}/content`, { key, retries: 5 });
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buf = "";
