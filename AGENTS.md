@@ -217,6 +217,12 @@ Two API details that will otherwise cost an hour:
   `User-Agent`**, returning a bare 403 with `error code: 1010`. It reads like
   an auth failure and is not.
 
+**Kie caps an account at 20 new generation requests per 10 seconds**, and
+rejects the excess with 429 *without queueing it*. `remove-background-kie.mjs`
+admits `createTask` through a shared sliding-window limiter at 18 per 10s, so
+`--concurrency` can be raised freely; a 429 waits out a whole window rather
+than backing off briefly, because the request was dropped, not held.
+
 Flow: upload → `POST https://api.kie.ai/api/v1/jobs/createTask` with
 `{"model": "recraft/remove-background", "input": {"image": "<url>"}}` → poll
 `GET https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…` until

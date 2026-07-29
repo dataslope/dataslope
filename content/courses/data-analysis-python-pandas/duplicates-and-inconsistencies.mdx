@@ -8,59 +8,10 @@ the same logical record appearing more than once. Closely
 related: **inconsistency**, where the same thing wears different
 labels.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="In a stack of records one row is an exact twin slid out toward a red cross, while on the right two pills of the same shape but different shades sit around an approximately-equals sign, duplicates and inconsistent labels"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="35" width="160" height="24" rx="12" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="115" cy="47" r="4" fillOpacity="0.9" />
-    <circle cx="135" cy="47" r="4" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="90" y="67" width="160" height="24" rx="12" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="99" width="160" height="24" rx="12" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="145" cy="111" r="4" fillOpacity="0.9" />
-    <circle cx="165" cy="111" r="4" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M94 111 H 114"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M299 104 L 313 118 M313 104 L 299 118"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="90" y="131" width="160" height="24" rx="12" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="163" width="160" height="24" rx="12" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="420" y="60" width="110" height="26" rx="13" fillOpacity="0.85" />
-    <rect x="420" y="134" width="110" height="26" rx="13" fillOpacity="0.3" />
-  </g>
-  <text x="475" y="119" fontFamily="var(--font-sans), Georgia, serif" fontSize="24" fontWeight="700" textAnchor="middle" fill="currentColor" opacity="0.5">≈</text>
-</svg>
+<Figure
+  slug="pandas-duplicates-cutout"
+  alt="Duplicates and inconsistencies, an isometric illustration"
+/>
 
 ## What counts as a duplicate?
 
@@ -255,14 +206,12 @@ df = pd.DataFrame(
     }
 )
 
-
 def normalize(row):
     if row["currency"] == "cents":
         return row["price"] / 100  # to USD
     if row["currency"] == "EUR":
         return row["price"] * 1.08
     return row["price"]
-
 
 df["price_usd"] = df.apply(normalize, axis=1).round(2)
 print(df)

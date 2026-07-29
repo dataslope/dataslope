@@ -13,8 +13,8 @@
  * full-bleed scene instead of dissolving the frame into a translucent ghost,
  * which is what the alternatives did to the busier illustrations.
  *
- * Two Kie API details this script exists to encapsulate, because both cost an
- * hour to rediscover:
+ * Three Kie API details this script exists to encapsulate, because each cost an
+ * hour to rediscover, or would:
  *
  *   1. The model input takes a **public URL only** — no base64, no data URI. So
  *      each image is pushed through Kie's own upload endpoint first (free,
@@ -23,6 +23,11 @@
  *   2. Both Kie hosts sit behind Cloudflare and answer a request with no
  *      browser `User-Agent` with a bare 403 and `error code: 1010`. It reads
  *      exactly like an auth failure and is not.
+ *   3. Kie caps an account at 20 new generation requests per 10 seconds, and
+ *      rejects the excess with 429 WITHOUT queueing it. A shared sliding-window
+ *      limiter admits createTask calls at 18 per 10s so --concurrency can be
+ *      raised freely without tripping it, and a 429 waits out a full window
+ *      rather than the usual short backoff, since the request was dropped.
  *
  * Usage:
  *   KIE_API_KEY=... node scripts/remove-background-kie.mjs [options]
@@ -100,24 +105,75 @@ function requireKey() {
   return key;
 }
 
-async function kie(url, { key, json, method = "GET" } = {}) {
-  const res = await fetch(url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "User-Agent": UA,
-      ...(json ? { "Content-Type": "application/json" } : {}),
-    },
-    body: json ? JSON.stringify(json) : undefined,
-  });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Kie ${method} ${new URL(url).pathname} → ${res.status} ${detail.slice(0, 300)}`);
-  }
-  return res.json();
-}
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Kie enforces, per account, 20 new generation requests per 10 seconds. Excess
+// requests are rejected with 429 and are NOT queued, so the limit has to be
+// respected client-side rather than discovered. Only createTask counts as a
+// "generation request"; uploads and status polls are not throttled here, but
+// they do get the same 429 retry below in case that ever changes.
+const RATE_WINDOW_MS = 10_000;
+const RATE_MAX = 18; // a little under 20, so a burst can't race past the limit
+
+/** Sliding-window limiter. Shared across workers, so raising --concurrency
+ *  cannot exceed the account limit. */
+function createLimiter(max, windowMs) {
+  const stamps = [];
+  let chain = Promise.resolve();
+  return () => {
+    // Serialise admission so two workers can't both read a stale window.
+    chain = chain.then(async () => {
+      for (;;) {
+        const now = Date.now();
+        while (stamps.length && now - stamps[0] >= windowMs) stamps.shift();
+        if (stamps.length < max) {
+          stamps.push(now);
+          return;
+        }
+        await sleep(windowMs - (now - stamps[0]) + 50);
+      }
+    });
+    return chain;
+  };
+}
+const admitGeneration = createLimiter(RATE_MAX, RATE_WINDOW_MS);
+
+const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+const MAX_ATTEMPTS = 6;
+
+async function kie(url, { key, json, method = "GET" } = {}) {
+  let lastDetail = "";
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    let res;
+    let networkErr;
+    try {
+      res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "User-Agent": UA,
+          ...(json ? { "Content-Type": "application/json" } : {}),
+        },
+        body: json ? JSON.stringify(json) : undefined,
+      });
+    } catch (err) {
+      networkErr = err;
+    }
+    if (res?.ok) return res.json();
+
+    const detail = networkErr ? networkErr.message : await res.text().catch(() => "");
+    lastDetail = networkErr ? detail : `${res.status} ${detail.slice(0, 300)}`;
+    const transient = networkErr !== undefined || RETRY_STATUS.has(res?.status);
+    if (!transient || attempt === MAX_ATTEMPTS - 1) break;
+
+    // A 429 means the window is already full; wait out a whole window rather
+    // than the usual short backoff, since the request was rejected, not queued.
+    const waitMs =
+      res?.status === 429 ? RATE_WINDOW_MS : Math.min(16_000, 500 * 2 ** attempt);
+    await sleep(waitMs);
+  }
+  throw new Error(`Kie ${method} ${new URL(url).pathname} → ${lastDetail}`);
+}
 
 /** Upload → createTask → poll → return the finished PNG bytes. */
 export async function removeBackground(buf, fileName, key) {
@@ -133,6 +189,7 @@ export async function removeBackground(buf, fileName, key) {
   const imageUrl = up?.data?.downloadUrl;
   if (!imageUrl) throw new Error(`upload returned no downloadUrl: ${JSON.stringify(up).slice(0, 200)}`);
 
+  await admitGeneration();
   const created = await kie(KIE_CREATE, {
     key,
     method: "POST",
