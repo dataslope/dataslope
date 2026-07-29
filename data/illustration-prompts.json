@@ -11,9 +11,9 @@
     },
     "sizes": {
       "course-thumbnail": "1536x1024",
-      "course-illustration": "1024x1024",
+      "course-illustration": "1536x1024",
       "interview-thumbnail": "1536x1024",
-      "interview-illustration": "1024x1024"
+      "interview-illustration": "1536x1024"
     }
   },
   "prompts": [

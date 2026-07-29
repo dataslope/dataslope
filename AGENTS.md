@@ -79,6 +79,115 @@ background is needed. In code, reference these via the CSS variables
 
 ---
 
+## Illustrations
+
+How course and interview illustrations get made. Both API keys
+(`OPENAI_API_KEY`, `KIE_API_KEY`) are already present as environment variables
+in Claude Code sessions; do not ask for them and never write them into a file.
+
+### The pipeline
+
+1. **Author** the prompt in `data/illustration-prompts.json` (one source of
+   truth: the `/illustration-prompts` gallery, the in-lesson `<Figure>`, and
+   the generator all read it).
+2. **Generate** with `scripts/generate-illustrations.mjs` — OpenAI `gpt-image-2`,
+   **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
+3. **Remove the background** with Recraft's `remove-background` through Kie AI.
+4. **Place** the source in `assets/images/`, run `npm run build:images`, and
+   embed with `<Figure slug="…" alt="…" />`.
+
+```bash
+# generate (low + batch are the defaults; --out defaults to ./generated-illustrations)
+node scripts/generate-illustrations.mjs dry-run          # prompts + projected cost, no API calls
+node scripts/generate-illustrations.mjs run              # submit, poll, download
+```
+
+### Non-negotiables
+
+**Quality `low`.** Image output tokens dominate the bill and the tiers are far
+apart. Measured on `gpt-image-2`: a 1536x1024 image is **158 output tokens at
+`low`** vs 1372 at `medium` and 5488 at `high`. At Batch pricing ($15 / 1M
+output tokens) 1000 images is ~$2.37 at `low` and ~$82 at `high`. `low` is
+visibly fine for this material. Never leave quality at `auto` — it picks its
+own tier per prompt, costing ~2x `low` with no control.
+
+**Size `1536x1024`** unless there is a specific reason otherwise. It is also
+the cheaper option: 158 tokens vs 196 for `1024x1024` at the same quality.
+
+**Batch API, always.** Half price, and a 20-image job returns in well under a
+minute in practice despite the 24h window. The generator chunks into
+`--batch-size` jobs and streams each output file — do not "simplify" that away:
+images come back as inline base64 (~3.6 MB per 1024px PNG), so a 1000-image
+batch would build a ~3.6 GB string and blow V8's ~512 MB string cap.
+
+### Style
+
+**Isometric illustration is the house style.** It survived every test: clean
+subject isolation, reads on both page backgrounds, and cuts out reliably.
+Default to it.
+
+**Risograph is the occasional exception**, and only for a *simple* subject —
+typically a mascot moment. Of the risographs tried, only `strings` (a ribbon of
+tiles) worked; `dictionaries`, `exceptions`, and `history` were all too busy.
+The marmot-in-the-mountains thumbnail looks great as a standalone image but did
+not survive background removal.
+
+**Avoid** flat geometric vector, line art, blueprint schematic, and cut-paper
+collage.
+
+| Style | Use |
+| --- | --- |
+| isometric illustration | ✅ default |
+| risograph | ⚠️ occasionally, simple subjects / mascot only |
+| flat geometric vector | ❌ |
+| line art illustration | ❌ |
+| blueprint schematic | ❌ |
+| cut-paper collage | ❌ |
+
+**Always render in the brand palette** (the four primaries above). This is not
+only aesthetic: see the transparency constraint below.
+
+### Background removal
+
+Recraft `remove-background` via Kie AI. It beat both Replicate's
+`851-labs/background-remover` and a local colour-key: it isolates a subject out
+of a full-bleed scene rather than dissolving the frame into a ghost matte.
+
+Two API details that will otherwise cost an hour:
+
+- **The model input takes a public URL only** — no base64, no data URI. Upload
+  the PNG to Kie's own file endpoint first
+  (`https://kieai.redpandaai.co/api/file-base64-upload`, free, auto-deleted
+  after 24h) and pass the returned `downloadUrl`.
+- **Both Kie hosts sit behind Cloudflare and reject a request with no browser
+  `User-Agent`**, returning a bare 403 with `error code: 1010`. It reads like
+  an auth failure and is not.
+
+Flow: upload → `POST https://api.kie.ai/api/v1/jobs/createTask` with
+`{"model": "recraft/remove-background", "input": {"image": "<url>"}}` → poll
+`GET https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…` until
+`state` is `success`, then read `resultJson.resultUrls[0]`. ~1 credit, ~3s each.
+
+**`gpt-image-2` cannot emit transparency itself.** The API rejects
+`background: "transparent"`, and asking for it in the prompt makes the model
+paint a fake checkerboard as real pixels. Removal is always a second step.
+
+### The transparency constraint
+
+Removing the background strips the white field that was making single-tone
+artwork legible. A monochrome cut-out only reads against one of the two page
+backgrounds — black linework is crisp on `#ffffff` and nearly invisible on
+`#121212`. No background remover can fix this; the fix is upstream.
+
+**So: any illustration meant to run transparent must be drawn in the brand
+colours, never in black, white, or a single hue.** Polychrome subjects survive
+both themes; monochrome ones do not.
+
+Check both themes with the toggle on `/illustration-prompts`, which renders
+each cut-out over the live page background for exactly this reason.
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.
