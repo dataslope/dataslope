@@ -8,61 +8,14 @@ is doing under the hood. But a beginner who builds a *correct mental
 model* of program execution will progress faster, and will be far
 better at debugging, than one who just memorises syntax.
 
+<Figure
+  slug="js-how-computers-execute-cutout"
+  alt="How computers execute programs, an isometric illustration"
+/>
+
 This page builds that mental model from scratch. We are going to
 zoom out, look at a computer the way it really is, and watch a
 program run from the inside.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A central chip with a glowing core, joined by dotted traces to a column of memory slots on one side and input and output shapes on the other"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="390" cy="95" r="3" />
-    <circle cx="412" cy="95" r="3" />
-    <circle cx="434" cy="95" r="3" />
-    <circle cx="456" cy="95" r="3" />
-    <circle cx="390" cy="150" r="3" />
-    <circle cx="412" cy="150" r="3" />
-    <circle cx="434" cy="150" r="3" />
-    <circle cx="456" cy="150" r="3" />
-    <circle cx="250" cy="95" r="3" />
-    <circle cx="228" cy="95" r="3" />
-    <circle cx="206" cy="95" r="3" />
-    <circle cx="184" cy="95" r="3" />
-    <circle cx="250" cy="161" r="3" />
-    <circle cx="228" cy="164" r="3" />
-    <circle cx="206" cy="167" r="3" />
-    <circle cx="184" cy="170" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="281" y="56" width="12" height="8" rx="2" />
-    <rect x="305" y="56" width="12" height="8" rx="2" />
-    <rect x="329" y="56" width="12" height="8" rx="2" />
-    <rect x="353" y="56" width="12" height="8" rx="2" />
-    <rect x="281" y="176" width="12" height="8" rx="2" />
-    <rect x="305" y="176" width="12" height="8" rx="2" />
-    <rect x="329" y="176" width="12" height="8" rx="2" />
-    <rect x="353" y="176" width="12" height="8" rx="2" />
-    <rect x="270" y="70" width="100" height="100" rx="18" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="302" y="102" width="36" height="36" rx="9" />
-    <circle cx="150" cy="95" r="20" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="130" y="150" width="40" height="40" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="470" y="60" width="90" height="18" rx="4" />
-    <rect x="470" y="84" width="90" height="18" rx="4" fillOpacity="0.45" />
-    <rect x="470" y="108" width="90" height="18" rx="4" />
-    <rect x="470" y="132" width="90" height="18" rx="4" />
-    <rect x="470" y="156" width="90" height="18" rx="4" fillOpacity="0.45" />
-    <rect x="470" y="180" width="90" height="18" rx="4" />
-  </g>
-</svg>
 
 ## Three things a computer fundamentally has
 

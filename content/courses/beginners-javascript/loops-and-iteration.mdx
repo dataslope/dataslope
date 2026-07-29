@@ -10,42 +10,13 @@ every row in a table, every pixel on a screen, every customer in a
 database. That repetition is called **iteration**, and the
 syntactic tools for it are called **loops**.
 
+<Figure
+  slug="js-loops-and-iteration-cutout"
+  alt="Loops and iteration, an isometric illustration"
+/>
+
 JavaScript has several kinds of loop. We will learn each one and,
 just as importantly, when to use which.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A row of squares being colored in one at a time, a marker over the current square, and a smooth arrow sweeping from the end of the row back to the start, a loop repeating over items"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="130" y="70" width="34" height="34" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="210" y="70" width="34" height="34" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="290" y="70" width="34" height="34" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="387" cy="48" r="6" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="370" y="70" width="34" height="34" rx="8" />
-    <rect x="450" y="70" width="34" height="34" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M467 118 C 472 172, 172 172, 147.3 121"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <polygon points="152.9,122.8 147,112 141.9,123.2" fill="currentColor" />
-  </g>
-</svg>
 
 ## The `while` loop
 
@@ -384,30 +355,6 @@ N-element loop runs the inner body N×N times. For N=10 that's
 100, fine. For N=10,000 that's 100,000,000, possibly too slow.
 
 ## Beware the infinite loop
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="A closed ring of blue dots with a single red dot trapped on it, a loop with no way out"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.75">
-    <circle cx="363" cy="105" r="7" />
-    <circle cx="345" cy="123" r="7" />
-    <circle cx="320" cy="130" r="7" />
-    <circle cx="295" cy="123" r="7" />
-    <circle cx="277" cy="105" r="7" />
-    <circle cx="270" cy="80" r="7" />
-    <circle cx="277" cy="55" r="7" />
-    <circle cx="295" cy="37" r="7" />
-    <circle cx="320" cy="30" r="7" />
-    <circle cx="345" cy="37" r="7" />
-    <circle cx="363" cy="55" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="370" cy="80" r="10" />
-  </g>
-</svg>
 
 Always ask: *how does this loop end?* Common mistakes:
 

@@ -10,48 +10,16 @@ makes the underlying ideas explicit. You don't need to become a
 strict functional programmer to benefit from them; you just need
 the *intuition*.
 
+<Figure
+  slug="js-functional-intuition-cutout"
+  alt="Functional intuition, an isometric illustration"
+/>
+
 Three ideas do most of the work:
 
 1. **Pure functions**, same input, same output, no surprises.
 2. **Immutability**, prefer creating new values to mutating old ones.
 3. **Data in, data out**, programs as pipelines of transformations.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A scattered cloud of colored dots passes through two translucent lenses and emerges as an evenly spaced line"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="60" cy="62" r="6" />
-    <circle cx="476" cy="100" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="86" cy="112" r="6" />
-    <circle cx="260" cy="78" r="5" />
-    <circle cx="444" cy="100" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="70" cy="152" r="6" />
-    <circle cx="122" cy="56" r="6" />
-    <circle cx="260" cy="122" r="5" />
-    <circle cx="412" cy="100" r="7" />
-    <circle cx="540" cy="100" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="104" cy="82" r="6" />
-    <circle cx="94" cy="136" r="6" />
-    <circle cx="260" cy="100" r="5" />
-    <circle cx="380" cy="100" r="7" />
-    <circle cx="508" cy="100" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="220" cy="100" r="55" fillOpacity="0.16" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="300" cy="100" r="55" fillOpacity="0.16" />
-  </g>
-</svg>
 
 ## Pure functions
 
