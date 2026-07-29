@@ -113,6 +113,14 @@ export function Figure({
         />
       </picture>
       {caption ? <figcaption className={styles.caption}>{caption}</figcaption> : null}
+      {/* Regeneration handle. The prompt id is the slug with the `-cutout`
+          suffix dropped, which is what `data/illustration-prompts.json` is keyed
+          by and what every pipeline script takes as `--only`. Rendered so a
+          reviewer reading the live page can name the exact image to redo
+          without cross-referencing the gallery. */}
+      <figcaption className={styles.assetId}>
+        <code>{slug.replace(/-cutout$/, "")}</code>
+      </figcaption>
     </figure>
   );
 }

@@ -59,3 +59,22 @@
   font-family: var(--font-mono, monospace);
   font-size: 0.75rem;
 }
+
+/* The image's regeneration handle: the prompt id from
+   data/illustration-prompts.json, the string a pipeline script wants for
+   `--only`. Deliberately quiet — it sits below the caption, at the smallest
+   readable size and the most muted foreground, so it reads as a plate number
+   rather than competing with the lesson. */
+.assetId {
+  margin-top: 0.35rem;
+  text-align: center;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--color-fd-muted-foreground);
+  opacity: 0.55;
+}
+
+.assetId code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  user-select: all;
+}
