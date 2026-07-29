@@ -87,19 +87,77 @@ in Claude Code sessions; do not ask for them and never write them into a file.
 
 ### The pipeline
 
+Four steps, three scripts. Candidates live in R2 until someone picks the
+keepers; only the keepers reach git.
+
 1. **Author** the prompt in `data/illustration-prompts.json` (one source of
    truth: the `/illustration-prompts` gallery, the in-lesson `<Figure>`, and
-   the generator all read it).
-2. **Generate** with `scripts/generate-illustrations.mjs` — OpenAI `gpt-image-2`,
+   every script read it).
+2. **Generate** — `scripts/generate-illustrations.mjs`, OpenAI `gpt-image-2`,
    **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
-3. **Remove the background** with Recraft's `remove-background` through Kie AI.
-4. **Place** the source in `assets/images/`, run `npm run build:images`, and
-   embed with `<Figure slug="…" alt="…" />`.
+3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
+   `remove-background` through Kie AI. Writes a `-cutout` beside each original.
+4. **Promote** — `scripts/promote-illustrations.mjs` converts the chosen
+   candidates to WebP, writes them to `assets/images/`, and runs
+   `build-images`. Then embed with `<Figure slug="…" alt="…" />`.
 
 ```bash
-# generate (low + batch are the defaults; --out defaults to ./generated-illustrations)
-node scripts/generate-illustrations.mjs dry-run          # prompts + projected cost, no API calls
-node scripts/generate-illustrations.mjs run              # submit, poll, download
+# Local run: everything on disk, nothing touches R2.
+node scripts/generate-illustrations.mjs dry-run        # prompts + projected cost, no API calls
+node scripts/generate-illustrations.mjs run            # submit, poll, download
+node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
+node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
+
+# Bulk run: candidates land in R2 under one run id, promote only the keepers.
+node scripts/generate-illustrations.mjs run --sink r2 --run 2026-07-29-python
+node scripts/remove-background-kie.mjs --from r2 --run 2026-07-29-python
+node scripts/promote-illustrations.mjs --from r2 --run 2026-07-29-python python-basics-loops
+```
+
+All four API keys are already environment variables in Claude Code sessions:
+`OPENAI_API_KEY` and `KIE_API_KEY`. The R2 variables
+(`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
+`R2_BUCKET=dataslope-illustrations`) are only needed for `--sink r2` /
+`--from r2`; without them, stick to the disk flow, which is fully functional.
+
+### Committed images are WebP, never PNG
+
+`promote-illustrations.mjs` writes `assets/images/<id>.webp`. Do not commit PNG
+sources. Measured on the Python Basics batch: 40 images were **58.1 MB as PNG
+and 7.6 MB as WebP**, and that ratio projects to ~2.9 GB vs ~266 MB per
+thousand. `build-images.mjs` already accepts `.webp` sources, so nothing
+downstream changes.
+
+A WebP source is re-encoded once more by `build-images` (its own quality 80) for
+serving, which is why promote writes at quality 92 — the second pass then has
+headroom. Spot-checked at 100% zoom on the grainiest risograph in the set, the
+result is indistinguishable from the PNG original.
+
+**Never leave both `<id>.png` and `<id>.webp` in `assets/images/`** — they
+slugify to the same manifest key and collide.
+
+### R2 (candidate storage)
+
+Bucket `dataslope-illustrations`, keys
+`illustrations/<runId>/<promptId>/v<n>/{original,cutout}.png`. Run-scoped so a
+whole run is one prefix delete, and so a lifecycle rule can expire candidates
+without bookkeeping. Candidates stay PNG in R2 (pristine, re-processable);
+only the promoted copy is WebP.
+
+There is no D1 table and no Worker binding for this bucket by design: the
+scripts are authoring tools that talk to the S3 API directly (SigV4 in
+`scripts/lib/r2.mjs`, no AWS SDK), so content authoring stays decoupled from
+deploying the app.
+
+Two one-time setup steps that must be done by a human in the Cloudflare
+dashboard, since neither the MCP connector nor an API token can do them:
+
+```bash
+# 1. Mint an R2 API token: dashboard → R2 → Manage API tokens → Object Read & Write
+#    scoped to dataslope-illustrations, then export the three R2_* variables.
+# 2. Expire candidates after 30 days so rejects clean themselves up:
+npx wrangler r2 bucket lifecycle add dataslope-illustrations \
+  --prefix illustrations/ --expire-days 30
 ```
 
 ### Non-negotiables

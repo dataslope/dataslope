@@ -41,6 +41,12 @@
  *
  * Options:
  *   --out <dir>          Output directory (default: ./generated-illustrations)
+ *   --sink <disk|r2>     Where images land (default: disk). `r2` uploads each
+ *                        image under illustrations/<runId>/<promptId>/v<n>/ so
+ *                        rejected candidates never reach git; promote the
+ *                        keepers with scripts/promote-illustrations.mjs.
+ *   --run <id>           Run id for the R2 key prefix (default: a timestamp)
+ *   --variant <n>        Variant number for the R2 key (default: 1)
  *   --only <id[,id...]>  Only these prompt ids
  *   --category <cat>     Only this category (course-thumbnail | course-illustration | ...)
  *   --size <WxH|auto>    Override the per-category size for every prompt
@@ -75,6 +81,7 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
@@ -95,6 +102,9 @@ function parseArgs(argv) {
   const opts = {
     command: null,
     out: join(process.cwd(), "generated-illustrations"),
+    sink: "disk",
+    run: null,
+    variant: 1,
     only: null,
     category: null,
     size: null,
@@ -118,6 +128,9 @@ function parseArgs(argv) {
     const next = () => argv[++i];
     switch (a) {
       case "--out": opts.out = next(); break;
+      case "--sink": opts.sink = next(); break;
+      case "--run": opts.run = next(); break;
+      case "--variant": opts.variant = Math.max(1, Number(next()) || 1); break;
       case "--only": opts.only = next().split(",").map((s) => s.trim()).filter(Boolean); break;
       case "--category": opts.category = next(); break;
       case "--size": opts.size = next(); break;
@@ -264,13 +277,11 @@ function selectEntries(data, opts) {
     console.error("No prompts matched the given filters.");
     process.exit(1);
   }
-  const ext = outputExt(opts);
   return prompts.map((p) => ({
     id: p.id,
     category: p.category,
     size: (meta.sizes && meta.sizes[p.category]) || "1024x1024",
     prompt: buildPrompt(p, meta.brandColors),
-    outPath: join(opts.out, `${p.id}.${ext}`),
   }));
 }
 
@@ -283,10 +294,50 @@ function chunk(entries, size) {
 }
 
 /** Decode a base64 image payload from an images response body and write it. */
-function writeImage(outPath, respBody) {
+function decodeImage(respBody) {
   const b64 = respBody?.data?.[0]?.b64_json;
   if (!b64) throw new Error("response contained no image data (b64_json)");
-  writeFileSync(outPath, Buffer.from(b64, "base64"));
+  return Buffer.from(b64, "base64");
+}
+
+/** R2 key for one candidate image. Mirrors promote-illustrations.mjs. */
+export function candidateKey(runId, promptId, variant, kind) {
+  return `illustrations/${runId}/${promptId}/v${variant}/${kind}.png`;
+}
+
+/**
+ * Where generated images land.
+ *
+ * `disk` is the default and keeps one-off local work frictionless. `r2` exists
+ * because most candidates are rejects: generating several variants per
+ * illustration and keeping one means three quarters of the bytes should never
+ * reach git. Uploading them under a run-scoped prefix keeps them reviewable,
+ * makes a whole run deletable with a single prefix delete, and lets a bucket
+ * lifecycle rule expire them without any bookkeeping.
+ */
+function makeSink(opts) {
+  const ext = outputExt(opts);
+  if (opts.sink === "disk") {
+    return {
+      describe: opts.out,
+      skip: (id) => !opts.force && existsSync(join(opts.out, `${id}.${ext}`)),
+      label: (id) => `${id}.${ext}`,
+      init: () => mkdirSync(opts.out, { recursive: true }),
+      write: async (id, buf) => writeFileSync(join(opts.out, `${id}.${ext}`), buf),
+    };
+  }
+  const client = createR2Client(credentialsFromEnv());
+  const runId = opts.run;
+  return {
+    describe: `r2://${client.bucket}/illustrations/${runId}/`,
+    // No per-object existence check: a HEAD per candidate would cost a round
+    // trip each, and re-uploading the same key is idempotent anyway.
+    skip: () => false,
+    label: (id) => candidateKey(runId, id, opts.variant, "original"),
+    init: () => {},
+    write: async (id, buf) =>
+      client.put(candidateKey(runId, id, opts.variant, "original"), buf, `image/${opts.outputFormat}`),
+  };
 }
 
 // ── Commands ─────────────────────────────────────────────────────────────────
@@ -433,27 +484,25 @@ async function* streamFileLines(fileId, key) {
 }
 
 /** Stream one batch's output file, writing every successful image as it arrives. */
-async function writeBatchOutputs(fileId, opts, key) {
-  const ext = outputExt(opts);
+async function writeBatchOutputs(fileId, opts, key, sink) {
   let ok = 0;
   let failed = 0;
   for await (const line of streamFileLines(fileId, key)) {
     const row = JSON.parse(line);
-    const outPath = join(opts.out, `${row.custom_id}.${ext}`);
     if (row.error || row.response?.status_code !== 200) {
       failed++;
       const msg = row.error?.message || row.response?.body?.error?.message || "unknown error";
       console.error(`  ✗ ${row.custom_id}: ${msg}`);
       continue;
     }
-    if (!opts.force && existsSync(outPath)) {
+    if (sink.skip(row.custom_id)) {
       console.log(`  • skip ${row.custom_id} (exists; use --force)`);
       continue;
     }
     try {
-      writeImage(outPath, row.response.body);
+      await sink.write(row.custom_id, decodeImage(row.response.body));
       ok++;
-      console.log(`  ✓ ${row.custom_id}.${ext}`);
+      console.log(`  ✓ ${sink.label(row.custom_id)}`);
     } catch (err) {
       failed++;
       console.error(`  ✗ ${row.custom_id}: ${err.message}`);
@@ -463,7 +512,7 @@ async function writeBatchOutputs(fileId, opts, key) {
 }
 
 /** Download one completed batch. Returns per-batch counts. */
-async function downloadBatch(b, opts, key) {
+async function downloadBatch(b, opts, key, sink) {
   if (b.status !== "completed") {
     console.error(`  ! batch ${b.id} is ${b.status}, skipping`);
     return { ok: 0, failed: 0 };
@@ -478,22 +527,22 @@ async function downloadBatch(b, opts, key) {
     console.error(`  ! batch ${b.id} completed but has no output file`);
     return { ok: 0, failed: 0 };
   }
-  return writeBatchOutputs(b.output_file_id, opts, key);
+  return writeBatchOutputs(b.output_file_id, opts, key, sink);
 }
 
-async function cmdDownload(opts, key, batches) {
-  mkdirSync(opts.out, { recursive: true });
+async function cmdDownload(opts, key, batches, sink = makeSink(opts)) {
+  sink.init();
   const list =
     batches ||
     (await Promise.all(resolveBatchIds(opts).map((id) => retrieveBatch(id, key))));
   let ok = 0;
   let failed = 0;
   for (const b of list) {
-    const r = await downloadBatch(b, opts, key);
+    const r = await downloadBatch(b, opts, key, sink);
     ok += r.ok;
     failed += r.failed;
   }
-  console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${opts.out}`);
+  console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${sink.describe}`);
   if (failed > 0) process.exitCode = 1;
 }
 
@@ -523,7 +572,8 @@ async function cmdRun(entries, opts, model, key) {
     `Submitting ${entries.length} prompt(s) across ${chunks.length} batch job(s), ` +
       `max ${opts.maxInFlight} in flight.\n`,
   );
-  mkdirSync(opts.out, { recursive: true });
+  const sink = makeSink(opts);
+  sink.init();
 
   const submitted = [];
   let ok = 0;
@@ -543,7 +593,7 @@ async function cmdRun(entries, opts, model, key) {
         failed += chunks[i].length;
         continue;
       }
-      const r = await downloadBatch(done, opts, key);
+      const r = await downloadBatch(done, opts, key, sink);
       ok += r.ok;
       failed += r.failed;
     }
@@ -552,14 +602,15 @@ async function cmdRun(entries, opts, model, key) {
   await Promise.all(
     Array.from({ length: Math.min(opts.maxInFlight, chunks.length) }, worker),
   );
-  console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${opts.out}`);
+  console.log(`\nDone: ${ok} written, ${failed} failed. Output in ${sink.describe}`);
   if (failed > 0) process.exitCode = 1;
 }
 
 async function cmdSync(entries, opts, model, key) {
-  mkdirSync(opts.out, { recursive: true });
+  const sink = makeSink(opts);
+  sink.init();
   const todo = entries.filter((e) => {
-    if (!opts.force && existsSync(e.outPath)) {
+    if (sink.skip(e.id)) {
       console.log(`  • skip ${e.id} (exists; use --force)`);
       return false;
     }
@@ -579,9 +630,9 @@ async function cmdSync(entries, opts, model, key) {
           key,
           json: requestBody(e, opts, model),
         });
-        writeImage(e.outPath, await res.json());
+        await sink.write(e.id, decodeImage(await res.json()));
         ok++;
-        console.log(`  ✓ ${e.id}.png`);
+        console.log(`  ✓ ${sink.label(e.id)}`);
       } catch (err) {
         failed++;
         console.error(`  ✗ ${e.id}: ${err.message}`);
@@ -591,7 +642,7 @@ async function cmdSync(entries, opts, model, key) {
   await Promise.all(
     Array.from({ length: Math.min(opts.concurrency, todo.length) }, worker),
   );
-  console.log(`\nDone: ${ok} generated, ${failed} failed. Output in ${opts.out}`);
+  console.log(`\nDone: ${ok} generated, ${failed} failed. Output in ${sink.describe}`);
   if (failed > 0) process.exitCode = 1;
 }
 
@@ -616,6 +667,17 @@ async function main() {
   if (!["auto", "low", "medium", "high"].includes(opts.quality)) {
     console.error(`Unsupported --quality "${opts.quality}". Use auto, low, medium, or high.`);
     process.exit(1);
+  }
+  if (!["disk", "r2"].includes(opts.sink)) {
+    console.error(`Unsupported --sink "${opts.sink}". Use disk or r2.`);
+    process.exit(1);
+  }
+  if (opts.sink === "r2" && !opts.run) {
+    // A run id groups every candidate from one invocation under one prefix, so
+    // the whole run can be deleted or expired as a unit. Default to a sortable
+    // UTC timestamp when the caller does not supply one.
+    opts.run = new Date().toISOString().replace(/[:.]/g, "-").replace(/Z$/, "");
+    console.log(`No --run given; using run id ${opts.run}`);
   }
 
   const data = JSON.parse(readFileSync(DATA_FILE, "utf8"));
