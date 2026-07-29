@@ -149,16 +149,18 @@ scripts are authoring tools that talk to the S3 API directly (SigV4 in
 `scripts/lib/r2.mjs`, no AWS SDK), so content authoring stays decoupled from
 deploying the app.
 
-Two one-time setup steps that must be done by a human in the Cloudflare
-dashboard, since neither the MCP connector nor an API token can do them:
+Candidates expire after **7 days**, applied by
+`.github/workflows/r2-illustrations-lifecycle.yml` (run it via
+workflow_dispatch, or it re-applies on push when the retention window is
+edited). Cloudflare does the deleting server-side, so nothing polls. That is
+the review window: generate, review in `/illustration-prompts`, promote the
+keepers inside a week. Promotion copies bytes into `assets/images/`, so an
+expired candidate that was already promoted costs nothing.
 
-```bash
-# 1. Mint an R2 API token: dashboard → R2 → Manage API tokens → Object Read & Write
-#    scoped to dataslope-illustrations, then export the three R2_* variables.
-# 2. Expire candidates after 30 days so rejects clean themselves up:
-npx wrangler r2 bucket lifecycle add dataslope-illustrations \
-  --prefix illustrations/ --expire-days 30
-```
+The same R2 credentials back the Actions workflows and the local scripts
+(`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
+`r2-cache-cleanup.yml`). The token needs Object Read & Write covering
+`dataslope-illustrations`.
 
 ### Non-negotiables
 
