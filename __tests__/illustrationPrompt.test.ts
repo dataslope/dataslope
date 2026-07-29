@@ -17,16 +17,22 @@ import {
 // "No text."), and the file name must be a stable PNG slug.
 
 describe("buildIllustrationPrompt", () => {
-  it("formats a risograph prompt with the four brand colors and No text.", () => {
+  it("defaults to the isometric house style, with brand colors and No text.", () => {
     expect(
       buildIllustrationPrompt({ subject: "a logistics center full of packages" }),
     ).toBe(
-      "A risograph of a logistics center full of packages. No text.\n\n" +
+      "An isometric illustration of a logistics center full of packages. No text.\n\n" +
         "Blue: #148cff\n" +
         "Green: #20c621\n" +
         "Red: #ff4f59\n" +
         "Yellow: #ffdd6c",
     );
+  });
+
+  it("still honours an explicitly authored risograph", () => {
+    expect(
+      buildIllustrationPrompt({ subject: "a ribbon of tiles", style: "risograph" }),
+    ).toContain("A risograph of a ribbon of tiles. No text.");
   });
 
   it("uses 'An' for a vowel-initial style and honours custom styles/colors", () => {

@@ -13,7 +13,7 @@
  * and the target file name. One source of truth, no per-call-site duplication.
  *
  * The prompts target OpenAI's GPT Image 2 and follow the Dataslope house style:
- * a risograph illustration of a subject, rendered in the four brand colors. See
+ * an isometric illustration of a subject, rendered in the four brand colors. See
  * `data/illustration-prompts.json` `meta.brandColors`.
  *
  * Pure (no Node/DOM APIs) so it can be imported from a client component, a
@@ -36,17 +36,22 @@ export const BRAND_COLORS: BrandColors = {
   yellow: "#ffdd6c",
 };
 
-/** The house illustration style when a prompt does not name its own. */
-export const DEFAULT_STYLE = "risograph";
+/** The house illustration style when a prompt does not name its own.
+ *  Isometric is the default because it was the one style that survived every
+ *  test: it isolates a subject cleanly, reads on both page backgrounds, and
+ *  cuts out reliably. Risograph is reserved for simple mascot moments; see
+ *  the "Illustrations" section of AGENTS.md. */
+export const DEFAULT_STYLE = "isometric illustration";
 
 /** The minimal shape needed to build a generation prompt. */
 export interface IllustrationSpec {
-  /** What to illustrate, phrased to read naturally after "A risograph of "
-   *  (e.g. "the Dataslope marmot mascot waving beside a monitor"). */
+  /** What to illustrate, phrased to read naturally after "An isometric
+   *  illustration of " (e.g. "a marmot waving beside a monitor"). */
   subject: string;
   /** Illustration style descriptor, inserted after the article, e.g.
-   *  "risograph" (default), "flat geometric vector illustration",
-   *  "line art illustration", "isometric illustration", "blueprint schematic". */
+   *  "isometric illustration" (default) or "risograph". The other styles
+   *  tried (flat geometric vector, line art, blueprint schematic, cut-paper
+   *  collage) are discouraged, see AGENTS.md. */
   style?: string;
 }
 
@@ -58,7 +63,7 @@ function article(style: string): string {
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
  *
- *   A risograph of the Dataslope marmot mascot waving beside a monitor. No text.
+ *   An isometric illustration of a marmot waving beside a monitor. No text.
  *
  *   Blue: #148cff
  *   Green: #20c621

@@ -6,8 +6,8 @@
  * Reads the prompt definitions from `data/illustration-prompts.json` (the same
  * source of truth the `/illustration-prompts` gallery and the in-lesson
  * `<IllustrationPrompt>` cards render), builds each generation prompt in the
- * Dataslope house style (a risograph of the subject, in the four brand colors),
- * and writes one PNG per prompt named `<id>.png`.
+ * Dataslope house style (an isometric illustration of the subject, in the four
+ * brand colors), and writes one PNG per prompt named `<id>.png`.
  *
  * By default it uses the OpenAI **Batch API** (~50% cheaper, async, up to a 24h
  * completion window) at **low** quality, packing the prompts into JSONL jobs
@@ -19,7 +19,7 @@
  * one 1024x1024 image is 196 output tokens at `low` but 1372 at `medium` and
  * 5488 at `high` — so at Batch pricing ($15 / 1M output tokens) a 1000-image
  * run is ~$2.94 low vs ~$82 high. `low` is more than good enough for flat
- * vector / risograph art; override with `--quality` for a hero image.
+ * isometric / risograph art; override with `--quality` for a hero image.
  *
  * Why the work is split across several batches: every image comes back as
  * inline base64 inside the batch's output JSONL, and one 1024x1024 PNG is
@@ -99,7 +99,7 @@ function parseArgs(argv) {
     category: null,
     size: null,
     // Low is the default on purpose: it is ~7x cheaper than medium and ~28x
-    // cheaper than high, and holds up for flat vector / risograph art.
+    // cheaper than high, and holds up for isometric / risograph art.
     quality: "low",
     background: "auto",
     outputFormat: "png",
@@ -156,7 +156,8 @@ function printHelp() {
 /** Exported so `__tests__/illustrationPrompt.test.ts` can assert this stays
  *  byte-identical to the TypeScript `buildIllustrationPrompt`. */
 export function buildPrompt(spec, colors) {
-  const style = (spec.style && spec.style.trim()) || "risograph";
+  // Mirror of DEFAULT_STYLE in lib/illustrationPrompt.ts (pinned by a parity test).
+  const style = (spec.style && spec.style.trim()) || "isometric illustration";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
   return (
     `${article} ${style} of ${spec.subject}. No text.\n\n` +

@@ -124,7 +124,9 @@ batch would build a ~3.6 GB string and blow V8's ~512 MB string cap.
 
 **Isometric illustration is the house style.** It survived every test: clean
 subject isolation, reads on both page backgrounds, and cuts out reliably.
-Default to it.
+Default to it — it is also the literal default (`DEFAULT_STYLE` in
+`lib/illustrationPrompt.ts` and `meta.defaultStyle` in the JSON), so a prompt
+that omits `style` gets it automatically.
 
 **Risograph is the occasional exception**, and only for a *simple* subject —
 typically a mascot moment. Of the risographs tried, only `strings` (a ribbon of
