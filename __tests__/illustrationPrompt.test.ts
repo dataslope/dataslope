@@ -94,7 +94,7 @@ describe("getIllustrationPrompts", () => {
     expect(thumb).toBeDefined();
     expect(thumb?.route).toBe("/courses/python-basics");
     expect(thumb?.file).toBe("python-basics-thumbnail.png");
-    expect(thumb?.prompt).toContain("A risograph of");
+    expect(thumb?.prompt).toContain("An isometric illustration of");
   });
 
   it("deep-links a lesson-embedded illustration and reflects its style", () => {
