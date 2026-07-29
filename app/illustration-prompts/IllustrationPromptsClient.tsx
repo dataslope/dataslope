@@ -106,7 +106,7 @@ function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
             className={styles.imageCutout}
           />
           <span className={styles.imageLabel}>
-            Background removed · Replicate 851-labs/background-remover
+            Background removed · Recraft remove-background via Kie AI
           </span>
         </div>
       ) : null}
