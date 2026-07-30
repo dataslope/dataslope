@@ -7,54 +7,13 @@ A customer signs up without an email. An order points to no customer.
 A product is saved with a negative price. Should your application
 remember to catch every one of those mistakes, every time?
 
+<Figure
+  slug="db-what-are-constraints-cutout"
+  alt="What constraints are, an isometric illustration"
+/>
+
 A well-designed schema does not merely *suggest* good data. It uses
 **constraints** to make bad data impossible to store.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Valid shapes slip through the gap between two green gate bars while a red triangle is deflected away, constraints rejecting bad data at the door"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="302" y="22" width="20" height="56" rx="9" />
-    <rect x="302" y="122" width="20" height="56" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="100" r="12" />
-    <path
-      d="M170 100 H 214"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.4"
-    />
-    <circle cx="430" cy="100" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="486" y="88" width="24" height="24" rx="7" />
-    <path
-      d="M348 100 H 386"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.5"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="246,128 268,166 224,166" />
-    <path
-      d="M262 134 L 292 104"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.5"
-    />
-  </g>
-</svg>
 
 ## Constraints are enforced rules
 

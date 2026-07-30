@@ -10,6 +10,11 @@ mutexes, and acquire any other resource you can imagine, and have
 them all released correctly, on every code path, with no manual
 cleanup calls.
 
+<Figure
+  slug="cpp-raii-and-resources-cutout"
+  alt="RAII and resources, an isometric illustration"
+/>
+
 The name comes from Bjarne Stroustrup himself, who developed the
 technique while designing C++'s exception handling: if an error can
 interrupt a function at almost any point, the *only* reliable place
@@ -18,48 +23,6 @@ guarantees to run. Even Stroustrup has admitted the name is clumsy,
 but the idea behind it is so load-bearing that the C++ community
 kept the awkward acronym and built the entire modern standard
 library on top of it.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Inside a translucent scope bubble a blue dot holds a green resource on a thin leash; where the bubble has closed on the right, the resource is gone and only green sparks remain, acquisition tied to lifetime, release guaranteed at the end"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="110" r="85" fillOpacity="0.1" />
-    <circle cx="185" cy="92" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M196 102 C 214 116, 230 128, 246 140"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="244" y="138" width="28" height="28" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M324 110 H 392"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <circle cx="480" cy="110" r="40" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="524" y="92" width="24" height="24" rx="6" fillOpacity="0.18" />
-    <circle cx="560" cy="80" r="4" fillOpacity="0.5" />
-    <circle cx="574" cy="104" r="3.5" fillOpacity="0.45" />
-    <circle cx="562" cy="128" r="3" fillOpacity="0.4" />
-  </g>
-</svg>
 
 ## What is a "resource"?
 

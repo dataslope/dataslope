@@ -7,31 +7,13 @@ An order belongs to a customer. A comment belongs to a post. A payment
 belongs to an invoice. In a database design, those sentences must become
 columns and constraints.
 
+<Figure
+  slug="db-foreign-keys-cutout"
+  alt="Foreign keys, an isometric illustration"
+/>
+
 A **foreign key** is the design tool that turns "belongs to" into a
 trustworthy relationship.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Two puzzle pieces about to snap together: the blue parent piece offers a round yellow tab that exactly fits the notch in the green child piece, a foreign key locking a row to the one it belongs to"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="70" width="140" height="80" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="260" cy="110" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M312 70 H 528 A 12 12 0 0 1 540 82 V 138 A 12 12 0 0 1 528 150 H 312 A 12 12 0 0 1 300 138 V 124 A 14 14 0 0 0 300 96 V 82 A 12 12 0 0 1 312 70 Z" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <rect x="138" y="94" width="76" height="9" rx="4.5" />
-    <rect x="138" y="112" width="56" height="9" rx="4.5" />
-    <rect x="336" y="94" width="76" height="9" rx="4.5" />
-    <rect x="336" y="112" width="56" height="9" rx="4.5" />
-  </g>
-</svg>
 
 ## A relationship needs a reference
 

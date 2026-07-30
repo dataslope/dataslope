@@ -7,47 +7,13 @@ A table can pass 1NF and 2NF and still store a fact in the wrong place.
 The warning sign is subtler: a non-key column explains another non-key
 column.
 
+<Figure
+  slug="db-third-normal-form-cutout"
+  alt="Third normal form, an isometric illustration"
+/>
+
 **Third normal form (3NF)** says non-key columns should depend on the
 key, the whole key, and nothing but the key.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Non-key squares connect by thin lines straight to the yellow key circle at the center, except one square whose red line leans on another square instead, the transitive dependency third normal form removes"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M200 64 L 302 98" />
-    <path d="M200 146 L 302 112" />
-    <path d="M440 64 L 338 98" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M458 138 L 458 78"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="105" r="15" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="170" y="44" width="24" height="24" rx="7" />
-    <rect x="446" y="44" width="24" height="24" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="170" y="142" width="24" height="24" rx="7" />
-    <rect x="446" y="142" width="24" height="24" rx="7" />
-  </g>
-</svg>
 
 ## The transitive dependency problem
 

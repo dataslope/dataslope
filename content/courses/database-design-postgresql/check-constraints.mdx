@@ -6,28 +6,12 @@ description: Learn how CHECK constraints encode domain rules such as valid price
 A product with a negative price is not a discounted product. It is bad
 data. An order with status `banana` is not creative; it is invalid.
 
-A **CHECK** constraint lets the schema say those things out loud.
+<Figure
+  slug="db-check-constraints-cutout"
+  alt="Check constraints, an isometric illustration"
+/>
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A translucent green band marks the allowed range on a number line; values inside it sit safely while a red value lands outside the band"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.2">
-    <rect x="70" y="130" width="500" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="260" y="54" width="220" height="106" rx="14" fillOpacity="0.12" />
-    <rect x="260" y="54" width="220" height="8" rx="4" fillOpacity="0.4" />
-    <circle cx="300" cy="112" r="9" />
-    <circle cx="370" cy="92" r="9" />
-    <circle cx="436" cy="112" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="150" cy="108" r="9" />
-  </g>
-</svg>
+A **CHECK** constraint lets the schema say those things out loud.
 
 ## CHECK encodes a domain rule
 

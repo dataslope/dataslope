@@ -6,47 +6,14 @@ description: How to recognize relationships where both sides can connect to many
 A student can take many courses. A course can contain many students.
 Neither side is naturally the single parent of the other.
 
+<Figure
+  slug="db-many-to-many-cutout"
+  alt="Many-to-many relationships, an isometric illustration"
+/>
+
 That is a **many-to-many relationship**: many rows on the left can
 connect to many rows on the right. It is common, but it cannot be
 stored directly with one foreign key.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Every dot in the left column is linked by a thin line to every dot in the right column, weaving a tangle that a single foreign key cannot hold"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="105" r="30" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="55" r="12" />
-    <circle cx="150" cy="105" r="12" />
-    <circle cx="150" cy="155" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="490" cy="55" r="12" />
-    <circle cx="490" cy="105" r="12" />
-    <circle cx="490" cy="155" r="12" />
-  </g>
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    opacity="0.22"
-  >
-    <path d="M164 55 L 476 55" />
-    <path d="M164 55 L 476 105" />
-    <path d="M164 55 L 476 155" />
-    <path d="M164 105 L 476 55" />
-    <path d="M164 105 L 476 105" />
-    <path d="M164 105 L 476 155" />
-    <path d="M164 155 L 476 55" />
-    <path d="M164 155 L 476 105" />
-    <path d="M164 155 L 476 155" />
-  </g>
-</svg>
 
 ## Seeing both sides as many
 

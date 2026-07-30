@@ -6,6 +6,11 @@ description: Combine everything from the course into a single, multi-file, end-t
 This chapter is a small project that ties together almost every
 idea from the course. We'll build a complete program that:
 
+<Figure
+  slug="fp-capstone-pipeline-cutout"
+  alt="A functional data pipeline, an isometric illustration"
+/>
+
 1. **Parses** raw input strings into a typed domain.
 2. **Validates** them with `Result` so all errors are first-class.
 3. **Transforms** the valid records with a `pipe` of pure
@@ -14,51 +19,6 @@ idea from the course. We'll build a complete program that:
 5. **Reports** the output through a tiny imperative shell.
 
 There is no library involved; just plain TypeScript.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Raw text bars descend a five-step staircase, becoming typed blue shapes, then validated green ones while a red reject falls off the edge, and finally merge into one large green result on the lowest step, the whole pipeline from parsing to report"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.2">
-    <rect x="40" y="60" width="110" height="12" rx="6" />
-    <rect x="150" y="100" width="110" height="12" rx="6" />
-    <rect x="260" y="140" width="110" height="12" rx="6" />
-    <rect x="370" y="180" width="110" height="12" rx="6" />
-    <rect x="480" y="220" width="110" height="12" rx="6" />
-  </g>
-  <g fill="currentColor" opacity="0.4">
-    <rect x="58" y="38" width="30" height="6" rx="3" />
-    <rect x="96" y="48" width="24" height="6" rx="3" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="140" cy="78" r="3" />
-    <circle cx="152" cy="90" r="3" />
-    <circle cx="250" cy="118" r="3" />
-    <circle cx="262" cy="130" r="3" />
-    <circle cx="360" cy="158" r="3" />
-    <circle cx="372" cy="170" r="3" />
-    <circle cx="470" cy="198" r="3" />
-    <circle cx="482" cy="210" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="87" r="9" />
-    <rect x="203" y="78" width="18" height="18" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="290" cy="127" r="9" />
-    <rect x="313" y="118" width="18" height="18" rx="4" />
-    <circle cx="402" cy="167" r="9" />
-    <circle cx="427" cy="167" r="9" />
-    <circle cx="536" cy="202" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="348" cy="158" r="2.5" fillOpacity="0.4" />
-    <circle cx="350" cy="168" r="2.5" fillOpacity="0.5" />
-    <rect x="342" y="178" width="16" height="16" rx="4" fillOpacity="0.55" />
-  </g>
-</svg>
 
 ## The scenario
 

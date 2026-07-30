@@ -7,69 +7,13 @@ Two entities can be related, but that is not enough detail. A customer
 places orders, but how many orders can one customer place? Must every
 order have a customer? Can one product appear on many orders?
 
+<Figure
+  slug="db-cardinality-cutout"
+  alt="Cardinality, an isometric illustration"
+/>
+
 **Cardinality** answers: *how many rows on one side may relate to how
 many rows on the other side?*
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three connector endings, double bars meaning exactly one, a crow's foot fanning to three rows, and a ring meaning optional, the small marks that answer how many"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="60" r="10" />
-    <path
-      d="M166 60 H 360"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeOpacity="0.4"
-    />
-    <rect x="368" y="46" width="6" height="28" rx="3" />
-    <rect x="384" y="46" width="6" height="28" rx="3" />
-    <circle cx="470" cy="60" r="8" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="150" cy="115" r="10" />
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeOpacity="0.4"
-    >
-      <path d="M166 115 H 358" />
-      <path d="M358 115 L 400 97" />
-      <path d="M358 115 H 400" />
-      <path d="M358 115 L 400 133" />
-    </g>
-    <circle cx="470" cy="97" r="7" fillOpacity="0.8" />
-    <circle cx="470" cy="115" r="7" fillOpacity="0.8" />
-    <circle cx="470" cy="133" r="7" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="150" cy="170" r="10" />
-    <path
-      d="M166 170 H 344"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeOpacity="0.4"
-    />
-    <circle
-      cx="357"
-      cy="170"
-      r="9"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="5"
-    />
-    <rect x="378" y="156" width="6" height="28" rx="3" />
-    <circle cx="470" cy="170" r="8" fillOpacity="0.25" />
-  </g>
-</svg>
 
 ## Cardinality is about counts
 
