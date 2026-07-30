@@ -28,7 +28,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "../Link";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import {
   HOME_SELECT_ITEM,
   HOME_SELECT_POPUP,
@@ -92,7 +91,8 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
       .filter(([, n]) => n >= MIN_TOPIC_COURSES)
       .sort(
         (a, b) =>
-          b[1] - a[1] || formatTagLabel(a[0]).localeCompare(formatTagLabel(b[0])),
+          b[1] - a[1] ||
+          formatTagLabel(a[0]).localeCompare(formatTagLabel(b[0])),
       )
       .slice(0, MAX_TOPICS)
       .map(([d]) => d);
@@ -117,12 +117,9 @@ export function CoursesSection({ courses }: { courses: CatalogCourse[] }) {
   return (
     <section id="courses" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
       <div className="mb-8 text-center">
-        <SparklesText
-          as="h2"
-          className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-        >
+        <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
           Free Courses
-        </SparklesText>
+        </h2>
         <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
           Hands-on, browser-based tracks across data and engineering.
         </p>

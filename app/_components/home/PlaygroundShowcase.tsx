@@ -3,13 +3,9 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, SquareTerminal } from "lucide-react";
 import { Select } from "@base-ui/react/select";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
-import {
-  LANGUAGE_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR,
-} from "../languageIcons";
+import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { EmbeddedPlayground } from "./EmbeddedPlayground";
 import {
   HOME_SELECT_ITEM,
@@ -109,12 +105,9 @@ export function PlaygroundShowcase() {
   return (
     <div className="px-4 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <SparklesText
-          as="h2"
-          className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-        >
+        <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
           Try the playground
-        </SparklesText>
+        </h2>
         <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
           {subtitle}
         </p>
@@ -123,7 +116,10 @@ export function PlaygroundShowcase() {
       {/* Switcher lives on the page (not inside the iframe), centered below the
           heading with ample spacing. */}
       <div className="mb-10 mt-10 flex justify-center">
-        <PlaygroundSwitcher value={playgroundId} onValueChange={setPlaygroundId} />
+        <PlaygroundSwitcher
+          value={playgroundId}
+          onValueChange={setPlaygroundId}
+        />
       </div>
 
       <div className="group ds-striped-shell ds-striped-shell-blue-hover mx-auto max-w-7xl">
