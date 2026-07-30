@@ -14,37 +14,10 @@ approximation method (**truncation error** from "stopping early" and
 **round-off error** from finite precision), how they interact, and
 how to think about the *order* of convergence of a method.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two translucent error wedges crossing in an X, truncation falling as round-off rises, with a dotted total-error curve and a green dot marking the sweet spot at the crossing"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor">
-    <rect x="80" y="40" width="3" height="135" rx="1.5" opacity="0.2" />
-    <rect x="80" y="172" width="480" height="3" rx="1.5" opacity="0.2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="100,50 540,150 540,155 100,55" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="100,150 540,50 540,55 100,155" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="140" cy="64" r="3.5" />
-    <circle cx="200" cy="78" r="3.5" />
-    <circle cx="260" cy="92" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="380" cy="92" r="3.5" />
-    <circle cx="440" cy="78" r="3.5" />
-    <circle cx="500" cy="64" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="320" cy="103" r="14" fillOpacity="0.25" />
-    <circle cx="320" cy="103" r="7" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-approximation-error-cutout"
+  alt="Two small error weights on a balance beam, one shrinking as the step size drops and one growing, meeting at a minimum"
+/>
 
 ## Truncation vs round-off
 
@@ -141,7 +114,6 @@ $$ p \approx \log_2 \frac{E(h_1)}{E(h_2)} $$
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 # Simpson's rule for ∫_0^1 e^x dx = e - 1
 def simpson(f, a, b, n):
     n = (n // 2) * 2 + 2  # ensure even
@@ -150,7 +122,6 @@ def simpson(f, a, b, n):
     return (
         (b - a) / (3 * n) * (y[0] + y[-1] + 4 * y[1:-1:2].sum() + 2 * y[2:-1:2].sum())
     )
-
 
 f = np.exp
 true = np.e - 1
@@ -247,11 +218,9 @@ Try integrating something with a sharp spike.
       starterCode: `import numpy as np
 from scipy.integrate import quad, simpson
 
-
 # A function with a sharp Lorentzian peak at x = 0
 def f(x):
     return 1.0 / (1.0 + 1000 * x**2)
-
 
 # Adaptive quadrature
 value, err_est = quad(f, -1, 1)
@@ -287,18 +256,15 @@ estimates across consecutive pairs.`}
       filename: "main.py",
       starterCode: `import math
 
-
 def estimate_order(errors):
     # TODO: average log2(E_i / E_{i+1}) across consecutive pairs
     return 0.0
-
 
 # Quick check: O(h²) data
 errs = [1e-2, 2.5e-3, 6.25e-4, 1.5625e-4]
 print("Estimated order:", estimate_order(errs))  # ~2
 `,
       solutionCode: `import math
-
 
 def estimate_order(errors):
     ratios = []

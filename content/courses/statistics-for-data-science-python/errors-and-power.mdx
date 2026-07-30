@@ -15,30 +15,10 @@ significant difference, so the treatment doesn't work." "The p-value was
 below 0.05, so who cares about power?" Both are dangerously wrong, and by
 the end of this page you'll be able to simulate exactly why.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A two-by-two grid of outcomes: green check cells on the diagonal, a red exclamation cell where a false alarm rejects a true null, and a yellow crescent cell asleep while a real effect slips past, Type one cries wolf, Type two misses the wolf"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="140" y="30" width="160" height="86" rx="14" fillOpacity="0.15" />
-    <rect x="330" y="130" width="160" height="86" rx="14" fillOpacity="0.15" />
-  </g>
-  <g fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M 206 74 L 216 86 L 236 60" />
-    <path d="M 396 174 L 406 186 L 426 160" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="330" y="30" width="160" height="86" rx="14" fillOpacity="0.12" />
-    <rect x="406" y="46" width="7" height="34" rx="3.5" />
-    <circle cx="409.5" cy="96" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="140" y="130" width="160" height="86" rx="14" fillOpacity="0.18" />
-    <path d="M218 173 m -17 0 a17 17 0 1 0 34 0 a17 17 0 1 0 -34 0 M227 168 m -14 0 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0" fillRule="evenodd" />
-  </g>
-</svg>
+<Figure
+  slug="stat-errors-power-cutout"
+  alt="A two-by-two grid of four cells on a platform, two cells holding a correct tick and two holding a distinct error marker"
+/>
 
 ## The 2x2 decision matrix
 
@@ -194,28 +174,6 @@ Two of the four levers are the ones you reason about most. Let's watch
 power climb as we increase `n`, and separately as we increase the true
 effect. We'll draw both curves with Plotly.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two overlapping bells, the blue no-effect world and the green real-effect world, split by a solid red decision post: the yellow slice of the green bell stranded left of the post is a missed effect, and the green mass beyond it is power, the chance of catching what is really there"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="172" width="520" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 78 170 C 138 170 148 58 228 58 C 308 58 318 170 378 170 Z" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 258 170 C 318 170 328 58 408 58 C 488 58 498 170 558 170 Z" fillOpacity="0.18" />
-    <path d="M 330 170 L 330 114 C 346 86 370 60 408 60 C 486 60 496 170 556 170 Z" fillOpacity="0.45" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 260 170 C 290 170 304 142 330 116 L 330 170 Z" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="328" y="48" width="5" height="124" rx="2.5" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -228,7 +186,6 @@ from scipy import stats
 rng = np.random.default_rng(1)
 alpha = 0.05
 
-
 def estimate_power(effect, n, reps=2000):
     rej = 0
     for _ in range(reps):
@@ -237,7 +194,6 @@ def estimate_power(effect, n, reps=2000):
         if stats.ttest_ind(a, b).pvalue <= alpha:
             rej += 1
     return rej / reps
-
 
 # Power vs sample size, for a fixed real effect of 0.5.
 sizes = [10, 20, 40, 80, 160, 320]
@@ -282,7 +238,6 @@ rng = np.random.default_rng(2)
 alpha = 0.05
 n_per_group = 40
 
-
 def estimate_power(effect, n, reps=2000):
     rej = 0
     for _ in range(reps):
@@ -291,7 +246,6 @@ def estimate_power(effect, n, reps=2000):
         if stats.ttest_ind(a, b).pvalue <= alpha:
             rej += 1
     return rej / reps
-
 
 # Power vs effect size, for a fixed n = 40 per group.
 effects = [0.0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0]

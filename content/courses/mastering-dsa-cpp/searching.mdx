@@ -7,42 +7,10 @@ Searching means locating a target value in a collection, and it splits the world
 
 That second idea, binary search, carries a warning label earned over decades. Jon Bentley reported in *Programming Pearls* that when he asked professional programmers to write it, the majority produced buggy versions, and Donald Knuth notes that although the idea was first published in 1946, the first published version that worked correctly for arrays of *every* size did not appear until 1962. Sixteen years to get a dozen lines right. This page teaches you the algorithm *and* the traps.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A sorted row of cells with one green target, and below it three successively halved blue range bands, each probed at its yellow midpoint, converging to a final green sliver, binary search closing in"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="128" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="166" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="204" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="242" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="280" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="318" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="356" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="432" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="470" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-    <rect x="508" y="40" width="34" height="26" rx="6" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="394" y="40" width="34" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="92" width="452" height="14" rx="7" fillOpacity="0.15" />
-    <rect x="316" y="120" width="226" height="14" rx="7" fillOpacity="0.25" />
-    <rect x="316" y="148" width="113" height="14" rx="7" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="316" cy="99" r="5" />
-    <circle cx="429" cy="127" r="5" />
-    <circle cx="372" cy="155" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="394" y="176" width="34" height="14" rx="7" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-searching-cutout"
+  alt="A sorted row of ascending blocks with a bracket spanning the whole row, a second bracket spanning only its right half"
+/>
 
 ## Linear search
 

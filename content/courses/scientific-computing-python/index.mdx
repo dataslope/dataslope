@@ -3,18 +3,18 @@ title: Welcome
 description: A hands-on course on numerical methods, mathematical modeling, and scientific computation with Python
 ---
 
-<Figure
-  slug="calculator"
-  alt="A calculator, a stand-in for turning Python into a mathematical instrument"
-  priority
-/>
-
 Welcome to **Scientific Computing with Python**. This course is for
 learners who already know Python as a *programming language* and now
 want to use it as a *mathematical instrument*, a way to model the
 physical world, solve equations that have no closed-form solution,
 simulate systems too complex to reason about by hand, and analyze
 data that arrives in matrices rather than rows.
+
+<Figure
+  slug="scientific-computing-python-thumbnail-cutout"
+  alt="A grid-lined plane with a curved trajectory arc above it and a small matrix of cubes beside"
+  priority
+/>
 
 Here is the kind of thing that lies ahead. The two snippets below
 compute exactly the same million sine-squared values, one with a
@@ -66,32 +66,6 @@ when they are stored in 64 bits, how to choose a linear solver based
 on the structure of a matrix, how to integrate a differential
 equation that describes a planet's orbit, and how to build
 experiments other scientists can reproduce a decade from now.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A smooth green curve in one card crosses a thin gray arrow and reappears in the next card as a row of discrete blue sample dots, continuous laws of nature turned into computation, one step at a time"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="60" y="35" width="220" height="140" rx="14" fillOpacity="0.1" />
-  </g>
-  <path d="M84 140 C 120 60, 180 60, 216 120 C 232 146, 246 152, 258 150" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="300" y="103.5" width="48" height="3" rx="1.5" />
-    <polygon points="346,99.5 357,105 346,110.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="380" y="35" width="220" height="140" rx="14" fillOpacity="0.08" />
-    <circle cx="404" cy="138" r="5" />
-    <circle cx="430" cy="96" r="5" />
-    <circle cx="456" cy="74" r="5" />
-    <circle cx="482" cy="86" r="5" />
-    <circle cx="508" cy="116" r="5" />
-    <circle cx="534" cy="144" r="5" />
-  </g>
-</svg>
-
 <Callout type="info" title="Prerequisites">
 You should already be comfortable with Python syntax, variables,
 functions, classes, list comprehensions, imports. Some exposure to
@@ -202,11 +176,9 @@ from scipy.integrate import solve_ivp
 # Damped pendulum:  θ'' + (b/m) θ' + (g/L) sin θ = 0
 g, L, b, m = 9.81, 1.0, 0.5, 1.0
 
-
 def pendulum(t, y):
     theta, omega = y
     return [omega, -(b / m) * omega - (g / L) * np.sin(theta)]
-
 
 sol = solve_ivp(
     pendulum, (0, 20), [np.pi / 2, 0], t_eval=np.linspace(0, 20, 2000), rtol=1e-8

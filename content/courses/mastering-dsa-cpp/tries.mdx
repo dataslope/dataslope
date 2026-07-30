@@ -9,51 +9,10 @@ The trie (or prefix tree) is that structure: it stores strings by *sharing* thei
 
 The name has a story: Edward Fredkin coined *trie* in 1960, from the middle of the word "re**trie**val", and pronounced it "tree," which everyone found maximally confusing since it *is* a tree. Most programmers now say "try," and the structure quietly runs your phone's keyboard predictions, router tables, and IDE symbol completion.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A trie sharing prefixes, one yellow-haloed trunk spells the shared prefix while branches fan out to green word-end letters for cat, car, cart, and dog"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="228" y="48" width="44" height="80" rx="22" fillOpacity="0.16" />
-  </g>
-  <circle cx="320" cy="28" r="6" fill="currentColor" opacity="0.35" />
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="320" y1="28" x2="250" y2="68" />
-    <line x1="320" y1="28" x2="400" y2="68" />
-    <line x1="250" y1="68" x2="250" y2="108" />
-    <line x1="400" y1="68" x2="400" y2="108" />
-    <line x1="250" y1="108" x2="190" y2="148" />
-    <line x1="250" y1="108" x2="310" y2="148" />
-    <line x1="310" y1="148" x2="310" y2="188" />
-    <line x1="400" y1="108" x2="400" y2="148" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="250" cy="68" r="12" />
-    <circle cx="400" cy="68" r="12" />
-    <circle cx="250" cy="108" r="12" />
-    <circle cx="400" cy="108" r="12" />
-  </g>
-  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
-    <text x="250" y="72">c</text>
-    <text x="400" y="72">d</text>
-    <text x="250" y="112">a</text>
-    <text x="400" y="112">o</text>
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="190" cy="148" r="12" />
-    <circle cx="310" cy="148" r="12" />
-    <circle cx="310" cy="188" r="12" />
-    <circle cx="400" cy="148" r="12" />
-  </g>
-  <g style={{ fill: "var(--ds-white)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
-    <text x="190" y="152">t</text>
-    <text x="310" y="152">r</text>
-    <text x="310" y="192">t</text>
-    <text x="400" y="152">g</text>
-  </g>
-</svg>
+<Figure
+  slug="dsa-tries-cutout"
+  alt="A fan of paths branching from one shared trunk, the first two segments common to every route before they split apart"
+/>
 
 ## Trie shape
 

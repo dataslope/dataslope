@@ -7,41 +7,10 @@ BFS told us the path with the fewest *edges*. But real edges have costs, kilomet
 
 The algorithm at the heart of it has the best origin story in computer science. One morning in 1956, the 26-year-old Edsger Dijkstra was shopping in Amsterdam with his fiancée; tired, they sat down on a café terrace for coffee, and he worked out the shortest-path algorithm in about twenty minutes, in his head. He later credited part of the design's elegance to having no pencil and paper, "you are almost forced to avoid all avoidable complexities." He had been hunting for a problem the public could understand, to demonstrate the new ARMAC computer; the demo found shortest routes between Dutch cities. The algorithm was published in 1959, three pages long, and it still runs the world's routing. This page focuses on that algorithm: **single-source shortest paths** in weighted graphs with **non-negative** edge weights.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two routes between the same endpoints, a thin direct edge crowned by one huge red weight, and a bold green three-hop path whose small weights add up to less, why shortest paths weigh edges instead of counting them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <path d="M120 92 C 200 50, 440 50, 520 92" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
-  <g stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round">
-    <line x1="118" y1="108" x2="243" y2="148" />
-    <line x1="257" y1="150" x2="383" y2="150" />
-    <line x1="397" y1="148" x2="522" y2="108" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="250" cy="150" r="7" />
-    <circle cx="390" cy="150" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="110" cy="100" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="320" cy="58" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="530" cy="100" r="10" />
-    <circle cx="180" cy="124" r="8" />
-    <circle cx="320" cy="166" r="8" />
-    <circle cx="460" cy="124" r="8" />
-  </g>
-  <g style={{ fill: "var(--ds-white)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="11" fontWeight="700" textAnchor="middle">
-    <text x="320" y="62">9</text>
-    <text x="180" y="128">2</text>
-    <text x="320" y="170">1</text>
-    <text x="460" y="128">2</text>
-  </g>
-</svg>
+<Figure
+  slug="dsa-shortest-paths-cutout"
+  alt="A network of nodes with weighted edges of varying thickness, one glowing route threading from a start node to a distant node"
+/>
 
 ## Why BFS is not enough
 

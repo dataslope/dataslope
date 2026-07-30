@@ -18,48 +18,10 @@ thresholds, simulations). The catch, and the part people skip, is the
 sanity check in between. A model that doesn't fit gives precise,
 authoritative, *wrong* answers.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A frozen distribution sits inside a translucent ice cube at the center while four small tool tiles hang off it on thin solid spokes, a density hump, a rising accumulation ribbon, a yellow quantile cut post, and a spray of random draws, every scipy distribution answers the same four questions"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="265" y="80" width="110" height="86" rx="16" fillOpacity="0.15" />
-    <circle cx="282" cy="96" r="3" fillOpacity="0.5" />
-    <path d="M 280 152 C 300 152 302 104 320 104 C 338 104 340 152 360 152 Z" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.08">
-    <rect x="80" y="28" width="96" height="64" rx="12" />
-    <rect x="464" y="28" width="96" height="64" rx="12" />
-    <rect x="80" y="148" width="96" height="64" rx="12" />
-    <rect x="464" y="148" width="96" height="64" rx="12" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="184" y1="78" x2="262" y2="104" />
-    <line x1="456" y1="78" x2="378" y2="104" />
-    <line x1="184" y1="170" x2="262" y2="144" />
-    <line x1="456" y1="170" x2="378" y2="144" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 96 80 C 110 80 112 44 128 44 C 144 44 146 80 160 80 Z" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 478 84 C 500 84 506 46 546 42 L 546 50 C 510 54 506 91 478 91 Z" fillOpacity="0.65" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="92" y="196" width="72" height="3.5" rx="1.75" fillOpacity="0.35" />
-    <rect x="136" y="166" width="4.5" height="32" rx="2.25" />
-    <circle cx="138" cy="160" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="488" cy="176" r="4" />
-    <circle cx="508" cy="192" r="4" />
-    <circle cx="528" cy="170" r="4" />
-    <circle cx="544" cy="188" r="4" />
-    <circle cx="498" cy="200" r="4" />
-  </g>
-</svg>
+<Figure
+  slug="stat-working-with-distributions-cutout"
+  alt="A four-dial control panel on a platform beside a curve being nudged to sit over a histogram silhouette"
+/>
 
 ```mermaid
 flowchart TD
@@ -308,7 +270,6 @@ rng = np.random.default_rng(7)
 normal_data = rng.normal(loc=50, scale=8, size=400)
 skewed_data = rng.lognormal(mean=3.5, sigma=0.5, size=400)
 
-
 def qq_points(data):
     n = len(data)
     probs = (np.arange(1, n + 1) - 0.5) / n  # plotting positions
@@ -316,7 +277,6 @@ def qq_points(data):
     theoretical = stats.norm(loc=loc, scale=scale).ppf(probs)
     sample = np.sort(data)
     return theoretical, sample
-
 
 for label, data in [
     ("normal data (good fit)", normal_data),
@@ -489,41 +449,6 @@ The tails of a fitted distribution are an *extrapolation*, they're
 governed by the assumed shape, not by observations you actually made. If
 your data tops out around 120, asking the fitted normal for P(X > 300) is
 answering a question the data never spoke to.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="A green fitted band runs solidly through the region where data dots actually live, then dissolves into fading ghost dots beyond the last observation, where a red diamond waits, past the data's edge a model is pure assumption, not evidence"
-  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="141" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.7">
-    <circle cx="100" cy="112" r="4" />
-    <circle cx="130" cy="96" r="4" />
-    <circle cx="160" cy="104" r="4" />
-    <circle cx="190" cy="84" r="4" />
-    <circle cx="220" cy="92" r="4" />
-    <circle cx="250" cy="74" r="4" />
-    <circle cx="280" cy="82" r="4" />
-    <circle cx="310" cy="66" r="4" />
-    <circle cx="336" cy="74" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 88 122 C 170 108 260 84 352 66 L 352 78 C 262 96 172 118 88 132 Z" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="378" cy="62" r="3.5" fillOpacity="0.45" />
-    <circle cx="404" cy="57" r="3.5" fillOpacity="0.35" />
-    <circle cx="430" cy="52" r="3.5" fillOpacity="0.26" />
-    <circle cx="456" cy="48" r="3.5" fillOpacity="0.18" />
-    <circle cx="482" cy="44" r="3.5" fillOpacity="0.12" />
-    <circle cx="508" cy="40" r="3.5" fillOpacity="0.07" />
-  </g>
-  <rect x="354" y="100" width="4" height="52" rx="2" fill="var(--ds-gray-500)" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 552 36 L 564 48 L 552 60 L 540 48 Z" fillOpacity="0.85" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

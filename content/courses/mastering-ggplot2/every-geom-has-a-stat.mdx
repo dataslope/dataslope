@@ -8,34 +8,10 @@ grasping it will make a lot of "magic" behavior suddenly make sense.
 **Every layer runs a statistical transformation before it draws.**
 Sometimes that transformation does nothing; sometimes it does a lot.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A card of scattered raw blue dots crosses a thin gray arrow and reappears as a card of solid green bars, before a geom draws anything, its stat counts and summarizes the data"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="35" width="210" height="140" rx="12" fill="currentColor" opacity="0.06" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="95" cy="70" r="5.5" />
-    <circle cx="140" cy="100" r="5.5" />
-    <circle cx="105" cy="135" r="5.5" />
-    <circle cx="180" cy="65" r="5.5" />
-    <circle cx="200" cy="120" r="5.5" />
-    <circle cx="155" cy="150" r="5.5" />
-    <circle cx="230" cy="90" r="5.5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="290" y="103.5" width="44" height="3" rx="1.5" />
-    <polygon points="332,99.5 343,105 332,110.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="360" y="35" width="220" height="140" rx="12" fillOpacity="0.1" />
-    <rect x="390" y="113" width="26" height="42" rx="4" />
-    <rect x="430" y="85" width="26" height="70" rx="4" />
-    <rect x="470" y="99" width="26" height="56" rx="4" />
-    <rect x="510" y="127" width="26" height="28" rx="4" />
-  </g>
-</svg>
+<Figure
+  slug="gg-geom-has-a-stat-cutout"
+  alt="A single column of tiles entering a small counting mechanism and emerging as bars of proportional height"
+/>
 
 ## The mystery of geom_bar
 

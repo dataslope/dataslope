@@ -10,30 +10,10 @@ categories. Carving out that part is **slicing**, and the tool is the
 sharpens your filtering vocabulary and explains *why* analysts filter as
 early as possible.
 
-<svg
-  viewBox="0 0 640 225"
-  role="img"
-  aria-label="A yellow cut mark runs across the top of a faint blue isometric cube of data, and past a solid gray arrow the carved slice stands alone as a solid blue slab, WHERE lifts out exactly the part the question asks about"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="200,30 290,80 200,130 110,80" fillOpacity="0.3" />
-    <polygon points="110,80 200,130 200,210 110,160" fillOpacity="0.2" />
-    <polygon points="290,80 200,130 200,210 290,160" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="238,56 260,68 181,112 159,100" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="312" y="118.5" width="46" height="3" rx="1.5" />
-    <polygon points="356,114.5 367,120 356,125.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="486,60 508,72 418,122 396,110" />
-    <polygon points="396,110 418,122 418,202 396,190" fillOpacity="0.65" />
-    <polygon points="418,122 508,72 508,152 418,202" fillOpacity="0.4" />
-  </g>
-</svg>
+<Figure
+  slug="duck-filtering-cutout"
+  alt="A wide grid platform with a narrow cutting frame lifting out one contiguous slab of rows"
+/>
 
 ## A slice is a question in disguise
 
@@ -192,36 +172,6 @@ ORDER BY
 Without the parentheses, `amount > 100 AND region = 'West' OR region =
 'East'` would also return *every* East order regardless of amount, a
 classic, silent analytical bug.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="Gray rows flow along a lane toward a yellow filter gate and come out green, but a solid red bypass arc jumps one row up and over the gate straight into the output, an ungrouped OR quietly lets rows skip the filter"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="40" y="98" width="560" height="30" rx="15" fillOpacity="0.08" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <circle cx="80" cy="113" r="6" />
-    <circle cx="124" cy="113" r="6" />
-    <circle cx="168" cy="113" r="6" />
-    <circle cx="212" cy="113" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="296" y="74" width="12" height="32" rx="5" />
-    <rect x="296" y="120" width="12" height="32" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="372" cy="113" r="6" />
-    <circle cx="420" cy="113" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 240 100 C 280 30 430 30 470 90" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    <polygon points="462,88 478,84 472,104" />
-    <circle cx="516" cy="113" r="6" />
-  </g>
-</svg>
 
 ## Why analysts filter *early*
 

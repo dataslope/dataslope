@@ -18,44 +18,10 @@ Exploration **generates** hypotheses; it must never be mistaken for
 **confirming** them. The single most important habit in all of applied
 statistics is to keep those two activities on opposite sides of a wall.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A messy playground of little charts on one side of a gray wall, a clean green interval with a stroked check on the other, and one yellow hypothesis arc jumping over the top, explore freely, then confirm on data that never saw the exploring"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="312" y="44" width="16" height="146" rx="8" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.5">
-    <rect x="70" y="122" width="10" height="34" rx="3" />
-    <rect x="84" y="108" width="10" height="48" rx="3" />
-    <rect x="98" y="130" width="10" height="26" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 142 100 C 156 100 158 70 174 70 C 190 70 192 100 206 100 Z" fillOpacity="0.45" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="92" cy="62" r="3.5" />
-    <circle cx="114" cy="48" r="3.5" />
-    <circle cx="136" cy="58" r="3.5" />
-    <circle cx="158" cy="42" r="3.5" />
-    <circle cx="130" cy="172" r="3.5" />
-    <circle cx="156" cy="160" r="3.5" />
-    <circle cx="182" cy="170" r="3.5" />
-    <circle cx="208" cy="156" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="250" cy="100" r="6" />
-    <polygon points="384,88 400,88 392,104" />
-  </g>
-  <path d="M 254 94 C 284 24 360 24 392 88" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="3" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="420" y="130" width="130" height="8" rx="4" fillOpacity="0.4" />
-    <rect x="418" y="124" width="5" height="20" rx="2.5" />
-    <rect x="547" y="124" width="5" height="20" rx="2.5" />
-    <circle cx="485" cy="134" r="5.5" />
-  </g>
-  <path d="M 466 84 L 480 98 L 504 68" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-</svg>
+<Figure
+  slug="stat-eda-cutout"
+  alt="A wall dividing a platform, an open exploration workbench on one side and a sealed confirmation chamber on the other"
+/>
 
 ## Exploratory vs confirmatory: the wall you must not cross
 
@@ -336,61 +302,6 @@ is itself a finding: sex was harder to record than size. Whether you
 drop, impute, or keep those rows depends entirely on the question you're
 asking, but you can only make that call after you've *looked* at the
 pattern.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A data grid of solid blue cells pocked with empty holes: in the left block the holes scatter randomly, but in the rightmost column they stack up together, ringed in red, missingness with a pattern is information, and dropping those rows would quietly bias everything"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
-    <rect x="100" y="36" width="34" height="20" rx="5" />
-    <rect x="142" y="36" width="34" height="20" rx="5" />
-    <rect x="184" y="36" width="34" height="20" rx="5" />
-    <rect x="226" y="36" width="34" height="20" rx="5" />
-    <rect x="268" y="36" width="34" height="20" rx="5" />
-    <rect x="310" y="36" width="34" height="20" rx="5" />
-    <rect x="352" y="36" width="34" height="20" rx="5" />
-    <rect x="394" y="36" width="34" height="20" rx="5" />
-    <rect x="436" y="36" width="34" height="20" rx="5" />
-    <rect x="100" y="64" width="34" height="20" rx="5" />
-    <rect x="184" y="64" width="34" height="20" rx="5" />
-    <rect x="226" y="64" width="34" height="20" rx="5" />
-    <rect x="268" y="64" width="34" height="20" rx="5" />
-    <rect x="310" y="64" width="34" height="20" rx="5" />
-    <rect x="352" y="64" width="34" height="20" rx="5" />
-    <rect x="394" y="64" width="34" height="20" rx="5" />
-    <rect x="436" y="64" width="34" height="20" rx="5" />
-    <rect x="436" y="92" width="34" height="20" rx="5" />
-    <rect x="100" y="92" width="34" height="20" rx="5" />
-    <rect x="142" y="92" width="34" height="20" rx="5" />
-    <rect x="184" y="92" width="34" height="20" rx="5" />
-    <rect x="268" y="92" width="34" height="20" rx="5" />
-    <rect x="310" y="92" width="34" height="20" rx="5" />
-    <rect x="352" y="92" width="34" height="20" rx="5" />
-    <rect x="394" y="92" width="34" height="20" rx="5" />
-    <rect x="100" y="120" width="34" height="20" rx="5" />
-    <rect x="142" y="120" width="34" height="20" rx="5" />
-    <rect x="184" y="120" width="34" height="20" rx="5" />
-    <rect x="226" y="120" width="34" height="20" rx="5" />
-    <rect x="310" y="120" width="34" height="20" rx="5" />
-    <rect x="352" y="120" width="34" height="20" rx="5" />
-    <rect x="394" y="120" width="34" height="20" rx="5" />
-    <rect x="436" y="120" width="34" height="20" rx="5" />
-  </g>
-  <g fill="currentColor" opacity="0.1">
-    <rect x="142" y="64" width="34" height="20" rx="5" />
-    <rect x="226" y="92" width="34" height="20" rx="5" />
-    <rect x="268" y="120" width="34" height="20" rx="5" />
-    <rect x="478" y="36" width="34" height="20" rx="5" />
-    <rect x="478" y="64" width="34" height="20" rx="5" />
-    <rect x="478" y="92" width="34" height="20" rx="5" />
-    <rect x="478" y="120" width="34" height="20" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="475" y="28" width="40" height="120" rx="12" fillOpacity="0.14" />
-  </g>
-</svg>
 
 ## Step 4: outliers
 

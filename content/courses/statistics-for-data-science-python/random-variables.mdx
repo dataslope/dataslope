@@ -19,51 +19,10 @@ variable. This page is about describing them with two summary numbers
 (**expectation** and **variance**) and using the first one to make
 real-world decisions.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Four coin-pair outcomes send thin lines into a solid blue function box with a white arrow, which maps them onto a number line of green mass dots, a random variable is the rule that turns whatever happened into a number you can do math on"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="128" y1="50" x2="266" y2="104" />
-    <line x1="128" y1="95" x2="266" y2="112" />
-    <line x1="128" y1="140" x2="266" y2="120" />
-    <line x1="128" y1="185" x2="266" y2="128" />
-    <line x1="338" y1="116" x2="396" y2="134" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="90" cy="50" r="9" />
-    <circle cx="114" cy="50" r="9" />
-    <circle cx="90" cy="95" r="9" />
-    <circle cx="114" cy="140" r="9" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <circle cx="114" cy="95" r="9" />
-    <circle cx="90" cy="140" r="9" />
-    <circle cx="90" cy="185" r="9" />
-    <circle cx="114" cy="185" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="266" y="80" width="72" height="72" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <polygon points="292,104 292,128 316,116" />
-  </g>
-  <rect x="360" y="132.5" width="39" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <polygon points="397,128.5 397,139.5 408,134" fill="var(--ds-gray-400)" />
-  <rect x="408" y="150" width="192" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="435" y="158" width="3" height="10" rx="1.5" />
-    <rect x="503" y="158" width="3" height="10" rx="1.5" />
-    <rect x="571" y="158" width="3" height="10" rx="1.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="436" cy="138" r="6" />
-    <circle cx="504" cy="132" r="9" />
-    <circle cx="572" cy="138" r="6" />
-  </g>
-</svg>
+<Figure
+  slug="stat-random-variables-cutout"
+  alt="A mapping bridge on a platform carrying labelled outcome tokens across and dropping numbered blocks on the far side"
+/>
 
 ## A random variable maps outcomes to numbers
 
@@ -142,38 +101,6 @@ function (pdf)** describes probability as **area**: the chance that `X`
 falls *in an interval* is the area under the pdf curve over that
 interval. Density is not probability, it's "probability per unit of
 `x`," and only becomes probability once you integrate over a range.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="On the left, discrete lollipop masses you can point at and read; on the right, a smooth density curve where only the shaded green slice between two points carries probability, masses for countable values, area under a curve for continuous ones"
-  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-400)">
-    <rect x="56" y="148" width="220" height="3" rx="1.5" />
-    <rect x="336" y="148" width="248" height="3" rx="1.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="88" y="106" width="5" height="42" rx="2.5" fillOpacity="0.5" />
-    <circle cx="90.5" cy="100" r="8" />
-    <rect x="136" y="66" width="5" height="82" rx="2.5" fillOpacity="0.5" />
-    <circle cx="138.5" cy="60" r="11" />
-    <rect x="184" y="84" width="5" height="64" rx="2.5" fillOpacity="0.5" />
-    <circle cx="186.5" cy="78" r="9.5" />
-    <rect x="232" y="120" width="5" height="28" rx="2.5" fillOpacity="0.5" />
-    <circle cx="234.5" cy="114" r="6.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 340 148 C 380 148 392 56 460 56 C 528 56 540 148 580 148 Z" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 432 148 L 432 72 C 442 63 452 59 460 59 C 468 59 478 63 488 72 L 488 148 Z" fillOpacity="0.55" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="430" y="148" width="4" height="14" rx="2" />
-    <rect x="486" y="148" width="4" height="14" rx="2" />
-  </g>
-</svg>
 
 <Callout type="warn" title="Misconception: a pdf gives the probability of a single value">
 For continuous variables, P(X = exact value) = 0, always.
@@ -382,7 +309,6 @@ a week? Add the expected tickets per day. Expected revenue from a funnel?
 Sum the expected revenue at each stage. No independence assumption
 needed, which is rare and precious in probability.
 </Callout>
-
 
 ## Expected value for decisions
 

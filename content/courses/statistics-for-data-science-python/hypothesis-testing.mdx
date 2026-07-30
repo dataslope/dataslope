@@ -19,33 +19,10 @@ question is the one this whole page is about:
 It is the engine underneath A/B tests, clinical trials, quality control,
 and almost every "is this real?" decision a data scientist makes.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A tilted balance: the blue null block rides high on one pan while a pile of green evidence dots drags the other pan down past a dashed red doubt threshold, assume nothing is going on, and reject only when the evidence outweighs that presumption"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <polygon points="320,186 294,208 346,208" fill="var(--ds-gray-400)" />
-  <rect x="316" y="100" width="8" height="92" rx="4" fill="var(--ds-gray-400)" />
-  <g transform="rotate(9 320 104)">
-    <rect x="150" y="100" width="340" height="8" rx="4" fill="var(--ds-gray-400)" />
-    <rect x="156" y="108" width="4" height="24" fill="var(--ds-gray-400)" />
-    <path d="M 132 132 A 26 26 0 0 0 184 132 Z" fill="var(--ds-gray-300)" />
-    <rect x="476" y="108" width="4" height="24" fill="var(--ds-gray-400)" />
-    <path d="M 452 132 A 26 26 0 0 0 504 132 Z" fill="var(--ds-gray-300)" />
-    <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-      <rect x="146" y="108" width="24" height="24" rx="6" />
-    </g>
-    <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-      <circle cx="464" cy="124" r="6" />
-      <circle cx="478" cy="124" r="6" />
-      <circle cx="492" cy="124" r="6" />
-      <circle cx="471" cy="112" r="6" />
-      <circle cx="485" cy="112" r="6" />
-    </g>
-  </g>
-  <line x1="424" y1="140" x2="516" y2="140" stroke="var(--ds-red-500)" strokeWidth="2.5" strokeDasharray="7 6" strokeLinecap="round" />
-</svg>
+<Figure
+  slug="stat-hypothesis-testing-cutout"
+  alt="A skeptical baseline curve on a platform with an observed marker pin standing far out in its thin tail"
+/>
 
 ## The core idea: assume nothing is going on, then look for a contradiction
 
@@ -335,29 +312,6 @@ scientific reason, in advance, or stay two-sided. `scipy.stats` tests are
 two-sided by default; you opt into one-sided with `alternative='greater'`
 or `alternative='less'`.
 </Callout>
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Two small bell curves: the left shades a solid yellow slice of surprise into each tail, the right pours its whole green slice into a single tail, a two-sided test splits its skepticism both ways, a one-sided test spends it all in one direction"
-  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-400)">
-    <rect x="56" y="140" width="240" height="3" rx="1.5" />
-    <rect x="344" y="140" width="240" height="3" rx="1.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.18">
-    <path d="M 66 138 C 116 138 126 48 176 48 C 226 48 236 138 286 138 Z" />
-    <path d="M 354 138 C 404 138 414 48 464 48 C 514 48 524 138 574 138 Z" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 66 138 C 84 138 92 124 100 110 L 104 138 Z" />
-    <path d="M 286 138 C 268 138 260 124 252 110 L 248 138 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 574 138 C 552 138 542 118 532 98 L 526 138 Z" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

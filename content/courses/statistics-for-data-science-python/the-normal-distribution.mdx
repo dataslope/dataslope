@@ -18,24 +18,10 @@ the normal is the wrong model*, because assuming normality on skewed or
 heavy-tailed data is one of the most expensive mistakes in applied
 statistics.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A bell curve built from three nested translucent layers, a wide base, a middle shell, and a tight core around the yellow center post, with a lone red dot stranded beyond the widest layer, the 68, 95, and 99.7 percent zones of the normal"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 100 180 C 190 180 205 40 320 40 C 435 40 450 180 540 180 Z" fillOpacity="0.12" />
-    <path d="M 180 180 C 235 180 240 60 320 60 C 400 60 405 180 460 180 Z" fillOpacity="0.18" />
-    <path d="M 245 180 C 280 180 285 86 320 86 C 355 86 360 180 395 180 Z" fillOpacity="0.26" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="317.5" y="48" width="5" height="132" rx="2.5" fillOpacity="0.75" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="588" cy="176" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-normal-distribution-cutout"
+  alt="A symmetric bell mound on a platform divided into three nested shaded bands widening outward from its centre"
+/>
 
 ## Why the normal shows up everywhere
 
@@ -307,44 +293,6 @@ print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
   ]}
 />
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A blue test score and a green height each slide down a thin line from their own differently scaled rulers onto one shared z ruler below, landing side by side at the same tick, standardizing strips the units so unlike things can be compared on a common scale"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-300)">
-    <rect x="70" y="46" width="220" height="3" rx="1.5" />
-    <rect x="350" y="46" width="220" height="3" rx="1.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="252" cy="38" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="532" cy="38" r="7" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="254" y1="48" x2="446" y2="124" />
-    <line x1="528" y1="48" x2="460" y2="124" />
-  </g>
-  <rect x="80" y="140" width="480" height="4" rx="2" fill="var(--ds-gray-400)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="118" y="148" width="4" height="12" rx="2" />
-    <rect x="184" y="148" width="4" height="12" rx="2" />
-    <rect x="250" y="148" width="4" height="12" rx="2" />
-    <rect x="318" y="148" width="4" height="12" rx="2" />
-    <rect x="384" y="148" width="4" height="12" rx="2" />
-    <rect x="450" y="148" width="4" height="12" rx="2" />
-    <rect x="516" y="148" width="4" height="12" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="446" cy="132" r="6.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="459" cy="132" r="6.5" />
-  </g>
-</svg>
-
 <Callout type="danger" title="Misconception: a z-score IS a probability">
 A z-score is a **position** (distance in standard deviations), not a
 probability. A z of 2 doesn't mean "2%" or "0.02." To turn a z-score
@@ -532,23 +480,6 @@ produces confidently wrong answers:
 - **Bounded / discrete**: proportions live in [0, 1]; counts are
   non-negative integers. A symmetric, unbounded bell can't honestly
   represent them, especially near the boundaries.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A symmetric blue bell mask laid over red skewed data that does not fit it, the red bulk leans left of the bell's center and a long red tail escapes far beyond the bell's edge, assuming normality hides exactly the tail that hurts you"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="50" y="152" width="540" height="4" rx="2" fill="currentColor" opacity="0.18" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 90 152 C 110 152 116 56 168 56 C 240 56 264 130 360 144 C 450 154 530 150 584 151 L 584 152 Z" fillOpacity="0.3" />
-    <circle cx="560" cy="146" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 130 152 C 190 152 200 48 270 48 C 340 48 350 152 410 152 Z" fillOpacity="0.25" />
-    <rect x="267" y="56" width="5" height="96" rx="2.5" fillOpacity="0.6" />
-  </g>
-</svg>
 
 Let's *see* the misfit by forcing a normal onto right-skewed income data.
 

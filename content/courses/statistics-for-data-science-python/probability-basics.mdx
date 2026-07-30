@@ -17,42 +17,10 @@ what *could* happen, or how surprising what *did* happen really is. That
 interval, p-value, and A/B test later in this course. This page builds
 the vocabulary and the handful of rules everything else rests on.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A six-wedge wheel with three faces lit blue under a yellow pointer, beside a fraction built from dots, three blue dots over a bar and six below it, probability as the share of the sample space an event covers"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-200)">
-    <path d="M 200 110 L 200 32 A 78 78 0 0 1 267.5 71 Z" />
-    <path d="M 200 110 L 267.5 149 A 78 78 0 0 1 200 188 Z" />
-    <path d="M 200 110 L 132.5 149 A 78 78 0 0 1 132.5 71 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 200 110 L 267.5 71 A 78 78 0 0 1 267.5 149 Z" />
-    <path d="M 200 110 L 200 188 A 78 78 0 0 1 132.5 149 Z" />
-    <path d="M 200 110 L 132.5 71 A 78 78 0 0 1 200 32 Z" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 190 12 L 210 12 L 200 32 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="452" cy="76" r="7" />
-    <circle cx="492" cy="76" r="7" />
-    <circle cx="532" cy="76" r="7" />
-  </g>
-  <rect x="424" y="98" width="136" height="4" rx="2" fill="var(--ds-gray-500)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="436" cy="126" r="7" />
-    <circle cx="476" cy="126" r="7" />
-    <circle cx="516" cy="126" r="7" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <circle cx="456" cy="150" r="7" />
-    <circle cx="496" cy="150" r="7" />
-    <circle cx="536" cy="150" r="7" />
-  </g>
-</svg>
+<Figure
+  slug="stat-probability-basics-cutout"
+  alt="A sample-space tray on a platform holding all possible outcome tokens, a smaller ring lassoing a subset of them"
+/>
 
 ## Sample spaces and events
 
@@ -266,39 +234,6 @@ Let's watch it happen. We'll flip a fair coin 5,000 times and plot the
 **running proportion** of heads after each flip. Early on it lurches
 around; as the flip count climbs it homes in on 0.5.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A trail of coin-flip dots lurches far above and below the dark blue one-half line at first, then settles into a tight hug of it as the flips pile up, the Law of Large Numbers stabilizes the long run without ever fixing the short run"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-700)" }} fill="currentColor">
-    <rect x="80" y="108" width="500" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
-    <circle cx="90" cy="40" r="4.5" />
-    <circle cx="120" cy="170" r="4.5" />
-    <circle cx="150" cy="60" r="4.5" />
-    <circle cx="180" cy="150" r="4.5" />
-    <circle cx="210" cy="80" r="4.5" />
-    <circle cx="240" cy="135" r="4.5" />
-    <circle cx="270" cy="92" r="4.5" />
-    <circle cx="300" cy="126" r="4.5" />
-    <circle cx="330" cy="99" r="4.5" />
-    <circle cx="360" cy="120" r="4.5" />
-    <circle cx="390" cy="104" r="4.5" />
-    <circle cx="420" cy="116" r="4.5" />
-    <circle cx="450" cy="106" r="4.5" />
-    <circle cx="480" cy="113" r="4.5" />
-    <circle cx="510" cy="108" r="4.5" />
-    <circle cx="540" cy="112" r="4.5" />
-    <circle cx="570" cy="110" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 80 30 C 240 30 380 96 580 102 L 580 118 C 380 124 240 190 80 190 Z" fillOpacity="0.1" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -389,10 +324,8 @@ The conversions:
       starterCode: `def prob_to_odds(p):
     return p / (1 - p)  # returns "to 1" odds
 
-
 def odds_to_prob(odds):
     return odds / (1 + odds)
-
 
 # A 20% chance.
 p = 0.20

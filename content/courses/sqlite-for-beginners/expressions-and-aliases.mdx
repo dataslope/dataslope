@@ -10,34 +10,10 @@ Those calculations are called **expressions**. An expression might
 multiply price by quantity, join two pieces of text, round a number, or
 make text uppercase. An **alias** gives the computed result a clear name.
 
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="A blue dot and a green dot flow along thin lines into a yellow operator diamond, and out comes one larger green value wearing a yellow name tag, an expression computes a fresh value and an alias gives it a friendly name"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="116" y1="60" x2="234" y2="86" />
-    <line x1="116" y1="120" x2="234" y2="94" />
-    <line x1="288" y1="90" x2="392" y2="90" />
-    <line x1="420" y1="104" x2="440" y2="126" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="100" cy="60" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="100" cy="120" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 260 62 L 288 90 L 260 118 L 232 90 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="410" cy="90" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="430" y="126" width="84" height="22" rx="11" />
-  </g>
-</svg>
+<Figure
+  slug="lite-expressions-aliases-cutout"
+  alt="Two value tiles feeding a small calculating block that emits a new computed tile with a blank name plate"
+/>
 
 ## Expressions create computed columns
 
@@ -167,35 +143,6 @@ flowchart TD
 
 In SQLite, `||` concatenates text. "Concatenate" means join pieces of
 text together.
-
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A blue ribbon and a green ribbon sit apart with a geometric double-bar operator between them; below a solid arrow the same two ribbons click together end to end with a small yellow joint, concatenation threads pieces of text into a single value"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="32" width="120" height="18" rx="9" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="250" y="30" width="5" height="22" rx="2.5" />
-    <rect x="260" y="30" width="5" height="22" rx="2.5" />
-    <rect x="318.5" y="66" width="3" height="14" rx="1.5" fill="var(--ds-gray-400)" />
-    <polygon points="314.5,78 325.5,78 320,89" fill="var(--ds-gray-400)" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="300" y="32" width="96" height="18" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="152" y="104" width="120" height="18" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="272" y="104" width="96" height="18" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="272" cy="113" r="6" />
-  </g>
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

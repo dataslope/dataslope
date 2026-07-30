@@ -8,49 +8,10 @@ Every ggplot starts with **data**. It is the first argument to
 the data into the right *shape* is half the battle of plotting, and
 the half beginners most often skip.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A data-frame card with blue, green, and yellow columns feeds through a thin gray arrow into a chart panel where the blue column becomes the x axis, the green column the y axis, and the yellow column the plotted points"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="56" y="36" width="200" height="148" rx="12" fill="currentColor" opacity="0.05" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="76" y="52" width="52" height="16" rx="4" />
-    <rect x="76" y="76" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="76" y="100" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="76" y="124" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="76" y="148" width="52" height="16" rx="4" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="138" y="52" width="52" height="16" rx="4" />
-    <rect x="138" y="76" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="138" y="100" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="138" y="124" width="52" height="16" rx="4" fillOpacity="0.15" />
-    <rect x="138" y="148" width="52" height="16" rx="4" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="200" y="52" width="52" height="16" rx="4" />
-    <rect x="200" y="76" width="52" height="16" rx="4" fillOpacity="0.18" />
-    <rect x="200" y="100" width="52" height="16" rx="4" fillOpacity="0.18" />
-    <rect x="200" y="124" width="52" height="16" rx="4" fillOpacity="0.18" />
-    <rect x="200" y="148" width="52" height="16" rx="4" fillOpacity="0.18" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="272" y="108.5" width="42" height="3" rx="1.5" />
-    <polygon points="312,104.5 323,110 312,115.5" />
-  </g>
-  <rect x="340" y="36" width="244" height="148" rx="12" fill="currentColor" opacity="0.05" />
-  <rect x="360" y="56" width="4" height="108" rx="2" fill="var(--ds-green-500)" />
-  <rect x="360" y="164" width="200" height="4" rx="2" fill="var(--ds-blue-500)" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="392" cy="140" r="5.5" />
-    <circle cx="424" cy="116" r="5.5" />
-    <circle cx="452" cy="132" r="5.5" />
-    <circle cx="488" cy="96" r="5.5" />
-    <circle cx="524" cy="76" r="5.5" />
-  </g>
-</svg>
+<Figure
+  slug="gg-data-layer-cutout"
+  alt="A tidy grid of small tiles forming the base platform of a chart, each row one tile deep and each column a distinct colour"
+/>
 
 ## ggplot2 wants a data frame
 

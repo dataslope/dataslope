@@ -46,46 +46,10 @@ This design is called an **embedded** database. Both designs are
 useful, they solve different problems, but the embedded design
 turned out to solve a problem almost every program has.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Two tall faded server racks stand behind a geometric equals sign that points to one small yellow file packed with the same colored data dots, SQLite carries a whole database in one little file, no server room required"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.1">
-    <rect x="80" y="28" width="80" height="184" rx="8" />
-    <rect x="172" y="48" width="80" height="164" rx="8" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="92" y="44" width="56" height="9" rx="4.5" />
-    <rect x="92" y="62" width="56" height="9" rx="4.5" />
-    <rect x="92" y="80" width="56" height="9" rx="4.5" />
-    <rect x="92" y="98" width="56" height="9" rx="4.5" />
-    <rect x="184" y="64" width="56" height="9" rx="4.5" />
-    <rect x="184" y="82" width="56" height="9" rx="4.5" />
-    <rect x="184" y="100" width="56" height="9" rx="4.5" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="296" y="112" width="30" height="5" rx="2.5" />
-    <rect x="296" y="124" width="30" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 380 60 H 500 L 540 100 V 190 H 380 Z" fillOpacity="0.2" />
-    <polygon points="500,60 540,100 500,100" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="414" cy="126" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="446" cy="112" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="446" cy="142" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="478" cy="126" r="8" />
-  </g>
-</svg>
+<Figure
+  slug="lite-why-sqlite-cutout"
+  alt="A single small self-contained file block resting on a platform beside a large empty server rack, a tiny ship's hull motif on its base"
+/>
 
 ## The most deployed database engine on Earth
 
@@ -132,29 +96,6 @@ tests deliberately simulate power failures, full disks, out-of-
 memory conditions, and corrupted files, because somewhere out
 there, every one of those things is happening to a SQLite
 database right now.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="A small blue database file stands calmly inside a thin ring dotted with solid green check marks, SQLite has earned trust through an enormous amount of careful testing"
-  style={{ display: "block", width: "100%", maxWidth: "420px", height: "auto", margin: "2.5rem auto" }}
->
-  <circle cx="320" cy="92" r="70" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 292 58 H 336 L 356 78 V 128 Q 356 132 352 132 H 296 Q 292 132 292 128 Z" fillOpacity="0.3" />
-    <polygon points="336,58 356,78 336,78" />
-    <rect x="304" y="92" width="36" height="6" rx="3" fillOpacity="0.8" />
-    <rect x="304" y="104" width="26" height="6" rx="3" fillOpacity="0.5" />
-    <rect x="304" y="116" width="42" height="6" rx="3" fillOpacity="0.5" />
-  </g>
-  <g fill="none" stroke="var(--ds-green-500)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M 312 20 L 318 27 L 329 12" />
-    <path d="M 382 58 L 388 65 L 399 50" />
-    <path d="M 382 126 L 388 133 L 399 118" />
-    <path d="M 242 126 L 248 133 L 259 118" />
-    <path d="M 242 58 L 248 65 L 259 50" />
-  </g>
-</svg>
 
 The point for you as a learner: SQLite is small and friendly, but
 it is **not a toy**. It is a real relational DBMS, holding real

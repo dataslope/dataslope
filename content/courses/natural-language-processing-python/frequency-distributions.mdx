@@ -10,31 +10,10 @@ varied is the vocabulary? These basic statistics are the foundation of search
 ranking, keyword extraction, spam scoring, and a surprising amount of "text
 analytics".
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Bar heights collapse in a long Zipf tail beneath a smooth green curve, the two tallest gray bars are stopwords, blue bars the common content words, and the small yellow bars words seen barely once"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.22">
-    <rect x="88" y="58" width="30" height="132" rx="5" />
-    <rect x="136" y="94" width="30" height="96" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="184" y="118" width="30" height="72" rx="5" />
-    <rect x="232" y="136" width="30" height="54" rx="5" />
-    <rect x="280" y="150" width="30" height="40" rx="5" />
-    <rect x="328" y="160" width="30" height="30" rx="5" />
-    <rect x="376" y="168" width="30" height="22" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="424" y="174" width="30" height="16" rx="5" />
-    <rect x="472" y="178" width="30" height="12" rx="5" />
-    <rect x="520" y="181" width="30" height="9" rx="5" />
-  </g>
-  <path d="M 103 50 C 220 118 360 166 545 176" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
-  <rect x="80" y="190" width="490" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
-</svg>
+<Figure
+  slug="nlp-frequencies-cutout"
+  alt="A long descending staircase of bars, a few towering at the near end and a very long tail of single-height bars trailing away"
+/>
 
 ## Counting words with `FreqDist`
 
@@ -161,7 +140,6 @@ from nltk.tokenize import word_tokenize`,
     if not tokens:
         return 0.0
     return len(set(tokens)) / len(tokens)
-
 
 repetitive = word_tokenize("very very very good good good good")
 varied = word_tokenize("an unusually eclectic vocabulary brimming with novelty")
@@ -377,11 +355,9 @@ from nltk.probability import FreqDist`,
     # distinct / total, or 0.0 if empty
     return 0.0
 
-
 def top_words(tokens, n):
     # use FreqDist(...).most_common(n)
     return []
-
 
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))
@@ -392,10 +368,8 @@ print("top 2:    ", top_words(sample, 2))
         return 0.0
     return len(set(tokens)) / len(tokens)
 
-
 def top_words(tokens, n):
     return FreqDist(tokens).most_common(n)
-
 
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))

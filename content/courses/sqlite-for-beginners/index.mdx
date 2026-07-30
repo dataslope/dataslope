@@ -9,6 +9,12 @@ ever organized information is a spreadsheet, you are in exactly
 the right place. This course assumes **no programming experience,
 no database experience, and no SQL experience.**
 
+<Figure
+  slug="sqlite-for-beginners-thumbnail-cutout"
+  alt="A single compact database disc resting on a platform with a small feather beside it"
+  priority
+/>
+
 Before any theory, here is the most important thing about this
 course: **it runs.** Every example on every page executes inside
 your browser on a real SQLite engine, no installation, no signup,
@@ -51,46 +57,6 @@ Now change something. In the editor above, replace `'cat'` with
 same question, different filter. That edit–run–observe loop is how
 this entire course works, and it is how you will actually learn,
 not by reading about queries, but by running and breaking them.
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="Loose tilted paper scraps flow along a solid gray arrow into one big friendly yellow file with a folded corner, where they settle into tidy blue and green tables, a whole little database living inside a single SQLite file"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-300)">
-    <rect x="40" y="56" width="52" height="38" rx="5" transform="rotate(-12 66 75)" />
-    <rect x="98" y="140" width="56" height="40" rx="5" transform="rotate(8 126 160)" />
-    <rect x="118" y="30" width="46" height="34" rx="5" transform="rotate(14 141 47)" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="48" y="66" width="30" height="5" rx="2.5" transform="rotate(-12 66 75)" />
-    <rect x="108" y="152" width="34" height="5" rx="2.5" transform="rotate(8 126 160)" />
-    <rect x="126" y="40" width="26" height="5" rx="2.5" transform="rotate(14 141 47)" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="196" y="120.5" width="40" height="3" rx="1.5" />
-    <polygon points="234,116.5 245,122 234,127.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 280 32 H 500 L 552 84 V 218 H 280 Z" fillOpacity="0.18" />
-    <polygon points="500,32 552,84 500,84" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="304" y="108" width="100" height="10" rx="3" />
-    <rect x="304" y="124" width="100" height="8" rx="3" fillOpacity="0.35" />
-    <rect x="304" y="138" width="100" height="8" rx="3" fillOpacity="0.35" />
-    <rect x="304" y="166" width="140" height="10" rx="3" />
-    <rect x="304" y="182" width="140" height="8" rx="3" fillOpacity="0.35" />
-    <rect x="304" y="196" width="140" height="8" rx="3" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="428" y="108" width="100" height="10" rx="3" />
-    <rect x="428" y="124" width="100" height="8" rx="3" fillOpacity="0.35" />
-    <rect x="428" y="138" width="100" height="8" rx="3" fillOpacity="0.35" />
-  </g>
-</svg>
-
 <Callout type="info" title="How the magic works">
 Every SQL block runs on the official `@sqlite.org/sqlite-wasm`
 build, SQLite itself, compiled to WebAssembly, executing entirely

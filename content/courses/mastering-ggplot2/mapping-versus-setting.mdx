@@ -7,39 +7,10 @@ This page covers the mistake *every* ggplot2 learner makes at least
 once. It is worth its own page because once it clicks, a whole class of
 "why is my chart the wrong color?" bugs disappears forever.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Top row: a stacked three-color data column points along a thin gray arrow to a bar chart whose bars take different colors (mapping); bottom row: a single fixed blue swatch points to a chart where every bar is the same blue (setting)"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="84" y="40" width="40" height="16" rx="5" fill="var(--ds-blue-500)" />
-  <rect x="84" y="60" width="40" height="16" rx="5" fill="var(--ds-green-500)" />
-  <rect x="84" y="80" width="40" height="16" rx="5" fill="var(--ds-yellow-500)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="140" y="66.5" width="44" height="3" rx="1.5" />
-    <polygon points="182,62.5 193,68 182,73.5" />
-  </g>
-  <rect x="210" y="24" width="360" height="88" rx="10" fill="currentColor" opacity="0.06" />
-  <rect x="240" y="56" width="32" height="44" rx="4" fill="var(--ds-blue-500)" />
-  <rect x="296" y="40" width="32" height="60" rx="4" fill="var(--ds-green-500)" />
-  <rect x="352" y="68" width="32" height="32" rx="4" fill="var(--ds-yellow-500)" />
-  <rect x="408" y="48" width="32" height="52" rx="4" fill="var(--ds-blue-500)" />
-  <rect x="464" y="60" width="32" height="40" rx="4" fill="var(--ds-green-500)" />
-  <rect x="84" y="152" width="40" height="40" rx="10" fill="var(--ds-blue-500)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="140" y="170.5" width="44" height="3" rx="1.5" />
-    <polygon points="182,166.5 193,172 182,177.5" />
-  </g>
-  <rect x="210" y="128" width="360" height="88" rx="10" fill="currentColor" opacity="0.06" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="240" y="164" width="32" height="40" rx="4" />
-    <rect x="296" y="148" width="32" height="56" rx="4" />
-    <rect x="352" y="174" width="32" height="30" rx="4" />
-    <rect x="408" y="154" width="32" height="50" rx="4" />
-    <rect x="464" y="168" width="32" height="36" rx="4" />
-  </g>
-</svg>
+<Figure
+  slug="gg-mapping-vs-setting-cutout"
+  alt="Two side-by-side plot frames, one where every dot is a single flat colour and one where the dots take colours from a data column"
+/>
 
 ## The two situations
 

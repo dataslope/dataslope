@@ -14,21 +14,10 @@ $\nabla F$. SciPy bundles both behind `scipy.optimize`, and this
 chapter gives you a tour of the right tool for each shape of
 problem.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A bold blue curve dips twice, a yellow ball rests in the shallow dip while a green ball sits at the true floor marked by a dashed line, optimization can settle for a local minimum or find the global one"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <line x1="100" y1="185" x2="540" y2="185" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="7 6" strokeLinecap="round" />
-  <path d="M70 45 C 110 140, 150 185, 200 185 C 250 185, 270 130, 320 115 C 360 103, 380 108, 420 130 C 450 146, 480 150, 510 135 C 550 115, 570 75, 585 50" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="200" cy="172" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="463" cy="137" r="9" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-root-finding-cutout"
+  alt="A curved valley landscape on a platform with a ball rolling toward its lowest point and a marker pin where the curve crosses the floor"
+/>
 
 ## A landscape of methods
 
@@ -97,12 +86,10 @@ method, secant-based, derivative-free, generally robust.
       starterCode: `import numpy as np
 from scipy.optimize import root
 
-
 # Solve   x² + y² = 4,   x - y = 1
 def F(v):
     x, y = v
     return [x * x + y * y - 4, x - y - 1]
-
 
 sol = root(F, x0=[1.0, 0.0])
 print(f"converged: {sol.success}")
@@ -132,11 +119,9 @@ approximation, fine up to a few hundred variables) or **L-BFGS-B**
       starterCode: `import numpy as np
 from scipy.optimize import minimize
 
-
 # Rosenbrock's "banana" function, the standard optimization test bed
 def rosen(x):
     return sum(100.0 * (x[1:] - x[:-1] ** 2) ** 2 + (1 - x[:-1]) ** 2)
-
 
 x0 = np.zeros(5)
 res = minimize(rosen, x0, method="BFGS", tol=1e-10)
@@ -166,17 +151,14 @@ analytic gradient is the single largest performance win available.
       starterCode: `import numpy as np
 from scipy.optimize import minimize
 
-
 def rosen(x):
     return sum(100.0 * (x[1:] - x[:-1] ** 2) ** 2 + (1 - x[:-1]) ** 2)
-
 
 def rosen_grad(x):
     g = np.zeros_like(x)
     g[:-1] = -400 * x[:-1] * (x[1:] - x[:-1] ** 2) - 2 * (1 - x[:-1])
     g[1:] += 200 * (x[1:] - x[:-1] ** 2)
     return g
-
 
 x0 = np.zeros(20)
 r1 = minimize(rosen, x0, method="BFGS")
@@ -204,11 +186,9 @@ functions).
       starterCode: `import numpy as np
 from scipy.optimize import minimize, NonlinearConstraint
 
-
 # Minimize  (x-1)² + (y-2.5)² subject to  x + y ≥ 3,  x ≥ 0, y ≥ 0
 def F(v):
     return (v[0] - 1) ** 2 + (v[1] - 2.5) ** 2
-
 
 cons = NonlinearConstraint(lambda v: v[0] + v[1] - 3, lb=0, ub=np.inf)
 bounds = [(0, None), (0, None)]
@@ -246,10 +226,8 @@ A_true, k_true, omega_true, phi_true = 2.0, 0.7, 5.0, 0.3
 y = A_true * np.exp(-k_true * t) * np.cos(omega_true * t + phi_true)
 y += 0.1 * rng.standard_normal(t.size)
 
-
 def model(t, A, k, omega, phi):
     return A * np.exp(-k * t) * np.cos(omega * t + phi)
-
 
 popt, pcov = curve_fit(model, t, y, p0=[1, 1, 4, 0])
 perr = np.sqrt(np.diag(pcov))
@@ -305,7 +283,6 @@ t0 = t - t[0]  # years since the first reading, for numerical conditioning`,
       starterCode: `def model(t, a, b, d, A, B):
     return a + b * t + d * t**2 + A * np.cos(2 * np.pi * t) + B * np.sin(2 * np.pi * t)
 
-
 popt, _ = curve_fit(model, t0, co2, p0=[315, 1.5, 0, 0, 0])
 a, b, d, A, B = popt
 seasonal_amp = np.hypot(A, B)
@@ -347,11 +324,9 @@ landscape has many local minima, use **global** methods:
       starterCode: `import numpy as np
 from scipy.optimize import differential_evolution, minimize
 
-
 # Rastrigin: highly multimodal, global minimum at the origin
 def rastrigin(x, A=10):
     return A * len(x) + sum(xi * xi - A * np.cos(2 * np.pi * xi) for xi in x)
-
 
 bounds = [(-5.12, 5.12)] * 4
 res_local = minimize(rastrigin, x0=[3, -2, 4, -1])
@@ -398,10 +373,8 @@ plt.show()
       starterCode: `import numpy as np
 from scipy.optimize import curve_fit
 
-
 def gaussian(x, amp, mu, sigma):
     return amp * np.exp(-(((x - mu) / sigma) ** 2) / 2)
-
 
 def fit_gaussian(x, y):
     """Fit a Gaussian peak; return (params, 1-sigma errors)."""

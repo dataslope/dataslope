@@ -8,37 +8,9 @@ Flip the stack's rule and you get its mirror twin. A queue is **first in, first 
 Queues were studied mathematically before computers existed to hold them: in 1909 the Danish engineer A. K. Erlang, working for the Copenhagen Telephone Company, founded queueing theory to answer how many circuits a telephone exchange needs before callers start hearing busy signals. The unit of telecom traffic load is still called the *erlang*. Software queues inherit the same questions, how fast must the consumer drain the line to keep the producer from backing up?, which is why the producer-consumer pattern below appears in every messaging system ever built.
 
 <Figure
-  slug="a-risograph-of-a-queue-data-structure"
-  alt="A risograph of a queue, items lined up and served first-in, first-out"
+  slug="dsa-queues-cutout"
+  alt="A straight open channel with four rounded tokens queued inside, one leaving at the front and one entering at the back"
 />
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A yellow newcomer rides a thin arrow into the back of a tunnel of blue dots while the green oldest dot rides another thin arrow out the front, first in, first out"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="150" y="58" width="340" height="56" rx="28" fill="currentColor" opacity="0.08" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="524" y="84.5" width="36" height="3" rx="1.5" />
-    <polygon points="526,80.5 515,86 526,91.5" />
-    <rect x="80" y="84.5" width="36" height="3" rx="1.5" />
-    <polygon points="82,80.5 71,86 82,91.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="86" r="11" />
-    <circle cx="250" cy="86" r="11" fillOpacity="0.8" />
-    <circle cx="300" cy="86" r="11" />
-    <circle cx="350" cy="86" r="11" fillOpacity="0.8" />
-    <circle cx="400" cy="86" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="130" cy="86" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="580" cy="86" r="11" />
-  </g>
-</svg>
 
 ## The queue ADT
 

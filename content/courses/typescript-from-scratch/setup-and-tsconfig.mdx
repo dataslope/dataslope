@@ -7,45 +7,10 @@ Now that you understand *why* TypeScript exists and *how* it works, let's get pr
 
 We'll keep it minimal. You don't need a complex build pipeline, a framework, or a bundler to learn TypeScript. The in-browser playground on this site is enough for most lessons. But if you want to experiment locally, this page shows you how.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A panel of six strictness switches: five are flipped up, the large green master among them, while one neglected switch still hangs down in red, tsconfig as a bank of compiler checks you switch on"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }}>
-    <rect
-      x="110"
-      y="40"
-      width="420"
-      height="140"
-      rx="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="150" y="70" width="10" height="80" rx="5" />
-    <rect x="214" y="70" width="10" height="80" rx="5" />
-    <rect x="278" y="70" width="10" height="80" rx="5" />
-    <rect x="342" y="70" width="10" height="80" rx="5" />
-    <rect x="406" y="70" width="10" height="80" rx="5" />
-    <rect x="470" y="70" width="10" height="80" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="155" cy="78" r="9" />
-    <circle cx="219" cy="78" r="9" />
-    <circle cx="347" cy="78" r="9" />
-    <circle cx="411" cy="78" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="283" cy="78" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="475" cy="142" r="9" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-setup-tsconfig-cutout"
+  alt="A control panel of strictness toggles on a platform, most switches flipped to their tightest position"
+/>
 
 ## Installing TypeScript
 
@@ -297,37 +262,6 @@ if (name !== null) {
 ```
 
 This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's own: he invented the null reference for ALGOL W in 1965 ("simply because it was so easy to implement," he said), and in a 2009 conference talk he publicly apologized, estimating that null dereferences had cost the industry a billion dollars in crashes and vulnerabilities over the decades since. JavaScript inherited the mistake *twice over*, it has both `null` and `undefined`, which makes `strictNullChecks` arguably the single highest-value flag in the entire compiler.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two copies of the same road with a missing stretch: on top the blue traveler is a step away from the unmarked hole crossed out in red, while below a solid green plate covers the gap and the traveler is already safely across, strictNullChecks makes the null hole visible and handled"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="70" y="64" width="270" height="10" rx="5" />
-    <rect x="390" y="64" width="160" height="10" rx="5" />
-    <rect x="70" y="156" width="270" height="10" rx="5" />
-    <rect x="390" y="156" width="160" height="10" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="300" cy="52" r="9" />
-    <circle cx="470" cy="144" r="9" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M355 82 L 375 102" />
-    <path d="M375 82 L 355 102" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="336" y="152" width="58" height="18" rx="6" />
-  </g>
-</svg>
 
 ### `noUncheckedIndexedAccess`, Safer array/object indexing
 

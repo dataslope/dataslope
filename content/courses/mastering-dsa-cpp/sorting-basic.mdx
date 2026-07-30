@@ -7,32 +7,9 @@ Sorting is the gateway drug of algorithm design. Binary search demands sorted in
 This page covers the three classic "slow" sorts: bubble, selection, and insertion. None is the right tool for a million elements, all are O(n²) in the worst case, so why learn them? Three honest reasons. They are small enough to *fully* understand, which makes them ideal for learning loop invariants, the reasoning tool behind every correct algorithm. One of them (insertion sort) is genuinely the fastest known method for tiny or nearly-sorted inputs, and lives on inside the hybrid sorts of every standard library. And they give the efficient sorts of the next page something to be measured against.
 
 <Figure
-  slug="a-risograph-of-sorting"
-  alt="A risograph of items being arranged into sorted order"
+  slug="dsa-sorting-basic-cutout"
+  alt="A row of uneven vertical bars on a platform with two adjacent bars swapping places along a small curved arrow"
 />
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A row of bars mid bubble sort, two adjacent yellow bars are being swapped while the tallest bars already sit settled and green at the right end"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="112" y="130" width="34" height="40" rx="6" fillOpacity="0.8" />
-    <rect x="160" y="104" width="34" height="66" rx="6" fillOpacity="0.8" />
-    <rect x="208" y="140" width="34" height="30" rx="6" fillOpacity="0.8" />
-    <rect x="352" y="96" width="34" height="74" rx="6" fillOpacity="0.8" />
-    <rect x="400" y="112" width="34" height="58" rx="6" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="256" y="78" width="34" height="92" rx="6" />
-    <rect x="304" y="122" width="34" height="48" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="448" y="60" width="34" height="110" rx="6" />
-    <rect x="496" y="44" width="34" height="126" rx="6" />
-  </g>
-</svg>
 
 ## Bubble sort
 

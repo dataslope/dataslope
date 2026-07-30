@@ -3,16 +3,16 @@ title: Welcome
 description: "An intuition-first tour of classical time series analysis and statistical forecasting with pandas and statsmodels, built around the one idea that changes everything: in time series, the order of the data IS the information."
 ---
 
-<Figure
-  slug="line-chart"
-  alt="A minimal line chart tracing a value over time, the shape of time series data"
-  priority
-/>
-
 Welcome to **Time Series Analysis with Python**. You already know how to
 load a DataFrame, filter it, group it, and plot a line chart. You can
 answer "*what happened?*" This course teaches the harder, more valuable
 question: "*what happens next, and how much should I trust my answer?*"
+
+<Figure
+  slug="time-series-analysis-python-thumbnail-cutout"
+  alt="A long ribbon of a wavy line chart running across a platform with a forecast segment continuing past a marker"
+  priority
+/>
 
 That second question is where time series analysis lives. A table of
 sales numbers and a table of *monthly* sales numbers look almost
@@ -21,52 +21,6 @@ a **spine**: each row is glued to the rows before and after it by the
 passage of time. Reorder the rows of an ordinary table and you lose
 nothing. Reorder the rows of a time series and you have **destroyed the
 data**, because in a time series, the *order is the information*.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="The same six blue points twice: on the left they are joined in order by a line that tells a story, while on the right they lie shuffled and unconnected beneath a small red cross, in a time series, the order is the information"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="330" y="50" width="4" height="130" rx="2" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M60 150 L 110 120 L 160 140 L 210 96 L 260 120 L 310 76" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="60" cy="150" r="4.5" />
-    <circle cx="110" cy="120" r="4.5" />
-    <circle cx="160" cy="140" r="4.5" />
-    <circle cx="210" cy="96" r="4.5" />
-    <circle cx="260" cy="120" r="4.5" />
-    <circle cx="310" cy="76" r="4.5" />
-    <circle cx="370" cy="96" r="4.5" />
-    <circle cx="410" cy="150" r="4.5" />
-    <circle cx="450" cy="76" r="4.5" />
-    <circle cx="490" cy="140" r="4.5" />
-    <circle cx="530" cy="120" r="4.5" />
-    <circle cx="570" cy="120" r="4.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <path d="M554 54 L 574 74" />
-    <path d="M574 54 L 554 74" />
-  </g>
-</svg>
-
 <Callout type="info" title="What we assume you already know">
 You can write basic Python (slicing, list comprehensions), use pandas
 (`DataFrame`, `Series`, filtering), make a simple line chart, and you

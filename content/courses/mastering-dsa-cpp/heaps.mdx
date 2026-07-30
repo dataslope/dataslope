@@ -7,49 +7,10 @@ An emergency room does not serve patients first-come-first-served, and it does n
 
 The binary heap, introduced by J. W. J. Williams in 1964 as the engine of his heapsort algorithm, is the just-enough structure: a complete binary tree that maintains only one promise. In a **max-heap**, every parent is ≥ its children; in a **min-heap**, every parent is ≤ its children. That single local rule guarantees the global winner sits at the root, and nothing more. Siblings may be in any order. By refusing to promise total order, the heap gets away with O(log n) insert and extract, O(1) peek, and, Williams's masterstroke, no pointers at all, because a *complete* tree packs perfectly into an array.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A heap tree with the largest value glowing yellow at the apex and a new green node joined to its parent by a bold green edge, above the flat array row that actually stores the levels"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="320" y1="48" x2="220" y2="110" />
-    <line x1="320" y1="48" x2="420" y2="110" />
-    <line x1="220" y1="110" x2="160" y2="170" />
-    <line x1="220" y1="110" x2="280" y2="170" />
-    <line x1="420" y1="110" x2="380" y2="170" />
-  </g>
-  <line x1="420" y1="110" x2="460" y2="170" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="48" r="30" fillOpacity="0.08" />
-    <circle cx="320" cy="48" r="22" fillOpacity="0.16" />
-    <circle cx="320" cy="48" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="220" cy="110" r="10" />
-    <circle cx="420" cy="110" r="10" />
-    <circle cx="160" cy="170" r="7" />
-    <circle cx="280" cy="170" r="7" />
-    <circle cx="380" cy="170" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="460" cy="170" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="230" y="196" width="24" height="14" rx="4" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="256" y="196" width="24" height="14" rx="4" fillOpacity="0.5" />
-    <rect x="282" y="196" width="24" height="14" rx="4" fillOpacity="0.5" />
-    <rect x="308" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="334" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="360" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="386" y="196" width="24" height="14" rx="4" fillOpacity="0.85" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-heaps-cutout"
+  alt="A pyramid of stacked spheres with the largest resting at the apex, one sphere climbing a side arrow toward the top"
+/>
 
 ## Conceptual tree and array storage
 

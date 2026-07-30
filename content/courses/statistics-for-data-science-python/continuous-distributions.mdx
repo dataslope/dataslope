@@ -19,25 +19,10 @@ for continuous variables lives in **intervals**, and it's computed as
 **area under a curve**. Internalize that and the rest of this page falls
 into place.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three density silhouettes stand along one thin baseline, a bell, a flat plateau, and a decaying slide, with one green interval slice holding real probability and a red hairline at a single point holding none, for continuous variables probability is area, and a point has zero width"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="50" y="164" width="540" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.3">
-    <path d="M 60 160 C 92 160 98 84 130 84 C 162 84 168 160 200 160 Z" />
-    <rect x="240" y="100" width="120" height="60" rx="6" />
-    <path d="M 420 160 L 420 72 C 460 76 492 120 552 148 C 572 155 580 158 590 160 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 460 160 L 460 86 C 482 96 502 124 522 140 L 522 160 Z" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="298" y="100" width="2.5" height="60" />
-  </g>
-</svg>
+<Figure
+  slug="stat-continuous-distributions-cutout"
+  alt="A smooth curve over a platform with one shaded slab of area beneath a marked interval"
+/>
 
 ## The big idea: probability is area under the PDF
 
@@ -284,29 +269,6 @@ print(f"90th percentile score  = {scores.ppf(0.9):.1f}")
     },
   ]}
 />
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A bell curve with most of its area filled green up to a yellow cutoff post, and a solid yellow probability chip above sending a straight gray arrow down at the post, the ppf question runs in reverse: name the probability, get back the value that traps it"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="80" y="152" width="480" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 120 150 C 200 150 210 54 320 54 C 430 54 440 150 520 150 Z" fillOpacity="0.18" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 120 150 C 200 150 210 54 320 54 C 380 54 402 90 430 122 L 430 150 Z" fillOpacity="0.45" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="404" y="20" width="52" height="20" rx="10" />
-    <rect x="427" y="116" width="5" height="44" rx="2.5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="428.5" y="46" width="3" height="46" rx="1.5" />
-    <polygon points="424.5,90 435.5,90 430,101" />
-  </g>
-</svg>
 
 <Callout type="tip" title="cdf and ppf are inverses">
 `cdf` takes a value and returns a probability (area to the left). `ppf`

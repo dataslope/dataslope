@@ -11,38 +11,10 @@ Backtracking is the disciplined answer. Build a candidate solution one choice at
 
 Make a choice, recurse into the world where that choice stands, then take the choice back so the loop can try the next one. The un-choose step is what separates backtracking from plain recursion, and forgetting it is the bug you will write most often on this page.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A small decision tree: the gray left branch ends at a red dead end and is abandoned, dashed circles wait unexplored, and the bold green branch threads down to a solid green goal, choose, explore, un-choose"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="312" y1="48" x2="226" y2="93" />
-    <line x1="215" y1="108" x2="164" y2="150" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5">
-    <line x1="226" y1="107" x2="276" y2="152" />
-    <line x1="414" y1="107" x2="366" y2="152" />
-  </g>
-  <g stroke="var(--ds-green-500)" strokeWidth="3.5" strokeLinecap="round">
-    <line x1="328" y1="48" x2="414" y2="93" />
-    <line x1="426" y1="107" x2="475" y2="151" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="40" r="10" />
-    <circle cx="220" cy="100" r="8" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="420" cy="100" r="8" />
-    <circle cx="480" cy="160" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="150" y="150" width="20" height="20" rx="5" />
-  </g>
-  <circle cx="280" cy="160" r="8" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="4 4" />
-  <circle cx="360" cy="160" r="8" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="4 4" />
-</svg>
+<Figure
+  slug="dsa-backtracking-cutout"
+  alt="A branching maze of corridors where one dead-end branch is folded away and a marker steps back to the previous junction to try another"
+/>
 
 ```mermaid
 flowchart TD

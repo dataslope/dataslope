@@ -7,43 +7,10 @@ TypeScript's compiler doesn't just check types, it can **infer** them. When you 
 
 Good inference means you write fewer annotations while keeping full type safety. The trick is knowing when the compiler can figure it out on its own and when you should step in with an explicit type.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three shapes standing in low sunlight cast their exact silhouettes onto the ground without anyone drawing them, and one square additionally wears a dashed hand-drawn outline, the compiler infers a type from each value, and annotations are simply drawn on top"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="80" cy="50" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="60" y="180" width="520" height="4" rx="2" />
-    <path d="M252 182 L296 182 L338 192 L274 192 Z" />
-    <path d="M352 182 L396 182 L430 192 L386 192 Z" />
-    <path d="M446 182 L496 182 L544 192 L478 192 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="250" cy="158" r="22" />
-    <path d="M470 110 L498 180 L442 180 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="350" y="136" width="44" height="44" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="342"
-      y="128"
-      width="60"
-      height="60"
-      rx="9"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeDasharray="5 6"
-      strokeLinecap="round"
-    />
-  </g>
-</svg>
+<Figure
+  slug="tsx-type-inference-cutout"
+  alt="A value block dropping into an empty socket that automatically moulds itself to the block's exact shape"
+/>
 
 ## Variable initializer inference
 
@@ -210,32 +177,6 @@ if (result !== null) {
 ## Best-common-type inference for arrays
 
 When you initialize an array with mixed values, the compiler tries to find a **best common type** that accommodates all elements.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="A gray jar holds blue circles and a yellow square, and its lid label shows one small chip of each kind; a green triangle standing outside appears nowhere on the label, the inferred element type is the union of exactly what the array was given"
-  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="250" y="60" width="140" height="100" rx="18" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <rect x="262" y="38" width="116" height="20" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="290" cy="128" r="13" />
-    <circle cx="352" cy="132" r="12" />
-    <circle cx="306" cy="48" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="320" y="100" width="26" height="26" rx="5" />
-    <rect x="326" y="42" width="12" height="12" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M470 100 L488 136 L452 136 Z" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="typescript"

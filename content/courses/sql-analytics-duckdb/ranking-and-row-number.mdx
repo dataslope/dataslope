@@ -11,29 +11,10 @@ top-N pattern they unlock. Because ranking is foundational and the
 RANK/DENSE_RANK distinction trips people up, there are extra questions at
 the end.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A podium where two green dots share the tallest step marked with one pip, the second step holds only a dashed empty ring, and a blue dot stands on the third step marked with three pips, when rows tie, RANK hands out two golds and no silver"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="264" y="92" width="116" height="112" rx="8" fillOpacity="0.2" />
-    <circle cx="298" cy="72" r="11" />
-    <circle cx="344" cy="72" r="11" />
-    <circle cx="322" cy="148" r="6" />
-  </g>
-  <rect x="148" y="128" width="116" height="76" rx="8" fill="currentColor" opacity="0.08" />
-  <circle cx="206" cy="108" r="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="380" y="152" width="116" height="52" rx="8" fillOpacity="0.12" />
-    <circle cx="438" cy="132" r="10" />
-    <circle cx="420" cy="178" r="5" />
-    <circle cx="438" cy="178" r="5" />
-    <circle cx="456" cy="178" r="5" />
-  </g>
-  <rect x="120" y="208" width="400" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
+<Figure
+  slug="duck-ranking-cutout"
+  alt="Three podium steps on a platform inside a partitioned lane, small numbered markers resting on each step"
+/>
 
 ## Numbering rows with `ROW_NUMBER`
 

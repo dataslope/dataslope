@@ -7,21 +7,10 @@ Here is an uncomfortable fact: a fast computer cannot save a slow algorithm. Buy
 
 This page gives you the vocabulary for talking about those shapes. The notation itself is older than computers: the big-O symbol comes from nineteenth-century number theory, Paul Bachmann introduced it in 1894 and Edmund Landau popularized it, and Donald Knuth later championed it as the standard language for analyzing programs. Mathematicians needed a way to say "grows like n², give or take a constant," and it turned out programmers needed exactly the same sentence.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three smooth curves race across one chart as input grows, a green one stays flat, a blue one rises steadily, and a red one explodes upward off the top"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.2">
-    <rect x="80" y="28" width="3" height="160" rx="1.5" />
-    <rect x="80" y="187" width="480" height="3" rx="1.5" />
-  </g>
-  <text x="572" y="208" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fill="currentColor" opacity="0.45">n</text>
-  <path d="M105 170 L540 167" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
-  <path d="M105 176 C 250 150, 400 110, 540 62" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinecap="round" />
-  <path d="M105 178 C 185 172, 222 130, 246 62 C 254 39, 259 24, 262 12" fill="none" stroke="var(--ds-red-500)" strokeWidth="4" strokeLinecap="round" />
-</svg>
+<Figure
+  slug="dsa-complexity-cutout"
+  alt="Three curved ramps rising side by side from one platform, a gentle one, a steeper one, and a near-vertical one, a small cart resting at the base of each"
+/>
 
 ## Why we care
 

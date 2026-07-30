@@ -10,50 +10,10 @@ separates a real forecaster from someone with a good-looking notebook is
 future it has never seen. Get this wrong and every accuracy number you report
 is a comfortable fiction.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two timelines: on top, a solid blue training stretch is separated from the green test stretch by one yellow divider and earns a green check; below, blue and green pieces interleave at random and earn a red cross, validation must split time in order, never shuffled"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="50" width="240" height="26" rx="8" />
-    <rect x="80" y="120" width="40" height="26" rx="8" />
-    <rect x="168" y="120" width="40" height="26" rx="8" />
-    <rect x="256" y="120" width="40" height="26" rx="8" />
-    <rect x="344" y="120" width="40" height="26" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="330" y="42" width="6" height="42" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="346" y="50" width="180" height="26" rx="8" />
-    <rect x="124" y="120" width="40" height="26" rx="8" />
-    <rect x="212" y="120" width="40" height="26" rx="8" />
-    <rect x="300" y="120" width="40" height="26" rx="8" />
-    <rect x="388" y="120" width="40" height="26" rx="8" />
-  </g>
-  <g
-    style={{ color: "var(--ds-green-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M556 64 L 566 74 L 584 48" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M556 120 L 582 146" />
-    <path d="M582 120 L 556 146" />
-  </g>
-</svg>
+<Figure
+  slug="tsa-chronological-validation-cutout"
+  alt="A timeline rail cleanly cut once with everything left of the cut in a training tray, beside a rail with dots wrongly interleaved across the cut"
+/>
 
 <Callout type="danger" title="The cardinal rule, one more time">
 **You may only use the past to predict the future, never the reverse.** Every
@@ -170,22 +130,18 @@ them by hand once and you'll never misread them again.
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def mae(y_true, y_pred):
     # Mean Absolute Error: average size of the miss, in the data's own units.
     return np.mean(np.abs(y_true - y_pred))
-
 
 def rmse(y_true, y_pred):
     # Root Mean Squared Error: like MAE but SQUARES errors first, so big
     # misses are punished much harder. Same units as the data.
     return np.sqrt(np.mean((y_true - y_pred) ** 2))
 
-
 def mape(y_true, y_pred):
     # Mean Absolute Percentage Error: scale-free, reported as a percent.
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-
 
 # Two forecasts of the same truth: one with small even misses, one that is
 # usually perfect but has a single huge blunder.
@@ -223,37 +179,6 @@ net flows). When in doubt, report MAE *and* RMSE, and add MAPE only when a
 percentage genuinely makes sense.
 </Callout>
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two error buckets: the left holds a handful of small, even green squares, while the right is dominated by one huge red square beside two tiny blue ones, squaring errors makes a single blunder dominate the RMSE score"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="140" y="60" width="6" height="100" rx="3" />
-    <rect x="300" y="60" width="6" height="100" rx="3" />
-    <rect x="140" y="154" width="166" height="6" rx="3" />
-    <rect x="380" y="60" width="6" height="100" rx="3" />
-    <rect x="540" y="60" width="6" height="100" rx="3" />
-    <rect x="380" y="154" width="166" height="6" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="160" y="134" width="16" height="16" rx="4" />
-    <rect x="182" y="134" width="16" height="16" rx="4" />
-    <rect x="204" y="134" width="16" height="16" rx="4" />
-    <rect x="226" y="134" width="16" height="16" rx="4" />
-    <rect x="170" y="114" width="16" height="16" rx="4" />
-    <rect x="196" y="114" width="16" height="16" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="400" y="96" width="54" height="54" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="464" y="138" width="12" height="12" rx="3" />
-    <rect x="482" y="138" width="12" height="12" rx="3" />
-  </g>
-</svg>
-
 ## Beyond one split: walk-forward backtesting
 
 A single train/test split gives *one* estimate of forecast skill, and one
@@ -273,34 +198,6 @@ set grows each fold while the test window marches forward. A **rolling-window**
 scheme instead keeps the training window a fixed *size* and slides it, useful
 when old history stops being relevant. Either way, you get several honest
 out-of-sample scores instead of one.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three stacked timelines show a blue training bar growing longer in each fold while a green test block marches further into the future past a yellow cut mark, walk-forward backtesting, where training always ends before testing begins"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="48" width="200" height="28" rx="8" fillOpacity="0.55" />
-    <rect x="60" y="104" width="284" height="28" rx="8" fillOpacity="0.55" />
-    <rect x="60" y="160" width="368" height="28" rx="8" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="263" y="44" width="5" height="36" rx="2.5" />
-    <rect x="347" y="100" width="5" height="36" rx="2.5" />
-    <rect x="431" y="156" width="5" height="36" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="271" y="48" width="84" height="28" rx="8" />
-    <rect x="355" y="104" width="84" height="28" rx="8" />
-    <rect x="439" y="160" width="84" height="28" rx="8" />
-  </g>
-  <g fill="currentColor" opacity="0.1">
-    <rect x="363" y="48" width="217" height="28" rx="8" />
-    <rect x="447" y="104" width="133" height="28" rx="8" />
-    <rect x="531" y="160" width="49" height="28" rx="8" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"
@@ -330,14 +227,12 @@ def mae(yt, yp):
     return float(np.mean(np.abs(np.asarray(yt) - np.asarray(yp))))`,
       starterCode: `import numpy as np
 
-
 # Expanding-window backtest of a SEASONAL-NAIVE forecaster (predict each month
 # with the value 12 months earlier). Fast, leakage-free, and a strong baseline.
 def seasonal_naive_forecast(train, horizon, m=12):
     last_season = train.values[-m:]
     reps = int(np.ceil(horizon / m))
     return np.tile(last_season, reps)[:horizon]
-
 
 initial, horizon, step = 60, 12, 12
 fold_maes = []
@@ -401,38 +296,6 @@ it won't have at prediction time:
   your choices. You need a separate **validation** set (or nested CV); the
   final test set is looked at **once**.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="The yellow divider guards the split above the ground, but a red pipe siphons from the green future side, dips beneath the timeline, and surfaces with an arrow inside the blue training side, preprocessing computed on the whole series leaks the future even when the split looks correct"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="44" y="130" width="552" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="100" width="220" height="26" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="324" y="66" width="8" height="64" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="356" y="100" width="220" height="26" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M470 134 C 470 182, 180 192, 180 142"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="180,128 173,142 187,142" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -495,36 +358,28 @@ y_true = np.array([200.0, 210.0, 190.0, 220.0, 205.0])
 y_pred = np.array([198.0, 215.0, 185.0, 219.0, 210.0])`,
       starterCode: `import numpy as np
 
-
 def mae(y_true, y_pred):
     return None
-
 
 def rmse(y_true, y_pred):
     return None
 
-
 def mape(y_true, y_pred):
     return None
-
 
 scores = {"mae": None, "rmse": None, "mape": None}
 print(scores)
 `,
       solutionCode: `import numpy as np
 
-
 def mae(y_true, y_pred):
     return float(np.mean(np.abs(y_true - y_pred)))
-
 
 def rmse(y_true, y_pred):
     return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
-
 def mape(y_true, y_pred):
     return float(np.mean(np.abs((y_true - y_pred) / y_true)) * 100)
-
 
 scores = {
     "mae": mae(y_true, y_pred),
@@ -585,7 +440,6 @@ Return the list of folds as \`folds\` (a list of \`(train_idx, test_idx)\` tuple
     # TODO: build (train_idx, test_idx) tuples
     return folds
 
-
 folds = expanding_folds(n, initial, horizon, step)
 for tr, te in folds:
     print(f"train 0..{tr[-1]}  test {te[0]}..{te[-1]}")
@@ -599,7 +453,6 @@ for tr, te in folds:
         folds.append((train_idx, test_idx))
         cut += step
     return folds
-
 
 folds = expanding_folds(n, initial, horizon, step)
 for tr, te in folds:

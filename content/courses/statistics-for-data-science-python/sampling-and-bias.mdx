@@ -17,77 +17,10 @@ an error that *no amount of extra rows removes*. Learning to see that
 error, and to choose samples that avoid it, is one of the highest-value
 skills in applied statistics.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A well-mixed field of blue and green dots is sampled by a yellow scoop that covers only one green-heavy corner, filling the tray with an unbalanced handful whose red estimate lands away from the yellow truth mark, a biased scoop stays wrong no matter how much it scoops"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="40" y="24" width="400" height="176" rx="16" fill="var(--ds-blue-500)" fillOpacity="0.06" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.75">
-    <circle cx="70" cy="50" r="4" />
-    <circle cx="130" cy="40" r="4" />
-    <circle cx="200" cy="56" r="4" />
-    <circle cx="270" cy="40" r="4" />
-    <circle cx="340" cy="52" r="4" />
-    <circle cx="400" cy="44" r="4" />
-    <circle cx="90" cy="96" r="4" />
-    <circle cx="160" cy="90" r="4" />
-    <circle cx="230" cy="104" r="4" />
-    <circle cx="300" cy="88" r="4" />
-    <circle cx="370" cy="100" r="4" />
-    <circle cx="415" cy="140" r="4" />
-    <circle cx="250" cy="150" r="4" />
-    <circle cx="330" cy="160" r="4" />
-    <circle cx="390" cy="184" r="4" />
-    <circle cx="210" cy="184" r="4" />
-    <circle cx="152" cy="136" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.75">
-    <circle cx="100" cy="60" r="4" />
-    <circle cx="170" cy="64" r="4" />
-    <circle cx="240" cy="76" r="4" />
-    <circle cx="310" cy="64" r="4" />
-    <circle cx="380" cy="72" r="4" />
-    <circle cx="60" cy="106" r="4" />
-    <circle cx="415" cy="80" r="4" />
-    <circle cx="280" cy="120" r="4" />
-    <circle cx="350" cy="130" r="4" />
-    <circle cx="180" cy="158" r="4" />
-    <circle cx="290" cy="184" r="4" />
-    <circle cx="105" cy="140" r="4" />
-    <circle cx="140" cy="150" r="4" />
-    <circle cx="120" cy="172" r="4" />
-    <circle cx="155" cy="178" r="4" />
-    <circle cx="96" cy="160" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="128" cy="158" r="52" fillOpacity="0.14" />
-  </g>
-  <circle cx="128" cy="158" r="49" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="6" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="448" y="110.5" width="26" height="3" rx="1.5" />
-    <polygon points="472,106.5 483,112 472,117.5" />
-  </g>
-  <rect x="490" y="70" width="110" height="86" rx="14" fill="var(--ds-blue-500)" fillOpacity="0.08" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="515" cy="96" r="5" />
-    <circle cx="545" cy="96" r="5" />
-    <circle cx="575" cy="96" r="5" />
-    <circle cx="530" cy="126" r="5" />
-    <circle cx="560" cy="126" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="515" cy="126" r="5" />
-  </g>
-  <rect x="490" y="176" width="110" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="543" y="168" width="4" height="20" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="582" cy="178" r="5.5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-sampling-bias-cutout"
+  alt="Two scoops drawing from a mixed bin, one reaching across the whole bin and one only skimming a single corner"
+/>
 
 ## Why the sampling method is everything
 
@@ -324,41 +257,6 @@ moves you *leftward* (less variance) but **cannot move you downward**
 collect more data" is the right instinct for noise and the *wrong*
 instinct for bias.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Two dartboards: on the left a loose blue cluster centered on the yellow bullseye, on the right a tight red cluster parked stubbornly away from it, noisy but honest beats consistent but wrong, because more darts tighten a cluster yet never move its center"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5">
-    <circle cx="180" cy="115" r="62" />
-    <circle cx="180" cy="115" r="40" />
-    <circle cx="460" cy="115" r="62" />
-    <circle cx="460" cy="115" r="40" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="180" cy="115" r="9" />
-    <circle cx="460" cy="115" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="85" r="5" />
-    <circle cx="215" cy="100" r="5" />
-    <circle cx="165" cy="148" r="5" />
-    <circle cx="206" cy="142" r="5" />
-    <circle cx="140" cy="120" r="5" />
-    <circle cx="190" cy="68" r="5" />
-    <circle cx="182" cy="118" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="492" cy="76" r="5" />
-    <circle cx="504" cy="86" r="5" />
-    <circle cx="494" cy="92" r="5" />
-    <circle cx="506" cy="72" r="5" />
-    <circle cx="500" cy="80" r="5" />
-    <circle cx="488" cy="84" r="5" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -374,7 +272,6 @@ true_mean = population.mean()
 weights = (population > 75).astype(float) + 0.1
 weights /= weights.sum()
 
-
 # Repeat each sampling method MANY times to see its CENTER and SPREAD.
 def repeat(method, n, reps=400):
     out = []
@@ -384,7 +281,6 @@ def repeat(method, n, reps=400):
         else:
             out.append(rng.choice(population, size=n, replace=False, p=weights).mean())
     return np.array(out)
-
 
 for n in [200, 5000]:
     r = repeat("random", n)
@@ -496,30 +392,6 @@ survivors. "Successful founders dropped out of college" ignores the vast
 graveyard of dropouts whose startups failed and who were never
 interviewed. Any time your dataset is "the ones still here," ask what the
 *absent* ones would have told you.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A top-view bomber silhouette speckled with red bullet holes along its wings and tail while a yellow ring marks the untouched nose, the holes only show where planes survived being hit, and the clean spot is where the lost planes were struck"
-  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
->
-  <path d="M 320 28 C 332 40 330 60 330 80 L 330 102 L 424 132 L 424 154 L 332 134 L 332 168 L 364 184 L 364 200 L 322 192 L 280 200 L 280 184 L 312 168 L 312 134 L 220 154 L 220 132 L 314 102 L 314 80 C 314 60 312 40 320 28 Z" fill="currentColor" opacity="0.15" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.85">
-    <circle cx="240" cy="143" r="4" />
-    <circle cx="262" cy="140" r="4" />
-    <circle cx="284" cy="135" r="4" />
-    <circle cx="298" cy="148" r="4" />
-    <circle cx="356" cy="136" r="4" />
-    <circle cx="378" cy="140" r="4" />
-    <circle cx="400" cy="144" r="4" />
-    <circle cx="322" cy="148" r="4" />
-    <circle cx="318" cy="162" r="4" />
-    <circle cx="326" cy="175" r="4" />
-    <circle cx="296" cy="190" r="4" />
-    <circle cx="346" cy="190" r="4" />
-  </g>
-  <circle cx="320" cy="58" r="25" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="6" />
-</svg>
 
 <CodeBlock
   adapter="python"

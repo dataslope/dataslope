@@ -14,31 +14,10 @@ This page has a split personality on purpose. The first half shows you why
 removing stopwords is useful. The second half shows you a task where removing
 them is a disaster. Holding both in your head is the whole point.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A sentence line where solid blue content chips stay in place over faint empty slots, while small stopword chips in fading red shades sink below the thin line"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor">
-    <rect x="60" y="106" width="520" height="3" rx="1.5" opacity="0.12" />
-    <rect x="70" y="70" width="56" height="30" rx="12" opacity="0.07" />
-    <rect x="216" y="70" width="36" height="30" rx="12" opacity="0.07" />
-    <rect x="346" y="70" width="62" height="30" rx="12" opacity="0.07" />
-    <rect x="490" y="70" width="44" height="30" rx="12" opacity="0.07" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="138" y="70" width="66" height="30" rx="12" fillOpacity="0.9" />
-    <rect x="264" y="70" width="70" height="30" rx="12" fillOpacity="0.9" />
-    <rect x="420" y="70" width="58" height="30" rx="12" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="76" y="128" width="52" height="24" rx="10" fillOpacity="0.55" transform="rotate(-7 102 140)" />
-    <rect x="222" y="146" width="34" height="22" rx="9" fillOpacity="0.3" transform="rotate(6 239 157)" />
-    <rect x="494" y="134" width="42" height="24" rx="10" fillOpacity="0.42" transform="rotate(-5 515 146)" />
-    <rect x="350" y="152" width="58" height="24" rx="10" fillOpacity="0.68" transform="rotate(5 379 164)" />
-  </g>
-</svg>
+<Figure
+  slug="nlp-stopwords-cutout"
+  alt="A sieve on a platform catching a pile of tiny featureless pebbles while larger distinctive shapes pass through into a tray"
+/>
 
 ## What are stopwords, and why remove them?
 
@@ -422,22 +401,18 @@ await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`,
       starterCode: `KEEP = {"not", "no", "nor", "never", "but"}
 
-
 def clean_keep_negation(tokens):
     # Build a custom stop set, then filter.
     return tokens
-
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))
 `,
       solutionCode: `KEEP = {"not", "no", "nor", "never", "but"}
 
-
 def clean_keep_negation(tokens):
     custom = set(stopwords.words("english")) - KEEP
     return [t for t in tokens if t not in custom]
-
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))

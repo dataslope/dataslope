@@ -9,52 +9,10 @@ The idea: define a union of object types, each with a **discriminant** field (a 
 
 This is how you model state machines, API responses, domain events, parser results, and anything else with "one of several possibilities." Let's see why discriminated unions are so powerful.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three identical gray parcels differ only by the small colored tag on their corner, and each rides its own thin arrow straight into the matching colored bin, the discriminant field tells the compiler exactly which variant it holds"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M164 60 H 440" />
-    <path d="M164 115 H 440" />
-    <path d="M164 170 H 440" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="454,60 440,53 440,67" />
-    <polygon points="454,115 440,108 440,122" />
-    <polygon points="454,170 440,163 440,177" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="100" y="40" width="56" height="40" rx="8" />
-    <rect x="100" y="95" width="56" height="40" rx="8" />
-    <rect x="100" y="150" width="56" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="152" cy="44" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="144,104 162,104 153,88" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="145" y="145" width="15" height="15" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }}>
-    <rect x="466" y="37" width="110" height="46" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <rect x="466" y="92" width="110" height="46" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }}>
-    <rect x="466" y="147" width="110" height="46" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-discriminated-unions-cutout"
+  alt="Three variant blocks on a platform each carrying a distinct shaped tag, a reader gate sorting them by tag alone"
+/>
 
 ## The discriminant field
 
@@ -117,55 +75,6 @@ You can name the discriminant field anything you want, but `kind` and `type` are
 The real power of discriminated unions is **exhaustiveness checking**: the compiler can verify you've handled *every* variant. If you add a new variant later and forget to update a `switch` statement, the compiler catches it.
 
 Here's the trick: assign the unhandled case to `never`. If you've covered all variants, the code is unreachable and `never` is satisfied. If you missed a variant, the compiler complains that the leftover type isn't assignable to `never`.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three outlined bins each hold a parcel matching their colored tag, but a fourth parcel with a red diamond tag hovers above a bin that exists only as a dashed outline, exhaustiveness checking complains until every variant has a place to go"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }}>
-    <rect x="50" y="90" width="110" height="60" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <rect x="190" y="90" width="110" height="60" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }}>
-    <rect x="330" y="90" width="110" height="60" rx="10" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="470"
-      y="90"
-      width="110"
-      height="60"
-      rx="10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 8"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="85" y="104" width="40" height="30" rx="6" />
-    <rect x="225" y="104" width="40" height="30" rx="6" />
-    <rect x="365" y="104" width="40" height="30" rx="6" />
-    <rect x="505" y="26" width="40" height="30" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="122" cy="107" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="255,110 271,110 263,96" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="396" y="98" width="13" height="13" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="544,20 553,29 544,38 535,29" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="typescript"

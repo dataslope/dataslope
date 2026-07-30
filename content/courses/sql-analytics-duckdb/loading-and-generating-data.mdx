@@ -9,52 +9,10 @@ introduces two DuckDB conveniences you will use constantly: the `range()`
 generator and `CREATE TABLE AS`. These let you build realistic practice
 datasets in seconds, no files required.
 
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="Three sources, a yellow file card, a green generator capsule with counting squares, and a blue VALUES capsule with literal dots, converge along thin lines into one solid arrow that fills a blue table grid"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="166" y1="64" x2="356" y2="104" />
-    <line x1="166" y1="135" x2="356" y2="104" />
-    <line x1="166" y1="185" x2="356" y2="104" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 70 30 H 140 L 164 54 V 98 H 70 Z" fillOpacity="0.25" />
-    <polygon points="140,30 164,54 140,54" />
-    <rect x="84" y="62" width="50" height="7" rx="3.5" />
-    <rect x="84" y="76" width="36" height="7" rx="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="70" y="120" width="94" height="30" rx="15" fillOpacity="0.2" />
-    <rect x="86" y="130" width="10" height="10" rx="2" />
-    <rect x="104" y="130" width="10" height="10" rx="2" />
-    <rect x="122" y="130" width="10" height="10" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="170" width="94" height="30" rx="15" fillOpacity="0.15" />
-    <circle cx="90" cy="185" r="5" />
-    <circle cx="110" cy="185" r="5" />
-    <circle cx="130" cy="185" r="5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="358" y="102.5" width="26" height="3" rx="1.5" />
-    <polygon points="382,98.5 393,104 382,109.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="410" y="58" width="168" height="18" rx="4" />
-    <rect x="410" y="84" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="468" y="84" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="526" y="84" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="410" y="108" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="468" y="108" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="526" y="108" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="410" y="132" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="468" y="132" width="52" height="18" rx="4" fillOpacity="0.3" />
-    <rect x="526" y="132" width="52" height="18" rx="4" fillOpacity="0.3" />
-  </g>
-</svg>
+<Figure
+  slug="duck-loading-data-cutout"
+  alt="Four chutes feeding one grid platform, one carrying loose literal blocks and one spooling out a generated ribbon of rows"
+/>
 
 ## Four ways data arrives
 
@@ -123,37 +81,6 @@ ORDER BY
 you want 1 through 100, write `range(1, 101)`. This off-by-one is the most
 common `range()` mistake.
 </Callout>
-
-<svg
-  viewBox="0 0 640 140"
-  role="img"
-  aria-label="A translucent blue band covers a row of twelve solid dots from one to twelve, while a thirteenth dot waits ghosted in red just outside the band's right edge, range includes its start but excludes its end"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="48" y="46" width="468" height="44" rx="22" fillOpacity="0.14" />
-    <circle cx="80" cy="68" r="9" />
-    <circle cx="116" cy="68" r="9" />
-    <circle cx="152" cy="68" r="9" />
-    <circle cx="188" cy="68" r="9" />
-    <circle cx="224" cy="68" r="9" />
-    <circle cx="260" cy="68" r="9" />
-    <circle cx="296" cy="68" r="9" />
-    <circle cx="332" cy="68" r="9" />
-    <circle cx="368" cy="68" r="9" />
-    <circle cx="404" cy="68" r="9" />
-    <circle cx="440" cy="68" r="9" />
-    <circle cx="484" cy="68" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="556" cy="68" r="9" fillOpacity="0.3" />
-  </g>
-  <g fill="currentColor" opacity="0.5">
-    <text x="80" y="118" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" textAnchor="middle">1</text>
-    <text x="484" y="118" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" textAnchor="middle">12</text>
-    <text x="556" y="118" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" textAnchor="middle">13</text>
-  </g>
-</svg>
 
 You can turn the integer into dates, categories, and amounts using
 arithmetic and DuckDB's list-indexing trick `['a','b','c'][n]`:
@@ -233,32 +160,6 @@ No import step, no schema declaration, DuckDB infers the columns and
 scans the file. This "query the file in place" ability is a big reason
 analysts love it. The browser sandbox here has no file system, so we
 generate data instead, but the **SQL you practice is identical**.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A green query capsule touches a blue file card directly, and a result row drops straight out of the file's bottom edge, the file is queried in place with no import step in between"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 240 24 H 366 L 400 58 V 130 H 240 Z" fillOpacity="0.12" />
-    <polygon points="366,24 400,58 366,58" />
-    <rect x="258" y="70" width="92" height="8" rx="4" />
-    <rect x="258" y="86" width="116" height="8" rx="4" />
-    <rect x="258" y="102" width="78" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="146" y="68" width="94" height="28" rx="14" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="318.5" y="132" width="3" height="14" rx="1.5" />
-    <polygon points="314.5,144 325.5,144 320,155" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="250" y="164" width="140" height="24" rx="7" fillOpacity="0.2" />
-    <rect x="264" y="172" width="60" height="8" rx="4" />
-  </g>
-</svg>
 
 ## Check your understanding
 

@@ -17,99 +17,10 @@ reporting a sample average as if it were the population's, expecting a
 bigger sample to "change" the answer, or forgetting that a statistic
 wobbles every time you collect new data. Let's pin them down.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A vast field of gray dots hides a yellow ring at its heart while nine scattered dots glow blue; past a solid arrow the same nine reappear in a small tray whose green summary dot is the only number you can actually compute, a sample statistic estimating a population parameter you never see"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="36" y="22" width="380" height="186" rx="18" fill="var(--ds-blue-500)" fillOpacity="0.06" />
-  <g fill="var(--ds-gray-400)">
-    <circle cx="60" cy="50" r="3.5" />
-    <circle cx="92" cy="38" r="3.5" />
-    <circle cx="124" cy="56" r="3.5" />
-    <circle cx="156" cy="40" r="3.5" />
-    <circle cx="188" cy="52" r="3.5" />
-    <circle cx="220" cy="38" r="3.5" />
-    <circle cx="252" cy="54" r="3.5" />
-    <circle cx="284" cy="42" r="3.5" />
-    <circle cx="316" cy="56" r="3.5" />
-    <circle cx="348" cy="40" r="3.5" />
-    <circle cx="380" cy="54" r="3.5" />
-    <circle cx="56" cy="86" r="3.5" />
-    <circle cx="88" cy="74" r="3.5" />
-    <circle cx="120" cy="92" r="3.5" />
-    <circle cx="152" cy="78" r="3.5" />
-    <circle cx="216" cy="76" r="3.5" />
-    <circle cx="248" cy="90" r="3.5" />
-    <circle cx="312" cy="80" r="3.5" />
-    <circle cx="344" cy="92" r="3.5" />
-    <circle cx="376" cy="78" r="3.5" />
-    <circle cx="64" cy="122" r="3.5" />
-    <circle cx="96" cy="110" r="3.5" />
-    <circle cx="128" cy="126" r="3.5" />
-    <circle cx="192" cy="112" r="3.5" />
-    <circle cx="256" cy="124" r="3.5" />
-    <circle cx="288" cy="110" r="3.5" />
-    <circle cx="320" cy="126" r="3.5" />
-    <circle cx="384" cy="112" r="3.5" />
-    <circle cx="58" cy="158" r="3.5" />
-    <circle cx="90" cy="146" r="3.5" />
-    <circle cx="122" cy="162" r="3.5" />
-    <circle cx="154" cy="148" r="3.5" />
-    <circle cx="186" cy="160" r="3.5" />
-    <circle cx="218" cy="146" r="3.5" />
-    <circle cx="250" cy="162" r="3.5" />
-    <circle cx="282" cy="148" r="3.5" />
-    <circle cx="314" cy="160" r="3.5" />
-    <circle cx="346" cy="146" r="3.5" />
-    <circle cx="378" cy="158" r="3.5" />
-    <circle cx="72" cy="190" r="3.5" />
-    <circle cx="104" cy="178" r="3.5" />
-    <circle cx="168" cy="182" r="3.5" />
-    <circle cx="200" cy="192" r="3.5" />
-    <circle cx="232" cy="178" r="3.5" />
-    <circle cx="264" cy="190" r="3.5" />
-    <circle cx="296" cy="180" r="3.5" />
-    <circle cx="328" cy="192" r="3.5" />
-    <circle cx="360" cy="180" r="3.5" />
-    <circle cx="392" cy="190" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M210 112 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M218 112 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0" fillRule="evenodd" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="110" cy="60" r="4.5" />
-    <circle cx="300" cy="64" r="4.5" />
-    <circle cx="76" cy="104" r="4.5" />
-    <circle cx="360" cy="120" r="4.5" />
-    <circle cx="170" cy="136" r="4.5" />
-    <circle cx="264" cy="72" r="4.5" />
-    <circle cx="140" cy="180" r="4.5" />
-    <circle cx="330" cy="168" r="4.5" />
-    <circle cx="212" cy="170" r="4.5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="424" y="102.5" width="28" height="3" rx="1.5" />
-    <polygon points="450,98.5 461,104 450,109.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="478" y="66" width="124" height="98" rx="14" fillOpacity="0.1" />
-    <circle cx="504" cy="92" r="4.5" />
-    <circle cx="540" cy="92" r="4.5" />
-    <circle cx="576" cy="92" r="4.5" />
-    <circle cx="504" cy="116" r="4.5" />
-    <circle cx="540" cy="116" r="4.5" />
-    <circle cx="576" cy="116" r="4.5" />
-    <circle cx="504" cy="140" r="4.5" />
-    <circle cx="540" cy="140" r="4.5" />
-    <circle cx="576" cy="140" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="478" y="178" width="124" height="6" rx="3" fillOpacity="0.3" />
-    <circle cx="546" cy="181" r="6.5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-populations-samples-cutout"
+  alt="An enormous crowd of tiny spheres on a wide platform with a small scoop lifting out a handful onto a tray"
+/>
 
 ## Population vs. sample
 
@@ -163,41 +74,6 @@ pointless:
   course: a modest, representative sample estimates a population
   parameter with quantifiable precision. You don't need everything,
   you need enough, collected well.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A shelf of identical batteries, two of them snapped in half by lifetime testing with a small yellow data spark above each, when measurement destroys the unit, you can only ever test a sample, never the whole shipment"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="132" width="500" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.6">
-    <rect x="90" y="56" width="14" height="6" rx="2" />
-    <rect x="80" y="62" width="34" height="64" rx="6" />
-    <rect x="150" y="56" width="14" height="6" rx="2" />
-    <rect x="140" y="62" width="34" height="64" rx="6" />
-    <rect x="270" y="56" width="14" height="6" rx="2" />
-    <rect x="260" y="62" width="34" height="64" rx="6" />
-    <rect x="330" y="56" width="14" height="6" rx="2" />
-    <rect x="320" y="62" width="34" height="64" rx="6" />
-    <rect x="450" y="56" width="14" height="6" rx="2" />
-    <rect x="440" y="62" width="34" height="64" rx="6" />
-    <rect x="510" y="56" width="14" height="6" rx="2" />
-    <rect x="500" y="62" width="34" height="64" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="210" y="56" width="14" height="6" rx="2" />
-    <rect x="200" y="62" width="34" height="26" rx="6" />
-    <rect x="208" y="98" width="34" height="28" rx="6" />
-    <rect x="390" y="56" width="14" height="6" rx="2" />
-    <rect x="380" y="62" width="34" height="26" rx="6" />
-    <rect x="372" y="98" width="34" height="28" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="217" cy="38" r="5" />
-    <circle cx="397" cy="38" r="5" />
-  </g>
-</svg>
 
 <Callout type="tip" title="Sampling is a feature, not a compromise">
 Sampling isn't a sad approximation you settle for. It's the entire

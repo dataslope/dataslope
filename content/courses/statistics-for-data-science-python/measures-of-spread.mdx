@@ -18,34 +18,10 @@ all of these are spread, not center. This page builds the vocabulary:
 **MAD**, and the **coefficient of variation**, plus the one divisor
 detail (`n−1`) that trips up almost everyone.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two rows of deliveries share one solid yellow average line: the top row's green dots huddle inside a tight capsule while the bottom row's blue dots scatter edge to edge inside a wide one, same center, completely different spread"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="318" y="24" width="4" height="152" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="286" y="54" width="70" height="28" rx="14" fillOpacity="0.15" />
-    <circle cx="298" cy="68" r="6" />
-    <circle cx="309" cy="68" r="6" />
-    <circle cx="320" cy="68" r="6" />
-    <circle cx="331" cy="68" r="6" />
-    <circle cx="342" cy="68" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="124" width="448" height="28" rx="14" fillOpacity="0.1" />
-    <circle cx="112" cy="138" r="6" />
-    <circle cx="182" cy="138" r="6" />
-    <circle cx="252" cy="138" r="6" />
-    <circle cx="320" cy="138" r="6" />
-    <circle cx="390" cy="138" r="6" />
-    <circle cx="460" cy="138" r="6" />
-    <circle cx="528" cy="138" r="6" />
-  </g>
-</svg>
+<Figure
+  slug="stat-measures-of-spread-cutout"
+  alt="Two mounds on a platform sharing one centre pin, one narrow and tall, the other wide and low"
+/>
 
 ## Same center, different spread
 
@@ -203,33 +179,6 @@ population mean. So squared deviations from the sample mean are
 the values, the last value is determined, so only `n−1` deviations are
 truly free to vary.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Five scattered points joined by thin solid spokes to the blue ring of the center they define themselves, while the yellow true center floats a little way off to the side, data always hugs its own mean most tightly, which is why sample spread divides by n minus one to push the estimate back up"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="185" y1="72" x2="251" y2="119" />
-    <line x1="315" y1="80" x2="251" y2="119" />
-    <line x1="195" y1="142" x2="251" y2="119" />
-    <line x1="308" y1="138" x2="251" y2="119" />
-    <line x1="252" y1="165" x2="251" y2="119" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="185" cy="72" r="6" />
-    <circle cx="315" cy="80" r="6" />
-    <circle cx="195" cy="142" r="6" />
-    <circle cx="308" cy="138" r="6" />
-    <circle cx="252" cy="165" r="6" />
-  </g>
-  <circle cx="251" cy="119" r="10" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="372" cy="90" r="16" fillOpacity="0.15" />
-    <circle cx="372" cy="90" r="7" />
-  </g>
-</svg>
-
 <Callout type="info" title="ddof = 'delta degrees of freedom'">
 In NumPy, `ddof` is what gets subtracted from `n` in the divisor.
 `ddof=0` divides by `n` (the **population** formula). `ddof=1` divides
@@ -315,40 +264,6 @@ print("The lone 9000 barely touches the IQR but explodes the std.")
     },
   ]}
 />
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Sorted dots on a line with the middle half wrapped in a green capsule that one far-flung red value cannot stretch, while the red band of the standard deviation below runs all the way out to reach it, the IQR shrugs off the outlier that wrecks the std"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="79" width="520" height="3" rx="1.5" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="144" y="60" width="156" height="40" rx="20" fillOpacity="0.18" />
-    <rect x="144" y="64" width="6" height="32" rx="3" />
-    <rect x="294" y="64" width="6" height="32" rx="3" />
-    <rect x="216" y="66" width="5" height="28" rx="2.5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <circle cx="100" cy="80" r="6" />
-    <circle cx="130" cy="80" r="6" />
-    <circle cx="330" cy="80" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="158" cy="80" r="6" />
-    <circle cx="183" cy="80" r="6" />
-    <circle cx="208" cy="80" r="6" />
-    <circle cx="233" cy="80" r="6" />
-    <circle cx="258" cy="80" r="6" />
-    <circle cx="285" cy="80" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="560" cy="80" r="7" />
-    <rect x="96" y="120" width="470" height="8" rx="4" fillOpacity="0.3" />
-    <rect x="94" y="114" width="5" height="20" rx="2.5" />
-    <rect x="561" y="114" width="5" height="20" rx="2.5" />
-  </g>
-</svg>
 
 <Callout type="tip" title="Std vs IQR: which spread to report">
 Mirror your center choice. If the data is roughly symmetric and you're

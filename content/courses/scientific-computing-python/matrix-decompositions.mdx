@@ -14,58 +14,10 @@ of dense numerical linear algebra: **LU**, **Cholesky**, **QR**,
 **SVD**, and the **eigendecomposition**. We will use each one and
 look at what it tells us.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A solid blue three-by-three grid of cells, a geometric equals sign, then a green lower-triangular grid times a yellow upper-triangular grid with their empty corners left faint, one matrix factored into two structured pieces"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="52" width="30" height="30" rx="6" />
-    <rect x="136" y="52" width="30" height="30" rx="6" />
-    <rect x="172" y="52" width="30" height="30" rx="6" />
-    <rect x="100" y="88" width="30" height="30" rx="6" />
-    <rect x="136" y="88" width="30" height="30" rx="6" />
-    <rect x="172" y="88" width="30" height="30" rx="6" />
-    <rect x="100" y="124" width="30" height="30" rx="6" />
-    <rect x="136" y="124" width="30" height="30" rx="6" />
-    <rect x="172" y="124" width="30" height="30" rx="6" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="234" y="92" width="26" height="5" rx="2.5" />
-    <rect x="234" y="104" width="26" height="5" rx="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.06">
-    <rect x="330" y="52" width="30" height="30" rx="6" />
-    <rect x="366" y="52" width="30" height="30" rx="6" />
-    <rect x="366" y="88" width="30" height="30" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="294" y="52" width="30" height="30" rx="6" />
-    <rect x="294" y="88" width="30" height="30" rx="6" />
-    <rect x="330" y="88" width="30" height="30" rx="6" />
-    <rect x="294" y="124" width="30" height="30" rx="6" />
-    <rect x="330" y="124" width="30" height="30" rx="6" />
-    <rect x="366" y="124" width="30" height="30" rx="6" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="426" y="100.5" width="24" height="5" rx="2.5" transform="rotate(45 438 103)" />
-    <rect x="426" y="100.5" width="24" height="5" rx="2.5" transform="rotate(-45 438 103)" />
-  </g>
-  <g fill="currentColor" opacity="0.06">
-    <rect x="478" y="88" width="30" height="30" rx="6" />
-    <rect x="478" y="124" width="30" height="30" rx="6" />
-    <rect x="514" y="124" width="30" height="30" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="478" y="52" width="30" height="30" rx="6" />
-    <rect x="514" y="52" width="30" height="30" rx="6" />
-    <rect x="550" y="52" width="30" height="30" rx="6" />
-    <rect x="514" y="88" width="30" height="30" rx="6" />
-    <rect x="550" y="88" width="30" height="30" rx="6" />
-    <rect x="550" y="124" width="30" height="30" rx="6" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-decompositions-cutout"
+  alt="One solid matrix cube splitting apart into three structured slab factors arranged in a row on a platform"
+/>
 
 ## The five factorizations at a glance
 
@@ -390,7 +342,6 @@ print(
       filename: "decompose.py",
       starterCode: `import numpy as np
 
-
 def pca_via_svd(X, n_components):
     """Principal Component Analysis using the SVD.
 
@@ -454,18 +405,15 @@ Compute \`U, s, Vt = np.linalg.svd(A, full_matrices=False)\`, keep the top \`k\`
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def low_rank_approx(A, k):
     # TODO: SVD, keep top k singular values, reconstruct
     return A
-
 
 # Quick check: a rank-1 matrix is reproduced exactly by k=1
 A = np.outer([1.0, 2.0, 3.0], [4.0, 5.0])
 print(np.allclose(low_rank_approx(A, 1), A))  # True
 `,
       solutionCode: `import numpy as np
-
 
 def low_rank_approx(A, k):
     A = np.asarray(A, dtype=float)

@@ -19,55 +19,10 @@ data with replacement**. With a few lines of NumPy you get a standard
 error and a confidence interval for almost any statistic, no calculus,
 no distributional assumptions, no lookup tables.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="One row of sample dots loops down a solid arrow into three resamples, where touching pairs reveal observations drawn twice while others vanish, and each resample sends a thin line to its green statistic dot piling into a small hump, resampling your own data with replacement fakes the sampling distribution you cannot collect"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="44" r="7" fillOpacity="0.95" />
-    <circle cx="180" cy="44" r="7" fillOpacity="0.7" />
-    <circle cx="210" cy="44" r="7" fillOpacity="0.5" />
-    <circle cx="240" cy="44" r="7" fillOpacity="0.3" />
-    <circle cx="270" cy="44" r="7" fillOpacity="0.85" />
-    <circle cx="300" cy="44" r="7" fillOpacity="0.45" />
-  </g>
-  <path d="M 122 58 C 96 84 96 146 118 170" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round" />
-  <polygon points="110,162 126,178 128,158" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="120" r="7" fillOpacity="0.95" />
-    <circle cx="166" cy="120" r="7" fillOpacity="0.95" />
-    <circle cx="210" cy="120" r="7" fillOpacity="0.5" />
-    <circle cx="240" cy="120" r="7" fillOpacity="0.3" />
-    <circle cx="290" cy="120" r="7" fillOpacity="0.45" />
-    <circle cx="306" cy="120" r="7" fillOpacity="0.45" />
-    <circle cx="150" cy="152" r="7" fillOpacity="0.7" />
-    <circle cx="196" cy="152" r="7" fillOpacity="0.5" />
-    <circle cx="212" cy="152" r="7" fillOpacity="0.5" />
-    <circle cx="256" cy="152" r="7" fillOpacity="0.85" />
-    <circle cx="272" cy="152" r="7" fillOpacity="0.85" />
-    <circle cx="320" cy="152" r="7" fillOpacity="0.45" />
-    <circle cx="150" cy="184" r="7" fillOpacity="0.95" />
-    <circle cx="180" cy="184" r="7" fillOpacity="0.7" />
-    <circle cx="226" cy="184" r="7" fillOpacity="0.3" />
-    <circle cx="242" cy="184" r="7" fillOpacity="0.3" />
-    <circle cx="286" cy="184" r="7" fillOpacity="0.85" />
-    <circle cx="316" cy="184" r="7" fillOpacity="0.45" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="348" y1="120" x2="394" y2="120" />
-    <line x1="348" y1="152" x2="394" y2="152" />
-    <line x1="348" y1="184" x2="394" y2="184" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="408" cy="120" r="5.5" />
-    <circle cx="408" cy="152" r="5.5" />
-    <circle cx="408" cy="184" r="5.5" />
-    <path d="M 470 196 C 494 196 498 144 520 144 C 542 144 546 196 570 196 Z" fillOpacity="0.45" />
-  </g>
-  <rect x="450" y="197" width="140" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
+<Figure
+  slug="stat-bootstrap-cutout"
+  alt="One sample tray on a platform being re-drawn from repeatedly with replacement, the copies stacking into a small mound"
+/>
 
 ## The core idea: your sample stands in for the population
 

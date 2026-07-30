@@ -36,42 +36,10 @@ The WASI runtime uses a similar layout in linear memory; the
 addresses just happen to be inside the WebAssembly module's memory
 rather than your laptop's physical RAM.
 
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="One horizontal strip of memory: a gray code segment, blue data and bss segments, then a green heap and a yellow stack whose arrows grow toward each other across the shrinking gap between them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="60" y="60" width="90" height="44" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="154" y="60" width="70" height="44" rx="8" />
-    <rect x="228" y="60" width="56" height="44" rx="8" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="288" y="60" width="110" height="44" rx="8" />
-    <path
-      d="M402 74 H 420"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <polygon points="432,74 418,67 418,81" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="470" y="60" width="110" height="44" rx="8" />
-    <path
-      d="M466 90 H 448"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <polygon points="436,90 450,83 450,97" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-memory-layout-cutout"
+  alt="A tall cutaway column on a platform divided into four labelled bands, one growing upward and one downward toward the middle"
+/>
 
 ## Seeing the regions
 
@@ -173,39 +141,6 @@ storing its contents, which is exactly what the segment still does.
 Like `a.out` from the toolchain chapter, it is a name that outlived
 every machine, operating system, and programmer fashion of its era
 because the *idea* it names never stopped being useful.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Initialized globals travel as solid blue crates with real contents, while the zeroed globals' spot is only a dashed outline carrying a small yellow manifest tag, BSS ships as metadata, not bytes"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="96" width="52" height="52" rx="8" />
-    <rect x="198" y="96" width="52" height="52" rx="8" />
-    <rect x="168" y="40" width="52" height="52" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="420"
-      y="52"
-      width="96"
-      height="96"
-      rx="10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 8"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="470" y="36" width="54" height="30" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <rect x="478" y="48" width="38" height="5" rx="2.5" />
-  </g>
-</svg>
 
 ## Storage classes for variables
 

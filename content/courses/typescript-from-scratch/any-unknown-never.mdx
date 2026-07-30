@@ -14,55 +14,10 @@ This chapter answers: **What is `any` and when should you (not) use it?**
 **How is `unknown` different?** **What does `never` represent?** **How do
 these types relate to each other?**
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three boxes: the first has no lid and its contents tumble out anywhere, the second is shut tight with a small yellow padlock that demands a check before use, and the third is only a dashed empty outline, any ignores the rules, unknown locks them, never holds nothing at all"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="110" width="100" height="70" rx="10" fillOpacity="0.55" />
-    <rect x="270" y="100" width="100" height="80" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="128" cy="88" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="162" y="72" width="18" height="18" rx="4" transform="rotate(14 171 81)" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="200,96 214,70 228,96" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }}>
-    <path
-      d="M312 122 V 112 A 8 8 0 0 1 328 112 V 122"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="4"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="304" y="122" width="32" height="24" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="320" cy="133" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="440"
-      y="100"
-      width="100"
-      height="80"
-      rx="10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 8"
-      strokeLinecap="round"
-    />
-  </g>
-</svg>
+<Figure
+  slug="tsx-any-unknown-never-cutout"
+  alt="A lattice on a platform with a wide open top plate, a sealed top plate beside it, and one entirely empty socket at the bottom"
+/>
 
 ## The type hierarchy: top and bottom
 
@@ -450,58 +405,6 @@ console.log("Type relationships demonstrated");
     },
   ]}
 />
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Colored value dots rest on the wide top shelf where anything fits, thin arrows fall to the middle type shelves, and the tiny dashed shelf at the bottom holds nothing yet sends arrows up to the shelves above, anything fits in unknown, nothing fits in never, and never fits anywhere"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M240 64 V 92" />
-    <path d="M410 64 V 92" />
-    <path d="M302 176 L 246 136" />
-    <path d="M338 176 L 394 136" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="240,104 233,92 247,92" />
-    <polygon points="410,104 403,92 417,92" />
-    <polygon points="240.5,134 246,145 251.5,134" />
-    <polygon points="388.5,134 394,145 399.5,134" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="140" y="42" width="360" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="32" r="7" />
-    <circle cx="380" cy="30" r="7" />
-    <rect x="170" y="110" width="120" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="260" cy="30" r="7" />
-    <circle cx="440" cy="32" r="7" />
-    <rect x="350" y="110" width="120" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="32" r="7" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeDasharray="5 6"
-    strokeLinecap="round"
-  >
-    <rect x="290" y="180" width="60" height="14" rx="7" />
-  </g>
-</svg>
 
 ## Practice: a safe JSON parser
 

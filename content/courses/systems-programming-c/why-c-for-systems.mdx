@@ -9,28 +9,10 @@ it is still the language that the world's most important systems are
 written in. Knowing why will help you understand what to expect from
 the language, and what *not* to expect.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A pyramid of software blocks, runtimes, databases, kernels, stacked in two tiers, all resting on one wide solid blue slab of C at the base"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="180" y="72" width="80" height="32" rx="7" />
-    <rect x="390" y="112" width="110" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="300" y="72" width="80" height="32" rx="7" fillOpacity="0.55" />
-    <rect x="120" y="160" width="400" height="32" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="140" y="112" width="110" height="40" rx="8" />
-    <rect x="420" y="72" width="60" height="32" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="265" y="112" width="110" height="40" rx="8" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-why-c-cutout"
+  alt="A small lean engine block bolted directly onto a bare machine floor, no insulating layers between them"
+/>
 
 ## A language named after its predecessor
 
@@ -170,29 +152,6 @@ A pragmatic course must be honest about C's costs:
 - **Undefined behavior is everywhere.** Signed overflow, reading
   uninitialized memory, strict aliasing violations, the compiler is
   allowed to do *anything* in response.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A blue walker stands at the tip of a plank that runs straight past the edge of its supporting cliff, with red spikes on the ground far below, C's speed comes with no bounds checks and no runtime to catch you"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="80" y="80" width="180" height="90" rx="8" />
-    <rect x="320" y="166" width="240" height="6" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <rect x="100" y="72" width="320" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="402" cy="63" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="350,166 368,138 386,166" />
-    <polygon points="396,166 414,138 432,166" />
-    <polygon points="442,166 460,138 478,166" fillOpacity="0.75" />
-  </g>
-</svg>
 
 <Callout type="warn" title="Undefined behavior is not just &quot;crashes&quot;">
 "Undefined behavior" (UB) means the C standard imposes no

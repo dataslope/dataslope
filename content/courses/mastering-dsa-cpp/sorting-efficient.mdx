@@ -7,37 +7,10 @@ The slow sorts of the last page all share a flaw: they move information one comp
 
 The two stars of this page were born decades apart and embody opposite temperaments. Merge sort is the careful one: John von Neumann worked it out in 1945, making it one of the first algorithms ever written for a stored-program computer, and it *guarantees* O(n log n) no matter what you feed it. Quicksort is the daring one, usually faster in practice, occasionally catastrophic, and its origin story is one of the best in computing.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two small sorted runs of bars flow down dotted paths and interleave into one fully sorted row below, merge sort combining sorted halves"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="150" y="70" width="20" height="18" rx="5" />
-    <rect x="176" y="58" width="20" height="30" rx="5" />
-    <rect x="202" y="46" width="20" height="42" rx="5" />
-    <rect x="228" y="34" width="20" height="54" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="360" y="74" width="20" height="14" rx="5" />
-    <rect x="386" y="62" width="20" height="26" rx="5" />
-    <rect x="412" y="50" width="20" height="38" rx="5" />
-    <rect x="438" y="38" width="20" height="50" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="219" y="171" width="20" height="14" rx="5" />
-    <rect x="271" y="159" width="20" height="26" rx="5" />
-    <rect x="323" y="147" width="20" height="38" rx="5" />
-    <rect x="375" y="135" width="20" height="50" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="245" y="167" width="20" height="18" rx="5" />
-    <rect x="297" y="155" width="20" height="30" rx="5" />
-    <rect x="349" y="143" width="20" height="42" rx="5" />
-    <rect x="401" y="131" width="20" height="54" rx="5" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-sorting-efficient-cutout"
+  alt="An unsorted bar row splitting down a fork into two smaller trays, then merging back up into one tidy ascending staircase"
+/>
 
 ## Merge sort
 

@@ -7,62 +7,10 @@ The difference between mediocre TypeScript and great TypeScript often comes down
 
 This chapter is the capstone of type-driven design. We'll take sloppy, bug-prone type definitions and evolve them into precise, self-documenting structures that use discriminated unions, literal types, and careful narrowing to eliminate invalid states. By the end, you'll see how the compiler can enforce your business logic at compile time, long before any code runs.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Three solid state cards are joined by thin arrows along the only transitions the domain allows; a red dashed shortcut between the ends is crossed out, and a dashed empty card floats apart with no connections at all, illegal states and transitions have nowhere to exist"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M204 85 H 256" />
-    <path d="M384 85 H 436" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="268,85 256,79 256,91" />
-    <polygon points="448,85 436,79 436,91" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M145 114 C 200 185, 380 190, 490 118"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeDasharray="7 8"
-    />
-    <path d="M308 152 L 332 176" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M332 152 L 308 176" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="60" width="110" height="50" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="270" y="60" width="110" height="50" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="450" y="60" width="110" height="50" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="490"
-      y="182"
-      width="100"
-      height="42"
-      rx="12"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 8"
-      strokeLinecap="round"
-    />
-  </g>
-</svg>
+<Figure
+  slug="tsx-modeling-domains-cutout"
+  alt="A socket board on a platform where every impossible pairing of tokens is physically blocked from fitting"
+/>
 
 ## The problem: boolean soup
 
@@ -440,63 +388,6 @@ console.log(
 />
 
 Each payment method is a distinct variant with its own fields. No optional properties, no runtime checks for "is this a credit card or a bank account?", the type tells you.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="On the left a grid of eight boolean combinations includes two crossed out in red; on the right a single dial points at one of exactly three positions, replacing boolean soup with one variant field leaves illegal mixes no place to live"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="80" y="42" width="32" height="32" rx="6" />
-    <rect x="124" y="42" width="32" height="32" rx="6" />
-    <rect x="168" y="42" width="32" height="32" rx="6" />
-    <rect x="212" y="42" width="32" height="32" rx="6" />
-    <rect x="80" y="118" width="32" height="32" rx="6" />
-    <rect x="212" y="118" width="32" height="32" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="124" y="118" width="32" height="32" rx="6" />
-    <rect x="168" y="118" width="32" height="32" rx="6" />
-  </g>
-  <g
-    style={{ color: "var(--ds-white)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M132 126 L 148 142" />
-    <path d="M148 126 L 132 142" />
-    <path d="M176 126 L 192 142" />
-    <path d="M192 126 L 176 142" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="290" y="94" width="4" height="60" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <circle cx="450" cy="106" r="48" fill="none" stroke="currentColor" strokeWidth="4" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M450 106 L 450 66" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="450" cy="106" r="7" />
-    <circle cx="450" cy="46" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="398" cy="136" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="502" cy="136" r="8" />
-  </g>
-</svg>
 
 ## Literal types for constrained values
 

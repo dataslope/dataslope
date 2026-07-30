@@ -23,41 +23,10 @@ These are not "exotic" bugs, they are the source of an enormous
 share of real-world security vulnerabilities (CVEs). Recognizing the
 patterns is half the battle.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A red bug with thin legs crawls along a row of blue memory cells, and the two cells just behind it sit tilted and turned yellow, memory bugs corrupt whatever they touch"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="110" width="40" height="40" rx="7" />
-    <rect x="186" y="110" width="40" height="40" rx="7" />
-    <rect x="232" y="110" width="40" height="40" rx="7" />
-    <rect x="416" y="110" width="40" height="40" rx="7" />
-    <rect x="462" y="110" width="40" height="40" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="278" y="112" width="40" height="40" rx="7" transform="rotate(-7 298 132)" />
-    <rect x="324" y="110" width="40" height="40" rx="7" transform="rotate(6 344 130)" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M382 92 L 370 104" />
-    <path d="M393 96 L 391 108" />
-    <path d="M406 92 L 416 102" />
-    <path d="M418 62 L 426 52" />
-    <path d="M410 58 L 411 48" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="395" cy="80" r="16" />
-    <circle cx="414" cy="66" r="8" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-memory-bugs-cutout"
+  alt="A memory strip on a platform with a dangling arrow pointing into a freed hole and a block spilling past its boundary"
+/>
 
 ## 1. Use-after-free
 
@@ -195,38 +164,6 @@ Writing past the end of an allocation (stack or heap) is the canonical
 C bug. Depending on the layout it may corrupt neighboring variables,
 allocator metadata, or, historically, before stack protections, the
 function's return address, leading to remote code execution.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Blue blocks stacked past the rim of the left box send a red one toppling over the shared wall toward the green value in the box next door, a buffer overflow corrupting its neighbour"
-  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="170" y="70" width="6" height="90" rx="3" />
-    <rect x="300" y="70" width="6" height="90" rx="3" />
-    <rect x="430" y="70" width="6" height="90" rx="3" />
-    <rect x="170" y="154" width="266" height="6" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="190" y="130" width="30" height="22" rx="4" />
-    <rect x="224" y="130" width="30" height="22" rx="4" />
-    <rect x="258" y="130" width="30" height="22" rx="4" />
-    <rect x="190" y="106" width="30" height="22" rx="4" />
-    <rect x="224" y="106" width="30" height="22" rx="4" />
-    <rect x="258" y="106" width="30" height="22" rx="4" />
-    <rect x="190" y="82" width="30" height="22" rx="4" />
-    <rect x="224" y="82" width="30" height="22" rx="4" />
-    <rect x="258" y="82" width="30" height="22" rx="4" />
-    <rect x="224" y="58" width="30" height="22" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="292" y="40" width="30" height="22" rx="4" transform="rotate(24 307 51)" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="368" cy="140" r="10" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="c"
@@ -418,38 +355,6 @@ a `union`. Do not cast unrelated pointer types and dereference them.
 
 C cannot give you safety, but you can build habits and tooling around
 the language:
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three red arrows fly toward a green core and each is stopped by a successively deeper blue wall, warnings, sanitizers, and runtime checks giving defense in depth for memory safety"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="250" y="50" width="10" height="100" rx="4" />
-    <rect x="330" y="60" width="10" height="80" rx="4" />
-    <rect x="410" y="70" width="10" height="60" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="500" cy="100" r="16" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M120 80 H 230" />
-    <path d="M120 100 H 310" />
-    <path d="M120 120 H 390" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="244,80 230,73 230,87" />
-    <polygon points="324,100 310,93 310,107" />
-    <polygon points="404,120 390,113 390,127" />
-  </g>
-</svg>
 
 | Defense | What it catches |
 | --- | --- |

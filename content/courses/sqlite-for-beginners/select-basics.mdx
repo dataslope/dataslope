@@ -10,37 +10,10 @@ choose which **columns** you want from a table.
 A helpful first idea: a `SELECT` query does **not** change the stored
 table. It creates a temporary result table for you to look at.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A table card holds four columns, and past a solid gray arrow the result card carries copies of just the chosen blue and yellow columns while the table keeps them all, SELECT chooses columns to look at without changing the stored table"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="52" y="32" width="280" height="150" rx="12" fillOpacity="0.08" />
-    <rect x="72" y="48" width="50" height="118" rx="6" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="134" y="48" width="50" height="118" rx="6" />
-    <rect x="258" y="48" width="50" height="118" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="196" y="48" width="50" height="118" rx="6" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="348" y="103.5" width="32" height="3" rx="1.5" />
-    <polygon points="378,99.5 389,105 378,110.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="410" y="52" width="178" height="110" rx="12" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="434" y="68" width="56" height="78" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="506" y="68" width="56" height="78" rx="6" />
-  </g>
-</svg>
+<Figure
+  slug="lite-select-basics-cutout"
+  alt="A grid platform with two of its columns lifted out onto a small temporary result tray beside it"
+/>
 
 ## SELECT chooses columns
 
@@ -213,34 +186,6 @@ FROM
 
 There are five books, but only three genres. `DISTINCT` is perfect for
 questions like "what categories exist?"
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="Five stamps in a row include the same blue design three times; below, each design appears exactly once, DISTINCT keeps one copy of every different value"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="130" cy="40" r="15" />
-    <circle cx="290" cy="40" r="15" fillOpacity="0.85" />
-    <circle cx="450" cy="40" r="15" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="195" y="26" width="30" height="28" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 370 26 L 384 54 L 356 54 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="210" cy="130" r="15" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="275" y="116" width="30" height="28" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 370 116 L 384 144 L 356 144 Z" />
-  </g>
-</svg>
 
 `DISTINCT` works on the whole selected row. If you select two columns,
 SQLite keeps each unique combination of those two columns.

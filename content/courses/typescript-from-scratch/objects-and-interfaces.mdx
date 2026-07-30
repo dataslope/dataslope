@@ -16,67 +16,10 @@ difference between `interface` and `type`, and how TypeScript's
 **structural type system** makes objects compatible based on their shape,
 not their declared name.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A workshop shadow board: painted silhouettes mark each required tool, a blue bar and a green disc hang over their matching outlines, a triangle outline waits empty beside a red alert dot, and a yellow extra tool hangs off the board, an interface as the painted shape an object must fill"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.06">
-    <rect x="70" y="30" width="400" height="180" rx="16" />
-  </g>
-  <g fill="currentColor" opacity="0.1">
-    <circle cx="100" cy="58" r="2" />
-    <circle cx="148" cy="58" r="2" />
-    <circle cx="196" cy="58" r="2" />
-    <circle cx="244" cy="58" r="2" />
-    <circle cx="292" cy="58" r="2" />
-    <circle cx="340" cy="58" r="2" />
-    <circle cx="388" cy="58" r="2" />
-    <circle cx="436" cy="58" r="2" />
-    <circle cx="100" cy="106" r="2" />
-    <circle cx="148" cy="106" r="2" />
-    <circle cx="196" cy="106" r="2" />
-    <circle cx="244" cy="106" r="2" />
-    <circle cx="292" cy="106" r="2" />
-    <circle cx="340" cy="106" r="2" />
-    <circle cx="388" cy="106" r="2" />
-    <circle cx="436" cy="106" r="2" />
-    <circle cx="100" cy="154" r="2" />
-    <circle cx="148" cy="154" r="2" />
-    <circle cx="196" cy="154" r="2" />
-    <circle cx="244" cy="154" r="2" />
-    <circle cx="292" cy="154" r="2" />
-    <circle cx="340" cy="154" r="2" />
-    <circle cx="388" cy="154" r="2" />
-    <circle cx="436" cy="154" r="2" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <rect x="117" y="85" width="90" height="22" rx="11" />
-    <circle cx="307" cy="99" r="24" />
-    <path d="M200 132 L232 186 L168 186 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="110" y="78" width="90" height="22" rx="11" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="300" cy="92" r="24" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="246" cy="140" r="5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <rect x="518" y="68" width="4" height="20" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="498" y="88" width="42" height="42" rx="9" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <circle cx="560" cy="190" r="3" />
-    <circle cx="38" cy="120" r="3" />
-    <circle cx="600" cy="40" r="3" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-objects-interfaces-cutout"
+  alt="A contract plate on a platform describing three sockets, an object block resting on it matching each one"
+/>
 
 ## Object type literals
 
@@ -232,27 +175,6 @@ The type of `bob.age` is `number | undefined`, so you must narrow before
 treating it as a pure `number`. This forces you to handle the "missing
 property" case explicitly, preventing `TypeError`s at runtime.
 
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="On a small shadow board two outlines hold their green and blue tools while a third spot simply stays empty and raises no alarm, optional properties may be filled or left absent"
-  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.06">
-    <rect x="110" y="24" width="420" height="112" rx="14" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <circle cx="196" cy="86" r="22" />
-    <rect x="438" y="64" width="44" height="44" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="188" cy="78" r="22" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="430" y="56" width="44" height="44" rx="9" />
-  </g>
-</svg>
-
 ## Readonly properties
 
 A `readonly` property can be set once (during initialization) but not
@@ -353,49 +275,6 @@ console.log("apple:", data.apple);
 be compatible with it. In the example above, `count` is a `number`, which
 matches the index signature `[key: string]: number`. If `count` were a
 `string`, the compiler would reject it.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A wall of identical pigeonholes accepts only green discs: one green-tinted slot is reserved by name, several wait empty, and a red triangle hovering outside fits none, an index signature gives every key the same value type"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.1">
-    <rect x="80" y="36" width="56" height="44" rx="8" />
-    <rect x="148" y="36" width="56" height="44" rx="8" />
-    <rect x="216" y="36" width="56" height="44" rx="8" />
-    <rect x="352" y="36" width="56" height="44" rx="8" />
-    <rect x="420" y="36" width="56" height="44" rx="8" />
-    <rect x="80" y="92" width="56" height="44" rx="8" />
-    <rect x="148" y="92" width="56" height="44" rx="8" />
-    <rect x="216" y="92" width="56" height="44" rx="8" />
-    <rect x="284" y="92" width="56" height="44" rx="8" />
-    <rect x="352" y="92" width="56" height="44" rx="8" />
-    <rect x="420" y="92" width="56" height="44" rx="8" />
-    <rect x="80" y="148" width="56" height="44" rx="8" />
-    <rect x="148" y="148" width="56" height="44" rx="8" />
-    <rect x="216" y="148" width="56" height="44" rx="8" />
-    <rect x="284" y="148" width="56" height="44" rx="8" />
-    <rect x="352" y="148" width="56" height="44" rx="8" />
-    <rect x="420" y="148" width="56" height="44" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="284" y="36" width="56" height="44" rx="8" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="108" cy="58" r="13" />
-    <circle cx="244" cy="58" r="13" />
-    <circle cx="312" cy="58" r="13" />
-    <circle cx="176" cy="114" r="13" />
-    <circle cx="380" cy="114" r="13" />
-    <circle cx="108" cy="170" r="13" />
-    <circle cx="312" cy="170" r="13" />
-    <circle cx="448" cy="170" r="13" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M560 96 L578 126 L542 126 Z" />
-  </g>
-</svg>
 
 ## Interface extension
 
@@ -513,44 +392,6 @@ confusing, so use it sparingly. Declaration merging is one of the main
 reasons to prefer `interface` over `type` for public APIs, if users need
 to extend your types, they can re-declare the interface in their own
 code.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Two capsules each carrying one porthole slide down and fuse into a single two-tone capsule with both portholes, declaring the same interface name twice merges its members into one shape"
-  style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="36" width="140" height="44" rx="22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="380" y="36" width="140" height="44" rx="22" />
-  </g>
-  <g fill="var(--ds-white)">
-    <circle cx="190" cy="58" r="6.5" />
-    <circle cx="450" cy="58" r="6.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M212 90 L 276 122" />
-    <path d="M428 90 L 364 122" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M254 130 L320 130 L320 178 L254 178 C240.7 178 230 167.3 230 154 C230 140.7 240.7 130 254 130 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M320 130 L386 130 C399.3 130 410 140.7 410 154 C410 167.3 399.3 178 386 178 L320 178 Z" />
-  </g>
-  <g fill="var(--ds-white)">
-    <circle cx="285" cy="154" r="6.5" />
-    <circle cx="355" cy="154" r="6.5" />
-  </g>
-</svg>
 
 ## `interface` vs `type`: when to use which
 

@@ -15,31 +15,10 @@ curve. Second, it relentlessly clears away every classic misreading,
 because knowing what a p-value is *not* is just as important as knowing
 what it is.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A bell-shaped blue histogram records every gap pure noise produced in a no-effect world; a solid red post marks the gap actually observed, and the small yellow tail bar at or beyond it is the p-value, the fraction of the boring world at least as extreme as you"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.35">
-    <rect x="122" y="170" width="30" height="16" rx="4" />
-    <rect x="154" y="154" width="30" height="32" rx="4" />
-    <rect x="186" y="122" width="30" height="64" rx="4" />
-    <rect x="218" y="82" width="30" height="104" rx="4" />
-    <rect x="250" y="50" width="30" height="136" rx="4" />
-    <rect x="282" y="50" width="30" height="136" rx="4" />
-    <rect x="314" y="82" width="30" height="104" rx="4" />
-    <rect x="346" y="122" width="30" height="64" rx="4" />
-    <rect x="378" y="154" width="30" height="32" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="410" y="170" width="30" height="16" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="405" y="60" width="4" height="126" rx="2" />
-  </g>
-  <rect x="90" y="186" width="440" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
+<Figure
+  slug="stat-p-values-cutout"
+  alt="A bell curve on a platform with only the sliver of area beyond an observed marker shaded in a distinct colour"
+/>
 
 ## The one-sentence definition
 
@@ -467,48 +446,6 @@ null tests is exactly what chance predicts. This is the multiple-comparisons
 problem in a single comic, and you will see real analyses make the same
 mistake without the punchline.
 </Callout>
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A wall of identical test tiles, every one of them pure noise, with exactly one glowing green, scan enough comparisons and luck alone will hand you a discovery to misreport"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.12">
-    <rect x="110" y="40" width="64" height="50" rx="10" />
-    <rect x="186" y="40" width="64" height="50" rx="10" />
-    <rect x="262" y="40" width="64" height="50" rx="10" />
-    <rect x="338" y="40" width="64" height="50" rx="10" />
-    <rect x="414" y="40" width="64" height="50" rx="10" />
-    <rect x="110" y="102" width="64" height="50" rx="10" />
-    <rect x="186" y="102" width="64" height="50" rx="10" />
-    <rect x="338" y="102" width="64" height="50" rx="10" />
-    <rect x="414" y="102" width="64" height="50" rx="10" />
-    <rect x="34" y="40" width="64" height="50" rx="10" />
-    <rect x="34" y="102" width="64" height="50" rx="10" />
-    <rect x="490" y="40" width="64" height="50" rx="10" />
-    <rect x="490" y="102" width="64" height="50" rx="10" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="66" cy="65" r="4" />
-    <circle cx="142" cy="65" r="4" />
-    <circle cx="218" cy="65" r="4" />
-    <circle cx="294" cy="65" r="4" />
-    <circle cx="370" cy="65" r="4" />
-    <circle cx="446" cy="65" r="4" />
-    <circle cx="522" cy="65" r="4" />
-    <circle cx="66" cy="127" r="4" />
-    <circle cx="142" cy="127" r="4" />
-    <circle cx="218" cy="127" r="4" />
-    <circle cx="370" cy="127" r="4" />
-    <circle cx="446" cy="127" r="4" />
-    <circle cx="522" cy="127" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="262" y="102" width="64" height="50" rx="10" fillOpacity="0.5" />
-    <circle cx="294" cy="127" r="6" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

@@ -7,45 +7,10 @@ You've written types, modeled domains, and structured architectures. But what do
 
 This chapter reveals the compiler's inner workings: how it catches bugs at compile time, enables refactoring with confidence, proves exhaustiveness, and drives the language service that powers autocomplete, go-to-definition, and instant feedback in your editor.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Parcels ride a belt through a blue scanning arch on their way to the departure flag: the parcel inside the arch reveals a red flaw, while the cleared parcels beyond carry small green dots, static analysis inspects code before it ever ships"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="50" y="160" width="540" height="8" rx="4" />
-    <rect x="110" y="118" width="52" height="42" rx="6" />
-    <rect x="190" y="126" width="44" height="34" rx="6" />
-    <rect x="296" y="118" width="48" height="42" rx="6" />
-    <rect x="430" y="118" width="48" height="42" rx="6" />
-    <rect x="510" y="126" width="40" height="34" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="256" y="36" width="12" height="124" rx="5" />
-    <rect x="372" y="36" width="12" height="124" rx="5" />
-    <rect x="250" y="24" width="140" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M320 124 L324 132 L333 133 L326 139 L329 148 L320 143 L311 148 L314 139 L307 133 L316 132 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="454" cy="128" r="6" />
-    <circle cx="530" cy="136" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M600 160 V 112"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="600,112 626,120 600,128" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-static-analysis-cutout"
+  alt="A checking lens sweeping a block assembly on a platform, flagging one mismatched socket before the machine runs"
+/>
 
 ---
 
@@ -321,41 +286,6 @@ console.log(processValue(0));
 />
 
 If you add another `else` after the `value === 0` case, it's unreachable, and the compiler can warn you.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A solid blue route runs straight through to a green terminal, while a faint gray spur drops away to a node nothing ever reaches, ringed in red, the compiler proves that code after a return or an impossible branch can never run"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M70 70 H 550" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-300)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M300 72 C 330 96, 360 118, 384 134" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="565" cy="70" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <circle cx="396" cy="142" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <circle cx="396" cy="142" r="15" fill="none" stroke="currentColor" strokeWidth="3" />
-  </g>
-</svg>
 
 ---
 

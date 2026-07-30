@@ -12,63 +12,10 @@ return it later with `free`.
 Manual heap management is C's most distinctive (and most dangerous)
 feature. This page is the long, careful introduction.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A wall of storage lockers, several claimed in green: a small yellow key floats beside the brightest locker ready to open it, while a red key lies lost at the bottom, its locker latched forever, malloc hands out space that only free can return"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.1">
-    <rect x="64" y="40" width="56" height="40" rx="5" />
-    <rect x="196" y="40" width="56" height="40" rx="5" />
-    <rect x="262" y="40" width="56" height="40" rx="5" />
-    <rect x="394" y="40" width="56" height="40" rx="5" />
-    <rect x="130" y="90" width="56" height="40" rx="5" />
-    <rect x="328" y="90" width="56" height="40" rx="5" />
-    <rect x="130" y="140" width="56" height="40" rx="5" />
-    <rect x="196" y="140" width="56" height="40" rx="5" />
-    <rect x="262" y="140" width="56" height="40" rx="5" />
-    <rect x="328" y="140" width="56" height="40" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="130" y="40" width="56" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="328" y="40" width="56" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="196" y="90" width="56" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="64" y="140" width="56" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="64" y="90" width="56" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="262" y="90" width="56" height="40" rx="5" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="394" y="140" width="56" height="40" rx="5" fillOpacity="0.45" />
-  </g>
-  <g fill="currentColor" opacity="0.45">
-    <rect x="412" y="156" width="20" height="7" rx="3.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-yellow-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <circle cx="363" cy="110" r="7" />
-    <path d="M356 110 H 330" />
-    <path d="M334 110 V 118" />
-    <path d="M342 110 V 116" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <circle cx="414" cy="208" r="7" />
-    <path d="M421 208 H 447" />
-    <path d="M441 208 V 216" />
-    <path d="M433 208 V 214" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-heap-cutout"
+  alt="A wide open field of free blocks on a platform with a requesting hand receiving one block and a return chute beside it"
+/>
 
 ## The four heap functions
 
@@ -227,40 +174,6 @@ by `memset(p, 0, ...)`.
 - allocate a *new* block, copy the old contents, and free the old one,
 - or return `NULL` (the old block is **still valid** in this case).
 
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="Four dots sit in a snug container, and the same four dots reappear in a roomier container with four hollow slots still waiting, realloc copies the contents to a bigger block and retires the old one"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="62" width="128" height="56" rx="12" fillOpacity="0.12" />
-    <circle cx="96" cy="90" r="9" fillOpacity="0.4" />
-    <circle cx="120" cy="90" r="9" fillOpacity="0.4" />
-    <circle cx="144" cy="90" r="9" fillOpacity="0.4" />
-    <circle cx="168" cy="90" r="9" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="330" y="62" width="240" height="56" rx="12" fillOpacity="0.2" />
-    <circle cx="358" cy="90" r="9" />
-    <circle cx="384" cy="90" r="9" />
-    <circle cx="410" cy="90" r="9" />
-    <circle cx="436" cy="90" r="9" />
-  </g>
-  <g
-    style={{ color: "var(--ds-white)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeOpacity="0.9"
-  >
-    <circle cx="462" cy="90" r="7.5" />
-    <circle cx="488" cy="90" r="7.5" />
-    <circle cx="514" cy="90" r="7.5" />
-    <circle cx="540" cy="90" r="7.5" />
-  </g>
-</svg>
-
 <Callout type="warn" title="Never assign realloc's result back over the only pointer">
 `p = realloc(p, n);` leaks the original block if `realloc` fails. The
 safe pattern is to use a temporary.
@@ -373,32 +286,6 @@ pushing 17 elements and predict the capacity before you run.
 
 Doubling the capacity each time gives amortized O(1) `push`. This is
 exactly how `std::vector<T>` in C++ and `Vec<T>` in Rust grow.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Capacity columns double from two to four to eight slots as green pushes fill them, doubling keeps the copy-everything resizes rare, so pushes stay cheap on average"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.85">
-    <rect x="120" y="152" width="40" height="14" rx="3" />
-    <rect x="120" y="134" width="40" height="14" rx="3" />
-    <rect x="240" y="152" width="40" height="14" rx="3" />
-    <rect x="240" y="134" width="40" height="14" rx="3" />
-    <rect x="240" y="116" width="40" height="14" rx="3" />
-    <rect x="240" y="98" width="40" height="14" rx="3" />
-    <rect x="400" y="152" width="40" height="14" rx="3" />
-    <rect x="400" y="134" width="40" height="14" rx="3" />
-    <rect x="400" y="116" width="40" height="14" rx="3" />
-    <rect x="400" y="98" width="40" height="14" rx="3" />
-    <rect x="400" y="80" width="40" height="14" rx="3" />
-    <rect x="400" y="62" width="40" height="14" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.15">
-    <rect x="400" y="44" width="40" height="14" rx="3" />
-    <rect x="400" y="26" width="40" height="14" rx="3" />
-  </g>
-</svg>
 
 ## Ownership: who frees what?
 

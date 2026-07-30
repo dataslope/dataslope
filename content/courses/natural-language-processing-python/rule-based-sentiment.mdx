@@ -14,27 +14,10 @@ genuinely used in the real world (it is transparent, needs no training data,
 and is easy to audit). Second, building it forces every earlier lesson to pay
 off at once, especially the warning about negation and stopwords.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A sentence of word chips, two green positives, one red negative, grays neutral, drops signed bars above and below a thin zero line, and past a divider the bars sum to one net green sentiment score"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="86" y="36" width="54" height="24" rx="10" fill="currentColor" opacity="0.18" />
-  <rect x="154" y="36" width="70" height="24" rx="10" fill="var(--ds-green-500)" />
-  <rect x="238" y="36" width="44" height="24" rx="10" fill="currentColor" opacity="0.18" />
-  <rect x="296" y="36" width="78" height="24" rx="10" fill="var(--ds-red-500)" />
-  <rect x="388" y="36" width="64" height="24" rx="10" fill="var(--ds-green-500)" />
-  <rect x="76" y="140" width="390" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="178" y="104" width="22" height="36" rx="4" />
-    <rect x="409" y="112" width="22" height="28" rx="4" />
-  </g>
-  <rect x="324" y="142.5" width="22" height="30" rx="4" fill="var(--ds-red-500)" />
-  <line x1="480" y1="96" x2="480" y2="186" stroke="var(--ds-gray-300)" strokeWidth="2" />
-  <rect x="494" y="140" width="70" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
-  <rect x="516" y="106" width="26" height="34" rx="4" fill="var(--ds-green-500)" />
-</svg>
+<Figure
+  slug="nlp-sentiment-cutout"
+  alt="A scoring machine reading a ribbon of tiles and tipping a needle gauge between a red end and a green end"
+/>
 
 ## The idea: score words against a lexicon
 
@@ -105,14 +88,12 @@ from nltk.tokenize import word_tokenize`,
       starterCode: `POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 
-
 def naive_sentiment(text):
     tokens = [t.lower() for t in word_tokenize(text)]
     score = sum(1 for t in tokens if t in POSITIVE) - sum(
         1 for t in tokens if t in NEGATIVE
     )
     return "positive" if score > 0 else "negative" if score < 0 else "neutral"
-
 
 for review in ["I love this movie", "This film is terrible", "It is not good"]:
     print(f"{naive_sentiment(review):9} <- {review!r}")
@@ -175,7 +156,6 @@ NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 NEGATIONS = {"not", "no", "never", "n't"}
 RESET = {".", "!", "?", ",", ";", "but"}  # clause boundaries reset negation
 
-
 def sentiment(text):
     tokens = [t.lower() for t in word_tokenize(text)]
     score = 0
@@ -194,7 +174,6 @@ def sentiment(text):
                 negate = False
             score += polarity
     return "positive" if score > 0 else "negative" if score < 0 else "neutral"
-
 
 tests = [
     "I love this movie",
@@ -342,7 +321,6 @@ RESET = {".", "!", "?", ",", ";", "but"}`,
     # return "positive" / "negative" / "neutral" based on score
     return "neutral"
 
-
 for review in ["I love it", "This is not good", "Not bad at all"]:
     print(f"{classify(review):9} <- {review!r}")
 `,
@@ -368,7 +346,6 @@ for review in ["I love it", "This is not good", "Not bad at all"]:
     if score < 0:
         return "negative"
     return "neutral"
-
 
 for review in ["I love it", "This is not good", "Not bad at all"]:
     print(f"{classify(review):9} <- {review!r}")

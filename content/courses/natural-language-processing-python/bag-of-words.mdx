@@ -15,32 +15,10 @@ and shake it. You keep *which* words appear and *how many times*, but you throw
 away the *order*. A document becomes a tally of word counts, and a tally is
 just a vector of numbers, which is exactly what an algorithm can work with.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A sentence of colored word chips loses its order as thin gray lines pour each chip into per-color count bars, three blue, two green, one yellow, a bag of words keeps only the counts"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="99" y1="58" x2="260" y2="142" />
-    <line x1="225" y1="58" x2="260" y2="142" />
-    <line x1="339" y1="58" x2="260" y2="142" />
-    <line x1="165" y1="58" x2="320" y2="158" />
-    <line x1="399" y1="58" x2="320" y2="158" />
-    <line x1="282" y1="58" x2="380" y2="174" />
-  </g>
-  <rect x="70" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
-  <rect x="142" y="36" width="46" height="20" rx="10" fill="var(--ds-green-500)" />
-  <rect x="196" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
-  <rect x="262" y="36" width="40" height="20" rx="10" fill="var(--ds-yellow-500)" />
-  <rect x="310" y="36" width="58" height="20" rx="10" fill="var(--ds-blue-500)" />
-  <rect x="376" y="36" width="46" height="20" rx="10" fill="var(--ds-green-500)" />
-  <rect x="180" y="126" width="280" height="80" rx="12" fill="var(--ds-white)" />
-  <rect x="180" y="126" width="280" height="80" rx="12" fill="currentColor" opacity="0.05" />
-  <rect x="240" y="142" width="40" height="48" rx="4" fill="var(--ds-blue-500)" />
-  <rect x="300" y="158" width="40" height="32" rx="4" fill="var(--ds-green-500)" />
-  <rect x="360" y="174" width="40" height="16" rx="4" fill="var(--ds-yellow-500)" />
-</svg>
+<Figure
+  slug="nlp-bag-of-words-cutout"
+  alt="An open sack tipping loose tiles onto a counting grid that fills into a sparse matrix of small numeric blocks"
+/>
 
 ## The feature extraction process
 
@@ -157,16 +135,13 @@ count.
 
 vocab = ["cheap", "free", "meeting", "report", "winner"]
 
-
 def count_vector(tokens, vocab):
     counts = Counter(tokens)
     return [counts[w] for w in vocab]
 
-
 def binary_vector(tokens, vocab):
     present = set(tokens)
     return [1 if w in present else 0 for w in vocab]
-
 
 spam = "free free free winner cheap".split()
 
@@ -262,13 +237,11 @@ Tip: \`collections.Counter\` makes this clean (it returns 0 for missing keys).`}
     # return a list of counts aligned to vocab
     return []
 
-
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
 `,
       solutionCode: `def bow_vector(tokens, vocab):
     counts = Counter(tokens)
     return [counts[w] for w in vocab]
-
 
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
 `,

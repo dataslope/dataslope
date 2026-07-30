@@ -22,52 +22,10 @@ This page is the bridge between the *foundations* you have just
 learned and the rest of the course. After this page, every example
 will assume you think in arrays.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A translucent blue band sweeps across a lattice of cells in a single pass: cells behind it already green, cells ahead still faint, one vectorized operation applied to every element at once"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.55">
-    <rect x="132" y="44" width="40" height="34" rx="8" />
-    <rect x="180" y="44" width="40" height="34" rx="8" />
-    <rect x="228" y="44" width="40" height="34" rx="8" />
-    <rect x="276" y="44" width="40" height="34" rx="8" />
-    <rect x="132" y="86" width="40" height="34" rx="8" />
-    <rect x="180" y="86" width="40" height="34" rx="8" />
-    <rect x="228" y="86" width="40" height="34" rx="8" />
-    <rect x="276" y="86" width="40" height="34" rx="8" />
-    <rect x="132" y="128" width="40" height="34" rx="8" />
-    <rect x="180" y="128" width="40" height="34" rx="8" />
-    <rect x="228" y="128" width="40" height="34" rx="8" />
-    <rect x="276" y="128" width="40" height="34" rx="8" />
-    <rect x="132" y="170" width="40" height="34" rx="8" />
-    <rect x="180" y="170" width="40" height="34" rx="8" />
-    <rect x="228" y="170" width="40" height="34" rx="8" />
-    <rect x="276" y="170" width="40" height="34" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="324" y="44" width="40" height="34" rx="8" fillOpacity="0.9" />
-    <rect x="324" y="86" width="40" height="34" rx="8" fillOpacity="0.9" />
-    <rect x="324" y="128" width="40" height="34" rx="8" fillOpacity="0.9" />
-    <rect x="324" y="170" width="40" height="34" rx="8" fillOpacity="0.9" />
-    <rect x="318" y="38" width="52" height="172" rx="12" fillOpacity="0.18" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="372" y="44" width="40" height="34" rx="8" />
-    <rect x="420" y="44" width="40" height="34" rx="8" />
-    <rect x="468" y="44" width="40" height="34" rx="8" />
-    <rect x="372" y="86" width="40" height="34" rx="8" />
-    <rect x="420" y="86" width="40" height="34" rx="8" />
-    <rect x="468" y="86" width="40" height="34" rx="8" />
-    <rect x="372" y="128" width="40" height="34" rx="8" />
-    <rect x="420" y="128" width="40" height="34" rx="8" />
-    <rect x="468" y="128" width="40" height="34" rx="8" />
-    <rect x="372" y="170" width="40" height="34" rx="8" />
-    <rect x="420" y="170" width="40" height="34" rx="8" />
-    <rect x="468" y="170" width="40" height="34" rx="8" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-vectorized-cutout"
+  alt="A wide press descending on an entire grid of cells in one stroke beside a slow single-cell stamping arm"
+/>
 
 ## The single most important benchmark
 
@@ -296,7 +254,6 @@ print("Long-run mean    :", traj[1000:].mean() if n > 1000 else traj.mean())
       filename: "kernels.py",
       starterCode: `import numpy as np
 
-
 def logistic_map_trajectory(r: float, x0: float, n: int) -> np.ndarray:
     """Iterate x_{t+1} = r * x_t * (1 - x_t).
 
@@ -404,18 +361,15 @@ Do it **without any explicit Python loop**, broadcast \`q\` against \`points\`, 
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def nearest_index(q, points):
     # TODO: vectorized squared distances, then argmin
     return 0
-
 
 # Quick check
 pts = np.array([[0.0, 0.0], [3.0, 4.0], [1.0, 1.0]])
 print("nearest to (0.9, 0.9):", nearest_index(np.array([0.9, 0.9]), pts))  # -> 2
 `,
       solutionCode: `import numpy as np
-
 
 def nearest_index(q, points):
     q = np.asarray(q, dtype=float)

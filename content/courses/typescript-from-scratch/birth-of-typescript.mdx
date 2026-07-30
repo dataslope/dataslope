@@ -59,38 +59,10 @@ bloated every function. None of it solved the core problem:
 before the code ran, whether a variable held a string or a number,
 or whether an object actually had a `save()` method.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A green outlined region encloses the solid blue JavaScript region whole, adding its own green blocks in the margin while every blue block stays in place, TypeScript as a strict superset that leaves everything where it was"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <rect
-      x="120"
-      y="30"
-      width="400"
-      height="160"
-      rx="20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="200" y="70" width="240" height="90" rx="14" fillOpacity="0.25" />
-    <rect x="228" y="93" width="30" height="20" rx="5" />
-    <rect x="280" y="108" width="32" height="18" rx="5" />
-    <rect x="330" y="88" width="24" height="24" rx="5" />
-    <rect x="382" y="104" width="28" height="18" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="148" y="54" width="20" height="20" rx="5" />
-    <rect x="470" y="58" width="20" height="20" rx="5" />
-    <rect x="150" y="146" width="20" height="20" rx="5" />
-    <rect x="468" y="142" width="20" height="20" rx="5" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-birth-of-typescript-cutout"
+  alt="A scaffolding frame of type rails being fitted around an existing loose block tower on a platform"
+/>
 
 ## The early experiments
 
@@ -101,53 +73,6 @@ Several teams tried to bring types to JavaScript:
 **Facebook's Flow** (2014) was a true static type checker for JavaScript. You added type annotations (`let x: number = 5`), and Flow checked them. It was fast, pragmatic, and integrated well with React. But it required a build step, the ecosystem was small, and Facebook's internal priorities meant external users often felt like second-class citizens.
 
 Both tools pointed toward the same insight: **JavaScript developers wanted types, but they wanted them to feel like a natural extension of the language, not a bolt-on.** The syntax had to be clean. The tooling had to be excellent. The migration path had to be gradual, you couldn't force a million-line codebase to convert overnight.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three lanes race toward a finish flag: the yellow and red lines stop partway while the blue line runs all the way to the pole, earlier attempts at typing JavaScript pointed the way, and TypeScript reached the top"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-yellow-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M80 60 H 240" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M80 100 H 330" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M80 140 H 530" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M540 36 V 164"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="540,36 574,46 540,56" />
-  </g>
-</svg>
 
 ## Enter Anders Hejlsberg
 

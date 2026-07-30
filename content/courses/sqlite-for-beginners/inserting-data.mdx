@@ -7,26 +7,10 @@ A table's structure is only the beginning. To make a table useful, you add rows.
 
 The SQL statement for adding rows is `INSERT INTO`.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A solid green new row hovers above a table card and a solid arrow points it into the dashed empty slot beneath two already-filled rows, INSERT plants a new row into the table"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="240" y="28" width="160" height="24" rx="12" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="318.5" y="60" width="3" height="26" rx="1.5" />
-    <polygon points="314.5,84 325.5,84 320,95" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="108" width="400" height="104" rx="12" fillOpacity="0.1" />
-    <rect x="144" y="124" width="352" height="20" rx="8" fillOpacity="0.35" />
-    <rect x="144" y="152" width="352" height="20" rx="8" fillOpacity="0.35" />
-  </g>
-  <rect x="144" y="180" width="352" height="20" rx="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
-</svg>
+<Figure
+  slug="lite-inserting-data-cutout"
+  alt="A hopper above a grid platform dropping three complete row strips into place one after another"
+/>
 
 ## INSERT adds rows
 
@@ -158,31 +142,6 @@ flowchart TB
 ## Column order matters
 
 The column list and values match by position. The first value goes into the first named column, the second value goes into the second named column, and so on.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Three colored value tokens drop straight down thin lines into three slots tinted the same colors, first to first, second to second, third to third, insert values line up with the column list purely by position"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="166" y1="52" x2="166" y2="108" />
-    <line x1="320" y1="52" x2="320" y2="108" />
-    <line x1="474" y1="52" x2="474" y2="108" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="118" y="22" width="96" height="26" rx="13" />
-    <rect x="110" y="112" width="112" height="40" rx="10" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="272" y="22" width="96" height="26" rx="13" />
-    <rect x="264" y="112" width="112" height="40" rx="10" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="426" y="22" width="96" height="26" rx="13" />
-    <rect x="418" y="112" width="112" height="40" rx="10" fillOpacity="0.2" />
-  </g>
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

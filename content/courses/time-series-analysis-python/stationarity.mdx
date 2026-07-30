@@ -9,39 +9,10 @@ you skip the check, you'll fit a model to conditions that won't hold and get
 a confident, wrong forecast. The good news: the idea is far more intuitive
 than its intimidating name.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="On the left ten dots jitter inside a flat green band around a steady center line; on the right the same number of dots drift upward and fan apart inside a widening red cloud, a stationary series keeps its rules fixed while a non-stationary one keeps changing them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="50" y="92" width="250" height="54" rx="20" fillOpacity="0.14" />
-    <circle cx="66" cy="108" r="3.5" />
-    <circle cx="90" cy="128" r="3.5" />
-    <circle cx="114" cy="102" r="3.5" />
-    <circle cx="138" cy="134" r="3.5" />
-    <circle cx="162" cy="112" r="3.5" />
-    <circle cx="186" cy="126" r="3.5" />
-    <circle cx="210" cy="100" r="3.5" />
-    <circle cx="234" cy="130" r="3.5" />
-    <circle cx="258" cy="110" r="3.5" />
-    <circle cx="284" cy="122" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 340 134 L 596 28 L 596 118 L 340 146 Z" fillOpacity="0.1" />
-    <circle cx="356" cy="138" r="3.5" />
-    <circle cx="382" cy="128" r="3.5" />
-    <circle cx="408" cy="133" r="3.5" />
-    <circle cx="434" cy="114" r="3.5" />
-    <circle cx="460" cy="124" r="3.5" />
-    <circle cx="486" cy="98" r="3.5" />
-    <circle cx="512" cy="114" r="3.5" />
-    <circle cx="538" cy="84" r="3.5" />
-    <circle cx="564" cy="102" r="3.5" />
-    <circle cx="588" cy="64" r="3.5" />
-  </g>
-</svg>
+<Figure
+  slug="tsa-stationarity-cutout"
+  alt="Two rails on a platform, one where the mound sits at a fixed height throughout and one where it drifts steadily upward"
+/>
 
 ## What "stationary" actually means
 
@@ -147,70 +118,6 @@ the same through time, which is exactly what stationarity guarantees. Point
 a fixed-coefficient model at a trending series and it's like fitting one
 straight line through data whose true level keeps moving, the coefficients
 describe an average of conditions that never actually occur.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A fixed blue line runs through a flat series of yellow dots and earns a green check, but the same fixed line through a rising series misses most of its dots and earns a red cross, constant model coefficients can only describe a relationship that holds still over time"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="70" cy="64" r="3.5" />
-    <circle cx="102" cy="54" r="3.5" />
-    <circle cx="134" cy="66" r="3.5" />
-    <circle cx="166" cy="56" r="3.5" />
-    <circle cx="198" cy="62" r="3.5" />
-    <circle cx="230" cy="52" r="3.5" />
-    <circle cx="262" cy="64" r="3.5" />
-    <circle cx="294" cy="56" r="3.5" />
-    <circle cx="326" cy="62" r="3.5" />
-    <circle cx="358" cy="54" r="3.5" />
-    <circle cx="390" cy="64" r="3.5" />
-    <circle cx="422" cy="58" r="3.5" />
-    <circle cx="70" cy="186" r="3.5" />
-    <circle cx="102" cy="180" r="3.5" />
-    <circle cx="134" cy="174" r="3.5" />
-    <circle cx="166" cy="166" r="3.5" />
-    <circle cx="198" cy="160" r="3.5" />
-    <circle cx="230" cy="152" r="3.5" />
-    <circle cx="262" cy="146" r="3.5" />
-    <circle cx="294" cy="138" r="3.5" />
-    <circle cx="326" cy="130" r="3.5" />
-    <circle cx="358" cy="122" r="3.5" />
-    <circle cx="390" cy="116" r="3.5" />
-    <circle cx="422" cy="108" r="3.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M60 60 H 430" />
-    <path d="M60 148 H 430" />
-  </g>
-  <g
-    style={{ color: "var(--ds-green-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M478 62 L 488 72 L 506 46" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-  >
-    <path d="M480 136 L 504 160" />
-    <path d="M504 136 L 480 160" />
-  </g>
-</svg>
 
 <Callout type="info" title="Stationarity is what makes the past usable">
 Forecasting is, at bottom, the bet that *the future will behave like the
@@ -379,38 +286,6 @@ So the *amount* of differencing a series needs is itself a property of the
 series. CO₂'s steady, near-linear climb yields to one difference; the
 airline series' growing, strongly seasonal swing needs more work. Same
 test, same logic, different answers, because the data is different.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Five p-value bars rise toward a dashed yellow decision line: two red bars overshoot it, two green bars stop well below, and one blue bar lands exactly on the line, the airline series after a single difference is the famous borderline case"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="80" y="150" width="480" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }}>
-    <path
-      d="M70 78 H 570"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeDasharray="8 8"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="113" y="40" width="14" height="110" rx="7" />
-    <rect x="213" y="56" width="14" height="94" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="313" y="110" width="14" height="40" rx="7" />
-    <rect x="413" y="98" width="14" height="52" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="513" y="78" width="14" height="72" rx="7" />
-  </g>
-</svg>
 
 <MultipleChoice
   markdown={`You run \`adfuller\` on a series and get a p-value of **0.78**. What do you conclude?
