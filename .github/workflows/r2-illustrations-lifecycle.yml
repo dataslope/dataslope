@@ -27,19 +27,35 @@ name: R2 illustrations lifecycle
 # different quality without paying to regenerate. Raise EXPIRE_DAYS if a batch
 # needs to sit through a longer review.
 #
-# Uses the S3 API with the same credentials as r2-cache-cleanup.yml rather than
-# wrangler, so no additional secret or `wrangler login` is required.
+# Uses the S3 API rather than wrangler, so no `wrangler login` and no separate
+# Cloudflare API token are needed — but NOT the same credentials as
+# r2-cache-cleanup.yml, which is what made the first run of this workflow fail.
+# A lifecycle rule is bucket *configuration*, and R2 lets only an
+# "Admin Read & Write" API token edit that. The "Object Read & Write" token the
+# rest of the pipeline shares can list, read and write objects, and even
+# head-bucket succeeds with it, so everything looks fine right up to the write,
+# where it returns a bare AccessDenied.
+# https://developers.cloudflare.com/r2/api/tokens/#permissions
+#
+# Hence the dedicated R2_ADMIN_* pair below, used by this workflow and nothing
+# else. R2 admin tokens cannot be scoped to a single bucket (they are
+# account-wide by definition), so confining one to the single job that needs it
+# beats handing the same rights to r2-cache-cleanup.yml, which deletes objects
+# unattended every six hours and whose whole safety story is that it cannot
+# reach dataslope-workspaces (live user data, bound to the app Worker) or
+# destroy dataslope-inc-cache outright. That job keeps its own object-scoped
+# R2_INC_CACHE_* pair.
 #
 # NOTE: PutBucketLifecycleConfiguration REPLACES a bucket's entire lifecycle
 # configuration. This job targets `dataslope-illustrations` only and that bucket
 # has no other rules; it must never be pointed at dataslope-inc-cache or
 # dataslope-workspaces, whose contents are not disposable.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions),
-# all three already used by r2-cache-cleanup.yml:
-#   CLOUDFLARE_ACCOUNT_ID  Cloudflare account ID (the R2 S3 endpoint host)
-#   R2_ACCESS_KEY_ID       R2 API token access key id (Object Read & Write)
-#   R2_SECRET_ACCESS_KEY   R2 API token secret access key
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (the R2 S3 endpoint host),
+#                               shared with r2-cache-cleanup.yml
+#   R2_ADMIN_ACCESS_KEY_ID      R2 API token access key id (Admin Read & Write)
+#   R2_ADMIN_SECRET_ACCESS_KEY  R2 API token secret access key
 
 on:
   # Re-apply whenever the retention policy itself changes.
@@ -74,8 +90,13 @@ jobs:
       # thousand rejected candidates never sit around being billed.
       EXPIRE_DAYS: "14"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      # Editing bucket configuration needs an R2 Admin Read & Write token; the
+      # object-scoped R2_INC_CACHE_* pair is denied here (see the header).
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY }}
+      # Secrets cannot be tested from inside `run:` (an unset one arrives as
+      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      ADMIN_CREDS_SET: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID != '' && secrets.R2_ADMIN_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_RETRY_MODE: standard
@@ -104,10 +125,46 @@ jobs:
             exit 1
           fi
 
+          # Say which secret is missing. Half a pair signs requests with a
+          # mismatched key/secret and fails as an opaque SignatureDoesNotMatch;
+          # neither fails as an equally opaque unsigned-request error.
+          if [[ "$ADMIN_CREDS_SET" != "true" ]]; then
+            echo "::error::Repository secrets R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY are not both set. This job needs an R2 'Admin Read & Write' token; see https://developers.cloudflare.com/r2/api/tokens/#permissions"
+            exit 1
+          fi
+
+          # Turn an AWS CLI failure into an annotation that says what to do.
+          # AccessDenied on a bucket-configuration call means one specific
+          # thing here, and the CLI's one-liner does not hint at it.
+          fail_aws() {
+            local what="$1" err="$2"
+            printf '%s\n' "$err"
+            if grep -q 'AccessDenied' <<<"$err"; then
+              echo
+              echo "A lifecycle rule is bucket configuration, and R2 lets only an 'Admin Read &"
+              echo "Write' API token edit that. An 'Object Read & Write' token can list, read and"
+              echo "write objects — head-bucket above even succeeds with one — but is denied on"
+              echo "the bucket's configuration."
+              echo "  https://developers.cloudflare.com/r2/api/tokens/#permissions"
+              echo
+              echo "Fix: check that R2_ADMIN_ACCESS_KEY_ID / R2_ADMIN_SECRET_ACCESS_KEY really hold"
+              echo "an 'Admin Read & Write' token — an object-scoped one reaches this far and then"
+              echo "fails exactly here. R2 admin tokens are account-wide, so keep them to this"
+              echo "workflow rather than reusing them for r2-cache-cleanup.yml, which has its own"
+              echo "object-scoped R2_INC_CACHE_* pair."
+              echo "::error::Access denied ${what} '$BUCKET' — these credentials are not an R2 'Admin Read & Write' token. See the log above for the fix."
+            else
+              echo "::error::Failed ${what} '$BUCKET'."
+            fi
+            exit 1
+          }
+
           # Confirm the bucket exists before touching its configuration, so a
           # typo or a not-yet-created bucket fails here with a clear message.
+          # Note this passes with an object-scoped token too — reachability
+          # says nothing about the right to edit the configuration below.
           if ! aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
-            echo "::error::Bucket '$BUCKET' is not reachable with these credentials. Create it, or check the R2 token covers it (Object Read & Write)."
+            echo "::error::Bucket '$BUCKET' is not reachable with these credentials. Create it, or check the R2 token covers it."
             exit 1
           fi
 
@@ -127,27 +184,43 @@ jobs:
           echo "Bucket:  $BUCKET"
           echo "Rule:    delete objects under '${PREFIX}' after ${EXPIRE_DAYS} days"
           echo "Dry run: $DRY_RUN"
+          echo "Token:   R2_ADMIN_* (Admin Read & Write)"
           echo "---"
           cat /tmp/lifecycle.json
 
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "---"
             echo "Dry run: existing configuration left untouched. Current rules:"
-            aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>/dev/null || echo "(none set)"
+            # Reading the configuration needs the same admin-tier token the
+            # write does, so this used to be the one path that hid the problem:
+            # `|| echo "(none set)"` reported a *denied read* as an empty
+            # policy, an all-green dry run that proved nothing. Only a genuine
+            # "this bucket has no rules" may print that now.
+            if current="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then
+              printf '%s\n' "$current"
+            elif grep -q 'NoSuchLifecycleConfiguration' <<<"$current"; then
+              echo "(none set)"
+            else
+              fail_aws "reading the lifecycle configuration of" "$current"
+            fi
             exit 0
           fi
 
-          aws s3api put-bucket-lifecycle-configuration \
-            --bucket "$BUCKET" \
-            --lifecycle-configuration file:///tmp/lifecycle.json
+          if ! put_out="$(aws s3api put-bucket-lifecycle-configuration \
+                --bucket "$BUCKET" \
+                --lifecycle-configuration file:///tmp/lifecycle.json 2>&1)"; then
+            fail_aws "applying the lifecycle rule to" "$put_out"
+          fi
 
           # Read back rather than trusting the write: a silently-empty policy
           # would mean candidates accumulate forever, which is the one failure
           # this job exists to prevent and the one that shows no symptom.
           echo "---"
           echo "Applied. Current configuration:"
-          applied="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET")"
-          echo "$applied"
+          if ! applied="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then
+            fail_aws "reading back the lifecycle configuration of" "$applied"
+          fi
+          printf '%s\n' "$applied"
           if ! grep -q '"expire-illustration-candidates"' <<<"$applied"; then
             echo "::error::Rule was not present after applying it."
             exit 1

@@ -54,9 +54,20 @@ name: R2 incremental-cache cleanup
 # manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
-#   CLOUDFLARE_ACCOUNT_ID Cloudflare account ID (the R2 S3 endpoint host)
-#   R2_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
-#   R2_SECRET_ACCESS_KEY  R2 API token secret access key
+#   CLOUDFLARE_ACCOUNT_ID           Cloudflare account ID (the R2 S3 endpoint host)
+#   R2_INC_CACHE_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
+#   R2_INC_CACHE_SECRET_ACCESS_KEY  R2 API token secret access key
+#
+# The R2_INC_CACHE_* pair is named for the bucket it belongs to. It is an
+# Object Read & Write token, deliberately: this job deletes objects on a
+# schedule and never needs bucket-level rights. Editing bucket configuration
+# needs an Admin Read & Write token, which lives in R2_ADMIN_* and is used only
+# by r2-illustrations-lifecycle.yml — admin tokens are account-wide and cannot
+# be scoped to one bucket, so keeping one out of this unattended delete job is
+# the point of the split. (Renamed 2026-07-30 from R2_ACCESS_KEY_ID /
+# R2_SECRET_ACCESS_KEY, which read as "the" R2 credentials once a second pair
+# existed. Unrelated to the identically-named local env vars the illustration
+# scripts use, see scripts/lib/r2.mjs.)
 
 on:
   schedule:
@@ -113,8 +124,11 @@ jobs:
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
       # For `gh pr list` (see step 2). GITHUB_TOKEN with pull-requests: read.
       GH_TOKEN: ${{ github.token }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_INC_CACHE_SECRET_ACCESS_KEY }}
+      # Secrets cannot be tested from inside `run:` (an unset one arrives as
+      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      CREDS_SET: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID != '' && secrets.R2_INC_CACHE_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
       # R2 intermittently returns a transient 500 InternalError on DeleteObject.
@@ -142,6 +156,18 @@ jobs:
           #    hold it under the old name.)
           if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
             echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID). Aborting without deleting."
+            exit 1
+          fi
+
+          # 0b) Missing credentials fail exactly the same silent way, and there
+          #     is no malformed ENDPOINT to catch them by: unsigned requests are
+          #     rejected, the `|| true` in step 3 swallows it, and the run goes
+          #     green having pruned nothing. This is a live risk right now — the
+          #     secrets were renamed to R2_INC_CACHE_* on 2026-07-30, and a
+          #     scheduled run firing between deleting the old pair and creating
+          #     the new one would otherwise report success while the bucket grew.
+          if [[ "$CREDS_SET" != "true" ]]; then
+            echo "::error::Repository secrets R2_INC_CACHE_ACCESS_KEY_ID and R2_INC_CACHE_SECRET_ACCESS_KEY are not both set (renamed 2026-07-30 from R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY). Aborting without deleting."
             exit 1
           fi
 

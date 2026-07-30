@@ -193,15 +193,44 @@ keepers inside a fortnight. Promotion writes its own encoded copy into
 serves fine — what you lose is the pristine PNG, and with it the ability to
 re-promote at a different quality without paying to regenerate.
 
-**The rule is not applied until this workflow runs at least once.** It has
-never run (the file has to be on `main` before `workflow_dispatch` appears),
-so nothing has expired yet and the bucket keeps every run. Trigger it once
-after merging, or candidates accumulate indefinitely.
+**The rule is not applied until this workflow runs successfully at least
+once.** Its first run (on #612 landing) failed: `AccessDenied` on
+`PutBucketLifecycleConfiguration`. Nothing has expired yet and the bucket
+still keeps every run.
 
-The same R2 credentials back the Actions workflows and the local scripts
-(`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
-`r2-cache-cleanup.yml`). The token needs Object Read & Write covering
-`dataslope-illustrations`.
+**That failure is a token-tier problem, not a bug in the rule.** A lifecycle
+rule is bucket *configuration*, and R2 lets only an **Admin Read & Write** API
+token edit that; the **Object Read & Write** token the rest of the pipeline
+shares can list, read and write objects — `head-bucket` even succeeds with it,
+so the job looks healthy right up to the write — and is denied on the
+configuration. See the [R2 token
+permissions](https://developers.cloudflare.com/r2/api/tokens/#permissions)
+table.
+
+So this one workflow reads the repository secrets `R2_ADMIN_ACCESS_KEY_ID` /
+`R2_ADMIN_SECRET_ACCESS_KEY`, holding the account's Admin Read & Write token.
+**R2 admin tokens are account-wide** — they cannot be scoped to one bucket —
+so they stay confined to this workflow. `r2-cache-cleanup.yml` keeps its own
+object-scoped pair, `R2_INC_CACHE_ACCESS_KEY_ID` /
+`R2_INC_CACHE_SECRET_ACCESS_KEY` (renamed 2026-07-30 from `R2_ACCESS_KEY_ID` /
+`R2_SECRET_ACCESS_KEY` once a second credential made "the" R2 secrets
+ambiguous). That job deletes objects unattended every six hours and has once
+deleted more than intended; handing it bucket-delete rights over
+`dataslope-workspaces` — live user work, bound to the app Worker — buys
+nothing.
+
+Two R2 credentials, then, and the names now say which is which:
+
+| Where | Secret | Tier | Reaches |
+| --- | --- | --- | --- |
+| `r2-illustrations-lifecycle.yml` | `R2_ADMIN_*` | Admin Read & Write | every bucket, plus their configuration |
+| `r2-cache-cleanup.yml` | `R2_INC_CACHE_*` | Object Read & Write | objects only |
+
+**Local scripts are unaffected by that rename.** `scripts/lib/r2.mjs` reads
+`R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` from the *session
+environment* — a separate Object Read & Write token that must cover
+`dataslope-illustrations`. Same variable names, different credential, nothing
+to do with repository secrets.
 
 ### Non-negotiables
 

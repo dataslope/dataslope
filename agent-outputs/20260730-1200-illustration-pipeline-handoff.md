@@ -509,8 +509,13 @@ against the S3 API, keeping content authoring decoupled from deploying the app.
 Retention is **14 days** (raised from 7 on 2026-07-30), applied by
 `.github/workflows/r2-illustrations-lifecycle.yml`.
 
-**The rule has never actually been applied.** `workflow_dispatch` only appears once the
-file is on `main`, and #612 is unmerged, so nothing has expired and all 9 runs remain:
+**The rule has never actually been applied.** #612 has since merged, which triggered the
+workflow, and that first run failed: `AccessDenied` on `PutBucketLifecycleConfiguration`.
+A lifecycle rule is bucket configuration, which R2 lets only an **Admin Read & Write**
+token edit — an **Object Read & Write** token gets as far as `head-bucket` and is then
+denied. The workflow now takes `R2_ADMIN_ACCESS_KEY_ID` / `R2_ADMIN_SECRET_ACCESS_KEY`
+(the `dataslope-github-admin` token, created 2026-07-30 along with those secrets). Until
+the job is re-run, nothing has expired and all 9 runs remain:
 
 | Run | Objects |
 |---|---|
@@ -561,8 +566,10 @@ Branch for this work: `claude/gpt-image-2-api-test-v4memq`, PR **#612**.
 
 ## Open items
 
-1. **Trigger the lifecycle workflow once after #612 merges.** Mandatory: until it runs,
-   candidates accumulate indefinitely. An agent can do this directly:
+1. **Run the lifecycle workflow successfully once.** Mandatory: until it applies,
+   candidates accumulate indefinitely. The `dataslope-github-admin` token
+   (**Admin Read & Write**) and its `R2_ADMIN_*` repository secrets exist as of
+   2026-07-30, so this is now unblocked — an agent can run it:
 
    ```
    mcp__github__actions_run_trigger   owner=dataslope repo=dataslope
@@ -571,7 +578,13 @@ Branch for this work: `claude/gpt-image-2-api-test-v4memq`, PR **#612**.
    Run it once with the `dry_run` input `true` to print the rule without applying it,
    confirm the output shows `"Days": 14`, then run again with `dry_run` false. The job
    reads the config back and fails if the rule is absent, so a silent no-op is already
-   guarded. Verify with `mcp__github__actions_get`.
+   guarded — and a dry run that cannot read the configuration now fails instead of
+   reporting `(none set)`. Verify with `mcp__github__actions_get`.
+
+   The `R2_INC_CACHE_*` secrets that `r2-cache-cleanup.yml` uses are the **object-scoped**
+   pair (renamed 2026-07-30 from `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`). Do not point
+   this workflow at them, and do not point that one at `R2_ADMIN_*`: admin tokens are
+   account-wide, and that job deletes on a schedule.
 
 2. **Guard the silent-stale-cut-out failure** (gotcha 1). Offered to the user, not built.
    In `promote-illustrations.mjs`, warn when promoting an original whose cut-out is
