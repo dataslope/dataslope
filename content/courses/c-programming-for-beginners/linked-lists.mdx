@@ -8,49 +8,15 @@ random access. They are awkward when you need to insert or remove
 items in the middle, or when you don't know how large the collection
 will grow.
 
+<Figure
+  slug="c-linked-lists-cutout"
+  alt="Linked lists, an isometric illustration"
+/>
+
 The **linked list** is the canonical alternative. It's also the
 canonical "you actually understand pointers now" exercise. Each
 element of the list is a **node** on the heap, and each node holds a
 pointer to the next node.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three nodes, each a blue data box with a green pointer tab, chained by thin curved arrows, the last tab holding a gray square for null, a linked list"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="74,118 50,106 50,130" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="90" width="56" height="56" rx="10" />
-    <rect x="270" y="90" width="56" height="56" rx="10" />
-    <rect x="450" y="90" width="56" height="56" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="146" y="104" width="28" height="28" rx="6" />
-    <rect x="326" y="104" width="28" height="28" rx="6" />
-    <rect x="506" y="104" width="28" height="28" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <path d="M182 108 C 206 92, 232 92, 250.3 104.7" />
-      <path d="M362 108 C 386 92, 412 92, 430.3 104.7" />
-    </g>
-    <g fill="currentColor">
-      <polygon points="256.1,105.2 248,96 245.5,108" />
-      <polygon points="436.1,105.2 428,96 425.5,108" />
-    </g>
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <rect x="512" y="110" width="16" height="16" rx="4" />
-  </g>
-</svg>
 
 ## The shape of a node
 

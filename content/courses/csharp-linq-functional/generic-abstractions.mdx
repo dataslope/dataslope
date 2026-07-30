@@ -8,36 +8,15 @@ works on **any sequence**, arrays, lists, dictionaries, file lines,
 network records, custom iterators, through a single generic
 interface: `IEnumerable<T>`.
 
+<Figure
+  slug="cs-generic-abstractions-cutout"
+  alt="Generic abstractions, an isometric illustration"
+/>
+
 This unification is what makes the same `.Where(...).Select(...)`
 work for everything from in-memory collections to streaming files.
 It is also a fantastic case study in how generics enable
 **reusable, type-safe abstractions** in any language.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three identical translucent containers with the same blue tab, each holding completely different contents, a circle, a triangle, a pair of bars, one generic shape, any element type"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="60" width="120" height="90" rx="16" fillOpacity="0.12" />
-    <rect x="260" y="60" width="120" height="90" rx="16" fillOpacity="0.12" />
-    <rect x="440" y="60" width="120" height="90" rx="16" fillOpacity="0.12" />
-    <rect x="122" y="48" width="36" height="14" rx="7" />
-    <rect x="302" y="48" width="36" height="14" rx="7" />
-    <rect x="482" y="48" width="36" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="140" cy="106" r="18" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="320,86 300,126 340,126" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="470" y="90" width="60" height="12" rx="6" />
-    <rect x="470" y="112" width="40" height="12" rx="6" />
-  </g>
-</svg>
 
 ## The interface that unifies everything
 

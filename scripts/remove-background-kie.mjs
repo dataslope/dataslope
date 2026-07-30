@@ -141,6 +141,35 @@ const admitGeneration = createLimiter(RATE_MAX, RATE_WINDOW_MS);
 const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 6;
 
+/**
+ * Fetch binary content with the same transient-failure policy as `kie`.
+ *
+ * This exists because the finished image is served from Kie's CDN rather than
+ * its API, and a bare fetch there is exactly where a run gets lost: the
+ * generation has already succeeded and been billed, so a 503 on the download
+ * throws away paid work. Eight of forty-four images failed this way before it
+ * was wrapped.
+ */
+async function fetchBinary(url, label) {
+  let lastDetail = "";
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    let res;
+    let networkErr;
+    try {
+      res = await fetch(url, { headers: { "User-Agent": UA } });
+    } catch (err) {
+      networkErr = err;
+    }
+    if (res?.ok) return Buffer.from(await res.arrayBuffer());
+
+    lastDetail = networkErr ? networkErr.message : String(res.status);
+    const transient = networkErr !== undefined || RETRY_STATUS.has(res?.status);
+    if (!transient || attempt === MAX_ATTEMPTS - 1) break;
+    await sleep(Math.min(16_000, 500 * 2 ** attempt));
+  }
+  throw new Error(`${label} failed: ${lastDetail}`);
+}
+
 async function kie(url, { key, json, method = "GET" } = {}) {
   let lastDetail = "";
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
@@ -204,9 +233,7 @@ export async function removeBackground(buf, fileName, key) {
     const d = info?.data ?? {};
     if (d.state === "success") {
       const url = JSON.parse(d.resultJson).resultUrls[0];
-      const res = await fetch(url, { headers: { "User-Agent": UA } });
-      if (!res.ok) throw new Error(`result download failed: ${res.status}`);
-      return Buffer.from(await res.arrayBuffer());
+      return fetchBinary(url, "result download");
     }
     if (d.state === "fail") throw new Error(`${d.failMsg || "failed"} (code ${d.failCode ?? "?"})`);
   }

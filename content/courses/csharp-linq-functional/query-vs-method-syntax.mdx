@@ -7,42 +7,14 @@ C# offers **two syntactic styles** for writing LINQ. They look very
 different, but they compile to the same code and have identical
 semantics. Choosing between them is a matter of *readability*.
 
+<Figure
+  slug="cs-query-vs-method-syntax-cutout"
+  alt="Query vs method syntax, an isometric illustration"
+/>
+
 This page builds an intuition for when each style serves you best,
 and shows you what the compiler does behind the scenes so the two
 never feel like separate languages.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Two parallel rails, one of rounded bars, one of chained circles, converge along thin lines on the same yellow diamond station: two syntaxes, one meaning"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="60" width="90" height="30" rx="15" />
-    <rect x="230" y="60" width="110" height="30" rx="15" />
-    <rect x="360" y="60" width="80" height="30" rx="15" />
-  </g>
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    opacity="0.3"
-  >
-    <path d="M186 160 H 264" />
-    <path d="M306 160 H 384" />
-    <path d="M444 75 C 472 82, 494 93, 508 102" />
-    <path d="M420 160 C 450 152, 478 136, 500 120" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="165" cy="160" r="16" />
-    <circle cx="285" cy="160" r="16" />
-    <circle cx="400" cy="160" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="520,82 548,110 520,138 492,110" />
-  </g>
-</svg>
 
 ## A side-by-side tour
 

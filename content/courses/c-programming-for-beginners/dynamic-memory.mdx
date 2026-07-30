@@ -8,37 +8,14 @@ So far, every variable we've used has been a **local variable**
 What if you don't know how much memory you'll need until the program
 is already running?
 
+<Figure
+  slug="c-dynamic-memory-cutout"
+  alt="Dynamic memory, an isometric illustration"
+/>
+
 That's what the **heap** is for. The heap is a big pool of memory
 your program can grab chunks from and give back as it sees fit. The
 controls are `malloc` and `free`.
-
-<svg
-  viewBox="0 0 640 245"
-  role="img"
-  aria-label="A translucent memory pool holding allocated green chunks, one chunk fading as it is freed, and a red chunk drifting outside the pool along a thin trail, a leak"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="50" width="440" height="150" rx="30" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="130" y="80" width="90" height="40" rx="10" />
-    <rect x="250" y="120" width="120" height="40" rx="10" />
-    <rect x="400" y="70" width="100" height="40" rx="10" />
-    <rect x="430" y="140" width="70" height="36" rx="10" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path
-      d="M516 180 C 538 190, 554 198, 566 208"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.35"
-    />
-    <rect x="560" y="210" width="50" height="26" rx="8" fillOpacity="0.8" />
-  </g>
-</svg>
 
 ## Stack vs heap
 
