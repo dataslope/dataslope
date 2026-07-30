@@ -399,7 +399,7 @@
       "category": "course-thumbnail",
       "title": "Database Design with PostgreSQL — course thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "three linked table blocks connected by short arrows, an elephant-shaped weight resting on the largest one"
     },
     {
@@ -627,7 +627,7 @@
       "category": "course-thumbnail",
       "title": "SQL for Data Analysis with DuckDB — course thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a duck standing on a stack of database discs beside a small aggregation chart"
     },
     {
@@ -2163,7 +2163,7 @@
       "category": "course-illustration",
       "title": "The relational revolution",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a stepped platform rising from loose ledgers to neatly linked table blocks, a friendly blue elephant (the PostgreSQL mascot) at the summit"
     },
     {
@@ -2175,7 +2175,7 @@
       "category": "course-illustration",
       "title": "From Ingres to PostgreSQL",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) standing on the top step of a stepped platform rising through database eras"
     },
     {
@@ -2223,7 +2223,7 @@
       "category": "course-illustration",
       "title": "Entity-relationship diagrams",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) beside three entity boxes joined by labelled connector rods on a platform"
     },
     {
@@ -2355,7 +2355,7 @@
       "category": "course-illustration",
       "title": "Foreign keys",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) using its trunk to fit a key token from one table block into a matching socket in another"
     },
     {
@@ -2511,7 +2511,7 @@
       "category": "course-illustration",
       "title": "Designing an online store",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) beside a schema of linked blocks for products, orders and customers laid out on a platform"
     },
     {
@@ -3663,7 +3663,7 @@
       "category": "course-illustration",
       "title": "The type system",
       "style": "isometric illustration",
-      "mascot": true,
+      "mascot": false,
       "subject": "tokens of several shapes admitted only by correspondingly shaped labelled slots"
     },
     {
@@ -3855,7 +3855,7 @@
       "category": "course-illustration",
       "title": "Why SQL and why PostgreSQL",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) standing proudly on a stepped platform of database eras, at the top step"
     },
     {
@@ -3867,7 +3867,7 @@
       "category": "course-illustration",
       "title": "How applications use databases",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a small app panel joined by a rod to a table block that a friendly blue elephant (the PostgreSQL mascot) stands beside, a request card passing along the rod"
     },
     {
@@ -3939,7 +3939,7 @@
       "category": "course-illustration",
       "title": "SELECT basics",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) using its trunk to lift two chosen column slots clear of a table block"
     },
     {
@@ -4107,7 +4107,7 @@
       "category": "course-illustration",
       "title": "Understanding joins",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) nudging two table blocks together so their matching edge tabs interlock"
     },
     {
@@ -4119,7 +4119,7 @@
       "category": "course-illustration",
       "title": "Inner joins",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "two overlapping discs with only the shared region raised, a friendly blue elephant (the PostgreSQL mascot) resting a foot on that region"
     },
     {
@@ -4131,7 +4131,7 @@
       "category": "course-illustration",
       "title": "Outer joins",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "two overlapping discs with the shared region and one full outer region raised, a friendly blue elephant (the PostgreSQL mascot) standing beside them"
     },
     {
@@ -4179,7 +4179,7 @@
       "category": "course-illustration",
       "title": "Common table expressions",
       "style": "isometric illustration",
-      "mascot": false,
+      "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) guiding tokens through three named intermediate trays into one final result tray"
     },
     {

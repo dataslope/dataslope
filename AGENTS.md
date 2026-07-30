@@ -87,32 +87,47 @@ in Claude Code sessions; do not ask for them and never write them into a file.
 
 ### The pipeline
 
-Four steps, three scripts. Candidates live in R2 until someone picks the
+> **Runbook:** `agent-outputs/20260730-1200-illustration-pipeline-handoff.md` is the
+> operational companion to this section — measured costs, every gotcha that has cost
+> real time, prompt-writing guidance, the course id-prefix registry, and copy-paste
+> audits. Read it before a large run.
+
+Five steps, four scripts. Candidates live in R2 until someone picks the
 keepers; only the keepers reach git.
 
 1. **Author** the prompt in `data/illustration-prompts.json` (one source of
    truth: the `/illustration-prompts` gallery, the in-lesson `<Figure>`, and
-   every script read it).
+   every script read it). `lesson` must equal the MDX file stem.
 2. **Generate** — `scripts/generate-illustrations.mjs`, OpenAI `gpt-image-2`,
    **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
 3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
    `remove-background` through Kie AI. Writes a `-cutout` beside each original.
+   **Never skip this on a regeneration:** pages reference the `-cutout` slug, and
+   promotion silently promotes only the original if no cut-out exists, leaving the
+   page serving the old image.
 4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
    candidates to WebP straight into `public/images/`, the files the site
-   serves, and runs `build-images` to record their dimensions. Then embed
-   with `<Figure slug="…" alt="…" />`.
+   serves, and runs `build-images` to record their dimensions.
+5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
+   across a course, clears retired slugs, and is idempotent. Always `--dry-run`
+   first.
 
 ```bash
-# Local run: everything on disk, nothing touches R2.
-node scripts/generate-illustrations.mjs dry-run        # prompts + projected cost, no API calls
-node scripts/generate-illustrations.mjs run            # submit, poll, download
+# Bulk run: candidates land in R2 under one run id, promote only the keepers.
+# Use submit/status/download, not `run` — a long batch can outlive the process.
+node scripts/generate-illustrations.mjs dry-run --only "$IDS"   # cost, no API calls
+node scripts/generate-illustrations.mjs submit  --only "$IDS" --sink r2 --run 2026-08-foo
+node scripts/generate-illustrations.mjs status
+node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-foo
+node scripts/remove-background-kie.mjs --from r2 --run 2026-08-foo --concurrency 8
+node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-foo
+node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
+  node scripts/wire-course-figures.mjs <course-dir>
+
+# Local run: everything on disk, nothing touches R2. Fine for one or two images.
+node scripts/generate-illustrations.mjs run
 node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
-
-# Bulk run: candidates land in R2 under one run id, promote only the keepers.
-node scripts/generate-illustrations.mjs run --sink r2 --run 2026-07-29-python
-node scripts/remove-background-kie.mjs --from r2 --run 2026-07-29-python
-node scripts/promote-illustrations.mjs --from r2 --run 2026-07-29-python python-basics-loops
 ```
 
 All four API keys are already environment variables in Claude Code sessions:
@@ -168,14 +183,20 @@ scripts are authoring tools that talk to the S3 API directly (SigV4 in
 `scripts/lib/r2.mjs`, no AWS SDK), so content authoring stays decoupled from
 deploying the app.
 
-Candidates expire after **7 days**, applied by
+Candidates expire after **14 days**, applied by
 `.github/workflows/r2-illustrations-lifecycle.yml` (run it via
 workflow_dispatch, or it re-applies on push when the retention window is
 edited). Cloudflare does the deleting server-side, so nothing polls. That is
 the review window: generate, review in `/illustration-prompts`, promote the
-keepers inside a week. Promotion writes its own encoded copy into
-`public/images/`, so an expired candidate that was already promoted costs
-nothing — you only lose the ability to re-encode it at a different quality.
+keepers inside a fortnight. Promotion writes its own encoded copy into
+`public/images/`, so an expired candidate that was already promoted still
+serves fine — what you lose is the pristine PNG, and with it the ability to
+re-promote at a different quality without paying to regenerate.
+
+**The rule is not applied until this workflow runs at least once.** It has
+never run (the file has to be on `main` before `workflow_dispatch` appears),
+so nothing has expired yet and the bucket keeps every run. Trigger it once
+after merging, or candidates accumulate indefinitely.
 
 The same R2 credentials back the Actions workflows and the local scripts
 (`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
