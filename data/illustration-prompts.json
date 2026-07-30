@@ -14,7 +14,8 @@
       "course-illustration": "1536x1024",
       "interview-thumbnail": "1536x1024",
       "interview-illustration": "1536x1024"
-    }
+    },
+    "postgresElephant": "a friendly blue elephant (the PostgreSQL mascot)"
   },
   "prompts": [
     {
@@ -2127,7 +2128,7 @@
       "title": "What database design is",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a drafting table laying out linked table blocks"
+      "subject": "the Dataslope marmot mascot at a drafting table laying out linked table blocks, a friendly blue elephant (the PostgreSQL mascot) watching over its shoulder"
     },
     {
       "id": "db-design-and-data-quality",
@@ -2163,7 +2164,7 @@
       "title": "The relational revolution",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from a stack of loose ledgers to a set of neatly linked table blocks"
+      "subject": "a stepped platform rising from loose ledgers to neatly linked table blocks, a friendly blue elephant (the PostgreSQL mascot) at the summit"
     },
     {
       "id": "db-ingres-to-postgresql",
@@ -2175,7 +2176,7 @@
       "title": "From Ingres to PostgreSQL",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising to an elephant-shaped weight resting on the top step"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) standing on the top step of a stepped platform rising through database eras"
     },
     {
       "id": "db-thinking-in-entities",
@@ -2223,7 +2224,7 @@
       "title": "Entity-relationship diagrams",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three entity boxes on a platform joined by labelled connector rods"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) beside three entity boxes joined by labelled connector rods on a platform"
     },
     {
       "id": "db-reading-er-diagrams",
@@ -2355,7 +2356,7 @@
       "title": "Foreign keys",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a key token in one table block matching a socket in another, the two joined by a rod"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) using its trunk to fit a key token from one table block into a matching socket in another"
     },
     {
       "id": "db-referential-integrity",
@@ -2367,7 +2368,7 @@
       "title": "Referential integrity",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot fastening a locking clasp onto the rod joining two entity boxes"
+      "subject": "the Dataslope marmot mascot fastening a locking clasp onto the rod joining two entity boxes while a friendly blue elephant (the PostgreSQL mascot) steadies it"
     },
     {
       "id": "db-what-are-constraints",
@@ -2427,7 +2428,7 @@
       "title": "Why normalization exists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot splitting one bloated table block into three tidy linked blocks"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) splitting one bloated table block into three tidy linked blocks"
     },
     {
       "id": "db-first-normal-form",
@@ -2487,7 +2488,7 @@
       "title": "A repeatable design process",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot walking a looping track of numbered design stations around a schema platform"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) walking a looping track of numbered design stations around a schema platform"
     },
     {
       "id": "db-case-study-blog",
@@ -2511,7 +2512,7 @@
       "title": "Designing an online store",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a schema of linked blocks for products, orders and customers laid out on a platform"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) beside a schema of linked blocks for products, orders and customers laid out on a platform"
     },
     {
       "id": "db-why-schemas-change",
@@ -2547,7 +2548,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) at a signpost on a platform, three paths leading to distant floating platforms"
     },
     {
       "id": "cpp-brief-history",
@@ -3831,7 +3832,7 @@
       "title": "What is a database",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot sliding a row tile into a labelled table block"
+      "subject": "the Dataslope marmot mascot sliding a row tile into a labelled table block while a friendly blue elephant (the PostgreSQL mascot) looks on"
     },
     {
       "id": "sql-spreadsheets-vs-databases",
@@ -3855,7 +3856,7 @@
       "title": "Why SQL and why PostgreSQL",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising to an elephant-shaped weight on the top step"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) standing proudly on a stepped platform of database eras, at the top step"
     },
     {
       "id": "sql-how-apps-use-databases",
@@ -3867,7 +3868,7 @@
       "title": "How applications use databases",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small app panel joined by a rod to a table block, a request card passing along it"
+      "subject": "a small app panel joined by a rod to a table block that a friendly blue elephant (the PostgreSQL mascot) stands beside, a request card passing along the rod"
     },
     {
       "id": "sql-tables-rows-columns",
@@ -3939,7 +3940,7 @@
       "title": "SELECT basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a claw lifting two chosen column slots clear of a table block"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) using its trunk to lift two chosen column slots clear of a table block"
     },
     {
       "id": "sql-expressions-aliases",
@@ -4107,7 +4108,7 @@
       "title": "Understanding joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two table blocks sliding together so their matching edge tabs interlock"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) nudging two table blocks together so their matching edge tabs interlock"
     },
     {
       "id": "sql-inner-joins",
@@ -4119,7 +4120,7 @@
       "title": "Inner joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two overlapping discs with only the shared region raised and populated"
+      "subject": "two overlapping discs with only the shared region raised, a friendly blue elephant (the PostgreSQL mascot) resting a foot on that region"
     },
     {
       "id": "sql-outer-joins",
@@ -4131,7 +4132,7 @@
       "title": "Outer joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two overlapping discs with the shared region and one full outer region raised"
+      "subject": "two overlapping discs with the shared region and one full outer region raised, a friendly blue elephant (the PostgreSQL mascot) standing beside them"
     },
     {
       "id": "sql-many-to-many",
@@ -4155,7 +4156,7 @@
       "title": "Normalization",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot splitting one bloated table block into three tidy linked blocks"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) together splitting one bloated table block into three tidy linked blocks"
     },
     {
       "id": "sql-subqueries",
@@ -4179,7 +4180,7 @@
       "title": "Common table expressions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three named intermediate trays feeding in sequence into one final result tray"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) guiding tokens through three named intermediate trays into one final result tray"
     },
     {
       "id": "sql-next-steps",
@@ -4191,7 +4192,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) at a signpost on a platform, three paths leading to distant floating platforms"
     },
     {
       "id": "web-how-the-web-works",
