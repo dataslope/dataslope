@@ -7,6 +7,11 @@ A toy program lives in one file. A real one might span hundreds.
 Without some way to *organize* those files, every project would
 eventually become an unnavigable mess.
 
+<Figure
+  slug="mcs-software-organization-cutout"
+  alt="Software organization, an isometric illustration"
+/>
+
 C# gives you three nested levels of organization:
 
 1. **Files**, physical containers, usually one class each.
@@ -17,43 +22,6 @@ C# gives you three nested levels of organization:
 Plus a fourth, less tangible but more important layer: the
 **architecture** of your program, how its pieces talk to each
 other.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A blue project bar branches along thin lines into three translucent namespace cards, each holding its own small type shapes, files, namespaces, and projects organizing one program"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M320 52 V 70" />
-    <path d="M150 70 H 490" />
-    <path d="M150 70 V 90" />
-    <path d="M320 70 V 90" />
-    <path d="M490 70 V 90" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="240" y="26" width="160" height="26" rx="9" fillOpacity="0.7" />
-    <rect x="95" y="92" width="110" height="90" rx="12" fillOpacity="0.12" />
-    <rect x="113" y="110" width="24" height="24" rx="6" fillOpacity="0.7" />
-    <circle cx="172" cy="152" r="11" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="265" y="92" width="110" height="90" rx="12" fillOpacity="0.12" />
-    <circle cx="300" cy="124" r="11" fillOpacity="0.6" />
-    <rect x="326" y="142" width="22" height="22" rx="5" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="435" y="92" width="110" height="90" rx="12" fillOpacity="0.12" />
-    <rect x="453" y="110" width="24" height="24" rx="6" fillOpacity="0.65" />
-    <circle cx="512" cy="152" r="10" fillOpacity="0.5" />
-  </g>
-</svg>
 
 ## Files
 

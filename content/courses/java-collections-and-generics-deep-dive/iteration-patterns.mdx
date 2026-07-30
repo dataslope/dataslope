@@ -8,62 +8,13 @@ There is more than one way to walk a collection in Java, and the
 element? remove some as you go? insert new ones? walk backwards?
 process the whole thing as a pipeline?
 
+<Figure
+  slug="jcol-iteration-patterns-cutout"
+  alt="Iteration patterns, an isometric illustration"
+/>
+
 This chapter is a tour of the five iteration patterns you'll use
 every week, plus the single most common bug each one introduces.
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="Three iteration patterns on cell strips: a green walk sweeps left to right over a thin arrow; a blue strip lifts one element out leaving a dashed gap, the iterator's safe remove; and a bottom walk halts with a red cross where a yellow outsider drops into the strip mid-iteration"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="120" y="28" width="48" height="28" rx="8" />
-    <rect x="176" y="28" width="48" height="28" rx="8" />
-    <rect x="232" y="28" width="48" height="28" rx="8" />
-    <rect x="288" y="28" width="48" height="28" rx="8" />
-    <rect x="344" y="28" width="48" height="28" rx="8" fillOpacity="0.25" />
-    <rect x="400" y="28" width="48" height="28" rx="8" fillOpacity="0.25" />
-    <rect x="456" y="28" width="48" height="28" rx="8" fillOpacity="0.25" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="120" y="70.5" width="376" height="3" rx="1.5" />
-    <polygon points="494,66.5 505,72 494,77.5" />
-  </g>
-  <rect x="302" y="74" width="20" height="20" rx="6" fill="var(--ds-blue-500)" />
-  <line x1="312" y1="96" x2="312" y2="108" stroke="var(--ds-gray-300)" strokeWidth="2" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="110" width="48" height="28" rx="8" />
-    <rect x="176" y="110" width="48" height="28" rx="8" />
-    <rect x="232" y="110" width="48" height="28" rx="8" />
-    <rect x="344" y="110" width="48" height="28" rx="8" />
-    <rect x="400" y="110" width="48" height="28" rx="8" />
-    <rect x="456" y="110" width="48" height="28" rx="8" />
-  </g>
-  <rect x="288" y="110" width="48" height="28" rx="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="1.5" strokeDasharray="5 4" />
-  <rect x="359" y="134" width="18" height="18" rx="5" fill="var(--ds-yellow-500)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="366.5" y="156" width="3" height="14" rx="1.5" />
-    <polygon points="362.5,168 373.5,168 368,179" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="182" width="48" height="28" rx="8" fillOpacity="0.9" />
-    <rect x="176" y="182" width="48" height="28" rx="8" fillOpacity="0.9" />
-    <rect x="232" y="182" width="48" height="28" rx="8" fillOpacity="0.9" />
-    <rect x="288" y="182" width="48" height="28" rx="8" fillOpacity="0.25" />
-    <rect x="344" y="182" width="48" height="28" rx="8" fillOpacity="0.25" />
-    <rect x="400" y="182" width="48" height="28" rx="8" fillOpacity="0.25" />
-    <rect x="456" y="182" width="48" height="28" rx="8" fillOpacity="0.25" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="358" y="193.5" width="20" height="5" rx="2.5" transform="rotate(45 368 196)" />
-    <rect x="358" y="193.5" width="20" height="5" rx="2.5" transform="rotate(-45 368 196)" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="120" y="228.5" width="158" height="3" rx="1.5" />
-    <polygon points="276,224.5 287,230 276,235.5" />
-  </g>
-</svg>
 
 ## 1. Enhanced for-each
 

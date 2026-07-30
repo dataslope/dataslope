@@ -7,52 +7,15 @@ Time-series data, anything indexed by date or timestamp, is the
 most common kind of data in business and science. It deserves its
 own chapter because:
 
+<Figure
+  slug="viz-time-series-cutout"
+  alt="Time series visualization, an isometric illustration"
+/>
+
 - Time has structure (years, months, weeks, hours, holidays,
   seasons).
 - The eye reads horizontal-time charts very fluently.
 - A handful of specific pitfalls are *unique* to time series.
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="A wave of dots repeats across year separators, one season band highlighted in yellow, and a single red dot breaking the seasonal rhythm"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="70" y="45" width="500" height="160" rx="12" fill="currentColor" opacity="0.06" />
-  <g fill="currentColor" opacity="0.12">
-    <rect x="195" y="55" width="2" height="140" />
-    <rect x="320" y="55" width="2" height="140" />
-    <rect x="445" y="55" width="2" height="140" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="322" y="57" width="121" height="136" rx="8" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
-    <circle cx="90" cy="125" r="4" />
-    <circle cx="113" cy="84" r="4" />
-    <circle cx="136" cy="92" r="4" />
-    <circle cx="159" cy="140" r="4" />
-    <circle cx="182" cy="170" r="4" />
-    <circle cx="205" cy="147" r="4" />
-    <circle cx="228" cy="98" r="4" />
-    <circle cx="251" cy="81" r="4" />
-    <circle cx="274" cy="117" r="4" />
-    <circle cx="297" cy="162" r="4" />
-    <circle cx="320" cy="163" r="4" />
-    <circle cx="343" cy="118" r="4" />
-    <circle cx="366" cy="82" r="4" />
-    <circle cx="389" cy="97" r="4" />
-    <circle cx="435" cy="170" r="4" />
-    <circle cx="458" cy="141" r="4" />
-    <circle cx="481" cy="93" r="4" />
-    <circle cx="504" cy="83" r="4" />
-    <circle cx="527" cy="123" r="4" />
-    <circle cx="550" cy="165" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="412" cy="185" r="5" />
-  </g>
-</svg>
 
 ## The default: a line chart with time on x
 

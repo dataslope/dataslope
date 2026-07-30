@@ -10,41 +10,15 @@ will-stay, not numbers. The word "regression" in its name is a historical
 accident about the math under the hood, and it trips up nearly every
 newcomer. Whenever you see "logistic regression," think **classifier**.
 
+<Figure
+  slug="ml-logistic-regression-cutout"
+  alt="Logistic regression, an isometric illustration"
+/>
+
 With that settled: logistic regression is to classification what linear
 regression is to predicting numbers, the simple, fast, interpretable
 baseline you reach for first and that everything fancier has to beat. It is
 probably the single most widely deployed classifier in the world.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Blue dots on one side and green dots on the other, separated by a translucent yellow boundary band; dots fade as they approach the band, a linear score squashed into probabilities and thresholded into classes"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="338,15 374,15 308,195 272,195" fillOpacity="0.28" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="60" r="8" />
-    <circle cx="140" cy="110" r="8" />
-    <circle cx="95" cy="160" r="8" />
-    <circle cx="180" cy="60" r="8" />
-    <circle cx="220" cy="140" r="8" />
-    <circle cx="255" cy="90" r="8" fillOpacity="0.7" />
-    <circle cx="280" cy="160" r="8" fillOpacity="0.5" />
-    <circle cx="322" cy="100" r="8" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="450" cy="60" r="8" />
-    <circle cx="500" cy="110" r="8" />
-    <circle cx="545" cy="55" r="8" />
-    <circle cx="560" cy="150" r="8" />
-    <circle cx="480" cy="180" r="8" />
-    <circle cx="430" cy="130" r="8" />
-    <circle cx="380" cy="80" r="8" fillOpacity="0.55" />
-    <circle cx="330" cy="172" r="8" fillOpacity="0.3" />
-  </g>
-</svg>
 
 <Callout type="danger" title="The one misconception to kill on sight">
 **Logistic regression does NOT predict a continuous number, and it is not a

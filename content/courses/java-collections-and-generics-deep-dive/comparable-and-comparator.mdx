@@ -7,50 +7,16 @@ A collection cannot sort what it cannot compare. So before any
 `sort`, `TreeSet`, `TreeMap`, or `PriorityQueue` works, *something*
 has to tell Java how two elements relate.
 
+<Figure
+  slug="jcol-comparable-comparator-cutout"
+  alt="Comparable and Comparator, an isometric illustration"
+/>
+
 There are two ways to provide that ordering:
 
 - **`Comparable<T>`**, the type *itself* defines a natural order.
 - **`Comparator<T>`**, an *external* object defines an order on the
   type, often one of many possible orderings.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Left: blue dots line up by their own size, smallest to largest, natural ordering; right: a yellow judge diamond hangs above equal green squares and orders them by shade along thin gray strings, a comparator imposing its own rule"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="318.5" y="30" width="3" height="150" rx="1.5" fill="currentColor" opacity="0.1" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="70" cy="120" r="5" />
-    <circle cx="120" cy="120" r="7.5" />
-    <circle cx="170" cy="120" r="10" />
-    <circle cx="222" cy="120" r="12.5" />
-    <circle cx="276" cy="120" r="15" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <circle cx="70" cy="120" r="2" />
-    <circle cx="120" cy="120" r="2.5" />
-    <circle cx="170" cy="120" r="3" />
-    <circle cx="222" cy="120" r="3.5" />
-    <circle cx="276" cy="120" r="4" />
-  </g>
-  <rect x="60" y="150" width="230" height="3" rx="1.5" fill="var(--ds-blue-500)" fillOpacity="0.2" />
-  <g stroke="var(--ds-gray-300)" strokeWidth="1.5">
-    <line x1="480" y1="66" x2="372" y2="120" />
-    <line x1="480" y1="66" x2="422" y2="120" />
-    <line x1="480" y1="66" x2="472" y2="120" />
-    <line x1="480" y1="66" x2="522" y2="120" />
-    <line x1="480" y1="66" x2="572" y2="120" />
-  </g>
-  <rect x="467" y="39" width="26" height="26" rx="7" fill="var(--ds-yellow-500)" transform="rotate(45 480 52)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="360" y="120" width="24" height="24" rx="6" fillOpacity="0.2" />
-    <rect x="410" y="120" width="24" height="24" rx="6" fillOpacity="0.4" />
-    <rect x="460" y="120" width="24" height="24" rx="6" fillOpacity="0.6" />
-    <rect x="510" y="120" width="24" height="24" rx="6" fillOpacity="0.8" />
-    <rect x="560" y="120" width="24" height="24" rx="6" />
-  </g>
-</svg>
 
 ## Comparable: the natural order
 

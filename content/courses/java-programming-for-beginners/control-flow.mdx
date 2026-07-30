@@ -7,6 +7,11 @@ A program made only of straight-line statements is uninteresting. The
 moment a program needs to *decide* or *repeat*, you reach for
 **control flow**: the constructs that change which line runs next.
 
+<Figure
+  slug="java-control-flow-cutout"
+  alt="Control flow, an isometric illustration"
+/>
+
 ```mermaid
 flowchart TB
     Start --> D{condition?}
@@ -15,26 +20,6 @@ flowchart TB
     A --> End
     B --> End
 ```
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="A blue token slides down a thin line into a yellow decision diamond; one path curves left straight to the green exit while the other passes through a blue work block whose loop line sweeps back up to the diamond for another round"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="320" y1="42" x2="320" y2="68" />
-    <path d="M 306 106 C 250 136 248 176 296 208" />
-    <path d="M 334 106 C 380 124 398 132 404 140" />
-    <path d="M 430 148 C 476 118 430 78 359 86" />
-    <path d="M 396 166 C 380 192 360 202 348 207" />
-  </g>
-  <polygon points="357.7,80.5 348,88 359.9,91.3" fill="var(--ds-gray-400)" />
-  <circle cx="320" cy="30" r="9" fill="var(--ds-blue-500)" />
-  <rect x="302" y="74" width="36" height="36" rx="8" fill="var(--ds-yellow-500)" transform="rotate(45 320 92)" />
-  <rect x="382" y="140" width="48" height="26" rx="9" fill="var(--ds-blue-500)" />
-  <rect x="284" y="202" width="72" height="28" rx="14" fill="var(--ds-green-500)" />
-</svg>
 
 ## `if` and `else`
 

@@ -8,41 +8,17 @@ and you have seen `train_test_split` carve a dataset into a part to learn
 from and a part to be honest with. Now we put the whole thing together and
 build a real, working model from start to finish.
 
+<Figure
+  slug="ml-your-first-model-cutout"
+  alt="Your first model, end to end, an isometric illustration"
+/>
+
 By the end of this page you will have trained a classifier on real penguin
 measurements, asked it to label penguins it never saw, and measured exactly
 how often it was right. More importantly, you will have internalized a
 shape, **load, split, train, evaluate**, that every model in this course
 repeats without exception. Once that shape is automatic, learning a new
 algorithm becomes a matter of swapping one line.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Four stations joined by thin gray arrows, a solid blue dataset dot, a split pair, a yellow training ring, and a green circle carrying a white check, load, split, train, evaluate"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-400)">
-    <rect x="118" y="98.5" width="52" height="3" rx="1.5" />
-    <polygon points="168,94.5 179,100 168,105.5" />
-    <rect x="268" y="98.5" width="56" height="3" rx="1.5" />
-    <polygon points="322,94.5 333,100 322,105.5" />
-    <rect x="398" y="98.5" width="72" height="3" rx="1.5" />
-    <polygon points="468,94.5 479,100 468,105.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="100" r="16" />
-    <circle cx="215" cy="88" r="11" />
-    <circle cx="237" cy="116" r="8" fillOpacity="0.35" />
-  </g>
-  <circle cx="370" cy="100" r="16" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="5" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="370" cy="100" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="520" cy="100" r="17" />
-  </g>
-  <polyline points="512,101 518,107 529,93" fill="none" stroke="var(--ds-white)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-</svg>
 
 <Callout type="info" title="What you already know going in">
 This page assumes you have read the welcome page and **The Train/Test

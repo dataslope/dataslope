@@ -6,6 +6,11 @@ description: Bundling data and behavior into a single thing, the central idea of
 Up to now, our programs have been **variables + methods**. Data
 lived in one place; the code that worked on it lived in another.
 
+<Figure
+  slug="mcs-classes-and-objects-cutout"
+  alt="Classes and objects, an isometric illustration"
+/>
+
 That works fine for small examples. But as a program grows, the
 gap between "the data" and "the rules about that data" becomes a
 real problem. If a `BankAccount` is "a `double balance` plus a
@@ -15,34 +20,6 @@ everything?
 
 The answer is the **class**, a way to bundle data and the
 behavior that owns it into a single unit.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A dashed blue blueprint card with construction marks links by thin gray lines to three solid squares, blue, green, yellow, each stamped from the same plan but holding its white state dot in a different spot"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="230" y1="90" x2="374" y2="58" />
-    <line x1="230" y1="115" x2="374" y2="128" />
-    <line x1="230" y1="140" x2="374" y2="198" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }}>
-    <rect x="80" y="48" width="150" height="134" rx="14" fill="currentColor" fillOpacity="0.07" />
-    <rect x="80" y="48" width="150" height="134" rx="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="7 5" />
-    <circle cx="155" cy="98" r="24" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5 4" />
-    <rect x="104" y="140" width="100" height="4" rx="2" fill="currentColor" fillOpacity="0.35" />
-    <rect x="104" y="152" width="70" height="4" rx="2" fill="currentColor" fillOpacity="0.25" />
-  </g>
-  <rect x="380" y="28" width="60" height="60" rx="14" fill="var(--ds-blue-500)" />
-  <rect x="380" y="98" width="60" height="60" rx="14" fill="var(--ds-green-500)" />
-  <rect x="380" y="168" width="60" height="60" rx="14" fill="var(--ds-yellow-500)" />
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.92">
-    <circle cx="398" cy="46" r="7" />
-    <circle cx="410" cy="128" r="7" />
-    <circle cx="422" cy="210" r="7" />
-  </g>
-</svg>
 
 ## A program of just variables and methods
 

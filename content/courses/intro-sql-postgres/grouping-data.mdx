@@ -9,81 +9,10 @@ headcount **per department**, orders **per customer**. `GROUP BY` is
 the tool for exactly this, and it is one of the most powerful ideas
 in SQL. Take your time, there are extra checks at the end.
 
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="Mixed rows cluster into three color stacks, one per category, and each stack collapses into a single summary dot carrying its count"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.08">
-    <rect x="60" y="30" width="130" height="20" rx="7" />
-    <rect x="60" y="60" width="130" height="20" rx="7" />
-    <rect x="60" y="90" width="130" height="20" rx="7" />
-    <rect x="60" y="120" width="130" height="20" rx="7" />
-    <rect x="60" y="150" width="130" height="20" rx="7" />
-    <rect x="60" y="180" width="130" height="20" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="78" cy="40" r="6" />
-    <circle cx="78" cy="100" r="6" />
-    <circle cx="78" cy="190" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="78" cy="70" r="6" />
-    <circle cx="78" cy="160" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="78" cy="130" r="6" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <rect x="94" y="36" width="80" height="7" rx="3.5" />
-    <rect x="94" y="66" width="80" height="7" rx="3.5" />
-    <rect x="94" y="96" width="80" height="7" rx="3.5" />
-    <rect x="94" y="126" width="80" height="7" rx="3.5" />
-    <rect x="94" y="156" width="80" height="7" rx="3.5" />
-    <rect x="94" y="186" width="80" height="7" rx="3.5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <polygon points="214,100 214,120 232,110" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="260" y="36" width="90" height="16" rx="8" fillOpacity="0.5" />
-    <rect x="260" y="58" width="90" height="16" rx="8" fillOpacity="0.65" />
-    <rect x="260" y="80" width="90" height="16" rx="8" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="260" y="112" width="90" height="16" rx="8" fillOpacity="0.55" />
-    <rect x="260" y="134" width="90" height="16" rx="8" fillOpacity="0.75" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="260" y="166" width="90" height="16" rx="8" fillOpacity="0.75" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="372" cy="66" r="3" />
-    <circle cx="387" cy="66" r="3" />
-    <circle cx="402" cy="66" r="3" />
-    <circle cx="372" cy="127" r="3" />
-    <circle cx="387" cy="127" r="3" />
-    <circle cx="402" cy="127" r="3" />
-    <circle cx="372" cy="174" r="3" />
-    <circle cx="387" cy="174" r="3" />
-    <circle cx="402" cy="174" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="432" cy="66" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="432" cy="127" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="432" cy="174" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <text x="432" y="71" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13" fontWeight="700">3</text>
-    <text x="432" y="132" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">2</text>
-    <text x="432" y="179" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="11" fontWeight="700">1</text>
-  </g>
-</svg>
+<Figure
+  slug="sql-grouping-data-cutout"
+  alt="Grouping data with GROUP BY, an isometric illustration"
+/>
 
 ## The idea: split, then summarize
 

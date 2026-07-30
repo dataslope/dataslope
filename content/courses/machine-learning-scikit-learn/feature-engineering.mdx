@@ -11,49 +11,16 @@ hidden, buried in a ratio you never computed, a date you left as a
 timestamp, a curve a straight line cannot bend to, even the best model
 will miss it.
 
+<Figure
+  slug="ml-feature-engineering-cutout"
+  alt="Feature engineering, an isometric illustration"
+/>
+
 **Feature engineering** is the craft of reshaping raw data into a
 representation that makes the learning easy. This page is about that craft:
 why the representation matters so much, the everyday moves that help
 (ratios, interactions, binning, date parts, polynomial terms), and the
 discipline to know when a new feature is signal and when it is just noise.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Jumbled blue dots in one card pass through a solid yellow diamond and come out in the next card lying along a clean rising green line, the same data, re-represented so the pattern shows"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="50" y="30" width="200" height="150" rx="14" fillOpacity="0.08" />
-    <circle cx="85" cy="60" r="6" />
-    <circle cx="130" cy="135" r="6" />
-    <circle cx="100" cy="160" r="6" />
-    <circle cx="160" cy="75" r="6" />
-    <circle cx="185" cy="145" r="6" />
-    <circle cx="140" cy="50" r="6" />
-    <circle cx="75" cy="110" r="6" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="258" y="103.5" width="20" height="3" rx="1.5" />
-    <polygon points="276,99.5 287,105 276,110.5" />
-    <rect x="362" y="103.5" width="20" height="3" rx="1.5" />
-    <polygon points="380,99.5 391,105 380,110.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="320,75 355,105 320,135 285,105" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="396" y="30" width="200" height="150" rx="14" fillOpacity="0.1" />
-  </g>
-  <line x1="420" y1="160" x2="572" y2="54" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="424" cy="158" r="6" />
-    <circle cx="456" cy="135" r="6" />
-    <circle cx="488" cy="113" r="6" />
-    <circle cx="520" cy="90" r="6" />
-    <circle cx="552" cy="68" r="6" />
-  </g>
-</svg>
 
 ## The core idea: the right representation makes learning easy
 

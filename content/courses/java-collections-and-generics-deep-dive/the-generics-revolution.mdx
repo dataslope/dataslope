@@ -9,52 +9,13 @@ have **generics**. That meant every collection was a collection of
 suffered from. The JCF was structurally beautiful; it was still
 type-unsafe.
 
+<Figure
+  slug="jcol-generics-revolution-cutout"
+  alt="The generics revolution, an isometric illustration"
+/>
+
 Java 5 (released September 2004) fixed that with a single language
 feature whose effect was enormous: **parameterized types**.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Before generics, a box of mixed shapes hands back a piece inside a red burst at runtime; after, a solid green gate line in front of the typed box checks arrivals, the circle sails through, the triangle is crossed out before it ever gets in"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="28" width="140" height="70" rx="12" fillOpacity="0.1" />
-    <circle cx="120" cy="63" r="8" />
-  </g>
-  <rect x="140" y="47" width="16" height="16" rx="4" fill="var(--ds-green-500)" />
-  <polygon points="180,55 171,71 189,71" fill="var(--ds-yellow-500)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="238" y="61.5" width="52" height="3" rx="1.5" />
-    <polygon points="288,57.5 299,63 288,68.5" />
-  </g>
-  <polygon points="340,43 346,57 360,63 346,69 340,83 334,69 320,63 334,57" fill="var(--ds-red-500)" fillOpacity="0.85" />
-  <rect x="332" y="55" width="16" height="16" rx="4" fill="var(--ds-green-500)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="90" y="150" width="140" height="70" rx="12" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="120" cy="185" r="8" />
-    <circle cx="146" cy="185" r="8" />
-    <circle cx="172" cy="185" r="8" />
-  </g>
-  <rect x="278" y="142" width="4" height="86" rx="2" fill="var(--ds-green-500)" />
-  <polyline points="266,132 272,138 284,124" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="306" y="166.5" width="40" height="3" rx="1.5" />
-    <polygon points="308,162.5 297,168 308,173.5" />
-  </g>
-  <circle cx="364" cy="168" r="8" fill="var(--ds-blue-500)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="306" y="206.5" width="40" height="3" rx="1.5" />
-    <polygon points="308,202.5 297,208 308,213.5" />
-  </g>
-  <polygon points="356,198 347,216 365,216" fill="var(--ds-yellow-500)" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="270" y="205.5" width="20" height="5" rx="2.5" transform="rotate(45 280 208)" />
-    <rect x="270" y="205.5" width="20" height="5" rx="2.5" transform="rotate(-45 280 208)" />
-  </g>
-</svg>
 
 ## What the world looked like before generics
 

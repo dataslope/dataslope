@@ -9,46 +9,10 @@ but PostgreSQL does **not** run it in that order. SQL has a hidden
 of confusing errors, like "why can't I use an alias in `WHERE`?"
 This is one of the most clarifying ideas in all of SQL.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="The same clauses in two columns, the order you write them on the left, the numbered order the database really runs them on the right, linked by crossing bands"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.15">
-    <polygon points="240,40 378,148 378,152 240,44" />
-    <polygon points="240,76 378,40 378,44 240,80" />
-    <polygon points="240,112 378,76 378,80 240,116" />
-    <polygon points="240,148 378,112 378,116 240,152" />
-    <polygon points="240,184 378,184 378,188 240,188" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="30" width="120" height="24" rx="9" fillOpacity="0.6" />
-    <rect x="120" y="66" width="120" height="24" rx="9" fillOpacity="0.6" />
-    <rect x="120" y="102" width="120" height="24" rx="9" fillOpacity="0.6" />
-    <rect x="120" y="138" width="120" height="24" rx="9" fillOpacity="0.6" />
-    <rect x="120" y="174" width="120" height="24" rx="9" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="400" y="30" width="120" height="24" rx="9" fillOpacity="0.7" />
-    <rect x="400" y="66" width="120" height="24" rx="9" fillOpacity="0.7" />
-    <rect x="400" y="102" width="120" height="24" rx="9" fillOpacity="0.7" />
-    <rect x="400" y="138" width="120" height="24" rx="9" fillOpacity="0.7" />
-    <rect x="400" y="174" width="120" height="24" rx="9" fillOpacity="0.7" />
-    <circle cx="392" cy="42" r="10" />
-    <circle cx="392" cy="78" r="10" />
-    <circle cx="392" cy="114" r="10" />
-    <circle cx="392" cy="150" r="10" />
-    <circle cx="392" cy="186" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <text x="392" y="47" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">1</text>
-    <text x="392" y="83" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">2</text>
-    <text x="392" y="119" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">3</text>
-    <text x="392" y="155" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">4</text>
-    <text x="392" y="191" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700">5</text>
-  </g>
-</svg>
+<Figure
+  slug="sql-query-execution-order-cutout"
+  alt="Query execution order, an isometric illustration"
+/>
 
 ## Written order vs. execution order
 

@@ -9,47 +9,13 @@ basically *the* data structure. They are still everywhere, every
 list, every hash table, every queue you'll meet in this course is
 secretly built on top of an array. So we have to start here.
 
+<Figure
+  slug="jcol-tyranny-of-arrays-cutout"
+  alt="The tyranny of arrays, an isometric illustration"
+/>
+
 But arrays alone were not enough to build big software. This page
 tells the story of why.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A sealed six-cell array cannot take one more item, adding means building the longer array below and copying every cell down thin gray lines, just to seat one yellow newcomer beside a still-empty slot"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="1.5">
-    <line x1="160" y1="74" x2="134" y2="150" />
-    <line x1="212" y1="74" x2="186" y2="150" />
-    <line x1="264" y1="74" x2="238" y2="150" />
-    <line x1="316" y1="74" x2="290" y2="150" />
-    <line x1="368" y1="74" x2="342" y2="150" />
-    <line x1="420" y1="74" x2="394" y2="150" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="126" y="32" width="6" height="44" rx="3" fillOpacity="0.8" />
-    <rect x="136" y="36" width="48" height="36" fillOpacity="0.55" />
-    <rect x="188" y="36" width="48" height="36" fillOpacity="0.35" />
-    <rect x="240" y="36" width="48" height="36" fillOpacity="0.55" />
-    <rect x="292" y="36" width="48" height="36" fillOpacity="0.35" />
-    <rect x="344" y="36" width="48" height="36" fillOpacity="0.55" />
-    <rect x="396" y="36" width="48" height="36" fillOpacity="0.35" />
-    <rect x="448" y="32" width="6" height="44" rx="3" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="146" width="6" height="44" rx="3" fillOpacity="0.8" />
-    <rect x="110" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="162" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="214" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="266" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="318" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="370" y="150" width="48" height="36" fillOpacity="0.4" />
-    <rect x="526" y="146" width="6" height="44" rx="3" fillOpacity="0.8" />
-  </g>
-  <rect x="422" y="150" width="48" height="36" fill="var(--ds-blue-500)" fillOpacity="0.08" />
-  <circle cx="446" cy="168" r="9" fill="var(--ds-yellow-500)" />
-  <rect x="474" y="150" width="48" height="36" fill="none" stroke="var(--ds-gray-400)" strokeWidth="1.5" strokeDasharray="5 4" />
-</svg>
 
 ## A short history of code working with data
 

@@ -9,35 +9,13 @@ object into existence*. If your constructor finishes without
 throwing an exception, callers are entitled to assume the object is
 ready to use.
 
+<Figure
+  slug="java-constructors-lifecycle-cutout"
+  alt="Constructors and object lifecycle, an isometric illustration"
+/>
+
 This page is about constructors and the broader **lifecycle** of an
 object, birth, life, and eventual death.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="One object at three moments along a thin baseline: a dashed circle with a yellow arc under construction, a solid blue circle wearing a green live ring, and a faded circle dissolving into drifting dots, built, used, collected"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="90" y="152" width="460" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
-  <circle cx="140" cy="100" r="34" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
-  <path d="M 140 66 A 34 34 0 0 1 174 100" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="5" strokeLinecap="round" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="192" y="98.5" width="70" height="3" rx="1.5" />
-    <polygon points="260,94.5 271,100 260,105.5" />
-  </g>
-  <circle cx="320" cy="100" r="42" fill="none" stroke="var(--ds-green-500)" strokeWidth="2.5" />
-  <circle cx="320" cy="100" r="34" fill="var(--ds-blue-500)" />
-  <circle cx="320" cy="100" r="7" fill="var(--ds-white)" fillOpacity="0.9" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="380" y="98.5" width="62" height="3" rx="1.5" />
-    <polygon points="440,94.5 451,100 440,105.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="500" cy="100" r="34" fillOpacity="0.15" />
-    <circle cx="542" cy="66" r="4" fillOpacity="0.25" />
-    <circle cx="556" cy="48" r="3" fillOpacity="0.15" />
-  </g>
-</svg>
 
 ## Anatomy of a constructor
 

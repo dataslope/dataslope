@@ -9,42 +9,10 @@ in the test set. Shuffle differently and the number changes. On small
 datasets that wobble can be large enough to make you pick the wrong model.
 **Cross-validation** fixes this by not betting everything on a single split.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Five rows of segmented bars; in each row the single yellow held-out segment slides one position along, so every segment takes a turn as the test set, k-fold cross-validation"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="192" y="30" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="284" y="30" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="376" y="30" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="468" y="30" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="100" y="62" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="284" y="62" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="376" y="62" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="468" y="62" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="100" y="94" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="192" y="94" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="376" y="94" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="468" y="94" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="100" y="126" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="192" y="126" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="284" y="126" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="468" y="126" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="100" y="158" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="192" y="158" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="284" y="158" width="84" height="18" rx="6" fillOpacity="0.25" />
-    <rect x="376" y="158" width="84" height="18" rx="6" fillOpacity="0.25" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="100" y="30" width="84" height="18" rx="6" fillOpacity="0.9" />
-    <rect x="192" y="62" width="84" height="18" rx="6" fillOpacity="0.9" />
-    <rect x="284" y="94" width="84" height="18" rx="6" fillOpacity="0.9" />
-    <rect x="376" y="126" width="84" height="18" rx="6" fillOpacity="0.9" />
-    <rect x="468" y="158" width="84" height="18" rx="6" fillOpacity="0.9" />
-  </g>
-</svg>
+<Figure
+  slug="ml-cross-validation-cutout"
+  alt="Cross-validation, an isometric illustration"
+/>
 
 ## The problem: one split is one roll of the dice
 

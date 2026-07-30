@@ -7,6 +7,11 @@ Almost every interesting method on a `Set` or `Map` answers the same
 question: **"have I seen this before?"** That question is answered by
 two methods that every Java object inherits from `Object`:
 
+<Figure
+  slug="jcol-equality-hashing-cutout"
+  alt="Equality and hashing, an isometric illustration"
+/>
+
 ```java
 public boolean equals(Object other);
 public int     hashCode();
@@ -15,44 +20,6 @@ public int     hashCode();
 They are tiny. They are also the single most-bugged corner of the
 whole framework. This page is about why, and how to get them right
 once and for all.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Left: two equal blue squares with matching green hash notches funnel into one bucket that stores a single copy with a green check; right: the same pair with mismatched notch colors splits into two buckets holding duplicates, flagged by a red cross, equals and hashCode must agree"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="318.5" y="28" width="3" height="174" rx="1.5" fill="currentColor" opacity="0.1" />
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="137" y1="80" x2="180" y2="140" />
-    <line x1="223" y1="80" x2="180" y2="140" />
-    <line x1="437" y1="80" x2="440" y2="140" />
-    <line x1="523" y1="80" x2="520" y2="140" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="40" width="34" height="34" rx="9" />
-    <rect x="206" y="40" width="34" height="34" rx="9" />
-    <rect x="420" y="40" width="34" height="34" rx="9" />
-    <rect x="506" y="40" width="34" height="34" rx="9" />
-  </g>
-  <circle cx="147" cy="47" r="5" fill="var(--ds-green-500)" />
-  <circle cx="233" cy="47" r="5" fill="var(--ds-green-500)" />
-  <circle cx="447" cy="47" r="5" fill="var(--ds-green-500)" />
-  <circle cx="533" cy="47" r="5" fill="var(--ds-yellow-500)" />
-  <rect x="140" y="140" width="80" height="48" rx="10" fill="var(--ds-green-500)" fillOpacity="0.12" />
-  <rect x="167" y="151" width="26" height="26" rx="7" fill="var(--ds-blue-500)" />
-  <polyline points="198,166 203,171 212,159" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-  <g fill="currentColor" opacity="0.08">
-    <rect x="402" y="140" width="76" height="48" rx="10" />
-    <rect x="482" y="140" width="76" height="48" rx="10" />
-  </g>
-  <rect x="427" y="151" width="26" height="26" rx="7" fill="var(--ds-blue-500)" />
-  <rect x="507" y="151" width="26" height="26" rx="7" fill="var(--ds-blue-500)" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="471" y="113.5" width="18" height="5" rx="2.5" transform="rotate(45 480 116)" />
-    <rect x="471" y="113.5" width="18" height="5" rx="2.5" transform="rotate(-45 480 116)" />
-  </g>
-</svg>
 
 ## What collections actually do with equals
 

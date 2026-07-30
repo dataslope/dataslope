@@ -8,46 +8,17 @@ what kind of problem you have. The very first fork in that decision is also
 the biggest one in all of machine learning, and it hinges on a single
 question: **do you have answers to learn from, or not?**
 
+<Figure
+  slug="ml-supervised-vs-unsupervised-cutout"
+  alt="Supervised vs unsupervised learning, an isometric illustration"
+/>
+
 If your data comes with labels, a known answer attached to each example,
 you are in **supervised** learning. If it does not, you have inputs but no
 answers, you are in **unsupervised** learning. These two worlds use
 different algorithms, ask different questions, and are even evaluated in
 completely different ways. Knowing which one you are in is the first thing
 to settle on any project, so this page makes the line crisp.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="On the left, dots each wear a small green or blue answer tag; on the right, the same dots sit untagged, supervised data comes with labels, unsupervised data does not"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.4">
-    <circle cx="95" cy="86" r="6" />
-    <circle cx="170" cy="66" r="6" />
-    <circle cx="125" cy="150" r="6" />
-    <circle cx="205" cy="124" r="6" />
-    <circle cx="160" cy="192" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="102" y="65" width="20" height="13" rx="4" />
-    <rect x="212" y="103" width="20" height="13" rx="4" />
-    <rect x="167" y="171" width="20" height="13" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="177" y="45" width="20" height="13" rx="4" />
-    <rect x="132" y="129" width="20" height="13" rx="4" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="319" y="36" width="2" height="160" rx="1" />
-  </g>
-  <g fill="currentColor" opacity="0.4">
-    <circle cx="405" cy="86" r="6" />
-    <circle cx="480" cy="66" r="6" />
-    <circle cx="435" cy="150" r="6" />
-    <circle cx="515" cy="124" r="6" />
-    <circle cx="470" cy="192" r="6" />
-  </g>
-</svg>
 
 ## The deciding question: is there a y?
 

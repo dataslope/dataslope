@@ -8,6 +8,11 @@ multiplies your features by coefficients and adds them up. K-nearest
 neighbors measures distances. Useful, but none of them is something you
 could explain to a colleague by drawing on a whiteboard.
 
+<Figure
+  slug="ml-decision-trees-cutout"
+  alt="Decision trees, an isometric illustration"
+/>
+
 A **decision tree** is different. It is a model you can *read*. It is
 nothing more than a flowchart of yes/no questions: "Is the flipper shorter
 than 206 mm? If yes, is the bill shorter than 43 mm? ..." Follow the answers
@@ -21,47 +26,6 @@ importantly for this course, they are the building block of random
 forests and gradient boosting, the workhorses of tabular machine learning.
 Understand the single tree and the powerful ensembles a few pages from now
 will make sense.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A yellow question diamond splits along thin lines into two more diamonds and four leaf cards, each card tinted and filled almost purely blue or green, a decision tree is a cascade of yes-or-no questions ending in confident bins"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="306" y1="56" x2="214" y2="92" />
-    <line x1="334" y1="56" x2="426" y2="92" />
-    <line x1="188" y1="124" x2="120" y2="154" />
-    <line x1="212" y1="124" x2="248" y2="154" />
-    <line x1="428" y1="124" x2="392" y2="154" />
-    <line x1="452" y1="124" x2="520" y2="154" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="320,20 348,42 320,64 292,42" />
-    <polygon points="200,88 224,107 200,126 176,107" fillOpacity="0.75" />
-    <polygon points="440,88 464,107 440,126 416,107" fillOpacity="0.75" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="78" y="156" width="84" height="44" rx="10" fillOpacity="0.1" />
-    <rect x="350" y="156" width="84" height="44" rx="10" fillOpacity="0.1" />
-    <circle cx="100" cy="178" r="5.5" />
-    <circle cx="120" cy="178" r="5.5" />
-    <circle cx="140" cy="178" r="5.5" />
-    <circle cx="374" cy="178" r="5.5" />
-    <circle cx="396" cy="178" r="5.5" />
-    <circle cx="274" cy="178" r="5.5" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="206" y="156" width="84" height="44" rx="10" fillOpacity="0.1" />
-    <rect x="478" y="156" width="84" height="44" rx="10" fillOpacity="0.1" />
-    <circle cx="230" cy="178" r="5.5" />
-    <circle cx="252" cy="178" r="5.5" />
-    <circle cx="418" cy="178" r="5.5" fillOpacity="0.5" />
-    <circle cx="500" cy="178" r="5.5" />
-    <circle cx="522" cy="178" r="5.5" />
-    <circle cx="544" cy="178" r="5.5" />
-  </g>
-</svg>
 
 ## The problem a tree solves
 

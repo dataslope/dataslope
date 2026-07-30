@@ -9,41 +9,13 @@ let Java 5 add generics without breaking any class file that
 predated them, but it has a small bag of consequences that every
 working Java programmer eventually trips on.
 
+<Figure
+  slug="jcol-type-erasure-cutout"
+  alt="Type erasure, an isometric illustration"
+/>
+
 This page lays them out so you don't have to learn each one by
 crash.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three blue boxes each wearing a different colored type badge funnel through a tall gray wall and come out as one identical box whose badge is only a dashed outline, every generic type erased to the same raw shape at runtime"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="190" y1="52" x2="300" y2="120" />
-    <line x1="190" y1="120" x2="300" y2="120" />
-    <line x1="190" y1="188" x2="300" y2="120" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="24" width="110" height="56" rx="12" fillOpacity="0.14" />
-    <rect x="80" y="92" width="110" height="56" rx="12" fillOpacity="0.14" />
-    <rect x="80" y="160" width="110" height="56" rx="12" fillOpacity="0.14" />
-  </g>
-  <circle cx="182" cy="30" r="8" fill="var(--ds-green-500)" />
-  <circle cx="182" cy="98" r="8" fill="var(--ds-yellow-500)" />
-  <circle cx="182" cy="166" r="8" fill="var(--ds-blue-500)" fillOpacity="0.45" />
-  <rect x="300" y="16" width="14" height="198" rx="7" fill="currentColor" opacity="0.22" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="322" y="118.5" width="40" height="3" rx="1.5" />
-    <polygon points="360,114.5 371,120 360,125.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="388" y="88" width="130" height="64" rx="12" fillOpacity="0.14" />
-    <circle cx="420" cy="120" r="7" />
-    <circle cx="446" cy="120" r="7" />
-    <circle cx="472" cy="120" r="7" />
-  </g>
-  <circle cx="510" cy="94" r="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 3" />
-</svg>
 
 ## What erasure actually does
 

@@ -9,6 +9,11 @@ Maps have an enormous advantage: the audience already knows the
 geography, so you can spend your visual encoding entirely on the
 *data* rather than on the layout.
 
+<Figure
+  slug="viz-geographic-cutout"
+  alt="Geographic visualization, an isometric illustration"
+/>
+
 Plotly Express offers three main map families:
 
 - **Choropleths**, colored *regions* (country, state, county).
@@ -16,46 +21,6 @@ Plotly Express offers three main map families:
   location).
 - **Mapbox / Density mapbox**, tile-based maps with finer
   geographic detail (cities, addresses).
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Two abstract landmasses shaded at different depths like a choropleth, dotted latitude lines behind them, and blue location dots scattered on top"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.15">
-    <circle cx="70" cy="65" r="2" />
-    <circle cx="130" cy="65" r="2" />
-    <circle cx="190" cy="65" r="2" />
-    <circle cx="250" cy="65" r="2" />
-    <circle cx="310" cy="65" r="2" />
-    <circle cx="370" cy="65" r="2" />
-    <circle cx="430" cy="65" r="2" />
-    <circle cx="490" cy="65" r="2" />
-    <circle cx="550" cy="65" r="2" />
-    <circle cx="70" cy="150" r="2" />
-    <circle cx="130" cy="150" r="2" />
-    <circle cx="190" cy="150" r="2" />
-    <circle cx="250" cy="150" r="2" />
-    <circle cx="310" cy="150" r="2" />
-    <circle cx="370" cy="150" r="2" />
-    <circle cx="430" cy="150" r="2" />
-    <circle cx="490" cy="150" r="2" />
-    <circle cx="550" cy="150" r="2" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="100,80 170,60 230,75 250,120 220,170 150,185 95,150 80,110" fillOpacity="0.3" />
-    <polygon points="330,95 420,70 500,85 545,130 515,180 430,195 355,165 330,130" fillOpacity="0.5" />
-    <polygon points="420,70 500,85 545,130 515,180 470,150 430,110" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="120" r="6" />
-    <circle cx="205" cy="143" r="5" />
-    <circle cx="445" cy="120" r="7" />
-    <circle cx="487" cy="158" r="5" />
-    <circle cx="390" cy="103" r="5" />
-  </g>
-</svg>
 
 ## Choropleths: data per region
 

@@ -8,6 +8,11 @@ carried information**. The story of this course is, in the end, the
 story of one of humanity's oldest habits: turning abstract things
 into shapes the eye can read.
 
+<Figure
+  slug="viz-history-of-data-pictures-cutout"
+  alt="A brief history of data pictures, an isometric illustration"
+/>
+
 This page is a single, deliberate sweep through that history, from
 the first chart ever drawn to the moment, a few seconds from now,
 when *you* will make one in your browser. We keep it short on
@@ -15,54 +20,6 @@ purpose: the goal is to make a chart within a page or two, not to
 write a textbook of dates. (If the longer story tempts you, there
 is an [Interesting discussions](/courses/intro-data-viz-plotly/interesting-discussions)
 appendix near the end.)
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three eras side by side: an ochre cave-painting cluster of dots, then tally marks, then a small coordinate chart, pictures slowly becoming data"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="95" cy="95" r="7" fillOpacity="0.4" />
-    <circle cx="115" cy="80" r="5" fillOpacity="0.5" />
-    <circle cx="138" cy="72" r="6" fillOpacity="0.45" />
-    <circle cx="160" cy="82" r="5" fillOpacity="0.5" />
-    <circle cx="175" cy="100" r="7" fillOpacity="0.4" />
-    <circle cx="158" cy="118" r="5" fillOpacity="0.5" />
-    <circle cx="132" cy="124" r="8" fillOpacity="0.45" />
-    <circle cx="108" cy="116" r="4" fillOpacity="0.55" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="232" cy="60" r="3" />
-    <circle cx="232" cy="100" r="3" />
-    <circle cx="232" cy="140" r="3" />
-    <circle cx="424" cy="60" r="3" />
-    <circle cx="424" cy="100" r="3" />
-    <circle cx="424" cy="140" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="270" y="70" width="8" height="60" rx="4" />
-    <rect x="284" y="70" width="8" height="60" rx="4" />
-    <rect x="298" y="70" width="8" height="60" rx="4" />
-    <rect x="312" y="70" width="8" height="60" rx="4" />
-    <rect x="259" y="96" width="72" height="8" rx="4" transform="rotate(-30 295 100)" />
-    <rect x="350" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
-    <rect x="364" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
-    <rect x="378" y="70" width="8" height="60" rx="4" fillOpacity="0.55" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="460" y="60" width="4" height="100" rx="2" />
-    <rect x="460" y="156" width="120" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="490" cy="135" r="6" />
-    <circle cx="515" cy="118" r="6" />
-    <circle cx="540" cy="98" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="565" cy="78" r="7" />
-  </g>
-</svg>
 
 ## The first picture of disagreement
 
@@ -122,36 +79,6 @@ Nightingale knew the numbers better than anyone in London. She also
 knew that *numbers in a report do not change policy*. So she did
 something almost unprecedented for a woman, or for anyone, in the
 mid-19th century: **she drew a chart.**
-
-<svg
-  viewBox="0 0 640 260"
-  role="img"
-  aria-label="A rose diagram of wedges fanning out from a center, large blue wedges of preventable disease dwarfing the small red wedges of battle wounds"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <circle cx="320" cy="135" r="112" fill="currentColor" opacity="0.05" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M320 135 L320 40 A95 95 0 0 1 387.2 67.8 Z" fillOpacity="0.4" />
-    <path d="M320 135 L394.2 60.8 A105 105 0 0 1 425 135 Z" fillOpacity="0.5" />
-    <path d="M320 135 L408 135 A88 88 0 0 1 382.2 197.2 Z" fillOpacity="0.42" />
-    <path d="M320 135 L369.5 184.5 A70 70 0 0 1 320 205 Z" fillOpacity="0.34" />
-    <path d="M320 135 L320 193 A58 58 0 0 1 279 176 Z" fillOpacity="0.3" />
-    <path d="M320 135 L286.1 168.9 A48 48 0 0 1 272 135 Z" fillOpacity="0.26" />
-    <path d="M320 135 L265 135 A55 55 0 0 1 281.1 96.1 Z" fillOpacity="0.3" />
-    <path d="M320 135 L267 82 A75 75 0 0 1 320 60 Z" fillOpacity="0.36" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M320 135 L320 105 A30 30 0 0 1 341.2 113.8 Z" fillOpacity="0.6" />
-    <path d="M320 135 L344 111 A34 34 0 0 1 354 135 Z" fillOpacity="0.65" />
-    <path d="M320 135 L348 135 A28 28 0 0 1 339.8 154.8 Z" fillOpacity="0.6" />
-    <path d="M320 135 L337 152 A24 24 0 0 1 320 159 Z" fillOpacity="0.55" />
-    <path d="M320 135 L320 155 A20 20 0 0 1 305.9 149.1 Z" fillOpacity="0.5" />
-    <path d="M320 135 L308 147 A17 17 0 0 1 303 135 Z" fillOpacity="0.5" />
-    <path d="M320 135 L301 135 A19 19 0 0 1 306.6 121.6 Z" fillOpacity="0.55" />
-    <path d="M320 135 L302.3 117.3 A25 25 0 0 1 320 110 Z" fillOpacity="0.6" />
-  </g>
-  <circle cx="320" cy="135" r="4" fill="currentColor" opacity="0.5" />
-</svg>
 
 The chart she published in 1858 is now famous as the **Coxcomb** or
 **rose diagram**. Each month of the war is a wedge fanning out from a

@@ -9,6 +9,11 @@ boundary, returned from a library, stored in a cache, shared
 between threads, used as a map key, exposed to "the rest of the
 codebase", mutability becomes a liability.
 
+<Figure
+  slug="jcol-immutable-collections-cutout"
+  alt="Immutable collections, an isometric illustration"
+/>
+
 This chapter is about three intertwined ideas:
 
 - **Truly immutable** collections, created with `List.of`, `Set.of`,
@@ -17,37 +22,6 @@ This chapter is about three intertwined ideas:
   (`Collections.unmodifiableList`).
 - **Defensive copies**, what you do at the boundaries of your code
   to keep your invariants safe.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A blue box accepts a dropping dot and shows a dashed gap where another left, while the sealed green box beside it keeps its dots fixed and a red arrival simply ricochets off its border"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="100" width="180" height="90" rx="14" fillOpacity="0.1" />
-    <circle cx="110" cy="146" r="9" />
-    <circle cx="150" cy="146" r="9" />
-    <circle cx="150" cy="26" r="8" />
-  </g>
-  <circle cx="190" cy="146" r="9" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="4 3" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="148.5" y="40" width="3" height="38" rx="1.5" />
-    <polygon points="144.5,76 155.5,76 150,87" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <rect x="384" y="94" width="192" height="102" rx="18" fill="none" stroke="currentColor" strokeWidth="2.5" />
-    <rect x="390" y="100" width="180" height="90" rx="14" fill="currentColor" fillOpacity="0.14" />
-    <circle cx="430" cy="146" r="9" fill="currentColor" />
-    <circle cx="470" cy="146" r="9" fill="currentColor" />
-    <circle cx="510" cy="146" r="9" fill="currentColor" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <circle cx="480" cy="20" r="8" fill="currentColor" />
-    <polyline points="480,36 480,86 509.6,56.4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
-    <polygon points="512.1,61.7 516,50 504.3,53.9" fill="currentColor" />
-  </g>
-</svg>
 
 ## Why immutability matters
 
