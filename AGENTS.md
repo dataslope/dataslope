@@ -193,15 +193,32 @@ keepers inside a fortnight. Promotion writes its own encoded copy into
 serves fine — what you lose is the pristine PNG, and with it the ability to
 re-promote at a different quality without paying to regenerate.
 
-**The rule is not applied until this workflow runs at least once.** It has
-never run (the file has to be on `main` before `workflow_dispatch` appears),
-so nothing has expired yet and the bucket keeps every run. Trigger it once
-after merging, or candidates accumulate indefinitely.
+**The rule is not applied until this workflow runs successfully at least
+once.** Its first run (on #612 landing) failed: `AccessDenied` on
+`PutBucketLifecycleConfiguration`. Nothing has expired yet and the bucket
+still keeps every run.
 
-The same R2 credentials back the Actions workflows and the local scripts
+**That failure is a token-tier problem, not a bug in the rule.** A lifecycle
+rule is bucket *configuration*, and R2 lets only an **Admin Read & Write** API
+token edit that; the **Object Read & Write** token the rest of the pipeline
+shares can list, read and write objects — `head-bucket` even succeeds with it,
+so the job looks healthy right up to the write — and is denied on the
+configuration. See the [R2 token
+permissions](https://developers.cloudflare.com/r2/api/tokens/#permissions)
+table.
+
+So this one workflow reads `R2_ADMIN_ACCESS_KEY_ID` /
+`R2_ADMIN_SECRET_ACCESS_KEY` (falling back to the shared pair if unset).
+Create an Admin Read & Write R2 API token, add those two repository secrets,
+then run the workflow. **R2 admin tokens are account-wide** — they cannot be
+scoped to one bucket — which is exactly why they stay confined to this
+workflow instead of upgrading the shared token: `r2-cache-cleanup.yml` and the
+local scripts would otherwise gain account-wide bucket-delete rights they have
+no use for.
+
+Everything else here still runs on the shared Object Read & Write pair
 (`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
-`r2-cache-cleanup.yml`). The token needs Object Read & Write covering
-`dataslope-illustrations`.
+`r2-cache-cleanup.yml`), which needs to cover `dataslope-illustrations`.
 
 ### Non-negotiables
 
