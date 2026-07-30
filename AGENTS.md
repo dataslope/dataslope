@@ -207,18 +207,30 @@ configuration. See the [R2 token
 permissions](https://developers.cloudflare.com/r2/api/tokens/#permissions)
 table.
 
-So this one workflow reads `R2_ADMIN_ACCESS_KEY_ID` /
-`R2_ADMIN_SECRET_ACCESS_KEY` (falling back to the shared pair if unset).
-Create an Admin Read & Write R2 API token, add those two repository secrets,
-then run the workflow. **R2 admin tokens are account-wide** — they cannot be
-scoped to one bucket — which is exactly why they stay confined to this
-workflow instead of upgrading the shared token: `r2-cache-cleanup.yml` and the
-local scripts would otherwise gain account-wide bucket-delete rights they have
-no use for.
+So this one workflow reads the repository secrets `R2_ADMIN_ACCESS_KEY_ID` /
+`R2_ADMIN_SECRET_ACCESS_KEY`, holding the account's Admin Read & Write token.
+**R2 admin tokens are account-wide** — they cannot be scoped to one bucket —
+so they stay confined to this workflow. `r2-cache-cleanup.yml` keeps its own
+object-scoped pair, `R2_INC_CACHE_ACCESS_KEY_ID` /
+`R2_INC_CACHE_SECRET_ACCESS_KEY` (renamed 2026-07-30 from `R2_ACCESS_KEY_ID` /
+`R2_SECRET_ACCESS_KEY` once a second credential made "the" R2 secrets
+ambiguous). That job deletes objects unattended every six hours and has once
+deleted more than intended; handing it bucket-delete rights over
+`dataslope-workspaces` — live user work, bound to the app Worker — buys
+nothing.
 
-Everything else here still runs on the shared Object Read & Write pair
-(`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
-`r2-cache-cleanup.yml`), which needs to cover `dataslope-illustrations`.
+Two R2 credentials, then, and the names now say which is which:
+
+| Where | Secret | Tier | Reaches |
+| --- | --- | --- | --- |
+| `r2-illustrations-lifecycle.yml` | `R2_ADMIN_*` | Admin Read & Write | every bucket, plus their configuration |
+| `r2-cache-cleanup.yml` | `R2_INC_CACHE_*` | Object Read & Write | objects only |
+
+**Local scripts are unaffected by that rename.** `scripts/lib/r2.mjs` reads
+`R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` from the *session
+environment* — a separate Object Read & Write token that must cover
+`dataslope-illustrations`. Same variable names, different credential, nothing
+to do with repository secrets.
 
 ### Non-negotiables
 

@@ -37,12 +37,14 @@ name: R2 illustrations lifecycle
 # where it returns a bare AccessDenied.
 # https://developers.cloudflare.com/r2/api/tokens/#permissions
 #
-# Hence the dedicated R2_ADMIN_* pair below. R2 admin tokens cannot be scoped to
-# a single bucket (they are account-wide by definition), so confining one to the
-# single workflow that needs it beats upgrading the shared token that
-# r2-cache-cleanup.yml and every local illustration script also hold — that
-# would hand account-wide bucket-delete rights to jobs whose whole safety story
-# is that they cannot touch dataslope-inc-cache or dataslope-workspaces.
+# Hence the dedicated R2_ADMIN_* pair below, used by this workflow and nothing
+# else. R2 admin tokens cannot be scoped to a single bucket (they are
+# account-wide by definition), so confining one to the single job that needs it
+# beats handing the same rights to r2-cache-cleanup.yml, which deletes objects
+# unattended every six hours and whose whole safety story is that it cannot
+# reach dataslope-workspaces (live user data, bound to the app Worker) or
+# destroy dataslope-inc-cache outright. That job keeps its own object-scoped
+# R2_INC_CACHE_* pair.
 #
 # NOTE: PutBucketLifecycleConfiguration REPLACES a bucket's entire lifecycle
 # configuration. This job targets `dataslope-illustrations` only and that bucket
@@ -51,13 +53,9 @@ name: R2 illustrations lifecycle
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (the R2 S3 endpoint host),
-#                               already used by r2-cache-cleanup.yml
+#                               shared with r2-cache-cleanup.yml
 #   R2_ADMIN_ACCESS_KEY_ID      R2 API token access key id (Admin Read & Write)
 #   R2_ADMIN_SECRET_ACCESS_KEY  R2 API token secret access key
-#
-# If the admin pair is absent the job falls back to R2_ACCESS_KEY_ID /
-# R2_SECRET_ACCESS_KEY, which only works if you chose to upgrade that shared
-# token to Admin Read & Write instead of minting a separate one.
 
 on:
   # Re-apply whenever the retention policy itself changes.
@@ -93,15 +91,12 @@ jobs:
       EXPIRE_DAYS: "14"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
       # Editing bucket configuration needs an R2 Admin Read & Write token; the
-      # shared Object Read & Write pair is denied (see the header). Falls back
-      # to the shared pair so an upgraded-in-place token also works.
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID || secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY || secrets.R2_SECRET_ACCESS_KEY }}
-      # Which pair was picked. Secrets cannot be tested from inside `run:`
-      # (they are masked, and an unset one is indistinguishable from empty
-      # there), so resolve it in the expression and pass the answer through.
-      ADMIN_KEY_ID_SET: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID != '' }}
-      ADMIN_SECRET_SET: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY != '' }}
+      # object-scoped R2_INC_CACHE_* pair is denied here (see the header).
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY }}
+      # Secrets cannot be tested from inside `run:` (an unset one arrives as
+      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      ADMIN_CREDS_SET: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID != '' && secrets.R2_ADMIN_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_RETRY_MODE: standard
@@ -130,11 +125,11 @@ jobs:
             exit 1
           fi
 
-          # Both admin secrets or neither. Setting one half signs requests with
-          # a mismatched key/secret, which fails as an opaque
-          # SignatureDoesNotMatch rather than "you forgot the other one".
-          if [[ "$ADMIN_KEY_ID_SET" != "$ADMIN_SECRET_SET" ]]; then
-            echo "::error::Set BOTH R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY, or neither. Only one of the two is set, which signs requests with a mismatched credential pair."
+          # Say which secret is missing. Half a pair signs requests with a
+          # mismatched key/secret and fails as an opaque SignatureDoesNotMatch;
+          # neither fails as an equally opaque unsigned-request error.
+          if [[ "$ADMIN_CREDS_SET" != "true" ]]; then
+            echo "::error::Repository secrets R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY are not both set. This job needs an R2 'Admin Read & Write' token; see https://developers.cloudflare.com/r2/api/tokens/#permissions"
             exit 1
           fi
 
@@ -152,12 +147,11 @@ jobs:
               echo "the bucket's configuration."
               echo "  https://developers.cloudflare.com/r2/api/tokens/#permissions"
               echo
-              echo "Fix: create an R2 API token with 'Admin Read & Write' permission and add its"
-              echo "keys as repository secrets R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY,"
-              echo "which this workflow prefers over the shared pair. R2 admin tokens are"
-              echo "account-wide, so keep them to this workflow rather than upgrading the"
-              echo "R2_ACCESS_KEY_ID pair that r2-cache-cleanup.yml and the local illustration"
-              echo "scripts also use."
+              echo "Fix: check that R2_ADMIN_ACCESS_KEY_ID / R2_ADMIN_SECRET_ACCESS_KEY really hold"
+              echo "an 'Admin Read & Write' token — an object-scoped one reaches this far and then"
+              echo "fails exactly here. R2 admin tokens are account-wide, so keep them to this"
+              echo "workflow rather than reusing them for r2-cache-cleanup.yml, which has its own"
+              echo "object-scoped R2_INC_CACHE_* pair."
               echo "::error::Access denied ${what} '$BUCKET' — these credentials are not an R2 'Admin Read & Write' token. See the log above for the fix."
             else
               echo "::error::Failed ${what} '$BUCKET'."
@@ -190,11 +184,7 @@ jobs:
           echo "Bucket:  $BUCKET"
           echo "Rule:    delete objects under '${PREFIX}' after ${EXPIRE_DAYS} days"
           echo "Dry run: $DRY_RUN"
-          if [[ "$ADMIN_KEY_ID_SET" == "true" ]]; then
-            echo "Token:   R2_ADMIN_* (dedicated Admin Read & Write token)"
-          else
-            echo "Token:   R2_* (shared pair; works only if that token is Admin Read & Write)"
-          fi
+          echo "Token:   R2_ADMIN_* (Admin Read & Write)"
           echo "---"
           cat /tmp/lifecycle.json
 

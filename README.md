@@ -78,8 +78,10 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 | Secret | Value |
 | --- | --- |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (the R2 S3 endpoint host) |
-| `R2_ACCESS_KEY_ID` | R2 API token access key ID |
-| `R2_SECRET_ACCESS_KEY` | R2 API token secret access key |
+| `R2_INC_CACHE_ACCESS_KEY_ID` | R2 API token access key ID |
+| `R2_INC_CACHE_SECRET_ACCESS_KEY` | R2 API token secret access key |
+
+The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every six hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
 
 To change how long stale/preview cache lingers, edit `THRESHOLD_HOURS` (age limit) and `MAX_BRANCHES` (how many active-branch previews may coexist) in the workflow. At ~1–1.4 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons, storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
 
