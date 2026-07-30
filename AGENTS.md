@@ -125,9 +125,11 @@ All four API keys are already environment variables in Claude Code sessions:
 
 `promote-illustrations.mjs` writes `public/images/<id>.webp` at quality 92 and
 that file **is** what browsers download. Do not commit PNG sources, and do not
-put a copy under `assets/images/`: that directory is for *legacy* raster sources
-only (photos, screenshots, pre-existing course art), which `build-images`
-re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.
+put a copy under `assets/images/`: that directory is reserved for raster that
+does *not* come from this pipeline (a photo, a screenshot, a scanned diagram),
+which `build-images` re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.
+It currently holds no sources at all — every served image comes from the
+pipeline.
 
 Two reasons promotion skips `assets/images/`:
 
@@ -140,9 +142,10 @@ Two reasons promotion skips `assets/images/`:
 
 Illustrations therefore carry `formats: ["webp"]` in the manifest, so `<Figure>`
 renders a bare `<img>` — no `<source>`, no fallback file. WebP has been
-universally supported since 2020; the fallback only still exists for the 28
-legacy sources. Measured on the Python Basics batch, a 1536x1024 illustration is
-~1.4 MB as PNG and ~130 kB as WebP.
+universally supported since 2020. Every entry in the manifest is single-format
+today; the two-format path only comes back if someone adds a raster source under
+`assets/images/`. Measured on the Python Basics batch, a 1536x1024 illustration
+is ~1.4 MB as PNG and ~130 kB as WebP.
 
 Pristine PNGs stay in R2 for the retention window, so a run can be re-promoted
 at a different quality without regenerating. Bump `ENCODER_VERSION` in

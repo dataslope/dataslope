@@ -8,16 +8,17 @@
  *
  * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
  * intrinsic size + formats in the generated manifest this component imports,
- * which is what lets the `<img>` reserve layout space (no CLS). Two kinds of
- * entry exist, and `formats` is what distinguishes them:
+ * which is what lets the `<img>` reserve layout space (no CLS). `formats` is
+ * what decides the markup:
  *
- *   - Pipeline illustrations, promoted straight into `public/images/<slug>.webp`
- *     as the exact bytes to serve. `formats: ["webp"]`, so `<picture>` collapses
- *     to a plain `<img>` — no fallback is generated, and none is needed.
- *   - Legacy raster sources under `assets/images/<slug>.<ext>` (photos,
- *     screenshots, older course art), which the build step crushes into a
- *     `.webp` plus a raster fallback (`.png` when transparent, else `.jpg`).
- *     Those carry two formats and do serve WebP-first via `<source>`.
+ *   - One format (`["webp"]`) — every image in the repo today. These are
+ *     pipeline illustrations promoted straight into `public/images/<slug>.webp`
+ *     as the exact bytes to serve, so `<picture>` collapses to a plain `<img>`:
+ *     no fallback file is generated, and none is needed (WebP has been
+ *     universally supported since 2020).
+ *   - Two formats — a raster source under `assets/images/` that the build step
+ *     crushed into a `.webp` plus a `.png`/`.jpg` fallback. None exist right
+ *     now; the `<source>` branch below stays for when one is added.
  *
  * Named `Figure` (not `Image`) to avoid confusion with `next/image`, and
  * because it renders a `<figure>` and covers any raster image, not just

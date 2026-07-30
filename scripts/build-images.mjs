@@ -27,17 +27,20 @@
  *     doesn't even rewrite the manifest, so it stays cheap on `dev` / `build`
  *     / `postinstall` and produces no git churn.
  *
- * Two classes of image reach `public/images/`:
+ * Two classes of image can reach `public/images/`:
  *
- *   1. **Legacy raster sources** under `assets/images/` (photos, screenshots,
- *      the pre-existing PNG course art). These are encoded here, exactly as
- *      before: an optimized `.webp` plus a raster fallback.
- *   2. **Pre-served WebP** written straight into `public/images/` by
+ *   1. **Pre-served WebP** written straight into `public/images/` by
  *      `scripts/promote-illustrations.mjs`. These are NOT re-encoded. Promotion
  *      already produced the exact bytes to serve, and running them through a
  *      second lossy pass cost ~1.8 dB PSNR to save ~3 kB — a bad trade. This
  *      script only reads their dimensions for the manifest, so a generated
- *      illustration is encoded once and exists in git once.
+ *      illustration is encoded once and exists in git once. Today this is
+ *      every image in the repo.
+ *   2. **Raster sources** under `assets/images/` (a photo, a screenshot, a
+ *      scanned diagram — anything not from the illustration pipeline). These
+ *      are encoded here into an optimized `.webp` plus a raster fallback. The
+ *      folder is currently empty of sources; the path stays supported and
+ *      tested for when one is added.
  *
  * Bumping `ENCODER_VERSION` invalidates every cached hash, forcing a one-time
  * re-encode after an encoder-settings change.
