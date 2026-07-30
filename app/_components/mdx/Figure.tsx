@@ -6,12 +6,18 @@
  * <Figure slug="panda" alt="A giant panda, mascot for the pandas library" priority />
  * ```
  *
- * The source bytes live in `assets/images/<slug>.<ext>`; the build step
- * (`scripts/build-images.mjs`) crushes each source into an optimized `.webp`
- * plus a raster fallback (`.png` when transparent, else `.jpg`) under
- * `public/images/` and records its intrinsic size + formats in the generated
- * manifest this component imports. That lets the `<img>` reserve layout space
- * (no CLS) and serve WebP first with a fallback via `<picture>`.
+ * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
+ * intrinsic size + formats in the generated manifest this component imports,
+ * which is what lets the `<img>` reserve layout space (no CLS). Two kinds of
+ * entry exist, and `formats` is what distinguishes them:
+ *
+ *   - Pipeline illustrations, promoted straight into `public/images/<slug>.webp`
+ *     as the exact bytes to serve. `formats: ["webp"]`, so `<picture>` collapses
+ *     to a plain `<img>` — no fallback is generated, and none is needed.
+ *   - Legacy raster sources under `assets/images/<slug>.<ext>` (photos,
+ *     screenshots, older course art), which the build step crushes into a
+ *     `.webp` plus a raster fallback (`.png` when transparent, else `.jpg`).
+ *     Those carry two formats and do serve WebP-first via `<source>`.
  *
  * Named `Figure` (not `Image`) to avoid confusion with `next/image`, and
  * because it renders a `<figure>` and covers any raster image, not just
@@ -76,9 +82,10 @@ export function Figure({
       >
         <ImageIcon className={styles.pendingIcon} aria-hidden="true" />
         <span>
-          Image <code>{slug}</code> pending, add a raster source named{" "}
-          <code>{slug}</code> under <code>assets/images/</code> and run{" "}
-          <code>npm run build:images</code>.
+          Image <code>{slug}</code> pending, promote a candidate for it (
+          <code>node scripts/promote-illustrations.mjs {slug}</code>) or add a
+          raster source named <code>{slug}</code> under{" "}
+          <code>assets/images/</code> and run <code>npm run build:images</code>.
         </span>
       </span>
     );

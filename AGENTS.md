@@ -97,9 +97,10 @@ keepers; only the keepers reach git.
    **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
 3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
    `remove-background` through Kie AI. Writes a `-cutout` beside each original.
-4. **Promote** — `scripts/promote-illustrations.mjs` converts the chosen
-   candidates to WebP, writes them to `assets/images/`, and runs
-   `build-images`. Then embed with `<Figure slug="…" alt="…" />`.
+4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
+   candidates to WebP straight into `public/images/`, the files the site
+   serves, and runs `build-images` to record their dimensions. Then embed
+   with `<Figure slug="…" alt="…" />`.
 
 ```bash
 # Local run: everything on disk, nothing touches R2.
@@ -120,18 +121,33 @@ All four API keys are already environment variables in Claude Code sessions:
 `R2_BUCKET=dataslope-illustrations`) are only needed for `--sink r2` /
 `--from r2`; without them, stick to the disk flow, which is fully functional.
 
-### Committed images are WebP, never PNG
+### Illustrations are encoded once, into `public/images/`
 
-`promote-illustrations.mjs` writes `assets/images/<id>.webp`. Do not commit PNG
-sources. Measured on the Python Basics batch: 40 images were **58.1 MB as PNG
-and 7.6 MB as WebP**, and that ratio projects to ~2.9 GB vs ~266 MB per
-thousand. `build-images.mjs` already accepts `.webp` sources, so nothing
-downstream changes.
+`promote-illustrations.mjs` writes `public/images/<id>.webp` at quality 92 and
+that file **is** what browsers download. Do not commit PNG sources, and do not
+put a copy under `assets/images/`: that directory is for *legacy* raster sources
+only (photos, screenshots, pre-existing course art), which `build-images`
+re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.
 
-A WebP source is re-encoded once more by `build-images` (its own quality 80) for
-serving, which is why promote writes at quality 92 — the second pass then has
-headroom. Spot-checked at 100% zoom on the grainiest risograph in the set, the
-result is indistinguishable from the PNG original.
+Two reasons promotion skips `assets/images/`:
+
+- **Quality.** Routing an illustration through both encoders is a double lossy
+  pass. Measured: promote-q92 → build-q80 lands at **35.58 dB PSNR** against the
+  PNG original, while a single q80 encode of the same image is **37.41 dB**. The
+  second pass cost ~1.8 dB to save ~3 kB.
+- **Size.** A source in `assets/` plus its two build outputs in `public/` means
+  every illustration is in git roughly three times.
+
+Illustrations therefore carry `formats: ["webp"]` in the manifest, so `<Figure>`
+renders a bare `<img>` — no `<source>`, no fallback file. WebP has been
+universally supported since 2020; the fallback only still exists for the 28
+legacy sources. Measured on the Python Basics batch, a 1536x1024 illustration is
+~1.4 MB as PNG and ~130 kB as WebP.
+
+Pristine PNGs stay in R2 for the retention window, so a run can be re-promoted
+at a different quality without regenerating. Bump `ENCODER_VERSION` in
+`build-images.mjs` when encoder settings change; it invalidates every cached
+hash and forces a one-time re-encode.
 
 **Never leave both `<id>.png` and `<id>.webp` in `assets/images/`** — they
 slugify to the same manifest key and collide.
@@ -154,8 +170,9 @@ Candidates expire after **7 days**, applied by
 workflow_dispatch, or it re-applies on push when the retention window is
 edited). Cloudflare does the deleting server-side, so nothing polls. That is
 the review window: generate, review in `/illustration-prompts`, promote the
-keepers inside a week. Promotion copies bytes into `assets/images/`, so an
-expired candidate that was already promoted costs nothing.
+keepers inside a week. Promotion writes its own encoded copy into
+`public/images/`, so an expired candidate that was already promoted costs
+nothing — you only lose the ability to re-encode it at a different quality.
 
 The same R2 credentials back the Actions workflows and the local scripts
 (`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for

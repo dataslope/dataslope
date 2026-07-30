@@ -27,6 +27,18 @@
  *     doesn't even rewrite the manifest, so it stays cheap on `dev` / `build`
  *     / `postinstall` and produces no git churn.
  *
+ * Two classes of image reach `public/images/`:
+ *
+ *   1. **Legacy raster sources** under `assets/images/` (photos, screenshots,
+ *      the pre-existing PNG course art). These are encoded here, exactly as
+ *      before: an optimized `.webp` plus a raster fallback.
+ *   2. **Pre-served WebP** written straight into `public/images/` by
+ *      `scripts/promote-illustrations.mjs`. These are NOT re-encoded. Promotion
+ *      already produced the exact bytes to serve, and running them through a
+ *      second lossy pass cost ~1.8 dB PSNR to save ~3 kB — a bad trade. This
+ *      script only reads their dimensions for the manifest, so a generated
+ *      illustration is encoded once and exists in git once.
+ *
  * Bumping `ENCODER_VERSION` invalidates every cached hash, forcing a one-time
  * re-encode after an encoder-settings change.
  *
@@ -76,7 +88,7 @@ const MAX_EDGE = 1600;
 
 // Bump to invalidate every cached hash after changing the encode settings
 // below (resize cap, webp/png/jpeg options). Forces a one-time full re-encode.
-const ENCODER_VERSION = "1";
+const ENCODER_VERSION = "2";
 
 /** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug.
  *  Exported for the vitest suite (__tests__/figureSlugs.test.ts). */
@@ -255,6 +267,35 @@ async function main() {
     );
   }
 
+  // Adopt pre-served WebP: files promotion wrote directly into public/images
+  // with no corresponding source under assets/images. They are already the
+  // bytes we serve, so record dimensions and move on — no decode, no re-encode.
+  // Registering them in the manifest is also what keeps the prune step below
+  // from deleting them.
+  let adopted = 0;
+  for (const file of readdirSync(OUT_DIR)) {
+    if (extname(file).toLowerCase() !== ".webp") continue;
+    const slug = file.replace(/\.webp$/i, "");
+    if (manifest[slug]) continue; // owned by a legacy source
+    const buf = readFileSync(join(OUT_DIR, file));
+    const hash = createHash("sha256").update(ENCODER_VERSION).update(buf).digest("hex");
+    const priorEntry = prior[slug];
+    if (priorEntry?.hash === hash && priorEntry.formats?.length === 1) {
+      manifest[slug] = priorEntry;
+      cached += 1;
+      continue;
+    }
+    const s2 = await ensureSharp();
+    const meta = await s2(buf).metadata();
+    manifest[slug] = {
+      hash,
+      width: meta.width,
+      height: meta.height,
+      formats: ["webp"],
+    };
+    adopted += 1;
+  }
+
   // Prune any optimized file that isn't an expected output of a current slug
   // (source removed, renamed, or its fallback format changed).
   const expected = new Set();
@@ -279,8 +320,8 @@ async function main() {
   if (next !== current) writeFileSync(MANIFEST_FILE, next);
 
   console.log(
-    `build-images: ${encoded} encoded, ${cached} cached, ${pruned} pruned ` +
-      `(${Object.keys(manifest).length} image(s) total)`,
+    `build-images: ${encoded} encoded, ${adopted} adopted, ${cached} cached, ` +
+      `${pruned} pruned (${Object.keys(manifest).length} image(s) total)`,
   );
 }
 
