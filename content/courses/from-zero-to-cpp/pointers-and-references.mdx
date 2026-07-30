@@ -8,42 +8,14 @@ for an existing variable. Both are how C++ lets one piece of code
 *reach into* memory owned by another. They are the two tools you
 will use most often once functions and objects start sharing data.
 
+<Figure
+  slug="cpp-pointers-and-references-cutout"
+  alt="Pointers and references, an isometric illustration"
+/>
+
 Beginners often find pointers intimidating. Don't be. A pointer is
 just a number, the address of a byte in memory, with a type
 attached so the compiler knows how to interpret what's there.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two name tags tether down to one blue dot while a small pointer box on the left stores its address and aims a thin arrow at it, references alias an object, pointers hold where it lives"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="400" cy="130" r="22" />
-    <rect x="90" y="110" width="54" height="40" rx="8" fillOpacity="0.25" />
-    <circle cx="117" cy="130" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="300" y="30" width="64" height="30" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="436" y="30" width="64" height="30" rx="8" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M340 62 C 356 80, 374 98, 388 112" />
-    <path d="M460 62 C 450 80, 436 98, 416 112" />
-    <path d="M152 130 H 356" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="358,122 358,138 372,130" fillOpacity="0.7" />
-  </g>
-</svg>
 
 ## A pointer is an address with a type
 

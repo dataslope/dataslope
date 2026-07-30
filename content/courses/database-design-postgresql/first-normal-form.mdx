@@ -7,44 +7,13 @@ A table can look tidy and still hide a design problem. Imagine an order
 row with a cell that says `Book, Pen, Mug`. It is one cell, but it is
 really three values squeezed together.
 
+<Figure
+  slug="db-first-normal-form-cutout"
+  alt="First normal form, an isometric illustration"
+/>
+
 **First normal form (1NF)** is the first cleanup step: every cell holds
 one value, and the table has no repeating groups.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three values squeezed into a single crowded cell separate along a thin arrow into three cells holding one value each, first normal form making cells atomic"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="90" y="67" width="150" height="56" rx="12" fillOpacity="0.14" />
-    <circle cx="136" cy="97" r="12" />
-    <circle cx="430" cy="48" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="162" cy="89" r="12" />
-    <circle cx="430" cy="95" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="188" cy="99" r="12" />
-    <circle cx="430" cy="142" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M264 95 H 336"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <polygon points="336,87 336,103 350,95" fill="currentColor" />
-  </g>
-  <g fill="currentColor" opacity="0.1">
-    <rect x="398" y="28" width="150" height="40" rx="10" />
-    <rect x="398" y="75" width="150" height="40" rx="10" />
-    <rect x="398" y="122" width="150" height="40" rx="10" />
-  </g>
-</svg>
 
 ## What 1NF protects you from
 

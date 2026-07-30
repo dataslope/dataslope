@@ -8,47 +8,12 @@ You can build *new* values from it, but the original stays as it was,
 forever. In functional programming, this is the default. Mutation
 is the exception, not the rule.
 
-Immutability is not about asceticism. It is about *reasoning*.
+<Figure
+  slug="fp-immutability-cutout"
+  alt="Immutability, an isometric illustration"
+/>
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A filmstrip of three frames: each new frame repeats the previous dots and adds one green dot, and every earlier frame remains intact, updates create new versions instead of editing old ones"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.15">
-    <rect x="110" y="22" width="9" height="9" rx="2" />
-    <rect x="140" y="22" width="9" height="9" rx="2" />
-    <rect x="170" y="22" width="9" height="9" rx="2" />
-    <rect x="285" y="22" width="9" height="9" rx="2" />
-    <rect x="315" y="22" width="9" height="9" rx="2" />
-    <rect x="345" y="22" width="9" height="9" rx="2" />
-    <rect x="460" y="22" width="9" height="9" rx="2" />
-    <rect x="490" y="22" width="9" height="9" rx="2" />
-    <rect x="520" y="22" width="9" height="9" rx="2" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="80" y="45" width="130" height="110" rx="12" />
-    <rect x="255" y="45" width="130" height="110" rx="12" />
-    <rect x="430" y="45" width="130" height="110" rx="12" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="222" cy="100" r="3.5" />
-    <circle cx="242" cy="100" r="3.5" />
-    <circle cx="397" cy="100" r="3.5" />
-    <circle cx="417" cy="100" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="145" cy="95" r="10" />
-    <circle cx="320" cy="95" r="10" />
-    <circle cx="495" cy="95" r="10" />
-    <circle cx="528" cy="128" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="353" cy="128" r="9" />
-    <circle cx="468" cy="128" r="9" />
-  </g>
-</svg>
+Immutability is not about asceticism. It is about *reasoning*.
 
 ## The cost of mutation, in one example
 

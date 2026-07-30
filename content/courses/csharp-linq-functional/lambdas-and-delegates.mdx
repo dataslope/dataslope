@@ -10,57 +10,14 @@ lambda compiles to, what a closure captures, and why
 `Expression<Func<T,bool>>` is fundamentally different from
 `Func<T,bool>`.
 
+<Figure
+  slug="cs-lambdas-and-delegates-cutout"
+  alt="Lambdas and delegates, an isometric illustration"
+/>
+
 This is the most "language mechanics" page in the course. It is
 worth the patience, every page after this assumes you can read a
 lambda and know what it's doing.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three tiny mappings, each an input dot, a thin arrow, and an output, change of shape, change of size, one into two, with a captured red dot tethered to the last row by a thin line"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    opacity="0.3"
-  >
-    <path d="M232 60 H 282" />
-    <path d="M232 110 H 282" />
-    <path d="M232 160 H 282" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <polygon points="282,53 282,67 296,60" />
-    <polygon points="282,103 282,117 296,110" />
-    <polygon points="282,153 282,167 296,160" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="200" cy="60" r="11" />
-    <rect x="320" y="46" width="28" height="28" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="200" cy="110" r="8" />
-    <circle cx="334" cy="110" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="160" r="11" />
-    <circle cx="326" cy="160" r="8" />
-    <circle cx="348" cy="160" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="120" cy="204" r="8" />
-    <path
-      d="M131 198 C 152 188, 170 178, 186 168"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.45"
-    />
-  </g>
-</svg>
 
 ## Delegates: the type of a function
 

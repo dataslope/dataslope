@@ -7,44 +7,10 @@ A database table is a place to store one kind of thing: books, customers, recipe
 
 Before a table can hold rows, you define its shape. In SQL, that job belongs to `CREATE TABLE`.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A blueprint card with a solid header and dashed column slots stamps out, past a solid gray arrow, three identical filled rows, CREATE TABLE defines the shape that every future row is made from"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="56" y="36" width="220" height="150" rx="12" fillOpacity="0.1" />
-    <rect x="76" y="56" width="120" height="12" rx="6" />
-  </g>
-  <g fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5">
-    <rect x="76" y="84" width="180" height="22" rx="6" />
-    <rect x="76" y="114" width="180" height="22" rx="6" />
-    <rect x="76" y="144" width="180" height="22" rx="6" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="292" y="109.5" width="32" height="3" rx="1.5" />
-    <polygon points="322,105.5 333,111 322,116.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="356" y="52" width="228" height="30" rx="8" fillOpacity="0.12" />
-    <rect x="356" y="96" width="228" height="30" rx="8" fillOpacity="0.12" />
-    <rect x="356" y="140" width="228" height="30" rx="8" fillOpacity="0.12" />
-    <circle cx="378" cy="67" r="6" />
-    <circle cx="378" cy="111" r="6" />
-    <circle cx="378" cy="155" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="396" y="62" width="70" height="10" rx="5" />
-    <rect x="396" y="106" width="70" height="10" rx="5" />
-    <rect x="396" y="150" width="70" height="10" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="478" y="62" width="42" height="10" rx="5" />
-    <rect x="478" y="106" width="42" height="10" rx="5" />
-    <rect x="478" y="150" width="42" height="10" rx="5" />
-  </g>
-</svg>
+<Figure
+  slug="lite-creating-tables-cutout"
+  alt="An empty grid frame being assembled on a platform, column header plates slotting into its top edge"
+/>
 
 ## The basic CREATE TABLE shape
 
@@ -180,30 +146,6 @@ A table can include rules called **constraints**. Two beginner-friendly constrai
 
 - `NOT NULL`: this column must have a value.
 - `DEFAULT`: if the insert omits this column, use a fallback value.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A new row whose third cell is only a dashed outline, while a yellow token drops straight down a solid line into the gap, a DEFAULT quietly fills in what the insert left out"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="104" width="118" height="44" rx="8" fillOpacity="0.1" />
-    <rect x="222" y="104" width="118" height="44" rx="8" fillOpacity="0.1" />
-    <circle cx="155" cy="126" r="9" />
-  </g>
-  <rect x="348" y="104" width="118" height="44" rx="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="244" y="120" width="74" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="407" cy="40" r="14" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="405.5" y="58" width="3" height="26" rx="1.5" />
-    <polygon points="401.5,82 412.5,82 407,93" />
-  </g>
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

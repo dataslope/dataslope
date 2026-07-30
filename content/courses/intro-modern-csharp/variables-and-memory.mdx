@@ -8,6 +8,11 @@ follows in the course builds on this single idea: a **variable** is
 a *named box* somewhere in memory that holds a value of a known
 **type**.
 
+<Figure
+  slug="mcs-variables-and-memory-cutout"
+  alt="Variables and memory, an isometric illustration"
+/>
+
 If you only take three things from this page, take these:
 
 1. A variable is a *name* the compiler gives to a *piece of memory*.
@@ -15,47 +20,6 @@ If you only take three things from this page, take these:
 3. Assignment `x = y` copies a value from one box into another (for
    value types) or copies a *reference* (for reference types, more
    on that next chapter).
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three labeled jars on a shelf: two hold solid colored balls while the third is empty with only a dashed outline inside, variables as named boxes in memory, one not yet assigned"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="90" y="186" width="470" height="4" rx="2" fill="currentColor" opacity="0.15" />
-  <g fill="currentColor" opacity="0.25">
-    <rect x="140" y="56" width="40" height="12" rx="6" />
-    <rect x="300" y="56" width="40" height="12" rx="6" />
-    <rect x="460" y="56" width="40" height="12" rx="6" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="115" y="70" width="90" height="110" rx="16" />
-    <rect x="275" y="70" width="90" height="110" rx="16" />
-    <rect x="435" y="70" width="90" height="110" rx="16" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="130" y="96" width="60" height="14" rx="7" fillOpacity="0.55" />
-    <circle cx="160" cy="150" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="290" y="96" width="60" height="14" rx="7" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="320" cy="150" r="14" />
-    <rect x="450" y="96" width="60" height="14" rx="7" fillOpacity="0.55" />
-  </g>
-  <circle
-    cx="480"
-    cy="150"
-    r="13"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeDasharray="4 7"
-    strokeLinecap="round"
-    opacity="0.35"
-  />
-</svg>
 
 ## Declaring and using variables
 

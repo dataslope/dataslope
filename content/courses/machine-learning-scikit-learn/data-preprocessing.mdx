@@ -10,40 +10,15 @@ scale. They almost never do. Age runs from roughly 0 to 100; income runs
 from thousands to millions. Left unscaled, that mismatch can wreck a model
 that would otherwise work beautifully.
 
+<Figure
+  slug="ml-data-preprocessing-cutout"
+  alt="Data preprocessing and scaling, an isometric illustration"
+/>
+
 This page is about **preprocessing**: the unglamorous step of turning raw
 numbers into numbers a model can actually use. We focus on the most common
 and most important transformation, **feature scaling**, and on the single
 rule that separates an honest pipeline from a leaky one.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A huge blue circle, a tiny green square, and a small yellow dot cross a thin gray arrow and come out the same size on the other side, scaling puts wildly different feature ranges on one common footing"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="120" cy="95" r="55" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="188" y="153" width="14" height="14" rx="4" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="212" cy="52" r="10" fillOpacity="0.8" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="280" y="108.5" width="90" height="3" rx="1.5" />
-    <polygon points="368,104.5 379,110 368,115.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="425" cy="110" r="20" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="470" y="90" width="40" height="40" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="555" cy="110" r="20" />
-  </g>
-</svg>
 
 ## The problem scaling solves
 

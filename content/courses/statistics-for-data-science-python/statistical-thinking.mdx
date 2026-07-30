@@ -20,44 +20,10 @@ useful. The mistake, the expensive, career-defining mistake, is
 using deterministic thinking on a question that needs statistical
 thinking.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A soft green process emits a string of draws that wobble around its yellow true level; the one draw you actually observed is ringed in blue and sits clearly off the line, a number is one noisy output of a process, not the truth itself"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="90" cy="100" r="42" fillOpacity="0.1" />
-    <circle cx="90" cy="100" r="27" fillOpacity="0.18" />
-    <circle cx="90" cy="100" r="11" />
-    <circle cx="90" cy="62" r="3.5" fillOpacity="0.6" />
-    <circle cx="117" cy="73" r="3.5" fillOpacity="0.6" />
-    <circle cx="128" cy="100" r="3.5" fillOpacity="0.6" />
-    <circle cx="117" cy="127" r="3.5" fillOpacity="0.6" />
-    <circle cx="90" cy="138" r="3.5" fillOpacity="0.6" />
-    <circle cx="63" cy="127" r="3.5" fillOpacity="0.6" />
-    <circle cx="52" cy="100" r="3.5" fillOpacity="0.6" />
-    <circle cx="63" cy="73" r="3.5" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="148" y="100" width="432" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="160" cy="96" r="4" fillOpacity="0.7" />
-    <circle cx="205" cy="114" r="4" fillOpacity="0.7" />
-    <circle cx="250" cy="88" r="4" fillOpacity="0.7" />
-    <circle cx="295" cy="106" r="4" fillOpacity="0.7" />
-    <circle cx="340" cy="118" r="4" fillOpacity="0.7" />
-    <circle cx="430" cy="104" r="4" fillOpacity="0.7" />
-    <circle cx="475" cy="86" r="4" fillOpacity="0.4" />
-    <circle cx="520" cy="112" r="4" fillOpacity="0.4" />
-    <circle cx="565" cy="98" r="4" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="385" cy="78" r="6.5" />
-  </g>
-  <circle cx="385" cy="78" r="13" fill="none" stroke="var(--ds-blue-500)" strokeWidth="3" />
-</svg>
+<Figure
+  slug="stat-statistical-thinking-cutout"
+  alt="A hidden machine under a platform emitting one visible sample token, several ghosted alternative tokens fanned behind it"
+/>
 
 <Callout type="info" title="What this page is and isn't">
 This is a *mindset* page, not a techniques page. There are no formulas
@@ -149,40 +115,6 @@ patterns that look exactly like real findings**, trends, gaps,
 Watch a fake trend appear from data where, by construction, there is no
 trend whatsoever.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Scattered blue dots jitter evenly around a flat yellow truth line while a red arrow sweeps upward through one lucky run of them, the rising trend is a story the noise told, not a thing the process did"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="70" y="118" width="500" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.6">
-    <circle cx="90" cy="108" r="3.5" />
-    <circle cx="118" cy="132" r="3.5" />
-    <circle cx="146" cy="114" r="3.5" />
-    <circle cx="174" cy="126" r="3.5" />
-    <circle cx="202" cy="98" r="3.5" />
-    <circle cx="230" cy="134" r="3.5" />
-    <circle cx="258" cy="120" r="3.5" />
-    <circle cx="286" cy="104" r="3.5" />
-    <circle cx="314" cy="128" r="3.5" />
-    <circle cx="342" cy="112" r="3.5" />
-    <circle cx="370" cy="140" r="3.5" />
-    <circle cx="398" cy="96" r="3.5" />
-    <circle cx="426" cy="122" r="3.5" />
-    <circle cx="454" cy="108" r="3.5" />
-    <circle cx="482" cy="130" r="3.5" />
-    <circle cx="510" cy="100" r="3.5" />
-    <circle cx="538" cy="124" r="3.5" />
-  </g>
-  <line x1="226" y1="139" x2="398" y2="92" stroke="var(--ds-red-500)" strokeWidth="4" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <polygon points="394,84 398,104 418,87" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -240,7 +172,6 @@ range, it's plausibly just noise.
 
 rng = np.random.default_rng(0)
 
-
 # Build a "no-effect world": split one identical population in half,
 # many times, and record the gap between the two halves' means.
 def gap_under_no_effect():
@@ -248,7 +179,6 @@ def gap_under_no_effect():
     rng.shuffle(everyone)
     a, b = everyone[:100], everyone[100:]
     return a.mean() - b.mean()
-
 
 null_gaps = np.array([gap_under_no_effect() for _ in range(5000)])
 
@@ -350,52 +280,6 @@ Statistical thinking says: "average handle time is *somewhere around*
 200, and here's the range of values that are consistent with what I
 saw." The second is not vaguer, it's *more honest and more useful*,
 because it carries its own error bars.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A single yellow point estimate caps a bell-shaped pile of translucent blue dots, each dot a value the same process could just as easily have produced, the reported number is one member of a distribution, not the distribution itself"
-  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="210" y="170" width="228" height="4" rx="2" fill="currentColor" opacity="0.2" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.5">
-    <circle cx="244" cy="158" r="6" />
-    <circle cx="264" cy="158" r="6" />
-    <circle cx="264" cy="142" r="6" />
-    <circle cx="284" cy="158" r="6" />
-    <circle cx="284" cy="142" r="6" />
-    <circle cx="284" cy="126" r="6" />
-    <circle cx="284" cy="110" r="6" />
-    <circle cx="304" cy="158" r="6" />
-    <circle cx="304" cy="142" r="6" />
-    <circle cx="304" cy="126" r="6" />
-    <circle cx="304" cy="110" r="6" />
-    <circle cx="304" cy="94" r="6" />
-    <circle cx="304" cy="78" r="6" />
-    <circle cx="324" cy="158" r="6" />
-    <circle cx="324" cy="142" r="6" />
-    <circle cx="324" cy="126" r="6" />
-    <circle cx="324" cy="110" r="6" />
-    <circle cx="324" cy="94" r="6" />
-    <circle cx="324" cy="78" r="6" />
-    <circle cx="344" cy="158" r="6" />
-    <circle cx="344" cy="142" r="6" />
-    <circle cx="344" cy="126" r="6" />
-    <circle cx="344" cy="110" r="6" />
-    <circle cx="344" cy="94" r="6" />
-    <circle cx="344" cy="78" r="6" />
-    <circle cx="364" cy="158" r="6" />
-    <circle cx="364" cy="142" r="6" />
-    <circle cx="364" cy="126" r="6" />
-    <circle cx="364" cy="110" r="6" />
-    <circle cx="384" cy="158" r="6" />
-    <circle cx="384" cy="142" r="6" />
-    <circle cx="404" cy="158" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="324" cy="58" r="7.5" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

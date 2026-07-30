@@ -1,0 +1,154 @@
+name: R2 illustrations lifecycle
+
+# Applies the retention rule for the illustration-candidate bucket
+# (`dataslope-illustrations`), so generated candidates expire on their own
+# instead of accumulating.
+#
+# Why a workflow rather than a one-off command: an R2 lifecycle rule is bucket
+# configuration, not a recurring job. Cloudflare does the deleting server-side
+# for free once the rule is set, so nothing here needs a schedule. Keeping the
+# rule in the repo makes the retention window reviewable in a diff and
+# re-appliable if the bucket is ever recreated — which is exactly what a
+# hand-run `wrangler r2 bucket lifecycle add` on someone's laptop is not.
+#
+# What the pipeline puts in this bucket (see "Illustrations" in AGENTS.md):
+# `scripts/generate-illustrations.mjs --sink r2` writes every generated
+# candidate under `illustrations/<runId>/<promptId>/v<n>/`, and
+# `scripts/remove-background-kie.mjs` adds the cut-outs beside them. Most are
+# rejects: the point of R2 is that only the chosen ones are promoted into git by
+# `scripts/promote-illustrations.mjs`. The rest are dead weight the moment a
+# pick is made, and this rule sweeps them.
+#
+# EXPIRE_DAYS is the window you have to review and promote a run. Anything
+# under `illustrations/` older than that is deleted by Cloudflare, promoted or
+# not — promotion writes its own encoded WebP into `public/images/`, so an
+# expired candidate that was already promoted costs nothing served. What you
+# lose is the pristine PNG, and with it the ability to re-promote at a
+# different quality without paying to regenerate. Raise EXPIRE_DAYS if a batch
+# needs to sit through a longer review.
+#
+# Uses the S3 API with the same credentials as r2-cache-cleanup.yml rather than
+# wrangler, so no additional secret or `wrangler login` is required.
+#
+# NOTE: PutBucketLifecycleConfiguration REPLACES a bucket's entire lifecycle
+# configuration. This job targets `dataslope-illustrations` only and that bucket
+# has no other rules; it must never be pointed at dataslope-inc-cache or
+# dataslope-workspaces, whose contents are not disposable.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions),
+# all three already used by r2-cache-cleanup.yml:
+#   CLOUDFLARE_ACCOUNT_ID  Cloudflare account ID (the R2 S3 endpoint host)
+#   R2_ACCESS_KEY_ID       R2 API token access key id (Object Read & Write)
+#   R2_SECRET_ACCESS_KEY   R2 API token secret access key
+
+on:
+  # Re-apply whenever the retention policy itself changes.
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/r2-illustrations-lifecycle.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Show the rule that would be applied without applying it"
+        type: boolean
+        default: false
+
+concurrency:
+  group: r2-illustrations-lifecycle
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    env:
+      BUCKET: dataslope-illustrations
+      PREFIX: illustrations/
+      # Two weeks: long enough to generate, review in /illustration-prompts,
+      # promote the keepers, and still re-promote a run at a different quality
+      # after feedback lands — that second pass is free, and re-generating
+      # because the pristine PNG expired is not. Short enough that a few
+      # thousand rejected candidates never sit around being billed.
+      EXPIRE_DAYS: "14"
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_RETRY_MODE: standard
+      AWS_MAX_ATTEMPTS: "10"
+      ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+    steps:
+      - name: Apply the candidate-expiry rule
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
+
+          # An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
+          # "https://.r2.cloudflarestorage.com" and every call fails; say so
+          # plainly rather than emitting a wall of AWS CLI errors. (The secret
+          # was named CF_ACCOUNT_ID until Cloudflare deprecated the CF_* prefix.)
+          if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
+            echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID)."
+            exit 1
+          fi
+
+          # Guard the destructive-replace semantics: refuse to run against any
+          # bucket but the candidate one, whatever a future edit sets BUCKET to.
+          if [[ "$BUCKET" != "dataslope-illustrations" ]]; then
+            echo "::error::This job replaces a bucket's whole lifecycle configuration and is only safe for dataslope-illustrations (got '$BUCKET')."
+            exit 1
+          fi
+
+          # Confirm the bucket exists before touching its configuration, so a
+          # typo or a not-yet-created bucket fails here with a clear message.
+          if ! aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
+            echo "::error::Bucket '$BUCKET' is not reachable with these credentials. Create it, or check the R2 token covers it (Object Read & Write)."
+            exit 1
+          fi
+
+          cat > /tmp/lifecycle.json <<JSON
+          {
+            "Rules": [
+              {
+                "ID": "expire-illustration-candidates",
+                "Status": "Enabled",
+                "Filter": { "Prefix": "${PREFIX}" },
+                "Expiration": { "Days": ${EXPIRE_DAYS} }
+              }
+            ]
+          }
+          JSON
+
+          echo "Bucket:  $BUCKET"
+          echo "Rule:    delete objects under '${PREFIX}' after ${EXPIRE_DAYS} days"
+          echo "Dry run: $DRY_RUN"
+          echo "---"
+          cat /tmp/lifecycle.json
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "---"
+            echo "Dry run: existing configuration left untouched. Current rules:"
+            aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>/dev/null || echo "(none set)"
+            exit 0
+          fi
+
+          aws s3api put-bucket-lifecycle-configuration \
+            --bucket "$BUCKET" \
+            --lifecycle-configuration file:///tmp/lifecycle.json
+
+          # Read back rather than trusting the write: a silently-empty policy
+          # would mean candidates accumulate forever, which is the one failure
+          # this job exists to prevent and the one that shows no symptom.
+          echo "---"
+          echo "Applied. Current configuration:"
+          applied="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET")"
+          echo "$applied"
+          if ! grep -q '"expire-illustration-candidates"' <<<"$applied"; then
+            echo "::error::Rule was not present after applying it."
+            exit 1
+          fi

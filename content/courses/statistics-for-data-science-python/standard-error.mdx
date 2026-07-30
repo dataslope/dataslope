@@ -17,35 +17,10 @@ question about your *estimate's* reliability. Keeping those two apart is
 the heart of this page, because conflating them is, without exaggeration,
 the most common quantitative mistake in data science.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Around one shared solid yellow center line, the raw data dots above scatter wide inside a broad blue capsule, while the sample means below huddle tight inside a slim green capsule, the standard deviation describes the data, the standard error describes the estimate"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="318" y="26" width="4" height="148" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="110" y="40" width="410" height="46" rx="23" fillOpacity="0.15" />
-    <circle cx="128" cy="64" r="5" />
-    <circle cx="185" cy="58" r="5" />
-    <circle cx="236" cy="68" r="5" />
-    <circle cx="284" cy="56" r="5" />
-    <circle cx="332" cy="66" r="5" />
-    <circle cx="382" cy="58" r="5" />
-    <circle cx="438" cy="68" r="5" />
-    <circle cx="498" cy="60" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="282" y="108" width="88" height="44" rx="22" fillOpacity="0.18" />
-    <circle cx="300" cy="128" r="5" />
-    <circle cx="313" cy="122" r="5" />
-    <circle cx="326" cy="130" r="5" />
-    <circle cx="338" cy="124" r="5" />
-    <circle cx="320" cy="134" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-standard-error-cutout"
+  alt="A mound narrowing across four stepped platforms as a sample-size dial climbs, the gains visibly shrinking"
+/>
 
 ## Standard deviation vs. standard error
 
@@ -217,28 +192,6 @@ the precision, you need **100x** the sample. Precision gets expensive fast.
 
 Let's watch the SE fall as `n` grows and feel the diminishing returns.
 The curve drops steeply at first, then flattens into a long, slow crawl.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three bars trade width for height: each is four times wider than the one before yet only half as tall, to halve the standard error you must quadruple the sample, so precision gets expensive fast"
-  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="60" y="74" width="24" height="96" rx="5" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="122" y="122" width="96" height="48" rx="5" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="256" y="146" width="330" height="24" rx="5" fillOpacity="0.55" />
-  </g>
-  <g fill="currentColor" opacity="0.5">
-    <text x="72" y="192" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13">25</text>
-    <text x="170" y="192" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13">100</text>
-    <text x="421" y="192" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13">400</text>
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

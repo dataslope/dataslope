@@ -7,52 +7,10 @@ You've learned how to build generic types that work with any input. But what if 
 
 These questions lead us to **mapped types** and **conditional types**, two of TypeScript's most powerful metaprogramming tools. They let you write type-level functions that inspect, filter, and reshape other types. They're the building blocks behind the standard library's utility types (which we'll tour in the next chapter), and they're essential for modeling complex, real-world constraints.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Five colored property squares pass through one wide blue transform bar: each comes out below wearing a small white badge, and the last thread simply stops at the bar, a mapped type transforms every property uniformly and can drop keys as it goes"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M153 66 V 96" />
-    <path d="M233 66 V 96" />
-    <path d="M313 66 V 96" />
-    <path d="M393 66 V 96" />
-    <path d="M473 66 V 96" />
-    <path d="M153 136 V 148" />
-    <path d="M233 136 V 148" />
-    <path d="M313 136 V 148" />
-    <path d="M393 136 V 148" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="40" width="26" height="26" rx="6" />
-    <rect x="380" y="40" width="26" height="26" rx="6" />
-    <rect x="110" y="100" width="420" height="32" rx="16" />
-    <rect x="140" y="152" width="26" height="26" rx="6" />
-    <rect x="380" y="152" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="220" y="40" width="26" height="26" rx="6" />
-    <rect x="460" y="40" width="26" height="26" rx="6" />
-    <rect x="220" y="152" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="300" y="40" width="26" height="26" rx="6" />
-    <rect x="300" y="152" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="166" cy="152" r="5" />
-    <circle cx="246" cy="152" r="5" />
-    <circle cx="326" cy="152" r="5" />
-    <circle cx="406" cy="152" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-mapped-conditional-cutout"
+  alt="A template row of sockets on a platform passing through a transformer that returns every socket altered the same way"
+/>
 
 ---
 
@@ -262,42 +220,6 @@ console.log(a, b);
 
 Conditional types become powerful when combined with generics. You can build type-level logic that branches based on the input.
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A rail reaches a blue gate with a diamond window and splits in two: the small yellow diamond that fits the window rides the upper branch toward the green terminal, while the lower branch leads to the yellow terminal, a conditional type picks one of two branches with an extends test"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M60 95 H 216" />
-    <path d="M297 95 C 340 78, 390 60, 443.6 47.2" />
-    <path d="M297 95 C 340 112, 390 130, 443.6 142.8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="443.6,53 452,44 439.8,42.7" />
-    <polygon points="439.8,147.3 452,146 443.6,137" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M260 58 L297 95 L260 132 L223 95 Z" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <path d="M260 80 L275 95 L260 110 L245 95 Z" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M360 54 L370 64 L360 74 L350 64 Z" />
-    <rect x="470" y="128" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="486" cy="40" r="13" />
-  </g>
-</svg>
-
 ---
 
 ## Distributive Conditional Types
@@ -370,37 +292,6 @@ console.log(x, y);
 ## The `infer` Keyword
 
 The `infer` keyword lets you **extract** parts of a type inside a conditional. It's like pattern matching for types.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A small gray crane grips the green pearl it has just lifted out of a blue capsule, leaving a hollow white ring behind, infer names the type packed inside a wrapper so you can carry it away"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="90" width="150" height="54" rx="27" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }}>
-    <circle cx="215" cy="117" r="12" fill="none" stroke="currentColor" strokeWidth="4" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <path d="M420 12 V 50" />
-    <path d="M404 54 C 400 72, 408 86, 418 92" />
-    <path d="M436 54 C 440 72, 432 86, 422 92" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <rect x="402" y="48" width="36" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="420" cy="80" r="13" />
-  </g>
-</svg>
 
 For example, here's how to extract the return type of a function:
 

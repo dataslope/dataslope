@@ -10,41 +10,10 @@ calculations behave. Many beginner SQL bugs come from treating `NULL`
 like a normal value. It is not zero. It is not an empty string. It is
 missing or unknown.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A grid of light blue tiles where most hold a solid colored dot, one tile is present but empty, and one spot has no tile at all, only a dashed outline marks the gap, an empty value is still a value, but NULL is the tile that was never placed"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="136" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="232" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="328" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="424" y="30" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="136" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="232" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="328" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="424" y="90" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="136" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="232" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <rect x="424" y="150" width="80" height="44" rx="8" fillOpacity="0.12" />
-    <circle cx="176" cy="52" r="9" />
-    <circle cx="464" cy="52" r="9" />
-    <circle cx="272" cy="172" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="272" cy="52" r="9" />
-    <circle cx="176" cy="112" r="9" />
-    <circle cx="464" cy="172" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="368" cy="52" r="9" />
-    <circle cx="272" cy="112" r="9" />
-    <circle cx="464" cy="112" r="9" />
-    <circle cx="176" cy="172" r="9" />
-  </g>
-  <rect x="328" y="150" width="80" height="44" rx="8" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
-</svg>
+<Figure
+  slug="lite-null-cutout"
+  alt="Three trays on a platform holding a zero block, an empty plate and an open hole, the hole distinctly different"
+/>
 
 ## NULL is not zero or empty text
 
@@ -274,31 +243,6 @@ Linus has `NULL` reward points, so adding 5 still gives `NULL`.
 `COALESCE` returns the first value in its list that is not `NULL`. It is
 one of the most useful tools for displaying or calculating with missing
 values.
-
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A scan line hops across four slots: the first two hold only dashed empty rings, the third holds a solid green value where the arrow stops, and the fourth is never reached, COALESCE takes the first value that is not NULL"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="148" y1="68" x2="192" y2="68" />
-    <line x1="264" y1="68" x2="306" y2="68" />
-  </g>
-  <polygon points="304,62.5 304,73.5 315,68" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
-    <rect x="196" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
-    <rect x="312" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
-    <rect x="428" y="36" width="64" height="64" rx="12" fillOpacity="0.1" />
-  </g>
-  <circle cx="112" cy="68" r="12" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
-  <circle cx="228" cy="68" r="12" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="344" cy="68" r="12" />
-  </g>
-  <circle cx="460" cy="68" r="12" fill="var(--ds-gray-300)" />
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

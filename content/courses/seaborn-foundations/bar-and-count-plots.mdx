@@ -14,39 +14,10 @@ Both live under `catplot`: a count plot is `kind="count"`, a bar plot is
 the value axis, and, for the bar plot, a quiet way it can mislead you that
 every analyst should learn to see.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Two chart panels side by side: a green count plot with three solid bars of different heights, and a blue bar plot where a single mean bar with a thin error bar hides red data points scattered above and below its top"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="48" y="32" width="252" height="176" rx="12" fillOpacity="0.15" />
-    <rect x="84" y="112" width="40" height="68" rx="4" />
-    <rect x="144" y="76" width="40" height="104" rx="4" />
-    <rect x="204" y="140" width="40" height="40" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="340" y="32" width="252" height="176" rx="12" fillOpacity="0.15" />
-    <rect x="428" y="108" width="48" height="72" rx="4" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="68" y="180" width="212" height="3" rx="1.5" />
-    <rect x="360" y="180" width="212" height="3" rx="1.5" />
-  </g>
-  <g stroke="var(--ds-gray-500)" strokeWidth="3" strokeLinecap="round">
-    <line x1="452" y1="88" x2="452" y2="128" />
-    <line x1="443" y1="88" x2="461" y2="88" />
-    <line x1="443" y1="128" x2="461" y2="128" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="440" cy="60" r="5" />
-    <circle cx="466" cy="76" r="5" />
-    <circle cx="462" cy="118" r="5" />
-    <circle cx="438" cy="148" r="5" />
-    <circle cx="458" cy="168" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="sns-bar-count-cutout"
+  alt="Two panels on a platform, one with bars counting stacked tokens and one with bars showing a single averaged marker each"
+/>
 
 ## Count plot: how many in each group?
 

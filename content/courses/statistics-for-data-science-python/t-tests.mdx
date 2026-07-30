@@ -22,45 +22,10 @@ This page is about picking the right one, running it with `scipy.stats`,
 and, the part that actually matters, reading the result like a careful
 analyst instead of a p-value vending machine.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two jittered dot columns with their mean bars at different heights and a yellow bracket measuring the gap, beside a literal fraction of that yellow gap pill over a row of noisy dots, the t statistic is just signal divided by noise"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="140" cy="60" r="5.5" fillOpacity="0.8" />
-    <circle cx="158" cy="76" r="5.5" fillOpacity="0.8" />
-    <circle cx="146" cy="94" r="5.5" fillOpacity="0.8" />
-    <circle cx="162" cy="110" r="5.5" fillOpacity="0.8" />
-    <circle cx="150" cy="128" r="5.5" fillOpacity="0.8" />
-    <rect x="120" y="92" width="64" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="272" cy="96" r="5.5" fillOpacity="0.8" />
-    <circle cx="288" cy="112" r="5.5" fillOpacity="0.8" />
-    <circle cx="276" cy="130" r="5.5" fillOpacity="0.8" />
-    <circle cx="292" cy="148" r="5.5" fillOpacity="0.8" />
-    <circle cx="280" cy="164" r="5.5" fillOpacity="0.8" />
-    <rect x="252" y="128" width="64" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="348" y="94" width="5" height="39" rx="2.5" />
-    <rect x="338" y="90" width="25" height="4" rx="2" />
-    <rect x="338" y="133" width="25" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="470" y="80" width="70" height="10" rx="5" />
-  </g>
-  <rect x="452" y="106" width="106" height="4" rx="2" fill="var(--ds-gray-500)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.7">
-    <circle cx="472" cy="126" r="3.5" />
-    <circle cx="489" cy="121" r="3.5" />
-    <circle cx="506" cy="128" r="3.5" />
-    <circle cx="523" cy="122" r="3.5" />
-    <circle cx="540" cy="127" r="3.5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-t-tests-cutout"
+  alt="A fraction machine on a platform with a signal block on top and a noise block beneath, emitting one statistic token"
+/>
 
 ## The t-statistic is signal divided by noise
 
@@ -400,40 +365,6 @@ flowchart TD
 A paired t-test is *literally* a one-sample t-test on the column of
 differences, with the target being **zero** ("no change"). Let's prove
 that to ourselves.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Six people's before dots on the left connect by thin lines to their after dots on the right; the two columns overlap so much their group means almost match, yet every single trail tilts upward, pairing each unit with itself reveals the change that group comparison drowns in noise"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="210" y1="58" x2="430" y2="44" />
-    <line x1="210" y1="86" x2="430" y2="72" />
-    <line x1="210" y1="114" x2="430" y2="100" />
-    <line x1="210" y1="142" x2="430" y2="128" />
-    <line x1="210" y1="170" x2="430" y2="156" />
-    <line x1="210" y1="198" x2="430" y2="184" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="200" cy="58" r="6.5" />
-    <circle cx="200" cy="86" r="6.5" />
-    <circle cx="200" cy="114" r="6.5" />
-    <circle cx="200" cy="142" r="6.5" />
-    <circle cx="200" cy="170" r="6.5" />
-    <circle cx="200" cy="198" r="6.5" />
-    <rect x="168" y="124" width="64" height="4" rx="2" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="440" cy="44" r="6.5" />
-    <circle cx="440" cy="72" r="6.5" />
-    <circle cx="440" cy="100" r="6.5" />
-    <circle cx="440" cy="128" r="6.5" />
-    <circle cx="440" cy="156" r="6.5" />
-    <circle cx="440" cy="184" r="6.5" />
-    <rect x="408" y="110" width="64" height="4" rx="2" fillOpacity="0.5" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="python"

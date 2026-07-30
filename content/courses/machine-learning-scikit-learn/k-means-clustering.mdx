@@ -9,6 +9,11 @@ arrives with no labels at all: a table of customers and nothing telling you
 which "type" each one is, a pile of sensor readings with no fault tags, a
 set of documents nobody has sorted. There is no `y`. There is only `X`.
 
+<Figure
+  slug="ml-k-means-cutout"
+  alt="K-means clustering, an isometric illustration"
+/>
+
 **K-means clustering** is the first and most famous tool for that
 situation. Give it a cloud of points and a number `k`, and it carves the
 cloud into `k` groups so that points in the same group are close together
@@ -19,35 +24,6 @@ data, waiting to be noticed.
 This is your entry point into **unsupervised learning**, and the ideas
 here, distance, centers, "similar things belong together", echo through
 everything that follows.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three star centroids in blue, green, and yellow each hold a small constellation of nearby dots, k-means alternates assigning points and moving centers"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="170,66 175.5,74.5 184,80 175.5,85.5 170,94 164.5,85.5 156,80 164.5,74.5" />
-    <circle cx="105" cy="55" r="5" fillOpacity="0.75" />
-    <circle cx="120" cy="125" r="5" fillOpacity="0.75" />
-    <circle cx="225" cy="50" r="5" fillOpacity="0.75" />
-    <circle cx="245" cy="105" r="5" fillOpacity="0.75" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="430,56 435.5,64.5 444,70 435.5,75.5 430,84 424.5,75.5 416,70 424.5,64.5" />
-    <circle cx="370" cy="40" r="5" fillOpacity="0.75" />
-    <circle cx="495" cy="50" r="5" fillOpacity="0.75" />
-    <circle cx="505" cy="110" r="5" fillOpacity="0.75" />
-    <circle cx="390" cy="115" r="5" fillOpacity="0.75" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="310,151 315.5,159.5 324,165 315.5,170.5 310,179 304.5,170.5 296,165 304.5,159.5" />
-    <circle cx="255" cy="190" r="5" fillOpacity="0.75" />
-    <circle cx="365" cy="190" r="5" fillOpacity="0.75" />
-    <circle cx="305" cy="210" r="5" fillOpacity="0.75" />
-    <circle cx="350" cy="140" r="5" fillOpacity="0.75" />
-  </g>
-</svg>
 
 <Callout type="info" title="Unsupervised: there is no answer key">
 In supervised learning you can check your work: predict, compare to the
@@ -408,12 +384,10 @@ raw_labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X)
 X_scaled = StandardScaler().fit_transform(X)
 scaled_labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X_scaled)
 
-
 # How much does each clustering depend on age vs income? Look at how
 # spread-out the age values are within each found cluster.
 def mean_age_spread(labels):
     return np.mean([age[labels == c].std() for c in np.unique(labels)])
-
 
 print(
     f"Avg age spread within clusters, RAW features:    {mean_age_spread(raw_labels):.1f} years"

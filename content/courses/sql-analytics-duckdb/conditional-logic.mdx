@@ -11,42 +11,10 @@ how analysts reshape values on the fly. This page also introduces
 **conditional aggregation**, one of the most useful patterns in all of
 analytical SQL.
 
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="Gray values ride one line into a yellow CASE diamond that routes each along a solid branch line into a blue, green, or red bucket, the first test a value passes decides its category"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="40" y1="108" x2="240" y2="108" />
-    <line x1="300" y1="108" x2="420" y2="48" />
-    <line x1="300" y1="108" x2="420" y2="108" />
-    <line x1="300" y1="108" x2="420" y2="168" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <circle cx="80" cy="108" r="6" />
-    <circle cx="130" cy="108" r="6" />
-    <circle cx="180" cy="108" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 270 78 L 300 108 L 270 138 L 240 108 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="420" y="28" width="150" height="40" rx="20" fillOpacity="0.15" />
-    <circle cx="450" cy="48" r="6" />
-    <circle cx="482" cy="48" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="420" y="88" width="150" height="40" rx="20" fillOpacity="0.15" />
-    <circle cx="450" cy="108" r="6" />
-    <circle cx="482" cy="108" r="6" />
-    <circle cx="514" cy="108" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="420" y="148" width="150" height="40" rx="20" fillOpacity="0.15" />
-    <circle cx="450" cy="168" r="6" />
-  </g>
-</svg>
+<Figure
+  slug="duck-conditional-logic-cutout"
+  alt="A sorting gate on a platform routing incoming tiles down three labelled chutes into separate bracket bins"
+/>
 
 ## `CASE`: if/else for a column
 
@@ -253,38 +221,6 @@ Two small but constant companions of conditional logic:
   for filling in a default: `COALESCE(discount, 0)`.
 - **`NULLIF(a, b)`** returns `NULL` when `a = b`, most often used to
   avoid divide-by-zero: `amount / NULLIF(quantity, 0)`.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Two divisions on stacked cards: dividing a blue value by a raw red zero ends in a jagged red burst, while NULLIF turns the zero into a hollow ring first so the same division lands as a calm green NULL"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="48" y="24" width="544" height="52" rx="12" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="48" y="92" width="544" height="52" rx="12" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="76" y="42" width="64" height="16" rx="8" />
-    <rect x="76" y="110" width="64" height="16" rx="8" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="166" y="36" width="4" height="28" rx="2" transform="rotate(20 168 50)" />
-    <rect x="166" y="104" width="4" height="28" rx="2" transform="rotate(20 168 118)" />
-    <rect x="248" y="44" width="24" height="4" rx="2" />
-    <rect x="248" y="54" width="24" height="4" rx="2" />
-    <rect x="248" y="112" width="24" height="4" rx="2" />
-    <rect x="248" y="122" width="24" height="4" rx="2" />
-  </g>
-  <circle cx="210" cy="50" r="10" fill="none" stroke="var(--ds-red-500)" strokeWidth="4" />
-  <circle cx="210" cy="118" r="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="3.5" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 310 41 L 319 25 L 324 39 L 340 31 L 334 45 L 350 49 L 334 55 L 342 69 L 326 61 L 320 75 L 314 59 L 298 65 L 306 51 L 290 45 L 306 43 Z" />
-  </g>
-  <circle cx="320" cy="118" r="13" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" />
-</svg>
 
 <SqlCodeBlock
   dialect="duckdb"

@@ -7,41 +7,14 @@ So far our operators have produced sequences. Aggregations are the
 operators that produce a *single value*. They're how you turn "a
 list of orders" into "the total revenue" or "the largest order".
 
+<Figure
+  slug="cs-aggregations-cutout"
+  alt="Aggregations, an isometric illustration"
+/>
+
 This page covers the built-in shortcuts (`Count`, `Sum`, `Min`,
 `Max`, `Average`) and then the general-purpose tool that underlies
 all of them: `Aggregate`.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A tidy grid of blue dots funnels into one large green circle with three small derived values beside it, a whole sequence collapsed to single values"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="60" r="10" />
-    <circle cx="140" cy="60" r="10" />
-    <circle cx="190" cy="60" r="10" />
-    <circle cx="90" cy="110" r="10" />
-    <circle cx="140" cy="110" r="10" />
-    <circle cx="190" cy="110" r="10" />
-    <circle cx="90" cy="160" r="10" />
-    <circle cx="140" cy="160" r="10" />
-    <circle cx="190" cy="160" r="10" />
-    <polygon points="250,40 250,180 360,110" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="430" cy="110" r="34" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="492" cy="84" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="510" cy="114" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="496" cy="142" r="6" />
-  </g>
-</svg>
 
 ## The friendly built-ins
 

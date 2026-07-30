@@ -7,6 +7,11 @@ A class is a *contract*. From the outside, it offers a set of
 operations and promises certain things will always be true. From the
 inside, it is whatever code is needed to keep those promises.
 
+<Figure
+  slug="cpp-encapsulation-cutout"
+  alt="Encapsulation and abstraction, an isometric illustration"
+/>
+
 Two ideas make this work:
 
 - **Encapsulation**, bundling data with the code that controls it
@@ -16,51 +21,6 @@ Two ideas make this work:
 
 These aren't C++ features; they are *design principles* that the
 language gives you tools to apply.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A watch with a translucent case: faint gears hide behind the glass while only two crisp green hands, a yellow crown dot, and four hour marks face the viewer, a class shows a simple interface and keeps its machinery private"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.12">
-    <circle cx="270" cy="110" r="24" />
-    <rect x="292" y="104" width="12" height="12" rx="3" />
-    <rect x="278" y="128" width="12" height="12" rx="3" />
-    <rect x="250" y="128" width="12" height="12" rx="3" />
-    <rect x="236" y="104" width="12" height="12" rx="3" />
-    <rect x="250" y="80" width="12" height="12" rx="3" />
-    <rect x="278" y="80" width="12" height="12" rx="3" />
-    <circle cx="330" cy="150" r="16" />
-    <rect x="344" y="145" width="10" height="10" rx="3" />
-    <rect x="325" y="164" width="10" height="10" rx="3" />
-    <rect x="306" y="145" width="10" height="10" rx="3" />
-    <rect x="325" y="126" width="10" height="10" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="115" r="78" fillOpacity="0.1" />
-    <path fillRule="evenodd" d="M242 115 a78 78 0 1 0 156 0 a78 78 0 1 0 -156 0 M250 115 a70 70 0 1 0 140 0 a70 70 0 1 0 -140 0" fillOpacity="0.8" />
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeOpacity="0.5"
-    >
-      <path d="M320 49 V 61" />
-      <path d="M386 115 H 374" />
-      <path d="M320 181 V 169" />
-      <path d="M254 115 H 266" />
-    </g>
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="316" y="61" width="8" height="58" rx="4" />
-    <rect x="320" y="111" width="42" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="115" r="7" />
-  </g>
-</svg>
 
 ## Invariants: truths your class must keep
 

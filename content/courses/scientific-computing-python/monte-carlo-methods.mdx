@@ -18,38 +18,10 @@ Three things make Monte Carlo special:
   able to *sample* and *evaluate*.
 - It produces an error estimate as a byproduct.
 
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="Random dots scattered over a square: those landing inside the translucent quarter circle are blue, the rest faded, estimating pi by counting where the darts fall"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.07">
-    <rect x="220" y="35" width="190" height="190" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M220 225 L220 35 A190 190 0 0 1 410 225 Z" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.85">
-    <circle cx="250" cy="200" r="3.5" />
-    <circle cx="300" cy="180" r="3.5" />
-    <circle cx="260" cy="120" r="3.5" />
-    <circle cx="340" cy="160" r="3.5" />
-    <circle cx="240" cy="70" r="3.5" />
-    <circle cx="310" cy="90" r="3.5" />
-    <circle cx="370" cy="190" r="3.5" />
-    <circle cx="290" cy="212" r="3.5" />
-    <circle cx="385" cy="150" r="3.5" />
-    <circle cx="355" cy="120" r="3.5" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="330" cy="60" r="3.5" />
-    <circle cx="390" cy="60" r="3.5" />
-    <circle cx="395" cy="105" r="3.5" />
-    <circle cx="360" cy="45" r="3.5" />
-    <circle cx="398" cy="140" r="3.5" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-monte-carlo-cutout"
+  alt="A square platform scattered with random dots and a quarter-circle arc inscribed on it, dots inside the arc a different colour"
+/>
 
 ## A first example: estimating $\pi$
 
@@ -312,10 +284,8 @@ statistics.
 import matplotlib.pyplot as plt
 from mc import estimate_with_se
 
-
 def integrand(x):
     return np.exp(-(x**2)) * np.cos(2 * x)
-
 
 # Run Monte Carlo with increasing sample sizes
 Ns = [10**k for k in range(2, 7)]
@@ -335,7 +305,6 @@ for N, est, se in zip(Ns, ests, ses):
     {
       filename: "mc.py",
       starterCode: `import numpy as np
-
 
 def estimate_with_se(f, low, high, N, seed=0):
     """Monte Carlo estimator of ∫ f over [low, high] and its standard error."""
@@ -368,13 +337,11 @@ Test on the unit disk where the true area is $\\pi$.`}
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def mc_area(predicate, bounds, n_samples, seed=0):
     # TODO: sample uniformly in the rectangle, count predicate hits, scale by rect area
     return 0.0
 `,
       solutionCode: `import numpy as np
-
 
 def mc_area(predicate, bounds, n_samples, seed=0):
     xlow, xhigh, ylow, yhigh = bounds

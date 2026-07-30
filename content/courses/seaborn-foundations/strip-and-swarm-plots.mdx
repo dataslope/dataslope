@@ -13,50 +13,10 @@ Both are `catplot` kinds: `kind="strip"` and `kind="swarm"`. They show the
 same thing, all the points, and differ only in *how they arrange* points
 that would otherwise land on top of each other.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="The same column of observations twice: stacked on one shared vertical position at the left, translucent dots piling up and hiding each other, and packed side by side into a tidy non-overlapping swarm whose widening silhouette is the distribution on the right"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="120" y="206" width="140" height="3" rx="1.5" fill="currentColor" opacity="0.3" />
-  <rect x="380" y="206" width="140" height="3" rx="1.5" fill="currentColor" opacity="0.3" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="190" cy="184" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="177" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="168" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="163" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="149" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="144" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="131" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="126" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="114" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="111" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="98" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="83" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="71" r="4.5" fillOpacity="0.55" />
-    <circle cx="190" cy="58" r="4.5" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="450" cy="190" r="4.5" />
-    <circle cx="444" cy="178" r="4.5" />
-    <circle cx="456" cy="178" r="4.5" />
-    <circle cx="438" cy="166" r="4.5" />
-    <circle cx="450" cy="166" r="4.5" />
-    <circle cx="462" cy="166" r="4.5" />
-    <circle cx="432" cy="154" r="4.5" />
-    <circle cx="444" cy="154" r="4.5" />
-    <circle cx="456" cy="154" r="4.5" />
-    <circle cx="468" cy="154" r="4.5" />
-    <circle cx="438" cy="142" r="4.5" />
-    <circle cx="450" cy="142" r="4.5" />
-    <circle cx="462" cy="142" r="4.5" />
-    <circle cx="444" cy="130" r="4.5" />
-    <circle cx="456" cy="130" r="4.5" />
-    <circle cx="450" cy="118" r="4.5" />
-    <circle cx="450" cy="104" r="4.5" />
-  </g>
-</svg>
+<Figure
+  slug="sns-strip-swarm-cutout"
+  alt="Two category columns of individual dots, one jittered into a loose band and one nudged into a tidy non-overlapping cluster"
+/>
 
 ## Strip plot: every point, with jitter
 

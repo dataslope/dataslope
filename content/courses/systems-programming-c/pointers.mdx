@@ -17,49 +17,10 @@ inside or repaint the door. Everything on this page is a precise
 version of that picture: `&` writes a house's address onto a slip,
 `*` walks to whatever address a slip currently holds.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three parcels sit on a shelf; a yellow tag's thin thread leads to exactly one of them, while a second gray tag's thread ends at a red cross, a pointer holds an address, and NULL points at nothing"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M214 160 C 260 142, 300 120, 318 96" />
-    <path d="M454 162 C 480 152, 498 140, 508 126" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="120" y="94" width="400" height="7" rx="3.5" />
-    <rect x="390" y="150" width="64" height="32" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="150" y="52" width="40" height="40" rx="7" />
-    <rect x="300" y="52" width="40" height="40" rx="7" />
-    <rect x="450" y="52" width="40" height="40" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="150" y="150" width="64" height="32" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="164" cy="166" r="4" />
-    <circle cx="404" cy="166" r="4" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M508 110 L 524 126" />
-    <path d="M524 110 L 508 126" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-pointers-cutout"
+  alt="A small slip of paper on a platform carrying an address, a thin arrow running from it to a distant storage cell"
+/>
 
 ## Variables live at addresses
 
@@ -196,40 +157,6 @@ Either give it a real address or set it to `NULL`.
 
 C passes arguments **by value**. If a function takes an `int`, it
 gets a copy. Modifying that copy does nothing to the caller.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Left: the function gets a copy of the box, and the yellow edit lands only on the faded copy below the original; right: it gets an arrow back to the one real box, so the same yellow edit lands on the original, pass by value versus pass by pointer"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="318" y="30" width="4" height="140" rx="2" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M139 96 V 118" />
-    <path d="M400 168 C 380 130, 394 96, 424.9 84.3" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="139,132 132,118 146,118" />
-    <polygon points="429.3,80.4 417,80 424.1,90.1" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="115" y="40" width="48" height="48" rx="10" />
-    <rect x="115" y="136" width="48" height="48" rx="10" fillOpacity="0.35" />
-    <rect x="440" y="72" width="48" height="48" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="163" cy="140" r="7" />
-    <circle cx="488" cy="76" r="7" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="c"
@@ -373,38 +300,6 @@ A pointer is a value, so you can take *its* address too. Patterns
 like this are how you write functions that allocate memory on behalf
 of the caller and store the new pointer in one of the caller's
 variables.
-
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A small blue card points along a thin arrow to a second blue card, which points along another arrow to the green value box, pointer to pointer to value, two dereferences from the data"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M162 75 H 244" />
-    <path d="M322 75 H 404" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="256,75 244,69 244,81" />
-    <polygon points="416,75 404,69 404,81" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="118" y="57" width="40" height="36" rx="8" fillOpacity="0.55" />
-    <rect x="266" y="55" width="48" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="426" y="51" width="52" height="48" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <rect x="440" y="71" width="24" height="8" rx="4" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="c"

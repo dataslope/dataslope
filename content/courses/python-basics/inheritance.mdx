@@ -5,31 +5,10 @@ description: Subclassing, super(), method overriding, and duck typing
 
 A class can **inherit** from another, getting all its attributes and methods for free. The new class can add behavior, override behavior, or both. Inheritance is one of the pillars of object-oriented programming, but it's also easy to overuse.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A blue parent card holding a circle and a square links down a thin line to a green child card holding the same blue circle, the square redone in yellow, and a brand-new green triangle, inherit, override, extend"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <line x1="320" y1="95" x2="320" y2="125" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="200" y="25" width="240" height="70" rx="12" fillOpacity="0.12" />
-    <circle cx="250" cy="60" r="11" />
-    <rect x="300" y="48" width="24" height="24" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="160" y="125" width="320" height="80" rx="12" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="230" cy="165" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="300" y="153" width="24" height="24" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="410,151 424,177 396,177" />
-  </g>
-</svg>
+<Figure
+  slug="python-basics-inheritance-cutout"
+  alt="A larger robot beside a smaller robot built from the same shapes, joined by a short line"
+/>
 
 ## Why inheritance matters: the real world
 
@@ -61,16 +40,13 @@ Every Django model inherits from \`django.db.models.Model\`. That base class pro
     def speak(self):
         return f"{self.name} makes a sound"
 
-
 class Dog(Animal):
     def speak(self):
         return f"{self.name} says woof!"
 
-
 class Cat(Animal):
     def speak(self):
         return f"{self.name} says meow!"
-
 
 for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
     print(animal.speak())
@@ -104,11 +80,9 @@ When a subclass defines a method with the same name as a parent method, the subc
     def speak(self):
         return "some sound"
 
-
 class Dog(Animal):
     def speak(self):
         return "woof!"
-
 
 d = Dog()
 print(d.speak())  # calls Dog.speak, not Animal.speak
@@ -134,7 +108,6 @@ Override a method when you need **different behavior** for the subclass. If you 
     def __init__(self, name):
         self.name = name
 
-
 class Dog(Animal):
     def __init__(self, name, breed):
         super().__init__(name)  # call Animal.__init__
@@ -142,7 +115,6 @@ class Dog(Animal):
 
     def describe(self):
         return f"{self.name} is a {self.breed}"
-
 
 print(Dog("Rex", "Labrador").describe())
 `,
@@ -177,16 +149,13 @@ In single inheritance, \`super()\` just calls the parent. In multiple inheritanc
     def speak(self):
         return "woof!"
 
-
 class Cat:
     def speak(self):
         return "meow!"
 
-
 class Duck:
     def speak(self):
         return "quack!"
-
 
 animals = [Dog(), Cat(), Duck()]
 for animal in animals:
@@ -214,10 +183,8 @@ Use these instead of `type(x) is SomeClass` when you want to allow subclasses.
       starterCode: `class Animal:
     pass
 
-
 class Dog(Animal):
     pass
-
 
 d = Dog()
 print(isinstance(d, Dog))  # True
@@ -248,21 +215,17 @@ Python allows a class to inherit from **multiple** parents. Method lookup uses t
     def hello(self):
         return "A"
 
-
 class B(A):
     def hello(self):
         return "B -> " + super().hello()
-
 
 class C(A):
     def hello(self):
         return "C -> " + super().hello()
 
-
 class D(B, C):
     def hello(self):
         return "D -> " + super().hello()
-
 
 print(D().hello())
 print([cls.__name__ for cls in D.__mro__])
@@ -301,11 +264,9 @@ An **abstract base class (ABC)** is a class that cannot be instantiated directly
       filename: "main.py",
       starterCode: `from abc import ABC, abstractmethod
 
-
 class Shape(ABC):
     @abstractmethod
     def area(self): ...
-
 
 class Square(Shape):
     def __init__(self, side):
@@ -313,7 +274,6 @@ class Square(Shape):
 
     def area(self):
         return self.side**2
-
 
 print(Square(3).area())
 
@@ -420,22 +380,18 @@ print(f"Circle area: {c.area():.2f}")
       starterCode: `from abc import ABC, abstractmethod
 import math
 
-
 class Shape(ABC):
     @abstractmethod
     def area(self): ...
-
 
 # Define Rectangle and Circle here
 `,
       solutionCode: `from abc import ABC, abstractmethod
 import math
 
-
 class Shape(ABC):
     @abstractmethod
     def area(self): ...
-
 
 class Rectangle(Shape):
     def __init__(self, width, height):
@@ -444,7 +400,6 @@ class Rectangle(Shape):
 
     def area(self):
         return self.width * self.height
-
 
 class Circle(Shape):
     def __init__(self, radius):
@@ -516,11 +471,9 @@ for animal in animals:
     # your code here
     pass
 
-
 class Dog(Animal):
     # your code here
     pass
-
 
 class Cat(Animal):
     # your code here
@@ -533,11 +486,9 @@ class Cat(Animal):
     def speak(self):
         return f"{self.name} makes a sound"
 
-
 class Dog(Animal):
     def speak(self):
         return f"{self.name} says woof!"
-
 
 class Cat(Animal):
     def speak(self):
@@ -605,7 +556,6 @@ print(f"{m.name}: \${m.salary()}")
     # your code here
     pass
 
-
 class Manager(Employee):
     # your code here
     pass
@@ -617,7 +567,6 @@ class Manager(Employee):
 
     def salary(self):
         return self.base_salary
-
 
 class Manager(Employee):
     def __init__(self, name, base_salary, bonus):
@@ -671,14 +620,12 @@ assert m.base_salary == 60000`,
       starterCode: `class Vehicle:
     pass
 
-
 class Car(Vehicle):
     pass
 `,
       solutionCode: `class Vehicle:
     def start(self):
         return "Vehicle starting"
-
 
 class Car(Vehicle):
     def start(self):

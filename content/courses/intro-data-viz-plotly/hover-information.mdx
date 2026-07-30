@@ -8,43 +8,14 @@ the x and y values of whatever you point at. With a little extra
 configuration, you can make the tooltip a *mini information panel*
 that turns each dot into a self-contained record.
 
+<Figure
+  slug="viz-hover-information-cutout"
+  alt="Hover information, an isometric illustration"
+/>
+
 This is one of the most under-used features of Plotly, and one of
 the highest-leverage. A great hover tooltip can answer questions
 that would otherwise require a separate table.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A cursor rests on one green chart point and a tooltip card unfolds above it with rows of details, every dot carrying its own record"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.25">
-    <rect x="90" y="50" width="3" height="150" rx="1.5" />
-    <rect x="90" y="197" width="360" height="3" rx="1.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.7">
-    <circle cx="140" cy="170" r="6" />
-    <circle cx="190" cy="150" r="6" />
-    <circle cx="240" cy="160" r="6" />
-    <circle cx="340" cy="135" r="6" />
-    <circle cx="390" cy="100" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="290" cy="120" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="322" y="50" width="180" height="66" rx="10" fillOpacity="0.15" />
-    <polygon points="298,124 320,106 320,124" fillOpacity="0.15" />
-    <rect x="338" y="64" width="90" height="8" rx="4" fillOpacity="0.55" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="338" y="80" width="130" height="8" rx="4" />
-    <rect x="338" y="96" width="110" height="8" rx="4" />
-  </g>
-  <g fill="currentColor" opacity="0.75">
-    <polygon points="300,126 300,148 306.4,143 310.4,152 314.6,150 310.6,141 317,141" />
-  </g>
-</svg>
 
 ## The default tooltip
 

@@ -20,55 +20,10 @@ The full arc, start to finish:
 
 **Hypothesis + primary metric → Randomize users to A/B → Pick sample size (power) in advance → Run to plan (no peeking) → Analyze (lift, CI, effect size, p) → Decide: ship? (significance *and* size)**
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A stream of yellow user dots reaches a yellow coin-flip diamond and splits along two thin lines, a blue control panel and a green variant panel of identical crowds, the variant lighting up more converted dots and growing a longer result pill, randomize the split, and the only difference left to credit is the change itself"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="56" cy="112" r="5" />
-    <circle cx="80" cy="112" r="5" />
-    <circle cx="104" cy="112" r="5" />
-    <circle cx="128" cy="112" r="5" />
-    <circle cx="152" cy="112" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 200 88 L 224 112 L 200 136 L 176 112 Z" fillOpacity="0.9" />
-  </g>
-  <g stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round">
-    <line x1="228" y1="104" x2="292" y2="62" />
-    <line x1="228" y1="120" x2="292" y2="162" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="296" y="30" width="180" height="64" rx="12" fillOpacity="0.13" />
-    <circle cx="322" cy="52" r="5" fillOpacity="0.3" />
-    <circle cx="354" cy="52" r="5" fillOpacity="0.3" />
-    <circle cx="386" cy="52" r="5" />
-    <circle cx="418" cy="52" r="5" fillOpacity="0.3" />
-    <circle cx="450" cy="52" r="5" fillOpacity="0.3" />
-    <circle cx="322" cy="76" r="5" fillOpacity="0.3" />
-    <circle cx="354" cy="76" r="5" />
-    <circle cx="386" cy="76" r="5" fillOpacity="0.3" />
-    <circle cx="418" cy="76" r="5" fillOpacity="0.3" />
-    <circle cx="450" cy="76" r="5" fillOpacity="0.3" />
-    <rect x="500" y="56" width="44" height="10" rx="5" fillOpacity="0.65" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="296" y="134" width="180" height="64" rx="12" fillOpacity="0.13" />
-    <circle cx="322" cy="156" r="5" />
-    <circle cx="354" cy="156" r="5" fillOpacity="0.3" />
-    <circle cx="386" cy="156" r="5" fillOpacity="0.3" />
-    <circle cx="418" cy="156" r="5" />
-    <circle cx="450" cy="156" r="5" fillOpacity="0.3" />
-    <circle cx="322" cy="180" r="5" fillOpacity="0.3" />
-    <circle cx="354" cy="180" r="5" fillOpacity="0.3" />
-    <circle cx="386" cy="180" r="5" />
-    <circle cx="418" cy="180" r="5" fillOpacity="0.3" />
-    <circle cx="450" cy="180" r="5" fillOpacity="0.3" />
-    <rect x="500" y="160" width="66" height="10" rx="5" fillOpacity="0.75" />
-  </g>
-</svg>
+<Figure
+  slug="stat-ab-testing-cutout"
+  alt="A splitter gate on a platform sending traffic tokens evenly into two variant chambers, a meter comparing their outputs"
+/>
 
 ## Design comes first (and is where most tests are won or lost)
 
@@ -283,11 +238,9 @@ conv_a = rng.binomial(1, 0.100, n_a)
 conv_b = rng.binomial(1, 0.118, n_b)
 p_a, p_b = conv_a.mean(), conv_b.mean()
 
-
 # 95% CI half-width per arm (normal approximation for a proportion).
 def ci_halfwidth(p, n):
     return stats.norm.ppf(0.975) * np.sqrt(p * (1 - p) / n)
-
 
 df = pd.DataFrame(
     {
@@ -397,36 +350,6 @@ of two *identical* arms will cross p < 0.05 *at some point* surprisingly
 often if you keep peeking. Pre-commit to your stopping rule, or use a
 method designed for continuous monitoring.
 </Callout>
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A thin blue p-value line wanders and dips below the red significance line exactly once, where a yellow stop flag is eagerly planted, while its fainter future climbs right back up, peek long enough and noise alone will hand you a lucky dip to stop on"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="70" y="130" width="500" height="4" rx="2" fill="var(--ds-red-500)" />
-  <polyline
-    points="90,60 120,84 150,70 180,96 210,110 240,122 270,144"
-    fill="none"
-    stroke="var(--ds-blue-500)"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <polyline
-    points="270,144 300,120 330,98 360,108 390,86 420,96 450,76 480,88 510,70 540,80"
-    fill="none"
-    stroke="var(--ds-blue-500)"
-    strokeWidth="3"
-    strokeOpacity="0.35"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="268" y="100" width="4" height="46" rx="2" />
-    <polygon points="272,100 296,108 272,116" />
-  </g>
-</svg>
 
 ## Practice
 

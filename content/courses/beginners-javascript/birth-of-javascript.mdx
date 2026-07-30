@@ -10,6 +10,11 @@ measures, the most widely used programming language ever created,
 and it was built in less time than most teams spend naming a
 project.
 
+<Figure
+  slug="js-birth-of-javascript-cutout"
+  alt="The birth of JavaScript, an isometric illustration"
+/>
+
 How does that happen? Not by accident, it turns out, but by a
 collision of three stories: what programming languages *are*, what
 the early web *couldn't do*, and what one company needed shipped
@@ -38,69 +43,6 @@ That is genuinely how the earliest computers were programmed: by
 flipping physical switches or punching holes in cards. A "program"
 was a stack of cards, and a single mistake meant combing through
 thousands of bits by hand.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Three stacked layers: dense binary blocks at the bottom, short instruction dashes in the middle, and one smooth bar at the top, code rising from bits to ideas"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor">
-    <circle cx="56" cy="196" r="4" opacity="0.12" />
-    <circle cx="56" cy="160" r="4" opacity="0.18" />
-    <circle cx="56" cy="124" r="4" opacity="0.24" />
-    <circle cx="56" cy="88" r="4" opacity="0.3" />
-    <circle cx="56" cy="56" r="4" opacity="0.36" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="88" y="168" width="20" height="20" rx="4" />
-    <rect x="122" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="156" y="168" width="20" height="20" rx="4" />
-    <rect x="190" y="168" width="20" height="20" rx="4" />
-    <rect x="224" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="258" y="168" width="20" height="20" rx="4" />
-    <rect x="292" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="326" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="360" y="168" width="20" height="20" rx="4" />
-    <rect x="394" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="428" y="168" width="20" height="20" rx="4" />
-    <rect x="462" y="168" width="20" height="20" rx="4" />
-    <rect x="496" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="530" y="168" width="20" height="20" rx="4" />
-    <rect x="88" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="122" y="196" width="20" height="20" rx="4" />
-    <rect x="156" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="190" y="196" width="20" height="20" rx="4" />
-    <rect x="224" y="196" width="20" height="20" rx="4" />
-    <rect x="258" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="292" y="196" width="20" height="20" rx="4" />
-    <rect x="326" y="196" width="20" height="20" rx="4" />
-    <rect x="360" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="394" y="196" width="20" height="20" rx="4" />
-    <rect x="428" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="462" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-    <rect x="496" y="196" width="20" height="20" rx="4" />
-    <rect x="530" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="88" y="116" width="54" height="16" rx="8" />
-    <rect x="154" y="116" width="30" height="16" rx="8" />
-    <rect x="196" y="116" width="72" height="16" rx="8" />
-    <rect x="280" y="116" width="42" height="16" rx="8" />
-    <rect x="334" y="116" width="64" height="16" rx="8" />
-    <rect x="410" y="116" width="34" height="16" rx="8" />
-    <rect x="456" y="116" width="84" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="88" y="52" width="300" height="24" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="430" cy="64" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="470" y="52" width="24" height="24" rx="7" />
-  </g>
-</svg>
 
 Programmers climbed out of the bit-mine one rung at a time. The
 first rung was **assembly language**: short names for each bit
@@ -159,8 +101,6 @@ computing, in miniature. Now: why did a language like this end up
 *inside a web browser*?
 
 ## The web before JavaScript
-
-<IllustrationPrompt subject="Tim Berners-Lee" photo />
 
 In the late 1980s, a researcher at CERN named **Tim Berners-Lee**
 designed a system for sharing scientific documents. It had three
@@ -224,8 +164,6 @@ That is the job Brendan Eich was hired for.
 
 ## Ten days in May
 
-<IllustrationPrompt subject="Brendan Eich" photo />
-
 Eich joined Netscape in April 1995. He was 33, with a background in
 operating systems and compilers, and a deep fondness for **Scheme**,
 a tiny, elegant descendant of Lisp in which functions are values
@@ -233,40 +171,6 @@ you can pass around like numbers. The assignment he was handed
 sounds absurd in hindsight: design and implement a new language,
 embeddable in HTML, friendly to amateurs, Java-flavoured on the
 surface, and demo-ready in ten days.
-
-<svg
-  viewBox="0 0 640 270"
-  role="img"
-  aria-label="A browser window with a lightning bolt inside, above a strip of ten day squares with the final one highlighted, ten days to a prototype"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="170" y="40" width="300" height="180" rx="16" fill="currentColor" opacity="0.07" />
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="196" cy="62" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="218" cy="62" r="6" />
-    <polygon points="345,85 305,150 332,150 312,195 375,125 345,125 368,85" />
-    <circle cx="488" cy="52" r="5" />
-    <circle cx="508" cy="84" r="4" />
-    <circle cx="492" cy="116" r="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="240" cy="62" r="6" />
-    <rect x="458" y="238" width="20" height="20" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
-    <rect x="170" y="238" width="20" height="20" rx="5" />
-    <rect x="202" y="238" width="20" height="20" rx="5" />
-    <rect x="234" y="238" width="20" height="20" rx="5" />
-    <rect x="266" y="238" width="20" height="20" rx="5" />
-    <rect x="298" y="238" width="20" height="20" rx="5" />
-    <rect x="330" y="238" width="20" height="20" rx="5" />
-    <rect x="362" y="238" width="20" height="20" rx="5" />
-    <rect x="394" y="238" width="20" height="20" rx="5" />
-    <rect x="426" y="238" width="20" height="20" rx="5" />
-  </g>
-</svg>
 
 Several decisions had been made for him before he wrote a line:
 

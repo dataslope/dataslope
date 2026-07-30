@@ -15,36 +15,10 @@ This chapter covers: **union types**, **intersection types**,
 **set-theoretic intuition**, **when intersections produce `never`**, and
 **designing APIs with unions**.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Two streams, one blue and one yellow, fork together into a single broad green channel that carries beads of both colors downstream, a union accepts values from either branch"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M40 30 C150 34 220 86 320 96 L320 132 C220 122 150 60 40 56 Z" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M40 210 C150 206 220 154 320 144 L320 108 C220 118 150 180 40 184 Z" fillOpacity="0.3" />
-  </g>
-  <g fill="var(--ds-white)">
-    <path d="M320 96 L600 96 L600 144 L320 144 C 296 138 276 128 264 120 C 276 112 296 102 320 96 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M320 96 L600 96 L600 144 L320 144 C 296 138 276 128 264 120 C 276 112 296 102 320 96 Z" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="350" cy="112" r="7" />
-    <circle cx="420" cy="116" r="7" />
-    <circle cx="490" cy="112" r="7" />
-    <circle cx="558" cy="118" r="7" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="385" cy="128" r="7" />
-    <circle cx="455" cy="124" r="7" />
-    <circle cx="525" cy="126" r="7" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-unions-intersections-cutout"
+  alt="Two overlapping rings on a platform, one holding the tokens of either ring and one only the tokens in the shared overlap"
+/>
 
 ## Union types: "this or that"
 
@@ -174,38 +148,6 @@ console.log("age:", alice.age);
 
 The type `Person` has *both* the `name` property from `Named` *and* the
 `age` property from `Aged`. Intersections merge object types.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A Venn diagram of a blue set and a yellow set whose overlapping lens is highlighted green: blue shapes sit in the blue-only region, yellow shapes in the yellow-only region, a green bead rests inside the shared lens, and a red square sits outside both circles, an intersection admits only values that satisfy every constraint"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="270" cy="100" r="78" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="370" cy="100" r="78" fillOpacity="0.3" />
-  </g>
-  <g fill="var(--ds-white)">
-    <path d="M320 40.1 A 78 78 0 0 1 320 159.9 A 78 78 0 0 1 320 40.1 Z" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M320 40.1 A 78 78 0 0 1 320 159.9 A 78 78 0 0 1 320 40.1 Z" fillOpacity="0.35" />
-    <circle cx="320" cy="100" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="232" cy="82" r="8" />
-    <rect x="222" y="112" width="17" height="17" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="408" cy="82" r="8" />
-    <path d="M408 111 L418 129 L398 129 Z" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="524" y="48" width="18" height="18" rx="4" transform="rotate(12 533 57)" />
-  </g>
-</svg>
 
 Intersections are useful for **mixins**, combining multiple interfaces
 or types into one:
@@ -519,24 +461,6 @@ console.log("Conflict type is uninhabited");
 The property `value` must be both `string` and `number`, which is
 impossible. So `Conflict` is effectively `never`. The compiler will catch
 this at declaration time in most cases.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Two puzzle pieces, one blue and one yellow, each with a protruding tab facing the other so they can never interlock, and a small red cross marks the gap between them, conflicting constraints intersect to never, the type with no values"
-  style={{ display: "block", width: "100%", maxWidth: "420px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M150 32 H285 V64 A16 16 0 0 1 285 96 V128 H150 Z" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M490 32 H355 V64 A16 16 0 0 0 355 96 V128 H490 Z" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none">
-    <path d="M312 72 L328 88" />
-    <path d="M328 72 L312 88" />
-  </g>
-</svg>
 
 ## Designing APIs with unions: flexibility and safety
 

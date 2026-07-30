@@ -3,16 +3,16 @@ title: Welcome
 description: An analytical-SQL course for people who already know basic SQL but want to learn how analysts actually use it, to explore, summarize, and reason about large datasets with DuckDB.
 ---
 
-<Figure
-  slug="bi-dashboard"
-  alt="A business intelligence dashboard of charts and metrics, the analytics SQL powers"
-  priority
-/>
-
 Welcome to **SQL for Data Analysis with DuckDB**. You already know the
 basics, `SELECT`, `WHERE`, `JOIN`, maybe `GROUP BY`, and you can read a
 simple query without flinching. This course is about the *next* leap:
 using SQL not to power an application, but to **think with data**.
+
+<Figure
+  slug="sql-analytics-duckdb-thumbnail-cutout"
+  alt="A duck standing on a stack of database discs beside a small aggregation chart"
+  priority
+/>
 
 Here is what that looks like. The query below reaches across the internet
 to a 53,940-row Parquet file of diamond sales, summarizes it by cut, and
@@ -52,36 +52,6 @@ database compiled to WebAssembly and loaded on demand. There is no server,
 no signup, and nothing to install. Edit the query, click *Run*, and the
 result appears right below the editor.
 </Callout>
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="A yellow SQL capsule flows through a solid gray arrow into a large blue isometric data cube, and out the other side as a small green bar chart, one query turning a big dataset into insight"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="48" y="105" width="120" height="36" rx="18" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="182" y="121.5" width="36" height="3" rx="1.5" />
-    <polygon points="216,117.5 227,123 216,128.5" />
-    <rect x="404" y="121.5" width="36" height="3" rx="1.5" />
-    <polygon points="438,117.5 449,123 438,128.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="320,35 390,75 320,115 250,75" />
-    <polygon points="250,75 320,115 320,179 250,139" fillOpacity="0.65" />
-    <polygon points="390,75 320,115 320,179 390,139" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="470" y="75" width="130" height="96" rx="12" fillOpacity="0.15" />
-    <rect x="490" y="120" width="22" height="32" rx="3" />
-    <rect x="520" y="104" width="22" height="48" rx="3" />
-    <rect x="550" y="130" width="22" height="22" rx="3" />
-  </g>
-  <rect x="484" y="152" width="100" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
-
 ## Who this course is for
 
 You will feel at home here if any of these describe you:

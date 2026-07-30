@@ -5,61 +5,16 @@ description: Apply the design process to a blog schema with users, posts, thread
 
 Suppose you are asked to design the database for a small blog.
 
+<Figure
+  slug="db-case-study-blog-cutout"
+  alt="Designing a blog, an isometric illustration"
+/>
+
 The first request sounds simple: users write posts, readers comment,
 and posts have tags. But those few sentences already contain several
 important design decisions.
 
 This page applies the design process end to end.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A blog post document with a title bar, body lines, and tag chips, while two comment bubbles attach to it from the right, the little world a blog schema must model"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.07">
-    <rect x="90" y="28" width="260" height="174" rx="14" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="114" y="50" width="150" height="14" rx="7" fillOpacity="0.6" />
-    <circle cx="124" cy="92" r="8" fillOpacity="0.8" />
-  </g>
-  <g fill="currentColor" opacity="0.18">
-    <rect x="142" y="87" width="120" height="9" rx="4.5" />
-    <rect x="114" y="112" width="212" height="8" rx="4" />
-    <rect x="114" y="130" width="196" height="8" rx="4" />
-    <rect x="114" y="148" width="150" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="114" y="172" width="48" height="16" rx="8" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="170" y="172" width="38" height="16" rx="8" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="216" y="172" width="54" height="16" rx="8" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="424" y="48" width="156" height="54" rx="12" fillOpacity="0.28" />
-    <polygon points="424,76 400,88 424,90" fillOpacity="0.28" />
-    <rect x="440" y="64" width="92" height="8" rx="4" fillOpacity="0.6" />
-    <rect x="440" y="80" width="64" height="8" rx="4" fillOpacity="0.4" />
-    <rect x="424" y="126" width="156" height="54" rx="12" fillOpacity="0.16" />
-    <polygon points="424,154 400,166 424,168" fillOpacity="0.16" />
-    <rect x="440" y="142" width="80" height="8" rx="4" fillOpacity="0.4" />
-    <rect x="440" y="158" width="100" height="8" rx="4" fillOpacity="0.3" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M354 84 C 370 84, 384 85, 396 87" />
-    <path d="M354 156 C 370 158, 384 161, 396 164" />
-  </g>
-</svg>
 
 ## Start with requirements
 

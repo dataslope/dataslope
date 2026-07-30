@@ -6,7 +6,6 @@ const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 // Development-only navigation surfaced in the footer during the redesign.
 const DEV_LINKS = [
   { href: "/color-test", label: "Color Theme Test", external: false },
-  { href: "/svg-gallery", label: "SVG Gallery", external: false },
   { href: "/illustration-prompts", label: "Illustration Prompts", external: false },
   { href: "/fumadocs-dev", label: "Fumadocs Dev", external: false },
   { href: "/email-preview", label: "Email Preview", external: false },

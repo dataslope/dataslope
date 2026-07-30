@@ -9,6 +9,11 @@ need to reach *outside* the component too, fetch data, start a timer,
 subscribe to something. Those are **side effects**, and `useEffect` is
 where they belong.
 
+<Figure
+  slug="rx-effects-cutout"
+  alt="A panel on a platform with an arm reaching outside its frame to a distant sphere, a small cleanup hook on the arm"
+/>
+
 ## useEffect basics
 
 `useEffect(fn, deps)` runs `fn` *after* the component renders. The

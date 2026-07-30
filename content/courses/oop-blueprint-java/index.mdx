@@ -9,6 +9,12 @@ science who are meeting object-oriented programming for the first time
 and who want to understand *why* it exists, not just how to type its
 syntax.
 
+<Figure
+  slug="oop-blueprint-java-thumbnail-cutout"
+  alt="A plan card standing beside three identical small assembled objects built from it"
+  priority
+/>
+
 Java is the vehicle, not the destination. We use it because it forces
 you to be explicit: every value is part of a class, every responsibility
 lives somewhere on purpose, and every relationship between objects has
@@ -16,12 +22,6 @@ a name. By the end of the course you should be able to look at a
 real-world problem, a library, a hospital ward, a vending machine, a
 ride-share system, and **decompose it into a small society of
 collaborating objects**.
-
-<Figure
-  slug="a-risograph-of-a-blueprint"
-  alt="A risograph-style architectural blueprint, a class is the plan you build objects from"
-  priority
-/>
 
 ## Try it right now
 
@@ -73,47 +73,6 @@ Notice that the lamp keeps its own state (`isOn`) and exposes
 *behavior* (`turnOn`, `turnOff`, `describe`) rather than letting
 outside code touch its fields. That is the seed of every idea in this
 course.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A blueprint card with a faint grid holds a plan of three colored object nodes joined by thin solid lines, one future node still a dashed outline, while a yellow pencil rests at the corner, designing software as a society of collaborating objects"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="32" width="520" height="158" rx="14" fillOpacity="0.08" />
-  </g>
-  <g stroke="var(--ds-blue-500)" strokeWidth="1.5" strokeOpacity="0.12">
-    <line x1="76" y1="76" x2="564" y2="76" />
-    <line x1="76" y1="120" x2="564" y2="120" />
-    <line x1="76" y1="164" x2="564" y2="164" />
-    <line x1="180" y1="44" x2="180" y2="178" />
-    <line x1="300" y1="44" x2="300" y2="178" />
-    <line x1="420" y1="44" x2="420" y2="178" />
-  </g>
-  <g stroke="var(--ds-gray-400)" strokeWidth="2">
-    <line x1="150" y1="95" x2="265" y2="70" />
-    <line x1="265" y1="70" x2="350" y2="140" />
-    <line x1="150" y1="95" x2="350" y2="140" />
-    <line x1="265" y1="70" x2="455" y2="90" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="150" cy="95" r="13" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="265" cy="70" r="13" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="350" cy="140" r="13" />
-  </g>
-  <circle cx="455" cy="90" r="13" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="5 5" />
-  <g transform="rotate(-20 540 172)">
-    <rect x="492" y="164" width="12" height="16" rx="3" fill="var(--ds-blue-500)" />
-    <rect x="504" y="164" width="64" height="16" rx="2" fill="var(--ds-yellow-500)" />
-    <polygon points="568,164 568,180 586,172" fill="var(--ds-gray-400)" />
-  </g>
-</svg>
-
 ## What this course is about
 
 ```mermaid

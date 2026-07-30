@@ -6,12 +6,19 @@
  * <Figure slug="panda" alt="A giant panda, mascot for the pandas library" priority />
  * ```
  *
- * The source bytes live in `assets/images/<slug>.<ext>`; the build step
- * (`scripts/build-images.mjs`) crushes each source into an optimized `.webp`
- * plus a raster fallback (`.png` when transparent, else `.jpg`) under
- * `public/images/` and records its intrinsic size + formats in the generated
- * manifest this component imports. That lets the `<img>` reserve layout space
- * (no CLS) and serve WebP first with a fallback via `<picture>`.
+ * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
+ * intrinsic size + formats in the generated manifest this component imports,
+ * which is what lets the `<img>` reserve layout space (no CLS). `formats` is
+ * what decides the markup:
+ *
+ *   - One format (`["webp"]`) — every image in the repo today. These are
+ *     pipeline illustrations promoted straight into `public/images/<slug>.webp`
+ *     as the exact bytes to serve, so `<picture>` collapses to a plain `<img>`:
+ *     no fallback file is generated, and none is needed (WebP has been
+ *     universally supported since 2020).
+ *   - Two formats — a raster source under `assets/images/` that the build step
+ *     crushed into a `.webp` plus a `.png`/`.jpg` fallback. None exist right
+ *     now; the `<source>` branch below stays for when one is added.
  *
  * Named `Figure` (not `Image`) to avoid confusion with `next/image`, and
  * because it renders a `<figure>` and covers any raster image, not just
@@ -76,9 +83,10 @@ export function Figure({
       >
         <ImageIcon className={styles.pendingIcon} aria-hidden="true" />
         <span>
-          Image <code>{slug}</code> pending, add a raster source named{" "}
-          <code>{slug}</code> under <code>assets/images/</code> and run{" "}
-          <code>npm run build:images</code>.
+          Image <code>{slug}</code> pending, promote a candidate for it (
+          <code>node scripts/promote-illustrations.mjs {slug}</code>) or add a
+          raster source named <code>{slug}</code> under{" "}
+          <code>assets/images/</code> and run <code>npm run build:images</code>.
         </span>
       </span>
     );
@@ -113,6 +121,14 @@ export function Figure({
         />
       </picture>
       {caption ? <figcaption className={styles.caption}>{caption}</figcaption> : null}
+      {/* Regeneration handle. The prompt id is the slug with the `-cutout`
+          suffix dropped, which is what `data/illustration-prompts.json` is keyed
+          by and what every pipeline script takes as `--only`. Rendered so a
+          reviewer reading the live page can name the exact image to redo
+          without cross-referencing the gallery. */}
+      <figcaption className={styles.assetId}>
+        <code>{slug.replace(/-cutout$/, "")}</code>
+      </figcaption>
     </figure>
   );
 }

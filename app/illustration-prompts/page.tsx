@@ -1,17 +1,18 @@
 /**
- * `/illustration-prompts`, a build-time review page for the custom line-art
- * illustration placeholders (`<IllustrationPrompt>`) authored across the
- * `/courses`, `/fumadocs-dev`, and `/interview-prep` pages.
+ * `/illustration-prompts`, a build-time review page for the custom illustrations
+ * (a mix of styles: risograph, flat vector, line art, isometric, blueprint)
+ * authored across the courses and interview prep.
  *
- * Each distinct illustration gets one card with its semantic target file name
- * (e.g. `leland-wilkinson-portrait.svg`), the exact generation prompt and a
- * copy button, and deep links to every lesson that uses it, so the full set of
- * illustrations to draw can be skimmed and copied from one place.
+ * The prompt definitions live in `data/illustration-prompts.json`; each one
+ * gets a card here with its target PNG file name (e.g.
+ * `python-basics-thumbnail.png`), the exact GPT Image 2 generation prompt and a
+ * copy button, and a deep link to the lesson that embeds it, so the full set of
+ * illustrations to draw can be skimmed and copied from one place, or generated
+ * in bulk with `scripts/generate-illustrations.mjs`.
  *
- * Unlike `/svg-gallery`, the payload is tiny (~80 short prompts), so the data
- * is collected at build time and prerendered straight into this static page
- * (no separate JSON asset / client fetch needed). Interactivity (theme toggle,
- * copy buttons) lives in the client child.
+ * The payload is tiny, so the data is built at request time and prerendered
+ * straight into this static page. Interactivity (theme toggle, copy buttons)
+ * lives in the client child.
  */
 import type { Metadata } from "next";
 import { getIllustrationPrompts } from "@/lib/illustrationPromptsGallery";
@@ -22,7 +23,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Illustration prompts",
   description:
-    "Placeholder prompts for the custom line-art illustrations across the Dataslope courses and interview prep.",
+    "GPT Image 2 prompts for the custom illustrations across the Dataslope courses and interview prep.",
   robots: { index: false, follow: false },
 };
 

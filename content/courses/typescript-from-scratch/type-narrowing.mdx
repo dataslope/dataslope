@@ -15,37 +15,10 @@ This chapter covers: **`typeof` guards**, **`instanceof` guards**,
 narrowing**, **user-defined type predicates**, and **assertion
 functions**.
 
-<svg
-  viewBox="0 0 640 260"
-  role="img"
-  aria-label="A mixed batch of shapes falls through two sieve trays: the green triangle and red pentagon rest on the first, the yellow square is caught by the second, and only the blue circle reaches the cup at the bottom, each type guard lets fewer possibilities through"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="140" y="90" width="80" height="10" rx="5" />
-    <rect x="260" y="90" width="90" height="10" rx="5" />
-    <rect x="390" y="90" width="110" height="10" rx="5" />
-    <rect x="140" y="170" width="100" height="10" rx="5" />
-    <rect x="280" y="170" width="70" height="10" rx="5" />
-    <rect x="410" y="170" width="90" height="10" rx="5" />
-    <path d="M250 232 L390 232 L378 254 L262 254 Z" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="240" cy="40" r="11" />
-    <circle cx="240" cy="132" r="11" />
-    <circle cx="316" cy="220" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="350" y="32" width="22" height="22" rx="4" />
-    <rect x="310" y="148" width="22" height="22" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M300 62 L316 90 L284 90 Z" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M450 64 L462.4 73 L457.6 87.6 L442.4 87.6 L437.6 73 Z" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-type-narrowing-cutout"
+  alt="A mixed group of token shapes entering a branching gate that separates them into single-shape lanes"
+/>
 
 ## The narrowing problem
 
@@ -399,39 +372,6 @@ The return type `value is string` tells the compiler: "If this function
 returns `true`, then `value` is a `string` in the caller's scope." This
 is more powerful than returning `boolean`, because it lets you encapsulate
 complex checks in a reusable function.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Shapes ride a belt beneath a gray magnifying lens: the circle past the lens emerges wearing a green certification ring while squares pass unmarked, a user-defined type predicate teaches the compiler which values to trust as the narrowed type"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="60" y="120" width="520" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="110" cy="107" r="11" />
-    <circle cx="300" cy="107" r="11" />
-    <circle cx="430" cy="107" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="168" y="85" width="22" height="22" rx="4" />
-    <rect x="498" y="85" width="22" height="22" rx="4" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <circle cx="300" cy="98" r="27" />
-    <path d="M320 118 L 344 142" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <circle cx="430" cy="107" r="16" fill="none" stroke="currentColor" strokeWidth="4" />
-  </g>
-</svg>
 
 Another example with custom objects:
 

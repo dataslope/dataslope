@@ -15,6 +15,7 @@ import {
 } from "@/app/_components/languageIcons";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
+import imageManifest from "@/lib/generated/images";
 import { CourseGlyph } from "./courseArt";
 
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
@@ -92,6 +93,56 @@ export function LevelBars({ level }: { level: string }) {
   );
 }
 
+// Output extension → MIME type, mirroring app/_components/mdx/Figure.tsx.
+const THUMB_MIME: Record<string, string> = {
+  webp: "image/webp",
+  png: "image/png",
+  jpg: "image/jpeg",
+  avif: "image/avif",
+};
+
+/**
+ * The course's generated thumbnail, or the mono glyph when it has none.
+ *
+ * The cut-out is used rather than the opaque original so the artwork sits on
+ * the row background in both themes instead of inside a white tile. Courses
+ * without generated art keep the glyph, so the catalog degrades a row at a
+ * time rather than all-or-nothing.
+ */
+function CourseThumb({ course }: { course: CatalogCourse }) {
+  const slug = `${course.slug}-thumbnail-cutout`;
+  const entry = imageManifest[slug];
+  if (!entry) {
+    return (
+      <CourseGlyph
+        slug={course.slug}
+        tags={course.tags}
+        size={22}
+        className={`mt-0.5 justify-self-center text-[var(--ds-gray-900)] dark:text-white ${HOVER_GLYPH}`}
+      />
+    );
+  }
+  const fallback = entry.formats[entry.formats.length - 1];
+  const sources = entry.formats.slice(0, -1);
+  return (
+    <picture>
+      {sources.map((ext) => (
+        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={THUMB_MIME[ext]} />
+      ))}
+      <img
+        src={`/images/${slug}.${fallback}`}
+        width={entry.width}
+        height={entry.height}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        className="mt-0.5 h-auto w-full transition-transform duration-200 group-hover:scale-105"
+      />
+    </picture>
+  );
+}
+
 export function CourseCard({ course }: { course: CatalogCourse }) {
   const lang = course.tags.language?.[0] ?? "python";
   const level = course.tags.level?.[0] ?? "intermediate";
@@ -101,14 +152,9 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
       // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
-      className="group -mx-3 grid grid-cols-[30px_1fr] items-start gap-4 px-3 py-6"
+      className="group -mx-3 grid grid-cols-[72px_1fr] items-start gap-4 px-3 py-6"
     >
-      <CourseGlyph
-        slug={course.slug}
-        tags={course.tags}
-        size={22}
-        className={`mt-0.5 text-[var(--ds-gray-900)] dark:text-white ${HOVER_GLYPH}`}
-      />
+      <CourseThumb course={course} />
       <span className="flex min-w-0 flex-col gap-[5px]">
         <span
           className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING} ${HOVER_TEXT}`}

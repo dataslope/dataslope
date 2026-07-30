@@ -12,49 +12,10 @@ Strip away the camouflage and the idea is one you have already met. On the [recu
 
 When both hold, an exponential search collapses to "number of distinct states × work per state," which is usually polynomial. That collapse is the entire trick; the rest of this page is practice recognizing it in different costumes.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A table filling cell by cell, base cases green, solved rows blue, and the yellow current cell next in line to be filled from earlier answers"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.3">
-    <rect x="108" y="30" width="52" height="32" rx="6" />
-    <rect x="170" y="30" width="52" height="32" rx="6" />
-    <rect x="232" y="30" width="52" height="32" rx="6" />
-    <rect x="294" y="30" width="52" height="32" rx="6" />
-    <rect x="356" y="30" width="52" height="32" rx="6" />
-    <rect x="418" y="30" width="52" height="32" rx="6" />
-    <rect x="480" y="30" width="52" height="32" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.35">
-    <rect x="108" y="74" width="52" height="32" rx="6" />
-    <rect x="170" y="74" width="52" height="32" rx="6" />
-    <rect x="232" y="74" width="52" height="32" rx="6" />
-    <rect x="294" y="74" width="52" height="32" rx="6" />
-    <rect x="356" y="74" width="52" height="32" rx="6" />
-    <rect x="418" y="74" width="52" height="32" rx="6" />
-    <rect x="480" y="74" width="52" height="32" rx="6" />
-    <rect x="108" y="118" width="52" height="32" rx="6" />
-    <rect x="170" y="118" width="52" height="32" rx="6" />
-    <rect x="232" y="118" width="52" height="32" rx="6" />
-    <rect x="294" y="118" width="52" height="32" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="356" y="118" width="52" height="32" rx="6" fillOpacity="0.9" />
-  </g>
-  <g fill="currentColor" opacity="0.06">
-    <rect x="418" y="118" width="52" height="32" rx="6" />
-    <rect x="480" y="118" width="52" height="32" rx="6" />
-    <rect x="108" y="162" width="52" height="32" rx="6" />
-    <rect x="170" y="162" width="52" height="32" rx="6" />
-    <rect x="232" y="162" width="52" height="32" rx="6" />
-    <rect x="294" y="162" width="52" height="32" rx="6" />
-    <rect x="356" y="162" width="52" height="32" rx="6" />
-    <rect x="418" y="162" width="52" height="32" rx="6" />
-    <rect x="480" y="162" width="52" height="32" rx="6" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-dynamic-programming-cutout"
+  alt="A grid of small pigeonhole cells being filled one row at a time, each new cell drawing short arrows from two already-filled neighbours"
+/>
 
 ## Mindset
 

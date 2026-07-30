@@ -10,48 +10,10 @@ This page builds your mental model of that structure and shows the
 operations you will reach for over and over in the rest of the
 course.
 
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="A contiguous strip of memory cells reappears below as a three-by-four grid of the same cells, with a small shape tag reading 3 by 4, one block of memory viewed as a multidimensional array"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="104" y="40" width="36" height="30" rx="5" fillOpacity="0.8" />
-    <rect x="239" y="140" width="36" height="30" rx="5" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="176" y="40" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="212" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="248" y="40" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="284" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="320" y="40" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="356" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="392" y="40" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="428" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="464" y="40" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="500" y="40" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="281" y="140" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="323" y="140" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="365" y="140" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="239" y="176" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="281" y="176" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="323" y="176" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="365" y="176" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="239" y="212" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="281" y="212" width="36" height="30" rx="5" fillOpacity="0.55" />
-    <rect x="323" y="212" width="36" height="30" rx="5" fillOpacity="0.3" />
-    <rect x="365" y="212" width="36" height="30" rx="5" fillOpacity="0.55" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="430" y="158" width="84" height="26" rx="13" fillOpacity="0.25" />
-  </g>
-  <g fill="var(--ds-yellow-700)">
-    <text x="458" y="177" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15">3</text>
-    <text x="486" y="177" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15">4</text>
-  </g>
-</svg>
+<Figure
+  slug="scipy-arrays-tensors-cutout"
+  alt="A contiguous memory strip on a platform reinterpreted above it as a flat grid and then as a stacked cube of cells"
+/>
 
 ## What an ndarray actually is
 
@@ -351,7 +313,6 @@ print("\\nFrobenius difference :", np.linalg.norm(points - proj).round(4))
       filename: "linalg.py",
       starterCode: `import numpy as np
 
-
 def project_onto_basis(points: np.ndarray, basis: np.ndarray) -> np.ndarray:
     """Project rows of \`points\` onto the row-space of \`basis\`.
 
@@ -391,11 +352,9 @@ Python loops**, use broadcasting and a single reduction.`}
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def weighted_centroid(points, weights):
     # TODO: vectorized weighted average along axis 0
     return None
-
 
 # Quick check
 points = np.array([[0.0, 0.0], [2.0, 0.0], [0.0, 4.0]])
@@ -404,7 +363,6 @@ print("centroid =", weighted_centroid(points, weights))
 # Expected: (1*0 + 1*2 + 2*0)/4, (1*0 + 1*0 + 2*4)/4 = (0.5, 2.0)
 `,
       solutionCode: `import numpy as np
-
 
 def weighted_centroid(points, weights):
     points = np.asarray(points, dtype=float)

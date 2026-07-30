@@ -8,7 +8,6 @@ import Link from "../_components/Link";
 import { HomeNav } from "../_components/home/HomeNav";
 import { PricingSection } from "../_components/home/PricingSection";
 import { HomeFooter } from "../_components/home/HomeFooter";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
 const PAGE_TITLE = "Pricing, Dataslope";
@@ -84,18 +83,15 @@ export default function PricingPage() {
           {/* ── Page heading ── */}
           <section className="px-4 pb-4 pt-12 sm:px-6 sm:pt-16">
             <div className="mx-auto max-w-2xl text-center">
-              <SparklesText
-                as="h1"
-                className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-              >
+              <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
                 Pricing
-              </SparklesText>
+              </h1>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
                 Every course, interview track, and playground is free to use,
-                sign-in optional, and anyone can share a playground with a
-                link. Create a free account to save and share your work in the
-                cloud. The detailed notes below the table explain exactly what
-                each row means.
+                sign-in optional, and anyone can share a playground with a link.
+                Create a free account to save and share your work in the cloud.
+                The detailed notes below the table explain exactly what each row
+                means.
               </p>
             </div>
           </section>
@@ -134,14 +130,17 @@ export default function PricingPage() {
 
                 <Footnote n={2} lead="“Save workspaces locally.”">
                   Local saves live in your browser&apos;s own storage on the
-                  device you&apos;re using. They&apos;re private to that browser,
-                  never uploaded, and persist until you clear your site data.
-                  Because they aren&apos;t synced, they won&apos;t follow you to
-                  another device or browser, that&apos;s what cloud saves are
-                  for.
+                  device you&apos;re using. They&apos;re private to that
+                  browser, never uploaded, and persist until you clear your site
+                  data. Because they aren&apos;t synced, they won&apos;t follow
+                  you to another device or browser, that&apos;s what cloud saves
+                  are for.
                 </Footnote>
 
-                <Footnote n={3} lead="“Save workspaces locally and in the cloud.”">
+                <Footnote
+                  n={3}
+                  lead="“Save workspaces locally and in the cloud.”"
+                >
                   Cloud saves sync your workspaces to your account so you can
                   pick them up on any device you sign in to. Free Members get
                   cloud saves with a retention limit (see note 4).
@@ -161,19 +160,19 @@ export default function PricingPage() {
                 <Footnote n={5} lead="“100 MB of cloud storage.”">
                   Your quota is the combined size of everything you keep in the
                   cloud, saved workspaces, databases, and any files you upload,
-                  totaled across all playgrounds, not measured per playground. If
-                  you reach the limit you can still open and export existing
+                  totaled across all playgrounds, not measured per playground.
+                  If you reach the limit you can still open and export existing
                   work; you&apos;ll just need to free up space before saving
                   more.
                 </Footnote>
 
                 <Footnote n={6} lead="“Share playgrounds.”">
-                  Sharing creates a link to a snapshot of your playground,
-                  the files, and for SQL playgrounds the database and queries
-, taken at the moment you share. Anyone who opens the link
-                  gets their own private copy to run and edit; nobody can
-                  change your original through a link, and later edits
-                  aren&apos;t shared until you create a new link.{" "}
+                  Sharing creates a link to a snapshot of your playground, the
+                  files, and for SQL playgrounds the database and queries ,
+                  taken at the moment you share. Anyone who opens the link gets
+                  their own private copy to run and edit; nobody can change your
+                  original through a link, and later edits aren&apos;t shared
+                  until you create a new link.{" "}
                   <strong>Everyone can share, including guests</strong> with no
                   account: guest links simply expire 30 days after they&apos;re
                   created and can&apos;t be managed afterwards. Links created

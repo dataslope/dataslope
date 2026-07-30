@@ -22,7 +22,6 @@ import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { JsonLd } from "../_components/JsonLd";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import { PLAYGROUNDS } from "../_components/playgrounds";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { absUrl, breadcrumbLd } from "@/lib/structuredData";
@@ -93,12 +92,9 @@ export default function PlaygroundPage() {
               block. */}
           <div className="mx-auto max-w-2xl text-center">
             {/* Magic UI sparkles on the title, in the brand palette. */}
-            <SparklesText
-              as="h1"
-              className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-            >
+            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
               Playground
-            </SparklesText>
+            </h1>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Full code editors that run entirely in your browser. Fourteen
               languages, free, no setup, no sign-up.

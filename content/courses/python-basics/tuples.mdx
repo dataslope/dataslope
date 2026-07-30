@@ -5,41 +5,12 @@ description: Immutable sequences, unpacking, and named tuples
 
 A `tuple` is an ordered, **immutable** sequence. Tuples are typically used for fixed-size, heterogeneous records, "a point is an `(x, y)`" or "a database row is `(id, name, email)`", where a list would be the wrong semantic choice. Tuples also serve as dictionary keys, multiple return values, and anywhere you need an immutable, hashable sequence.
 
-Every snippet on this page runs in your browser, no setup required.
+<Figure
+  slug="python-basics-tuples-cutout"
+  alt="Two padlocked rings linked together as a fixed pair, with a sealed wax stamp beside them"
+/>
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three dots vacuum-sealed into one tight pack that hangs from a hook, while a red newcomer bounces off the crimped seal, a tuple's contents are fixed the moment it is made, which is exactly what makes it hashable"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="28" r="6" />
-    <rect x="316" y="28" width="8" height="32" rx="4" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="180" y="60" width="280" height="70" rx="35" fillOpacity="0.12" />
-    <rect x="194" y="68" width="252" height="54" rx="27" fillOpacity="0.1" />
-    <rect x="166" y="72" width="10" height="46" rx="5" fillOpacity="0.4" />
-    <rect x="464" y="72" width="10" height="46" rx="5" fillOpacity="0.4" />
-    <circle cx="250" cy="95" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="320" cy="95" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="390" cy="95" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="598" cy="118" r="3" fillOpacity="0.4" />
-    <circle cx="580" cy="110" r="3" fillOpacity="0.4" />
-    <circle cx="562" cy="100" r="3" fillOpacity="0.4" />
-    <circle cx="540" cy="88" r="9" />
-    <circle cx="550" cy="66" r="3" fillOpacity="0.35" />
-    <circle cx="558" cy="50" r="2.5" fillOpacity="0.3" />
-    <circle cx="564" cy="34" r="2" fillOpacity="0.25" />
-  </g>
-</svg>
+Every snippet on this page runs in your browser, no setup required.
 
 <Callout type="info" title="Etymology: why 'tuple'?">
 The name comes from mathematics: **single, double, triple, quadruple, quintuple, ... n-tuple**. In math, an n-tuple is an ordered list of n elements. Python's `tuple` is the programming language version of that concept. The trailing letters are often dropped (dupl**e**, tripl**e**, ...), leaving just "tuple."
@@ -328,7 +299,6 @@ Functions "return multiple values" by returning a tuple, which the caller can un
       starterCode: `def minmax(values):
     return min(values), max(values)
 
-
 lo, hi = minmax([3, 1, 4, 1, 5, 9, 2, 6])
 print("min:", lo, "max:", hi)
 `,
@@ -343,7 +313,6 @@ print("min:", lo, "max:", hi)
       filename: "main.py",
       starterCode: `def divmod_manual(a, b):
     return (a // b, a % b)
-
 
 quotient, remainder = divmod_manual(17, 5)
 print("quotient:", quotient, "remainder:", remainder)
@@ -382,12 +351,10 @@ The newer `typing.NamedTuple` version lets you add type hints.
       filename: "main.py",
       starterCode: `from typing import NamedTuple
 
-
 class Color(NamedTuple):
     r: int
     g: int
     b: int
-
 
 c = Color(255, 128, 0)
 print(c)

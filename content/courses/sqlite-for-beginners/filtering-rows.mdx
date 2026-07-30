@@ -9,31 +9,10 @@ That difference matters. A table may hold hundreds or millions of rows,
 but most questions only need some of them: books under a certain price,
 employees in one department, or customers in one city.
 
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Small green dots slip through the slot of a yellow WHERE gate into a light green tray, while the big red dots are stopped at the bar, WHERE is a sieve that lets matching rows through"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="70" cy="88" r="6" />
-    <circle cx="120" cy="88" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="220" cy="52" r="10" />
-    <circle cx="220" cy="126" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="240" y="24" width="12" height="48" rx="5" />
-    <rect x="240" y="104" width="12" height="48" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="284" y="58" width="180" height="60" rx="30" fillOpacity="0.12" />
-    <circle cx="316" cy="88" r="6" />
-    <circle cx="364" cy="88" r="6" />
-    <circle cx="412" cy="88" r="6" />
-  </g>
-</svg>
+<Figure
+  slug="lite-filtering-rows-cutout"
+  alt="A row of tiles passing a gate on a platform, matching tiles continuing on the track and the rest dropping into a bin"
+/>
 
 ## WHERE keeps matching rows
 
@@ -303,38 +282,6 @@ WHERE
 
 In SQLite, `LIKE` is case-insensitive for ordinary ASCII letters by
 default. That means `'sql%'` can match `SQL Street`.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A pattern card shows a solid blue start followed by a dashed wildcard tail; below it, the two text bars whose beginnings match earn green dots while the bar with a different yellow start gets a red one, LIKE matches the shape of text, not the whole exact value"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="180" y="18" width="280" height="44" rx="10" fillOpacity="0.1" />
-    <rect x="198" y="32" width="84" height="16" rx="8" />
-  </g>
-  <line x1="300" y1="40" x2="430" y2="40" stroke="var(--ds-gray-400)" strokeWidth="3" strokeDasharray="6 7" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="146" y="92" width="84" height="14" rx="7" />
-    <rect x="146" y="156" width="84" height="14" rx="7" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="238" y="92" width="120" height="14" rx="7" />
-    <rect x="238" y="124" width="96" height="14" rx="7" />
-    <rect x="238" y="156" width="56" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="146" y="124" width="84" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="392" cy="99" r="7" />
-    <circle cx="392" cy="163" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="392" cy="131" r="7" />
-  </g>
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

@@ -1,7 +1,11 @@
-/* Theme tokens mirror /svg-gallery: light is the default; `.dark` (toggled on
-   the root) swaps in the dark palette. Page background is pure white (#ffffff)
-   in light and #121212 in dark, the two backgrounds the illustrations must
-   read well on, and the ones named in every prompt. */
+/* Theme tokens: light is the default; the dark palette is selected by the
+   site-wide `.dark` class on <html>, which the root layout's bootstrap script
+   applies before paint and ThemePillToggle flips. Keying off <html> (rather
+   than a page-local class as this page used to) is what lets the shared pill
+   drive it and keeps the choice in step with the rest of the site.
+   Page background is pure white (#ffffff) in light and #121212 in dark, the
+   two backgrounds the illustrations must read well on, and the ones named in
+   every prompt. */
 .page {
   --bg: #ffffff;
   --fg: #111827;
@@ -25,7 +29,7 @@
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
-.page.dark {
+:global(html.dark) .page {
   --bg: #121212;
   --fg: #e6e6e6;
   --muted: #a3a3a3;
@@ -88,23 +92,29 @@
   color: var(--fg);
 }
 
-.themeToggle {
-  display: inline-flex;
+/* Docked theme pill: pinned to the viewport so it stays reachable through the
+   whole scroll. The translucent backing keeps it legible when a bright
+   illustration scrolls underneath. */
+.themeDock {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
-  padding: 0.4rem 0.7rem;
+  padding: 0.3rem;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--btn-bg);
-  color: var(--fg);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
 }
 
-.themeToggle:hover {
-  background: var(--btn-hover);
+@media (max-width: 720px) {
+  .themeDock {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
 }
 
 /* ── Sections (People / Objects & scenes) ───────────────────────────────── */
@@ -178,6 +188,14 @@
   user-select: all;
 }
 
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .badge {
   flex-shrink: 0;
   padding: 0.15rem 0.5rem;
@@ -186,16 +204,79 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono, ui-monospace, monospace);
 }
 
-.badgePhoto {
+.badgeAccent {
   background: var(--badge-bg);
   color: var(--badge-fg);
 }
 
-.badgeNoPhoto {
+.badgeMuted {
   background: var(--badge-muted-bg);
   color: var(--badge-muted-fg);
+}
+
+/* The generated artwork, shown above its prompt, with the background-removed
+   variant stacked underneath for comparison. */
+.imageStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.imagePane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-soft);
+}
+
+/* The cut-out gets no backdrop of its own — the page colour shows through its
+   alpha, so the theme toggle is what reveals a halo or a background that never
+   actually came off. */
+.imageCutout {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--border);
+  background: transparent;
+}
+
+.imageLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.imagePending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
 }
 
 .prompt {
@@ -206,26 +287,6 @@
   color: var(--muted);
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.refLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.refLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--link);
-  font-size: 0.78rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.refLink:hover {
-  text-decoration: underline;
 }
 
 .cardBottom {
@@ -309,4 +370,54 @@
 .empty {
   margin-top: 2rem;
   color: var(--muted);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+/* Every card carries two full-width 1536x1024 images, so the full set is both a
+   very long scroll and a lot of bytes; the list is paged rather than infinite so
+   a reader can hold a position and come back to it. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.pagerBtn {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pagerBtn:hover:not(:disabled) {
+  background: var(--btn-hover);
+}
+
+.pagerBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerStatus {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.pagerRange {
+  color: var(--faint);
+}
+
+@media (max-width: 560px) {
+  .pagerRange {
+    display: none;
+  }
 }

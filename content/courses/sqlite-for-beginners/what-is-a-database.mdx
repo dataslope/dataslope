@@ -19,36 +19,10 @@ That definition sounds modest. This page is about why it is
 actually one of the biggest ideas in computing, and why it has a
 surprisingly good origin story.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A blue catalog box holds a row of neat gray cards with colored tabs, and one green-tabbed card is lifted straight up on a thin line, a database is an organized place where facts are stored, found again, and trusted"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <line x1="457" y1="110" x2="457" y2="86" stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="438" y="10" width="24" height="12" rx="4" />
-    <rect x="430" y="20" width="54" height="60" rx="5" fillOpacity="0.25" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="200" y="66" width="50" height="54" rx="4" />
-    <rect x="262" y="72" width="50" height="48" rx="4" />
-    <rect x="324" y="68" width="50" height="52" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="208" y="56" width="24" height="12" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="270" y="62" width="24" height="12" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="332" y="58" width="24" height="12" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 160 126 L 480 126 L 464 208 Q 462 216 454 216 L 186 216 Q 178 216 176 208 Z" fillOpacity="0.22" />
-    <rect x="152" y="114" width="336" height="14" rx="7" />
-  </g>
-</svg>
+<Figure
+  slug="lite-what-is-a-database-cutout"
+  alt="A sturdy vault-like cabinet on a platform holding neat trays of labelled fact tiles, a small retrieval arm at its front"
+/>
 
 ## The four jobs every database does
 
@@ -184,8 +158,6 @@ answer was complicated: databases arranged records into trees and
 networks of pointers, and to fetch anything, a programmer had to
 know the physical layout and navigate it step by step. Change the
 layout, and every program that touched the data broke.
-
-<IllustrationPrompt subject="Edgar F. Codd" photo />
 
 In June 1970, an IBM researcher named **Edgar F. Codd** published
 a paper with the unglamorous title *"A Relational Model of Data

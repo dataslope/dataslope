@@ -13,46 +13,10 @@ This chapter takes you from the simplest ODE solver you can write
 by hand to the production-grade adaptive solvers in SciPy, and
 shows you how to recognize when a problem is **stiff**.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A field of short tilted gray dashes fills a pale blue card, and one bold green curve threads through them from a solid starting dot, always following the local slope, an ODE solved by walking the direction field"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="25" width="500" height="170" rx="14" fillOpacity="0.07" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="101" y1="55" x2="119" y2="55" transform="rotate(-42 110 55)" />
-    <line x1="161" y1="55" x2="179" y2="55" transform="rotate(-36 170 55)" />
-    <line x1="221" y1="55" x2="239" y2="55" transform="rotate(-30 230 55)" />
-    <line x1="281" y1="55" x2="299" y2="55" transform="rotate(-24 290 55)" />
-    <line x1="341" y1="55" x2="359" y2="55" transform="rotate(-18 350 55)" />
-    <line x1="401" y1="55" x2="419" y2="55" transform="rotate(-13 410 55)" />
-    <line x1="461" y1="55" x2="479" y2="55" transform="rotate(-9 470 55)" />
-    <line x1="521" y1="55" x2="539" y2="55" transform="rotate(-6 530 55)" />
-    <line x1="101" y1="105" x2="119" y2="105" transform="rotate(-42 110 105)" />
-    <line x1="161" y1="105" x2="179" y2="105" transform="rotate(-36 170 105)" />
-    <line x1="221" y1="105" x2="239" y2="105" transform="rotate(-30 230 105)" />
-    <line x1="281" y1="105" x2="299" y2="105" transform="rotate(-24 290 105)" />
-    <line x1="341" y1="105" x2="359" y2="105" transform="rotate(-18 350 105)" />
-    <line x1="401" y1="105" x2="419" y2="105" transform="rotate(-13 410 105)" />
-    <line x1="461" y1="105" x2="479" y2="105" transform="rotate(-9 470 105)" />
-    <line x1="521" y1="105" x2="539" y2="105" transform="rotate(-6 530 105)" />
-    <line x1="101" y1="155" x2="119" y2="155" transform="rotate(-42 110 155)" />
-    <line x1="161" y1="155" x2="179" y2="155" transform="rotate(-36 170 155)" />
-    <line x1="221" y1="155" x2="239" y2="155" transform="rotate(-30 230 155)" />
-    <line x1="281" y1="155" x2="299" y2="155" transform="rotate(-24 290 155)" />
-    <line x1="341" y1="155" x2="359" y2="155" transform="rotate(-18 350 155)" />
-    <line x1="401" y1="155" x2="419" y2="155" transform="rotate(-13 410 155)" />
-    <line x1="461" y1="155" x2="479" y2="155" transform="rotate(-9 470 155)" />
-    <line x1="521" y1="155" x2="539" y2="155" transform="rotate(-6 530 155)" />
-  </g>
-  <path d="M100 168 C 240 130, 360 78, 530 56" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="100" cy="168" r="8" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-odes-cutout"
+  alt="A small cart stepping along a curved trajectory track, short direction arrows sprouting from the surface beneath it"
+/>
 
 ## The initial-value problem
 
@@ -90,11 +54,9 @@ step, easy to code, and almost always wrong.
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
-
 # dy/dt = -2 y,  y(0) = 1.   Exact solution: y = exp(-2 t)
 def f(t, y):
     return -2.0 * y
-
 
 def euler(f, t0, y0, t_end, h):
     ts, ys = [t0], [y0]
@@ -105,7 +67,6 @@ def euler(f, t0, y0, t_end, h):
         ts.append(t)
         ys.append(y)
     return np.array(ts), np.array(ys)
-
 
 for h in [0.5, 0.2, 0.05]:
     t, y = euler(f, 0, 1.0, 3.0, h)
@@ -151,7 +112,6 @@ halving $h$ shrinks the error by **sixteen**.
       filename: "main.py",
       starterCode: `import numpy as np
 
-
 def rk4_step(f, t, y, h):
     k1 = f(t, y)
     k2 = f(t + h / 2, y + h * k1 / 2)
@@ -159,11 +119,9 @@ def rk4_step(f, t, y, h):
     k4 = f(t + h, y + h * k3)
     return y + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
 
-
 # Same test problem
 def f(t, y):
     return -2.0 * y
-
 
 t, y = 0.0, 1.0
 for _ in range(10):
@@ -196,12 +154,10 @@ RK4 with a built-in error estimator.
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-
 # Damped pendulum:  theta'' + 0.3 theta' + sin(theta) = 0
 def pendulum(t, y):
     theta, omega = y
     return [omega, -0.3 * omega - np.sin(theta)]
-
 
 sol = solve_ivp(
     pendulum, [0, 30], y0=[2.0, 0.0], dense_output=True, rtol=1e-8, atol=1e-10
@@ -248,15 +204,12 @@ something happens. `events` lets you catch those moments exactly.
       starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
-
 # A ball thrown upward in gravity, with the ground at y = 0
 def ball(t, s):  # s = [position, velocity]
     return [s[1], -9.81]
 
-
 def hit_ground(t, s):
     return s[0]
-
 
 hit_ground.terminal = True  # stop integrating when triggered
 hit_ground.direction = -1  # only catch downward crossings
@@ -287,12 +240,10 @@ how big the state is.
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-
 # Lotka-Volterra predator-prey
 def lv(t, z, alpha=1.1, beta=0.4, delta=0.1, gamma=0.4):
     x, y = z  # x = prey, y = predator
     return [alpha * x - beta * x * y, delta * x * y - gamma * y]
-
 
 sol = solve_ivp(lv, [0, 50], [10, 5], dense_output=True, rtol=1e-8)
 t = np.linspace(0, 50, 500)
@@ -328,11 +279,9 @@ slowly. The classic example is the chemical kinetics problem
 from scipy.integrate import solve_ivp
 import time
 
-
 def robertson(t, y):
     a, b, c = y
     return [-0.04 * a + 1e4 * b * c, 0.04 * a - 1e4 * b * c - 3e7 * b * b, 3e7 * b * b]
-
 
 y0 = [1.0, 0.0, 0.0]
 t_span = [0, 1e5]
@@ -426,14 +375,12 @@ Verify against the closed-form answer $t^* = v_0 / g$.`}
       starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
-
 def time_to_apex(v0):
     # TODO: integrate, use an event on velocity == 0, return event time
     return 0.0
 `,
       solutionCode: `import numpy as np
 from scipy.integrate import solve_ivp
-
 
 def time_to_apex(v0):
     def rhs(t, s):

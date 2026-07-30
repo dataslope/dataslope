@@ -9,39 +9,10 @@ moderation, though, subqueries are a precise, expressive tool. This page
 sorts the common kinds, shows where each shines in analysis, and gives you
 a rule for choosing between a subquery, a CTE, and a join.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Green dots float above and blue dots below one solid yellow line, while a small side card shows rows collapsing into the single yellow value the line is drawn from, a subquery computes one number and every outer row is measured against it"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="48" y="28" width="380" height="160" rx="12" fillOpacity="0.1" />
-    <circle cx="140" cy="146" r="8" />
-    <circle cx="230" cy="162" r="8" />
-    <circle cx="310" cy="138" r="8" />
-    <circle cx="384" cy="158" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="110" cy="64" r="8" />
-    <circle cx="190" cy="52" r="8" />
-    <circle cx="270" cy="78" r="8" />
-    <circle cx="350" cy="60" r="8" />
-  </g>
-  <rect x="68" y="106" width="340" height="4" rx="2" fill="var(--ds-yellow-500)" />
-  <line x1="412" y1="108" x2="466" y2="108" stroke="var(--ds-gray-300)" strokeWidth="2" />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="468" y="52" width="124" height="104" rx="12" fillOpacity="0.2" />
-    <circle cx="517" cy="140" r="8" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="488" y="72" width="60" height="7" rx="3.5" />
-    <rect x="488" y="86" width="74" height="7" rx="3.5" />
-    <rect x="488" y="100" width="48" height="7" rx="3.5" />
-    <rect x="515" y="112" width="4" height="8" rx="2" />
-    <polygon points="510,118 524,118 517,128" />
-  </g>
-</svg>
+<Figure
+  slug="duck-subqueries-cutout"
+  alt="A small query box nested inside a larger query box on a platform, a single result token passing outward from the inner one"
+/>
 
 ## Three kinds of subquery
 
@@ -247,35 +218,6 @@ ORDER BY
 
 Bo has no orders, so Bo is excluded. `EXISTS` stops at the first match,
 making it an efficient "has any" test.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Three customer cards inspected for contents: the two holding yellow order dots earn a solid green lamp above, while the empty card with its dashed placeholder gets a hollow red ring, EXISTS asks only whether a match exists, never how many"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="152" y1="64" x2="152" y2="46" />
-    <line x1="320" y1="64" x2="320" y2="46" />
-    <line x1="488" y1="64" x2="488" y2="46" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="84" y="64" width="136" height="70" rx="16" fillOpacity="0.1" />
-    <rect x="252" y="64" width="136" height="70" rx="16" fillOpacity="0.1" />
-    <rect x="420" y="64" width="136" height="70" rx="16" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="134" cy="99" r="9" />
-    <circle cx="166" cy="99" r="9" />
-    <circle cx="488" cy="99" r="9" />
-  </g>
-  <circle cx="320" cy="99" r="9" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeDasharray="4 4" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="152" cy="34" r="9" />
-    <circle cx="488" cy="34" r="9" />
-  </g>
-  <circle cx="320" cy="34" r="9" fill="none" stroke="var(--ds-red-500)" strokeWidth="4" />
-</svg>
 
 ## Choosing: subquery vs. CTE vs. join
 

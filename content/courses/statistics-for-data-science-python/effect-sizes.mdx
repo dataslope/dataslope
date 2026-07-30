@@ -22,27 +22,10 @@ collected. This page is about measuring magnitude, and about why, with
 a big enough sample, *everything* becomes significant whether it matters
 or not.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A tiny blue speck ringed by loud yellow broadcast circles stands on a long sample bar, while a massive green boulder with barely a whisper of a ring stands on a short one, a huge sample can make a microscopic effect scream with significance while a big effect on little data hardly registers"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="none" stroke="var(--ds-yellow-500)">
-    <circle cx="180" cy="104" r="28" strokeWidth="4" strokeOpacity="0.9" />
-    <circle cx="180" cy="104" r="46" strokeWidth="4" strokeOpacity="0.55" />
-    <circle cx="180" cy="104" r="64" strokeWidth="4" strokeOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="104" r="5" />
-  </g>
-  <rect x="120" y="182" width="120" height="8" rx="4" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="470" cy="104" r="38" />
-  </g>
-  <circle cx="470" cy="104" r="52" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
-  <rect x="452" y="182" width="36" height="8" rx="4" fill="var(--ds-gray-400)" />
-</svg>
+<Figure
+  slug="stat-effect-sizes-cutout"
+  alt="Two overlapping mounds on a platform with a caliper measuring the gap between their peaks in spread units"
+/>
 
 ## The problem: significance is not importance
 
@@ -131,7 +114,6 @@ rng = np.random.default_rng(7)
 control = rng.normal(loc=100, scale=15, size=200)
 treatment = rng.normal(loc=107, scale=15, size=200)
 
-
 def cohens_d(a, b):
     na, nb = len(a), len(b)
     # Pooled standard deviation (uses ddof=1 sample variances).
@@ -139,7 +121,6 @@ def cohens_d(a, b):
     var_b = b.var(ddof=1)
     s_pooled = np.sqrt(((na - 1) * var_a + (nb - 1) * var_b) / (na + nb - 2))
     return (a.mean() - b.mean()) / s_pooled
-
 
 d = cohens_d(treatment, control)
 
@@ -292,44 +273,6 @@ flowchart TD
 Let's verify it. We fix a true `d` of about 0.3 and watch what happens
 to the p-value versus the estimated `d` as `n` grows.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three panels with ever taller stacks of blue data dots: the green effect-size bar stays exactly the same height in every panel while the red p-value bar collapses to a sliver, more data sharpens the magnitude but makes significance nearly automatic"
-  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="56" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
-    <rect x="236" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
-    <rect x="416" y="24" width="168" height="152" rx="12" fillOpacity="0.08" />
-    <circle cx="118" cy="58" r="4.5" />
-    <circle cx="298" cy="58" r="4.5" />
-    <circle cx="310" cy="58" r="4.5" />
-    <circle cx="304" cy="48" r="4.5" />
-    <circle cx="478" cy="58" r="4.5" />
-    <circle cx="490" cy="58" r="4.5" />
-    <circle cx="502" cy="58" r="4.5" />
-    <circle cx="484" cy="48" r="4.5" />
-    <circle cx="496" cy="48" r="4.5" />
-    <circle cx="490" cy="38" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="96" y="110" width="26" height="48" rx="5" />
-    <rect x="276" y="110" width="26" height="48" rx="5" />
-    <rect x="456" y="110" width="26" height="48" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="136" y="82" width="26" height="76" rx="5" />
-    <rect x="316" y="122" width="26" height="36" rx="5" />
-    <rect x="496" y="150" width="26" height="8" rx="4" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="78" y="158" width="124" height="3" rx="1.5" />
-    <rect x="258" y="158" width="124" height="3" rx="1.5" />
-    <rect x="438" y="158" width="124" height="3" rx="1.5" />
-  </g>
-</svg>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -340,12 +283,10 @@ from scipy import stats
 
 rng = np.random.default_rng(123)
 
-
 def cohens_d(a, b):
     na, nb = len(a), len(b)
     sp = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 2))
     return (b.mean() - a.mean()) / sp
-
 
 # True effect is fixed: means 100 vs 103, sd = 10  ->  true d = 0.30.
 print(f"{'n per group':>12} | {'p-value':>10} | {'estimated d':>11}")
@@ -500,12 +441,10 @@ rng = np.random.default_rng(11)
 control = rng.normal(100, 15, size=120)
 treatment = rng.normal(106, 15, size=120)
 
-
 def cohens_d(a, b):
     na, nb = len(a), len(b)
     sp = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 2))
     return (b.mean() - a.mean()) / sp
-
 
 d = cohens_d(control, treatment)
 

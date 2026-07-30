@@ -1,12 +1,12 @@
 // Tiny input-hash cache shared by the content generator scripts
-// (build-search-index.mjs, build-svg-gallery-data.mjs), so unchanged-content
+// (build-search-index.mjs), so unchanged-content
 // runs skip their expensive scan/parse work entirely.
 //
 // A generator computes one sha256 over all of its input files (path +
 // bytes, sorted) and compares it to the hash stored on its previous run. On
 // a match — and only if every declared output still exists — the run is a
 // no-op. Manifests live under node_modules/.cache (same place
-// build-svg-gallery-data.mjs keeps its esbuild bundle): a fresh `npm ci`
+// build-search-index.mjs keeps its esbuild bundle): a fresh `npm ci`
 // wipes them, which just means the first run after an install regenerates,
 // exactly like before this cache existed.
 import { createHash } from "node:crypto";

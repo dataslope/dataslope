@@ -13,26 +13,14 @@ ten-day prototype into the substrate of modern software.
 
 In 1995, the web was young. Websites were static documents, text, images, and hyperlinks. Netscape Communications, riding high on the success of its Navigator browser, saw an opportunity: what if pages could *respond* to the user? What if forms could validate themselves before submission? What if you could build interactive experiences without waiting for a server round-trip?
 
-<IllustrationPrompt subject="Brendan Eich" photo />
-
 Netscape hired a programmer named **Brendan Eich** and gave him ten days to create a scripting language that would run inside the browser. The constraints were tight: it had to be easy to learn, forgiving, and fast to prototype. It had to appeal to amateur programmers, not just systems engineers. It had to complement Java, Netscape's bet for "serious" programming on the web.
 
 In May 1995, Eich delivered **Mocha** (soon renamed JavaScript), a small, dynamic language inspired by Scheme, Self, and Java. It was never meant to scale beyond a few hundred lines of form validation. It was a *prototype*, and it showed.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Geological cross-section: blue sediment layers laid down era by era thicken into a tall wedge, JavaScript growing far beyond its scripting-toy origins"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M40 202 L600 202 L600 182 C410 178 200 188 40 194 Z" fillOpacity="0.15" />
-    <path d="M90 190.5 C260 185 430 179 600 182 L600 160 C430 156 270 168 90 190.5 Z" fillOpacity="0.24" />
-    <path d="M160 184 C320 174 460 158 600 160 L600 136 C460 132 330 148 160 184 Z" fillOpacity="0.34" />
-    <path d="M240 172 C380 156 480 134 600 136 L600 110 C490 106 390 124 240 172 Z" fillOpacity="0.48" />
-    <path d="M330 158 C440 136 500 108 600 110 L600 82 C510 78 450 96 330 158 Z" fillOpacity="0.65" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-evolution-of-js-cutout"
+  alt="A tiny ten-day prototype block on a low plinth growing into a sprawling untidy tower of mismatched blocks beside it"
+/>
 
 ## The first decade: scripting toy to DOM workhorse
 
@@ -67,8 +55,6 @@ timeline
 ```
 
 ## Node.js and the explosion
-
-<IllustrationPrompt subject="Ryan Dahl" photo />
 
 In 2009, **Ryan Dahl** unveiled **Node.js** at JSConf EU. JavaScript could now run *outside* the browser, on the server, in build tools, in command-line utilities. Suddenly, JavaScript was a general-purpose language. npm (Node Package Manager) became the largest package ecosystem in the world. Developers built REST APIs, real-time chat servers, build pipelines, and desktop apps (Electron) in JavaScript.
 
@@ -130,47 +116,6 @@ function getUserDetails(id, includeOrders) {
 ```
 
 In JavaScript, the **50 call sites** scattered across your codebase still compile and run. They just pass `undefined` for the second argument. Some code paths work. Some don't. You won't know until a user reports a bug, or worse, until data gets corrupted silently.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="The blue function bar has grown a third yellow socket, but each gray caller card below still supplies only two blue pins, with the empty third slot ringed in red, call sites silently broken by a signature change"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="220" y="24" width="200" height="40" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="262" cy="44" r="7" />
-    <circle cx="312" cy="44" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="366" cy="44" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="90" y="110" width="120" height="44" rx="10" />
-    <rect x="260" y="110" width="120" height="44" rx="10" />
-    <rect x="430" y="110" width="120" height="44" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="120" cy="132" r="6" />
-    <circle cx="148" cy="132" r="6" />
-    <circle cx="290" cy="132" r="6" />
-    <circle cx="318" cy="132" r="6" />
-    <circle cx="460" cy="132" r="6" />
-    <circle cx="488" cy="132" r="6" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-  >
-    <circle cx="180" cy="132" r="6.5" />
-    <circle cx="350" cy="132" r="6.5" />
-    <circle cx="520" cy="132" r="6.5" />
-  </g>
-</svg>
 
 ## The search for safety
 

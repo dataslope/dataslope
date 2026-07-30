@@ -8,32 +8,10 @@ that knows its own length. **C is older than that idea.** In C, a
 string is just an array of `char` ending in the special "null
 character" `\0`.
 
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A row of character cells holding yellow dots, with the final cell holding a red square marked as the null terminator"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.08">
-    <rect x="120" y="60" width="56" height="56" rx="10" />
-    <rect x="182" y="60" width="56" height="56" rx="10" />
-    <rect x="244" y="60" width="56" height="56" rx="10" />
-    <rect x="306" y="60" width="56" height="56" rx="10" />
-    <rect x="368" y="60" width="56" height="56" rx="10" />
-    <rect x="430" y="60" width="56" height="56" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="148" cy="88" r="11" />
-    <circle cx="210" cy="88" r="11" />
-    <circle cx="272" cy="88" r="11" />
-    <circle cx="334" cy="88" r="11" />
-    <circle cx="396" cy="88" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="446" y="76" width="24" height="24" rx="6" />
-  </g>
-  <text x="458" y="150" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" textAnchor="middle" fill="currentColor" opacity="0.55">{"\\0"}</text>
-</svg>
+<Figure
+  slug="c-strings-cutout"
+  alt="Strings, an isometric illustration"
+/>
 
 This page is about how to think about that, and how not to shoot
 yourself in the foot.

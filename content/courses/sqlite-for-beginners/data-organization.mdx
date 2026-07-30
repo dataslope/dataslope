@@ -9,44 +9,10 @@ the opposite: splitting that big table into smaller, related ones so
 each fact is stored **once**. This page builds the intuition behind
 why that matters, the idea professionals call *normalization*.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A crammed reddish table holds the same yellow fact three times with one copy drifted red, while across from it three tidy cards each hold one solid fact and hang together by thin lines, organizing data gives every fact exactly one home"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="48" y="44" width="230" height="152" rx="12" fillOpacity="0.08" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="70" y="68" width="60" height="14" rx="7" />
-    <rect x="150" y="68" width="60" height="14" rx="7" />
-    <rect x="70" y="96" width="60" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="150" y="96" width="60" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="134" width="90" height="14" rx="7" />
-    <rect x="70" y="162" width="140" height="14" rx="7" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="446" y1="140" x2="410" y2="100" />
-    <line x1="498" y1="140" x2="534" y2="100" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="340" y="40" width="120" height="60" rx="10" fillOpacity="0.2" />
-    <rect x="362" y="62" width="76" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="480" y="40" width="120" height="60" rx="10" fillOpacity="0.15" />
-    <rect x="502" y="62" width="76" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="402" y="140" width="140" height="64" rx="10" fillOpacity="0.12" />
-    <rect x="426" y="164" width="92" height="16" rx="8" />
-  </g>
-</svg>
+<Figure
+  slug="lite-data-organization-cutout"
+  alt="One bloated grid platform with repeated identical cells beside three small tidy grids linked by short connector arrows"
+/>
 
 ## The problem: one big table
 

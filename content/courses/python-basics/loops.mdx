@@ -5,27 +5,12 @@ description: for, while, range, break, continue, and the for-else surprise
 
 Iteration is the engine of automation. Every batch job, every data pipeline, every web scraper, every game loop, every file processor, they all loop. Python has two looping constructs: `for` iterates over any iterable; `while` repeats while a condition holds true. Mastering loops means writing efficient, readable code that processes data at scale.
 
-Every snippet on this page runs in your browser, no setup required.
+<Figure
+  slug="python-basics-loops-cutout"
+  alt="The Dataslope marmot riding a cart around a looping isometric roller-coaster track"
+/>
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three green squares already filled, a blue square under the marker being handled now, and a dashed slot still waiting, while a thin gray loop line sweeps from the end of the row back to the start, a loop repeats until every item is done"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="120" y="60" width="44" height="44" rx="10" />
-    <rect x="196" y="60" width="44" height="44" rx="10" />
-    <rect x="272" y="60" width="44" height="44" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="348" y="60" width="44" height="44" rx="10" />
-    <polygon points="364.5,38 375.5,38 370,49" />
-  </g>
-  <rect x="424" y="60" width="44" height="44" rx="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="6 5" />
-  <path d="M446 118 C 446 160, 142 160, 142 133" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round" />
-  <polygon points="136.5,131 147.5,131 142,120" fill="var(--ds-gray-400)" />
-</svg>
+Every snippet on this page runs in your browser, no setup required.
 
 ## Real-world impact
 
@@ -356,7 +341,6 @@ Both `for` and `while` accept an `else:` block, which runs **only if the loop co
     else:
         print(f"{n} is prime")
 
-
 for n in [12, 13, 21, 29]:
     first_factor(n)
 `,
@@ -385,7 +369,6 @@ def first_factor_alt(n):
             break
     if not found:
         print(f"{n} is prime")
-
 
 for n in [12, 13]:
     first_factor_alt(n)

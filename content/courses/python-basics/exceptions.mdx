@@ -7,31 +7,10 @@ When something goes wrong, Python raises an **exception**. If nothing catches it
 
 Exceptions are Python's way of encoding **expected failure paths**: file not found, network down, invalid input, permission denied. They let you separate "happy path" logic from error handling.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A blue dot running along a thin line meets a red break, drops onto a soft green catch pad below, and the path continues along a thin gray arrow, an exception raised, caught by except, and the program moves on"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="70" y1="70" x2="302" y2="70" />
-    <line x1="326" y1="82" x2="352" y2="118" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="256" cy="70" r="10" />
-    <circle cx="360" cy="128" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="316" y="48" width="6" height="44" rx="3" transform="rotate(28 319 70)" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="308" y="140" width="144" height="30" rx="15" fillOpacity="0.25" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="462" y="153.5" width="84" height="3" rx="1.5" />
-    <polygon points="544,149.5 555,155 544,160.5" />
-  </g>
-</svg>
+<Figure
+  slug="python-basics-exceptions-cutout"
+  alt="A safety net catching a falling object mid-air, with a soft burst where it lands"
+/>
 
 ## What happens when exceptions are not handled?
 
@@ -49,11 +28,9 @@ If an exception is raised and **no** `try`/`except` catches it, Python does thre
       starterCode: `def divide(a, b):
     return a / b
 
-
 def main():
     result = divide(10, 0)
     print("result:", result)
-
 
 try:
     main()
@@ -154,7 +131,6 @@ Every exception is an object. You can inspect its type (`type(e)`), its message 
     except (TypeError, ZeroDivisionError) as e:
         return f"error: {type(e).__name__}: {e}"
 
-
 print(safe_div(10, 2))
 print(safe_div(10, 0))
 print(safe_div("10", 2))
@@ -202,7 +178,6 @@ finally:
         print("done with", repr(text))
     print()
 
-
 parse_int("42")
 parse_int("oops")
 `,
@@ -229,7 +204,6 @@ Use `raise` to signal an error from your own code. Use a specific built-in type 
     if amount > balance:
         raise ValueError(f"insufficient funds: balance={balance}, amount={amount}")
     return balance - amount
-
 
 print(withdraw(100, 30))
 try:
@@ -263,13 +237,11 @@ When you wrap a lower-level error in a higher-level one, use `from` to keep the 
       starterCode: `class ConfigError(Exception):
     pass
 
-
 def load_config(text):
     try:
         return int(text)
     except ValueError as e:
         raise ConfigError("bad config value") from e
-
 
 try:
     load_config("not a number")
@@ -301,7 +273,6 @@ Make your own exception types by subclassing `Exception` (or a more specific bui
       starterCode: `class InsufficientFundsError(Exception):
     """Raised when a withdrawal exceeds the available balance."""
 
-
 class Account:
     def __init__(self, balance):
         self.balance = balance
@@ -310,7 +281,6 @@ class Account:
         if amount > self.balance:
             raise InsufficientFundsError(f"requested {amount}, have {self.balance}")
         self.balance -= amount
-
 
 acct = Account(50)
 try:
@@ -471,14 +441,12 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
       starterCode: `class InsufficientFundsError(Exception):
     pass
 
-
 def withdraw(balance, amount):
     # your code here
     return balance
 `,
       solutionCode: `class InsufficientFundsError(Exception):
     pass
-
 
 def withdraw(balance, amount):
     if amount < 0:
@@ -570,7 +538,6 @@ For testing, assume a function that raises \`RateLimitError\` on the first \`n-1
       starterCode: `class RateLimitError(Exception):
     pass
 
-
 def retry_on_rate_limit(max_retries=3):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -583,7 +550,6 @@ def retry_on_rate_limit(max_retries=3):
 `,
       solutionCode: `class RateLimitError(Exception):
     pass
-
 
 def retry_on_rate_limit(max_retries=3):
     def decorator(func):

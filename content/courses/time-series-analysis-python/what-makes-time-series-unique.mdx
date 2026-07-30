@@ -9,44 +9,10 @@ have a date column.** It is a fundamentally different object, and almost
 every mistake beginners make comes from forgetting that. This page is the
 "why" the rest of the course rests on.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Eleven dots ride an ordered blue wave-band with the newest glowing yellow at its tip, while below the same eleven lie scattered with no shape and one stray dot flushed red, a time series is a sequence whose order carries the signal, and shuffling turns it into dust"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 64 80 C 100 56 130 56 166 80 C 202 104 232 104 268 80 C 304 56 334 56 370 80 C 406 104 436 104 472 80 C 508 56 538 56 574 80 L 574 94 C 538 70 508 70 472 94 C 436 118 406 118 370 94 C 334 70 304 70 268 94 C 232 118 202 118 166 94 C 130 70 100 70 64 94 Z" fillOpacity="0.16" />
-    <circle cx="64" cy="87" r="5" />
-    <circle cx="115" cy="69" r="5" />
-    <circle cx="166" cy="87" r="5" />
-    <circle cx="217" cy="105" r="5" />
-    <circle cx="268" cy="87" r="5" />
-    <circle cx="319" cy="69" r="5" />
-    <circle cx="370" cy="87" r="5" />
-    <circle cx="421" cy="105" r="5" />
-    <circle cx="472" cy="87" r="5" />
-    <circle cx="523" cy="69" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="574" cy="87" r="6.5" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="96" cy="170" r="5" />
-    <circle cx="141" cy="193" r="5" />
-    <circle cx="187" cy="159" r="5" />
-    <circle cx="243" cy="186" r="5" />
-    <circle cx="282" cy="166" r="5" />
-    <circle cx="372" cy="158" r="5" />
-    <circle cx="431" cy="189" r="5" />
-    <circle cx="469" cy="171" r="5" />
-    <circle cx="525" cy="161" r="5" />
-    <circle cx="560" cy="186" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="336" cy="197" r="5.5" />
-  </g>
-</svg>
+<Figure
+  slug="tsa-what-makes-unique-cutout"
+  alt="An ordered row of blocks on a rail with each block linked to the one before it, a shuffled loose pile of the same blocks beside it"
+/>
 
 ## What actually is a time series?
 
@@ -347,13 +313,11 @@ air = pd.Series(_passengers, index=idx, name="passengers")`,
       starterCode: `# A laughably simple forecaster: "next month = this month" (a naive forecast).
 # How good is it when order is intact vs destroyed?
 
-
 def naive_mae(series):
     s = series.reset_index(drop=True)
     pred = s.shift(1)  # predict each value with the previous one
     err = (s - pred).dropna()
     return float(np.mean(np.abs(err)))
-
 
 ordered_mae = naive_mae(air)
 shuffled_mae = naive_mae(air.sample(frac=1.0, random_state=3))
@@ -411,27 +375,6 @@ In every case the failure is the same: the order of the data was the most
 important variable, and it got thrown away, either by shuffling, or by an
 evaluation that pretended the future was available.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A gentle weekly traffic wave ripples beneath a green band of forecast comfort until one red spike erupts straight through it with alarm ticks flying, a model validated with a leaky split looks calm right up until the real future arrives unannounced"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="40" y="171" width="560" height="3" rx="1.5" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="50" y="118" width="540" height="20" rx="10" fillOpacity="0.16" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 50 158 C 62 158 70 134 82 134 C 94 134 102 158 114 158 C 126 158 134 134 146 134 C 158 134 166 158 178 158 C 190 158 198 134 210 134 C 222 134 230 158 242 158 C 254 158 262 134 274 134 C 286 134 294 158 306 158 C 318 158 326 134 338 134 C 350 134 358 158 370 158 C 382 158 390 134 402 134 C 414 134 422 158 434 158 L 434 170 L 50 170 Z" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path d="M 462 170 C 474 168 478 60 492 60 C 506 60 510 168 522 170 Z" fillOpacity="0.85" />
-    <rect x="470" y="40" width="4" height="13" rx="2" transform="rotate(-28 472 46)" />
-    <rect x="490" y="32" width="4" height="13" rx="2" />
-    <rect x="510" y="40" width="4" height="13" rx="2" transform="rotate(28 512 46)" />
-  </g>
-</svg>
-
 <Callout type="info" title="Where time series shows up in jobs">
 "Demand forecasting," "capacity planning," "anomaly detection on metrics,"
 "churn *timing*," "sensor / IoT analytics," and most of "operations
@@ -450,59 +393,6 @@ baseline.** Two are classic:
   one full season ago (`ŷₜ = yₜ₋ₘ`, with `m = 12` for monthly data with
   yearly seasonality). For strongly seasonal series, this is the baseline
   to beat.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Two thin arrows converge on tomorrow's yellow dot along a timeline of blue readings: a short blue hop from yesterday's value and a long green arc from the same month one year back, the naive and seasonal-naive baselines every real model must beat"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="44" y="162" width="556" height="3" rx="1.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-green-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M100 140 C 220 30, 460 30, 578 136" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="582,146 570,132 584,128" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M542 140 C 550 118, 566 116, 576 132" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="580,142 568,132 582,126" />
-    <circle cx="60" cy="150" r="4" />
-    <circle cx="140" cy="150" r="4" />
-    <circle cx="180" cy="150" r="4" />
-    <circle cx="220" cy="150" r="4" />
-    <circle cx="260" cy="150" r="4" />
-    <circle cx="300" cy="150" r="4" />
-    <circle cx="340" cy="150" r="4" />
-    <circle cx="380" cy="150" r="4" />
-    <circle cx="420" cy="150" r="4" />
-    <circle cx="460" cy="150" r="4" />
-    <circle cx="500" cy="150" r="4" />
-    <circle cx="540" cy="150" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="100" cy="150" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="584" cy="150" r="7.5" />
-  </g>
-</svg>
 
 If your fancy ARIMA can't beat "same as last year," the ARIMA is not
 adding value. Let's compute both baselines so the idea is concrete.
@@ -595,7 +485,6 @@ air = pd.Series(_passengers, index=idx, name="passengers")`,
     # TODO: correlate the series with itself shifted by 1 step.
     return None
 
-
 result = {
     "ordered": None,
     "shuffled": None,
@@ -605,7 +494,6 @@ print(result)
       solutionCode: `def lag1_autocorr(series):
     s = series.reset_index(drop=True)
     return float(s.corr(s.shift(1)))
-
 
 result = {
     "ordered": lag1_autocorr(air),

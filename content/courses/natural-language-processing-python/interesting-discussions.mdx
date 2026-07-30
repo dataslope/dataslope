@@ -9,29 +9,12 @@ search results. None of this history is required to *use* the tools, but it
 makes them stick, and it is genuinely good company. Here are the moments worth
 knowing, each tied to something you now understand.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two overlapping discussion cards, one blue, one green, each holding short text bars, meet at a solid yellow diamond spark on a thin gray diagonal, a back-and-forth exchange of ideas"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <line x1="100" y1="172" x2="560" y2="28" stroke="var(--ds-gray-300)" strokeWidth="2" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="36" width="220" height="80" rx="16" fillOpacity="0.1" />
-    <rect x="144" y="58" width="120" height="8" rx="4" fillOpacity="0.7" />
-    <rect x="144" y="76" width="86" height="8" rx="4" fillOpacity="0.45" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="300" y="92" width="220" height="80" rx="16" fillOpacity="0.12" />
-    <rect x="324" y="114" width="130" height="8" rx="4" fillOpacity="0.7" />
-    <rect x="324" y="132" width="92" height="8" rx="4" fillOpacity="0.45" />
-  </g>
-  <rect x="311" y="95" width="18" height="18" rx="5" fill="var(--ds-yellow-500)" transform="rotate(45 320 104)" />
-</svg>
+<Figure
+  slug="nlp-discussions-cutout"
+  alt="A row of six small commemorative platform plinths of increasing height, each carrying a different simple machine"
+/>
 
 ## 1950, Turing frames the goal
-
-<IllustrationPrompt subject="Alan Turing" photo />
 
 Before there were any tools, there was a target. In 1950 **Alan Turing** posed
 the "imitation game", now called the **Turing test**, asking whether a machine
@@ -61,8 +44,6 @@ just the clean example.
 </Callout>
 
 ## 1948, Shannon and the n-gram
-
-<IllustrationPrompt subject="Claude Shannon" photo />
 
 In 1948 **Claude Shannon** published "A Mathematical Theory of Communication",
 the paper that founded information theory. Tucked inside was an idea you met on
@@ -112,8 +93,6 @@ ran.
 
 ## 1966, ELIZA and the effect named after it
 
-<IllustrationPrompt subject="Joseph Weizenbaum" photo />
-
 At MIT in 1966, **Joseph Weizenbaum** wrote **ELIZA**, a program that imitated a
 Rogerian psychotherapist using nothing but simple pattern-matching and canned
 responses, spotting a keyword and reflecting it back as a question. It had no
@@ -132,7 +111,6 @@ then type a couple of sentences into the `inputs` list.
       filename: "main.py",
       starterCode: `import re
 
-
 def eliza_reply(text):
     text = text.lower().strip().rstrip(".!")
     # A few hand-written reflection rules, exactly ELIZA's style.
@@ -146,7 +124,6 @@ def eliza_reply(text):
     if m:
         return f"Tell me more about feeling {m.group(1)}."
     return "Please, go on."
-
 
 inputs = ["I need a break", "I am tired", "I feel stuck", "The weather is fine"]
 for line in inputs:
@@ -164,8 +141,6 @@ is precisely the warning the "What is NLP?" page raised: **processing** text and
 the first for the second.
 
 ## 1972, Spärck Jones and IDF
-
-<IllustrationPrompt subject="Karen Spärck Jones" photo />
 
 When you ran the TF-IDF page, you used a weighting introduced by **Karen Spärck
 Jones** in 1972. Her paper argued that a term's value for retrieval should grow

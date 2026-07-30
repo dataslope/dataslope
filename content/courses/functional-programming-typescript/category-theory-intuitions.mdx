@@ -8,48 +8,13 @@ Category theory has a fearsome reputation. The good news is that
 patterns daily, usually without naming them. This chapter gives
 you the names and, more importantly, the intuitions.
 
+<Figure
+  slug="fp-category-theory-cutout"
+  alt="Category theory intuitions, an isometric illustration"
+/>
+
 We'll keep all the code in plain TypeScript. No libraries, no
 Greek letters.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A square diagram: along the top a plain circle becomes a square, along the bottom the same circle inside a capsule becomes a square inside a capsule, with dotted arrows lifting one world into the other, the functor pattern"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="170" cy="60" r="14" />
-    <rect x="130" y="140" width="80" height="56" rx="16" fillOpacity="0.12" />
-    <circle cx="170" cy="168" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="438" y="46" width="28" height="28" rx="7" />
-    <rect x="412" y="140" width="80" height="56" rx="16" fillOpacity="0.12" />
-    <rect x="438" y="154" width="28" height="28" rx="7" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="230" cy="60" r="3" />
-    <circle cx="280" cy="60" r="3" />
-    <circle cx="330" cy="60" r="3" />
-    <circle cx="380" cy="60" r="3" />
-    <circle cx="230" cy="168" r="3" />
-    <circle cx="280" cy="168" r="3" />
-    <circle cx="330" cy="168" r="3" />
-    <circle cx="380" cy="168" r="3" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <polygon points="414,53 428,60 414,67" />
-    <polygon points="396,161 410,168 396,175" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="170" cy="94" r="3" />
-    <circle cx="170" cy="112" r="3" />
-    <polygon points="163,126 177,126 170,136" />
-    <circle cx="452" cy="94" r="3" />
-    <circle cx="452" cy="112" r="3" />
-    <polygon points="445,126 459,126 452,136" />
-  </g>
-</svg>
 
 ## A unifying observation
 

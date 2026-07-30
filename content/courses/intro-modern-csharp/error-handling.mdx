@@ -7,6 +7,11 @@ So far our programs have assumed everything works: files exist,
 inputs parse, math never overflows, networks never go down. Real
 programs aren't that lucky.
 
+<Figure
+  slug="mcs-error-handling-cutout"
+  alt="Error handling, an isometric illustration"
+/>
+
 C# splits "things that go wrong" into two camps:
 
 1. **Expected failures** that you can predict and check for, these
@@ -18,47 +23,6 @@ these use the **exception system**.
 
 The discipline of knowing which is which is most of what "good
 error handling" means.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A blue line of execution snaps at a red cross, drops into a green catching curve, and climbs back up to continue to a safe green end, an exception thrown, caught, and handled"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }}>
-    <circle cx="72" cy="80" r="9" fill="currentColor" />
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-      strokeOpacity="0.6"
-    >
-      <path d="M86 80 H 282" />
-      <path d="M462 92 H 544" />
-    </g>
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M294 68 L 318 92 M318 68 L 294 92"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <path
-      d="M306 100 C 330 158, 430 158, 456 100"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-      strokeOpacity="0.7"
-    />
-    <circle cx="560" cy="88" r="11" fill="currentColor" />
-  </g>
-</svg>
 
 ## Exceptions, the mechanism
 

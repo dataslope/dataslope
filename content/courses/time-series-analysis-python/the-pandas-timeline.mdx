@@ -11,39 +11,10 @@ weekly, roll a 7-day average, and, the quiet hero of this page,
 off-by-one error again. This page is about getting your data onto that
 timeline correctly.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Tilted scraps of date text drift above an evenly spaced timeline and rain down into clean blue dots, but one red scrap that will not parse leaves only a hollow ring on the spine, to_datetime turns messy strings into a DatetimeIndex, marking the unparseable as NaT"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
-    <rect x="70" y="40" width="64" height="12" rx="6" transform="rotate(-12 102 46)" />
-    <rect x="180" y="68" width="52" height="12" rx="6" transform="rotate(8 206 74)" />
-    <rect x="300" y="36" width="70" height="12" rx="6" transform="rotate(-5 335 42)" />
-    <rect x="430" y="60" width="56" height="12" rx="6" transform="rotate(14 458 66)" />
-    <rect x="512" y="40" width="48" height="12" rx="6" transform="rotate(-10 536 46)" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="214" y="98" width="58" height="13" rx="6.5" transform="rotate(4 243 104)" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="50" y="173" width="540" height="3" rx="1.5" />
-    <circle cx="86" cy="174" r="4" />
-    <circle cx="138" cy="174" r="4" />
-    <circle cx="190" cy="174" r="4" />
-    <circle cx="242" cy="174" r="4" />
-    <circle cx="294" cy="174" r="4" />
-    <circle cx="346" cy="174" r="4" />
-    <circle cx="450" cy="174" r="4" />
-    <circle cx="502" cy="174" r="4" />
-    <circle cx="554" cy="174" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="336" y="92" width="66" height="13" rx="6.5" transform="rotate(-16 369 98)" fillOpacity="0.85" />
-    <circle cx="398" cy="174" r="4.5" fill="none" stroke="currentColor" strokeWidth="2.5" />
-  </g>
-</svg>
+<Figure
+  slug="tsa-pandas-timeline-cutout"
+  alt="A calendar rail running along the edge of a grid platform, date plates slotted into it as the index rather than as a column"
+/>
 
 ## From strings to timestamps: `pd.to_datetime`
 
@@ -265,50 +236,6 @@ unlike normal Python slicing, which excludes the stop. That's deliberate:
 you asked for "through September," so you get September. This partial-string
 slicing is the single most convenient thing about a `DatetimeIndex`.
 
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A yellow selection frame with corner handles encloses a run of solid blue squares on the timeline while the squares outside it stay gray, partial-string slicing selects the whole span you name, inclusive of both ends"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="52" y="78" width="16" height="16" rx="4" />
-    <rect x="92" y="78" width="16" height="16" rx="4" />
-    <rect x="132" y="78" width="16" height="16" rx="4" />
-    <rect x="172" y="78" width="16" height="16" rx="4" />
-    <rect x="452" y="78" width="16" height="16" rx="4" />
-    <rect x="492" y="78" width="16" height="16" rx="4" />
-    <rect x="532" y="78" width="16" height="16" rx="4" />
-    <rect x="572" y="78" width="16" height="16" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="212" y="78" width="16" height="16" rx="4" />
-    <rect x="252" y="78" width="16" height="16" rx="4" />
-    <rect x="292" y="78" width="16" height="16" rx="4" />
-    <rect x="332" y="78" width="16" height="16" rx="4" />
-    <rect x="372" y="78" width="16" height="16" rx="4" />
-    <rect x="412" y="78" width="16" height="16" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }}>
-    <rect
-      x="200"
-      y="62"
-      width="240"
-      height="48"
-      rx="12"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="195" y="57" width="10" height="10" rx="3" />
-    <rect x="435" y="57" width="10" height="10" rx="3" />
-    <rect x="195" y="105" width="10" height="10" rx="3" />
-    <rect x="435" y="105" width="10" height="10" rx="3" />
-  </g>
-</svg>
-
 <MultipleChoice
   markdown={`With a \`DatetimeIndex\`, what does \`air.loc["1955-06":"1955-09"]\` return?
 
@@ -381,40 +308,6 @@ Grouping by `date.dt.month` already reveals the yearly seasonal shape,
 summer months tower over winter ones. We'll formalize that into a proper
 *seasonal component* later; for now, notice how `.dt` turns timestamps into
 ordinary grouping keys.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="One solid blue timestamp capsule fans out along three thin arrows into green, blue, and yellow tiles, the dt accessor splits a single datetime into calendar parts like year, month, and weekday"
-  style={{ display: "block", width: "100%", maxWidth: "540px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <path d="M206 100 L 300.6 48" />
-    <path d="M206 100 H 296" />
-    <path d="M206 100 L 300.6 152" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="295.3,45.6 300,57 306.3,46.4" />
-    <polygon points="310,100 296,93 296,107" />
-    <polygon points="306.3,153.6 300,143 295.3,154.4" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="82" width="130" height="36" rx="18" />
-    <rect x="322" y="87" width="72" height="26" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="322" y="30" width="72" height="26" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="322" y="144" width="72" height="26" rx="9" />
-  </g>
-</svg>
 
 ## Timestamp vs Period: a point versus a span
 

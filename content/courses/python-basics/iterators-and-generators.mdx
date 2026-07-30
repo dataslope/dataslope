@@ -5,34 +5,10 @@ description: The iterator protocol, yield, and lazy evaluation
 
 Every `for` loop in Python is powered by the **iterator protocol**. Understanding it unlocks generators, infinite sequences, and memory-efficient pipelines that power everything from streaming giant log files to building data processing frameworks.
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="A blue capsule crowded with pale dots releases through a small slot onto a thin gray arrow, where solid green dots line up one after another, an iterator hands over one value per next call and keeps the rest waiting"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="45" width="190" height="100" rx="18" fillOpacity="0.1" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
-    <circle cx="110" cy="80" r="8" />
-    <circle cx="150" cy="70" r="8" />
-    <circle cx="190" cy="88" r="8" />
-    <circle cx="120" cy="115" r="8" />
-    <circle cx="170" cy="112" r="8" />
-  </g>
-  <rect x="254" y="78" width="8" height="34" rx="4" fill="var(--ds-gray-300)" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="272" y="93.5" width="46" height="3" rx="1.5" />
-    <polygon points="316,89.5 327,95 316,100.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="352" cy="95" r="9" />
-    <circle cx="404" cy="95" r="9" />
-    <circle cx="456" cy="95" r="9" />
-    <circle cx="508" cy="95" r="9" />
-  </g>
-</svg>
+<Figure
+  slug="python-basics-iterators-cutout"
+  alt="A hand-cranked dispenser releasing one cube at a time onto a short track"
+/>
 
 <Callout type="info" title="Real-world impact">
 Iterators and generators are everywhere in production Python. They enable streaming HTTP responses without loading gigabytes into RAM, processing database result sets one row at a time, tailing logs indefinitely, and building lazy data pipelines with `itertools`. Mastering them means writing code that scales.
@@ -132,7 +108,6 @@ If you need complex state, write your own iterator with `__iter__` and `__next__
         self.current -= 1
         return self.current + 1
 
-
 for n in Countdown(5):
     print(n)
 `,
@@ -155,7 +130,6 @@ Writing `__iter__` and `__next__` by hand is tedious. A function that uses `yiel
     while n > 0:
         yield n
         n -= 1
-
 
 for x in countdown(5):
     print(x)
@@ -185,7 +159,6 @@ Here's proof that local variables survive across `yield` calls:
         count += 1
         yield f"call {count}"
 
-
 gen = stateful()
 print(next(gen))
 print(next(gen))
@@ -211,7 +184,6 @@ Generators can run forever. You take as much as you need and stop:
     while True:
         yield n
         n += 1
-
 
 from itertools import islice
 
@@ -275,18 +247,15 @@ Generators chain naturally. Each stage processes one item at a time:
     for line in ["alpha", "  beta  ", "", "gamma", "  ", "delta", "zeta"]:
         yield line
 
-
 def clean(stream):
     for line in stream:
         cleaned = line.strip()
         if cleaned:
             yield cleaned
 
-
 def uppercase(stream):
     for line in stream:
         yield line.upper()
-
 
 # Compose the pipeline
 pipeline = uppercase(clean(read_lines()))
@@ -316,7 +285,6 @@ In production, you might chain generators to process log files too large for RAM
       starterCode: `def chain(*iterables):
     for it in iterables:
         yield from it
-
 
 for x in chain([1, 2], (3, 4), "ab"):
     print(x)
@@ -397,7 +365,6 @@ Once exhausted, a generator cannot be restarted:
       starterCode: `def gen():
     yield 1
     yield 2
-
 
 g = gen()
 print(list(g))  # [1, 2]

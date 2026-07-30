@@ -12,31 +12,15 @@ number on a held-out set tells you *that* the model is good. It does not
 tell you *how* the model thinks, and for most real decisions, that second
 question matters just as much.
 
+<Figure
+  slug="ml-model-interpretation-cutout"
+  alt="Model interpretation and feature importance, an isometric illustration"
+/>
+
 This page is about **interpretation**, opening the box and asking a
 trained model which features it leaned on, and how much. You will learn the
 three most common ways to do this in scikit-learn, and, just as important,
 the ways each one can quietly mislead you.
-
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="A translucent model box pours out horizontal bars of sharply decreasing length, the longest glowing green, feature importance asks a trained model which inputs it actually leaned on"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="62" width="120" height="96" rx="18" fillOpacity="0.15" />
-    <circle cx="140" cy="110" r="16" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="260" y="46" width="280" height="20" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="260" y="78" width="200" height="20" rx="10" fillOpacity="0.6" />
-    <rect x="260" y="110" width="130" height="20" rx="10" fillOpacity="0.45" />
-    <rect x="260" y="142" width="76" height="20" rx="10" fillOpacity="0.3" />
-    <rect x="260" y="174" width="38" height="20" rx="10" fillOpacity="0.2" />
-  </g>
-</svg>
 
 ## Why interpretability matters
 

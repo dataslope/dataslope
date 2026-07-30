@@ -9,48 +9,10 @@ left-to-right and y bottom-to-top, without naming it. Making it an
 explicit component unlocks zooming, aspect-ratio control, and (next
 page) entirely different chart shapes.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A faint Cartesian grid with axis arrows and one highlighted point dropping dotted projection lines to its x and y addresses"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.08">
-    <rect x="159" y="40" width="2" height="140" />
-    <rect x="239" y="40" width="2" height="140" />
-    <rect x="319" y="40" width="2" height="140" />
-    <rect x="399" y="40" width="2" height="140" />
-    <rect x="479" y="40" width="2" height="140" />
-    <rect x="92" y="69" width="440" height="2" />
-    <rect x="92" y="109" width="440" height="2" />
-    <rect x="92" y="149" width="440" height="2" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <rect x="88" y="180" width="452" height="4" rx="2" />
-    <polygon points="540,174 540,190 558,182" />
-    <rect x="88" y="38" width="4" height="146" rx="2" />
-    <polygon points="82,42 98,42 90,26" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="400" cy="96" r="2.5" />
-    <circle cx="400" cy="122" r="2.5" />
-    <circle cx="400" cy="148" r="2.5" />
-    <circle cx="364" cy="70" r="2.5" />
-    <circle cx="328" cy="70" r="2.5" />
-    <circle cx="292" cy="70" r="2.5" />
-    <circle cx="256" cy="70" r="2.5" />
-    <circle cx="220" cy="70" r="2.5" />
-    <circle cx="184" cy="70" r="2.5" />
-    <circle cx="148" cy="70" r="2.5" />
-    <circle cx="112" cy="70" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="400" cy="70" r="16" fillOpacity="0.15" />
-    <circle cx="400" cy="70" r="9" />
-    <circle cx="400" cy="182" r="5" />
-    <circle cx="90" cy="70" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="gg-cartesian-cutout"
+  alt="A flat gridded plane on a platform with a viewing frame hovering above it, cropping a smaller region of the grid"
+/>
 
 ## The default: Cartesian
 

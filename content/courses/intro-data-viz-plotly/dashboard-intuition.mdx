@@ -8,60 +8,14 @@ usually arranged in a grid, usually meant to be glanced at
 quickly. The word originally came from cars: an instrument panel
 of dials and gauges meant to be readable at speed.
 
+<Figure
+  slug="viz-dashboard-intuition-cutout"
+  alt="Dashboard intuition, an isometric illustration"
+/>
+
 Dashboards are *everywhere* in modern business. Most are bad.
 This page is about what makes a dashboard work, and what makes
 it fail.
-
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="An instrument panel of three tiles, a gauge with a needle, a big number, and a sparkline, with traffic-light status dots, made to be read at a glance"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="80" y="35" width="480" height="190" rx="14" fill="currentColor" opacity="0.06" />
-  <rect x="96" y="50" width="200" height="12" rx="6" fill="currentColor" opacity="0.2" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="500" cy="56" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="520" cy="56" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="540" cy="56" r="5" />
-  </g>
-  <g fill="currentColor" opacity="0.07">
-    <rect x="96" y="80" width="140" height="120" rx="10" />
-    <rect x="252" y="80" width="140" height="120" rx="10" />
-    <rect x="408" y="80" width="140" height="120" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
-    <circle cx="126" cy="170" r="3.5" />
-    <circle cx="131.4" cy="150" r="3.5" />
-    <circle cx="146" cy="135.4" r="3.5" />
-    <circle cx="166" cy="130" r="3.5" />
-    <circle cx="186" cy="135.4" r="3.5" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="200.6" cy="150" r="3.5" />
-    <circle cx="206" cy="170" r="3.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="163" y="136" width="6" height="38" rx="3" transform="rotate(48 166 172)" />
-  </g>
-  <g fill="currentColor" opacity="0.65" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="40" textAnchor="middle">
-    <text x="322" y="155">42</text>
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
-    <circle cx="430" cy="172" r="4" />
-    <circle cx="452" cy="152" r="4" />
-    <circle cx="474" cy="160" r="4" />
-    <circle cx="496" cy="132" r="4" />
-    <circle cx="518" cy="142" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="535" cy="118" r="5" />
-  </g>
-</svg>
 
 ## What dashboards are for
 

@@ -79,6 +79,216 @@ background is needed. In code, reference these via the CSS variables
 
 ---
 
+## Illustrations
+
+How course and interview illustrations get made. Both API keys
+(`OPENAI_API_KEY`, `KIE_API_KEY`) are already present as environment variables
+in Claude Code sessions; do not ask for them and never write them into a file.
+
+### The pipeline
+
+> **Runbook:** `agent-outputs/20260730-1200-illustration-pipeline-handoff.md` is the
+> operational companion to this section — measured costs, every gotcha that has cost
+> real time, prompt-writing guidance, the course id-prefix registry, and copy-paste
+> audits. Read it before a large run.
+
+Five steps, four scripts. Candidates live in R2 until someone picks the
+keepers; only the keepers reach git.
+
+1. **Author** the prompt in `data/illustration-prompts.json` (one source of
+   truth: the `/illustration-prompts` gallery, the in-lesson `<Figure>`, and
+   every script read it). `lesson` must equal the MDX file stem.
+2. **Generate** — `scripts/generate-illustrations.mjs`, OpenAI `gpt-image-2`,
+   **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
+3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
+   `remove-background` through Kie AI. Writes a `-cutout` beside each original.
+   **Never skip this on a regeneration:** pages reference the `-cutout` slug, and
+   promotion silently promotes only the original if no cut-out exists, leaving the
+   page serving the old image.
+4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
+   candidates to WebP straight into `public/images/`, the files the site
+   serves, and runs `build-images` to record their dimensions.
+5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
+   across a course, clears retired slugs, and is idempotent. Always `--dry-run`
+   first.
+
+```bash
+# Bulk run: candidates land in R2 under one run id, promote only the keepers.
+# Use submit/status/download, not `run` — a long batch can outlive the process.
+node scripts/generate-illustrations.mjs dry-run --only "$IDS"   # cost, no API calls
+node scripts/generate-illustrations.mjs submit  --only "$IDS" --sink r2 --run 2026-08-foo
+node scripts/generate-illustrations.mjs status
+node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-foo
+node scripts/remove-background-kie.mjs --from r2 --run 2026-08-foo --concurrency 8
+node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-foo
+node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
+  node scripts/wire-course-figures.mjs <course-dir>
+
+# Local run: everything on disk, nothing touches R2. Fine for one or two images.
+node scripts/generate-illustrations.mjs run
+node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
+node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
+```
+
+All four API keys are already environment variables in Claude Code sessions:
+`OPENAI_API_KEY` and `KIE_API_KEY`. The R2 variables
+(`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
+`R2_BUCKET=dataslope-illustrations`) are only needed for `--sink r2` /
+`--from r2`; without them, stick to the disk flow, which is fully functional.
+
+### Illustrations are encoded once, into `public/images/`
+
+`promote-illustrations.mjs` writes `public/images/<id>.webp` at quality 92 and
+that file **is** what browsers download. Do not commit PNG sources, and do not
+put a copy under `assets/images/`: that directory is reserved for raster that
+does *not* come from this pipeline (a photo, a screenshot, a scanned diagram),
+which `build-images` re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.
+It currently holds no sources at all — every served image comes from the
+pipeline.
+
+Two reasons promotion skips `assets/images/`:
+
+- **Quality.** Routing an illustration through both encoders is a double lossy
+  pass. Measured: promote-q92 → build-q80 lands at **35.58 dB PSNR** against the
+  PNG original, while a single q80 encode of the same image is **37.41 dB**. The
+  second pass cost ~1.8 dB to save ~3 kB.
+- **Size.** A source in `assets/` plus its two build outputs in `public/` means
+  every illustration is in git roughly three times.
+
+Illustrations therefore carry `formats: ["webp"]` in the manifest, so `<Figure>`
+renders a bare `<img>` — no `<source>`, no fallback file. WebP has been
+universally supported since 2020. Every entry in the manifest is single-format
+today; the two-format path only comes back if someone adds a raster source under
+`assets/images/`. Measured on the Python Basics batch, a 1536x1024 illustration
+is ~1.4 MB as PNG and ~130 kB as WebP.
+
+Pristine PNGs stay in R2 for the retention window, so a run can be re-promoted
+at a different quality without regenerating. Bump `ENCODER_VERSION` in
+`build-images.mjs` when encoder settings change; it invalidates every cached
+hash and forces a one-time re-encode.
+
+**Never leave both `<id>.png` and `<id>.webp` in `assets/images/`** — they
+slugify to the same manifest key and collide.
+
+### R2 (candidate storage)
+
+Bucket `dataslope-illustrations`, keys
+`illustrations/<runId>/<promptId>/v<n>/{original,cutout}.png`. Run-scoped so a
+whole run is one prefix delete, and so a lifecycle rule can expire candidates
+without bookkeeping. Candidates stay PNG in R2 (pristine, re-processable);
+only the promoted copy is WebP.
+
+There is no D1 table and no Worker binding for this bucket by design: the
+scripts are authoring tools that talk to the S3 API directly (SigV4 in
+`scripts/lib/r2.mjs`, no AWS SDK), so content authoring stays decoupled from
+deploying the app.
+
+Candidates expire after **14 days**, applied by
+`.github/workflows/r2-illustrations-lifecycle.yml` (run it via
+workflow_dispatch, or it re-applies on push when the retention window is
+edited). Cloudflare does the deleting server-side, so nothing polls. That is
+the review window: generate, review in `/illustration-prompts`, promote the
+keepers inside a fortnight. Promotion writes its own encoded copy into
+`public/images/`, so an expired candidate that was already promoted still
+serves fine — what you lose is the pristine PNG, and with it the ability to
+re-promote at a different quality without paying to regenerate.
+
+**The rule is not applied until this workflow runs at least once.** It has
+never run (the file has to be on `main` before `workflow_dispatch` appears),
+so nothing has expired yet and the bucket keeps every run. Trigger it once
+after merging, or candidates accumulate indefinitely.
+
+The same R2 credentials back the Actions workflows and the local scripts
+(`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, already repository secrets for
+`r2-cache-cleanup.yml`). The token needs Object Read & Write covering
+`dataslope-illustrations`.
+
+### Non-negotiables
+
+**Quality `low`.** Image output tokens dominate the bill and the tiers are far
+apart. Measured on `gpt-image-2`: a 1536x1024 image is **158 output tokens at
+`low`** vs 1372 at `medium` and 5488 at `high`. At Batch pricing ($15 / 1M
+output tokens) 1000 images is ~$2.37 at `low` and ~$82 at `high`. `low` is
+visibly fine for this material. Never leave quality at `auto` — it picks its
+own tier per prompt, costing ~2x `low` with no control.
+
+**Size `1536x1024`** unless there is a specific reason otherwise. It is also
+the cheaper option: 158 tokens vs 196 for `1024x1024` at the same quality.
+
+**Batch API, always.** Half price, and a 20-image job returns in well under a
+minute in practice despite the 24h window. The generator chunks into
+`--batch-size` jobs and streams each output file — do not "simplify" that away:
+images come back as inline base64 (~3.6 MB per 1024px PNG), so a 1000-image
+batch would build a ~3.6 GB string and blow V8's ~512 MB string cap.
+
+### Style
+
+**Isometric illustration is the house style.** It survived every test: clean
+subject isolation, reads on both page backgrounds, and cuts out reliably.
+Default to it — it is also the literal default (`DEFAULT_STYLE` in
+`lib/illustrationPrompt.ts` and `meta.defaultStyle` in the JSON), so a prompt
+that omits `style` gets it automatically.
+
+**Every other style is retired.** Risograph, flat geometric vector, line art,
+blueprint schematic and cut-paper collage were all tried and dropped: the
+monochrome ones (line art, blueprint) only read against one page background
+once the background is removed, and the busy ones (risograph scenes) have no
+isolable subject to cut out. Hand-authored inline `<svg>` graphics are retired
+in the same move — the `/svg-gallery` page that catalogued them is gone.
+
+Do not reintroduce a second style "just for this one". A mixed set is what
+made the first pass unusable.
+
+**Always render in the brand palette** (the four primaries above). This is not
+only aesthetic: see the transparency constraint below.
+
+### Background removal
+
+Recraft `remove-background` via Kie AI. It beat both Replicate's
+`851-labs/background-remover` and a local colour-key: it isolates a subject out
+of a full-bleed scene rather than dissolving the frame into a ghost matte.
+
+Two API details that will otherwise cost an hour:
+
+- **The model input takes a public URL only** — no base64, no data URI. Upload
+  the PNG to Kie's own file endpoint first
+  (`https://kieai.redpandaai.co/api/file-base64-upload`, free, auto-deleted
+  after 24h) and pass the returned `downloadUrl`.
+- **Both Kie hosts sit behind Cloudflare and reject a request with no browser
+  `User-Agent`**, returning a bare 403 with `error code: 1010`. It reads like
+  an auth failure and is not.
+
+**Kie caps an account at 20 new generation requests per 10 seconds**, and
+rejects the excess with 429 *without queueing it*. `remove-background-kie.mjs`
+admits `createTask` through a shared sliding-window limiter at 18 per 10s, so
+`--concurrency` can be raised freely; a 429 waits out a whole window rather
+than backing off briefly, because the request was dropped, not held.
+
+Flow: upload → `POST https://api.kie.ai/api/v1/jobs/createTask` with
+`{"model": "recraft/remove-background", "input": {"image": "<url>"}}` → poll
+`GET https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…` until
+`state` is `success`, then read `resultJson.resultUrls[0]`. ~1 credit, ~3s each.
+
+**`gpt-image-2` cannot emit transparency itself.** The API rejects
+`background: "transparent"`, and asking for it in the prompt makes the model
+paint a fake checkerboard as real pixels. Removal is always a second step.
+
+### The transparency constraint
+
+Removing the background strips the white field that was making single-tone
+artwork legible. A monochrome cut-out only reads against one of the two page
+backgrounds — black linework is crisp on `#ffffff` and nearly invisible on
+`#121212`. No background remover can fix this; the fix is upstream.
+
+**So: any illustration meant to run transparent must be drawn in the brand
+colours, never in black, white, or a single hue.** Polychrome subjects survive
+both themes; monochrome ones do not.
+
+Check both themes with the toggle on `/illustration-prompts`, which renders
+each cut-out over the live page background for exactly this reason.
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.

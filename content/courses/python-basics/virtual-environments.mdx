@@ -5,31 +5,10 @@ description: Isolating dependencies with venv, installing packages with pip, and
 
 A Python install ships with a small standard library. Anything beyond that, NumPy, requests, Flask, pandas, comes from **PyPI**, the Python Package Index. You install packages with **`pip`** and you keep projects from stepping on each other's toes with **virtual environments**.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two rooms hold their own copies of the same packages, the blue circle small in one and much larger in the other, the yellow dot present only on the left, with a solid wall between them: each project keeps its own isolated installs"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="40" width="210" height="130" rx="16" fillOpacity="0.1" />
-    <circle cx="130" cy="105" r="14" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="190" y="90" width="26" height="26" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="238" cy="140" r="8" />
-  </g>
-  <rect x="316" y="40" width="8" height="130" rx="4" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="360" y="40" width="210" height="130" rx="16" fillOpacity="0.1" />
-    <rect x="490" y="92" width="26" height="26" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="430" cy="105" r="22" />
-  </g>
-</svg>
+<Figure
+  slug="python-basics-virtual-environments-cutout"
+  alt="Three sealed glass terrariums on a low bench, each holding a differently coloured plant"
+/>
 
 <Callout type="warn" title="Never pip install into system Python">
 Without a virtual environment, \`pip install\` modifies your global Python installation. Two projects that need different versions of the same package cannot coexist. Worse, you risk breaking system tools that depend on specific versions. Every Python developer uses virtual environments. No exceptions.

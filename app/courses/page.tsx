@@ -7,7 +7,6 @@ import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import { getCourseCatalog } from "@/lib/courseCatalog";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { CoursesCatalog } from "./_components/CoursesCatalog";
@@ -56,12 +55,9 @@ export default async function CoursesPage() {
         <main className="mx-auto w-full max-w-[1120px] px-4 pt-12 sm:px-6 sm:pt-16">
           {/* Centered heading, matching the /pricing page's title block. */}
           <div className="mx-auto max-w-2xl text-center">
-            <SparklesText
-              as="h1"
-              className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-            >
+            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
               Free Courses
-            </SparklesText>
+            </h1>
             <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
               Hands-on, browser-based tracks across data and engineering. Every
               lesson runs live, no setup, no sign-up.

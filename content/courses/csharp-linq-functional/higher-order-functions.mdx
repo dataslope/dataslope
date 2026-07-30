@@ -6,6 +6,11 @@ description: Functions that take functions, return functions, or both, and why t
 A **higher-order function** (HOF) is a function that does at least
 one of these two things:
 
+<Figure
+  slug="cs-higher-order-functions-cutout"
+  alt="Higher-order functions, an isometric illustration"
+/>
+
 1. **Takes another function as an argument.**
 2. **Returns a function as its result.**
 
@@ -16,54 +21,6 @@ predicate) as a parameter.
 
 This page is about why that idea is so powerful, and how to wield it
 in everyday C#.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A small yellow box, itself a function, drops through the slot of a larger blue machine, which emits a green box carrying a yellow core"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <path
-    d="M104 125 H 158"
-    fill="none"
-    stroke="var(--ds-gray-400)"
-    strokeWidth="2"
-    strokeLinecap="round"
-   
-  />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="125" r="8" />
-    <rect x="240" y="70" width="160" height="110" rx="20" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="296" y="62" width="48" height="14" rx="7" />
-  </g>
-  <path
-    d="M320 50 V 58"
-    fill="none"
-    stroke="var(--ds-gray-400)"
-    strokeWidth="2"
-    strokeLinecap="round"
-   
-  />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="306" y="16" width="28" height="28" rx="8" />
-  </g>
-  <path
-    d="M406 125 H 446"
-    fill="none"
-    stroke="var(--ds-gray-400)"
-    strokeWidth="2"
-    strokeLinecap="round"
-   
-  />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="456" y="104" width="42" height="42" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="477" cy="125" r="9" />
-  </g>
-</svg>
 
 ## The pattern before the name
 

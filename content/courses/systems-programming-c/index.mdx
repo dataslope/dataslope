@@ -3,17 +3,17 @@ title: Welcome
 description: A hands-on, browser-based tour of systems programming and memory management in C
 ---
 
-<Figure
-  slug="cpu"
-  alt="A CPU chip, the processor whose behavior systems C code controls directly"
-  priority
-/>
-
 Welcome to **Systems Programming &amp; Memory Management in C**, a course
 that takes you from your very first `int main(void)` all the way to
 hand-rolled memory allocators, structs with carefully chosen padding,
 and the kinds of memory bugs that have powered half the CVEs of the
 last forty years.
+
+<Figure
+  slug="systems-programming-c-thumbnail-cutout"
+  alt="A cutaway of stacked memory layers with a small crane lifting one block out of the heap"
+  priority
+/>
 
 C is the lingua franca of systems software. Operating system kernels,
 databases, language runtimes (CPython, V8, the JVM, Go's runtime),
@@ -60,47 +60,6 @@ is how the whole course works: the prose explains an idea, a code
 block makes it concrete, and you are expected to poke at it. The
 pages where you break things on purpose, and there will be several,
 are where C actually sinks in.
-
-<svg
-  viewBox="0 0 640 280"
-  role="img"
-  aria-label="Isometric tower of a process address space: read-only code bedrock at the base, a globals floor above it, a green heap floor holding allocated blocks, and a stack floor of trays on top"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.18">
-    <rect x="86" y="60" width="10" height="3" rx="1.5" />
-    <rect x="86" y="86" width="10" height="3" rx="1.5" />
-    <rect x="86" y="112" width="10" height="3" rx="1.5" />
-    <rect x="86" y="138" width="10" height="3" rx="1.5" />
-    <rect x="86" y="164" width="10" height="3" rx="1.5" />
-    <rect x="86" y="190" width="10" height="3" rx="1.5" />
-    <rect x="86" y="216" width="10" height="3" rx="1.5" />
-    <rect x="86" y="242" width="10" height="3" rx="1.5" />
-  </g>
-  <g fill="currentColor">
-    <path d="M145 228 L310 262 L475 228 L475 242 L310 276 L145 242 Z" opacity="0.22" />
-    <path d="M145 228 L310 194 L475 228 L310 262 Z" opacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M145 192 L310 226 L475 192 L475 206 L310 240 L145 206 Z" fillOpacity="0.38" />
-    <path d="M145 192 L310 158 L475 192 L310 226 Z" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M145 154 L310 188 L475 154 L475 168 L310 202 L145 168 Z" fillOpacity="0.45" />
-    <path d="M145 154 L310 120 L475 154 L310 188 Z" fillOpacity="0.25" />
-    <path d="M222 146 L250 158 L278 146 L278 153 L250 165 L222 153 Z" fillOpacity="0.6" />
-    <path d="M222 146 L250 134 L278 146 L250 158 Z" fillOpacity="0.9" />
-    <path d="M316 152 L340 162 L364 152 L364 159 L340 169 L316 159 Z" fillOpacity="0.6" />
-    <path d="M316 152 L340 142 L364 152 L340 162 Z" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M145 66 L310 100 L475 66 L475 80 L310 114 L145 80 Z" fillOpacity="0.5" />
-    <path d="M145 66 L310 32 L475 66 L310 100 Z" fillOpacity="0.32" />
-    <path d="M270 60 L310 76 L350 60 L310 44 Z" fillOpacity="0.65" />
-    <path d="M282 47 L310 58 L338 47 L310 36 Z" fillOpacity="0.9" />
-  </g>
-</svg>
-
 ## What you will learn
 
 Each page mixes prose with three kinds of interactive widgets:

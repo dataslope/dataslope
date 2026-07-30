@@ -8,48 +8,10 @@ We have hinted at how tables connect: an order stores a customer's
 the mechanism that makes the relational model relational. This page
 makes it concrete.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Each order row carries a colored key dot that matches one customer's key color, except a red orphan dot that points at no one"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.07">
-    <rect x="80" y="40" width="180" height="130" rx="12" />
-    <rect x="380" y="28" width="180" height="164" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="106" cy="70" r="7" />
-    <circle cx="404" cy="56" r="7" fillOpacity="0.85" />
-    <circle cx="404" cy="128" r="7" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="106" cy="105" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="106" cy="140" r="7" />
-    <circle cx="404" cy="92" r="7" fillOpacity="0.85" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="124" y="66" width="110" height="8" rx="4" />
-    <rect x="124" y="101" width="110" height="8" rx="4" />
-    <rect x="124" y="136" width="110" height="8" rx="4" />
-    <rect x="422" y="52" width="120" height="8" rx="4" />
-    <rect x="422" y="88" width="120" height="8" rx="4" />
-    <rect x="422" y="124" width="120" height="8" rx="4" />
-    <rect x="422" y="160" width="120" height="8" rx="4" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <polygon points="316,50 316,62 304,56" />
-    <polygon points="316,86 316,98 304,92" />
-    <polygon points="316,122 316,134 304,128" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="404" cy="164" r="7" fillOpacity="0.45" />
-    <circle cx="350" cy="164" r="3" fillOpacity="0.3" />
-    <circle cx="334" cy="164" r="3" fillOpacity="0.18" />
-  </g>
-</svg>
+<Figure
+  slug="sql-foreign-keys-cutout"
+  alt="Foreign keys, an isometric illustration"
+/>
 
 ## A foreign key is a pointer to a primary key
 

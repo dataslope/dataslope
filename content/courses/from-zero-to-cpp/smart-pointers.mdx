@@ -8,6 +8,11 @@ Raw `new`/`delete` are easy to get wrong. The standard library's
 delete it automatically. Once you internalize them, you almost
 never write `delete` again.
 
+<Figure
+  slug="cpp-smart-pointers-cutout"
+  alt="Smart pointers, an isometric illustration"
+/>
+
 There are three to know:
 
 - `std::unique_ptr<T>`, exclusive owner. Lightweight, free of
@@ -16,48 +21,6 @@ There are three to know:
   hold the same object; the last one to die deletes it.
 - `std::weak_ptr<T>`, non-owning observer of a `shared_ptr`. Used
   to break cycles or watch an object without keeping it alive.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three panels: one dot firmly tied to its green box, three dots sharing one box with a count badge of three, and a faint dot watching a box through a barely-there dotted line, unique, shared, and weak ownership"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.08">
-    <rect x="211" y="30" width="4" height="170" rx="2" />
-    <rect x="424" y="30" width="4" height="170" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="106" cy="56" r="11" />
-    <rect x="103" y="74" width="6" height="58" rx="3" fillOpacity="0.5" />
-    <circle cx="270" cy="50" r="9" />
-    <circle cx="320" cy="40" r="9" />
-    <circle cx="370" cy="50" r="9" />
-    <circle cx="533" cy="50" r="9" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="86" y="138" width="40" height="40" rx="10" />
-    <rect x="300" y="138" width="40" height="40" rx="10" />
-    <rect x="513" y="138" width="40" height="40" rx="10" />
-  </g>
-  <g fill="currentColor" opacity="0.35">
-    <circle cx="282" cy="78" r="3" />
-    <circle cx="296" cy="106" r="3" />
-    <circle cx="320" cy="72" r="3" />
-    <circle cx="320" cy="102" r="3" />
-    <circle cx="358" cy="78" r="3" />
-    <circle cx="344" cy="106" r="3" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <circle cx="533" cy="78" r="2.5" />
-    <circle cx="533" cy="100" r="2.5" />
-    <circle cx="533" cy="122" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
-    <circle cx="354" cy="132" r="11" />
-  </g>
-  <text x="354" y="137" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="14" fontWeight="700" textAnchor="middle" style={{ fill: "var(--ds-white)" }}>3</text>
-</svg>
 
 ## `std::unique_ptr`: one owner, no overhead
 

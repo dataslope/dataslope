@@ -19,26 +19,10 @@ This page covers the two tools that handle these cases:
 Both are one-liners in `scipy.stats`. As always, the value is in picking
 the right one and reading the result honestly.
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three colored group humps stand above one shared axis, each raising a post to its own mean, ANOVA asks a single global question: are the posts farther apart than the width of the humps can explain?"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="168" width="520" height="2.5" rx="1.25" fill="currentColor" opacity="0.18" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M 80 160 C 105 160 110 96 140 96 C 170 96 175 160 200 160 Z" fillOpacity="0.35" />
-    <rect x="137.5" y="100" width="5" height="60" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 230 160 C 255 160 260 78 290 78 C 320 78 325 160 350 160 Z" fillOpacity="0.35" />
-    <rect x="287.5" y="84" width="5" height="76" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <path d="M 390 160 C 415 160 420 110 450 110 C 480 110 485 160 510 160 Z" fillOpacity="0.4" />
-    <rect x="447.5" y="114" width="5" height="46" rx="2.5" />
-  </g>
-</svg>
+<Figure
+  slug="stat-anova-chi-square-cutout"
+  alt="Four group mounds compared at once on one platform beside a grid of observed and expected count cells"
+/>
 
 ## Part A, One-way ANOVA: comparing 3+ group means
 
@@ -246,25 +230,6 @@ flowchart TD
 ```
 
 Let's test whether **device type** is associated with **churn**.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three device columns split into red churn tiles above blue stay tiles, all crossed by one dashed yellow line marking the counts expected if the variables were unrelated, the first column's solid red tile bulging past the line is exactly the deviation a chi-square test adds up"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="110" y="50" width="140" height="58" rx="6" />
-    <rect x="280" y="50" width="140" height="28" rx="6" fillOpacity="0.35" />
-    <rect x="450" y="50" width="140" height="36" rx="6" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.22">
-    <rect x="110" y="114" width="140" height="66" rx="6" />
-    <rect x="280" y="84" width="140" height="96" rx="6" />
-    <rect x="450" y="92" width="140" height="88" rx="6" />
-  </g>
-  <line x1="96" y1="92" x2="600" y2="92" stroke="var(--ds-yellow-500)" strokeWidth="3" strokeDasharray="10 8" strokeLinecap="round" />
-</svg>
 
 <CodeBlock
   adapter="python"

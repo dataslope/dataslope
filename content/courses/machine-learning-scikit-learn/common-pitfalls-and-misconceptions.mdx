@@ -10,35 +10,15 @@ produce results that look *great*, which is precisely why they are so
 dangerous. A model that crashes is annoying but honest. A model that scores
 99% because of a subtle leak is a trap with a bow on it.
 
+<Figure
+  slug="ml-common-pitfalls-cutout"
+  alt="Common pitfalls and misconceptions, an isometric illustration"
+/>
+
 This page is a catalog of those traps. For each one: **what the trap is**,
 **why it fools people**, and **the fix**. Read it once now, then come back
 to it whenever a result looks too good to be true, because that feeling is
 usually right.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A blue training card and a green test card sit on either side of a solid wall, but one green test dot has slipped onto the training side and sits circled in red, leakage smuggles test information into training"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="35" width="230" height="130" rx="14" fillOpacity="0.1" />
-    <circle cx="105" cy="70" r="7" />
-    <circle cx="160" cy="110" r="7" />
-    <circle cx="230" cy="65" r="7" />
-    <circle cx="130" cy="135" r="7" />
-  </g>
-  <rect x="310" y="35" width="10" height="130" rx="5" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="350" y="35" width="230" height="130" rx="14" fillOpacity="0.1" />
-    <circle cx="400" cy="75" r="7" />
-    <circle cx="465" cy="120" r="7" />
-    <circle cx="530" cy="65" r="7" />
-    <circle cx="430" cy="145" r="7" />
-    <circle cx="255" cy="125" r="7" />
-  </g>
-  <circle cx="255" cy="125" r="14" fill="none" stroke="var(--ds-red-500)" strokeWidth="3" />
-</svg>
 
 ```mermaid
 flowchart TD

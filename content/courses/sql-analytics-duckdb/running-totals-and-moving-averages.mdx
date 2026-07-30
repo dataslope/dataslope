@@ -10,47 +10,10 @@ calculation accumulate or slide as it moves through the rows. This page
 covers running totals, moving averages, and the row-comparison functions
 `LAG`/`LEAD`, and finally explains the **window frame**.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A staircase of stacked bars climbs left to right, each step carrying the previous blue total with today's green slice added on top, while a yellow dot walks the rising edge, a running total accumulating row by row"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="104" y="176" width="56" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="196" y="176" width="56" height="26" rx="6" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="196" y="140" width="56" height="32" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="288" y="140" width="56" height="62" rx="6" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="288" y="116" width="56" height="20" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="380" y="116" width="56" height="86" rx="6" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="380" y="66" width="56" height="46" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="472" y="66" width="56" height="136" rx="6" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="472" y="36" width="56" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="132" cy="162" r="7" fillOpacity="0.35" />
-    <circle cx="224" cy="126" r="7" fillOpacity="0.5" />
-    <circle cx="316" cy="102" r="7" fillOpacity="0.65" />
-    <circle cx="408" cy="52" r="7" fillOpacity="0.8" />
-    <circle cx="500" cy="22" r="7" />
-  </g>
-</svg>
+<Figure
+  slug="duck-running-totals-cutout"
+  alt="A rising cumulative staircase across a plane with a small sliding frame three cells wide travelling along it"
+/>
 
 ## A running total
 
@@ -178,36 +141,6 @@ The first row's `prev_day` is `NULL`, there is no earlier row to look
 back to. That is expected, and it is why the first `change` is also
 `NULL`.
 
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A blue row reaches back along a solid green arc to its predecessor and forward along a solid yellow arc to its successor, while the first row's backward arc finds only a hollow red ring, LAG and LEAD read neighboring rows, and the first row has nothing behind it"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <circle cx="56" cy="100" r="8" fill="none" stroke="var(--ds-red-500)" strokeWidth="3.5" />
-  <path d="M 112 88 Q 90 62 68 86" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeLinecap="round" />
-  <polygon points="62,82 74,82 68,96" fill="var(--ds-gray-400)" />
-  <g fill="var(--ds-gray-500)">
-    <circle cx="124" cy="100" r="8" />
-    <circle cx="192" cy="100" r="8" />
-    <circle cx="464" cy="100" r="8" />
-    <circle cx="532" cy="100" r="8" />
-  </g>
-  <path d="M 316 86 Q 294 56 272 84" fill="none" stroke="var(--ds-green-500)" strokeWidth="3" strokeLinecap="round" />
-  <polygon points="266,80 278,80 272,94" fill="var(--ds-green-500)" />
-  <path d="M 340 86 Q 362 56 384 84" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="3" strokeLinecap="round" />
-  <polygon points="378,80 390,80 384,94" fill="var(--ds-yellow-500)" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="260" cy="100" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="328" cy="100" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="396" cy="100" r="9" />
-  </g>
-</svg>
-
 ## The window frame, moving averages
 
 So far an ordered `SUM` summed *everything up to the current row*. That
@@ -215,33 +148,6 @@ default is called the frame `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT
 ROW`. You can change the frame to a **sliding window**, say, the current
 row plus the two before it, to compute a **moving average** that smooths
 out noise.
-
-<svg
-  viewBox="0 0 640 185"
-  role="img"
-  aria-label="A translucent yellow frame slides along a row of jagged bars three at a time, leaving behind its ghost from the previous step, a moving window smoothing the series"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.22">
-    <rect x="70" y="108" width="26" height="58" rx="5" />
-    <rect x="120" y="84" width="26" height="82" rx="5" />
-    <rect x="170" y="122" width="26" height="44" rx="5" />
-    <rect x="220" y="70" width="26" height="96" rx="5" />
-    <rect x="270" y="100" width="26" height="66" rx="5" />
-    <rect x="320" y="60" width="26" height="106" rx="5" />
-    <rect x="370" y="114" width="26" height="52" rx="5" />
-    <rect x="420" y="78" width="26" height="88" rx="5" />
-    <rect x="470" y="96" width="26" height="70" rx="5" />
-    <rect x="520" y="68" width="26" height="98" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="110" y="48" width="146" height="128" rx="14" fillOpacity="0.12" />
-    <rect x="260" y="42" width="146" height="134" rx="14" fillOpacity="0.32" />
-  </g>
-  <g fill="currentColor" opacity="0.2">
-    <rect x="60" y="170" width="500" height="2.5" rx="1.25" />
-  </g>
-</svg>
 
 <SqlCodeBlock
   dialect="duckdb"

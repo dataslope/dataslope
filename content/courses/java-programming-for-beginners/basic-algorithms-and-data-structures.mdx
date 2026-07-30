@@ -9,49 +9,10 @@ and structures** that show up in real software again and again. We
 will not get formal, no Big-O notation lectures, but we *will*
 develop intuition for *which idea to reach for* and *why it works*.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three algorithm cards: a blue scan sweeps cell by cell behind a thin arrow, a yellow probe lands mid-row while eliminated cells fade, and green bars stand freshly sorted in ascending order"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="45" y="32" width="170" height="150" rx="14" fillOpacity="0.07" />
-    <rect x="65" y="80" width="24" height="24" rx="6" />
-    <rect x="93" y="80" width="24" height="24" rx="6" />
-    <rect x="121" y="80" width="24" height="24" rx="6" />
-    <rect x="149" y="80" width="24" height="24" rx="6" fillOpacity="0.25" />
-    <rect x="177" y="80" width="24" height="24" rx="6" fillOpacity="0.25" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="65" y="126.5" width="100" height="3" rx="1.5" />
-    <polygon points="163,122.5 174,128 163,133.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="235" y="32" width="170" height="150" rx="14" fillOpacity="0.1" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="255" y="80" width="24" height="24" rx="6" />
-    <rect x="283" y="80" width="24" height="24" rx="6" />
-  </g>
-  <rect x="311" y="80" width="24" height="24" rx="6" fill="var(--ds-yellow-500)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="339" y="80" width="24" height="24" rx="6" fillOpacity="0.4" />
-    <rect x="367" y="80" width="24" height="24" rx="6" fillOpacity="0.4" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="321.5" y="48" width="3" height="20" rx="1.5" />
-    <polygon points="317.5,66 328.5,66 323,77" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="425" y="32" width="170" height="150" rx="14" fillOpacity="0.07" />
-    <rect x="452" y="126" width="18" height="24" rx="4" fillOpacity="0.45" />
-    <rect x="478" y="110" width="18" height="40" rx="4" fillOpacity="0.6" />
-    <rect x="504" y="94" width="18" height="56" rx="4" fillOpacity="0.75" />
-    <rect x="530" y="78" width="18" height="72" rx="4" fillOpacity="0.9" />
-    <rect x="556" y="62" width="18" height="88" rx="4" />
-  </g>
-</svg>
+<Figure
+  slug="java-algorithms-data-structures-cutout"
+  alt="Basic algorithms and data structures, an isometric illustration"
+/>
 
 ## Linear search
 
@@ -140,8 +101,6 @@ A list of 1 million elements is fully searched in **20** comparisons
     },
   ]}
 />
-
-<IllustrationPrompt subject="Joshua Bloch" photo />
 
 Look closely at the line `int mid = lo + (hi - lo) / 2;`. The
 "obvious" way to take a midpoint is `(lo + hi) / 2`, and that

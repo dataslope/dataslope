@@ -2,7 +2,6 @@
 
 import { Accordion } from "@base-ui/react/accordion";
 import { ChevronDown } from "lucide-react";
-import { SparklesText } from "@/components/ui/sparkles-text";
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -42,12 +41,9 @@ const FAQS: { q: string; a: string }[] = [
 export function Faq() {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-      <SparklesText
-        as="h2"
-        className="mb-16 block text-center text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-      >
+      <h2 className="mb-16 block text-center text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
         Frequently asked questions
-      </SparklesText>
+      </h2>
       <Accordion.Root className="border-t border-[var(--ds-gray-200)] dark:border-white/10">
         {FAQS.map((item) => (
           <Accordion.Item

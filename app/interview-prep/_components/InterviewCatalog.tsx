@@ -132,33 +132,33 @@ interface Presentation {
 const PRESENTATION: Record<string, Presentation> = {
   "data-analyst": {
     tagline: "SQL fluency, aggregation, and turning data into answers.",
-    banner: "a-risograph-of-sorting",
-    bannerAlt: "Risograph illustration: sorting into order",
+    banner: "interview-data-analyst-thumbnail-cutout",
+    bannerAlt: "An isometric dashboard of small charts with a magnifying lens resting over one of them",
   },
   "data-scientist": {
     tagline: "Statistics, modeling, and experiment design.",
-    banner: "a-risograph-of-the-dictionary-data-type",
-    bannerAlt: "Risograph illustration: a dictionary, key to value",
+    banner: "interview-data-scientist-thumbnail-cutout",
+    bannerAlt: "An isometric scatter plane with a fitted curve, a flask and a dial",
   },
   "data-engineer": {
     tagline: "SQL at depth, pipelines, modeling, and systems.",
-    banner: "a-risograph-of-a-pipeline",
-    bannerAlt: "Risograph illustration: a data pipeline",
+    banner: "interview-data-engineer-thumbnail-cutout",
+    bannerAlt: "An isometric pipeline carrying coloured cubes from a source tank into a storage silo",
   },
   "analytics-engineer": {
     tagline: "The dbt and warehouse layer between engineering and analytics.",
-    banner: "a-risograph-of-a-blueprint",
-    bannerAlt: "Risograph illustration: an architectural blueprint",
+    banner: "interview-analytics-engineer-thumbnail-cutout",
+    bannerAlt: "An isometric transformation pipeline turning raw tiles into tidy modelled tables",
   },
   "machine-learning-engineer": {
     tagline: "ML fundamentals plus production engineering.",
-    banner: "a-risograph-of-a-queue-data-structure",
-    bannerAlt: "Risograph illustration: a queue, first in first out",
+    banner: "interview-machine-learning-engineer-thumbnail-cutout",
+    bannerAlt: "An isometric trained-model block feeding predictions into a deployment container",
   },
   "backend-engineer": {
     tagline: "Data structures, algorithms, and language fundamentals.",
-    banner: "a-risograph-of-a-linked-list-data-structure",
-    bannerAlt: "Risograph illustration: a linked list",
+    banner: "interview-backend-engineer-thumbnail-cutout",
+    bannerAlt: "An isometric server rack linked to an API gateway block and a database disc",
   },
 };
 

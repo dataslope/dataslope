@@ -30,36 +30,10 @@ This data includes two unmatched things:
 - Linus is a customer with no order.
 - Order `104` points to customer `7`, who is not in the customers table.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Blue dots on the left and green dots on the right send thin lines only where they match, forming two joined pairs inside a yellow result card, while one dot on each side sits unmatched with no line, an inner join keeps only matched pairs"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="102" y1="62" x2="280" y2="90" />
-    <line x1="538" y1="62" x2="334" y2="90" />
-    <line x1="102" y1="122" x2="280" y2="146" />
-    <line x1="538" y1="178" x2="334" y2="150" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="230" y="52" width="180" height="136" rx="14" fillOpacity="0.18" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="60" r="10" />
-    <circle cx="90" cy="120" r="10" />
-    <circle cx="90" cy="180" r="10" />
-    <circle cx="292" cy="92" r="10" />
-    <circle cx="292" cy="148" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="550" cy="60" r="10" />
-    <circle cx="550" cy="120" r="10" />
-    <circle cx="550" cy="180" r="10" />
-    <circle cx="322" cy="92" r="10" />
-    <circle cx="322" cy="148" r="10" />
-  </g>
-</svg>
+<Figure
+  slug="lite-inner-joins-cutout"
+  alt="Two overlapping grid platforms where only the rows in the shared middle region lift out onto a result tray"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

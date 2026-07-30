@@ -9,39 +9,10 @@ and **bias**, and explains the deep reason you cannot simply eliminate
 both at once. Understanding this tradeoff is what separates someone who can
 *run* models from someone who can *reason* about them.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two targets: on the left the shots cluster tightly but away from the bullseye (bias); on the right they scatter widely around it (variance), the two distinct ways a model misses"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="170" cy="105" r="62" fillOpacity="0.08" />
-    <circle cx="170" cy="105" r="42" fillOpacity="0.14" />
-    <circle cx="170" cy="105" r="22" fillOpacity="0.22" />
-    <circle cx="470" cy="105" r="62" fillOpacity="0.08" />
-    <circle cx="470" cy="105" r="42" fillOpacity="0.14" />
-    <circle cx="470" cy="105" r="22" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="170" cy="105" r="5" />
-    <circle cx="470" cy="105" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="206" cy="64" r="4.5" />
-    <circle cx="218" cy="72" r="4.5" />
-    <circle cx="208" cy="78" r="4.5" />
-    <circle cx="216" cy="58" r="4.5" />
-    <circle cx="222" cy="80" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="430" cy="60" r="4.5" />
-    <circle cx="515" cy="75" r="4.5" />
-    <circle cx="445" cy="150" r="4.5" />
-    <circle cx="505" cy="140" r="4.5" />
-    <circle cx="470" cy="55" r="4.5" />
-  </g>
-</svg>
+<Figure
+  slug="ml-bias-variance-cutout"
+  alt="The bias–variance tradeoff, an isometric illustration"
+/>
 
 ## Error has parts
 
@@ -159,10 +130,8 @@ from sklearn.pipeline import make_pipeline
 
 rng = np.random.default_rng(0)
 
-
 def true_function(x):
     return np.sin(1.5 * x)
-
 
 grid = np.linspace(0, 4, 200).reshape(-1, 1)
 
@@ -340,7 +309,6 @@ print("var_flexible:", var_flexible)
         model.fit(X, y)
         preds.append(model.predict(x_star)[0])
     return float(np.var(preds))
-
 
 var_simple = variance_at_point(simple)
 var_flexible = variance_at_point(flexible)

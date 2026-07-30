@@ -9,56 +9,10 @@ output of each step becomes the input to the next. Before we spend a page
 each on the individual steps, it is worth seeing the whole assembly line at
 once, because the shape will repeat on nearly every page that follows.
 
-<svg
-  viewBox="0 0 640 310"
-  role="img"
-  aria-label="A raw text capsule descends through small gray arrows: split into blue token chips, then filtered, two slots left as dashed outlines, into green normalized chips, and finally counted into a small green bar chart"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="170" y="22" width="300" height="30" rx="12" fillOpacity="0.12" />
-    <rect x="190" y="33" width="52" height="8" rx="4" fillOpacity="0.5" />
-    <rect x="252" y="33" width="34" height="8" rx="4" fillOpacity="0.5" />
-    <rect x="296" y="33" width="60" height="8" rx="4" fillOpacity="0.5" />
-    <rect x="366" y="33" width="42" height="8" rx="4" fillOpacity="0.5" />
-    <rect x="418" y="33" width="36" height="8" rx="4" fillOpacity="0.5" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="318.5" y="58" width="3" height="18" rx="1.5" />
-    <polygon points="314.5,74 325.5,74 320,85" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="174" y="92" width="56" height="26" rx="10" />
-    <rect x="242" y="92" width="38" height="26" rx="10" />
-    <rect x="292" y="92" width="64" height="26" rx="10" />
-    <rect x="368" y="92" width="46" height="26" rx="10" />
-    <rect x="426" y="92" width="40" height="26" rx="10" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="318.5" y="124" width="3" height="18" rx="1.5" />
-    <polygon points="314.5,140 325.5,140 320,151" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="174" y="158" width="56" height="24" rx="10" />
-    <rect x="292" y="158" width="64" height="24" rx="10" />
-    <rect x="426" y="158" width="40" height="24" rx="10" />
-  </g>
-  <g fill="none" stroke="var(--ds-gray-400)" strokeWidth="1.5" strokeDasharray="5 4">
-    <rect x="242" y="158" width="38" height="24" rx="10" />
-    <rect x="368" y="158" width="46" height="24" rx="10" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="318.5" y="188" width="3" height="18" rx="1.5" />
-    <polygon points="314.5,204 325.5,204 320,215" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="232" y="222" width="176" height="68" rx="12" fillOpacity="0.08" />
-    <rect x="252" y="254" width="20" height="24" rx="3" />
-    <rect x="284" y="240" width="20" height="38" rx="3" />
-    <rect x="316" y="262" width="20" height="16" rx="3" />
-    <rect x="348" y="246" width="20" height="32" rx="3" />
-  </g>
-</svg>
+<Figure
+  slug="nlp-pipeline-cutout"
+  alt="A straight conveyor line passing through five distinct processing stations, the material growing tidier at each stop"
+/>
 
 ## The standard text preprocessing pipeline
 
@@ -431,7 +385,6 @@ stop = set(stopwords.words("english"))`,
     # ... lowercase, keep alphabetic, drop stopwords ...
     return tokens
 
-
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))
 `,
@@ -441,7 +394,6 @@ print(preprocess("It is NOT a good day."))
     tokens = [t for t in tokens if t.isalpha()]
     tokens = [t for t in tokens if t not in stop]
     return tokens
-
 
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))

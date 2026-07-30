@@ -8,47 +8,14 @@ need a small, well-chosen subset of Python, enough to read the
 code you write, enough to recognize errors, and enough to glue
 together the Pandas calls that do the real work.
 
+<Figure
+  slug="pandas-python-for-analysis-cutout"
+  alt="Python for analysis, an isometric illustration"
+/>
+
 This chapter is that subset. If you already know Python, skim.
 If you do not, read carefully, every concept here will appear
 in later chapters.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A large faint territory scattered with pale dots contains one small bright green region where a handful of vivid dots cluster, the small, well-chosen slice of Python an analyst actually needs"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="30" width="520" height="160" rx="24" fill="currentColor" opacity="0.06" />
-  <g fill="currentColor" opacity="0.15">
-    <circle cx="100" cy="60" r="4" />
-    <circle cx="150" cy="100" r="4" />
-    <circle cx="120" cy="160" r="4" />
-    <circle cx="200" cy="55" r="4" />
-    <circle cx="240" cy="130" r="4" />
-    <circle cx="190" cy="168" r="4" />
-    <circle cx="300" cy="70" r="4" />
-    <circle cx="280" cy="165" r="4" />
-    <circle cx="380" cy="55" r="4" />
-    <circle cx="460" cy="48" r="4" />
-    <circle cx="540" cy="62" r="4" />
-    <circle cx="552" cy="170" r="4" />
-    <circle cx="300" cy="120" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="330" y="90" width="170" height="80" rx="16" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="365" cy="115" r="4" />
-    <circle cx="470" cy="145" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="405" cy="132" r="4" />
-    <circle cx="360" cy="150" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="445" cy="112" r="4" />
-  </g>
-</svg>
 
 ## Variables and assignment
 
@@ -254,7 +221,6 @@ A function bundles up reusable logic. The classic shape:
     """Return how many years until retirement."""
     return retire_at - age
 
-
 print(years_until_retirement(29))
 print(years_until_retirement(60, retire_at=67))
 `,
@@ -297,11 +263,9 @@ column transformations.
       starterCode: `square = lambda x: x * x
 print(square(7))
 
-
 # Equivalent to:
 def square2(x):
     return x * x
-
 
 # Lambdas shine when passed to other functions:
 nums = [1, 2, 3, 4, 5]
@@ -385,14 +349,12 @@ Store the three take-home values in a list called \`results\` in that order.`}
     # TODO
     pass
 
-
 results = []  # TODO: fill with three numbers
 
 print(results)
 `,
       solutionCode: `def take_home(salary, tax_rate):
     return salary * (1 - tax_rate)
-
 
 results = [
     take_home(100000, 0.30),

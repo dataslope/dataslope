@@ -13,24 +13,10 @@ proportion of your data, and the **rug** plots the raw observations
 themselves. Neither hides anything behind a parameter, which makes them
 honest companions to the histogram.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="An ECDF staircase drawn as one thin blue line climbs step by step until its final green stretch runs along the dashed 100 percent line, no bins, nothing hidden"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <line x1="80" y1="48" x2="560" y2="48" stroke="var(--ds-gray-300)" strokeWidth="2" strokeDasharray="6 8" strokeLinecap="round" />
-  <line x1="80" y1="176" x2="560" y2="176" stroke="var(--ds-gray-400)" strokeWidth="2" strokeLinecap="round" />
-  <path
-    d="M 88 168 H 136 V 152 H 168 V 138 H 188 V 124 H 232 V 110 H 260 V 96 H 300 V 82 H 348 V 68 H 412 V 56 H 472 V 48"
-    fill="none"
-    stroke="var(--ds-blue-500)"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <line x1="472" y1="48" x2="552" y2="48" stroke="var(--ds-green-500)" strokeWidth="3.5" strokeLinecap="round" />
-</svg>
+<Figure
+  slug="sns-ecdf-rug-cutout"
+  alt="A staircase curve climbing steadily across a plane with a row of small tick marks laid along its base rail"
+/>
 
 ## The ECDF: a running tally of proportions
 

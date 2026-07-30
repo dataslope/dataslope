@@ -5,37 +5,12 @@ description: Reading and writing files, the with statement, and pathlib
 
 Every real program touches files, reading config, writing logs, parsing CSV data, fetching JSON from an API, exporting reports. Python's file API is small, consistent, and powerful.
 
-The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
+<Figure
+  slug="python-basics-files-cutout"
+  alt="An open filing drawer with a document lifted out and resting on top, a folder standing beside it"
+/>
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A document card filled with faint lines sends a thin gray arrow to three clean colored bars, opening a file reads its contents out line by line"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="100" y="30" width="150" height="140" rx="10" fill="currentColor" opacity="0.07" />
-  <polygon points="222,30 250,30 250,58" fill="currentColor" opacity="0.12" />
-  <g fill="var(--ds-gray-300)">
-    <rect x="118" y="58" width="90" height="6" rx="3" />
-    <rect x="118" y="78" width="112" height="6" rx="3" />
-    <rect x="118" y="98" width="76" height="6" rx="3" />
-    <rect x="118" y="118" width="100" height="6" rx="3" />
-    <rect x="118" y="138" width="64" height="6" rx="3" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="280" y="98.5" width="70" height="3" rx="1.5" />
-    <polygon points="348,94.5 359,100 348,105.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="390" y="58" width="170" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="390" y="94" width="200" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="390" y="130" width="140" height="12" rx="6" />
-  </g>
-</svg>
+The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
 
 ## Why file I/O matters: the real world
 
@@ -519,13 +494,11 @@ Monitor,300
       filename: "parser.py",
       starterCode: `import csv
 
-
 def parse_sales(filename):
     # your code here
     return []
 `,
       solutionCode: `import csv
-
 
 def parse_sales(filename):
     with open(filename) as f:
@@ -586,13 +559,11 @@ print(f"Port: {config['server']['port']}")
       filename: "config_loader.py",
       starterCode: `import json
 
-
 def load_config(filename):
     # your code here
     return {}
 `,
       solutionCode: `import json
-
 
 def load_config(filename):
     with open(filename) as f:

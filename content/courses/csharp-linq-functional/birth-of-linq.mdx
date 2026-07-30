@@ -10,33 +10,12 @@ object-oriented C# and C++ and Java, were drowning in a very
 specific style of bug that had nothing to do with algorithms. The
 bugs lived in the *shape* of the code itself.
 
-That style of code has a name: **imperative**.
+<Figure
+  slug="cs-birth-of-linq-cutout"
+  alt="Why LINQ exists, an isometric illustration"
+/>
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A tangle of overlapping translucent loops with a dot lost inside, an arrow, and then the same journey as one straight green bar arriving at a blue dot"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="120" cy="90" r="40" fillOpacity="0.18" />
-    <circle cx="160" cy="120" r="34" fillOpacity="0.18" />
-    <circle cx="110" cy="140" r="30" fillOpacity="0.18" />
-    <circle cx="170" cy="70" r="26" fillOpacity="0.18" />
-    <circle cx="140" cy="108" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="135" cy="130" r="24" fillOpacity="0.15" />
-    <circle cx="175" cy="100" r="30" fillOpacity="0.12" />
-  </g>
-  <polygon points="260,95 260,125 290,110" fill="currentColor" opacity="0.25" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="330" y="104" width="220" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="580" cy="110" r="12" />
-  </g>
-</svg>
+That style of code has a name: **imperative**.
 
 ## The shape of the problem
 
@@ -290,8 +269,6 @@ flowchart TD
 Each arrow was a different language stitched into C#. None of them
 could see the others. A typo inside a SQL string failed at runtime,
 in production, sometimes hours after deployment.
-
-<IllustrationPrompt subject="Erik Meijer" photo />
 
 The Microsoft team, with Anders Hejlsberg, C#'s lead architect, and
 Erik Meijer among the central figures, asked a deceptively simple

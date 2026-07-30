@@ -9,6 +9,11 @@ the whole tree can rearrange itself. That instability is high variance, and
 high variance means the model is overfitting to the particular sample it
 happened to see.
 
+<Figure
+  slug="ml-ensembles-cutout"
+  alt="Ensembles and random forests, an isometric illustration"
+/>
+
 This page is the payoff. It turns out the cure for one unstable model is
 *many* unstable models. If you train hundreds of slightly different trees
 and let them vote, their individual errors, which point in random
@@ -18,26 +23,7 @@ than any single tree, and it is the model most experienced practitioners
 reach for first on tabular data. Understanding *why* averaging works is one
 of the most valuable intuitions in classical machine learning.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three wobbly light green lines each guess the trend differently inside one card, and their bold green average cuts smoothly through the middle, an ensemble averages many noisy models into one steady prediction"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="90" y="30" width="460" height="150" rx="16" fillOpacity="0.08" />
-  </g>
-  <g stroke="var(--ds-green-300)" strokeWidth="2.5" strokeLinecap="round" fill="none">
-    <path d="M120 150 C 200 100, 260 160, 330 100 C 390 55, 450 110, 520 60" />
-    <path d="M120 140 C 190 130, 270 80, 340 120 C 410 150, 460 70, 520 70" />
-    <path d="M120 160 C 210 140, 250 90, 320 130 C 400 170, 440 60, 520 50" />
-  </g>
-  <path d="M120 150 C 250 120, 390 85, 520 62" fill="none" stroke="var(--ds-green-500)" strokeWidth="5" strokeLinecap="round" />
-</svg>
-
 ## The intuition: the wisdom of crowds
-
-<IllustrationPrompt subject="a prize ox at a country fair weight-guessing contest (Galton's wisdom of crowds)" />
 
 There is a famous story. At a 1906 country fair, the statistician Francis
 Galton collected the roughly 800 entries in a contest to guess the weight of

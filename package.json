@@ -4,10 +4,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && node scripts/build-search-index.mjs && node scripts/build-course-md.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next dev",
-    "build": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && node scripts/build-search-index.mjs && node scripts/build-course-md.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next build",
+    "dev": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-search-index.mjs && node scripts/build-course-md.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next dev",
+    "build": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-search-index.mjs && node scripts/build-course-md.mjs && node scripts/build-brand-fallbacks.mjs && node scripts/build-images.mjs && next build",
     "build:workers": "node scripts/build-almostnode-workers.mjs",
-    "build:svg-gallery": "node scripts/build-svg-gallery-data.mjs",
     "build:search-index": "node scripts/build-search-index.mjs",
     "build:course-md": "node scripts/build-course-md.mjs",
     "build:brand-fallbacks": "node scripts/build-brand-fallbacks.mjs",

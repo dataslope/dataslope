@@ -1,7 +1,7 @@
 export function SvgLabel({ figId }: { figId: string }) {
   return (
     // `id={figId}` makes each graphic a deep-link target, so the build-time
-    // SVG gallery (/svg-gallery) can link straight to a graphic on its lesson.
+    // Stable per-graphic id, kept so a lesson SVG remains addressable by anchor.
     <div
       id={figId}
       data-svg-id={figId}

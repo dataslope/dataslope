@@ -9,6 +9,11 @@ the operating system gives you a budget, and if you don't return
 what you've borrowed, eventually the program (or the whole
 machine) runs out.
 
+<Figure
+  slug="mcs-resource-management-cutout"
+  alt="Resource management, an isometric illustration"
+/>
+
 C# splits resources into two camps:
 
 1. **Memory**, which is reclaimed automatically by the **garbage
@@ -18,60 +23,6 @@ C# splits resources into two camps:
    on its own.
 
 Understanding this split is the foundation of clean, leak-free C#.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Green tokens leave a depot and ride a thin loop through a yellow work zone back home, while one red token slips off the bottom of the loop and never returns"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <ellipse
-      cx="350"
-      cy="110"
-      rx="140"
-      ry="62"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-    />
-    <path
-      d="M178 110 H 206"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <polygon points="374,42 374,56 388,49" fill="currentColor" fillOpacity="0.6" />
-    <polygon points="326,164 326,178 312,171" fill="currentColor" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="70" width="116" height="80" rx="14" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="78" y="84" width="22" height="22" rx="5" fillOpacity="0.85" />
-    <rect x="112" y="84" width="22" height="22" rx="5" fillOpacity="0.6" />
-    <rect x="78" y="116" width="22" height="22" rx="5" fillOpacity="0.4" />
-    <rect x="330" y="38" width="20" height="20" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="490" cy="110" r="27" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="479" y="99" width="22" height="22" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path
-      d="M350 172 C 354 186, 360 196, 368 204"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeOpacity="0.5"
-    />
-    <rect x="368" y="200" width="20" height="20" rx="5" fillOpacity="0.75" transform="rotate(12 378 210)" />
-  </g>
-</svg>
 
 ## Memory: handled (mostly) for you
 

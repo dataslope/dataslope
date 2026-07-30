@@ -10,9 +10,12 @@ research lab, a trademark dispute, and a race that IBM lost to a
 startup, and knowing them will make the language feel less like
 arbitrary syntax and more like the punchline of a very good idea.
 
-## 1970: Codd's dangerous idea
+<Figure
+  slug="sql-why-sql-exists-cutout"
+  alt="Why SQL and why PostgreSQL, an isometric illustration"
+/>
 
-<IllustrationPrompt subject="Edgar F. Codd" photo />
+## 1970: Codd's dangerous idea
 
 In the late 1960s, databases already existed, and they were
 miserable to use. Data was stored in rigid hierarchies and
@@ -94,8 +97,6 @@ company, so the language's name was shortened to **SQL**. The
 ghost of the old name lives on in how many people pronounce it:
 you will hear both "sequel" and "S-Q-L," and both are fine.
 
-<IllustrationPrompt subject="Larry Ellison" photo />
-
 Meanwhile, the published System R papers were being read very
 carefully in California by a young programmer named **Larry
 Ellison**. His small company, later renamed **Oracle**, raced to
@@ -111,48 +112,6 @@ replace it since.
 Why did SQL win? Largely because of one genuinely surprising design
 decision: **you describe the result you want, not the steps to
 compute it.**
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A speech bubble of structured word bars is sent toward a grid of cells, lighting up exactly the cells that answer it"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="44" width="180" height="84" rx="18" fillOpacity="0.15" />
-    <polygon points="120,126 146,126 128,150" fillOpacity="0.15" />
-    <rect x="78" y="66" width="52" height="10" rx="5" />
-    <rect x="138" y="66" width="36" height="10" rx="5" fillOpacity="0.7" />
-    <rect x="182" y="66" width="40" height="10" rx="5" fillOpacity="0.5" />
-    <rect x="78" y="90" width="30" height="10" rx="5" fillOpacity="0.8" />
-    <rect x="114" y="90" width="58" height="10" rx="5" fillOpacity="0.6" />
-    <rect x="178" y="90" width="28" height="10" rx="5" />
-  </g>
-  <g fill="currentColor" opacity="0.3">
-    <circle cx="262" cy="90" r="3.5" />
-    <circle cx="286" cy="90" r="3.5" />
-    <circle cx="310" cy="90" r="3.5" />
-    <polygon points="326,80 326,100 344,90" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="370" y="44" width="52" height="34" rx="6" />
-    <rect x="430" y="44" width="52" height="34" rx="6" />
-    <rect x="490" y="44" width="52" height="34" rx="6" />
-    <rect x="370" y="86" width="52" height="34" rx="6" />
-    <rect x="490" y="86" width="52" height="34" rx="6" />
-    <rect x="370" y="128" width="52" height="34" rx="6" />
-    <rect x="430" y="128" width="52" height="34" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="550" y="44" width="52" height="34" rx="6" fillOpacity="0.75" />
-    <rect x="430" y="86" width="52" height="34" rx="6" fillOpacity="0.75" />
-    <rect x="490" y="128" width="52" height="34" rx="6" fillOpacity="0.75" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="550" y="86" width="52" height="34" rx="6" />
-    <rect x="550" y="128" width="52" height="34" rx="6" />
-  </g>
-</svg>
 
 Compare two ways of getting "the three most expensive products":
 
@@ -221,8 +180,6 @@ can talk to almost any relational database on Earth.
 
 ## Berkeley's answer: from Ingres to Postgres
 
-<IllustrationPrompt subject="Michael Stonebraker" photo />
-
 So where does **PostgreSQL** fit into this story? Across the bay
 from IBM's lab, at the University of California, Berkeley,
 professor **Michael Stonebraker** read Codd's paper and built his
@@ -239,23 +196,6 @@ open source. In 1996 the project took its modern name,
 **PostgreSQL**, wearing its whole lineage in one slightly awkward
 word: *Postgres*, the post-Ingres project, plus *QL* for the query
 language that conquered the world.
-
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A sturdy three-step stack of blue slabs, darkest at the base, carrying small green and yellow data dots on top, PostgreSQL as a dependable foundation"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="190" y="196" width="260" height="3" rx="1.5" fill="var(--ds-gray-300)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="200" y="152" width="240" height="40" rx="12" fillOpacity="0.85" />
-    <rect x="224" y="112" width="192" height="36" rx="11" fillOpacity="0.6" />
-    <rect x="248" y="76" width="144" height="32" rx="10" fillOpacity="0.35" />
-  </g>
-  <circle cx="288" cy="62" r="7" fill="var(--ds-green-500)" />
-  <circle cx="320" cy="54" r="7" fill="var(--ds-yellow-500)" />
-  <circle cx="352" cy="62" r="7" fill="var(--ds-green-500)" fillOpacity="0.8" />
-</svg>
 
 <Callout type="info" title="How do you say it?">
 Officially: "post-GRES-cue-ell." In practice, nearly everyone just

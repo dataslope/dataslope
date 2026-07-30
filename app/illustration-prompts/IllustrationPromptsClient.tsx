@@ -2,50 +2,120 @@
 
 /**
  * Interactive shell for the `/illustration-prompts` gallery. The entry data is
- * collected at build time by the server component (see `page.tsx` and
- * `lib/illustrationPromptsGallery.ts`) and passed in as a prop, the payload is
- * small (~80 short prompts), so unlike the SVG gallery there is no static JSON
- * asset or client fetch. Everything here, the light/dark toggle and the
- * per-card copy buttons, is client-side.
+ * built from `data/illustration-prompts.json` by the server component (see
+ * `page.tsx` and `lib/illustrationPromptsGallery.ts`) and passed in as a prop.
+ * The per-card copy buttons are the only local state.
+ *
+ * Theme is the shared site one (ThemePillToggle → siteTheme.ts → `.dark` on
+ * <html>), not a page-local toggle: the root layout's bootstrap script applies
+ * the class before paint, so the palette here matches every other surface and
+ * survives a reload. The pill is docked so it stays reachable at any scroll
+ * position — this page is a long scroll of artwork and the whole point is
+ * flipping the background under it.
  */
-import { useCallback, useState, useSyncExternalStore } from "react";
-import { Check, Copy, Moon, Search, Sun } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { Check, Copy, ImageIcon } from "lucide-react";
+import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
+import imageManifest from "@/lib/generated/images";
 import type {
   IllustrationPromptEntry,
   IllustrationPromptsData,
 } from "@/lib/illustrationPromptsGallery";
 import styles from "./illustration-prompts.module.css";
 
-const THEME_KEY = "illustration_prompts_theme";
-type Theme = "light" | "dark";
+// Output extension → MIME type, mirroring app/_components/mdx/Figure.tsx.
+const IMAGE_MIME: Record<string, string> = {
+  webp: "image/webp",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  avif: "image/avif",
+};
 
-// Theme comes from localStorage (falling back to the OS preference) via an
-// external store, mirroring /svg-gallery: reading it needs no effect and the
-// server snapshot stays a stable "light", avoiding any hydration mismatch.
-const themeListeners = new Set<() => void>();
+/** Suffix on the background-removed variant's slug (assets/images/<id>-cutout.png). */
+const CUTOUT_SUFFIX = "-cutout";
 
-function readTheme(): Theme {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+/** Entries per page. Each card renders two 1536x1024 images, so this is chosen
+ *  for bytes-per-page as much as for scroll length. */
+const PAGE_SIZE = 12;
+
+/** One image from the build manifest, or null when that slug has no artwork. */
+function ManifestImage({
+  slug,
+  alt,
+  className,
+}: {
+  slug: string;
+  alt: string;
+  className: string;
+}) {
+  const entry = imageManifest[slug];
+  if (!entry) return null;
+  const fallback = entry.formats[entry.formats.length - 1];
+  const sources = entry.formats.slice(0, -1);
+  return (
+    <picture>
+      {sources.map((ext) => (
+        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={IMAGE_MIME[ext]} />
+      ))}
+      <img
+        src={`/images/${slug}.${fallback}`}
+        width={entry.width}
+        height={entry.height}
+        alt={alt}
+        className={className}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
 }
 
-function useTheme(): [Theme, () => void] {
-  const theme = useSyncExternalStore<Theme>(
-    (cb) => {
-      themeListeners.add(cb);
-      return () => themeListeners.delete(cb);
-    },
-    readTheme,
-    () => "light",
+/**
+ * The generated artwork for a card, rendered above its prompt so the prompt
+ * reads as the caption for the image it produced — that pairing is the whole
+ * point of the gallery once the art exists.
+ *
+ * When a background-removed variant exists it is stacked directly underneath
+ * the original for comparison. The cut-out is deliberately given no backdrop of
+ * its own, so the page background shows through its alpha and the theme toggle
+ * doubles as the judgement tool: a cut-out that only works on one background is
+ * exactly what needs catching here.
+ */
+function PromptImage({ entry }: { entry: IllustrationPromptEntry }) {
+  const hasOriginal = Boolean(imageManifest[entry.id]);
+  const cutoutSlug = `${entry.id}${CUTOUT_SUFFIX}`;
+  const hasCutout = Boolean(imageManifest[cutoutSlug]);
+
+  if (!hasOriginal) {
+    return (
+      <div className={styles.imagePending}>
+        <ImageIcon size={15} aria-hidden="true" />
+        <span>Not generated yet</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.imageStack}>
+      <div className={styles.imagePane}>
+        <ManifestImage slug={entry.id} alt={entry.title} className={styles.image} />
+        <span className={styles.imageLabel}>Original</span>
+      </div>
+      {hasCutout ? (
+        <div className={styles.imagePane}>
+          <ManifestImage
+            slug={cutoutSlug}
+            alt={`${entry.title}, background removed`}
+            className={styles.imageCutout}
+          />
+          <span className={styles.imageLabel}>
+            Background removed · Recraft remove-background via Kie AI
+          </span>
+        </div>
+      ) : null}
+    </div>
   );
-  const toggle = useCallback(() => {
-    localStorage.setItem(THEME_KEY, theme === "light" ? "dark" : "light");
-    themeListeners.forEach((l) => l());
-  }, [theme]);
-  return [theme, toggle];
 }
 
 function PromptCard({
@@ -57,10 +127,12 @@ function PromptCard({
   copiedKey: string | null;
   onCopy: (key: string, text: string) => void;
 }) {
-  const fileKey = `${entry.slug}:file`;
-  const promptKey = `${entry.slug}:prompt`;
+  const fileKey = `${entry.id}:file`;
+  const promptKey = `${entry.id}:prompt`;
+  // Trim the generic tail ("… illustration"/"… schematic") for a tidy badge.
+  const styleLabel = entry.style.replace(/ (illustration|schematic)$/i, "");
   return (
-    <figure id={entry.slug} className={styles.card}>
+    <figure id={entry.id} className={styles.card}>
       <div className={styles.cardTop}>
         <span className={styles.fileWrap}>
           <code className={styles.file}>{entry.file}</code>
@@ -74,40 +146,27 @@ function PromptCard({
             {copiedKey === fileKey ? <Check size={13} /> : <Copy size={13} />}
           </button>
         </span>
-        <span
-          className={`${styles.badge} ${entry.photo ? styles.badgePhoto : styles.badgeNoPhoto}`}
-        >
-          {entry.photo ? "photo attached" : "no reference"}
+        <span className={styles.badges}>
+          <span className={`${styles.badge} ${styles.badgeAccent}`}>{styleLabel}</span>
+          {entry.mascot ? (
+            <span className={`${styles.badge} ${styles.badgeMuted}`}>marmot</span>
+          ) : null}
+          <span className={`${styles.badge} ${styles.badgeMuted}`}>{entry.size}</span>
         </span>
       </div>
 
-      <p className={styles.prompt}>{entry.prompt}</p>
+      <PromptImage entry={entry} />
 
-      {entry.photo && entry.imageSearchUrl ? (
-        <div className={styles.refLinks}>
-          <a
-            className={styles.refLink}
-            href={entry.imageSearchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Search size={13} aria-hidden="true" />
-            Google Images
-          </a>
-        </div>
-      ) : null}
+      <p className={styles.cardTitle}>{entry.title}</p>
+      <p className={styles.prompt}>{entry.prompt}</p>
 
       <div className={styles.cardBottom}>
         <div className={styles.usages}>
-          <span className={styles.usagesLabel}>
-            Used on {entry.usages.length} page{entry.usages.length === 1 ? "" : "s"}
-          </span>
-          {entry.usages.map((u) => (
-            <a key={u.href} className={styles.usage} href={u.href}>
-              <span className={styles.usageCourse}>{u.courseTitle}</span> ·{" "}
-              {u.route} →
-            </a>
-          ))}
+          <span className={styles.usagesLabel}>Used on</span>
+          <a className={styles.usage} href={entry.href}>
+            <span className={styles.usageCourse}>{entry.courseTitle}</span> ·{" "}
+            {entry.route} →
+          </a>
         </div>
         <button
           type="button"
@@ -128,7 +187,6 @@ export function IllustrationPromptsClient({
 }: {
   data: IllustrationPromptsData;
 }) {
-  const [theme, toggleTheme] = useTheme();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const onCopy = useCallback((key: string, text: string) => {
@@ -146,70 +204,112 @@ export function IllustrationPromptsClient({
       });
   }, []);
 
-  const people = data.entries.filter((e) => e.photo);
-  const objects = data.entries.filter((e) => !e.photo);
+  // Each card now carries two full-width images (the original and its cut-out),
+  // so a page of every entry is a very long scroll and a lot of image bytes.
+  // Paginate over the flat, pre-sorted list and re-group whatever lands on the
+  // current page, so category headings still appear but only for what is shown.
+  const [page, setPage] = useState(0);
+  const pageCount = Math.max(1, Math.ceil(data.entries.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount - 1);
 
-  const section = (
-    title: string,
-    entries: IllustrationPromptEntry[],
-  ) =>
-    entries.length === 0 ? null : (
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>
-          {title}
-          <span className={styles.sectionCount}>
-            {entries.length} illustration{entries.length === 1 ? "" : "s"}
-          </span>
-        </h2>
-        <div className={styles.list}>
-          {entries.map((entry) => (
-            <PromptCard
-              key={entry.slug}
-              entry={entry}
-              copiedKey={copiedKey}
-              onCopy={onCopy}
-            />
-          ))}
-        </div>
-      </section>
-    );
+  const groups = useMemo(() => {
+    const slice = data.entries.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
+    const byLabel = new Map<string, IllustrationPromptEntry[]>();
+    for (const entry of slice) {
+      const list = byLabel.get(entry.categoryLabel);
+      if (list) list.push(entry);
+      else byLabel.set(entry.categoryLabel, [entry]);
+    }
+    return [...byLabel.entries()];
+  }, [data.entries, current]);
+
+  const goTo = useCallback((next: number) => {
+    setPage(next);
+    // Jumping pages mid-scroll would otherwise land the reader in the middle of
+    // the new page's cards with no context.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
-    <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
+    <div className={styles.page}>
+      {/* Docked rather than inline in the header: the page is a long scroll of
+          artwork, and flipping the background under it is the point, so the
+          pill has to stay reachable wherever the reader has got to. */}
+      <div className={styles.themeDock}>
+        <ThemePillToggle />
+      </div>
       <div className={styles.inner}>
         <header className={styles.header}>
           <div className={styles.headerRow}>
             <h1 className={styles.title}>Illustration prompts</h1>
-            <button
-              type="button"
-              className={styles.themeToggle}
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            >
-              {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-              <span>{theme === "light" ? "Dark" : "Light"}</span>
-            </button>
           </div>
           <p className={styles.subtitle}>
-            Placeholder prompts for the custom line-art illustrations across the{" "}
-            <code>/learn</code> and <code>/interview</code> pages,{" "}
+            GPT Image 2 prompts for the custom illustrations across the Dataslope
+            courses and interview prep, a mix of styles (risograph, flat vector,
+            line art, isometric, blueprint) rendered in the four brand colors.{" "}
             <span className={styles.count}>{data.totalIllustrations}</span>{" "}
-            illustration{data.totalIllustrations === 1 ? "" : "s"} to draw,
-            placed in <span className={styles.count}>{data.totalLessons}</span>{" "}
-            lesson{data.totalLessons === 1 ? "" : "s"}. Each card carries its
-            target file name and the exact generation prompt.
+            illustration{data.totalIllustrations === 1 ? "" : "s"} to draw across{" "}
+            <span className={styles.count}>{data.totalCourses}</span> course
+            {data.totalCourses === 1 ? "" : "s"}. Each card carries its target
+            file name and the exact generation prompt. Batch-generate them with{" "}
+            <code>scripts/generate-illustrations.mjs</code>.
           </p>
         </header>
 
         {data.totalIllustrations === 0 ? (
           <p className={styles.empty}>No illustration prompts found.</p>
         ) : (
-          <>
-            {section("People (portraits)", people)}
-            {section("Objects & scenes", objects)}
-          </>
+          groups.map(([label, entries]) => (
+            <section key={label} className={styles.section}>
+              <h2 className={styles.sectionHeading}>
+                {label}
+                <span className={styles.sectionCount}>
+                  {entries.length} illustration{entries.length === 1 ? "" : "s"}
+                </span>
+              </h2>
+              <div className={styles.list}>
+                {entries.map((entry) => (
+                  <PromptCard
+                    key={entry.id}
+                    entry={entry}
+                    copiedKey={copiedKey}
+                    onCopy={onCopy}
+                  />
+                ))}
+              </div>
+            </section>
+          ))
         )}
+
+        {pageCount > 1 ? (
+          <nav className={styles.pager} aria-label="Illustration pages">
+            <button
+              type="button"
+              className={styles.pagerBtn}
+              onClick={() => goTo(current - 1)}
+              disabled={current === 0}
+            >
+              ← Previous
+            </button>
+            <span className={styles.pagerStatus}>
+              Page {current + 1} of {pageCount}
+              <span className={styles.pagerRange}>
+                {" "}
+                · {current * PAGE_SIZE + 1}–
+                {Math.min((current + 1) * PAGE_SIZE, data.entries.length)} of{" "}
+                {data.entries.length}
+              </span>
+            </span>
+            <button
+              type="button"
+              className={styles.pagerBtn}
+              onClick={() => goTo(current + 1)}
+              disabled={current >= pageCount - 1}
+            >
+              Next →
+            </button>
+          </nav>
+        ) : null}
       </div>
     </div>
   );

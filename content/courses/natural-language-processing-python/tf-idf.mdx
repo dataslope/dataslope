@@ -11,49 +11,10 @@ hopes for the best. There is a more graceful idea, one of the most important in
 all of classic text analysis: instead of *deleting* common words, **weight every
 word by how distinctive it is.** That idea is **TF-IDF**.
 
-<svg
-  viewBox="0 0 640 224"
-  role="img"
-  aria-label="Four document cards each contain a faded blue word chip, but only one holds the green chip; thin gray lines pour the occurrences into two weight bars, the everywhere-word collapses to a stub while the rare word towers"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="92" y1="124" x2="272" y2="186" />
-    <line x1="240" y1="124" x2="276" y2="186" />
-    <line x1="372" y1="124" x2="284" y2="186" />
-    <line x1="512" y1="124" x2="288" y2="186" />
-    <line x1="224" y1="124" x2="348" y2="148" />
-  </g>
-  <g fill="currentColor" opacity="0.06">
-    <rect x="56" y="32" width="120" height="92" rx="10" />
-    <rect x="196" y="32" width="120" height="92" rx="10" />
-    <rect x="336" y="32" width="120" height="92" rx="10" />
-    <rect x="476" y="32" width="120" height="92" rx="10" />
-  </g>
-  <g fill="currentColor" opacity="0.13">
-    <rect x="72" y="48" width="86" height="6" rx="3" />
-    <rect x="72" y="84" width="70" height="6" rx="3" />
-    <rect x="72" y="102" width="80" height="6" rx="3" />
-    <rect x="212" y="66" width="84" height="6" rx="3" />
-    <rect x="212" y="102" width="64" height="6" rx="3" />
-    <rect x="352" y="66" width="78" height="6" rx="3" />
-    <rect x="352" y="84" width="88" height="6" rx="3" />
-    <rect x="352" y="102" width="58" height="6" rx="3" />
-    <rect x="492" y="48" width="76" height="6" rx="3" />
-    <rect x="492" y="66" width="88" height="6" rx="3" />
-    <rect x="492" y="102" width="72" height="6" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="72" y="63" width="40" height="12" rx="6" fillOpacity="0.4" />
-    <rect x="212" y="81" width="40" height="12" rx="6" fillOpacity="0.4" />
-    <rect x="352" y="45" width="40" height="12" rx="6" fillOpacity="0.4" />
-    <rect x="492" y="81" width="40" height="12" rx="6" fillOpacity="0.4" />
-  </g>
-  <rect x="212" y="45" width="44" height="12" rx="6" fill="var(--ds-green-500)" />
-  <rect x="260" y="186" width="36" height="22" rx="4" fill="var(--ds-blue-500)" fillOpacity="0.45" />
-  <rect x="330" y="148" width="36" height="60" rx="4" fill="var(--ds-green-500)" />
-  <rect x="248" y="208" width="134" height="2.5" rx="1.25" fill="var(--ds-gray-300)" />
-</svg>
+<Figure
+  slug="nlp-tf-idf-cutout"
+  alt="A balance beam on a platform where a common repeated tile sits light and a rare distinctive tile weighs the pan down"
+/>
 
 ## The intuition before the formula
 
@@ -152,10 +113,8 @@ corpus = [
 ]
 N = len(corpus)
 
-
 def doc_freq(word):
     return sum(1 for doc in corpus if word in doc)
-
 
 for word in ["the", "cat", "comet"]:
     df = doc_freq(word)
@@ -204,11 +163,9 @@ corpus = [
 N = len(corpus)
 vocab = sorted({w for doc in corpus for w in doc})
 
-
 def idf(word):
     df = sum(1 for doc in corpus if word in doc)
     return math.log(N / df)
-
 
 def tfidf(word, doc):
     tf = Counter(doc)[word] / len(doc)
@@ -295,16 +252,13 @@ N = len(CORPUS)`,
     # count of word in doc, divided by len(doc); 0.0 if doc is empty
     return 0.0
 
-
 def idf(word):
     # log(N / number_of_docs_containing_word)
     return 0.0
 
-
 def tfidf(word, doc):
     # tf(word, doc) * idf(word)
     return 0.0
-
 
 print("idf('the')      =", idf("the"))
 print("idf('cat')      =", round(idf("cat"), 3))
@@ -315,15 +269,12 @@ print("tfidf('cat',d0) =", round(tfidf("cat", CORPUS[0]), 3))
         return 0.0
     return Counter(doc)[word] / len(doc)
 
-
 def idf(word):
     df = sum(1 for d in CORPUS if word in d)
     return math.log(N / df)
 
-
 def tfidf(word, doc):
     return tf(word, doc) * idf(word)
-
 
 print("idf('the')      =", idf("the"))
 print("idf('cat')      =", round(idf("cat"), 3))

@@ -10,41 +10,10 @@ model orders without brute-force search. Master these two plots and the
 otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 *read off a chart*.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into small solid gray dots, an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="122" y="42" width="36" height="146" rx="13" fillOpacity="0.12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="80" cy="70" r="11" />
-    <circle cx="140" cy="70" r="8.5" fillOpacity="0.85" />
-    <circle cx="196" cy="70" r="7.5" fillOpacity="0.72" />
-    <circle cx="252" cy="70" r="6.6" fillOpacity="0.6" />
-    <circle cx="308" cy="70" r="5.8" fillOpacity="0.5" />
-    <circle cx="364" cy="70" r="5.1" fillOpacity="0.41" />
-    <circle cx="420" cy="70" r="4.5" fillOpacity="0.33" />
-    <circle cx="476" cy="70" r="4" fillOpacity="0.26" />
-    <circle cx="532" cy="70" r="3.6" fillOpacity="0.2" />
-    <circle cx="584" cy="70" r="3.2" fillOpacity="0.15" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="80" cy="160" r="11" />
-    <circle cx="140" cy="160" r="8.5" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <circle cx="196" cy="160" r="5" />
-    <circle cx="252" cy="160" r="5" />
-    <circle cx="308" cy="160" r="5" />
-    <circle cx="364" cy="160" r="5" />
-    <circle cx="420" cy="160" r="5" />
-    <circle cx="476" cy="160" r="5" />
-    <circle cx="532" cy="160" r="5" />
-  </g>
-</svg>
+<Figure
+  slug="tsa-acf-pacf-cutout"
+  alt="Two stem-plot panels on a platform, one with spikes tapering gradually and one with spikes stopping abruptly, dashed bands on both"
+/>
 
 ## Two kinds of correlation with the past
 
@@ -62,32 +31,6 @@ correlated with `y(t-2)` too, through the chain, even though there's no
 direct link. The **ACF** at lag 2 sees that indirect echo and is nonzero;
 the **PACF** at lag 2 strips the chain away and reveals the truth: no direct
 lag-2 relationship.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Two solid links join three dots in a chain while a faint arc of small dots leaps directly from the first to the last; a green ring pins the middle dot in place, the ACF counts the leaping indirect echo, the PACF holds the middleman fixed and keeps only direct ties"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="158" width="520" height="4" rx="2" fill="currentColor" opacity="0.15" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="185" cy="88" r="3.5" fillOpacity="0.3" />
-    <circle cx="230" cy="66" r="3.5" fillOpacity="0.3" />
-    <circle cx="275" cy="52" r="3.5" fillOpacity="0.3" />
-    <circle cx="320" cy="48" r="3.5" fillOpacity="0.3" />
-    <circle cx="365" cy="52" r="3.5" fillOpacity="0.3" />
-    <circle cx="410" cy="66" r="3.5" fillOpacity="0.3" />
-    <circle cx="455" cy="88" r="3.5" fillOpacity="0.3" />
-    <rect x="162" y="115" width="136" height="10" rx="5" fillOpacity="0.35" />
-    <rect x="342" y="115" width="136" height="10" rx="5" fillOpacity="0.35" />
-    <circle cx="140" cy="120" r="10" />
-    <circle cx="320" cy="120" r="10" />
-    <circle cx="500" cy="120" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <path d="M 303 120 a 17 17 0 1 0 34 0 a 17 17 0 1 0 -34 0 Z M 307 120 a 13 13 0 1 0 26 0 a 13 13 0 1 0 -26 0 Z" fillRule="evenodd" />
-  </g>
-</svg>
 
 <Callout type="tip" title="The intuition in one line">
 ACF asks "how related are values `k` apart, *however* that relationship
@@ -269,70 +212,6 @@ the band are statistically indistinguishable from zero, noise. Spikes
 `p`," we mean the spikes are significant up through lag `p` and then duck
 inside the band.
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Lollipop spikes around a shaded zero band: the first two rise clear of it in blue, the rest hide inside as small gray stems, and one lone red spike pokes far out down the row, only the overall pattern, not a single stray spike, names a model"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="60" y="94" width="520" height="52" rx="10" fill="currentColor" opacity="0.08" />
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="60" y="118" width="520" height="4" rx="2" />
-  </g>
-  <g
-    style={{ color: "var(--ds-blue-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M100 118 V 56" />
-    <path d="M140 118 V 72" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="100" cy="50" r="5.5" />
-    <circle cx="140" cy="66" r="5.5" />
-  </g>
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M180 118 V 106" />
-    <path d="M220 122 V 134" />
-    <path d="M260 118 V 110" />
-    <path d="M300 122 V 130" />
-    <path d="M340 118 V 104" />
-    <path d="M380 122 V 136" />
-    <path d="M420 118 V 108" />
-    <path d="M460 122 V 132" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <circle cx="180" cy="102" r="4" />
-    <circle cx="220" cy="138" r="4" />
-    <circle cx="260" cy="106" r="4" />
-    <circle cx="300" cy="134" r="4" />
-    <circle cx="340" cy="100" r="4" />
-    <circle cx="380" cy="140" r="4" />
-    <circle cx="420" cy="104" r="4" />
-    <circle cx="460" cy="136" r="4" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }}>
-    <path
-      d="M520 118 V 52"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="520" cy="46" r="5.5" />
-  </g>
-</svg>
-
 <Callout type="warn" title="Don't over-read the bands">
 With many lags plotted, a few spikes will breach the band *by chance* alone
 (plot 40 lags and ~2 false alarms at the 5% level are expected). So don't
@@ -447,7 +326,6 @@ y = y[20:]`,
     # TODO: mean-centered autocorrelation at the given lag
     return None
 
-
 my_acf = None  # list of acf_at(0..5)
 matches = None  # True if it matches statsmodels acf(y, nlags=5)
 print(my_acf)
@@ -459,13 +337,11 @@ from statsmodels.tsa.stattools import acf
 ybar = y.mean()
 denom = np.sum((y - ybar) ** 2)
 
-
 def acf_at(lag):
     if lag == 0:
         return 1.0
     num = np.sum((y[lag:] - ybar) * (y[:-lag] - ybar))
     return float(num / denom)
-
 
 my_acf = [acf_at(k) for k in range(6)]
 ref = acf(y, nlags=5)

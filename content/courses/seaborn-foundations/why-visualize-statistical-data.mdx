@@ -18,41 +18,10 @@ This page is about that gap, between what statistics *say* and what the
 data is *actually doing*, and why a picture closes it. It is the reason the
 rest of this course exists.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Two light blue panels share one identical yellow mean line and matching summary chips, joined by a gray equals sign, yet one holds a tidy rising trend and the other two separate clusters with a canyon between them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="70" y="30" width="210" height="140" rx="14" fillOpacity="0.12" />
-    <rect x="360" y="30" width="210" height="140" rx="14" fillOpacity="0.12" />
-    <circle cx="100" cy="146" r="4.5" />
-    <circle cx="128" cy="132" r="4.5" />
-    <circle cx="156" cy="118" r="4.5" />
-    <circle cx="184" cy="104" r="4.5" />
-    <circle cx="212" cy="90" r="4.5" />
-    <circle cx="240" cy="76" r="4.5" />
-    <circle cx="398" cy="146" r="4.5" />
-    <circle cx="420" cy="138" r="4.5" />
-    <circle cx="408" cy="128" r="4.5" />
-    <circle cx="430" cy="150" r="4.5" />
-    <circle cx="496" cy="78" r="4.5" />
-    <circle cx="518" cy="70" r="4.5" />
-    <circle cx="508" cy="88" r="4.5" />
-    <circle cx="532" cy="80" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="88" y="109" width="174" height="4" rx="2" />
-    <rect x="378" y="109" width="174" height="4" rx="2" />
-    <rect x="145" y="182" width="60" height="14" rx="7" />
-    <rect x="435" y="182" width="60" height="14" rx="7" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="304" y="92" width="32" height="5" rx="2.5" />
-    <rect x="304" y="104" width="32" height="5" rx="2.5" />
-  </g>
-</svg>
+<Figure
+  slug="sns-why-visualize-cutout"
+  alt="Four small scatter panels arranged in a square on a platform, each showing a visibly different pattern of dots"
+/>
 
 ## The eye is a pattern detector
 
@@ -73,8 +42,6 @@ So the case for statistical visualization is simple: **plots restore the
 information that summaries compress away.** Let's prove it.
 
 ## Meet Anscombe's quartet
-
-<IllustrationPrompt subject="Francis Anscombe" photo />
 
 In 1973 the statistician Francis Anscombe built four small datasets to make
 exactly this point. Each has 11 `(x, y)` pairs. They are now a rite of
@@ -239,8 +206,6 @@ it reveal, what does it hide, and when would it break?
 </Callout>
 
 ## It is not a fluke: the Datasaurus
-
-<IllustrationPrompt subject="the Datasaurus dinosaur-shaped scatter plot" />
 
 If you suspect Anscombe rigged a rare special case in 1973, a modern sequel
 puts that to rest. In 2017 Justin Matejka and George Fitzmaurice published

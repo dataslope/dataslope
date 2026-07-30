@@ -9,30 +9,12 @@ performance one, pick wrongly and your code will be full of awkward
 loops and edge cases; pick well and most queries become one method
 call.
 
-This chapter is about the **shape** of your data.
+<Figure
+  slug="jcol-data-modeling-cutout"
+  alt="Data modeling with collections, an isometric illustration"
+/>
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A data card models two blue keys, each indenting into its own child chips; a thin gray arrow from outside lands directly on one green chip ringed in yellow, the right nesting makes the lookup a single call"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="170" y="28" width="300" height="180" rx="14" fill="currentColor" opacity="0.05" />
-  <circle cx="200" cy="60" r="7" fill="var(--ds-blue-500)" />
-  <rect x="216" y="53" width="90" height="14" rx="7" fill="var(--ds-blue-500)" fillOpacity="0.7" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="232" y="82" width="56" height="16" rx="8" fillOpacity="0.5" />
-    <rect x="232" y="110" width="72" height="16" rx="8" fillOpacity="0.5" />
-  </g>
-  <circle cx="200" cy="146" r="7" fill="var(--ds-blue-500)" />
-  <rect x="216" y="139" width="74" height="14" rx="7" fill="var(--ds-blue-500)" fillOpacity="0.7" />
-  <rect x="232" y="170" width="64" height="16" rx="8" fill="var(--ds-yellow-500)" fillOpacity="0.6" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="60" y="116.5" width="158" height="3" rx="1.5" />
-    <polygon points="216,112.5 227,118 216,123.5" />
-  </g>
-  <rect x="226" y="104" width="84" height="28" rx="12" fill="none" stroke="var(--ds-yellow-500)" strokeWidth="2.5" />
-</svg>
+This chapter is about the **shape** of your data.
 
 ## The "shape" mental model
 

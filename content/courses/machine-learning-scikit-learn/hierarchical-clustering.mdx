@@ -11,6 +11,11 @@ entire **tree of clusters**, from "every point is its own cluster" all the
 way up to "everything is one big cluster", and lets you decide *afterward*
 where to slice it.
 
+<Figure
+  slug="ml-hierarchical-clustering-cutout"
+  alt="Hierarchical clustering, an isometric illustration"
+/>
+
 That tree, drawn as a diagram called a **dendrogram**, is the real prize.
 It does not just tell you the groups; it shows you which groups are tight,
 which are loose, which two clusters are most similar, and how the whole
@@ -21,43 +26,6 @@ This page assumes you have met clustering on the **K-Means Clustering**
 page. We will lean on the same instincts, distance, "similar things belong
 together," standardize before you measure distance, and add a new one:
 *structure*.
-
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A dendrogram fuses six leaf dots into ever larger clusters, hierarchical clustering builds the whole tree and lets you cut it afterward at any height"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.35">
-    <rect x="118" y="150" width="4" height="40" rx="2" />
-    <rect x="178" y="150" width="4" height="40" rx="2" />
-    <rect x="118" y="150" width="64" height="4" rx="2" />
-    <rect x="148" y="96" width="4" height="54" rx="2" />
-    <rect x="258" y="130" width="4" height="60" rx="2" />
-    <rect x="338" y="130" width="4" height="60" rx="2" />
-    <rect x="258" y="130" width="84" height="4" rx="2" />
-    <rect x="298" y="96" width="4" height="34" rx="2" />
-    <rect x="148" y="96" width="154" height="4" rx="2" />
-    <rect x="223" y="52" width="4" height="48" rx="2" />
-    <rect x="458" y="140" width="4" height="50" rx="2" />
-    <rect x="518" y="140" width="4" height="50" rx="2" />
-    <rect x="458" y="140" width="64" height="4" rx="2" />
-    <rect x="488" y="52" width="4" height="88" rx="2" />
-    <rect x="223" y="52" width="269" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="120" cy="198" r="6" />
-    <circle cx="180" cy="198" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="260" cy="198" r="6" />
-    <circle cx="340" cy="198" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="460" cy="198" r="6" />
-    <circle cx="520" cy="198" r="6" />
-  </g>
-</svg>
 
 <Callout type="info" title="Same family, different philosophy">
 K-means and hierarchical clustering are both unsupervised and both
@@ -379,7 +347,6 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import dendrogram
 
-
 def plot_dendrogram_from_model(model, **kwargs):
     # Count how many original points sit under each merged node.
     counts = np.zeros(model.children_.shape[0])
@@ -392,7 +359,6 @@ def plot_dendrogram_from_model(model, **kwargs):
     # SciPy's linkage matrix: [child1, child2, distance, sample_count].
     Z = np.column_stack([model.children_, model.distances_, counts]).astype(float)
     dendrogram(Z, **kwargs)
-
 
 X, _ = make_blobs(n_samples=18, centers=3, cluster_std=0.60, random_state=0)
 X_scaled = StandardScaler().fit_transform(X)

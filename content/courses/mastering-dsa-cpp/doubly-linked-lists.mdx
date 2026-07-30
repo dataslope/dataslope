@@ -7,52 +7,10 @@ A singly linked list has a blind spot: a node cannot see *backward*. Deleting a 
 
 That one capability, *unlink this exact node, right now, cheaply*, is the doubly linked list's reason to exist, and it powers a famous real-world design: the LRU cache. An LRU ("least recently used") cache keeps hot items in a doubly linked list ordered by recency; every access unlinks the touched node and re-splices it to the front, and every eviction pops the tail. All O(1), all impossible with a singly linked list or an array. You will find this exact structure inside CPU caches, database buffer pools, and `memcached`.
 
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Three blue node capsules linked by thin green next arrows arcing right above and yellow prev arrows arcing left below, with red null stops at both ends, a doubly linked list runs in both directions"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="145" y1="95" x2="127" y2="95" />
-    <line x1="495" y1="95" x2="513" y2="95" />
-  </g>
-  <g stroke="var(--ds-green-500)" strokeWidth="2.5" strokeLinecap="round" fill="none">
-    <path d="M205 68 C 228 50, 265 50, 283.3 64" />
-    <path d="M345 68 C 368 50, 405 50, 423.3 64" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="278.2,66.8 290,70 285.4,58.6" />
-    <polygon points="418.2,66.8 430,70 425.4,58.6" />
-  </g>
-  <g stroke="var(--ds-yellow-500)" strokeWidth="2.5" strokeLinecap="round" fill="none">
-    <path d="M295 122 C 272 140, 235 140, 217.1 125.5" />
-    <path d="M435 122 C 412 140, 375 140, 357.1 125.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="222.1,122.4 210,120 215.3,131" />
-    <polygon points="362.1,122.4 350,120 355.3,131" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="145" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
-    <rect x="285" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
-    <rect x="425" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="160" cy="95" r="4.5" />
-    <circle cx="300" cy="95" r="4.5" />
-    <circle cx="440" cy="95" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="200" cy="95" r="4.5" />
-    <circle cx="340" cy="95" r="4.5" />
-    <circle cx="480" cy="95" r="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="112" y="89" width="11" height="11" rx="3" />
-    <rect x="517" y="89" width="11" height="11" rx="3" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-doubly-linked-lists-cutout"
+  alt="Three cube nodes in a row joined by paired arrows running both directions, the middle node lifted slightly out of the chain"
+/>
 
 ## The shape of a doubly linked list
 

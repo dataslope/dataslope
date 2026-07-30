@@ -5,43 +5,12 @@ description: Literals, indexing, slicing, methods, and f-strings
 
 A `str` in Python 3 is an immutable sequence of Unicode code points. Strings are one of the most-used types in the language-text is everywhere-and Python gives you a rich toolkit for working with them.
 
-Every snippet on this page runs in your browser-no setup required.
-
 <Figure
-  slug="a-risograph-of-a-string-data-structure"
-  alt="A risograph of a string as a sequence of characters threaded in order"
+  slug="python-basics-strings-cutout"
+  alt="A long ribbon threaded with small rounded tiles like a bead necklace, curling across the frame"
 />
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Two thin yellow cut lines drop at positions two and six along a loaf of character cells and the span between them lifts out as a fresh green copy, slicing reads from the first cut up to, not including, the second"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="102" y="120" width="44" height="44" fillOpacity="0.3" />
-    <rect x="146" y="120" width="44" height="44" fillOpacity="0.2" />
-    <rect x="190" y="120" width="44" height="44" fillOpacity="0.3" />
-    <rect x="234" y="120" width="44" height="44" fillOpacity="0.2" />
-    <rect x="278" y="120" width="44" height="44" fillOpacity="0.3" />
-    <rect x="322" y="120" width="44" height="44" fillOpacity="0.2" />
-    <rect x="366" y="120" width="44" height="44" fillOpacity="0.3" />
-    <rect x="410" y="120" width="44" height="44" fillOpacity="0.2" />
-    <rect x="454" y="120" width="44" height="44" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="190" y="42" width="44" height="44" rx="4" fillOpacity="0.9" />
-    <rect x="234" y="42" width="44" height="44" rx="4" fillOpacity="0.7" />
-    <rect x="278" y="42" width="44" height="44" rx="4" fillOpacity="0.9" />
-    <rect x="322" y="42" width="44" height="44" rx="4" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="188" y="20" width="4" height="96" rx="2" />
-    <rect x="364" y="20" width="4" height="96" rx="2" />
-  </g>
-  <text x="190" y="196" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fill="currentColor" opacity="0.5">2</text>
-  <text x="366" y="196" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fill="currentColor" opacity="0.5">6</text>
-</svg>
+Every snippet on this page runs in your browser-no setup required.
 
 ## Real-world context: Text is everywhere
 
@@ -521,12 +490,10 @@ response = b"Hello"  # from a network request
     # Your code here
     return ""
 
-
 print(format_name("  ada", "LOVELACE "))
 `,
       solutionCode: `def format_name(first, last):
     return f"{last.strip().title()}, {first.strip().title()}"
-
 
 print(format_name("  ada", "LOVELACE "))
 `,
@@ -562,13 +529,11 @@ print(format_name("  ada", "LOVELACE "))
     # Your code here
     return False
 
-
 print(is_palindrome("A man, a plan, a canal: Panama"))
 `,
       solutionCode: `def is_palindrome(s):
     clean = "".join(c.lower() for c in s if c.isalnum())
     return clean == clean[::-1]
-
 
 print(is_palindrome("A man, a plan, a canal: Panama"))
 `,
@@ -609,14 +574,12 @@ print(is_palindrome("A man, a plan, a canal: Panama"))
     # Your code here
     return ""
 
-
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))
 `,
       solutionCode: `def slugify(text):
     clean = "".join(c.lower() if c.isalnum() or c == " " else "" for c in text)
     return "-".join(clean.split())
-
 
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))

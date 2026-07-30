@@ -16,33 +16,10 @@ queries into *trustworthy, repeatable* work. Nothing in the core path
 depends on it, so read it whenever the topic matters to you.
 </Callout>
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three colored station dots ride a thin loop whose gray arrowhead marks the direction of travel, and a geometric equals sign points to a stack of three identical green result chips, a reproducible workflow returns the same answer every lap"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <circle cx="240" cy="110" r="72" fill="none" stroke="var(--ds-gray-300)" strokeWidth="2.5" />
-  <polygon points="306.5,104 317.5,104 312,115" fill="var(--ds-gray-400)" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="240" cy="38" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="182" cy="156" r="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="298" cy="156" r="12" />
-  </g>
-  <g fill="var(--ds-gray-500)">
-    <rect x="372" y="100" width="28" height="5" rx="2.5" />
-    <rect x="372" y="112" width="28" height="5" rx="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="436" y="62" width="132" height="20" rx="10" />
-    <rect x="436" y="100" width="132" height="20" rx="10" />
-    <rect x="436" y="138" width="132" height="20" rx="10" />
-  </g>
-</svg>
+<Figure
+  slug="duck-reproducible-cutout"
+  alt="One query block on a platform stamping three identical result sheets, a stable sort pin holding their order"
+/>
 
 ## Why reproducibility is non-negotiable
 
@@ -190,34 +167,6 @@ ORDER BY
 The definition of "paid revenue by region" now lives in *one* place. If
 the business redefines it, you change the view once and every downstream
 query follows.
-
-<svg
-  viewBox="0 0 640 175"
-  role="img"
-  aria-label="Three blue readers draw from one yellow named definition along thin solid lines, while below two gray copy-pasted chips have drifted out of line under a red slash, a view keeps everyone computing the same metric"
-  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="214" y1="66" x2="360" y2="28" />
-    <line x1="214" y1="66" x2="368" y2="66" />
-    <line x1="214" y1="66" x2="360" y2="104" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="86" y="48" width="128" height="36" rx="18" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="372" cy="28" r="11" />
-    <circle cx="380" cy="66" r="11" />
-    <circle cx="372" cy="104" r="11" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="118" y="128" width="84" height="16" rx="8" />
-    <rect x="232" y="140" width="84" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="206" y="130" width="34" height="6" rx="3" transform="rotate(14 223 133)" />
-  </g>
-</svg>
 
 ## Structure for readability and auditability
 

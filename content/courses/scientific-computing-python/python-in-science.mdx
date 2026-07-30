@@ -12,45 +12,12 @@ produce the machine code. That idea gave us FORTRAN, then MATLAB,
 and finally the scientific Python stack you are running right now.
 This chapter is that lineage, three languages, one continuous idea.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A solid blue hub links by thin lines to a formula card, a data grid card, and a rising chart card, Python sitting at the center of scientific work, gluing math, data, and plots together"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="293" y1="95" x2="222" y2="72" />
-    <line x1="293" y1="125" x2="222" y2="152" />
-    <line x1="352" y1="110" x2="428" y2="110" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="110" r="30" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="90" y="30" width="130" height="64" rx="12" fillOpacity="0.12" />
-    <rect x="108" y="48" width="50" height="8" rx="4" />
-    <rect x="108" y="66" width="80" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="90" y="130" width="130" height="64" rx="12" fillOpacity="0.16" />
-    <rect x="110" y="144" width="14" height="14" rx="3" />
-    <rect x="132" y="144" width="14" height="14" rx="3" />
-    <rect x="154" y="144" width="14" height="14" rx="3" />
-    <rect x="110" y="166" width="14" height="14" rx="3" />
-    <rect x="132" y="166" width="14" height="14" rx="3" />
-    <rect x="154" y="166" width="14" height="14" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="430" y="70" width="130" height="80" rx="12" fillOpacity="0.12" />
-    <rect x="450" y="118" width="14" height="20" rx="4" />
-    <rect x="472" y="104" width="14" height="34" rx="4" />
-    <rect x="494" y="90" width="14" height="48" rx="4" />
-  </g>
-</svg>
+<Figure
+  slug="scipy-python-in-science-cutout"
+  alt="Three stepped platforms carrying a punched-card reader, a matrix calculator panel, and a small modern console"
+/>
 
 ## FORTRAN: scientists' first compiler
-
-<IllustrationPrompt subject="John Backus" photo />
 
 A team led by **John Backus** at IBM started work on FORTRAN, the
 **FOR**mula **TRAN**slator, in 1954 and released the first compiler
@@ -100,8 +67,6 @@ as the primary data type**, **fast numerical inner loops**, and
 the workhorses inside SciPy).
 
 ## MATLAB: a calculator that thought in matrices
-
-<IllustrationPrompt subject="Cleve Moler" photo />
 
 In the late 1970s, **Cleve Moler** was teaching numerical analysis at
 the University of New Mexico. He wanted students to use the new
@@ -158,8 +123,6 @@ support for strings, file formats, plotting, or the gluework that
 surrounds real science.
 
 ## Why Python won
-
-<IllustrationPrompt subject="Travis Oliphant" photo />
 
 In 1995, scientific Python did not exist. By 2015 it was the most
 widely used language in computational research. The transformation
@@ -260,10 +223,8 @@ noisy = clean + 0.5 * np.sin(2 * np.pi * 20 * t) + 0.4 * rng.standard_normal(t.s
 sos = signal.butter(N=4, Wn=5, btype="low", fs=400, output="sos")
 filtered = signal.sosfiltfilt(sos, noisy)
 
-
 def snr(x, ref):
     return 10 * np.log10(np.var(ref) / np.var(x - ref))
-
 
 print(pd.Series({"noisy_SNR_dB": snr(noisy, clean),
                  "filtered_SNR_dB": snr(filtered, clean)}).round(2))

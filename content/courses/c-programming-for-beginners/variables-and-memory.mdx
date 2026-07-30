@@ -6,72 +6,13 @@ description: What a variable really is, where it lives, and how to think about i
 A **variable** in C is a name attached to a piece of memory. Behind
 the friendly name is a fixed-size box of bytes at a specific address.
 
+<Figure
+  slug="c-variables-and-memory-cutout"
+  alt="Variables and memory, an isometric illustration"
+/>
+
 That mental model, *variable = labelled box in memory*, will guide
 every chapter from now on.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="A long strip of memory cells with a few occupied by colored values, one holding a half-faded dot, a variable never initialized, and address ticks underneath"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.08">
-    <rect x="75" y="80" width="30" height="30" rx="6" />
-    <rect x="110" y="80" width="30" height="30" rx="6" />
-    <rect x="145" y="80" width="30" height="30" rx="6" />
-    <rect x="180" y="80" width="30" height="30" rx="6" />
-    <rect x="215" y="80" width="30" height="30" rx="6" />
-    <rect x="250" y="80" width="30" height="30" rx="6" />
-    <rect x="285" y="80" width="30" height="30" rx="6" />
-    <rect x="320" y="80" width="30" height="30" rx="6" />
-    <rect x="355" y="80" width="30" height="30" rx="6" />
-    <rect x="390" y="80" width="30" height="30" rx="6" />
-    <rect x="425" y="80" width="30" height="30" rx="6" />
-    <rect x="460" y="80" width="30" height="30" rx="6" />
-    <rect x="495" y="80" width="30" height="30" rx="6" />
-    <rect x="530" y="80" width="30" height="30" rx="6" />
-  </g>
-  <path
-    d="M78 128 H 557"
-    fill="none"
-    stroke="var(--ds-gray-300)"
-    strokeWidth="2"
-    strokeLinecap="round"
-   
-  />
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    opacity="0.25"
-  >
-    <path d="M90 123 V 133" />
-    <path d="M160 123 V 133" />
-    <path d="M230 123 V 133" />
-    <path d="M300 123 V 133" />
-    <path d="M370 123 V 133" />
-    <path d="M440 123 V 133" />
-    <path d="M510 123 V 133" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="138" y="58" width="44" height="12" rx="6" />
-    <rect x="248" y="58" width="44" height="12" rx="6" />
-    <rect x="383" y="58" width="44" height="12" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="160" cy="95" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="270" cy="95" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="405" cy="95" r="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="510" cy="95" r="10" fillOpacity="0.4" />
-  </g>
-</svg>
 
 ## Declaring a variable
 

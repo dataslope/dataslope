@@ -7,6 +7,11 @@ Before you build a schema, it helps to draw it. An
 **entity-relationship diagram**, usually called an **ER diagram**, is
 a picture of the main things in your system and how they connect.
 
+<Figure
+  slug="db-er-diagrams-cutout"
+  alt="Entity-relationship diagrams, an isometric illustration"
+/>
+
 The idea has a precise birthday: computer scientist Peter Chen
 introduced the entity-relationship model in a 1976 paper, "The
 Entity-Relationship Model, Toward a Unified View of Data," arguing
@@ -18,43 +23,6 @@ whiteboards.
 
 The goal is not art. The goal is shared understanding before the SQL
 hardens your choices into a database.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Two entity boxes joined by a relationship line carrying a small yellow label chip, with a double bar on one end and a crow's-foot on the other, an ER diagram stating one-to-many before any SQL exists"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g
-    style={{ color: "var(--ds-gray-400)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M240 102 H 376" />
-    <path d="M252 90 V 114" />
-    <path d="M262 90 V 114" />
-    <path d="M376 102 L 400 88" />
-    <path d="M376 102 L 400 102" />
-    <path d="M376 102 L 400 116" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="70" width="140" height="64" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="400" y="70" width="140" height="64" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="296" y="92" width="48" height="20" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <rect x="116" y="88" width="72" height="9" rx="4.5" />
-    <rect x="116" y="106" width="52" height="9" rx="4.5" />
-    <rect x="416" y="88" width="72" height="9" rx="4.5" />
-    <rect x="416" y="106" width="52" height="9" rx="4.5" />
-  </g>
-</svg>
 
 ## Why draw before building?
 

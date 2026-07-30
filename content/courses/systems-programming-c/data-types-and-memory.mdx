@@ -9,40 +9,10 @@ fixed number of bytes. That fixed size is both C's greatest strength
 of overflow bugs. This page builds the mental model you need to
 reason about *what is actually in memory*.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="A tube of fixed height is packed full of blue value blocks; the next red block cannot fit and tips over the rim, while a thin arrow loops from the top of the tube around to its bottom, a fixed-size integer overflowing and wrapping to the minimum"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="270" y="40" width="6" height="152" rx="3" />
-    <rect x="364" y="40" width="6" height="152" rx="3" />
-    <rect x="270" y="186" width="100" height="6" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="308" y="158" width="24" height="24" rx="5" />
-    <rect x="308" y="132" width="24" height="24" rx="5" />
-    <rect x="308" y="106" width="24" height="24" rx="5" />
-    <rect x="308" y="80" width="24" height="24" rx="5" />
-    <rect x="308" y="54" width="24" height="24" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="308" y="16" width="24" height="24" rx="5" transform="rotate(14 320 28)" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M384 48 C 424 82, 424 150, 386.4 183.6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <polygon points="383.9,178.3 380,190 391.7,186.1" />
-  </g>
-</svg>
+<Figure
+  slug="sysc-data-types-cutout"
+  alt="Four byte-width trays of increasing size on a platform, one tray visibly overflowing its edge"
+/>
 
 ## The fundamental types
 
@@ -218,32 +188,6 @@ Little-endian:   0x78     0x56     0x34     0x12     (x86, WASI)
 Big-endian:      0x12     0x34     0x56     0x78
 ```
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="The same four byte blocks, graded tall to short, appear in opposite orders on two shelves: big-endian leads with the tallest byte while little-endian leads with the shortest one, marked by a yellow underline in both rows, opposite layouts, identical value"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="140,68 156,76 140,84" />
-    <polygon points="140,148 156,156 140,164" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="180" y="46" width="46" height="44" rx="6" />
-    <rect x="238" y="56" width="46" height="34" rx="6" />
-    <rect x="296" y="66" width="46" height="24" rx="6" />
-    <rect x="354" y="76" width="46" height="14" rx="6" />
-    <rect x="180" y="156" width="46" height="14" rx="6" />
-    <rect x="238" y="146" width="46" height="24" rx="6" />
-    <rect x="296" y="136" width="46" height="34" rx="6" />
-    <rect x="354" y="126" width="46" height="44" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="354" y="94" width="46" height="5" rx="2.5" />
-    <rect x="180" y="174" width="46" height="5" rx="2.5" />
-  </g>
-</svg>
-
 You can *see* the byte order at runtime by reading the bytes of an
 integer through a `char *`:
 
@@ -301,33 +245,6 @@ The compiler enforces alignment automatically: local variables and
 struct members are placed at aligned addresses, sometimes with unused
 padding bytes in between. We will see padding clearly when we cover
 structs.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Cars parked neatly inside evenly spaced parking bays, except one red car slewed across two bays' dividing line, values must start at addresses that are multiples of their size, and the red one is misaligned"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="78" y="34" width="4" height="96" rx="2" />
-    <rect x="158" y="34" width="4" height="96" rx="2" />
-    <rect x="238" y="34" width="4" height="96" rx="2" />
-    <rect x="318" y="34" width="4" height="96" rx="2" />
-    <rect x="398" y="34" width="4" height="96" rx="2" />
-    <rect x="478" y="34" width="4" height="96" rx="2" />
-    <rect x="558" y="34" width="4" height="96" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="42" width="48" height="76" rx="10" />
-    <rect x="336" y="42" width="48" height="76" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="176" y="42" width="48" height="76" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="454" y="42" width="48" height="76" rx="10" transform="rotate(14 478 80)" />
-  </g>
-</svg>
 
 <CodeBlock
   adapter="c"

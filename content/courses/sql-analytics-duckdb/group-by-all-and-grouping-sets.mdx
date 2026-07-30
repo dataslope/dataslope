@@ -10,38 +10,10 @@ multi-level summaries in a single query. This page covers `GROUP BY ALL`
 SETS`) for subtotals, the kind of thing you would otherwise stitch
 together with several queries.
 
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="Six blue detail chips join by thin gray lines into two green subtotal chips, which join into one yellow grand total, one rolled-up query returning every level of summary at once"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="125" y1="176" x2="195" y2="126" />
-    <line x1="195" y1="176" x2="195" y2="126" />
-    <line x1="265" y1="176" x2="195" y2="126" />
-    <line x1="359" y1="176" x2="429" y2="126" />
-    <line x1="429" y1="176" x2="429" y2="126" />
-    <line x1="499" y1="176" x2="429" y2="126" />
-    <line x1="195" y1="108" x2="320" y2="58" />
-    <line x1="429" y1="108" x2="320" y2="58" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="176" width="58" height="16" rx="8" />
-    <rect x="166" y="176" width="58" height="16" rx="8" />
-    <rect x="236" y="176" width="58" height="16" rx="8" />
-    <rect x="330" y="176" width="58" height="16" rx="8" />
-    <rect x="400" y="176" width="58" height="16" rx="8" />
-    <rect x="470" y="176" width="58" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="130" y="108" width="130" height="18" rx="9" />
-    <rect x="364" y="108" width="130" height="18" rx="9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="230" y="38" width="180" height="20" rx="10" />
-  </g>
-</svg>
+<Figure
+  slug="duck-grouping-sets-cutout"
+  alt="A stepped pyramid of summary blocks on a platform, each tier a coarser subtotal of the tier below"
+/>
 
 ## `GROUP BY ALL`, stop repeating yourself
 
@@ -176,37 +148,6 @@ ORDER BY
 
 You now have per-region subtotals, per-product subtotals, the detail, and
 the grand total, the full cross-tabulation, in one query.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A two-by-two grid of blue detail cells grows a green margin column, a yellow margin row, and a red corner total, CUBE computing the detail and every marginal subtotal in a single pass"
-  style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="160" y="30" width="92" height="44" rx="9" fillOpacity="0.55" />
-    <rect x="262" y="30" width="92" height="44" rx="9" fillOpacity="0.4" />
-    <rect x="160" y="84" width="92" height="44" rx="9" fillOpacity="0.35" />
-    <rect x="262" y="84" width="92" height="44" rx="9" fillOpacity="0.6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="382" y="30" width="60" height="44" rx="9" fillOpacity="0.8" />
-    <rect x="382" y="84" width="60" height="44" rx="9" fillOpacity="0.8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="160" y="146" width="92" height="28" rx="9" fillOpacity="0.85" />
-    <rect x="262" y="146" width="92" height="28" rx="9" fillOpacity="0.85" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="382" y="146" width="60" height="28" rx="9" fillOpacity="0.8" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="368" cy="52" r="2.5" />
-    <circle cx="368" cy="106" r="2.5" />
-    <circle cx="206" cy="138" r="2.5" />
-    <circle cx="308" cy="138" r="2.5" />
-  </g>
-</svg>
 
 ## Distinguishing real NULLs from subtotal NULLs
 

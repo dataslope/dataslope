@@ -5,6 +5,11 @@ description: Names, assignment, and Python's dynamic typing
 
 In Python, a **variable** is a name that references an object in memory. There's no `let`, `var`, or type declaration-assignment with `=` creates the binding. This simplicity is powerful, but it comes with subtleties you need to understand to avoid surprises.
 
+<Figure
+  slug="python-basics-variables-cutout"
+  alt="An isometric shelf of labelled storage boxes and jars, each holding a different geometric object"
+/>
+
 Every snippet on this page runs in your browser-no setup required.
 
 <CodeBlock
@@ -21,30 +26,6 @@ print(name, "is", age, "years old. Pi is approximately", pi)
     },
   ]}
 />
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three yellow name tags hang by thin lines above two solid values, and two of the tags are tied to the same blue circle, Python variables are labels attached to values, not boxes that contain them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2" strokeLinecap="round">
-    <line x1="128" y1="66" x2="172" y2="116" />
-    <line x1="248" y1="66" x2="192" y2="116" />
-    <line x1="438" y1="66" x2="404" y2="114" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="90" y="40" width="76" height="24" rx="12" />
-    <rect x="210" y="40" width="76" height="24" rx="12" />
-    <rect x="400" y="40" width="76" height="24" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="180" cy="140" r="22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="380" y="118" width="48" height="48" rx="10" />
-  </g>
-</svg>
 
 ## Real-world context: Variables everywhere
 
@@ -321,11 +302,9 @@ print("b =", b)
       filename: "main.py",
       starterCode: `import keyword
 
-
 def is_valid_identifier(name):
     # Your code here
     return False
-
 
 print(is_valid_identifier("user_count"))
 print(is_valid_identifier("2nd_place"))
@@ -333,10 +312,8 @@ print(is_valid_identifier("class"))
 `,
       solutionCode: `import keyword
 
-
 def is_valid_identifier(name):
     return name.isidentifier() and not keyword.iskeyword(name)
-
 
 print(is_valid_identifier("user_count"))
 print(is_valid_identifier("2nd_place"))

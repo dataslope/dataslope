@@ -14,33 +14,10 @@ But many everyday questions are not detail questions. They are summary questions
 
 **Aggregate functions** answer questions like these by reading many rows and returning one summary value.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three blue isometric cubes standing for many raw rows flow along a solid gray arrow into one large green cube, many rows in, a single summary value out"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="150,35 194,60 150,85 106,60" />
-    <polygon points="106,60 150,85 150,125 106,100" fillOpacity="0.65" />
-    <polygon points="194,60 150,85 150,125 194,100" fillOpacity="0.4" />
-    <polygon points="95,105 139,130 95,155 51,130" />
-    <polygon points="51,130 95,155 95,195 51,170" fillOpacity="0.65" />
-    <polygon points="139,130 95,155 95,195 139,170" fillOpacity="0.4" />
-    <polygon points="205,105 249,130 205,155 161,130" />
-    <polygon points="161,130 205,155 205,195 161,170" fillOpacity="0.65" />
-    <polygon points="249,130 205,155 205,195 249,170" fillOpacity="0.4" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="284" y="110.5" width="56" height="3" rx="1.5" />
-    <polygon points="338,106.5 349,112 338,117.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="480,50 542,85 480,120 418,85" />
-    <polygon points="418,85 480,120 480,176 418,141" fillOpacity="0.65" />
-    <polygon points="542,85 480,120 480,176 542,141" fillOpacity="0.4" />
-  </g>
-</svg>
+<Figure
+  slug="lite-aggregates-cutout"
+  alt="A tall stack of tiles funnelling into a narrow neck and emerging as one single summary block"
+/>
 
 ## From many rows to one answer
 
@@ -161,27 +138,6 @@ Aggregates are for summary questions, not row-by-row detail questions.`}
 ## Finding the smallest and largest values
 
 `MIN(column)` returns the smallest value. `MAX(column)` returns the largest value.
-
-<svg
-  viewBox="0 0 640 150"
-  role="img"
-  aria-label="A row of light blue bars of different heights on a thin baseline, with the shortest bar solid green and the tallest solid red, MIN and MAX walk the whole column and point at its two extremes"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="96" y="66" width="34" height="52" rx="5" fillOpacity="0.45" />
-    <rect x="248" y="44" width="34" height="74" rx="5" fillOpacity="0.45" />
-    <rect x="324" y="78" width="34" height="40" rx="5" fillOpacity="0.45" />
-    <rect x="476" y="88" width="34" height="30" rx="5" fillOpacity="0.45" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="172" y="98" width="34" height="20" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="400" y="22" width="34" height="96" rx="5" />
-  </g>
-  <rect x="70" y="118" width="500" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

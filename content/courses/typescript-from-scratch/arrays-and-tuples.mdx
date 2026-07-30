@@ -19,52 +19,10 @@ the bounds of a known-length sequence.
 This chapter answers: **How do you type arrays?** **What's the difference
 between arrays and tuples?** **What bugs does this prevent?**
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A rail of identical blue squares runs on past a dashed continuation, an array holds any number of one type, while below, a tray with exactly three slots holds a green square, a blue circle, and a yellow triangle in fixed positions, a tuple gives each slot its own type"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="60" y="72" width="470" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M544 76 H 596"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeDasharray="6 8"
-    />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="44" width="26" height="26" rx="6" />
-    <rect x="130" y="44" width="26" height="26" rx="6" />
-    <rect x="180" y="44" width="26" height="26" rx="6" />
-    <rect x="230" y="44" width="26" height="26" rx="6" />
-    <rect x="280" y="44" width="26" height="26" rx="6" />
-    <rect x="330" y="44" width="26" height="26" rx="6" />
-    <rect x="380" y="44" width="26" height="26" rx="6" />
-    <rect x="430" y="44" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="170" y="140" width="300" height="64" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.9">
-    <rect x="268" y="148" width="6" height="48" rx="3" />
-    <rect x="368" y="148" width="6" height="48" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="199" y="152" width="40" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="172" r="20" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="421,150 443,192 399,192" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-arrays-tuples-cutout"
+  alt="A long tray of identical sockets beside a short fixed tray whose three sockets each have a different shape"
+/>
 
 ## Array types: homogeneous collections
 
@@ -186,45 +144,6 @@ makes that contract explicit. The compiler ensures that the function
 doesn't accidentally call a mutating method. This is especially valuable
 in large codebases where function signatures act as machine-checked
 documentation.
-
-<svg
-  viewBox="0 0 640 190"
-  role="img"
-  aria-label="Four blue squares sit safely inside a green outlined display case while a red square outside is stopped at the wall with a red cross, a readonly array can be viewed and iterated but never mutated"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <rect
-      x="140"
-      y="50"
-      width="280"
-      height="90"
-      rx="14"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-    />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="168" y="81" width="28" height="28" rx="6" />
-    <rect x="228" y="81" width="28" height="28" rx="6" />
-    <rect x="288" y="81" width="28" height="28" rx="6" />
-    <rect x="348" y="81" width="28" height="28" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="478" y="82" width="26" height="26" rx="6" transform="rotate(12 491 95)" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-  >
-    <path d="M432 87 L 448 103" />
-    <path d="M448 87 L 432 103" />
-  </g>
-</svg>
 
 Alternatively, you can use the `ReadonlyArray<T>` generic:
 
@@ -391,38 +310,6 @@ console.log(\`\${aliceName}'s scores:\`, aliceScores);
 
 The rest element must be last. It behaves like a normal array, so you can
 iterate over it, `push` to it (if the tuple is mutable), etc.
-
-<svg
-  viewBox="0 0 640 170"
-  role="img"
-  aria-label="A single tray slot holds one fixed green square, then a rail of identical blue squares stretches away past a dashed continuation, a tuple's required head followed by a rest element of any length"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="56" y="66" width="110" height="68" rx="12" />
-    <rect x="190" y="96" width="330" height="8" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="91" y="80" width="40" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="210" y="68" width="26" height="26" rx="6" />
-    <rect x="260" y="68" width="26" height="26" rx="6" />
-    <rect x="310" y="68" width="26" height="26" rx="6" />
-    <rect x="360" y="68" width="26" height="26" rx="6" />
-    <rect x="410" y="68" width="26" height="26" rx="6" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M534 100 H 586"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeDasharray="6 8"
-    />
-  </g>
-</svg>
 
 ## Variadic tuple types (a glimpse)
 

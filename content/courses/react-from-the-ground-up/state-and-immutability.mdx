@@ -9,6 +9,11 @@ sees that the state *value changed*, and it checks by identity: is this
 a **different** object than last time? So the rule is simple and
 absolute: **never mutate state, replace it.**
 
+<Figure
+  slug="rx-immutability-cutout"
+  alt="An old tray of tiles set aside intact while a freshly built replacement tray takes its place on the platform"
+/>
+
 ## Why mutation doesn't work
 
 `items.push("new")` changes the existing array in place. Its identity is

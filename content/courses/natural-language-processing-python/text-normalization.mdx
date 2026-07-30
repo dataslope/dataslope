@@ -14,41 +14,10 @@ The two workhorse normalization steps, and the focus of this page, are
 **case folding** (lowercasing) and **punctuation stripping**. Both are
 simple to do and surprisingly consequential to get wrong.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="A messy tilted stack of blue word chips in mixed sizes, one trailing a red punctuation dot, passes through a green normalizer box marked with two equal bars and comes out as four identical aligned green chips"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="60" y="36" width="88" height="30" rx="11" fillOpacity="0.75" transform="rotate(-6 104 51)" />
-    <rect x="74" y="84" width="64" height="24" rx="10" fillOpacity="0.45" transform="rotate(4 106 96)" />
-    <rect x="56" y="128" width="96" height="34" rx="12" fillOpacity="0.6" transform="rotate(-3 104 145)" />
-    <rect x="78" y="174" width="72" height="26" rx="10" fillOpacity="0.4" transform="rotate(5 114 187)" />
-  </g>
-  <circle cx="160" cy="146" r="5" fill="var(--ds-red-500)" fillOpacity="0.6" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="186" y="108.5" width="44" height="3" rx="1.5" />
-    <polygon points="228,104.5 239,110 228,115.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="252" y="76" width="96" height="68" rx="16" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <rect x="276" y="100" width="48" height="6" rx="3" fillOpacity="0.9" />
-    <rect x="276" y="114" width="48" height="6" rx="3" fillOpacity="0.9" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="362" y="108.5" width="44" height="3" rx="1.5" />
-    <polygon points="404,104.5 415,110 404,115.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="444" y="32" width="88" height="26" rx="10" />
-    <rect x="444" y="80" width="88" height="26" rx="10" />
-    <rect x="444" y="128" width="88" height="26" rx="10" />
-    <rect x="444" y="176" width="88" height="26" rx="10" />
-  </g>
-</svg>
+<Figure
+  slug="nlp-normalization-cutout"
+  alt="Three differently shaped tiles pressed through a single flattening roller and emerging as three identical tiles"
+/>
 
 ## Case folding: collapsing "The", "the", and "THE"
 
@@ -264,7 +233,6 @@ stripping, you do not need to fix it here, just be aware of it.)`}
     # 3. split and drop empties
     return []
 
-
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))
 `,
@@ -273,7 +241,6 @@ print(normalize("Wow!!!  Amazing??"))
     table = str.maketrans("", "", string.punctuation)
     text = text.translate(table)
     return [w for w in text.split() if w]
-
 
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))

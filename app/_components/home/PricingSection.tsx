@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import {
   Briefcase,
   Check,
@@ -24,10 +23,7 @@ import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
 import { Highlighter } from "@/components/ui/highlighter";
-import {
-  stashCheckoutPeriod,
-  startProCheckout,
-} from "../billing/proCheckout";
+import { stashCheckoutPeriod, startProCheckout } from "../billing/proCheckout";
 
 /** A single capability line: an icon that maps to the feature, the text, and an
  *  optional clarifying sub-note. Set `included: false` to render it as a
@@ -213,7 +209,7 @@ function sameFeature(a: Feature, b: Feature): boolean {
   return (
     a.text === b.text &&
     (a.note ?? "") === (b.note ?? "") &&
-    a.included !== false === (b.included !== false)
+    (a.included !== false) === (b.included !== false)
   );
 }
 
@@ -472,12 +468,9 @@ export function PricingSection({
     <section id="pricing" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
       {showHeading && (
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <SparklesText
-            as="h2"
-            className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white"
-          >
+          <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
             Pricing
-          </SparklesText>
+          </h2>
           <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
             Every course, interview track, and playground is free to use, and
             anyone can share a playground with a link. Create a free account to

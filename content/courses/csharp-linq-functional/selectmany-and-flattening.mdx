@@ -8,45 +8,17 @@ each element to a *sequence* of things, and then flattens the result
 into one sequence. It is the answer to a question that comes up
 constantly in real data:
 
+<Figure
+  slug="cs-selectmany-flattening-cutout"
+  alt="SelectMany and flattening, an isometric illustration"
+/>
+
 > *"I have a list of things, each of which has a list inside it.
 > How do I get one flat list out?"*
 
 That question is everywhere, orders with line items, blog posts
 with tags, departments with employees, files with lines, paragraphs
 with words. `SelectMany` is the right tool every single time.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three translucent bags holding dots empty downward into one flat row that keeps every dot in order, sequences of sequences flattened into one"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="100" y="40" width="120" height="70" rx="16" fillOpacity="0.12" />
-    <circle cx="130" cy="75" r="9" />
-    <circle cx="160" cy="75" r="9" />
-    <circle cx="190" cy="75" r="9" />
-    <circle cx="160" cy="170" r="9" />
-    <circle cx="196" cy="170" r="9" />
-    <circle cx="232" cy="170" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="260" y="40" width="100" height="70" rx="16" fillOpacity="0.12" />
-    <circle cx="288" cy="75" r="9" />
-    <circle cx="330" cy="75" r="9" />
-    <circle cx="268" cy="170" r="9" />
-    <circle cx="304" cy="170" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="400" y="40" width="130" height="70" rx="16" fillOpacity="0.12" />
-    <circle cx="432" cy="75" r="9" />
-    <circle cx="464" cy="75" r="9" />
-    <circle cx="496" cy="75" r="9" />
-    <circle cx="340" cy="170" r="9" />
-    <circle cx="376" cy="170" r="9" />
-    <circle cx="412" cy="170" r="9" />
-  </g>
-</svg>
 
 ## The problem with `Select` alone
 

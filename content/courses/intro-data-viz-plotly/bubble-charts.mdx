@@ -8,32 +8,10 @@ encodes a third quantitative variable. It's not really a different
 chart type, it's a scatter plot with an extra trick, but it's so
 useful that it gets its own page.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Translucent bubbles of many sizes drift across the scene, one green among the blue, with a nested size legend in the corner, area carrying a third variable"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="140" cy="170" r="14" fillOpacity="0.4" />
-    <circle cx="175" cy="82" r="6" fillOpacity="0.3" />
-    <circle cx="200" cy="120" r="22" fillOpacity="0.32" />
-    <circle cx="246" cy="64" r="8" fillOpacity="0.3" />
-    <circle cx="280" cy="160" r="30" fillOpacity="0.28" />
-    <circle cx="350" cy="95" r="18" fillOpacity="0.4" />
-    <circle cx="420" cy="130" r="38" fillOpacity="0.25" />
-    <circle cx="500" cy="80" r="26" fillOpacity="0.35" />
-    <circle cx="540" cy="150" r="10" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="468" cy="184" r="16" fillOpacity="0.5" />
-  </g>
-  <g fill="currentColor">
-    <circle cx="585" cy="197" r="18" opacity="0.12" />
-    <circle cx="585" cy="204" r="11" opacity="0.18" />
-    <circle cx="585" cy="210" r="5" opacity="0.25" />
-  </g>
-</svg>
+<Figure
+  slug="viz-bubble-charts-cutout"
+  alt="Bubble charts, an isometric illustration"
+/>
 
 ## The pitch
 
@@ -41,8 +19,6 @@ If a scatter plot uses x and y for two variables, a bubble chart
 gives you *three* variables in one picture: x, y, and bubble size.
 Add `color` and you have *four*. Add `facet_col` and you have
 *five*. This information density is the bubble chart's superpower.
-
-<IllustrationPrompt subject="Hans Rosling" photo />
 
 The most famous bubble chart is **Hans Rosling's Gapminder**
 animation, life expectancy vs GDP per capita, with population as

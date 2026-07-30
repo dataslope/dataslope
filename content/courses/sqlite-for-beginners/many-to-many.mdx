@@ -16,40 +16,10 @@ flowchart LR
 
 Ada connects to more than one course. Math connects to more than one student. A single foreign-key column on either table cannot describe all those crossings.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Blue student dots on the left and green course dots on the right connect through solid yellow rows inside a central junction card, every connection passing through its own row, a junction table turns many-to-many into simple pairs"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="104" y1="60" x2="278" y2="64" />
-    <line x1="104" y1="60" x2="278" y2="102" />
-    <line x1="104" y1="120" x2="278" y2="140" />
-    <line x1="104" y1="180" x2="278" y2="178" />
-    <line x1="362" y1="64" x2="536" y2="60" />
-    <line x1="362" y1="102" x2="536" y2="120" />
-    <line x1="362" y1="140" x2="536" y2="66" />
-    <line x1="362" y1="178" x2="536" y2="180" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="260" y="36" width="120" height="168" rx="14" fillOpacity="0.15" />
-    <rect x="280" y="56" width="80" height="16" rx="8" />
-    <rect x="280" y="94" width="80" height="16" rx="8" />
-    <rect x="280" y="132" width="80" height="16" rx="8" />
-    <rect x="280" y="170" width="80" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="90" cy="60" r="11" />
-    <circle cx="90" cy="120" r="11" />
-    <circle cx="90" cy="180" r="11" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="550" cy="60" r="11" />
-    <circle cx="550" cy="120" r="11" />
-    <circle cx="550" cy="180" r="11" />
-  </g>
-</svg>
+<Figure
+  slug="lite-many-to-many-cutout"
+  alt="Two grid platforms bridged by a small third junction platform, arrows crossing through it in both directions"
+/>
 
 ## Why one foreign key is not enough
 

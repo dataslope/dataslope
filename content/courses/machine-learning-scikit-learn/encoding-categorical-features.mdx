@@ -9,45 +9,15 @@ of exactly these: color, country, product category, blood type, payment
 method. Before any model can use them, these **categorical features** must
 become numbers.
 
+<Figure
+  slug="ml-encoding-categorical-cutout"
+  alt="Encoding categorical features, an isometric illustration"
+/>
+
 The obvious way to do that is also, for most categories, the *wrong* way,
 and the mistake is subtle enough that it ships in real systems all the
 time. This page is about encoding categories correctly, why the tempting
 shortcut backfires, and how `OneHotEncoder` does it right.
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Three colored category pills each become a row of cells in which exactly one cell lights up with a one, one-hot encoding gives every category its own honest yes-or-no column"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="120" y="44" width="64" height="22" rx="11" />
-    <rect x="280" y="42" width="68" height="26" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="120" y="99" width="64" height="22" rx="11" />
-    <rect x="364" y="97" width="68" height="26" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="120" y="154" width="64" height="22" rx="11" />
-  </g>
-  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
-    <rect x="448" y="152" width="68" height="26" rx="7" />
-  </g>
-  <g fill="currentColor" opacity="0.08">
-    <rect x="364" y="42" width="68" height="26" rx="7" />
-    <rect x="448" y="42" width="68" height="26" rx="7" />
-    <rect x="280" y="97" width="68" height="26" rx="7" />
-    <rect x="448" y="97" width="68" height="26" rx="7" />
-    <rect x="280" y="152" width="68" height="26" rx="7" />
-    <rect x="364" y="152" width="68" height="26" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <text x="314" y="60" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" fontWeight="700">1</text>
-    <text x="398" y="115" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" fontWeight="700">1</text>
-    <text x="482" y="170" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="15" fontWeight="700">1</text>
-  </g>
-</svg>
 
 ## The problem: models need numbers, categories are words
 

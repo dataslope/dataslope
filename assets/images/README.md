@@ -1,81 +1,57 @@
-# Content images (optimized raster art)
+# Content images (optimized raster sources)
 
-Drop raster source images here, one per image, named `<slug>.<ext>`. Supported
-sources: `.png`, `.jpg`/`.jpeg`, `.webp`, `.avif`, `.tif`/`.tiff`. Not
-supported: SVG (vector, author it inline in the MDX instead) and GIF (the
-encoder reads only the first frame, so animation would be silently dropped,
-convert to PNG/WebP first). The build step optimizes each source and the
-`<Figure>` component wires it into the pages that reference its `slug`.
+**This folder is currently empty of sources, and that is the expected state.**
 
-The Recraft topic art is transparent PNG, but this folder takes any raster:
-photos, diagrams, screenshots, etc.
+Every image the site serves is now produced by the illustration pipeline
+(`gpt-image-2` → Recraft background removal → `promote-illustrations.mjs`),
+which encodes once at quality 92 and writes the served file **straight into
+`public/images/<slug>.webp`**. Nothing is committed twice. See the
+"Illustrations" section of `AGENTS.md` for that workflow.
 
-## How it works
+This folder exists for the other case: a raster image that does *not* come from
+the pipeline and needs the build step to optimize it — a photo, a screenshot, a
+scanned diagram, a logo someone hands you. It stays supported and tested; there
+just isn't one in the repo right now.
 
-1. Add a source, e.g. `assets/images/panda.png`.
-2. Run `npm run build:images` (also runs automatically on `dev`, `build`, and
-   `postinstall`). For each source it:
-   - writes an optimized `.webp` plus a raster fallback to `public/images/`,
-     `.png` when the source is transparent, otherwise `.jpg`,
-   - records the source hash, intrinsic size, and formats in
-     `lib/generated/images.js`.
-3. **Commit** the generated `public/images/*` and the updated manifest
-   alongside the source. Unlike the repo's other generated assets these are
-   committed on purpose, the script only re-encodes a source whose content
-   hash changed, so deploys serve the committed outputs with no rebuild and no
-   per-commit re-encoding. If nothing changed the script is a no-op.
-4. Any `<Figure slug="panda" alt="…" />` in the content then renders the image.
-   Until a slug's source exists, that placement shows a small hint in `next dev`
-   and renders nothing in production, so a page can reference art before it's
-   added.
+## When you do add a source here
 
-> **Keep the sources in git.** The build runs on every deploy and prunes any
-> optimized file whose source is gone, so a source that isn't committed would
-> cause its served image to be deleted on the next build.
+Supported: `.png`, `.jpg`/`.jpeg`, `.webp`, `.avif`, `.tif`/`.tiff`. Not
+supported: SVG (retired repo-wide — use the illustration pipeline instead) and
+GIF (the encoder reads only the first frame, so animation would be silently
+dropped; convert first).
 
-Transparent sources (the Recraft art) should read on both the light (`#ffffff`)
-and dark (`#121212`) backgrounds, the served `<img>` is not swapped per theme.
+1. Add `assets/images/<slug>.<ext>`.
+2. Run `npm run build:images` (also runs on `dev`, `build`, and `postinstall`).
+   For each source it writes an optimized `.webp` **plus a raster fallback**
+   (`.png` when the source has transparency, else `.jpg`) to `public/images/`,
+   and records the source hash, intrinsic size, and formats in
+   `lib/generated/images.js`.
+3. Commit the source, the generated `public/images/*`, and the manifest. These
+   generated files are committed on purpose: the script only re-encodes a
+   source whose content hash changed, so deploys serve committed bytes with no
+   rebuild. If nothing changed it is a true no-op.
+4. `<Figure slug="<slug>" alt="…" />` in any MDX then renders it.
 
-The longest edge is capped at 1600px on optimization; larger sources are scaled
-down (smaller ones are left as-is).
+> **Keep any source you add in git.** The build prunes optimized files whose
+> source is gone, so an uncommitted source would have its served image deleted
+> on the next build. Pipeline illustrations are exempt: they have no source
+> here, and `build-images` *adopts* them from `public/images` instead of
+> pruning them.
 
-## Slugs referenced by the content
+The longest edge is capped at 1600px; larger sources are scaled down, smaller
+ones left as-is. Transparent sources must read on both the light (`#ffffff`)
+and dark (`#121212`) backgrounds — the served `<img>` is not swapped per theme.
 
-These slugs are placed in the pages below, and each has a matching
-`<slug>.png` source in this folder. A slug can be reused on more than one page.
-Rename freely, the slug is just the filename; update the `<Figure slug="…">`
-call to match.
+## Pending slugs
 
-| Slug                 | Image                                   | Placed on |
-| -------------------- | --------------------------------------- | --------- |
-| `panda`              | Panda in sunglasses (pandas mascot)     | `courses/data-analysis-python-pandas` · `interview-prep/data-analyst` |
-| `conversation`       | People talking / speech bubbles         | `courses/natural-language-processing-python` · `interview-prep` (landing) |
-| `penguins`           | Penguin family (Palmer Penguins vibe)   | `courses/seaborn-foundations` |
-| `us-map`             | US map with plotted points              | `courses/intro-data-viz-plotly` |
-| `playground`         | Playground (slide, swings)              | `courses/python-basics` |
-| `programmer-duck`    | Programmer duck (rubber-duck debugging) | `courses/beginners-javascript` · `courses/java-programming-for-beginners` |
-| `control-flow`       | Branching control-flow arrows           | `courses/c-programming-for-beginners` · `courses/typescript-from-scratch` |
-| `calculator`         | Calculator                              | `courses/scientific-computing-python` |
-| `cpu`                | CPU chip                                | `courses/systems-programming-c` |
-| `ram`                | Stick of RAM (memory)                   | `courses/from-zero-to-cpp` |
-| `stack`              | Stack data structure (LIFO)             | `courses/mastering-dsa-cpp` · `courses/java-collections-and-generics-deep-dive` |
-| `gpu`                | GPU                                     | `courses/machine-learning-scikit-learn` · `interview-prep/machine-learning-engineer` |
-| `box-plot`           | Minimal box plot                        | `courses/statistics-for-data-science-python` |
-| `line-chart`         | Minimal line chart                      | `courses/time-series-analysis-python` |
-| `data-visualization` | Assortment of charts                    | `courses/mastering-ggplot2` · `interview-prep/data-scientist` |
-| `bi-dashboard`       | Business-intelligence dashboard         | `courses/sql-analytics-duckdb` · `interview-prep/analytics-engineer` |
-| `a-risograph-of-a-blueprint`                  | Architectural blueprint (class as a plan) | `courses/oop-blueprint-java` |
-| `a-risograph-of-a-gardener-stemming`          | Gardener pruning stems                     | `courses/natural-language-processing-python` (`stemming-and-lemmatization`) |
-| `a-risograph-of-a-linked-list-data-structure` | Linked list                                | `courses/mastering-dsa-cpp` (`linked-lists`) |
-| `a-risograph-of-a-pipeline`                   | Data pipeline                              | `interview-prep/data-engineer` (`pipelines`) |
-| `a-risograph-of-a-queue-data-structure`       | Queue (FIFO)                               | `courses/mastering-dsa-cpp` (`queues`) |
-| `a-risograph-of-a-string-data-structure`      | String of characters                       | `courses/python-basics` (`strings`) |
-| `a-risograph-of-a-warehouse`                  | Warehouse (data warehouse)                 | `interview-prep/analytics-engineer` (`dimensional-modeling`) |
-| `a-risograph-of-beautiful-sea`                | Calm sea                                    | `courses/seaborn-foundations` (`visual-storytelling`) |
-| `a-risograph-of-inside-a-data-center`         | Inside a data center                       | `courses/intro-sql-postgres` (`what-is-a-database`) |
-| `a-risograph-of-sorting`                      | Sorting into order                         | `courses/mastering-dsa-cpp` (`sorting-basic`) |
-| `a-risograph-of-the-boolean-data-type`        | Boolean (true / false)                     | `courses/python-basics` (`booleans`) |
-| `a-risograph-of-the-dictionary-data-type`     | Dictionary (key → value)                   | `courses/python-basics` (`dictionaries`) |
+`__tests__/figureSlugs.test.ts` fails a `<Figure>` whose slug has no image,
+because in production such a placement renders nothing at all — a silent
+missing image. To land a placement *before* its artwork, list the slug in the
+table below and the test will accept it as deliberately pending.
 
-To add more, drop `<slug>.<ext>` here and place a `<Figure slug="<slug>" alt="…" />`
-wherever it fits.
+Keep this table empty unless something is genuinely in flight. A stale row is
+worse than no row: it whitelists a slug that will never resolve, so a typo
+matching it ships an invisible image with no test failure.
+
+| Slug | Image | Placed on |
+| ---- | ----- | --------- |

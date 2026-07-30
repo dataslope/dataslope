@@ -36,35 +36,10 @@ This keeps data tidy:
 - Many orders can point to the same customer.
 - If Ada's name changes, the orders still point to customer `1`.
 
-<svg
-  viewBox="0 0 640 250"
-  role="img"
-  aria-label="Three child rows connect by thin lines to their matching parent keys in the table above, but a red fourth row's line reaches toward a dashed circle where no parent exists, a dangling foreign key"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="170" y1="184" x2="200" y2="66" />
-    <line x1="290" y1="184" x2="320" y2="66" />
-    <line x1="410" y1="184" x2="440" y2="66" />
-  </g>
-  <line x1="500" y1="184" x2="552" y2="66" stroke="var(--ds-red-500)" strokeWidth="2.5" strokeLinecap="round" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="24" width="360" height="64" rx="12" fillOpacity="0.12" />
-    <circle cx="200" cy="56" r="8" />
-    <circle cx="320" cy="56" r="8" />
-    <circle cx="440" cy="56" r="8" />
-  </g>
-  <circle cx="560" cy="56" r="10" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2.5" strokeDasharray="4 5" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="100" y="162" width="440" height="64" rx="12" fillOpacity="0.12" />
-    <circle cx="170" cy="194" r="8" />
-    <circle cx="290" cy="194" r="8" />
-    <circle cx="410" cy="194" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="500" cy="194" r="8" />
-  </g>
-</svg>
+<Figure
+  slug="lite-foreign-keys-cutout"
+  alt="A key tag on one grid platform with an arrow pointing across to the exact matching row on a second platform"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

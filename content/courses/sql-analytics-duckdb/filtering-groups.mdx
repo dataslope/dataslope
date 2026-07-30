@@ -10,43 +10,10 @@ filter that runs *after* aggregation, on the group summaries themselves.
 The hardest part is keeping it distinct from `WHERE`, so that is what this
 page nails down.
 
-<svg
-  viewBox="0 0 640 235"
-  role="img"
-  aria-label="Three groups of blue dots each feed a total bar below; a dashed yellow threshold line crosses the bars, and only the two green totals tall enough to reach it survive while the short red one falls out, HAVING filters whole groups after aggregation"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="110" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
-    <circle cx="134" cy="48" r="5" />
-    <circle cx="152" cy="40" r="5" />
-    <circle cx="168" cy="50" r="5" />
-    <circle cx="142" cy="62" r="5" />
-    <circle cx="160" cy="60" r="5" />
-    <rect x="290" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
-    <circle cx="318" cy="50" r="5" />
-    <circle cx="342" cy="54" r="5" />
-    <rect x="470" y="24" width="80" height="52" rx="10" fillOpacity="0.12" />
-    <circle cx="494" cy="48" r="5" />
-    <circle cx="512" cy="42" r="5" />
-    <circle cx="528" cy="52" r="5" />
-    <circle cx="504" cy="62" r="5" />
-  </g>
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="150" y1="76" x2="150" y2="110" />
-    <line x1="330" y1="76" x2="330" y2="170" />
-    <line x1="510" y1="76" x2="510" y2="124" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="120" y="110" width="60" height="100" rx="5" />
-    <rect x="480" y="124" width="60" height="86" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="300" y="170" width="60" height="40" rx="5" />
-  </g>
-  <line x1="80" y1="150" x2="560" y2="150" stroke="var(--ds-yellow-500)" strokeWidth="3.5" strokeDasharray="12 9" strokeLinecap="round" />
-  <rect x="90" y="210" width="460" height="3" rx="1.5" fill="var(--ds-gray-400)" />
-</svg>
+<Figure
+  slug="duck-having-cutout"
+  alt="Two gates on a conveyor, the first screening loose tiles and the second screening the finished summary blocks further along"
+/>
 
 ## Two filters, two moments
 
@@ -150,51 +117,6 @@ Read it as a pipeline: *"Of the **paid** orders, group by region, and show
 only regions whose paid revenue exceeds \$150."* The refunded rows never
 enter the groups at all, and that changes the totals `HAVING` then
 judges.
-
-<svg
-  viewBox="0 0 640 165"
-  role="img"
-  aria-label="A flow with two checkpoints: gray rows pass a yellow WHERE gate that drops one red row, the survivors gather into group cards, and a taller yellow HAVING gate lets only the full green group through while the thin red group stays behind"
-  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="var(--ds-gray-500)">
-    <circle cx="46" cy="80" r="5" />
-    <circle cx="72" cy="64" r="5" />
-    <circle cx="72" cy="96" r="5" />
-    <circle cx="98" cy="80" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="126" y="44" width="9" height="30" rx="4.5" />
-    <rect x="126" y="88" width="9" height="30" rx="4.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="118" cy="142" r="5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="162" cy="80" r="5" />
-    <circle cx="186" cy="80" r="5" />
-    <rect x="216" y="40" width="74" height="54" rx="10" fillOpacity="0.12" />
-    <circle cx="238" cy="74" r="5.5" />
-    <circle cx="256" cy="68" r="5.5" />
-    <circle cx="272" cy="76" r="5.5" />
-    <circle cx="246" cy="56" r="5.5" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="216" y="104" width="74" height="40" rx="10" fillOpacity="0.12" />
-    <circle cx="244" cy="124" r="5.5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="322" y="24" width="11" height="44" rx="5" />
-    <rect x="322" y="92" width="11" height="44" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="368" y="46" width="84" height="56" rx="11" fillOpacity="0.16" />
-    <circle cx="392" cy="84" r="6" />
-    <circle cx="412" cy="78" r="6" />
-    <circle cx="428" cy="86" r="6" />
-    <circle cx="402" cy="64" r="6" />
-  </g>
-</svg>
 
 ## The classic mistake
 

@@ -10,41 +10,9 @@ That is the linked list: values in separate nodes, stitched together by `next` p
 The price of this flexibility is the loss of the array's address formula. Nodes are not contiguous, so there is no O(1) random access: to reach the ith node you must walk i links. Linked lists trade arithmetic for navigation.
 
 <Figure
-  slug="a-risograph-of-a-linked-list-data-structure"
-  alt="A risograph of a linked list, its nodes chained one to the next"
+  slug="dsa-linked-lists-cutout"
+  alt="Three separated cube nodes on a platform joined left to right by curved arrows, the last arrow trailing off into empty space"
 />
-
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="Four blue nodes scattered across memory are threaded in logical order by thin curving lines from a yellow head marker to a red null ring, a linked list's order lives in its pointers, not its memory layout"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2.5" strokeLinecap="round" fill="none">
-    <path d="M124 84 C 200 72, 240 62, 286 58" />
-    <path d="M292 69 C 265 105, 245 128, 224 142" />
-    <path d="M224 152 C 300 152, 380 135, 436 118" />
-    <path d="M464 110 C 500 96, 525 82, 546 70" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="102,46 118,46 110,60" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="110" cy="84" r="14" />
-    <circle cx="300" cy="56" r="14" />
-    <circle cx="210" cy="154" r="14" />
-    <circle cx="450" cy="114" r="14" />
-  </g>
-  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13" fontWeight="700" textAnchor="middle">
-    <text x="110" y="89">1</text>
-    <text x="300" y="61">2</text>
-    <text x="210" y="159">3</text>
-    <text x="450" y="119">4</text>
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <path fillRule="evenodd" d="M560 64 m-12 0 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 M560 64 m-5.5 0 a5.5 5.5 0 1 1 11 0 a5.5 5.5 0 1 1 -11 0" />
-  </g>
-</svg>
 
 ## Nodes and links
 

@@ -8,32 +8,10 @@ You can write Java for years without thinking about memory. But the
 unexpected shared mutation, a stack overflow, a mental model of
 the **stack** and the **heap** turns confusion into clarity.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three blue stack frames hold small white references tied by thin gray lines into the green heap card, two frames share the same round object, while an untethered shape drawn only in dashed outline waits to be collected"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g stroke="var(--ds-gray-300)" strokeWidth="2">
-    <line x1="155" y1="70" x2="378" y2="86" />
-    <line x1="155" y1="110" x2="378" y2="96" />
-    <line x1="155" y1="150" x2="468" y2="150" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="110" y="52" width="130" height="36" rx="9" fillOpacity="0.45" />
-    <rect x="110" y="92" width="130" height="36" rx="9" fillOpacity="0.3" />
-    <rect x="110" y="132" width="130" height="36" rx="9" fillOpacity="0.18" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor" fillOpacity="0.95">
-    <circle cx="150" cy="70" r="5" />
-    <circle cx="150" cy="110" r="5" />
-    <circle cx="150" cy="150" r="5" />
-  </g>
-  <rect x="330" y="36" width="250" height="160" rx="18" fill="var(--ds-green-500)" fillOpacity="0.07" />
-  <circle cx="402" cy="91" r="24" fill="var(--ds-green-500)" />
-  <rect x="470" y="130" width="64" height="40" rx="14" fill="var(--ds-green-500)" fillOpacity="0.85" />
-  <circle cx="520" cy="72" r="18" fill="none" stroke="var(--ds-gray-400)" strokeWidth="2" strokeDasharray="5 4" />
-</svg>
+<Figure
+  slug="java-stack-and-heap-cutout"
+  alt="The stack and the heap, an isometric illustration"
+/>
 
 ## The two regions, side by side
 

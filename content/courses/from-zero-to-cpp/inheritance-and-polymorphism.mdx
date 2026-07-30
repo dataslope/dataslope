@@ -9,6 +9,11 @@ height. A `Dog`, a `Cat`, and a `Cow` are all `Animal`s that
 differ in how they make a sound. C++ offers two complementary
 features for these situations:
 
+<Figure
+  slug="cpp-inheritance-polymorphism-cutout"
+  alt="Inheritance and polymorphism, an isometric illustration"
+/>
+
 - **Inheritance** lets one class extend another, taking its
   interface and adding to or refining it.
 - **Polymorphism** lets a single call site invoke different code
@@ -17,48 +22,6 @@ features for these situations:
 Used carefully, this combination is powerful. Used carelessly, it
 produces tangled hierarchies that are hard to change. We'll lean
 toward small examples and clear rules.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="A faint base card branches into three colored child cards that all carry the same white dot, yet each emits a different little shape below, shared interface, different behavior at runtime"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="270" y="30" width="100" height="56" rx="14" fillOpacity="0.2" />
-    <circle cx="320" cy="58" r="10" fillOpacity="0.5" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="318" y="86" width="4" height="24" rx="2" />
-    <rect x="158" y="110" width="324" height="4" rx="2" />
-    <rect x="158" y="110" width="4" height="26" rx="2" />
-    <rect x="478" y="110" width="4" height="26" rx="2" />
-    <rect x="318" y="110" width="4" height="26" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="112" y="136" width="96" height="56" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="272" y="136" width="96" height="56" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="432" y="136" width="96" height="56" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
-    <circle cx="136" cy="164" r="8" fillOpacity="0.9" />
-    <circle cx="296" cy="164" r="8" fillOpacity="0.9" />
-    <circle cx="456" cy="164" r="8" fillOpacity="0.9" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="160" cy="215" r="6" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="308,208 320,226 296,226" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="462" y="208" width="16" height="16" rx="4" />
-  </g>
-</svg>
 
 ## A first hierarchy
 

@@ -7,43 +7,10 @@ In [Generics Basics](./generics-basics), we saw how unconstrained type parameter
 
 This is where **generic constraints** come in. You can restrict a type parameter to types that satisfy certain conditions using the `extends` keyword. This unlocks richer operations: accessing properties, calling methods, indexing into objects, and more, all while keeping the code generic and type-safe.
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three very different shapes all connect to the same rail through an identical small plug, while a red shape with no plug sits apart beneath a red cross, a constraint admits any type as long as it brings the required part"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="80" y="60" width="380" height="16" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }} fill="currentColor">
-    <rect x="136" y="76" width="8" height="26" rx="3" />
-    <rect x="246" y="76" width="8" height="26" rx="3" />
-    <rect x="344" y="76" width="8" height="26" rx="3" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="140" cy="122" r="20" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="230" y="102" width="40" height="40" rx="8" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="330" y="102" width="36" height="62" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <circle cx="540" cy="150" r="18" />
-  </g>
-  <g
-    style={{ color: "var(--ds-red-500)" }}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3.5"
-    strokeLinecap="round"
-  >
-    <path d="M528 96 L 552 120" />
-    <path d="M552 96 L 528 120" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-generic-constraints-cutout"
+  alt="An adaptable socket on a platform fitted with a keyed guard that admits only tokens carrying a matching notch"
+/>
 
 ## The problem: operations on unconstrained types
 
@@ -280,50 +247,6 @@ console.log(\`Ages: \${ages.join(", ")}\`);
 />
 
 The `pluck` function is generic over both the object type (`T`) and the key type (`K`). The constraint `K extends keyof T` ensures the key exists, and the return type `T[K][]` gives you an array of the property's type.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="Three record cards each carry the same three slots; a translucent band lifts the middle slot out of every card into one tidy green column, pluck extracts a single keyed property from every object, and the constraint guarantees the key exists"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.12">
-    <rect x="80" y="30" width="280" height="40" rx="10" />
-    <rect x="80" y="84" width="280" height="40" rx="10" />
-    <rect x="80" y="138" width="280" height="40" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="186" y="18" width="56" height="170" rx="12" fillOpacity="0.13" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="120" cy="50" r="9" />
-    <circle cx="120" cy="104" r="9" />
-    <circle cx="120" cy="158" r="9" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="202" y="41" width="24" height="18" rx="5" />
-    <rect x="202" y="95" width="24" height="18" rx="5" />
-    <rect x="202" y="149" width="24" height="18" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="310" cy="50" r="9" />
-    <circle cx="310" cy="104" r="9" />
-    <circle cx="310" cy="158" r="9" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="396" cy="50" r="2.5" />
-    <circle cx="424" cy="50" r="2.5" />
-    <circle cx="396" cy="104" r="2.5" />
-    <circle cx="424" cy="104" r="2.5" />
-    <circle cx="396" cy="158" r="2.5" />
-    <circle cx="424" cy="158" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="460" y="41" width="24" height="18" rx="5" />
-    <rect x="460" y="95" width="24" height="18" rx="5" />
-    <rect x="460" y="149" width="24" height="18" rx="5" />
-  </g>
-</svg>
 
 ## A practical example: typed `pick`
 

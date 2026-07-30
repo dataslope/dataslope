@@ -19,31 +19,10 @@ You stop asking "what fields does this class have?" and start asking
 "what does this object *know*, and what does it *do*, and *who does
 it ask for help*?"
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Three index cards, each with a name bar and a few responsibility bars, fanned at slight angles, responsibility-driven design with CRC cards"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" transform="rotate(-8 150 120)">
-    <rect x="80" y="70" width="140" height="100" rx="10" fillOpacity="0.15" />
-    <rect x="94" y="84" width="70" height="12" rx="6" fillOpacity="0.85" />
-    <rect x="94" y="106" width="100" height="8" rx="4" fillOpacity="0.35" />
-    <rect x="94" y="122" width="84" height="8" rx="4" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="250" y="60" width="130" height="100" rx="10" fillOpacity="0.15" />
-    <rect x="264" y="74" width="70" height="12" rx="6" fillOpacity="0.85" />
-    <rect x="264" y="96" width="100" height="8" rx="4" fillOpacity="0.35" />
-    <rect x="264" y="112" width="84" height="8" rx="4" fillOpacity="0.35" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor" transform="rotate(7 460 130)">
-    <rect x="390" y="80" width="140" height="100" rx="10" fillOpacity="0.18" />
-    <rect x="404" y="94" width="70" height="12" rx="6" fillOpacity="0.9" />
-    <rect x="404" y="116" width="100" height="8" rx="4" fillOpacity="0.4" />
-    <rect x="404" y="132" width="80" height="8" rx="4" fillOpacity="0.4" />
-  </g>
-</svg>
+<Figure
+  slug="oopj-responsibility-cutout"
+  alt="Three index-card plinths on a platform, each carrying one distinct small tool, thin collaboration lines drawn between them"
+/>
 
 ## Three questions for every object
 
@@ -62,8 +41,6 @@ someone else. If the *collaborate* list is enormous, the object is
 acting as a central coordinator and should probably be broken up.
 
 ## CRC cards: a 5-minute design tool
-
-<IllustrationPrompt subject="Kent Beck and Ward Cunningham, who introduced CRC cards" photo />
 
 The classic tool for this style of thinking is the **CRC card**,
 *Class–Responsibility–Collaborator*. Kent Beck and Ward Cunningham

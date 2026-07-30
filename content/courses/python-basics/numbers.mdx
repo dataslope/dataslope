@@ -5,59 +5,12 @@ description: Integers, floats, complex numbers, arithmetic, and the math module
 
 Python ships with three numeric types: arbitrary-precision integers, IEEE 754 floats, and complex numbers. The operators are familiar, but there are a few surprises-especially around floating-point precision.
 
-Every snippet on this page runs in your browser-no setup required.
+<Figure
+  slug="python-basics-numbers-cutout"
+  alt="A wooden abacus beside a number line arrow, with counting beads sliding along a rod"
+/>
 
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="A train of digit cells grows straight out past the fixed box meant to bound it, a float hovers in a fuzzy halo just off the ruler's ticks, and one number lives on its own little plane, ints without limits, floats approximate, complex numbers two-dimensional"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g fill="currentColor" opacity="0.1">
-    <rect x="90" y="36" width="250" height="60" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="102" y="49" width="34" height="34" rx="6" fillOpacity="0.85" />
-    <rect x="140" y="49" width="34" height="34" rx="6" fillOpacity="0.6" />
-    <rect x="178" y="49" width="34" height="34" rx="6" fillOpacity="0.85" />
-    <rect x="216" y="49" width="34" height="34" rx="6" fillOpacity="0.6" />
-    <rect x="254" y="49" width="34" height="34" rx="6" fillOpacity="0.85" />
-    <rect x="292" y="49" width="34" height="34" rx="6" fillOpacity="0.6" />
-    <rect x="330" y="49" width="34" height="34" rx="6" fillOpacity="0.85" />
-    <rect x="368" y="49" width="34" height="34" rx="6" fillOpacity="0.6" />
-    <rect x="406" y="49" width="34" height="34" rx="6" fillOpacity="0.85" />
-    <circle cx="456" cy="66" r="4" fillOpacity="0.5" />
-    <circle cx="474" cy="66" r="3.5" fillOpacity="0.35" />
-    <circle cx="490" cy="66" r="3" fillOpacity="0.25" />
-  </g>
-  <g fill="currentColor" opacity="0.15">
-    <rect x="90" y="150" width="240" height="5" rx="2.5" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="110" cy="162" r="2" />
-    <circle cx="150" cy="162" r="2" />
-    <circle cx="190" cy="162" r="2" />
-    <circle cx="230" cy="162" r="2" />
-    <circle cx="270" cy="162" r="2" />
-    <circle cx="310" cy="162" r="2" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="212" cy="140" r="8" />
-    <circle cx="212" cy="140" r="15" fillOpacity="0.18" />
-    <circle cx="212" cy="140" r="22" fillOpacity="0.08" />
-  </g>
-  <g fill="currentColor" opacity="0.12">
-    <rect x="470" y="110" width="4" height="70" rx="2" />
-    <rect x="440" y="158" width="80" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="502" cy="128" r="8" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <circle cx="502" cy="160" r="2.5" />
-    <circle cx="472" cy="128" r="2.5" />
-  </g>
-</svg>
+Every snippet on this page runs in your browser-no setup required.
 
 ## Real-world context: Where numbers matter
 
@@ -424,22 +377,18 @@ print(random.sample(range(100), 5))  # 5 unique items
       filename: "main.py",
       starterCode: `from decimal import Decimal, ROUND_HALF_UP
 
-
 def round_to_cents(amount):
     # Your code here
     return Decimal("0.00")
-
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
 `,
       solutionCode: `from decimal import Decimal, ROUND_HALF_UP
 
-
 def round_to_cents(amount):
     d = Decimal(amount)
     return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
@@ -476,7 +425,6 @@ print(round_to_cents("0.004"))
     # Your code here
     return 1
 
-
 print(gcd(48, 18))
 print(gcd(100, 25))
 `,
@@ -484,7 +432,6 @@ print(gcd(100, 25))
     while b:
         a, b = b, a % b
     return a
-
 
 print(gcd(48, 18))
 print(gcd(100, 25))
@@ -521,13 +468,11 @@ print(gcd(100, 25))
     # Your code here
     return 0.0
 
-
 print(compound_interest(1000, 0.05, 10))
 `,
       solutionCode: `def compound_interest(principal, rate, years):
     amount = principal * (1 + rate) ** years
     return round(amount, 2)
-
 
 print(compound_interest(1000, 0.05, 10))
 `,

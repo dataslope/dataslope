@@ -21,25 +21,10 @@ making the wrongness controllable. The chapters that follow will make
 each idea precise; here we just want to internalize the shape of the
 problem.
 
-<svg
-  viewBox="0 0 640 210"
-  role="img"
-  aria-label="A perfect green circle in one card faces its computed twin in the next, the same shape rebuilt from straight blue segments, mathematics is exact, computation approximates"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="70" y="30" width="210" height="150" rx="14" fillOpacity="0.1" />
-  </g>
-  <circle cx="175" cy="105" r="52" fill="none" stroke="var(--ds-green-500)" strokeWidth="4" />
-  <g fill="var(--ds-gray-400)">
-    <rect x="300" y="103.5" width="40" height="3" rx="1.5" />
-    <polygon points="338,99.5 349,105 338,110.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="370" y="30" width="210" height="150" rx="14" fillOpacity="0.08" />
-  </g>
-  <polygon points="527,105 511.8,141.8 475,157 438.2,141.8 423,105 438.2,68.2 475,53 511.8,68.2" fill="none" stroke="var(--ds-blue-500)" strokeWidth="4" strokeLinejoin="round" />
-</svg>
+<Figure
+  slug="scipy-math-meets-computation-cutout"
+  alt="A perfectly smooth continuous curve on one platform beside the same curve rebuilt from discrete stepped blocks"
+/>
 
 ## Continuous mathematics, discrete machines
 
@@ -167,14 +152,12 @@ $\sin$ as you add more terms.
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def taylor_sin(x, n_terms):
     s, term = 0.0, x
     for k in range(n_terms):
         s += term
         term *= -x * x / ((2 * k + 2) * (2 * k + 3))
     return s
-
 
 xs = np.linspace(-2 * np.pi, 2 * np.pi, 400)
 true = np.sin(xs)

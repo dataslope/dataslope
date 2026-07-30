@@ -81,3 +81,6 @@ script-runner-src/__pycache__/
 
 # Playground audit output (e2e/playground-audit.spec.ts)
 audit-results/
+
+# GPT Image 2 output from scripts/generate-illustrations.mjs
+generated-illustrations/

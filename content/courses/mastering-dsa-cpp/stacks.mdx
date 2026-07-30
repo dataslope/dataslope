@@ -7,29 +7,10 @@ Some problems care only about *the most recent thing*. Which bracket needs closi
 
 The idea is old enough to predate most of computing's vocabulary. Alan Turing described subroutine calls in his 1945 ACE report using operations he called "bury" and "unbury." In the 1950s, the German computer scientists Friedrich Bauer and Klaus Samelson worked out the same principle for evaluating expressions and named it the *Keller*, the "cellar," because values are dropped in and the last one dropped is the first one fetched. Bauer later received the IEEE Computer Pioneer Award for the stack principle. Today the stack is so central that the dedicated memory region for function calls is simply called *the stack*, and the most famous programming Q&A site on the internet is named after what happens when it fills up.
 
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Plates drop down a translucent vertical tube and settle in a stack, with a thin blue push arrow pointing into the opening and a thin blue pop arrow pointing back out of it, last in, first out"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
->
-  <rect x="280" y="36" width="80" height="180" rx="16" fill="currentColor" opacity="0.08" />
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="248.5" y="42" width="3" height="30" rx="1.5" />
-    <polygon points="243,70 254,70 248.5,81" />
-    <rect x="386.5" y="48" width="3" height="30" rx="1.5" />
-    <polygon points="381,50 392,50 386.5,39" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="60" r="2.5" fillOpacity="0.4" />
-    <circle cx="320" cy="72" r="2.5" fillOpacity="0.4" />
-    <rect x="290" y="84" width="60" height="12" rx="6" fillOpacity="0.9" />
-    <rect x="290" y="148" width="60" height="12" rx="6" />
-    <rect x="290" y="164" width="60" height="12" rx="6" fillOpacity="0.75" />
-    <rect x="290" y="180" width="60" height="12" rx="6" />
-    <rect x="290" y="196" width="60" height="12" rx="6" fillOpacity="0.75" />
-  </g>
-</svg>
+<Figure
+  slug="dsa-stacks-cutout"
+  alt="A vertical column of stacked plates on a platform with the topmost plate lifted off on an arrow, the lower plates untouched"
+/>
 
 ## The stack ADT
 

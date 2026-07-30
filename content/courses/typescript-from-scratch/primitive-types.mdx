@@ -13,47 +13,10 @@ number never accidentally receives a string.
 This chapter answers three questions: **What are the primitive types?**
 **How does the compiler track them?** **What bugs does this prevent?**
 
-<svg
-  viewBox="0 0 640 220"
-  role="img"
-  aria-label="Seven primitive tiles laid out like a tiny periodic table: solid blue, green, yellow, and pale blue tiles on the top row, with a gray tile, a dashed empty outline, and a one-of-a-kind red tile with a sparkle below, the indivisible atoms of the type system"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="140" y="36" width="48" height="48" rx="10" />
-    <rect x="356" y="36" width="48" height="48" rx="10" fillOpacity="0.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="212" y="36" width="48" height="48" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="284" y="36" width="48" height="48" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
-    <rect x="428" y="36" width="48" height="48" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="176" y="120" width="48" height="48" rx="10" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <rect
-      x="248"
-      y="120"
-      width="48"
-      height="48"
-      rx="10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 7"
-      strokeLinecap="round"
-    />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="320" y="120" width="48" height="48" rx="10" />
-    <path d="M392 128 L395 137 L404 140 L395 143 L392 152 L389 143 L380 140 L389 137 Z" />
-  </g>
-</svg>
+<Figure
+  slug="tsx-primitive-types-cutout"
+  alt="Seven small distinct atomic tokens resting in individual fitted sockets on a platform"
+/>
 
 ## The seven primitive types
 
@@ -209,35 +172,6 @@ In practice, `undefined` means "never initialized" or "missing property,"
 while `null` means "intentionally empty." By giving each its own type,
 TypeScript forces you to be explicit about which kind of emptiness you
 expect.
-
-<svg
-  viewBox="0 0 640 180"
-  role="img"
-  aria-label="Two kinds of nothing: on the left a solid blue bowl stands on its pedestal, deliberately empty under a green ring marker, while on the right only a dashed outline shows where a bowl would stand, null is emptiness on purpose, undefined is a value that never arrived"
-  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-gray-300)" }} fill="currentColor">
-    <rect x="80" y="160" width="480" height="4" rx="2" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <path d="M120 70 L220 70 C218 102 196 118 170 118 C144 118 122 102 120 70 Z" fillOpacity="0.85" />
-    <rect x="160" y="118" width="20" height="22" rx="4" fillOpacity="0.6" />
-    <rect x="130" y="140" width="80" height="10" rx="5" fillOpacity="0.4" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }}>
-    <circle cx="170" cy="48" r="11" fill="none" stroke="currentColor" strokeWidth="5" />
-  </g>
-  <g style={{ color: "var(--ds-gray-400)" }}>
-    <path
-      d="M420 70 L 520 70 C 518 102 496 118 470 118 C 444 118 422 102 420 70 Z"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeDasharray="6 8"
-      strokeLinecap="round"
-    />
-  </g>
-</svg>
 
 **Strict null checks:** By default (in `strict` mode), TypeScript does
 *not* allow `null` or `undefined` to inhabit other types. A variable of

@@ -1,57 +1,51 @@
 "use client";
 
 /**
- * A placeholder slot for a custom line-art illustration that hasn't been
- * drawn yet. Authored inline in a lesson wherever an illustration of a person
- * or object would fit:
+ * A placeholder slot for a custom illustration that hasn't been drawn yet.
+ * Authored inline in a lesson by referencing a prompt id defined in
+ * `data/illustration-prompts.json`:
  *
  * ```mdx
- * <IllustrationPrompt subject="Brendan Eich" photo />
- * <IllustrationPrompt subject="a Gentoo penguin standing on ice" />
+ * <IllustrationPrompt id="python-basics-hello-world" />
  * ```
  *
- * It renders a dashed "to be illustrated" card carrying the exact generation
- * prompt plus a copy button, so the prompt can be dropped straight into the
- * image tool. Centralising the prompt template here keeps every request
- * consistent (Recraft Vector V4.1, transparent background, light/dark safe);
- * authors only supply the subject and whether a reference photo is attached.
+ * It renders a dashed "to be illustrated" card carrying the exact GPT Image 2
+ * generation prompt (a risograph of the subject, in the four brand colors) plus
+ * a copy button, so the prompt can be dropped straight into the image tool or
+ * generated in bulk with scripts/generate-illustrations.mjs. Centralising the
+ * definitions in the JSON keeps the lesson card, the `/illustration-prompts`
+ * gallery, and the generator perfectly in sync; authors only supply the id.
  */
 import { useCallback, useState } from "react";
 import { Check, Copy, ImageIcon } from "lucide-react";
-import {
-  buildIllustrationPrompt,
-  illustrationFileSlug,
-} from "@/lib/illustrationPrompt";
+import { getIllustrationPromptById } from "@/lib/illustrationPromptsGallery";
 import styles from "./IllustrationPrompt.module.css";
 
 interface IllustrationPromptProps {
-  /** What to illustrate, phrased to read naturally after "illustration of"
-   *  (e.g. "Brendan Eich", "a person punching holes in a paper punch card"). */
-  subject: string;
-  /** Set for a specific real person, appends "(photo attached)" so the prompt
-   *  signals that a reference photo accompanies the request. Omit for generic
-   *  objects/scenes that need no reference image. */
-  photo?: boolean;
+  /** Prompt id defined in `data/illustration-prompts.json` (e.g.
+   *  "python-basics-hello-world"). */
+  id: string;
 }
 
-export function IllustrationPrompt({ subject, photo = false }: IllustrationPromptProps) {
-  const prompt = buildIllustrationPrompt(subject, photo);
-  // Deep-link target: the `/illustration-prompts` gallery links back here using
-  // the same semantic file slug, so each placeholder is addressable by anchor.
-  const slug = illustrationFileSlug(subject, photo);
+export function IllustrationPrompt({ id }: IllustrationPromptProps) {
+  const entry = getIllustrationPromptById(id);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    void navigator.clipboard.writeText(prompt).then(() => {
+    if (!entry) return;
+    void navigator.clipboard.writeText(entry.prompt).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  }, [prompt]);
+  }, [entry]);
+
+  // An unknown id renders nothing rather than breaking the lesson build.
+  if (!entry) return null;
 
   return (
     <div
-      id={slug}
-      data-illustration-file={`${slug}.svg`}
+      id={entry.id}
+      data-illustration-file={entry.file}
       className={styles.placeholder}
       role="group"
       aria-label="Illustration placeholder"
@@ -75,7 +69,7 @@ export function IllustrationPrompt({ subject, photo = false }: IllustrationPromp
           )}
         </button>
       </div>
-      <p className={styles.prompt}>{prompt}</p>
+      <p className={styles.prompt}>{entry.prompt}</p>
     </div>
   );
 }

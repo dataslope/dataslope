@@ -10,33 +10,10 @@ have ever seen in a report is an aggregate. This page explains not just
 the five functions but *why* aggregation is the analyst's most important
 move.
 
-<svg
-  viewBox="0 0 640 230"
-  role="img"
-  aria-label="Three blue isometric cubes standing for many raw rows flow along a solid gray arrow into one large green cube, many rows in, a single summary value out"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="150,35 194,60 150,85 106,60" />
-    <polygon points="106,60 150,85 150,125 106,100" fillOpacity="0.65" />
-    <polygon points="194,60 150,85 150,125 194,100" fillOpacity="0.4" />
-    <polygon points="95,105 139,130 95,155 51,130" />
-    <polygon points="51,130 95,155 95,195 51,170" fillOpacity="0.65" />
-    <polygon points="139,130 95,155 95,195 139,170" fillOpacity="0.4" />
-    <polygon points="205,105 249,130 205,155 161,130" />
-    <polygon points="161,130 205,155 205,195 161,170" fillOpacity="0.65" />
-    <polygon points="249,130 205,155 205,195 249,170" fillOpacity="0.4" />
-  </g>
-  <g fill="var(--ds-gray-400)">
-    <rect x="284" y="110.5" width="56" height="3" rx="1.5" />
-    <polygon points="338,106.5 349,112 338,117.5" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="480,50 542,85 480,120 418,85" />
-    <polygon points="418,85 480,120 480,176 418,141" fillOpacity="0.65" />
-    <polygon points="542,85 480,120 480,176 542,141" fillOpacity="0.4" />
-  </g>
-</svg>
+<Figure
+  slug="duck-aggregates-cutout"
+  alt="A tall column of many tiles funnelling down through a narrow neck into a single summary block"
+/>
 
 ## Why aggregation exists
 
@@ -158,34 +135,6 @@ Product A averages over its two real scores (5 and 3 → 4.0), ignoring the
 missing one. If `NULL` counted as 0, the average would be a misleading
 2.67. SQL's choice to skip NULLs is what makes aggregates trustworthy,
 but you must *know* it is happening.
-
-<svg
-  viewBox="0 0 640 160"
-  role="img"
-  aria-label="Four solid green values pass through the slot of a blue aggregate gate toward one yellow result, while two hollow NULL rings are stopped at the bar, aggregates skip NULLs rather than counting them as zero"
-  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="70" cy="80" r="8" />
-    <circle cx="110" cy="80" r="8" />
-    <circle cx="150" cy="80" r="8" />
-    <circle cx="190" cy="80" r="8" />
-    <circle cx="330" cy="80" r="8" />
-    <circle cx="368" cy="80" r="8" />
-  </g>
-  <g fill="none" stroke="var(--ds-gray-400)" strokeWidth="3">
-    <circle cx="274" cy="46" r="8" />
-    <circle cx="274" cy="114" r="8" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="292" y="24" width="10" height="40" rx="5" />
-    <rect x="292" y="96" width="10" height="40" rx="5" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="470" cy="80" r="18" fillOpacity="0.2" />
-    <circle cx="470" cy="80" r="10" />
-  </g>
-</svg>
 
 ## Aggregating a filtered slice
 

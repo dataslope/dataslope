@@ -11,38 +11,10 @@ because almost every habit you build in this course flows from it: the
 shape of analytical questions, and the kind of engine that answers them
 fast.
 
-<svg
-  viewBox="0 0 640 215"
-  role="img"
-  aria-label="Two cards: on the left one solid blue row lights up among gray rows, transactional SQL grabbing a single record; on the right one whole green column lights up among gray columns and condenses into a single green value, analytical SQL scanning a column to summarize it"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="48" y="32" width="252" height="152" rx="12" fillOpacity="0.1" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="72" y="52" width="204" height="14" rx="7" />
-    <rect x="72" y="78" width="204" height="14" rx="7" />
-    <rect x="72" y="130" width="204" height="14" rx="7" />
-    <rect x="72" y="156" width="204" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="72" y="104" width="204" height="14" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="340" y="32" width="252" height="152" rx="12" fillOpacity="0.12" />
-  </g>
-  <g fill="var(--ds-gray-300)">
-    <rect x="372" y="52" width="14" height="104" rx="7" />
-    <rect x="412" y="52" width="14" height="104" rx="7" />
-    <rect x="492" y="52" width="14" height="104" rx="7" />
-    <rect x="532" y="52" width="14" height="104" rx="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="452" y="52" width="14" height="104" rx="7" />
-    <circle cx="459" cy="172" r="6" />
-  </g>
-</svg>
+<Figure
+  slug="duck-olap-vs-oltp-cutout"
+  alt="A fine needle plucking one single cell from a grid platform beside a wide net sweeping a whole column of cells"
+/>
 
 ## Two jobs, one language
 
@@ -143,85 +115,6 @@ store reads *only* those stripes, never the columns it does not touch. On
 a wide table that can mean reading a small fraction of the data instead of
 all of it. That single design choice is most of why purpose-built
 analytical engines crush row-oriented databases on summary queries.
-
-<svg
-  viewBox="0 0 640 200"
-  role="img"
-  aria-label="The same table stored two ways: on the left each row keeps its four mixed-color values side by side and one whole row is lit for a point read; on the right every column's values stand together as one vertical stripe and only the green column stripe glows, a column store reads just what the question needs"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="56" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="56" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="56" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
-    <rect x="56" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="56" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="106" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="106" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="106" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
-    <rect x="106" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="106" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="156" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="156" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="156" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
-    <rect x="156" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="156" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="206" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="206" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="206" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
-    <rect x="206" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
-    <rect x="206" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
-  </g>
-  <g fill="currentColor" opacity="0.25">
-    <rect x="86" y="168" width="134" height="4" rx="2" />
-  </g>
-  <g fill="currentColor" opacity="0.28">
-    <circle cx="306" cy="92" r="2.5" />
-    <circle cx="320" cy="92" r="2.5" />
-    <circle cx="334" cy="92" r="2.5" />
-  </g>
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="388" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
-    <rect x="396" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="396" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="396" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="396" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="396" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="438" y="30" width="44" height="124" rx="8" fillOpacity="0.3" />
-    <rect x="448" y="44" width="24" height="14" rx="4" />
-    <rect x="448" y="64" width="24" height="14" rx="4" />
-    <rect x="448" y="84" width="24" height="14" rx="4" />
-    <rect x="448" y="104" width="24" height="14" rx="4" />
-    <rect x="448" y="124" width="24" height="14" rx="4" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="492" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
-    <rect x="500" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="500" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="500" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="500" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="500" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="542" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
-    <rect x="550" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="550" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="550" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="550" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
-    <rect x="550" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="448" y="168" width="24" height="4" rx="2" fillOpacity="0.7" />
-  </g>
-</svg>
 
 ## Vectorized execution: the second half of the speed
 

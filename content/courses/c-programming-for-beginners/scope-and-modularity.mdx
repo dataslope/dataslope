@@ -6,41 +6,17 @@ description: Where names live, and how to split a real program across multiple f
 A program of any size eventually becomes too big to fit comfortably
 in one file. To grow, you need two skills:
 
+<Figure
+  slug="c-scope-and-modularity-cutout"
+  alt="Scope and modularity, an isometric illustration"
+/>
+
 1. **Scope**, understanding *where* a name is visible.
 2. **Modularity**, splitting the program into pieces that hide
    their internals from each other.
 
 These are the engineering disciplines that turn working code into
 **maintainable** code.
-
-<svg
-  viewBox="0 0 640 240"
-  role="img"
-  aria-label="Two translucent panels, each keeping its own dots private, joined by a thin bridge line carrying a single shared yellow dot between them"
-  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
->
-  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="80" y="50" width="200" height="140" rx="18" fillOpacity="0.12" />
-    <circle cx="132" cy="100" r="9" />
-    <circle cx="184" cy="142" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="360" y="50" width="200" height="140" rx="18" fillOpacity="0.12" />
-    <circle cx="422" cy="100" r="9" />
-    <circle cx="474" cy="142" r="7" />
-  </g>
-  <path
-    d="M282 100 H 358"
-    fill="none"
-    stroke="var(--ds-gray-400)"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-   
-  />
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="320" cy="100" r="12" />
-  </g>
-</svg>
 
 ## What is a scope?
 
