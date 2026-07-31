@@ -20,11 +20,17 @@ import {
   type BrandColors,
 } from "./illustrationPrompt";
 
-/** Content collections: which public URL base each maps to. */
-export type Collection = "courses" | "interview";
+/** Content collections: which public URL base each maps to.
+ *
+ *  `home` is not a collection of lessons, it is the single landing page, so it
+ *  has no course/lesson hierarchy beneath it (see `lessonRoute`). It exists so
+ *  the home page's bento icons are authored, reviewed, and regenerated through
+ *  the same pipeline as everything else rather than as one-off art. */
+export type Collection = "courses" | "interview" | "home";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
+  home: "/",
 };
 
 /** Asset categories, in the order they are shown on the gallery page. */
@@ -32,13 +38,15 @@ export type Category =
   | "course-thumbnail"
   | "course-illustration"
   | "interview-thumbnail"
-  | "interview-illustration";
+  | "interview-illustration"
+  | "home-icon";
 
 const CATEGORY_LABEL: Record<Category, string> = {
   "course-thumbnail": "Course thumbnails",
   "course-illustration": "Course illustrations",
   "interview-thumbnail": "Interview prep thumbnails",
   "interview-illustration": "Interview prep illustrations",
+  "home-icon": "Home page bento icons",
 };
 
 const CATEGORY_ORDER: Category[] = [
@@ -46,6 +54,7 @@ const CATEGORY_ORDER: Category[] = [
   "course-illustration",
   "interview-thumbnail",
   "interview-illustration",
+  "home-icon",
 ];
 
 /** One raw prompt definition, as authored in the JSON. */
@@ -122,9 +131,12 @@ export interface IllustrationPromptsData {
 }
 
 /** `courses` + `python-basics` + `hello-world` → `/courses/python-basics/hello-world`;
- *  a missing/"index" lesson collapses to the course landing page. */
+ *  a missing/"index" lesson collapses to the course landing page. The `home`
+ *  collection is one page with nothing beneath it, so it always resolves to
+ *  `/`. */
 function lessonRoute(p: RawPrompt): string {
   const base = URL_BASE[p.collection];
+  if (p.collection === "home") return base;
   const courseUrl = `${base}/${p.course}`;
   if (!p.lesson || p.lesson === "index") return courseUrl;
   return `${courseUrl}/${p.lesson}`;

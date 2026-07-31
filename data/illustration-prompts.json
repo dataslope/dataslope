@@ -13,7 +13,8 @@
       "course-thumbnail": "1536x1024",
       "course-illustration": "1536x1024",
       "interview-thumbnail": "1536x1024",
-      "interview-illustration": "1536x1024"
+      "interview-illustration": "1536x1024",
+      "home-icon": "1024x1024"
     },
     "postgresElephant": "a friendly blue elephant (the PostgreSQL mascot)"
   },
@@ -9461,6 +9462,54 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a platform beside a typed block assembly and a signpost with four arrows pointing outward"
+    },
+    {
+      "id": "home-icon-courses",
+      "collection": "home",
+      "course": "home",
+      "courseTitle": "Home page",
+      "lesson": "index",
+      "category": "home-icon",
+      "title": "Free courses — bento icon",
+      "style": "isometric illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot wearing a graduation cap and holding a small open book"
+    },
+    {
+      "id": "home-icon-interview-prep",
+      "collection": "home",
+      "course": "home",
+      "courseTitle": "Home page",
+      "lesson": "index",
+      "category": "home-icon",
+      "title": "Interview prep — bento icon",
+      "style": "isometric illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot in a neat collared shirt carrying a briefcase"
+    },
+    {
+      "id": "home-icon-challenges",
+      "collection": "home",
+      "course": "home",
+      "courseTitle": "Home page",
+      "lesson": "index",
+      "category": "home-icon",
+      "title": "Code challenges — bento icon",
+      "style": "isometric illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot holding up a trophy cup with both paws"
+    },
+    {
+      "id": "home-icon-code-blocks",
+      "collection": "home",
+      "course": "home",
+      "courseTitle": "Home page",
+      "lesson": "index",
+      "category": "home-icon",
+      "title": "Runnable code blocks — bento icon",
+      "style": "isometric illustration",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot standing beside a small terminal window panel with a blank screen and one glowing caret"
     }
   ]
 }
