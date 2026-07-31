@@ -255,7 +255,7 @@ export function AuthGlobe() {
               ref={(el) => {
                 pinRefs.current[i] = el;
               }}
-              className="absolute left-0 top-0 flex size-[68px] items-center justify-center opacity-0 will-change-transform"
+              className="absolute left-0 top-0 flex size-[88px] items-center justify-center opacity-0 will-change-transform"
             >
               {src ? (
                 // No disc behind these: the artwork is a transparent cut-out
