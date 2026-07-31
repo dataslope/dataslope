@@ -1,10 +1,4 @@
-import {
-  SquareTerminal,
-  Trophy,
-  Briefcase,
-  GraduationCap,
-} from "lucide-react";
-
+import imageManifest from "@/lib/generated/images";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import {
   DiamondBackground,
@@ -12,6 +6,63 @@ import {
   TypingBackground,
   CoursesListBackground,
 } from "./statsBentoBackgrounds";
+
+/**
+ * Turn a generated illustration into the `Icon` component `<BentoCard>` wants.
+ *
+ * The card renders `<Icon className={…} />` with its own sizing classes, so an
+ * illustration has to arrive as a component with that same shape rather than as
+ * an `<img>` inline. Each icon is the `-cutout` slug (transparent background),
+ * so the marmot sits directly on the card in both themes instead of inside a
+ * white tile — the same reason the course rows use cut-outs.
+ *
+ * Returns `null` when the slug has no manifest entry, which renders nothing
+ * rather than a broken image; the card's heading and copy still stand on their
+ * own. The images are eager and non-lazy: all four sit in the bento grid near
+ * the top of the home page.
+ */
+function illustrationIcon(slug: string) {
+  const entry = imageManifest[slug];
+  if (!entry) return () => null;
+  const src = `/images/${slug}.${entry.formats[entry.formats.length - 1]}`;
+  return function IllustrationIcon({ className }: { className?: string }) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        width={entry.width}
+        height={entry.height}
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        className={className}
+      />
+    );
+  };
+}
+
+const CoursesIcon = illustrationIcon("home-icon-courses-cutout");
+const InterviewPrepIcon = illustrationIcon("home-icon-interview-prep-cutout");
+const ChallengesIcon = illustrationIcon("home-icon-challenges-cutout");
+const CodeBlocksIcon = illustrationIcon("home-icon-code-blocks-cutout");
+
+/** 160px square, the same on every card. `scale-100` is required: the card's
+ *  default icon classes carry a `scale-75` (pinned there when the icon was a
+ *  line glyph), which would otherwise render `h-40` at 120px. All four cards
+ *  now share one size — the illustrations differ enough card to card that the
+ *  old large/small split no longer bought any hierarchy.
+ *
+ *  This size drives the copy: at 160px the icon plus a heading, a CTA, and the
+ *  card's padding leave roughly two lines for the description inside the
+ *  grid's fixed `auto-rows-[22rem]`, and less than that on a single-column
+ *  card. Descriptions below are written to that budget. */
+const ICON_SIZE = "mb-3 h-40 w-40 scale-100";
+
+/** The interview prep card only. It is a one-column card whose background is
+ *  the typing animation, and at 160px the marmot ran into that text once the
+ *  grid went three-across. 140px clears it. Below `lg` the cards stack full
+ *  width, the animation has room, and the icon goes back to the shared size. */
+const ICON_SIZE_LG_140 = `${ICON_SIZE} lg:h-[140px] lg:w-[140px]`;
 
 export interface HomeStats {
   /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks across all content. */
@@ -33,43 +84,46 @@ export function StatsBento({
 }) {
   const features = [
     {
-      Icon: GraduationCap,
+      Icon: CoursesIcon,
       name: `${stats.courses} free courses`,
       description:
         "Hands-on, browser-based courses with interactive code blocks, all free, no sign-up, no paywall.",
       href: "/courses",
       cta: "Browse courses",
       className: "col-span-3 lg:col-span-2",
+      iconClassName: ICON_SIZE,
       background: <CoursesListBackground titles={courseTitles} />,
     },
     {
-      Icon: Briefcase,
+      Icon: InterviewPrepIcon,
       name: "Free interview prep",
-      description:
-        "Role-based preparation, data analyst, data scientist, data & analytics engineer, ML, and backend.",
+      // Narrowest card (one column) and it carries a CTA, so it has the
+      // tightest copy budget of the four: the full role list overflowed.
+      description: "Role-based prep for analyst, data, ML, and backend roles.",
       href: "/interview-prep",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
+      iconClassName: ICON_SIZE_LG_140,
       background: <TypingBackground />,
     },
     {
-      // Link-less card (T8): no CTA, smaller icon.
-      Icon: Trophy,
+      // Link-less card (T8): no CTA.
+      Icon: ChallengesIcon,
       name: `${stats.codeChallenges.toLocaleString()}+ code challenges`,
       description:
         "Coding and SQL challenges with instant, test-driven feedback.",
       className: "col-span-3 lg:col-span-1",
-      iconClassName: "mb-3 h-9 w-9",
+      iconClassName: ICON_SIZE,
       background: <TestRailBackground />,
     },
     {
-      // Link-less card (T7): no CTA, smaller icon.
-      Icon: SquareTerminal,
+      // Link-less card (T7): no CTA.
+      Icon: CodeBlocksIcon,
       name: `${stats.runnableCodeBlocks.toLocaleString()}+ runnable code blocks`,
       description:
         "Run every example inline, Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
       className: "col-span-3 lg:col-span-2",
-      iconClassName: "mb-3 h-9 w-9",
+      iconClassName: ICON_SIZE,
       background: <DiamondBackground />,
     },
   ];

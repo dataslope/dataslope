@@ -20,25 +20,40 @@ import {
   type BrandColors,
 } from "./illustrationPrompt";
 
-/** Content collections: which public URL base each maps to. */
-export type Collection = "courses" | "interview";
+/** Content collections: which public URL base each maps to.
+ *
+ *  `home` and `auth` are not collections of lessons but single pages, so they
+ *  have no course/lesson hierarchy beneath them (see `SINGLE_PAGE` below). They
+ *  exist so chrome artwork — the home page's bento icons, the auth globe pins —
+ *  is authored, reviewed, and regenerated through the same pipeline as
+ *  everything else rather than as one-off art. */
+export type Collection = "courses" | "interview" | "home" | "auth";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
+  home: "/",
+  auth: "/sign-in",
 };
+
+/** Collections that are one page, with nothing addressable beneath them. */
+const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>(["home", "auth"]);
 
 /** Asset categories, in the order they are shown on the gallery page. */
 export type Category =
   | "course-thumbnail"
   | "course-illustration"
   | "interview-thumbnail"
-  | "interview-illustration";
+  | "interview-illustration"
+  | "home-icon"
+  | "auth-globe-pin";
 
 const CATEGORY_LABEL: Record<Category, string> = {
   "course-thumbnail": "Course thumbnails",
   "course-illustration": "Course illustrations",
   "interview-thumbnail": "Interview prep thumbnails",
   "interview-illustration": "Interview prep illustrations",
+  "home-icon": "Home page bento icons",
+  "auth-globe-pin": "Auth globe pins",
 };
 
 const CATEGORY_ORDER: Category[] = [
@@ -46,6 +61,8 @@ const CATEGORY_ORDER: Category[] = [
   "course-illustration",
   "interview-thumbnail",
   "interview-illustration",
+  "home-icon",
+  "auth-globe-pin",
 ];
 
 /** One raw prompt definition, as authored in the JSON. */
@@ -122,9 +139,11 @@ export interface IllustrationPromptsData {
 }
 
 /** `courses` + `python-basics` + `hello-world` → `/courses/python-basics/hello-world`;
- *  a missing/"index" lesson collapses to the course landing page. */
+ *  a missing/"index" lesson collapses to the course landing page. The
+ *  single-page collections (`home`, `auth`) always resolve to their own base. */
 function lessonRoute(p: RawPrompt): string {
   const base = URL_BASE[p.collection];
+  if (SINGLE_PAGE.has(p.collection)) return base;
   const courseUrl = `${base}/${p.course}`;
   if (!p.lesson || p.lesson === "index") return courseUrl;
   return `${courseUrl}/${p.lesson}`;

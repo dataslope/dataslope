@@ -44,6 +44,11 @@
  *   --variant <n>     Which variant to take when several exist (default: 1)
  *   --all             Promote every candidate found in the source
  *   --quality <n>     WebP quality of the served image (default: 92)
+ *   --max-width <px>  Downscale to at most this width before encoding (default:
+ *                     none, the generated size is served). For art that is only
+ *                     ever painted small — the auth globe pins are 36 CSS px —
+ *                     a 1024px source is ~50 kB of detail no one can see.
+ *                     Never upscales.
  *   --no-cutout       Promote only the original, not its background-removed pair
  *   --no-build        Skip the build-images run afterwards
  *   --dry-run         Report what would be promoted; write nothing
@@ -74,6 +79,7 @@ function parseArgs(argv) {
     variant: 1,
     all: false,
     quality: 92,
+    maxWidth: null,
     cutout: true,
     build: true,
     dryRun: false,
@@ -88,6 +94,7 @@ function parseArgs(argv) {
       case "--variant": opts.variant = Math.max(1, Number(next()) || 1); break;
       case "--all": opts.all = true; break;
       case "--quality": opts.quality = Math.min(100, Math.max(1, Number(next()) || 92)); break;
+      case "--max-width": opts.maxWidth = Math.max(1, Number(next()) || 0) || null; break;
       case "--no-cutout": opts.cutout = false; break;
       case "--no-build": opts.build = false; break;
       case "--dry-run": opts.dryRun = true; break;
@@ -120,8 +127,12 @@ export function candidateKey(runId, promptId, variant, kind) {
  * `nearLossless` is not used: these are photographic-ish raster renders, so
  * plain high-quality WebP is both smaller and visually equivalent.
  */
-export async function toWebpSource(buf, quality) {
-  return sharp(buf).webp({ quality, alphaQuality: 100, effort: 6 }).toBuffer();
+export async function toWebpSource(buf, quality, maxWidth = null) {
+  const img = sharp(buf);
+  // `withoutEnlargement` keeps this a no-op for anything already smaller, so
+  // passing --max-width over a mixed run never upscales the small ones.
+  if (maxWidth) img.resize({ width: maxWidth, withoutEnlargement: true });
+  return img.webp({ quality, alphaQuality: 100, effort: 6 }).toBuffer();
 }
 
 /** Candidate sources: either a local directory of PNGs or an R2 run prefix. */
@@ -201,7 +212,9 @@ async function main() {
 
   console.log(
     `Promoting ${stems.length} image(s) from ${source.describe} ` +
-      `→ public/images (webp q${opts.quality})${opts.dryRun ? " [dry-run]" : ""}\n`,
+      `→ public/images (webp q${opts.quality}${
+        opts.maxWidth ? `, ≤${opts.maxWidth}px wide` : ""
+      })${opts.dryRun ? " [dry-run]" : ""}\n`,
   );
 
   if (!opts.dryRun) mkdirSync(OUT_DIR, { recursive: true });
@@ -214,7 +227,7 @@ async function main() {
       continue;
     }
     const raw = await source.read(stem);
-    const webp = await toWebpSource(raw, opts.quality);
+    const webp = await toWebpSource(raw, opts.quality, opts.maxWidth);
     before += raw.length;
     after += webp.length;
     const out = join(OUT_DIR, `${stem}.webp`);

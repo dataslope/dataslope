@@ -123,7 +123,7 @@ const FALLBACK_GLYPH: ReactNode = (
 interface Presentation {
   /** One-line pitch shown under the role name. */
   tagline: string;
-  /** Image slug under `assets/images/` for the 3:1 card banner. */
+  /** Image slug for the 3:2 card banner. */
   banner: string;
   /** Alt text describing the banner illustration. */
   bannerAlt: string;
@@ -133,32 +133,32 @@ const PRESENTATION: Record<string, Presentation> = {
   "data-analyst": {
     tagline: "SQL fluency, aggregation, and turning data into answers.",
     banner: "interview-data-analyst-thumbnail-cutout",
-    bannerAlt: "An isometric dashboard of small charts with a magnifying lens resting over one of them",
+    bannerAlt: "The Dataslope marmot holding a magnifying lens over an isometric dashboard of small charts",
   },
   "data-scientist": {
     tagline: "Statistics, modeling, and experiment design.",
     banner: "interview-data-scientist-thumbnail-cutout",
-    bannerAlt: "An isometric scatter plane with a fitted curve, a flask and a dial",
+    bannerAlt: "The Dataslope marmot holding a flask beside an isometric scatter plane with a fitted curve",
   },
   "data-engineer": {
     tagline: "SQL at depth, pipelines, modeling, and systems.",
     banner: "interview-data-engineer-thumbnail-cutout",
-    bannerAlt: "An isometric pipeline carrying coloured cubes from a source tank into a storage silo",
+    bannerAlt: "The Dataslope marmot guiding coloured cubes along an isometric pipeline into a storage silo",
   },
   "analytics-engineer": {
     tagline: "The dbt and warehouse layer between engineering and analytics.",
     banner: "interview-analytics-engineer-thumbnail-cutout",
-    bannerAlt: "An isometric transformation pipeline turning raw tiles into tidy modelled tables",
+    bannerAlt: "The Dataslope marmot feeding raw tiles into an isometric pipeline that returns tidy modelled tables",
   },
   "machine-learning-engineer": {
     tagline: "ML fundamentals plus production engineering.",
     banner: "interview-machine-learning-engineer-thumbnail-cutout",
-    bannerAlt: "An isometric trained-model block feeding predictions into a deployment container",
+    bannerAlt: "The Dataslope marmot placing an isometric trained-model block into a deployment container",
   },
   "backend-engineer": {
     tagline: "Data structures, algorithms, and language fundamentals.",
     banner: "interview-backend-engineer-thumbnail-cutout",
-    bannerAlt: "An isometric server rack linked to an API gateway block and a database disc",
+    bannerAlt: "The Dataslope marmot beside an isometric server rack linked to an API gateway block and a database disc",
   },
 };
 
@@ -169,9 +169,13 @@ const MIME: Record<string, string> = {
   avif: "image/avif",
 };
 
-/** The 3:1 card banner, served WebP-first with a raster fallback from the
+/** The 3:2 card banner, served WebP-first with a raster fallback from the
  *  build-time image manifest (same source `<Figure>` reads), but styled to
- *  fill the card top edge to edge rather than as an in-content figure. */
+ *  fill the card top edge to edge rather than as an in-content figure.
+ *
+ *  3:2 (1.5:1) is the illustrations' native ratio — every image the pipeline
+ *  produces is 1536x1024 — so the banner shows the whole artwork and
+ *  `object-cover` never crops the subject out of frame. */
 function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
   const entry = imageManifest[slug];
   if (!entry) return null;
@@ -189,7 +193,7 @@ function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
         height={entry.height}
         loading="lazy"
         decoding="async"
-        className="block aspect-[3/1] w-full object-cover"
+        className="block aspect-[3/2] w-full object-cover"
       />
     </picture>
   );

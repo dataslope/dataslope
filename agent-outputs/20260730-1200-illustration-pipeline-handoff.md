@@ -33,7 +33,7 @@ without bound.
 | Courses converted | 30 / 30 |
 | Pages with an illustration | 781 / 781 |
 | `<Figure>` placements in `content/` | 787 (all resolve) |
-| Prompts in `data/illustration-prompts.json` | 787 — 751 course illustrations, 30 course thumbnails, 6 interview thumbnails |
+| Prompts in `data/illustration-prompts.json` | 810 — 751 course illustrations, 30 course thumbnails, 6 interview thumbnails, 4 home bento icons, 19 auth globe pins |
 | Manifest (`lib/generated/images.js`) | 1580 entries, **all single-format** |
 | `public/images` | 1580 files, 154 MB |
 | `assets/images` | README only — **no raster sources** |
@@ -76,8 +76,10 @@ carried the flag with no creature. All 15 were corrected on 2026-07-30, and the 
 in [Verification](#verification) now returns 0 on a clean tree — if it returns anything,
 you introduced it.
 
-**153 of 787** prompts (19%) feature a creature. Use them for welcome pages, capstones,
-and next-steps; keep technical concept pages as clean diagrams.
+**182 of 810** prompts (22%) feature a creature. Use them for welcome pages, capstones,
+and next-steps; keep technical concept pages as clean diagrams. Site *chrome* is the
+exception to that restraint and is deliberately creature-heavy: the interview thumbnails,
+the home bento icons, and the auth globe pins are all mascot art by request.
 
 ---
 
@@ -95,6 +97,7 @@ and next-steps; keep technical concept pages as clean diagrams.
   "courseTitle": "Modern CSS: Layout and Responsive Design",
   "lesson": "css-grid",                   // MUST equal the MDX file stem
   "category": "course-illustration",      // or course-thumbnail | interview-thumbnail
+                                          // | home-icon | auth-globe-pin
   "title": "CSS Grid in depth",
   "style": "isometric illustration",      // the default; only change deliberately
   "mascot": false,                        // true iff the subject features a creature
@@ -175,6 +178,41 @@ leading word (`mastering-`, `intro-`, `java-`), which is why prefixes are hand-a
 | `java-programming-for-beginners` | `java-` | `systems-programming-c` | `sysc-` |
 | `machine-learning-scikit-learn` | `ml-` | `time-series-analysis-python` | `tsa-` |
 | `mastering-dsa-cpp` | `dsa-` | `typescript-from-scratch` | `tsx-` |
+
+### Site chrome: the `home` and `auth` collections
+
+Most prompts belong to a course or an interview track. Three groups are page
+*chrome* instead, and they are authored through the same pipeline on purpose —
+so they show up in `/illustration-prompts`, and so "regenerate `auth-pin-duckdb`"
+works exactly like any other id.
+
+| Category | Collection | Where it renders | Size |
+|---|---|---|---|
+| `interview-thumbnail` | `interview` | `/interview-prep` role cards | 1536x1024 |
+| `home-icon` | `home` | the home page bento grid | 1024x1024 |
+| `auth-globe-pin` | `auth` | the cobe globe behind the auth card | 1024x1024 |
+
+`home` and `auth` are single-page collections: `lib/illustrationPromptsGallery.ts`
+holds them in `SINGLE_PAGE`, so `lessonRoute` returns their base URL instead of
+building a `<base>/<course>/<lesson>` path. Adding another chrome collection means
+adding it to `Collection`, `URL_BASE`, `SINGLE_PAGE`, `Category`, `CATEGORY_LABEL`,
+`CATEGORY_ORDER`, and `meta.sizes` — all in that one file plus the JSON.
+
+**Square, not 3:2, for anything painted into a square slot.** The bento icon and
+the globe pin are both square on the page; generating 1536x1024 for them would
+mean cropping. `meta.sizes` is per category, so this is just a JSON value.
+
+**Promote chrome art with `--max-width`.** The globe pins render at 36 CSS px. A
+1024px WebP is ~50 kB of detail nobody can see, and there are 19 of them on a
+page a signed-out user always hits:
+
+```bash
+node scripts/promote-illustrations.mjs --all --from r2 --run <runId> --max-width 144
+```
+
+144px covers a 36px disc at 4x DPR. Measured on the pin run: **~50 kB → ~4 kB**
+per image, 19 pins landing at ~75 kB total instead of ~1 MB. The flag never
+upscales (`withoutEnlargement`), so it is safe to pass over a mixed run.
 
 ### Appending prompts safely
 

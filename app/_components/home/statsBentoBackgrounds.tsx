@@ -133,10 +133,18 @@ export function TestRailBackground() {
       ref={railRef}
       className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]"
     >
-      {/* Rail pinned to the right so it doesn't sit over the trophy icon; the
+      {/* Rail pinned to the right so it doesn't sit over the card's icon; the
           pass-count badge is a header row above the rail so the two never
-          overlap. */}
-      <div className="absolute right-4 top-4 flex w-[15rem] flex-col gap-3">
+          overlap.
+
+          From `lg` the card is one column of three and the icon is a 160px
+          illustration rather than a small glyph, so `right-4` alone still put
+          the rail's nodes across the marmot. The extra shift moves the rail
+          clear of it; the label tails run past the card edge and are clipped,
+          which is fine for a decorative background already behind a scrim and
+          a fade mask. Below `lg` the cards are full width, there is room for
+          both, and the rail sits where it always did. */}
+      <div className="absolute right-4 top-4 flex w-[15rem] flex-col gap-3 lg:translate-x-24">
         {/* pass-count badge, echoing the challenge card's results header */}
         <div
           className="inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors duration-300"
