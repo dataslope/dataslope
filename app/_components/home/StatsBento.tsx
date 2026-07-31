@@ -58,6 +58,12 @@ const CodeBlocksIcon = illustrationIcon("home-icon-code-blocks-cutout");
  *  card. Descriptions below are written to that budget. */
 const ICON_SIZE = "mb-3 h-40 w-40 scale-100";
 
+/** The interview prep card only. It is a one-column card whose background is
+ *  the typing animation, and at 160px the marmot ran into that text once the
+ *  grid went three-across. 140px clears it. Below `lg` the cards stack full
+ *  width, the animation has room, and the icon goes back to the shared size. */
+const ICON_SIZE_LG_140 = `${ICON_SIZE} lg:h-[140px] lg:w-[140px]`;
+
 export interface HomeStats {
   /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks across all content. */
   runnableCodeBlocks: number;
@@ -97,7 +103,7 @@ export function StatsBento({
       href: "/interview-prep",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
-      iconClassName: ICON_SIZE,
+      iconClassName: ICON_SIZE_LG_140,
       background: <TypingBackground />,
     },
     {

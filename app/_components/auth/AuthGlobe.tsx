@@ -70,10 +70,10 @@ const PINS: GlobePin[] = [
   { location: [-37.8136, 144.9631], slug: "auth-pin-star", label: "achievements" },
 ];
 
-/** The served file for a pin: the `-cutout` (transparent) copy, so the artwork
- *  sits on the white disc rather than in a square tile inside a circle. Falls
- *  back to nothing when a slug is missing from the manifest, which leaves an
- *  empty disc rather than a broken image. */
+/** The served file for a pin: the `-cutout` (transparent) copy, which is what
+ *  lets the creature sit on the sphere with no plate behind it. Falls back to
+ *  nothing when a slug is missing from the manifest, so an unknown slug is an
+ *  absent sticker rather than a broken image. */
 function pinSrc(slug: string): string | null {
   const entry = imageManifest[`${slug}-cutout`];
   if (!entry) return null;
@@ -255,19 +255,21 @@ export function AuthGlobe() {
               ref={(el) => {
                 pinRefs.current[i] = el;
               }}
-              className="absolute left-0 top-0 flex size-9 items-center justify-center overflow-hidden rounded-full bg-white opacity-0 shadow-[0_4px_12px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.06] will-change-transform"
+              className="absolute left-0 top-0 flex size-[68px] items-center justify-center opacity-0 will-change-transform"
             >
               {src ? (
-                // The disc is 36px; the art is inset slightly so the subject
-                // does not run into the ring. `object-contain` keeps the whole
-                // creature visible rather than cropping it to fill.
+                // No disc behind these: the artwork is a transparent cut-out
+                // drawn in the brand palette, so it reads directly on the
+                // sphere in both themes. A soft drop-shadow does the work the
+                // white circle used to, lifting each creature off the globe
+                // without boxing it in.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={src}
                   alt=""
                   aria-hidden="true"
                   decoding="async"
-                  className="size-[30px] object-contain"
+                  className="size-full object-contain [filter:drop-shadow(0_2px_5px_rgba(0,0,0,0.35))]"
                 />
               ) : null}
             </span>
