@@ -1,8 +1,8 @@
 "use client";
 
 // Decorative background for the auth shell: the Magic UI / cobe globe parked
-// low behind the card, with Dataslope emoji "stickers" pinned to points on the
-// sphere that orbit with the rotation (à la https://cobe.vercel.app).
+// low behind the card, with Dataslope creature "stickers" pinned to points on
+// the sphere that orbit with the rotation (à la https://cobe.vercel.app).
 //
 // This embeds cobe directly (rather than the generic components/ui/globe.tsx)
 // because the stickers have to be projected from the *live* rotation each
@@ -13,7 +13,7 @@
 // Shown in both themes with a theme-appropriate config (light: pale sphere;
 // dark: near-black sphere that melts into #121212). The dotted continents are
 // kept faint via a low canvas opacity so the globe reads as a soft backdrop;
-// the emoji stickers stay fully opaque on top. `useIsDark` tracks the live
+// the stickers stay fully opaque on top. `useIsDark` tracks the live
 // `.dark` class the shared toggle flips; cobe bakes colours in at creation, so
 // a theme change tears down and rebuilds the globe.
 //
@@ -21,44 +21,64 @@
 
 import { useEffect, useRef, useState } from "react";
 import createGlobe, { type COBEOptions } from "cobe";
+import imageManifest from "@/lib/generated/images";
 
 const DEG = Math.PI / 180;
 
 interface GlobePin {
   location: [number, number]; // [lat, long]
-  emoji: string;
+  /** Illustration slug under `public/images/`, without the `-cutout` suffix
+   *  (see `pinSrc`). Doubles as the React key. */
+  slug: string;
+  /** What the sticker depicts, for the comment trail only — the globe is
+   *  `aria-hidden`, so nothing here is announced. */
+  label: string;
 }
 
 // Dataslope-flavoured stickers, languages, data, challenges, and a little fun,
-// spread around the globe so several sit on the front face at any moment. The
-// globe is parked low behind the card (see the container transform below), so
-// its *upper* latitudes hide behind the card and only the lower arc is on
+// spread around the globe so several sit on the front face at any moment. Each
+// is a generated illustration on a white disc: mostly the marmot, plus the
+// PostgreSQL elephant and a DuckDB duck where the domain has its own mascot
+// (the same convention the course art follows).
+//
+// The globe is parked low behind the card (see the container transform below),
+// so its *upper* latitudes hide behind the card and only the lower arc is on
 // show, the bulk of the pins therefore sit in the southern hemisphere / low
 // latitudes so the visible region below the card stays populated.
 const PINS: GlobePin[] = [
   // Northern / mid latitudes (partly tucked behind the card).
-  { location: [37.7749, -122.4194], emoji: "🐍" }, // Python
-  { location: [51.5074, -0.1278], emoji: "📊" }, // data / analytics
-  { location: [35.6762, 139.6503], emoji: "🏆" }, // challenges
-  { location: [1.3521, 103.8198], emoji: "🚀" }, // ship it
-  { location: [40.7128, -74.006], emoji: "🐘" }, // Postgres
-  { location: [52.52, 13.405], emoji: "🦆" }, // DuckDB
-  { location: [28.6139, 77.209], emoji: "🔥" }, // streak
+  { location: [37.7749, -122.4194], slug: "auth-pin-python", label: "Python" },
+  { location: [51.5074, -0.1278], slug: "auth-pin-charts", label: "data" },
+  { location: [35.6762, 139.6503], slug: "auth-pin-trophy", label: "challenges" },
+  { location: [1.3521, 103.8198], slug: "auth-pin-rocket", label: "ship it" },
+  { location: [40.7128, -74.006], slug: "auth-pin-postgres", label: "Postgres" },
+  { location: [52.52, 13.405], slug: "auth-pin-duckdb", label: "DuckDB" },
+  { location: [28.6139, 77.209], slug: "auth-pin-streak", label: "streak" },
   // Southern / low latitudes (the visible lower arc), spread across longitudes
   // so several are always on the front face as the globe rotates.
-  { location: [-23.5505, -46.6333], emoji: "🧠" }, // learning
-  { location: [-33.8688, 151.2093], emoji: "⚡" }, // WebAssembly speed
-  { location: [-34.6037, -58.3816], emoji: "📈" }, // growth
-  { location: [-33.9249, 18.4241], emoji: "🧮" }, // compute
-  { location: [-36.8485, 174.7633], emoji: "🤖" }, // AI
-  { location: [-33.4489, -70.6693], emoji: "📉" }, // analytics
-  { location: [-31.9523, 115.8613], emoji: "☁️" }, // cloud
-  { location: [-26.2041, 28.0473], emoji: "💡" }, // ideas
-  { location: [-12.0464, -77.0428], emoji: "🔢" }, // numbers
-  { location: [-6.2088, 106.8456], emoji: "🌐" }, // web
-  { location: [-1.2921, 36.8219], emoji: "🎯" }, // goals
-  { location: [-37.8136, 144.9631], emoji: "⭐" }, // achievements
+  { location: [-23.5505, -46.6333], slug: "auth-pin-learning", label: "learning" },
+  { location: [-33.8688, 151.2093], slug: "auth-pin-speed", label: "speed" },
+  { location: [-34.6037, -58.3816], slug: "auth-pin-growth", label: "growth" },
+  { location: [-33.9249, 18.4241], slug: "auth-pin-compute", label: "compute" },
+  { location: [-36.8485, 174.7633], slug: "auth-pin-ai", label: "AI" },
+  { location: [-33.4489, -70.6693], slug: "auth-pin-pie-chart", label: "analytics" },
+  { location: [-31.9523, 115.8613], slug: "auth-pin-cloud", label: "cloud" },
+  { location: [-26.2041, 28.0473], slug: "auth-pin-idea", label: "ideas" },
+  { location: [-12.0464, -77.0428], slug: "auth-pin-blocks", label: "numbers" },
+  { location: [-6.2088, 106.8456], slug: "auth-pin-web", label: "web" },
+  { location: [-1.2921, 36.8219], slug: "auth-pin-goals", label: "goals" },
+  { location: [-37.8136, 144.9631], slug: "auth-pin-star", label: "achievements" },
 ];
+
+/** The served file for a pin: the `-cutout` (transparent) copy, so the artwork
+ *  sits on the white disc rather than in a square tile inside a circle. Falls
+ *  back to nothing when a slug is missing from the manifest, which leaves an
+ *  empty disc rather than a broken image. */
+function pinSrc(slug: string): string | null {
+  const entry = imageManifest[`${slug}-cutout`];
+  if (!entry) return null;
+  return `/images/${slug}-cutout.${entry.formats[entry.formats.length - 1]}`;
+}
 
 const SHARED: Omit<
   COBEOptions,
@@ -72,7 +92,7 @@ const SHARED: Omit<
   theta: 0.24,
   mapSamples: 16000,
   markerColor: [0.078, 0.549, 1],
-  // No cobe markers, the emoji stickers are the points of interest.
+  // No cobe markers, the stickers are the points of interest.
   markers: [],
 };
 
@@ -227,17 +247,32 @@ export function AuthGlobe() {
               "radial-gradient(circle at 50% 50%, #000 58%, transparent 74%)",
           }}
         />
-        {PINS.map((pin, i) => (
-          <span
-            key={pin.emoji}
-            ref={(el) => {
-              pinRefs.current[i] = el;
-            }}
-            className="absolute left-0 top-0 flex size-9 items-center justify-center rounded-full bg-white text-[19px] leading-none opacity-0 shadow-[0_4px_12px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.06] will-change-transform"
-          >
-            {pin.emoji}
-          </span>
-        ))}
+        {PINS.map((pin, i) => {
+          const src = pinSrc(pin.slug);
+          return (
+            <span
+              key={pin.slug}
+              ref={(el) => {
+                pinRefs.current[i] = el;
+              }}
+              className="absolute left-0 top-0 flex size-9 items-center justify-center overflow-hidden rounded-full bg-white opacity-0 shadow-[0_4px_12px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.06] will-change-transform"
+            >
+              {src ? (
+                // The disc is 36px; the art is inset slightly so the subject
+                // does not run into the ring. `object-contain` keeps the whole
+                // creature visible rather than cropping it to fill.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={src}
+                  alt=""
+                  aria-hidden="true"
+                  decoding="async"
+                  className="size-[30px] object-contain"
+                />
+              ) : null}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
