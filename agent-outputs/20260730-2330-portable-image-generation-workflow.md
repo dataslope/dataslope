@@ -1,57 +1,68 @@
-# Portable Image-Generation Workflow
+# Image-Generation Workflow — Tabbied Showcase Sites & Product Mockups
 
 **Date:** 2026-07-30
-**Source:** the illustration pipeline in `dataslope/dataslope`
-**Target:** any other Next.js repository, **without R2** — generated WebP files are
-committed to git and served straight out of `public/`.
+**Source:** the illustration pipeline in `dataslope/dataslope`, generalised
+**Target:** the Tabbied repo (tabbied.com) — sample showcase websites and product
+mockups for a css-doodle pattern library. **No R2**: generated WebP files are committed
+to git and served straight out of `public/`.
 
-> This document is self-contained. It is written to be dropped into a *different*
-> repository and implemented from scratch: every API call, every parameter, every
-> measured number, and complete drop-in scripts are here. Nothing depends on
-> Dataslope-specific infrastructure.
+> This document is self-contained. It is written to be implemented from scratch in a
+> different repository: every API call, every parameter, every measured number, and
+> complete drop-in scripts are here.
 >
-> **Verification status of the scripts in the appendices.** All four were run in a
-> scratch repo: prompt rendering, cost estimation, `--only` / `--category` filtering,
-> argument validation, `--help`, WebP q92 encoding, the stale-cut-out guard, and the
-> manifest's incremental/no-op behaviour all confirmed working. The paths that spend
-> money — the OpenAI Batch calls and the Kie job calls — were **not** executed; they
-> are transcribed unchanged from the pipeline that generated ~800 production images.
+> **Claim hygiene.** The source pipeline generated ~800 production images, so some
+> numbers here are measured. Others are recommendations for *this* use case, which is
+> different in three ways that matter (many palettes, many styles, photographic
+> content). Measured claims say **measured**; the rest are marked **recommended** and
+> should be confirmed on your first batch.
+>
+> **Verification status of the appendix scripts.** All five were run in a scratch repo:
+> the resolution cascade, prompt rendering, cost estimation, filtering, argument
+> validation, `--help`, WebP q92 encoding, the missing-cut-out guard, and the manifest's
+> incremental/no-op behaviour. The paths that spend money — OpenAI Batch calls, Kie job
+> calls — were **not** executed; they are transcribed unchanged from the pipeline that
+> ran ~800 images through them.
 
 ---
 
 ## 1. What the workflow does
 
-Four steps, four scripts, one committed artifact per image:
-
 ```
-  data/image-prompts.json          ← 1. author the prompt (source of truth)
+  data/image-prompts.json        ← 1. author the PROJECT (palette + style), then its prompts
             │
-            ▼  scripts/generate-images.mjs        (OpenAI Batch API, gpt-image-2, quality low)
-  generated-images/<id>.png        ← 2. candidates, gitignored, local scratch
+            ▼  scripts/generate-images.mjs      (OpenAI Batch API, gpt-image-2)
+  generated-images/<id>.png      ← 2. candidates, gitignored, local scratch
             │
-            ▼  scripts/remove-background.mjs      (Kie.ai → recraft/remove-background)
-  generated-images/<id>-cutout.png ← 3. transparent cut-out beside its original
-            │
-            ▼  scripts/promote-images.mjs         (sharp → WebP q92)
-  public/images/<id>-cutout.webp   ← 4. COMMITTED. This file IS what browsers download.
-  lib/generated/images.js          ←    manifest: slug → {hash, width, height}
+            ├───────────────── cutout: false ──────────────┐   (a scene: hero photo,
+            │                                              │    interior, landscape)
+            ▼  scripts/remove-background.mjs               │
+  generated-images/<id>-cutout.png  ← 3. only for cutout: true
+            │    (an object: product, portrait, prop)      │
+            ▼                                              ▼
+            └──────────► scripts/promote-images.mjs  (sharp → WebP q92)
+  public/images/<id>[-cutout].webp  ← 4. COMMITTED. This file IS what browsers download.
+  lib/generated/images.js           ←    manifest: slug → {hash, width, height}
             │
             ▼
-  <Figure slug="…" />              ← 5. rendered by the Next.js app from /images/<slug>.webp
+  <Figure slug="…" />               ← 5. rendered by the app, composited over a Tabbied pattern
 ```
 
-The defining property: **an image is encoded exactly once and exists in git exactly
-once.** The promoted WebP is the served byte stream — there is no build-time
-re-encode, no source copy, no second lossy pass.
+Two properties define the pipeline:
+
+- **An image is encoded exactly once and exists in git exactly once.** The promoted WebP
+  is the served byte stream — no build-time re-encode, no source copy, no second lossy
+  pass.
+- **Background removal is per-image, not global.** Whether an image gets a cut-out is a
+  property of the *prompt*, declared in the JSON, and it drives every downstream step.
 
 ### Why each step exists
 
 | Step | Why it can't be skipped or merged |
 |---|---|
-| Prompt in JSON | One source of truth for the generator, any review UI, and the page that embeds the image. Prompts drift instantly when they live in two places. |
-| Generate at `low` | Image output tokens dominate the bill; `low` is 1/7 the cost of `medium` and visually fine for flat/isometric art. |
-| Background removal | `gpt-image-2` **cannot** emit transparency. It is a separate model call, always. |
-| WebP q92 | PNG is ~11–15× larger. Committing PNG puts gigabytes in git per thousand images. |
+| Project + prompt in JSON | One source of truth for the palette, the style, and the removal flag. A palette that lives in two places has already drifted. |
+| Generate | `gpt-image-2` via the Batch API at half price. |
+| Background removal | `gpt-image-2` **cannot** emit transparency. It is always a separate model call — and only for images that need it. |
+| WebP q92 | PNG is ~11–15× larger (**measured**). Committing PNG puts gigabytes in git per thousand images. |
 | Manifest | The page needs intrinsic `width`/`height` to reserve layout space (no CLS) without shipping or decoding the file at build time. |
 
 ---
@@ -63,154 +74,395 @@ node --version   # 20+ (native fetch, FormData, Blob, web streams)
 npm i sharp      # the only runtime dependency the pipeline adds
 ```
 
-Two API keys, as environment variables. Never write them to a file.
-
 | Variable | Used by | Where to get it |
 |---|---|---|
 | `OPENAI_API_KEY` | step 2 (generation) | platform.openai.com |
 | `KIE_API_KEY` | step 3 (background removal) | kie.ai |
 
-No cloud storage credentials are needed — that is the whole point of this port.
-Candidates live in a gitignored local directory.
+No cloud-storage credentials. Candidates live in a gitignored local directory:
 
 ```gitignore
-# scratch: raw model output, only the promoted WebP is committed
+# scratch: raw model output. Only the promoted WebP is committed.
 generated-images/
 ```
 
 ---
 
-## 3. Step 1 — Author the prompt
+## 3. Author the project, then its prompts
 
-### The data file
+This is the section that differs most from the source pipeline. There, one repo had one
+house style and one four-colour brand palette forever. Here, **every showcase site and
+every product mockup is its own visual world** — its own palette, its own style, its own
+media mix — and there will be many of them.
 
-`data/image-prompts.json` is the single source of truth. Every script reads it, and
-so should any in-app gallery or review page.
+The structure that makes that manageable: **a project record holds everything shared, a
+prompt holds only what is specific to one image.** A prompt that repeats its project's
+palette is a bug waiting to happen.
+
+### 3.1 The data file
+
+`data/image-prompts.json`:
 
 ```jsonc
 {
   "meta": {
     "model": "gpt-image-2",
-    "defaultStyle": "isometric illustration",
-    "brandColors": {
-      "blue": "#148cff",
-      "green": "#20c621",
-      "red": "#ff4f59",
-      "yellow": "#ffdd6c"
+    "defaults": { "size": "1536x1024", "quality": "low", "paletteMode": "hex", "cutout": false }
+  },
+
+  // ── One record per showcase site / mockup series. Everything shared lives here.
+  "projects": {
+    "northwind-architects": {
+      "title": "Northwind Architects — sample site",
+      "style": "editorial architectural photograph",
+      "paletteMode": "scene",
+      "palette": {
+        "Ink":   { "hex": "#1c1c1a", "as": "window frames, railings, and deep shadow" },
+        "Sand":  { "hex": "#e8dfd2", "as": "plaster walls and poured concrete" },
+        "Clay":  { "hex": "#b8674a", "as": "terracotta brick and clay planters" },
+        "Sage":  { "hex": "#8a9a7b", "as": "planting and upholstery" }
+      },
+      "quality": "medium",
+      "cutout": false
     },
-    "sizes": {
-      "hero": "1536x1024",
-      "illustration": "1536x1024",
-      "portrait": "1024x1536",
-      "square": "1024x1024"
+
+    "lumen-cosmetics": {
+      "title": "Lumen Cosmetics — product mockups",
+      "style": "product photograph",
+      "paletteMode": "scene",
+      "palette": {
+        "Blush": { "hex": "#e8b4b8", "as": "packaging and powder" },
+        "Ink":   { "hex": "#171512", "as": "caps, type plates, and shadow" },
+        "Gold":  { "hex": "#c9a227", "as": "trim and foil" }
+      },
+      "size": "1024x1024",
+      "quality": "medium",
+      "cutout": true,
+      "backdrop": "The product stands alone on a plain neutral light-grey seamless backdrop, evenly lit, with no cast shadow and nothing else in frame."
+    },
+
+    "orchard-co-op": {
+      "title": "Orchard Co-op — sample site",
+      "style": "risograph illustration",
+      "paletteMode": "hex",
+      "palette": { "Ink": "#22201c", "Pulp": "#f4efe4", "Fig": "#7b4b6d", "Leaf": "#4f7c4a" },
+      "quality": "low",
+      "cutout": true
     }
   },
+
+  // ── Reusable descriptors that must be IDENTICAL across a group of images.
+  //    A team grid only reads as one set if every portrait shares these words.
+  "sets": {
+    "northwind-team": {
+      "style": "portrait photograph",
+      "size": "1024x1536",
+      "quality": "medium",
+      "cutout": true,
+      "description": "Head-and-shoulders portrait, framed at the same distance, subject facing the camera with a relaxed, friendly expression. Soft large-source key light from camera left, gentle fill, natural skin texture, 85mm lens look with a shallow depth of field.",
+      "backdrop": "Plain warm-grey seamless studio backdrop, evenly lit, no props, no cast shadow on the backdrop.",
+      "palette": {
+        "Ink":  { "hex": "#1c1c1a", "as": "clothing and hair" },
+        "Sand": { "hex": "#e8dfd2", "as": "the backdrop and warm highlights on skin" },
+        "Clay": { "hex": "#b8674a", "as": "an occasional warm accent in knitwear" },
+        "Sage": { "hex": "#8a9a7b", "as": "an occasional cool accent in shirts" }
+      }
+    }
+  },
+
+  // ── One entry per image. Only what is specific to THIS image.
   "prompts": [
     {
-      "id": "css-grid",                  // unique; becomes the filename AND the
-                                         // regeneration handle. Slug-safe.
-      "category": "illustration",        // selects the size from meta.sizes
-      "title": "CSS Grid in depth",      // human label for review UIs
-      "style": "isometric illustration", // optional; defaults to meta.defaultStyle
-      "subject": "a two-dimensional lattice of cells on a platform, one wide panel spanning three cells and another spanning two rows"
+      "id": "northwind-hero",
+      "project": "northwind-architects",
+      "slot": "hero",
+      "subject": "a finished single-storey house at the end of a gravel drive, low afternoon sun raking across its façade, mature trees behind it"
+    },
+    {
+      "id": "northwind-team-01",
+      "project": "northwind-architects",
+      "set": "northwind-team",
+      "slot": "about-portrait",
+      "subject": "a woman in her fifties with short silver hair and dark-rimmed glasses, wearing a charcoal roll-neck"
+    },
+    {
+      "id": "northwind-team-02",
+      "project": "northwind-architects",
+      "set": "northwind-team",
+      "slot": "about-portrait",
+      "subject": "a Black man in his thirties with a close-cropped beard, wearing an open denim shirt over a plain tee"
+    },
+    {
+      "id": "lumen-serum-bottle",
+      "project": "lumen-cosmetics",
+      "slot": "product",
+      "subject": "a frosted glass serum bottle with a matte cap and a slim pipette, three-quarter view"
     }
   ]
 }
 ```
 
-Add whatever extra fields your repo needs (`page`, `collection`, `mascot`, …) — the
-scripts only require `id`, `category`, and `subject`.
+### 3.2 The resolution cascade
 
-### The prompt template
+Every field resolves **prompt → set → project → `meta.defaults`**, first hit wins.
 
-One shared, dependency-free builder, imported by the generator **and** by any UI that
-displays the prompt, so the two can never disagree:
+| Field | Typical home | Notes |
+|---|---|---|
+| `style` | project (or set) | one style per project — see §3.4 |
+| `palette` / `paletteMode` | project | never on a prompt |
+| `size` | project default, set, or prompt | choose by slot — see §4 |
+| `quality` | project or set | `low` vs `medium` matters here — see §4 |
+| `cutout` | project, overridden per prompt/set | drives steps 3 and 4 — see §3.5 |
+| `backdrop` | project or set | only for images that will be cut out |
+| `subject` | **prompt only** | the one thing that is always specific |
 
-```ts
-// lib/imagePrompt.ts
-export interface BrandColors { blue: string; green: string; red: string; yellow: string }
+This is what stops a twenty-image mockup from drifting: change the palette once and
+every image in the project follows.
 
-export const DEFAULT_STYLE = "isometric illustration";
+> **Keep one copy of the palette.** The same colours drive the css-doodle pattern behind
+> the image. If Tabbied already defines a palette per showcase (a token file, a JS
+> export), generate the `palette` block from it or assert equality in a test. Two
+> hand-maintained copies of four hex codes will diverge, and the failure is subtle — an
+> image that is *almost* on-palette looks worse than one that is obviously off.
 
-/** "An" before a vowel-initial style ("isometric"), "A" otherwise. */
-const article = (style: string) => (/^[aeiou]/i.test(style) ? "An" : "A");
+### 3.3 The prompt template
 
-export function buildImagePrompt(
-  spec: { subject: string; style?: string },
-  colors: BrandColors,
-): string {
-  const style = spec.style?.trim() || DEFAULT_STYLE;
-  return (
-    `${article(style)} ${style} of ${spec.subject}. No text.\n\n` +
-    `Blue: ${colors.blue}\n` +
-    `Green: ${colors.green}\n` +
-    `Red: ${colors.red}\n` +
-    `Yellow: ${colors.yellow}`
-  );
+One shared, dependency-free builder used by the generator **and** by any review UI, so
+the two can never disagree. It **only concatenates authored sentences — it never invents
+prose.** Anything that needs to read as English (the set description, the backdrop) is
+written by a human in the JSON and appended verbatim.
+
+```js
+// scripts/lib/prompts.mjs  (excerpt — full file in Appendix A)
+export function buildPrompt(r) {
+  const article = /^[aeiou]/i.test(r.style) ? "An" : "A";
+  const sentences = [`${article} ${r.style} of ${r.subject}.`];
+  for (const s of r.sentences) sentences.push(period(s));   // set description, backdrop, note
+  if (r.noText) sentences.push("No text, letters, numbers, or logos.");
+
+  const entries = Object.entries(r.palette ?? {});
+  if (!entries.length) return sentences.join(" ");
+
+  const header =
+    r.paletteMode === "scene"
+      ? "Palette — render these as the scene's real materials, surfaces, and light:"
+      : "Palette — use these colours and no others:";
+  const lines = entries.map(([name, v]) =>
+    typeof v === "string" ? `${name}: ${v}` : `${name}: ${v.hex}${v.as ? ` — ${v.as}` : ""}`);
+
+  return `${sentences.join(" ")}\n\n${header}\n${lines.join("\n")}`;
 }
 ```
 
-Which renders exactly:
+**Rendered — a risograph illustration (`paletteMode: "hex"`):**
 
 ```
-An isometric illustration of a two-dimensional lattice of cells on a platform, one
-wide panel spanning three cells and another spanning two rows. No text.
+A risograph illustration of a market stall stacked with crates of apples under a
+striped awning. No text, letters, numbers, or logos.
 
-Blue: #148cff
-Green: #20c621
-Red: #ff4f59
-Yellow: #ffdd6c
+Palette — use these colours and no others:
+Ink: #22201c
+Pulp: #f4efe4
+Fig: #7b4b6d
+Leaf: #4f7c4a
 ```
 
-**`"No text."` is appended unconditionally.** Never ask for lettering — the model
-bakes in garbled text. If a label seems needed, write "blank name plate", "blank
-banner", "blank paper tag" into the subject.
+**Rendered — a portrait photograph (`paletteMode: "scene"`, with a set):**
 
-> If you keep both a TypeScript builder (for the app) and a JS copy (for the Node
-> script), pin them together with a test that asserts byte-identical output for a
-> sample spec. That test is the only thing preventing house-style drift.
+```
+A portrait photograph of a woman in her fifties with short silver hair and dark-rimmed
+glasses, wearing a charcoal roll-neck. Head-and-shoulders portrait, framed at the same
+distance, subject facing the camera with a relaxed, friendly expression. Soft
+large-source key light from camera left, gentle fill, natural skin texture, 85mm lens
+look with a shallow depth of field. Plain warm-grey seamless studio backdrop, evenly
+lit, no props, no cast shadow on the backdrop. No text, letters, numbers, or logos.
 
-### Writing a good `subject`
+Palette — render these as the scene's real materials, surfaces, and light:
+Ink: #1c1c1a — clothing and hair
+Sand: #e8dfd2 — the backdrop and warm highlights on skin
+Clay: #b8674a — an occasional warm accent in knitwear
+Sage: #8a9a7b — an occasional cool accent in shirts
+```
 
-Rules that produced a set of ~800 usable images:
+Note what the set contributed: the style (`portrait photograph`, overriding the
+project's architectural one), the three shared sentences, the size, the quality, the
+cut-out flag, and re-anchored palette notes. The prompt supplied one thing — the person.
 
-- **Describe the page's actual idea**, not a generic scene. You should be able to tell
-  which page an image belongs to.
-- **Concrete objects on a platform.** "platform", "tray", "rail", "chute", "socket",
-  "gate" recur because they cut out cleanly and read at small sizes.
-- **Contrast pairs** work well for before/after ideas: "a messy heap of irregular tiles
-  on one platform beside the same tiles arranged into a perfect rectangular grid".
-- **Keep it simple.** Complex compositions are what fail background removal.
-- **Never request text.**
+### 3.4 Two palette modes, because photographs don't take hex codes
 
-### Style: pick one and hold it
+**Recommended, based on how the two kinds of content behave — worth confirming on your
+first batch of each.**
 
-**Isometric illustration is the recommended house style.** It survived every
-comparison: clean subject isolation, readable on both light and dark page
-backgrounds, and it cuts out reliably.
+| Mode | Use for | How it reads to the model |
+|---|---|---|
+| **`hex`** | risograph, flat vector, isometric, halftone, screen-print, any graphic style | A literal ink list. Graphic styles have flat fills, so "use these and no others" is a constraint the model can actually satisfy. |
+| **`scene`** | photographs, 3D renders, painterly work | A hex code alone has little purchase on a photograph — there is no "fill" to set. Anchoring each colour to a **material** ("terracotta brick", "plaster walls") gives the model something physical to place it on, and the palette arrives as art direction rather than as a colour instruction. |
 
-Tried and permanently retired: risograph (busy scenes have no isolable subject), flat
-geometric vector, line art, blueprint schematic, cut-paper collage. Do not
-reintroduce a second style "just for this one" — a mixed set is what makes a first
-pass unusable.
+In `scene` mode a palette entry is `{ "hex": "…", "as": "where this colour lives in the
+scene" }`. The `as` note is the part that does the work; the hex keeps the intent
+recorded next to the pattern that shares it.
 
-### The transparency constraint (read before choosing a palette)
+**When a set changes the medium, it must re-anchor the palette.** The `northwind-team`
+set above carries its own `palette` — the *same four hexes*, because the site's colours
+don't change, but with the `as` notes rewritten for a studio portrait. Inheriting the
+project's "plaster walls and poured concrete" into a head-and-shoulders shot on a
+seamless backdrop sends the model anchors that have nothing to attach to. This is the
+single easiest way to write a prompt that reads fine and generates badly, and it is
+exactly what the cascade exists to fix: override the `as` notes on the set, never the
+hexes.
 
-Removing the background strips the white field that was making single-tone artwork
-legible. **A monochrome cut-out only reads against one of two page backgrounds** —
-black linework is crisp on `#ffffff` and nearly invisible on `#121212`. No background
-remover can fix this; the fix is upstream.
+Neither mode makes the model colour-accurate. Expect a family resemblance, not a match —
+which is fine, because the pattern behind the image *is* exact, and an image that is
+close-but-organic reads better against an exact pattern than a flat colour-matched one
+would.
 
-**Any image meant to run transparent must be drawn in a multi-colour palette, never in
-black, white, or a single hue.** Naming four brand colours in every prompt is not only
-an aesthetic decision — it is what makes the cut-outs survive both themes.
+### 3.5 One style per project, many styles across the library
 
-Build a review page that renders each cut-out over the *live* page background with a
-light/dark toggle. It catches this in seconds and nothing else does.
+The source pipeline retired every style but isometric, because it was one product with
+one voice. **That rule does not port** — a pattern library's showcase is meant to
+demonstrate range.
+
+The rule that does port, scoped down one level:
+
+> **One style per project, held across every image in it. As many styles across the
+> library as you like.**
+
+A single sample site that mixes risograph illustrations with 3D renders and stock-looking
+photos reads as a template nobody art-directed — which is the one thing a showcase for a
+design tool cannot afford. Declare `style` on the project record so it cannot drift, and
+override it only where the *medium* genuinely differs (a photo-styled site still needs
+photographic portraits — hence `style` on the `northwind-team` set).
+
+A starting vocabulary. The cut-out column matters — see §3.6.
+
+| `style` string | Palette mode | Cuts out cleanly? |
+|---|---|---|
+| `isometric illustration` | hex | ✅ **measured** — the source pipeline's house style, cut out ~800 times |
+| `risograph illustration` | hex | ⚠️ only when the subject is a single simple object (**measured**: busy risograph scenes had no isolable subject) |
+| `flat vector illustration` | hex | ✅ recommended |
+| `halftone screen-print illustration` | hex | ⚠️ recommended — texture at the edge can confuse the matte |
+| `product photograph` | scene | ✅ recommended — this is what background removers are built for |
+| `portrait photograph` | scene | ✅ recommended, with the hair caveat in §3.6 |
+| `editorial architectural photograph` | scene | ❌ a scene, not an object — use full-bleed |
+| `interior photograph` | scene | ❌ same |
+| `3D clay render` | scene | ✅ recommended |
+| `watercolour illustration` | hex | ⚠️ soft edges matte poorly |
+| `technical line drawing` | hex | ❌ monochrome — see the value-separation trap in §5.4 |
+
+### 3.6 Cut out objects, not scenes
+
+The decision the user is already making intuitively, stated as a rule:
+
+> **`cutout: true` for an object. `cutout: false` for a scene.**
+
+An **object** has a silhouette — a product on a backdrop, a portrait, a single prop, a
+piece of furniture. Removing its background gives you something to place *on* a Tabbied
+pattern, which is the strongest composite the library can show: the pattern reads as the
+brand's surface, the object sits on it.
+
+A **scene** has no silhouette — a finished house, an interior, a landscape, a street. Cut
+one out and you get a rectangle with ragged sky, or a ghost. **Measured** on the source
+pipeline: this is exactly how the busy compositions failed. Use these full-bleed, and let
+the pattern live *next to* them (a split hero, a section band, a card back) rather than
+behind them.
+
+Worked examples from your list:
+
+| Image | `cutout` | Why |
+|---|---|---|
+| Architect's finished home | `false` | scene — full-bleed hero |
+| Makeup product on seamless | `true` | object — sits on the pattern |
+| "About us" team portrait | `true` | object — a portrait grid over a pattern is the best use of this whole pipeline |
+| Interior shot, office | `false` | scene |
+| A single illustrated icon/prop | `true` | object |
+| Lifestyle shot (person using the product in a room) | `false` | scene containing a person ≠ an object |
+
+Set the default on the project (`"cutout": true` for a product-mockup series) and
+override per prompt for the exceptions.
+
+**An image that will be cut out must be generated for it.** That means a `backdrop`
+sentence on the project or set — plain, neutral, evenly lit, nothing else in frame — and
+it means **never asking for a drop shadow** in the prompt. Both are covered in §5.3.
+
+### 3.7 Human portraits
+
+The "About Us" grid is the hardest thing in this workflow to make look real, and almost
+all of the difficulty is *consistency*, not per-image quality.
+
+**Generate a team as a set, never as individuals.** Six portraits generated from six
+independently-written prompts will differ in crop, lighting direction, backdrop tone, and
+lens feel, and the grid will look like six stock photos — which is precisely the tell you
+are trying to avoid. Put every shared word in a `sets` entry (see `northwind-team` above)
+and let each prompt contribute **only the person**. Submit the whole set in one batch.
+
+The set descriptor should pin, in this order:
+
+1. **Crop** — "head-and-shoulders, framed at the same distance"
+2. **Pose and expression** — "facing the camera, relaxed friendly expression"
+3. **Light** — direction, size, and quality: "soft large-source key from camera left, gentle fill"
+4. **Backdrop** — one named tone, "plain warm-grey seamless"
+5. **Lens feel** — "85mm look, shallow depth of field"
+6. **Skin** — "natural skin texture" is worth stating; without it the model drifts toward retouched plastic
+
+**Author the diversity explicitly.** Left to itself the model collapses toward a narrow
+default. Write each person's age, build, hair, skin tone, and clothing into their
+`subject` — it is one line each and it is the difference between a team that looks like a
+company and one that looks like a stock-photo search result. Keep wardrobe within the
+project palette (`charcoal roll-neck`, `denim shirt`) so the grid coheres.
+
+**Faces are where `low` quality shows.** See §4 — portraits are the main reason this
+workflow does not inherit `low` as a blanket default.
+
+**Hair is where cut-outs fail.** Flyaway strands against a seamless backdrop are the
+classic matting failure: the remover either eats them or leaves a grey fringe. Three
+mitigations, in order of effectiveness: prefer subjects with contained hair (short,
+tied-back, cropped) in the `subject` text; keep the backdrop neutral and evenly lit
+(§5.3); and check the cut-out at full size over an actual pattern before promoting.
+**Recommended** — the source pipeline never generated human portraits, so this is
+reasoning from how matting works, not a measurement. Budget a reject-and-retry on your
+first portrait set.
+
+> **Synthetic people, used honestly.** These are placeholders in a demo of a pattern
+> library, which is a fine use of a generated face. Two things to hold to: don't prompt
+> for a named real person's likeness, and don't present generated faces as real staff,
+> customers, or testimonials of a real business. When a mockup is built to pitch a
+> specific real client, that second one is worth an explicit glance before it ships.
+
+### 3.8 Writing a good `subject`
+
+Carried over from the source pipeline (**measured** across ~800 images), plus what
+changes for photographic work:
+
+- **Describe the actual thing**, specifically enough that you can tell which slot it
+  belongs to. Generic subjects produce generic images.
+- **Keep it to one subject.** Complex compositions are what failed background removal.
+  For `cutout: true`, one object, clear silhouette, nothing else in frame.
+- **Concrete nouns beat adjectives.** "a frosted glass serum bottle with a matte cap and
+  a slim pipette" places better than "an elegant premium serum bottle".
+- **For photographs, add the shot** — angle and distance ("three-quarter view",
+  "head-and-shoulders", "low afternoon sun raking across the façade"). Without it the
+  model picks, and it picks differently every time, which is fatal for a set.
+- **Don't put style, palette, lighting, or backdrop in the subject.** Those live on the
+  project or the set. A subject that names its own style has already started the drift.
+
+### 3.9 Never bake text
+
+`"No text, letters, numbers, or logos."` is appended to every prompt by default. The
+model bakes in garbled lettering otherwise (**measured** — this is why the clause exists
+in the source pipeline).
+
+This is *more* important here, not less. A product mockup wants a brand name on the
+packaging — put it in the DOM, over the image, in a real font. Baked text is garbled,
+unlocalisable, uneditable, and unsearchable; DOM text is none of those and lets one
+generated bottle serve five different fictional brands. Same for headlines over a hero:
+that is HTML, not pixels.
+
+If a label shape is genuinely needed in-frame, ask for a **blank** one: "a blank foil
+label", "a blank name plate".
 
 ---
 
-## 4. Step 2 — Generate with GPT Image 2 (quality `low`)
+## 4. Generate with GPT Image 2
 
 ### The request
 
@@ -219,236 +471,262 @@ light/dark toggle. It catches this in seconds and nothing else does.
 ```jsonc
 {
   "model": "gpt-image-2",
-  "prompt": "An isometric illustration of …\n\nBlue: #148cff\n…",
-  "size": "1536x1024",   // see the size table below
-  "quality": "low",      // non-negotiable, see cost table
+  "prompt": "A portrait photograph of …\n\nPalette — …",
+  "size": "1024x1536",
+  "quality": "medium",
   "n": 1
-  // "output_format": "png"    (default; "webp" and "jpeg" also valid, "svg" is a 400)
-  // "background": "opaque"    (do NOT send "transparent" — 400)
+  // "output_format": "png"   (default; "webp"/"jpeg" also valid, "svg" is a 400)
+  // "background": "opaque"   (do NOT send "transparent" — 400)
 }
 ```
 
 The response carries **base64, never a URL**:
 
-```jsonc
-{ "data": [ { "b64_json": "iVBORw0KG…" } ] }
-```
-
 ```js
 const buf = Buffer.from(res.data[0].b64_json, "base64");
 ```
 
-### Sizes
+### Size by slot
 
-`gpt-image-2` accepts a fixed set of sizes — all of which are below 1536×1536, so the
-"smaller than 1536×1536" requirement is satisfied by construction:
+`gpt-image-2` accepts a fixed set of sizes — all below 1536×1536, so that constraint is
+satisfied by construction. Pick by what the image is for, not by habit:
 
-| `size` | Shape | Output tokens at `low` |
+| Slot | `size` | Output tokens at `low` |
 |---|---|---|
-| **`1536x1024`** | landscape — **the default, use this unless there's a reason not to** | **158** (measured) |
-| `1024x1536` | portrait | 158 assumed by symmetry — **measure before budgeting a large portrait run** |
-| `1024x1024` | square | 196 (measured) |
-| `auto` | model picks | unpredictable — **never use** |
+| Hero, full-bleed scene, wide card | **`1536x1024`** | **158** (**measured**) |
+| Team portrait, standing product, phone mockup | **`1024x1536`** | 158 assumed by symmetry — **measure before a large portrait run** |
+| Product on seamless, avatar, icon tile, square card | **`1024x1024`** | 196 (**measured**) |
+| — | `auto` | unpredictable — **never use** |
 
-Landscape is *cheaper* than square at the same quality (158 vs 196 tokens), which is a
-pleasant surprise the first time you see it. `auto` costs roughly 2× `low` with no
-control over the tier, so pin the size per category in `meta.sizes` and pin the quality
-on the command line.
+Landscape is *cheaper* than square at the same quality (158 vs 196 tokens, **measured**),
+which surprises people the first time. `auto` costs roughly 2× `low` with no control over
+the tier.
 
-Only landscape and square were used in production, so those two token counts are
-measured; the portrait figure is inferred from the pixel count matching landscape. A
-`dry-run` on a handful of prompts, compared against the API's reported usage, confirms
-it in a minute.
+### Quality — this is where the source pipeline's default does *not* port
 
-### Quality: `low`, and why it is not a compromise
+The source repo pinned `low` forever, and the argument was purely volume: at ~800 images,
+`medium` would have cost ~$82 instead of ~$2.37. **That argument does not apply here.** A
+showcase site is ten to thirty images; a mockup series is a handful.
 
-Image output tokens dominate the bill and the tiers are far apart. Measured against
-`gpt-image-2` on 2026-07-28:
+| Size / quality | Output tokens | Per image (Batch, $15/1M) | A 20-image site |
+|---|---|---|---|
+| 1536x1024 / **low** | 158 (**measured**) | $0.0024 | **$0.05** |
+| 1536x1024 / **medium** | 1372 (**measured**) | $0.021 | **$0.41** |
+| 1536x1024 / high | 5488 (**measured**) | $0.082 | $1.65 |
 
-| Size / quality | Output tokens | 1000 images @ Batch ($15/1M) |
-|---|---|---|
-| 1536x1024 / **low** | **158** | **$2.37** |
-| 1024x1024 / low | 196 | $2.94 |
-| 1536x1024 / medium | 1372 | $20.58 |
-| 1536x1024 / high | 5488 | $82.32 |
+**Recommended split:**
 
-`low` is visibly fine for flat, isometric, brand-coloured art. Reach for `medium` only
-for a one-off hero image where you have actually compared the two side by side.
+- **`low`** — flat graphic styles: risograph, flat vector, isometric, halftone. `low` was
+  measured as visibly fine for exactly this material across ~800 images. It is also
+  correct for anything that will sit small on the page.
+- **`medium`** — **faces, hero shots, and any product photograph that will be seen
+  large.** Photorealistic content is where the tier shows: skin, hair, fabric weave,
+  glass and metal highlights. A mockup's entire job is to look convincing, and the
+  difference between the two tiers on a 20-image site is about 36 cents.
+- **`high`** — only after comparing it against `medium` on the actual image and seeing a
+  difference worth 4×.
+
+Set `quality` on the project (or on a portrait set) rather than passing it per run, so
+the choice is recorded next to the images it applies to.
 
 ### Batch API, always
 
-The Batch API is **half price** and, in practice, a 20-image job returns in well under
-a minute despite the 24-hour completion window. A 337-image job took 27 minutes.
+Half price, and **measured**: a 20-image job returns in well under a minute despite the
+24-hour window; a 337-image job took 27 minutes.
 
-The flow is four calls:
-
-1. **Upload** a JSONL file of requests — `POST /v1/files` with `purpose=batch`
-   (multipart). One line per image:
+1. **Upload** JSONL — `POST /v1/files`, `purpose=batch`, multipart. One line per image:
    ```jsonc
-   {"custom_id":"css-grid","method":"POST","url":"/v1/images/generations","body":{…}}
+   {"custom_id":"lumen-serum-bottle","method":"POST","url":"/v1/images/generations","body":{…}}
    ```
-   `custom_id` is the prompt id, and it is what comes back on each output row — that is
-   how a result is matched to a filename.
-2. **Create** — `POST /v1/batches` with
-   `{ input_file_id, endpoint: "/v1/images/generations", completion_window: "24h" }`.
-3. **Poll** — `GET /v1/batches/{id}` until `status` is terminal
-   (`completed` / `failed` / `expired` / `cancelled`). `request_counts` gives progress.
-4. **Download** — `GET /v1/files/{output_file_id}/content`, a JSONL stream, one row per
-   image with the base64 inline.
+   `custom_id` is the prompt id and comes back on each output row — that is how a result
+   is matched to a filename.
+2. **Create** — `POST /v1/batches` with `{ input_file_id, endpoint: "/v1/images/generations", completion_window: "24h" }`.
+3. **Poll** — `GET /v1/batches/{id}` until `status` is terminal (`completed` / `failed` /
+   `expired` / `cancelled`). `request_counts` gives progress.
+4. **Download** — `GET /v1/files/{output_file_id}/content`, a JSONL stream with the
+   base64 inline.
 
-Two structural constraints that the script's shape exists to satisfy — do **not**
-"simplify" them away:
+Two structural constraints — do **not** "simplify" them away:
 
-- **Chunk the prompts into separate batch jobs** (default 100 per job). One 1536×1024
-  PNG is ~2.6 MB, ~3.6 MB as inline base64. A single 1000-image batch would produce a
-  ~3.6 GB output file.
-- **Stream the output file line by line.** `await res.text()` on that file blows V8's
-  ~512 MB max string length. Read `res.body` with a reader and split on newlines, so
-  only one row (~3.6 MB) is in memory at a time.
+- **Chunk prompts into separate batch jobs** (default 100). One 1536×1024 PNG is ~2.6 MB,
+  ~3.6 MB as inline base64; a 1000-image batch produces a ~3.6 GB output file.
+- **Stream the output file line by line.** `await res.text()` on it blows V8's ~512 MB
+  max string length.
 
-**Use `submit` → `status` → `download` as three separate invocations, not one
-long-lived process.** A 65-minute batch once outlived its parent process; the images
-were only recovered because the batch id had been written to disk and
-`download --batch <id>` could pick it up. Paid work must never depend on a process
-staying alive.
+At Tabbied's volumes a single project is one batch job, so this matters less than it did
+— but the scripts already handle it and removing the handling only creates a cliff later.
+
+**Use `submit` → `status` → `download` as three separate invocations.** A 65-minute batch
+once outlived its parent process; the images were recovered only because the batch id was
+on disk. Paid work must never depend on a process staying alive.
 
 ### Retry policy — the part that actually bites
 
-**Every expensive failure so far has been on the *retrieval* side, after the paid work
-completed.** Three separate incidents: the OpenAI batch-output GET (504 through a
-proxy), the object-store fetch under concurrency, and the Kie CDN result download (8 of
-44 failed). The images were already generated and billed in all three cases.
-
-So:
+**Measured, three separate times: every expensive failure was on the *retrieval* side,
+after the paid work completed.** The OpenAI batch-output GET (504 through a proxy), the
+object-store fetch under concurrency (43 of 45 failed), and the Kie CDN result download
+(8 of 44). The images were already generated and billed in all three cases.
 
 - Retry **idempotent GETs** — status polls, file content — on `408, 425, 429, 500, 502,
-  503, 504` and on network errors, with exponential backoff (2s, 4s, 8s, 16s, 32s cap).
+  503, 504` and on network errors, exponential backoff (2s, 4s, 8s, 16s, 32s cap).
 - **Never** blanket-retry the POSTs that create batches or generate images. A silent
-  re-send duplicates work and doubles the bill. Retries are opted into per call site,
-  never a default.
-- Any new `fetch` added to these scripts must be wrapped. A bare `fetch` here is a bug
-  waiting for a burst of concurrency.
+  re-send duplicates work and doubles the bill. Retries are opted into per call site.
+- Any new `fetch` added to these scripts must be wrapped.
 
 ### Known 400s
 
 | You send | You get |
 |---|---|
-| `background: "transparent"` | 400. `gpt-image-2` has no transparent background. Asking for transparency *in the prompt* is worse — the model paints a fake checkerboard as real opaque pixels. |
+| `background: "transparent"` | 400. `gpt-image-2` has no transparent background. Asking for transparency *in the prompt* is worse — **measured**: the model paints a fake checkerboard as real opaque pixels. |
 | `output_format: "svg"` | 400. png / webp / jpeg only. |
 
 ---
 
-## 5. Step 3 — Background removal (Kie.ai → Recraft)
+## 5. Background removal (Kie.ai → Recraft) — for `cutout: true` only
 
-Model: **`recraft/remove-background`**, served through Kie.ai.
+Model: **`recraft/remove-background`** via Kie.ai. Chosen after comparison
+(**measured**): it lifts a subject out of a full-bleed scene where Replicate's
+`851-labs/background-remover` and a local colour-key both dissolved busy frames into
+translucent ghost mattes.
 
-Chosen after comparison: it lifts a subject out of a full-bleed scene, where
-Replicate's `851-labs/background-remover` and a local colour-key both dissolved busy
-frames into translucent ghost mattes.
+### 5.1 Which images the script processes
 
-### The flow
+`scripts/remove-background.mjs` reads `data/image-prompts.json` and processes **only the
+prompts whose resolved `cutout` is `true`** and whose original is on disk. You do not
+hand it a list; the flag in the JSON is the list. `--only` narrows it further,
+`--ignore-flags` falls back to scanning the whole directory.
+
+That is the mechanical difference from the source pipeline, where every image was cut out
+unconditionally.
+
+### 5.2 The flow
 
 ```
 POST https://kieai.redpandaai.co/api/file-base64-upload
-     { base64Data: "data:image/png;base64,…", uploadPath: "images/…", fileName: "css-grid.png" }
+     { base64Data: "data:image/png;base64,…", uploadPath: "images/…", fileName: "lumen-serum-bottle.png" }
   → { data: { downloadUrl: "https://…" } }
 
 POST https://api.kie.ai/api/v1/jobs/createTask
      { model: "recraft/remove-background", input: { image: "<downloadUrl>" } }
   → { data: { taskId: "…" } }
 
-GET  https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…      (poll every ~3s)
+GET  https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…        (poll every ~3s)
   → { data: { state: "success", resultJson: "{\"resultUrls\":[\"https://…\"]}" } }
      state is "success" | "fail" (with failMsg/failCode) | in-progress
 
 GET  <resultUrls[0]>   → the transparent PNG bytes
 ```
 
-All requests carry `Authorization: Bearer $KIE_API_KEY`.
-Cost is ~1 credit and ~3 seconds per image.
+All requests carry `Authorization: Bearer $KIE_API_KEY`. ~1 credit and ~3 seconds each
+(**measured**).
 
-### Four API details that each cost an hour to rediscover
+### 5.3 Four API details that each cost an hour (**measured**)
 
-1. **The model takes a public URL only** — no base64, no data URI. That is why every
-   image is pushed through Kie's own upload endpoint first. The upload is free and
-   auto-deletes after 24 h.
+1. **The model takes a public URL only** — no base64, no data URI. Hence the upload step.
+   Kie's upload is free and auto-deletes after 24 h.
 2. **Both Kie hosts sit behind Cloudflare and reject a request with no browser
    `User-Agent`** — a bare `403` with `error code: 1010`. It reads exactly like an auth
-   failure and is not. Any ordinary browser UA string satisfies it.
-3. **Rate limit is per account: 20 new generation requests per 10 seconds, and the
-   excess is rejected with 429 *without being queued*.** Admit `createTask` calls
-   through a shared sliding-window limiter at 18/10 s so concurrency can be raised
-   freely, and on a 429 wait out a **full window** rather than a short backoff — the
-   request was dropped, not held. Uploads and status polls are not counted against this
-   limit.
-4. **`resultJson` is a JSON *string*** inside the response, not an object. Parse it,
-   then read `resultUrls[0]`.
+   failure and is not. Any ordinary browser UA satisfies it.
+3. **Rate limit is per account: 20 new generation requests per 10 seconds, and the excess
+   is rejected with 429 *without being queued*.** Admit `createTask` through a shared
+   sliding-window limiter at 18/10 s, and on a 429 wait out a **full window** rather than
+   a short backoff. Uploads and status polls are not counted.
+4. **`resultJson` is a JSON *string***, not an object. Parse it, then read
+   `resultUrls[0]`.
 
-### The failure mode that will waste your afternoon
+### 5.4 Generating an image so it can be cut out
 
-**Skipping background removal fails silently.** Pages reference the `-cutout` slug. If
-you regenerate an original and skip this step, promotion finds no cut-out for that run
-and promotes **only the original**: no warning, no error. `<id>.webp` updates,
-`<id>-cutout.webp` stays stale, and **the page keeps serving the old image**. You will
-wrongly conclude the regeneration didn't work.
+**Recommended — this is the part to get right before your first product batch.**
 
-After any regeneration, verify explicitly:
+- **Neutral backdrop, never a palette colour.** Matting leaves a thin fringe of the
+  original backdrop blended into the subject's edge pixels. Against a Tabbied pattern, a
+  fringe of *neutral grey* reads as a soft edge; a fringe of saturated Blush reads as a
+  coloured outline around the product. Put a `backdrop` sentence on the project — "plain
+  neutral light-grey seamless, evenly lit" — and leave the palette to the subject.
+- **Never ask for a drop shadow.** A baked shadow either gets stripped (leaving the
+  object looking unseated) or survives as a grey blob on the transparent PNG. Add
+  `filter: drop-shadow(…)` in CSS at composite time, where it can be tuned per pattern
+  and per theme.
+- **One object, nothing else in frame.** Props, hands, and surfaces all become matting
+  ambiguity.
+- **Value separation from the pattern.** The pattern behind the cut-out is drawn from
+  *the same palette*, so a subject rendered only in palette mid-tones can disappear into
+  it. Two fixes: keep the subject's value range at one end (clearly darker or lighter
+  than the pattern), or reserve one palette colour for subjects and keep it out of the
+  pattern. This is the Tabbied-specific version of a constraint that was **measured** in
+  the source pipeline — there, a monochrome cut-out was legible on a white page and
+  nearly invisible on a `#121212` one. A busy pattern is a harder background than either.
+- **Check over the real pattern, at full size, before promoting.** Build a review page
+  that renders each cut-out over the actual css-doodle output with a palette switcher.
+  It takes an afternoon and it is the only way to catch fringing and value collapse
+  before they are committed.
+
+### 5.5 The failure mode that will waste your afternoon
+
+**Skipping background removal fails silently** in the source pipeline: pages reference the
+`-cutout` slug, so a regenerated original with no new cut-out leaves the page serving the
+old image, with no warning.
+
+Two things close it here:
+
+1. The `cutout` flag makes the expectation explicit, so `promote` knows which images
+   *must* have a cut-out.
+2. The promote script in Appendix D **errors** when a `cutout: true` prompt has no
+   `-cutout.png` in the source directory, and shouts louder when a stale
+   `<id>-cutout.webp` is already committed. That was an open item in the source repo; it
+   is built in here.
+
+After any regeneration, still eyeball it:
 
 ```bash
 git status --short public/images | grep -- -cutout
 ```
 
-Better: have the promote script warn when it promotes an original whose cut-out is
-absent from the source directory *while* a `<id>-cutout.webp` already exists in
-`public/images` — that combination always means a stale page.
-
 ---
 
-## 6. Step 4 — Encode to WebP q92 and commit
+## 6. Encode to WebP q92 and commit
 
 ### The encode
 
 ```js
-import sharp from "sharp";
-
-const webp = await sharp(pngBuffer)
-  .webp({ quality: 92, alphaQuality: 100, effort: 6 })
-  .toBuffer();
+const webp = await sharp(pngBuffer).webp({ quality: 92, alphaQuality: 100, effort: 6 }).toBuffer();
 ```
 
-- **`quality: 92`**, not a serving-oriented 80, because this file *is* the artifact —
-  q92 is what users actually see. There is no later "real" encode to defer quality to.
-- **`alphaQuality: 100`** keeps the cut-out edge clean. Lossy alpha shows as a halo.
-- **`effort: 6`** is the encoder's time/size tradeoff; it costs seconds per image and is
-  paid once, at authoring time, not per request.
-- **`nearLossless` is deliberately not used** — these are photographic-ish raster
-  renders, so plain high-quality WebP is both smaller and visually equivalent.
+- **`quality: 92`**, not a serving-oriented 80, because this file *is* the artifact.
+- **`alphaQuality: 100`** keeps the cut-out edge clean. Lossy alpha shows as a halo —
+  which matters more here than in the source repo, since every cut-out lands on a busy
+  pattern.
+- **`effort: 6`** is paid once at authoring time, never per request.
+- **`nearLossless` deliberately unused** — plain high-quality WebP is both smaller and
+  visually equivalent on this material (**measured**).
 
-Measured: PNG → WebP q92 took 929.6 MB → 63.8 MB across 674 files (**14.6×**). A single
-1536×1024 illustration is ~1.4 MB as PNG and ~130 kB as WebP.
+**Measured:** PNG → WebP q92 took 929.6 MB → 63.8 MB across 674 files (**14.6×**). A
+1536×1024 image is ~1.4 MB as PNG and ~130 kB as WebP.
 
-### Write straight into `public/images/` — do not keep a source copy
+### Write straight into `public/images/` — no source copy
 
-This is the decision that most repos get wrong, so here is the measurement behind it.
-
-If you put the promoted file under `assets/` (or `src/images/`) and let a build step
-re-encode it for serving, you pay a **double lossy pass**:
+If you put the promoted file under `assets/` and let a build step re-encode it, you pay a
+**double lossy pass** (**measured**):
 
 | Path | PSNR vs the PNG original |
 |---|---|
 | promote q92 → build q80 (two passes) | **35.58 dB** |
 | single q80 encode | **37.41 dB** |
 
-The second pass **cost ~1.8 dB to save ~3 kB**. It also means every image is in git
-roughly three times (source + two build outputs).
+The second pass **cost ~1.8 dB to save ~3 kB**, and put every image in git roughly three
+times. So `promote` writes `public/images/<id>.webp` and that is the end of it.
 
-So: **`promote` writes `public/images/<id>.webp` and that is the end of it.** The build
-step never touches those bytes; it only reads their dimensions.
+### Only the served variant is committed
 
-If your repo also needs a *second* class of image — a photo, a screenshot, a scanned
-diagram that did not come from this pipeline — keep a separate source directory that
-the build step *does* encode (WebP + a `.png`/`.jpg` fallback). Just never route a
-pipeline image through it.
+**Changed for this port.** The source pipeline promoted both the opaque original and the
+cut-out for every image. Here, promotion follows the flag:
+
+- `cutout: false` → commit `<id>.webp`
+- `cutout: true` → commit `<id>-cutout.webp` **only** (pass `--keep-original` if you also
+  want the opaque one, e.g. to show a before/after)
+
+That halves the committed bytes for product and portrait sets, where the opaque original
+is never served.
 
 ### The manifest
 
@@ -457,64 +735,45 @@ pipeline image through it.
 ```js
 // GENERATED by scripts/build-image-manifest.mjs, do not edit by hand.
 export default {
-  "css-grid-cutout": {
-    "hash": "9f2c…",     // sha256(MANIFEST_VERSION + file bytes)
-    "width": 1536,
-    "height": 1024,
-    "formats": ["webp"]
-  }
+  "lumen-serum-bottle-cutout": { "hash": "9f2c…", "width": 1024, "height": 1024, "formats": ["webp"] }
 };
 ```
 
-Why it exists and why it is committed:
-
-- `width`/`height` let the `<img>` reserve layout space — **no CLS** — without the page
-  importing or decoding the file.
-- The hash makes the build step **incremental and a true no-op** on a clean tree: an
-  unchanged file is never re-measured and the manifest file is not even rewritten, so
-  it produces no git churn on `dev` / `build` / `postinstall`.
-- Committing it means a deploy serves the images straight from CDN with **zero build
-  work**.
-- `formats` stays an array so a two-format image (WebP + fallback) can coexist later.
-  Pipeline images are always `["webp"]`.
-
-`MANIFEST_VERSION` is a bump-to-invalidate constant: change it when metadata semantics
-change and every entry is re-measured once.
+- `width`/`height` let the `<img>` reserve layout space — **no CLS** — without importing
+  or decoding the file.
+- The hash makes the build **incremental and a true no-op**: an unchanged file is never
+  re-measured and the manifest is not even rewritten, so it produces no git churn on
+  `dev` / `build` / `postinstall`.
+- Committing it means a deploy does **zero** image work.
+- `formats` stays an array so a WebP + fallback pair can coexist later.
 
 ### What "commit the WebP" means in practice
 
-- A commit that lands artwork is **large and touches many binary files** — 674 files in
-  one commit is normal. Don't split it to look tidier: **the manifest must land in the
-  same commit as its images**, or the app renders nothing for the new slugs.
-- The manifest is a single generated file, so two concurrent branches each regenerating
-  a different image **will conflict there**. Resolution is mechanical: take either side,
-  re-run the manifest build, commit.
-- Budget the repo size honestly: ~130 kB per image ⇒ ~130 MB per thousand. That is fine
-  for git. PNG at ~1.4 MB each would be ~1.4 GB per thousand, which is not.
-- Regenerating an image **reuses its slug**, so the diff is two changed WebP files
-  (original + cutout) and one changed manifest line. Git stores both blob versions
-  forever — expect steady, modest growth per regeneration, and don't regenerate in bulk
-  casually.
+- A commit that lands artwork **touches many binary files at once.** Don't split it: the
+  manifest must land in the same commit as its images or the app renders nothing for the
+  new slugs.
+- The manifest is a single generated file, so two branches each adding a project **will
+  conflict there**. Resolution is mechanical: take either side, re-run the manifest
+  build, commit.
+- ~130 kB per image ⇒ a 20-image showcase is ~2.6 MB. Twenty showcases, ~50 MB. Fine for
+  git. PNG at ~1.4 MB each would not be.
+- Regenerating reuses the slug, so the diff is one changed WebP and one manifest line.
+  Git keeps both blob versions forever — expect modest steady growth, and don't
+  regenerate in bulk casually.
 
 ### Losing R2: the one real tradeoff
 
-In the source repo, pristine PNG candidates live in object storage for a 14-day
-retention window, so a run can be **re-promoted at a different WebP quality for free**,
-without paying to regenerate.
+The source repo kept pristine PNG candidates in object storage for 14 days, so a run
+could be **re-promoted at a different WebP quality for free**. Committing directly gives
+that up: once `generated-images/` is cleaned, the only copy is the q92 WebP.
 
-Committing directly gives that up: once `generated-images/` is cleaned, the only copy
-is the q92 WebP. Two mitigations, pick one:
-
-1. **Keep candidates locally** for as long as you might want to re-promote. Disk is
-   cheap; the directory is gitignored.
-2. **Accept regeneration cost** — at ~$0.0024 per image, redoing one is ~a quarter of a
-   cent. This is the honest default for a small repo.
-
-Do **not** solve this by committing the PNGs.
+Either keep candidates locally while a project is still in flux, or accept regeneration
+(~$0.002 at `low`, ~$0.02 at `medium` per image). **Do not** solve it by committing the
+PNGs.
 
 ---
 
-## 7. Step 5 — Serving from the Next.js app
+## 7. Serving, and compositing over a Tabbied pattern
 
 Files in `public/images/` are served at `/images/<slug>.webp`. The component reads the
 manifest for dimensions:
@@ -524,137 +783,134 @@ manifest for dimensions:
 import imageManifest from "@/lib/generated/images";
 
 const PUBLIC_BASE = "/images";
-const MIME: Record<string, string> = { webp: "image/webp", png: "image/png", jpg: "image/jpeg" };
 
 interface FigureProps {
-  /** Image slug — the committed filename without its extension. */
+  /** Committed filename without its extension — include `-cutout` for cut-outs. */
   slug: string;
-  /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;
-  caption?: string;
-  maxWidth?: number;
-  /** Eager-load + high fetch priority for an above-the-fold hero. */
+  /** Cut-outs get a CSS shadow to seat them on the pattern; scenes don't. */
+  cutout?: boolean;
   priority?: boolean;
 }
 
-export function Figure({ slug, alt, caption, maxWidth, priority = false }: FigureProps) {
+export function Figure({ slug, alt, cutout = false, priority = false }: FigureProps) {
   const entry = imageManifest[slug];
 
-  // A slug with no image yet: surface it while developing, render nothing in
-  // production, so a placement can be authored before its artwork exists.
+  // A slug with no image yet: surface it in dev, render nothing in production, so a
+  // layout can be built before its artwork exists.
   if (!entry) {
     if (process.env.NODE_ENV !== "development") return null;
     return <span role="img" aria-label={`Image pending: ${slug}`}>Image <code>{slug}</code> pending</span>;
   }
 
-  // The last format is the <img> src; any earlier ones become <source>s. With a
-  // single format <picture> collapses to a plain <img>.
-  const fallback = entry.formats[entry.formats.length - 1];
-  const sources = entry.formats.slice(0, -1);
-
   return (
-    <figure style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}>
-      <picture>
-        {sources.map((ext) => (
-          <source key={ext} srcSet={`${PUBLIC_BASE}/${slug}.${ext}`} type={MIME[ext]} />
-        ))}
-        <img
-          src={`${PUBLIC_BASE}/${slug}.${fallback}`}
-          width={entry.width}
-          height={entry.height}
-          alt={alt}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          fetchPriority={priority ? "high" : "auto"}
-        />
-      </picture>
-      {caption ? <figcaption>{caption}</figcaption> : null}
-      {/* Regeneration handle: the prompt id is the slug minus the -cutout suffix,
-          which is exactly what every script takes as --only. */}
-      <figcaption className="assetId"><code>{slug.replace(/-cutout$/, "")}</code></figcaption>
-    </figure>
+    <img
+      src={`${PUBLIC_BASE}/${slug}.webp?v=${entry.hash.slice(0, 8)}`}
+      width={entry.width}
+      height={entry.height}
+      alt={alt}
+      className={cutout ? "figure figure--cutout" : "figure"}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      fetchPriority={priority ? "high" : "auto"}
+    />
   );
 }
 ```
 
-Three things worth copying verbatim:
-
-- **A plain `<img>`, not `next/image`.** `next/image` re-encodes at request time, which
-  is the same double-lossy pass the pipeline exists to avoid, and the bytes are already
-  final and correctly sized. If you must use `next/image` for layout reasons, pass
-  `unoptimized`.
-- **`width`/`height` always set** from the manifest. This is the entire CLS story.
-- **The prompt id rendered under the image.** It looks like a small thing; it is the
-  regeneration handle. A reviewer reading the live page can say "redo `css-grid`" and
-  that string is precisely what `--only` takes. Keep it working. (Gate it behind
-  non-production if it ever reads as clutter — a one-line change.)
-
-**Caching.** Slugs are *stable across regenerations*, so `Cache-Control: immutable` is
-wrong — a regenerated image would never reach returning visitors. Either use a moderate
-`max-age` with `stale-while-revalidate`, or append the manifest hash as a cache-buster
-and then cache immutably:
-
-```tsx
-src={`${PUBLIC_BASE}/${slug}.${fallback}?v=${entry.hash.slice(0, 8)}`}
+```css
+/* The pattern is the surface; the cut-out sits on it. */
+.figure--cutout {
+  /* Seats the object on a busy pattern. Never bake this into the PNG — see §5.4. */
+  filter: drop-shadow(0 12px 24px rgb(0 0 0 / 0.18));
+}
 ```
 
-*(The query-string buster is an addition for this port, not something the source repo
-does — it becomes worthwhile precisely because there is no CDN purge step here.)*
+Four things worth copying verbatim:
+
+- **A plain `<img>`, not `next/image`.** `next/image` re-encodes at request time — the
+  same double-lossy pass §6 exists to avoid — and the bytes are already final and
+  correctly sized. If you need it for layout reasons, pass `unoptimized`.
+- **`width`/`height` always set** from the manifest. That is the entire CLS story.
+- **The hash as a cache-buster.** Slugs are stable across regenerations, so
+  `Cache-Control: immutable` alone would be wrong — a regenerated image would never reach
+  returning visitors. `?v=<hash8>` changes when the bytes change, which makes immutable
+  caching safe. (**Recommended addition**; the source repo relied on a CDN purge
+  instead.)
+- **Text over the image, not in it.** Headlines, brand names on packaging, captions — all
+  DOM. See §3.9.
+
+**Composition patterns that use the library well:** a cut-out product centred on a
+full-bleed pattern panel; a portrait grid where each face sits on a pattern tile from the
+same palette; a full-bleed scene photo with a pattern band beside or beneath it. The
+common thread: the pattern is the *surface*, and the image is either an object placed on
+it or a scene adjacent to it — never a scene layered under it, which fights the pattern
+for the same job.
 
 ---
 
-## 8. Cost and performance, measured
+## 8. Cost and performance
+
+**Measured** on the source pipeline:
 
 | | |
 |---|---|
-| Tokens per image | **158** at low / 1536×1024 |
-| Batch pricing | $15 / 1M output tokens (standard sync: $30) |
-| Real run | 337 images → **$0.80**, **27 min**, 4 batch jobs, **0 failures** |
-| Per image | **~$0.0024** |
+| Tokens per image | **158** at low / 1536×1024; 1372 at medium; 5488 at high |
+| Batch pricing | $15 / 1M output tokens (sync: $30) |
+| Real run | 337 images → **$0.80**, **27 min**, 4 batch jobs, 0 failures |
 | Background removal | 337 images → 0 failures at concurrency 8, ~1 credit + ~3 s each |
 | PNG → WebP q92 | 929.6 MB → 63.8 MB (**14.6×**) |
-| A 30-image set, end to end | **~$0.07**, ~40 minutes wall clock including removal and promotion |
 
-Promotion is slower than it looks: 674 files took ~25 minutes of `sharp` encoding.
-Node buffers stdout to a pipe, so a backgrounded run's log looks empty while it works —
-watch the filesystem instead (`ls public/images/*.webp | wc -l`).
+Projected for this use case:
+
+| Showcase site | Images | Mix | Cost |
+|---|---|---|---|
+| Graphic-style site (risograph, all `low`) | 20 | 20 × low | **~$0.05** |
+| Photo-style site with a team grid | 20 | 6 portraits + 4 heroes at medium, 10 at low | **~$0.24** |
+| Product mockup series | 8 | 8 × medium, all cut out | **~$0.17** + 8 Kie credits |
+
+Wall clock is dominated by the batch (minutes) and by removal (~3 s each), not by cost.
+Promotion is `sharp` encoding — seconds per image; a large run buffers stdout, so watch
+`ls public/images/*.webp | wc -l` rather than the log.
 
 ---
 
 ## 9. Gotcha checklist
 
-Ordered by how likely each is to bite you.
+Ordered by how likely each is to bite.
 
-1. **Skipping background removal fails silently** and leaves the page serving the old
-   image. See §5. Verify with `git status --short public/images | grep -- -cutout`.
-2. **Never run a large batch inside one long-lived process.** `submit` → `status` →
-   `download` as separate invocations; persist the batch ids to disk.
-3. **Every expensive failure is on the retrieval side, after the paid work.** Wrap every
+1. **A `cutout: true` prompt with no cut-out on disk** silently leaves a stale committed
+   image. The Appendix D guard turns this into an error — keep it.
+2. **A palette-coloured backdrop puts a coloured fringe around every cut-out.** Neutral
+   backdrops only (§5.4).
+3. **A baked drop shadow** either gets stripped or survives as a grey blob. CSS, always.
+4. **A team grid generated as individuals will not match.** Use a `sets` entry (§3.7).
+5. **`low` quality on faces** is the wrong economy at these volumes. `medium` for
+   portraits and hero shots (§4).
+6. **Never run a large batch inside one long-lived process.** `submit` → `status` →
+   `download`, with batch ids persisted.
+7. **Every expensive failure is on the retrieval side, after the paid work.** Wrap every
    GET in retries; never blanket-retry a POST that creates work.
-4. **Kie's rate limit is per account** (20 new generation requests / 10 s) and the
-   excess is **not queued**. Client-side sliding-window limiter, 18/10 s.
-5. **Kie needs a browser `User-Agent`** or Cloudflare answers `403 / error code: 1010`,
+8. **Kie's rate limit is per account** (20 generation requests / 10 s) and the excess is
+   **not queued**. Client-side sliding window at 18/10 s.
+9. **Kie needs a browser `User-Agent`** or Cloudflare answers `403 / error code: 1010`,
    which reads exactly like an auth failure.
-6. **Kie takes a public URL only** — upload through its own endpoint first.
-7. **Batch output cannot be buffered whole** (V8 caps strings at ~512 MB). Stream the
-   JSONL; chunk the prompts.
-8. **`gpt-image-2` has no transparent background.** `background: "transparent"` is a
-   400; asking in the prompt paints a fake checkerboard. `output_format: "svg"` is also
-   a 400.
-9. **Filtering prompt ids by regex has bitten twice** — `^(c|cs)-` also matched
-   `c-programming-…`. Filter on the `category` field, never on an id prefix alone.
-10. **Bump `MANIFEST_VERSION`** when metadata semantics change; it forces a one-time
-    re-measure of every entry.
-11. **The manifest is one generated file** — concurrent branches conflict there. Take
+10. **Kie takes a public URL only** — upload through its own endpoint first.
+11. **Batch output cannot be buffered whole** (V8 caps strings at ~512 MB). Stream the
+    JSONL; chunk the prompts.
+12. **`gpt-image-2` has no transparent background.** `background: "transparent"` is a
+    400; asking in the prompt paints a fake checkerboard. `output_format: "svg"` is a 400.
+13. **Two copies of a palette drift.** Generate the prompt palette from the same source
+    the pattern uses, or assert equality in a test (§3.2).
+14. **Filtering ids by regex has bitten twice** (**measured**) — `^(c|cs)-` also matched
+    `c-programming-…`. Filter on `project`, never on an id prefix alone.
+15. **Bump `MANIFEST_VERSION`** when manifest semantics change.
+16. **The manifest is one generated file** — concurrent branches conflict there. Take
     either side and re-run the build.
-12. **Never leave both `<id>.png` and `<id>.webp` in a source directory** — they
-    slugify to the same manifest key and collide.
 
 ---
 
 ## 10. Verification checklist
-
-Run before committing image work.
 
 ```bash
 npm run build:images     # must be a TRUE no-op on a clean tree
@@ -663,42 +919,55 @@ npm run lint
 npm run build
 ```
 
-Plus these audits, which no test suite gives you for free:
+Plus the audits no test suite gives you for free:
 
 ```bash
-# 1. Every <Figure slug> resolves to a manifest entry.
-#    A slug with no image renders NOTHING in production — a silent missing image.
-node -e '
-const fs=require("fs"),path=require("path");const m=require("./lib/generated/images.js");const e=m.default||m;
-let figs=0,bad=0;
-(function walk(d){for(const f of fs.readdirSync(d)){const p=path.join(d,f);
-  if(fs.statSync(p).isDirectory())walk(p);
-  else if(f.endsWith(".mdx")||f.endsWith(".tsx")){
-    for(const x of fs.readFileSync(p,"utf8").matchAll(/<Figure\b[^>]*slug="([^"]+)"/g)){
-      figs++; if(!e[x[1]]){bad++;console.log("  unresolved",x[1],p);}}}}})("content");
-console.log(figs+" figures, "+bad+" unresolved");'
+# 1. Every prompt's EXPECTED served slug exists in the manifest.
+#    cutout:true → <id>-cutout ; cutout:false → <id>
+#    NOTE: --input-type=module must come BEFORE -e, or node treats it as a script arg.
+node --input-type=module -e '
+import { loadPromptData, resolvePrompt, servedSlug } from "./scripts/lib/prompts.mjs";
+const m = (await import("./lib/generated/images.js")).default;
+const data = loadPromptData("data/image-prompts.json");
+let missing = 0;
+for (const p of data.prompts) {
+  const slug = servedSlug(resolvePrompt(p, data));
+  if (!m[slug]) { missing++; console.log("  missing", slug, `(${p.id})`); }
+}
+console.log(`${data.prompts.length} prompts, ${missing} missing`);'
 
 # 2. Manifest vs disk: no missing served files, no strays.
 node -e '
 const m=require("./lib/generated/images.js");const e=m.default||m;const fs=require("fs");
-const k=Object.keys(e);const miss=[];
-for(const s of k)for(const f of e[s].formats)if(!fs.existsSync(`public/images/${s}.${f}`))miss.push(s+"."+f);
+const miss=[];for(const s of Object.keys(e))for(const f of e[s].formats)
+  if(!fs.existsSync(`public/images/${s}.${f}`))miss.push(s+"."+f);
 const stray=fs.readdirSync("public/images").filter(f=>{const s=f.replace(/\.[^.]+$/,""),x=f.split(".").pop();
   return !e[s]||!e[s].formats.includes(x);});
-console.log(k.length+" entries, "+miss.length+" missing, "+stray.length+" stray");'
+console.log(Object.keys(e).length+" entries, "+miss.length+" missing, "+stray.length+" stray");'
 
-# 3. Prompts are 1:1 with the pages that need art.
-node -e '
-const j=require("./data/image-prompts.json");
-const ids=j.prompts.map(p=>p.id);
-const dup=ids.filter((x,i)=>ids.indexOf(x)!==i);
-console.log(ids.length+" prompts, "+dup.length+" duplicate ids", dup.slice(0,5));'
+# 3. Every project referenced by a prompt exists, ids are unique, sets resolve.
+#    (loadPromptData throws on duplicates; resolvePrompt throws on unknown project/set)
+node --input-type=module -e '
+import { loadPromptData, resolvePrompt } from "./scripts/lib/prompts.mjs";
+const data = loadPromptData("data/image-prompts.json");
+for (const p of data.prompts) resolvePrompt(p, data);
+console.log(`${data.prompts.length} prompts across ${Object.keys(data.projects).length} projects — all resolve`);'
+
+# 4. Style discipline: flags a project whose prompts use more than one style.
+#    A set that deliberately changes medium (portraits inside a photo site) shows up
+#    here — read the output, don't just assert on it.
+node --input-type=module -e '
+import { loadPromptData, resolvePrompt } from "./scripts/lib/prompts.mjs";
+const data = loadPromptData("data/image-prompts.json");
+const byProject = {};
+for (const p of data.prompts) (byProject[p.project] ??= new Set()).add(resolvePrompt(p, data).style);
+for (const [proj, styles] of Object.entries(byProject))
+  if (styles.size > 1) console.log("  mixed styles in", proj, [...styles]);
+console.log("checked", Object.keys(byProject).length, "projects");'
 ```
 
-**Make audit 1 a real test.** It is the guard that matters: in production an unresolved
-slug renders nothing at all, so a typo ships an invisible image with a green build. If
-you add an allowlist for pending slugs, keep it empty — a stale row whitelists a slug
-that will never resolve.
+**Make audit 1 a real test.** In production an unresolved slug renders nothing at all, so
+a typo ships an invisible image with a green build.
 
 ---
 
@@ -709,25 +978,27 @@ that will never resolve.
 npm i sharp
 echo "generated-images/" >> .gitignore
 
-# ── 1. author prompts in data/image-prompts.json, then check the cost (no API calls)
-node scripts/generate-images.mjs dry-run --only css-grid,flexbox
+# ── 1. author the project + prompts in data/image-prompts.json, then check cost
+node scripts/generate-images.mjs dry-run --project lumen-cosmetics
 
 # ── 2. generate (Batch API). Three separate invocations, never one long process.
-node scripts/generate-images.mjs submit --only css-grid,flexbox
+node scripts/generate-images.mjs submit --project lumen-cosmetics
 node scripts/generate-images.mjs status            # repeat until "completed"
 node scripts/generate-images.mjs download
 
-# ── 3. background removal → writes <id>-cutout.png beside each original
-node scripts/remove-background.mjs --concurrency 8
+# ── 3. background removal — automatically selects the cutout:true prompts
+node scripts/remove-background.mjs --project lumen-cosmetics --concurrency 8
 
-# ── 4. promote → WebP q92 into public/images + rebuild the manifest
-node scripts/promote-images.mjs --all
+# ── 4. REVIEW before promoting: check each cut-out over a real pattern, full size.
+#       Fringing and value collapse are invisible at thumbnail size.
 
-# ── 5. verify, then commit images and manifest TOGETHER
-git status --short public/images | grep -- -cutout    # cut-outs actually moved?
+# ── 5. promote → WebP q92 into public/images + rebuild the manifest
+node scripts/promote-images.mjs --project lumen-cosmetics
+
+# ── 6. verify, then commit images and manifest TOGETHER
 npm run build:images                                  # must be a no-op
 git add public/images lib/generated/images.js data/image-prompts.json
-git commit -m "Add generated illustrations for CSS layout pages"
+git commit -m "Add Lumen Cosmetics product mockup imagery"
 ```
 
 **Waiting on a batch** — poll in the background, never chain a foreground `sleep`:
@@ -742,57 +1013,174 @@ for i in $(seq 1 200); do
 done
 ```
 
-**Regenerating one image** (the id under the figure on the live page is the handle):
+**Regenerating one image:**
 
 ```bash
-# edit that prompt's "subject" in data/image-prompts.json, then:
-node scripts/generate-images.mjs submit --only css-grid
+# edit that prompt's "subject", then:
+node scripts/generate-images.mjs submit --only lumen-serum-bottle
 node scripts/generate-images.mjs status
 node scripts/generate-images.mjs download --force
-node scripts/remove-background.mjs --only css-grid --force   # ← NEVER skip
-node scripts/promote-images.mjs css-grid
+node scripts/remove-background.mjs --only lumen-serum-bottle --force   # if cutout: true
+node scripts/promote-images.mjs --only lumen-serum-bottle
 ```
 
-No re-wiring needed — the slug is unchanged, the manifest picks up the new hash, and
-the commit is two WebP files plus one manifest line.
+The slug is unchanged, so the commit is one WebP plus one manifest line.
+
+**Adding a whole new showcase site:**
+
+1. Add a `projects` entry: title, `style`, `palette` (from the same source the css-doodle
+   pattern uses), `paletteMode`, `quality`, and the `cutout` default.
+2. If it has a team grid, add a `sets` entry for it.
+3. Add one prompt per slot. Subject only — everything else is inherited.
+4. `dry-run`, read the rendered prompts, fix the ones that read badly, then run the
+   pipeline above.
 
 ---
 
-## Appendix A — `scripts/generate-images.mjs`
+## Appendix A — `scripts/lib/prompts.mjs`
 
-Disk-only adaptation. Batch (`submit`/`status`/`download`) plus a `sync` mode for
-one-offs. A single-process `run` command is deliberately **not** included — see gotcha
-2.
+The shared core: load, validate, resolve the cascade, render the prompt. All three
+pipeline scripts import it, so the resolution rules exist once.
+
+```js
+/**
+ * Load, validate, resolve and render image prompts.
+ *
+ * Resolution cascade, first hit wins:  prompt → set → project → meta.defaults
+ *
+ * The prompt builder only CONCATENATES AUTHORED SENTENCES; it never invents prose.
+ * Anything that has to read as English (a set description, a backdrop) is written by
+ * a human in the JSON and appended verbatim. That keeps the rendered prompt reviewable
+ * and stops the script from becoming a second, hidden art director.
+ */
+import { readFileSync } from "node:fs";
+
+export const CUTOUT_SUFFIX = "-cutout";
+
+/** Read + validate the prompt file. Throws on the mistakes that are silent otherwise. */
+export function loadPromptData(file) {
+  const data = JSON.parse(readFileSync(file, "utf8"));
+  if (!data.projects || typeof data.projects !== "object") throw new Error(`${file}: missing "projects"`);
+  if (!Array.isArray(data.prompts)) throw new Error(`${file}: missing "prompts" array`);
+  const seen = new Set();
+  for (const p of data.prompts) {
+    if (!p.id) throw new Error(`${file}: a prompt has no id`);
+    if (seen.has(p.id)) throw new Error(`${file}: duplicate prompt id "${p.id}"`);
+    seen.add(p.id);
+    if (!p.subject) throw new Error(`${file}: prompt "${p.id}" has no subject`);
+  }
+  return data;
+}
+
+/** prompt → set → project → meta.defaults */
+export function resolvePrompt(prompt, data) {
+  const project = data.projects[prompt.project];
+  if (!project) throw new Error(`prompt "${prompt.id}": unknown project "${prompt.project}"`);
+  const set = prompt.set ? data.sets?.[prompt.set] : undefined;
+  if (prompt.set && !set) throw new Error(`prompt "${prompt.id}": unknown set "${prompt.set}"`);
+  const defaults = data.meta?.defaults ?? {};
+  const pick = (key, fallback) =>
+    prompt[key] ?? set?.[key] ?? project[key] ?? defaults[key] ?? fallback;
+
+  const style = pick("style");
+  if (!style) throw new Error(`prompt "${prompt.id}": no style on the prompt, set, project or defaults`);
+
+  return {
+    id: prompt.id,
+    project: prompt.project,
+    slot: prompt.slot ?? null,
+    subject: prompt.subject,
+    style,
+    palette: pick("palette", {}),
+    paletteMode: pick("paletteMode", "hex"),
+    size: pick("size", "1536x1024"),
+    quality: pick("quality", "low"),
+    cutout: pick("cutout", false) === true,
+    noText: pick("noText", true) !== false,
+    // Authored sentences, appended verbatim in this order.
+    sentences: [set?.description, pick("backdrop"), prompt.note].filter(Boolean),
+  };
+}
+
+const period = (s) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`);
+
+/** The exact text sent to the model. Keep any UI copy of this byte-identical. */
+export function buildPrompt(r) {
+  const article = /^[aeiou]/i.test(r.style) ? "An" : "A";
+  const sentences = [`${article} ${r.style} of ${r.subject}.`];
+  for (const s of r.sentences) sentences.push(period(s));
+  // The model bakes in garbled lettering otherwise. Brand names belong in the DOM.
+  if (r.noText) sentences.push("No text, letters, numbers, or logos.");
+  const head = sentences.join(" ");
+
+  const entries = Object.entries(r.palette ?? {});
+  if (!entries.length) return head;
+
+  // A hex list is a constraint a flat graphic style can satisfy; a photograph needs
+  // each colour anchored to a material before it has any purchase.
+  const header =
+    r.paletteMode === "scene"
+      ? "Palette — render these as the scene's real materials, surfaces, and light:"
+      : "Palette — use these colours and no others:";
+  const lines = entries.map(([name, v]) =>
+    typeof v === "string" ? `${name}: ${v}` : `${name}: ${v.hex}${v.as ? ` — ${v.as}` : ""}`,
+  );
+  return `${head}\n\n${header}\n${lines.join("\n")}`;
+}
+
+/** The slug the site actually serves: the cut-out when there is one. */
+export function servedSlug(resolved) {
+  return resolved.cutout ? `${resolved.id}${CUTOUT_SUFFIX}` : resolved.id;
+}
+
+/** Resolved prompts matching the usual CLI filters. */
+export function selectPrompts(data, { only = null, project = null, slot = null, cutout = null } = {}) {
+  let list = data.prompts;
+  if (only) list = list.filter((p) => only.includes(p.id));
+  if (project) list = list.filter((p) => p.project === project);
+  const resolved = list.map((p) => resolvePrompt(p, data));
+  const filtered = resolved
+    .filter((r) => (slot ? r.slot === slot : true))
+    .filter((r) => (cutout === null ? true : r.cutout === cutout));
+  return filtered.map((r) => ({ ...r, prompt: buildPrompt(r) }));
+}
+```
+
+---
+
+## Appendix B — `scripts/generate-images.mjs`
 
 ```js
 #!/usr/bin/env node
 /**
- * Batch-generate images with OpenAI's GPT Image 2.
+ * Generate images with OpenAI's GPT Image 2, from data/image-prompts.json.
  *
- * Reads prompt definitions from `data/image-prompts.json`, builds each prompt in
- * the house style, and writes one PNG per prompt named `<id>.png` into --out.
+ * Size and quality are resolved per prompt (prompt → set → project → defaults), so one
+ * batch can mix a 1024x1536 medium-quality portrait with a 1536x1024 low-quality
+ * illustration. The CLI flags are overrides, not defaults.
  *
- * Uses the OpenAI Batch API (~50% cheaper) at quality `low`. Prompts are chunked
- * into `--batch-size` jobs and every output file is parsed as a STREAM, never
- * buffered whole: images come back as inline base64 (~3.6 MB per image), so a
- * 1000-image batch would build a ~3.6 GB string and blow V8's ~512 MB cap.
+ * Uses the Batch API (~50% cheaper). Prompts are chunked into --batch-size jobs and
+ * every output file is parsed as a STREAM, never buffered whole: images come back as
+ * inline base64 (~3.6 MB each), so a 1000-image batch would build a ~3.6 GB string and
+ * blow V8's ~512 MB cap.
  *
  * Usage:
  *   OPENAI_API_KEY=sk-... node scripts/generate-images.mjs <command> [options]
  *
  * Commands:
- *   dry-run    print prompts, targets and projected cost; make no API calls
- *   submit     build + upload the JSONL batches and create them; prints the ids
+ *   dry-run    print the rendered prompts, targets and projected cost; no API calls
+ *   submit     upload the JSONL batches and create them; prints the ids
  *   status     show batch status (--batch <id>, or every batch last submitted)
  *   download   download completed batches' images into --out
  *   sync       generate immediately, one request per prompt (bounded concurrency)
  *
  * Options:
- *   --out <dir>          Output directory (default: ./generated-images)
+ *   --project <id>       Only this project
  *   --only <id[,id...]>  Only these prompt ids
- *   --category <cat>     Only this category
- *   --size <WxH>         Override the per-category size (1536x1024 | 1024x1536 | 1024x1024)
- *   --quality <q>        low | medium | high (default: low)
+ *   --slot <name>        Only this slot
+ *   --out <dir>          Output directory (default: ./generated-images)
+ *   --size <WxH>         OVERRIDE every entry's size (1536x1024|1024x1536|1024x1024)
+ *   --quality <q>        OVERRIDE every entry's quality (low|medium|high)
  *   --output-format <f>  png | webp | jpeg (default: png)
  *   --model <name>       Override the model (default: JSON meta.model)
  *   --batch-size <n>     Prompts per batch job (default: 100)
@@ -804,6 +1192,7 @@ one-offs. A single-process `run` command is deliberately **not** included — se
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { loadPromptData, selectPrompts } from "./lib/prompts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "image-prompts.json");
@@ -812,30 +1201,23 @@ const IMAGES_ENDPOINT = "/v1/images/generations";
 
 const COMMANDS = new Set(["dry-run", "submit", "status", "download", "sync"]);
 const SIZES = new Set(["1536x1024", "1024x1536", "1024x1024"]);
+const QUALITIES = new Set(["low", "medium", "high"]); // "auto" excluded on purpose
 
 function parseArgs(argv) {
   const opts = {
-    command: null,
+    command: null, project: null, only: null, slot: null,
     out: join(process.cwd(), "generated-images"),
-    only: null,
-    category: null,
-    size: null,
-    quality: "low", // ~7x cheaper than medium, ~28x cheaper than high
-    outputFormat: "png",
-    model: null,
-    batchSize: 100,
-    batch: null,
-    concurrency: 3,
-    force: false,
-    help: false,
+    size: null, quality: null, outputFormat: "png", model: null,
+    batchSize: 100, batch: null, concurrency: 3, force: false, help: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => argv[++i];
     switch (a) {
-      case "--out": opts.out = next(); break;
+      case "--project": opts.project = next(); break;
       case "--only": opts.only = next().split(",").map((s) => s.trim()).filter(Boolean); break;
-      case "--category": opts.category = next(); break;
+      case "--slot": opts.slot = next(); break;
+      case "--out": opts.out = next(); break;
       case "--size": opts.size = next(); break;
       case "--quality": opts.quality = next(); break;
       case "--output-format": opts.outputFormat = next(); break;
@@ -855,27 +1237,13 @@ function parseArgs(argv) {
 
 function printHelp() {
   const src = readFileSync(fileURLToPath(import.meta.url), "utf8");
-  console.log(
-    src.slice(src.indexOf("/**"), src.indexOf("*/") + 2)
-      .replace(/^\/\*\*?|\*\/$|^ \* ?/gm, "").trim(),
-  );
-}
-
-// ── Prompt building (keep byte-identical to lib/imagePrompt.ts) ──────────────
-export function buildPrompt(spec, colors, defaultStyle) {
-  const style = (spec.style && spec.style.trim()) || defaultStyle;
-  const article = /^[aeiou]/i.test(style) ? "An" : "A";
-  return (
-    `${article} ${style} of ${spec.subject}. No text.\n\n` +
-    `Blue: ${colors.blue}\n` +
-    `Green: ${colors.green}\n` +
-    `Red: ${colors.red}\n` +
-    `Yellow: ${colors.yellow}`
-  );
+  console.log(src.slice(src.indexOf("/**"), src.indexOf("*/") + 2).replace(/^\/\*\*?|\*\/$|^ \* ?/gm, "").trim());
 }
 
 // ── Cost estimation ─────────────────────────────────────────────────────────
 // Image output tokens per request, measured against gpt-image-2 on 2026-07-28.
+// 1024x1536 is assumed equal to 1536x1024 (same pixel count) — verify before a
+// large portrait run.
 const COST_TOKENS = {
   "1024x1024/low": 196, "1024x1024/medium": 1372, "1024x1024/high": 5488,
   "1536x1024/low": 158, "1536x1024/medium": 1372, "1536x1024/high": 5488,
@@ -883,11 +1251,14 @@ const COST_TOKENS = {
 };
 const USD_PER_MTOK = { batch: 15, sync: 30 };
 
+const sizeOf = (e, opts) => opts.size || e.size;
+const qualityOf = (e, opts) => opts.quality || e.quality;
+
 function describeCost(entries, opts, mode) {
   let tokens = 0;
   for (const e of entries) {
-    const t = COST_TOKENS[`${opts.size || e.size}/${opts.quality}`];
-    if (t === undefined) return `cost not estimable at quality "${opts.quality}"`;
+    const t = COST_TOKENS[`${sizeOf(e, opts)}/${qualityOf(e, opts)}`];
+    if (t === undefined) return `cost not estimable for ${sizeOf(e, opts)}/${qualityOf(e, opts)}`;
     tokens += t;
   }
   return `~$${((tokens * USD_PER_MTOK[mode]) / 1e6).toFixed(2)} projected (${mode} pricing)`;
@@ -895,9 +1266,8 @@ function describeCost(entries, opts, mode) {
 
 const outputExt = (opts) => (opts.outputFormat === "jpeg" ? "jpg" : opts.outputFormat);
 
-function requestBody(entry, opts, model) {
-  const body = { model, prompt: entry.prompt, size: opts.size || entry.size, n: 1 };
-  if (opts.quality) body.quality = opts.quality;
+function requestBody(e, opts, model) {
+  const body = { model, prompt: e.prompt, size: sizeOf(e, opts), quality: qualityOf(e, opts), n: 1 };
   if (opts.outputFormat !== "png") body.output_format = opts.outputFormat;
   return body;
 }
@@ -944,20 +1314,6 @@ async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) 
 
 const BATCH_STATE_FILE = (out) => join(out, "last-batch.json");
 
-// ── Entry selection ─────────────────────────────────────────────────────────
-function selectEntries(data, opts) {
-  const { meta } = data;
-  let prompts = data.prompts;
-  if (opts.only) prompts = prompts.filter((p) => opts.only.includes(p.id));
-  if (opts.category) prompts = prompts.filter((p) => p.category === opts.category);
-  if (!prompts.length) { console.error("No prompts matched the filters."); process.exit(1); }
-  return prompts.map((p) => ({
-    id: p.id,
-    size: (meta.sizes && meta.sizes[p.category]) || "1536x1024",
-    prompt: buildPrompt(p, meta.brandColors, meta.defaultStyle || "isometric illustration"),
-  }));
-}
-
 function chunk(entries, size) {
   const out = [];
   for (let i = 0; i < entries.length; i += size) out.push(entries.slice(i, i + size));
@@ -974,12 +1330,14 @@ function decodeImage(respBody) {
 function cmdDryRun(entries, opts) {
   const ext = outputExt(opts);
   console.log(
-    `[dry-run] ${entries.length} prompt(s) · quality ${opts.quality} · ${ext} · ` +
-      `${chunk(entries, opts.batchSize).length} batch job(s)\n          ` +
-      `${describeCost(entries, opts, "batch")}\n`,
+    `[dry-run] ${entries.length} prompt(s) · ${chunk(entries, opts.batchSize).length} batch job(s)\n` +
+      `          ${describeCost(entries, opts, "batch")}\n`,
   );
   for (const e of entries) {
-    console.log(`── ${e.id}.${ext}  (${opts.size || e.size})`);
+    console.log(
+      `── ${e.id}.${ext}  (${e.project}${e.slot ? `/${e.slot}` : ""} · ` +
+        `${sizeOf(e, opts)} · ${qualityOf(e, opts)} · ${e.cutout ? "cutout" : "full-bleed"})`,
+    );
     console.log(e.prompt.replace(/^/gm, "   "));
     console.log();
   }
@@ -1047,9 +1405,9 @@ async function cmdStatus(opts, key) {
 }
 
 /**
- * Yield an output file's JSONL rows one line at a time. Batch image output
- * embeds each PNG as base64, so these files run to gigabytes; res.text() would
- * exceed V8's ~512 MB max string length.
+ * Yield an output file's JSONL rows one line at a time. Batch image output embeds
+ * each PNG as base64, so these files run to gigabytes; res.text() would exceed
+ * V8's ~512 MB max string length.
  */
 async function* streamFileLines(fileId, key) {
   const res = await api(`/files/${fileId}/content`, { key, retries: 5 });
@@ -1094,8 +1452,7 @@ async function downloadBatch(b, opts, key) {
     if (!opts.force && existsSync(dest)) { console.log(`  • skip ${row.custom_id} (exists; use --force)`); continue; }
     try {
       writeFileSync(dest, decodeImage(row.response.body));
-      ok++;
-      console.log(`  ✓ ${row.custom_id}.${ext}`);
+      ok++; console.log(`  ✓ ${row.custom_id}.${ext}`);
     } catch (err) { failed++; console.error(`  ✗ ${row.custom_id}: ${err.message}`); }
   }
   return { ok, failed };
@@ -1115,8 +1472,7 @@ async function cmdSync(entries, opts, model, key) {
   const ext = outputExt(opts);
   const todo = entries.filter((e) => {
     if (!opts.force && existsSync(join(opts.out, `${e.id}.${ext}`))) {
-      console.log(`  • skip ${e.id} (exists; use --force)`);
-      return false;
+      console.log(`  • skip ${e.id} (exists; use --force)`); return false;
     }
     return true;
   });
@@ -1143,81 +1499,92 @@ async function main() {
   if (opts.help || !opts.command) return printHelp();
 
   if (!["png", "webp", "jpeg"].includes(opts.outputFormat)) {
-    console.error(`Unsupported --output-format "${opts.outputFormat}". Use png, webp, or jpeg.`);
-    process.exit(1);
+    console.error(`Unsupported --output-format "${opts.outputFormat}". Use png, webp, or jpeg.`); process.exit(1);
   }
-  if (!["low", "medium", "high"].includes(opts.quality)) {
-    // "auto" is rejected on purpose: it picks its own tier per prompt, costing
-    // ~2x low with no control.
-    console.error(`Unsupported --quality "${opts.quality}". Use low, medium, or high.`);
-    process.exit(1);
+  if (opts.quality && !QUALITIES.has(opts.quality)) {
+    console.error(`Unsupported --quality "${opts.quality}". Use ${[...QUALITIES].join(", ")}.`); process.exit(1);
   }
   if (opts.size && !SIZES.has(opts.size)) {
-    console.error(`Unsupported --size "${opts.size}". Use ${[...SIZES].join(", ")}.`);
-    process.exit(1);
+    console.error(`Unsupported --size "${opts.size}". Use ${[...SIZES].join(", ")}.`); process.exit(1);
   }
 
-  const data = JSON.parse(readFileSync(DATA_FILE, "utf8"));
+  const data = loadPromptData(DATA_FILE);
   const model = opts.model || data.meta.model;
 
   if (opts.command === "status") return cmdStatus(opts, requireKey());
   if (opts.command === "download") return cmdDownload(opts, requireKey());
 
-  const entries = selectEntries(data, opts);
+  const entries = selectPrompts(data, { only: opts.only, project: opts.project, slot: opts.slot });
+  if (!entries.length) { console.error("No prompts matched the filters."); process.exit(1); }
+
+  // Every entry's resolved size/quality must be one the API accepts.
+  for (const e of entries) {
+    if (!SIZES.has(sizeOf(e, opts))) throw new Error(`prompt "${e.id}": unsupported size "${sizeOf(e, opts)}"`);
+    if (!QUALITIES.has(qualityOf(e, opts))) throw new Error(`prompt "${e.id}": unsupported quality "${qualityOf(e, opts)}"`);
+  }
+
   if (opts.command === "dry-run") return cmdDryRun(entries, opts);
 
   const mode = opts.command === "sync" ? "sync" : "batch";
   console.log(
-    `${entries.length} prompt(s) · model ${model} · quality ${opts.quality} · ` +
-      `${outputExt(opts)} · out ${opts.out}\n${describeCost(entries, opts, mode)}\n`,
+    `${entries.length} prompt(s) · model ${model} · ${outputExt(opts)} · out ${opts.out}\n` +
+      `${describeCost(entries, opts, mode)}\n`,
   );
   const key = requireKey();
   if (opts.command === "sync") return cmdSync(entries, opts, model, key);
   if (opts.command === "submit") return cmdSubmit(entries, opts, model, key);
 }
 
-// Only drive the CLI when executed directly, so tests can import buildPrompt.
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  main().catch((err) => { console.error(err); process.exit(1); });
+  main().catch((err) => { console.error(err.message || err); process.exit(1); });
 }
 ```
 
 ---
 
-## Appendix B — `scripts/remove-background.mjs`
+## Appendix C — `scripts/remove-background.mjs`
 
 ```js
 #!/usr/bin/env node
 /**
  * Remove the background from generated images with Recraft's `remove-background`,
- * served through Kie AI. Reads `<id>.png` from --from and writes `<id>-cutout.png`
- * beside it.
+ * served through Kie AI. Writes `<id>-cutout.png` beside each `<id>.png`.
+ *
+ * SELECTION IS DRIVEN BY THE DATA, not by the directory: only prompts whose resolved
+ * `cutout` is true are processed. Scenes (a hero photo, an interior) are meant to stay
+ * full-bleed and are skipped. --ignore-flags falls back to scanning the directory.
  *
  * Three Kie API details this script exists to encapsulate:
- *   1. The model input takes a PUBLIC URL only — no base64, no data URI. Each image
- *      is pushed through Kie's own upload endpoint first (free, auto-deleted after
- *      24h) and the returned `downloadUrl` is handed to the model.
+ *   1. The model input takes a PUBLIC URL only — no base64, no data URI. Each image is
+ *      pushed through Kie's own upload endpoint first (free, auto-deleted after 24h)
+ *      and the returned `downloadUrl` is handed to the model.
  *   2. Both Kie hosts sit behind Cloudflare and answer a request with no browser
- *      `User-Agent` with a bare 403 and `error code: 1010`. It reads exactly like
- *      an auth failure and is not.
- *   3. Kie caps an account at 20 new generation requests per 10 seconds and rejects
- *      the excess with 429 WITHOUT queueing it. A shared sliding-window limiter
- *      admits createTask at 18 per 10s so --concurrency can be raised freely, and a
- *      429 waits out a full window rather than the usual short backoff.
+ *      `User-Agent` with a bare 403 and `error code: 1010`. It reads exactly like an
+ *      auth failure and is not.
+ *   3. Kie caps an account at 20 new generation requests per 10 seconds and rejects the
+ *      excess with 429 WITHOUT queueing it. A shared sliding-window limiter admits
+ *      createTask at 18 per 10s so --concurrency can be raised freely, and a 429 waits
+ *      out a full window rather than the usual short backoff.
  *
  * Usage:
  *   KIE_API_KEY=... node scripts/remove-background.mjs [options]
  *
  * Options:
+ *   --project <id>     Only this project
+ *   --only <id[,id..]> Only these prompt ids
  *   --from <dir>       Source directory (default: ./generated-images)
- *   --only <id[,id..]> Only these ids
  *   --concurrency <n>  Parallel jobs (default: 4)
+ *   --ignore-flags     Process every original in the directory, whatever the JSON says
  *   --force            Redo images whose cut-out already exists
  *   -h, --help         Show this help
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { CUTOUT_SUFFIX, loadPromptData, selectPrompts } from "./lib/prompts.mjs";
+
+const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+const DATA_FILE = join(ROOT, "data", "image-prompts.json");
 
 const KIE_UPLOAD = "https://kieai.redpandaai.co/api/file-base64-upload";
 const KIE_CREATE = "https://api.kie.ai/api/v1/jobs/createTask";
@@ -1227,17 +1594,21 @@ const MODEL = "recraft/remove-background";
 // 403 "error code: 1010"; any ordinary browser UA satisfies it.
 const UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36";
-export const CUTOUT_SUFFIX = "-cutout";
 
 function parseArgs(argv) {
-  const opts = { from: join(process.cwd(), "generated-images"), only: null, concurrency: 4, force: false, help: false };
+  const opts = {
+    project: null, only: null, from: join(process.cwd(), "generated-images"),
+    concurrency: 4, ignoreFlags: false, force: false, help: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => argv[++i];
     switch (a) {
-      case "--from": opts.from = next(); break;
+      case "--project": opts.project = next(); break;
       case "--only": opts.only = next().split(",").map((x) => x.trim()).filter(Boolean); break;
+      case "--from": opts.from = next(); break;
       case "--concurrency": opts.concurrency = Math.max(1, Number(next()) || 4); break;
+      case "--ignore-flags": opts.ignoreFlags = true; break;
       case "--force": opts.force = true; break;
       case "-h": case "--help": opts.help = true; break;
       default: console.error(`Unknown argument: ${a}`); process.exit(1);
@@ -1259,14 +1630,14 @@ function requireKey() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Kie enforces, per account, 20 new generation requests per 10 seconds. Excess
-// requests are rejected with 429 and are NOT queued, so the limit has to be
-// respected client-side rather than discovered.
+// Kie enforces, per account, 20 new generation requests per 10 seconds. Excess requests
+// are rejected with 429 and are NOT queued, so the limit has to be respected
+// client-side rather than discovered.
 const RATE_WINDOW_MS = 10_000;
 const RATE_MAX = 18; // a little under 20, so a burst can't race past the limit
 
-/** Sliding-window limiter, shared across workers so raising --concurrency
- *  cannot exceed the account limit. */
+/** Sliding-window limiter, shared across workers so raising --concurrency cannot
+ *  exceed the account limit. */
 function createLimiter(max, windowMs) {
   const stamps = [];
   let chain = Promise.resolve();
@@ -1290,10 +1661,9 @@ const MAX_ATTEMPTS = 6;
 
 /**
  * Fetch binary content with the same transient-failure policy as `kie`.
- * The finished image is served from Kie's CDN rather than its API, and a bare
- * fetch there is exactly where a run gets lost: the generation has already
- * succeeded and been billed. Eight of forty-four images failed this way before
- * it was wrapped.
+ * The finished image is served from Kie's CDN rather than its API, and a bare fetch
+ * there is exactly where a run gets lost: the generation has already succeeded and been
+ * billed. Eight of forty-four images failed this way before it was wrapped.
  */
 async function fetchBinary(url, label) {
   let lastDetail = "";
@@ -1333,8 +1703,8 @@ async function kie(url, { key, json, method = "GET" } = {}) {
     const transient = networkErr !== undefined || RETRY_STATUS.has(res?.status);
     if (!transient || attempt === MAX_ATTEMPTS - 1) break;
 
-    // A 429 means the window is already full; wait out a whole window rather
-    // than the usual short backoff, since the request was rejected, not queued.
+    // A 429 means the window is already full; wait out a whole window rather than the
+    // usual short backoff, since the request was rejected, not queued.
     const waitMs = res?.status === 429 ? RATE_WINDOW_MS : Math.min(16_000, 500 * 2 ** attempt);
     await sleep(waitMs);
   }
@@ -1356,8 +1726,7 @@ export async function removeBackground(buf, fileName, key) {
 
   await admitGeneration();
   const created = await kie(KIE_CREATE, {
-    key, method: "POST",
-    json: { model: MODEL, input: { image: imageUrl } },
+    key, method: "POST", json: { model: MODEL, input: { image: imageUrl } },
   });
   const taskId = created?.data?.taskId;
   if (!taskId) throw new Error(`createTask returned no taskId: ${JSON.stringify(created).slice(0, 200)}`);
@@ -1368,12 +1737,31 @@ export async function removeBackground(buf, fileName, key) {
     const d = info?.data ?? {};
     if (d.state === "success") {
       // resultJson is a JSON *string*, not an object.
-      const url = JSON.parse(d.resultJson).resultUrls[0];
-      return fetchBinary(url, "result download");
+      return fetchBinary(JSON.parse(d.resultJson).resultUrls[0], "result download");
     }
     if (d.state === "fail") throw new Error(`${d.failMsg || "failed"} (code ${d.failCode ?? "?"})`);
   }
   throw new Error("timed out waiting for the task");
+}
+
+/** Ids to process: the cutout:true prompts, or everything on disk with --ignore-flags. */
+function selectIds(opts, dir) {
+  const onDisk = new Set(
+    readdirSync(dir)
+      .filter((f) => /\.png$/i.test(f))
+      .map((f) => basename(f, extname(f)))
+      .filter((s) => !s.endsWith(CUTOUT_SUFFIX)),
+  );
+  if (opts.ignoreFlags) {
+    let ids = [...onDisk];
+    if (opts.only) ids = ids.filter((id) => opts.only.includes(id));
+    return ids.sort();
+  }
+  const data = loadPromptData(DATA_FILE);
+  const wanted = selectPrompts(data, { only: opts.only, project: opts.project, cutout: true });
+  const missing = wanted.filter((r) => !onDisk.has(r.id));
+  for (const r of missing) console.error(`  ! ${r.id}: cutout:true but no original in ${dir} — generate it first`);
+  return wanted.filter((r) => onDisk.has(r.id)).map((r) => r.id).sort();
 }
 
 async function main() {
@@ -1384,18 +1772,12 @@ async function main() {
   const dir = opts.from;
   if (!existsSync(dir)) { console.error(`Source directory not found: ${dir}`); process.exit(1); }
 
-  let ids = readdirSync(dir)
-    .filter((f) => /\.png$/i.test(f))
-    .map((f) => basename(f, extname(f)))
-    .filter((s) => !s.endsWith(CUTOUT_SUFFIX))
-    .sort();
-  if (opts.only) ids = ids.filter((id) => opts.only.includes(id));
-  if (!ids.length) { console.error(`No originals found in ${dir}`); process.exit(1); }
+  const ids = selectIds(opts, dir);
+  if (!ids.length) return console.log("No images need background removal.");
 
   const todo = ids.filter((id) => {
     if (!opts.force && existsSync(join(dir, `${id}${CUTOUT_SUFFIX}.png`))) {
-      console.log(`  • skip ${id} (cut-out exists; use --force)`);
-      return false;
+      console.log(`  • skip ${id} (cut-out exists; use --force)`); return false;
     }
     return true;
   });
@@ -1409,13 +1791,13 @@ async function main() {
       try {
         const cut = await removeBackground(readFileSync(join(dir, `${id}.png`)), `${id}.png`, key);
         writeFileSync(join(dir, `${id}${CUTOUT_SUFFIX}.png`), cut);
-        ok++;
-        console.log(`  ✓ ${id}${CUTOUT_SUFFIX}.png (${(cut.length / 1e6).toFixed(2)}MB)`);
+        ok++; console.log(`  ✓ ${id}${CUTOUT_SUFFIX}.png (${(cut.length / 1e6).toFixed(2)}MB)`);
       } catch (err) { failed++; console.error(`  ✗ ${id}: ${err.message}`); }
     }
   }
   await Promise.all(Array.from({ length: Math.min(opts.concurrency, todo.length) }, worker));
   console.log(`\nDone: ${ok} removed, ${failed} failed.`);
+  console.log("Review each cut-out over a real pattern, at full size, before promoting.");
   if (failed) process.exitCode = 1;
 }
 
@@ -1426,71 +1808,73 @@ if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) 
 
 ---
 
-## Appendix C — `scripts/promote-images.mjs`
+## Appendix D — `scripts/promote-images.mjs`
 
 ```js
 #!/usr/bin/env node
 /**
- * Promote chosen candidates into the repository: encode to WebP q92 straight
- * into `public/images/`, the files the site serves, then rebuild the manifest.
+ * Promote chosen candidates into the repository: encode to WebP q92 straight into
+ * `public/images/`, the files the site serves, then rebuild the manifest.
  *
- * Why WebP, and why this writes the served file directly:
- *   A 1536x1024 image is ~1.4 MB as PNG and ~130 kB as WebP — an 11x reduction
- *   that holds for alpha cut-outs too. And routing it through a second encoder
- *   later is a double lossy pass: measured, promote-q92 → build-q80 lands at
- *   35.58 dB PSNR against the PNG original while a single q80 encode is 37.41 dB.
- *   The second pass costs ~1.8 dB to save ~3 kB.
+ * Promotion follows the `cutout` flag:
+ *   cutout: false → commits <id>.webp            (a scene, served full-bleed)
+ *   cutout: true  → commits <id>-cutout.webp     (an object, placed on a pattern)
+ * Pass --keep-original to also commit the opaque original of a cut-out image.
  *
- * Because the promoted file IS the artifact, --quality is the quality users
+ * A cutout:true prompt with no cut-out on disk is an ERROR, not a silent skip: that
+ * combination is what leaves a page serving a stale image after a regeneration.
+ *
+ * Why WebP, and why this writes the served file directly: a 1536x1024 image is ~1.4 MB
+ * as PNG and ~130 kB as WebP. And routing it through a second encoder later is a double
+ * lossy pass — measured, promote-q92 → build-q80 lands at 35.58 dB PSNR against the PNG
+ * original while a single q80 encode is 37.41 dB. The second pass costs ~1.8 dB to save
+ * ~3 kB. Because the promoted file IS the artifact, --quality is the quality users
  * actually see; it defaults to 92 rather than a serving-oriented 80.
  *
  * Usage:
- *   node scripts/promote-images.mjs <ids...> [options]
- *   node scripts/promote-images.mjs --all
- *
- * A `-cutout` suffix is promoted alongside its original automatically.
+ *   node scripts/promote-images.mjs [options]
  *
  * Options:
- *   --from <dir>    Candidate directory (default: ./generated-images)
- *   --all           Promote every candidate found
- *   --quality <n>   WebP quality of the served image (default: 92)
- *   --no-cutout     Promote only the original, not its background-removed pair
- *   --no-build      Skip the manifest rebuild afterwards
- *   --dry-run       Report what would be promoted; write nothing
- *   -h, --help      Show this help
+ *   --project <id>    Only this project
+ *   --only <id[,id..]> Only these prompt ids
+ *   --from <dir>      Candidate directory (default: ./generated-images)
+ *   --quality <n>     WebP quality of the served image (default: 92)
+ *   --keep-original   Also promote the opaque original of a cut-out image
+ *   --no-build        Skip the manifest rebuild afterwards
+ *   --dry-run         Report what would be promoted; write nothing
+ *   -h, --help        Show this help
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { basename, dirname, extname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
+import { CUTOUT_SUFFIX, loadPromptData, selectPrompts } from "./lib/prompts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-// Promotion writes the *served* file directly. There is deliberately no source
-// copy elsewhere: that would put every image in git twice and add a second
-// lossy encode.
+const DATA_FILE = join(ROOT, "data", "image-prompts.json");
+// Promotion writes the *served* file directly. There is deliberately no source copy
+// elsewhere: that would put every image in git twice and add a second lossy encode.
 const OUT_DIR = join(ROOT, "public", "images");
-export const CUTOUT_SUFFIX = "-cutout";
 
 function parseArgs(argv) {
   const opts = {
-    ids: [], from: join(process.cwd(), "generated-images"),
-    all: false, quality: 92, cutout: true, build: true, dryRun: false, help: false,
+    project: null, only: null, from: join(process.cwd(), "generated-images"),
+    quality: 92, keepOriginal: false, build: true, dryRun: false, help: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => argv[++i];
     switch (a) {
+      case "--project": opts.project = next(); break;
+      case "--only": opts.only = next().split(",").map((x) => x.trim()).filter(Boolean); break;
       case "--from": opts.from = next(); break;
-      case "--all": opts.all = true; break;
       case "--quality": opts.quality = Math.min(100, Math.max(1, Number(next()) || 92)); break;
-      case "--no-cutout": opts.cutout = false; break;
+      case "--keep-original": opts.keepOriginal = true; break;
       case "--no-build": opts.build = false; break;
       case "--dry-run": opts.dryRun = true; break;
       case "-h": case "--help": opts.help = true; break;
-      default:
-        if (a.startsWith("-")) { console.error(`Unknown argument: ${a}`); process.exit(1); }
-        opts.ids.push(a);
+      default: console.error(`Unknown argument: ${a}`); process.exit(1);
     }
   }
   return opts;
@@ -1503,51 +1887,66 @@ function printHelp() {
 
 /**
  * Convert one image buffer to the committed WebP.
- * `nearLossless` is not used: these are photographic-ish raster renders, so
- * plain high-quality WebP is both smaller and visually equivalent.
+ * `nearLossless` is not used: these are photographic-ish raster renders, so plain
+ * high-quality WebP is both smaller and visually equivalent. alphaQuality 100 matters
+ * here — every cut-out lands on a busy pattern, where a lossy alpha edge shows.
  */
 export async function toWebp(buf, quality) {
   return sharp(buf).webp({ quality, alphaQuality: 100, effort: 6 }).toBuffer();
 }
 
+/** The candidate files to promote for one resolved prompt, or null with a reason. */
+function plan(r, opts) {
+  const src = (stem) => join(opts.from, `${stem}.png`);
+  if (!r.cutout) {
+    return existsSync(src(r.id))
+      ? { stems: [r.id] }
+      : { error: `no ${r.id}.png in ${opts.from}` };
+  }
+  const cutStem = `${r.id}${CUTOUT_SUFFIX}`;
+  if (!existsSync(src(cutStem))) {
+    const stale = existsSync(join(OUT_DIR, `${cutStem}.webp`));
+    return {
+      error:
+        `cutout:true but no ${cutStem}.png in ${opts.from}.` +
+        (stale
+          ? `\n    public/images/${cutStem}.webp already exists, so the site will KEEP SERVING THE OLD IMAGE.`
+          : "") +
+        `\n    Run: node scripts/remove-background.mjs --only ${r.id}`,
+    };
+  }
+  const stems = [cutStem];
+  if (opts.keepOriginal && existsSync(src(r.id))) stems.push(r.id);
+  return { stems };
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  if (opts.help || (!opts.ids.length && !opts.all)) return printHelp();
+  if (opts.help) return printHelp();
 
-  const dir = opts.from;
-  if (!existsSync(dir)) { console.error(`Source directory not found: ${dir}`); process.exit(1); }
-  const names = readdirSync(dir).filter((f) => /\.(png|webp)$/i.test(f));
-  const stemOf = (f) => basename(f, extname(f));
-  const has = (stem) => names.some((f) => stemOf(f) === stem);
-  const read = (stem) => readFileSync(join(dir, names.find((f) => stemOf(f) === stem)));
+  if (!existsSync(opts.from)) { console.error(`Source directory not found: ${opts.from}`); process.exit(1); }
+  const data = loadPromptData(DATA_FILE);
+  const selected = selectPrompts(data, { only: opts.only, project: opts.project });
+  if (!selected.length) { console.error("No prompts matched the filters."); process.exit(1); }
 
-  const ids = opts.all ? [...new Set(names.map(stemOf).filter((s) => !s.endsWith(CUTOUT_SUFFIX)))].sort() : opts.ids;
-  if (!ids.length) { console.error(`No candidates found in ${dir}`); process.exit(1); }
-
-  // Each id promotes its original plus, unless suppressed, its cut-out pair.
   const stems = [];
-  for (const id of ids) {
-    stems.push(id);
-    if (opts.cutout) {
-      if (has(`${id}${CUTOUT_SUFFIX}`)) stems.push(`${id}${CUTOUT_SUFFIX}`);
-      // The silent-stale trap: no cut-out in this run, but one already served.
-      else if (existsSync(join(OUT_DIR, `${id}${CUTOUT_SUFFIX}.webp`))) {
-        console.error(
-          `  ! ${id}: no cut-out in ${dir}, but public/images/${id}${CUTOUT_SUFFIX}.webp exists.\n` +
-          `    Pages referencing "${id}${CUTOUT_SUFFIX}" will keep serving the OLD image.\n` +
-          `    Run: node scripts/remove-background.mjs --only ${id} --force`,
-        );
-      }
-    }
+  let errors = 0;
+  for (const r of selected) {
+    const p = plan(r, opts);
+    if (p.error) { errors++; console.error(`  ✗ ${r.id}: ${p.error}`); continue; }
+    stems.push(...p.stems);
   }
+  if (!stems.length) { console.error("\nNothing to promote."); process.exit(1); }
 
-  console.log(`Promoting ${stems.length} image(s) from ${dir} → public/images (webp q${opts.quality})${opts.dryRun ? " [dry-run]" : ""}\n`);
+  console.log(
+    `\nPromoting ${stems.length} image(s) from ${opts.from} → public/images ` +
+      `(webp q${opts.quality})${opts.dryRun ? " [dry-run]" : ""}\n`,
+  );
   if (!opts.dryRun) mkdirSync(OUT_DIR, { recursive: true });
 
   let promoted = 0, before = 0, after = 0;
   for (const stem of stems) {
-    if (!has(stem)) { console.error(`  ✗ ${stem}: not found in source`); continue; }
-    const raw = read(stem);
+    const raw = readFileSync(join(opts.from, `${stem}.png`));
     const webp = await toWebp(raw, opts.quality);
     before += raw.length; after += webp.length;
     if (!opts.dryRun) writeFileSync(join(OUT_DIR, `${stem}.webp`), webp);
@@ -1556,13 +1955,18 @@ async function main() {
   }
   console.log(
     `\n${promoted} promoted · ${(before / 1e6).toFixed(1)}MB → ${(after / 1e6).toFixed(1)}MB ` +
-      `(${after ? (before / after).toFixed(1) : "1.0"}x smaller)`,
+      `(${after ? (before / after).toFixed(1) : "1.0"}x smaller)` +
+      (errors ? ` · ${errors} skipped with errors` : ""),
   );
 
   if (opts.dryRun) return;
-  if (!opts.build) return console.log("Skipped the manifest rebuild (--no-build); run `npm run build:images`.");
-  console.log("\nRebuilding the image manifest…");
-  execFileSync(process.execPath, [join(ROOT, "scripts", "build-image-manifest.mjs")], { stdio: "inherit" });
+  if (opts.build) {
+    console.log("\nRebuilding the image manifest…");
+    execFileSync(process.execPath, [join(ROOT, "scripts", "build-image-manifest.mjs")], { stdio: "inherit" });
+  } else {
+    console.log("Skipped the manifest rebuild (--no-build); run `npm run build:images`.");
+  }
+  if (errors) process.exitCode = 1;
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
@@ -1572,17 +1976,19 @@ if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) 
 
 ---
 
-## Appendix D — `scripts/build-image-manifest.mjs`
+## Appendix E — `scripts/build-image-manifest.mjs`
+
+Unchanged from the source pipeline apart from the file names.
 
 ```js
 #!/usr/bin/env node
 /**
- * Record every committed image in `public/images/` into `lib/generated/images.js`
- * so pages can set intrinsic width/height (no CLS) without importing the file.
+ * Record every committed image in `public/images/` into `lib/generated/images.js` so
+ * pages can set intrinsic width/height (no CLS) without importing the file.
  *
  * These bytes are NEVER re-encoded: promotion already produced the exact bytes to
- * serve, and a second lossy pass costs ~1.8 dB PSNR to save ~3 kB. This script
- * only reads dimensions.
+ * serve, and a second lossy pass costs ~1.8 dB PSNR to save ~3 kB. This script only
+ * reads dimensions.
  *
  * Incremental and idempotent: an entry whose content hash is unchanged is reused
  * without touching sharp, and the manifest file is only rewritten when it actually
@@ -1601,9 +2007,9 @@ const IMAGES_DIR = join(ROOT, "public", "images");
 const MANIFEST_FILE = join(ROOT, "lib", "generated", "images.js");
 const MANIFEST_VERSION = "1";
 
-/** Read the previous manifest so unchanged images can be skipped. It is an ES
- *  module this script wrote, so the JSON literal is pulled out by regex rather
- *  than import()-ed. Absent or unparseable → treat everything as new. */
+/** Read the previous manifest so unchanged images can be skipped. It is an ES module
+ *  this script wrote, so the JSON literal is pulled out by regex rather than
+ *  import()-ed. Absent or unparseable → treat everything as new. */
 function loadPrior() {
   if (!existsSync(MANIFEST_FILE)) return {};
   try {
@@ -1661,7 +2067,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 
 ---
 
-## Appendix E — wiring
+## Appendix F — Wiring
 
 `package.json`:
 
@@ -1685,15 +2091,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 generated-images/
 ```
 
-**Do not gitignore `lib/generated/images.js` or `public/images/`.** Both are
-deliberately committed — that is what makes a deploy zero-work.
-
-Files added, in total:
+**Do not gitignore `lib/generated/images.js` or `public/images/`.** Both are deliberately
+committed — that is what makes a deploy zero-work.
 
 | Path | Committed | Role |
 |---|---|---|
-| `data/image-prompts.json` | ✅ | prompt source of truth |
-| `lib/imagePrompt.ts` | ✅ | shared prompt template |
+| `data/image-prompts.json` | ✅ | projects, sets, prompts — the source of truth |
+| `scripts/lib/prompts.mjs` | ✅ | load / resolve / render |
 | `scripts/generate-images.mjs` | ✅ | step 2 |
 | `scripts/remove-background.mjs` | ✅ | step 3 |
 | `scripts/promote-images.mjs` | ✅ | step 4 |
@@ -1705,20 +2109,30 @@ Files added, in total:
 
 ---
 
-## Appendix F — what changed from the source pipeline
+## Appendix G — What changed, and why
 
-| | Source repo (`dataslope`) | This port |
+### From the Dataslope pipeline
+
+| | Dataslope | Here |
 |---|---|---|
-| Candidate storage | Cloudflare R2, run-scoped keys `illustrations/<runId>/<id>/v<n>/{original,cutout}.png`, 14-day lifecycle rule | local `generated-images/`, gitignored |
+| Candidate storage | Cloudflare R2, run-scoped keys, 14-day lifecycle | local `generated-images/`, gitignored |
 | Credentials | `OPENAI_API_KEY`, `KIE_API_KEY`, 4 × `R2_*` | `OPENAI_API_KEY`, `KIE_API_KEY` |
-| `--sink` / `--from` / `--run` / `--variant` flags | present | removed — disk is the only store |
-| SigV4 S3 client (`scripts/lib/r2.mjs`) | ~250 lines, hand-rolled | not needed |
-| Re-promote at another quality | free, while candidates live in R2 | only while `generated-images/` is still on disk |
-| Two classes of image (pipeline + raster sources) | supported; `build-images.mjs` encodes raster sources too | simplified to pipeline-only; add the second class back if you need photos/screenshots |
-| Single-process `run` command | present but discouraged | removed |
-| `promote` stale-cut-out warning | open item, not built | **built in** (Appendix C) |
-| Cache-busting query string | not used | suggested (§7) |
+| SigV4 S3 client | ~250 lines, hand-rolled | not needed |
+| Re-promote at another quality | free, while candidates live in R2 | only while `generated-images/` is on disk |
+| Style | one house style (isometric) forever | **one style per project, many across the library** |
+| Palette | one brand palette, four fixed colours | **per-project palette, any size, two modes** |
+| Quality | `low`, always, on volume grounds | **`low` for graphic styles, `medium` for faces and heroes** |
+| Background removal | every image, unconditionally | **per-prompt `cutout` flag; objects yes, scenes no** |
+| Promoted files | original **and** cut-out for every image | only the served variant (`--keep-original` to opt in) |
+| Prompt shape | fixed template, four colour lines | authored sentences + palette block, `sets` for consistency |
+| Backdrop / set descriptors | n/a | first-class, because portraits and products need them |
+| Stale-cut-out guard | open item, not built | **built in, as an error** |
+| Cache-busting query string | not used | `?v=<hash8>` |
 
-Everything else — the prompt template, `quality: low`, `1536x1024`, the Batch API
-shape, Recraft via Kie, WebP q92, the committed manifest, the single-encode rule — is
-carried over unchanged, because each was arrived at by measurement.
+### What deliberately did *not* change
+
+Everything arrived at by measurement: the Batch API shape and its chunk-and-stream
+requirement, the retry policy and where it applies, all four Kie API quirks, WebP q92
+with `alphaQuality: 100`, the single-encode rule and the PSNR numbers behind it, the
+committed incremental manifest, and "cut out objects, not scenes" — which was learned the
+expensive way on ~800 images.
