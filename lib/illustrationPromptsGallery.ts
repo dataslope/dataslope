@@ -22,16 +22,21 @@ import {
 
 /** Content collections: which public URL base each maps to.
  *
- *  `home` is not a collection of lessons, it is the single landing page, so it
- *  has no course/lesson hierarchy beneath it (see `lessonRoute`). It exists so
- *  the home page's bento icons are authored, reviewed, and regenerated through
- *  the same pipeline as everything else rather than as one-off art. */
-export type Collection = "courses" | "interview" | "home";
+ *  `home` and `auth` are not collections of lessons but single pages, so they
+ *  have no course/lesson hierarchy beneath them (see `SINGLE_PAGE` below). They
+ *  exist so chrome artwork — the home page's bento icons, the auth globe pins —
+ *  is authored, reviewed, and regenerated through the same pipeline as
+ *  everything else rather than as one-off art. */
+export type Collection = "courses" | "interview" | "home" | "auth";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
   home: "/",
+  auth: "/sign-in",
 };
+
+/** Collections that are one page, with nothing addressable beneath them. */
+const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>(["home", "auth"]);
 
 /** Asset categories, in the order they are shown on the gallery page. */
 export type Category =
@@ -39,7 +44,8 @@ export type Category =
   | "course-illustration"
   | "interview-thumbnail"
   | "interview-illustration"
-  | "home-icon";
+  | "home-icon"
+  | "auth-globe-pin";
 
 const CATEGORY_LABEL: Record<Category, string> = {
   "course-thumbnail": "Course thumbnails",
@@ -47,6 +53,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
   "interview-thumbnail": "Interview prep thumbnails",
   "interview-illustration": "Interview prep illustrations",
   "home-icon": "Home page bento icons",
+  "auth-globe-pin": "Auth globe pins",
 };
 
 const CATEGORY_ORDER: Category[] = [
@@ -55,6 +62,7 @@ const CATEGORY_ORDER: Category[] = [
   "interview-thumbnail",
   "interview-illustration",
   "home-icon",
+  "auth-globe-pin",
 ];
 
 /** One raw prompt definition, as authored in the JSON. */
@@ -131,12 +139,11 @@ export interface IllustrationPromptsData {
 }
 
 /** `courses` + `python-basics` + `hello-world` → `/courses/python-basics/hello-world`;
- *  a missing/"index" lesson collapses to the course landing page. The `home`
- *  collection is one page with nothing beneath it, so it always resolves to
- *  `/`. */
+ *  a missing/"index" lesson collapses to the course landing page. The
+ *  single-page collections (`home`, `auth`) always resolve to their own base. */
 function lessonRoute(p: RawPrompt): string {
   const base = URL_BASE[p.collection];
-  if (p.collection === "home") return base;
+  if (SINGLE_PAGE.has(p.collection)) return base;
   const courseUrl = `${base}/${p.course}`;
   if (!p.lesson || p.lesson === "index") return courseUrl;
   return `${courseUrl}/${p.lesson}`;

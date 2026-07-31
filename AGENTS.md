@@ -243,6 +243,11 @@ own tier per prompt, costing ~2x `low` with no control.
 
 **Size `1536x1024`** unless there is a specific reason otherwise. It is also
 the cheaper option: 158 tokens vs 196 for `1024x1024` at the same quality.
+Art painted into a *square* slot is that specific reason, and uses
+`1024x1024`: the home bento icons (`home-icon`) and the auth globe pins
+(`auth-globe-pin`). Size is per category in `meta.sizes`, so this is a JSON
+value rather than a flag. Chrome art that only ever renders small should also
+be promoted with `--max-width` — see the runbook's "Site chrome" section.
 
 **Batch API, always.** Half price, and a 20-image job returns in well under a
 minute in practice despite the 24h window. The generator chunks into
