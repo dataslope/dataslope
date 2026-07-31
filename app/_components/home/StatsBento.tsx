@@ -46,12 +46,17 @@ const InterviewPrepIcon = illustrationIcon("home-icon-interview-prep-cutout");
 const ChallengesIcon = illustrationIcon("home-icon-challenges-cutout");
 const CodeBlocksIcon = illustrationIcon("home-icon-code-blocks-cutout");
 
-/** Icon sizing, one notch up from the line glyphs these replaced (48px and
- *  36px effective, after the card's `scale-75`). An illustration carries more
- *  detail than a 1.75px-stroke glyph and needs the extra room to read; the two
- *  link-less cards stay the smaller of the two, as they were. */
-const ICON_SIZE = "mb-3 h-16 w-16";
-const ICON_SIZE_SMALL = "mb-3 h-12 w-12";
+/** 160px square, the same on every card. `scale-100` is required: the card's
+ *  default icon classes carry a `scale-75` (pinned there when the icon was a
+ *  line glyph), which would otherwise render `h-40` at 120px. All four cards
+ *  now share one size — the illustrations differ enough card to card that the
+ *  old large/small split no longer bought any hierarchy.
+ *
+ *  This size drives the copy: at 160px the icon plus a heading, a CTA, and the
+ *  card's padding leave roughly two lines for the description inside the
+ *  grid's fixed `auto-rows-[22rem]`, and less than that on a single-column
+ *  card. Descriptions below are written to that budget. */
+const ICON_SIZE = "mb-3 h-40 w-40 scale-100";
 
 export interface HomeStats {
   /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks across all content. */
@@ -86,8 +91,9 @@ export function StatsBento({
     {
       Icon: InterviewPrepIcon,
       name: "Free interview prep",
-      description:
-        "Role-based preparation, data analyst, data scientist, data & analytics engineer, ML, and backend.",
+      // Narrowest card (one column) and it carries a CTA, so it has the
+      // tightest copy budget of the four: the full role list overflowed.
+      description: "Role-based prep for analyst, data, ML, and backend roles.",
       href: "/interview-prep",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
@@ -95,23 +101,23 @@ export function StatsBento({
       background: <TypingBackground />,
     },
     {
-      // Link-less card (T8): no CTA, smaller icon.
+      // Link-less card (T8): no CTA.
       Icon: ChallengesIcon,
       name: `${stats.codeChallenges.toLocaleString()}+ code challenges`,
       description:
         "Coding and SQL challenges with instant, test-driven feedback.",
       className: "col-span-3 lg:col-span-1",
-      iconClassName: ICON_SIZE_SMALL,
+      iconClassName: ICON_SIZE,
       background: <TestRailBackground />,
     },
     {
-      // Link-less card (T7): no CTA, smaller icon.
+      // Link-less card (T7): no CTA.
       Icon: CodeBlocksIcon,
       name: `${stats.runnableCodeBlocks.toLocaleString()}+ runnable code blocks`,
       description:
         "Run every example inline, Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
       className: "col-span-3 lg:col-span-2",
-      iconClassName: ICON_SIZE_SMALL,
+      iconClassName: ICON_SIZE,
       background: <DiamondBackground />,
     },
   ];
