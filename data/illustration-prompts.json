@@ -699,8 +699,8 @@
       "category": "interview-thumbnail",
       "title": "Analytics Engineer — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a layered transformation pipeline turning raw tiles into tidy modelled tables on a platform"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot feeding raw tiles into a small transformation pipeline that returns tidy modelled tables on a platform"
     },
     {
       "id": "interview-backend-engineer-thumbnail",
@@ -711,8 +711,8 @@
       "category": "interview-thumbnail",
       "title": "Backend / Software Engineer — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a small server rack connected by arrows to an API gateway block and a database disc"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot standing beside a small server rack linked by arrows to an API gateway block and a database disc"
     },
     {
       "id": "interview-data-analyst-thumbnail",
@@ -723,8 +723,8 @@
       "category": "interview-thumbnail",
       "title": "Data Analyst — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a dashboard panel of small charts on a platform with a magnifying lens resting over one chart"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot holding a magnifying lens over a dashboard panel of small charts on a platform"
     },
     {
       "id": "interview-data-engineer-thumbnail",
@@ -735,8 +735,8 @@
       "category": "interview-thumbnail",
       "title": "Data Engineer — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a pipeline of connected pipes carrying coloured cubes from a source tank into a storage silo"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot guiding coloured cubes along a short pipeline from a source tank into a storage silo"
     },
     {
       "id": "interview-data-scientist-thumbnail",
@@ -747,8 +747,8 @@
       "category": "interview-thumbnail",
       "title": "Data Scientist — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a scatter plane with a fitted curve, a flask and a small dial arranged on a platform"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot holding a small flask beside a scatter plane with a fitted curve on a platform"
     },
     {
       "id": "interview-machine-learning-engineer-thumbnail",
@@ -759,8 +759,8 @@
       "category": "interview-thumbnail",
       "title": "Machine Learning Engineer — interview thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a trained model block on a platform feeding predictions into a deployment container beside it"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot placing a trained model block into a deployment container on a platform"
     },
     {
       "id": "pandas-what-is-data-analysis",
