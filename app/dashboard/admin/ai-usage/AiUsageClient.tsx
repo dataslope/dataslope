@@ -111,7 +111,7 @@ const fmtDay = (d: string) =>
 function windowLabel(start: string | null, end: string): string {
   if (!start) return "All time";
   if (start === end) return fmtDay(end);
-  return `${fmtDay(start)} – ${fmtDay(end)}`;
+  return `${fmtDay(start)} to ${fmtDay(end)}`;
 }
 
 // ─── Tiles ─────────────────────────────────────────────────────────────────

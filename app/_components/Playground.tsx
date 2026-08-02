@@ -4950,7 +4950,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                             ))
                           ) : (
                             <span className="web-console-ready">
-                              Ready — console output lands here.
+                              Ready. Console output lands here.
                             </span>
                           )}
                         </div>
@@ -4961,7 +4961,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               ) : outputs.length === 0 && statusState !== "running" ? (
                 outputCleared ? (
                   <div className="run-history-empty">
-                    Output cleared — press Run to start a new history.
+                    Output cleared. Press Run to start a new history.
                   </div>
                 ) : (
                   <div className="welcome">

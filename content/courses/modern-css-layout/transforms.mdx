@@ -31,7 +31,7 @@ the scaled box overlaps its footprint without shoving its siblings,
 because transforms never disturb layout:
 
 <LivePreview
-  title="translate, scale, rotate, skew — layout stays put"
+  title="translate, scale, rotate, skew: layout stays put"
   background="#ffffff"
   html={`<div class="row">
   <div class="box t">translate</div>
@@ -65,7 +65,7 @@ because transforms never disturb layout:
 ## Combining transforms and transform-origin
 
 You can list several functions in one `transform`, separated by spaces.
-**Order matters** — the browser applies them right to left, so
+**Order matters**: the browser applies them right to left, so
 `rotate(45deg) translateX(40px)` rotates first and then moves along the
 already-tilted axis, which is not the same as translating and then
 rotating.
@@ -117,7 +117,7 @@ Transforms shine on hover, because moving a card with `translate` and
 below (it's live) to watch it lift and grow:
 
 <LivePreview
-  title="Hover to lift and scale — combined transform + transition"
+  title="Hover to lift and scale: combined transform + transition"
   background="#ffffff"
   html={`<div class="card">
   <strong>Pro plan</strong>
@@ -149,7 +149,7 @@ the transitions lesson.
 
 <Callout type="info" title="Why transforms feel smooth">
 Changing `top` or `margin` forces the browser to recompute layout for
-the page. A `transform` does not — it only repaints the one element,
+the page. A `transform` does not; it only repaints the one element,
 and the compositor can offload it to the GPU. That is why transform and
 opacity are the two properties to lean on for silky hover and animation
 effects.
@@ -279,7 +279,7 @@ for (let i = 0; i < 12 && (!s.transform || s.transform === "none"); i++) {
   s = getComputedStyle(badge);
 }
 if (!s.transform || s.transform === "none") {
-  throw new Error("Add a transform to .badge — its computed transform is still 'none'.");
+  throw new Error("Add a transform to .badge; its computed transform is still 'none'.");
 }`,
     },
     {

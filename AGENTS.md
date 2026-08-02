@@ -327,6 +327,53 @@ each cut-out over the live page background for exactly this reason.
 
 ---
 
+## Prose style
+
+Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by
+`__tests__/proseStyle.test.ts`, which runs as part of `npm test`.
+
+### No em dashes
+
+**Never use an em dash (`—`) in authored prose.** It is banned precisely
+because it is the easy way out: it can stand in for a comma, a colon, a
+semicolon or a full stop, so reaching for it means skipping the decision about
+which relationship the sentence actually has. Pick the right mark instead:
+
+| The aside is | Use |
+| --- | --- |
+| a parenthetical | commas, or parentheses when it already contains commas |
+| an elaboration or a list | a colon |
+| a second independent clause | a semicolon or a full stop |
+
+```markdown
+<!-- Bad -->
+A significant result says at least one group differs, without saying which — that needs a post-hoc test.
+Three colors — unvisited, in-progress, done — is the standard encoding.
+
+<!-- Good -->
+A significant result says at least one group differs, without saying which; that needs a post-hoc test.
+Three colors (unvisited, in-progress, done) is the standard encoding.
+```
+
+**En dashes are fine, unspaced.** They are correct in numeric ranges
+(`1815–1864`) and two-name compounds (`Runge–Kutta`, `bias–variance`). A
+*spaced* en dash (` – `) is the same tic as the em dash and is rejected.
+
+Two things deliberately pass: a lone `—` glyph marking an empty table cell in
+a component (`{col.type || "—"}`) is a typographic convention rather than
+prose, and em dashes inside code comments are not shipped as page text.
+
+### Filler phrases
+
+`AI_FILLER` in the checker holds a short, high-precision list ("delve into",
+"a testament to", "unlock the potential", "let's dive in", …). Keep it that
+way. Words that are ordinary technical vocabulary here must stay out of it:
+**robust** (robust statistics), **leverage** (high-leverage points),
+**underscore** (the `_` character) and **crucial** all have real meanings in
+this material, and a linter that fires on correct prose gets ignored.
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.

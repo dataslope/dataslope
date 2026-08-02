@@ -274,7 +274,7 @@ this track do, and is standard except where a question says otherwise.
 - It compresses the partitions more aggressively.
   > Compression is independent of pruning.
 - [o] A filter on the partition key lets the engine skip whole partitions without reading them, so billed bytes drop.
-  > The saving only materializes if queries actually filter on that key, which is why the partition column should be the one people filter by — usually a date.
+  > The saving only materializes if queries actually filter on that key, which is why the partition column should be the one people filter by, usually a date.
 - It rewrites the query to use fewer joins.
   > Pruning affects what is scanned, not the join plan.
 - It caches each partition in memory.
@@ -455,7 +455,7 @@ this track do, and is standard except where a question says otherwise.
 
 - A warehouse that has been moved into object storage, with no other change.
   > Storage location alone is not the distinction.
-- [o] Open table formats over object storage that add warehouse features — ACID transactions, schema enforcement, and time travel — to lake-scale files.
+- [o] Open table formats over object storage that add warehouse features (ACID transactions, schema enforcement, and time travel) to lake-scale files.
   > Delta Lake, Iceberg, and Hudi are the common implementations, and they are what let one copy of the data serve both SQL and non-SQL engines.
 - A data lake with a BI tool connected to it.
   > A BI connection does not add transactions or schema guarantees.
@@ -719,7 +719,7 @@ this track do, and is standard except where a question says otherwise.
 
 - Because the grain determines the table name.
   > Naming follows the grain but is not why it matters.
-- [o] Every later decision — which dimensions apply, which measures are additive, whether a join fans out — follows from what one row represents.
+- [o] Every later decision (which dimensions apply, which measures are additive, whether a join fans out) follows from what one row represents.
   > "One row per order line per day" is a testable statement; a table without an agreed grain quietly accumulates double counting.
 - Because the warehouse needs it to allocate storage.
   > Storage is allocated regardless.
@@ -823,7 +823,7 @@ this track do, and is standard except where a question says otherwise.
 
 - A dimension whose rows have gone stale.
   > Staleness is a freshness problem.
-- [o] A dimensional attribute — typically an identifier such as an order number — that lives on the fact table because it has no other attributes worth a table of its own.
+- [o] A dimensional attribute (typically an identifier such as an order number) that lives on the fact table because it has no other attributes worth a table of its own.
   > It still supports grouping and drill-through; it just does not justify a join.
 - A dimension with only one row.
   > A single-row dimension is unusual but not degenerate in this sense.
@@ -862,7 +862,7 @@ this track do, and is standard except where a question says otherwise.
 
 - A fact table whose measures are all zero.
   > Zeros are still measures.
-- [o] A table recording that an event or a relationship occurred, with no numeric measure — the count of rows is the measure.
+- [o] A table recording that an event or a relationship occurred, with no numeric measure; the count of rows is the measure.
   > Student attendance and promotion eligibility are the classic examples: the useful questions are "how many" and, harder, "which ones did *not* happen".
 - A dimension misclassified as a fact.
   > It is a genuine fact table by grain and purpose.
@@ -900,7 +900,7 @@ this track do, and is standard except where a question says otherwise.
   markdown={`Why does dimensional modelling deliberately avoid 3NF for dimensions?
 
 - Because 3NF is incorrect.
-  > 3NF is correct and appropriate — for transactional systems.
+  > 3NF is correct and appropriate for transactional systems.
 - [o] Splitting a dimension into normalized parts adds joins that cost query time and comprehension, and the update anomalies 3NF prevents barely arise in an append-mostly warehouse.
   > A flat, wide dimension is the deliberate trade: some redundancy for far simpler and faster queries.
 - Because warehouses cannot enforce foreign keys.
@@ -994,7 +994,7 @@ this track do, and is standard except where a question says otherwise.
 
 - They are the same thing under two names.
   > They arise from different join shapes.
-- [o] A chasm trap comes from joining two unrelated one-to-many branches off the same dimension, producing a cross product of the two — worse than a fan trap's single inflation.
+- [o] A chasm trap comes from joining two unrelated one-to-many branches off the same dimension, producing a cross product of the two, worse than a fan trap's single inflation.
   > Splitting into separate queries per branch, or aggregating each branch before joining, avoids it.
 - A chasm trap only occurs in NoSQL databases.
   > It is a relational join problem.
@@ -1033,7 +1033,7 @@ this track do, and is standard except where a question says otherwise.
 
 - One of the warehouses is stale.
   > Possible, but the numbers would usually differ by a smaller, time-shaped amount.
-- [o] The two encode different definitions — a different activity window, different exclusions, or a different grain — because the logic lives in each dashboard rather than in one shared definition.
+- [o] The two encode different definitions (a different activity window, different exclusions, or a different grain) because the logic lives in each dashboard rather than in one shared definition.
   > This is exactly the problem a semantic layer exists to remove.
 - One dashboard uses a different chart type.
   > Presentation does not change the underlying number.
@@ -1059,7 +1059,7 @@ this track do, and is standard except where a question says otherwise.
 
 - Because window functions are slow.
   > Performance is not the argument.
-- [o] Because the window's exact boundaries — inclusive or exclusive, calendar or rolling, how gaps are treated — are easy to implement differently, and each variant produces a plausible but different number.
+- [o] Because the window's exact boundaries (inclusive or exclusive, calendar or rolling, how gaps are treated) are easy to implement differently, and each variant produces a plausible but different number.
   > A trailing-28-day metric that silently means "last 4 calendar weeks" in one place is the sort of divergence nobody catches for months.
 - Because dashboards cannot express window functions.
   > Most BI tools can.
@@ -1152,7 +1152,7 @@ this track do, and is standard except where a question says otherwise.
 
 - Whenever it fails intermittently.
   > Downgrading a flaky test hides a real problem instead of fixing it.
-- [o] When the condition is worth surfacing but should not block the build — a known upstream imperfection, or a threshold being tuned.
+- [o] When the condition is worth surfacing but should not block the build: a known upstream imperfection, or a threshold being tuned.
   > \`warn\` is a deliberate, temporary state. A suite of permanent warnings is indistinguishable from no tests at all.
 - On every test in production, to avoid pipeline failures.
   > That trades pipeline uptime for silently wrong data, which is the worse failure.
@@ -1205,7 +1205,7 @@ this track do, and is standard except where a question says otherwise.
 - They run faster on the same data.
   > They run on different data entirely.
 - [o] A unit test runs the model's logic against fixed input fixtures and asserts an expected output, so it validates the transformation itself rather than today's data.
-  > It is the right tool for tricky logic — a window function, a date-boundary rule — where you want the edge case pinned regardless of what the warehouse currently holds.
+  > It is the right tool for tricky logic (a window function, a date-boundary rule), where you want the edge case pinned regardless of what the warehouse currently holds.
 - Unit tests only apply to macros.
   > They apply to models.
 - Unit tests replace the need for data tests.
@@ -1256,7 +1256,7 @@ this track do, and is standard except where a question says otherwise.
 
 - Add a \`not_null\` and a \`unique\` test to the metric column.
   > These catch structural problems and say nothing about the value.
-- [o] Reconcile it against an independent calculation — the source system's own total, a known period's published figure, or a differently-derived model — and assert the difference is within tolerance.
+- [o] Reconcile it against an independent calculation (the source system's own total, a known period's published figure, or a differently-derived model), and assert the difference is within tolerance.
   > It is the only class of test that catches logic that is confidently, consistently wrong.
 - Check that it is greater than zero.
   > A sign check catches gross failures and little else.

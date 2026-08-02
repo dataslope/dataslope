@@ -27,7 +27,7 @@
       "courseTitle": "Python Basics",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Python Basics — course thumbnail",
+      "title": "Python Basics: course thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly and small rounded ears, sitting cross-legged with a laptop on a grassy hillside, playful rounded code shapes and a rising sun behind it"
@@ -351,7 +351,7 @@
       "courseTitle": "Beginner's Guide to JavaScript",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Beginner's Guide to JavaScript — course thumbnail",
+      "title": "Beginner's Guide to JavaScript: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a small browser window panel floating above a base platform with rounded script blocks slotting into it, a cursor arrow resting nearby"
@@ -363,7 +363,7 @@
       "courseTitle": "C Programming for Beginners",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "C Programming for Beginners — course thumbnail",
+      "title": "C Programming for Beginners: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a cutaway machine showing labelled memory cells in a row, a pointer arrow resting against one of them"
@@ -375,7 +375,7 @@
       "courseTitle": "C# LINQ and Functional Patterns",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "C# LINQ and Functional Patterns — course thumbnail",
+      "title": "C# LINQ and Functional Patterns: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a conveyor pipeline where shapes pass through three filter gates and emerge sorted into a tray"
@@ -387,7 +387,7 @@
       "courseTitle": "Data Analysis with Python Pandas",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Data Analysis with Python Pandas — course thumbnail",
+      "title": "Data Analysis with Python Pandas: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a tidy spreadsheet grid rendered as a raised platform of small tiles, one column lifted out and stacked to the side"
@@ -399,7 +399,7 @@
       "courseTitle": "Database Design with PostgreSQL",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Database Design with PostgreSQL — course thumbnail",
+      "title": "Database Design with PostgreSQL: course thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "three linked table blocks connected by short arrows, an elephant-shaped weight resting on the largest one"
@@ -411,7 +411,7 @@
       "courseTitle": "From Zero to C++ Programming",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "From Zero to C++ Programming — course thumbnail",
+      "title": "From Zero to C++ Programming: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a stepped platform climbing from a single small block up to an intricate assembled machine at the top"
@@ -423,7 +423,7 @@
       "courseTitle": "Functional Programming with TypeScript",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Functional Programming with TypeScript — course thumbnail",
+      "title": "Functional Programming with TypeScript: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "three shaped funnels chained in a row, a shape entering the first and a transformed shape leaving the last"
@@ -435,7 +435,7 @@
       "courseTitle": "Introduction to Data Visualization with Plotly",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Introduction to Data Visualization with Plotly — course thumbnail",
+      "title": "Introduction to Data Visualization with Plotly: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a raised chart platform with bars, a line ribbon and a scatter of dots, one bar lifted slightly above the rest"
@@ -447,7 +447,7 @@
       "courseTitle": "Introduction to Modern C#",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Introduction to Modern C# — course thumbnail",
+      "title": "Introduction to Modern C#: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a neat workbench of interlocking blocks assembling into a small program tower"
@@ -459,7 +459,7 @@
       "courseTitle": "Introduction to SQL and Relational Databases",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Introduction to SQL and Relational Databases — course thumbnail",
+      "title": "Introduction to SQL and Relational Databases: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "two table blocks joined by a bridge, a magnifying lens hovering over the joined rows"
@@ -471,7 +471,7 @@
       "courseTitle": "Intro to Web Development",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Intro to Web Development — course thumbnail",
+      "title": "Intro to Web Development: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a layered stack of three floating panels, structure beneath, styling above it, and an interactive button on top"
@@ -483,7 +483,7 @@
       "courseTitle": "Java Collections and Generics Deep Dive",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Java Collections and Generics Deep Dive — course thumbnail",
+      "title": "Java Collections and Generics Deep Dive: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a rack of differently shaped containers, each holding matching coloured tokens, one drawer pulled open"
@@ -495,7 +495,7 @@
       "courseTitle": "Java Programming for Beginners",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Java Programming for Beginners — course thumbnail",
+      "title": "Java Programming for Beginners: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a steaming cup beside a small assembled block tower on a workbench platform"
@@ -507,7 +507,7 @@
       "courseTitle": "Machine Learning with scikit-learn",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Machine Learning with scikit-learn — course thumbnail",
+      "title": "Machine Learning with scikit-learn: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a scatter of coloured dots on a raised plane with a smooth curve fitted through them and a small dial beside it"
@@ -519,7 +519,7 @@
       "courseTitle": "Mastering Data Structures and Algorithms in C++",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Mastering Data Structures and Algorithms in C++ — course thumbnail",
+      "title": "Mastering Data Structures and Algorithms in C++: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a branching tree of connected nodes rising from a platform beside a short row of linked boxes"
@@ -531,7 +531,7 @@
       "courseTitle": "Mastering ggplot2",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Mastering ggplot2 — course thumbnail",
+      "title": "Mastering ggplot2: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "layered translucent chart planes stacked one above another, each adding marks to the plot below"
@@ -543,7 +543,7 @@
       "courseTitle": "Modern CSS: Layout and Responsive Design",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Modern CSS: Layout and Responsive Design — course thumbnail",
+      "title": "Modern CSS: Layout and Responsive Design: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a grid of rearranging panels on a platform, three panels sliding into a new column arrangement"
@@ -555,7 +555,7 @@
       "courseTitle": "Natural Language Processing with Python",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Natural Language Processing with Python — course thumbnail",
+      "title": "Natural Language Processing with Python: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a ribbon of blank word tiles feeding into a sorting machine that stacks them into tidy piles"
@@ -567,7 +567,7 @@
       "courseTitle": "Object-Oriented Programming Blueprint with Java",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Object-Oriented Programming Blueprint with Java — course thumbnail",
+      "title": "Object-Oriented Programming Blueprint with Java: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a plan card standing beside three identical small assembled objects built from it"
@@ -579,7 +579,7 @@
       "courseTitle": "Practical R for Beginners",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Practical R for Beginners — course thumbnail",
+      "title": "Practical R for Beginners: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a workbench with a small chart panel, a stack of data tiles, and a calculator dial"
@@ -591,7 +591,7 @@
       "courseTitle": "React from the Ground Up",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "React from the Ground Up — course thumbnail",
+      "title": "React from the Ground Up: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "nested rounded component frames floating one inside another, with small connectors linking them"
@@ -603,7 +603,7 @@
       "courseTitle": "Scientific Computing with Python",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Scientific Computing with Python — course thumbnail",
+      "title": "Scientific Computing with Python: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a grid-lined plane with a curved trajectory arc above it and a small matrix of cubes beside"
@@ -615,7 +615,7 @@
       "courseTitle": "Seaborn Foundations",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Seaborn Foundations — course thumbnail",
+      "title": "Seaborn Foundations: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a raised platform holding a box plot, a scatter cloud and a smooth distribution curve side by side"
@@ -627,7 +627,7 @@
       "courseTitle": "SQL for Data Analysis with DuckDB",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "SQL for Data Analysis with DuckDB — course thumbnail",
+      "title": "SQL for Data Analysis with DuckDB: course thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a duck standing on a stack of database discs beside a small aggregation chart"
@@ -639,7 +639,7 @@
       "courseTitle": "SQLite for Beginners",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "SQLite for Beginners — course thumbnail",
+      "title": "SQLite for Beginners: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a single compact database disc resting on a platform with a small feather beside it"
@@ -651,7 +651,7 @@
       "courseTitle": "Statistics for Data Science with Python",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Statistics for Data Science with Python — course thumbnail",
+      "title": "Statistics for Data Science with Python: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a bell-shaped distribution surface on a platform with two marker pins set into its tails"
@@ -663,7 +663,7 @@
       "courseTitle": "Systems Programming in C",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Systems Programming in C — course thumbnail",
+      "title": "Systems Programming in C: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a cutaway of stacked memory layers with a small crane lifting one block out of the heap"
@@ -675,7 +675,7 @@
       "courseTitle": "Time Series Analysis with Python",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "Time Series Analysis with Python — course thumbnail",
+      "title": "Time Series Analysis with Python: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "a long ribbon of a wavy line chart running across a platform with a forecast segment continuing past a marker"
@@ -687,7 +687,7 @@
       "courseTitle": "TypeScript from Scratch",
       "lesson": "index",
       "category": "course-thumbnail",
-      "title": "TypeScript from Scratch — course thumbnail",
+      "title": "TypeScript from Scratch: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
       "subject": "loose blocks on the left snapping into precisely shaped labelled slots on the right"
@@ -699,7 +699,7 @@
       "courseTitle": "Analytics Engineer",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Analytics Engineer — interview thumbnail",
+      "title": "Analytics Engineer: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot feeding raw tiles into a small transformation pipeline that returns tidy modelled tables on a platform"
@@ -711,7 +711,7 @@
       "courseTitle": "Backend / Software Engineer",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Backend / Software Engineer — interview thumbnail",
+      "title": "Backend / Software Engineer: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot standing beside a small server rack linked by arrows to an API gateway block and a database disc"
@@ -723,7 +723,7 @@
       "courseTitle": "Data Analyst",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Data Analyst — interview thumbnail",
+      "title": "Data Analyst: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a magnifying lens over a dashboard panel of small charts on a platform"
@@ -735,7 +735,7 @@
       "courseTitle": "Data Engineer",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Data Engineer — interview thumbnail",
+      "title": "Data Engineer: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot guiding coloured cubes along a short pipeline from a source tank into a storage silo"
@@ -747,7 +747,7 @@
       "courseTitle": "Data Scientist",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Data Scientist — interview thumbnail",
+      "title": "Data Scientist: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a small flask beside a scatter plane with a fitted curve on a platform"
@@ -759,7 +759,7 @@
       "courseTitle": "Machine Learning Engineer",
       "lesson": "index",
       "category": "interview-thumbnail",
-      "title": "Machine Learning Engineer — interview thumbnail",
+      "title": "Machine Learning Engineer: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot placing a trained model block into a deployment container on a platform"
@@ -9471,7 +9471,7 @@
       "courseTitle": "Home page",
       "lesson": "index",
       "category": "home-icon",
-      "title": "Free courses — bento icon",
+      "title": "Free courses: bento icon",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot wearing a graduation cap and holding a small open book"
@@ -9483,7 +9483,7 @@
       "courseTitle": "Home page",
       "lesson": "index",
       "category": "home-icon",
-      "title": "Interview prep — bento icon",
+      "title": "Interview prep: bento icon",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot in a neat collared shirt carrying a briefcase"
@@ -9495,7 +9495,7 @@
       "courseTitle": "Home page",
       "lesson": "index",
       "category": "home-icon",
-      "title": "Code challenges — bento icon",
+      "title": "Code challenges: bento icon",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding up a trophy cup with both paws"
@@ -9507,7 +9507,7 @@
       "courseTitle": "Home page",
       "lesson": "index",
       "category": "home-icon",
-      "title": "Runnable code blocks — bento icon",
+      "title": "Runnable code blocks: bento icon",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot standing beside a small terminal window panel with a blank screen and one glowing caret"
@@ -9519,7 +9519,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Python — auth globe pin",
+      "title": "Python: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot with a small friendly green snake coiled beside it"
@@ -9531,7 +9531,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Data and analytics — auth globe pin",
+      "title": "Data and analytics: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding up a small bar chart panel"
@@ -9543,7 +9543,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Challenges — auth globe pin",
+      "title": "Challenges: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a small trophy cup"
@@ -9555,7 +9555,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Ship it — auth globe pin",
+      "title": "Ship it: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot riding a small rocket"
@@ -9567,7 +9567,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Postgres — auth globe pin",
+      "title": "Postgres: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a friendly blue elephant (the PostgreSQL mascot) standing on a small platform"
@@ -9579,7 +9579,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "DuckDB — auth globe pin",
+      "title": "DuckDB: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a friendly round yellow duck standing on a small platform"
@@ -9591,7 +9591,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Streak — auth globe pin",
+      "title": "Streak: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot cupping a small glowing flame in its paws"
@@ -9603,7 +9603,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Learning — auth globe pin",
+      "title": "Learning: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot reading a small open book"
@@ -9615,7 +9615,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Speed — auth globe pin",
+      "title": "Speed: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a bold lightning bolt"
@@ -9627,7 +9627,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Growth — auth globe pin",
+      "title": "Growth: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a bold upward arrow"
@@ -9639,7 +9639,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Compute — auth globe pin",
+      "title": "Compute: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot working a small abacus"
@@ -9651,7 +9651,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "AI — auth globe pin",
+      "title": "AI: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot standing beside a small friendly robot"
@@ -9663,7 +9663,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Analytics — auth globe pin",
+      "title": "Analytics: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a small round pie chart"
@@ -9675,7 +9675,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Cloud — auth globe pin",
+      "title": "Cloud: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot sitting on a small fluffy cloud"
@@ -9687,7 +9687,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Ideas — auth globe pin",
+      "title": "Ideas: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding up a glowing light bulb"
@@ -9699,7 +9699,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Numbers — auth globe pin",
+      "title": "Numbers: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot stacking small plain coloured blocks"
@@ -9711,7 +9711,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Web — auth globe pin",
+      "title": "Web: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding a small wireframe globe"
@@ -9723,7 +9723,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Goals — auth globe pin",
+      "title": "Goals: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot beside a small round target with a dart in the bullseye"
@@ -9735,7 +9735,7 @@
       "courseTitle": "Auth pages",
       "lesson": "index",
       "category": "auth-globe-pin",
-      "title": "Achievements — auth globe pin",
+      "title": "Achievements: auth globe pin",
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding up a bright star"

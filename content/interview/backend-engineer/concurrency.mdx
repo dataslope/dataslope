@@ -148,7 +148,7 @@ async def main():
         fetch("a", 0.02),
         fetch("b", 0.01),
     )
-    print(results)   # ['a done', 'b done'] — gather preserves argument order
+    print(results)   # ['a done', 'b done'] (gather preserves argument order)
 
 asyncio.run(main())`,
     },
@@ -184,7 +184,7 @@ def square(n):
 with ThreadPoolExecutor(max_workers=4) as pool:
     results = list(pool.map(square, range(6)))
 
-print(results)   # [0, 1, 4, 9, 16, 25] — map preserves input order`,
+print(results)   # [0, 1, 4, 9, 16, 25] (map preserves input order)`,
     },
   ]}
 />

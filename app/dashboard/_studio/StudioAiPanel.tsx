@@ -131,7 +131,7 @@ export function StudioAiPanel() {
         </button>
       </div>
       <p className="px-4 text-xs leading-relaxed" style={{ color: "var(--faint)" }}>
-        Drafts fill the form on the left — you review and edit everything before
+        Drafts fill the form on the left, and you review and edit everything before
         publishing.
       </p>
 

@@ -58,10 +58,10 @@ You can also match on an element's **attributes**, not just its tag or class.
 Wrap the attribute in square brackets, and add an operator to match part of the
 value:
 
-- `[type="text"]` — exact match.
-- `[href^="https"]` — value **starts with** (`^`).
-- `[href$=".pdf"]` — value **ends with** (`$`).
-- `[class*="btn"]` — value **contains** (`*`).
+- `[type="text"]`, exact match.
+- `[href^="https"]`, value **starts with** (`^`).
+- `[href$=".pdf"]`, value **ends with** (`$`).
+- `[class*="btn"]`, value **contains** (`*`).
 
 This is how you style all external links green, or flag every password field,
 without adding a single extra class:
@@ -117,7 +117,7 @@ The descendant vs. child distinction is the one to burn in. `.menu li` reaches
   title="Child combinator (top level) vs. descendant (all levels)"
   background="#ffffff"
   html={`<div class="col">
-  <p class="label">.menu li  — every item, nested included</p>
+  <p class="label">.menu li: every item, nested included</p>
   <ul class="menu descendant">
     <li>Fruit
       <ul>
@@ -129,7 +129,7 @@ The descendant vs. child distinction is the one to burn in. `.menu li` reaches
   </ul>
 </div>
 <div class="col">
-  <p class="label">.menu &gt; li  — direct children only</p>
+  <p class="label">.menu &gt; li: direct children only</p>
   <ul class="menu child">
     <li>Fruit
       <ul>

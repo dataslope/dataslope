@@ -454,7 +454,7 @@ says otherwise.
 />
 
 <MultipleChoice
-  markdown={`\`orders.merge(customers, on="customer_id", how="left")\` — which rows survive?
+  markdown={`\`orders.merge(customers, on="customer_id", how="left")\`: which rows survive?
 
 - Only the \`customer_id\` values present in both frames.
   > That describes \`how="inner"\`, which is also the pandas default.
@@ -799,7 +799,7 @@ says otherwise.
 - The data is normally distributed around 50.
   > A normal distribution has spread by definition.
 - [o] Every value in the dataset is exactly 50.
-  > Zero spread means no deviation from the mean at all — usually a sign of a broken join, a default value, or a constant column rather than a real finding.
+  > Zero spread means no deviation from the mean at all, usually a sign of a broken join, a default value, or a constant column rather than a real finding.
 - The values are evenly spread around 50.
   > An even spread would produce a positive standard deviation.
 - The dataset is empty.
@@ -809,11 +809,11 @@ says otherwise.
 <MultipleChoice
   markdown={`What is the median of \`2, 4, 4, 5, 100\`, and what does comparing it to the mean tell you?
 
-- Median 4, mean 4 — the distribution is symmetric.
+- Median 4, mean 4: the distribution is symmetric.
   > The mean is \`115 / 5 = 23\`, nowhere near 4.
-- [o] Median 4, mean 23 — the gap flags a large outlier pulling the mean up.
+- [o] Median 4, mean 23: the gap flags a large outlier pulling the mean up.
   > The median moves by at most one position when a single value changes; the mean absorbs the full magnitude. That contrast is the quickest outlier check there is.
-- Median 5, mean 23 — the middle value is 5.
+- Median 5, mean 23: the middle value is 5.
   > With five sorted values the middle position is the third, which is 4.
 - Median 100, because the median is the largest value.
   > The largest value is the maximum; the median is the middle one.`}
@@ -1143,7 +1143,7 @@ says otherwise.
 - [o] It removes the back-and-forth of matching a color swatch to a line, putting the name where the reader's eye already is.
   > It also survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
 - Direct labels let you fit more series on one chart.
-  > More series makes labelling harder, not easier — labels start colliding.
+  > More series makes labelling harder, not easier; labels start colliding.
 - Legends are only for bar charts.
   > Legends are used across every chart type.`}
 />

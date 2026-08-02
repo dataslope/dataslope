@@ -16,7 +16,7 @@ export default function ShareError({
       error={error}
       reset={reset}
       title="This shared playground didn't load"
-      message="A temporary problem interrupted opening this share link. It usually clears up on retry — the shared workspace itself is safe."
+      message="A temporary problem interrupted opening this share link. It usually clears up on retry, and the shared workspace itself is safe."
     />
   );
 }

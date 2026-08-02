@@ -298,13 +298,13 @@ Custom exceptions make your code **self-documenting**: `except InsufficientFunds
 
 Every exception inherits from `BaseException`. The ones you usually care about inherit from `Exception` (which itself inherits from `BaseException`). A few useful built-ins:
 
-- `ValueError` – right type, wrong value (`int("oops")`)
-- `TypeError` – wrong type entirely (`len(5)`)
-- `KeyError` / `IndexError` – missing dict key / list index
-- `AttributeError` – missing attribute
-- `FileNotFoundError` / `OSError` – filesystem trouble
-- `RuntimeError` – generic, "something else went wrong"
-- `StopIteration` – an iterator is exhausted
+- `ValueError`, right type, wrong value (`int("oops")`)
+- `TypeError`, wrong type entirely (`len(5)`)
+- `KeyError` / `IndexError`, missing dict key / list index
+- `AttributeError`, missing attribute
+- `FileNotFoundError` / `OSError`, filesystem trouble
+- `RuntimeError`, generic, "something else went wrong"
+- `StopIteration`, an iterator is exhausted
 
 `Exception` catches "every normal error". **Do not** catch `BaseException` casually; it includes `KeyboardInterrupt` and `SystemExit`, which you usually want to let through.
 

@@ -18,7 +18,7 @@ export default function DashboardError({
       error={error}
       reset={reset}
       title="This dashboard page didn't load"
-      message="A temporary problem interrupted loading this view. Retry, or pick another section from the sidebar — your saved work is not affected."
+      message="A temporary problem interrupted loading this view. Retry, or pick another section from the sidebar. Your saved work is not affected."
       fullScreen={false}
     />
   );

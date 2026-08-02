@@ -102,7 +102,7 @@ reasoning and runnable code.
 - Track whether each node has been visited before.
   > A revisited node may simply be reachable by two different paths, which is not a cycle.
 - [o] Track nodes currently on the recursion stack; an edge back to one of those is a back edge and therefore a cycle.
-  > Three colors — unvisited, in-progress, done — is the standard encoding. Kahn's algorithm is the iterative alternative.
+  > Three colors (unvisited, in-progress, done) is the standard encoding. Kahn's algorithm is the iterative alternative.
 - Count edges and compare to nodes minus one.
   > That test applies to undirected trees only.
 - Run BFS from every node.
@@ -141,7 +141,7 @@ reasoning and runnable code.
 - O(log n) and O(log n).
   > Only a balanced tree guarantees the worst case.
 - [o] O(log n) average, O(n) worst case when inserted in sorted order and the tree degenerates into a linked list.
-  > Self-balancing variants — red-black, AVL — restore the O(log n) guarantee.
+  > Self-balancing variants (red-black, AVL) restore the O(log n) guarantee.
 - O(1) and O(log n).
   > Constant-time search would require hashing.
 - O(n) and O(n log n).
@@ -154,7 +154,7 @@ reasoning and runnable code.
 - Pre-order.
   > Pre-order visits the node before its left subtree, so it yields the root first.
 - [o] In-order.
-  > Left, node, right — which is exactly ascending key order for a BST, and the reason in-order traversal is the standard way to validate one.
+  > Left, node, right. That is exactly ascending key order for a BST, and the reason in-order traversal is the standard way to validate one.
 - Post-order.
   > Post-order visits both subtrees before the node, useful for deletion and expression evaluation.
 - Level-order.
@@ -166,7 +166,7 @@ reasoning and runnable code.
 
 - Finding the k largest elements.
   > That is a heap's job.
-- [o] Prefix queries over a set of strings — autocomplete, longest-common-prefix, dictionary matching — in time proportional to the key length rather than the set size.
+- [o] Prefix queries over a set of strings (autocomplete, longest-common-prefix, dictionary matching) in time proportional to the key length rather than the set size.
   > The trade is memory: a node per character can dwarf a hash set unless the keys share prefixes heavily.
 - Range queries over numbers.
   > A balanced BST or a sorted array serves ranges better.
@@ -192,7 +192,7 @@ reasoning and runnable code.
 
 - Sorting a nearly-sorted array.
   > That calls for insertion sort or a heap.
-- [o] Problems over contiguous subarrays or substrings, by extending and shrinking a window instead of re-examining every subarray — turning O(n²) into O(n).
+- [o] Problems over contiguous subarrays or substrings, by extending and shrinking a window instead of re-examining every subarray, turning O(n²) into O(n).
   > "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.
 - Searching an unsorted array.
   > A window offers nothing over a linear scan there.
@@ -205,7 +205,7 @@ reasoning and runnable code.
 
 - On reverse-sorted input; nothing can be done.
   > Pivot choice can be fixed.
-- [o] When the pivot consistently splits off one element — sorted input with a first-element pivot is the classic trigger — mitigated by a random or median-of-three pivot.
+- [o] When the pivot consistently splits off one element (sorted input with a first-element pivot is the classic trigger), mitigated by a random or median-of-three pivot.
   > Introsort goes further, switching to heapsort once recursion gets too deep, which is what most standard libraries ship.
 - On input with many duplicates; mitigated by using a stable sort.
   > Duplicates hurt naive partitioning, but three-way partitioning fixes that specifically.
@@ -260,7 +260,7 @@ reasoning and runnable code.
 - [o] When the graph is dense, or when you need O(1) edge-existence checks.
   > A sparse graph with a million nodes would need a terabyte-scale matrix, which is why lists are the default.
 - When the graph is a tree.
-  > A tree is maximally sparse — the worst case for a matrix.
+  > A tree is maximally sparse, the worst case for a matrix.
 - When edges are weighted.
   > Both representations carry weights fine.`}
 />
@@ -270,7 +270,7 @@ reasoning and runnable code.
 
 - That it fits in memory.
   > True but not the distinguishing requirement.
-- [o] Some exploitable order or structure — usually sortedness — so moving a pointer lets you rule out a whole range of possibilities.
+- [o] Some exploitable order or structure (usually sortedness), so moving a pointer lets you rule out a whole range of possibilities.
   > "Find two numbers summing to a target in a sorted array" is O(n) with two pointers and O(n log n) if you have to sort first.
 - That it contains no duplicates.
   > Duplicates are usually handled with a small skip step.
@@ -311,7 +311,7 @@ reasoning and runnable code.
 
 - Only \`GET\`.
   > Several others are too.
-- [o] \`GET\`, \`PUT\`, \`DELETE\`, and \`HEAD\` — repeating the request leaves the server in the same state.
+- [o] \`GET\`, \`PUT\`, \`DELETE\`, and \`HEAD\`: repeating the request leaves the server in the same state.
   > \`DELETE\` is idempotent even though the second call returns 404: the *state* is the same. \`POST\` and \`PATCH\` generally are not.
 - All of them, since HTTP is stateless.
   > Statelessness of the protocol says nothing about the effect of a request.
@@ -337,7 +337,7 @@ reasoning and runnable code.
 
 - 401 means the resource does not exist; 403 means it does but is private.
   > A hidden resource is usually 404 on purpose.
-- [o] 401 means unauthenticated — the request lacks valid credentials; 403 means authenticated but not permitted.
+- [o] 401 means unauthenticated, the request lacks valid credentials; 403 means authenticated but not permitted.
   > "Who are you?" versus "I know who you are and the answer is still no."
 - 401 is for expired tokens only.
   > An absent token is 401 too.
@@ -364,7 +364,7 @@ reasoning and runnable code.
 - Offsets are limited to 10,000 rows.
   > No such universal limit exists, though some engines impose one.
 - [o] Deep offsets force the database to scan and discard everything before them, and rows inserted mid-pagination shift the window so items are skipped or repeated.
-  > Cursor (keyset) pagination — "everything after this sorted key" — avoids both problems.
+  > Cursor (keyset) pagination, meaning "everything after this sorted key", avoids both problems.
 - It cannot be combined with sorting.
   > It requires sorting to be meaningful at all.
 - It requires a stateful server.
@@ -455,7 +455,7 @@ reasoning and runnable code.
 - When the API serves mobile clients.
   > Client type does not decide this.
 - [o] When you need immediate revocation, since a session can be deleted server-side while a signed token stays valid until it expires.
-  > The workarounds — very short expiry plus refresh tokens, or a revocation list — reintroduce the server-side state JWTs were meant to avoid.
+  > The workarounds (very short expiry plus refresh tokens, or a revocation list) reintroduce the server-side state JWTs were meant to avoid.
 - When the payload is large.
   > A large payload argues *for* a session, since the token travels on every request, but revocation is the decisive point.
 - When you have multiple servers.
@@ -466,7 +466,7 @@ reasoning and runnable code.
   markdown={`Is HATEOAS required for an API to be useful?
 
 - Yes; without it the API is not REST.
-  > Strictly, Fielding's model does require it — which is why almost no popular "REST" API is fully RESTful.
+  > Strictly, Fielding's model does require it, which is why almost no popular "REST" API is fully RESTful.
 - [o] It is a formal REST constraint, but most successful HTTP APIs omit it and are perfectly usable with documentation and stable URLs.
   > Knowing both the definition and the industry reality is the answer an interviewer is looking for.
 - No; it was removed from the REST specification.
@@ -509,7 +509,7 @@ reasoning and runnable code.
 - Two threads competing for the same lock.
   > Lock contention is expected behavior, not a bug.
 - [o] Behavior that depends on the unpredictable interleaving of operations, so the result varies between runs.
-  > \`x = x + 1\` is three operations — read, add, write — and two threads can interleave them to lose an update.
+  > \`x = x + 1\` is three operations (read, add, write), and two threads can interleave them to lose an update.
 - A thread that runs faster than expected.
   > Speed alone is not a correctness problem.
 - A deadlock that resolves itself.
@@ -522,7 +522,7 @@ reasoning and runnable code.
 - Two threads, two locks, one CPU, and no timeout.
   > These are incidental to one example rather than the general conditions.
 - [o] Mutual exclusion, hold-and-wait, no preemption, and circular wait.
-  > Breaking any one prevents deadlock — which is why a global lock ordering, breaking circular wait, is the usual practical fix.
+  > Breaking any one prevents deadlock, which is why a global lock ordering, breaking circular wait, is the usual practical fix.
 - Starvation, livelock, priority inversion, and contention.
   > These are other concurrency pathologies.
 - Shared memory, threads, locks, and recursion.
@@ -718,7 +718,7 @@ reasoning and runnable code.
 
 - That each transaction runs on its own connection.
   > Connection topology is unrelated.
-- [o] That concurrent transactions do not observe each other's partial state — to a degree determined by the isolation level.
+- [o] That concurrent transactions do not observe each other's partial state, to a degree determined by the isolation level.
   > "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
 - That the database is isolated from network failures.
   > Durability and replication cover failure scenarios.
@@ -770,7 +770,7 @@ reasoning and runnable code.
 
 - The table needs to be vacuumed.
   > Bloat can contribute, but it is not what the line says.
-- [o] No usable index exists for the predicate, or the planner judged a scan cheaper — often because the filter is not sargable, as with a function applied to the column.
+- [o] No usable index exists for the predicate, or the planner judged a scan cheaper, often because the filter is not sargable, as with a function applied to the column.
   > \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
 - The query returns too many columns.
   > Column count affects width, not scan choice.
@@ -902,7 +902,7 @@ reasoning and runnable code.
 
 - That subclasses implement every parent method.
   > Implementing them is not enough if the behavior differs.
-- [o] That a subclass can stand in for its parent without breaking any caller's expectations — no strengthened preconditions, no weakened postconditions.
+- [o] That a subclass can stand in for its parent without breaking any caller's expectations: no strengthened preconditions, no weakened postconditions.
   > A \`Square\` extending \`Rectangle\` violates it: code that sets width and height independently breaks.
 - That every class have exactly one parent.
   > Single inheritance is a language rule in some languages, not this principle.
@@ -981,7 +981,7 @@ reasoning and runnable code.
 - \`is\` compares values and \`==\` compares types.
   > Neither is right.
 - [o] \`is\` tests whether two names refer to the same object; \`==\` calls \`__eq__\` to test equality of value.
-  > Small integers and short strings are interned, so \`is\` sometimes appears to work on values — which is precisely what makes the bug intermittent.
+  > Small integers and short strings are interned, so \`is\` sometimes appears to work on values, which is precisely what makes the bug intermittent.
 - They are equivalent for immutable types.
   > Interning makes them *appear* equivalent, which is not the same as being so.
 - \`is\` is faster and otherwise identical.
@@ -1072,7 +1072,7 @@ reasoning and runnable code.
 - That its block runs only when no exception was raised.
   > It runs in either case; that is the point.
 - [o] That its block runs on the way out of the \`try\`, whether that exit is normal completion, an exception, or a \`return\`.
-  > A \`return\` inside \`finally\` will even override one from the \`try\` block — legal, and a reliable way to confuse the next reader.
+  > A \`return\` inside \`finally\` will even override one from the \`try\` block. That is legal, and a reliable way to confuse the next reader.
 - That exceptions in the \`try\` block are suppressed.
   > Suppression requires an \`except\` clause.
 - That the code runs in a separate thread.
@@ -1123,7 +1123,7 @@ reasoning and runnable code.
 
 - O(log n), because a \`dict\` is a balanced tree.
   > Python's \`dict\` is a hash table, not a tree.
-- [o] O(1) average for lookup, insert, and delete, because keys are hashed to a slot — which is also why keys must be hashable and therefore effectively immutable.
+- [o] O(1) average for lookup, insert, and delete, because keys are hashed to a slot, which is also why keys must be hashable and therefore effectively immutable.
   > Worst case degrades to O(n) under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
 - O(1) for lookup but O(n) for insert.
   > Insertion is amortized O(1); the occasional resize is what "amortized" absorbs.
@@ -1151,7 +1151,7 @@ reasoning and runnable code.
 
 - Lower operational complexity.
   > It is considerably more complex.
-- [o] Headroom past the largest available machine, plus redundancy — losing one node degrades capacity instead of causing an outage.
+- [o] Headroom past the largest available machine, plus redundancy; losing one node degrades capacity instead of causing an outage.
   > It requires stateless services or a way to route state, which is the real cost.
 - Better single-request latency.
   > Latency per request generally does not improve, and cross-node coordination can worsen it.
@@ -1165,7 +1165,7 @@ reasoning and runnable code.
 - The cache reads through to the database on a miss and populates itself.
   > That is read-through, where the cache owns the loading.
 - [o] The application checks the cache, and on a miss reads the database and writes the result into the cache itself.
-  > It keeps the cache optional — the system still works if it is down — which is why it is the most common pattern.
+  > It keeps the cache optional (the system still works if it is down), which is why it is the most common pattern.
 - Writes go to the cache and are flushed to the database later.
   > That is write-behind, with a durability risk on cache failure.
 - The cache is populated by a background job only.
@@ -1229,7 +1229,7 @@ reasoning and runnable code.
 
 - Consistency, availability, and performance.
   > Performance is not one of the three.
-- [o] Consistency and availability — but only when a network partition is happening, since partition tolerance is not optional in a distributed system.
+- [o] Consistency and availability, but only when a network partition is happening, since partition tolerance is not optional in a distributed system.
   > The everyday version, PACELC, adds the point that even without a partition you trade latency against consistency.
 - Two of consistency, availability, and partition tolerance, freely.
   > The popular "pick two" framing is misleading: partitions occur whether or not you pick them.
@@ -1281,7 +1281,7 @@ reasoning and runnable code.
 
 - When most users have few followers.
   > That is the case it handles best.
-- [o] For accounts with millions of followers, where one post triggers millions of writes — the usual answer is a hybrid, pulling celebrity posts at read time.
+- [o] For accounts with millions of followers, where one post triggers millions of writes; the usual answer is a hybrid, pulling celebrity posts at read time.
   > Fan-out on write optimizes reads at the cost of write amplification; the tail of the follower distribution is what breaks it.
 - When the feed must be chronological.
   > Ordering works under either strategy.
@@ -1321,7 +1321,7 @@ reasoning and runnable code.
 - The exact price of each cloud instance type.
   > Pricing changes constantly and is rarely the crux.
 - [o] Rough orders of magnitude: memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day.
-  > The numbers only need to be right to an order of magnitude — enough to say whether something fits in memory or needs a different design.
+  > The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.
 - The number of cores in the latest server CPUs.
   > Occasionally useful, rarely decisive.
 - The default configuration values of your database.

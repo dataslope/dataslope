@@ -84,7 +84,7 @@ const r4: Profile<{ name: string }> = { kind: "failed", error: "404" };
 const render = <A,>(p: Profile<A>, show: (a: A) => string): string => {
   switch (p.kind) {
     case "idle":
-      return "—";
+      return "none";
     case "loading":
       return "loading...";
     case "loaded":

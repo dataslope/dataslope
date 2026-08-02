@@ -24,7 +24,7 @@ reasoning and runnable examples.
 - A parameter is numeric; a statistic can be categorical.
   > Both are numeric summaries.
 - [o] A parameter describes a population and is usually unknown; a statistic is computed from a sample and is used to estimate it.
-  > The Greek-versus-Latin notation convention — μ and σ against x̄ and s — exists to keep the two visually distinct.
+  > The Greek-versus-Latin notation convention (μ and σ against x̄ and s) exists to keep the two visually distinct.
 - A parameter is estimated and a statistic is known exactly.
   > It is the other way round.
 - They are the same quantity at different sample sizes.
@@ -49,7 +49,7 @@ reasoning and runnable examples.
 
 - That large samples are normally distributed.
   > The *data* need not be; the theorem is about the sampling distribution of the mean.
-- [o] That the sampling distribution of the mean approaches normality as n grows, regardless of the population's shape — but it says nothing about the shape of the data itself.
+- [o] That the sampling distribution of the mean approaches normality as n grows, regardless of the population's shape, but it says nothing about the shape of the data itself.
   > It is why a t-test on skewed data is often still fine at a reasonable sample size.
 - That any dataset becomes normal with enough observations.
   > Income data stays skewed no matter how much you collect.
@@ -128,7 +128,7 @@ reasoning and runnable examples.
 - Whether two variances are equal.
   > That is an F-test of variances, related but different.
 - [o] Whether the means of three or more groups are all equal, by comparing between-group to within-group variability.
-  > A significant result says at least one group differs, without saying which — that needs a post-hoc test with a multiplicity correction.
+  > A significant result says at least one group differs, without saying which; that needs a post-hoc test with a multiplicity correction.
 - Whether a regression coefficient is zero.
   > That is a t-test on the coefficient.
 - Whether residuals are normally distributed.
@@ -153,7 +153,7 @@ reasoning and runnable examples.
 
 - The probability of a Type I error.
   > That is α.
-- [o] The probability of detecting a real effect when one exists — raised by a larger sample, a larger true effect, lower variance, or a higher α.
+- [o] The probability of detecting a real effect when one exists, raised by a larger sample, a larger true effect, lower variance, or a higher α.
   > Power is the quantity that determines whether "no significant difference" is informative or meaningless.
 - The magnitude of the observed effect.
   > That is effect size.
@@ -192,7 +192,7 @@ reasoning and runnable examples.
 
 - Computing a p-value incorrectly.
   > A calculation error is a different mistake.
-- [o] Trying variations — extra covariates, different subgroups, more data collection — until something crosses 0.05, then reporting only that.
+- [o] Trying variations (extra covariates, different subgroups, more data collection) until something crosses 0.05, then reporting only that.
   > The published p-value is then uninterpretable, because the search that produced it is invisible. Pre-registration is the structural fix.
 - Using a one-sided test.
   > A one-sided test chosen in advance for a directional hypothesis is legitimate.
@@ -325,7 +325,7 @@ reasoning and runnable examples.
 - No; both remaining doors are equally likely.
   > This ignores that the host's choice is constrained by knowledge.
 - [o] Yes; your original door keeps its 1/3 probability, and the host's informed reveal concentrates the remaining 2/3 on the other door.
-  > If the host opened a door at random and it happened to be empty, the intuition would change — the host's knowledge is the load-bearing assumption.
+  > If the host opened a door at random and it happened to be empty, the intuition would change; the host's knowledge is the load-bearing assumption.
 - Yes, because the probability becomes 1/2.
   > Switching wins 2/3 of the time, not 1/2.
 - It makes no difference to the long-run outcome.
@@ -363,7 +363,7 @@ reasoning and runnable examples.
 
 - Less than 1/2, since tails is due.
   > That is the gambler's fallacy.
-- [o] 1/2, since the coin is stated to be fair and flips are independent — though 10 heads is itself weak evidence to re-examine that assumption.
+- [o] 1/2, since the coin is stated to be fair and flips are independent, though 10 heads is itself weak evidence to re-examine that assumption.
   > Both halves matter: independence given fairness, and the sensible instinct to question fairness after an unlikely run.
 - More than 1/2, since the coin is clearly biased.
   > Under the stated assumption of fairness it is exactly 1/2; suspecting bias is a separate, Bayesian, question.
@@ -389,7 +389,7 @@ reasoning and runnable examples.
 
 - \`P(A|B) = P(A)P(B)\`, used when events are independent.
   > That is the definition of independence, not Bayes' theorem.
-- [o] \`P(A|B) = P(B|A)P(A) / P(B)\`, used to invert a conditional — turning "probability of the evidence given the hypothesis" into "probability of the hypothesis given the evidence".
+- [o] \`P(A|B) = P(B|A)P(A) / P(B)\`, used to invert a conditional, turning "probability of the evidence given the hypothesis" into "probability of the hypothesis given the evidence".
   > Diagnostic testing, spam filtering, and any question where the base rate matters more than the test's accuracy.
 - \`P(A|B) = P(A ∩ B)\`, used for joint distributions.
   > The joint probability is the numerator before dividing by \`P(B)\`.
@@ -402,7 +402,7 @@ reasoning and runnable examples.
 
 - When the probability of success is above 0.5.
   > The success probability is not the criterion.
-- [o] When events occur at some average rate over an interval and there is no fixed number of trials — support tickets per hour, defects per metre.
+- [o] When events occur at some average rate over an interval and there is no fixed number of trials: support tickets per hour, defects per metre.
   > Binomial converges to Poisson when n is large and p is small, which is why the two so often approximate each other.
 - When trials are dependent.
   > Both assume independence.
@@ -429,7 +429,7 @@ reasoning and runnable examples.
 - 1/12.
   > This undercounts the ways to make 7.
 - [o] 6/36 = 1/6.
-  > Six of the 36 equally likely ordered pairs sum to 7, which is more than any other total — the reason 7 is the modal sum.
+  > Six of the 36 equally likely ordered pairs sum to 7, which is more than any other total, the reason 7 is the modal sum.
 - 1/36.
   > That is the probability of one specific pair.
 - 7/36.
@@ -495,7 +495,7 @@ reasoning and runnable examples.
 
 - When false positives are expensive.
   > That argues for precision.
-- [o] When missing a positive case is costly — disease screening, fraud detection, safety alerts — and a follow-up step can filter false alarms.
+- [o] When missing a positive case is costly (disease screening, fraud detection, safety alerts), and a follow-up step can filter false alarms.
   > The threshold is a business decision, which is why reporting the full precision-recall curve is more useful than a single F1 number.
 - When the classes are balanced.
   > Balance does not determine which error matters more.
@@ -573,7 +573,7 @@ reasoning and runnable examples.
 
 - For every model.
   > Trees are scale-invariant.
-- [o] For distance-based and gradient-based methods — kNN, SVM, k-means, PCA, regularized linear models, neural networks — where feature magnitude affects the objective or the geometry.
+- [o] For distance-based and gradient-based methods (kNN, SVM, k-means, PCA, regularized linear models, neural networks), where feature magnitude affects the objective or the geometry.
   > Regularization is easy to forget here: an unscaled feature is penalized differently purely because of its units.
 - Only for classification problems.
   > It applies to regression too.
@@ -586,7 +586,7 @@ reasoning and runnable examples.
 
 - Always oversample the minority class to 50/50.
   > Forcing balance distorts the base rate and can hurt calibration.
-- [o] Pick a metric that survives imbalance, then consider class weights, resampling, or threshold tuning — validating each against the actual decision cost.
+- [o] Pick a metric that survives imbalance, then consider class weights, resampling, or threshold tuning, validating each against the actual decision cost.
   > Often the most useful move is adjusting the decision threshold on a well-calibrated model rather than touching the training data.
 - Drop the minority class.
   > That removes the thing being predicted.
@@ -599,7 +599,7 @@ reasoning and runnable examples.
 
 - One-hot encoding, always.
   > Thousands of columns makes the matrix sparse and unwieldy.
-- [o] Target or frequency encoding computed inside the cross-validation folds, or an embedding — with care, since target encoding leaks if fitted on all the data.
+- [o] Target or frequency encoding computed inside the cross-validation folds, or an embedding, with care, since target encoding leaks if fitted on all the data.
   > Grouping rare levels into an "other" bucket is often the simplest effective step.
 - Label encoding with arbitrary integers.
   > It imposes a false ordering that linear models and distance metrics will act on.
@@ -639,7 +639,7 @@ reasoning and runnable examples.
 - Its accuracy is above a threshold.
   > Accuracy says nothing about probability quality.
 - [o] Among cases it assigns a 70% probability, about 70% are actually positive.
-  > It matters whenever the score feeds a downstream decision with a cost — expected-value ranking, pricing, triage. Platt scaling and isotonic regression are the usual fixes.
+  > It matters whenever the score feeds a downstream decision with a cost: expected-value ranking, pricing, triage. Platt scaling and isotonic regression are the usual fixes.
 - Its predictions are evenly spread across [0, 1].
   > A well-calibrated model can concentrate its predictions anywhere.
 - It has been trained on balanced classes.
@@ -651,7 +651,7 @@ reasoning and runnable examples.
 
 - Randomly, then prunes the bad ones.
   > Random splits belong to extremely randomized trees.
-- [o] By searching candidate feature-threshold pairs for the one that most reduces impurity — Gini or entropy for classification, variance for regression.
+- [o] By searching candidate feature-threshold pairs for the one that most reduces impurity: Gini or entropy for classification, variance for regression.
   > The search is greedy and local, which is why a single tree is unstable and ensembles help so much.
 - By maximizing accuracy on a validation set at each node.
   > Splits are chosen on training impurity, not a validation set.
@@ -731,7 +731,7 @@ reasoning and runnable examples.
 
 - Too large a learning rate; lower it.
   > That causes divergence, the opposite problem.
-- [o] Repeatedly multiplying small derivatives through deep networks — sigmoid and tanh saturate — mitigated by ReLU-family activations, residual connections, and careful initialization.
+- [o] Repeatedly multiplying small derivatives through deep networks (sigmoid and tanh saturate), mitigated by ReLU-family activations, residual connections, and careful initialization.
   > Residual connections are the biggest single reason very deep networks became trainable.
 - Too few parameters; add layers.
   > More layers deepen the problem.
@@ -745,7 +745,7 @@ reasoning and runnable examples.
 - It removes unhelpful neurons permanently.
   > Nothing is removed permanently.
 - [o] It randomly zeroes a fraction of activations during training, forcing redundant representations; at inference it is disabled and activations are scaled accordingly.
-  > Forgetting to switch to evaluation mode is the classic bug — the model then makes stochastic predictions.
+  > Forgetting to switch to evaluation mode is the classic bug; the model then makes stochastic predictions.
 - It drops training examples with high loss.
   > Examples are not dropped.
 - It reduces the learning rate over time.
@@ -797,7 +797,7 @@ reasoning and runnable examples.
 - A weighted average of the previous layer's outputs with learned fixed weights.
   > The weights are computed from the input, not fixed.
 - [o] For each position, a weighted sum of all positions' values, where the weights come from the compatibility of that position's query with every key.
-  > Because every position attends to every other, cost grows quadratically with sequence length — the bottleneck long-context work keeps attacking.
+  > Because every position attends to every other, cost grows quadratically with sequence length, the bottleneck long-context work keeps attacking.
 - The correlation between adjacent tokens.
   > It is not restricted to adjacency; that is a convolution.
 - A recurrent update over the sequence.
@@ -900,7 +900,7 @@ reasoning and runnable examples.
 
 - It reduces the parameter count.
   > Parameters are roughly comparable, since each head is narrower.
-- [o] Each head attends in a different learned subspace, so the layer can track several kinds of relationship — syntactic, positional, semantic — at once.
+- [o] Each head attends in a different learned subspace, so the layer can track several kinds of relationship (syntactic, positional, semantic) at once.
   > The heads run in parallel and are concatenated, so the cost is largely unchanged.
 - It makes attention linear in sequence length.
   > Cost stays quadratic; that is a separate research direction.
@@ -954,7 +954,7 @@ reasoning and runnable examples.
 
 - Proving two variants are identical.
   > Exact equality cannot be established statistically.
-- [o] Showing a change is not worse than the control by more than a pre-specified margin — the right frame for a migration or simplification that is expected to be neutral.
+- [o] Showing a change is not worse than the control by more than a pre-specified margin, the right frame for a migration or simplification that is expected to be neutral.
   > A standard test failing to reject the null does not demonstrate equivalence, which is the gap this fills.
 - Testing more than two variants at once.
   > That is a multi-arm test.
@@ -980,7 +980,7 @@ reasoning and runnable examples.
 
 - When the sample is small; run it longer.
   > Duration is a fix, not an alternative method.
-- [o] When randomization is impossible or unethical — a pricing change across a whole market, a legally mandated feature — where difference-in-differences, synthetic control, or an interrupted time series substitute.
+- [o] When randomization is impossible or unethical (a pricing change across a whole market, a legally mandated feature), where difference-in-differences, synthetic control, or an interrupted time series substitute.
   > These are weaker causally and demand explicit assumptions about what the counterfactual would have done.
 - When the metric is a ratio; use a proportion test.
   > Ratio metrics are testable with care.
@@ -1125,7 +1125,7 @@ reasoning and runnable examples.
 
 - Whether a competitor launched something.
   > External causes rarely produce a clean overnight step.
-- [o] Whether the metric itself broke — a logging change, a failed pipeline, a client release that stopped firing an event — before investigating user behavior.
+- [o] Whether the metric itself broke (a logging change, a failed pipeline, a client release that stopped firing an event), before investigating user behavior.
   > A sharp discontinuity is far more often an instrumentation change than a real behavioral one. After that: segment by platform, geography, version, and cohort.
 - Whether to roll back the most recent release.
   > Rolling back before diagnosing may remove the evidence.
@@ -1138,7 +1138,7 @@ reasoning and runnable examples.
 
 - Metrics degrade over time as data quality falls.
   > Data decay is a separate problem.
-- [o] When a measure becomes a target it stops being a good measure — teams optimize the proxy in ways that leave the underlying goal untouched or worse.
+- [o] When a measure becomes a target it stops being a good measure; teams optimize the proxy in ways that leave the underlying goal untouched or worse.
   > Optimizing "tickets closed" produces fast closures rather than resolved problems. Guardrails and paired counter-metrics are the practical defence.
 - Correlated metrics eventually diverge.
   > Divergence is not the mechanism.
@@ -1164,7 +1164,7 @@ reasoning and runnable examples.
 
 - Wait until it is built and measure it.
   > That defeats the purpose of prioritization.
-- [o] Decompose it into a funnel — reachable population × expected adoption × effect per user — anchored on comparable past launches, and state the assumptions as a range.
+- [o] Decompose it into a funnel (reachable population × expected adoption × effect per user), anchored on comparable past launches, and state the assumptions as a range.
   > The value is in exposing which assumption the estimate hinges on, which is usually adoption rather than effect size.
 - Use the largest plausible number to justify the work.
   > An estimate designed to persuade stops being an estimate.
@@ -1191,7 +1191,7 @@ reasoning and runnable examples.
 - Group events by user and day.
   > A calendar day is not a session; one user can have several, and a session can cross midnight.
 - [o] Order events per user, flag each one whose gap from the previous exceeds the timeout, and take a running sum of those flags as the session id.
-  > \`LAG\` supplies the gap and \`SUM(...) OVER (ORDER BY ...)\` accumulates the boundary flags — the gaps-and-islands pattern.
+  > \`LAG\` supplies the gap and \`SUM(...) OVER (ORDER BY ...)\` accumulates the boundary flags, the gaps-and-islands pattern.
 - Use \`DISTINCT\` on user and timestamp.
   > That deduplicates rather than grouping into sessions.
 - Join the events table to itself on user id.
@@ -1242,7 +1242,7 @@ reasoning and runnable examples.
 
 - Any metric that is not revenue.
   > Plenty of non-financial metrics drive good decisions.
-- [o] One that reliably looks good without informing a decision — a cumulative total, or a count that cannot go down. Ask what action a change in it would trigger.
+- [o] One that reliably looks good without informing a decision: a cumulative total, or a count that cannot go down. Ask what action a change in it would trigger.
   > If no plausible movement in the metric would change what the team does next, it is decoration.
 - A metric that is hard to compute.
   > Difficulty is unrelated.

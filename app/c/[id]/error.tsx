@@ -17,7 +17,7 @@ export default function CustomItemError({
       error={error}
       reset={reset}
       title="This challenge didn't load"
-      message="A temporary problem interrupted loading this page. It usually clears up on retry — the challenge itself is safe."
+      message="A temporary problem interrupted loading this page. It usually clears up on retry, and the challenge itself is safe."
     />
   );
 }

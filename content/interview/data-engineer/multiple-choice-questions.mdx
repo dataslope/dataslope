@@ -62,7 +62,7 @@ reasoning and runnable examples.
 
 - It runs once and caches the result.
   > An uncorrelated subquery can be; a correlated one cannot.
-- [o] It references a column from the outer query, so conceptually it re-evaluates per outer row — though modern planners often rewrite it into a join.
+- [o] It references a column from the outer query, so conceptually it re-evaluates per outer row, though modern planners often rewrite it into a join.
   > When the rewrite does not happen, an \`EXISTS\` or an explicit join is the usual remedy.
 - It joins a table to itself.
   > That is a self join.
@@ -75,7 +75,7 @@ reasoning and runnable examples.
 
 - Finding \`NULL\` values in a column.
   > Missing values are a different question.
-- [o] Identifying runs of consecutive values (islands) and the breaks between them (gaps) — consecutive login days, uninterrupted status periods, sessionization.
+- [o] Identifying runs of consecutive values (islands) and the breaks between them (gaps): consecutive login days, uninterrupted status periods, sessionization.
   > The standard trick is a difference between a row number and the value itself, which stays constant within a run and becomes a group key.
 - Detecting duplicate rows.
   > Duplicates are found with a count per key.
@@ -89,7 +89,7 @@ reasoning and runnable examples.
 - \`ROWS BETWEEN 7 PRECEDING AND CURRENT ROW\`
   > That spans 8 rows.
 - [o] \`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\`
-  > Six prior rows plus the current one is seven days — provided the series has no missing days, which is why a date spine often comes first.
+  > Six prior rows plus the current one is seven days, provided the series has no missing days, which is why a date spine often comes first.
 - \`RANGE BETWEEN 7 PRECEDING AND CURRENT ROW\`
   > \`RANGE\` with an interval works on some engines and behaves differently around gaps and ties.
 - \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
@@ -149,7 +149,7 @@ reasoning and runnable examples.
 />
 
 <MultipleChoice
-  markdown={`\`UNION\` versus \`UNION ALL\` — which should be the default in a pipeline, and why?
+  markdown={`\`UNION\` versus \`UNION ALL\`: which should be the default in a pipeline, and why?
 
 - \`UNION\`, because duplicates are always a bug.
   > Deduplicating by default hides real duplicates that should have been investigated.
@@ -167,7 +167,7 @@ reasoning and runnable examples.
 - The table being clustered.
   > Clustering is a separate, complementary mechanism.
 - [o] The query filtering directly on the partition column, in a form the engine can evaluate before reading data.
-  > It is why the partition column should be the one people actually filter on — almost always a date.
+  > It is why the partition column should be the one people actually filter on, almost always a date.
 - The number of partitions being a power of two.
   > No such requirement.
 - Statistics being refreshed.
@@ -205,7 +205,7 @@ reasoning and runnable examples.
 
 - Never; it is always a mistake.
   > It is the correct tool in several modelling situations.
-- [o] When you deliberately need every combination — a date spine crossed with every store, say, to produce a dense grid before joining sparse facts.
+- [o] When you deliberately need every combination: a date spine crossed with every store, say, to produce a dense grid before joining sparse facts.
   > The accidental version, from a missing join condition, is what gives it its reputation.
 - When the join key is missing from one table.
   > A missing key is a modelling problem to fix, not to cross-join around.
@@ -272,7 +272,7 @@ reasoning and runnable examples.
 
 - Every table has a primary key.
   > That is closer to 1NF's spirit and a general requirement.
-- [o] Every non-key attribute depends on the key, the whole key, and nothing but the key — so no transitive dependencies remain.
+- [o] Every non-key attribute depends on the key, the whole key, and nothing but the key, so no transitive dependencies remain.
   > It is what prevents the same fact being stored in two places and drifting apart under update.
 - Every column holds an atomic value.
   > That is 1NF.
@@ -298,7 +298,7 @@ reasoning and runnable examples.
 
 - Two tables using different date formats.
   > Formatting is a parsing issue.
-- [o] Joining or aggregating tables whose rows represent different things — order headers against order lines, say — so measures duplicate or fail to align.
+- [o] Joining or aggregating tables whose rows represent different things (order headers against order lines, say), so measures duplicate or fail to align.
   > The fix is to aggregate one side to the other's grain before joining, rather than joining and hoping.
 - A partition key with the wrong cardinality.
   > That is a partitioning problem.
@@ -350,7 +350,7 @@ reasoning and runnable examples.
 
 - Recording every individual transaction.
   > That is a transaction fact.
-- [o] Capturing state at regular intervals — daily balances, month-end inventory — so questions about levels rather than events can be answered directly.
+- [o] Capturing state at regular intervals (daily balances, month-end inventory), so questions about levels rather than events can be answered directly.
   > Its measures are typically semi-additive: summable across accounts, not across days.
 - Storing a backup of a fact table.
   > It is a modelling pattern, not a backup.
@@ -417,7 +417,7 @@ reasoning and runnable examples.
 
 - Columns compress into a single file per table.
   > File layout is not the mechanism.
-- [o] A query reads only the columns it references, and values within a column are homogeneous so they compress far better — less I/O on both counts.
+- [o] A query reads only the columns it references, and values within a column are homogeneous so they compress far better; less I/O on both counts.
   > It is also why \`SELECT *\` is disproportionately expensive in a columnar store.
 - Columnar formats keep the whole table in memory.
   > Memory residency is unrelated to layout.
@@ -573,7 +573,7 @@ reasoning and runnable examples.
 
 - Nothing; more files parallelize better.
   > Past the parallelism you can actually use, files cost more than they return.
-- [o] Compact them into far fewer, larger files — roughly 128 MB to 1 GB — either at write time or in a periodic compaction job.
+- [o] Compact them into far fewer, larger files (roughly 128 MB to 1 GB), either at write time or in a periodic compaction job.
   > Per-file open, metadata, and object-store request overhead is what dominates otherwise.
 - Switch from Parquet to CSV.
   > That loses columnar reads and compression, making things worse.
@@ -641,7 +641,7 @@ reasoning and runnable examples.
 - Splitting work into many small tasks.
   > Granularity aids retries and observability.
 - [o] A single monolithic task doing extract, transform, and load together, so a failure at the end re-runs everything and the logs say only "failed".
-  > The opposite extreme — thousands of trivial tasks — has its own scheduler overhead, so the balance is per-pipeline.
+  > The opposite extreme (thousands of trivial tasks) has its own scheduler overhead, so the balance is per-pipeline.
 - Declaring explicit dependencies between tasks.
   > That is what a DAG is for.
 - Using sensors to wait for upstream data.
@@ -692,7 +692,7 @@ reasoning and runnable examples.
 
 - A task that stops the DAG at a fixed time.
   > That is a timeout.
-- [o] A check that halts the pipeline when a signal looks badly wrong — row count off by 90%, a source that returned nothing — rather than publishing obviously broken data.
+- [o] A check that halts the pipeline when a signal looks badly wrong (row count off by 90%, a source that returned nothing), rather than publishing obviously broken data.
   > It trades freshness for correctness, which is nearly always the right trade for a reporting pipeline.
 - A retry limit.
   > Retry limits bound attempts, not data quality.
@@ -825,7 +825,7 @@ reasoning and runnable examples.
 - It recomputes the entire lineage.
   > Recomputation happens only on failure.
 - [o] It redistributes data across the network by key, writing intermediate files and serializing everything, so it is bounded by disk and network rather than CPU.
-  > Minimizing shuffles — broadcast joins, pre-partitioning, \`reduceByKey\` over \`groupByKey\` — is most of Spark performance tuning.
+  > Minimizing shuffles (broadcast joins, pre-partitioning, \`reduceByKey\` over \`groupByKey\`) is most of Spark performance tuning.
 - It forces every partition onto one node.
   > That would be a collect, not a shuffle.
 - It disables parallelism.
@@ -955,7 +955,7 @@ reasoning and runnable examples.
 - Spark uses SQL and MapReduce does not.
   > Hive provided SQL over MapReduce.
 - [o] Spark keeps intermediate results in memory across stages and optimizes a whole DAG at once, where MapReduce writes to disk between every map and reduce.
-  > It is why iterative workloads — machine learning, graph algorithms — improved by an order of magnitude.
+  > It is why iterative workloads (machine learning, graph algorithms) improved by an order of magnitude.
 - Spark is single-node and MapReduce is distributed.
   > Both are distributed.
 - MapReduce cannot handle failures.
@@ -980,7 +980,7 @@ reasoning and runnable examples.
 
 - Broadcasts the smaller side to every executor.
   > That is a broadcast hash join.
-- [o] Shuffles both sides by the join key, sorts each partition, and merges them — the general strategy when neither side is small enough to broadcast.
+- [o] Shuffles both sides by the join key, sorts each partition, and merges them, the general strategy when neither side is small enough to broadcast.
   > Pre-partitioning or bucketing both tables on the join key lets the shuffle be skipped on subsequent joins.
 - Joins without any network transfer.
   > Both sides move unless already co-partitioned.
@@ -1047,7 +1047,7 @@ reasoning and runnable examples.
 
 - Nothing; the broker deduplicates.
   > Kafka does not deduplicate on the consumer's behalf.
-- [o] A message can be delivered more than once, so the handler must be idempotent — keyed upserts, or a deduplication store on a message id.
+- [o] A message can be delivered more than once, so the handler must be idempotent: keyed upserts, or a deduplication store on a message id.
   > Most production systems choose at-least-once plus idempotency over the coordination cost of true exactly-once.
 - Messages may be lost but never duplicated.
   > That is at-most-once.
@@ -1164,7 +1164,7 @@ reasoning and runnable examples.
 
 - Commit offsets more frequently.
   > Frequent commits narrow the duplicate window without closing it.
-- [o] Key the work so reprocessing converges — an upsert on a natural key, or a processed-id store checked before acting.
+- [o] Key the work so reprocessing converges: an upsert on a natural key, or a processed-id store checked before acting.
   > Once the handler is idempotent, at-least-once delivery stops being a problem worth engineering around.
 - Process messages in a single thread.
   > Concurrency is not the source of duplicates.
@@ -1177,7 +1177,7 @@ reasoning and runnable examples.
 
 - It determines how long messages are retained.
   > Retention is configured separately.
-- [o] It caps a consumer group's parallelism, and it fixes the unit of ordering — and increasing it later changes key-to-partition mapping, breaking per-key ordering for existing keys.
+- [o] It caps a consumer group's parallelism, and it fixes the unit of ordering, and increasing it later changes key-to-partition mapping, breaking per-key ordering for existing keys.
   > That last point is why partition count is chosen with headroom rather than tuned reactively.
 - It controls the replication factor.
   > Replication is an independent setting.
@@ -1190,7 +1190,7 @@ reasoning and runnable examples.
 
 - Whenever the data volume is large.
   > Large volumes are often better served by batch.
-- [o] When the value of the result decays within minutes — fraud detection, alerting, live personalization — enough to justify the extra operational complexity.
+- [o] When the value of the result decays within minutes (fraud detection, alerting, live personalization), enough to justify the extra operational complexity.
   > Batch is simpler to reason about, cheaper to reprocess, and easier to test; streaming should be a requirement, not a default.
 - Whenever the source is a message queue.
   > A queue can perfectly well be drained in batches.
@@ -1244,7 +1244,7 @@ reasoning and runnable examples.
 
 - Collect all rows into a list, then aggregate.
   > That is the memory profile being avoided.
-- [o] Maintain running accumulators — a running count and sum for a mean, a \`Counter\` keyed by group — updating them as each record passes.
+- [o] Maintain running accumulators (a running count and sum for a mean, a \`Counter\` keyed by group), updating them as each record passes.
   > Some statistics, such as an exact median, genuinely need the full data or an approximation such as a t-digest.
 - Sort the stream first.
   > Sorting requires materializing everything.
@@ -1270,7 +1270,7 @@ reasoning and runnable examples.
 
 - It has no side effects at all.
   > Purity is stronger than needed; the write can have effects as long as they converge.
-- [o] Applying it twice to the same input leaves the same result — typically by keying the output and overwriting rather than appending.
+- [o] Applying it twice to the same input leaves the same result, typically by keying the output and overwriting rather than appending.
   > A function that appends a row per call is not idempotent no matter how pure its computation is.
 - It uses only immutable data structures.
   > Immutability helps but does not determine the write behavior.
@@ -1296,7 +1296,7 @@ reasoning and runnable examples.
 
 - Whenever the data has more than 100 rows.
   > Plain Python is fine well past that.
-- [o] When the work is columnar and vectorizable — group-and-aggregate, joins, time-series resampling — and the data fits comfortably in memory.
+- [o] When the work is columnar and vectorizable (group-and-aggregate, joins, time-series resampling), and the data fits comfortably in memory.
   > Streaming row-at-a-time work with constant memory is where generators still win.
 - Whenever reading a CSV.
   > \`csv\` from the standard library is often the better tool for a streaming read.
@@ -1309,7 +1309,7 @@ reasoning and runnable examples.
 
 - Using too many functions.
   > Function call overhead is rarely the bottleneck.
-- [o] Doing per-row work in the interpreter — \`iterrows\`, \`apply(axis=1)\`, or appending to a DataFrame in a loop — where a vectorized or bulk operation exists.
+- [o] Doing per-row work in the interpreter (\`iterrows\`, \`apply(axis=1)\`, or appending to a DataFrame in a loop), where a vectorized or bulk operation exists.
   > Appending to a DataFrame in a loop is quadratic, since each append copies the whole frame.
 - Reading files instead of databases.
   > Source choice is a design decision, not a pitfall.
