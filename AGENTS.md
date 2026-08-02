@@ -110,7 +110,9 @@ keepers; only the keepers reach git.
    serves, and runs `build-images` to record their dimensions.
 5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
    across a course, clears retired slugs, and is idempotent. Always `--dry-run`
-   first.
+   first. Pass `--collection interview` for an interview-prep track, which pairs
+   pages with `interview-thumbnail` / `interview-illustration` prompts under
+   `content/interview` instead of the `course-*` pair under `content/courses`.
 
 ```bash
 # Bulk run: candidates land in R2 under one run id, promote only the keepers.
@@ -123,6 +125,8 @@ node scripts/remove-background-kie.mjs --from r2 --run 2026-08-foo --concurrency
 node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-foo
 node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
   node scripts/wire-course-figures.mjs <course-dir>
+# …or, for an interview-prep track:
+node scripts/wire-course-figures.mjs --collection interview <role-dir> --dry-run
 
 # Local run: everything on disk, nothing touches R2. Fine for one or two images.
 node scripts/generate-illustrations.mjs run
@@ -323,6 +327,53 @@ each cut-out over the live page background for exactly this reason.
 
 ---
 
+## Prose style
+
+Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by
+`__tests__/proseStyle.test.ts`, which runs as part of `npm test`.
+
+### No em dashes
+
+**Never use an em dash (`—`) in authored prose.** It is banned precisely
+because it is the easy way out: it can stand in for a comma, a colon, a
+semicolon or a full stop, so reaching for it means skipping the decision about
+which relationship the sentence actually has. Pick the right mark instead:
+
+| The aside is | Use |
+| --- | --- |
+| a parenthetical | commas, or parentheses when it already contains commas |
+| an elaboration or a list | a colon |
+| a second independent clause | a semicolon or a full stop |
+
+```markdown
+<!-- Bad -->
+A significant result says at least one group differs, without saying which — that needs a post-hoc test.
+Three colors — unvisited, in-progress, done — is the standard encoding.
+
+<!-- Good -->
+A significant result says at least one group differs, without saying which; that needs a post-hoc test.
+Three colors (unvisited, in-progress, done) is the standard encoding.
+```
+
+**En dashes are fine, unspaced.** They are correct in numeric ranges
+(`1815–1864`) and two-name compounds (`Runge–Kutta`, `bias–variance`). A
+*spaced* en dash (` – `) is the same tic as the em dash and is rejected.
+
+Two things deliberately pass: a lone `—` glyph marking an empty table cell in
+a component (`{col.type || "—"}`) is a typographic convention rather than
+prose, and em dashes inside code comments are not shipped as page text.
+
+### Filler phrases
+
+`AI_FILLER` in the checker holds a short, high-precision list ("delve into",
+"a testament to", "unlock the potential", "let's dive in", …). Keep it that
+way. Words that are ordinary technical vocabulary here must stay out of it:
+**robust** (robust statistics), **leverage** (high-leverage points),
+**underscore** (the `_` character) and **crucial** all have real meanings in
+this material, and a linter that fires on correct prose gets ignored.
+
+---
+
 ## Multiple-choice question explanations
 
 Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners after they submit, regardless of which choice they selected. This means the correct choice's explanation is also shown to learners who picked a wrong answer.
@@ -336,6 +387,46 @@ Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners a
 - `Perfect!`, `Great!`, `Well done!`
 
 Write the explanation as a neutral statement that stands on its own.
+
+### Option length
+
+**The correct option must not be the longest one.** It is the easiest way to
+make a question guessable without reading it: the writer packs the reasoning
+into the right answer and leaves the distractors as stubs. The interview
+question banks were once 94% guessable this way.
+
+The reasoning belongs in the explanation, which every learner sees after
+submitting. Keep the option to the claim itself and let the `>` line carry the
+justification:
+
+```markdown
+<!-- Bad: the answer is obvious from the shape alone -->
+- Only in the learning rate used.
+- [o] Batch uses the whole dataset per update (stable, slow); SGD uses one example
+      (noisy, fast, can escape shallow minima); mini-batch uses a subset and is the
+      practical default.
+- SGD is deterministic and batch is not.
+
+<!-- Good -->
+- Only in the learning rate each one uses.
+- [o] In how many examples each parameter update is computed from.
+  > Batch uses the whole dataset (stable, slow), SGD one example (noisy, fast),
+  > mini-batch a subset. Mini-batch dominates because it keeps a GPU busy.
+- SGD is fully deterministic while batch gradient descent is not.
+```
+
+Lengthening the distractors is the other half, and it makes them better
+distractors: a one-line stub next to three real sentences is not plausible.
+
+`scripts/check-mcq.mjs` enforces two rules over `content/interview/*/
+multiple-choice-questions.mdx`: no single question where the correct option
+exceeds the longest distractor by both 1.4x and 20 characters, and a
+corpus-wide rate below 40% for "correct option is the single longest" (chance
+is 25% with four options; the banks currently sit at 31.5%).
+
+**The course concept-checks are not covered yet** and roughly half of them
+still fail the per-question rule. Extending the guard to them means rewriting
+about 1,400 questions; it has not been done.
 
 ```markdown
 <!-- Bad -->

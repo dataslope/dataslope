@@ -8,6 +8,11 @@ from those who have only read about it. Expect to explain the GIL, race
 conditions, and when threads, processes, or async each win. This page is a
 question bank with a few **runnable** (and deterministic) Python examples.
 
+<Figure
+  slug="interview-backend-engineer-concurrency-cutout"
+  alt="Three parallel lanes on a platform where capsules advance side by side, one lane briefly held by a small lock gate while the others keep moving"
+/>
+
 ## Q&A
 
 ### Concurrency vs parallelism, what is the difference?
@@ -143,7 +148,7 @@ async def main():
         fetch("a", 0.02),
         fetch("b", 0.01),
     )
-    print(results)   # ['a done', 'b done'] — gather preserves argument order
+    print(results)   # ['a done', 'b done'] (gather preserves argument order)
 
 asyncio.run(main())`,
     },
@@ -179,7 +184,7 @@ def square(n):
 with ThreadPoolExecutor(max_workers=4) as pool:
     results = list(pool.map(square, range(6)))
 
-print(results)   # [0, 1, 4, 9, 16, 25] — map preserves input order`,
+print(results)   # [0, 1, 4, 9, 16, 25] (map preserves input order)`,
     },
   ]}
 />

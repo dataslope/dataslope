@@ -18,7 +18,8 @@
 //                            statement's truth value.
 //
 // Used both as a CLI (`node scripts/check-mcq.mjs [files...]`, defaults to
-// all course + fumadocs-dev content) and as a library by __tests__/mcqContent.test.ts.
+// all course + interview + fumadocs-dev content) and as a library by
+// __tests__/mcqContent.test.ts.
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -147,6 +148,63 @@ export function lintSource(src, file) {
   return violations;
 }
 
+// --- length bias ----------------------------------------------------------
+
+// A correct answer that is visibly longer than every distractor is guessable
+// without reading the question: the writer packs the justification into the
+// right option and leaves the wrong ones as stubs. The justification belongs
+// in the explanation, which every learner sees after submitting anyway.
+//
+// The threshold is deliberately loose. It does not ask for equal lengths, only
+// that the correct option is never *conspicuously* the longest, so a question
+// whose right answer genuinely needs a few more words still passes.
+const LENGTH_RATIO = 1.4;
+const LENGTH_DELTA = 20;
+
+/** Length-bias violations in one file. Separate from `lintSource` because it
+ *  is currently enforced on the interview MCQ banks only; the course
+ *  concept-checks carry the same bias and have not been rewritten yet. */
+export function lintLengthBias(src, file) {
+  const violations = [];
+  for (const md of extractMcqBlocks(src)) {
+    const { body, choices } = parseChoices(md);
+    const correct = choices.find((c) => c.correct);
+    const others = choices.filter((c) => !c.correct);
+    if (!correct || !others.length) continue;
+    const longest = Math.max(...others.map((c) => c.text.length));
+    const ratio = correct.text.length / Math.max(longest, 1);
+    if (ratio > LENGTH_RATIO && correct.text.length - longest > LENGTH_DELTA) {
+      const stem = (body.split("\n").find((l) => l.trim()) || "").trim().slice(0, 60);
+      violations.push({
+        file,
+        rule: "length-bias",
+        detail: `correct is ${correct.text.length} chars vs ${longest} longest distractor, ${stem}`,
+      });
+    }
+  }
+  return violations;
+}
+
+/** Share of questions whose correct option is the single longest, which is 25%
+ *  for four options if length carries no signal. Used as a corpus-level check
+ *  alongside the per-question rule. */
+export function longestAnswerRate(files) {
+  let total = 0;
+  let longest = 0;
+  for (const file of files) {
+    for (const md of extractMcqBlocks(readFileSync(file, "utf8"))) {
+      const { choices } = parseChoices(md);
+      const correct = choices.find((c) => c.correct);
+      if (!correct || choices.length < 2) continue;
+      total++;
+      const lens = choices.map((c) => c.text.length);
+      const max = Math.max(...lens);
+      if (correct.text.length === max && lens.filter((l) => l === max).length === 1) longest++;
+    }
+  }
+  return { total, longest, rate: total ? longest / total : 0 };
+}
+
 // Recursively collect .mdx files under `dir` that contain a <MultipleChoice>.
 export function findMcqFiles(dir) {
   const out = [];
@@ -162,6 +220,16 @@ export function lintFiles(files) {
   return files.flatMap((f) => lintSource(readFileSync(f, "utf8"), f));
 }
 
+/** The six interview MCQ banks, the corpus the length-bias rule covers. */
+export function interviewMcqBanks(root = process.cwd()) {
+  const dir = path.join(root, "content", "interview");
+  return findMcqFiles(dir).filter((f) => path.basename(f) === "multiple-choice-questions.mdx");
+}
+
+export function lintLengthBiasFiles(files) {
+  return files.flatMap((f) => lintLengthBias(readFileSync(f, "utf8"), f));
+}
+
 // --- CLI ------------------------------------------------------------------
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
@@ -169,10 +237,14 @@ if (isMain) {
   const args = process.argv.slice(2);
   const roots = [
     path.join(process.cwd(), "content", "courses"),
+    path.join(process.cwd(), "content", "interview"),
     path.join(process.cwd(), "content", "fumadocs-dev"),
   ];
   const files = args.length ? args : roots.flatMap((root) => findMcqFiles(root));
-  const violations = lintFiles(files);
+  const banks = args.length
+    ? files.filter((f) => path.basename(f) === "multiple-choice-questions.mdx")
+    : interviewMcqBanks();
+  const violations = [...lintFiles(files), ...lintLengthBiasFiles(banks)];
   if (violations.length) {
     const byRule = {};
     for (const v of violations) (byRule[v.rule] ??= []).push(v);
@@ -184,5 +256,14 @@ if (isMain) {
     console.error(`\n${violations.length} MCQ violation(s) across ${files.length} file(s).`);
     process.exit(1);
   }
-  console.log(`✓ all MCQ blocks in ${files.length} file(s) pass (exactly one correct answer, ≥2 distinct choices, neutral explanations)`);
+  const { total, longest, rate } = longestAnswerRate(banks);
+  console.log(
+    `✓ all MCQ blocks in ${files.length} file(s) pass (exactly one correct answer, ≥2 distinct choices, neutral explanations)`,
+  );
+  if (total) {
+    console.log(
+      `✓ no length bias in ${banks.length} question bank(s): the correct option is the single longest in ` +
+        `${longest}/${total} (${(100 * rate).toFixed(1)}%, chance is 25%)`,
+    );
+  }
 }

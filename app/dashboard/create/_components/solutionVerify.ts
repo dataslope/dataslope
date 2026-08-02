@@ -106,7 +106,7 @@ export async function verifySolutionViaCard(opts: {
   const failing = handle
     .getTestResults()
     .filter((t) => t.state !== "pass")
-    .map((t) => `“${t.name}”${t.detail ? ` — ${t.detail}` : ""}`)
+    .map((t) => `“${t.name}”${t.detail ? `: ${t.detail}` : ""}`)
     .join("; ")
     .replace(/\.+$/, "");
   return {

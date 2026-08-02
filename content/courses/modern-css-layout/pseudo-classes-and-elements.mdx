@@ -18,11 +18,11 @@ and pseudo-elements let you reach all of them.
 A pseudo-class targets an element in a particular **state**, written with a
 single colon. The ones you'll use daily:
 
-- `:hover` — the pointer is over it.
-- `:focus` — it's focused (via click or keyboard).
-- `:active` — it's being pressed.
-- `:disabled` — a disabled form control.
-- `:checked` — a checked checkbox or radio.
+- `:hover`, the pointer is over it.
+- `:focus`, it's focused (via click or keyboard).
+- `:active`, it's being pressed.
+- `:disabled`, a disabled form control.
+- `:checked`, a checked checkbox or radio.
 
 These are live, so the demo below actually responds. Hover the first button,
 click into the input, and toggle the checkbox:
@@ -81,10 +81,10 @@ working together: when the box is checked, restyle the label text beside it.
 Other pseudo-classes match an element by its **position among siblings**, no
 state or interaction involved:
 
-- `:first-child` / `:last-child` — the first or last of its siblings.
-- `:nth-child(even)` / `:nth-child(odd)` — alternating positions.
-- `:nth-child(3n)` — every third one (the formula accepts `an + b`).
-- `:not(...)` — anything **not** matching the inner selector.
+- `:first-child` / `:last-child`, the first or last of its siblings.
+- `:nth-child(even)` / `:nth-child(odd)`, alternating positions.
+- `:nth-child(3n)`, every third one (the formula accepts `an + b`).
+- `:not(...)`, anything **not** matching the inner selector.
 
 `:nth-child(even)` is the classic way to zebra-stripe a list for readability,
 and `:not(:last-child)` is a tidy way to add dividers between items but not
@@ -118,10 +118,10 @@ after the final one:
 A pseudo-element styles a **part** of an element, or invents a brand-new sub-box
 that isn't in your HTML. These take **two** colons:
 
-- `::before` / `::after` — generated content, driven by the `content` property.
-- `::first-line` / `::first-letter` — the first line or letter of text.
-- `::placeholder` — an input's placeholder text.
-- `::selection` — the part the user has highlighted.
+- `::before` / `::after`, generated content, driven by the `content` property.
+- `::first-line` / `::first-letter`, the first line or letter of text.
+- `::placeholder`, an input's placeholder text.
+- `::selection`, the part the user has highlighted.
 
 The `content` property is what makes `::before` and `::after` appear, set it to
 a string (even an empty one) and the box exists. Here it stamps a "NEW" tag,

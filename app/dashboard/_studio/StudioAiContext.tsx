@@ -54,8 +54,8 @@ interface StudioAiValue {
 const StudioAiContext = createContext<StudioAiValue | null>(null);
 
 const DONE_MESSAGE: Record<DraftKind, string> = {
-  code: "Drafted the challenge — title, instructions, starter, solution, and tests are in the form. Review each field, then Verify & get link.",
-  sql: "Drafted the challenge — schema, seed data, solution query, and checks are filled in. Review the seed data especially, then Verify & get link.",
+  code: "Drafted the challenge: title, instructions, starter, solution, and tests are in the form. Review each field, then Verify & get link.",
+  sql: "Drafted the challenge: schema, seed data, solution query, and checks are filled in. Review the seed data especially, then Verify & get link.",
   mcq: "Drafted the question, choices, and explanations. Check the distractors are plausible but clearly wrong, then Save.",
   quiz: "Drafted a title and description. Add your questions below, then Save.",
 };

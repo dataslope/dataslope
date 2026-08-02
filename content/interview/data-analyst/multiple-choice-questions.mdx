@@ -1,0 +1,1345 @@
+---
+title: Multiple Choice Questions
+description: 100 Data Analyst interview multiple choice questions covering SQL, window functions, pandas, statistics, A/B testing and metrics, data visualization, and spreadsheets, each with an explanation for every option.
+---
+
+A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+on this track. Each one mirrors a decision a Data Analyst actually makes on
+the job, and every option carries an explanation, so a wrong answer tells you
+exactly which idea to revisit.
+
+<Figure
+  slug="interview-data-analyst-multiple-choice-questions-cutout"
+  alt="The Dataslope marmot mascot standing on a platform beside a large blank card with four empty pill-shaped option slots, pressing the one that lights up"
+/>
+
+Work through a section, then read the matching topic page for the long-form
+reasoning. The SQL questions are written against standard SQL and behave the
+same on DuckDB, Postgres, MySQL, BigQuery, and Snowflake unless a question
+says otherwise.
+
+## SQL fundamentals
+
+<MultipleChoice
+  markdown={`A query uses \`WHERE\`, \`GROUP BY\`, \`HAVING\`, \`SELECT\`, and \`ORDER BY\`. Which clause is evaluated **last**?
+
+- \`SELECT\`, which names the output columns.
+  > \`SELECT\` is evaluated after \`HAVING\` but before the result set is sorted, which is why a column alias defined in \`SELECT\` is usable in \`ORDER BY\` but not in \`WHERE\`.
+- [o] \`ORDER BY\`
+  > Sorting happens once the rows to return are known: \`FROM\` → \`WHERE\` → \`GROUP BY\` → \`HAVING\` → \`SELECT\` → \`ORDER BY\` → \`LIMIT\`.
+- \`HAVING\`
+  > \`HAVING\` filters groups immediately after \`GROUP BY\`, well before the rows are sorted.
+- \`WHERE\`
+  > \`WHERE\` is one of the earliest steps: it filters individual rows before any grouping happens.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`users\` table has 10 rows, and 3 of them have a \`NULL\` \`email\`. What does \`SELECT COUNT(email) FROM users\` return?
+
+- \`10\`
+  > That is what \`COUNT(*)\` returns. \`COUNT(col)\` is the one that skips \`NULL\`s.
+- [o] \`7\`
+  > \`COUNT(col)\` counts only rows where the column is not \`NULL\`, so the 3 \`NULL\` emails are excluded.
+- \`3\`
+  > \`COUNT(email)\` counts the populated values, not the missing ones. Counting the missing ones needs something like \`COUNT(*) - COUNT(email)\`.
+- \`NULL\`
+  > Aggregates do not propagate \`NULL\` the way scalar expressions do; \`COUNT\` always returns a number, and returns \`0\` on an empty input.`}
+/>
+
+<MultipleChoice
+  markdown={`How many rows does \`SELECT * FROM orders WHERE status = NULL\` return, on a table where many rows genuinely have a \`NULL\` \`status\`?
+
+- Every row whose \`status\` is \`NULL\`.
+  > \`= NULL\` never matches, even against a \`NULL\` value. The predicate for that is \`status IS NULL\`.
+- [o] Zero rows.
+  > Comparing anything to \`NULL\` with \`=\` yields \`NULL\` rather than true, and \`WHERE\` keeps only rows where the predicate is true, so nothing survives.
+- Every row in the table.
+  > A predicate evaluating to \`NULL\` is not treated as true, so no rows are kept rather than all of them.
+- The query raises a syntax error.
+  > It is valid SQL and runs without complaint, which is exactly what makes the bug easy to miss.`}
+/>
+
+<MultipleChoice
+  markdown={`Which query returns the customers who have **never** placed an order?
+
+- \`SELECT c.* FROM customers c INNER JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL\`
+  > An \`INNER JOIN\` has already discarded the unmatched customers, so the \`IS NULL\` filter can never be satisfied and the result is empty.
+- [o] \`SELECT c.* FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.customer_id IS NULL\`
+  > The \`LEFT JOIN\` keeps every customer and fills the order columns with \`NULL\` when there is no match, so the \`IS NULL\` filter isolates exactly the non-buyers. \`NOT EXISTS\` expresses the same anti-join.
+- \`SELECT c.* FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.amount = 0\`
+  > This finds customers whose orders have a zero amount, which is a different population from customers with no orders at all.
+- \`SELECT c.* FROM customers c WHERE c.id NOT IN (SELECT customer_id FROM orders)\`
+  > The idea is right, but if \`orders.customer_id\` contains even one \`NULL\`, \`NOT IN\` returns no rows at all. \`NOT EXISTS\` or the \`LEFT JOIN\` pattern is the safe form.`}
+/>
+
+<MultipleChoice
+  markdown={`Which set operator keeps duplicate rows across the two result sets?
+
+- \`UNION\`
+  > \`UNION\` deduplicates, which costs a sort or hash pass over the combined result.
+- [o] \`UNION ALL\`
+  > \`UNION ALL\` concatenates both inputs untouched, which also makes it the faster of the two because it skips deduplication.
+- \`INTERSECT\`, which keeps rows found in both.
+  > \`INTERSECT\` returns the distinct rows present in both inputs, so duplicates are collapsed.
+- \`EXCEPT\`
+  > \`EXCEPT\` returns the distinct rows of the first input that are absent from the second.`}
+/>
+
+<MultipleChoice
+  markdown={`\`SELECT region, category, SUM(amount) FROM orders GROUP BY region\` fails on most engines. Why?
+
+- \`SUM\` cannot be combined with \`GROUP BY\`.
+  > Aggregating per group is precisely what \`GROUP BY\` exists for.
+- [o] \`category\` is neither in the \`GROUP BY\` nor wrapped in an aggregate.
+  > Each output row represents one region, which may span many categories, so the engine has no single \`category\` value to show. Group by it as well, or aggregate it (\`MIN(category)\`, \`STRING_AGG(...)\`).
+- \`GROUP BY\` requires at least two columns.
+  > Grouping by a single column is perfectly valid.
+- \`amount\` has to be listed in the \`GROUP BY\` as well.
+  > \`amount\` is inside an aggregate, which is exactly how a measure should be handled.`}
+/>
+
+<MultipleChoice
+  markdown={`\`orders\` has one row per order with an \`amount\`. \`order_items\` has several rows per order. You join them and \`SUM(o.amount)\`. What happens to the total?
+
+- It stays correct, because the join only adds columns.
+  > A one-to-many join adds *rows*: the left row is repeated once per match, and each repeat contributes its \`amount\` again.
+- [o] It is inflated, because each order's \`amount\` is repeated once per item.
+  > This is join fan-out. Aggregate the many-side back to the order grain first, in a CTE or subquery, and only then join. (\`SUM(DISTINCT o.amount)\` looks like a shortcut and is not one: it also collapses two genuinely different orders that happen to share an amount.)
+- It is understated, since unmatched orders get dropped.
+  > An \`INNER JOIN\` does drop orders with no items, but the dominant and more dangerous effect here is duplication of the matched ones.
+- It returns \`NULL\`.
+  > \`SUM\` skips \`NULL\`s and returns a number whenever at least one non-\`NULL\` value exists.`}
+/>
+
+<MultipleChoice
+  markdown={`A report uses \`FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status = 'shipped'\`, and customers with no orders vanish. What happened?
+
+- The \`LEFT JOIN\` was silently rewritten as a \`RIGHT JOIN\`.
+  > Engines do not swap join direction; the filter is what changed the result.
+- [o] The \`WHERE\` filter discards the \`NULL\`-padded rows.
+  > That turns the \`LEFT JOIN\` into an inner join. Non-buyers arrive with \`o.status\` as \`NULL\`, and \`NULL = 'shipped'\` is not true. Move the condition into the \`ON\` clause to keep them.
+- \`LEFT JOIN\` cannot be used with a \`WHERE\` clause.
+  > The combination is legal and common; the subtlety is only *which* table the filtered column belongs to.
+- The join key has duplicates.
+  > Duplicate keys would multiply rows, not remove the unmatched ones.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`COALESCE(discount, promo_rate, 0)\` return?
+
+- The sum of the three arguments.
+  > Adding the arguments is what \`+\` does; \`COALESCE\` selects rather than combines.
+- [o] The first argument that is not \`NULL\`, left to right.
+  > So \`0\` if both columns are \`NULL\`. \`COALESCE\` walks its arguments in order and returns the first non-\`NULL\` one, which is the standard way to supply a fallback.
+- \`NULL\`, whenever any one argument is \`NULL\`.
+  > That is the behavior of ordinary arithmetic on \`NULL\`, and the reason \`COALESCE\` exists.
+- The last argument, always.
+  > The last argument acts as the default and is only reached when everything before it is \`NULL\`.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`ratings\` column has 100 rows, 20 of them \`NULL\`. How does \`AVG(rating)\` treat the missing values?
+
+- It treats them as \`0\`, so the average is dragged down.
+  > Substituting \`0\` requires an explicit \`AVG(COALESCE(rating, 0))\`, which is a different question about the data.
+- [o] It ignores them, averaging the 80 non-\`NULL\` values.
+  > SQL aggregates skip \`NULL\`s entirely, so both the numerator and the denominator use only the 80 populated ratings.
+- It returns \`NULL\` because some inputs are \`NULL\`.
+  > An aggregate returns \`NULL\` only when *every* input is \`NULL\`.
+- It divides the sum of 80 values by 100 rows.
+  > The denominator is the count of non-\`NULL\` values, not the row count. Dividing by 100 requires \`SUM(rating) / COUNT(*)\`.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`SELECT COUNT(DISTINCT customer_id) FROM orders\` count?
+
+- Every row in \`orders\`.
+  > That is \`COUNT(*)\`, which counts orders rather than customers.
+- [o] The number of different non-\`NULL\` customer ids that appear.
+  > \`DISTINCT\` collapses repeats, and \`COUNT\` still ignores \`NULL\`, so a customer with 40 orders contributes exactly 1.
+- The number of orders carrying a non-\`NULL\` customer id.
+  > That is \`COUNT(customer_id)\` without \`DISTINCT\`.
+- The number of customers in the \`customers\` table.
+  > It can only see ids that actually appear in \`orders\`, so customers who never ordered are invisible to it.`}
+/>
+
+<MultipleChoice
+  markdown={`Which expression counts only the orders from the North region, in a query that is already grouped by month?
+
+- \`COUNT(region = 'North')\` over each group.
+  > \`COUNT\` counts every non-\`NULL\` argument, and a boolean is non-\`NULL\` whether it is true or false, so this counts every row.
+- [o] \`SUM(CASE WHEN region = 'North' THEN 1 ELSE 0 END)\`
+  > Conditional aggregation: the \`CASE\` contributes 1 for matching rows and 0 otherwise. \`COUNT(CASE WHEN region = 'North' THEN 1 END)\` works too, because the implicit \`ELSE NULL\` is skipped.
+- \`WHERE region = 'North'\`
+  > A \`WHERE\` clause would restrict the *whole* query, so the other regions would disappear from every month.
+- \`HAVING region = 'North'\`
+  > \`HAVING\` filters entire groups after aggregation, which again drops the other regions rather than counting alongside them.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`LIMIT 10\` return without an \`ORDER BY\`?
+
+- The 10 rows that were inserted first.
+  > Insertion order is not preserved or promised by the relational model.
+- [o] An arbitrary 10 rows, which may differ between runs.
+  > Without \`ORDER BY\` there is no defined order, so the engine is free to return whichever 10 rows are cheapest. "Top 10" always needs an explicit sort.
+- The 10 rows with the smallest primary key.
+  > Primary-key order is a plausible physical outcome on some engines, never a guarantee.
+- An error, since \`LIMIT\` requires an \`ORDER BY\` to be present.
+  > The combination is legal, which is exactly why the bug ships.`}
+/>
+
+<MultipleChoice
+  markdown={`\`WHERE created_at >= '2026-01-01' AND created_at <= '2026-01-31'\` on a timestamp column. What does it miss?
+
+- Nothing; the range covers all of January.
+  > It covers the days but not the hours inside the last one.
+- [o] Everything after midnight on 31 January.
+  > The bare date is read as \`2026-01-31 00:00:00\`. A whole final day is silently dropped. The safe pattern is a half-open range: \`>= '2026-01-01' AND < '2026-02-01'\`.
+- Rows from 1 January, because the lower bound is exclusive.
+  > \`>=\` includes the boundary, so the first day is fine.
+- Rows where \`created_at\` is \`NULL\`, which should have been included.
+  > \`NULL\` timestamps are excluded, but that is standard comparison behavior rather than the date-range bug.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the correct way to express "customers whose name is missing"?
+
+- \`WHERE name = ''\`
+  > An empty string is a known value that happens to be empty, which is a different state from unknown.
+- [o] \`WHERE name IS NULL\`
+  > \`IS NULL\` is the only predicate that tests for the unknown marker. If the source can produce both, \`name IS NULL OR name = ''\` covers them.
+- \`WHERE name = NULL\`, comparing against null.
+  > This evaluates to \`NULL\` for every row and therefore matches nothing.
+- \`WHERE NOT name\`
+  > Applying \`NOT\` to a text column is a type error on most engines.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a CTE, and what does it buy you over a nested subquery?
+
+- It materializes a permanent table you can query later.
+  > A CTE lives only for the duration of the statement; a permanent table needs \`CREATE TABLE\`.
+- [o] A named, inline result set defined with \`WITH\`.
+  > It reads top-to-bottom and can be referenced more than once in the same query. The gain is readability and reuse. Whether it is materialized or inlined is an optimizer decision that varies by engine.
+- It always runs faster than the equivalent subquery.
+  > Most engines treat the two the same, and a materialized CTE can occasionally be slower.
+- It lets you skip the \`GROUP BY\` clause.
+  > Grouping is unaffected by how the query is structured.`}
+/>
+
+<MultipleChoice
+  markdown={`\`SELECT AVG(rating) FROM reviews\` returns \`4\` when you expected \`4.33\`. What is the likely cause?
+
+- \`AVG\` rounds to the nearest whole number by design.
+  > \`AVG\` returns the true mean; the rounding comes from the type it was given.
+- [o] \`rating\` is an integer column.
+  > The division is therefore integer division on some engines. Cast first: \`AVG(rating * 1.0)\` or \`AVG(CAST(rating AS DECIMAL))\`. The same trap turns a conversion rate into \`0\`.
+- The column contains \`NULL\`s, which \`AVG\` counts as zero.
+  > \`AVG\` skips \`NULL\`s entirely rather than treating them as zero.
+- \`AVG\` requires an \`ORDER BY\` to be accurate.
+  > Ordering has no bearing on an average.`}
+/>
+
+## Advanced SQL
+
+<MultipleChoice
+  markdown={`Sales are \`90, 85, 85, 80\` ordered descending. Which ranking function leaves a **gap** after the tie?
+
+- \`ROW_NUMBER()\`
+  > \`ROW_NUMBER\` assigns \`1, 2, 3, 4\` with no gaps and no shared values, breaking the tie arbitrarily.
+- [o] \`RANK()\`
+  > \`RANK\` gives \`1, 2, 2, 4\`: tied rows share a rank and the next rank skips ahead by the number of tied rows.
+- \`DENSE_RANK()\`
+  > \`DENSE_RANK\` gives \`1, 2, 2, 3\`, sharing the rank but continuing without a gap.
+- \`NTILE(4)\`
+  > \`NTILE\` distributes rows into a fixed number of buckets rather than ranking them.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the default window frame when \`OVER\` includes an \`ORDER BY\` but no explicit frame clause?
+
+- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`.
+  > Close, but the default is \`RANGE\`, not \`ROWS\`, and the difference shows up whenever the ordering column has ties.
+- [o] \`RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
+  > With \`RANGE\`, "current row" means every peer sharing the same \`ORDER BY\` value, so tied rows all see the same running total.
+- The whole partition, unbounded in both directions.
+  > That is the default only when \`OVER\` has *no* \`ORDER BY\` at all, which is why \`SUM(x) OVER (PARTITION BY r)\` gives a grand total per partition.
+- One row before and one row after the current row.
+  > A three-row sliding frame has to be requested explicitly with \`ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING\`.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`LAG(revenue, 1) OVER (PARTITION BY region ORDER BY day)\`, what does the **first** row of each region return?
+
+- The last row's value, wrapping around to the partition start.
+  > Window functions do not wrap; there is simply no preceding row.
+- [o] \`NULL\`, because there is no previous row in that partition.
+  > Supply a third argument to substitute a default, e.g. \`LAG(revenue, 1, 0)\`.
+- \`0\`.
+  > \`0\` appears only if it is passed explicitly as the default argument.
+- The first row's own value.
+  > \`LAG(x, 0)\` would return the current row's value; an offset of \`1\` looks strictly backwards.`}
+/>
+
+<MultipleChoice
+  markdown={`You want to label each customer by spending quartile. Which window function fits?
+
+- \`RANK()\`
+  > \`RANK\` produces a position per customer, not a bucket label, and its range grows with the row count.
+- [o] \`NTILE(4)\`
+  > \`NTILE(n)\` splits the ordered partition into \`n\` buckets of near-equal size and returns the bucket number, which is exactly a quartile label at \`n = 4\`.
+- \`PERCENT_RANK()\`
+  > \`PERCENT_RANK\` returns a continuous value between 0 and 1, which then still needs bucketing.
+- \`ROW_NUMBER()\`
+  > \`ROW_NUMBER\` numbers rows sequentially; turning that into quartiles means dividing by the partition count by hand.`}
+/>
+
+<MultipleChoice
+  markdown={`\`LAST_VALUE(price) OVER (PARTITION BY sku ORDER BY day)\` keeps returning the current row's price instead of the final one. What fixes it?
+
+- Swap the \`ORDER BY day\` for \`ORDER BY day DESC\` instead.
+  > Reversing the order makes it return the *earliest* price instead, trading one wrong answer for another.
+- [o] Add \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\`.
+  > The default frame ends at the current row, so "last value so far" is the current row. Widening the frame to the whole partition makes \`LAST_VALUE\` mean what it looks like it means.
+- Replace it with \`MAX(price)\`.
+  > \`MAX\` returns the largest price, which coincides with the last one only by accident.
+- Remove the \`PARTITION BY\`.
+  > Dropping the partition changes the grouping and leaves the frame problem untouched.`}
+/>
+
+<MultipleChoice
+  markdown={`Which clause lets you filter directly on a window function's result, without wrapping the query in a subquery?
+
+- \`HAVING\`, filtering after the grouping.
+  > \`HAVING\` filters \`GROUP BY\` aggregates, and it runs before window functions are computed.
+- [o] \`QUALIFY\`
+  > \`QUALIFY\` runs after window functions, so \`QUALIFY ROW_NUMBER() OVER (...) = 1\` works directly. It is available in DuckDB, Snowflake, BigQuery, and Teradata, though not in Postgres or MySQL.
+- \`WHERE\`
+  > \`WHERE\` is evaluated before window functions exist, which is why referencing one there raises an error.
+- \`FILTER\`
+  > The \`FILTER (WHERE ...)\` modifier restricts which rows feed an aggregate; it does not filter the output rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Which frame computes a **7-day moving average** over one row per day?
+
+- \`ROWS BETWEEN 7 PRECEDING AND CURRENT ROW\`
+  > That spans 8 rows: the 7 preceding ones plus the current one.
+- [o] \`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\`
+  > Six preceding rows plus the current row is a 7-row window, which is a 7-day average when the data has exactly one row per day.
+- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`.
+  > An unbounded start gives a cumulative average over all history rather than a fixed 7-day window.
+- \`ROWS BETWEEN 3 PRECEDING AND 3 FOLLOWING\`
+  > This is a 7-row *centered* window, which peeks at future days. It smooths well for a retrospective chart but is not the trailing average usually meant.`}
+/>
+
+<MultipleChoice
+  markdown={`What are the two required parts of a recursive CTE?
+
+- A \`GROUP BY\` and a \`HAVING\` clause.
+  > Grouping is unrelated to recursion; a recursive CTE is defined by its self-reference.
+- [o] An anchor member and a recursive member, joined by \`UNION ALL\`.
+  > The anchor seeds the result; the recursive member references the CTE. The anchor runs once, then the recursive member re-runs against the previous iteration's rows until it returns none. A termination condition is what keeps it finite.
+- A window function together with a frame clause.
+  > Window functions walk one result set; they cannot feed their own output back in.
+- Two separate CTEs joined together.
+  > Joining two ordinary CTEs traverses exactly one level, which is what recursion exists to avoid hard-coding.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`SUM(amount) OVER (PARTITION BY region)\` return, with no \`ORDER BY\` inside the \`OVER\`?
+
+- A running total that resets at every region boundary.
+  > A running total requires an \`ORDER BY\`, which is what narrows the default frame to "up to the current row".
+- [o] The region's grand total, repeated on every row of that region.
+  > With no \`ORDER BY\` the frame is the entire partition, which makes this the standard way to put a group total beside each row without a join.
+- The overall total across all regions.
+  > \`PARTITION BY\` restricts each row's window to its own region.
+- One row per region, like \`GROUP BY\`.
+  > A window function preserves the input rows; it never collapses them.`}
+/>
+
+<MultipleChoice
+  markdown={`Which pattern returns the top 3 products **per category**?
+
+- \`ORDER BY category, sales DESC LIMIT 3\`
+  > \`LIMIT\` applies to the whole result, so this returns 3 rows in total rather than 3 per category.
+- [o] \`ROW_NUMBER()\` partitioned by category, filtered to \`<= 3\`.
+  > The filter has to sit outside the window's own \`SELECT\`, or in \`QUALIFY\` where it exists. Numbering restarts inside each category, and the filter has to sit outside the window's own \`SELECT\` (or in \`QUALIFY\`, where it exists).
+- \`GROUP BY category HAVING COUNT(*) <= 3\`
+  > This filters categories by how many products they have, and returns no product rows at all.
+- \`SELECT DISTINCT TOP 3 category, product\` from the table.
+  > \`DISTINCT\` deduplicates; it has no notion of a per-group limit.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between \`ROWS\` and \`RANGE\` in a window frame?
+
+- \`ROWS\` works only on integers; \`RANGE\` works on any type.
+  > Both accept the same ordering types; the difference is in what a frame boundary means.
+- [o] \`ROWS\` counts rows; \`RANGE\` includes tied peers.
+  > Any row whose \`ORDER BY\` value ties with the boundary is in the \`RANGE\` frame. On a column with duplicates the two give different answers, which is why an explicit \`ROWS\` frame is the safer default for a running total.
+- \`RANGE\` is always faster because it scans fewer rows.
+  > \`RANGE\` often costs more, since it has to identify the full set of peers.
+- They are synonyms kept for backwards compatibility.
+  > They are distinct semantics, and mixing them up is a classic source of off-by-a-few totals.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you compute each row's percentage of its group total in one pass?
+
+- Group the table, then join the totals back on the key.
+  > The result is right, but it is the multi-step version of what one window function does inline.
+- [o] \`amount * 100.0 / SUM(amount) OVER (PARTITION BY region)\`
+  > The window supplies the denominator per region without collapsing the rows. The \`100.0\` also avoids integer division.
+- \`amount * 100.0 / SUM(amount)\`
+  > A bare \`SUM\` is an aggregate, so this needs a \`GROUP BY\` and would not leave the individual rows in place.
+- \`PERCENT_RANK() OVER (PARTITION BY region ORDER BY amount)\`
+  > \`PERCENT_RANK\` reports relative position in the ordering, not share of the total.`}
+/>
+
+<MultipleChoice
+  markdown={`\`day_over_day = revenue - LAG(revenue) OVER (ORDER BY day)\` returns \`NULL\` for scattered rows in the middle of the series. Why?
+
+- \`LAG\` cannot be used in an arithmetic expression.
+  > It returns an ordinary value and composes freely.
+- [o] Those days have a \`NULL\` \`revenue\`.
+  > Any arithmetic involving \`NULL\` yields \`NULL\`. \`LAG\` returns the previous row's value faithfully, including when that value is missing. Wrap the operands in \`COALESCE\` if a gap should read as zero.
+- The \`ORDER BY\` inside \`OVER\` is being ignored.
+  > If it were, the differences would be wrong rather than missing.
+- \`LAG\` skips rows it has already returned.
+  > \`LAG\` is evaluated independently for each row and skips nothing.`}
+/>
+
+<MultipleChoice
+  markdown={`Which query keeps only the most recent row per \`customer_id\`?
+
+- \`SELECT DISTINCT customer_id, MAX(updated_at) FROM events\`.
+  > This returns the timestamp but discards every other column of the winning row.
+- [o] \`ROW_NUMBER()\` per customer, newest first, filtered to \`= 1\`.
+  > The whole winning row survives intact. \`RANK\` would be the wrong choice here: ties would return several rows per customer.
+- \`GROUP BY customer_id ORDER BY updated_at DESC LIMIT 1\`
+  > \`LIMIT 1\` applies to the entire result, leaving one row overall.
+- \`SELECT DISTINCT ON\` is the only portable way to do it.
+  > \`DISTINCT ON\` does solve it, but it is a Postgres/DuckDB extension rather than the portable answer.`}
+/>
+
+## Pandas
+
+<MultipleChoice
+  markdown={`A DataFrame has a default integer index \`0..9\`. How many rows do \`df.loc[0:2]\` and \`df.iloc[0:2]\` return, respectively?
+
+- 2 rows and 2 rows respectively.
+  > \`iloc\` returns 2, but \`loc\` slices by *label* and includes the endpoint.
+- [o] 3 and 2.
+  > \`loc[0:2]\` is label-based and inclusive on both ends, returning rows \`0, 1, 2\`; \`iloc[0:2]\` is positional and half-open like ordinary Python slicing, returning rows \`0, 1\`.
+- 2 and 3.
+  > The inclusive endpoint belongs to \`loc\`, not \`iloc\`.
+- 3 and 3.
+  > \`iloc\` follows Python's half-open slice convention, so it stops before position 2.`}
+/>
+
+<MultipleChoice
+  markdown={`You need each row to carry its group's mean alongside the original values, with the DataFrame shape unchanged. Which groupby method fits?
+
+- \`agg\`
+  > \`agg\` collapses each group to one row, so it would have to be merged back on the key afterwards.
+- [o] \`transform\`
+  > \`transform\` broadcasts the group result back to every original row, so \`df.groupby("region")["amount"].transform("mean")\` aligns directly as a new column.
+- \`filter\`, applied to the groupby.
+  > \`filter\` keeps or drops entire groups by a predicate; it computes no per-row value.
+- \`apply\`
+  > \`apply\` can be coerced into doing it, but it is slower and its output shape depends on what the function returns.`}
+/>
+
+<MultipleChoice
+  markdown={`\`orders.merge(customers, on="customer_id", how="left")\`: which rows survive?
+
+- Only the \`customer_id\` values present in both frames.
+  > That describes \`how="inner"\`, which is also the pandas default.
+- [o] Every row of \`orders\`, matched or not.
+  > Unmatched customer columns come back as \`NaN\`. A left merge preserves the left frame's rows and cardinality, padding unmatched right-side columns with \`NaN\`.
+- Every row of \`customers\`, matched or not.
+  > Keeping all of the right frame is \`how="right"\`.
+- Every row of both frames.
+  > Keeping both sides in full is \`how="outer"\`.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`pd.concat([df1, df2])\` do by default?
+
+- Joins them side by side on the index.
+  > Concatenating along the columns needs \`axis=1\`.
+- [o] Stacks them vertically, aligning on column names.
+  > The original index values are kept, so \`ignore_index=True\` is usually wanted. The default is \`axis=0\`. Duplicate index labels are preserved, so \`ignore_index=True\` is usually wanted after a vertical stack.
+- Merges them on a shared key column.
+  > Key-based joining is \`merge\`; \`concat\` glues frames together along an axis without matching keys.
+- Removes any duplicate rows across the two frames.
+  > \`concat\` performs no deduplication; \`drop_duplicates\` is a separate step.`}
+/>
+
+<MultipleChoice
+  markdown={`\`df[df["region"] == "North"]["amount"] = 0\` raises a \`SettingWithCopyWarning\` and the DataFrame is unchanged. Why?
+
+- The comparison operator should be \`is\` rather than \`==\`.
+  > \`is\` tests object identity and would not produce an element-wise boolean mask at all.
+- [o] Chained indexing may produce a copy, not a view.
+  > The assignment can then land on a temporary rather than on \`df\`. Write it as a single indexing operation: \`df.loc[df["region"] == "North", "amount"] = 0\`.
+- \`amount\` has the wrong dtype for assignment.
+  > The warning is about *what object* is being written to, not about the column's type.
+- Boolean masks are read-only in pandas.
+  > Boolean masks assign fine when used inside a single \`.loc\` call.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a bare \`df.dropna()\` remove?
+
+- Every column containing at least one \`NaN\` value.
+  > Dropping columns requires \`axis=1\`; the default axis is rows.
+- [o] Every row that contains at least one \`NaN\`, in any column.
+  > The defaults are \`axis=0\` and \`how="any"\`. Use \`how="all"\` for rows that are entirely missing, or \`subset=[...]\` to restrict which columns count.
+- Only rows where every column is \`NaN\`.
+  > That is \`how="all"\`, which is much less aggressive than the default.
+- Nothing, unless \`inplace=True\` is passed.
+  > It returns a cleaned copy either way; \`inplace\` only controls whether \`df\` itself is rebound.`}
+/>
+
+<MultipleChoice
+  markdown={`A column of 100 values contains 12 \`NaN\`s. What does \`df["col"].value_counts()\` report for them?
+
+- A \`NaN\` row with a count of 12.
+  > Including missing values requires \`value_counts(dropna=False)\`.
+- [o] Nothing, because missing values are dropped by default.
+  > \`dropna=True\` is the default, so the counts sum to 88 rather than 100. Pass \`dropna=False\` to see the \`NaN\` bucket.
+- A count of \`0\` for \`NaN\`.
+  > No \`NaN\` row appears at all rather than one with a zero count.
+- The counts are computed but silently rescaled to 100.
+  > Proportions require \`normalize=True\`, and even then the missing values stay excluded by default.`}
+/>
+
+<MultipleChoice
+  markdown={`Monthly revenue sits in 12 columns named \`jan\` through \`dec\`, one row per store. Which method reshapes it to one row per store-month?
+
+- \`pivot_table\`
+  > \`pivot_table\` moves the other way: it spreads long data out into a wide cross-tab.
+- [o] \`melt\`
+  > \`melt\` unpivots the 12 month columns into a \`variable\`/\`value\` pair, producing the long, tidy shape that grouping and plotting expect.
+- \`explode\`
+  > \`explode\` expands list-like cell values into separate rows; it does not touch the column layout.
+- \`stack\` on the row index.
+  > \`stack\` can achieve a similar shape, but it operates on the column *index* and needs index gymnastics afterwards. \`melt\` is the direct tool.`}
+/>
+
+<MultipleChoice
+  markdown={`\`df.pivot(index="store", columns="month", values="revenue")\` raises \`ValueError: Index contains duplicate entries\`. What is the pragmatic fix?
+
+- Sort the DataFrame before doing the pivot.
+  > Ordering has no effect on whether a store-month pair appears more than once.
+- [o] Use \`pivot_table\`, which aggregates the duplicates.
+  > It takes an \`aggfunc\` such as \`sum\` or \`mean\`. \`pivot\` reshapes only when each index/column pair is unique. \`pivot_table\` accepts an \`aggfunc\`, which is what the duplicate rows need.
+- Drop the \`columns\` argument.
+  > Without it there is nothing to spread across the columns, so the reshape no longer happens.
+- Reset the index first.
+  > \`reset_index\` renumbers the rows; the collision is between repeated store-month combinations in the data.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`df["price"] * 1.2\` preferred over looping over the rows and multiplying each one?
+
+- Looping produces a different numerical result.
+  > Both compute the same numbers; the difference is how long it takes.
+- [o] The loop runs in compiled C rather than the interpreter.
+  > Over a contiguous array, typically 10–100x faster, and \`iterrows\` also copies each row into a new Series. It is also shorter and harder to get wrong. \`iterrows\` in particular also copies each row into a new Series.
+- Looping is unavailable on a DataFrame.
+  > \`iterrows\` and \`itertuples\` both exist; they are just the slow path.
+- Vectorized operations skip the missing values automatically.
+  > \`NaN\` propagates through arithmetic in both approaches.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`df.groupby("region")["amount"].sum()\` return?
+
+- A DataFrame with \`region\` as an ordinary column.
+  > That is what \`.reset_index()\` produces afterwards, or \`groupby(..., as_index=False)\`.
+- [o] A Series whose index is the distinct regions.
+  > The grouping key becomes the index, which is why \`.reset_index()\` is such a common follow-up before merging or plotting.
+- A GroupBy object that has not been evaluated yet.
+  > The GroupBy object is what \`groupby\` alone returns; calling \`.sum()\` evaluates it.
+- A dict mapping each region to its total.
+  > A Series behaves dict-like, but it is a pandas object with an index, not a plain dict.`}
+/>
+
+<MultipleChoice
+  markdown={`A left merge on \`customer_id\` turns 1,000 order rows into 1,340. What does that tell you?
+
+- The merge dropped unmatched orders.
+  > A left merge never drops left rows, and dropping could not raise the count.
+- [o] The right frame has duplicate \`customer_id\` values.
+  > Some orders therefore matched more than one row. A left merge preserves *rows*, not row count. Check with \`customers["customer_id"].duplicated().any()\`, or pass \`validate="m:1"\` to make pandas raise instead.
+- The join key has a different dtype on each side.
+  > A dtype mismatch causes rows to fail to match, which would leave the count unchanged with \`NaN\` columns.
+- \`how="left"\` was ignored because the key is not the index.
+  > \`on=\` works on columns; the join type was honored.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the idiomatic way to express a SQL \`CASE WHEN\` across a whole column?
+
+- A Python \`for\` loop that appends to a list.
+  > It produces the right answer at interpreted-loop speed and reads worse.
+- [o] \`np.select([cond1, cond2], ["high", "mid"], default="low")\`
+  > \`np.select\` handles several conditions in order, vectorized. For a single either/or, \`np.where(cond, a, b)\` is the simpler form.
+- \`df.apply(lambda row: ... , axis=1)\`
+  > Row-wise \`apply\` is a loop in disguise; it is the fallback when no vectorized form exists, not the idiom.
+- \`df.replace\` with a dict of ranges.
+  > \`replace\` maps exact values, so it cannot express a threshold condition.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`df["city"].astype("category")\` change?
+
+- It converts the values to integers, losing the original text.
+  > The labels are preserved; only their storage changes.
+- [o] It stores integer codes plus a lookup of distinct values.
+  > Memory falls and grouping speeds up, as long as the text is low-cardinality. The win grows with repetition. On a column where almost every value is unique, the category dtype costs more than it saves.
+- It sorts the column alphabetically.
+  > Categories carry an order only if one is set explicitly with \`CategoricalDtype(ordered=True)\`.
+- It removes rows with missing values.
+  > \`NaN\` survives; it is simply not one of the categories.`}
+/>
+
+<MultipleChoice
+  markdown={`\`df["ts"]\` holds strings like \`"2026-03-01"\`. What does \`df["ts"].dt.month\` do?
+
+- It returns the month number for each row.
+  > It would, once the column is a datetime, which is the missing step.
+- [o] It raises an \`AttributeError\` on the \`.dt\` accessor.
+  > That accessor requires a datetime dtype. Convert first with \`pd.to_datetime(df["ts"])\`. Pass \`errors="coerce"\` to turn unparseable values into \`NaT\` instead of raising.
+- It parses the strings automatically and returns the month.
+  > pandas does not infer datetimes on attribute access; parsing is always explicit.
+- It returns the string \`"03"\` for each row.
+  > No string slicing happens; the accessor is rejected outright.`}
+/>
+
+## Statistics
+
+<MultipleChoice
+  markdown={`Order values are measured in dollars. What are the units of the **variance** and of the **standard deviation**?
+
+- Both are in dollars.
+  > The standard deviation is, but variance is the average *squared* deviation.
+- [o] Variance is in dollars squared; standard deviation is in dollars.
+  > Taking the square root returns variance to the original units, which is why the standard deviation is the one worth quoting to a stakeholder.
+- Variance is in dollars, and standard deviation in dollars squared.
+  > The squaring happens on the way *in* to variance, and the square root undoes it.
+- Both are unitless.
+  > Only a normalized measure such as the coefficient of variation is unitless.`}
+/>
+
+<MultipleChoice
+  markdown={`You analyze all 4,300 transactions your company processed last quarter. What is that dataset?
+
+- A random sample.
+  > A sample is a subset drawn from a larger group; nothing here was left out.
+- [o] The population for that quarter, since it is every unit of interest.
+  > Population versus sample depends on the question being asked: every transaction in the quarter is the whole population if the claim is about that quarter, and a sample if the claim is about the business in general.
+- A convenience sample, since the data was easy to obtain.
+  > Convenience sampling means taking whichever units are easy to reach *instead of* the full group.
+- Neither, because 4,300 is too small to be a population.
+  > Population size is defined by the question, not by a minimum count.`}
+/>
+
+<MultipleChoice
+  markdown={`A response time of 900 ms sits at the 90th percentile. What does that mean?
+
+- 90% of the requests are slower than 900 ms.
+  > That inverts the definition; only about 10% are slower.
+- [o] About 90% of requests completed in 900 ms or less.
+  > A percentile is a cut point below which that share of observations falls, which is why latency is reported as p50/p90/p99 rather than as a mean.
+- The average response time is 900 ms.
+  > The average is a different statistic and is usually far below p90 on a right-skewed latency distribution.
+- 90% of requests took exactly 900 ms.
+  > A percentile marks a boundary, not a cluster of identical values.`}
+/>
+
+<MultipleChoice
+  markdown={`Under the common IQR rule, which values are flagged as outliers?
+
+- Anything further than one standard deviation from the mean.
+  > That is a different (and far more aggressive) rule, and it uses the mean rather than the quartiles.
+- [o] Anything below \`Q1 - 1.5 × IQR\` or above \`Q3 + 1.5 × IQR\`.
+  > The interquartile range is \`Q3 - Q1\`, and the fences sit 1.5 IQRs outside the box. This is exactly what a box plot's whiskers and dots show.
+- The highest and lowest 5% of values.
+  > Trimming fixed tail percentages flags the same *count* of points no matter how tight the distribution is.
+- Anything outside the 25th to 75th percentile.
+  > That range is the IQR itself and contains the middle half of the data, which is nothing like an outlier rule.`}
+/>
+
+<MultipleChoice
+  markdown={`A satisfaction survey is shown only to users who open the app during a given week. Which bias is most at risk of distorting the result?
+
+- Simpson's paradox.
+  > Simpson's paradox is about a trend reversing when data is split by a subgroup, not about who was surveyed.
+- [o] Sampling bias, since dormant users are never reached.
+  > Churned and dormant users have the lowest scores and cannot be sampled at all. The sampling frame excludes exactly the users whose experience the survey most needs, so the average is biased upward however many responses arrive.
+- Regression to the mean over repeated draws.
+  > Regression to the mean concerns extreme measurements drifting toward the average on re-measurement.
+- Multiple comparisons.
+  > That risk comes from testing many hypotheses at once, not from how respondents were reached.`}
+/>
+
+<MultipleChoice
+  markdown={`For a roughly normal distribution, about what share of values falls within **one** standard deviation of the mean?
+
+- About 50%.
+  > Roughly half the values fall within about 0.67 standard deviations, not a full one.
+- [o] About 68%.
+  > The familiar 68–95–99.7 rule: about 68% within one standard deviation, 95% within two, and 99.7% within three.
+- About 95%.
+  > 95% corresponds to about two standard deviations.
+- About 99.7%.
+  > 99.7% corresponds to about three standard deviations.`}
+/>
+
+<MultipleChoice
+  markdown={`Two variables have a Pearson correlation of almost exactly \`0\`. What can you conclude?
+
+- The two variables are independent.
+  > Independence is stronger than zero correlation; a perfect U-shaped relationship can correlate at \`0\` while being entirely predictable.
+- [o] There is no strong **linear** relationship.
+  > A non-linear one may still exist, which is why plotting the data matters as much as the number. Pearson's coefficient only measures straight-line association, which is why plotting the data matters as much as computing the number.
+- One variable causes no change at all in the other.
+  > Correlation says nothing about causation in either direction.
+- The data contains an error.
+  > A near-zero correlation is an ordinary, informative result.`}
+/>
+
+<MultipleChoice
+  markdown={`Household income is strongly right-skewed. How do the mean and median compare?
+
+- The mean is below the median.
+  > A left-skewed distribution pulls the mean below the median; income skews the other way.
+- [o] The mean is above the median, pulled up by the long tail of high earners.
+  > The mean weighs every value by its magnitude, so a few extreme values move it while the median barely shifts.
+- They are equal, since both of them describe the centre.
+  > They coincide only in a symmetric distribution.
+- The relationship depends on the sample size.
+  > The gap is driven by the shape of the distribution, and it does not close as more data arrives.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the standard error of the mean, as distinct from the standard deviation?
+
+- Another name for the standard deviation.
+  > They answer different questions: one about individuals, one about the estimate.
+- [o] The standard deviation of the *sample mean* itself.
+  > Measured across repeated samples, and it shrinks as the sample grows. It is roughly the standard deviation divided by the square root of the sample size, and it is what confidence intervals are built from.
+- The average size of the measurement errors in the data.
+  > Instrument error is a separate concern from sampling variability.
+- The difference between the sample mean and the true mean.
+  > That single unknown difference is the error; the standard error describes its typical magnitude.`}
+/>
+
+<MultipleChoice
+  markdown={`Support tickets arrive at about 3 per hour, independently. Which distribution models the count in a given hour?
+
+- Binomial.
+  > Binomial needs a fixed number of trials, each succeeding or failing; here there is no upper bound on tickets.
+- [o] Poisson.
+  > Poisson models counts of independent events over a fixed interval given an average rate. The *waiting time between* tickets would be exponential.
+- Normal.
+  > A normal distribution is continuous and unbounded below; ticket counts are non-negative integers, though Poisson does approach normal at a high rate.
+- Uniform.
+  > Uniform would make 0 tickets and 30 tickets equally likely.`}
+/>
+
+<MultipleChoice
+  markdown={`Weekly conversion has been unusually low for one segment, and next week it rises with no change shipped. What is the most parsimonious explanation?
+
+- The segment was responding to a competitor's change.
+  > Possible, but it invents an external cause for a pattern that noise alone produces.
+- [o] Regression to the mean, on a reading selected for being extreme.
+  > Any metric picked *because* it was extreme is partly extreme by luck, and the luck does not repeat. Any metric selected *because* it was extreme is partly extreme by luck, and the luck does not repeat. It is why "worst performers improved after the intervention" is such a weak claim.
+- The metric definition changed.
+  > A definition change would usually shift the whole series rather than let one segment drift back.
+- Seasonality.
+  > Seasonality could explain it, but it would move comparable segments too.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement about a histogram's bin width is true?
+
+- Bin width has no effect once the sample is large enough.
+  > The choice matters at any sample size; large samples just make each bin less noisy.
+- [o] Too wide hides structure; too narrow invents it.
+  > Bimodality disappears under wide bins, and sampling noise looks like signal under narrow ones. Trying two or three widths before settling is standard practice, and a density plot is a useful cross-check.
+- Bins must always be equal width.
+  > Unequal bins are legitimate as long as the bar area, not its height, encodes frequency.
+- The number of bins should equal the number of distinct values.
+  > That turns a histogram into a bar chart of every value, which is exactly the too-narrow failure.`}
+/>
+
+<MultipleChoice
+  markdown={`Two variables have a correlation of \`0.9\`. What does that support?
+
+- Changing one will move the other by 90%.
+  > The coefficient is not a rate of change; that would be a regression slope.
+- [o] They move together closely, in a linear sense.
+  > That is consistent with causation in either direction, a common cause, or coincidence. A strong correlation narrows the hypotheses worth testing; it does not select one.
+- 90% of the variation in one is explained by the other.
+  > That figure is the square of the coefficient, so about 81%.
+- The relationship will hold outside the observed range.
+  > Extrapolating past the observed range is unsupported no matter how tight the fit is.`}
+/>
+
+<MultipleChoice
+  markdown={`A dataset has a mean of 50 and a standard deviation of 0. What does that tell you?
+
+- The data is normally distributed around 50.
+  > A normal distribution has spread by definition.
+- [o] Every value in the dataset is exactly 50.
+  > Zero spread means no deviation from the mean at all, usually a sign of a broken join, a default value, or a constant column rather than a real finding.
+- The values are evenly spread around 50.
+  > An even spread would produce a positive standard deviation.
+- The dataset is empty.
+  > An empty dataset has no mean to report.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the median of \`2, 4, 4, 5, 100\`, and what does comparing it to the mean tell you?
+
+- Median 4, mean 4: the distribution is symmetric.
+  > The mean is \`115 / 5 = 23\`, nowhere near 4.
+- [o] Median 4, mean 23: the gap flags a large outlier pulling the mean up.
+  > The median moves by at most one position when a single value changes; the mean absorbs the full magnitude. That contrast is the quickest outlier check there is.
+- Median 5, mean 23: the middle value is 5.
+  > With five sorted values the middle position is the third, which is 4.
+- Median 100, on the basis that the median is the largest.
+  > The largest value is the maximum; the median is the middle one.`}
+/>
+
+## A/B testing & metrics
+
+<MultipleChoice
+  markdown={`Which statement describes a p-value most accurately?
+
+- The probability that the null hypothesis is true.
+  > This is the most common misreading. The p-value is computed *assuming* the null holds, so it cannot also be the probability that it holds.
+- [o] The chance of a result this extreme under the null.
+  > Small p-values mean the data would be surprising under "no effect", which is evidence against the null and not a measurement of effect size.
+- The probability that the observed lift will replicate.
+  > Replication depends on the true effect and on the next experiment's power, neither of which the p-value reports.
+- The size of the effect.
+  > Effect size is a separate quantity; a tiny lift on a huge sample can produce a very small p-value.`}
+/>
+
+<MultipleChoice
+  markdown={`A team checks an experiment's dashboard every morning and plans to stop as soon as it hits significance. What does this do?
+
+- Nothing, as long as the final sample size is large.
+  > The damage is done by the stopping *rule*, not by the final count.
+- [o] It inflates the false positive rate well above 5%.
+  > Each look is another chance to cross the threshold on noise alone. Fix the sample size in advance, or use a method built for it, such as sequential testing or always-valid confidence intervals.
+- It reduces the false positive rate by adding evidence.
+  > Repeated looks add opportunities to be fooled, not protection from it.
+- It only matters for one-sided tests.
+  > Peeking inflates error rates under one-sided and two-sided tests alike.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a guardrail metric for?
+
+- To replace the primary metric when the primary metric is noisy.
+  > Guardrails sit alongside the primary metric; they do not stand in for it.
+- [o] To catch collateral damage the change must not cause.
+  > Latency, refund rate, and support contacts are typical, and a primary-metric win with a guardrail regression is not a win. Latency, refund rate, unsubscribe rate, and support contacts are typical guardrails. A win on the primary metric with a guardrail regression is not a win.
+- To measure how much revenue the experiment produced.
+  > That is the job of a primary or secondary business metric.
+- To confirm that randomization worked.
+  > Randomization is checked with balance or A/A tests on pre-experiment attributes.`}
+/>
+
+<MultipleChoice
+  markdown={`All else equal, how does halving the minimum detectable effect change the required sample size?
+
+- It halves it.
+  > Sample size does not scale linearly with the effect you want to detect.
+- [o] It roughly quadruples the required sample size.
+  > Sample size scales with roughly one over the effect squared. Detecting smaller effects gets expensive fast, which is why agreeing on an MDE before launch is what makes an experiment feasible or not.
+- It leaves the required sample unchanged.
+  > The target effect size is one of the main inputs to a power calculation.
+- It doubles it.
+  > Doubling would be a linear relationship; the inverse-square relationship is steeper.`}
+/>
+
+<MultipleChoice
+  markdown={`A redesign shows a big lift in week one that fades to nothing by week four. What is the most likely explanation?
+
+- The randomization broke partway through.
+  > A broken assignment usually shows up as imbalanced group sizes or skewed pre-experiment metrics, not as a clean decay.
+- [o] A novelty effect that has since worn off.
+  > Existing users engaged because the change was new, then reverted. Run long enough to cover the decay, and check whether new users, who have no old version to react to, show the same pattern.
+- Regression to the mean in the control group.
+  > That would move the control, whereas here it is the treatment's advantage that erodes.
+- The metric was mis-instrumented in week one only.
+  > Possible, but an instrumentation bug rarely decays smoothly over several weeks.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is best described as a **vanity metric**?
+
+- Weekly active users for a product measured on weekly engagement.
+  > This is a defensible primary metric when weekly engagement is the goal.
+- [o] Cumulative registered accounts since launch.
+  > A cumulative total can only go up, so it looks good regardless. A cumulative total can only go up, so it looks good regardless of what is actually happening and cannot distinguish a good week from a bad one.
+- Seven-day retention, split by acquisition channel.
+  > Retention by cohort is one of the more decision-relevant metrics available.
+- Checkout conversion rate.
+  > A rate tied to a specific funnel step maps directly onto actions a team can take.`}
+/>
+
+<MultipleChoice
+  markdown={`A funnel has 10,000 views → 4,000 add-to-cart → 1,000 purchases. What is the **step-to-step** conversion from add-to-cart to purchase?
+
+- 10%, the end-to-end rate.
+  > 10% is the end-to-end conversion from views to purchases, not the step between cart and purchase.
+- [o] 25%
+  > Step conversion divides each step by the step immediately before it: 1,000 / 4,000 = 25%. The 40% and 25% step rates multiply to the 10% overall rate.
+- 40%
+  > 40% is the view-to-cart step, one stage earlier.
+- 60%
+  > 60% is the *drop-off* from views to cart, the complement of that step's conversion.`}
+/>
+
+<MultipleChoice
+  markdown={`A test reports a 2.1% lift with a 95% confidence interval of \`[-0.3%, 4.5%]\`. What is the honest summary for a stakeholder?
+
+- The change definitely works, since the point estimate is positive.
+  > A single point estimate ignores the uncertainty the interval was computed to express.
+- [o] Anything from a small loss to a solid gain is consistent.
+  > The result is not yet conclusive. An interval spanning zero means the data cannot rule out no effect. The useful follow-up is whether the plausible range is worth the cost of a longer test.
+- The change has no effect.
+  > Failing to detect an effect is not the same as demonstrating there is none; a 4.5% gain is equally inside the interval.
+- There is a 95% probability the true lift is 2.1%.
+  > The 95% describes the long-run behavior of the interval-building procedure, and it attaches to the interval rather than to the point estimate.`}
+/>
+
+<MultipleChoice
+  markdown={`An experiment assigned 50/50 but the data shows 52% in treatment and 48% in control. What should you do?
+
+- Reweight the groups and read the result.
+  > Reweighting papers over a defect whose cause is still unknown, and the cause usually biases the metric too.
+- [o] Treat it as a sample ratio mismatch and investigate.
+  > Bot filtering, redirect failures, and one-sided logging all produce it, and all skew the metric. At realistic sample sizes a 52/48 split is far outside chance. Bot filtering, redirect failures, and logging that fires only on one variant all produce it, and all of them skew the metric.
+- Nothing; small imbalances are expected.
+  > Small *absolute* imbalance is not the test. What matters is how improbable the split is given the sample size.
+- Stop the experiment and declare the result a null.
+  > Diagnosing the cause usually salvages the experiment; discarding it loses the information.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a ratio metric such as revenue-per-user awkward to test?
+
+- Ratios cannot be averaged at all.
+  > They can; the care is in what the denominator does between groups.
+- [o] The denominator can shift between the variants.
+  > The ratio then moves without the numerator changing at all. A change that quietly suppresses low-value sessions raises revenue-per-session while total revenue falls. Reporting numerator and denominator alongside the ratio makes that visible.
+- Ratios always have larger sample-size requirements.
+  > Variance depends on the specific metric, not on it being a ratio.
+- Ratio metrics cannot have confidence intervals.
+  > They can; the interval just has to account for variability in both parts.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical use of an A/A test?
+
+- To confirm the new feature has no effect.
+  > No feature is shipped in an A/A test; both arms are identical.
+- [o] To validate the experiment platform itself.
+  > With no real difference, only the expected share of A/A tests should show "significant" results, and the assignment should split as configured. A pipeline that returns significance far more often than its false-positive rate has a bug in randomization, logging, or the analysis itself.
+- To measure the metric's absolute level before launch.
+  > A single query answers that; it needs no experiment.
+- To double the sample size available for the real test.
+  > The arms are not reusable as extra sample for a later test.`}
+/>
+
+<MultipleChoice
+  markdown={`Retention is 40% at day 1, 25% at day 7, and 24% at day 30. What is the most useful read?
+
+- Retention is collapsing and the product is failing.
+  > A steep early drop followed by flattening is the normal shape for almost every product.
+- [o] The curve is flattening, which suggests a retained core.
+  > The day-1 to day-7 drop is where the biggest opportunity sits. A curve that flattens implies a stable base. One that keeps sloping toward zero is the alarming shape.
+- The day-30 number must be wrong, since retention cannot rise.
+  > It did not rise; 24% is below 25%, and small non-monotonic wobbles happen with cohort noise anyway.
+- Nothing can be said without a control group.
+  > A control is needed for causal claims, not for reading the shape of a retention curve.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a cohort analysis let you see that a single overall metric hides?
+
+- The total size of the user base.
+  > A headline count shows that directly.
+- [o] Whether behavior differs by when users joined.
+  > A mix shift between cohorts is then not mistaken for a change in behavior. A flat overall retention number can hide steadily worsening new-user retention, masked by a growing share of long-tenured users.
+- Which individual users are most valuable.
+  > That is user-level scoring, not cohorting.
+- Whether the metric is statistically significant.
+  > Significance needs a comparison and a test; cohorting is descriptive.`}
+/>
+
+<MultipleChoice
+  markdown={`A test needs 20,000 users per arm but traffic only allows 6,000. What is the honest response?
+
+- Run it anyway and read the direction of the result.
+  > An underpowered test mostly returns noise, and any "significant" result it does produce is inflated in magnitude.
+- [o] Say up front which effect sizes it can actually detect.
+  > Then run longer, pick a more sensitive metric, or accept that a small effect will be undetectable. Stating the detectable effect before launch is what stops an inconclusive result from being read as "no effect".
+- Lower the significance threshold to 0.10 to compensate for it.
+  > Loosening the threshold buys power by accepting more false positives; it does not add information.
+- Split the traffic 90/10 to concentrate the sample.
+  > An unbalanced split lowers power for a fixed total, though it is useful when exposure risk matters more than power.`}
+/>
+
+## Data visualization
+
+<MultipleChoice
+  markdown={`What distinguishes a histogram from a bar chart?
+
+- A histogram is drawn horizontally; a bar chart is drawn vertically.
+  > Orientation is a styling choice available to both.
+- [o] One bins a continuous variable, the other compares categories.
+  > A histogram's bars are adjacent; a bar chart's are separated, and that gap is a real signal. The gap between bars is a real signal: it says the x-axis is categorical, and that reordering the bars loses no information.
+- A histogram can only display counts, while a bar chart can display any measure.
+  > A histogram can show density or relative frequency as well as raw counts.
+- They are the same chart under two names.
+  > They answer different questions: "how is this variable distributed?" versus "how do these categories compare?"`}
+/>
+
+<MultipleChoice
+  markdown={`You are plotting daily revenue over 24 consecutive months. Which encoding reads best?
+
+- A pie chart, one slice per month.
+  > A pie chart destroys the time ordering and asks the reader to compare 24 angles.
+- [o] A line chart, with time on the x-axis.
+  > A connected line encodes ordering and rate of change, which is what a time series is read for.
+- A scatter plot with no connecting line.
+  > Points alone are readable but leave the reader to reconstruct the sequence that the line makes obvious.
+- A stacked area chart of each month's share.
+  > Stacked areas answer a composition question; here there is only one series to show.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a pie chart a defensible choice?
+
+- Whenever the values are percentages.
+  > Percentages alone do not make a pie readable; the number of slices and the size differences do.
+- [o] For a part-to-whole split with few, clearly different slices.
+  > Angles are hard to compare, so a pie fails once slices are numerous or similar. Angles are hard to compare precisely, so a pie survives two or three obviously different parts and fails once slices are numerous or similar.
+- For comparing one single category across several time periods.
+  > Change over time belongs on a line or a grouped bar chart.
+- For showing the distribution of a continuous variable.
+  > Distributions call for a histogram, a box plot, or a density plot.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the main risk of a dual-axis chart plotting revenue and support tickets together?
+
+- Dual axes cannot be rendered by most BI tools.
+  > Nearly every tool supports them; the problem is interpretive rather than technical.
+- [o] The two axis ranges are chosen independently.
+  > The apparent relationship can be manufactured by rescaling either one. Two lines can be made to cross, converge, or diverge purely by moving an axis. Small multiples or an indexed view make the comparison honest.
+- The chart can only show two series.
+  > Series count is a readability limit, not the specific hazard of dual axes.
+- Dual axes always require a logarithmic scale.
+  > Log scaling is an independent choice that applies to single-axis charts too.`}
+/>
+
+<MultipleChoice
+  markdown={`What does maximizing the data-ink ratio mean in practice?
+
+- Using the brightest colors available so the data stands out.
+  > Saturated color everywhere adds ink without adding information, and it makes real highlights harder to see.
+- [o] Removing decoration that carries no information.
+  > Heavy gridlines, 3-D effects, and background fills all go, so the remaining ink encodes data. Tufte's principle: every mark should earn its place. Careful subtraction usually makes a chart more legible, not less.
+- Printing at the highest resolution the display allows.
+  > Resolution is a rendering concern, unrelated to how much of the ink is data.
+- Packing as many series onto one chart as will fit.
+  > Crowding raises ink and lowers legibility, which is the opposite of the intent.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical difference between a dashboard and a report?
+
+- A dashboard is interactive; a report is always static.
+  > Interactivity is common in dashboards but is not what separates them; plenty of reports are interactive.
+- [o] One prompts a question, the other answers one.
+  > A dashboard monitors a few metrics continuously; a report answers a specific question at a point in time, with narrative and caveats. This is why a dashboard is refreshed and a report is dated: one is for noticing that something changed, the other for explaining why.
+- A dashboard is built by engineers; a report is written by analysts.
+  > Both are ordinary analyst deliverables.
+- A report can contain charts, while a dashboard shows only numbers.
+  > Both use whatever visual encoding the question needs.`}
+/>
+
+<MultipleChoice
+  markdown={`You are shading a map by average order value per region. Which palette fits?
+
+- A categorical palette using one distinct hue per region.
+  > Distinct hues imply unordered categories and hide the fact that the values run low to high.
+- [o] A sequential palette running light to dark in a single hue.
+  > A sequential ramp encodes magnitude with lightness, which is the ordering the reader needs to see.
+- A diverging palette centered on zero.
+  > A diverging palette is right when a meaningful midpoint exists, such as change versus last year; a plain average has no natural center.
+- A rainbow palette across the full spectrum.
+  > Rainbow ramps are not perceptually uniform: they create false boundaries where the hue shifts quickly and hide real differences where it does not.`}
+/>
+
+<MultipleChoice
+  markdown={`You need to show the distribution of order values for four regions side by side. Which chart fits best?
+
+- Four pie charts, one per region.
+  > A pie shows composition, not the spread of a continuous variable.
+- [o] A box plot (or violin) per region on a shared axis.
+  > Median, spread, and outliers are all visible for each region at once, on a common scale.
+- A stacked bar chart of total revenue per region.
+  > A stacked bar answers a totals question and says nothing about how the values are spread.
+- A single scatter plot of order value against region.
+  > A strip plot is defensible, but with many orders it becomes an unreadable vertical smear.`}
+/>
+
+<MultipleChoice
+  markdown={`When are small multiples the better choice over one chart with many overlaid lines?
+
+- Never, since a single chart is always more compact.
+  > Compactness stops helping once the lines are indistinguishable.
+- [o] When overlapping lines can no longer be traced individually.
+  > Small multiples suit a reader who mainly needs each series' shape. A grid of small panels on a shared scale trades precise cross-series comparison for readability. Overlay stays better when the comparison *is* the point and there are only a few series.
+- Whenever the data is time-based.
+  > Two or three time series overlay perfectly well.
+- Only when the series have different units.
+  > Different units are a reason to avoid a shared axis, but small multiples help with same-unit clutter too.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the main problem with sorting a bar chart of categories alphabetically?
+
+- Alphabetical order is harder for readers to scan.
+  > Alphabetical helps for lookup; the problem is what it costs elsewhere.
+- [o] It scatters the ranking across the chart.
+  > The reader then compares bar lengths manually instead of reading the order off. Sorting by value makes the largest and smallest obvious instantly. Keep a fixed order only when the categories have an inherent one, or when several charts must stay comparable.
+- Bar charts cannot be sorted.
+  > Sorting is a standard operation in every charting library.
+- It requires a categorical color palette.
+  > Color is an independent choice; most bar charts need only one.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the strongest argument for direct-labelling lines instead of using a legend?
+
+- Legends are not supported on mobile.
+  > Legends render fine; they just cost more effort to use.
+- [o] It puts the name where the reader's eye already is.
+  > No back-and-forth matching a colour swatch to a line, and it survives readers who cannot distinguish the palette. It also survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
+- Direct labels let you fit more series onto one chart.
+  > More series makes labelling harder, not easier; labels start colliding.
+- Legends are only for bar charts.
+  > Legends are used across every chart type.`}
+/>
+
+<MultipleChoice
+  markdown={`A stakeholder asks for "everything we know" on one dashboard. What is the better response?
+
+- Build it as asked; more information is strictly better.
+  > Past a point, more panels lower the chance any single one gets read.
+- [o] Ask which decisions the dashboard should support.
+  > Build for those, and link the rest as detail. A dashboard's job is to make a small number of things impossible to miss. "Everything" guarantees nothing stands out.
+- Refuse, since dashboards should never exceed five charts.
+  > A fixed cap is arbitrary; the right number follows from the decisions being supported.
+- Build two dashboards, one for each audience, without asking.
+  > Splitting before understanding the need risks maintaining two unused dashboards.`}
+/>
+
+## Excel & spreadsheets
+
+<MultipleChoice
+  markdown={`What does \`XLOOKUP\` improve over both \`VLOOKUP\` and \`INDEX\`/\`MATCH\`?
+
+- It is the only one of the three that can search a sorted range.
+  > All three support sorted-range lookups; \`VLOOKUP\` has done so since the beginning.
+- [o] It takes the ranges directly and defaults to exact match.
+  > It also searches in either direction and has a built-in "if not found" argument. It removes the column-offset counting that makes \`VLOOKUP\` fragile, and the two-function pairing that makes \`INDEX\`/\`MATCH\` verbose.
+- It recalculates faster on very large workbooks.
+  > Performance is broadly comparable; the gain is in correctness and readability.
+- It can return several columns at once, which the others cannot.
+  > \`XLOOKUP\` can spill a multi-column result, but \`INDEX\` can return a multi-cell range too. The defining improvements are the interface ones.`}
+/>
+
+<MultipleChoice
+  markdown={`Which argument order is correct?
+
+- \`SUMIFS(criteria_range, criteria, sum_range)\`
+  > That is \`SUMIF\`'s order, and reusing it in \`SUMIFS\` is the classic mistake.
+- [o] \`SUMIFS(sum_range, criteria_range1, criteria1, ...)\`
+  > \`SUMIFS\` puts the range being summed **first**, then repeating criteria pairs, precisely because the number of pairs varies.
+- \`SUMIFS(criteria1, criteria_range1, sum_range)\`
+  > The criterion never comes before the range it applies to.
+- The order is interchangeable as long as the ranges are the same size.
+  > Spreadsheet functions match arguments by position, so the order is what gives each range its meaning.`}
+/>
+
+<MultipleChoice
+  markdown={`A model wraps every lookup in \`IFERROR(..., 0)\`. What is the risk?
+
+- \`IFERROR\` slows recalculation noticeably.
+  > Any cost is negligible next to the correctness problem.
+- [o] It hides genuine problems behind a plausible \`0\`.
+  > A broken reference, a typo in a key, and a missing row all look the same. Totals stay plausible while quietly under-counting. Prefer \`IFNA\`, which catches only "not found", and leave real errors visible.
+- \`IFERROR\` cannot be nested inside other functions.
+  > It nests freely; that is part of how it spreads through a workbook.
+- It converts numbers to text.
+  > The fallback value keeps whatever type it was given.`}
+/>
+
+<MultipleChoice
+  markdown={`A formula in \`C2\` contains \`B$2\`. It is copied down to \`C3\` and right to \`D2\`. What does the reference become in each copy?
+
+- \`B$3\` in \`C3\`, and \`B$2\` over in \`D2\`.
+  > The dollar sign is on the row, so it is the *row* that is pinned; the column is free to move.
+- [o] \`B$2\` in \`C3\`, and \`C$2\` in \`D2\`.
+  > \`$\` locks whatever immediately follows it. In \`B$2\` the row is locked and the column is relative, so copying down changes nothing and copying right advances the column.
+- \`B$2\` in both copies.
+  > That would be \`$B$2\`, with both parts locked.
+- \`B3\` in \`C3\`, and \`C2\` in \`D2\`.
+  > That is the behavior of the fully relative \`B2\`, with no lock at all.`}
+/>
+
+<MultipleChoice
+  markdown={`\`VLOOKUP\` is called without its fourth argument. What happens?
+
+- It performs an exact match, which is the default.
+  > The default is the other way around, which is why the omission is dangerous.
+- [o] It defaults to approximate match.
+  > That requires the lookup column to be sorted ascending, and otherwise returns a wrong value silently. Always pass \`FALSE\` (or \`0\`) for exact matching. An approximate match on unsorted data returns a neighbouring row's value instead of an error.
+- It raises \`#N/A\` because the argument is required.
+  > The argument is optional, so nothing signals that it was left out.
+- It returns the first row of the range.
+  > It returns whichever row the approximate search lands on, which varies with the data.`}
+/>
+
+<MultipleChoice
+  markdown={`A date cell shows \`45,000\` after the format is cleared. Why?
+
+- The date was corrupted by an import.
+  > The underlying value is intact; only its display changed.
+- [o] Dates are stored as serial numbers counting from an epoch.
+  > The visible date is only a display format over that number. Because dates are numbers, arithmetic works directly: subtracting two dates gives a day count, and adding \`7\` moves forward a week.
+- The cell holds text that happens to look numeric.
+  > Text would stay left-aligned as typed rather than becoming a number.
+- Dates are stored as seconds, so this value is a timestamp.
+  > The unit is days; the fractional part carries the time of day.`}
+/>
+
+<MultipleChoice
+  markdown={`Lookups against a pasted list keep returning \`#N/A\` even though the keys look identical on screen. What should you check first?
+
+- Whether the workbook needs a full recalculation.
+  > Recalculation would resolve stale results, not values that look right and still fail to match.
+- [o] Stray whitespace in the keys, which \`TRIM\` and \`CLEAN\` remove.
+  > Non-breaking spaces do it too, and so does text \`"1001"\` against the number \`1001\`. \`"ACME "\` and \`"ACME"\` are different strings, and the difference is invisible. A mismatched type, text \`"1001"\` versus the number \`1001\`, causes the same symptom.
+- Whether the lookup range is sorted.
+  > Sorting matters only for approximate match, and it would return a wrong value rather than \`#N/A\`.
+- Whether the two lists hold the same number of rows.
+  > Row counts do not have to match for a lookup to find its key.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a pivot table's "Values" area do with a text field dropped into it?
+
+- It concatenates all of the text values it finds.
+  > Spreadsheets offer no concatenating aggregation in a pivot's Values area.
+- [o] It falls back to \`Count\`, since the rest need numbers.
+  > This is why a pivot that should show revenue sometimes shows a row count instead. This is why a pivot that should show revenue sometimes shows a row count instead: the underlying column is text, usually because of a stray currency symbol or a thousands separator.
+- It raises an error.
+  > It silently picks \`Count\`, which is what makes the mistake easy to ship.
+- It shows the first value found.
+  > No aggregation returns a single arbitrary value in that area.`}
+/>
+
+<MultipleChoice
+  markdown={`Your pivot table shows a total of 40,000 but the source now holds 60,000 rows. What is the most likely cause?
+
+- Pivot tables cap out at 40,000 rows.
+  > No such limit exists at that size.
+- [o] The pivot's source range never grew with the data.
+  > Basing it on a named table means new rows are picked up on refresh. Basing the pivot on a named table means new rows are picked up on refresh instead of silently excluded.
+- The extra rows contain errors and so were skipped.
+  > Error values would show up as their own category rather than vanish.
+- The pivot is filtered to the current month.
+  > A filter is possible, but a stale source range is by far the more common cause of a round shortfall.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`COUNTA\` count that \`COUNT\` does not?
+
+- Nothing; they are aliases.
+  > They differ precisely in which cell contents qualify.
+- [o] Any non-empty cell, including text and error values.
+  > \`COUNT\` counts numbers only, so a gap between the two flags numbers stored as text. \`COUNTBLANK\` is the complement. A gap between the two is a fast way to spot numbers stored as text.
+- Only cells containing formulas.
+  > Neither function distinguishes a formula from a typed value; only the result matters.
+- Cells that have conditional formatting applied.
+  > Formatting is invisible to both.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the strongest sign that an analysis should move from a spreadsheet into SQL?
+
+- The file has more than ten sheets.
+  > Sheet count alone says little about whether the work belongs in a database.
+- [o] The same manual steps repeat against a queryable source.
+  > Every refresh is a chance to make a new mistake, and none of it is reviewable. Repeated manual steps against a queryable source is the case where a spreadsheet costs the most: every refresh is a chance to make a new mistake, and none of it is reviewable.
+- Someone asked for a chart the spreadsheet cannot produce.
+  > A charting gap is usually solved by a BI tool rather than by moving the data.
+- The workbook contains \`VLOOKUP\` formulas.
+  > Lookups are ordinary spreadsheet work and fine at small scale.`}
+/>
+
+<MultipleChoice
+  markdown={`A shared workbook's numbers differ depending on who opens it. What should you suspect first?
+
+- Different Excel versions round numbers differently.
+  > Arithmetic is consistent across supported versions.
+- [o] Volatile functions such as \`TODAY\`, \`NOW\`, or \`RAND\`.
+  > A locale-sensitive date parse does it too. These recalculate per session and per locale, so "as of today" logic quietly shifts under each reader. Pinning the reporting date in a cell makes the workbook reproducible.
+- The file is corrupt.
+  > Corruption usually fails loudly rather than yielding two plausible sets of numbers.
+- Someone left a filter applied.
+  > A filter changes what is *displayed*, but formula results stay the same for everyone.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical difference between a spreadsheet's \`SUMPRODUCT\` and a plain \`SUM\`?
+
+- \`SUMPRODUCT\` is faster on large ranges.
+  > It usually costs more, since it evaluates arrays element by element.
+- [o] It multiplies corresponding elements before summing.
+  > That also makes it a way to sum under multiple conditions. \`SUMPRODUCT((region="North")*(qty>10)*amount)\` predates \`SUMIFS\` and still handles conditions \`SUMIFS\` cannot express.
+- \`SUMPRODUCT\` ignores text values while \`SUM\` errors on them.
+  > \`SUM\` skips text in a range too.
+- They differ only in argument order.
+  > They compute different things: one sums, the other sums products.`}
+/>
+
+## Keep practicing
+
+Missed a few? Each section maps to a topic page with the long-form reasoning
+and runnable examples:
+
+- [SQL](/interview-prep/data-analyst/sql) and [Advanced SQL](/interview-prep/data-analyst/advanced-sql)
+- [Pandas](/interview-prep/data-analyst/pandas)
+- [Statistics & communication](/interview-prep/data-analyst/statistics-and-communication)
+- [A/B testing & metrics](/interview-prep/data-analyst/ab-testing-and-metrics)
+- [Data visualization & storytelling](/interview-prep/data-analyst/data-visualization)
+- [Excel & spreadsheets](/interview-prep/data-analyst/excel-and-spreadsheets)

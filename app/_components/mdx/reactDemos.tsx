@@ -429,7 +429,7 @@ export function LikeButtonDemo() {
 }
 
 export function KeyPressDemo() {
-  const [last, setLast] = useState("—");
+  const [last, setLast] = useState("none");
   const [count, setCount] = useState(0);
   return (
     <Demo>
@@ -698,7 +698,7 @@ export function TabsDemo() {
   const bodies = [
     "A quick summary of the product and what it does.",
     "Simple, transparent pricing with a free tier.",
-    "★★★★☆ — loved by thousands of developers.",
+    "★★★★☆ loved by thousands of developers.",
   ];
   return (
     <Demo>

@@ -336,7 +336,7 @@ export function SignInClient({
           // when email verification is on it instead returns a neutral success
           // to prevent enumeration, handled below.)
           setError(
-            "An account already exists for that email. Try signing in below — " +
+            "An account already exists for that email. Try signing in below. " +
               "including with Google or GitHub if that's how you first signed " +
               "up. You can also use “Forgot password?” to set a password.",
           );
@@ -359,7 +359,7 @@ export function SignInClient({
         setPassword("");
         go("signin"); // clears notice…
         setNotice(
-          "Almost there — check your email for a verification link, then sign " +
+          "Almost there. Check your email for a verification link, then sign " +
             "in. Already have an account (including with Google or GitHub)? " +
             "Just sign in instead.",
         ); // …so set it after the switch

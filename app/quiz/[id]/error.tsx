@@ -17,7 +17,7 @@ export default function QuizError({
       error={error}
       reset={reset}
       title="This quiz didn't load"
-      message="A temporary problem interrupted loading this quiz set. It usually clears up on retry — the quiz itself is safe."
+      message="A temporary problem interrupted loading this quiz set. It usually clears up on retry, and the quiz itself is safe."
     />
   );
 }

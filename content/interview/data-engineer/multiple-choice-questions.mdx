@@ -1,0 +1,1345 @@
+---
+title: Multiple Choice Questions
+description: 100 Data Engineer interview multiple choice questions covering SQL, data modeling, warehousing and storage, pipelines, orchestration and reliability, distributed processing, streaming, and Python, each with an explanation for every option.
+---
+
+A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+on this track. Each one mirrors a decision a Data Engineer actually makes on
+the job, and every option carries an explanation, so a wrong answer tells you
+exactly which idea to revisit.
+
+<Figure
+  slug="interview-data-engineer-multiple-choice-questions-cutout"
+  alt="The Dataslope marmot mascot on a platform sorting blank answer cards into four pill-shaped slots on a standing board, one slot glowing"
+/>
+
+Work through a section, then read the matching topic page for the long-form
+reasoning and runnable examples.
+
+## SQL
+
+<MultipleChoice
+  markdown={`What is the logical order in which SQL clauses are evaluated?
+
+- Exactly the order they are written.
+  > \`SELECT\` is written first and evaluated near the end, which is why its aliases are unavailable in \`WHERE\`.
+- [o] \`FROM\` → \`WHERE\` → \`GROUP BY\` → \`HAVING\` → \`SELECT\` → \`ORDER BY\` → \`LIMIT\`.
+  > This single fact explains most beginner errors: aliases usable in \`ORDER BY\` but not \`WHERE\`, and aggregates belonging in \`HAVING\`.
+- \`SELECT\` → \`FROM\` → \`WHERE\` → \`GROUP BY\`.
+  > Rows must be sourced and filtered before anything can be projected.
+- It varies from one engine to the next and cannot be relied on.
+  > The logical order is standardized; only the physical plan varies.`}
+/>
+
+<MultipleChoice
+  markdown={`Which pattern keeps only the latest row per key, preserving all columns?
+
+- \`GROUP BY key\` with \`MAX(updated_at)\`.
+  > This returns the key and timestamp but discards the winning row's other columns.
+- [o] \`ROW_NUMBER() OVER (PARTITION BY key ORDER BY updated_at DESC)\` filtered to \`= 1\`.
+  > \`RANK\` would return several rows per key on a timestamp tie, which is why \`ROW_NUMBER\` is the safe default here.
+- \`SELECT DISTINCT ON (key) *\`, which every engine will support.
+  > \`DISTINCT ON\` solves it neatly, but it is a Postgres and DuckDB extension.
+- \`SELECT DISTINCT *\`.
+  > This removes only fully identical rows.`}
+/>
+
+<MultipleChoice
+  markdown={`A query on a partitioned table is slow and scans everything. What is the most likely cause?
+
+- The table has been split into far too many very small partitions.
+  > Over-partitioning hurts, but it would not eliminate pruning entirely.
+- [o] The filter is not on the partition column, or wraps it.
+  > A function applied to the column stops the engine pruning. \`WHERE DATE(event_ts) = '2026-01-01'\` defeats pruning on \`event_ts\`; a bare range predicate preserves it.
+- The table is not indexed.
+  > Columnar engines generally have no secondary indexes; pruning takes their place.
+- Statistics are out of date.
+  > Stale statistics skew join order, but pruning is driven by the predicate.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a correlated subquery do, and why can it be slow?
+
+- It runs a single time and then caches the result for reuse.
+  > An uncorrelated subquery can be; a correlated one cannot.
+- [o] It references the outer query, so it re-evaluates per row.
+  > Conceptually, at least. Modern planners often rewrite it into a join. When the rewrite does not happen, an \`EXISTS\` or an explicit join is the usual remedy.
+- It joins a table to itself.
+  > That is a self join.
+- It always returns exactly one row.
+  > A scalar subquery must, but correlated subqueries appear in \`EXISTS\` and \`IN\` too.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the gaps-and-islands problem?
+
+- Finding \`NULL\` values in a column.
+  > Missing values are a different question.
+- [o] Identifying runs of consecutive values and the breaks in them.
+  > Consecutive login days, uninterrupted status periods, and sessionization are all cases of it. The standard trick is a difference between a row number and the value itself, which stays constant within a run and becomes a group key.
+- Detecting duplicate rows.
+  > Duplicates are found with a count per key.
+- Filling in whichever partitions are missing from a table.
+  > A date spine handles that.`}
+/>
+
+<MultipleChoice
+  markdown={`Which frame computes a 7-day moving average on daily data?
+
+- \`ROWS BETWEEN 7 PRECEDING AND CURRENT ROW\`
+  > That spans 8 rows.
+- [o] \`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\`
+  > Six prior rows plus the current one is seven days, provided the series has no missing days, which is why a date spine often comes first.
+- \`RANGE BETWEEN 7 PRECEDING AND CURRENT ROW\`
+  > \`RANGE\` with an interval works on some engines and behaves differently around gaps and ties.
+- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
+  > That is a cumulative average over all history.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you find duplicate rows on a key?
+
+- \`SELECT DISTINCT key FROM t\`
+  > This lists the keys and hides which ones repeat.
+- [o] \`SELECT key FROM t GROUP BY key HAVING COUNT(*) > 1\`
+  > Grouping and filtering on the count is the direct expression. \`COUNT(*) OVER (PARTITION BY key)\` gives the same answer while keeping the offending rows visible.
+- \`SELECT key FROM t WHERE COUNT(*) > 1\`
+  > An aggregate cannot appear in \`WHERE\`.
+- \`SELECT key, ROW_NUMBER() OVER () FROM t\`, numbering rows.
+  > An unpartitioned row number just numbers every row.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a covering index, and what does it avoid?
+
+- An index on every column of the table.
+  > That would duplicate the table.
+- [o] An index holding every column the query needs.
+  > The query is then served from the index without reading the table rows. The saving is the random I/O of the table lookups, which on a wide table dominates.
+- An index that covers \`NULL\` values.
+  > \`NULL\` handling is orthogonal.
+- An index maintained by the query planner automatically.
+  > Indexes are created explicitly.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you join two very large tables efficiently in a distributed engine?
+
+- Broadcast one side of the join out to every node in the cluster.
+  > Broadcast works only when one side is small enough to fit in each worker's memory.
+- [o] Co-partition both sides so matching rows share a node.
+  > Otherwise accept a shuffle sort-merge join, and make sure the key is not skewed. Pre-bucketing on the join key is what turns a repeated expensive shuffle into a one-time cost.
+- Add an index on the join key.
+  > Most distributed engines do not use secondary indexes for this.
+- Convert the join to a subquery.
+  > Syntax does not change the physical strategy.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`NTILE(10)\` do?
+
+- Returns the value sitting at the 10th percentile of the column.
+  > That would be a percentile function.
+- [o] Splits the ordered partition into 10 equal-sized buckets.
+  > It returns each row's bucket number. With a row count that does not divide evenly, earlier buckets get the extra rows.
+- Returns every 10th row.
+  > Sampling by position is a different operation.
+- Rounds values to the nearest tenth.
+  > No arithmetic is applied to the values.`}
+/>
+
+<MultipleChoice
+  markdown={`\`UNION\` versus \`UNION ALL\`: which should be the default in a pipeline, and why?
+
+- \`UNION\`, because duplicates are always a bug.
+  > Deduplicating by default hides real duplicates that should have been investigated.
+- [o] \`UNION ALL\`, because it skips the deduplication pass.
+  > Reach for \`UNION\` only when you specifically need distinct rows. Silent deduplication also masks a fan-out upstream, which you would rather see fail a uniqueness test.
+- They perform identically, so the choice does not matter.
+  > \`UNION\` costs a sort or hash over the whole result.
+- \`UNION\`, because \`UNION ALL\` is non-standard.
+  > Both are standard SQL.`}
+/>
+
+<MultipleChoice
+  markdown={`What does partition pruning depend on?
+
+- The table being clustered.
+  > Clustering is a separate, complementary mechanism.
+- [o] A filter on the partition column the engine can read early.
+  > It is why the partition column should be the one people actually filter on, almost always a date.
+- The partition count happening to be an exact power of two.
+  > No such requirement.
+- Statistics being refreshed.
+  > Pruning uses partition metadata, not table statistics.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a materialized view, and what is its cost?
+
+- A view that gets recomputed from scratch on every single query.
+  > That is an ordinary view.
+- [o] A stored, precomputed result that repeated queries reuse.
+  > The cost is storage, and staleness until it is refreshed. Some engines refresh incrementally on write; others need a scheduled full refresh, which is a pipeline concern.
+- A view restricted to certain columns.
+  > Column restriction is just a projection.
+- A temporary table scoped to a session.
+  > Temp tables vanish with the session.`}
+/>
+
+<MultipleChoice
+  markdown={`Which returns rows present in the left table but absent from the right?
+
+- \`INNER JOIN\` with \`IS NULL\`.
+  > An inner join has already dropped the unmatched rows.
+- [o] \`LEFT JOIN ... WHERE right.key IS NULL\`, or equivalently \`NOT EXISTS\`.
+  > \`NOT IN\` expresses the same intent but returns nothing at all if the subquery yields a single \`NULL\`.
+- A \`FULL OUTER JOIN\` with no filtering applied afterwards.
+  > That returns everything from both sides.
+- \`CROSS JOIN\` with a filter.
+  > A cross join multiplies rows before anything is filtered.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a \`CROSS JOIN\` the right tool?
+
+- Never; it is always a mistake.
+  > It is the correct tool in several modelling situations.
+- [o] When you deliberately need every combination of two sets.
+  > A date spine crossed with every store produces a dense grid before joining sparse facts. The accidental version, from a missing join condition, is what gives it its reputation.
+- When the join key is missing entirely from one of the tables.
+  > A missing key is a modelling problem to fix, not to cross-join around.
+- When joining more than three tables.
+  > Table count is irrelevant.`}
+/>
+
+## Data modeling
+
+<MultipleChoice
+  markdown={`What does the grain of a fact table define?
+
+- How many partitions it needs.
+  > Partitioning follows from query patterns and size.
+- [o] Exactly what a single row represents.
+  > It determines which dimensions apply and whether a measure can be summed. "One row per order line per day" is testable with a uniqueness assertion; a table with no agreed grain accumulates double counting.
+- The physical sort order of the stored table.
+  > That is clustering.
+- The level of access control applied.
+  > Security is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between a star and a snowflake schema?
+
+- A star has more tables.
+  > A snowflake has more, since its dimensions are split.
+- [o] A snowflake normalizes its dimensions; a star does not.
+  > The star trades redundancy for fewer joins and simpler queries. The star trades some redundancy for fewer joins and simpler queries, which is usually the right trade in a warehouse.
+- A snowflake schema can support more fact tables than a star.
+  > Both support any number.
+- A star cannot express hierarchies.
+  > Hierarchies live inside the flat dimension as columns.`}
+/>
+
+<MultipleChoice
+  markdown={`Which SCD type preserves full history with validity ranges?
+
+- Type 0, which refuses the change.
+  > Type 0 retains the original value outright.
+- [o] Type 2.
+  > A new row per version with effective dates and a current flag, joined from facts on the surrogate key that was current at the time.
+- Type 1.
+  > Type 1 overwrites and keeps no history.
+- Type 3.
+  > Type 3 keeps only one prior value in an extra column.`}
+/>
+
+<MultipleChoice
+  markdown={`What are SCD Types 4 and 6?
+
+- Two names for the same technique.
+  > They are distinct.
+- [o] One splits out history; the other blends Types 1, 2, and 3.
+  > Type 4 puts fast-changing attributes in a separate history table; Type 6 lets a row carry both current and historical values. Type 6 is sometimes written as "1 + 2 + 3", which is where the number comes from.
+- Type 4 deletes old rows; Type 6 archives them.
+  > Neither discards history.
+- Type 4 applies to fact tables and Type 6 to dimension tables.
+  > Both are dimension techniques.`}
+/>
+
+<MultipleChoice
+  markdown={`What is 3NF, in one sentence?
+
+- Every table has a primary key.
+  > That is closer to 1NF's spirit and a general requirement.
+- [o] Every non-key attribute depends on the key and only the key.
+  > The whole key, and nothing but it, so no transitive dependencies remain. It is what prevents the same fact being stored in two places and drifting apart under update.
+- Every column holds an atomic value.
+  > That is 1NF.
+- No table is allowed to hold more than a single foreign key.
+  > Foreign key count is unconstrained.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a data vault, and when would you choose it over a star schema?
+
+- A backup format for warehouse tables.
+  > It is a modelling methodology, not a backup.
+- [o] Hubs, links, and satellites, chosen for auditability.
+  > Business keys, relationships, and attributes with history. It suits absorbing many changing sources when that matters more than query ergonomics. It is insert-only and highly normalized, so a dimensional presentation layer is usually built on top for consumers.
+- A star schema with all history removed.
+  > It retains more history, not less.
+- A NoSQL alternative to dimensional modelling entirely.
+  > It is implemented in relational warehouses.`}
+/>
+
+<MultipleChoice
+  markdown={`What does "grain mismatch" mean?
+
+- Two tables using different date formats.
+  > Formatting is a parsing issue.
+- [o] Combining tables whose rows represent different things.
+  > Order headers against order lines, say, so measures duplicate or fail to align. The fix is to aggregate one side to the other's grain before joining, rather than joining and hoping.
+- A partition key that was chosen with the wrong cardinality.
+  > That is a partitioning problem.
+- A dimension with missing members.
+  > That is a referential integrity problem.`}
+/>
+
+<MultipleChoice
+  markdown={`Why use a date dimension rather than date functions?
+
+- Date functions are simply unsupported in most cloud warehouses.
+  > They are universally supported.
+- [o] It puts fiscal calendars and holidays in one governed place.
+  > Week-start conventions and business-day flags too, and a join then does work that would otherwise be repeated in every query. It is also what makes "compare to the same week last year" a join rather than a bespoke expression.
+- It makes queries run faster in all cases.
+  > Any speed benefit is secondary and situational.
+- It is required for partitioning.
+  > Partitioning uses a column, not a dimension.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a surrogate key sequence's advantage over a UUID?
+
+- UUIDs cannot be primary keys.
+  > They can.
+- [o] Sequential integers are compact and keep storage ordered.
+  > They compress and sort well, where random UUIDs scatter writes and are four times wider. UUIDs win when keys must be generated independently across systems without coordination, which is a real trade rather than a wrong answer.
+- Sequences guarantee uniqueness across entirely separate systems.
+  > That is precisely what UUIDs offer and sequences do not.
+- UUIDs cannot be indexed.
+  > They index fine; they just index worse.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you model a many-to-many between facts and a dimension?
+
+- Duplicate the fact row per dimension member.
+  > Duplication breaks the grain and inflates every measure.
+- [o] Introduce a bridge table holding the pairs.
+  > An allocation weight lets measures be apportioned instead of double counted. Without the weight, "revenue by product category" for a multi-category order counts the revenue once per category.
+- Store the dimension keys as a comma-separated list.
+  > This is unjoinable and unqueryable without parsing.
+- Create a separate fact table per dimension member.
+  > Unmaintainable, and it fragments the measure.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a periodic snapshot fact table for?
+
+- Recording every individual transaction.
+  > That is a transaction fact.
+- [o] Capturing state at regular intervals rather than events.
+  > Daily balances and month-end inventory are the classic cases, and they answer questions about levels. Its measures are typically semi-additive: summable across accounts, not across days.
+- Storing a backup of a fact table.
+  > It is a modelling pattern, not a backup.
+- Tracking each milestone of a single long-running process.
+  > That is an accumulating snapshot.`}
+/>
+
+<MultipleChoice
+  markdown={`A dimension attribute changes and history does not matter. Which type applies, and what is the risk?
+
+- Type 2, with the risk of table growth.
+  > Type 2 is what you use when history *does* matter.
+- [o] Type 1, overwriting the attribute in place.
+  > The risk is that "history does not matter" is often wrong, and prior reports silently change when re-run. Once the old value is gone it cannot be recovered, which is why Type 2 is often the safer default for anything used in reporting.
+- Type 0, with the risk of stale data.
+  > Type 0 rejects the change entirely.
+- Type 3, with the risk of losing the current value.
+  > Type 3 retains both current and one prior value.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a mini-dimension, and what problem does it solve?
+
+- A dimension with fewer than 100 rows.
+  > Size alone does not define it.
+- [o] Fast-changing attributes split into their own small table.
+  > It stops Type 2 versioning from exploding the main dimension's row count. Demographic bands on a customer dimension are the classic case.
+- A dimension used by only one fact table.
+  > That is simply a non-conformed dimension.
+- A denormalized copy of a dimension, built purely for BI tools.
+  > That is a mart-level convenience table.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between a bus matrix and a data mart?
+
+- They are the same artifact seen at two different scales.
+  > One is a plan, the other a built thing.
+- [o] One is a planning grid, the other a built subject area.
+  > The bus matrix maps business processes against conformed dimensions; the mart is the thing you query. The matrix is what keeps independently-built marts conformable rather than accidentally incompatible.
+- A bus matrix is a physical table.
+  > It is documentation.
+- A data mart contains only aggregates.
+  > Marts usually contain detail as well.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you handle a fact row whose dimension member has not arrived yet?
+
+- Reject the fact and alert.
+  > Alerting is reasonable; rejecting loses the event.
+- [o] Assign it a reserved "unknown" dimension key, then repair it once the real member lands.
+  > Every dimension carrying an explicit unknown row is what stops an inner join from silently deleting facts.
+- Insert a dimension row carrying the key and \`NULL\` for the attributes.
+  > This creates a placeholder indistinguishable from a real member, which then collides when the genuine row arrives.
+- Use an outer join everywhere instead.
+  > Outer joins mask the problem and leave \`NULL\`s scattered through downstream logic.`}
+/>
+
+## Warehousing & storage
+
+<MultipleChoice
+  markdown={`Why is columnar storage faster for analytical queries?
+
+- Columns compress into a single file per table.
+  > File layout is not the mechanism.
+- [o] Fewer columns are read, and each compresses far better.
+  > Values within a column share a type, so encoding is much more effective. Less I/O on both counts. It is also why \`SELECT *\` is disproportionately expensive in a columnar store.
+- Columnar formats keep the entire table resident in memory.
+  > Memory residency is unrelated to layout.
+- Rows are stored sorted by primary key.
+  > Sorting is a separate choice.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes a good partition key?
+
+- The column with the most distinct values.
+  > High cardinality produces many tiny partitions and the small files problem.
+- [o] A low-cardinality column that queries reliably filter on.
+  > Most often a date, producing partitions of a workable size. The two tests are "do queries filter on it" and "are the resulting partitions neither tiny nor enormous".
+- The primary key.
+  > A unique key is the worst possible partition key.
+- Whichever column happens to be listed first in the schema.
+  > Column order carries no meaning here.`}
+/>
+
+<MultipleChoice
+  markdown={`How do Parquet, ORC, and Avro differ?
+
+- They are three broadly interchangeable columnar file formats.
+  > Avro is not columnar.
+- [o] Two are columnar; Avro is row-based with schema evolution.
+  > Parquet and ORC suit analytical scans, Avro suits streaming and record-at-a-time writes. Kafka pipelines commonly land Avro and convert to Parquet for the analytical layer.
+- Avro compresses better than both.
+  > Columnar formats compress better on analytical data.
+- ORC is a compressed form of Parquet.
+  > They are independent formats.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does compression work better in a columnar format?
+
+- Columnar files are smaller before compression.
+  > Uncompressed size is comparable.
+- [o] A column's values share a type and often a narrow range.
+  > Run-length, dictionary, and delta encodings all apply, where a mixed-type row would defeat them. A low-cardinality string column can compress by an order of magnitude through dictionary encoding alone.
+- Compression algorithms only ever work well on numeric data.
+  > They work on any bytes; homogeneity is what raises the ratio.
+- Columnar files skip compressing the headers.
+  > Header size is negligible.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the small files problem, and what causes it?
+
+- Files smaller than the block size get rejected outright.
+  > They are accepted, just inefficient.
+- [o] Per-file overhead comes to dwarf the actual read.
+  > Streaming micro-batches and over-partitioning are the usual causes. Compaction into roughly 128 MB to 1 GB files is the standard remedy.
+- Small files cannot be compressed.
+  > They compress, just less effectively.
+- It only affects HDFS.
+  > Object stores suffer from it too, through request overhead and listing cost.`}
+/>
+
+<MultipleChoice
+  markdown={`Why did ELT largely replace ETL?
+
+- Transformation logic became simpler.
+  > It generally became more complex.
+- [o] Cheap elastic compute made transform-in-place practical.
+  > Load the raw data first, and the transformations become versioned SQL rather than a separate processing tier. Keeping the raw data also means a logic change can be re-applied without re-extracting from the source.
+- Sources stopped supporting extraction.
+  > Extraction is unchanged.
+- ETL simply cannot cope with any semi-structured data at all.
+  > It can; the shift was economic and operational.`}
+/>
+
+<MultipleChoice
+  markdown={`What most drives cost in a cloud data warehouse?
+
+- The sheer number of tables the warehouse holds.
+  > Table count is close to free.
+- [o] Bytes scanned, or compute-seconds consumed.
+  > Both track how much data the queries actually read. It is why partitioning, clustering, narrow column selection, and materializing repeated heavy work are the levers that matter.
+- The number of users.
+  > Seat licensing exists but is rarely the dominant line.
+- Storage volume.
+  > Storage is usually the cheapest component by a wide margin.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a lakehouse?
+
+- A warehouse with a separate data lake bolted onto it.
+  > Coexistence is not the architecture.
+- [o] Open table formats layered over object storage.
+  > Delta, Iceberg, and Hudi add ACID transactions, schema enforcement, and time travel to lake-scale files. One copy of the data then serves SQL engines and Spark or Python alike, which is the point.
+- A data lake queried through a BI tool.
+  > A connector adds no transactional guarantees.
+- A warehouse that stores only Parquet.
+  > File format alone is not the distinction.`}
+/>
+
+<MultipleChoice
+  markdown={`How does schema evolution differ between Avro and Parquet?
+
+- Neither supports it.
+  > Both do, differently.
+- [o] Avro resolves a writer schema against a reader schema.
+  > That handles added, removed, and renamed fields. Parquet supports evolution too, but is more constrained around type changes and ordering. It is why Avro is favoured at the ingestion boundary where sources change unpredictably.
+- Parquet requires rewriting all historical files on any change.
+  > Adding a column does not require a rewrite.
+- Avro requires the schema to be embedded in every record.
+  > The schema is per file, or held in a registry.`}
+/>
+
+<MultipleChoice
+  markdown={`What is predicate and projection pushdown?
+
+- Two names for partition pruning.
+  > Pruning is a related but coarser mechanism.
+- [o] Pushing the filter and column list into the file scan.
+  > The reader then skips row groups and columns instead of returning everything for the engine to discard. Parquet's per-row-group min/max statistics are what make predicate pushdown effective.
+- Moving the computation from the client over to the server.
+  > That is a different architectural idea.
+- Rewriting joins as subqueries.
+  > Unrelated to scan behavior.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between OLTP and OLAP storage layout?
+
+- OLTP is columnar and OLAP is row-based.
+  > This has them the wrong way round.
+- [o] One stores rows together, the other stores columns together.
+  > OLTP reads or writes a whole record in one place; OLAP scans few columns over many rows. It follows directly from the workload: point reads and writes versus wide aggregate scans.
+- Both are columnar; only the indexes differ.
+  > Transactional systems are overwhelmingly row-oriented.
+- The layout is identical, and only the underlying hardware differs.
+  > Layout is the defining difference.`}
+/>
+
+<MultipleChoice
+  markdown={`What does clustering (or sorting) within a partition buy you?
+
+- It reduces the number of partitions.
+  > Partition count is unchanged.
+- [o] Similar values sit together, so whole blocks can be skipped.
+  > Per-block min/max statistics are what let the engine rule a block out. It is the finer-grained companion to partition pruning, and it is where high-cardinality filter columns belong.
+- It compresses the partition further.
+  > Compression often does improve, but skipping is the mechanism that matters.
+- It enforces uniqueness of the keys inside each partition.
+  > No constraint is implied.`}
+/>
+
+<MultipleChoice
+  markdown={`A pipeline writes 5,000 files of 2 MB each per hour. What should you change?
+
+- Nothing at all, since more files parallelize better.
+  > Past the parallelism you can actually use, files cost more than they return.
+- [o] Compact them into far fewer, much larger files.
+  > Roughly 128 MB to 1 GB, either at write time or in a periodic compaction job. Per-file open, metadata, and object-store request overhead is what dominates otherwise.
+- Switch from Parquet to CSV.
+  > That loses columnar reads and compression, making things worse.
+- Add more partitions.
+  > More partitions produces more, smaller files.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`SELECT *\` cost disproportionately more in a columnar warehouse?
+
+- It disables the query cache.
+  > Caching keys on the query text; the column list is not the issue.
+- [o] \`*\` gives up reading only the columns you actually name.
+  > Every column is read, including the large rarely-used ones. On a wide table it can be the difference between scanning gigabytes and scanning terabytes.
+- It forces a full sort.
+  > No sort is implied.
+- It quietly stops the engine from pruning any partitions.
+  > Pruning depends on the \`WHERE\` clause, not the projection.`}
+/>
+
+<MultipleChoice
+  markdown={`What does time travel in a lakehouse table format give you?
+
+- Automatic backups to cold storage.
+  > Backup is a separate mechanism.
+- [o] Querying the table as of an earlier version or timestamp.
+  > Reproducing a report and recovering from a bad write both become straightforward. Retention of old snapshots costs storage, so a vacuum or expiry policy is part of operating it.
+- Noticeably faster queries across the historical partitions.
+  > No speed benefit is implied.
+- Scheduled rollback of failed pipelines.
+  > It enables rollback; it does not schedule it.`}
+/>
+
+## Pipelines & orchestration
+
+<MultipleChoice
+  markdown={`What makes a pipeline idempotent, and why does it matter most?
+
+- It runs in under an hour.
+  > Duration is unrelated.
+- [o] Re-running the same window produces the same result.
+  > It is what makes retries, backfills, and recovery from partial failure safe. The usual implementations are delete-then-insert per partition, or a merge on a unique key. Blind appends break it.
+- It never writes to the same target table more than once.
+  > Rewriting the same partition is exactly how idempotency is achieved.
+- It has no external dependencies.
+  > Dependencies are orthogonal.`}
+/>
+
+<MultipleChoice
+  markdown={`What does an orchestrator give you over cron?
+
+- Lower latency between tasks.
+  > Latency is comparable.
+- [o] Dependency-aware scheduling, retries, and observability.
+  > Backfills too, and a place for failure to be visible rather than silent. Cron runs a command at a time and knows nothing about whether the thing it depends on succeeded.
+- Guaranteed exactly-once execution.
+  > Neither provides that; the task must be idempotent.
+- The ability to run several separate tasks all in parallel.
+  > Cron can start parallel jobs; it just cannot coordinate them.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is a common DAG anti-pattern?
+
+- Splitting work into many small tasks.
+  > Granularity aids retries and observability.
+- [o] One monolithic task doing extract, transform, and load.
+  > A failure at the end re-runs everything, and the logs say only "failed". The opposite extreme (thousands of trivial tasks) has its own scheduler overhead, so the balance is per-pipeline.
+- Declaring the explicit dependencies that link the tasks.
+  > That is what a DAG is for.
+- Using sensors to wait for upstream data.
+  > Sensors are a legitimate pattern, in reschedule mode.`}
+/>
+
+<MultipleChoice
+  markdown={`Why prefer a sensor in reschedule mode over poke mode?
+
+- Reschedule mode polls more frequently.
+  > It generally polls less frequently.
+- [o] Poke mode holds a worker slot; reschedule mode releases it.
+  > A long wait then does not starve the pool. A handful of poke-mode sensors waiting hours is a classic way to deadlock an Airflow deployment.
+- Reschedule mode retries automatically whenever a check fails.
+  > Retries are configured separately.
+- Poke mode cannot express a timeout.
+  > Both support timeouts.`}
+/>
+
+<MultipleChoice
+  markdown={`What should you *not* retry automatically?
+
+- A transient network timeout.
+  > That is the canonical retry case.
+- [o] A deterministic failure such as a schema mismatch.
+  > Every attempt fails identically, so the retries only delay the alert. Retrying a non-idempotent write is the other case, since each attempt can compound the damage.
+- A rate-limit response.
+  > Retrying with backoff is the correct handling.
+- A transient period of upstream service unavailability.
+  > Retries are exactly right there.`}
+/>
+
+<MultipleChoice
+  markdown={`Where do data-quality checks belong in a DAG?
+
+- Only at the very end, once everything downstream has been built.
+  > A failure there tells you something is wrong but not where.
+- [o] Between stages, so bad data is blocked from propagating.
+  > Otherwise it is discovered in a dashboard, much later. Checking the source's assumptions first, and the mart's business rules last, localizes problems quickly.
+- In a separate DAG that runs afterwards.
+  > By then downstream consumers have already read the data.
+- Only on the source tables.
+  > Source checks cannot catch a bug in your own transformation.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a circuit breaker in a pipeline?
+
+- A task that halts the whole DAG at some fixed wall-clock time.
+  > That is a timeout.
+- [o] A check that halts the pipeline when a signal looks wrong.
+  > A row count off by 90%, or a source that returned nothing, beats publishing obviously broken data. It trades freshness for correctness, which is nearly always the right trade for a reporting pipeline.
+- A retry limit.
+  > Retry limits bound attempts, not data quality.
+- A rollback of the previous run.
+  > Rollback is a recovery action, not a breaker.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between a backfill, a retry, and a rerun?
+
+- They are three names for the same operation.
+  > They differ in intent and scope.
+- [o] One re-attempts, one re-executes, one covers history.
+  > A retry re-attempts a failed task in place; a rerun re-executes a completed run after a logic change; a backfill covers historical intervals. All three depend on idempotency to be safe, which is why it comes first.
+- A backfill only applies to streaming pipelines.
+  > It is primarily a batch concept.
+- A rerun always requires the table to be deleted first.
+  > Only if the write is not idempotent, which is the thing to fix.`}
+/>
+
+<MultipleChoice
+  markdown={`What is dead-letter handling?
+
+- Deleting any record which fails to process cleanly.
+  > Deletion loses the evidence.
+- [o] Routing unprocessable records to a separate store.
+  > The pipeline keeps moving, and the failures can be inspected and replayed. Without one, a single malformed record either halts the pipeline or is silently dropped, and both are bad.
+- Retrying a record indefinitely.
+  > A poison record then blocks the queue forever.
+- Logging the failure and continuing.
+  > A log line is not replayable.`}
+/>
+
+<MultipleChoice
+  markdown={`A source system adds a column without warning. How should a well-built pipeline behave?
+
+- Fail the entire load.
+  > An additive change rarely justifies halting ingestion.
+- [o] Ingest tolerantly, and fail loudly only where a contract breaks.
+  > Strict at the boundary that matters, permissive where it does not, is what keeps a pipeline both safe and operable.
+- Silently ignore all schema changes.
+  > A removed or retyped column would then break things quietly.
+- Automatically propagate the new column to every downstream model.
+  > Automatic propagation ships unreviewed columns into consumer-facing tables.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a Medallion (Bronze/Silver/Gold) architecture describe?
+
+- Three tiers of storage cost.
+  > Storage tiering is unrelated.
+- [o] Progressive refinement across three named layers.
+  > Raw ingested data, then cleaned and conformed data, then business-level aggregates ready for consumption. The value is that each layer has one job, so a problem can be traced to the layer that introduced it.
+- Three separate warehouses.
+  > They are layers within one platform.
+- A scoring system that grades the quality of data.
+  > No scores are involved.`}
+/>
+
+<MultipleChoice
+  markdown={`How do Lambda and Kappa architectures differ?
+
+- Lambda is serverless; Kappa is not.
+  > The names have nothing to do with AWS Lambda.
+- [o] One runs two layers in parallel; the other runs one.
+  > Lambda merges a batch and a speed layer; Kappa uses a single streaming path and replays the log when recomputation is needed. Lambda's cost is maintaining the same logic twice, which is exactly what Kappa set out to remove.
+- Kappa handles only batch workloads.
+  > Kappa is the streaming-only design.
+- Lambda architecture cannot handle real-time data at all.
+  > Its speed layer exists for precisely that.`}
+/>
+
+<MultipleChoice
+  markdown={`What is data lineage, and why does it matter operationally?
+
+- A log of who queried each table.
+  > That is access auditing.
+- [o] The dependency graph from sources through to consumers.
+  > It is what makes impact analysis and root-cause tracing possible. "What breaks if I change this column" and "which upstream failure caused this dashboard to be wrong" are both lineage questions.
+- The history of schema changes.
+  > Schema history is version control.
+- The chain of ownership standing behind each dataset.
+  > Ownership is metadata, adjacent to lineage but distinct.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you enforce a pipeline SLA rather than merely state one?
+
+- Document the expected completion time somewhere visible.
+  > Documentation alone changes nothing.
+- [o] Instrument completion and freshness, then alert on a miss.
+  > The alert has to route to someone who can actually act on it. An SLA nobody measures is a wish. Tracking the miss rate over time is also what justifies the engineering work to fix it.
+- Increase the retry count.
+  > More retries can make a run finish later, not sooner.
+- Run the pipeline more frequently.
+  > Frequency does not guarantee timeliness of any one run.`}
+/>
+
+<MultipleChoice
+  markdown={`What is Change Data Capture, and when do you use it?
+
+- A batch job that compares today's full export against yesterday's.
+  > That is a diff-based approach CDC exists to avoid.
+- [o] Reading the database's transaction log as changes happen.
+  > Inserts, updates, and crucially deletes all stream out, which is what query-based incremental extraction misses. Query-based incremental extraction misses hard deletes entirely, which is the usual reason to reach for CDC.
+- A schema versioning tool.
+  > Unrelated to schema.
+- A method for detecting drift in a model.
+  > That is a machine-learning concept.`}
+/>
+
+## Distributed processing
+
+<MultipleChoice
+  markdown={`What is the difference between a transformation and an action in Spark?
+
+- Transformations write to disk, while actions write to memory.
+  > Neither necessarily writes anywhere.
+- [o] Transformations are lazy; an action triggers execution.
+  > A transformation returns a new DataFrame; \`count\` or \`write\` runs the whole plan. Lazy evaluation is what lets the optimizer fuse operations and push filters down before anything runs.
+- Actions are always faster.
+  > Actions do the work, so they are where time is spent.
+- Transformations can only be applied once.
+  > They compose freely.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a shuffle expensive?
+
+- It recomputes the entire lineage.
+  > Recomputation happens only on failure.
+- [o] It redistributes data across the network by key.
+  > Intermediate files are written and everything is serialized, so it is bounded by disk and network rather than CPU. Minimizing shuffles (broadcast joins, pre-partitioning, \`reduceByKey\` over \`groupByKey\`) is most of Spark performance tuning.
+- It forces every one of the partitions onto a single node.
+  > That would be a collect, not a shuffle.
+- It disables parallelism.
+  > Both sides of a shuffle run in parallel.`}
+/>
+
+<MultipleChoice
+  markdown={`What distinguishes a narrow from a wide dependency?
+
+- Narrow dependencies use fewer columns.
+  > Column count is irrelevant.
+- [o] Whether an output partition draws from one input or many.
+  > Narrow needs no shuffle; wide forces one, and starts a new stage. \`map\` and \`filter\` are narrow; \`groupBy\` and \`join\` on an unpartitioned key are wide, and each wide dependency starts a new stage.
+- Wide dependencies apply only to joins.
+  > Aggregations and repartitions are wide too.
+- Narrow dependencies cannot be parallelized in any way at all.
+  > They parallelize perfectly.`}
+/>
+
+<MultipleChoice
+  markdown={`What is data skew, and how do you address it?
+
+- Data arriving out of order.
+  > Ordering is a streaming concern.
+- [o] A few keys hold a disproportionate share of the rows.
+  > One task then runs far longer than the rest. Salting the hot key, or broadcasting the small side, spreads the work. The tell is a stage where 199 of 200 tasks finish quickly and one runs for an hour.
+- Data that does not fit the schema.
+  > That is a validation problem.
+- Partitions that end up with unequal file sizes on disk.
+  > Related symptom, but skew is about key distribution.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a broadcast join the right choice?
+
+- Whenever both tables are large.
+  > Broadcasting a large table exhausts executor memory.
+- [o] When one side fits in each executor's memory.
+  > It can then be copied everywhere, and the large side never shuffles. Spark applies it automatically under a size threshold, and a broadcast hint forces it when statistics are wrong.
+- When the join key is unique.
+  > Uniqueness does not determine the strategy.
+- When both of the tables are already sorted on the join key.
+  > Sortedness favours a sort-merge join.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`reduceByKey\` preferred over \`groupByKey\`?
+
+- It preserves the order of values.
+  > Neither guarantees order.
+- [o] It combines values on the map side before shuffling.
+  > Far less data crosses the network, where \`groupByKey\` shuffles every value. On a skewed key, \`groupByKey\` can also blow up a single executor's memory holding the whole group.
+- It handles \`NULL\` keys correctly.
+  > Both treat keys the same way.
+- It is the only one that works on DataFrames.
+  > Both are RDD operations; the DataFrame API applies the same optimization automatically.`}
+/>
+
+<MultipleChoice
+  markdown={`How does Spark achieve fault tolerance?
+
+- By replicating every partition three times.
+  > Replication is the storage layer's job.
+- [o] By recording the lineage of the transformations.
+  > A lost partition is recomputed from its inputs rather than restored from a copy. Checkpointing truncates a lineage that has grown too long or expensive to replay.
+- By writing every intermediate result to disk.
+  > Only shuffle boundaries write intermediate data.
+- By retrying the entire job.
+  > Only the lost tasks are recomputed.`}
+/>
+
+<MultipleChoice
+  markdown={`Why should you avoid \`collect()\` on a large DataFrame?
+
+- It is deprecated.
+  > It is current and useful at small scale.
+- [o] It pulls every row back to the driver.
+  > The driver has finite memory. A large result crashes the driver rather than the executors. \`take(n)\`, \`limit\`, or writing to storage are the alternatives when you only need a sample or the full output elsewhere.
+- It bypasses the query optimizer.
+  > The plan is optimized either way.
+- It silently converts the DataFrame into an RDD first.
+  > It returns a local collection.`}
+/>
+
+<MultipleChoice
+  markdown={`When is caching a DataFrame worth it?
+
+- Always; caching is free.
+  > Cached partitions consume executor memory that the shuffle and execution also need.
+- [o] When the same DataFrame is reused and recomputing costs more.
+  > It matters most after an expensive shuffle or a slow read. Caching something used once just adds overhead, and over-caching causes eviction that makes things slower still.
+- Only for DataFrames smaller than one partition.
+  > Size matters for feasibility, but reuse is the criterion.
+- Only when using the RDD API.
+  > Both APIs support it.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the relationship between a job, a stage, and a task in Spark?
+
+- They are three names for one unit of work.
+  > They nest.
+- [o] They nest: a job splits into stages, which split into tasks.
+  > An action creates the job, shuffle boundaries split the stages, and each stage runs one task per partition. It is why the number of tasks in a stage equals the partition count, and why partition count is such a load-bearing tuning knob.
+- A task contains several stages.
+  > The nesting is the other way round.
+- Stages run sequentially within a task.
+  > Tasks are the leaves of the hierarchy.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the MapReduce mental model consist of?
+
+- Splitting, sorting, and merging files.
+  > Those are implementation steps, not the model.
+- [o] Map to key-value pairs, shuffle by key, then reduce.
+  > The map phase runs independently per input split, and the reduce phase aggregates each group. Nearly every distributed processing framework since is a generalization of this shape, which is why it is still worth being able to reason in.
+- A driver distributing work to workers by round robin.
+  > That describes task scheduling generally.
+- Loading data into memory across a cluster.
+  > Memory residency is Spark's departure from classic MapReduce, not the model.`}
+/>
+
+<MultipleChoice
+  markdown={`How does Spark differ most from classic Hadoop MapReduce?
+
+- Spark uses SQL and MapReduce does not.
+  > Hive provided SQL over MapReduce.
+- [o] Spark keeps intermediate results in memory across stages.
+  > It also optimizes a whole DAG at once, where MapReduce writes to disk between every map and reduce. It is why iterative workloads (machine learning, graph algorithms) improved by an order of magnitude.
+- Spark is single-node and MapReduce is distributed.
+  > Both are distributed.
+- MapReduce cannot handle failures.
+  > Fault tolerance was one of its central features.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the effect of setting the shuffle partition count too low?
+
+- Too many small tasks, dominated by scheduling overhead.
+  > That is the symptom of setting it too *high*.
+- [o] Each task handles too much data and spills to disk.
+  > Some tasks run out of memory, and the available parallelism is left unused. The default of 200 is a frequent culprit at both ends: far too many for a small job, far too few for a large one.
+- The job fails to start.
+  > It runs; it just runs badly.
+- Shuffles are skipped entirely.
+  > The shuffle still happens.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a sort-merge join do, and when is it chosen?
+
+- Broadcasts the smaller side to every executor.
+  > That is a broadcast hash join.
+- [o] Shuffles both sides by the key, sorts, and merges.
+  > It is the general strategy when neither side is small enough to broadcast. Pre-partitioning or bucketing both tables on the join key lets the shuffle be skipped on subsequent joins.
+- Joins without any network transfer.
+  > Both sides move unless already co-partitioned.
+- Only works on sorted input files.
+  > It sorts as part of its execution.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does Spark use lazy evaluation?
+
+- To reduce driver memory.
+  > Driver memory is not the motivation.
+- [o] Deferring execution lets the optimizer see the whole plan.
+  > It can then push filters down, prune columns, and fuse narrow operations into one pass. Eager evaluation would materialize intermediate results the optimizer could otherwise have eliminated.
+- To allow transformations to be undone.
+  > Nothing is undone.
+- Because transformations run on the driver.
+  > Transformations run on executors when triggered.`}
+/>
+
+## Streaming
+
+<MultipleChoice
+  markdown={`What does a Kafka partition guarantee?
+
+- Global ordering across the whole topic.
+  > Ordering is per partition only.
+- [o] Ordering within the partition, and one consumer per group.
+  > Messages that must stay ordered relative to each other therefore need a shared partition key. It is why messages that must stay ordered relative to each other need a shared partition key.
+- Exactly-once delivery.
+  > That requires transactions and idempotent producers on top.
+- That each message is delivered to every consumer.
+  > Within a group, each message goes to one consumer; separate groups each get a copy.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens when a consumer group has more consumers than partitions?
+
+- Throughput increases proportionally.
+  > It cannot; there is nothing more to assign.
+- [o] The surplus consumers simply sit idle.
+  > A partition is assigned to only one consumer in the group. Partition count is therefore the ceiling on a group's parallelism, and it is why it is chosen with headroom.
+- Partitions are split automatically.
+  > Partition count only changes by explicit reconfiguration.
+- Messages are duplicated across consumers.
+  > Duplication happens across groups, not within one.`}
+/>
+
+<MultipleChoice
+  markdown={`What does committing an offset mean?
+
+- Deleting the messages up to that point.
+  > Retention governs deletion, independently of any consumer.
+- [o] Recording how far the consumer group has progressed.
+  > A restart or a rebalance then resumes from there instead of the beginning. Committing before processing risks losing messages; committing after risks reprocessing them, which is why idempotent handling matters.
+- Acknowledging receipt to the producer.
+  > Producers get acknowledgements from brokers, not consumers.
+- Locking the partition.
+  > Assignment, not offsets, controls exclusivity.`}
+/>
+
+<MultipleChoice
+  markdown={`What does at-least-once delivery mean for your consumer?
+
+- Nothing; the broker deduplicates.
+  > Kafka does not deduplicate on the consumer's behalf.
+- [o] A message can arrive twice, so the handler must be idempotent.
+  > Keyed upserts, or a deduplication store on the message id, both work. Most production systems choose at-least-once plus idempotency over the coordination cost of true exactly-once.
+- Messages may be lost but never duplicated.
+  > That is at-most-once.
+- Each message is processed exactly once.
+  > That is a stronger guarantee requiring transactional coordination.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between event time and processing time?
+
+- Event time is when the record was written to Kafka.
+  > That is closer to ingestion time, a third distinct notion.
+- [o] When it happened, against when you got round to it.
+  > Windowing on event time stays correct across replays and delays; processing time does not. Windowing on event time gives results that stay correct across replays and delays; processing time does not.
+- They are the same when the pipeline is fast enough.
+  > They converge, but never provably coincide.
+- Processing time is only relevant in batch systems.
+  > It is a streaming concept.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a watermark represent?
+
+- The maximum size of a window.
+  > Window size is configured separately.
+- [o] An assertion that no older events are still expected.
+  > It is what allows a window to be closed and emitted. It is a heuristic trade: a later watermark waits for more stragglers at the cost of latency.
+- The point at which a consumer last committed.
+  > That is an offset.
+- The threshold at which backpressure begins.
+  > Backpressure is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`What are the main window types in stream processing?
+
+- Fixed, floating, and dynamic.
+  > Not the standard vocabulary.
+- [o] Tumbling, hopping or sliding, and session windows.
+  > Fixed and non-overlapping, fixed and overlapping, and bounded by a gap of inactivity. Session windows are the natural fit for user activity, since their length is determined by behavior rather than a clock.
+- Batch, micro-batch, and continuous.
+  > Those describe execution models.
+- Time, count, and key.
+  > Count-based windows exist, but this is not the standard triad.`}
+/>
+
+<MultipleChoice
+  markdown={`How should late-arriving data be handled once its window has closed?
+
+- Discard it silently.
+  > Silent loss is the outcome you are trying to avoid noticing too late.
+- [o] Choose deliberately, rather than defaulting.
+  > Allow a grace period, route to a side output, or drop with a metric. Update the emitted result, route it aside for separate handling, or drop it with a metric so the volume stays visible. The wrong answer is having no policy, which usually means dropping it invisibly.
+- Reopen the closed window indefinitely.
+  > Unbounded state grows until the job fails.
+- Reprocess the entire stream.
+  > A full replay is a recovery mechanism, not routine handling.`}
+/>
+
+<MultipleChoice
+  markdown={`What is log compaction in Kafka?
+
+- Compressing messages to save disk.
+  > That is message compression, configured separately.
+- [o] Retaining the most recent value per key indefinitely.
+  > Older values for the same key are discarded. It turns a topic into a changelog you can replay to rebuild current state, which is what makes it suit CDC and state stores.
+- Deleting messages older than the retention period.
+  > That is time-based retention, the other policy.
+- Merging small segment files.
+  > Segment management is internal housekeeping.`}
+/>
+
+<MultipleChoice
+  markdown={`What is backpressure, and how do streaming systems handle it?
+
+- A spike in producer throughput.
+  > The spike is the cause; backpressure is the response.
+- [o] The signal that a consumer cannot keep up.
+  > Slow the source, buffer to bounded storage, or shed load deliberately. A system with no backpressure mechanism instead exhausts memory and fails, which is strictly worse than slowing down.
+- Messages that end up delivered out of order.
+  > Ordering is a separate concern.
+- The latency added by a watermark.
+  > Watermark delay is a deliberate correctness trade.`}
+/>
+
+<MultipleChoice
+  markdown={`How is exactly-once processing achieved in Kafka?
+
+- By setting \`acks=all\` on the producer.
+  > That improves durability, not deduplication.
+- [o] An idempotent producer plus transactions across the cycle.
+  > Offsets and output then commit atomically over consume-process-produce. It holds within Kafka. The moment the output goes to an external system, the practical answer is at-least-once plus an idempotent write.
+- By committing offsets before processing.
+  > That yields at-most-once, losing messages on failure.
+- By disabling retries.
+  > Disabling retries loses messages rather than deduplicating them.`}
+/>
+
+<MultipleChoice
+  markdown={`How does a streaming join differ from a batch join?
+
+- It cannot join on more than one key.
+  > Key count is unconstrained.
+- [o] Both sides arrive over time, so the join needs buffered state.
+  > The buffer is bounded by a window, and a match may simply never arrive. Deciding how long to hold state, and what to do with unmatched rows when it expires, is the design work a batch join never requires.
+- It produces the same result as a batch join with no extra considerations.
+  > State and time make it materially different.
+- It requires both streams to be sorted.
+  > Ordering is per partition and not a precondition.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you make a Kafka consumer idempotent?
+
+- Commit offsets more frequently.
+  > Frequent commits narrow the duplicate window without closing it.
+- [o] Key the work so that reprocessing converges.
+  > An upsert on a natural key, or a processed-id store checked before acting. Once the handler is idempotent, at-least-once delivery stops being a problem worth engineering around.
+- Process messages in a single thread.
+  > Concurrency is not the source of duplicates.
+- Increase the session timeout.
+  > A longer timeout reduces rebalances but does not make reprocessing safe.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the number of partitions in a Kafka topic matter?
+
+- It determines how long messages are retained.
+  > Retention is configured separately.
+- [o] It caps parallelism and fixes the unit of ordering.
+  > Increasing it later changes key-to-partition mapping, breaking per-key ordering for existing keys, which is why it is chosen with headroom. That last point is why partition count is chosen with headroom rather than tuned reactively.
+- It controls the replication factor.
+  > Replication is an independent setting.
+- More partitions always mean higher throughput.
+  > Past a point, more partitions add broker overhead and rebalance cost.`}
+/>
+
+<MultipleChoice
+  markdown={`When should a streaming pipeline be chosen over batch?
+
+- Whenever the data volume is large.
+  > Large volumes are often better served by batch.
+- [o] When the value of the result decays within minutes.
+  > Fraud detection, alerting, and live personalization justify the extra operational complexity. Batch is simpler to reason about, cheaper to reprocess, and easier to test; streaming should be a requirement, not a default.
+- Whenever the source is a message queue.
+  > A queue can perfectly well be drained in batches.
+- When the pipeline must be idempotent.
+  > Idempotency is required in both.`}
+/>
+
+## Python
+
+<MultipleChoice
+  markdown={`How do you process a file larger than memory?
+
+- Read it with \`read()\` and slice the string.
+  > \`read()\` loads the whole file first, which is the problem.
+- [o] Iterate line by line, or read fixed-size chunks.
+  > Memory then stays constant regardless of file size. For CSV, \`pandas.read_csv(..., chunksize=n)\` gives the same property with a DataFrame per chunk.
+- Load it into a list and process in batches.
+  > The list holds everything at once.
+- Increase the process's memory limit.
+  > This postpones the failure rather than removing it.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between an iterable and an iterator?
+
+- They are synonyms.
+  > One produces the other.
+- [o] One can produce the other, which is the stateful cursor.
+  > An iterable supplies an iterator via \`__iter__\`; the iterator has \`__next__\` and yields until exhausted. A list can be iterated repeatedly; the iterator it hands out can be consumed only once, which is the source of many "the second loop found nothing" bugs.
+- An iterator can be indexed and an iterable cannot.
+  > Neither guarantees indexing; sequences do.
+- Iterables are lazy and iterators are eager.
+  > Laziness belongs to generators specifically.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you make a network call resilient?
+
+- Retry immediately in a tight loop until it succeeds.
+  > Hammering a struggling service makes the outage worse.
+- [o] Bounded retries with exponential backoff and jitter.
+  > Only on transient errors, and under an overall timeout. Jitter matters at scale: without it, every client retries in lockstep and recreates the spike.
+- Catch every exception and continue.
+  > This silently converts failures into missing data.
+- Set an infinite timeout so the call always completes.
+  > A hung call then blocks the pipeline indefinitely.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you aggregate a stream without holding every row?
+
+- Collect all rows into a list, then aggregate.
+  > That is the memory profile being avoided.
+- [o] Maintain running accumulators as each record passes.
+  > A running count and sum give a mean; a \`Counter\` keyed by group gives per-group totals. Some statistics, such as an exact median, genuinely need the full data or an approximation such as a t-digest.
+- Sort the stream first.
+  > Sorting requires materializing everything.
+- Use \`pandas\` on the whole stream.
+  > That materializes it too.`}
+/>
+
+<MultipleChoice
+  markdown={`Which is the correct way to deduplicate a list while preserving order?
+
+- \`list(set(items))\`
+  > A set discards order, which varies between runs for some types.
+- [o] \`list(dict.fromkeys(items))\`
+  > Dictionaries preserve insertion order as of Python 3.7, and the lookup stays O(1) per item.
+- \`sorted(set(items))\`
+  > This produces sorted order, not the original order.
+- A nested loop checking membership in the output list.
+  > Correct but O(n²), since each membership test scans the list.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes a transform idempotent in Python terms?
+
+- It has no side effects at all.
+  > Purity is stronger than needed; the write can have effects as long as they converge.
+- [o] Applying it twice to one input leaves the same result.
+  > Typically by keying the output and overwriting rather than appending. A function that appends a row per call is not idempotent no matter how pure its computation is.
+- It uses only immutable data structures.
+  > Immutability helps but does not determine the write behavior.
+- It runs in a single thread.
+  > Concurrency is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you parse a value that may be malformed, without stopping the pipeline?
+
+- Wrap the whole batch in one \`try\`/\`except\`.
+  > One bad record then discards the entire batch.
+- [o] Parse per record and route failures to a dead-letter store.
+  > Catch the specific exception, and keep enough context to diagnose them. Counting the failures as a metric is what turns a slow degradation into something visible.
+- Use a bare \`except:\` and continue.
+  > A bare except also swallows \`KeyboardInterrupt\` and genuine bugs.
+- Validate with a regular expression first, then parse without error handling.
+  > Validation reduces failures but cannot guarantee none.`}
+/>
+
+<MultipleChoice
+  markdown={`When should you reach for pandas rather than plain Python?
+
+- Whenever the data has more than 100 rows.
+  > Plain Python is fine well past that.
+- [o] When the work is columnar and fits comfortably in memory.
+  > Group-and-aggregate, joins, and time-series resampling all vectorize well. Streaming row-at-a-time work with constant memory is where generators still win.
+- Whenever reading a CSV.
+  > \`csv\` from the standard library is often the better tool for a streaming read.
+- When you need to guarantee type safety.
+  > pandas dtypes are flexible rather than a guarantee.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the most common performance pitfall in Python data code?
+
+- Using too many functions.
+  > Function call overhead is rarely the bottleneck.
+- [o] Doing per-row work in the interpreter needlessly.
+  > \`iterrows\`, \`apply(axis=1)\`, and appending to a DataFrame in a loop are the usual culprits, and the last is quadratic. Appending to a DataFrame in a loop is quadratic, since each append copies the whole frame.
+- Reading files instead of databases.
+  > Source choice is a design decision, not a pitfall.
+- Using generators instead of lists.
+  > Generators are usually the improvement.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you split an iterable into fixed-size batches without materializing it?
+
+- \`[items[i:i+n] for i in range(0, len(items), n)]\`
+  > Slicing requires a sequence with a known length, so it will not work on a generator.
+- [o] Take \`n\` items at a time with \`itertools.islice\`.
+  > Or use \`itertools.batched\` on Python 3.12 and later. Both keep memory bounded to one batch, which is the whole point when the source is a stream.
+- Convert to a list first, then slice.
+  > That materializes everything.
+- Use \`zip(*[iter(items)] * n)\`.
+  > A well-known trick, but it silently drops the final partial batch.`}
+/>
+
+## Keep practicing
+
+Missed a few? Each section maps to a topic page with the long-form reasoning
+and runnable examples:
+
+- [SQL](/interview-prep/data-engineer/sql)
+- [Data modeling](/interview-prep/data-engineer/data-modeling)
+- [Data warehousing & storage](/interview-prep/data-engineer/data-warehousing)
+- [Pipelines & systems](/interview-prep/data-engineer/pipelines)
+- [Orchestration & reliability](/interview-prep/data-engineer/orchestration-and-reliability)
+- [Distributed processing](/interview-prep/data-engineer/distributed-processing)
+- [Streaming & messaging](/interview-prep/data-engineer/streaming)
+- [Python for data engineering](/interview-prep/data-engineer/python)

@@ -8,8 +8,15 @@
  * lesson page, this places the matching `<Figure>` on every page so nothing is
  * missed by hand across a 30-page course.
  *
+ * Works on either content collection. `--collection courses` (the default)
+ * walks `content/courses` and pairs pages with `course-thumbnail` /
+ * `course-illustration` prompts; `--collection interview` walks
+ * `content/interview` and pairs them with `interview-thumbnail` /
+ * `interview-illustration`. Everything else about the two is identical, which
+ * is why they share one script rather than diverging into two.
+ *
  * What it does per file, keyed on the prompt whose `lesson` matches the file
- * stem (`index.mdx` uses the course's `course-thumbnail` prompt instead):
+ * stem (`index.mdx` uses the collection's thumbnail prompt instead):
  *
  *   - Drops any `<Figure>` pointing at a slug that is not a known prompt id.
  *     That is how retired art (the old risographs and one-off slugs) is cleared.
@@ -37,18 +44,34 @@
  * Usage:
  *   node scripts/wire-course-figures.mjs <course...> [--dry-run]
  *   node scripts/wire-course-figures.mjs --all [--dry-run]
+ *   node scripts/wire-course-figures.mjs --collection interview data-analyst
  *
  * Options:
- *   --all       Every directory under content/courses
- *   --dry-run   Report what would change; write nothing
- *   -h, --help  Show this help
+ *   --collection <name>  courses (default) or interview
+ *   --all                Every directory in the collection
+ *   --dry-run            Report what would change; write nothing
+ *   -h, --help           Show this help
  */
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const COURSES_DIR = join(ROOT, "content", "courses");
+
+/** Per-collection content directory and the two prompt categories that pair
+ *  with it: one thumbnail for `index.mdx`, one illustration per lesson page. */
+const COLLECTIONS = {
+  courses: {
+    dir: join(ROOT, "content", "courses"),
+    thumbnail: "course-thumbnail",
+    illustration: "course-illustration",
+  },
+  interview: {
+    dir: join(ROOT, "content", "interview"),
+    thumbnail: "interview-thumbnail",
+    illustration: "interview-illustration",
+  },
+};
 
 // A whole inline <svg> element. No <svg> nests inside another here, so the
 // non-greedy body is unambiguous.
@@ -116,19 +139,20 @@ function mdxFiles(dir) {
   return out;
 }
 
-export function wireCourse(course, prompts, { dryRun = false } = {}) {
+export function wireCourse(course, prompts, { dryRun = false, collection = "courses" } = {}) {
+  const { dir, thumbnail: thumbCategory, illustration } = COLLECTIONS[collection];
   const known = new Set(prompts.prompts.map((p) => p.id));
   const byLesson = new Map();
   let thumbnail = null;
   for (const p of prompts.prompts) {
     if (p.course !== course) continue;
-    if (p.category === "course-thumbnail") thumbnail = p;
-    else if (p.category === "course-illustration") byLesson.set(p.lesson, p);
+    if (p.category === thumbCategory) thumbnail = p;
+    else if (p.category === illustration) byLesson.set(p.lesson, p);
   }
 
   const stats = { wired: 0, alreadyOk: 0, svgRemoved: 0, staleDropped: 0, noPrompt: [] };
 
-  for (const file of mdxFiles(join(COURSES_DIR, course))) {
+  for (const file of mdxFiles(join(dir, course))) {
     const stem = basename(file).replace(/\.mdx?$/, "");
     const isIndex = stem === "index";
     const prompt = isIndex ? thumbnail : byLesson.get(stem);
@@ -197,9 +221,20 @@ function main() {
   const argv = process.argv.slice(2);
   if (argv.includes("-h") || argv.includes("--help")) return printHelp();
   const dryRun = argv.includes("--dry-run");
+  const flag = argv.indexOf("--collection");
+  const collection = flag === -1 ? "courses" : argv[flag + 1];
+  if (!COLLECTIONS[collection]) {
+    console.error(
+      `Unknown collection "${collection}". Expected one of: ${Object.keys(COLLECTIONS).join(", ")}`,
+    );
+    process.exitCode = 1;
+    return;
+  }
+  const { dir } = COLLECTIONS[collection];
+  const positional = argv.filter((a, i) => !a.startsWith("-") && i !== flag + 1);
   const courses = argv.includes("--all")
-    ? readdirSync(COURSES_DIR).filter((d) => statSync(join(COURSES_DIR, d)).isDirectory())
-    : argv.filter((a) => !a.startsWith("-"));
+    ? readdirSync(dir).filter((d) => statSync(join(dir, d)).isDirectory())
+    : positional;
   if (!courses.length) return printHelp();
 
   const prompts = JSON.parse(
@@ -208,7 +243,7 @@ function main() {
   const total = { wired: 0, alreadyOk: 0, svgRemoved: 0, staleDropped: 0, noPrompt: 0 };
 
   for (const course of courses.sort()) {
-    const s = wireCourse(course, prompts, { dryRun });
+    const s = wireCourse(course, prompts, { dryRun, collection });
     total.wired += s.wired;
     total.alreadyOk += s.alreadyOk;
     total.svgRemoved += s.svgRemoved;

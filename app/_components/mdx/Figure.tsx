@@ -3,7 +3,7 @@
  * screenshot, anything under `assets/images/`) inside a lesson or landing page:
  *
  * ```mdx
- * <Figure slug="panda" alt="A giant panda, mascot for the pandas library" priority />
+ * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three coloured lanes" priority />
  * ```
  *
  * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
@@ -46,7 +46,7 @@ const MIME: Record<string, string> = {
 };
 
 interface FigureProps {
-  /** Image slug, the source filename without extension (e.g. "panda"). */
+  /** Image slug, the source filename without extension (e.g. "pandas-groupby-cutout"). */
   slug: string;
   /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;

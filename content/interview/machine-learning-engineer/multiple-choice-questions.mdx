@@ -1,0 +1,1342 @@
+---
+title: Multiple Choice Questions
+description: 100 Machine Learning Engineer interview multiple choice questions covering ML fundamentals, deep learning, NLP and LLMs, ML system design, MLOps, statistics and probability, and coding for ML, each with an explanation for every option.
+---
+
+A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+on this track. Each one mirrors a decision an ML engineer actually makes on
+the job, and every option carries an explanation, so a wrong answer tells you
+exactly which idea to revisit.
+
+<Figure
+  slug="interview-machine-learning-engineer-multiple-choice-questions-cutout"
+  alt="The Dataslope marmot mascot on a platform pressing the last of four blank pill-shaped option slots on a wide card, three finished cards stacked beside it"
+/>
+
+Work through a section, then read the matching topic page for the long-form
+reasoning and runnable code.
+
+## ML fundamentals
+
+<MultipleChoice
+  markdown={`What separates supervised, unsupervised, and reinforcement learning?
+
+- The size of the labelled dataset each one requires.
+  > Data volume varies within each paradigm.
+- [o] The feedback signal available: labels, none, or rewards.
+  > Supervised learns from labelled input-output pairs, unsupervised finds structure in unlabelled data, and reinforcement learns a policy from rewards earned by acting. What separates them is the feedback available, not the algorithm used.
+- Whether a neural network or a classical algorithm is involved.
+  > All three can use neural networks or not.
+- Whether the output variable is continuous or discrete.
+  > That distinguishes regression from classification within supervised learning.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the bias–variance decomposition say about generalization error?
+
+- Generalization error comes down entirely to having too little data.
+  > More data reduces variance, not bias.
+- [o] It splits into bias squared, variance, and irreducible noise.
+  > Simple models carry high bias and low variance, flexible ones the reverse, and total error is minimized somewhere between. It explains why an underfit model does not improve with more data and an overfit one does.
+- Bias and variance always rise and fall together.
+  > They typically trade against each other as capacity changes.
+- Regularization can eliminate variance entirely.
+  > Regularization reduces variance at the cost of bias; it does not remove it.`}
+/>
+
+<MultipleChoice
+  markdown={`Why split data into train, validation, and test rather than just train and test?
+
+- It leaves more data available for training.
+  > Splitting three ways leaves less for training.
+- [o] Repeated tuning leaks information into the validation set.
+  > The test set stays untouched so the final estimate is honest. Every decision made by looking at the test set spends a little of its credibility.
+- Because k-fold cross-validation requires exactly three splits.
+  > Cross-validation replaces the validation split, using the folds instead.
+- To detect data drift before deployment.
+  > Drift is monitored in production, against live traffic.`}
+/>
+
+<MultipleChoice
+  markdown={`What is data leakage, and what is the structural defence?
+
+- Training data being accidentally exposed to the public internet.
+  > That is a security incident.
+- [o] Information unavailable at prediction time entering training.
+  > A future-derived feature or a transform fitted before the split will both do it. The defence is a pipeline that fits every transform inside the training fold. The tell is validation performance that is too good and collapses in production.
+- Overfitting the model to the training set.
+  > Overfitting shows up in validation; leakage hides from it.
+- Imputing missing values with the column mean.
+  > Mean imputation leaks only if the mean is computed over all the data, which is the pipeline point again.`}
+/>
+
+<MultipleChoice
+  markdown={`When is k-fold cross-validation the wrong choice?
+
+- When the dataset is very large.
+  > A large dataset makes it expensive, not wrong.
+- [o] On time series, where random folds leak the future into the past.
+  > A rolling-origin or expanding-window split is the correct form. Grouped data has the same problem: rows from one patient or one user must not straddle the split.
+- When the model being tuned is a deep neural network rather than a tree.
+  > Model family does not matter.
+- When the target classes are heavily imbalanced.
+  > Stratified k-fold handles that.`}
+/>
+
+<MultipleChoice
+  markdown={`What is early stopping, and what is the subtlety?
+
+- Halting training after a fixed number of epochs.
+  > A fixed budget is not early stopping.
+- [o] Stopping once validation performance stops improving.
+  > The best checkpoint is kept. The subtlety is that the epoch count is then itself a hyperparameter tuned on validation, so that score is optimistic. It is a form of regularization and costs nothing extra.
+- Stopping once the training loss reaches zero.
+  > Zero training loss is usually a sign of overfitting.
+- Stopping once the learning rate schedule reaches its minimum.
+  > That is a scheduler ending.`}
+/>
+
+<MultipleChoice
+  markdown={`How do batch, stochastic, and mini-batch gradient descent differ?
+
+- Only in the learning rate each one uses.
+  > They differ in how much data each update sees.
+- [o] In how many examples each parameter update is computed from.
+  > Batch uses the whole dataset (stable, slow), SGD one example (noisy, fast, able to escape shallow minima), mini-batch a subset. Mini-batch dominates because it is what keeps a GPU efficiently utilized.
+- SGD is fully deterministic while batch gradient descent is not.
+  > The randomness is in SGD's sampling.
+- Batch gradient descent cannot be parallelized.
+  > It parallelizes well; it is simply expensive per step.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the F1 score, and when is it the wrong summary?
+
+- The arithmetic average of accuracy and recall.
+  > It combines precision and recall.
+- [o] The harmonic mean of precision and recall.
+  > It is the wrong summary when the two errors have very different costs, since it weights them equally by construction. When a false negative costs ten times a false positive, an Fβ score or an explicit cost analysis is more honest.
+- The area under the precision-recall curve.
+  > That is PR-AUC, a different metric entirely.
+- The accuracy measured on the positive class only.
+  > That is recall.`}
+/>
+
+<MultipleChoice
+  markdown={`What do RMSE, MAE, and R² each tell you?
+
+- They are interchangeable measures of how well a regression fits.
+  > They respond differently to outliers and to scale.
+- [o] How harshly each one treats a large error, and in what units.
+  > RMSE penalizes large errors quadratically in the target's units, MAE weights every error linearly and is more robust, and R² is scale-free. A large gap between RMSE and MAE says a few big errors dominate.
+- RMSE suits classification and MAE suits regression.
+  > All three are regression metrics.
+- R² always falls between 0 and 1.
+  > On unseen data a model worse than predicting the mean gives a negative R².`}
+/>
+
+<MultipleChoice
+  markdown={`What is a parametric versus a non-parametric model?
+
+- Parametric models have hyperparameters and non-parametric ones do not.
+  > Both have hyperparameters.
+- [o] Whether the parameter count is fixed or grows with the data.
+  > A parametric model has a fixed number regardless of data size; a non-parametric one keeps growing, as kNN does by storing every training point. It is why kNN inference scales with the training set and linear regression does not.
+- Non-parametric models make no assumptions whatsoever.
+  > They make weaker distributional assumptions, not none.
+- Parametric models are incapable of overfitting.
+  > They can overfit, particularly with many parameters relative to data.`}
+/>
+
+<MultipleChoice
+  markdown={`How does kNN make a prediction, and what is its main practical cost?
+
+- It fits a small local linear model at each new query point.
+  > That is locally weighted regression.
+- [o] It votes or averages over the k nearest training points.
+  > The cost is that inference scans the training set, and the distance metric degrades in high dimensions. Feature scaling is mandatory, since an unscaled large-magnitude feature dominates the distance.
+- It builds a decision tree and traverses it per query.
+  > Index structures such as KD-trees accelerate the search; they are not the algorithm.
+- It learns a weight per feature by gradient descent.
+  > There is no training phase beyond storing the data.`}
+/>
+
+<MultipleChoice
+  markdown={`How does a support vector machine classify?
+
+- By fitting a probability distribution over each class.
+  > That is a generative classifier.
+- [o] By maximizing the margin between the classes.
+  > The separating hyperplane depends only on the support vectors, and a kernel handles non-linear boundaries implicitly. The kernel trick computes inner products in a high-dimensional space without ever constructing it, which is what makes it tractable.
+- By recursively splitting the feature space in two.
+  > That is a decision tree.
+- By averaging over the nearest labelled examples.
+  > That is kNN.`}
+/>
+
+<MultipleChoice
+  markdown={`What are embeddings, in the general ML sense?
+
+- Losslessly compressed copies of the raw input feature vectors.
+  > Compression is incidental; the geometry is the point.
+- [o] Dense learned vectors in which distance encodes similarity.
+  > They let discrete items such as words, users, and products feed models that need continuous input. It is also why one model's embeddings can power retrieval, clustering, and recommendation without retraining.
+- The final output layer of a neural network.
+  > That is usually called the output head.
+- One-hot encoded representations of categories.
+  > One-hot vectors are sparse and carry no similarity structure.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the curse of dimensionality?
+
+- Models simply take longer to train with more features.
+  > Compute cost is real but not the phenomenon.
+- [o] Data becomes sparse and pairwise distances converge.
+  > Volume grows so fast with dimension that every point ends up roughly equidistant, which undermines distance-based methods. It is why kNN and clustering degrade in high dimensions and dimensionality reduction helps them specifically.
+- High-dimensional data cannot be visualized directly.
+  > A practical inconvenience, not the statistical problem.
+- Adding more features always causes overfitting.
+  > Overfitting risk rises but is not guaranteed.`}
+/>
+
+<MultipleChoice
+  markdown={`What does gradient boosting do that a Random Forest does not?
+
+- Sample a random subset of the features at each candidate split.
+  > That is a Random Forest's distinguishing move.
+- [o] Fit each new tree to the errors the ensemble has left.
+  > Boosting reduces bias sequentially; a forest averages independent trees to reduce variance. Boosting typically reaches higher accuracy and is far easier to overfit, so learning rate, depth, and early stopping carry real weight.
+- Train all of its trees in parallel.
+  > Boosting is inherently sequential.
+- Restrict itself to shallow trees.
+  > Shallow trees are conventional in boosting but not the defining difference.`}
+/>
+
+## Deep learning
+
+<MultipleChoice
+  markdown={`What does a single artificial neuron compute?
+
+- A plain weighted sum of its inputs.
+  > That is only the first half of it.
+- [o] A weighted sum and bias, then a non-linear activation.
+  > Without the activation the whole network collapses to one linear map, which is why the non-linearity is essential rather than optional.
+- The dot product of two separate input vectors, unweighted.
+  > It weights one input vector by learned parameters.
+- A probability bounded between 0 and 1.
+  > Only with a sigmoid activation; ReLU is unbounded above.`}
+/>
+
+<MultipleChoice
+  markdown={`Compare sigmoid, tanh, and ReLU.
+
+- They are broadly interchangeable in practice.
+  > Their gradient behavior differs sharply.
+- [o] Both sigmoid and tanh saturate, where ReLU does not.
+  > Sigmoid squashes to (0,1), tanh is zero-centred but saturates too, and ReLU is cheap and non-saturating for positive inputs at the cost of dead units. Leaky ReLU and GELU keep its benefits while avoiding units stuck at zero.
+- ReLU is bounded above and sigmoid is not.
+  > It is the other way round.
+- Only sigmoid is usable in the hidden layers.
+  > ReLU is the default in hidden layers.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are CNNs well suited to images compared with a fully-connected network?
+
+- They have far more parameters, so they capture much finer detail.
+  > They have far fewer, which is part of the advantage.
+- [o] Local receptive fields and weight sharing are a correct prior.
+  > They encode translation equivariance and cut the parameter count enormously. A fully-connected layer on a 224×224 image would need tens of millions of parameters in the first layer alone.
+- They process the pixels one after another.
+  > Convolutions apply in parallel across the image.
+- They do not need non-linear activation functions.
+  > They need them exactly as much as any network.`}
+/>
+
+<MultipleChoice
+  markdown={`What do LSTMs and GRUs add over a vanilla RNN?
+
+- Substantially more hidden layers.
+  > Depth is orthogonal to the gating mechanism.
+- [o] Gates controlling what to keep, forget, and output.
+  > They provide a path along which gradients flow without repeated multiplicative shrinkage. GRUs merge some of the LSTM's gates for fewer parameters and often comparable performance.
+- Attention across the whole input sequence.
+  > Attention is a separate mechanism, added later.
+- The ability to run bidirectionally.
+  > Any RNN can be made bidirectional.`}
+/>
+
+<MultipleChoice
+  markdown={`Describe the transformer architecture at a high level.
+
+- Stacked convolutions with residual connections.
+  > Convolutions are not the core operation.
+- [o] Stacked self-attention and feed-forward sublayers.
+  > Each block wraps multi-head self-attention and a position-wise feed-forward network in residual connections and layer norm, with positional information injected because attention is order-agnostic. Removing recurrence is what lets the whole sequence train in parallel.
+- A recurrent encoder feeding a recurrent decoder.
+  > That is the pre-transformer seq2seq design.
+- An encoder-only network with no feed-forward layers.
+  > The feed-forward sublayer holds a large share of the parameters.`}
+/>
+
+<MultipleChoice
+  markdown={`How does layer normalization differ from batch normalization?
+
+- Layer norm normalizes across the whole batch.
+  > That is batch norm.
+- [o] Layer norm normalizes across features within one sample.
+  > That makes it independent of batch size and comfortable with variable-length sequences, which is why transformers use it; batch statistics are awkward there and with small batches.
+- They are exactly equivalent whenever layers are fully connected.
+  > They normalize along different axes and give different results.
+- Layer norm is applied at inference time only.
+  > It is active in both phases, unlike batch norm's running statistics.`}
+/>
+
+<MultipleChoice
+  markdown={`What causes exploding gradients, and what is the standard remedy?
+
+- A learning rate that is far too small.
+  > That causes slow convergence, not explosion.
+- [o] Repeated multiplication by values greater than one.
+  > Compounded through depth or time steps, it is remedied by gradient clipping, better initialization, and normalization layers. Clipping by global norm is the routine defence in RNN and transformer training.
+- Dropout applied at too high a rate.
+  > Dropout does not cause explosion.
+- Choosing ReLU as the activation.
+  > ReLU mitigates vanishing gradients; it is not a primary cause of explosion.`}
+/>
+
+<MultipleChoice
+  markdown={`What is transfer learning, and when is full fine-tuning worth it over feature extraction?
+
+- They are two names for one technique.
+  > They differ in which parameters are updated.
+- [o] Fine-tuning updates the backbone; feature extraction freezes it.
+  > Transfer learning is the umbrella: reusing a pretrained model. Full fine-tuning is worth it when you have enough task data and the domain differs from pretraining. On a small dataset it tends to overfit and destroy the pretrained representations.
+- Full fine-tuning is always the better option.
+  > On small datasets it frequently is not.
+- Feature extraction requires retraining the backbone from scratch.
+  > It trains only the new head.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is cross-entropy paired with softmax for classification?
+
+- Softmax requires it as a matter of definition.
+  > Other losses are computable; they are just worse.
+- [o] Their composition gives a clean predicted-minus-target gradient.
+  > That avoids the vanishing gradient MSE suffers on a saturated output. It is also why frameworks fuse the two into one numerically-stable operation rather than computing them separately.
+- Cross-entropy is much faster to compute.
+  > Speed is not the reason.
+- Softmax outputs are not valid probabilities without that pairing.
+  > Softmax outputs a distribution regardless of the loss.`}
+/>
+
+<MultipleChoice
+  markdown={`Why subtract the maximum before exponentiating in a softmax?
+
+- To make the outputs sum to exactly one.
+  > Division by the sum does that; the shift is separate.
+- [o] For numerical stability, since a large logit overflows.
+  > Subtracting the max leaves the result mathematically identical while keeping every exponent at most zero. It is why you should use the framework's fused implementation rather than writing softmax by hand.
+- To centre the output distribution at zero.
+  > Centring is not the goal.
+- To make the exponential noticeably cheaper to evaluate.
+  > Any speed difference is negligible.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a "dead ReLU" mean, and what causes it?
+
+- A neuron whose incoming weights have all decayed to zero.
+  > Zero weights are unusual and not what the term describes.
+- [o] A unit whose pre-activation is negative for every input.
+  > It outputs zero and receives no gradient, permanently, usually after too large a learning rate or a bad initialization. Leaky ReLU, ELU, and GELU all keep a small gradient on the negative side to avoid it.
+- A neuron switched off by dropout.
+  > Dropout is temporary and random.
+- A neuron that always outputs its maximum value.
+  > ReLU is unbounded above, so there is no maximum to saturate at.`}
+/>
+
+<MultipleChoice
+  markdown={`How should the learning rate be scheduled in practice?
+
+- Held fixed for the whole training run.
+  > A fixed rate is rarely optimal at both the start and the end.
+- [o] A short warmup, then decay on a cosine or step schedule.
+  > Early updates stay stable and later ones get fine-grained. Warmup matters most with adaptive optimizers and large batches, where the early moment estimates are unreliable.
+- Increased steadily from start to finish.
+  > A growing step size destabilizes convergence.
+- Set to the largest value that does not immediately produce NaN.
+  > That is the divergence boundary, not a good operating point.`}
+/>
+
+<MultipleChoice
+  markdown={`What do residual (skip) connections contribute?
+
+- They cut the network's parameter count.
+  > Parameters are unchanged.
+- [o] A direct path for gradients around each block.
+  > Very deep networks stay trainable and each block only has to learn a correction. It is the change that took networks from tens of layers to hundreds, and it appears in every transformer block.
+- They remove the need for normalization layers.
+  > Residuals and normalization are used together.
+- They allow layers to be skipped at inference for speed.
+  > The connection is always active.`}
+/>
+
+<MultipleChoice
+  markdown={`Compare Xavier (Glorot) and He initialization.
+
+- They are one scheme published under two names.
+  > They scale differently.
+- [o] He scales up to account for ReLU zeroing half the units.
+  > Xavier targets a variance suited to symmetric activations such as tanh. Using Xavier with deep ReLU networks makes activations shrink layer by layer.
+- He initialization sets every weight to the same constant.
+  > Both draw from a distribution.
+- Xavier applies only to convolutional layers.
+  > Both apply to any weight matrix.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does batch size interact with the learning rate?
+
+- Larger batches always call for a proportionally smaller learning rate.
+  > The relationship usually runs the other way.
+- [o] A bigger batch means a lower-variance gradient estimate.
+  > That makes a proportionally larger learning rate usable, the linear scaling rule, usually with warmup. Very large batches can still generalize worse, which is why the scaling is a heuristic rather than a law.
+- They are entirely independent hyperparameters.
+  > They are among the most coupled pair in training.
+- Batch size affects memory use and nothing else.
+  > Memory is the obvious constraint and not the only effect.`}
+/>
+
+<MultipleChoice
+  markdown={`What does gradient accumulation achieve?
+
+- It speeds up training on a single GPU device.
+  > It is slightly slower per effective batch.
+- [o] It simulates a large batch on limited memory.
+  > Gradients are summed over several forward and backward passes before the optimizer steps. The subtlety is that batch-norm statistics still use the small physical batch, so results are not identical to a true large batch.
+- It stores gradients for later analysis.
+  > Nothing is retained after the step.
+- It removes the need for an optimizer entirely.
+  > The optimizer still applies the accumulated gradient.`}
+/>
+
+<MultipleChoice
+  markdown={`What is knowledge distillation?
+
+- Removing every weight below some threshold.
+  > That is pruning.
+- [o] Training a small student to match a larger teacher's outputs.
+  > Matching the soft probability distribution rather than hard labels is what carries the extra information: the temperature-softened logits convey the teacher's relative confidence across classes.
+- Reducing the numeric precision of the weights.
+  > That is quantization.
+- Training the same architecture on a random subset of the data.
+  > Sampling is unrelated.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is data augmentation effective, and where does it go wrong?
+
+- It adds genuinely new information to the original training dataset.
+  > No new information is created; the invariances are what is being taught.
+- [o] It teaches invariances through label-preserving variation.
+  > That reduces overfitting, and it goes wrong when a transform changes the label, as flipping an image of a digit does. Applying augmentation to the validation set is the other common error, since it makes the measurement inconsistent.
+- It reliably improves accuracy either way.
+  > A badly chosen transform can hurt.
+- It removes any need for other regularization.
+  > It is one form of regularization among several.`}
+/>
+
+## NLP & LLMs
+
+<MultipleChoice
+  markdown={`Why is subword tokenization the standard?
+
+- It produces markedly shorter sequences than word-level tokenization.
+  > Sequences are usually longer than word-level ones.
+- [o] It bounds the vocabulary while still spelling any string.
+  > Rare and unseen words decompose into known pieces instead of collapsing to one unknown token. BPE, WordPiece, and SentencePiece are the common algorithms, and they handle morphology and code reasonably too.
+- It removes the need for an embedding layer.
+  > Tokens are still embedded.
+- It guarantees every token is a real morpheme.
+  > The splits are learned from frequency, not linguistics.`}
+/>
+
+<MultipleChoice
+  markdown={`What distinguishes contextual from static embeddings?
+
+- Contextual embeddings have far more dimensions.
+  > Dimensionality is a design choice.
+- [o] Whether the vector depends on the surrounding sentence.
+  > A static embedding gives one vector per word regardless of usage; a contextual one makes "bank" differ between a river and a loan. word2vec and GloVe are static; representations inside BERT or a GPT-style model are contextual.
+- Static embeddings are trained on far more text.
+  > Data volume is not the distinction.
+- Contextual embeddings need no pretraining at all.
+  > They come specifically from pretrained models.`}
+/>
+
+<MultipleChoice
+  markdown={`Why did transformers replace RNNs for most NLP?
+
+- They get by with far fewer parameters.
+  > They typically use many more.
+- [o] Removing recurrence lets the whole sequence train in parallel.
+  > Attention also gives every position direct access to every other, so a long dependency need not survive many sequential steps. The parallelism is what made training at internet scale practical.
+- They need far smaller training datasets to reach the same quality.
+  > They are more data-hungry, not less.
+- They remove any need for positional information.
+  > They need it added explicitly, precisely because attention is order-agnostic.`}
+/>
+
+<MultipleChoice
+  markdown={`What is parameter-efficient fine-tuning, and what does LoRA do?
+
+- Training the final classification layer only.
+  > That is classic feature extraction, one narrow form of the idea.
+- [o] Training a small set of added parameters, as LoRA does.
+  > LoRA injects trainable low-rank matrices alongside frozen weights, mergeable at inference. It cuts memory and checkpoint size enormously and lets many task-specific adapters share one base model.
+- Quantizing the model down to fewer bits.
+  > That is quantization, a serving optimization.
+- Distilling the weights into a smaller model.
+  > Distillation trains a separate student model.`}
+/>
+
+<MultipleChoice
+  markdown={`When would you choose RAG over fine-tuning?
+
+- When you need the model to adopt a specific tone and output format.
+  > Format and style are what fine-tuning does well.
+- [o] When the knowledge is current, changing, or needs a citation.
+  > The retrieval corpus updates without touching the weights. The two compose: fine-tune for behavior and format, retrieve for facts.
+- When end-to-end latency is the binding constraint.
+  > RAG adds a retrieval hop, so it usually costs latency.
+- When the available training data is very small.
+  > Small data does favour RAG, but currency and attribution are the decisive reasons.`}
+/>
+
+<MultipleChoice
+  markdown={`What causes hallucination, and what mitigates it?
+
+- Too few model parameters, so the fix is to scale the model up.
+  > Larger models hallucinate more fluently, not less reliably.
+- [o] It is trained for plausible continuations, not for truth.
+  > It fills gaps confidently. Grounding with retrieval, requiring citations, and constrained decoding all reduce it, and none eliminate it, which is why high-stakes outputs need verification rather than trust.
+- A decoding temperature that has been set to zero.
+  > Greedy decoding reduces randomness without guaranteeing factuality.
+- Errors introduced by the tokenizer.
+  > Tokenization is not the source.`}
+/>
+
+<MultipleChoice
+  markdown={`How do temperature and top-p control generation?
+
+- Temperature sets the maximum length of the output.
+  > Length is controlled separately.
+- [o] Temperature scales the logits; top-p bounds the candidate pool.
+  > Lower temperature is more deterministic, and top-p samples from the smallest set of tokens whose cumulative probability exceeds p, adapting per step. Temperature 0 makes decoding greedy, usually what you want for extraction and classification.
+- Top-p restricts the vocabulary to the p most frequent tokens overall.
+  > That is top-k; top-p is defined by cumulative probability.
+- They are two different names for one parameter.
+  > They interact but are distinct.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is attention's cost a bottleneck for long documents?
+
+- Memory use grows linearly with sequence length.
+  > Linear growth would not be a bottleneck.
+- [o] Time and memory scale quadratically with sequence length.
+  > FlashAttention improves the constant and memory pattern; sparse, linear, and sliding-window attention change the asymptotics.
+- Positional encodings grow ambiguous at length.
+  > Extrapolation is a real issue, but not the cost bottleneck.
+- The vocabulary grows with document length.
+  > Vocabulary is fixed.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you evaluate an LLM-based feature meaningfully?
+
+- Perplexity measured on a held-out corpus.
+  > Perplexity measures language modelling, not task usefulness.
+- [o] A task-specific graded eval set, plus a regression suite.
+  > Combine automatic metrics, model-based grading, and human review. The fixed regression suite is what stops a prompt change from quietly breaking last month's fix.
+- User satisfaction surveys and nothing else.
+  > Useful signal, far too slow and coarse to iterate on.
+- BLEU score alone, whatever the generation task happens to be.
+  > BLEU suits translation and correlates poorly with quality on open-ended generation.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a context window, and why does its size matter?
+
+- The number of documents a RAG system retrieves.
+  > Retrieval count is a separate parameter.
+- [o] The token budget the model can attend to in one pass.
+  > It covers prompt plus generation, bounds what can be supplied in-context, and interacts directly with attention's quadratic cost. Models also use the middle of a long context less effectively, so bigger is not automatically better.
+- The size of the model's token vocabulary.
+  > Vocabulary is unrelated.
+- The number of layers stacked inside the transformer.
+  > Depth is a separate dimension.`}
+/>
+
+<MultipleChoice
+  markdown={`What objectives are used to pretrain language models?
+
+- Supervised classification over large hand-labelled corpora.
+  > Pretraining is self-supervised precisely to avoid needing labels.
+- [o] Self-supervised objectives derived from the text itself.
+  > Next-token prediction for autoregressive models, masked-token prediction for encoder models. It is what allows training on internet-scale text with no annotation.
+- Reinforcement learning from human preferences.
+  > RLHF is an alignment stage applied after pretraining.
+- Contrastive learning between sentence pairs.
+  > Used for embedding models, not general pretraining.`}
+/>
+
+<MultipleChoice
+  markdown={`What are zero-shot, few-shot, and chain-of-thought prompting?
+
+- Three different names for one and the same underlying prompting technique.
+  > They differ in what the prompt supplies.
+- [o] Instruction only, instruction plus examples, and reasoning first.
+  > Zero-shot gives the instruction alone, few-shot adds worked examples, and chain-of-thought asks for intermediate reasoning. Chain-of-thought helps most on multi-step problems and costs more tokens, a real latency and price consideration.
+- Three different sizes of training dataset.
+  > None of them involve training.
+- Three alternative decoding strategies.
+  > Decoding is controlled separately by temperature and top-p.`}
+/>
+
+<MultipleChoice
+  markdown={`What are the moving parts of a RAG system?
+
+- A single model handed a much longer context window in place of it.
+  > A long context is an alternative to RAG, not its implementation.
+- [o] A chunked and embedded corpus, an index, a retriever, a generator.
+  > Chunk size and overlap, plus a reranker, usually matter more to output quality than the choice of generator.
+- A fine-tuned model paired with a cache.
+  > Caching is an optimization, not a component of retrieval.
+- A vector database and nothing more.
+  > The store is one piece of the pipeline.`}
+/>
+
+<MultipleChoice
+  markdown={`What are embeddings used for beyond feeding a model?
+
+- Only as the input layer of a model.
+  > Their reuse is much of their value.
+- [o] Search, clustering, deduplication, and recommendation.
+  > All of it works by comparing vectors rather than running the model again, which is why an embedding endpoint is often the most-used part of an LLM stack.
+- Compressing the source text for cheaper long-term storage.
+  > Embeddings are lossy and not invertible, so they cannot serve as compression.
+- Tokenizing the raw input text.
+  > Tokenization happens before embedding.`}
+/>
+
+<MultipleChoice
+  markdown={`How do word2vec and GloVe differ?
+
+- word2vec is contextual while GloVe is a purely static method.
+  > Both produce static embeddings.
+- [o] Local prediction windows against global co-occurrence counts.
+  > word2vec learns predictively from local windows (skip-gram or CBOW); GloVe factorizes a global co-occurrence matrix. They land in a similar place, which is part of why both were superseded by contextual models rather than by each other.
+- GloVe needs labelled training data.
+  > Both are unsupervised.
+- word2vec produces one vector per sentence.
+  > It produces one per word.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does chunk size matter in a retrieval pipeline?
+
+- It determines the dimension of each embedding.
+  > Dimension is fixed by the model.
+- [o] Too small loses context; too large dilutes the embedding.
+  > A large chunk also wastes context window on irrelevant text. Overlapping chunks and retrieving neighbours are the usual ways to keep boundaries from splitting an answer in half.
+- It affects retrieval latency and nothing else.
+  > Latency changes, but relevance is the bigger effect.
+- Smaller chunks are always better for precision.
+  > Below a certain size the chunk no longer contains a complete idea.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a reranker add to a retrieval pipeline?
+
+- It re-sorts the results by recency.
+  > Recency is a metadata filter.
+- [o] A slower, more accurate rescoring of the top candidates.
+  > A cross-encoder sees query and document together rather than comparing two independent embeddings. Retrieve broadly and rerank narrowly is the standard shape, trading a little latency for a large relevance gain.
+- It strips near-duplicate documents out of the result set.
+  > Deduplication is a separate step.
+- It compresses the retrieved passages.
+  > Compression is a different optimization.`}
+/>
+
+## ML system design
+
+<MultipleChoice
+  markdown={`When do you choose batch inference over online inference?
+
+- Whenever the model is a large one.
+  > Model size affects cost, not the fundamental choice.
+- [o] When the entities are known ahead of time, so it is a lookup.
+  > Daily churn scores and precomputed recommendations fit. It is dramatically simpler and cheaper; online inference is for when the input is only known at request time.
+- When the input data happens to arrive as a continuous stream.
+  > Streaming input usually argues for online or near-online scoring.
+- When the latency requirement is a strict one.
+  > Strict latency is met by precomputation *or* by an optimized online path; the availability of the input is the deciding factor.`}
+/>
+
+<MultipleChoice
+  markdown={`What problem does a feature store solve?
+
+- Storing the trained model artifacts.
+  > That is a model registry.
+- [o] One definition of each feature for both training and serving.
+  > An offline store holds point-in-time-correct history, an online store serves low-latency lookups. Without it the same feature gets implemented twice in two languages and quietly diverges, which is training–serving skew.
+- Caching the model's most recent predictions so they can be reused.
+  > Prediction caching is separate.
+- Versioning each training dataset.
+  > Data versioning is adjacent but distinct.`}
+/>
+
+<MultipleChoice
+  markdown={`What is training–serving skew?
+
+- The model performing worse over time.
+  > That is drift or degradation.
+- [o] The features at serving time differ from those in training.
+  > Different code paths, different aggregation windows, or a leaked future value all cause it. It shows up as offline metrics that do not survive contact with production, and it is one of the most common causes of a "good" model failing.
+- The gap between training accuracy and held-out test accuracy.
+  > That is overfitting.
+- Latency differences between environments.
+  > Latency is an operational concern.`}
+/>
+
+<MultipleChoice
+  markdown={`How do data drift, concept drift, and performance degradation differ?
+
+- They are three names for the same thing.
+  > They have different causes and different responses.
+- [o] Inputs shifted, the input-output relationship shifted, metrics fell.
+  > Those are data drift, concept drift, and performance degradation in turn, and either drift can cause the drop. Data drift is detectable without labels; concept drift usually is not, which is why label delay matters so much.
+- Concept drift only affects classification.
+  > It affects any supervised task.
+- Data drift invariably causes model performance to degrade in production.
+  > A model can be robust to a shift in a feature it barely uses.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you detect drift when labels arrive weeks late or never?
+
+- Wait for the labels to arrive, then measure.
+  > That leaves the model unmonitored for the whole delay.
+- [o] Monitor unlabelled proxies against a training baseline.
+  > Input feature distributions, the prediction distribution, and model confidence all work. PSI and KL divergence are the usual measures, and a shifting prediction distribution is often the earliest signal available.
+- Retrain on a schedule and assume it is fine.
+  > Blind retraining can bake in a problem rather than fix it.
+- Compare the output against a second model's predictions.
+  > A useful check, but both can drift together.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a shadow deployment?
+
+- Serving the new model to a small percentage of the live traffic.
+  > That is a canary.
+- [o] Running on real traffic, logging predictions but serving none.
+  > It validates the serving path, behavior, and latency at zero user risk. It cannot measure business impact, since nobody sees the output.
+- Deploying the model to a staging environment.
+  > Staging usually lacks real traffic.
+- Running the model on historical data.
+  > That is backtesting.`}
+/>
+
+<MultipleChoice
+  markdown={`How does a canary deployment differ from shadow testing?
+
+- A canary is driven by synthetic traffic.
+  > It uses real traffic and real users.
+- [o] A canary serves real users; shadow serves nobody.
+  > That is why a canary can measure business metrics, with harm bounded by the share of traffic. Shadow first, canary second is the usual order, since shadow catches crashes before any user sees them.
+- Canary requires a separate cluster.
+  > It typically shares infrastructure with weighted routing.
+- Shadow testing is what measures conversion.
+  > Shadow predictions are never shown, so no behavioral metric exists.`}
+/>
+
+<MultipleChoice
+  markdown={`What belongs in a model registry?
+
+- Only the serialized model weights.
+  > Weights alone cannot be traced or reproduced.
+- [o] Versioned models with their full lineage.
+  > Training data and code versions, hyperparameters, evaluation metrics, stage transitions, and approval history. It is the artifact that answers "what exactly is in production and how was it made" during an incident.
+- The whole of the training dataset itself, stored in full.
+  > Data is versioned separately and referenced by the registry.
+- The live prediction logs.
+  > Those go to monitoring.`}
+/>
+
+<MultipleChoice
+  markdown={`What triggers retraining in a well-run system?
+
+- A fixed weekly schedule, always.
+  > A schedule is a reasonable floor, not a complete policy.
+- [o] A schedule, plus drift and performance thresholds, plus events.
+  > The evaluation gate before promotion matters most: automatic retraining without an automatic quality check is how a bad model reaches production unattended.
+- A noticeable drop in traffic.
+  > Traffic volume is not a model-quality signal.
+- A manual request from an engineer, and nothing else.
+  > Manual-only works until the person responsible is on holiday.`}
+/>
+
+<MultipleChoice
+  markdown={`What is an evaluation gate in a training pipeline?
+
+- A check that the training code compiles.
+  > That is CI for the code.
+- [o] An automated candidate-versus-incumbent comparison.
+  > It runs on a held-out set and on key segments, blocking promotion unless the candidate clears the bar. Segment checks matter: an overall improvement can hide a serious regression for one group.
+- A human sign-off step before release.
+  > Human review may follow, but the gate is automated.
+- A benchmark of serving latency.
+  > Latency belongs in the gate but is not the whole of it.`}
+/>
+
+<MultipleChoice
+  markdown={`How does request batching improve GPU throughput?
+
+- It reduces the served model's memory footprint substantially.
+  > Batching increases activation memory.
+- [o] It amortizes launch overhead and keeps the GPU saturated.
+  > Throughput rises at the cost of added per-request latency while the batch fills. Dynamic batching with a short timeout is the standard compromise between the two.
+- It removes the need for a request queue.
+  > It requires a queue.
+- It improves the model's accuracy.
+  > Accuracy is unaffected at inference.`}
+/>
+
+<MultipleChoice
+  markdown={`What does model quantization do, and what does it cost?
+
+- Removes redundant weights from the model.
+  > That is pruning.
+- [o] Represents weights and activations at lower precision.
+  > int8 or 4-bit instead of fp32 cuts memory and often latency, at some accuracy cost. Post-training quantization is quick; quantization-aware training recovers more of the accuracy for more effort.
+- Compresses the model file for storage only.
+  > The compute itself runs at lower precision.
+- Trains a smaller model to imitate a larger one.
+  > That is distillation.`}
+/>
+
+<MultipleChoice
+  markdown={`How would you handle cold start in a recommender?
+
+- Recommend the most recent items.
+  > Recency alone ignores quality and relevance.
+- [o] Fall back to content features and popularity, then collect signal.
+  > Onboarding preferences or light exploration gather it quickly. Collaborative filtering has no signal at all for an entity with no interactions, which is the whole of the problem.
+- Wait until enough interactions have accumulated to model.
+  > A poor first experience means they may never accumulate.
+- Train one separate model for each user.
+  > There is no data to train it on.`}
+/>
+
+<MultipleChoice
+  markdown={`Sketch the core of a fraud detection system. What is the defining constraint?
+
+- Maximizing overall classification accuracy.
+  > At a fraction of a percent fraud rate, accuracy is meaningless.
+- [o] Extreme imbalance, asymmetric costs, and an adapting adversary.
+  > Add a hard latency budget and precision-recall trade-offs, fast features, and frequent retraining dominate the design. Label delay from chargebacks is the other structural problem: you learn you were wrong weeks later.
+- Model interpretability, prized above everything else.
+  > Explanations matter for disputes, but they are not the defining constraint.
+- Using the largest model you can afford.
+  > Latency budgets usually rule that out.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the population stability index used for?
+
+- Measuring the model's accuracy.
+  > It never looks at the target.
+- [o] Quantifying how far a distribution has moved from baseline.
+  > It is a label-free drift signal over a feature or a score. Rules of thumb put below 0.1 as stable and above 0.25 as a significant shift, though the thresholds are conventions rather than laws.
+- Detecting noise in the labels.
+  > Label quality is assessed differently.
+- Measuring the degree of class imbalance in the training set.
+  > Imbalance is a property of one dataset, not a comparison between two.`}
+/>
+
+## MLOps
+
+<MultipleChoice
+  markdown={`How does MLOps differ from ordinary DevOps?
+
+- It relies on an entirely different deployment toolchain.
+  > The tooling overlaps heavily.
+- [o] Behavior depends on data as well as code.
+  > Data and models must be versioned and tested too, and a system can degrade with no code change at all. That last point is the crux: nothing shipped, and the model is quietly worse than last month.
+- It depends on containerization.
+  > Containers are common in both.
+- It applies to deep learning only.
+  > It applies to any deployed model.`}
+/>
+
+<MultipleChoice
+  markdown={`What do you need to version to reproduce a model?
+
+- The trained model weights.
+  > Weights alone cannot be re-derived.
+- [o] Code, data snapshot, environment, hyperparameters, and seeds.
+  > Missing any one of these turns "reproduce last quarter's model" into an archaeology project.
+- The training code and the training data, and nothing more than that.
+  > A dependency upgrade alone can change results.
+- The logs from the training run.
+  > Logs describe the run; they do not reproduce it.`}
+/>
+
+<MultipleChoice
+  markdown={`What is continuous training?
+
+- Training a model in a loop that never stops running.
+  > Nothing runs indefinitely.
+- [o] An automated retraining pipeline behind an evaluation gate.
+  > Schedule, drift, or new data can trigger it. It is the ML-specific extension of CI/CD, and the gate is what separates it from automated damage.
+- Fine-tuning the model on every request.
+  > Online learning is a distinct and much riskier approach.
+- Training several models in parallel.
+  > That is a hyperparameter sweep.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you roll back a model safely?
+
+- Retrain the earlier version from scratch.
+  > Slow, and it may not reproduce exactly.
+- [o] Keep the previous version registered and deployable.
+  > Rollback is then a routing change rather than a rebuild. The overlooked half is the feature pipeline: a rolled-back model needs the features it was trained on to still exist.
+- Revert the code commit and redeploy.
+  > A code revert does not restore the model artifact or its features.
+- Disable the model and return a default.
+  > A valid emergency stop, but not a rollback.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a champion/challenger setup?
+
+- Two teams competing on the same task.
+  > It concerns models, not teams.
+- [o] The incumbent serves while candidates are evaluated in parallel.
+  > Shadow or a small traffic share, with promotion only on demonstrated improvement. It makes model replacement a continuous, evidence-driven process rather than an occasional event.
+- A/B testing two product features.
+  > That is feature experimentation.
+- Training two models and averaging their predictions.
+  > That is an ensemble.`}
+/>
+
+<MultipleChoice
+  markdown={`What should you monitor for a model in production?
+
+- Accuracy, and nothing besides.
+  > Labels often arrive late or never, so accuracy cannot be the only signal.
+- [o] Operational health, data health, model behavior, and outcomes.
+  > Latency and errors, schema and distributions, prediction distribution and confidence, then business metrics where labels allow. Most incidents are visible in the data layer well before the business layer notices.
+- The distributions of the input features, and nothing beyond that.
+  > Necessary but incomplete.
+- The headline business KPI only.
+  > By the time the KPI moves, the cause is hard to isolate.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you version training data practically?
+
+- Copy the whole dataset into a new folder on each run.
+  > It works and does not scale or deduplicate.
+- [o] Snapshot it behind an immutable reference.
+  > A table version or time-travel timestamp in a lakehouse format, or content-addressed storage such as DVC, recorded alongside the model. The requirement is that the exact rows can be recovered later, not that a copy exists somewhere.
+- Record the query that built the dataset.
+  > A query against a mutable table returns different data tomorrow.
+- Version the schema and leave it there.
+  > Schema without content does not reproduce anything.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does experiment tracking matter?
+
+- It is required by most frameworks.
+  > No framework requires it.
+- [o] Runs cannot be compared or reproduced without a record.
+  > Parameters, data version, code version, and metrics per run are the minimum, or the best model becomes unrecoverable. It is also what makes a stalled project resumable by someone who was not there.
+- It speeds up training.
+  > It adds a small overhead.
+- It removes any need to run a separate model registry.
+  > Tracking covers experiments; the registry governs what is deployable.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you package a model for deployment?
+
+- Pickle the object and load it in production.
+  > Pickle is version-fragile and unsafe with untrusted input.
+- [o] The artifact plus its preprocessing, containerized.
+  > A portable format such as ONNX or a framework serving format, inside a container pinning the exact runtime and dependencies. Preprocessing travelling with the model is the part most often forgotten, and it is where skew creeps in.
+- Export the weights as a text file.
+  > Weights alone lack architecture and preprocessing.
+- Retrain the model inside the serving container at startup.
+  > Non-deterministic and slow to start.`}
+/>
+
+<MultipleChoice
+  markdown={`What does blue/green deployment mean for models?
+
+- Splitting traffic evenly between two models.
+  > Even splitting is A/B testing.
+- [o] Two full environments, with one atomic traffic switch.
+  > The new version stands up alongside the old on separate infrastructure, and the old one stays ready for instant rollback. It costs double the resources during the switch and gives the fastest possible reversal.
+- Deploying to two regions.
+  > Multi-region is a separate topology.
+- Running the new model against a copy of the production data.
+  > That is shadow testing.`}
+/>
+
+<MultipleChoice
+  markdown={`What are the stages of a CI/CD pipeline for models?
+
+- Build, test, and deploy, exactly as you would for an ordinary web service.
+  > The data and model stages are what make it different.
+- [o] Code checks, data validation, training, evaluation, then rollout.
+  > Evaluation compares the candidate against the incumbent on held-out and segmented data before artifact registration, staged rollout, and monitoring. It is the stage with no analogue in ordinary software CI.
+- Train, deploy, monitor.
+  > This omits validation and the promotion gate.
+- Lint, package, publish.
+  > That is a library release process.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is data validation before training essential?
+
+- It makes the training run faster.
+  > Any speed effect is incidental.
+- [o] Corrupted input yields a model that is confidently wrong.
+  > The failure then surfaces much later and much more expensively than a failed check would have. Schema, null rates, ranges, and category sets are the usual assertions, compared against a training baseline.
+- It is required for reproducibility.
+  > Reproducibility comes from versioning.
+- It removes the need for a separate model evaluation stage.
+  > They catch different classes of problem.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between throughput and latency in model serving?
+
+- Two names for the same measurement.
+  > They frequently move in opposite directions.
+- [o] One request's duration against requests served per second.
+  > Batching raises throughput while adding latency. Which one you optimize follows from the product: interactive features are latency-bound, offline scoring is throughput-bound.
+- Throughput matters only for batch inference.
+  > It is central to sizing an online service too.
+- Lower latency per request always implies higher overall throughput.
+  > Serving one request at a time minimizes latency and wastes GPU capacity.`}
+/>
+
+<MultipleChoice
+  markdown={`When is a GPU worth it for serving, rather than a CPU?
+
+- Always, because GPUs are simply faster.
+  > For small models at low volume a GPU sits idle and costs more.
+- [o] Large models with enough traffic to keep the device busy.
+  > Transformers qualify: the arithmetic is parallel and batching fills the device. Small trees and linear models often serve faster on CPU once you account for transfer overhead.
+- During training runs only.
+  > Serving benefits too.
+- When the model has more than a million parameters.
+  > A million parameters is small; the threshold is far higher and depends on traffic.`}
+/>
+
+<MultipleChoice
+  markdown={`How do feedback loops distort a deployed model?
+
+- They quietly improve the model all by themselves over time.
+  > They can, and they can also entrench errors.
+- [o] Its own predictions decide which data ever gets labelled.
+  > A recommender only gets feedback on what it showed, so retraining on that data reinforces existing behavior. Deliberate exploration, or logging propensity scores so the bias can be corrected, is the standard mitigation.
+- They are what causes data drift.
+  > Drift is externally driven; this is self-inflicted.
+- They only occur in reinforcement learning.
+  > Any system whose output influences its future training data has them.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you ensure an ML experiment is reproducible?
+
+- Save the final evaluation metrics.
+  > Metrics record the outcome, not how to recreate it.
+- [o] Pin versions, data, seeds, hyperparameters, and precision.
+  > All five, including the hardware settings that affect numerics. GPU non-determinism means bitwise reproducibility sometimes needs explicit deterministic flags, at a speed cost.
+- Reuse the same random seed on every training run.
+  > Necessary and far from sufficient.
+- Run the training twice and compare.
+  > That tests reproducibility rather than establishing it.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you scale a serving endpoint under variable load?
+
+- Provision for peak load and simply leave it running.
+  > Simple, and it pays for idle capacity all day.
+- [o] Autoscale on saturation, keeping warm headroom.
+  > Queue depth or in-flight requests beat CPU as the signal, and the warm capacity absorbs the scale-up delay. Model containers are slow to start, so that headroom matters more than for a stateless web service.
+- Put a cache in front of the model.
+  > Effective when inputs repeat, and most do not.
+- Cut the batch size when load rises.
+  > Smaller batches lower throughput exactly when it is needed most.`}
+/>
+
+## Statistics, probability & coding for ML
+
+<MultipleChoice
+  markdown={`What is the difference between a PMF and a PDF?
+
+- A PMF applies to continuous variables.
+  > It applies to discrete ones.
+- [o] A PMF gives probabilities; a PDF gives a density.
+  > A PMF covers discrete outcomes; under a PDF only the area over a region is a probability. It is why a PDF's value can exceed 1 while a PMF's cannot.
+- A PDF sums to one across its outcomes.
+  > It integrates to one; summation is the discrete case.
+- They are the same function published under different names.
+  > They are defined for different variable types.`}
+/>
+
+<MultipleChoice
+  markdown={`What is bootstrapping, and when is it useful?
+
+- Training a model repeatedly on its own earlier predictions.
+  > That is self-training.
+- [o] Resampling the data with replacement, many times over.
+  > It approximates the sampling distribution of a statistic where no closed-form standard error exists. Confidence intervals for a median, an AUC, or any custom metric are the typical uses.
+- Initializing weights before training.
+  > Unrelated to initialization.
+- Removing outliers one round at a time.
+  > That is trimming.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a permutation test?
+
+- A test of whether data is normally distributed.
+  > That is a normality test.
+- [o] Shuffling the group labels to build the null distribution.
+  > The observed statistic is then located within it. The test assumes very little about the distribution, which makes it a good default for an unusual statistic or a small sample.
+- A test that permutes the features to measure their importance.
+  > Permutation *importance* borrows the idea for a different purpose.
+- A non-parametric alternative to bootstrapping.
+  > They are related resampling methods answering different questions.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does NumPy vectorization beat a Python \`for\` loop?
+
+- NumPy spreads the work across multiple CPU cores by default.
+  > Most element-wise operations are single-threaded.
+- [o] The loop runs in compiled C over a contiguous typed array.
+  > That avoids per-element Python object overhead and interpreter dispatch. Contiguity also lets the CPU prefetch and vectorize, which is where the remaining factor comes from.
+- It simply uses less memory.
+  > Arrays are more compact, but speed comes from the execution model.
+- It quietly offloads work to the GPU.
+  > NumPy is CPU-only; that is what CuPy and framework tensors are for.`}
+/>
+
+<MultipleChoice
+  markdown={`What is broadcasting in NumPy?
+
+- Copying an array to every worker process.
+  > That is a distributed-computing broadcast.
+- [o] Expanding size-one dimensions so shapes line up.
+  > Arrays of different shapes combine element-wise without the expansion ever being materialized. Subtracting a per-column mean from a matrix is the everyday case: shape \`(n, d)\` against \`(d,)\`.
+- Converting an array to a different dtype.
+  > That is casting.
+- Flattening a multi-dimensional array down to one dimension.
+  > That is reshaping.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you find the top-k scores efficiently from n items when k is small?
+
+- Sort the whole array and take the first k.
+  > O(n log n) when you do not need the rest ordered.
+- [o] \`np.argpartition\` in O(n), then sort only the k selected, or a size-k heap when streaming.
+  > The distinction matters when n is millions and k is ten.
+- Loop over the array and take the running maximum k separate times.
+  > O(nk), fine for tiny k and worse as k grows.
+- Deduplicate with a set before sorting.
+  > Deduplication is a different operation.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you compute cosine similarity between two vectors in NumPy?
+
+- \`np.dot(a, b)\` on the raw vectors.
+  > That is the unnormalized dot product.
+- [o] \`np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))\`
+  > Pre-normalizing every vector once turns a batch of similarities into a single matrix multiplication, which is how vector search works.
+- \`np.corrcoef(a, b)[0, 1]\`, the correlation.
+  > Correlation centres both vectors first, which is a different measure.
+- \`1 / np.linalg.norm(a - b)\`, an inverse distance.
+  > That is a function of Euclidean distance.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do float32 and float64 matter for ML data?
+
+- float64 always gives better model accuracy.
+  > Model accuracy rarely improves, while memory doubles.
+- [o] float32 halves memory and is what GPUs are tuned for.
+  > Frameworks default to it, and float16 or bfloat16 go further at some numerical risk. Accidentally holding a large dataset as float64 is a common and needless doubling of memory.
+- float32 cannot represent negative numbers.
+  > It represents the full signed range.
+- The difference only affects training runs, never inference.
+  > It affects both.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you shuffle features and labels together correctly?
+
+- Call a shuffle on each array separately.
+  > That destroys the correspondence between rows and labels.
+- [o] Permute the indices once and index both arrays with it.
+  > \`sklearn.utils.shuffle\` does exactly this, and setting a seed makes the split reproducible.
+- Sort both arrays by an added random column.
+  > A workable hack that is easy to get subtly wrong.
+- Shuffle only the features, since labels are aligned by position.
+  > Alignment by position is precisely what shuffling one side breaks.`}
+/>
+
+<MultipleChoice
+  markdown={`What is reservoir sampling, and when do you need it?
+
+- Sampling with replacement from a fixed, fully-known dataset.
+  > That is bootstrap sampling.
+- [o] A uniform sample of k items from a stream, in one pass.
+  > The i-th element replaces an existing one with probability k/i. It is the answer when the data does not fit in memory and you cannot count it in advance.
+- Sampling in proportion to a per-item weight.
+  > That is weighted sampling, a related variant.
+- Buffering the whole stream, then sampling.
+  > Buffering everything is exactly what it avoids.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the Central Limit Theorem let an ML engineer do?
+
+- Assume any dataset is normally distributed.
+  > The data itself need not be.
+- [o] Treat the sampling distribution of a mean as normal.
+  > A mean loss or a mean metric across batches qualifies, which is what underpins confidence intervals on evaluation results and gives a measured metric a computable margin of error.
+- Justify picking MSE as the loss.
+  > MSE follows from a Gaussian noise assumption on the residuals, not from the CLT.
+- Safely ignore the outliers.
+  > Outliers still affect means, and heavy tails slow convergence to normality.`}
+/>
+
+<MultipleChoice
+  markdown={`What is selection bias, and how does it reach a training set?
+
+- Choosing the wrong set of features.
+  > That is feature selection.
+- [o] The training sample does not represent who the model serves.
+  > A fraud model trained only on reviewed transactions, or a survey answered only by active users. The model then performs well offline and badly on the population it never saw.
+- Sampling the data with replacement.
+  > That is bootstrapping.
+- Selecting the best-performing model on the test set.
+  > That is test-set overfitting, a related but different error.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does correlation not imply causation, and what would establish it?
+
+- Correlation is simply unreliable on small samples.
+  > Sample size affects precision, not the logical gap.
+- [o] A confounder, reverse causation, or selection can all explain it.
+  > Randomized assignment, or a credible quasi-experimental design, is what closes the gap. For a model this often does not matter, until someone proposes intervening on a feature, at which point it matters entirely.
+- It does when the correlation exceeds 0.9.
+  > Strength does not convert association into causation.
+- Only experiments can produce correlations.
+  > Observational data produces them routinely.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you compute pairwise Euclidean distances between the rows of a matrix efficiently?
+
+- A nested Python loop over row pairs.
+  > It produces the right answer, hundreds of times slower than the vectorized form.
+- [o] Expand the square, or call \`scipy.spatial.distance.cdist\`.
+  > Both compute every pair in compiled code with one matrix multiplication. The expansion trick can produce small negative values from floating-point error, so clip at zero before taking the square root.
+- Sort the rows first, then compare each adjacent neighbour.
+  > Sorting does not give all pairwise distances.
+- Call \`np.linalg.norm\` on the whole matrix.
+  > That returns a single norm, not a distance matrix.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the complexity of a naive kNN prediction, and how does a heap help?
+
+- O(1), since it just looks up neighbours.
+  > Every training point has to be considered.
+- [o] O(n log n) sorted, or O(n log k) with a size-k heap.
+  > A spatial index or approximate search does better still in low dimensions. At high dimensionality exact indexes lose their advantage, which is why approximate nearest neighbour libraries dominate vector search.
+- O(k), independent of the training set size.
+  > Cost scales with n.
+- O(n²) for every single prediction.
+  > That is the cost of all-pairs distances, not one query.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you compute precision and recall from scratch given predictions and labels?
+
+- Precision is correct predictions over total predictions.
+  > That is accuracy.
+- [o] TP / (TP + FP) and TP / (TP + FN) respectively.
+  > One measures how many flagged items were right, the other how many real positives were caught. Guard the denominators: a model that predicts no positives has an undefined precision rather than a zero one.
+- Precision works out as TP / (TP + FN).
+  > That is recall.
+- Recall works out as TN / (TN + FP).
+  > That is specificity.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you decode class predictions from a probability matrix?
+
+- Take the row-wise sum of the matrix.
+  > Each row already sums to one under softmax.
+- [o] \`np.argmax(probs, axis=1)\`, or a threshold per class.
+  > Argmax gives the predicted class index; thresholding a chosen class suits an asymmetric decision cost. Argmax implicitly assumes equal error costs, which is a decision worth making explicitly.
+- Round each probability to 0 or 1.
+  > That can produce several positives or none in a single-label setting.
+- \`np.max(probs, axis=1)\` for each row.
+  > That returns the confidence, not which class it belongs to.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you implement mini-batching for training?
+
+- Slice the array into fixed chunks in order, the same way every epoch.
+  > A fixed order lets the model learn the ordering, particularly if the data is sorted by label.
+- [o] Shuffle the indices each epoch, then slice the permutation.
+  > Decide deliberately whether to drop or keep the final partial batch. Keeping the ragged one is fine unless batch norm is involved, where a batch of one causes trouble.
+- Sample rows randomly with replacement each step.
+  > That is bootstrap sampling; some rows are seen twice per epoch and others not at all.
+- Load the whole dataset and pass it in one batch.
+  > That is full-batch gradient descent.`}
+/>
+
+## Keep practicing
+
+Missed a few? Each section maps to a topic page with the long-form reasoning
+and runnable code:
+
+- [ML fundamentals](/interview-prep/machine-learning-engineer/ml-fundamentals)
+- [Deep learning](/interview-prep/machine-learning-engineer/deep-learning)
+- [NLP & LLMs](/interview-prep/machine-learning-engineer/nlp-and-llms)
+- [ML system design](/interview-prep/machine-learning-engineer/ml-system-design)
+- [MLOps & deployment](/interview-prep/machine-learning-engineer/mlops)
+- [Statistics & probability](/interview-prep/machine-learning-engineer/statistics-and-probability)
+- [Coding & algorithms for ML](/interview-prep/machine-learning-engineer/coding)
