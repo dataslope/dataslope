@@ -18,7 +18,8 @@
 //                            statement's truth value.
 //
 // Used both as a CLI (`node scripts/check-mcq.mjs [files...]`, defaults to
-// all course + fumadocs-dev content) and as a library by __tests__/mcqContent.test.ts.
+// all course + interview + fumadocs-dev content) and as a library by
+// __tests__/mcqContent.test.ts.
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -169,6 +170,7 @@ if (isMain) {
   const args = process.argv.slice(2);
   const roots = [
     path.join(process.cwd(), "content", "courses"),
+    path.join(process.cwd(), "content", "interview"),
     path.join(process.cwd(), "content", "fumadocs-dev"),
   ];
   const files = args.length ? args : roots.flatMap((root) => findMcqFiles(root));

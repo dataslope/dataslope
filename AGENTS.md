@@ -110,7 +110,9 @@ keepers; only the keepers reach git.
    serves, and runs `build-images` to record their dimensions.
 5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
    across a course, clears retired slugs, and is idempotent. Always `--dry-run`
-   first.
+   first. Pass `--collection interview` for an interview-prep track, which pairs
+   pages with `interview-thumbnail` / `interview-illustration` prompts under
+   `content/interview` instead of the `course-*` pair under `content/courses`.
 
 ```bash
 # Bulk run: candidates land in R2 under one run id, promote only the keepers.
@@ -123,6 +125,8 @@ node scripts/remove-background-kie.mjs --from r2 --run 2026-08-foo --concurrency
 node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-foo
 node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
   node scripts/wire-course-figures.mjs <course-dir>
+# …or, for an interview-prep track:
+node scripts/wire-course-figures.mjs --collection interview <role-dir> --dry-run
 
 # Local run: everything on disk, nothing touches R2. Fine for one or two images.
 node scripts/generate-illustrations.mjs run

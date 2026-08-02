@@ -8,9 +8,10 @@ import { findMcqFiles, lintFiles } from "../scripts/check-mcq.mjs";
 // contradictory duplicate options, too-few choices, and affirmative-opening
 // explanations (which render as false praise for learners who answered
 // wrong, see AGENTS.md). Runs as part of `npm test`.
-describe("content/courses + content/fumadocs-dev <MultipleChoice> corpus", () => {
+describe("content/courses + content/interview + content/fumadocs-dev <MultipleChoice> corpus", () => {
   const files = [
     ...findMcqFiles(path.join(process.cwd(), "content", "courses")),
+    ...findMcqFiles(path.join(process.cwd(), "content", "interview")),
     ...findMcqFiles(path.join(process.cwd(), "content", "fumadocs-dev")),
   ];
 

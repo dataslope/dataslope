@@ -9739,6 +9739,102 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot holding up a bright star"
+    },
+    {
+      "id": "interview-data-analyst-sql",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "sql",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "SQL interview questions",
+      "mascot": false,
+      "subject": "two stacks of coloured row tiles on a platform bridged into one combined table, with a small funnel above filtering rows down into three grouped bars"
+    },
+    {
+      "id": "interview-data-analyst-pandas",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "pandas",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Pandas interview questions",
+      "mascot": true,
+      "subject": "a giant panda sliding one labelled column out of a two-dimensional grid platform while three grouped stacks of tiles rise beside it"
+    },
+    {
+      "id": "interview-data-analyst-statistics-and-communication",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "statistics-and-communication",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Statistics and communication interview questions",
+      "mascot": false,
+      "subject": "a smooth bell-shaped curve model standing on a platform beside a small easel holding three plain bars, a pointer resting between them"
+    },
+    {
+      "id": "interview-data-analyst-advanced-sql",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "advanced-sql",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Advanced SQL interview questions",
+      "mascot": false,
+      "subject": "a long rail of evenly spaced blocks on a platform with a transparent sliding frame hovering over three consecutive blocks and a rising staircase of totals beside it"
+    },
+    {
+      "id": "interview-data-analyst-excel-and-spreadsheets",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "excel-and-spreadsheets",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Excel and spreadsheets interview questions",
+      "mascot": false,
+      "subject": "a spreadsheet grid platform whose cells are filled with blue, green, red, and yellow tiles, one corner peeling up and folding a block of those coloured cells into a compact cross-tab tray beside it"
+    },
+    {
+      "id": "interview-data-analyst-data-visualization",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "data-visualization",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Data visualization and storytelling interview questions",
+      "mascot": false,
+      "subject": "three plain chart plaques standing in a row on a platform, one of bars, one of a rising line, one a circular disc split into wedges, beside a small stand of colour swatches"
+    },
+    {
+      "id": "interview-data-analyst-ab-testing-and-metrics",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "ab-testing-and-metrics",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "A/B testing and metrics interview questions",
+      "mascot": false,
+      "subject": "a platform split into two identical lanes of small cubes, each lane ending in its own collection bin, with a balance scale tipping slightly between them"
+    },
+    {
+      "id": "interview-data-analyst-multiple-choice-questions",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "multiple-choice-questions",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Multiple choice practice questions",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot standing on a platform beside a large blank card with four empty pill-shaped option slots, pressing the one that lights up"
     }
   ]
 }

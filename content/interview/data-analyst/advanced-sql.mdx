@@ -8,6 +8,11 @@ Once you clear the basic SQL screen, the follow-ups get analytical:
 This page is a question bank with **runnable** DuckDB challenges so you can
 try the patterns interviewers actually ask for.
 
+<Figure
+  slug="interview-data-analyst-advanced-sql-cutout"
+  alt="A long rail of evenly spaced blocks on a platform with a transparent sliding frame hovering over three consecutive blocks and a rising staircase of totals beside it"
+/>
+
 > **SQL dialect:** the runnable blocks execute in your browser on **DuckDB**. The syntax is standard SQL; most of it runs unchanged on Postgres, BigQuery, or Snowflake.
 
 ## Q&A
@@ -328,7 +333,7 @@ SELECT * FROM ranked WHERE rn = 1;
 - The \`PARTITION BY\` is being ignored.
   > It isn't; each region still resets. The issue is the frame the \`ORDER BY\` implies.
 - [o] Adding \`ORDER BY\` set the default frame to \`UNBOUNDED PRECEDING\` to \`CURRENT ROW\`, making it a running total.
-  > Exactly, drop the \`ORDER BY\` or use \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\` for the full-partition total.
+  > Drop the \`ORDER BY\` or use \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\` for the full-partition total.
 - \`SUM\` can't be used as a window function.
   > It can; aggregate functions become window functions with an \`OVER\` clause.
 - You need \`GROUP BY region\` instead.
